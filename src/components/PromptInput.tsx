@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Sparkles } from "lucide-react";
 
 interface PromptInputProps {
   onGenerate: (prompt: string) => void;
@@ -30,8 +31,8 @@ export default function PromptInput({ onGenerate, isGenerating }: PromptInputPro
   };
 
   return (
-    <div className="p-4 border-b border-gray-200">
-      <label className="block text-xs font-medium text-gray-500 mb-2">
+    <div className="p-4 border-b border-white/[0.06]">
+      <label className="block text-xs font-medium text-white/40 mb-2 uppercase tracking-wider">
         Describe your website
       </label>
 
@@ -42,24 +43,25 @@ export default function PromptInput({ onGenerate, isGenerating }: PromptInputPro
         placeholder="A modern landing page for a SaaS product..."
         disabled={isGenerating}
         rows={4}
-        className="w-full bg-white border border-gray-200 rounded-lg px-3.5 py-2.5
-                   text-sm text-gray-900 placeholder-gray-400
-                   focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400
+        className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-3.5 py-2.5
+                   text-sm text-white/90 placeholder-white/20
+                   focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30
                    transition-all resize-none disabled:opacity-50"
       />
 
       <button
         onClick={handleSubmit}
         disabled={!prompt.trim() || isGenerating}
-        className="w-full mt-3 px-4 py-2.5 text-sm font-medium text-white
-                   bg-brand-600 hover:bg-brand-700 rounded-lg
-                   transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        className="w-full mt-3 px-4 py-2.5 text-sm font-semibold text-white
+                   btn-gradient rounded-xl flex items-center justify-center gap-2
+                   disabled:opacity-40 disabled:cursor-not-allowed"
       >
-        {isGenerating ? "Generating..." : "Generate website"}
+        <Sparkles className="w-4 h-4" />
+        <span>{isGenerating ? "Generating..." : "Generate Website"}</span>
       </button>
 
       <div className="mt-4">
-        <div className="text-[11px] font-medium text-gray-400 mb-2">
+        <div className="text-[11px] font-medium text-white/20 mb-2 uppercase tracking-wider">
           Try an example
         </div>
         <div className="flex flex-col gap-1">
@@ -68,7 +70,7 @@ export default function PromptInput({ onGenerate, isGenerating }: PromptInputPro
               key={i}
               onClick={() => setPrompt(example)}
               disabled={isGenerating}
-              className="text-left text-xs text-gray-400 hover:text-brand-600
+              className="text-left text-xs text-white/25 hover:text-brand-400
                          transition-colors truncate disabled:opacity-30"
             >
               {example}
