@@ -1,153 +1,46 @@
-@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* === CYBERPUNK BASE === */
 :root {
-  --cyber-magenta: #ff2d7b;
-  --cyber-cyan: #00f0ff;
-  --cyber-yellow: #f0ff00;
-  --cyber-purple: #b829ff;
-  --cyber-green: #39ff14;
-  --cyber-black: #0a0a0f;
-  --cyber-dark: #12121a;
+  --brand: #4c6ef5;
+  --brand-light: #dbe4ff;
 }
 
 body {
-  background-color: var(--cyber-black);
-  color: #e0e0e0;
-  font-family: "Rajdhani", sans-serif;
+  background-color: #fafbfc;
+  color: #1a1a2e;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* === SCROLLBAR === */
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--cyber-black);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--cyber-magenta);
+  background: #d1d5db;
   border-radius: 3px;
 }
-
-/* === GLITCH TEXT EFFECT === */
-.glitch-text {
-  position: relative;
-  display: inline-block;
-}
-.glitch-text::before,
-.glitch-text::after {
-  content: attr(data-text);
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-.glitch-text::before {
-  animation: glitchTop 2s infinite;
-  clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
-  color: var(--cyber-cyan);
-}
-.glitch-text::after {
-  animation: glitchBottom 1.5s infinite;
-  clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
-  color: var(--cyber-magenta);
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
 }
 
-@keyframes glitchTop {
-  0%, 100% { transform: translate(0); }
-  20% { transform: translate(-3px, -1px); }
-  40% { transform: translate(3px, 1px); }
-  60% { transform: translate(-1px, -2px); }
-}
-@keyframes glitchBottom {
-  0%, 100% { transform: translate(0); }
-  25% { transform: translate(2px, 1px); }
-  50% { transform: translate(-3px, -1px); }
-  75% { transform: translate(1px, 2px); }
-}
-
-/* === NEON GLOW UTILITIES === */
-.glow-magenta {
-  box-shadow: 0 0 10px var(--cyber-magenta), 0 0 30px rgba(255, 45, 123, 0.3);
-}
-.glow-cyan {
-  box-shadow: 0 0 10px var(--cyber-cyan), 0 0 30px rgba(0, 240, 255, 0.3);
-}
-.glow-text-magenta {
-  text-shadow: 0 0 10px var(--cyber-magenta), 0 0 30px rgba(255, 45, 123, 0.5);
-}
-.glow-text-cyan {
-  text-shadow: 0 0 10px var(--cyber-cyan), 0 0 30px rgba(0, 240, 255, 0.5);
-}
-
-/* === SCAN LINE OVERLAY === */
-.scan-lines::after {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(0, 0, 0, 0.05) 0px,
-    rgba(0, 0, 0, 0.05) 1px,
-    transparent 1px,
-    transparent 3px
-  );
-  z-index: 9999;
-}
-
-/* === CYBER GRID BACKGROUND === */
-.cyber-grid {
-  background-image:
-    linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
-}
-
-/* === CYBER BUTTON === */
-.cyber-btn {
-  position: relative;
-  padding: 12px 28px;
-  font-family: "Orbitron", sans-serif;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  border: 1px solid var(--cyber-magenta);
-  background: rgba(255, 45, 123, 0.1);
-  color: var(--cyber-magenta);
-  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-.cyber-btn:hover {
-  background: rgba(255, 45, 123, 0.25);
-  box-shadow: 0 0 20px rgba(255, 45, 123, 0.4);
-}
-
-/* === CYBER PANEL === */
-.cyber-panel {
-  background: rgba(26, 26, 46, 0.8);
-  border: 1px solid rgba(0, 240, 255, 0.15);
-  backdrop-filter: blur(10px);
-}
-
-/* === CODE OUTPUT STYLING === */
+/* Code block styling */
 .code-output pre {
-  background: rgba(10, 10, 15, 0.9);
-  border: 1px solid rgba(0, 240, 255, 0.1);
-  border-radius: 4px;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
   padding: 16px;
   overflow-x: auto;
-  font-family: "Share Tech Mono", monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 13px;
-  line-height: 1.6;
-  color: #e0e0e0;
+  line-height: 1.7;
+  color: #343a40;
 }

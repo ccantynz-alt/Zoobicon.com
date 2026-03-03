@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ZOOBICON // AI Website Builder",
-  description: "Build websites from the future. Powered by AI.",
+  title: "Zoobicon - AI Website Builder",
+  description: "Describe a website and watch it come to life. Powered by AI.",
 };
 
 export default function RootLayout({
@@ -13,7 +13,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="scan-lines cyber-grid min-h-screen">
+      <body className="min-h-screen bg-[#fafbfc]">
         {children}
       </body>
     </html>

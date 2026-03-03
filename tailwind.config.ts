@@ -9,55 +9,31 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        cyber: {
-          black: "#0a0a0f",
-          dark: "#12121a",
-          panel: "#1a1a2e",
-          border: "#2a2a4a",
-          magenta: "#ff2d7b",
-          cyan: "#00f0ff",
-          yellow: "#f0ff00",
-          purple: "#b829ff",
-          green: "#39ff14",
+        brand: {
+          50: "#f0f4ff",
+          100: "#dbe4ff",
+          200: "#bac8ff",
+          300: "#91a7ff",
+          400: "#748ffc",
+          500: "#5c7cfa",
+          600: "#4c6ef5",
+          700: "#4263eb",
+          800: "#3b5bdb",
+          900: "#364fc7",
         },
       },
       fontFamily: {
-        mono: ["'Share Tech Mono'", "monospace"],
-        display: ["'Orbitron'", "sans-serif"],
-        body: ["'Rajdhani'", "sans-serif"],
+        sans: ["'Inter'", "system-ui", "-apple-system", "sans-serif"],
+        mono: ["'JetBrains Mono'", "'SF Mono'", "'Fira Code'", "monospace"],
       },
-      animation: {
-        "glitch": "glitch 2s infinite",
-        "pulse-glow": "pulseGlow 2s ease-in-out infinite",
-        "scan-line": "scanLine 4s linear infinite",
-        "flicker": "flicker 3s infinite",
-        "typing": "typing 1s steps(20) forwards",
+      borderRadius: {
+        xl: "12px",
+        "2xl": "16px",
       },
-      keyframes: {
-        glitch: {
-          "0%, 100%": { transform: "translate(0)" },
-          "20%": { transform: "translate(-2px, 2px)" },
-          "40%": { transform: "translate(-2px, -2px)" },
-          "60%": { transform: "translate(2px, 2px)" },
-          "80%": { transform: "translate(2px, -2px)" },
-        },
-        pulseGlow: {
-          "0%, 100%": { opacity: "1" },
-          "50%": { opacity: "0.5" },
-        },
-        scanLine: {
-          "0%": { transform: "translateY(-100%)" },
-          "100%": { transform: "translateY(100vh)" },
-        },
-        flicker: {
-          "0%, 100%": { opacity: "1" },
-          "33%": { opacity: "0.8" },
-          "66%": { opacity: "0.95" },
-        },
-        typing: {
-          "0%": { width: "0" },
-          "100%": { width: "100%" },
-        },
+      boxShadow: {
+        soft: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+        card: "0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.03)",
+        elevated: "0 10px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04)",
       },
     },
   },
