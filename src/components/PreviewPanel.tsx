@@ -8,19 +8,17 @@ interface PreviewPanelProps {
 export default function PreviewPanel({ code, isGenerating }: PreviewPanelProps) {
   if (isGenerating) {
     return (
-      <div className="flex items-center justify-center h-full">
+      <div className="flex items-center justify-center h-full bg-gray-50">
         <div className="text-center">
-          <div className="relative inline-block mb-6">
-            {/* Spinning ring */}
-            <div className="w-20 h-20 border-2 border-cyber-magenta/20 rounded-full" />
-            <div className="absolute inset-0 w-20 h-20 border-2 border-transparent border-t-cyber-magenta rounded-full animate-spin" />
-            <div className="absolute inset-2 w-16 h-16 border border-transparent border-b-cyber-cyan rounded-full animate-spin" style={{ animationDirection: "reverse", animationDuration: "1.5s" }} />
+          <div className="relative inline-block mb-4">
+            <div className="w-10 h-10 border-2 border-gray-200 rounded-full" />
+            <div className="absolute inset-0 w-10 h-10 border-2 border-transparent border-t-brand-500 rounded-full animate-spin" />
           </div>
-          <div className="font-display text-sm text-cyber-magenta tracking-widest uppercase animate-pulse">
-            Building...
+          <div className="text-sm font-medium text-gray-700">
+            Building your website...
           </div>
-          <div className="font-mono text-[10px] text-gray-600 mt-2">
-            AI is constructing your website
+          <div className="text-xs text-gray-400 mt-1">
+            This may take a few seconds
           </div>
         </div>
       </div>
@@ -29,16 +27,16 @@ export default function PreviewPanel({ code, isGenerating }: PreviewPanelProps) 
 
   if (!code) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center max-w-md">
-          <div className="font-display text-4xl font-black text-cyber-magenta/20 mb-4 tracking-wider">
-            ZOOBICON
+      <div className="flex items-center justify-center h-full bg-gray-50">
+        <div className="text-center max-w-sm">
+          <div className="text-2xl font-semibold text-gray-200 mb-2 tracking-tight">
+            Zoobicon
           </div>
-          <div className="font-body text-gray-600 text-sm">
+          <div className="text-sm text-gray-400">
             Describe a website and watch it come to life.
           </div>
-          <div className="font-mono text-[10px] text-cyber-cyan/30 mt-6">
-            [ AWAITING INPUT ]
+          <div className="text-xs text-gray-300 mt-4">
+            Your preview will appear here
           </div>
         </div>
       </div>

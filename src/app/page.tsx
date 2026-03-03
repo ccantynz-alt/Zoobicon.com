@@ -18,7 +18,7 @@ export default function BuilderPage() {
     setIsGenerating(true);
     setError("");
     setGeneratedCode("");
-    setBuildLog(["[ZOOBICON] Initializing AI core...", "[ZOOBICON] Parsing prompt..."]);
+    setBuildLog(["Initializing...", "Parsing prompt..."]);
 
     try {
       const response = await fetch("/api/generate", {
@@ -32,7 +32,7 @@ export default function BuilderPage() {
         throw new Error(data.error || "Generation failed");
       }
 
-      setBuildLog((prev) => [...prev, "[ZOOBICON] AI is building your site..."]);
+      setBuildLog((prev) => [...prev, "Building your site..."]);
 
       const data = await response.json();
       const code = data.code || "";
@@ -40,15 +40,15 @@ export default function BuilderPage() {
       setGeneratedCode(code);
       setBuildLog((prev) => [
         ...prev,
-        "[ZOOBICON] Code generated successfully",
-        `[ZOOBICON] Output: ${code.length} characters`,
-        "[ZOOBICON] Ready for preview ✓",
+        "Code generated successfully",
+        `Output: ${code.length} characters`,
+        "Ready for preview",
       ]);
       setActiveTab("preview");
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Unknown error";
       setError(message);
-      setBuildLog((prev) => [...prev, `[ERROR] ${message}`]);
+      setBuildLog((prev) => [...prev, `Error: ${message}`]);
     } finally {
       setIsGenerating(false);
     }
@@ -59,68 +59,68 @@ export default function BuilderPage() {
       <TopBar />
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Left: Prompt & Build Log */}
-        <div className="w-[400px] flex flex-col border-r border-cyber-border bg-cyber-dark/50">
+        {/* Left sidebar */}
+        <div className="w-[380px] flex flex-col border-r border-gray-200 bg-white">
           <PromptInput onGenerate={handleGenerate} isGenerating={isGenerating} />
 
           {/* Build Log */}
           <div className="flex-1 overflow-y-auto p-4 font-mono text-xs">
-            <div className="text-cyber-cyan/50 mb-2 font-display text-[10px] uppercase tracking-widest">
-              // Build Log
+            <div className="text-[11px] font-medium text-gray-400 mb-2">
+              Activity log
             </div>
             {buildLog.map((line, i) => (
               <div
                 key={i}
                 className={`py-0.5 ${
-                  line.includes("[ERROR]")
-                    ? "text-cyber-magenta"
-                    : line.includes("✓")
-                    ? "text-cyber-green"
-                    : "text-cyber-cyan/70"
+                  line.startsWith("Error")
+                    ? "text-red-500"
+                    : line.includes("Ready")
+                    ? "text-emerald-500"
+                    : "text-gray-500"
                 }`}
               >
                 {line}
               </div>
             ))}
             {isGenerating && (
-              <div className="text-cyber-yellow animate-pulse">
-                [ZOOBICON] Processing...
+              <div className="text-brand-500 animate-pulse">
+                Processing...
               </div>
             )}
           </div>
         </div>
 
-        {/* Right: Preview / Code */}
+        {/* Main content */}
         <div className="flex-1 flex flex-col">
-          {/* Tab Bar */}
-          <div className="flex border-b border-cyber-border bg-cyber-dark/30">
+          {/* Tab bar */}
+          <div className="flex border-b border-gray-200 bg-white">
             <button
               onClick={() => setActiveTab("preview")}
-              className={`px-6 py-3 font-display text-xs uppercase tracking-widest transition-all ${
+              className={`px-5 py-2.5 text-xs font-medium transition-all ${
                 activeTab === "preview"
-                  ? "text-cyber-magenta border-b-2 border-cyber-magenta bg-cyber-magenta/5"
-                  : "text-gray-500 hover:text-gray-300"
+                  ? "text-brand-600 border-b-2 border-brand-500"
+                  : "text-gray-400 hover:text-gray-600"
               }`}
             >
-              ◈ Preview
+              Preview
             </button>
             <button
               onClick={() => setActiveTab("code")}
-              className={`px-6 py-3 font-display text-xs uppercase tracking-widest transition-all ${
+              className={`px-5 py-2.5 text-xs font-medium transition-all ${
                 activeTab === "code"
-                  ? "text-cyber-cyan border-b-2 border-cyber-cyan bg-cyber-cyan/5"
-                  : "text-gray-500 hover:text-gray-300"
+                  ? "text-brand-600 border-b-2 border-brand-500"
+                  : "text-gray-400 hover:text-gray-600"
               }`}
             >
-              ◈ Code
+              Code
             </button>
           </div>
 
-          {/* Content Area */}
+          {/* Content */}
           <div className="flex-1 overflow-hidden">
             {error && (
-              <div className="m-4 p-4 border border-cyber-magenta bg-cyber-magenta/10 text-cyber-magenta font-mono text-sm">
-                ⚠ {error}
+              <div className="m-4 p-3 border border-red-200 bg-red-50 text-red-600 rounded-lg text-sm">
+                {error}
               </div>
             )}
 

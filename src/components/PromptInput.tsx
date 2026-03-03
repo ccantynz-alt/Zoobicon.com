@@ -8,10 +8,10 @@ interface PromptInputProps {
 }
 
 const EXAMPLE_PROMPTS = [
-  "A portfolio site for a cyberpunk photographer with neon gallery",
-  "A landing page for an AI startup with animated hero section",
-  "A restaurant menu page with dark theme and food categories",
-  "A personal blog with minimalist design and smooth animations",
+  "A portfolio site for a photographer with a grid gallery",
+  "A landing page for an AI startup with a hero section",
+  "A restaurant menu page with food categories and pricing",
+  "A personal blog with a minimalist design",
 ];
 
 export default function PromptInput({ onGenerate, isGenerating }: PromptInputProps) {
@@ -30,51 +30,48 @@ export default function PromptInput({ onGenerate, isGenerating }: PromptInputPro
   };
 
   return (
-    <div className="p-4 border-b border-cyber-border">
-      <div className="text-cyber-cyan/50 mb-3 font-display text-[10px] uppercase tracking-widest">
-        // Describe Your Website
-      </div>
+    <div className="p-4 border-b border-gray-200">
+      <label className="block text-xs font-medium text-gray-500 mb-2">
+        Describe your website
+      </label>
 
       <textarea
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="Tell ZOOBICON what to build..."
+        placeholder="A modern landing page for a SaaS product..."
         disabled={isGenerating}
         rows={4}
-        className="w-full bg-cyber-black/60 border border-cyber-border rounded px-4 py-3 
-                   text-sm font-body text-gray-200 placeholder-gray-600 
-                   focus:outline-none focus:border-cyber-magenta focus:shadow-[0_0_15px_rgba(255,45,123,0.15)]
+        className="w-full bg-white border border-gray-200 rounded-lg px-3.5 py-2.5
+                   text-sm text-gray-900 placeholder-gray-400
+                   focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400
                    transition-all resize-none disabled:opacity-50"
       />
 
       <button
         onClick={handleSubmit}
         disabled={!prompt.trim() || isGenerating}
-        className="cyber-btn w-full mt-3 text-sm disabled:opacity-30 disabled:cursor-not-allowed"
+        className="w-full mt-3 px-4 py-2.5 text-sm font-medium text-white
+                   bg-brand-600 hover:bg-brand-700 rounded-lg
+                   transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
       >
-        {isGenerating ? (
-          <span className="animate-pulse">◈ GENERATING...</span>
-        ) : (
-          "◈ BUILD WEBSITE"
-        )}
+        {isGenerating ? "Generating..." : "Generate website"}
       </button>
 
-      {/* Example Prompts */}
       <div className="mt-4">
-        <div className="text-gray-600 text-[10px] font-display uppercase tracking-widest mb-2">
-          // Quick Start
+        <div className="text-[11px] font-medium text-gray-400 mb-2">
+          Try an example
         </div>
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-1">
           {EXAMPLE_PROMPTS.map((example, i) => (
             <button
               key={i}
               onClick={() => setPrompt(example)}
               disabled={isGenerating}
-              className="text-left text-xs text-cyber-cyan/40 hover:text-cyber-cyan/80 
-                         transition-colors font-mono truncate disabled:opacity-30"
+              className="text-left text-xs text-gray-400 hover:text-brand-600
+                         transition-colors truncate disabled:opacity-30"
             >
-              → {example}
+              {example}
             </button>
           ))}
         </div>
