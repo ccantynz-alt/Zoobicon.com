@@ -5,29 +5,23 @@ const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-const SYSTEM_PROMPT = `You are ZOOBICON, the most advanced AI website builder on the planet.
-You generate complete, single-file HTML websites based on user descriptions.
+const SYSTEM_PROMPT = `You are ZOOBICON's AI editing assistant. The user has a generated HTML website and wants to make changes to it.
 
 RULES:
-- Output ONLY valid HTML. No markdown, no explanation, no backticks.
-- Include all CSS inline in a <style> tag.
-- Include all JavaScript inline in a <script> tag.
-- Use modern CSS (grid, flexbox, custom properties, animations, transitions).
-- Make designs visually striking — bold colors, smooth animations, clean typography.
-- Use Google Fonts via CDN link for beautiful typography.
-- The output must be a complete, self-contained HTML document.
-- Make it responsive (works on mobile and desktop).
-- Include hover effects, micro-interactions, and smooth transitions.
-- Use semantic HTML5 elements.
-- Add proper meta tags for SEO.
-- NEVER include any text before or after the HTML. Just the HTML.`;
+- You will receive the current HTML code and a user instruction for changes.
+- Output ONLY the complete updated HTML. No markdown, no explanation, no backticks.
+- Preserve all existing structure and styles unless the user asks to change them.
+- Make only the changes the user requests.
+- Keep the code clean and well-organized.
+- Maintain responsiveness.
+- NEVER include any text before or after the HTML. Just the complete updated HTML.`;
 
 export async function POST(request: NextRequest) {
   try {
-    const { prompt, template } = await request.json();
+    const { currentCode, instruction } = await request.json();
 
-    if (!prompt || typeof prompt !== "string") {
-      return new Response(JSON.stringify({ error: "A prompt is required" }), {
+    if (!instruction || typeof instruction !== "string") {
+      return new Response(JSON.stringify({ error: "An instruction is required" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
@@ -35,14 +29,14 @@ export async function POST(request: NextRequest) {
 
     if (!process.env.ANTHROPIC_API_KEY) {
       return new Response(
-        JSON.stringify({ error: "ANTHROPIC_API_KEY is not configured. Add it to your .env.local file." }),
+        JSON.stringify({ error: "ANTHROPIC_API_KEY is not configured." }),
         { status: 500, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    const userMessage = template
-      ? `Build me a website based on this template style: "${template}". User requirements: ${prompt}`
-      : `Build me a website: ${prompt}`;
+    const userMessage = currentCode
+      ? `Here is the current website HTML:\n\n${currentCode}\n\nPlease make this change: ${instruction}`
+      : `Create a website with this requirement: ${instruction}`;
 
     const stream = await client.messages.stream({
       model: "claude-sonnet-4-5-20250514",
@@ -61,9 +55,8 @@ export async function POST(request: NextRequest) {
               event.type === "content_block_delta" &&
               event.delta.type === "text_delta"
             ) {
-              const chunk = event.delta.text;
               controller.enqueue(
-                encoder.encode(`data: ${JSON.stringify({ type: "chunk", content: chunk })}\n\n`)
+                encoder.encode(`data: ${JSON.stringify({ type: "chunk", content: event.delta.text })}\n\n`)
               );
             }
           }
@@ -89,8 +82,8 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (err: unknown) {
-    console.error("Generation error:", err);
-    const message = err instanceof Error ? err.message : "Generation failed";
+    console.error("Chat error:", err);
+    const message = err instanceof Error ? err.message : "Chat failed";
     return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
