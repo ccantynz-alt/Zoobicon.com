@@ -23,6 +23,7 @@ import {
   BookOpen,
   MessageCircle,
 } from "lucide-react";
+import SupportAvatar from "@/components/SupportAvatar";
 
 interface Message {
   role: "user" | "assistant";
@@ -206,17 +207,18 @@ export default function SupportPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="text-center mb-10"
+                className="flex flex-col items-center mb-10"
               >
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500/20 to-accent-purple/20 border border-brand-500/20 flex items-center justify-center mx-auto mb-6">
-                  <MessageCircle className="w-8 h-8 text-brand-400" />
+                {/* Zoe avatar */}
+                <div className="mb-6">
+                  <SupportAvatar isSpeaking={false} size="lg" />
                 </div>
-                <h1 className="text-3xl md:text-4xl font-black tracking-tight mb-3">
-                  How can we help?
+                <h1 className="text-3xl md:text-4xl font-black tracking-tight mb-3 text-center">
+                  Hi, I&apos;m Zoe!
                 </h1>
-                <p className="text-base text-white/40 max-w-lg mx-auto">
-                  Ask anything about Zoobicon — our products, features, billing, DNS,
-                  or how to get the most out of the platform.
+                <p className="text-base text-white/40 max-w-lg mx-auto text-center">
+                  Your Zoobicon AI support assistant. Ask me anything about our products,
+                  features, billing, DNS, or how to get the most out of the platform.
                 </p>
                 <div className="flex items-center justify-center gap-2 mt-3">
                   <Shield className="w-3.5 h-3.5 text-white/20" />
@@ -259,7 +261,7 @@ export default function SupportPage() {
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={handleKeyDown}
-                      placeholder="Ask about Zoobicon..."
+                      placeholder="Ask Zoe about Zoobicon..."
                       rows={1}
                       className="flex-1 bg-transparent px-5 py-4 text-white placeholder:text-white/25 outline-none text-base resize-none max-h-32"
                       style={{ minHeight: "56px" }}
@@ -318,8 +320,11 @@ export default function SupportPage() {
                       className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                     >
                       {msg.role === "assistant" && (
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500/20 to-accent-purple/20 border border-brand-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <Bot className="w-4 h-4 text-brand-400" />
+                        <div className="flex-shrink-0 mt-0.5">
+                          <SupportAvatar
+                            isSpeaking={isStreaming && i === messages.length - 1}
+                            size="sm"
+                          />
                         </div>
                       )}
                       <div
@@ -334,7 +339,7 @@ export default function SupportPage() {
                         ) : (
                           <div className="flex items-center gap-2 text-white/30">
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            <span className="text-xs">Thinking...</span>
+                            <span className="text-xs">Zoe is typing...</span>
                           </div>
                         )}
                       </div>
@@ -359,7 +364,7 @@ export default function SupportPage() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder={isStreaming ? "Waiting for response..." : "Ask about Zoobicon..."}
+                    placeholder={isStreaming ? "Waiting for response..." : "Ask Zoe about Zoobicon..."}
                     disabled={isStreaming}
                     rows={1}
                     className="flex-1 bg-transparent px-5 py-3.5 text-white placeholder:text-white/25 outline-none text-sm resize-none max-h-32 disabled:opacity-50"
