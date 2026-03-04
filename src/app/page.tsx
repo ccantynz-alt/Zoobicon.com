@@ -46,6 +46,7 @@ const PRODUCTS = [
     glowColor: "shadow-glow",
     domain: "zoobicon.ai",
     tag: "Core Product",
+    href: "/products/website-builder",
   },
   {
     icon: Search,
@@ -55,6 +56,7 @@ const PRODUCTS = [
     glowColor: "shadow-glow-cyan",
     domain: "zoobicon.com",
     tag: "Agent",
+    href: "/products/seo-agent",
   },
   {
     icon: Video,
@@ -64,6 +66,7 @@ const PRODUCTS = [
     glowColor: "shadow-glow-purple",
     domain: "zoobicon.com",
     tag: "Creator",
+    href: "/products/video-creator",
   },
   {
     icon: Palette,
@@ -120,6 +123,7 @@ const DOMAINS = [
     icon: Zap,
     color: "text-brand-400",
     borderColor: "border-brand-500/30",
+    href: "/",
   },
   {
     domain: "zoobicon.ai",
@@ -128,6 +132,7 @@ const DOMAINS = [
     icon: Sparkles,
     color: "text-accent-purple",
     borderColor: "border-accent-purple/30",
+    href: "/products/website-builder",
   },
   {
     domain: "zoobicon.io",
@@ -136,6 +141,7 @@ const DOMAINS = [
     icon: Code2,
     color: "text-accent-cyan",
     borderColor: "border-accent-cyan/30",
+    href: "/developers",
   },
   {
     domain: "zoobicon.sh",
@@ -144,6 +150,7 @@ const DOMAINS = [
     icon: Layers,
     color: "text-amber-400",
     borderColor: "border-amber-500/30",
+    href: "/cli",
   },
 ];
 
@@ -213,15 +220,15 @@ export default function LandingPage() {
               </Link>
               <div className="hidden md:flex items-center gap-6">
                 <a href="#products" className="text-sm text-white/50 hover:text-white transition-colors">Products</a>
-                <a href="#ecosystem" className="text-sm text-white/50 hover:text-white transition-colors">Ecosystem</a>
-                <a href="#features" className="text-sm text-white/50 hover:text-white transition-colors">Features</a>
+                <Link href="/developers" className="text-sm text-white/50 hover:text-white transition-colors">Developers</Link>
+                <Link href="/agencies" className="text-sm text-white/50 hover:text-white transition-colors">Agencies</Link>
                 <a href="#pricing" className="text-sm text-white/50 hover:text-white transition-colors">Pricing</a>
               </div>
             </div>
             <div className="hidden md:flex items-center gap-4">
-              <button className="text-sm text-white/50 hover:text-white transition-colors px-4 py-2">
+              <Link href="/auth/login" className="text-sm text-white/50 hover:text-white transition-colors px-4 py-2">
                 Sign in
-              </button>
+              </Link>
               <Link
                 href="/builder"
                 className="btn-gradient px-5 py-2.5 rounded-xl text-sm font-semibold text-white"
@@ -241,8 +248,9 @@ export default function LandingPage() {
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-white/[0.06] bg-[#050507]/95 backdrop-blur-2xl px-6 py-6 space-y-4">
             <a href="#products" className="block text-sm text-white/60 hover:text-white">Products</a>
-            <a href="#ecosystem" className="block text-sm text-white/60 hover:text-white">Ecosystem</a>
-            <a href="#features" className="block text-sm text-white/60 hover:text-white">Features</a>
+            <Link href="/developers" className="block text-sm text-white/60 hover:text-white">Developers</Link>
+            <Link href="/agencies" className="block text-sm text-white/60 hover:text-white">Agencies</Link>
+            <Link href="/cli" className="block text-sm text-white/60 hover:text-white">CLI Tools</Link>
             <a href="#pricing" className="block text-sm text-white/60 hover:text-white">Pricing</a>
             <Link href="/builder" className="block btn-gradient px-5 py-2.5 rounded-xl text-sm font-semibold text-white text-center mt-4">
               <span>Start Building</span>
@@ -414,32 +422,43 @@ export default function LandingPage() {
             </motion.div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {PRODUCTS.map((product, i) => (
-                <motion.div
-                  key={i}
-                  variants={fadeInUp}
-                  className="gradient-border card-hover p-6 rounded-2xl group cursor-pointer"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${product.color} flex items-center justify-center shadow-lg`}>
-                      <product.icon className="w-6 h-6 text-white" />
+              {PRODUCTS.map((product, i) => {
+                const content = (
+                  <>
+                    <div className="flex items-start justify-between mb-4">
+                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${product.color} flex items-center justify-center shadow-lg`}>
+                        <product.icon className="w-6 h-6 text-white" />
+                      </div>
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-white/30 bg-white/[0.04] px-2.5 py-1 rounded-full">
+                        {product.tag}
+                      </span>
                     </div>
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-white/30 bg-white/[0.04] px-2.5 py-1 rounded-full">
-                      {product.tag}
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-bold mb-2 group-hover:text-white transition-colors">
-                    {product.name}
-                  </h3>
-                  <p className="text-sm text-white/40 leading-relaxed mb-4">
-                    {product.description}
-                  </p>
-                  <div className="flex items-center gap-2 text-xs text-white/20">
-                    <Globe className="w-3 h-3" />
-                    <span>{product.domain}</span>
-                  </div>
-                </motion.div>
-              ))}
+                    <h3 className="text-lg font-bold mb-2 group-hover:text-white transition-colors">
+                      {product.name}
+                    </h3>
+                    <p className="text-sm text-white/40 leading-relaxed mb-4">
+                      {product.description}
+                    </p>
+                    <div className="flex items-center gap-2 text-xs text-white/20">
+                      <Globe className="w-3 h-3" />
+                      <span>{product.domain}</span>
+                    </div>
+                  </>
+                );
+                return (
+                  <motion.div key={i} variants={fadeInUp}>
+                    {product.href ? (
+                      <Link href={product.href} className="block gradient-border card-hover p-6 rounded-2xl group cursor-pointer">
+                        {content}
+                      </Link>
+                    ) : (
+                      <div className="gradient-border card-hover p-6 rounded-2xl group cursor-pointer">
+                        {content}
+                      </div>
+                    )}
+                  </motion.div>
+                );
+              })}
             </div>
           </motion.div>
         </div>
@@ -470,21 +489,22 @@ export default function LandingPage() {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
               {DOMAINS.map((d, i) => (
-                <motion.div
-                  key={i}
-                  variants={fadeInUp}
-                  className={`relative p-6 rounded-2xl border ${d.borderColor} bg-white/[0.02] hover:bg-white/[0.04] transition-all group`}
-                >
-                  <d.icon className={`w-8 h-8 ${d.color} mb-4`} />
-                  <div className="text-xl font-bold mb-1 group-hover:text-white transition-colors">
-                    {d.domain}
-                  </div>
-                  <div className={`text-sm font-semibold ${d.color} mb-2`}>
-                    {d.label}
-                  </div>
-                  <p className="text-sm text-white/40">
-                    {d.description}
-                  </p>
+                <motion.div key={i} variants={fadeInUp}>
+                  <Link
+                    href={d.href}
+                    className={`block relative p-6 rounded-2xl border ${d.borderColor} bg-white/[0.02] hover:bg-white/[0.04] transition-all group`}
+                  >
+                    <d.icon className={`w-8 h-8 ${d.color} mb-4`} />
+                    <div className="text-xl font-bold mb-1 group-hover:text-white transition-colors">
+                      {d.domain}
+                    </div>
+                    <div className={`text-sm font-semibold ${d.color} mb-2`}>
+                      {d.label}
+                    </div>
+                    <p className="text-sm text-white/40">
+                      {d.description}
+                    </p>
+                  </Link>
                 </motion.div>
               ))}
             </div>
@@ -771,25 +791,30 @@ export default function LandingPage() {
             <div>
               <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">Products</div>
               <ul className="space-y-2.5">
-                {["Website Builder", "SEO Agent", "Video Creator", "Brand Kit", "Email Marketing", "Social Manager"].map((item) => (
-                  <li key={item}><a href="#products" className="text-sm text-white/30 hover:text-white/60 transition-colors">{item}</a></li>
-                ))}
+                <li><Link href="/products/website-builder" className="text-sm text-white/30 hover:text-white/60 transition-colors">Website Builder</Link></li>
+                <li><Link href="/products/seo-agent" className="text-sm text-white/30 hover:text-white/60 transition-colors">SEO Agent</Link></li>
+                <li><Link href="/products/video-creator" className="text-sm text-white/30 hover:text-white/60 transition-colors">Video Creator</Link></li>
+                <li><a href="#products" className="text-sm text-white/30 hover:text-white/60 transition-colors">Brand Kit</a></li>
+                <li><a href="#products" className="text-sm text-white/30 hover:text-white/60 transition-colors">Email Marketing</a></li>
+                <li><a href="#products" className="text-sm text-white/30 hover:text-white/60 transition-colors">Social Manager</a></li>
               </ul>
             </div>
             <div>
               <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">Platform</div>
               <ul className="space-y-2.5">
-                {["API Docs", "CLI Tools", "Integrations", "Changelog", "Status"].map((item) => (
-                  <li key={item}><a href="#" className="text-sm text-white/30 hover:text-white/60 transition-colors">{item}</a></li>
-                ))}
+                <li><Link href="/developers" className="text-sm text-white/30 hover:text-white/60 transition-colors">API Docs</Link></li>
+                <li><Link href="/cli" className="text-sm text-white/30 hover:text-white/60 transition-colors">CLI Tools</Link></li>
+                <li><Link href="/developers#sdks" className="text-sm text-white/30 hover:text-white/60 transition-colors">SDKs</Link></li>
+                <li><Link href="/developers#endpoints" className="text-sm text-white/30 hover:text-white/60 transition-colors">API Reference</Link></li>
               </ul>
             </div>
             <div>
-              <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">Company</div>
+              <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">For Teams</div>
               <ul className="space-y-2.5">
-                {["About", "Blog", "Careers", "Contact", "Legal"].map((item) => (
-                  <li key={item}><a href="#" className="text-sm text-white/30 hover:text-white/60 transition-colors">{item}</a></li>
-                ))}
+                <li><Link href="/agencies" className="text-sm text-white/30 hover:text-white/60 transition-colors">Agencies</Link></li>
+                <li><Link href="/agencies#white-label" className="text-sm text-white/30 hover:text-white/60 transition-colors">White Label</Link></li>
+                <li><Link href="/agencies#pricing" className="text-sm text-white/30 hover:text-white/60 transition-colors">Agency Pricing</Link></li>
+                <li><Link href="/auth/signup" className="text-sm text-white/30 hover:text-white/60 transition-colors">Sign Up</Link></li>
               </ul>
             </div>
           </div>
