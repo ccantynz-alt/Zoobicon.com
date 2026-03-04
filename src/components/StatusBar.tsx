@@ -1,5 +1,7 @@
 "use client";
 
+import { Zap } from "lucide-react";
+
 interface StatusBarProps {
   isGenerating: boolean;
   codeLength: number;
@@ -7,11 +9,14 @@ interface StatusBarProps {
 
 export default function StatusBar({ isGenerating, codeLength }: StatusBarProps) {
   return (
-    <footer className="flex items-center justify-between px-6 py-2 border-t border-gray-200 bg-white text-xs text-gray-400">
+    <footer className="flex items-center justify-between px-6 py-2 border-t border-white/[0.06] bg-dark-300/80 backdrop-blur-xl text-xs text-white/30">
       <div className="flex items-center gap-3">
-        <span>Zoobicon v0.1</span>
-        <span className="text-gray-200">|</span>
-        <span className={isGenerating ? "text-brand-500" : ""}>
+        <div className="flex items-center gap-1.5">
+          <Zap className="w-3 h-3 text-brand-400" />
+          <span>Zoobicon v0.1</span>
+        </div>
+        <span className="text-white/10">|</span>
+        <span className={isGenerating ? "text-brand-400 animate-pulse" : ""}>
           {isGenerating ? "Generating..." : "Ready"}
         </span>
       </div>
@@ -19,7 +24,7 @@ export default function StatusBar({ isGenerating, codeLength }: StatusBarProps) 
         {codeLength > 0 && (
           <span>{codeLength.toLocaleString()} chars</span>
         )}
-        <span className="text-gray-300">Powered by Claude</span>
+        <span className="text-white/15">Powered by Claude</span>
       </div>
     </footer>
   );

@@ -1,139 +1,813 @@
 "use client";
 
 import { useState } from "react";
-import PromptInput from "@/components/PromptInput";
-import PreviewPanel from "@/components/PreviewPanel";
-import CodePanel from "@/components/CodePanel";
-import TopBar from "@/components/TopBar";
-import StatusBar from "@/components/StatusBar";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import {
+  Zap,
+  Globe,
+  Video,
+  Search,
+  BarChart3,
+  Sparkles,
+  Palette,
+  Mail,
+  MessageSquare,
+  Shield,
+  Cpu,
+  ArrowRight,
+  ChevronRight,
+  Code2,
+  Layers,
+  Bot,
+  TrendingUp,
+  Play,
+  Star,
+  Menu,
+  X,
+} from "lucide-react";
 
-export default function BuilderPage() {
-  const [generatedCode, setGeneratedCode] = useState<string>("");
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [error, setError] = useState<string>("");
-  const [activeTab, setActiveTab] = useState<"preview" | "code">("preview");
-  const [buildLog, setBuildLog] = useState<string[]>([]);
+const fadeInUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+};
 
-  const handleGenerate = async (prompt: string) => {
-    setIsGenerating(true);
-    setError("");
-    setGeneratedCode("");
-    setBuildLog(["Initializing...", "Parsing prompt..."]);
+const staggerContainer = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1 } },
+};
 
-    try {
-      const response = await fetch("/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
-      });
+const PRODUCTS = [
+  {
+    icon: Globe,
+    name: "AI Website Builder",
+    description: "Describe any website and watch it materialize in seconds. Full-stack, responsive, production-ready.",
+    color: "from-brand-500 to-brand-700",
+    glowColor: "shadow-glow",
+    domain: "zoobicon.ai",
+    tag: "Core Product",
+  },
+  {
+    icon: Search,
+    name: "SEO Campaigns Agent",
+    description: "Autonomous AI agent that researches, plans, and executes SEO campaigns that dominate search rankings.",
+    color: "from-accent-cyan to-emerald-600",
+    glowColor: "shadow-glow-cyan",
+    domain: "zoobicon.com",
+    tag: "Agent",
+  },
+  {
+    icon: Video,
+    name: "AI Video Creator",
+    description: "Generate high-end videos for TikTok, Facebook, Instagram & YouTube. No scripts needed - just pure AI magic.",
+    color: "from-accent-purple to-pink-600",
+    glowColor: "shadow-glow-purple",
+    domain: "zoobicon.com",
+    tag: "Creator",
+  },
+  {
+    icon: Palette,
+    name: "AI Brand Kit",
+    description: "Complete brand identity in minutes. Logos, color palettes, typography, style guides - all AI-generated.",
+    color: "from-pink-500 to-rose-600",
+    glowColor: "shadow-glow-purple",
+    domain: "zoobicon.ai",
+    tag: "Designer",
+  },
+  {
+    icon: Mail,
+    name: "AI Email Marketing",
+    description: "Craft and automate email campaigns that convert. AI writes, designs, segments, and optimizes delivery.",
+    color: "from-amber-500 to-orange-600",
+    glowColor: "shadow-glow",
+    domain: "zoobicon.com",
+    tag: "Agent",
+  },
+  {
+    icon: MessageSquare,
+    name: "AI Social Media Manager",
+    description: "Auto-create, schedule, and optimize posts across all platforms. Your 24/7 social media powerhouse.",
+    color: "from-cyan-500 to-blue-600",
+    glowColor: "shadow-glow-cyan",
+    domain: "zoobicon.com",
+    tag: "Agent",
+  },
+  {
+    icon: BarChart3,
+    name: "AI Analytics & Insights",
+    description: "Real-time intelligence on your digital presence. Competitor tracking, trend analysis, actionable insights.",
+    color: "from-emerald-500 to-teal-600",
+    glowColor: "shadow-glow-cyan",
+    domain: "zoobicon.io",
+    tag: "Intelligence",
+  },
+  {
+    icon: Bot,
+    name: "AI Chatbot Builder",
+    description: "Deploy custom AI chatbots on any website. Trained on your content, branded to your style.",
+    color: "from-violet-500 to-indigo-600",
+    glowColor: "shadow-glow-purple",
+    domain: "zoobicon.ai",
+    tag: "Builder",
+  },
+];
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Generation failed");
-      }
+const DOMAINS = [
+  {
+    domain: "zoobicon.com",
+    label: "Brand Hub",
+    description: "Main platform & marketing engine",
+    icon: Zap,
+    color: "text-brand-400",
+    borderColor: "border-brand-500/30",
+  },
+  {
+    domain: "zoobicon.ai",
+    label: "AI Builder",
+    description: "Website builder & AI creation tools",
+    icon: Sparkles,
+    color: "text-accent-purple",
+    borderColor: "border-accent-purple/30",
+  },
+  {
+    domain: "zoobicon.io",
+    label: "Developer API",
+    description: "API platform & integrations",
+    icon: Code2,
+    color: "text-accent-cyan",
+    borderColor: "border-accent-cyan/30",
+  },
+  {
+    domain: "zoobicon.sh",
+    label: "CLI & DevOps",
+    description: "Command-line tools & automation",
+    icon: Layers,
+    color: "text-amber-400",
+    borderColor: "border-amber-500/30",
+  },
+];
 
-      setBuildLog((prev) => [...prev, "Building your site..."]);
+const STATS = [
+  { value: "10x", label: "Faster than manual coding" },
+  { value: "4", label: "Domain ecosystem" },
+  { value: "8+", label: "AI-powered products" },
+  { value: "24/7", label: "Autonomous agents" },
+];
 
-      const data = await response.json();
-      const code = data.code || "";
+const FEATURES = [
+  {
+    icon: Cpu,
+    title: "Most Advanced AI Agents",
+    description: "Our agents don't just assist - they execute. Autonomous AI that handles your entire digital workflow end-to-end.",
+  },
+  {
+    icon: Zap,
+    title: "Instant Generation",
+    description: "From idea to production-ready output in seconds. Websites, videos, campaigns - all generated at lightning speed.",
+  },
+  {
+    icon: Shield,
+    title: "Enterprise-Grade",
+    description: "Built for scale with security-first architecture. SOC 2 compliant infrastructure with 99.9% uptime guarantee.",
+  },
+  {
+    icon: TrendingUp,
+    title: "Market Domination Tools",
+    description: "SEO agents, competitor intelligence, and trend analysis that give you an unfair advantage in any market.",
+  },
+  {
+    icon: Layers,
+    title: "Full Ecosystem",
+    description: "Four domains, eight products, one unified platform. Everything you need to build, grow, and dominate online.",
+  },
+  {
+    icon: Globe,
+    title: "Multi-Platform Publishing",
+    description: "One-click deploy to any platform. Generate content optimized for TikTok, Facebook, Instagram, YouTube, and the web.",
+  },
+];
 
-      setGeneratedCode(code);
-      setBuildLog((prev) => [
-        ...prev,
-        "Code generated successfully",
-        `Output: ${code.length} characters`,
-        "Ready for preview",
-      ]);
-      setActiveTab("preview");
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Unknown error";
-      setError(message);
-      setBuildLog((prev) => [...prev, `Error: ${message}`]);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
+export default function LandingPage() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="flex flex-col h-screen">
-      <TopBar />
-
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left sidebar */}
-        <div className="w-[380px] flex flex-col border-r border-gray-200 bg-white">
-          <PromptInput onGenerate={handleGenerate} isGenerating={isGenerating} />
-
-          {/* Build Log */}
-          <div className="flex-1 overflow-y-auto p-4 font-mono text-xs">
-            <div className="text-[11px] font-medium text-gray-400 mb-2">
-              Activity log
-            </div>
-            {buildLog.map((line, i) => (
-              <div
-                key={i}
-                className={`py-0.5 ${
-                  line.startsWith("Error")
-                    ? "text-red-500"
-                    : line.includes("Ready")
-                    ? "text-emerald-500"
-                    : "text-gray-500"
-                }`}
-              >
-                {line}
-              </div>
-            ))}
-            {isGenerating && (
-              <div className="text-brand-500 animate-pulse">
-                Processing...
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Main content */}
-        <div className="flex-1 flex flex-col">
-          {/* Tab bar */}
-          <div className="flex border-b border-gray-200 bg-white">
-            <button
-              onClick={() => setActiveTab("preview")}
-              className={`px-5 py-2.5 text-xs font-medium transition-all ${
-                activeTab === "preview"
-                  ? "text-brand-600 border-b-2 border-brand-500"
-                  : "text-gray-400 hover:text-gray-600"
-              }`}
-            >
-              Preview
-            </button>
-            <button
-              onClick={() => setActiveTab("code")}
-              className={`px-5 py-2.5 text-xs font-medium transition-all ${
-                activeTab === "code"
-                  ? "text-brand-600 border-b-2 border-brand-500"
-                  : "text-gray-400 hover:text-gray-600"
-              }`}
-            >
-              Code
-            </button>
-          </div>
-
-          {/* Content */}
-          <div className="flex-1 overflow-hidden">
-            {error && (
-              <div className="m-4 p-3 border border-red-200 bg-red-50 text-red-600 rounded-lg text-sm">
-                {error}
-              </div>
-            )}
-
-            {activeTab === "preview" ? (
-              <PreviewPanel code={generatedCode} isGenerating={isGenerating} />
-            ) : (
-              <CodePanel code={generatedCode} />
-            )}
-          </div>
-        </div>
+    <div className="relative">
+      {/* Background Effects */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="glow-orb glow-orb-blue w-[600px] h-[600px] -top-[200px] -left-[200px] animate-pulse-glow" />
+        <div className="glow-orb glow-orb-purple w-[500px] h-[500px] top-[30%] -right-[150px] animate-pulse-glow" style={{ animationDelay: "2s" }} />
+        <div className="glow-orb glow-orb-cyan w-[400px] h-[400px] bottom-[20%] left-[10%] animate-pulse-glow" style={{ animationDelay: "4s" }} />
+        <div className="grid-pattern fixed inset-0 opacity-100" />
       </div>
 
-      <StatusBar isGenerating={isGenerating} codeLength={generatedCode.length} />
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.04] bg-[#050507]/80 backdrop-blur-2xl">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-8">
+              <Link href="/" className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
+                  <Zap className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-lg font-bold tracking-tight">Zoobicon</span>
+              </Link>
+              <div className="hidden md:flex items-center gap-6">
+                <a href="#products" className="text-sm text-white/50 hover:text-white transition-colors">Products</a>
+                <a href="#ecosystem" className="text-sm text-white/50 hover:text-white transition-colors">Ecosystem</a>
+                <a href="#features" className="text-sm text-white/50 hover:text-white transition-colors">Features</a>
+                <a href="#pricing" className="text-sm text-white/50 hover:text-white transition-colors">Pricing</a>
+              </div>
+            </div>
+            <div className="hidden md:flex items-center gap-4">
+              <button className="text-sm text-white/50 hover:text-white transition-colors px-4 py-2">
+                Sign in
+              </button>
+              <Link
+                href="/builder"
+                className="btn-gradient px-5 py-2.5 rounded-xl text-sm font-semibold text-white"
+              >
+                <span>Start Building</span>
+              </Link>
+            </div>
+            <button
+              className="md:hidden text-white/60"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
+        </div>
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-white/[0.06] bg-[#050507]/95 backdrop-blur-2xl px-6 py-6 space-y-4">
+            <a href="#products" className="block text-sm text-white/60 hover:text-white">Products</a>
+            <a href="#ecosystem" className="block text-sm text-white/60 hover:text-white">Ecosystem</a>
+            <a href="#features" className="block text-sm text-white/60 hover:text-white">Features</a>
+            <a href="#pricing" className="block text-sm text-white/60 hover:text-white">Pricing</a>
+            <Link href="/builder" className="block btn-gradient px-5 py-2.5 rounded-xl text-sm font-semibold text-white text-center mt-4">
+              <span>Start Building</span>
+            </Link>
+          </div>
+        )}
+      </nav>
+
+      {/* Hero Section */}
+      <section className="relative pt-32 pb-24 lg:pt-44 lg:pb-36 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center relative z-10">
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={staggerContainer}
+          >
+            {/* Badge */}
+            <motion.div variants={fadeInUp} className="flex justify-center mb-8">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/[0.08] bg-white/[0.03] backdrop-blur-sm">
+                <div className="w-2 h-2 rounded-full bg-accent-cyan animate-pulse" />
+                <span className="text-xs font-medium text-white/60">The Future of Digital Creation is Here</span>
+                <ChevronRight className="w-3 h-3 text-white/40" />
+              </div>
+            </motion.div>
+
+            {/* Main Headline */}
+            <motion.h1
+              variants={fadeInUp}
+              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[0.95] mb-8"
+            >
+              <span className="block">Build the Future</span>
+              <span className="block gradient-text-hero mt-2">With AI That Dominates</span>
+            </motion.h1>
+
+            {/* Sub headline */}
+            <motion.p
+              variants={fadeInUp}
+              className="max-w-3xl mx-auto text-lg md:text-xl text-white/40 leading-relaxed mb-12"
+            >
+              The most advanced AI platform on the planet. Build stunning websites, crush SEO rankings,
+              create viral videos, and automate your entire digital empire — all powered by autonomous AI agents.
+            </motion.p>
+
+            {/* CTAs */}
+            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+              <Link
+                href="/builder"
+                className="group btn-gradient px-8 py-4 rounded-2xl text-base font-bold text-white flex items-center gap-3 shadow-glow"
+              >
+                <span>Start Building Free</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <button className="group px-8 py-4 rounded-2xl text-base font-medium text-white/60 border border-white/[0.08] hover:border-white/20 hover:text-white/80 transition-all flex items-center gap-3 bg-white/[0.02]">
+                <Play className="w-5 h-5" />
+                <span>Watch Demo</span>
+              </button>
+            </motion.div>
+
+            {/* Hero Visual - Floating UI preview */}
+            <motion.div
+              variants={fadeInUp}
+              className="relative max-w-5xl mx-auto"
+            >
+              <div className="gradient-border rounded-2xl overflow-hidden">
+                <div className="bg-dark-300/90 backdrop-blur-xl p-1 rounded-2xl">
+                  {/* Mock browser chrome */}
+                  <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.06]">
+                    <div className="flex gap-1.5">
+                      <div className="w-3 h-3 rounded-full bg-red-500/60" />
+                      <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
+                      <div className="w-3 h-3 rounded-full bg-green-500/60" />
+                    </div>
+                    <div className="flex-1 mx-4">
+                      <div className="bg-white/[0.04] rounded-lg px-4 py-1.5 text-xs text-white/30 text-center">
+                        zoobicon.ai/builder
+                      </div>
+                    </div>
+                  </div>
+                  {/* Mock builder UI */}
+                  <div className="flex h-[400px] md:h-[500px]">
+                    {/* Sidebar */}
+                    <div className="w-1/3 border-r border-white/[0.06] p-6 space-y-4">
+                      <div className="h-3 w-3/4 bg-white/10 rounded" />
+                      <div className="space-y-2">
+                        <div className="h-20 bg-white/[0.04] rounded-lg border border-white/[0.06]" />
+                        <div className="h-10 bg-gradient-to-r from-brand-600 to-accent-purple rounded-lg flex items-center justify-center">
+                          <span className="text-xs text-white/80 font-medium">Generate</span>
+                        </div>
+                      </div>
+                      <div className="space-y-2 mt-6">
+                        <div className="h-2 w-1/2 bg-white/[0.06] rounded" />
+                        <div className="h-2 w-3/4 bg-accent-cyan/20 rounded" />
+                        <div className="h-2 w-2/3 bg-accent-cyan/20 rounded" />
+                        <div className="h-2 w-1/2 bg-white/[0.06] rounded" />
+                      </div>
+                    </div>
+                    {/* Preview area */}
+                    <div className="flex-1 p-6 flex items-center justify-center relative">
+                      <div className="absolute inset-0 bg-gradient-to-br from-brand-500/5 to-accent-purple/5" />
+                      <div className="relative text-center space-y-4">
+                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500/20 to-accent-purple/20 border border-brand-500/20">
+                          <Sparkles className="w-8 h-8 text-brand-400 animate-pulse" />
+                        </div>
+                        <div className="space-y-2">
+                          <div className="h-3 w-48 bg-white/10 rounded mx-auto" />
+                          <div className="h-2 w-32 bg-white/[0.06] rounded mx-auto" />
+                        </div>
+                        <div className="flex gap-3 justify-center mt-4">
+                          <div className="h-24 w-24 bg-white/[0.03] rounded-lg border border-white/[0.06]" />
+                          <div className="h-24 w-24 bg-white/[0.03] rounded-lg border border-white/[0.06]" />
+                          <div className="hidden sm:block h-24 w-24 bg-white/[0.03] rounded-lg border border-white/[0.06]" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {/* Glow under the preview */}
+              <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 w-[80%] h-40 bg-brand-500/10 blur-[100px] rounded-full" />
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Stats Bar */}
+      <section className="relative py-16 border-y border-white/[0.04]">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+            className="grid grid-cols-2 md:grid-cols-4 gap-8"
+          >
+            {STATS.map((stat, i) => (
+              <motion.div key={i} variants={fadeInUp} className="text-center">
+                <div className="text-4xl md:text-5xl font-black gradient-text-static mb-2">
+                  {stat.value}
+                </div>
+                <div className="text-sm text-white/40">{stat.label}</div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Products Section */}
+      <section id="products" className="relative py-24 lg:py-32">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            <motion.div variants={fadeInUp} className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-purple/20 bg-accent-purple/5 mb-6">
+                <Sparkles className="w-3 h-3 text-accent-purple" />
+                <span className="text-xs font-medium text-accent-purple">Product Suite</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-6">
+                Everything You Need to<br />
+                <span className="gradient-text">Dominate Online</span>
+              </h2>
+              <p className="max-w-2xl mx-auto text-lg text-white/40">
+                Eight AI-powered products working in harmony. Each one best-in-class.
+                Together, an unstoppable digital powerhouse.
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {PRODUCTS.map((product, i) => (
+                <motion.div
+                  key={i}
+                  variants={fadeInUp}
+                  className="gradient-border card-hover p-6 rounded-2xl group cursor-pointer"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${product.color} flex items-center justify-center shadow-lg`}>
+                      <product.icon className="w-6 h-6 text-white" />
+                    </div>
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-white/30 bg-white/[0.04] px-2.5 py-1 rounded-full">
+                      {product.tag}
+                    </span>
+                  </div>
+                  <h3 className="text-lg font-bold mb-2 group-hover:text-white transition-colors">
+                    {product.name}
+                  </h3>
+                  <p className="text-sm text-white/40 leading-relaxed mb-4">
+                    {product.description}
+                  </p>
+                  <div className="flex items-center gap-2 text-xs text-white/20">
+                    <Globe className="w-3 h-3" />
+                    <span>{product.domain}</span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Domain Ecosystem */}
+      <section id="ecosystem" className="relative py-24 lg:py-32 border-t border-white/[0.04]">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            <motion.div variants={fadeInUp} className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-cyan/20 bg-accent-cyan/5 mb-6">
+                <Globe className="w-3 h-3 text-accent-cyan" />
+                <span className="text-xs font-medium text-accent-cyan">Domain Ecosystem</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-6">
+                Four Domains.<br />
+                <span className="gradient-text">One Empire.</span>
+              </h2>
+              <p className="max-w-2xl mx-auto text-lg text-white/40">
+                We own every extension. Complete market presence across .com, .ai, .io, and .sh — an impenetrable brand fortress.
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {DOMAINS.map((d, i) => (
+                <motion.div
+                  key={i}
+                  variants={fadeInUp}
+                  className={`relative p-6 rounded-2xl border ${d.borderColor} bg-white/[0.02] hover:bg-white/[0.04] transition-all group`}
+                >
+                  <d.icon className={`w-8 h-8 ${d.color} mb-4`} />
+                  <div className="text-xl font-bold mb-1 group-hover:text-white transition-colors">
+                    {d.domain}
+                  </div>
+                  <div className={`text-sm font-semibold ${d.color} mb-2`}>
+                    {d.label}
+                  </div>
+                  <p className="text-sm text-white/40">
+                    {d.description}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Connection visualization */}
+            <motion.div variants={fadeInUp} className="mt-12 text-center">
+              <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full border border-white/[0.06] bg-white/[0.02]">
+                <div className="flex -space-x-2">
+                  <div className="w-6 h-6 rounded-full bg-brand-500/30 border border-brand-500/40" />
+                  <div className="w-6 h-6 rounded-full bg-accent-purple/30 border border-accent-purple/40" />
+                  <div className="w-6 h-6 rounded-full bg-accent-cyan/30 border border-accent-cyan/40" />
+                  <div className="w-6 h-6 rounded-full bg-amber-500/30 border border-amber-500/40" />
+                </div>
+                <span className="text-sm text-white/50">All domains. One unified platform. Total market coverage.</span>
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section id="features" className="relative py-24 lg:py-32 border-t border-white/[0.04]">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            <motion.div variants={fadeInUp} className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand-500/20 bg-brand-500/5 mb-6">
+                <Zap className="w-3 h-3 text-brand-400" />
+                <span className="text-xs font-medium text-brand-400">Why Zoobicon</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-6">
+                Built Different.<br />
+                <span className="gradient-text">Built to Win.</span>
+              </h2>
+              <p className="max-w-2xl mx-auto text-lg text-white/40">
+                We didn&apos;t build another tool. We built the platform that makes every other tool obsolete.
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {FEATURES.map((feature, i) => (
+                <motion.div
+                  key={i}
+                  variants={fadeInUp}
+                  className="gradient-border card-hover p-8 rounded-2xl group"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center mb-5 group-hover:border-brand-500/30 transition-colors">
+                    <feature.icon className="w-6 h-6 text-white/60 group-hover:text-brand-400 transition-colors" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
+                  <p className="text-sm text-white/40 leading-relaxed">
+                    {feature.description}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Video Creator Highlight Section */}
+      <section className="relative py-24 lg:py-32 border-t border-white/[0.04] overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="glow-orb glow-orb-purple w-[600px] h-[600px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-10" />
+        </div>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+            className="grid lg:grid-cols-2 gap-16 items-center"
+          >
+            <motion.div variants={fadeInUp}>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-pink/20 bg-accent-pink/5 mb-6">
+                <Video className="w-3 h-3 text-accent-pink" />
+                <span className="text-xs font-medium text-accent-pink">AI Video Creator</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-6">
+                High-End Videos.<br />
+                <span className="gradient-text">Zero Scripts.</span>
+              </h2>
+              <p className="text-lg text-white/40 leading-relaxed mb-8">
+                Our AI doesn&apos;t need scripts, storyboards, or templates. Describe what you want and it
+                creates scroll-stopping, high-production videos optimized for every platform.
+              </p>
+              <div className="space-y-4">
+                {[
+                  "TikTok viral format videos with trending hooks",
+                  "Facebook & Instagram ads that convert",
+                  "YouTube Shorts with AI-generated visuals",
+                  "Brand story videos with cinematic quality",
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-accent-cyan/10 flex items-center justify-center flex-shrink-0">
+                      <Star className="w-3 h-3 text-accent-cyan" />
+                    </div>
+                    <span className="text-sm text-white/60">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+            <motion.div variants={fadeInUp} className="relative">
+              <div className="gradient-border rounded-2xl overflow-hidden">
+                <div className="bg-dark-300/80 backdrop-blur-xl p-8 aspect-video flex items-center justify-center relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-accent-purple/5 to-accent-pink/5" />
+                  <div className="relative text-center space-y-6">
+                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-accent-purple/20 to-accent-pink/20 border border-accent-purple/20">
+                      <Play className="w-10 h-10 text-white/60 ml-1" />
+                    </div>
+                    <div>
+                      <div className="text-lg font-bold text-white/80 mb-1">AI Video Generation</div>
+                      <div className="text-sm text-white/40">Describe &rarr; Generate &rarr; Publish</div>
+                    </div>
+                    <div className="flex gap-2 justify-center">
+                      {["TikTok", "Facebook", "Instagram", "YouTube"].map((platform) => (
+                        <span key={platform} className="px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.06] text-xs text-white/40">
+                          {platform}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-[60%] h-20 bg-accent-purple/10 blur-[60px] rounded-full" />
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section id="pricing" className="relative py-24 lg:py-32 border-t border-white/[0.04]">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            <motion.div variants={fadeInUp} className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-6">
+                Ready to<br />
+                <span className="gradient-text">Dominate?</span>
+              </h2>
+              <p className="max-w-2xl mx-auto text-lg text-white/40">
+                Start free. Scale when you&apos;re ready. No credit card required.
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+              {/* Free */}
+              <motion.div variants={fadeInUp} className="gradient-border p-8 rounded-2xl">
+                <div className="text-sm font-semibold text-white/50 mb-2">Starter</div>
+                <div className="text-4xl font-black mb-1">Free</div>
+                <div className="text-sm text-white/30 mb-6">Forever</div>
+                <ul className="space-y-3 mb-8">
+                  {["5 websites/month", "Basic SEO tools", "Community support", "1 AI agent"].map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-sm text-white/50">
+                      <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href="/builder"
+                  className="block w-full py-3 text-center rounded-xl border border-white/[0.1] text-sm font-semibold text-white/70 hover:text-white hover:border-white/20 transition-all"
+                >
+                  Get Started
+                </Link>
+              </motion.div>
+
+              {/* Pro - Featured */}
+              <motion.div variants={fadeInUp} className="relative p-8 rounded-2xl border border-brand-500/30 bg-brand-500/[0.03] shadow-glow">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-brand-500 to-accent-purple text-xs font-bold text-white">
+                  Most Popular
+                </div>
+                <div className="text-sm font-semibold text-brand-400 mb-2">Pro</div>
+                <div className="text-4xl font-black mb-1">$49<span className="text-lg font-normal text-white/30">/mo</span></div>
+                <div className="text-sm text-white/30 mb-6">Everything you need</div>
+                <ul className="space-y-3 mb-8">
+                  {["Unlimited websites", "AI Video Creator", "SEO Campaign Agent", "All 8 AI products", "Priority support"].map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-sm text-white/60">
+                      <div className="w-1.5 h-1.5 rounded-full bg-brand-400" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <button className="w-full btn-gradient py-3 rounded-xl text-sm font-bold text-white shadow-glow">
+                  <span>Start Pro Trial</span>
+                </button>
+              </motion.div>
+
+              {/* Enterprise */}
+              <motion.div variants={fadeInUp} className="gradient-border p-8 rounded-2xl">
+                <div className="text-sm font-semibold text-white/50 mb-2">Enterprise</div>
+                <div className="text-4xl font-black mb-1">Custom</div>
+                <div className="text-sm text-white/30 mb-6">For teams & agencies</div>
+                <ul className="space-y-3 mb-8">
+                  {["White-label platform", "Custom AI training", "Dedicated agents", "API access (zoobicon.io)", "24/7 premium support"].map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-sm text-white/50">
+                      <div className="w-1.5 h-1.5 rounded-full bg-accent-cyan" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <button className="w-full py-3 rounded-xl border border-white/[0.1] text-sm font-semibold text-white/70 hover:text-white hover:border-white/20 transition-all">
+                  Contact Sales
+                </button>
+              </motion.div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="relative py-24 lg:py-32 border-t border-white/[0.04] overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="glow-orb glow-orb-blue w-[800px] h-[800px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-10" />
+        </div>
+        <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center relative z-10">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            <motion.h2
+              variants={fadeInUp}
+              className="text-4xl md:text-5xl lg:text-7xl font-black tracking-tight mb-6"
+            >
+              Stop Building Websites.<br />
+              <span className="gradient-text-hero">Start Building Empires.</span>
+            </motion.h2>
+            <motion.p
+              variants={fadeInUp}
+              className="max-w-2xl mx-auto text-lg text-white/40 mb-10"
+            >
+              Join the next generation of creators, marketers, and entrepreneurs
+              who refuse to settle for ordinary tools.
+            </motion.p>
+            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link
+                href="/builder"
+                className="group btn-gradient px-10 py-5 rounded-2xl text-lg font-bold text-white flex items-center gap-3 shadow-glow-lg"
+              >
+                <span>Launch Your Empire</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-white/[0.04] py-16">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="grid md:grid-cols-5 gap-8 mb-12">
+            {/* Brand */}
+            <div className="md:col-span-2">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
+                  <Zap className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-lg font-bold">Zoobicon</span>
+              </div>
+              <p className="text-sm text-white/30 max-w-xs leading-relaxed mb-6">
+                The most advanced AI platform for building, marketing, and dominating the digital landscape.
+              </p>
+              <div className="flex gap-3">
+                {DOMAINS.map((d) => (
+                  <span key={d.domain} className="text-xs text-white/20 bg-white/[0.03] px-2.5 py-1 rounded-full border border-white/[0.04]">
+                    {d.domain}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Links */}
+            <div>
+              <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">Products</div>
+              <ul className="space-y-2.5">
+                {["Website Builder", "SEO Agent", "Video Creator", "Brand Kit", "Email Marketing", "Social Manager"].map((item) => (
+                  <li key={item}><a href="#products" className="text-sm text-white/30 hover:text-white/60 transition-colors">{item}</a></li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">Platform</div>
+              <ul className="space-y-2.5">
+                {["API Docs", "CLI Tools", "Integrations", "Changelog", "Status"].map((item) => (
+                  <li key={item}><a href="#" className="text-sm text-white/30 hover:text-white/60 transition-colors">{item}</a></li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">Company</div>
+              <ul className="space-y-2.5">
+                {["About", "Blog", "Careers", "Contact", "Legal"].map((item) => (
+                  <li key={item}><a href="#" className="text-sm text-white/30 hover:text-white/60 transition-colors">{item}</a></li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div className="section-divider mb-8" />
+
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="text-xs text-white/20">
+              &copy; 2026 Zoobicon. All rights reserved.
+            </div>
+            <div className="flex items-center gap-6">
+              <a href="#" className="text-xs text-white/20 hover:text-white/40 transition-colors">Privacy</a>
+              <a href="#" className="text-xs text-white/20 hover:text-white/40 transition-colors">Terms</a>
+              <a href="#" className="text-xs text-white/20 hover:text-white/40 transition-colors">Cookies</a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
