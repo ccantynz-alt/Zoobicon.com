@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import BuilderDemo from "@/components/BuilderDemo";
+import VideoShowcase from "@/components/VideoShowcase";
 import {
   Zap,
   Globe,
@@ -309,65 +311,12 @@ export default function LandingPage() {
               </button>
             </motion.div>
 
-            {/* Hero Visual - Floating UI preview */}
+            {/* Hero Visual - Live Animated Builder Demo */}
             <motion.div
               variants={fadeInUp}
               className="relative max-w-5xl mx-auto"
             >
-              <div className="gradient-border rounded-2xl overflow-hidden">
-                <div className="bg-dark-300/90 backdrop-blur-xl p-1 rounded-2xl">
-                  {/* Mock browser chrome */}
-                  <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.06]">
-                    <div className="flex gap-1.5">
-                      <div className="w-3 h-3 rounded-full bg-red-500/60" />
-                      <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-                      <div className="w-3 h-3 rounded-full bg-green-500/60" />
-                    </div>
-                    <div className="flex-1 mx-4">
-                      <div className="bg-white/[0.04] rounded-lg px-4 py-1.5 text-xs text-white/30 text-center">
-                        zoobicon.ai/builder
-                      </div>
-                    </div>
-                  </div>
-                  {/* Mock builder UI */}
-                  <div className="flex h-[400px] md:h-[500px]">
-                    {/* Sidebar */}
-                    <div className="w-1/3 border-r border-white/[0.06] p-6 space-y-4">
-                      <div className="h-3 w-3/4 bg-white/10 rounded" />
-                      <div className="space-y-2">
-                        <div className="h-20 bg-white/[0.04] rounded-lg border border-white/[0.06]" />
-                        <div className="h-10 bg-gradient-to-r from-brand-600 to-accent-purple rounded-lg flex items-center justify-center">
-                          <span className="text-xs text-white/80 font-medium">Generate</span>
-                        </div>
-                      </div>
-                      <div className="space-y-2 mt-6">
-                        <div className="h-2 w-1/2 bg-white/[0.06] rounded" />
-                        <div className="h-2 w-3/4 bg-accent-cyan/20 rounded" />
-                        <div className="h-2 w-2/3 bg-accent-cyan/20 rounded" />
-                        <div className="h-2 w-1/2 bg-white/[0.06] rounded" />
-                      </div>
-                    </div>
-                    {/* Preview area */}
-                    <div className="flex-1 p-6 flex items-center justify-center relative">
-                      <div className="absolute inset-0 bg-gradient-to-br from-brand-500/5 to-accent-purple/5" />
-                      <div className="relative text-center space-y-4">
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500/20 to-accent-purple/20 border border-brand-500/20">
-                          <Sparkles className="w-8 h-8 text-brand-400 animate-pulse" />
-                        </div>
-                        <div className="space-y-2">
-                          <div className="h-3 w-48 bg-white/10 rounded mx-auto" />
-                          <div className="h-2 w-32 bg-white/[0.06] rounded mx-auto" />
-                        </div>
-                        <div className="flex gap-3 justify-center mt-4">
-                          <div className="h-24 w-24 bg-white/[0.03] rounded-lg border border-white/[0.06]" />
-                          <div className="h-24 w-24 bg-white/[0.03] rounded-lg border border-white/[0.06]" />
-                          <div className="hidden sm:block h-24 w-24 bg-white/[0.03] rounded-lg border border-white/[0.06]" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <BuilderDemo />
               {/* Glow under the preview */}
               <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 w-[80%] h-40 bg-brand-500/10 blur-[100px] rounded-full" />
             </motion.div>
@@ -569,7 +518,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Video Creator Highlight Section */}
+      {/* Video Creator Showcase Section */}
       <section className="relative py-24 lg:py-32 border-t border-white/[0.04] overflow-hidden">
         <div className="absolute inset-0">
           <div className="glow-orb glow-orb-purple w-[600px] h-[600px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-10" />
@@ -580,61 +529,27 @@ export default function LandingPage() {
             whileInView="visible"
             viewport={{ once: true, margin: "-100px" }}
             variants={staggerContainer}
-            className="grid lg:grid-cols-2 gap-16 items-center"
           >
-            <motion.div variants={fadeInUp}>
+            <motion.div variants={fadeInUp} className="text-center mb-12">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-pink/20 bg-accent-pink/5 mb-6">
                 <Video className="w-3 h-3 text-accent-pink" />
                 <span className="text-xs font-medium text-accent-pink">AI Video Creator</span>
               </div>
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-6">
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-6">
                 High-End Videos.<br />
                 <span className="gradient-text">Zero Scripts.</span>
               </h2>
-              <p className="text-lg text-white/40 leading-relaxed mb-8">
-                Our AI doesn&apos;t need scripts, storyboards, or templates. Describe what you want and it
-                creates scroll-stopping, high-production videos optimized for every platform.
+              <p className="max-w-2xl mx-auto text-lg text-white/40 mb-4">
+                Describe what you want. AI creates scroll-stopping, production-quality videos
+                optimized for every platform. Click any video to preview.
               </p>
-              <div className="space-y-4">
-                {[
-                  "TikTok viral format videos with trending hooks",
-                  "Facebook & Instagram ads that convert",
-                  "YouTube Shorts with AI-generated visuals",
-                  "Brand story videos with cinematic quality",
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full bg-accent-cyan/10 flex items-center justify-center flex-shrink-0">
-                      <Star className="w-3 h-3 text-accent-cyan" />
-                    </div>
-                    <span className="text-sm text-white/60">{item}</span>
-                  </div>
-                ))}
-              </div>
+              <Link href="/products/video-creator" className="inline-flex items-center gap-2 text-sm text-accent-pink hover:text-accent-pink/80 transition-colors">
+                Learn more about Video Creator <ArrowRight className="w-4 h-4" />
+              </Link>
             </motion.div>
 
-            <motion.div variants={fadeInUp} className="relative">
-              <div className="gradient-border rounded-2xl overflow-hidden">
-                <div className="bg-dark-300/80 backdrop-blur-xl p-8 aspect-video flex items-center justify-center relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-accent-purple/5 to-accent-pink/5" />
-                  <div className="relative text-center space-y-6">
-                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-accent-purple/20 to-accent-pink/20 border border-accent-purple/20">
-                      <Play className="w-10 h-10 text-white/60 ml-1" />
-                    </div>
-                    <div>
-                      <div className="text-lg font-bold text-white/80 mb-1">AI Video Generation</div>
-                      <div className="text-sm text-white/40">Describe &rarr; Generate &rarr; Publish</div>
-                    </div>
-                    <div className="flex gap-2 justify-center">
-                      {["TikTok", "Facebook", "Instagram", "YouTube"].map((platform) => (
-                        <span key={platform} className="px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.06] text-xs text-white/40">
-                          {platform}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-[60%] h-20 bg-accent-purple/10 blur-[60px] rounded-full" />
+            <motion.div variants={fadeInUp}>
+              <VideoShowcase />
             </motion.div>
           </motion.div>
         </div>
