@@ -29,6 +29,7 @@ import {
   X,
   Store,
   Headphones,
+  HelpCircle,
 } from "lucide-react";
 
 const fadeInUp = {
@@ -252,6 +253,10 @@ export default function LandingPage() {
               </div>
             </div>
             <div className="hidden md:flex items-center gap-4">
+              <Link href="/support" className="text-sm text-white/50 hover:text-white transition-colors px-4 py-2 flex items-center gap-1.5">
+                <HelpCircle className="w-3.5 h-3.5" />
+                Support
+              </Link>
               <Link href="/auth/login" className="text-sm text-white/50 hover:text-white transition-colors px-4 py-2">
                 Sign in
               </Link>
@@ -278,6 +283,7 @@ export default function LandingPage() {
             <Link href="/domains" className="block text-sm text-white/60 hover:text-white">Domains</Link>
             <Link href="/developers" className="block text-sm text-white/60 hover:text-white">Developers</Link>
             <Link href="/agencies" className="block text-sm text-white/60 hover:text-white">Agencies</Link>
+            <Link href="/support" className="block text-sm text-white/60 hover:text-white">Support</Link>
             <a href="#pricing" className="block text-sm text-white/60 hover:text-white">Pricing</a>
             <Link href="/builder" className="block btn-gradient px-5 py-2.5 rounded-xl text-sm font-semibold text-white text-center mt-4">
               <span>Start Building</span>
@@ -753,7 +759,7 @@ export default function LandingPage() {
               <ul className="space-y-2.5">
                 <li><Link href="/agencies" className="text-sm text-white/30 hover:text-white/60 transition-colors">Agencies</Link></li>
                 <li><Link href="/agencies#white-label" className="text-sm text-white/30 hover:text-white/60 transition-colors">White Label</Link></li>
-                <li><Link href="/agencies#pricing" className="text-sm text-white/30 hover:text-white/60 transition-colors">Agency Pricing</Link></li>
+                <li><Link href="/support" className="text-sm text-white/30 hover:text-white/60 transition-colors">AI Support</Link></li>
                 <li><Link href="/auth/signup" className="text-sm text-white/30 hover:text-white/60 transition-colors">Sign Up</Link></li>
               </ul>
             </div>
