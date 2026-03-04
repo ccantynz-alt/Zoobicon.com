@@ -27,6 +27,8 @@ import {
   Star,
   Menu,
   X,
+  Store,
+  Headphones,
 } from "lucide-react";
 
 const fadeInUp = {
@@ -80,20 +82,41 @@ const PRODUCTS = [
     tag: "Designer",
   },
   {
-    icon: Mail,
-    name: "AI Email Marketing",
-    description: "Craft and automate email campaigns that convert. AI writes, designs, segments, and optimizes delivery.",
+    icon: Headphones,
+    name: "AI Email Support",
+    description: "World-class AI customer support. Auto-replies in <30s, sentiment analysis, smart routing — 24/7.",
     color: "from-amber-500 to-orange-600",
     glowColor: "shadow-glow",
     domain: "zoobicon.com",
     tag: "Agent",
+    href: "/products/email-support",
   },
   {
-    icon: MessageSquare,
-    name: "AI Social Media Manager",
-    description: "Auto-create, schedule, and optimize posts across all platforms. Your 24/7 social media powerhouse.",
+    icon: Globe,
+    name: "Domain Registration",
+    description: "Register premium domains from $2.99/yr. Free WHOIS privacy, DNS management, and AI website builder included.",
     color: "from-cyan-500 to-blue-600",
     glowColor: "shadow-glow-cyan",
+    domain: "zoobicon.com",
+    tag: "Revenue",
+    href: "/domains",
+  },
+  {
+    icon: Store,
+    name: "Add-ons Marketplace",
+    description: "Discover premium templates, AI agents, integrations, and tools. Install with one click. Build & sell your own.",
+    color: "from-accent-purple to-pink-600",
+    glowColor: "shadow-glow-purple",
+    domain: "zoobicon.com",
+    tag: "Marketplace",
+    href: "/marketplace",
+  },
+  {
+    icon: Mail,
+    name: "AI Email Marketing",
+    description: "Craft and automate email campaigns that convert. AI writes, designs, segments, and optimizes delivery.",
+    color: "from-rose-500 to-red-600",
+    glowColor: "shadow-glow",
     domain: "zoobicon.com",
     tag: "Agent",
   },
@@ -159,7 +182,7 @@ const DOMAINS = [
 const STATS = [
   { value: "10x", label: "Faster than manual coding" },
   { value: "4", label: "Domain ecosystem" },
-  { value: "8+", label: "AI-powered products" },
+  { value: "10+", label: "AI-powered products" },
   { value: "24/7", label: "Autonomous agents" },
 ];
 
@@ -222,8 +245,9 @@ export default function LandingPage() {
               </Link>
               <div className="hidden md:flex items-center gap-6">
                 <a href="#products" className="text-sm text-white/50 hover:text-white transition-colors">Products</a>
+                <Link href="/marketplace" className="text-sm text-white/50 hover:text-white transition-colors">Marketplace</Link>
+                <Link href="/domains" className="text-sm text-white/50 hover:text-white transition-colors">Domains</Link>
                 <Link href="/developers" className="text-sm text-white/50 hover:text-white transition-colors">Developers</Link>
-                <Link href="/agencies" className="text-sm text-white/50 hover:text-white transition-colors">Agencies</Link>
                 <a href="#pricing" className="text-sm text-white/50 hover:text-white transition-colors">Pricing</a>
               </div>
             </div>
@@ -250,9 +274,10 @@ export default function LandingPage() {
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-white/[0.06] bg-[#050507]/95 backdrop-blur-2xl px-6 py-6 space-y-4">
             <a href="#products" className="block text-sm text-white/60 hover:text-white">Products</a>
+            <Link href="/marketplace" className="block text-sm text-white/60 hover:text-white">Marketplace</Link>
+            <Link href="/domains" className="block text-sm text-white/60 hover:text-white">Domains</Link>
             <Link href="/developers" className="block text-sm text-white/60 hover:text-white">Developers</Link>
             <Link href="/agencies" className="block text-sm text-white/60 hover:text-white">Agencies</Link>
-            <Link href="/cli" className="block text-sm text-white/60 hover:text-white">CLI Tools</Link>
             <a href="#pricing" className="block text-sm text-white/60 hover:text-white">Pricing</a>
             <Link href="/builder" className="block btn-gradient px-5 py-2.5 rounded-xl text-sm font-semibold text-white text-center mt-4">
               <span>Start Building</span>
@@ -365,7 +390,7 @@ export default function LandingPage() {
                 <span className="gradient-text">Dominate Online</span>
               </h2>
               <p className="max-w-2xl mx-auto text-lg text-white/40">
-                Eight AI-powered products working in harmony. Each one best-in-class.
+                Ten AI-powered products working in harmony. Each one best-in-class.
                 Together, an unstoppable digital powerhouse.
               </p>
             </motion.div>
@@ -709,9 +734,9 @@ export default function LandingPage() {
                 <li><Link href="/products/website-builder" className="text-sm text-white/30 hover:text-white/60 transition-colors">Website Builder</Link></li>
                 <li><Link href="/products/seo-agent" className="text-sm text-white/30 hover:text-white/60 transition-colors">SEO Agent</Link></li>
                 <li><Link href="/products/video-creator" className="text-sm text-white/30 hover:text-white/60 transition-colors">Video Creator</Link></li>
-                <li><a href="#products" className="text-sm text-white/30 hover:text-white/60 transition-colors">Brand Kit</a></li>
-                <li><a href="#products" className="text-sm text-white/30 hover:text-white/60 transition-colors">Email Marketing</a></li>
-                <li><a href="#products" className="text-sm text-white/30 hover:text-white/60 transition-colors">Social Manager</a></li>
+                <li><Link href="/products/email-support" className="text-sm text-white/30 hover:text-white/60 transition-colors">AI Email Support</Link></li>
+                <li><Link href="/domains" className="text-sm text-white/30 hover:text-white/60 transition-colors">Domains</Link></li>
+                <li><Link href="/marketplace" className="text-sm text-white/30 hover:text-white/60 transition-colors">Marketplace</Link></li>
               </ul>
             </div>
             <div>
