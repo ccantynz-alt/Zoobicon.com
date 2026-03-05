@@ -8,6 +8,18 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: false,
   },
+  // Compress responses
+  compress: true,
+  // Optimize images
+  images: {
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 86400,
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+  },
+  // Experimental performance features
+  experimental: {
+    optimizePackageImports: ["framer-motion", "lucide-react"],
+  },
   // Security headers
   async headers() {
     return [

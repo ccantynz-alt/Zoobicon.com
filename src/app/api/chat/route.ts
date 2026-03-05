@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       : `Create a website with this requirement: ${instruction}`;
 
     const stream = await client.messages.stream({
-      model: "claude-sonnet-4-5-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 16000,
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userMessage }],
