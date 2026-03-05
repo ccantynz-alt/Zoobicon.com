@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -47,6 +48,25 @@ ZOOBICON QUICK FACTS:
 - Agency pricing: Starter $149/mo, Pro $399/mo, Enterprise Custom`;
 
 export async function POST(request: NextRequest) {
+  // Rate limit: 30 support messages per minute per IP
+  const ip = getClientIp(request);
+  const rl = checkRateLimit(`support:${ip}`, { limit: 30, windowMs: 60_000 });
+  if (!rl.allowed) {
+    return new Response(
+      JSON.stringify({ error: "Too many requests. Please wait a moment and try again." }),
+      {
+        status: 429,
+        headers: {
+          "Content-Type": "application/json",
+          "X-RateLimit-Limit": "30",
+          "X-RateLimit-Remaining": "0",
+          "X-RateLimit-Reset": String(rl.resetAt),
+          "Retry-After": String(Math.ceil((rl.resetAt - Date.now()) / 1000)),
+        },
+      }
+    );
+  }
+
   try {
     const { messages } = await request.json();
 
@@ -71,7 +91,7 @@ export async function POST(request: NextRequest) {
     }));
 
     const stream = await client.messages.stream({
-      model: "claude-sonnet-4-5-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 1024,
       system: SYSTEM_PROMPT,
       messages: sanitizedMessages,

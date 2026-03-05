@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -23,6 +24,25 @@ RULES:
 - NEVER include any text before or after the HTML. Just the HTML.`;
 
 export async function POST(request: NextRequest) {
+  // Rate limit: 10 generations per minute per IP
+  const ip = getClientIp(request);
+  const rl = checkRateLimit(`generate:${ip}`, { limit: 10, windowMs: 60_000 });
+  if (!rl.allowed) {
+    return new Response(
+      JSON.stringify({ error: "Too many requests. Please wait a moment and try again." }),
+      {
+        status: 429,
+        headers: {
+          "Content-Type": "application/json",
+          "X-RateLimit-Limit": "10",
+          "X-RateLimit-Remaining": "0",
+          "X-RateLimit-Reset": String(rl.resetAt),
+          "Retry-After": String(Math.ceil((rl.resetAt - Date.now()) / 1000)),
+        },
+      }
+    );
+  }
+
   try {
     const { prompt, template } = await request.json();
 

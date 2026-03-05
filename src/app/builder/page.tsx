@@ -19,6 +19,7 @@ import {
   Save,
   Check,
   FolderOpen,
+  Download,
 } from "lucide-react";
 
 type DeviceMode = "desktop" | "tablet" | "mobile";
@@ -146,6 +147,19 @@ function BuilderContent() {
     setBuildLog((prev) => [...prev, "AI edit applied", `Updated: ${newCode.length.toLocaleString()} chars`]);
   };
 
+  const handleExport = () => {
+    if (!generatedCode) return;
+    const filename = (lastPrompt.slice(0, 40) || "zoobicon-site").replace(/[^a-z0-9]/gi, "-").toLowerCase() + ".html";
+    const blob = new Blob([generatedCode], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+    setBuildLog((prev) => [...prev, `Exported as ${filename}`]);
+  };
+
   const handleSave = () => {
     if (!generatedCode) return;
 
@@ -195,6 +209,17 @@ function BuilderContent() {
           >
             {isSaved ? <Check className="w-3 h-3" /> : <Save className="w-3 h-3" />}
             {isSaved ? "Saved" : "Save"}
+          </button>
+
+          {/* Export button */}
+          <button
+            onClick={handleExport}
+            disabled={!generatedCode}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
+                       bg-white/[0.04] text-white/40 border border-white/[0.06] hover:text-white/60 hover:bg-white/[0.06] transition-all disabled:opacity-30"
+          >
+            <Download className="w-3 h-3" />
+            Export
           </button>
 
           {/* Dashboard link */}

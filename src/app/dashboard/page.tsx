@@ -20,6 +20,7 @@ import {
   BarChart3,
   Sparkles,
   Bot,
+  Shield,
 } from "lucide-react";
 import { getProjects, deleteProject, type SavedProject } from "@/lib/storage";
 
@@ -143,6 +144,15 @@ export default function DashboardPage() {
                         </div>
                       </div>
                       <div className="py-1">
+                        {userRole === "admin" && (
+                          <Link
+                            href="/admin"
+                            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-brand-400/70 hover:text-brand-400 hover:bg-white/[0.04] transition-colors"
+                          >
+                            <Shield className="w-4 h-4" />
+                            Admin Panel
+                          </Link>
+                        )}
                         <Link
                           href="/auth/settings"
                           className="w-full flex items-center gap-2 px-4 py-2 text-sm text-white/50 hover:text-white hover:bg-white/[0.04] transition-colors"
