@@ -65,19 +65,25 @@ const MOCK_RESULTS = [
 export default function DomainsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showResults, setShowResults] = useState(false);
-  const [cart, setCart] = useState<string[]>([]);
+  const [cart, setCart] = useState<string[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const saved = localStorage.getItem("zoobicon_domain_cart");
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      setShowResults(true);
-    }
+    if (searchQuery.trim()) setShowResults(true);
   };
 
   const toggleCart = (domain: string) => {
-    setCart((prev) =>
-      prev.includes(domain) ? prev.filter((d) => d !== domain) : [...prev, domain]
-    );
+    setCart((prev) => {
+      const next = prev.includes(domain) ? prev.filter((d) => d !== domain) : [...prev, domain];
+      try { localStorage.setItem("zoobicon_domain_cart", JSON.stringify(next)); } catch {}
+      return next;
+    });
   };
 
   const displayResults = showResults

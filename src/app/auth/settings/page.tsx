@@ -13,6 +13,10 @@ import {
   AlertTriangle,
   Copy,
   Check,
+  Key,
+  RefreshCw,
+  Code2,
+  Trash2,
 } from "lucide-react";
 
 type StoredUser = {
@@ -37,15 +41,86 @@ export default function SettingsPage() {
   const [envInstruction, setEnvInstruction] = useState("");
   const [copied, setCopied] = useState(false);
 
+  // API key state
+  const [apiKey, setApiKey] = useState<string>("");
+  const [apiKeyVersion, setApiKeyVersion] = useState(1);
+  const [apiKeyCopied, setApiKeyCopied] = useState(false);
+  const [apiKeyLoading, setApiKeyLoading] = useState(false);
+  const [showApiKey, setShowApiKey] = useState(false);
+
   useEffect(() => {
     try {
       const raw = localStorage.getItem("zoobicon_user");
       if (raw) setUser(JSON.parse(raw));
       else window.location.href = "/auth/login";
+      const savedKey = localStorage.getItem("zoobicon_api_key");
+      const savedVersion = localStorage.getItem("zoobicon_api_key_version");
+      if (savedKey) setApiKey(savedKey);
+      if (savedVersion) setApiKeyVersion(Number(savedVersion));
     } catch {
       window.location.href = "/auth/login";
     }
   }, []);
+
+  const handleGenerateApiKey = async () => {
+    if (!user) return;
+    setApiKeyLoading(true);
+    try {
+      const plan = user.plan === "unlimited" ? "pro" : "free";
+      const res = await fetch("/api/keys", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: user.email, plan, version: apiKeyVersion }),
+      });
+      const data = await res.json();
+      if (res.ok && data.key) {
+        setApiKey(data.key);
+        setShowApiKey(true);
+        localStorage.setItem("zoobicon_api_key", data.key);
+        localStorage.setItem("zoobicon_api_key_version", String(apiKeyVersion));
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setApiKeyLoading(false);
+    }
+  };
+
+  const handleRevokeApiKey = async () => {
+    const newVersion = apiKeyVersion + 1;
+    setApiKeyVersion(newVersion);
+    setApiKey("");
+    setShowApiKey(false);
+    localStorage.removeItem("zoobicon_api_key");
+    localStorage.setItem("zoobicon_api_key_version", String(newVersion));
+    // Re-generate with new version immediately
+    if (!user) return;
+    setApiKeyLoading(true);
+    try {
+      const plan = user.plan === "unlimited" ? "pro" : "free";
+      const res = await fetch("/api/keys", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: user.email, plan, version: newVersion }),
+      });
+      const data = await res.json();
+      if (res.ok && data.key) {
+        setApiKey(data.key);
+        setShowApiKey(true);
+        localStorage.setItem("zoobicon_api_key", data.key);
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setApiKeyLoading(false);
+    }
+  };
+
+  const copyApiKey = () => {
+    navigator.clipboard.writeText(apiKey);
+    setApiKeyCopied(true);
+    setTimeout(() => setApiKeyCopied(false), 2000);
+  };
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -304,6 +379,85 @@ export default function SettingsPage() {
             </Link>
           </section>
         )}
+
+        {/* API Keys */}
+        <section className="gradient-border rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-accent-cyan/20 to-brand-500/10 flex items-center justify-center">
+                <Key className="w-4 h-4 text-accent-cyan" />
+              </div>
+              <h2 className="text-base font-bold">API Keys</h2>
+            </div>
+            <span className="text-[10px] text-white/20 font-mono">zoobicon.io</span>
+          </div>
+          <p className="text-xs text-white/30 mb-5 ml-12">
+            Use your API key to call the Zoobicon API from your own apps and scripts.
+            Keep it secret — treat it like a password.
+          </p>
+
+          {!apiKey ? (
+            <button
+              onClick={handleGenerateApiKey}
+              disabled={apiKeyLoading}
+              className="flex items-center gap-2 btn-gradient px-4 py-2.5 rounded-xl text-sm font-bold text-white disabled:opacity-50"
+            >
+              {apiKeyLoading
+                ? <><RefreshCw className="w-4 h-4 animate-spin" />Generating…</>
+                : <><Key className="w-4 h-4" />Generate API Key</>
+              }
+            </button>
+          ) : (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="flex-1 flex items-center gap-2 bg-white/[0.03] border border-white/[0.06] rounded-xl px-3 py-2.5">
+                  <Code2 className="w-3.5 h-3.5 text-white/20 flex-shrink-0" />
+                  <code className="text-xs font-mono text-white/50 flex-1 truncate">
+                    {showApiKey ? apiKey : apiKey.slice(0, 12) + "••••••••••••••••••••••••••••"}
+                  </code>
+                  <button
+                    onClick={() => setShowApiKey(!showApiKey)}
+                    className="text-white/20 hover:text-white/40 text-[10px] flex-shrink-0"
+                  >
+                    {showApiKey ? "hide" : "show"}
+                  </button>
+                </div>
+                <button
+                  onClick={copyApiKey}
+                  className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] transition-colors text-xs font-medium flex-shrink-0"
+                >
+                  {apiKeyCopied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                  {apiKeyCopied ? "Copied" : "Copy"}
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] text-white/20">
+                  Version {apiKeyVersion} · {user?.plan === "unlimited" ? "Pro" : "Free"} tier ·
+                  {user?.plan === "unlimited" ? " 60 gen/min" : " 10 gen/min"}
+                </p>
+                <button
+                  onClick={handleRevokeApiKey}
+                  disabled={apiKeyLoading}
+                  className="flex items-center gap-1.5 text-[10px] text-red-400/40 hover:text-red-400/70 transition-colors"
+                >
+                  <Trash2 className="w-3 h-3" />
+                  Revoke & regenerate
+                </button>
+              </div>
+
+              {/* Quick usage example */}
+              <div className="mt-4 pt-4 border-t border-white/[0.04]">
+                <p className="text-[10px] text-white/25 mb-2 font-mono">Quick start</p>
+                <div className="bg-dark-400/60 rounded-lg p-3 text-[10px] font-mono text-white/40 leading-relaxed overflow-x-auto">
+                  <span className="text-white/20">curl</span> https://zoobicon.com/api/generate \<br />
+                  &nbsp;&nbsp;<span className="text-white/20">-H</span> <span className="text-accent-cyan/60">&quot;Authorization: Bearer {showApiKey ? apiKey : apiKey.slice(0, 16) + "…"}&quot;</span> \<br />
+                  &nbsp;&nbsp;<span className="text-white/20">-d</span> <span className="text-brand-400/60">&apos;&#123;&quot;prompt&quot;:&quot;A landing page for my SaaS&quot;&#125;&apos;</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
 
         <div className="text-center">
           <Link href="/dashboard" className="text-sm text-white/30 hover:text-white/60 transition-colors">

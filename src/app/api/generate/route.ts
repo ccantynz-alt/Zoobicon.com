@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+import { validateApiKey } from "@/lib/apiKey";
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -24,9 +25,16 @@ RULES:
 - NEVER include any text before or after the HTML. Just the HTML.`;
 
 export async function POST(request: NextRequest) {
-  // Rate limit: 10 generations per minute per IP
+  // API key auth — if a valid zbk_live_ key is provided, grant higher rate limits
+  const bearerKey = request.headers.get("authorization")?.replace("Bearer ", "").trim() || "";
+  const apiKeyResult = bearerKey ? await validateApiKey(bearerKey) : null;
+  const isApiKeyRequest = apiKeyResult?.valid === true;
+
+  // Rate limit: 10 gen/min for browsers, 60/min for valid API key holders
   const ip = getClientIp(request);
-  const rl = checkRateLimit(`generate:${ip}`, { limit: 10, windowMs: 60_000 });
+  const rateLimitId = isApiKeyRequest ? `generate:key:${bearerKey.slice(-8)}` : `generate:${ip}`;
+  const rateLimit = isApiKeyRequest ? { limit: 60, windowMs: 60_000 } : { limit: 10, windowMs: 60_000 };
+  const rl = checkRateLimit(rateLimitId, rateLimit);
   if (!rl.allowed) {
     return new Response(
       JSON.stringify({ error: "Too many requests. Please wait a moment and try again." }),

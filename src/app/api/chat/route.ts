@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+import { validateApiKey } from "@/lib/apiKey";
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -18,9 +19,16 @@ RULES:
 - NEVER include any text before or after the HTML. Just the complete updated HTML.`;
 
 export async function POST(request: NextRequest) {
-  // Rate limit: 20 edits per minute per IP
+  // API key auth — valid zbk_live_ key gets higher rate limit
+  const bearerKey = request.headers.get("authorization")?.replace("Bearer ", "").trim() || "";
+  const apiKeyResult = bearerKey ? await validateApiKey(bearerKey) : null;
+  const isApiKeyRequest = apiKeyResult?.valid === true;
+
+  // Rate limit: 20 edits/min for browsers, 120/min for valid API key holders
   const ip = getClientIp(request);
-  const rl = checkRateLimit(`chat:${ip}`, { limit: 20, windowMs: 60_000 });
+  const rateLimitId = isApiKeyRequest ? `chat:key:${bearerKey.slice(-8)}` : `chat:${ip}`;
+  const rateLimit = isApiKeyRequest ? { limit: 120, windowMs: 60_000 } : { limit: 20, windowMs: 60_000 };
+  const rl = checkRateLimit(rateLimitId, rateLimit);
   if (!rl.allowed) {
     return new Response(
       JSON.stringify({ error: "Too many requests. Please wait a moment and try again." }),
