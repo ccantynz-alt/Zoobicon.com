@@ -143,10 +143,13 @@ export default function DashboardPage() {
                         </div>
                       </div>
                       <div className="py-1">
-                        <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-white/50 hover:text-white hover:bg-white/[0.04] transition-colors">
+                        <Link
+                          href="/auth/settings"
+                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-white/50 hover:text-white hover:bg-white/[0.04] transition-colors"
+                        >
                           <Settings className="w-4 h-4" />
                           Settings
-                        </button>
+                        </Link>
                         <button
                           onClick={handleLogout}
                           className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-400/60 hover:text-red-400 hover:bg-white/[0.04] transition-colors"
