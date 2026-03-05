@@ -36,6 +36,8 @@ export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [userName, setUserName] = useState("User");
+  const [userRole, setUserRole] = useState<"user" | "admin">("user");
+  const [userPlan, setUserPlan] = useState<"free" | "unlimited">("free");
 
   useEffect(() => {
     setProjects(getProjects());
@@ -44,6 +46,8 @@ export default function DashboardPage() {
       if (user) {
         const parsed = JSON.parse(user);
         setUserName(parsed.name || "User");
+        setUserRole(parsed.role === "admin" ? "admin" : "user");
+        setUserPlan(parsed.plan === "unlimited" ? "unlimited" : "free");
       }
     } catch { /* ignore */ }
   }, []);
@@ -132,7 +136,11 @@ export default function DashboardPage() {
                     <div className="absolute right-0 mt-2 w-48 bg-dark-100 border border-white/[0.08] rounded-xl shadow-elevated overflow-hidden z-50">
                       <div className="px-4 py-3 border-b border-white/[0.06]">
                         <div className="text-sm font-medium">{userName}</div>
-                        <div className="text-xs text-white/30">Free Plan</div>
+                        <div className="text-xs text-white/30">
+                          {userRole === "admin" ? (
+                            <span className="text-brand-400 font-semibold">Admin · Unlimited</span>
+                          ) : "Free Plan"}
+                        </div>
                       </div>
                       <div className="py-1">
                         <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-white/50 hover:text-white hover:bg-white/[0.04] transition-colors">
@@ -197,8 +205,12 @@ export default function DashboardPage() {
             <div className="text-xs text-white/40 mt-1">Characters Generated</div>
           </div>
           <div className="gradient-border p-5 rounded-xl">
-            <div className="text-2xl font-black gradient-text-static">Free</div>
-            <div className="text-xs text-white/40 mt-1">Current Plan</div>
+            <div className="text-2xl font-black gradient-text-static">
+              {userRole === "admin" ? "∞" : userPlan === "unlimited" ? "∞" : "Free"}
+            </div>
+            <div className="text-xs text-white/40 mt-1">
+              {userRole === "admin" ? "Admin · Unlimited" : "Current Plan"}
+            </div>
           </div>
         </div>
 

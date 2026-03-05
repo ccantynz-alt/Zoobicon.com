@@ -10,14 +10,50 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const [authError, setAuthError] = useState("");
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate auth - replace with real auth later
-    setTimeout(() => {
-      localStorage.setItem("zoobicon_user", JSON.stringify({ email, name: email.split("@")[0] }));
+    setAuthError("");
+
+    try {
+      // Try admin login first
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (res.ok) {
+        const { user } = await res.json();
+        localStorage.setItem("zoobicon_user", JSON.stringify(user));
+        window.location.href = "/dashboard";
+        return;
+      }
+
+      if (res.status === 401) {
+        // Fall through to regular user login (demo mode)
+        localStorage.setItem(
+          "zoobicon_user",
+          JSON.stringify({ email, name: email.split("@")[0], role: "user", plan: "free" })
+        );
+        window.location.href = "/dashboard";
+        return;
+      }
+
+      const data = await res.json();
+      setAuthError(data.error || "Sign in failed");
+    } catch {
+      // Network error – fall back to demo login
+      localStorage.setItem(
+        "zoobicon_user",
+        JSON.stringify({ email, name: email.split("@")[0], role: "user", plan: "free" })
+      );
       window.location.href = "/dashboard";
-    }, 1000);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -94,6 +130,10 @@ export default function LoginPage() {
                 </button>
               </div>
             </div>
+
+            {authError && (
+              <p className="text-sm text-red-400/80 text-center py-2">{authError}</p>
+            )}
 
             <button
               type="submit"
