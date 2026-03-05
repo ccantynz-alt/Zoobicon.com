@@ -9,6 +9,8 @@ import {
   ArrowRight,
   Star,
   Download,
+  Check,
+  RefreshCw,
   Zap,
   Globe,
   Palette,
@@ -299,6 +301,36 @@ export default function MarketplacePage() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [priceFilter, setPriceFilter] = useState<"all" | "free" | "paid">("all");
+  const [installed, setInstalled] = useState<Set<string>>(() => {
+    if (typeof window === "undefined") return new Set();
+    try {
+      const saved = localStorage.getItem("zoobicon_installed_addons");
+      return new Set(saved ? JSON.parse(saved) : []);
+    } catch { return new Set(); }
+  });
+  const [installing, setInstalling] = useState<string | null>(null);
+
+  const handleInstall = (itemName: string, priceType: string) => {
+    if (installing) return;
+    if (installed.has(itemName)) return;
+
+    if (priceType !== "free") {
+      // Paid — redirect to signup/billing
+      window.location.href = "/auth/signup";
+      return;
+    }
+
+    setInstalling(itemName);
+    setTimeout(() => {
+      setInstalled((prev) => {
+        const next = new Set(prev);
+        next.add(itemName);
+        try { localStorage.setItem("zoobicon_installed_addons", JSON.stringify([...next])); } catch {}
+        return next;
+      });
+      setInstalling(null);
+    }, 800);
+  };
 
   const filteredItems = MARKETPLACE_ITEMS.filter((item) => {
     const matchesCategory = activeCategory === "All" || item.category === activeCategory;
@@ -445,9 +477,23 @@ export default function MarketplacePage() {
                     <span className={`text-sm font-bold ${item.priceType === "free" ? "text-emerald-400" : "text-white/70"}`}>
                       {item.price}
                     </span>
-                    <button className="btn-gradient px-4 py-2 rounded-lg text-xs font-bold text-white flex items-center gap-1.5">
-                      <Download className="w-3.5 h-3.5" />
-                      Install
+                    <button
+                      onClick={() => handleInstall(item.name, item.priceType)}
+                      className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
+                        installed.has(item.name)
+                          ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                          : "btn-gradient text-white"
+                      }`}
+                    >
+                      {installed.has(item.name) ? (
+                        <><Check className="w-3.5 h-3.5" />Installed</>
+                      ) : installing === item.name ? (
+                        <><RefreshCw className="w-3.5 h-3.5 animate-spin" />Installing…</>
+                      ) : item.priceType !== "free" ? (
+                        <><Download className="w-3.5 h-3.5" />Get</>
+                      ) : (
+                        <><Download className="w-3.5 h-3.5" />Install</>
+                      )}
                     </button>
                   </div>
                 </motion.div>
@@ -507,17 +553,32 @@ export default function MarketplacePage() {
                     </div>
                   </div>
                   <p className="text-[11px] text-white/35 leading-relaxed mb-3 line-clamp-2">{item.description}</p>
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between mt-auto">
                     <div className="flex items-center gap-2">
                       <div className="flex items-center gap-0.5">
                         <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
                         <span className="text-[10px] text-white/50">{item.rating}</span>
                       </div>
-                      <span className="text-[10px] text-white/20">{item.installs}</span>
+                      <span className={`text-[10px] font-semibold ${item.priceType === "free" ? "text-emerald-400/70" : "text-white/40"}`}>
+                        {item.price}
+                      </span>
                     </div>
-                    <span className={`text-xs font-bold ${item.priceType === "free" ? "text-emerald-400" : "text-white/60"}`}>
-                      {item.price}
-                    </span>
+                    <button
+                      onClick={() => handleInstall(item.name, item.priceType)}
+                      className={`px-3 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all ${
+                        installed.has(item.name)
+                          ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                          : "btn-gradient text-white"
+                      }`}
+                    >
+                      {installed.has(item.name) ? (
+                        <><Check className="w-3 h-3" />Installed</>
+                      ) : installing === item.name ? (
+                        <><RefreshCw className="w-3 h-3 animate-spin" />…</>
+                      ) : (
+                        <><Download className="w-3 h-3" />{item.priceType !== "free" ? "Get" : "Install"}</>
+                      )}
+                    </button>
                   </div>
                 </motion.div>
               ))}
