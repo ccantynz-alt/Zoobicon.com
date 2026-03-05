@@ -4,7 +4,7 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
 
-  "regions": ["iad1", "sfo1", "lhr1", "sin1"],
+  "regions": ["iad1"],
 
   "functions": {
     "src/app/api/generate/route.ts": {
