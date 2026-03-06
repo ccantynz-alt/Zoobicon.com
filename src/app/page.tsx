@@ -772,8 +772,8 @@ export default function LandingPage() {
               &copy; 2026 Zoobicon. All rights reserved.
             </div>
             <div className="flex items-center gap-6">
-              <a href="#" className="text-xs text-white/20 hover:text-white/40 transition-colors">Privacy</a>
-              <a href="#" className="text-xs text-white/20 hover:text-white/40 transition-colors">Terms</a>
+              <Link href="/privacy" className="text-xs text-white/20 hover:text-white/40 transition-colors">Privacy</Link>
+              <Link href="/terms" className="text-xs text-white/20 hover:text-white/40 transition-colors">Terms</Link>
               <a href="#" className="text-xs text-white/20 hover:text-white/40 transition-colors">Cookies</a>
             </div>
           </div>
