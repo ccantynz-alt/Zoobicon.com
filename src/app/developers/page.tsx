@@ -414,9 +414,9 @@ export default function DevelopersPage() {
                   <li>Unlimited API keys</li>
                   <li>24/7 support</li>
                 </ul>
-                <button className="w-full py-2.5 rounded-xl border border-white/[0.08] text-sm font-semibold text-white/60 hover:border-white/20 transition-all">
+                <a href="mailto:sales@zoobicon.com?subject=Enterprise API Inquiry" className="block w-full py-2.5 rounded-xl border border-white/[0.08] text-sm font-semibold text-white/60 hover:border-white/20 transition-all text-center">
                   Contact Sales
-                </button>
+                </a>
               </motion.div>
             </div>
           </motion.div>

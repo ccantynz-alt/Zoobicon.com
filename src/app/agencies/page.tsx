@@ -191,10 +191,10 @@ export default function AgenciesPage() {
                 <span>Start 14-Day Free Trial</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <button className="px-8 py-4 rounded-2xl text-base font-medium text-white/50 border border-white/[0.08] hover:border-white/20 transition-all flex items-center gap-3">
+              <a href="mailto:sales@zoobicon.com?subject=Agency Demo Request" className="px-8 py-4 rounded-2xl text-base font-medium text-white/50 border border-white/[0.08] hover:border-white/20 transition-all flex items-center gap-3">
                 <Briefcase className="w-5 h-5" />
                 <span>Book a Demo</span>
-              </button>
+              </a>
             </motion.div>
 
             {/* Stats */}
@@ -340,13 +340,25 @@ export default function AgenciesPage() {
                       </li>
                     ))}
                   </ul>
-                  <button className={`w-full py-2.5 rounded-xl text-sm font-bold ${
-                    tier.featured
-                      ? "btn-gradient text-white"
-                      : "border border-white/[0.08] text-white/60 hover:border-white/20 transition-all"
-                  }`}>
-                    <span>{tier.cta}</span>
-                  </button>
+                  {tier.cta === "Contact Sales" ? (
+                    <a
+                      href="mailto:sales@zoobicon.com?subject=Agency Enterprise Inquiry"
+                      className="block w-full py-2.5 rounded-xl text-sm font-bold text-center border border-white/[0.08] text-white/60 hover:border-white/20 transition-all"
+                    >
+                      Contact Sales
+                    </a>
+                  ) : (
+                    <Link
+                      href="/auth/signup"
+                      className={`block w-full py-2.5 rounded-xl text-sm font-bold text-center ${
+                        tier.featured
+                          ? "btn-gradient text-white"
+                          : "border border-white/[0.08] text-white/60 hover:border-white/20 transition-all"
+                      }`}
+                    >
+                      {tier.cta}
+                    </Link>
+                  )}
                 </motion.div>
               ))}
             </div>

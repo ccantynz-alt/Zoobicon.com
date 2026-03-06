@@ -249,7 +249,7 @@ export default function LandingPage() {
                 <Link href="/marketplace" className="text-sm text-white/50 hover:text-white transition-colors">Marketplace</Link>
                 <Link href="/domains" className="text-sm text-white/50 hover:text-white transition-colors">Domains</Link>
                 <Link href="/developers" className="text-sm text-white/50 hover:text-white transition-colors">Developers</Link>
-                <a href="#pricing" className="text-sm text-white/50 hover:text-white transition-colors">Pricing</a>
+                <Link href="/pricing" className="text-sm text-white/50 hover:text-white transition-colors">Pricing</Link>
               </div>
             </div>
             <div className="hidden md:flex items-center gap-4">
@@ -284,7 +284,7 @@ export default function LandingPage() {
             <Link href="/developers" className="block text-sm text-white/60 hover:text-white">Developers</Link>
             <Link href="/agencies" className="block text-sm text-white/60 hover:text-white">Agencies</Link>
             <Link href="/support" className="block text-sm text-white/60 hover:text-white">Support</Link>
-            <a href="#pricing" className="block text-sm text-white/60 hover:text-white">Pricing</a>
+            <Link href="/pricing" className="block text-sm text-white/60 hover:text-white">Pricing</Link>
             <Link href="/builder" className="block btn-gradient px-5 py-2.5 rounded-xl text-sm font-semibold text-white text-center mt-4">
               <span>Start Building</span>
             </Link>
@@ -643,9 +643,9 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <button className="w-full btn-gradient py-3 rounded-xl text-sm font-bold text-white shadow-glow">
-                  <span>Start Pro Trial</span>
-                </button>
+                <Link href="/auth/signup" className="block w-full btn-gradient py-3 rounded-xl text-sm font-bold text-white shadow-glow text-center">
+                  Start Pro Trial
+                </Link>
               </motion.div>
 
               {/* Enterprise */}
@@ -661,9 +661,9 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <button className="w-full py-3 rounded-xl border border-white/[0.1] text-sm font-semibold text-white/70 hover:text-white hover:border-white/20 transition-all">
+                <a href="mailto:sales@zoobicon.com?subject=Enterprise Inquiry" className="block w-full py-3 rounded-xl border border-white/[0.1] text-sm font-semibold text-white/70 hover:text-white hover:border-white/20 transition-all text-center">
                   Contact Sales
-                </button>
+                </a>
               </motion.div>
             </div>
           </motion.div>
