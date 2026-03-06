@@ -13,15 +13,23 @@ export const sql = neon(process.env.DATABASE_URL);
 export async function initSchema() {
   await sql`
     CREATE TABLE IF NOT EXISTS users (
-      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      email       TEXT UNIQUE NOT NULL,
-      name        TEXT NOT NULL DEFAULT '',
-      role        TEXT NOT NULL DEFAULT 'user',
-      plan        TEXT NOT NULL DEFAULT 'free',
-      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      id                      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      email                   TEXT UNIQUE NOT NULL,
+      name                    TEXT NOT NULL DEFAULT '',
+      role                    TEXT NOT NULL DEFAULT 'user',
+      plan                    TEXT NOT NULL DEFAULT 'free',
+      stripe_customer_id      TEXT UNIQUE,
+      stripe_subscription_id  TEXT UNIQUE,
+      subscription_status     TEXT,
+      created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `;
+
+  // Idempotent: add Stripe columns if the table was created before this migration
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_customer_id     TEXT UNIQUE`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_subscription_id TEXT UNIQUE`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_status    TEXT`;
 
   await sql`
     CREATE TABLE IF NOT EXISTS projects (
