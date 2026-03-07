@@ -26,7 +26,6 @@ import {
   ChevronRight,
   Cpu,
   Workflow,
-  HardDrive,
   Layers,
 } from "lucide-react";
 
@@ -35,12 +34,6 @@ const fadeInUp = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } },
 };
 const staggerContainer = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
-const staggerFast = { hidden: {}, visible: { transition: { staggerChildren: 0.05 } } };
-const scaleIn = {
-  hidden: { opacity: 0, scale: 0.9 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: "easeOut" as const } },
-};
-
 const SPEED_STATS = [
   { value: "50ms", label: "Global edge latency" },
   { value: "99.99%", label: "Uptime SLA" },
