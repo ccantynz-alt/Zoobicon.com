@@ -60,44 +60,5 @@
         { "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }
       ]
     }
-  ],
-
-  "env": {
-    "ANTHROPIC_API_KEY": "@anthropic-api-key",
-    "OPENAI_API_KEY": "@openai-api-key",
-    "GOOGLE_GENERATIVE_AI_API_KEY": "@google-generative-ai-api-key",
-    "XAI_API_KEY": "@xai-api-key",
-    "GROQ_API_KEY": "@groq-api-key",
-    "MISTRAL_API_KEY": "@mistral-api-key",
-    "COHERE_API_KEY": "@cohere-api-key",
-    "PERPLEXITY_API_KEY": "@perplexity-api-key",
-    "STABILITY_API_KEY": "@stability-api-key",
-    "REPLICATE_API_TOKEN": "@replicate-api-token",
-    "FAL_API_KEY": "@fal-api-key",
-    "IDEOGRAM_API_KEY": "@ideogram-api-key",
-    "RUNWAY_API_KEY": "@runway-api-key",
-    "LUMA_API_KEY": "@luma-api-key",
-    "PIKA_API_KEY": "@pika-api-key",
-    "KLING_API_KEY": "@kling-api-key",
-    "ELEVENLABS_API_KEY": "@elevenlabs-api-key",
-    "PLAYHT_API_KEY": "@playht-api-key",
-    "PLAYHT_USER_ID": "@playht-user-id",
-    "DATAFORSEO_LOGIN": "@dataforseo-login",
-    "DATAFORSEO_PASSWORD": "@dataforseo-password",
-    "SERPER_API_KEY": "@serper-api-key",
-    "TAVILY_API_KEY": "@tavily-api-key",
-    "BRAVE_SEARCH_API_KEY": "@brave-search-api-key",
-    "GOOGLE_SEARCH_CONSOLE_CLIENT_ID": "@google-search-console-client-id",
-    "GOOGLE_SEARCH_CONSOLE_CLIENT_SECRET": "@google-search-console-client-secret",
-    "CLOUDINARY_CLOUD_NAME": "@cloudinary-cloud-name",
-    "CLOUDINARY_API_KEY": "@cloudinary-api-key",
-    "CLOUDINARY_API_SECRET": "@cloudinary-api-secret",
-    "UNSPLASH_ACCESS_KEY": "@unsplash-access-key",
-    "PEXELS_API_KEY": "@pexels-api-key",
-    "NEXT_PUBLIC_POSTHOG_KEY": "@posthog-key",
-    "ADMIN_EMAIL": "@admin-email",
-    "ADMIN_PASSWORD": "@admin-password",
-    "RESEND_API_KEY": "@resend-api-key",
-    "NEXT_PUBLIC_APP_URL": "@app-url"
-  }
+  ]
 }
