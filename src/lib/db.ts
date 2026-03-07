@@ -1,10 +1,20 @@
-import { neon } from "@neondatabase/serverless";
+import { neon, type NeonQueryFunction } from "@neondatabase/serverless";
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL is not set");
+function getSQL(): NeonQueryFunction<false, false> {
+  if (!process.env.DATABASE_URL) {
+    throw new Error("DATABASE_URL is not set");
+  }
+  return neon(process.env.DATABASE_URL);
 }
 
-export const sql = neon(process.env.DATABASE_URL);
+export const sql = new Proxy({} as NeonQueryFunction<false, false>, {
+  apply(_target, thisArg, args) {
+    return Reflect.apply(getSQL(), thisArg, args);
+  },
+  get(_target, prop) {
+    return Reflect.get(getSQL(), prop);
+  },
+});
 
 /**
  * Initialize database schema. Call this from /api/db/init or at startup.

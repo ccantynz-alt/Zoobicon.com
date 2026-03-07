@@ -27,8 +27,9 @@ export default function PromptInput({
   const [isMac, setIsMac] = useState(false);
 
   useEffect(() => {
-    // Use userAgentData (modern) with fallback to userAgent (universal compat)
-    const ua = navigator.userAgentData?.platform ?? navigator.userAgent ?? "";
+    // Detect macOS/iOS for keyboard shortcut label
+    const nav = navigator as Navigator & { userAgentData?: { platform: string } };
+    const ua = nav.userAgentData?.platform ?? navigator.userAgent ?? "";
     setIsMac(/mac|iphone|ipad/i.test(ua));
     textareaRef.current?.focus();
   }, []);

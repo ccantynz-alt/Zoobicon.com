@@ -115,7 +115,7 @@ export default function SupportAvatar({ isSpeaking, size = "lg" }: SupportAvatar
                   style={{ width: 148, height: 148, top: "50%", left: "50%", x: "-50%", y: "-50%" }}
                   initial={{ scale: 0.9, opacity: 0.8 }}
                   animate={{ scale: 1.5, opacity: 0 }}
-                  transition={{ duration: 1.2, ease: "easeOut" }}
+                  transition={{ duration: 1.2, ease: "easeOut" as const }}
                 />
               )}
             </AnimatePresence>
