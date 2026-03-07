@@ -357,8 +357,14 @@ function BuilderContent() {
           <div className="flex-1 overflow-hidden flex">
             <div className="flex-1 overflow-hidden">
               {error && (
-                <div className="m-4 p-3 border border-red-500/20 bg-red-500/10 text-red-400 rounded-lg text-sm">
-                  {error}
+                <div className="m-4 p-4 border border-red-500/20 bg-red-500/10 rounded-lg">
+                  <div className="text-red-400 text-sm font-medium mb-1">Generation Failed</div>
+                  <div className="text-red-400/70 text-xs">{error}</div>
+                  {error.includes("API key") && (
+                    <div className="mt-2 text-xs text-white/40">
+                      The AI builder is temporarily unavailable. Please try again later or contact support.
+                    </div>
+                  )}
                 </div>
               )}
 
