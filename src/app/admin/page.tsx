@@ -101,7 +101,7 @@ export default function AdminPage() {
   ];
 
   const launchChecklist = [
-    { done: true,  label: "AI generation working (claude-sonnet-4-6)" },
+    { done: true,  label: "AI generation working (claude-3-5-sonnet)" },
     { done: true,  label: "AI chat editor working" },
     { done: true,  label: "Support chat working (Zoe)" },
     { done: true,  label: "Rate limiting on all API routes" },
