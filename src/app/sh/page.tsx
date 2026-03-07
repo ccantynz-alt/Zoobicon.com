@@ -8,7 +8,6 @@ import {
   Copy,
   Check,
   ArrowRight,
-  Zap,
   Globe,
   Shield,
   Rocket,
@@ -27,8 +26,6 @@ import {
   Lock,
   Network,
   Server,
-  Github,
-  GitlabIcon,
 } from "lucide-react";
 
 const fadeInUp = {
