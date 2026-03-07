@@ -1,25 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Check, Download } from "lucide-react";
 
 interface CodePanelProps {
-  code: string;
+  html: string;
 }
 
-export default function CodePanel({ code }: CodePanelProps) {
+export default function CodePanel({ html }: CodePanelProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
-    if (!code) return;
-    await navigator.clipboard.writeText(code);
+    await navigator.clipboard.writeText(html);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleDownload = () => {
-    if (!code) return;
-    const blob = new Blob([code], { type: "text/html" });
+    const blob = new Blob([html], { type: "text/html" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -28,43 +25,41 @@ export default function CodePanel({ code }: CodePanelProps) {
     URL.revokeObjectURL(url);
   };
 
-  if (!code) {
+  if (!html) {
     return (
-      <div className="flex items-center justify-center h-full bg-dark-400">
-        <div className="text-sm text-white/30">No code generated yet</div>
+      <div className="flex items-center justify-center h-full">
+        <p className="text-sm text-cyber-border uppercase tracking-[2px]">
+          No code generated yet
+        </p>
       </div>
     );
   }
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center gap-2 px-4 py-2 border-b border-white/[0.06] bg-dark-300/50">
+      {/* Toolbar */}
+      <div className="flex items-center gap-2 px-4 py-2 border-b border-cyber-border">
+        <span className="text-[10px] uppercase tracking-[2px] text-cyber-border flex-1">
+          Generated HTML
+        </span>
         <button
           onClick={handleCopy}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white/50 bg-white/[0.04]
-                     hover:bg-white/[0.08] rounded-lg transition-colors border border-white/[0.06]"
+          className="text-[11px] text-cyber-cyan/60 hover:text-cyber-cyan transition-colors px-2 py-1 rounded hover:bg-cyber-panel"
         >
-          {copied ? <Check className="w-3 h-3 text-accent-cyan" /> : <Copy className="w-3 h-3" />}
-          {copied ? "Copied!" : "Copy code"}
+          {copied ? "Copied!" : "Copy"}
         </button>
         <button
           onClick={handleDownload}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-brand-400 bg-brand-500/10
-                     hover:bg-brand-500/20 rounded-lg transition-colors border border-brand-500/20"
+          className="text-[11px] text-cyber-magenta/60 hover:text-cyber-magenta transition-colors px-2 py-1 rounded hover:bg-cyber-panel"
         >
-          <Download className="w-3 h-3" />
-          Download HTML
+          Download
         </button>
-        <span className="ml-auto text-xs text-white/20">
-          {code.length.toLocaleString()} chars
-        </span>
       </div>
 
-      <div className="flex-1 overflow-auto p-4 bg-dark-400 code-output">
-        <pre className="text-xs leading-relaxed">
-          <code>{code}</code>
-        </pre>
-      </div>
+      {/* Code display */}
+      <pre className="flex-1 overflow-auto p-4 text-xs leading-relaxed text-cyber-green/80">
+        <code>{html}</code>
+      </pre>
     </div>
   );
 }

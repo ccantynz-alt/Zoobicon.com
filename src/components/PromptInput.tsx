@@ -1,77 +1,89 @@
 "use client";
 
-import { useState } from "react";
-import { Sparkles } from "lucide-react";
+import { useRef, useEffect } from "react";
 
 interface PromptInputProps {
-  onGenerate: (prompt: string) => void;
+  prompt: string;
+  onPromptChange: (value: string) => void;
+  onGenerate: () => void;
   isGenerating: boolean;
 }
 
 const EXAMPLE_PROMPTS = [
-  "A portfolio site for a photographer with a grid gallery",
-  "A landing page for an AI startup with a hero section",
-  "A restaurant menu page with food categories and pricing",
-  "A personal blog with a minimalist design",
+  "A landing page for a cybersecurity startup with dark theme and neon accents",
+  "A personal portfolio for a photographer with a minimal, elegant layout",
+  "A retro-futuristic dashboard showing weather data with animated charts",
+  "A restaurant menu page with a warm, rustic aesthetic and food photography",
+  "A SaaS pricing page with three tiers, toggle for monthly/annual, and FAQ section",
 ];
 
-export default function PromptInput({ onGenerate, isGenerating }: PromptInputProps) {
-  const [prompt, setPrompt] = useState("");
+export default function PromptInput({
+  prompt,
+  onPromptChange,
+  onGenerate,
+  isGenerating,
+}: PromptInputProps) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleSubmit = () => {
-    if (!prompt.trim() || isGenerating) return;
-    onGenerate(prompt.trim());
-  };
+  useEffect(() => {
+    textareaRef.current?.focus();
+  }, []);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
-      handleSubmit();
+      onGenerate();
     }
   };
 
   return (
-    <div className="p-4 border-b border-white/[0.06]">
-      <label className="block text-xs font-medium text-white/40 mb-2 uppercase tracking-wider">
-        Describe your website
-      </label>
-
+    <div className="flex flex-col h-full p-4 gap-4">
+      {/* Textarea */}
       <textarea
+        ref={textareaRef}
+        className="cyber-input flex-1 min-h-[120px]"
+        placeholder="Describe the website you want to build..."
         value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
+        onChange={(e) => onPromptChange(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="A modern landing page for a SaaS product..."
         disabled={isGenerating}
-        rows={4}
-        className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-3.5 py-2.5
-                   text-sm text-white/90 placeholder-white/20
-                   focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30
-                   transition-all resize-none disabled:opacity-50"
+        maxLength={5000}
       />
 
+      {/* Character count */}
+      <div className="flex justify-between items-center text-[10px] text-cyber-border">
+        <span>{prompt.length} / 5000</span>
+        <span className="text-cyber-cyan/40">
+          {navigator.platform?.includes("Mac") ? "Cmd" : "Ctrl"}+Enter to
+          build
+        </span>
+      </div>
+
+      {/* Build button */}
       <button
-        onClick={handleSubmit}
-        disabled={!prompt.trim() || isGenerating}
-        className="w-full mt-3 px-4 py-2.5 text-sm font-semibold text-white
-                   btn-gradient rounded-xl flex items-center justify-center gap-2
-                   disabled:opacity-40 disabled:cursor-not-allowed"
+        className="cyber-btn w-full"
+        onClick={onGenerate}
+        disabled={isGenerating || !prompt.trim()}
       >
-        <Sparkles className="w-4 h-4" />
-        <span>{isGenerating ? "Generating..." : "Generate Website"}</span>
+        {isGenerating ? (
+          <span className="loading-dots">Generating</span>
+        ) : (
+          "Build Website"
+        )}
       </button>
 
-      <div className="mt-4">
-        <div className="text-[11px] font-medium text-white/20 mb-2 uppercase tracking-wider">
+      {/* Example prompts */}
+      <div className="mt-2">
+        <span className="text-[10px] uppercase tracking-[2px] text-cyber-border block mb-2">
           Try an example
-        </div>
-        <div className="flex flex-col gap-1">
+        </span>
+        <div className="flex flex-col gap-1.5 overflow-y-auto max-h-[200px]">
           {EXAMPLE_PROMPTS.map((example, i) => (
             <button
               key={i}
-              onClick={() => setPrompt(example)}
+              className="text-left text-xs text-cyber-cyan/50 hover:text-cyber-cyan transition-colors p-2 rounded hover:bg-cyber-panel/50 leading-relaxed"
+              onClick={() => onPromptChange(example)}
               disabled={isGenerating}
-              className="text-left text-xs text-white/25 hover:text-brand-400
-                         transition-colors truncate disabled:opacity-30"
             >
               {example}
             </button>
