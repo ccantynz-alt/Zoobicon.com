@@ -1,10 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   Check, Zap, ArrowRight, HelpCircle, Sparkles, Globe, Video, BarChart3,
-  Mail, Bot, Palette, Code2, Shield, Users, Building2,
+  Mail, Bot, Palette, Code2, Shield, Users, Building2, Loader2,
 } from "lucide-react";
 
 const fadeInUp = {
@@ -122,6 +123,27 @@ const FAQS = [
 ];
 
 export default function PricingPage() {
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+
+  async function handleProCheckout() {
+    setCheckoutLoading(true);
+    const email = window.prompt("Enter your email to start the Pro trial:");
+    if (!email) { setCheckoutLoading(false); return; }
+
+    const res = await fetch("/api/stripe/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert(data.error ?? "Something went wrong");
+      setCheckoutLoading(false);
+    }
+  }
+
   return (
     <div className="relative min-h-screen">
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
@@ -211,14 +233,19 @@ export default function PricingPage() {
                     >
                       {plan.cta}
                     </a>
+                  ) : plan.featured ? (
+                    <button
+                      onClick={handleProCheckout}
+                      disabled={checkoutLoading}
+                      className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold btn-gradient text-white shadow-glow disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {checkoutLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                      {plan.cta}
+                    </button>
                   ) : (
                     <Link
                       href={plan.ctaHref}
-                      className={`block w-full py-3 rounded-xl text-sm font-bold text-center ${
-                        plan.featured
-                          ? "btn-gradient text-white shadow-glow"
-                          : "border border-white/[0.1] text-white/70 hover:text-white hover:border-white/20 transition-all"
-                      }`}
+                      className="block w-full py-3 rounded-xl text-sm font-bold text-center border border-white/[0.1] text-white/70 hover:text-white hover:border-white/20 transition-all"
                     >
                       {plan.cta}
                     </Link>
