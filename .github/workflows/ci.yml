@@ -30,7 +30,9 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          # Dummy key so build succeeds in CI (API routes are not called at build time)
+          # Dummy keys so build succeeds in CI (API routes are not called at build time)
           ANTHROPIC_API_KEY: sk-ant-ci-placeholder
           ADMIN_EMAIL: admin@zoobicon.com
           ADMIN_PASSWORD: ci-placeholder
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+          STRIPE_SECRET_KEY: sk_test_ci_placeholder
