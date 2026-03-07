@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
       : `Build me a website: ${prompt}`;
 
     const stream = await client.messages.stream({
-      model: "claude-sonnet-4-6",
+      model: "claude-3-5-sonnet-20241022",
       max_tokens: 16000,
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userMessage }],
