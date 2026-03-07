@@ -3,9 +3,11 @@ import Anthropic from "@anthropic-ai/sdk";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { validateApiKey } from "@/lib/apiKey";
 
-const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+function getClient() {
+  return new Anthropic({
+    apiKey: process.env.ANTHROPIC_API_KEY,
+  });
+}
 
 const SYSTEM_PROMPT = `You are ZOOBICON's AI editing assistant. The user has a generated HTML website and wants to make changes to it.
 
@@ -66,12 +68,26 @@ export async function POST(request: NextRequest) {
       ? `Here is the current website HTML:\n\n${currentCode}\n\nPlease make this change: ${instruction}`
       : `Create a website with this requirement: ${instruction}`;
 
-    const stream = await client.messages.stream({
-      model: "claude-sonnet-4-6",
-      max_tokens: 16000,
-      system: SYSTEM_PROMPT,
-      messages: [{ role: "user", content: userMessage }],
-    });
+    let stream;
+    try {
+      stream = await getClient().messages.stream({
+        model: "claude-sonnet-4-6",
+        max_tokens: 16000,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: "user", content: userMessage }],
+      });
+    } catch (apiErr: unknown) {
+      const isAuthError =
+        apiErr instanceof Anthropic.AuthenticationError ||
+        (apiErr instanceof Error && apiErr.message.includes("authentication"));
+      if (isAuthError) {
+        return new Response(
+          JSON.stringify({ error: "AI service is temporarily unavailable. The site owner needs to update their API key." }),
+          { status: 503, headers: { "Content-Type": "application/json" } }
+        );
+      }
+      throw apiErr;
+    }
 
     const encoder = new TextEncoder();
 
