@@ -175,7 +175,7 @@ function analyzeHeadings(html: string, keyword: string): SeoCategory {
 
   // Keyword in H1
   if (h1Count > 0 && keyword) {
-    const h1Text = h1Matches[0].replace(/<[^>]*>/g, "").trim();
+    const h1Text = (h1Matches[0] ?? "").replace(/<[^>]*>/g, "").trim();
     if (containsKeyword(h1Text, keyword)) {
       checks.push({ name: "Keyword in H1", passed: true, message: `H1 contains target keyword "${keyword}".`, impact: "high" });
       score += 25;
