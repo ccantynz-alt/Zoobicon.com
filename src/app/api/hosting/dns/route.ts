@@ -5,7 +5,7 @@ import { randomUUID } from "crypto";
 // In-memory storage — would be backed by a DNS zone database (e.g. PowerDNS,
 // Route 53 API) in production.
 // ---------------------------------------------------------------------------
-export interface DnsRecord {
+interface DnsRecord {
   id: string;
   domain: string;
   type: "A" | "AAAA" | "CNAME" | "MX" | "TXT" | "NS" | "SRV";
@@ -20,7 +20,7 @@ export interface DnsRecord {
 
 const dnsRecords = new Map<string, DnsRecord>();
 
-export { dnsRecords };
+// Internal storage — not exported
 
 // ---------------------------------------------------------------------------
 // Helpers

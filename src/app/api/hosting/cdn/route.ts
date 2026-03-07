@@ -4,7 +4,7 @@ import { randomUUID } from "crypto";
 // ---------------------------------------------------------------------------
 // In-memory storage — would be backed by a database in production.
 // ---------------------------------------------------------------------------
-export interface CdnConfig {
+interface CdnConfig {
   siteId: string;
   cacheEverything: boolean;
   minify: { html: boolean; css: boolean; js: boolean };
@@ -16,7 +16,7 @@ export interface CdnConfig {
   updatedAt: string;
 }
 
-export interface CachePurgeRecord {
+interface CachePurgeRecord {
   id: string;
   siteId: string;
   paths: string[] | "all";
@@ -27,7 +27,7 @@ export interface CachePurgeRecord {
 const cdnConfigs = new Map<string, CdnConfig>();
 const cachePurges = new Map<string, CachePurgeRecord>();
 
-export { cdnConfigs, cachePurges };
+// Internal storage — not exported to avoid Next.js route validation errors
 
 // ---------------------------------------------------------------------------
 // Helpers

@@ -4,7 +4,7 @@ import { randomUUID } from "crypto";
 // ---------------------------------------------------------------------------
 // In-memory storage — would be backed by a database in production.
 // ---------------------------------------------------------------------------
-export interface Site {
+interface Site {
   siteId: string;
   name: string;
   email: string;
@@ -25,7 +25,7 @@ export interface Site {
 const sites = new Map<string, Site>();
 
 /** Expose store for sibling routes. */
-export { sites };
+// Internal storage — not exported
 
 // ---------------------------------------------------------------------------
 // Helpers

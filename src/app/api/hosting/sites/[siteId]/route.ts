@@ -10,8 +10,31 @@ import { NextRequest, NextResponse } from "next/server";
 // a single-process dev server the re-imports *may* share state.
 // ---------------------------------------------------------------------------
 
-import type { Site } from "../route";
-import type { Deployment } from "../../deploy/route";
+interface Site {
+  id: string;
+  name: string;
+  slug: string;
+  email: string;
+  plan: string;
+  status: string;
+  url: string;
+  createdAt: string;
+  updatedAt: string;
+  settings: Record<string, unknown>;
+  storage: { used: number; limit: number };
+  bandwidth: { used: number; limit: number };
+}
+
+interface Deployment {
+  id: string;
+  siteId: string;
+  environment: string;
+  status: string;
+  url: string;
+  size: number;
+  createdAt: string;
+  commitMessage?: string;
+}
 
 // We maintain our own reference Maps so the route is self-contained.
 // In production, replace with DB calls.

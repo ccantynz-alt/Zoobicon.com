@@ -4,7 +4,7 @@ import { randomUUID } from "crypto";
 // ---------------------------------------------------------------------------
 // In-memory storage — would be backed by a database in production.
 // ---------------------------------------------------------------------------
-export interface SslCertificate {
+interface SslCertificate {
   id: string;
   domain: string;
   siteId: string;
@@ -19,7 +19,7 @@ export interface SslCertificate {
 
 const sslCertificates = new Map<string, SslCertificate>();
 
-export { sslCertificates };
+// Internal storage — not exported
 
 // ---------------------------------------------------------------------------
 // Helpers

@@ -4,7 +4,7 @@ import { randomUUID } from "crypto";
 // ---------------------------------------------------------------------------
 // In-memory storage — would be backed by a database (e.g. Postgres) in prod.
 // ---------------------------------------------------------------------------
-export interface Deployment {
+interface Deployment {
   id: string;
   siteId: string;
   environment: "production" | "staging" | "preview";
@@ -17,7 +17,7 @@ export interface Deployment {
 const deployments = new Map<string, Deployment>();
 
 /** Expose the store so sibling routes (sites, analytics) can read deployments. */
-export { deployments };
+// Internal storage — not exported
 
 // ---------------------------------------------------------------------------
 // Helpers

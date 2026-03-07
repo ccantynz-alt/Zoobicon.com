@@ -4,7 +4,7 @@ import { randomUUID } from "crypto";
 // ---------------------------------------------------------------------------
 // In-memory storage — would be backed by a database in production.
 // ---------------------------------------------------------------------------
-export interface DomainRecord {
+interface DomainRecord {
   id: string;
   domain: string;
   siteId: string;
@@ -23,7 +23,7 @@ export interface DomainRecord {
 const domainRecords = new Map<string, DomainRecord>();
 
 /** Expose store for sibling routes. */
-export { domainRecords };
+// Internal storage — not exported
 
 // ---------------------------------------------------------------------------
 // Helpers
