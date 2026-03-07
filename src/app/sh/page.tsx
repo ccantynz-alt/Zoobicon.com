@@ -70,7 +70,7 @@ const CLI_COMMANDS = [
   { cmd: "zb init [name]", desc: "Initialize a new project", icon: FolderPlus, color: "text-emerald-400" },
   { cmd: "zb generate \"[prompt]\"", desc: "Generate a website from prompt", icon: Sparkles, color: "text-amber-400" },
   { cmd: "zb edit \"[instruction]\"", desc: "Edit with natural language", icon: Pencil, color: "text-sky-400" },
-  { cmd: "zb deploy", desc: "Deploy to zoobicon.sh subdomain", icon: Upload, color: "text-green-400" },
+  { cmd: "zb deploy", desc: "Deploy to zoobicon.sh subdomain", icon: Upload, color: "text-brand-400" },
   { cmd: "zb deploy --domain custom.com", desc: "Deploy to custom domain", icon: Globe, color: "text-violet-400" },
   { cmd: "zb export --wordpress", desc: "Export as WordPress theme", icon: ExternalLink, color: "text-blue-400" },
   { cmd: "zb translate --lang es,fr,de", desc: "Add translations", icon: Languages, color: "text-pink-400" },
@@ -85,8 +85,8 @@ const PIPELINE_STEPS = [
   { label: "Local Dev", icon: Terminal, color: "text-white/60" },
   { label: "zb generate", icon: Sparkles, color: "text-amber-400" },
   { label: "Preview", icon: Eye, color: "text-sky-400" },
-  { label: "zb deploy", icon: Upload, color: "text-green-400" },
-  { label: "Live on zoobicon.sh", icon: Rocket, color: "text-accent-cyan" },
+  { label: "zb deploy", icon: Upload, color: "text-brand-400" },
+  { label: "Live on zoobicon.sh", icon: Rocket, color: "text-brand-400" },
 ];
 
 /* ── CI/CD snippets ──────────────────────────────────────────── */
@@ -286,11 +286,11 @@ export default function ZoobiconShPage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
                 <Terminal className="w-4 h-4 text-white" />
               </div>
               <span className="text-lg font-bold tracking-tight">Zoobicon</span>
-              <span className="text-xs font-mono text-green-400 bg-green-500/10 px-2 py-0.5 rounded-md border border-green-500/20">.sh</span>
+              <span className="text-xs font-mono text-brand-400 bg-brand-500/10 px-2 py-0.5 rounded-md border border-brand-500/20">.sh</span>
             </Link>
             <div className="hidden md:flex items-center gap-4">
               <a href="#commands" className="text-sm text-white/40 hover:text-white transition-colors">Commands</a>
@@ -314,15 +314,15 @@ export default function ZoobiconShPage() {
       <section className="pt-32 pb-20 lg:pt-44 lg:pb-28">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
-            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-green-500/20 bg-green-500/5 mb-6">
-              <Terminal className="w-3 h-3 text-green-400" />
-              <span className="text-xs font-medium text-green-400">CLI &amp; Deployment Hub</span>
+            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand-500/20 bg-brand-500/5 mb-6">
+              <Terminal className="w-3 h-3 text-brand-400" />
+              <span className="text-xs font-medium text-brand-400">CLI &amp; Deployment Hub</span>
               <span className="text-xs text-white/20 font-mono">zoobicon.sh</span>
             </motion.div>
 
             <motion.h1 variants={fadeInUp} className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[0.95] mb-6">
               Zoobicon.sh &mdash; Deploy<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-emerald-400 to-cyan-400">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 via-accent-purple to-accent-cyan">
                 from Your Terminal
               </span>
             </motion.h1>
@@ -335,7 +335,7 @@ export default function ZoobiconShPage() {
             <motion.div variants={fadeInUp} className="flex flex-wrap gap-3 mb-16">
               <button
                 onClick={() => copyText("npm install -g zoobicon-cli", "hero")}
-                className="group flex items-center gap-3 bg-dark-200 border border-white/[0.08] hover:border-green-500/30 rounded-xl px-6 py-3 font-mono text-sm text-white/60 transition-all"
+                className="group flex items-center gap-3 bg-dark-200 border border-white/[0.08] hover:border-brand-500/30 rounded-xl px-6 py-3 font-mono text-sm text-white/60 transition-all"
               >
                 <span className="text-green-400">$</span> npm install -g zoobicon-cli
                 {copied === "hero" ? <Check className="w-4 h-4 text-accent-cyan" /> : <Copy className="w-4 h-4 text-white/20 group-hover:text-white/50" />}
@@ -364,7 +364,7 @@ export default function ZoobiconShPage() {
             <motion.div variants={fadeInUp} className="text-center mb-12">
               <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
                 CLI Commands<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400">Reference</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-purple">Reference</span>
               </h2>
               <p className="text-white/40 max-w-xl mx-auto">Everything you need, right from your terminal.</p>
             </motion.div>
@@ -382,7 +382,7 @@ export default function ZoobiconShPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <code className="text-sm font-mono text-green-400/90 truncate">{cmd.cmd}</code>
+                        <code className="text-sm font-mono text-brand-400/90 truncate">{cmd.cmd}</code>
                         <button
                           onClick={() => copyText(cmd.cmd, `cmd-${i}`)}
                           className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
@@ -406,13 +406,13 @@ export default function ZoobiconShPage() {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="gradient-border rounded-2xl p-8 md:p-12">
               <div className="text-center mb-10">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-cyan/20 bg-accent-cyan/5 mb-6">
-                  <Globe className="w-3 h-3 text-accent-cyan" />
-                  <span className="text-xs font-medium text-accent-cyan">Free Subdomain Hosting</span>
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand-500/20 bg-brand-500/5 mb-6">
+                  <Globe className="w-3 h-3 text-brand-400" />
+                  <span className="text-xs font-medium text-brand-400">Free Subdomain Hosting</span>
                 </div>
                 <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-4">
                   Every Project Gets a Free<br />
-                  <span className="text-green-400 font-mono">*.zoobicon.sh</span> Subdomain
+                  <span className="text-brand-400 font-mono">*.zoobicon.sh</span> Subdomain
                 </h2>
                 <p className="text-lg text-white/40 max-w-2xl mx-auto">
                   Deploy instantly to our global edge network. Zero configuration, zero cost.
@@ -428,7 +428,7 @@ export default function ZoobiconShPage() {
                   { icon: Shield, title: "DDoS Protection", desc: "Enterprise-grade security" },
                 ].map((feat, i) => (
                   <motion.div key={i} variants={scaleIn} className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 text-center">
-                    <feat.icon className="w-6 h-6 text-green-400/60 mx-auto mb-2" />
+                    <feat.icon className="w-6 h-6 text-brand-400/60 mx-auto mb-2" />
                     <h4 className="text-sm font-semibold mb-1">{feat.title}</h4>
                     <p className="text-xs text-white/30">{feat.desc}</p>
                   </motion.div>
@@ -443,7 +443,7 @@ export default function ZoobiconShPage() {
                   { name: "agency-client", highlight: true },
                 ].map((sub, i) => (
                   <div key={i} className="bg-[#0c0c14] border border-white/[0.06] rounded-lg px-4 py-2 font-mono text-sm text-white/50">
-                    <span className="text-green-400">{sub.name}</span>.zoobicon.sh
+                    <span className="text-brand-400">{sub.name}</span>.zoobicon.sh
                   </div>
                 ))}
               </div>
@@ -459,7 +459,7 @@ export default function ZoobiconShPage() {
             <motion.div variants={fadeInUp} className="text-center mb-12">
               <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
                 From Idea to<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400">Production</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-cyan">Production</span>
               </h2>
               <p className="text-white/40 max-w-xl mx-auto">A streamlined pipeline from local development to live deployment.</p>
             </motion.div>
@@ -469,7 +469,7 @@ export default function ZoobiconShPage() {
               {/* Desktop horizontal pipeline */}
               <div className="hidden md:flex items-center justify-between relative">
                 {/* Connecting line */}
-                <div className="absolute top-1/2 left-[10%] right-[10%] h-px bg-gradient-to-r from-white/10 via-green-500/30 to-accent-cyan/30 -translate-y-1/2" />
+                <div className="absolute top-1/2 left-[10%] right-[10%] h-px bg-gradient-to-r from-white/10 via-brand-500/30 to-accent-purple/30 -translate-y-1/2" />
 
                 {PIPELINE_STEPS.map((step, i) => (
                   <motion.div
@@ -499,7 +499,7 @@ export default function ZoobiconShPage() {
                     </div>
                     <span className="text-xs font-mono text-white/50 mt-2 mb-1">{step.label}</span>
                     {i < PIPELINE_STEPS.length - 1 && (
-                      <div className="w-px h-6 bg-gradient-to-b from-white/10 to-green-500/20" />
+                      <div className="w-px h-6 bg-gradient-to-b from-white/10 to-brand-500/20" />
                     )}
                   </div>
                 ))}
@@ -516,13 +516,13 @@ export default function ZoobiconShPage() {
             <motion.div variants={fadeInUp} className="grid lg:grid-cols-2 gap-12 items-start">
               {/* Left — info */}
               <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-green-500/20 bg-green-500/5 mb-6">
-                  <Workflow className="w-3 h-3 text-green-400" />
-                  <span className="text-xs font-medium text-green-400">CI/CD Integration</span>
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand-500/20 bg-brand-500/5 mb-6">
+                  <Workflow className="w-3 h-3 text-brand-400" />
+                  <span className="text-xs font-medium text-brand-400">CI/CD Integration</span>
                 </div>
                 <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
                   Deploy on<br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400">Every Push</span>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-purple">Every Push</span>
                 </h2>
                 <p className="text-lg text-white/40 leading-relaxed mb-8">
                   Drop Zoobicon into any CI/CD pipeline. Generate, test, and deploy automatically on every commit to main.
@@ -535,7 +535,7 @@ export default function ZoobiconShPage() {
                     "Environment-based deployments (staging / production)",
                   ].map((item, i) => (
                     <div key={i} className="flex items-center gap-3">
-                      <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
+                      <Check className="w-4 h-4 text-brand-400 flex-shrink-0" />
                       <span className="text-sm text-white/50">{item}</span>
                     </div>
                   ))}
@@ -552,7 +552,7 @@ export default function ZoobiconShPage() {
                         onClick={() => setActiveTab("github")}
                         className={`flex items-center gap-2 px-5 py-3 text-xs font-mono transition-colors border-b-2 ${
                           activeTab === "github"
-                            ? "border-green-400 text-green-400"
+                            ? "border-brand-500 text-brand-400"
                             : "border-transparent text-white/30 hover:text-white/50"
                         }`}
                       >
@@ -563,7 +563,7 @@ export default function ZoobiconShPage() {
                         onClick={() => setActiveTab("gitlab")}
                         className={`flex items-center gap-2 px-5 py-3 text-xs font-mono transition-colors border-b-2 ${
                           activeTab === "gitlab"
-                            ? "border-green-400 text-green-400"
+                            ? "border-brand-500 text-brand-400"
                             : "border-transparent text-white/30 hover:text-white/50"
                         }`}
                       >
@@ -595,9 +595,9 @@ export default function ZoobiconShPage() {
         <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <motion.div variants={fadeInUp}>
-              <Terminal className="w-12 h-12 text-green-400/30 mx-auto mb-6" />
+              <Terminal className="w-12 h-12 text-brand-400/30 mx-auto mb-6" />
               <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                Install the <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400">CLI</span>
+                Install the <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-cyan">CLI</span>
               </h2>
               <p className="text-lg text-white/40 mb-8">One command to deploy AI-powered websites from your terminal.</p>
             </motion.div>
@@ -605,7 +605,7 @@ export default function ZoobiconShPage() {
             <motion.div variants={fadeInUp}>
               <button
                 onClick={() => copyText("npm install -g zoobicon-cli", "cta")}
-                className="group inline-flex items-center gap-3 bg-dark-200 border border-green-500/20 hover:border-green-500/40 rounded-xl px-8 py-4 font-mono text-sm text-white/60 transition-all mb-8"
+                className="group inline-flex items-center gap-3 bg-dark-200 border border-brand-500/20 hover:border-brand-500/40 rounded-xl px-8 py-4 font-mono text-sm text-white/60 transition-all mb-8"
               >
                 <span className="text-green-400">$</span>
                 npm install -g zoobicon-cli

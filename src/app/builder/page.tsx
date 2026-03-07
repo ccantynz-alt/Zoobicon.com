@@ -156,9 +156,9 @@ export default function BuilderPage() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Left panel — Prompt */}
-        <div className="w-[400px] min-w-[340px] flex flex-col border-r border-cyber-border bg-cyber-dark">
-          <div className="px-4 py-3 border-b border-cyber-border">
-            <span className="text-[11px] uppercase tracking-[2px] text-cyber-cyan/60">
+        <div className="w-[400px] min-w-[340px] flex flex-col border-r border-white/[0.06] bg-[#12121a]">
+          <div className="px-4 py-3 border-b border-white/[0.06]">
+            <span className="text-[11px] uppercase tracking-[2px] text-brand-400/50">
               Prompt
             </span>
           </div>
@@ -173,17 +173,25 @@ export default function BuilderPage() {
         </div>
 
         {/* Center panel — Preview / Code */}
-        <div className="flex-1 flex flex-col bg-cyber-black">
+        <div className="flex-1 flex flex-col bg-[#0a0a0f]">
           {/* Tabs */}
-          <div className="flex items-center border-b border-cyber-border px-2">
+          <div className="flex items-center border-b border-white/[0.06] px-2">
             <button
-              className={`cyber-tab ${activeTab === "preview" ? "active" : ""}`}
+              className={`px-4 py-2.5 text-xs font-medium transition-colors border-b-2 ${
+                activeTab === "preview"
+                  ? "border-brand-500 text-brand-400"
+                  : "border-transparent text-white/30 hover:text-white/50"
+              }`}
               onClick={() => setActiveTab("preview")}
             >
               Preview
             </button>
             <button
-              className={`cyber-tab ${activeTab === "code" ? "active" : ""}`}
+              className={`px-4 py-2.5 text-xs font-medium transition-colors border-b-2 ${
+                activeTab === "code"
+                  ? "border-brand-500 text-brand-400"
+                  : "border-transparent text-white/30 hover:text-white/50"
+              }`}
               onClick={() => setActiveTab("code")}
             >
               Code
@@ -211,9 +219,9 @@ export default function BuilderPage() {
 
         {/* Tool panel (slides open when a tool is active) */}
         {activeTool && (
-          <div className="w-[380px] flex flex-col border-l border-cyber-border bg-[#0a0a0f] animate-in slide-in-from-right duration-200">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-cyber-border">
-              <span className="text-[11px] uppercase tracking-[2px] text-cyber-cyan/60">
+          <div className="w-[380px] flex flex-col border-l border-white/[0.06] bg-[#0a0a0f] animate-in slide-in-from-right duration-200">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+              <span className="text-[11px] uppercase tracking-[2px] text-brand-400/50">
                 {activeToolLabel}
               </span>
               <button
@@ -228,7 +236,7 @@ export default function BuilderPage() {
         )}
 
         {/* Right toolbar — Tool icons */}
-        <div className="w-12 flex flex-col items-center py-2 gap-1 border-l border-cyber-border bg-[#0a0a0f]">
+        <div className="w-12 flex flex-col items-center py-2 gap-1 border-l border-white/[0.06] bg-[#0a0a0f]">
           {TOOLS.map((tool) => (
             <button
               key={tool.id}
@@ -236,7 +244,7 @@ export default function BuilderPage() {
               title={tool.label}
               className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-150 ${
                 activeTool === tool.id
-                  ? "bg-cyber-cyan/20 text-cyber-cyan shadow-[0_0_8px_rgba(0,255,255,0.15)]"
+                  ? "bg-brand-500/20 text-brand-400 shadow-glow"
                   : "text-gray-500 hover:text-gray-300 hover:bg-white/5"
               }`}
             >
