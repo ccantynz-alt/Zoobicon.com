@@ -27,9 +27,9 @@ body {
   background: var(--cyber-black);
   color: #e0e0e0;
   font-family: "JetBrains Mono", monospace;
-  overflow: hidden;
-  height: 100vh;
-  height: 100dvh; /* Dynamic viewport height — respects mobile browser chrome on iOS/Android */
+  overflow-x: hidden; /* Prevent horizontal scroll from glow effects */
+  min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height — respects mobile browser chrome on iOS/Android */
   -webkit-text-size-adjust: 100%; /* Prevent iOS Safari from inflating font sizes in landscape */
   text-size-adjust: 100%;
 }
