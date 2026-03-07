@@ -1,0 +1,101 @@
+services:
+  - type: web
+    name: zoobicon
+    runtime: node
+    plan: starter
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_APP_URL
+        value: https://zoobicon.com
+
+      # ── Core AI ──────────────────────────────────────────
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: GOOGLE_GENERATIVE_AI_API_KEY
+        sync: false
+      - key: XAI_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: MISTRAL_API_KEY
+        sync: false
+      - key: COHERE_API_KEY
+        sync: false
+      - key: PERPLEXITY_API_KEY
+        sync: false
+
+      # ── Image Generation ─────────────────────────────────
+      - key: STABILITY_API_KEY
+        sync: false
+      - key: REPLICATE_API_TOKEN
+        sync: false
+      - key: FAL_API_KEY
+        sync: false
+      - key: IDEOGRAM_API_KEY
+        sync: false
+
+      # ── Video Generation ─────────────────────────────────
+      - key: RUNWAY_API_KEY
+        sync: false
+      - key: LUMA_API_KEY
+        sync: false
+      - key: PIKA_API_KEY
+        sync: false
+      - key: KLING_API_KEY
+        sync: false
+
+      # ── Voice & Audio ────────────────────────────────────
+      - key: ELEVENLABS_API_KEY
+        sync: false
+      - key: PLAYHT_API_KEY
+        sync: false
+      - key: PLAYHT_USER_ID
+        sync: false
+
+      # ── SEO & Search ─────────────────────────────────────
+      - key: DATAFORSEO_LOGIN
+        sync: false
+      - key: DATAFORSEO_PASSWORD
+        sync: false
+      - key: SERPER_API_KEY
+        sync: false
+      - key: TAVILY_API_KEY
+        sync: false
+      - key: BRAVE_SEARCH_API_KEY
+        sync: false
+      - key: GOOGLE_SEARCH_CONSOLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_SEARCH_CONSOLE_CLIENT_SECRET
+        sync: false
+
+      # ── Media & Assets ───────────────────────────────────
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: UNSPLASH_ACCESS_KEY
+        sync: false
+      - key: PEXELS_API_KEY
+        sync: false
+
+      # ── Analytics ────────────────────────────────────────
+      - key: NEXT_PUBLIC_POSTHOG_KEY
+        sync: false
+
+      # ── Admin & Auth ─────────────────────────────────────
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+
+    autoDeploy: true
