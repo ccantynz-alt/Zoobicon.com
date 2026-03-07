@@ -1,4 +1,5 @@
 # Zoobicon.com
+
 # 🚀 Zoobicon
 
 **The AI website builder from the future.**
@@ -30,10 +31,10 @@ Zoobicon is a futuristic AI-powered platform that builds stunning websites throu
 
 ```bash
 # Clone the repo
-git clone https://github.com/YOUR-USERNAME/zoobicon.git
+git clone https://github.com/ccantynz-alt/Zoobicon.com.git
 
 # Install dependencies
-cd zoobicon
+cd Zoobicon.com
 npm install
 
 # Run the dev server
@@ -45,12 +46,18 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 ## 📁 Project Structure
 
 ```
-zoobicon/
+Zoobicon.com/
 ├── public/          # Static assets
-├── src/
-│   ├── app/         # Next.js app router pages
-│   ├── components/  # Reusable UI components
-│   └── lib/         # Utilities and helpers
+├── app/             # Next.js app router pages
+├── components/      # Reusable UI components
+│   ├── Navbar.tsx
+│   ├── Hero.tsx
+│   ├── PromptBuilder.tsx
+│   ├── Features.tsx
+│   ├── FeatureCard.tsx
+│   └── Footer.tsx
+├── lib/             # Utilities and helpers
+│   └── utils.ts
 ├── .gitignore
 ├── package.json
 ├── tsconfig.json
