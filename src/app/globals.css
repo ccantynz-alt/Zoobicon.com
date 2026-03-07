@@ -29,9 +29,12 @@ body {
   font-family: "JetBrains Mono", monospace;
   overflow: hidden;
   height: 100vh;
+  height: 100dvh; /* Dynamic viewport height — respects mobile browser chrome on iOS/Android */
+  -webkit-text-size-adjust: 100%; /* Prevent iOS Safari from inflating font sizes in landscape */
+  text-size-adjust: 100%;
 }
 
-/* Scrollbar */
+/* Scrollbar — WebKit (Chrome, Safari, Edge) */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -48,6 +51,12 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--cyber-cyan);
+}
+
+/* Scrollbar — Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--cyber-border) var(--cyber-dark);
 }
 
 /* Scan line overlay */
@@ -289,4 +298,118 @@ body {
 .cyber-tab.active {
   color: var(--cyber-cyan);
   border-bottom-color: var(--cyber-cyan);
+}
+
+/* ============================================
+   CROSS-PLATFORM COMPATIBILITY
+   ============================================ */
+
+/* Reduced motion — respects system setting on macOS, Windows, iOS, Android */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .scan-lines::after,
+  .scan-lines::before {
+    display: none;
+  }
+}
+
+/* Safe area insets — iPhone notch, Dynamic Island, Android display cutouts */
+@supports (padding: env(safe-area-inset-top)) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Touch devices — disable hover effects that cause "sticky hover" on mobile */
+@media (hover: none) and (pointer: coarse) {
+  .cyber-btn:hover {
+    background: linear-gradient(135deg, rgba(0, 240, 255, 0.1), rgba(139, 92, 246, 0.1));
+    box-shadow: none;
+    transform: none;
+  }
+
+  .cyber-btn:hover::before {
+    left: -100%;
+  }
+
+  .cyber-btn:active {
+    background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(139, 92, 246, 0.2));
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+  }
+
+  .cyber-tab:hover {
+    color: #666;
+  }
+}
+
+/* Ensure proper touch scrolling on iOS */
+.overflow-y-auto,
+.overflow-x-auto,
+.overflow-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Focus-visible — keyboard navigation for all platforms (a11y) */
+:focus-visible {
+  outline: 2px solid var(--cyber-cyan);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* High contrast mode — Windows, macOS high contrast preferences */
+@media (forced-colors: active) {
+  .cyber-btn {
+    border: 2px solid ButtonText;
+    color: ButtonText;
+    background: ButtonFace;
+  }
+
+  .cyber-input {
+    border: 1px solid ButtonText;
+    color: CanvasText;
+    background: Canvas;
+  }
+
+  .gradient-text,
+  .gradient-text-hero,
+  .gradient-text-static {
+    -webkit-text-fill-color: unset;
+    background: none;
+    color: CanvasText;
+  }
+}
+
+/* Selection styling — consistent across browsers */
+::selection {
+  background: rgba(0, 240, 255, 0.3);
+  color: #fff;
+}
+
+::-moz-selection {
+  background: rgba(0, 240, 255, 0.3);
+  color: #fff;
+}
+
+/* Touch action — prevent accidental zoom on double-tap for interactive elements */
+button,
+a,
+input,
+textarea,
+select {
+  touch-action: manipulation;
 }

@@ -121,7 +121,13 @@ function VideoPlayer({ video, isLarge }: { video: VideoCard; isLarge?: boolean }
       className={`relative ${video.aspectRatio} rounded-2xl overflow-hidden group cursor-pointer`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onTouchStart={() => setIsHovered(true)}
+      onTouchEnd={() => setTimeout(() => setIsHovered(false), 1500)}
       onClick={() => setIsPlaying(!isPlaying)}
+      role="button"
+      tabIndex={0}
+      aria-label={`${isPlaying ? "Pause" : "Play"} ${video.title} video — ${video.platform}`}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setIsPlaying(!isPlaying); } }}
     >
       {/* Background */}
       <div className={`absolute inset-0 bg-gradient-to-br ${video.gradient}`}>

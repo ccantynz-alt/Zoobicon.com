@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 
 interface PromptInputProps {
   prompt: string;
@@ -24,8 +24,13 @@ export default function PromptInput({
   isGenerating,
 }: PromptInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [isMac, setIsMac] = useState(false);
 
   useEffect(() => {
+    // Detect macOS/iOS for keyboard shortcut label
+    const nav = navigator as Navigator & { userAgentData?: { platform: string } };
+    const ua = nav.userAgentData?.platform ?? navigator.userAgent ?? "";
+    setIsMac(/mac|iphone|ipad/i.test(ua));
     textareaRef.current?.focus();
   }, []);
 
@@ -54,8 +59,7 @@ export default function PromptInput({
       <div className="flex justify-between items-center text-[10px] text-cyber-border">
         <span>{prompt.length} / 5000</span>
         <span className="text-cyber-cyan/40">
-          {navigator.platform?.includes("Mac") ? "Cmd" : "Ctrl"}+Enter to
-          build
+          {isMac ? "Cmd" : "Ctrl"}+Enter to build
         </span>
       </div>
 
