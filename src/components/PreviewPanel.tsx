@@ -1,122 +1,70 @@
 "use client";
 
-import { Sparkles, Monitor, Tablet, Smartphone } from "lucide-react";
-
-type DeviceMode = "desktop" | "tablet" | "mobile";
+import { useMemo } from "react";
 
 interface PreviewPanelProps {
-  code: string;
+  html: string;
   isGenerating: boolean;
-  deviceMode: DeviceMode;
-  onDeviceModeChange: (mode: DeviceMode) => void;
 }
 
-const DEVICE_WIDTHS: Record<DeviceMode, string> = {
-  desktop: "100%",
-  tablet: "768px",
-  mobile: "375px",
-};
+export default function PreviewPanel({ html, isGenerating }: PreviewPanelProps) {
+  const srcDoc = useMemo(() => html || "", [html]);
 
-export default function PreviewPanel({
-  code,
-  isGenerating,
-  deviceMode,
-  onDeviceModeChange,
-}: PreviewPanelProps) {
   if (isGenerating) {
     return (
-      <div className="flex items-center justify-center h-full bg-dark-400">
+      <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <div className="relative inline-block mb-4">
-            <div className="w-12 h-12 border-2 border-white/10 rounded-full" />
-            <div className="absolute inset-0 w-12 h-12 border-2 border-transparent border-t-brand-500 rounded-full animate-spin" />
+          <div className="flex gap-1 justify-center mb-4">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className="w-2 h-8 bg-cyber-cyan/30 rounded-sm"
+                style={{
+                  animation: `pulse 1s ease-in-out ${i * 0.15}s infinite`,
+                }}
+              />
+            ))}
           </div>
-          <div className="text-sm font-medium text-white/70">
-            Building your website...
-          </div>
-          <div className="text-xs text-white/30 mt-1">
-            Watch the code stream in real-time
-          </div>
+          <style>{`
+            @keyframes pulse {
+              0%, 100% { transform: scaleY(0.4); opacity: 0.3; }
+              50% { transform: scaleY(1); opacity: 1; }
+            }
+          `}</style>
+          <p className="text-sm text-cyber-cyan/60 uppercase tracking-[3px]">
+            Generating
+          </p>
+          <p className="text-[10px] text-cyber-border mt-2">
+            Claude is building your website...
+          </p>
         </div>
       </div>
     );
   }
 
-  if (!code) {
+  if (!html) {
     return (
-      <div className="flex items-center justify-center h-full bg-dark-400">
-        <div className="text-center max-w-sm">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-500/10 to-accent-purple/10 border border-brand-500/10 mb-4">
-            <Sparkles className="w-7 h-7 text-brand-400/60" />
-          </div>
-          <div className="text-lg font-semibold text-white/20 mb-2 tracking-tight">
-            Zoobicon Builder
-          </div>
-          <div className="text-sm text-white/30">
-            Describe a website or pick a template to start.
-          </div>
-          <div className="text-xs text-white/15 mt-4">
-            Your preview will appear here
-          </div>
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center max-w-md px-8">
+          <div className="text-6xl mb-6 opacity-10">Z</div>
+          <p className="text-sm text-cyber-border uppercase tracking-[2px] mb-3">
+            No preview yet
+          </p>
+          <p className="text-xs text-cyber-border/60 leading-relaxed">
+            Describe a website in the prompt panel and hit Build Website to see
+            it rendered here in real time.
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Device toggle bar */}
-      <div className="flex items-center justify-center gap-1 px-4 py-2 border-b border-white/[0.06] bg-dark-300/50">
-        <button
-          onClick={() => onDeviceModeChange("desktop")}
-          className={`p-1.5 rounded-md transition-colors ${
-            deviceMode === "desktop" ? "bg-white/[0.08] text-brand-400" : "text-white/25 hover:text-white/50"
-          }`}
-          title="Desktop"
-        >
-          <Monitor className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => onDeviceModeChange("tablet")}
-          className={`p-1.5 rounded-md transition-colors ${
-            deviceMode === "tablet" ? "bg-white/[0.08] text-brand-400" : "text-white/25 hover:text-white/50"
-          }`}
-          title="Tablet"
-        >
-          <Tablet className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => onDeviceModeChange("mobile")}
-          className={`p-1.5 rounded-md transition-colors ${
-            deviceMode === "mobile" ? "bg-white/[0.08] text-brand-400" : "text-white/25 hover:text-white/50"
-          }`}
-          title="Mobile"
-        >
-          <Smartphone className="w-4 h-4" />
-        </button>
-        <span className="ml-2 text-[10px] text-white/15">
-          {deviceMode === "desktop" ? "100%" : DEVICE_WIDTHS[deviceMode]}
-        </span>
-      </div>
-
-      {/* Preview iframe */}
-      <div className="flex-1 overflow-auto bg-dark-400 flex justify-center">
-        <div
-          className="h-full transition-all duration-300 ease-out bg-white"
-          style={{
-            width: DEVICE_WIDTHS[deviceMode],
-            maxWidth: "100%",
-            boxShadow: deviceMode !== "desktop" ? "0 0 60px -15px rgba(0,0,0,0.5)" : "none",
-          }}
-        >
-          <iframe
-            srcDoc={code}
-            title="Website Preview"
-            className="w-full h-full border-0"
-            sandbox="allow-scripts allow-same-origin"
-          />
-        </div>
-      </div>
-    </div>
+    <iframe
+      srcDoc={srcDoc}
+      className="w-full h-full border-0 bg-white"
+      title="Website preview"
+      sandbox="allow-scripts allow-same-origin"
+    />
   );
 }

@@ -1,30 +1,33 @@
 "use client";
 
-import { Zap } from "lucide-react";
-
 interface StatusBarProps {
-  isGenerating: boolean;
-  codeLength: number;
+  status: "idle" | "generating" | "complete" | "error";
 }
 
-export default function StatusBar({ isGenerating, codeLength }: StatusBarProps) {
+const STATUS_CONFIG = {
+  idle: { color: "bg-cyber-border", label: "Ready" },
+  generating: { color: "bg-cyber-yellow", label: "Generating..." },
+  complete: { color: "bg-cyber-green", label: "Build Complete" },
+  error: { color: "bg-red-500", label: "Error" },
+} as const;
+
+export default function StatusBar({ status }: StatusBarProps) {
+  const config = STATUS_CONFIG[status];
+
   return (
-    <footer className="flex items-center justify-between px-6 py-2 border-t border-white/[0.06] bg-dark-300/80 backdrop-blur-xl text-xs text-white/30">
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-1.5">
-          <Zap className="w-3 h-3 text-brand-400" />
-          <span>Zoobicon v0.1</span>
-        </div>
-        <span className="text-white/10">|</span>
-        <span className={isGenerating ? "text-brand-400 animate-pulse" : ""}>
-          {isGenerating ? "Generating..." : "Ready"}
-        </span>
+    <footer className="flex items-center justify-between px-4 py-1.5 border-t border-cyber-border bg-cyber-dark/80 text-[10px] uppercase tracking-[1px]">
+      <div className="flex items-center gap-2">
+        <div
+          className={`w-1.5 h-1.5 rounded-full ${config.color} ${
+            status === "generating" ? "animate-glow-pulse" : ""
+          }`}
+        />
+        <span className="text-cyber-border">{config.label}</span>
       </div>
-      <div className="flex items-center gap-3">
-        {codeLength > 0 && (
-          <span>{codeLength.toLocaleString()} chars</span>
-        )}
-        <span className="text-white/15">Powered by Claude</span>
+
+      <div className="flex items-center gap-4 text-cyber-border/50">
+        <span>Powered by Claude</span>
+        <span>Zoobicon v0.1.0</span>
       </div>
     </footer>
   );
