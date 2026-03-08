@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import TopBar from "@/components/TopBar";
 import PromptInput from "@/components/PromptInput";
+import type { Tier } from "@/components/PromptInput";
 import PreviewPanel from "@/components/PreviewPanel";
 import CodePanel from "@/components/CodePanel";
 import StatusBar from "@/components/StatusBar";
@@ -62,11 +63,13 @@ const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }
 
 export default function BuilderPage() {
   const [prompt, setPrompt] = useState("");
+  const [editPrompt, setEditPrompt] = useState("");
   const [generatedCode, setGeneratedCode] = useState("");
   const [status, setStatus] = useState<BuildStatus>("idle");
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState<RightTab>("preview");
   const [activeTool, setActiveTool] = useState<ToolId>(null);
+  const [tier, setTier] = useState<Tier>("premium");
 
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim()) return;
@@ -80,7 +83,7 @@ export default function BuilderPage() {
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: prompt.trim() }),
+        body: JSON.stringify({ prompt: prompt.trim(), tier }),
       });
 
       if (!res.ok) {
@@ -95,7 +98,40 @@ export default function BuilderPage() {
       setError(err instanceof Error ? err.message : "Something went wrong");
       setStatus("error");
     }
-  }, [prompt]);
+  }, [prompt, tier]);
+
+  const handleEdit = useCallback(async () => {
+    if (!editPrompt.trim() || !generatedCode) return;
+
+    setStatus("generating");
+    setError("");
+    setActiveTab("preview");
+
+    try {
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: editPrompt.trim(),
+          tier,
+          existingCode: generatedCode,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Edit failed");
+      }
+
+      const data = await res.json();
+      setGeneratedCode(data.html);
+      setStatus("complete");
+      setEditPrompt("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+      setStatus("error");
+    }
+  }, [editPrompt, generatedCode, tier]);
 
   const handleCodeUpdate = useCallback((newCode: string) => {
     setGeneratedCode(newCode);
@@ -104,9 +140,7 @@ export default function BuilderPage() {
 
   const handleSeoFixRequest = useCallback(
     (instruction: string) => {
-      setPrompt((prev) =>
-        prev ? `${prev}\n\nSEO fix: ${instruction}` : `SEO fix: ${instruction}`
-      );
+      setEditPrompt(instruction);
     },
     []
   );
@@ -162,12 +196,18 @@ export default function BuilderPage() {
               Prompt
             </span>
           </div>
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-y-auto">
             <PromptInput
               prompt={prompt}
               onPromptChange={setPrompt}
               onGenerate={handleGenerate}
               isGenerating={status === "generating"}
+              tier={tier}
+              onTierChange={setTier}
+              hasExistingCode={!!generatedCode}
+              editPrompt={editPrompt}
+              onEditPromptChange={setEditPrompt}
+              onEdit={handleEdit}
             />
           </div>
         </div>
