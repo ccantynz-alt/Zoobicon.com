@@ -1,0 +1,22 @@
+# Development files
+.git
+.github
+.vscode
+.idea
+
+# Documentation
+*.md
+!README.md
+LICENSE
+
+# Test files
+__tests__
+*.test.*
+*.spec.*
+coverage
+
+# Development configs
+.env.local
+.env.development
+.eslintcache
+.stylelintcache

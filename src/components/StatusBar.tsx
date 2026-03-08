@@ -1,12 +1,13 @@
 "use client";
 
 interface StatusBarProps {
-  status: "idle" | "generating" | "complete" | "error";
+  status: "idle" | "generating" | "editing" | "complete" | "error";
 }
 
 const STATUS_CONFIG = {
   idle: { color: "bg-white/20", label: "Ready" },
   generating: { color: "bg-yellow-400", label: "Generating..." },
+  editing: { color: "bg-blue-400", label: "Editing..." },
   complete: { color: "bg-green-500", label: "Build Complete" },
   error: { color: "bg-red-500", label: "Error" },
 } as const;
@@ -19,7 +20,7 @@ export default function StatusBar({ status }: StatusBarProps) {
       <div className="flex items-center gap-2">
         <div
           className={`w-1.5 h-1.5 rounded-full ${config.color} ${
-            status === "generating" ? "animate-glow-pulse" : ""
+            status === "generating" || status === "editing" ? "animate-glow-pulse" : ""
           }`}
         />
         <span className="text-white/30">{config.label}</span>
