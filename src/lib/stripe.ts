@@ -1,20 +1,23 @@
 import Stripe from "stripe";
 
-function getStripe(): Stripe {
-  if (!process.env.STRIPE_SECRET_KEY) {
-    throw new Error("STRIPE_SECRET_KEY is not set");
+let _stripe: Stripe;
+
+export function getStripe() {
+  if (!_stripe) {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      throw new Error("STRIPE_SECRET_KEY is not set");
+    }
+    _stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: "2026-02-25.clover",
+      typescript: true,
+    });
   }
-  return new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: "2026-02-25.clover",
-    typescript: true,
-  });
+  return _stripe;
 }
 
-let _stripe: Stripe | null = null;
 export const stripe = new Proxy({} as Stripe, {
   get(_target, prop, receiver) {
-    if (!_stripe) _stripe = getStripe();
-    return Reflect.get(_stripe, prop, receiver);
+    return Reflect.get(getStripe(), prop, receiver);
   },
 });
 
