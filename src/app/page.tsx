@@ -30,6 +30,18 @@ import {
   Store,
   Headphones,
   HelpCircle,
+  Check,
+  Minus,
+  Bug,
+  GitBranch,
+  FileCode,
+  Figma,
+  Languages,
+  ShoppingCart,
+  Receipt,
+  Lock,
+  Wand2,
+  Download,
 } from "lucide-react";
 
 const fadeInUp = {
@@ -40,6 +52,16 @@ const fadeInUp = {
 const staggerContainer = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.1 } },
+};
+
+const staggerFast = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.05 } },
+};
+
+const scaleIn = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: "easeOut" as const } },
 };
 
 const PRODUCTS = [
@@ -181,10 +203,100 @@ const DOMAINS = [
 ];
 
 const STATS = [
-  { value: "10x", label: "Faster than manual coding" },
-  { value: "4", label: "Domain ecosystem" },
-  { value: "10+", label: "AI-powered products" },
-  { value: "24/7", label: "Autonomous agents" },
+  { value: "12+", label: "AI-Powered Tools" },
+  { value: "30+", label: "Languages Supported" },
+  { value: "WP", label: "WordPress Ready" },
+  { value: "4", label: "Domain Ecosystem" },
+];
+
+const COMPETITOR_FEATURES = [
+  { name: "AI Website Generation", zoobicon: true, wix: true, framer: false, durable: true, emergent: true },
+  { name: "Auto-Debugging", zoobicon: true, wix: false, framer: false, durable: false, emergent: false },
+  { name: "GitHub Import", zoobicon: true, wix: false, framer: false, durable: false, emergent: false },
+  { name: "WordPress Export", zoobicon: true, wix: false, framer: false, durable: false, emergent: false },
+  { name: "Figma Import", zoobicon: true, wix: false, framer: true, durable: false, emergent: false },
+  { name: "i18n Translation (30+)", zoobicon: true, wix: true, framer: false, durable: false, emergent: false },
+  { name: "E-commerce Builder", zoobicon: true, wix: true, framer: false, durable: false, emergent: false },
+  { name: "CRM & Invoicing", zoobicon: true, wix: true, framer: false, durable: false, emergent: false },
+  { name: "SEO Scoring & Auto-Fix", zoobicon: true, wix: true, framer: false, durable: true, emergent: false },
+  { name: "Animation Editor", zoobicon: true, wix: false, framer: true, durable: false, emergent: false },
+  { name: "Auth Scaffolding", zoobicon: true, wix: false, framer: false, durable: false, emergent: false },
+  { name: "White-Label Platform", zoobicon: true, wix: false, framer: false, durable: false, emergent: false },
+  { name: "Domain Registration", zoobicon: true, wix: true, framer: false, durable: false, emergent: false },
+  { name: "Full API Access", zoobicon: true, wix: true, framer: false, durable: false, emergent: false },
+];
+
+const NEW_FEATURES = [
+  {
+    icon: Bug,
+    title: "Auto-Debugging",
+    description: "AI catches and fixes errors before you see them",
+    color: "from-red-500 to-orange-500",
+    glowColor: "shadow-red-500/20",
+  },
+  {
+    icon: GitBranch,
+    title: "GitHub Import",
+    description: "Paste any repo URL. Get a modernized website.",
+    color: "from-gray-400 to-gray-600",
+    glowColor: "shadow-gray-500/20",
+  },
+  {
+    icon: Download,
+    title: "WordPress Export",
+    description: "One click to a full WordPress theme",
+    color: "from-blue-500 to-indigo-600",
+    glowColor: "shadow-blue-500/20",
+  },
+  {
+    icon: Figma,
+    title: "Figma Import",
+    description: "Design in Figma, deploy with Zoobicon",
+    color: "from-purple-500 to-pink-500",
+    glowColor: "shadow-purple-500/20",
+  },
+  {
+    icon: Languages,
+    title: "i18n Translation",
+    description: "30+ languages, one click",
+    color: "from-emerald-500 to-teal-500",
+    glowColor: "shadow-emerald-500/20",
+  },
+  {
+    icon: ShoppingCart,
+    title: "E-commerce Generator",
+    description: "Complete stores with cart & checkout",
+    color: "from-amber-500 to-yellow-500",
+    glowColor: "shadow-amber-500/20",
+  },
+  {
+    icon: Receipt,
+    title: "CRM & Invoicing",
+    description: "Business tools built in",
+    color: "from-cyan-500 to-blue-500",
+    glowColor: "shadow-cyan-500/20",
+  },
+  {
+    icon: Lock,
+    title: "Auth Scaffolding",
+    description: "Login, database, admin — generated",
+    color: "from-green-500 to-emerald-600",
+    glowColor: "shadow-green-500/20",
+  },
+  {
+    icon: Search,
+    title: "SEO Scoring",
+    description: "Real-time SEO analysis with auto-fix",
+    color: "from-brand-500 to-brand-700",
+    glowColor: "shadow-brand-500/20",
+  },
+  {
+    icon: Wand2,
+    title: "Animation Editor",
+    description: "Professional animations, no code",
+    color: "from-violet-500 to-fuchsia-500",
+    glowColor: "shadow-violet-500/20",
+  },
 ];
 
 const FEATURES = [
@@ -234,7 +346,7 @@ export default function LandingPage() {
       </div>
 
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.04] bg-[#050507]/80 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.04] bg-[#050507]/80 backdrop-blur-2xl" aria-label="Main navigation">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-8">
@@ -270,6 +382,8 @@ export default function LandingPage() {
             <button
               className="md:hidden text-white/60"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-expanded={mobileMenuOpen}
+              aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -277,7 +391,7 @@ export default function LandingPage() {
         </div>
         {/* Mobile menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-white/[0.06] bg-[#050507]/95 backdrop-blur-2xl px-6 py-6 space-y-4">
+          <nav className="md:hidden border-t border-white/[0.06] bg-[#050507]/95 backdrop-blur-2xl px-6 py-6 space-y-4" aria-label="Mobile navigation">
             <a href="#products" className="block text-sm text-white/60 hover:text-white">Products</a>
             <Link href="/marketplace" className="block text-sm text-white/60 hover:text-white">Marketplace</Link>
             <Link href="/domains" className="block text-sm text-white/60 hover:text-white">Domains</Link>
@@ -288,7 +402,7 @@ export default function LandingPage() {
             <Link href="/builder" className="block btn-gradient px-5 py-2.5 rounded-xl text-sm font-semibold text-white text-center mt-4">
               <span>Start Building</span>
             </Link>
-          </div>
+          </nav>
         )}
       </nav>
 
@@ -321,11 +435,27 @@ export default function LandingPage() {
             {/* Sub headline */}
             <motion.p
               variants={fadeInUp}
-              className="max-w-3xl mx-auto text-lg md:text-xl text-white/40 leading-relaxed mb-12"
+              className="max-w-4xl mx-auto text-lg md:text-xl text-white/40 leading-relaxed mb-6"
             >
-              The most advanced AI platform on the planet. Build stunning websites, crush SEO rankings,
-              create viral videos, and automate your entire digital empire — all powered by autonomous AI agents.
+              The only AI platform with auto-debugging, GitHub import, WordPress export, Figma-to-code,
+              30+ language translation, and full-stack scaffolding — all in one builder.
             </motion.p>
+
+            {/* Feature pills */}
+            <motion.div
+              variants={fadeInUp}
+              className="flex flex-wrap justify-center gap-2 mb-12 max-w-3xl mx-auto"
+            >
+              {["Auto-Debug", "GitHub Import", "WP Export", "Figma Import", "30+ Languages", "E-commerce", "Auth Scaffold", "SEO Auto-Fix"].map((pill) => (
+                <span
+                  key={pill}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] text-xs font-medium text-white/50"
+                >
+                  <Check className="w-3 h-3 text-accent-cyan" />
+                  {pill}
+                </span>
+              ))}
+            </motion.div>
 
             {/* CTAs */}
             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
@@ -377,8 +507,198 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Competitor Comparison Banner */}
+      <section className="relative py-24 lg:py-32 border-b border-white/[0.04] overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="glow-orb glow-orb-blue w-[700px] h-[700px] top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 opacity-5" />
+          <div className="glow-orb glow-orb-purple w-[500px] h-[500px] top-1/3 right-0 opacity-5" />
+        </div>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            <motion.div variants={fadeInUp} className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand-500/20 bg-brand-500/5 mb-6">
+                <Star className="w-3 h-3 text-brand-400" />
+                <span className="text-xs font-medium text-brand-400">Industry Comparison</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-6">
+                See Why Builders<br />
+                <span className="gradient-text">Switch to Zoobicon</span>
+              </h2>
+              <p className="max-w-2xl mx-auto text-lg text-white/40">
+                The only platform that does it all. No more juggling tools, plugins, or workarounds.
+              </p>
+            </motion.div>
+
+            {/* Comparison Table */}
+            <motion.div variants={fadeInUp} className="overflow-x-auto">
+              <div className="min-w-[700px]">
+                {/* Header Row */}
+                <div className="grid grid-cols-6 gap-0 mb-2">
+                  <div className="p-4" />
+                  <div className="p-4 text-center">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-brand-500/20 to-accent-purple/20 border border-brand-500/30">
+                      <Zap className="w-4 h-4 text-brand-400" />
+                      <span className="text-sm font-bold text-white">Zoobicon</span>
+                    </div>
+                  </div>
+                  <div className="p-4 text-center">
+                    <span className="text-sm font-medium text-white/40">Wix</span>
+                  </div>
+                  <div className="p-4 text-center">
+                    <span className="text-sm font-medium text-white/40">Framer</span>
+                  </div>
+                  <div className="p-4 text-center">
+                    <span className="text-sm font-medium text-white/40">Durable</span>
+                  </div>
+                  <div className="p-4 text-center">
+                    <span className="text-sm font-medium text-white/40">Emergent</span>
+                  </div>
+                </div>
+
+                {/* Feature Rows */}
+                {COMPETITOR_FEATURES.map((feature, i) => (
+                  <motion.div
+                    key={i}
+                    variants={fadeInUp}
+                    className={`grid grid-cols-6 gap-0 ${
+                      i % 2 === 0 ? "bg-white/[0.02]" : ""
+                    } rounded-lg`}
+                  >
+                    <div className="p-4 flex items-center">
+                      <span className="text-sm text-white/60 font-medium">{feature.name}</span>
+                    </div>
+                    <div className="p-4 flex items-center justify-center">
+                      <div className="w-7 h-7 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
+                        <Check className="w-4 h-4 text-emerald-400" />
+                      </div>
+                    </div>
+                    {[feature.wix, feature.framer, feature.durable, feature.emergent].map((has, j) => (
+                      <div key={j} className="p-4 flex items-center justify-center">
+                        {has ? (
+                          <div className="w-7 h-7 rounded-full bg-white/[0.05] border border-white/[0.08] flex items-center justify-center">
+                            <Check className="w-4 h-4 text-white/30" />
+                          </div>
+                        ) : (
+                          <div className="w-7 h-7 rounded-full bg-white/[0.02] border border-white/[0.04] flex items-center justify-center">
+                            <Minus className="w-4 h-4 text-white/10" />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </motion.div>
+                ))}
+
+                {/* Score Row */}
+                <div className="grid grid-cols-6 gap-0 mt-4 pt-4 border-t border-white/[0.06]">
+                  <div className="p-4">
+                    <span className="text-sm font-bold text-white/60">Total Features</span>
+                  </div>
+                  <div className="p-4 text-center">
+                    <span className="text-2xl font-black gradient-text">14/14</span>
+                  </div>
+                  <div className="p-4 text-center">
+                    <span className="text-2xl font-black text-white/20">6/14</span>
+                  </div>
+                  <div className="p-4 text-center">
+                    <span className="text-2xl font-black text-white/20">2/14</span>
+                  </div>
+                  <div className="p-4 text-center">
+                    <span className="text-2xl font-black text-white/20">2/14</span>
+                  </div>
+                  <div className="p-4 text-center">
+                    <span className="text-2xl font-black text-white/20">1/14</span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* CTA under comparison */}
+            <motion.div variants={fadeInUp} className="text-center mt-12">
+              <Link
+                href="/builder"
+                className="inline-flex items-center gap-2 btn-gradient px-6 py-3 rounded-xl text-sm font-bold text-white shadow-glow"
+              >
+                <span>Try the Most Complete Builder</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* New Features Showcase */}
+      <section className="relative py-24 lg:py-32 overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="glow-orb glow-orb-cyan w-[500px] h-[500px] top-0 right-1/4 opacity-5" />
+        </div>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            <motion.div variants={fadeInUp} className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/5 mb-6">
+                <Sparkles className="w-3 h-3 text-emerald-400" />
+                <span className="text-xs font-medium text-emerald-400">New in 2026</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-6">
+                10 Game-Changing<br />
+                <span className="gradient-text">Features Just Dropped</span>
+              </h2>
+              <p className="max-w-2xl mx-auto text-lg text-white/40">
+                Every feature our competitors wish they had. Built, tested, and shipping today.
+              </p>
+            </motion.div>
+
+            <motion.div
+              variants={staggerFast}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+              className="grid md:grid-cols-2 lg:grid-cols-5 gap-4"
+            >
+              {NEW_FEATURES.map((feature, i) => (
+                <motion.div
+                  key={i}
+                  variants={scaleIn}
+                  whileHover={{ y: -6, transition: { duration: 0.2, ease: "easeOut" as const } }}
+                  className="group relative p-6 rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.12] transition-all cursor-pointer"
+                >
+                  {/* Glow effect on hover */}
+                  <div className={`absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-br ${feature.color} blur-xl -z-10`} style={{ opacity: 0 }} />
+
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform`}>
+                    <feature.icon className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-base font-bold mb-2 group-hover:text-white transition-colors">
+                    {feature.title}
+                  </h3>
+                  <p className="text-xs text-white/40 leading-relaxed">
+                    {feature.description}
+                  </p>
+
+                  {/* NEW badge */}
+                  <div className="absolute top-4 right-4">
+                    <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+                      New
+                    </span>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Products Section */}
-      <section id="products" className="relative py-24 lg:py-32">
+      <section id="products" className="relative py-24 lg:py-32 border-t border-white/[0.04]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div
             initial="hidden"
@@ -636,7 +956,7 @@ export default function LandingPage() {
                 <div className="text-4xl font-black mb-1">$49<span className="text-lg font-normal text-white/30">/mo</span></div>
                 <div className="text-sm text-white/30 mb-6">Everything you need</div>
                 <ul className="space-y-3 mb-8">
-                  {["Unlimited websites", "AI Video Creator", "SEO Campaign Agent", "All 8 AI products", "Priority support"].map((f) => (
+                  {["Unlimited websites", "AI Video Creator", "SEO Campaign Agent", "All 12+ AI tools", "GitHub Import & WP Export", "Priority support"].map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm text-white/60">
                       <div className="w-1.5 h-1.5 rounded-full bg-brand-400" />
                       {f}

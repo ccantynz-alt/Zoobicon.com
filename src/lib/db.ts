@@ -62,4 +62,82 @@ export async function initSchema() {
   await sql`
     CREATE INDEX IF NOT EXISTS projects_user_email_idx ON projects (user_email)
   `;
+
+  // ---- Hosting tables ----
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS sites (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      email       TEXT NOT NULL,
+      name        TEXT NOT NULL,
+      slug        TEXT UNIQUE NOT NULL,
+      plan        TEXT NOT NULL DEFAULT 'free',
+      status      TEXT NOT NULL DEFAULT 'active',
+      settings    JSONB NOT NULL DEFAULT '{}',
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS sites_email_idx ON sites (email)`;
+  await sql`CREATE INDEX IF NOT EXISTS sites_slug_idx  ON sites (slug)`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS deployments (
+      id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      site_id         UUID NOT NULL REFERENCES sites(id),
+      environment     TEXT NOT NULL DEFAULT 'production',
+      status          TEXT NOT NULL,
+      url             TEXT,
+      size            INTEGER,
+      commit_message  TEXT,
+      created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS deployments_site_id_idx ON deployments (site_id)`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS custom_domains (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      site_id     UUID NOT NULL REFERENCES sites(id),
+      domain      TEXT UNIQUE NOT NULL,
+      status      TEXT NOT NULL DEFAULT 'pending',
+      ssl_status  TEXT NOT NULL DEFAULT 'pending',
+      dns_records JSONB,
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS custom_domains_site_id_idx ON custom_domains (site_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS custom_domains_domain_idx  ON custom_domains (domain)`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS dns_records (
+      id        UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      domain    TEXT NOT NULL,
+      type      TEXT NOT NULL,
+      name      TEXT NOT NULL,
+      value     TEXT NOT NULL,
+      ttl       INTEGER NOT NULL DEFAULT 3600,
+      priority  INTEGER,
+      proxied   BOOLEAN NOT NULL DEFAULT false
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS dns_records_domain_idx ON dns_records (domain)`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS site_analytics (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      site_id     UUID NOT NULL,
+      date        DATE NOT NULL,
+      visitors    INTEGER NOT NULL DEFAULT 0,
+      page_views  INTEGER NOT NULL DEFAULT 0,
+      bandwidth   BIGINT NOT NULL DEFAULT 0,
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS site_analytics_site_id_idx ON site_analytics (site_id)`;
 }

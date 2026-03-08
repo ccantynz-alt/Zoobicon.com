@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 
 interface PromptInputProps {
   prompt: string;
@@ -24,8 +24,13 @@ export default function PromptInput({
   isGenerating,
 }: PromptInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [isMac, setIsMac] = useState(false);
 
   useEffect(() => {
+    // Detect macOS/iOS for keyboard shortcut label
+    const nav = navigator as Navigator & { userAgentData?: { platform: string } };
+    const ua = nav.userAgentData?.platform ?? navigator.userAgent ?? "";
+    setIsMac(/mac|iphone|ipad/i.test(ua));
     textareaRef.current?.focus();
   }, []);
 
@@ -41,7 +46,7 @@ export default function PromptInput({
       {/* Textarea */}
       <textarea
         ref={textareaRef}
-        className="cyber-input flex-1 min-h-[120px]"
+        className="flex-1 min-h-[120px] bg-[#0a0a0f] border border-white/[0.06] text-white/90 text-sm font-mono rounded-xl p-4 outline-none transition-colors focus:border-brand-500/50 focus:shadow-glow resize-none placeholder:text-white/20"
         placeholder="Describe the website you want to build..."
         value={prompt}
         onChange={(e) => onPromptChange(e.target.value)}
@@ -51,17 +56,16 @@ export default function PromptInput({
       />
 
       {/* Character count */}
-      <div className="flex justify-between items-center text-[10px] text-cyber-border">
+      <div className="flex justify-between items-center text-[10px] text-white/20">
         <span>{prompt.length} / 5000</span>
-        <span className="text-cyber-cyan/40">
-          {navigator.platform?.includes("Mac") ? "Cmd" : "Ctrl"}+Enter to
-          build
+        <span className="text-brand-400/50">
+          {isMac ? "Cmd" : "Ctrl"}+Enter to build
         </span>
       </div>
 
       {/* Build button */}
       <button
-        className="cyber-btn w-full"
+        className="btn-gradient w-full py-3 rounded-xl text-sm font-bold text-white uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed"
         onClick={onGenerate}
         disabled={isGenerating || !prompt.trim()}
       >
@@ -74,14 +78,14 @@ export default function PromptInput({
 
       {/* Example prompts */}
       <div className="mt-2">
-        <span className="text-[10px] uppercase tracking-[2px] text-cyber-border block mb-2">
+        <span className="text-[10px] uppercase tracking-[2px] text-white/20 block mb-2">
           Try an example
         </span>
         <div className="flex flex-col gap-1.5 overflow-y-auto max-h-[200px]">
           {EXAMPLE_PROMPTS.map((example, i) => (
             <button
               key={i}
-              className="text-left text-xs text-cyber-cyan/50 hover:text-cyber-cyan transition-colors p-2 rounded hover:bg-cyber-panel/50 leading-relaxed"
+              className="text-left text-xs text-brand-400/50 hover:text-brand-400 transition-colors p-2 rounded-lg hover:bg-white/[0.03] leading-relaxed"
               onClick={() => onPromptChange(example)}
               disabled={isGenerating}
             >
