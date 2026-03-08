@@ -41,7 +41,7 @@ export default function RootLayout({
         <meta name="msapplication-TileColor" content="#0a0a0f" />
         <meta name="msapplication-config" content="none" />
       </head>
-      <body className="scan-lines">{children}</body>
+      <body>{children}</body>
     </html>
   );
 }
