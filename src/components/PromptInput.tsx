@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState, useCallback } from "react";
-import { Mic, MicOff, Sparkles, Zap, Pencil, Send } from "lucide-react";
+import { Mic, MicOff, Sparkles, Zap, Pencil, Send, Check } from "lucide-react";
 
 interface SpeechResult {
   isFinal: boolean;
@@ -46,6 +46,9 @@ const EXAMPLE_PROMPTS = [
   "A restaurant menu page with a warm, rustic aesthetic and food photography",
   "A SaaS pricing page with three tiers, toggle for monthly/annual, and FAQ section",
 ];
+
+const STANDARD_FEATURES = ["Clean layout", "Responsive", "Fast build"];
+const PREMIUM_FEATURES = ["Agency-quality", "Animations", "Glass effects", "Rich layouts"];
 
 export default function PromptInput({
   prompt,
@@ -153,37 +156,103 @@ export default function PromptInput({
 
   return (
     <div className="flex flex-col h-full p-4 gap-3">
-      {/* Tier toggle */}
-      <div className="flex items-center gap-1 p-1 bg-white/[0.03] rounded-xl border border-white/[0.06]">
+      {/* Tier toggle — visually distinctive cards */}
+      <div className="grid grid-cols-2 gap-2">
+        {/* Standard tier card */}
         <button
           onClick={() => onTierChange("standard")}
-          className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-medium transition-all ${
+          className={`relative group flex flex-col items-start p-3 rounded-xl text-left transition-all duration-300 overflow-hidden ${
             tier === "standard"
-              ? "bg-white/[0.08] text-white shadow-sm"
-              : "text-white/30 hover:text-white/50"
+              ? "bg-white/[0.08] border-2 border-white/20 shadow-lg"
+              : "bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04] hover:border-white/10"
           }`}
         >
-          <Zap className="w-3.5 h-3.5" />
-          Standard
+          <div className="flex items-center gap-2 mb-1.5">
+            <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${
+              tier === "standard" ? "bg-white/15" : "bg-white/[0.06]"
+            }`}>
+              <Zap className={`w-3.5 h-3.5 ${tier === "standard" ? "text-white" : "text-white/30"}`} />
+            </div>
+            <span className={`text-xs font-bold uppercase tracking-wider ${
+              tier === "standard" ? "text-white" : "text-white/30"
+            }`}>
+              Standard
+            </span>
+          </div>
+          <div className="flex flex-col gap-0.5 mt-1">
+            {STANDARD_FEATURES.map((f) => (
+              <span key={f} className={`text-[9px] flex items-center gap-1 ${
+                tier === "standard" ? "text-white/50" : "text-white/15"
+              }`}>
+                <Check className="w-2.5 h-2.5" />{f}
+              </span>
+            ))}
+          </div>
+          {tier === "standard" && (
+            <div className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-white/60" />
+          )}
         </button>
+
+        {/* Premium tier card */}
         <button
           onClick={() => onTierChange("premium")}
-          className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-medium transition-all ${
+          className={`relative group flex flex-col items-start p-3 rounded-xl text-left transition-all duration-300 overflow-hidden ${
             tier === "premium"
-              ? "bg-gradient-to-r from-brand-500/20 to-accent-purple/20 text-brand-300 border border-brand-500/20 shadow-sm"
-              : "text-white/30 hover:text-white/50"
+              ? "border-2 border-brand-500/40 shadow-lg shadow-brand-500/10"
+              : "bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04] hover:border-brand-500/20"
           }`}
+          style={tier === "premium" ? {
+            background: "linear-gradient(135deg, rgba(124,58,237,0.15), rgba(139,92,246,0.08), rgba(0,200,255,0.05))",
+          } : undefined}
         >
-          <Sparkles className="w-3.5 h-3.5" />
-          Premium
+          {/* Animated shimmer on premium when selected */}
+          {tier === "premium" && (
+            <div
+              className="absolute inset-0 opacity-20"
+              style={{
+                background: "linear-gradient(90deg, transparent, rgba(124,58,237,0.3), transparent)",
+                backgroundSize: "200% 100%",
+                animation: "premium-shimmer 3s linear infinite",
+              }}
+            />
+          )}
+          <div className="relative flex items-center gap-2 mb-1.5">
+            <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${
+              tier === "premium"
+                ? "bg-gradient-to-br from-brand-500/30 to-accent-cyan/20"
+                : "bg-white/[0.06]"
+            }`}>
+              <Sparkles className={`w-3.5 h-3.5 ${
+                tier === "premium" ? "text-brand-300" : "text-white/30"
+              }`} />
+            </div>
+            <span className={`text-xs font-bold uppercase tracking-wider ${
+              tier === "premium" ? "text-brand-300" : "text-white/30"
+            }`}>
+              Premium
+            </span>
+          </div>
+          <div className="relative flex flex-col gap-0.5 mt-1">
+            {PREMIUM_FEATURES.map((f) => (
+              <span key={f} className={`text-[9px] flex items-center gap-1 ${
+                tier === "premium" ? "text-brand-300/60" : "text-white/15"
+              }`}>
+                <Check className="w-2.5 h-2.5" />{f}
+              </span>
+            ))}
+          </div>
+          {tier === "premium" && (
+            <div className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-brand-400/80" />
+          )}
         </button>
       </div>
 
-      {tier === "premium" && (
-        <div className="text-[10px] text-brand-400/60 bg-brand-500/5 border border-brand-500/10 rounded-lg px-3 py-2 leading-relaxed">
-          Premium uses advanced prompting for jaw-dropping, agency-quality designs with animations, glass effects, and rich layouts.
-        </div>
-      )}
+      <style>{`
+        @keyframes premium-shimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+      `}</style>
 
       {/* Main textarea */}
       <div className="relative flex-1 min-h-0">

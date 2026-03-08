@@ -185,12 +185,56 @@ export default function BuilderPage() {
   const activeToolLabel = TOOLS.find((t) => t.id === activeTool)?.label ?? "";
 
   return (
-    <div className="flex flex-col h-screen bg-[#0a0a0f]">
+    <div className="flex flex-col h-screen bg-[#0a0a0f] relative overflow-hidden">
+      {/* Ambient background glow orbs */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div
+          className="absolute -top-40 -left-40 w-96 h-96 rounded-full"
+          style={{
+            background: "radial-gradient(circle, rgba(124,58,237,0.08) 0%, transparent 70%)",
+            filter: "blur(60px)",
+            animation: "ambient-float 20s ease-in-out infinite",
+          }}
+        />
+        <div
+          className="absolute -bottom-32 right-1/4 w-80 h-80 rounded-full"
+          style={{
+            background: "radial-gradient(circle, rgba(0,150,255,0.06) 0%, transparent 70%)",
+            filter: "blur(60px)",
+            animation: "ambient-float 15s ease-in-out 5s infinite reverse",
+          }}
+        />
+        <div
+          className="absolute top-1/3 -right-20 w-64 h-64 rounded-full"
+          style={{
+            background: "radial-gradient(circle, rgba(139,92,246,0.05) 0%, transparent 70%)",
+            filter: "blur(50px)",
+            animation: "ambient-float 18s ease-in-out 3s infinite",
+          }}
+        />
+        {/* Subtle grid pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.015]"
+          style={{
+            backgroundImage: "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)",
+            backgroundSize: "80px 80px",
+          }}
+        />
+      </div>
+
+      <style>{`
+        @keyframes ambient-float {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          33% { transform: translate(30px, -20px) scale(1.1); }
+          66% { transform: translate(-20px, 15px) scale(0.95); }
+        }
+      `}</style>
+
       <TopBar />
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative z-10">
         {/* Left panel — Prompt */}
-        <div className="w-[400px] min-w-[340px] flex flex-col border-r border-white/[0.06] bg-[#12121a]">
+        <div className="w-[400px] min-w-[340px] flex flex-col border-r border-white/[0.06] bg-[#12121a]/90 backdrop-blur-sm">
           <div className="px-4 py-3 border-b border-white/[0.06]">
             <span className="text-[11px] uppercase tracking-[2px] text-brand-400/50">
               Prompt
@@ -213,7 +257,7 @@ export default function BuilderPage() {
         </div>
 
         {/* Center panel — Preview / Code */}
-        <div className="flex-1 flex flex-col bg-[#0a0a0f]">
+        <div className="flex-1 flex flex-col bg-[#0a0a0f]/80 backdrop-blur-sm">
           {/* Tabs */}
           <div className="flex items-center border-b border-white/[0.06] px-2">
             <button
@@ -259,7 +303,7 @@ export default function BuilderPage() {
 
         {/* Tool panel (slides open when a tool is active) */}
         {activeTool && (
-          <div className="w-[380px] flex flex-col border-l border-white/[0.06] bg-[#0a0a0f] animate-in slide-in-from-right duration-200">
+          <div className="w-[380px] flex flex-col border-l border-white/[0.06] bg-[#0a0a0f]/90 backdrop-blur-sm animate-in slide-in-from-right duration-200">
             <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
               <span className="text-[11px] uppercase tracking-[2px] text-brand-400/50">
                 {activeToolLabel}
@@ -276,7 +320,7 @@ export default function BuilderPage() {
         )}
 
         {/* Right toolbar — Tool icons */}
-        <div className="w-12 flex flex-col items-center py-2 gap-1 border-l border-white/[0.06] bg-[#0a0a0f]">
+        <div className="w-12 flex flex-col items-center py-2 gap-1 border-l border-white/[0.06] bg-[#0a0a0f]/90 backdrop-blur-sm">
           {TOOLS.map((tool) => (
             <button
               key={tool.id}
