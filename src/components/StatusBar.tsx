@@ -1,8 +1,16 @@
 "use client";
 
 interface StatusBarProps {
-  status: "idle" | "generating" | "complete" | "error";
+  status: "idle" | "generating" | "editing" | "complete" | "error";
 }
+
+const STATUS_CONFIG = {
+  idle: { color: "bg-white/20", label: "Ready" },
+  generating: { color: "bg-yellow-400", label: "Generating..." },
+  editing: { color: "bg-blue-400", label: "Editing..." },
+  complete: { color: "bg-green-500", label: "Build Complete" },
+  error: { color: "bg-red-500", label: "Error" },
+} as const;
 
 export default function StatusBar({ status }: StatusBarProps) {
   const isGenerating = status === "generating";
@@ -12,12 +20,9 @@ export default function StatusBar({ status }: StatusBarProps) {
       {/* Animated progress bar during generation */}
       {isGenerating && (
         <div
-          className="absolute inset-0 opacity-100"
-          style={{
-            background: "linear-gradient(90deg, transparent, rgba(0,150,255,0.08), rgba(124,58,237,0.08), transparent)",
-            backgroundSize: "200% 100%",
-            animation: "status-sweep 2s linear infinite",
-          }}
+          className={`w-1.5 h-1.5 rounded-full ${config.color} ${
+            status === "generating" || status === "editing" ? "animate-glow-pulse" : ""
+          }`}
         />
       )}
 

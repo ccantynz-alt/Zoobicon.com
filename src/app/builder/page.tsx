@@ -6,6 +6,7 @@ import PromptInput from "@/components/PromptInput";
 import type { Tier } from "@/components/PromptInput";
 import PreviewPanel from "@/components/PreviewPanel";
 import CodePanel from "@/components/CodePanel";
+import ChatPanel from "@/components/ChatPanel";
 import StatusBar from "@/components/StatusBar";
 
 import AutoDebugPanel from "@/components/AutoDebugPanel";
@@ -33,7 +34,7 @@ import {
   X,
 } from "lucide-react";
 
-type BuildStatus = "idle" | "generating" | "complete" | "error";
+type BuildStatus = "idle" | "generating" | "editing" | "complete" | "error";
 type RightTab = "preview" | "code";
 type ToolId =
   | "debug"
@@ -70,6 +71,8 @@ export default function BuilderPage() {
   const [activeTab, setActiveTab] = useState<RightTab>("preview");
   const [activeTool, setActiveTool] = useState<ToolId>(null);
   const [tier, setTier] = useState<Tier>("premium");
+
+  const hasCode = generatedCode.length > 0;
 
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim()) return;
@@ -136,6 +139,15 @@ export default function BuilderPage() {
   const handleCodeUpdate = useCallback((newCode: string) => {
     setGeneratedCode(newCode);
     setStatus("complete");
+    setActiveTab("preview");
+  }, []);
+
+  const handleNewSite = useCallback(() => {
+    setGeneratedCode("");
+    setPrompt("");
+    setStatus("idle");
+    setError("");
+    setActiveTool(null);
   }, []);
 
   const handleSeoFixRequest = useCallback(
@@ -232,28 +244,47 @@ export default function BuilderPage() {
 
       <TopBar />
 
-      <div className="flex flex-1 overflow-hidden relative z-10">
-        {/* Left panel — Prompt */}
-        <div className="w-[400px] min-w-[340px] flex flex-col border-r border-white/[0.06] bg-[#12121a]/90 backdrop-blur-sm">
-          <div className="px-4 py-3 border-b border-white/[0.06]">
-            <span className="text-[11px] uppercase tracking-[2px] text-brand-400/50">
-              Prompt
-            </span>
-          </div>
-          <div className="flex-1 overflow-y-auto">
-            <PromptInput
-              prompt={prompt}
-              onPromptChange={setPrompt}
-              onGenerate={handleGenerate}
-              isGenerating={status === "generating"}
-              tier={tier}
-              onTierChange={setTier}
-              hasExistingCode={!!generatedCode}
-              editPrompt={editPrompt}
-              onEditPromptChange={setEditPrompt}
-              onEdit={handleEdit}
-            />
-          </div>
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left panel — Prompt (before generation) or Chat editor (after) */}
+        <div className="w-[400px] min-w-[340px] flex flex-col border-r border-white/[0.06] bg-[#12121a]">
+          {!hasCode ? (
+            <>
+              <div className="px-4 py-3 border-b border-white/[0.06]">
+                <span className="text-[11px] uppercase tracking-[2px] text-brand-400/50">
+                  Prompt
+                </span>
+              </div>
+              <div className="flex-1 overflow-hidden">
+                <PromptInput
+                  prompt={prompt}
+                  onPromptChange={setPrompt}
+                  onGenerate={handleGenerate}
+                  isGenerating={status === "generating"}
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="px-4 py-3 border-b border-white/[0.06] flex items-center justify-between">
+                <span className="text-[11px] uppercase tracking-[2px] text-brand-400/50">
+                  AI Editor
+                </span>
+                <button
+                  onClick={handleNewSite}
+                  className="text-[10px] uppercase tracking-wider text-red-400/60 hover:text-red-400 transition-colors"
+                >
+                  New Site
+                </button>
+              </div>
+              <div className="flex-1 overflow-hidden">
+                <ChatPanel
+                  currentCode={generatedCode}
+                  onCodeUpdate={handleCodeUpdate}
+                  isVisible={true}
+                />
+              </div>
+            </>
+          )}
         </div>
 
         {/* Center panel — Preview / Code */}
