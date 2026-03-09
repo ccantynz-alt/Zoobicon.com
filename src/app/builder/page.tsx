@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import TopBar from "@/components/TopBar";
 import PromptInput from "@/components/PromptInput";
 import type { Tier } from "@/components/PromptInput";
@@ -112,6 +112,19 @@ export default function BuilderPage() {
 
   const abortRef = useRef<AbortController | null>(null);
   const hasCode = generatedCode.length > 0;
+
+  // Admin always gets premium tier locked
+  useEffect(() => {
+    try {
+      const user = localStorage.getItem("zoobicon_user");
+      if (user) {
+        const parsed = JSON.parse(user);
+        if (parsed.role === "admin" || parsed.plan === "unlimited") {
+          setTier("premium");
+        }
+      }
+    } catch { /* ignore */ }
+  }, []);
 
   const streamGenerate = useCallback(
     async (userPrompt: string, existingCode?: string) => {

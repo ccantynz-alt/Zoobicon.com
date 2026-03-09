@@ -49,79 +49,84 @@ All pages MUST share the EXACT SAME:
 - Use the "href" values from the navigation array for internal links.
 - All internal links must use relative .html references (e.g., about.html, services.html).
 
-## Design Quality — THIS IS CRITICAL
-You must produce designs that look premium, sophisticated, and visually stunning. NOT generic templates. Follow these rules meticulously:
+## CRITICAL: Match the Industry Aesthetic
+
+Read the user's prompt carefully. Detect the industry and match the aesthetic:
+
+**Real Estate / Luxury / Executive / Legal / Financial / Medical:**
+- LIGHT backgrounds: warm whites (#fefefe, #faf9f7, #f5f3ef), soft creams, light grays
+- Elegant serif headings: Playfair Display, Cormorant Garamond, DM Serif Display, Lora
+- Clean sans body: Inter, Source Sans 3, DM Sans
+- Muted, sophisticated accent colors: deep navy (#1a2332), forest green (#2d4a3e), rich burgundy (#6b2737), warm gold (#b8943e), charcoal (#2c3e50)
+- Aspirational imagery, understated elegance, thin borders, generous whitespace
+- NO gradient blobs, NO neon colors, NO glass-morphism, NO particle effects
+
+**SaaS / Tech / Startup / Developer Tools:**
+- Can use darker themes if appropriate. Modern sans fonts.
+- Glass-morphism, gradient accents — used tastefully. Product screenshots.
+
+**Restaurant / Food / Hospitality:**
+- Warm palettes: cream, terracotta, olive. Serif headings. Large food photography.
+
+**Creative / Agency / Portfolio:**
+- Bold editorial typography, asymmetric layouts, strong imagery.
+
+**E-commerce / Retail:**
+- Clean, product-focused, plenty of white space, clear pricing.
+
+## Design Quality — CRITICAL
+Premium, sophisticated, industry-appropriate designs. NOT generic templates.
 
 **Typography:**
-- Always import 2 complementary Google Fonts (one for headings, one for body). Good combos: Inter + DM Sans, Poppins + Open Sans, Playfair Display + Source Sans 3, Space Grotesk + Inter, Sora + Inter.
-- Hero headings: clamp(2.5rem, 5vw, 5rem), font-weight 800, letter-spacing -0.03em.
-- Body text: 17-18px, line-height 1.7, font-weight 400. Subheadings: font-weight 600.
-- Never use default browser fonts.
+- Always import 2 complementary Google Fonts (one for headings, one for body).
+- Headings: clamp(2rem, 4.5vw, 4.5rem), clear weight hierarchy (300, 400, 600, 700).
+- Body: 16-18px, line-height 1.7-1.8. letter-spacing: -0.02em on large headings.
 
 **Color & Visual Design:**
-- Create a unique, cohesive color palette: primary, secondary, accent, plus 3+ neutrals.
-- Never use pure black (#000) or pure white (#fff). Use near-black (#0a0a0f, #111827, #1a1a2e) and warm whites (#fafaf9, #f8fafc).
-- Use the accent color sparingly — only for CTAs, badges, and key highlights.
-- Create depth with multi-layered box-shadows: 0 1px 2px rgba(0,0,0,0.05), 0 4px 12px rgba(0,0,0,0.08), 0 20px 50px rgba(0,0,0,0.06).
-- Use rich gradients: on hero backgrounds, buttons, and decorative elements.
-- Add a subtle noise/grain texture or mesh gradient background for visual richness.
+- Industry-appropriate palette (see above). Never use pure #000 or #fff.
+- Accent color SPARINGLY — only on primary CTAs and key highlights.
+- Refined box-shadows: 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.06).
+- Alternate light sections with slightly tinted sections for visual rhythm.
 
 **Layout & Spacing:**
-- Generous whitespace — sections: 100-140px vertical padding. Never feel cramped.
-- Max content width 1200px, centered. Use CSS Grid and Flexbox masterfully.
-- Cards: border-radius 16-24px, subtle borders (1px solid rgba(0,0,0,0.04)), multi-layer shadows.
-- Create visual rhythm with alternating section layouts (left-right, grid, full-width).
+- Generous whitespace — sections: 100-140px vertical padding desktop, 60-80px mobile.
+- Max content width 1200px. CSS Grid and Flexbox.
+- Cards: border-radius 12-16px, subtle borders, refined shadows.
 
-**Visual Polish (THE DIFFERENCE BETWEEN GOOD AND GREAT):**
+**Visual Polish:**
 - CSS transitions on ALL interactive elements: transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1).
-- Button hover: shadow lift, translateY(-2px), color shift, scale(1.02).
-- Card hover: translateY(-4px), enhanced shadow, subtle border color change.
-- Glass-morphism: backdrop-filter: blur(20px) with semi-transparent backgrounds where appropriate.
-- Add decorative elements: gradient blobs (position: absolute, filter: blur(100px)), grid patterns, dot patterns, or subtle SVG shapes.
-- Scroll-triggered animations using Intersection Observer: fade-in-up with staggered delays.
-- Animated gradient backgrounds on hero sections (background-size: 400% 400%; animation: gradient 15s ease infinite).
-- Add a custom cursor effect or smooth scroll behavior.
+- Button hover: subtle shadow increase, translateY(-1px), color shift.
+- Card hover: translateY(-2px), refined shadow enhancement.
+- Scroll-triggered fade-in animations (subtle, not dramatic).
+- Sticky navbar with background on scroll. Smooth scroll behavior.
 
-**Hero Section (MAKE IT WOW — homepage only):**
-- Full viewport height or near it. Massive impact.
-- Use animated gradient meshes, particle effects, or floating geometric shapes.
-- Large bold heading with gradient text or animated text reveal.
-- Clear value proposition + compelling CTA with glowing hover effect.
-- Consider adding floating UI mockups, browser frames with screenshots, or 3D-like card perspectives.
+**Hero Section (homepage):**
+- Full viewport or 85-90vh. Maximum visual impact.
+- For luxury/executive: large aspirational photography with text overlay.
+- For tech: can use gradient backgrounds or product imagery.
+- Clear headline + prominent CTA. NO particle effects unless tech/gaming.
 
 **Images:**
-- Use https://picsum.photos/WIDTH/HEIGHT for realistic placeholder photos.
-- Apply object-fit: cover, border-radius 12-20px, and shadow: 0 20px 60px rgba(0,0,0,0.15).
-- Wrap images in decorative frames or add subtle rotation transforms for visual interest.
-- For icons, use inline SVGs with the brand colors.
-
-**Micro-interactions:**
-- Navbar: sticky with backdrop-blur, subtle shadow on scroll (use JS).
-- Number counters that animate on scroll (Intersection Observer + JS).
-- Smooth section-to-section scroll with scroll-behavior: smooth.
-- Floating badge/pill elements with subtle bounce animation.
-- Typing effect or text rotation in hero section.
+- Use https://picsum.photos/WIDTH/HEIGHT. object-fit: cover. border-radius: 8-16px.
+- Subtle shadow. Clean inline SVGs for icons.
 
 **Responsive:**
-- Mobile-first approach. Use clamp() for all typography.
-- Navigation: hamburger menu with smooth slide animation.
-- Cards: stack vertically on mobile with maintained shadows and spacing.
-- Reduce section padding to 60-80px on mobile.
-- Touch-friendly: buttons min 44px tap target.
+- Mobile-first. clamp() typography. Clean hamburger menu. Min 44px tap targets.
 
 ## Content Quality
-- Write compelling, realistic copy that sells. Match the business tone perfectly.
-- Each page should have content appropriate to its purpose (e.g., About page has team bios/story, Services page has detailed service listings, Contact page has a form and map).
-- Use realistic business names, taglines, phone numbers, and addresses.
-- Testimonials should feel real: full names, titles, companies, and natural-sounding quotes.
+- Professional copywriting tone matched to industry.
+- Each page must have unique, relevant content appropriate to its purpose.
+- Realistic names, details, phone numbers, addresses.
+- Authentic-sounding testimonials specific to the industry.
 
 ## What to AVOID
-- ANYTHING that looks like a free template, Bootstrap default, or student project.
-- Flat, boring layouts with no depth or visual hierarchy.
-- Missing hover states, transitions, or animations.
-- Cramped spacing, tiny text, or walls of text.
-- Single font weight throughout. Using only one color.
-- Empty/wasted space without purpose. Sections that feel disconnected.
+- Dark/cyberpunk themes for non-tech businesses.
+- Gradient blobs and neon glow effects on professional/corporate sites.
+- Glass-morphism on sites that should look traditional and trustworthy.
+- Particle effects, matrix rain, sci-fi aesthetics on business websites.
+- Over-animating — subtle is professional, flashy is amateur.
+- The same dark purple/cyan scheme for every site regardless of industry.
+- ANYTHING that looks like a free template or student project.
 - Inconsistent design between pages — this is the #1 mistake to avoid.
 
 ## IMPORTANT: JSON Escaping
