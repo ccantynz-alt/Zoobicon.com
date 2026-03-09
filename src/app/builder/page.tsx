@@ -19,6 +19,11 @@ import EcommerceGenerator from "@/components/EcommerceGenerator";
 import CrmGenerator from "@/components/CrmGenerator";
 import FigmaImport from "@/components/FigmaImport";
 import SeoScorePanel from "@/components/SeoScorePanel";
+import QAPanel from "@/components/QAPanel";
+import AccessibilityPanel from "@/components/AccessibilityPanel";
+import PerformancePanel from "@/components/PerformancePanel";
+import ExportPanel from "@/components/ExportPanel";
+import VariantsPanel from "@/components/VariantsPanel";
 
 import {
   Bug,
@@ -35,6 +40,11 @@ import {
   Rocket,
   Check,
   ExternalLink,
+  Shield,
+  Accessibility,
+  Gauge,
+  Download,
+  Layers,
 } from "lucide-react";
 
 type BuildStatus = "idle" | "generating" | "editing" | "complete" | "error";
@@ -50,19 +60,29 @@ type ToolId =
   | "crm"
   | "figma"
   | "seo"
+  | "qa"
+  | "a11y"
+  | "perf"
+  | "export"
+  | "variants"
   | null;
 
 const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }[] = [
+  { id: "qa", label: "QA Check", icon: <Shield size={18} /> },
+  { id: "a11y", label: "Accessibility", icon: <Accessibility size={18} /> },
+  { id: "perf", label: "Performance", icon: <Gauge size={18} /> },
+  { id: "variants", label: "A/B Variants", icon: <Layers size={18} /> },
+  { id: "export", label: "Export", icon: <Download size={18} /> },
   { id: "debug", label: "Auto Debug", icon: <Bug size={18} /> },
-  { id: "github", label: "GitHub Import", icon: <Github size={18} /> },
-  { id: "translate", label: "Translate", icon: <Languages size={18} /> },
-  { id: "wordpress", label: "WordPress Export", icon: <FileArchive size={18} /> },
-  { id: "scaffold", label: "Scaffolding", icon: <Database size={18} /> },
+  { id: "seo", label: "SEO Score", icon: <Search size={18} /> },
   { id: "animations", label: "Animations", icon: <Wand2 size={18} /> },
   { id: "ecommerce", label: "E-commerce", icon: <ShoppingCart size={18} /> },
   { id: "crm", label: "CRM", icon: <Users size={18} /> },
+  { id: "scaffold", label: "Scaffolding", icon: <Database size={18} /> },
+  { id: "translate", label: "Translate", icon: <Languages size={18} /> },
+  { id: "github", label: "GitHub Import", icon: <Github size={18} /> },
   { id: "figma", label: "Figma Import", icon: <Figma size={18} /> },
-  { id: "seo", label: "SEO Score", icon: <Search size={18} /> },
+  { id: "wordpress", label: "WordPress Export", icon: <FileArchive size={18} /> },
 ];
 
 export default function BuilderPage() {
@@ -229,6 +249,16 @@ export default function BuilderPage() {
         return <FigmaImport onImport={handleCodeUpdate} />;
       case "seo":
         return <SeoScorePanel code={generatedCode} onFixRequest={handleSeoFixRequest} />;
+      case "qa":
+        return <QAPanel code={generatedCode} />;
+      case "a11y":
+        return <AccessibilityPanel code={generatedCode} />;
+      case "perf":
+        return <PerformancePanel code={generatedCode} />;
+      case "export":
+        return <ExportPanel code={generatedCode} />;
+      case "variants":
+        return <VariantsPanel code={generatedCode} onApplyVariant={handleCodeUpdate} />;
       default:
         return null;
     }
