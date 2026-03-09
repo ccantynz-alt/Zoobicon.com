@@ -32,7 +32,7 @@ export async function GET(
         `<!DOCTYPE html><html><head><title>Site Not Found</title>
         <style>body{background:#0a0a0f;color:#e0e0e0;font-family:Inter,system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0}
         .c{text-align:center}.h{font-size:2rem;font-weight:800;margin-bottom:1rem}.p{color:rgba(255,255,255,0.4)}</style></head>
-        <body><div class="c"><div class="h">Site Not Found</div><p class="p">This site hasn't been deployed yet.<br>Build one at <a href="https://zoobicon.com/builder" style="color:#7c3aed">zoobicon.com/builder</a></p></div></body></html>`,
+        <body><div class="c"><div class="h">Site Not Found</div><p class="p">This site hasn't been deployed yet.<br>Build one at <a href="https://zoobicon.com/builder" style="color:#2563eb">zoobicon.com/builder</a></p></div></body></html>`,
         {
           status: 404,
           headers: { "Content-Type": "text/html; charset=utf-8" },

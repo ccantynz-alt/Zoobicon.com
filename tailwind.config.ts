@@ -14,16 +14,16 @@ const config: Config = {
           300: "#0a0a0f",
         },
         brand: {
-          200: "#c4b5fd",
-          300: "#a78bfa",
-          400: "#8b5cf6",
-          500: "#7c3aed",
-          600: "#6d28d9",
-          700: "#5b21b6",
+          200: "#bfdbfe",
+          300: "#93c5fd",
+          400: "#60a5fa",
+          500: "#2563eb",
+          600: "#1d4ed8",
+          700: "#1e40af",
         },
         accent: {
           cyan: "#00f0ff",
-          purple: "#8b5cf6",
+          purple: "#818cf8",
           pink: "#ec4899",
         },
       },
@@ -36,10 +36,10 @@ const config: Config = {
         "pulse-glow": "pulse-glow 4s ease-in-out infinite",
       },
       boxShadow: {
-        glow: "0 0 20px rgba(124, 58, 237, 0.3), 0 0 60px rgba(124, 58, 237, 0.1)",
-        "glow-lg": "0 0 30px rgba(124, 58, 237, 0.4), 0 0 80px rgba(124, 58, 237, 0.15)",
+        glow: "0 0 20px rgba(37, 99, 235, 0.3), 0 0 60px rgba(37, 99, 235, 0.1)",
+        "glow-lg": "0 0 30px rgba(37, 99, 235, 0.4), 0 0 80px rgba(37, 99, 235, 0.15)",
         "glow-cyan": "0 0 20px rgba(0, 240, 255, 0.3), 0 0 60px rgba(0, 240, 255, 0.1)",
-        "glow-purple": "0 0 20px rgba(139, 92, 246, 0.3), 0 0 60px rgba(139, 92, 246, 0.1)",
+        "glow-blue": "0 0 20px rgba(96, 165, 250, 0.3), 0 0 60px rgba(96, 165, 250, 0.1)",
       },
       keyframes: {
         "glow-pulse": {

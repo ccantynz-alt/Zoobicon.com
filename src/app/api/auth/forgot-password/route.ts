@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
             html: `
               <div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:#09090f;color:#fff;border-radius:16px">
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:32px">
-                  <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#6d28d9);display:flex;align-items:center;justify-content:center">
+                  <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#2563eb,#1d4ed8);display:flex;align-items:center;justify-content:center">
                     <span style="color:#fff;font-size:18px;font-weight:900">Z</span>
                   </div>
                   <span style="font-size:20px;font-weight:800;letter-spacing:-0.5px">Zoobicon</span>
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
                   Click the button below to choose a new password. This link expires in 1 hour.
                 </p>
                 <a href="${resetUrl}"
-                   style="display:inline-block;padding:14px 28px;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:15px">
+                   style="display:inline-block;padding:14px 28px;background:linear-gradient(135deg,#2563eb,#0ea5e9);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:15px">
                   Reset Password
                 </a>
                 <p style="color:rgba(255,255,255,0.25);font-size:12px;margin:28px 0 0;line-height:1.6">

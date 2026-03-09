@@ -5,8 +5,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap");
 
 :root {
-  --brand-500: #7c3aed;
-  --brand-600: #6d28d9;
+  --brand-500: #2563eb;
+  --brand-600: #1d4ed8;
   --accent-cyan: #00f0ff;
 }
 
@@ -70,9 +70,9 @@ pre code {
 
 .cyber-btn {
   position: relative;
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(109, 40, 217, 0.15));
-  border: 1px solid rgba(124, 58, 237, 0.4);
-  color: #a78bfa;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(29, 78, 216, 0.15));
+  border: 1px solid rgba(37, 99, 235, 0.4);
+  color: #60a5fa;
   padding: 12px 24px;
   font-family: "Inter", system-ui, sans-serif;
   font-size: 14px;
@@ -84,8 +84,8 @@ pre code {
 }
 
 .cyber-btn:hover {
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.25), rgba(109, 40, 217, 0.25));
-  box-shadow: 0 0 20px rgba(124, 58, 237, 0.2);
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.25), rgba(29, 78, 216, 0.25));
+  box-shadow: 0 0 20px rgba(37, 99, 235, 0.2);
   transform: translateY(-1px);
 }
 
@@ -125,8 +125,8 @@ pre code {
 }
 
 .cyber-input:focus {
-  border-color: rgba(124, 58, 237, 0.5);
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+  border-color: rgba(37, 99, 235, 0.5);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .cyber-input::placeholder {
@@ -171,8 +171,8 @@ pre code {
 }
 
 .cyber-tab.active {
-  color: #a78bfa;
-  border-bottom-color: #7c3aed;
+  color: #60a5fa;
+  border-bottom-color: #2563eb;
 }
 
 /* ============================================
@@ -180,14 +180,14 @@ pre code {
    ============================================ */
 
 .gradient-text {
-  background: linear-gradient(135deg, #7c3aed, #00f0ff);
+  background: linear-gradient(135deg, #2563eb, #00f0ff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .gradient-text-hero {
-  background: linear-gradient(135deg, #a78bfa, #00f0ff, #8b5cf6);
+  background: linear-gradient(135deg, #60a5fa, #00f0ff, #3b82f6);
   background-size: 200% 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -196,7 +196,7 @@ pre code {
 }
 
 .gradient-text-static {
-  background: linear-gradient(135deg, #7c3aed, #00f0ff);
+  background: linear-gradient(135deg, #2563eb, #00f0ff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -212,7 +212,7 @@ pre code {
    ============================================ */
 
 .btn-gradient {
-  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
   transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
@@ -220,8 +220,8 @@ pre code {
 }
 
 .btn-gradient:hover {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-  box-shadow: 0 0 20px rgba(124, 58, 237, 0.4), 0 0 60px rgba(124, 58, 237, 0.1);
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  box-shadow: 0 0 20px rgba(37, 99, 235, 0.4), 0 0 60px rgba(37, 99, 235, 0.1);
   transform: translateY(-1px);
 }
 
@@ -241,11 +241,11 @@ pre code {
 }
 
 .glow-orb-blue {
-  background: radial-gradient(circle, rgba(124, 58, 237, 0.6), transparent 70%);
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.6), transparent 70%);
 }
 
 .glow-orb-purple {
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.5), transparent 70%);
+  background: radial-gradient(circle, rgba(96, 165, 250, 0.5), transparent 70%);
 }
 
 .glow-orb-cyan {
@@ -329,13 +329,13 @@ pre code {
 /* Touch devices — disable hover effects that cause "sticky hover" on mobile */
 @media (hover: none) and (pointer: coarse) {
   .cyber-btn:hover {
-    background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(109, 40, 217, 0.15));
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(29, 78, 216, 0.15));
     box-shadow: none;
     transform: none;
   }
 
   .cyber-btn:active {
-    background: linear-gradient(135deg, rgba(124, 58, 237, 0.25), rgba(109, 40, 217, 0.25));
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.25), rgba(29, 78, 216, 0.25));
   }
 
   .cyber-tab:hover {
@@ -352,7 +352,7 @@ pre code {
 
 /* Focus-visible — keyboard navigation (a11y) */
 :focus-visible {
-  outline: 2px solid rgba(124, 58, 237, 0.6);
+  outline: 2px solid rgba(37, 99, 235, 0.6);
   outline-offset: 2px;
   border-radius: 2px;
 }
@@ -415,12 +415,12 @@ pre code {
 
 /* Selection styling */
 ::selection {
-  background: rgba(124, 58, 237, 0.3);
+  background: rgba(37, 99, 235, 0.3);
   color: #fff;
 }
 
 ::-moz-selection {
-  background: rgba(124, 58, 237, 0.3);
+  background: rgba(37, 99, 235, 0.3);
   color: #fff;
 }
 

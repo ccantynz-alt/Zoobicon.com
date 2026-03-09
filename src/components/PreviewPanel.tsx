@@ -14,7 +14,7 @@ function AnimatedLogo() {
       <div
         className="absolute inset-0 rounded-full"
         style={{
-          background: "conic-gradient(from 0deg, transparent, #7c3aed, #00f0ff, #8b5cf6, transparent)",
+          background: "conic-gradient(from 0deg, transparent, #2563eb, #00f0ff, #3b82f6, transparent)",
           animation: "spin-slow 8s linear infinite",
           opacity: 0.3,
           filter: "blur(1px)",
@@ -24,7 +24,7 @@ function AnimatedLogo() {
       <div
         className="absolute inset-6 rounded-full"
         style={{
-          background: "conic-gradient(from 180deg, transparent, #00f0ff, #7c3aed, #ec4899, transparent)",
+          background: "conic-gradient(from 180deg, transparent, #00f0ff, #2563eb, #ec4899, transparent)",
           animation: "spin-slow 6s linear infinite reverse",
           opacity: 0.25,
           filter: "blur(1px)",
@@ -34,7 +34,7 @@ function AnimatedLogo() {
       <div
         className="absolute inset-10 rounded-full"
         style={{
-          background: "radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(37,99,235,0.15) 0%, transparent 70%)",
           animation: "breathe 4s ease-in-out infinite",
         }}
       />
@@ -54,7 +54,7 @@ function AnimatedLogo() {
         const angle = (i / 12) * 360;
         const radius = 90 + (i % 3) * 15;
         const size = 2 + (i % 3);
-        const color = i % 3 === 0 ? "#7c3aed" : i % 3 === 1 ? "#00f0ff" : "#ec4899";
+        const color = i % 3 === 0 ? "#2563eb" : i % 3 === 1 ? "#00f0ff" : "#ec4899";
         return (
           <div
             key={i}
@@ -78,13 +78,13 @@ function AnimatedLogo() {
         <div
           className="text-7xl font-black"
           style={{
-            background: "linear-gradient(135deg, #a78bfa, #00f0ff, #8b5cf6)",
+            background: "linear-gradient(135deg, #60a5fa, #00f0ff, #3b82f6)",
             backgroundSize: "200% 200%",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             backgroundClip: "text",
             animation: "gradient-drift 4s ease-in-out infinite",
-            filter: "drop-shadow(0 0 20px rgba(124,58,237,0.4))",
+            filter: "drop-shadow(0 0 20px rgba(37,99,235,0.4))",
           }}
         >
           Z
@@ -131,7 +131,7 @@ function GeneratingVortex() {
       <div
         className="absolute inset-6 rounded-full"
         style={{
-          background: "conic-gradient(from 90deg, transparent 0%, #00eeff 20%, #7c3aed 40%, transparent 55%, #00aaff 70%, #8b5cf6 85%, transparent 100%)",
+          background: "conic-gradient(from 90deg, transparent 0%, #00eeff 20%, #2563eb 40%, transparent 55%, #00aaff 70%, #3b82f6 85%, transparent 100%)",
           animation: "vortex-spin 1.5s linear infinite reverse",
           opacity: 0.6,
           filter: "blur(1px)",
@@ -163,7 +163,7 @@ function GeneratingVortex() {
         const radius = 100 + (i % 4) * 20;
         const size = 2 + (i % 3) * 1.5;
         const isBlue = i % 3 !== 2;
-        const color = isBlue ? (i % 2 === 0 ? "#00ddff" : "#3388ff") : "#8b5cf6";
+        const color = isBlue ? (i % 2 === 0 ? "#00ddff" : "#3388ff") : "#3b82f6";
         return (
           <div
             key={i}
@@ -209,7 +209,7 @@ function GeneratingVortex() {
         <div
           className="text-5xl font-black"
           style={{
-            background: "linear-gradient(135deg, #00ddff, #4488ff, #8b5cf6)",
+            background: "linear-gradient(135deg, #00ddff, #4488ff, #3b82f6)",
             backgroundSize: "200% 200%",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
@@ -273,7 +273,7 @@ export default function PreviewPanel({ html, isGenerating }: PreviewPanelProps) 
           <p
             className="text-sm font-bold uppercase tracking-[4px] mt-4"
             style={{
-              background: "linear-gradient(90deg, #00ddff, #4488ff, #8b5cf6, #00ddff)",
+              background: "linear-gradient(90deg, #00ddff, #4488ff, #3b82f6, #00ddff)",
               backgroundSize: "300% 100%",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
