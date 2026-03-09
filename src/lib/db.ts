@@ -41,7 +41,8 @@ export async function initSchema() {
     )
   `;
 
-  // Idempotent: add Stripe columns if the table was created before this migration
+  // Idempotent: add columns if the table was created before this migration
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash          TEXT`;
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_customer_id     TEXT UNIQUE`;
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_subscription_id TEXT UNIQUE`;
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_status    TEXT`;
@@ -95,6 +96,7 @@ export async function initSchema() {
     )
   `;
 
+  await sql`ALTER TABLE deployments ADD COLUMN IF NOT EXISTS code TEXT`;
   await sql`CREATE INDEX IF NOT EXISTS deployments_site_id_idx ON deployments (site_id)`;
 
   await sql`

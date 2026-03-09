@@ -36,6 +36,7 @@ import {
   Loader2,
   Search,
   Filter,
+  Pencil,
 } from "lucide-react";
 
 /* ────────────────────── Animations ────────────────────── */
@@ -481,6 +482,7 @@ export default function HostingDashboard() {
                         </td>
                         <td className="px-4 py-4">
                           <div className="flex items-center justify-end gap-1">
+                            <Link href={`/edit/${site.name}`} title="Edit with AI" className="p-1.5 rounded-lg hover:bg-brand-500/10 text-white/40 hover:text-brand-400 transition-colors"><Pencil className="w-4 h-4" /></Link>
                             <button title="View" className="p-1.5 rounded-lg hover:bg-white/5 text-white/40 hover:text-white/80 transition-colors"><Eye className="w-4 h-4" /></button>
                             <button title="Deploy" className="p-1.5 rounded-lg hover:bg-white/5 text-white/40 hover:text-white/80 transition-colors"><Upload className="w-4 h-4" /></button>
                             <button title="Settings" className="p-1.5 rounded-lg hover:bg-white/5 text-white/40 hover:text-white/80 transition-colors"><Settings className="w-4 h-4" /></button>

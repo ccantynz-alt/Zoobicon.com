@@ -1,5 +1,7 @@
 import { NextRequest } from "next/server";
 import { verifyResetToken } from "@/lib/resetToken";
+import { sql } from "@/lib/db";
+import { hashPassword } from "@/lib/password";
 
 export async function POST(request: NextRequest) {
   try {
@@ -47,12 +49,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // For regular users — once a database is added, update the hashed password here.
-    // For now, acknowledge success (regular users use localStorage auth).
-    return new Response(
-      JSON.stringify({ ok: true, isAdmin: false }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
-    );
+    // Update regular user password in the database
+    const passwordHash = await hashPassword(newPassword);
+    await sql`
+      UPDATE users SET password_hash = ${passwordHash}, updated_at = NOW()
+      WHERE email = ${result.email}
+    `;
+
+    return Response.json({ ok: true, isAdmin: false });
   } catch {
     return new Response(JSON.stringify({ error: "Internal error" }), {
       status: 500,

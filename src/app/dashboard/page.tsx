@@ -22,7 +22,7 @@ import {
   Bot,
   Shield,
 } from "lucide-react";
-import { getProjects, deleteProject, type SavedProject } from "@/lib/storage";
+import { getProjects as getLocalProjects, deleteProject as deleteLocalProject, type SavedProject } from "@/lib/storage";
 
 const QUICK_ACTIONS = [
   { icon: Globe, label: "New Website", href: "/builder", color: "from-brand-500 to-brand-700" },
@@ -41,22 +41,57 @@ export default function DashboardPage() {
   const [userPlan, setUserPlan] = useState<"free" | "unlimited">("free");
 
   useEffect(() => {
-    setProjects(getProjects());
+    let userEmail = "";
     try {
       const user = localStorage.getItem("zoobicon_user");
       if (user) {
         const parsed = JSON.parse(user);
         setUserName(parsed.name || "User");
         setUserRole(parsed.role === "admin" ? "admin" : "user");
-        setUserPlan(parsed.plan === "unlimited" ? "unlimited" : "free");
+        setUserPlan(parsed.plan === "unlimited" || parsed.plan === "pro" ? "unlimited" : "free");
+        userEmail = parsed.email || "";
       }
     } catch { /* ignore */ }
+
+    // Load projects from database API, fall back to localStorage
+    if (userEmail) {
+      fetch(`/api/projects?email=${encodeURIComponent(userEmail)}`)
+        .then((res) => (res.ok ? res.json() : Promise.reject()))
+        .then((data) => {
+          if (Array.isArray(data) && data.length > 0) {
+            setProjects(
+              data.map((p: Record<string, string>) => ({
+                id: p.id,
+                name: p.name,
+                prompt: p.prompt || "",
+                code: p.code || "",
+                template: p.template,
+                createdAt: new Date(p.created_at).getTime(),
+                updatedAt: new Date(p.updated_at).getTime(),
+              }))
+            );
+          } else {
+            setProjects(getLocalProjects());
+          }
+        })
+        .catch(() => setProjects(getLocalProjects()));
+    } else {
+      setProjects(getLocalProjects());
+    }
   }, []);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm("Delete this project? This cannot be undone.")) {
-      deleteProject(id);
-      setProjects(getProjects());
+      // Try database delete first, then fall back to localStorage
+      try {
+        const res = await fetch(`/api/projects/${id}`, { method: "DELETE" });
+        if (res.ok) {
+          setProjects((prev) => prev.filter((p) => p.id !== id));
+          return;
+        }
+      } catch { /* fall through */ }
+      deleteLocalProject(id);
+      setProjects(getLocalProjects());
     }
   };
 

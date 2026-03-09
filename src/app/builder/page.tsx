@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import TopBar from "@/components/TopBar";
 import PromptInput from "@/components/PromptInput";
 import type { Tier } from "@/components/PromptInput";
@@ -19,6 +19,14 @@ import EcommerceGenerator from "@/components/EcommerceGenerator";
 import CrmGenerator from "@/components/CrmGenerator";
 import FigmaImport from "@/components/FigmaImport";
 import SeoScorePanel from "@/components/SeoScorePanel";
+import QAPanel from "@/components/QAPanel";
+import AccessibilityPanel from "@/components/AccessibilityPanel";
+import PerformancePanel from "@/components/PerformancePanel";
+import ExportPanel from "@/components/ExportPanel";
+import VariantsPanel from "@/components/VariantsPanel";
+import MultiPagePanel from "@/components/MultiPagePanel";
+import FullStackPanel from "@/components/FullStackPanel";
+import EmailTemplatePanel from "@/components/EmailTemplatePanel";
 
 import {
   Bug,
@@ -32,6 +40,17 @@ import {
   Figma,
   Search,
   X,
+  Rocket,
+  Check,
+  ExternalLink,
+  Shield,
+  Accessibility,
+  Gauge,
+  Download,
+  Layers,
+  FileText,
+  Boxes,
+  Mail,
 } from "lucide-react";
 
 type BuildStatus = "idle" | "generating" | "editing" | "complete" | "error";
@@ -47,19 +66,35 @@ type ToolId =
   | "crm"
   | "figma"
   | "seo"
+  | "qa"
+  | "a11y"
+  | "perf"
+  | "export"
+  | "variants"
+  | "multipage"
+  | "fullstack"
+  | "email"
   | null;
 
 const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }[] = [
+  { id: "fullstack", label: "Full-Stack App", icon: <Boxes size={18} /> },
+  { id: "multipage", label: "Multi-Page", icon: <FileText size={18} /> },
+  { id: "qa", label: "QA Check", icon: <Shield size={18} /> },
+  { id: "a11y", label: "Accessibility", icon: <Accessibility size={18} /> },
+  { id: "perf", label: "Performance", icon: <Gauge size={18} /> },
+  { id: "variants", label: "A/B Variants", icon: <Layers size={18} /> },
+  { id: "email", label: "Email Template", icon: <Mail size={18} /> },
+  { id: "export", label: "Export", icon: <Download size={18} /> },
   { id: "debug", label: "Auto Debug", icon: <Bug size={18} /> },
-  { id: "github", label: "GitHub Import", icon: <Github size={18} /> },
-  { id: "translate", label: "Translate", icon: <Languages size={18} /> },
-  { id: "wordpress", label: "WordPress Export", icon: <FileArchive size={18} /> },
-  { id: "scaffold", label: "Scaffolding", icon: <Database size={18} /> },
+  { id: "seo", label: "SEO Score", icon: <Search size={18} /> },
   { id: "animations", label: "Animations", icon: <Wand2 size={18} /> },
   { id: "ecommerce", label: "E-commerce", icon: <ShoppingCart size={18} /> },
   { id: "crm", label: "CRM", icon: <Users size={18} /> },
+  { id: "scaffold", label: "Scaffolding", icon: <Database size={18} /> },
+  { id: "translate", label: "Translate", icon: <Languages size={18} /> },
+  { id: "github", label: "GitHub Import", icon: <Github size={18} /> },
   { id: "figma", label: "Figma Import", icon: <Figma size={18} /> },
-  { id: "seo", label: "SEO Score", icon: <Search size={18} /> },
+  { id: "wordpress", label: "WordPress Export", icon: <FileArchive size={18} /> },
 ];
 
 export default function BuilderPage() {
@@ -71,70 +106,111 @@ export default function BuilderPage() {
   const [activeTab, setActiveTab] = useState<RightTab>("preview");
   const [activeTool, setActiveTool] = useState<ToolId>(null);
   const [tier, setTier] = useState<Tier>("premium");
+  const [isDeploying, setIsDeploying] = useState(false);
+  const [deployUrl, setDeployUrl] = useState("");
+  const [deployStatus, setDeployStatus] = useState<"idle" | "deploying" | "deployed" | "error">("idle");
 
+  const abortRef = useRef<AbortController | null>(null);
   const hasCode = generatedCode.length > 0;
+
+  const streamGenerate = useCallback(
+    async (userPrompt: string, existingCode?: string) => {
+      setStatus("generating");
+      setError("");
+      if (!existingCode) setGeneratedCode("");
+      setActiveTab("preview");
+
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+
+      try {
+        const res = await fetch("/api/generate/stream", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            prompt: userPrompt,
+            tier,
+            ...(existingCode ? { existingCode } : {}),
+          }),
+          signal: controller.signal,
+        });
+
+        if (!res.ok) {
+          // Fallback to non-streaming endpoint
+          const fallbackRes = await fetch("/api/generate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              prompt: userPrompt,
+              tier,
+              ...(existingCode ? { existingCode } : {}),
+            }),
+          });
+          if (!fallbackRes.ok) {
+            const data = await fallbackRes.json();
+            throw new Error(data.error || "Generation failed");
+          }
+          const data = await fallbackRes.json();
+          setGeneratedCode(data.html);
+          setStatus("complete");
+          return;
+        }
+
+        const reader = res.body?.getReader();
+        if (!reader) throw new Error("No response stream");
+
+        const decoder = new TextDecoder();
+        let accumulated = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const text = decoder.decode(value, { stream: true });
+          const lines = text.split("\n");
+
+          for (const line of lines) {
+            if (!line.startsWith("data: ")) continue;
+            const jsonStr = line.slice(6).trim();
+            if (!jsonStr) continue;
+
+            try {
+              const event = JSON.parse(jsonStr);
+              if (event.type === "chunk" && event.content) {
+                accumulated += event.content;
+                setGeneratedCode(accumulated);
+              } else if (event.type === "done") {
+                setStatus("complete");
+              } else if (event.type === "error") {
+                throw new Error(event.message || "Stream error");
+              }
+            } catch (parseErr) {
+              // Skip malformed SSE lines
+            }
+          }
+        }
+
+        if (accumulated) setStatus("complete");
+      } catch (err) {
+        if ((err as Error).name === "AbortError") return;
+        setError(err instanceof Error ? err.message : "Something went wrong");
+        setStatus("error");
+      }
+    },
+    [tier]
+  );
 
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim()) return;
-
-    setStatus("generating");
-    setError("");
-    setGeneratedCode("");
-    setActiveTab("preview");
-
-    try {
-      const res = await fetch("/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: prompt.trim(), tier }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Generation failed");
-      }
-
-      const data = await res.json();
-      setGeneratedCode(data.html);
-      setStatus("complete");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
-      setStatus("error");
-    }
-  }, [prompt, tier]);
+    await streamGenerate(prompt.trim());
+  }, [prompt, streamGenerate]);
 
   const handleEdit = useCallback(async () => {
     if (!editPrompt.trim() || !generatedCode) return;
-
-    setStatus("generating");
-    setError("");
-    setActiveTab("preview");
-
-    try {
-      const res = await fetch("/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt: editPrompt.trim(),
-          tier,
-          existingCode: generatedCode,
-        }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Edit failed");
-      }
-
-      const data = await res.json();
-      setGeneratedCode(data.html);
-      setStatus("complete");
-      setEditPrompt("");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
-      setStatus("error");
-    }
-  }, [editPrompt, generatedCode, tier]);
+    await streamGenerate(editPrompt.trim(), generatedCode);
+    setEditPrompt("");
+  }, [editPrompt, generatedCode, streamGenerate]);
 
   const handleCodeUpdate = useCallback((newCode: string) => {
     setGeneratedCode(newCode);
@@ -156,6 +232,40 @@ export default function BuilderPage() {
     },
     []
   );
+
+  const handleDeploy = useCallback(async () => {
+    if (!generatedCode || isDeploying) return;
+
+    setIsDeploying(true);
+    setDeployStatus("deploying");
+
+    try {
+      const userStr = typeof window !== "undefined" ? localStorage.getItem("zoobicon_user") : null;
+      const user = userStr ? JSON.parse(userStr) : null;
+      const email = user?.email || "anonymous@zoobicon.com";
+      const siteName = prompt.trim().slice(0, 50) || "My Site";
+
+      const res = await fetch("/api/hosting/deploy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: siteName, email, code: generatedCode }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Deploy failed");
+      }
+
+      const data = await res.json();
+      setDeployUrl(data.url);
+      setDeployStatus("deployed");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Deploy failed");
+      setDeployStatus("error");
+    } finally {
+      setIsDeploying(false);
+    }
+  }, [generatedCode, isDeploying, prompt]);
 
   const toggleTool = useCallback((toolId: Exclude<ToolId, null>) => {
     setActiveTool((prev) => (prev === toolId ? null : toolId));
@@ -189,6 +299,22 @@ export default function BuilderPage() {
         return <FigmaImport onImport={handleCodeUpdate} />;
       case "seo":
         return <SeoScorePanel code={generatedCode} onFixRequest={handleSeoFixRequest} />;
+      case "qa":
+        return <QAPanel code={generatedCode} />;
+      case "a11y":
+        return <AccessibilityPanel code={generatedCode} />;
+      case "perf":
+        return <PerformancePanel code={generatedCode} />;
+      case "export":
+        return <ExportPanel code={generatedCode} />;
+      case "variants":
+        return <VariantsPanel code={generatedCode} onApplyVariant={handleCodeUpdate} />;
+      case "multipage":
+        return <MultiPagePanel onApplyPage={handleCodeUpdate} />;
+      case "fullstack":
+        return <FullStackPanel onApplyCode={handleCodeUpdate} />;
+      case "email":
+        return <EmailTemplatePanel onApplyCode={handleCodeUpdate} />;
       default:
         return null;
     }
@@ -318,7 +444,37 @@ export default function BuilderPage() {
               Code
             </button>
 
-            {status === "error" && (
+            {/* Deploy button */}
+            {hasCode && (
+              <div className="ml-auto flex items-center gap-2 pr-3">
+                {deployStatus === "deployed" && deployUrl && (
+                  <a
+                    href={deployUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
+                  >
+                    <Check size={14} />
+                    <span>Live</span>
+                    <ExternalLink size={12} />
+                  </a>
+                )}
+                <button
+                  onClick={handleDeploy}
+                  disabled={isDeploying}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                    isDeploying
+                      ? "bg-brand-500/10 text-brand-400/50 cursor-wait"
+                      : "bg-brand-500/20 text-brand-400 hover:bg-brand-500/30"
+                  }`}
+                >
+                  <Rocket size={14} className={isDeploying ? "animate-pulse" : ""} />
+                  {isDeploying ? "Deploying..." : "Deploy"}
+                </button>
+              </div>
+            )}
+
+            {status === "error" && !hasCode && (
               <span className="ml-auto text-xs text-red-400 pr-3">
                 {error}
               </span>
