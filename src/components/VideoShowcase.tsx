@@ -266,18 +266,6 @@ function VideoPlayer({ video, isLarge }: { video: VideoCard; isLarge?: boolean }
 export default function VideoShowcase() {
   return (
     <div>
-      {/* CSS for animations */}
-      <style jsx global>{`
-        @keyframes scan {
-          0% { top: 0%; }
-          100% { top: 100%; }
-        }
-        @keyframes progress {
-          0% { width: 0%; }
-          100% { width: 100%; }
-        }
-      `}</style>
-
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 auto-rows-auto">
         {/* Featured large video */}
         <div className="col-span-2 row-span-2">
