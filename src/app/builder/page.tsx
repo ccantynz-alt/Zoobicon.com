@@ -27,6 +27,9 @@ import VariantsPanel from "@/components/VariantsPanel";
 import MultiPagePanel from "@/components/MultiPagePanel";
 import FullStackPanel from "@/components/FullStackPanel";
 import EmailTemplatePanel from "@/components/EmailTemplatePanel";
+import ClonePanel from "@/components/ClonePanel";
+import AiImagesPanel from "@/components/AiImagesPanel";
+import PipelinePanel from "@/components/PipelinePanel";
 
 import {
   Bug,
@@ -51,11 +54,17 @@ import {
   FileText,
   Boxes,
   Mail,
+  Globe,
+  ImagePlus,
+  Workflow,
 } from "lucide-react";
 
 type BuildStatus = "idle" | "generating" | "editing" | "complete" | "error";
 type RightTab = "preview" | "code";
 type ToolId =
+  | "pipeline"
+  | "clone"
+  | "ai-images"
   | "debug"
   | "github"
   | "translate"
@@ -77,6 +86,9 @@ type ToolId =
   | null;
 
 const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }[] = [
+  { id: "pipeline", label: "Agent Pipeline", icon: <Workflow size={18} /> },
+  { id: "clone", label: "Clone Site", icon: <Globe size={18} /> },
+  { id: "ai-images", label: "AI Images", icon: <ImagePlus size={18} /> },
   { id: "fullstack", label: "Full-Stack App", icon: <Boxes size={18} /> },
   { id: "multipage", label: "Multi-Page", icon: <FileText size={18} /> },
   { id: "qa", label: "QA Check", icon: <Shield size={18} /> },
@@ -286,6 +298,12 @@ export default function BuilderPage() {
 
   const renderToolPanel = () => {
     switch (activeTool) {
+      case "pipeline":
+        return <PipelinePanel onApplyCode={handleCodeUpdate} />;
+      case "clone":
+        return <ClonePanel onClone={handleCodeUpdate} />;
+      case "ai-images":
+        return <AiImagesPanel code={generatedCode} onApplyImages={handleCodeUpdate} />;
       case "debug":
         return <AutoDebugPanel code={generatedCode} onApplyFix={handleCodeUpdate} />;
       case "github":

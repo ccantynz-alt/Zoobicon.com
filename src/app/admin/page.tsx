@@ -1,49 +1,66 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
   Zap, Shield, CheckCircle2, XCircle, AlertTriangle, LogOut,
-  Settings, Key, Users, Activity, Server, Globe, RefreshCw,
-  Copy, Check, ExternalLink, ArrowRight, BarChart3, Code2,
+  Settings, Users, Server, Globe, RefreshCw,
+  Copy, Check, ExternalLink, BarChart3, Code2,
+  Trash2, Edit3, Crown, ImagePlus, Workflow, Layout,
+  TrendingUp, UserPlus, FolderOpen, Rocket,
 } from "lucide-react";
 
-interface EnvStatus {
-  key: string;
-  label: string;
-  required: boolean;
-  set: boolean | null;
+type AdminTab = "overview" | "users" | "templates" | "analytics";
+
+interface UserRecord {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  plan: string;
+  subscription_status: string | null;
+  created_at: string;
+  projectCount: number;
 }
 
-interface SystemCheck {
-  label: string;
-  status: "ok" | "warn" | "error" | "loading";
-  detail: string;
+interface TemplateRecord {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  prompt: string;
+  tier: string;
+  tags: string[];
+  featured: boolean;
+}
+
+interface Analytics {
+  stats: { totalUsers: number; totalProjects: number; totalSites: number; totalDeployments: number };
+  recentUsers: Array<{ email: string; name: string; plan: string; created_at: string }>;
+  recentProjects: Array<{ name: string; user_email: string; created_at: string }>;
+  planDistribution: Array<{ plan: string; count: number }>;
 }
 
 export default function AdminPage() {
   const [userName, setUserName] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [activeTab, setActiveTab] = useState<AdminTab>("overview");
   const [copied, setCopied] = useState("");
   const [apiTest, setApiTest] = useState<"idle" | "loading" | "ok" | "error">("idle");
   const [apiError, setApiError] = useState("");
 
-  const [checks] = useState<SystemCheck[]>([
-    { label: "Next.js App Router", status: "ok", detail: "Running Next.js 14 with App Router" },
-    { label: "Streaming API", status: "ok", detail: "SSE streaming enabled on generate, chat, support" },
-    { label: "Rate Limiting", status: "ok", detail: "10 gen/min · 20 chat/min · 30 support/min per IP" },
-    { label: "Password Reset", status: "ok", detail: "HMAC-signed tokens, 1-hour expiry, no DB required" },
-    { label: "Export HTML", status: "ok", detail: "Single-file HTML download from builder" },
-  ]);
+  // Data states
+  const [users, setUsers] = useState<UserRecord[]>([]);
+  const [usersLoading, setUsersLoading] = useState(false);
+  const [templates, setTemplates] = useState<TemplateRecord[]>([]);
+  const [templatesLoading, setTemplatesLoading] = useState(false);
+  const [analytics, setAnalytics] = useState<Analytics | null>(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
-  const envKeys: EnvStatus[] = [
-    { key: "ANTHROPIC_API_KEY", label: "Anthropic (Claude)", required: true, set: null },
-    { key: "RESEND_API_KEY", label: "Resend (Email)", required: false, set: null },
-    { key: "RESET_TOKEN_SECRET", label: "Reset Token Secret", required: false, set: null },
-    { key: "NEXT_PUBLIC_APP_URL", label: "App URL", required: false, set: null },
-    { key: "ADMIN_EMAIL", label: "Admin Email", required: true, set: null },
-    { key: "ADMIN_PASSWORD", label: "Admin Password", required: true, set: null },
-  ];
+  // Edit states
+  const [editingUser, setEditingUser] = useState<string | null>(null);
+  const [editRole, setEditRole] = useState("");
+  const [editPlan, setEditPlan] = useState("");
 
   useEffect(() => {
     try {
@@ -78,9 +95,8 @@ export default function AdminPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: [{ role: "user", content: "ping" }] }),
       });
-      if (res.ok || res.status === 200) {
-        setApiTest("ok");
-      } else {
+      if (res.ok || res.status === 200) setApiTest("ok");
+      else {
         const data = await res.json().catch(() => ({}));
         setApiError(data.error || `HTTP ${res.status}`);
         setApiTest("error");
@@ -91,32 +107,113 @@ export default function AdminPage() {
     }
   };
 
+  // ── Data fetchers ──
+
+  const fetchUsers = useCallback(async () => {
+    setUsersLoading(true);
+    try {
+      const res = await fetch("/api/admin/users");
+      const data = await res.json();
+      setUsers(data.users || []);
+    } catch { setUsers([]); }
+    setUsersLoading(false);
+  }, []);
+
+  const fetchTemplates = useCallback(async () => {
+    setTemplatesLoading(true);
+    try {
+      const res = await fetch("/api/admin/templates");
+      const data = await res.json();
+      setTemplates(data.templates || []);
+    } catch { setTemplates([]); }
+    setTemplatesLoading(false);
+  }, []);
+
+  const fetchAnalytics = useCallback(async () => {
+    setAnalyticsLoading(true);
+    try {
+      const res = await fetch("/api/admin/analytics");
+      const data = await res.json();
+      setAnalytics(data);
+    } catch { setAnalytics(null); }
+    setAnalyticsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    if (activeTab === "users") fetchUsers();
+    if (activeTab === "templates") fetchTemplates();
+    if (activeTab === "analytics") fetchAnalytics();
+  }, [activeTab, isAdmin, fetchUsers, fetchTemplates, fetchAnalytics]);
+
+  // ── User actions ──
+
+  const updateUser = async (id: string) => {
+    await fetch(`/api/admin/users?id=${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ role: editRole || undefined, plan: editPlan || undefined }),
+    });
+    setEditingUser(null);
+    fetchUsers();
+  };
+
+  const deleteUser = async (id: string, email: string) => {
+    if (!confirm(`Delete user ${email}? This cannot be undone.`)) return;
+    await fetch(`/api/admin/users?id=${id}`, { method: "DELETE" });
+    fetchUsers();
+  };
+
   if (!isAdmin) return null;
 
-  const quickActions = [
-    { icon: Settings, label: "Change Password", href: "/auth/settings", desc: "Update admin credentials" },
-    { icon: Globe, label: "View Site", href: "/", desc: "Open public homepage", external: true },
-    { icon: BarChart3, label: "Dashboard", href: "/dashboard", desc: "User project dashboard" },
-    { icon: Code2, label: "Builder", href: "/builder", desc: "AI website builder" },
+  const tabs: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
+    { id: "overview", label: "Overview", icon: <Zap className="w-4 h-4" /> },
+    { id: "analytics", label: "Analytics", icon: <BarChart3 className="w-4 h-4" /> },
+    { id: "users", label: "Users", icon: <Users className="w-4 h-4" /> },
+    { id: "templates", label: "Templates", icon: <Layout className="w-4 h-4" /> },
+  ];
+
+  const envKeys = [
+    { key: "ANTHROPIC_API_KEY", label: "Anthropic (Claude)", required: true },
+    { key: "OPENAI_API_KEY", label: "OpenAI (DALL-E images)", required: false },
+    { key: "STABILITY_API_KEY", label: "Stability AI (SDXL images)", required: false },
+    { key: "UNSPLASH_ACCESS_KEY", label: "Unsplash (stock photos)", required: false },
+    { key: "RESEND_API_KEY", label: "Resend (Email)", required: false },
+    { key: "DATABASE_URL", label: "Neon Database", required: false },
+    { key: "ADMIN_EMAIL", label: "Admin Email", required: true },
+    { key: "ADMIN_PASSWORD", label: "Admin Password", required: true },
   ];
 
   const launchChecklist = [
-    { done: true,  label: "AI generation working (claude-3-5-sonnet)" },
-    { done: true,  label: "AI chat editor working" },
-    { done: true,  label: "Support chat working (Zoe)" },
+    { done: true,  label: "AI website generation (Claude)" },
+    { done: true,  label: "AI chat editor" },
+    { done: true,  label: "Multi-agent pipeline (4 agents)" },
+    { done: true,  label: "AI image generation engine" },
+    { done: true,  label: "Website cloning (URL-to-premium)" },
+    { done: true,  label: "Support chat (Zoe)" },
     { done: true,  label: "Rate limiting on all API routes" },
-    { done: true,  label: "Export HTML from builder" },
-    { done: true,  label: "Password reset flow + email" },
-    { done: true,  label: "Reset password page (/auth/reset-password)" },
-    { done: true,  label: "Admin panel (/admin)" },
-    { done: true,  label: "Zoe avatar redesigned (real photo)" },
-    { done: false, label: "Add RESEND_API_KEY in Vercel → password reset emails live" },
-    { done: false, label: "Add RESET_TOKEN_SECRET in Vercel → secure reset tokens" },
-    { done: false, label: "Set NEXT_PUBLIC_APP_URL in Vercel (e.g. https://zoobicon.com)" },
-    { done: false, label: "Stripe billing integration" },
-    { done: false, label: "Supabase database (persistent user projects)" },
+    { done: true,  label: "Export HTML / GitHub / WordPress" },
+    { done: true,  label: "Admin panel with user management" },
+    { done: true,  label: "Template curation system" },
+    { done: true,  label: "Password reset flow" },
+    { done: true,  label: "Site hosting & deploy" },
+    { done: false, label: "Stripe billing live" },
+    { done: false, label: "OPENAI_API_KEY for DALL-E images" },
     { done: false, label: "Google / GitHub OAuth" },
-    { done: false, label: "PostHog analytics" },
+    { done: false, label: "Production database (DATABASE_URL)" },
+  ];
+
+  const apiRoutes = [
+    { method: "POST", path: "/api/generate/pipeline", desc: "Multi-agent website generation", limit: "—" },
+    { method: "POST", path: "/api/generate/stream", desc: "Stream AI website generation", limit: "10/min" },
+    { method: "POST", path: "/api/generate/ai-images", desc: "AI image generation (DALL-E/Stability)", limit: "—" },
+    { method: "POST", path: "/api/clone", desc: "Clone & upgrade any website", limit: "—" },
+    { method: "POST", path: "/api/chat", desc: "Stream AI code editing", limit: "20/min" },
+    { method: "POST", path: "/api/support", desc: "Stream Zoe support chat", limit: "30/min" },
+    { method: "GET",  path: "/api/admin/users", desc: "User management", limit: "admin" },
+    { method: "GET",  path: "/api/admin/analytics", desc: "Platform analytics", limit: "admin" },
+    { method: "GET",  path: "/api/admin/templates", desc: "Template management", limit: "admin" },
+    { method: "POST", path: "/api/hosting/deploy", desc: "Deploy site", limit: "—" },
   ];
 
   return (
@@ -139,6 +236,9 @@ export default function AdminPage() {
           </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-white/30 hidden sm:block">{userName}</span>
+            <Link href="/builder" className="text-xs text-white/40 hover:text-white/60 px-3 py-1.5 rounded-lg border border-white/[0.06] transition-colors">
+              Builder
+            </Link>
             <Link href="/dashboard" className="text-xs text-white/40 hover:text-white/60 px-3 py-1.5 rounded-lg border border-white/[0.06] transition-colors">
               Dashboard
             </Link>
@@ -150,202 +250,489 @@ export default function AdminPage() {
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-6 lg:px-8 py-10 space-y-10">
-        {/* Header */}
-        <div>
-          <h1 className="text-2xl font-black tracking-tight mb-1">Admin Panel</h1>
-          <p className="text-white/40 text-sm">System health, configuration, and launch checklist.</p>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {quickActions.map((a) => (
-            <Link
-              key={a.label}
-              href={a.href}
-              target={a.external ? "_blank" : undefined}
-              className="gradient-border p-4 rounded-xl card-hover flex items-center gap-3 group"
+      {/* Tab Navigation */}
+      <div className="border-b border-white/[0.04]">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex gap-1">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-3 text-xs font-medium border-b-2 transition-colors ${
+                activeTab === tab.id
+                  ? "border-brand-500 text-brand-400"
+                  : "border-transparent text-white/30 hover:text-white/50"
+              }`}
             >
-              <div className="w-9 h-9 rounded-lg bg-brand-500/10 border border-brand-500/20 flex items-center justify-center flex-shrink-0">
-                <a.icon className="w-4 h-4 text-brand-400" />
-              </div>
-              <div className="min-w-0">
-                <div className="text-sm font-semibold truncate">{a.label}</div>
-                <div className="text-[10px] text-white/30 truncate">{a.desc}</div>
-              </div>
-            </Link>
+              {tab.icon}
+              {tab.label}
+            </button>
           ))}
         </div>
+      </div>
 
-        <div className="grid lg:grid-cols-2 gap-6">
-          {/* System Checks */}
-          <div className="gradient-border rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-base font-bold">System Status</h2>
-              <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-xs text-emerald-400/80">All systems operational</span>
-              </div>
-            </div>
-            <div className="space-y-3">
-              {checks.map((c) => (
-                <div key={c.label} className="flex items-start gap-3">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <div className="text-sm font-medium">{c.label}</div>
-                    <div className="text-xs text-white/30">{c.detail}</div>
-                  </div>
-                </div>
-              ))}
+      <main className="max-w-7xl mx-auto px-6 lg:px-8 py-10 space-y-8">
+
+        {/* ═══════ OVERVIEW TAB ═══════ */}
+        {activeTab === "overview" && (
+          <>
+            <div>
+              <h1 className="text-2xl font-black tracking-tight mb-1">Admin Panel</h1>
+              <p className="text-white/40 text-sm">System health, configuration, and launch checklist.</p>
             </div>
 
-            {/* API test */}
-            <div className="mt-5 pt-5 border-t border-white/[0.06]">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Server className="w-4 h-4 text-white/40" />
-                  <span className="text-sm font-medium">Anthropic API</span>
-                </div>
-                <button
-                  onClick={testApiConnection}
-                  disabled={apiTest === "loading"}
-                  className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white/60 border border-white/[0.06] rounded-lg px-3 py-1.5 transition-colors disabled:opacity-50"
+            {/* Quick Actions */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {[
+                { icon: Code2, label: "Builder", href: "/builder", desc: "AI website builder" },
+                { icon: Globe, label: "View Site", href: "/", desc: "Public homepage", external: true },
+                { icon: Settings, label: "Settings", href: "/auth/settings", desc: "Change password" },
+                { icon: BarChart3, label: "Dashboard", href: "/dashboard", desc: "Project dashboard" },
+              ].map((a) => (
+                <Link
+                  key={a.label}
+                  href={a.href}
+                  target={a.external ? "_blank" : undefined}
+                  className="gradient-border p-4 rounded-xl card-hover flex items-center gap-3 group"
                 >
-                  <RefreshCw className={`w-3 h-3 ${apiTest === "loading" ? "animate-spin" : ""}`} />
-                  Test connection
-                </button>
-              </div>
-              {apiTest === "ok" && (
-                <div className="flex items-center gap-2 text-xs text-emerald-400">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  API key valid — connection successful
-                </div>
-              )}
-              {apiTest === "error" && (
-                <div className="flex items-center gap-2 text-xs text-red-400">
-                  <XCircle className="w-3.5 h-3.5" />
-                  {apiError}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Env Vars Status */}
-          <div className="gradient-border rounded-2xl p-6">
-            <h2 className="text-base font-bold mb-1">Environment Variables</h2>
-            <p className="text-xs text-white/30 mb-5">
-              Set these in <span className="text-white/50">Vercel → Project Settings → Environment Variables</span>
-            </p>
-            <div className="space-y-3">
-              {envKeys.map((e) => (
-                <div key={e.key} className="flex items-center justify-between gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-brand-500/10 border border-brand-500/20 flex items-center justify-center flex-shrink-0">
+                    <a.icon className="w-4 h-4 text-brand-400" />
+                  </div>
                   <div className="min-w-0">
-                    <div className="text-sm font-mono text-white/70 truncate">{e.key}</div>
-                    <div className="text-[10px] text-white/25">{e.label}{e.required ? " — required" : " — optional"}</div>
+                    <div className="text-sm font-semibold truncate">{a.label}</div>
+                    <div className="text-[10px] text-white/30 truncate">{a.desc}</div>
                   </div>
-                  <div className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${
-                    e.required
-                      ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
-                      : "bg-white/[0.04] text-white/30 border border-white/[0.06]"
-                  }`}>
-                    {e.required ? "Required" : "Optional"}
+                </Link>
+              ))}
+            </div>
+
+            {/* New Feature Highlights */}
+            <div className="grid md:grid-cols-3 gap-4">
+              {[
+                { icon: Workflow, title: "Multi-Agent Pipeline", desc: "4 AI agents (Designer, Copywriter, Developer, QA) collaborate to produce $30K quality websites.", color: "brand" },
+                { icon: ImagePlus, title: "AI Image Generation", desc: "DALL-E 3, Stability AI, and Unsplash integration. Replace placeholders with contextual AI images.", color: "accent-cyan" },
+                { icon: Globe, title: "Website Cloner", desc: "Paste any URL to analyze, extract content, and rebuild as a premium modern website.", color: "accent-purple" },
+              ].map((f) => (
+                <div key={f.title} className="gradient-border rounded-2xl p-5">
+                  <div className={`w-10 h-10 rounded-xl bg-${f.color === "brand" ? "brand-500" : f.color === "accent-cyan" ? "cyan-500" : "purple-500"}/10 flex items-center justify-center mb-3`}>
+                    <f.icon className={`w-5 h-5 ${f.color === "brand" ? "text-brand-400" : f.color === "accent-cyan" ? "text-cyan-400" : "text-purple-400"}`} />
                   </div>
+                  <h3 className="text-sm font-bold mb-1">{f.title}</h3>
+                  <p className="text-xs text-white/30 leading-relaxed">{f.desc}</p>
                 </div>
               ))}
             </div>
 
-            <div className="mt-5 pt-5 border-t border-white/[0.06]">
-              <p className="text-xs text-white/30 mb-3">Copy env var block for <code className="text-white/50">.env.local</code></p>
-              <button
-                onClick={() => copyToClipboard(
-                  "ANTHROPIC_API_KEY=\nADMIN_EMAIL=\nADMIN_PASSWORD=\nRESEND_API_KEY=\nRESET_TOKEN_SECRET=\nNEXT_PUBLIC_APP_URL=https://zoobicon.com",
-                  "envblock"
-                )}
-                className="flex items-center gap-2 text-xs text-white/40 hover:text-white/60 border border-white/[0.06] rounded-lg px-3 py-1.5 transition-colors"
-              >
-                {copied === "envblock" ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                {copied === "envblock" ? "Copied!" : "Copy template"}
+            <div className="grid lg:grid-cols-2 gap-6">
+              {/* System Checks */}
+              <div className="gradient-border rounded-2xl p-6">
+                <div className="flex items-center justify-between mb-5">
+                  <h2 className="text-base font-bold">System Status</h2>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-xs text-emerald-400/80">Operational</span>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  {[
+                    { label: "AI Generation Engine", detail: "Claude Sonnet + streaming SSE" },
+                    { label: "Multi-Agent Pipeline", detail: "Designer → Copywriter → Developer → QA" },
+                    { label: "AI Image Engine", detail: "DALL-E 3 / Stability AI / Unsplash" },
+                    { label: "Website Cloner", detail: "Fetch, analyze, rebuild premium" },
+                    { label: "Rate Limiting", detail: "10 gen/min · 20 chat/min · 30 support/min" },
+                  ].map((c) => (
+                    <div key={c.label} className="flex items-start gap-3">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <div className="text-sm font-medium">{c.label}</div>
+                        <div className="text-xs text-white/30">{c.detail}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-5 pt-5 border-t border-white/[0.06]">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Server className="w-4 h-4 text-white/40" />
+                      <span className="text-sm font-medium">Anthropic API</span>
+                    </div>
+                    <button onClick={testApiConnection} disabled={apiTest === "loading"}
+                      className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white/60 border border-white/[0.06] rounded-lg px-3 py-1.5 transition-colors disabled:opacity-50">
+                      <RefreshCw className={`w-3 h-3 ${apiTest === "loading" ? "animate-spin" : ""}`} />
+                      Test
+                    </button>
+                  </div>
+                  {apiTest === "ok" && <div className="flex items-center gap-2 text-xs text-emerald-400"><CheckCircle2 className="w-3.5 h-3.5" />Connection successful</div>}
+                  {apiTest === "error" && <div className="flex items-center gap-2 text-xs text-red-400"><XCircle className="w-3.5 h-3.5" />{apiError}</div>}
+                </div>
+              </div>
+
+              {/* Env Vars */}
+              <div className="gradient-border rounded-2xl p-6">
+                <h2 className="text-base font-bold mb-1">Environment Variables</h2>
+                <p className="text-xs text-white/30 mb-5">Set in <span className="text-white/50">Vercel → Environment Variables</span></p>
+                <div className="space-y-2.5">
+                  {envKeys.map((e) => (
+                    <div key={e.key} className="flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="text-xs font-mono text-white/70 truncate">{e.key}</div>
+                        <div className="text-[10px] text-white/25">{e.label}</div>
+                      </div>
+                      <div className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${
+                        e.required ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" : "bg-white/[0.04] text-white/30 border border-white/[0.06]"
+                      }`}>
+                        {e.required ? "Required" : "Optional"}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-5 pt-5 border-t border-white/[0.06]">
+                  <button
+                    onClick={() => copyToClipboard(
+                      "ANTHROPIC_API_KEY=\nOPENAI_API_KEY=\nSTABILITY_API_KEY=\nUNSPLASH_ACCESS_KEY=\nDATABASE_URL=\nADMIN_EMAIL=admin@zoobicon.com\nADMIN_PASSWORD=\nRESEND_API_KEY=\nNEXT_PUBLIC_APP_URL=https://zoobicon.com",
+                      "envblock"
+                    )}
+                    className="flex items-center gap-2 text-xs text-white/40 hover:text-white/60 border border-white/[0.06] rounded-lg px-3 py-1.5 transition-colors"
+                  >
+                    {copied === "envblock" ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                    {copied === "envblock" ? "Copied!" : "Copy .env.local template"}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Launch Checklist */}
+            <div className="gradient-border rounded-2xl p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-base font-bold">Launch Checklist</h2>
+                  <p className="text-xs text-white/30 mt-0.5">
+                    {launchChecklist.filter((i) => i.done).length} of {launchChecklist.length} complete
+                  </p>
+                </div>
+                <div className="text-2xl font-black gradient-text-static">
+                  {Math.round((launchChecklist.filter((i) => i.done).length / launchChecklist.length) * 100)}%
+                </div>
+              </div>
+              <div className="h-2 bg-white/[0.04] rounded-full mb-6 overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-brand-500 to-accent-cyan rounded-full transition-all duration-500"
+                  style={{ width: `${(launchChecklist.filter((i) => i.done).length / launchChecklist.length) * 100}%` }} />
+              </div>
+              <div className="grid md:grid-cols-2 gap-2">
+                {launchChecklist.map((item, i) => (
+                  <div key={i} className="flex items-center gap-3 py-1.5">
+                    {item.done ? <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" /> : <div className="w-4 h-4 rounded-full border border-white/[0.12] flex-shrink-0" />}
+                    <span className={`text-sm ${item.done ? "text-white/60" : "text-white/40"}`}>{item.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* API Reference */}
+            <div className="gradient-border rounded-2xl p-6">
+              <h2 className="text-base font-bold mb-5">API Reference</h2>
+              <div className="space-y-2">
+                {apiRoutes.map((r) => (
+                  <div key={r.path} className="flex items-center gap-4 py-2 border-b border-white/[0.04] last:border-0">
+                    <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded w-12 text-center flex-shrink-0 ${
+                      r.method === "GET" ? "text-emerald-400 bg-emerald-500/10" : "text-brand-400 bg-brand-500/10"
+                    }`}>{r.method}</span>
+                    <code className="text-xs font-mono text-white/60 w-56 flex-shrink-0">{r.path}</code>
+                    <span className="text-xs text-white/30 flex-1">{r.desc}</span>
+                    <span className="text-[10px] text-white/20 flex-shrink-0">{r.limit}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* ═══════ ANALYTICS TAB ═══════ */}
+        {activeTab === "analytics" && (
+          <>
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-black tracking-tight">Analytics</h1>
+              <button onClick={fetchAnalytics} className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white/60 border border-white/[0.06] rounded-lg px-3 py-1.5 transition-colors">
+                <RefreshCw className={`w-3 h-3 ${analyticsLoading ? "animate-spin" : ""}`} />
+                Refresh
               </button>
             </div>
-          </div>
-        </div>
 
-        {/* Launch Checklist */}
-        <div className="gradient-border rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-base font-bold">Launch Checklist</h2>
-              <p className="text-xs text-white/30 mt-0.5">
-                {launchChecklist.filter((i) => i.done).length} of {launchChecklist.length} complete
-              </p>
+            {/* Stat cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { label: "Total Users", value: analytics?.stats.totalUsers || 0, icon: Users, color: "brand" },
+                { label: "Projects", value: analytics?.stats.totalProjects || 0, icon: FolderOpen, color: "purple" },
+                { label: "Sites Deployed", value: analytics?.stats.totalSites || 0, icon: Rocket, color: "cyan" },
+                { label: "Deployments", value: analytics?.stats.totalDeployments || 0, icon: TrendingUp, color: "emerald" },
+              ].map((s) => (
+                <div key={s.label} className="gradient-border rounded-2xl p-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <s.icon className={`w-5 h-5 ${s.color === "brand" ? "text-brand-400" : s.color === "purple" ? "text-purple-400" : s.color === "cyan" ? "text-cyan-400" : "text-emerald-400"}`} />
+                  </div>
+                  <div className="text-3xl font-black">{s.value}</div>
+                  <div className="text-xs text-white/30 mt-1">{s.label}</div>
+                </div>
+              ))}
             </div>
-            <div className="text-2xl font-black gradient-text-static">
-              {Math.round((launchChecklist.filter((i) => i.done).length / launchChecklist.length) * 100)}%
-            </div>
-          </div>
 
-          {/* Progress bar */}
-          <div className="h-2 bg-white/[0.04] rounded-full mb-6 overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-brand-500 to-accent-cyan rounded-full transition-all duration-500"
-              style={{ width: `${(launchChecklist.filter((i) => i.done).length / launchChecklist.length) * 100}%` }}
-            />
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-2">
-            {launchChecklist.map((item, i) => (
-              <div key={i} className="flex items-center gap-3 py-1.5">
-                {item.done ? (
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+            <div className="grid lg:grid-cols-2 gap-6">
+              {/* Plan Distribution */}
+              <div className="gradient-border rounded-2xl p-6">
+                <h2 className="text-base font-bold mb-4">Plan Distribution</h2>
+                {analytics?.planDistribution && analytics.planDistribution.length > 0 ? (
+                  <div className="space-y-3">
+                    {analytics.planDistribution.map((p) => (
+                      <div key={p.plan} className="space-y-1">
+                        <div className="flex justify-between text-xs">
+                          <span className="text-white/60 capitalize">{p.plan || "free"}</span>
+                          <span className="text-white/30">{p.count} users</span>
+                        </div>
+                        <div className="h-2 bg-white/[0.04] rounded-full overflow-hidden">
+                          <div className="h-full bg-gradient-to-r from-brand-500 to-accent-purple rounded-full"
+                            style={{ width: `${Math.max(5, (p.count / (analytics.stats.totalUsers || 1)) * 100)}%` }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 ) : (
-                  <div className="w-4 h-4 rounded-full border border-white/[0.12] flex-shrink-0" />
+                  <p className="text-xs text-white/20">No user data available yet.</p>
                 )}
-                <span className={`text-sm ${item.done ? "text-white/60" : "text-white/40"}`}>
-                  {item.label}
-                </span>
               </div>
-            ))}
-          </div>
 
-          {/* Next steps */}
-          <div className="mt-6 pt-6 border-t border-white/[0.06]">
-            <div className="flex items-center gap-2 mb-3">
-              <AlertTriangle className="w-4 h-4 text-amber-400" />
-              <span className="text-sm font-semibold text-amber-400/80">Next steps to go live</span>
+              {/* Recent signups */}
+              <div className="gradient-border rounded-2xl p-6">
+                <h2 className="text-base font-bold mb-4 flex items-center gap-2">
+                  <UserPlus className="w-4 h-4 text-brand-400" />
+                  Recent Signups
+                </h2>
+                {analytics?.recentUsers && analytics.recentUsers.length > 0 ? (
+                  <div className="space-y-3">
+                    {analytics.recentUsers.slice(0, 8).map((u, i) => (
+                      <div key={i} className="flex items-center justify-between py-1.5 border-b border-white/[0.04] last:border-0">
+                        <div>
+                          <div className="text-xs font-medium">{u.name || u.email}</div>
+                          <div className="text-[10px] text-white/20">{u.email}</div>
+                        </div>
+                        <div className="text-[10px] text-white/20">
+                          {new Date(u.created_at).toLocaleDateString()}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-white/20">No users yet. They&apos;ll show up here once people sign up.</p>
+                )}
+              </div>
             </div>
-            <ol className="space-y-2 text-xs text-white/40 list-decimal list-inside">
-              <li>Add <code className="text-white/60">RESEND_API_KEY</code> in Vercel — password reset emails will start working instantly</li>
-              <li>Add <code className="text-white/60">RESET_TOKEN_SECRET</code> — any random 32+ char string for secure token signing</li>
-              <li>Set <code className="text-white/60">NEXT_PUBLIC_APP_URL</code> to your production domain</li>
-              <li>Merge the latest branch to <code className="text-white/60">main</code> to deploy all recent fixes</li>
-            </ol>
-          </div>
-        </div>
 
-        {/* API Reference */}
-        <div className="gradient-border rounded-2xl p-6">
-          <h2 className="text-base font-bold mb-5">Internal API Reference</h2>
-          <div className="space-y-3">
-            {[
-              { method: "POST", path: "/api/generate", desc: "Stream AI website generation", limit: "10 req/min" },
-              { method: "POST", path: "/api/chat", desc: "Stream AI code editing", limit: "20 req/min" },
-              { method: "POST", path: "/api/support", desc: "Stream Zoe support chat", limit: "30 req/min" },
-              { method: "POST", path: "/api/auth/login", desc: "Admin login", limit: "—" },
-              { method: "POST", path: "/api/auth/forgot-password", desc: "Request password reset email", limit: "—" },
-              { method: "POST", path: "/api/auth/reset-password", desc: "Validate token + reset password", limit: "—" },
-              { method: "POST", path: "/api/auth/change-password", desc: "Admin password change", limit: "—" },
-            ].map((r) => (
-              <div key={r.path} className="flex items-center gap-4 py-2 border-b border-white/[0.04] last:border-0">
-                <span className="text-[10px] font-mono font-bold text-brand-400 bg-brand-500/10 px-2 py-0.5 rounded w-12 text-center flex-shrink-0">
-                  {r.method}
-                </span>
-                <code className="text-xs font-mono text-white/60 w-52 flex-shrink-0">{r.path}</code>
-                <span className="text-xs text-white/30 flex-1">{r.desc}</span>
-                <span className="text-[10px] text-white/20 flex-shrink-0">{r.limit}</span>
+            {/* Recent projects */}
+            <div className="gradient-border rounded-2xl p-6">
+              <h2 className="text-base font-bold mb-4 flex items-center gap-2">
+                <FolderOpen className="w-4 h-4 text-purple-400" />
+                Recent Projects
+              </h2>
+              {analytics?.recentProjects && analytics.recentProjects.length > 0 ? (
+                <div className="grid md:grid-cols-2 gap-3">
+                  {analytics.recentProjects.map((p, i) => (
+                    <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-white/[0.02] border border-white/[0.04]">
+                      <div>
+                        <div className="text-xs font-medium">{p.name}</div>
+                        <div className="text-[10px] text-white/20">{p.user_email}</div>
+                      </div>
+                      <div className="text-[10px] text-white/20">
+                        {new Date(p.created_at).toLocaleDateString()}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-white/20">No projects created yet.</p>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* ═══════ USERS TAB ═══════ */}
+        {activeTab === "users" && (
+          <>
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-black tracking-tight">User Management</h1>
+                <p className="text-white/40 text-sm mt-1">{users.length} registered users</p>
               </div>
-            ))}
-          </div>
-        </div>
+              <button onClick={fetchUsers} className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white/60 border border-white/[0.06] rounded-lg px-3 py-1.5 transition-colors">
+                <RefreshCw className={`w-3 h-3 ${usersLoading ? "animate-spin" : ""}`} />
+                Refresh
+              </button>
+            </div>
+
+            {users.length > 0 ? (
+              <div className="gradient-border rounded-2xl overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-white/[0.06]">
+                        <th className="text-left text-[10px] uppercase tracking-wider text-white/30 px-4 py-3">User</th>
+                        <th className="text-left text-[10px] uppercase tracking-wider text-white/30 px-4 py-3">Role</th>
+                        <th className="text-left text-[10px] uppercase tracking-wider text-white/30 px-4 py-3">Plan</th>
+                        <th className="text-left text-[10px] uppercase tracking-wider text-white/30 px-4 py-3">Projects</th>
+                        <th className="text-left text-[10px] uppercase tracking-wider text-white/30 px-4 py-3">Joined</th>
+                        <th className="text-right text-[10px] uppercase tracking-wider text-white/30 px-4 py-3">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {users.map((user) => (
+                        <tr key={user.id} className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
+                          <td className="px-4 py-3">
+                            <div className="text-sm font-medium">{user.name || "—"}</div>
+                            <div className="text-[10px] text-white/30">{user.email}</div>
+                          </td>
+                          <td className="px-4 py-3">
+                            {editingUser === user.id ? (
+                              <select value={editRole} onChange={(e) => setEditRole(e.target.value)}
+                                className="bg-white/[0.06] border border-white/[0.1] rounded px-2 py-1 text-xs">
+                                <option value="user">User</option>
+                                <option value="admin">Admin</option>
+                              </select>
+                            ) : (
+                              <span className={`text-xs px-2 py-0.5 rounded-full ${
+                                user.role === "admin" ? "bg-brand-500/10 text-brand-400 border border-brand-500/20" : "bg-white/[0.04] text-white/40 border border-white/[0.06]"
+                              }`}>
+                                {user.role === "admin" && <Crown className="w-3 h-3 inline mr-1" />}
+                                {user.role}
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3">
+                            {editingUser === user.id ? (
+                              <select value={editPlan} onChange={(e) => setEditPlan(e.target.value)}
+                                className="bg-white/[0.06] border border-white/[0.1] rounded px-2 py-1 text-xs">
+                                <option value="free">Free</option>
+                                <option value="pro">Pro</option>
+                                <option value="unlimited">Unlimited</option>
+                              </select>
+                            ) : (
+                              <span className="text-xs text-white/50 capitalize">{user.plan || "free"}</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className="text-xs text-white/40">{user.projectCount}</span>
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className="text-xs text-white/30">
+                              {new Date(user.created_at).toLocaleDateString()}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            {editingUser === user.id ? (
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button onClick={() => updateUser(user.id)}
+                                  className="text-xs text-emerald-400 hover:text-emerald-300 px-2 py-1 rounded border border-emerald-500/20 hover:bg-emerald-500/10 transition-colors">
+                                  Save
+                                </button>
+                                <button onClick={() => setEditingUser(null)}
+                                  className="text-xs text-white/30 hover:text-white/50 px-2 py-1 rounded border border-white/[0.06] transition-colors">
+                                  Cancel
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button onClick={() => { setEditingUser(user.id); setEditRole(user.role); setEditPlan(user.plan); }}
+                                  className="text-white/20 hover:text-white/50 p-1 transition-colors" title="Edit">
+                                  <Edit3 className="w-3.5 h-3.5" />
+                                </button>
+                                <button onClick={() => deleteUser(user.id, user.email)}
+                                  className="text-white/20 hover:text-red-400 p-1 transition-colors" title="Delete">
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ) : (
+              <div className="gradient-border rounded-2xl p-12 text-center">
+                <Users className="w-12 h-12 text-white/10 mx-auto mb-4" />
+                <h3 className="text-sm font-semibold mb-1">No users yet</h3>
+                <p className="text-xs text-white/30">
+                  {usersLoading ? "Loading..." : "Users will appear here once they sign up. Make sure DATABASE_URL is configured."}
+                </p>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* ═══════ TEMPLATES TAB ═══════ */}
+        {activeTab === "templates" && (
+          <>
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-black tracking-tight">Template Gallery</h1>
+                <p className="text-white/40 text-sm mt-1">{templates.length} curated templates</p>
+              </div>
+              <button onClick={fetchTemplates} className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white/60 border border-white/[0.06] rounded-lg px-3 py-1.5 transition-colors">
+                <RefreshCw className={`w-3 h-3 ${templatesLoading ? "animate-spin" : ""}`} />
+                Refresh
+              </button>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {templates.map((t) => (
+                <div key={t.id} className="gradient-border rounded-2xl p-5 hover:bg-white/[0.02] transition-colors">
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <h3 className="text-sm font-bold">{t.name}</h3>
+                      <span className="text-[10px] text-white/30">{t.category}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      {t.featured && (
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                          Featured
+                        </span>
+                      )}
+                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
+                        t.tier === "premium"
+                          ? "bg-brand-500/10 text-brand-400 border border-brand-500/20"
+                          : "bg-white/[0.04] text-white/30 border border-white/[0.06]"
+                      }`}>
+                        {t.tier}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-white/30 mb-3 line-clamp-2">{t.description}</p>
+                  <div className="flex flex-wrap gap-1">
+                    {t.tags.map((tag) => (
+                      <span key={tag} className="text-[9px] text-white/20 px-1.5 py-0.5 rounded bg-white/[0.03] border border-white/[0.04]">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-white/[0.04]">
+                    <button
+                      onClick={() => copyToClipboard(t.prompt, t.id)}
+                      className="flex items-center gap-1.5 text-[10px] text-white/30 hover:text-white/60 transition-colors"
+                    >
+                      {copied === t.id ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                      {copied === t.id ? "Copied prompt!" : "Copy prompt"}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {templates.length === 0 && !templatesLoading && (
+              <div className="gradient-border rounded-2xl p-12 text-center">
+                <Layout className="w-12 h-12 text-white/10 mx-auto mb-4" />
+                <h3 className="text-sm font-semibold mb-1">Loading templates...</h3>
+              </div>
+            )}
+          </>
+        )}
       </main>
     </div>
   );
