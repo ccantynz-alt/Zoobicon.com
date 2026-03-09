@@ -355,35 +355,44 @@ export default function BuilderPage() {
 
   return (
     <div className="flex flex-col h-screen bg-[#0a0a0f] relative overflow-hidden">
-      {/* Ambient background glow orbs */}
+      {/* Ambient atmospheric background */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {/* Deep base gradient */}
+        <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at 30% 80%, rgba(37,99,235,0.04) 0%, transparent 60%)" }} />
+
+        {/* Slow-drifting aurora along the top edge */}
         <div
-          className="absolute -top-40 -left-40 w-96 h-96 rounded-full"
+          className="absolute -top-20 -left-[10%] w-[120%] h-[200px]"
           style={{
-            background: "radial-gradient(circle, rgba(37,99,235,0.08) 0%, transparent 70%)",
+            background: "linear-gradient(90deg, transparent, rgba(37,99,235,0.06) 30%, rgba(14,165,233,0.08) 50%, rgba(37,99,235,0.04) 70%, transparent)",
             filter: "blur(60px)",
-            animation: "ambient-float 20s ease-in-out infinite",
+            animation: "builder-aurora 25s ease-in-out infinite",
           }}
         />
+
+        {/* Bottom edge glow */}
         <div
-          className="absolute -bottom-32 right-1/4 w-80 h-80 rounded-full"
+          className="absolute -bottom-10 -left-[10%] w-[120%] h-[150px]"
           style={{
-            background: "radial-gradient(circle, rgba(0,150,255,0.06) 0%, transparent 70%)",
-            filter: "blur(60px)",
-            animation: "ambient-float 15s ease-in-out 5s infinite reverse",
-          }}
-        />
-        <div
-          className="absolute top-1/3 -right-20 w-64 h-64 rounded-full"
-          style={{
-            background: "radial-gradient(circle, rgba(139,92,246,0.05) 0%, transparent 70%)",
+            background: "linear-gradient(90deg, transparent, rgba(0,200,255,0.04) 40%, rgba(37,99,235,0.05) 60%, transparent)",
             filter: "blur(50px)",
-            animation: "ambient-float 18s ease-in-out 3s infinite",
+            animation: "builder-aurora 20s ease-in-out 8s infinite reverse",
           }}
         />
-        {/* Subtle grid pattern */}
+
+        {/* Right edge accent */}
         <div
-          className="absolute inset-0 opacity-[0.015]"
+          className="absolute top-[20%] -right-10 w-[150px] h-[60%]"
+          style={{
+            background: "linear-gradient(to bottom, transparent, rgba(96,165,250,0.04) 40%, rgba(37,99,235,0.03) 60%, transparent)",
+            filter: "blur(40px)",
+            animation: "builder-edge 18s ease-in-out infinite",
+          }}
+        />
+
+        {/* Subtle grid */}
+        <div
+          className="absolute inset-0 opacity-[0.012]"
           style={{
             backgroundImage: "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)",
             backgroundSize: "80px 80px",
@@ -392,10 +401,13 @@ export default function BuilderPage() {
       </div>
 
       <style>{`
-        @keyframes ambient-float {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          33% { transform: translate(30px, -20px) scale(1.1); }
-          66% { transform: translate(-20px, 15px) scale(0.95); }
+        @keyframes builder-aurora {
+          0%, 100% { transform: translateX(0) scaleY(1); opacity: 0.7; }
+          50% { transform: translateX(60px) scaleY(1.2); opacity: 1; }
+        }
+        @keyframes builder-edge {
+          0%, 100% { transform: translateY(0); opacity: 0.5; }
+          50% { transform: translateY(30px); opacity: 1; }
         }
       `}</style>
 
