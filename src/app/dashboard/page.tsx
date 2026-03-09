@@ -21,6 +21,19 @@ import {
   Sparkles,
   Bot,
   Shield,
+  Server,
+  Pencil,
+  Layers,
+  Key,
+  Bug,
+  Languages,
+  ShoppingCart,
+  Figma,
+  Gauge,
+  Accessibility,
+  Mail,
+  Download,
+  Crown,
 } from "lucide-react";
 import { getProjects as getLocalProjects, deleteProject as deleteLocalProject, type SavedProject } from "@/lib/storage";
 
@@ -29,6 +42,30 @@ const QUICK_ACTIONS = [
   { icon: Sparkles, label: "SEO Agent", href: "/builder", color: "from-accent-cyan to-emerald-600" },
   { icon: Video, label: "Video Creator", href: "/builder", color: "from-accent-purple to-pink-600" },
   { icon: Bot, label: "Chatbot", href: "/builder", color: "from-violet-500 to-indigo-600" },
+];
+
+const ADMIN_QUICK_ACTIONS = [
+  { icon: Globe, label: "AI Builder", desc: "Premium generation", href: "/builder", color: "from-brand-500 to-brand-700" },
+  { icon: Layers, label: "Multi-Page", desc: "Full site builds", href: "/builder", color: "from-indigo-500 to-violet-600" },
+  { icon: Server, label: "Hosting", desc: "Deploy & manage", href: "/hosting", color: "from-emerald-500 to-teal-600" },
+  { icon: Pencil, label: "Live Editor", desc: "Edit deployed sites", href: "/edit", color: "from-amber-500 to-orange-600" },
+  { icon: Shield, label: "Admin Panel", desc: "System controls", href: "/admin", color: "from-red-500 to-rose-600" },
+  { icon: Key, label: "API Keys", desc: "Developer access", href: "/auth/settings", color: "from-cyan-500 to-blue-600" },
+  { icon: BarChart3, label: "Analytics", desc: "Site performance", href: "/hosting", color: "from-purple-500 to-fuchsia-600" },
+  { icon: Settings, label: "Settings", desc: "Account config", href: "/auth/settings", color: "from-gray-500 to-slate-600" },
+];
+
+const ADMIN_TOOLS = [
+  { icon: Bug, label: "Auto Debug", desc: "AI-powered bug detection" },
+  { icon: Sparkles, label: "SEO Score", desc: "Full SEO analysis" },
+  { icon: Gauge, label: "Performance", desc: "Speed optimization" },
+  { icon: Accessibility, label: "Accessibility", desc: "WCAG compliance" },
+  { icon: Languages, label: "Translate", desc: "Multi-language sites" },
+  { icon: ShoppingCart, label: "E-commerce", desc: "Store generator" },
+  { icon: Figma, label: "Figma Import", desc: "Design to code" },
+  { icon: Mail, label: "Email Templates", desc: "Marketing emails" },
+  { icon: Download, label: "Export", desc: "ZIP, WordPress, React" },
+  { icon: Layers, label: "A/B Variants", desc: "Design variants" },
 ];
 
 export default function DashboardPage() {
@@ -215,30 +252,83 @@ export default function DashboardPage() {
       <main className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
         {/* Welcome */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold tracking-tight mb-1">
-            Welcome back, {userName}
-          </h1>
-          <p className="text-white/40 text-sm">Manage your projects and create new ones.</p>
+          <div className="flex items-center gap-3 mb-1">
+            <h1 className="text-2xl font-bold tracking-tight">
+              Welcome back, {userName}
+            </h1>
+            {userRole === "admin" && (
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-brand-500/20 to-accent-purple/20 border border-brand-500/20 text-xs font-bold text-brand-400">
+                <Crown className="w-3 h-3" /> Admin · Unlimited
+              </span>
+            )}
+          </div>
+          <p className="text-white/40 text-sm">
+            {userRole === "admin"
+              ? "Full access to all tools, agents, and platform controls."
+              : "Manage your projects and create new ones."}
+          </p>
         </div>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
-          {QUICK_ACTIONS.map((action) => (
-            <Link
-              key={action.label}
-              href={action.href}
-              className="group gradient-border p-4 rounded-xl card-hover flex items-center gap-3"
-            >
-              <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${action.color} flex items-center justify-center flex-shrink-0`}>
-                <action.icon className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <div className="text-sm font-semibold group-hover:text-white transition-colors">{action.label}</div>
-                <div className="text-xs text-white/30">Create new</div>
-              </div>
-            </Link>
-          ))}
-        </div>
+        {/* Admin: Full Quick Actions Grid */}
+        {userRole === "admin" ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
+            {ADMIN_QUICK_ACTIONS.map((action) => (
+              <Link
+                key={action.label}
+                href={action.href}
+                className="group gradient-border p-4 rounded-xl card-hover flex items-center gap-3"
+              >
+                <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${action.color} flex items-center justify-center flex-shrink-0`}>
+                  <action.icon className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <div className="text-sm font-semibold group-hover:text-white transition-colors">{action.label}</div>
+                  <div className="text-xs text-white/30">{action.desc}</div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
+            {QUICK_ACTIONS.map((action) => (
+              <Link
+                key={action.label}
+                href={action.href}
+                className="group gradient-border p-4 rounded-xl card-hover flex items-center gap-3"
+              >
+                <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${action.color} flex items-center justify-center flex-shrink-0`}>
+                  <action.icon className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <div className="text-sm font-semibold group-hover:text-white transition-colors">{action.label}</div>
+                  <div className="text-xs text-white/30">Create new</div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {/* Admin: AI Tools Arsenal */}
+        {userRole === "admin" && (
+          <div className="mb-10">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-white/30 mb-4">AI Tools Arsenal — All Unlocked</h2>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+              {ADMIN_TOOLS.map((tool) => (
+                <Link
+                  key={tool.label}
+                  href="/builder"
+                  className="group p-3 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.05] hover:border-brand-500/20 transition-all"
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <tool.icon className="w-4 h-4 text-brand-400/60 group-hover:text-brand-400 transition-colors" />
+                    <span className="text-xs font-semibold text-white/70 group-hover:text-white transition-colors">{tool.label}</span>
+                  </div>
+                  <div className="text-[10px] text-white/25">{tool.desc}</div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mb-10">
@@ -257,7 +347,7 @@ export default function DashboardPage() {
               {userRole === "admin" ? "∞" : userPlan === "unlimited" ? "∞" : "Free"}
             </div>
             <div className="text-xs text-white/40 mt-1">
-              {userRole === "admin" ? "Admin · Unlimited" : "Current Plan"}
+              {userRole === "admin" ? "All Agents Active" : "Current Plan"}
             </div>
           </div>
         </div>
