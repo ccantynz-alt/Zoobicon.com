@@ -26,6 +26,7 @@ import ExportPanel from "@/components/ExportPanel";
 import VariantsPanel from "@/components/VariantsPanel";
 import MultiPagePanel from "@/components/MultiPagePanel";
 import FullStackPanel from "@/components/FullStackPanel";
+import EmailTemplatePanel from "@/components/EmailTemplatePanel";
 
 import {
   Bug,
@@ -49,6 +50,7 @@ import {
   Layers,
   FileText,
   Boxes,
+  Mail,
 } from "lucide-react";
 
 type BuildStatus = "idle" | "generating" | "editing" | "complete" | "error";
@@ -71,6 +73,7 @@ type ToolId =
   | "variants"
   | "multipage"
   | "fullstack"
+  | "email"
   | null;
 
 const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }[] = [
@@ -80,6 +83,7 @@ const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }
   { id: "a11y", label: "Accessibility", icon: <Accessibility size={18} /> },
   { id: "perf", label: "Performance", icon: <Gauge size={18} /> },
   { id: "variants", label: "A/B Variants", icon: <Layers size={18} /> },
+  { id: "email", label: "Email Template", icon: <Mail size={18} /> },
   { id: "export", label: "Export", icon: <Download size={18} /> },
   { id: "debug", label: "Auto Debug", icon: <Bug size={18} /> },
   { id: "seo", label: "SEO Score", icon: <Search size={18} /> },
@@ -309,6 +313,8 @@ export default function BuilderPage() {
         return <MultiPagePanel onApplyPage={handleCodeUpdate} />;
       case "fullstack":
         return <FullStackPanel onApplyCode={handleCodeUpdate} />;
+      case "email":
+        return <EmailTemplatePanel onApplyCode={handleCodeUpdate} />;
       default:
         return null;
     }
