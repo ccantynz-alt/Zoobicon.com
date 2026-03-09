@@ -398,6 +398,21 @@ pre code {
   100% { width: 100%; }
 }
 
+@keyframes video-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(10px, -15px) scale(1.1); }
+}
+
+@keyframes video-text-glow {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.2); }
+}
+
+@keyframes video-bar {
+  0% { height: 4px; }
+  100% { height: 20px; }
+}
+
 /* Selection styling */
 ::selection {
   background: rgba(124, 58, 237, 0.3);

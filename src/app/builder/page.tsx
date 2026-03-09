@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import TopBar from "@/components/TopBar";
 import PromptInput from "@/components/PromptInput";
 import type { Tier } from "@/components/PromptInput";
@@ -24,6 +24,8 @@ import AccessibilityPanel from "@/components/AccessibilityPanel";
 import PerformancePanel from "@/components/PerformancePanel";
 import ExportPanel from "@/components/ExportPanel";
 import VariantsPanel from "@/components/VariantsPanel";
+import MultiPagePanel from "@/components/MultiPagePanel";
+import FullStackPanel from "@/components/FullStackPanel";
 
 import {
   Bug,
@@ -45,6 +47,8 @@ import {
   Gauge,
   Download,
   Layers,
+  FileText,
+  Boxes,
 } from "lucide-react";
 
 type BuildStatus = "idle" | "generating" | "editing" | "complete" | "error";
@@ -65,9 +69,13 @@ type ToolId =
   | "perf"
   | "export"
   | "variants"
+  | "multipage"
+  | "fullstack"
   | null;
 
 const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }[] = [
+  { id: "fullstack", label: "Full-Stack App", icon: <Boxes size={18} /> },
+  { id: "multipage", label: "Multi-Page", icon: <FileText size={18} /> },
   { id: "qa", label: "QA Check", icon: <Shield size={18} /> },
   { id: "a11y", label: "Accessibility", icon: <Accessibility size={18} /> },
   { id: "perf", label: "Performance", icon: <Gauge size={18} /> },
@@ -98,69 +106,107 @@ export default function BuilderPage() {
   const [deployUrl, setDeployUrl] = useState("");
   const [deployStatus, setDeployStatus] = useState<"idle" | "deploying" | "deployed" | "error">("idle");
 
+  const abortRef = useRef<AbortController | null>(null);
   const hasCode = generatedCode.length > 0;
+
+  const streamGenerate = useCallback(
+    async (userPrompt: string, existingCode?: string) => {
+      setStatus("generating");
+      setError("");
+      if (!existingCode) setGeneratedCode("");
+      setActiveTab("preview");
+
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+
+      try {
+        const res = await fetch("/api/generate/stream", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            prompt: userPrompt,
+            tier,
+            ...(existingCode ? { existingCode } : {}),
+          }),
+          signal: controller.signal,
+        });
+
+        if (!res.ok) {
+          // Fallback to non-streaming endpoint
+          const fallbackRes = await fetch("/api/generate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              prompt: userPrompt,
+              tier,
+              ...(existingCode ? { existingCode } : {}),
+            }),
+          });
+          if (!fallbackRes.ok) {
+            const data = await fallbackRes.json();
+            throw new Error(data.error || "Generation failed");
+          }
+          const data = await fallbackRes.json();
+          setGeneratedCode(data.html);
+          setStatus("complete");
+          return;
+        }
+
+        const reader = res.body?.getReader();
+        if (!reader) throw new Error("No response stream");
+
+        const decoder = new TextDecoder();
+        let accumulated = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const text = decoder.decode(value, { stream: true });
+          const lines = text.split("\n");
+
+          for (const line of lines) {
+            if (!line.startsWith("data: ")) continue;
+            const jsonStr = line.slice(6).trim();
+            if (!jsonStr) continue;
+
+            try {
+              const event = JSON.parse(jsonStr);
+              if (event.type === "chunk" && event.content) {
+                accumulated += event.content;
+                setGeneratedCode(accumulated);
+              } else if (event.type === "done") {
+                setStatus("complete");
+              } else if (event.type === "error") {
+                throw new Error(event.message || "Stream error");
+              }
+            } catch (parseErr) {
+              // Skip malformed SSE lines
+            }
+          }
+        }
+
+        if (accumulated) setStatus("complete");
+      } catch (err) {
+        if ((err as Error).name === "AbortError") return;
+        setError(err instanceof Error ? err.message : "Something went wrong");
+        setStatus("error");
+      }
+    },
+    [tier]
+  );
 
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim()) return;
-
-    setStatus("generating");
-    setError("");
-    setGeneratedCode("");
-    setActiveTab("preview");
-
-    try {
-      const res = await fetch("/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: prompt.trim(), tier }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Generation failed");
-      }
-
-      const data = await res.json();
-      setGeneratedCode(data.html);
-      setStatus("complete");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
-      setStatus("error");
-    }
-  }, [prompt, tier]);
+    await streamGenerate(prompt.trim());
+  }, [prompt, streamGenerate]);
 
   const handleEdit = useCallback(async () => {
     if (!editPrompt.trim() || !generatedCode) return;
-
-    setStatus("generating");
-    setError("");
-    setActiveTab("preview");
-
-    try {
-      const res = await fetch("/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt: editPrompt.trim(),
-          tier,
-          existingCode: generatedCode,
-        }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Edit failed");
-      }
-
-      const data = await res.json();
-      setGeneratedCode(data.html);
-      setStatus("complete");
-      setEditPrompt("");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
-      setStatus("error");
-    }
-  }, [editPrompt, generatedCode, tier]);
+    await streamGenerate(editPrompt.trim(), generatedCode);
+    setEditPrompt("");
+  }, [editPrompt, generatedCode, streamGenerate]);
 
   const handleCodeUpdate = useCallback((newCode: string) => {
     setGeneratedCode(newCode);
@@ -259,6 +305,10 @@ export default function BuilderPage() {
         return <ExportPanel code={generatedCode} />;
       case "variants":
         return <VariantsPanel code={generatedCode} onApplyVariant={handleCodeUpdate} />;
+      case "multipage":
+        return <MultiPagePanel onApplyPage={handleCodeUpdate} />;
+      case "fullstack":
+        return <FullStackPanel onApplyCode={handleCodeUpdate} />;
       default:
         return null;
     }
