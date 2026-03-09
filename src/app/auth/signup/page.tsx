@@ -18,14 +18,34 @@ export default function SignupPage() {
     { label: "One number", met: /\d/.test(password) },
   ];
 
+  const [authError, setAuthError] = useState("");
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate auth - replace with real auth later
-    setTimeout(() => {
-      localStorage.setItem("zoobicon_user", JSON.stringify({ email, name }));
+    setAuthError("");
+
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setAuthError(data.error || "Signup failed");
+        return;
+      }
+
+      localStorage.setItem("zoobicon_user", JSON.stringify(data.user));
       window.location.href = "/dashboard";
-    }, 1000);
+    } catch {
+      setAuthError("Network error. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -135,6 +155,10 @@ export default function SignupPage() {
                 </div>
               )}
             </div>
+
+            {authError && (
+              <p className="text-sm text-red-400/80 text-center py-2">{authError}</p>
+            )}
 
             <button
               type="submit"

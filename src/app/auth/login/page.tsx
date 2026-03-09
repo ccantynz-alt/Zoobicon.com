@@ -19,39 +19,23 @@ export default function LoginPage() {
     setAuthError("");
 
     try {
-      // Try admin login first
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
-      if (res.ok) {
-        const { user } = await res.json();
-        localStorage.setItem("zoobicon_user", JSON.stringify(user));
-        window.location.href = "/dashboard";
-        return;
-      }
-
-      if (res.status === 401) {
-        // Fall through to regular user login (demo mode)
-        localStorage.setItem(
-          "zoobicon_user",
-          JSON.stringify({ email, name: email.split("@")[0], role: "user", plan: "free" })
-        );
-        window.location.href = "/dashboard";
-        return;
-      }
-
       const data = await res.json();
-      setAuthError(data.error || "Sign in failed");
+
+      if (res.ok) {
+        localStorage.setItem("zoobicon_user", JSON.stringify(data.user));
+        window.location.href = "/dashboard";
+        return;
+      }
+
+      setAuthError(data.error || "Invalid credentials");
     } catch {
-      // Network error – fall back to demo login
-      localStorage.setItem(
-        "zoobicon_user",
-        JSON.stringify({ email, name: email.split("@")[0], role: "user", plan: "free" })
-      );
-      window.location.href = "/dashboard";
+      setAuthError("Network error. Please try again.");
     } finally {
       setIsLoading(false);
     }
