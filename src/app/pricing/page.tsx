@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   Check, Zap, ArrowRight, HelpCircle, Sparkles, Globe, Video, BarChart3,
   Mail, Bot, Palette, Code2, Shield, Users, Building2, Loader2,
+  LayoutDashboard, LogOut,
 } from "lucide-react";
 
 const fadeInUp = {
@@ -124,6 +125,14 @@ const FAQS = [
 
 export default function PricingPage() {
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [user, setUser] = useState<{ email: string; name?: string } | null>(null);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("zoobicon_user");
+      if (stored) setUser(JSON.parse(stored));
+    } catch {}
+  }, []);
 
   async function handleProCheckout() {
     setCheckoutLoading(true);
@@ -161,10 +170,26 @@ export default function PricingPage() {
             <span className="text-lg font-bold tracking-tight">Zoobicon</span>
           </Link>
           <div className="flex items-center gap-3">
-            <Link href="/auth/login" className="text-sm text-white/50 hover:text-white transition-colors px-3 py-2">Sign in</Link>
-            <Link href="/auth/signup" className="btn-gradient px-4 py-2 rounded-xl text-sm font-semibold text-white">
-              Get Started
-            </Link>
+            {user ? (
+              <>
+                <Link href="/dashboard" className="text-sm text-white/50 hover:text-white transition-colors px-3 py-2 flex items-center gap-1.5">
+                  <LayoutDashboard className="w-3.5 h-3.5" /> Dashboard
+                </Link>
+                <button
+                  onClick={() => { localStorage.removeItem("zoobicon_user"); setUser(null); }}
+                  className="text-sm text-white/50 hover:text-white transition-colors px-3 py-2 flex items-center gap-1.5"
+                >
+                  <LogOut className="w-3.5 h-3.5" /> Sign out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/auth/login" className="text-sm text-white/50 hover:text-white transition-colors px-3 py-2">Sign in</Link>
+                <Link href="/auth/signup" className="btn-gradient px-4 py-2 rounded-xl text-sm font-semibold text-white">
+                  Get Started
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </nav>

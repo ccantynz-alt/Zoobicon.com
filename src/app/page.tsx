@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import BuilderDemo from "@/components/BuilderDemo";
@@ -42,6 +42,9 @@ import {
   Lock,
   Wand2,
   Download,
+  User,
+  LogOut,
+  LayoutDashboard,
 } from "lucide-react";
 
 const fadeInUp = {
@@ -334,6 +337,19 @@ const FEATURES = [
 
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<{ email: string; name?: string; role?: string } | null>(null);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("zoobicon_user");
+      if (stored) setUser(JSON.parse(stored));
+    } catch {}
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("zoobicon_user");
+    setUser(null);
+  };
 
   return (
     <div className="relative">
@@ -369,15 +385,40 @@ export default function LandingPage() {
                 <HelpCircle className="w-3.5 h-3.5" />
                 Support
               </Link>
-              <Link href="/auth/login" className="text-sm text-white/50 hover:text-white transition-colors px-4 py-2">
-                Sign in
-              </Link>
-              <Link
-                href="/builder"
-                className="btn-gradient px-5 py-2.5 rounded-xl text-sm font-semibold text-white"
-              >
-                <span>Start Building</span>
-              </Link>
+              {user ? (
+                <>
+                  <Link href="/dashboard" className="text-sm text-white/50 hover:text-white transition-colors px-4 py-2 flex items-center gap-1.5">
+                    <LayoutDashboard className="w-3.5 h-3.5" />
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="text-sm text-white/50 hover:text-white transition-colors px-4 py-2 flex items-center gap-1.5"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    Sign out
+                  </button>
+                  <Link
+                    href="/builder"
+                    className="btn-gradient px-5 py-2.5 rounded-xl text-sm font-semibold text-white flex items-center gap-2"
+                  >
+                    <User className="w-3.5 h-3.5" />
+                    <span>{user.name || user.email.split("@")[0]}</span>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link href="/auth/login" className="text-sm text-white/50 hover:text-white transition-colors px-4 py-2">
+                    Sign in
+                  </Link>
+                  <Link
+                    href="/builder"
+                    className="btn-gradient px-5 py-2.5 rounded-xl text-sm font-semibold text-white"
+                  >
+                    <span>Start Building</span>
+                  </Link>
+                </>
+              )}
             </div>
             <button
               className="md:hidden text-white/60"
@@ -399,9 +440,23 @@ export default function LandingPage() {
             <Link href="/agencies" className="block text-sm text-white/60 hover:text-white">Agencies</Link>
             <Link href="/support" className="block text-sm text-white/60 hover:text-white">Support</Link>
             <Link href="/pricing" className="block text-sm text-white/60 hover:text-white">Pricing</Link>
-            <Link href="/builder" className="block btn-gradient px-5 py-2.5 rounded-xl text-sm font-semibold text-white text-center mt-4">
-              <span>Start Building</span>
-            </Link>
+            {user ? (
+              <>
+                <Link href="/dashboard" className="block text-sm text-white/60 hover:text-white flex items-center gap-2">
+                  <LayoutDashboard className="w-4 h-4" /> Dashboard
+                </Link>
+                <button onClick={handleLogout} className="block text-sm text-white/60 hover:text-white flex items-center gap-2 w-full text-left">
+                  <LogOut className="w-4 h-4" /> Sign out
+                </button>
+                <Link href="/builder" className="block btn-gradient px-5 py-2.5 rounded-xl text-sm font-semibold text-white text-center mt-4">
+                  <span>{user.name || user.email.split("@")[0]}&apos;s Builder</span>
+                </Link>
+              </>
+            ) : (
+              <Link href="/builder" className="block btn-gradient px-5 py-2.5 rounded-xl text-sm font-semibold text-white text-center mt-4">
+                <span>Start Building</span>
+              </Link>
+            )}
           </nav>
         )}
       </nav>

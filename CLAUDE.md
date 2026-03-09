@@ -87,6 +87,7 @@ Build has `ignoreBuildErrors: true` and `ignoreDuringBuilds: true` in next.confi
 6. **`/api/contact` route exists** — Created for the forms-backend generator. Don't delete it.
 7. **Admin fallback credentials** — The admin auth has fallback credentials for when the database is unavailable. This is intentional.
 8. **Tree-shaking config** — `optimizePackageImports` for lucide-react and framer-motion in next.config.js is critical for bundle size.
+9. **Auth-aware navbars on homepage & pricing** — These pages read `localStorage("zoobicon_user")` and show Dashboard/Sign out when logged in, Sign in/Start Building when logged out. Auth is localStorage-based (key: `zoobicon_user`). Do not revert to hardcoded "Sign in" links.
 
 ## Route Audit Status
 
