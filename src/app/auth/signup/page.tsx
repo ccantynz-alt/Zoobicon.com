@@ -173,9 +173,9 @@ export default function SignupPage() {
 
           <p className="mt-4 text-center text-xs text-white/20">
             By signing up you agree to our{" "}
-            <a href="#" className="text-white/40 hover:text-white/60">Terms of Service</a>
+            <Link href="/terms" className="text-white/40 hover:text-white/60">Terms of Service</Link>
             {" "}and{" "}
-            <a href="#" className="text-white/40 hover:text-white/60">Privacy Policy</a>.
+            <Link href="/privacy" className="text-white/40 hover:text-white/60">Privacy Policy</Link>.
           </p>
 
           <p className="mt-4 text-center text-sm text-white/30">

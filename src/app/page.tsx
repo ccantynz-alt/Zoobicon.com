@@ -1094,7 +1094,7 @@ export default function LandingPage() {
             <div className="flex items-center gap-6">
               <Link href="/privacy" className="text-xs text-white/20 hover:text-white/40 transition-colors">Privacy</Link>
               <Link href="/terms" className="text-xs text-white/20 hover:text-white/40 transition-colors">Terms</Link>
-              <a href="#" className="text-xs text-white/20 hover:text-white/40 transition-colors">Cookies</a>
+              <Link href="/privacy" className="text-xs text-white/20 hover:text-white/40 transition-colors">Cookies</Link>
             </div>
           </div>
         </div>
