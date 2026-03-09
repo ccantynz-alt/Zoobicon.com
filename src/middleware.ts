@@ -1,14 +1,45 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+/**
+ * Multi-Domain Middleware
+ *
+ * Routes requests based on the incoming domain:
+ *
+ * Zoobicon domains:
+ *   zoobicon.com  → / (homepage)
+ *   zoobicon.ai   → /ai
+ *   zoobicon.io   → /io
+ *   zoobicon.sh   → /sh
+ *
+ * Dominat8 domains:
+ *   dominat8.io   → /dominat8 (Dominat8 landing page)
+ *   dominat8.com  → /dominat8 (Dominat8 landing page)
+ *
+ * All domains share the same builder, dashboard, auth, and API routes.
+ * Only the root "/" path is rewritten — everything else passes through.
+ */
+
 export function middleware(request: NextRequest) {
   const hostname = request.headers.get("host") ?? "";
   const domain = hostname.split(":")[0]; // strip port for localhost
 
   let rewritePath: string | null = null;
   let domainLabel = "com";
+  let brandId = "zoobicon";
 
-  if (domain === "zoobicon.ai" || domain.endsWith(".zoobicon.ai")) {
+  // Dominat8 domains
+  if (domain === "dominat8.io" || domain.endsWith(".dominat8.io")) {
+    rewritePath = "/dominat8";
+    domainLabel = "dominat8-io";
+    brandId = "dominat8";
+  } else if (domain === "dominat8.com" || domain.endsWith(".dominat8.com")) {
+    rewritePath = "/dominat8";
+    domainLabel = "dominat8-com";
+    brandId = "dominat8";
+  }
+  // Zoobicon domains
+  else if (domain === "zoobicon.ai" || domain.endsWith(".zoobicon.ai")) {
     rewritePath = "/ai";
     domainLabel = "ai";
   } else if (domain === "zoobicon.io" || domain.endsWith(".zoobicon.io")) {
@@ -25,15 +56,18 @@ export function middleware(request: NextRequest) {
     url.pathname = rewritePath;
     const response = NextResponse.rewrite(url);
     response.headers.set("x-zoobicon-domain", domainLabel);
+    response.headers.set("x-brand-id", brandId);
     return response;
   }
 
-  // Pass through — still tag the domain header
+  // Pass through — still tag the domain and brand headers
   const response = NextResponse.next();
   response.headers.set("x-zoobicon-domain", domainLabel);
+  response.headers.set("x-brand-id", brandId);
   return response;
 }
 
 export const config = {
-  matcher: "/",
+  // Match root path and all routes for domain detection
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

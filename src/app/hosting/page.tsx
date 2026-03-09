@@ -1036,7 +1036,7 @@ export default function HostingDashboard() {
                       </button>
                     )}
                     {d.status === "live" && (
-                      <a href="#" className="flex items-center gap-1 px-3 py-1 rounded-lg text-xs bg-brand-500/10 text-brand-400 hover:bg-brand-500/20 transition-colors">
+                      <a href={d.url || `/api/hosting/serve/${d.slug}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 px-3 py-1 rounded-lg text-xs bg-brand-500/10 text-brand-400 hover:bg-brand-500/20 transition-colors">
                         <ExternalLink className="w-3 h-3" /> Visit
                       </a>
                     )}

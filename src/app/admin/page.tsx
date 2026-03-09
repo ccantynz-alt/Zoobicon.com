@@ -187,7 +187,7 @@ export default function AdminPage() {
   const launchChecklist = [
     { done: true,  label: "AI website generation (Claude)" },
     { done: true,  label: "AI chat editor" },
-    { done: true,  label: "Multi-agent pipeline (4 agents)" },
+    { done: true,  label: "Multi-agent pipeline (10 agents, 3 tiers)" },
     { done: true,  label: "AI image generation engine" },
     { done: true,  label: "Website cloning (URL-to-premium)" },
     { done: true,  label: "Support chat (Zoe)" },
@@ -204,8 +204,40 @@ export default function AdminPage() {
   ];
 
   const apiRoutes = [
-    { method: "POST", path: "/api/generate/pipeline", desc: "Multi-agent website generation", limit: "—" },
+    { method: "POST", path: "/api/generate/pipeline", desc: "10-agent pipeline (Standard/Premium/Ultra)", limit: "—" },
     { method: "POST", path: "/api/generate/stream", desc: "Stream AI website generation", limit: "10/min" },
+    { method: "POST", path: "/api/generate/landing", desc: "Landing page generator (12 sections)", limit: "—" },
+    { method: "POST", path: "/api/generate/saas", desc: "SaaS dashboard generator", limit: "—" },
+    { method: "POST", path: "/api/generate/booking", desc: "Booking system generator", limit: "—" },
+    { method: "POST", path: "/api/generate/dashboard", desc: "Data dashboard generator (SVG charts)", limit: "—" },
+    { method: "POST", path: "/api/generate/portfolio", desc: "Portfolio & case study generator", limit: "—" },
+    { method: "POST", path: "/api/generate/blog", desc: "Blog/magazine site generator", limit: "—" },
+    { method: "POST", path: "/api/generate/restaurant", desc: "Restaurant site generator", limit: "—" },
+    { method: "POST", path: "/api/generate/realestate", desc: "Real estate site generator", limit: "—" },
+    { method: "POST", path: "/api/generate/marketplace", desc: "Marketplace platform generator", limit: "—" },
+    { method: "POST", path: "/api/generate/event", desc: "Event/conference site generator", limit: "—" },
+    { method: "POST", path: "/api/generate/directory", desc: "Business directory generator", limit: "—" },
+    { method: "POST", path: "/api/generate/hrm", desc: "HR management system generator", limit: "—" },
+    { method: "POST", path: "/api/generate/project-mgmt", desc: "Project management tool generator", limit: "—" },
+    { method: "POST", path: "/api/generate/lms", desc: "Learning platform (LMS) generator", limit: "—" },
+    { method: "POST", path: "/api/generate/inventory", desc: "Inventory management generator", limit: "—" },
+    { method: "POST", path: "/api/generate/admin", desc: "Admin panel / CMS generator", limit: "—" },
+    { method: "POST", path: "/api/generate/animations", desc: "Animation enhancement agent", limit: "—" },
+    { method: "POST", path: "/api/generate/seo-markup", desc: "SEO markup injection agent", limit: "—" },
+    { method: "POST", path: "/api/generate/dark-mode", desc: "Dark mode enhancement agent", limit: "—" },
+    { method: "POST", path: "/api/generate/forms-backend", desc: "Forms backend enhancement agent", limit: "—" },
+    { method: "POST", path: "/api/generate/integrations", desc: "Third-party integrations agent", limit: "—" },
+    { method: "POST", path: "/api/generate/email-sequence", desc: "Email sequence generator", limit: "—" },
+    { method: "POST", path: "/api/generate/pitch-deck", desc: "Pitch deck generator", limit: "—" },
+    { method: "POST", path: "/api/generate/copy", desc: "Copywriter agent", limit: "—" },
+    { method: "POST", path: "/api/generate/brand-kit", desc: "Brand kit / design system generator", limit: "—" },
+    { method: "POST", path: "/api/generate/api-gen", desc: "REST API code generator", limit: "—" },
+    { method: "POST", path: "/api/generate/chrome-ext", desc: "Chrome extension generator", limit: "—" },
+    { method: "POST", path: "/api/generate/component-lib", desc: "Component library generator", limit: "—" },
+    { method: "POST", path: "/api/generate/pwa", desc: "Progressive web app generator", limit: "—" },
+    { method: "POST", path: "/api/generate/form-builder", desc: "Form builder generator", limit: "—" },
+    { method: "POST", path: "/api/generate/style-guide", desc: "Style guide extractor", limit: "—" },
+    { method: "POST", path: "/api/generate/report", desc: "Business report generator", limit: "—" },
     { method: "POST", path: "/api/generate/ai-images", desc: "AI image generation (DALL-E/Stability)", limit: "—" },
     { method: "POST", path: "/api/clone", desc: "Clone & upgrade any website", limit: "—" },
     { method: "POST", path: "/api/chat", desc: "Stream AI code editing", limit: "20/min" },
@@ -308,7 +340,7 @@ export default function AdminPage() {
             {/* New Feature Highlights */}
             <div className="grid md:grid-cols-3 gap-4">
               {[
-                { icon: Workflow, title: "Multi-Agent Pipeline", desc: "4 AI agents (Designer, Copywriter, Developer, QA) collaborate to produce $30K quality websites.", color: "brand" },
+                { icon: Workflow, title: "10-Agent Pipeline", desc: "Strategist, Brand, Copywriter, Architect, Developer, Animator, SEO, Forms, Integrations, QA — 3 tiers: Standard, Premium, Ultra.", color: "brand" },
                 { icon: ImagePlus, title: "AI Image Generation", desc: "DALL-E 3, Stability AI, and Unsplash integration. Replace placeholders with contextual AI images.", color: "accent-cyan" },
                 { icon: Globe, title: "Website Cloner", desc: "Paste any URL to analyze, extract content, and rebuild as a premium modern website.", color: "accent-purple" },
               ].map((f) => (
@@ -335,7 +367,9 @@ export default function AdminPage() {
                 <div className="space-y-3">
                   {[
                     { label: "AI Generation Engine", detail: "Claude Sonnet + streaming SSE" },
-                    { label: "Multi-Agent Pipeline", detail: "Designer → Copywriter → Developer → QA" },
+                    { label: "Multi-Agent Pipeline", detail: "10 agents · 3 tiers · Parallel execution" },
+                    { label: "AI Generators", detail: "32+ specialized generators across 6 categories" },
+                    { label: "Dominat8 Brand", detail: "dominat8.io + dominat8.com white-label active" },
                     { label: "AI Image Engine", detail: "DALL-E 3 / Stability AI / Unsplash" },
                     { label: "Website Cloner", detail: "Fetch, analyze, rebuild premium" },
                     { label: "Rate Limiting", detail: "10 gen/min · 20 chat/min · 30 support/min" },
