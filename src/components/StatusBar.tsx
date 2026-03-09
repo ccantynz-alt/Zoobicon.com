@@ -20,7 +20,7 @@ export default function StatusBar({ status }: StatusBarProps) {
       {/* Animated progress bar during generation */}
       {isGenerating && (
         <div
-          className={`w-1.5 h-1.5 rounded-full ${config.color} ${
+          className={`w-1.5 h-1.5 rounded-full ${STATUS_CONFIG[status].color} ${
             status === "generating" || status === "editing" ? "animate-glow-pulse" : ""
           }`}
         />

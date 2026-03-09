@@ -260,6 +260,12 @@ export default function BuilderPage() {
                   onPromptChange={setPrompt}
                   onGenerate={handleGenerate}
                   isGenerating={status === "generating"}
+                  tier={tier}
+                  onTierChange={setTier}
+                  hasExistingCode={hasCode}
+                  editPrompt={editPrompt}
+                  onEditPromptChange={setEditPrompt}
+                  onEdit={handleEdit}
                 />
               </div>
             </>
