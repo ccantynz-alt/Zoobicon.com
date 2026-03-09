@@ -7,249 +7,258 @@ interface PreviewPanelProps {
   isGenerating: boolean;
 }
 
-function AnimatedLogo() {
+/** Particle field — scattered glowing dots across the entire canvas */
+function ParticleField({ count, speed }: { count: number; speed: number }) {
+  const particles = useMemo(() => {
+    return Array.from({ length: count }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: 1.5 + Math.random() * 2.5,
+      delay: Math.random() * 8,
+      duration: (4 + Math.random() * 6) / speed,
+      drift: 10 + Math.random() * 30,
+      opacity: 0.15 + Math.random() * 0.4,
+      hue: 200 + Math.random() * 30, // blue range
+    }));
+  }, [count, speed]);
+
   return (
-    <div className="relative w-64 h-64 flex items-center justify-center select-none">
-      {/* Outer rotating ring */}
-      <div
-        className="absolute inset-0 rounded-full"
-        style={{
-          background: "conic-gradient(from 0deg, transparent, #2563eb, #00f0ff, #3b82f6, transparent)",
-          animation: "spin-slow 8s linear infinite",
-          opacity: 0.3,
-          filter: "blur(1px)",
-        }}
-      />
-      {/* Inner counter-rotating ring */}
-      <div
-        className="absolute inset-6 rounded-full"
-        style={{
-          background: "conic-gradient(from 180deg, transparent, #00f0ff, #2563eb, #ec4899, transparent)",
-          animation: "spin-slow 6s linear infinite reverse",
-          opacity: 0.25,
-          filter: "blur(1px)",
-        }}
-      />
-      {/* Pulsing glow backdrop */}
-      <div
-        className="absolute inset-10 rounded-full"
-        style={{
-          background: "radial-gradient(circle, rgba(37,99,235,0.15) 0%, transparent 70%)",
-          animation: "breathe 4s ease-in-out infinite",
-        }}
-      />
-      {/* Dotted orbit ring 1 */}
-      <div
-        className="absolute inset-2 rounded-full border border-dashed border-brand-500/10"
-        style={{ animation: "spin-slow 20s linear infinite" }}
-      />
-      {/* Dotted orbit ring 2 */}
-      <div
-        className="absolute inset-8 rounded-full border border-dashed border-accent-cyan/10"
-        style={{ animation: "spin-slow 15s linear infinite reverse" }}
-      />
-
-      {/* Floating particles */}
-      {[...Array(12)].map((_, i) => {
-        const angle = (i / 12) * 360;
-        const radius = 90 + (i % 3) * 15;
-        const size = 2 + (i % 3);
-        const color = i % 3 === 0 ? "#2563eb" : i % 3 === 1 ? "#00f0ff" : "#ec4899";
-        return (
-          <div
-            key={i}
-            className="absolute rounded-full"
-            style={{
-              width: size,
-              height: size,
-              background: color,
-              boxShadow: `0 0 ${size * 3}px ${color}`,
-              top: `calc(50% + ${Math.sin((angle * Math.PI) / 180) * radius}px)`,
-              left: `calc(50% + ${Math.cos((angle * Math.PI) / 180) * radius}px)`,
-              animation: `twinkle ${2 + (i % 3)}s ease-in-out ${i * 0.3}s infinite`,
-              transform: "translate(-50%, -50%)",
-            }}
-          />
-        );
-      })}
-
-      {/* Center Z logo */}
-      <div className="relative z-10 flex flex-col items-center">
+    <>
+      {particles.map((p) => (
         <div
-          className="text-7xl font-black"
+          key={p.id}
+          className="absolute rounded-full"
           style={{
-            background: "linear-gradient(135deg, #60a5fa, #00f0ff, #3b82f6)",
-            backgroundSize: "200% 200%",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            backgroundClip: "text",
-            animation: "gradient-drift 4s ease-in-out infinite",
-            filter: "drop-shadow(0 0 20px rgba(37,99,235,0.4))",
+            left: `${p.x}%`,
+            top: `${p.y}%`,
+            width: p.size,
+            height: p.size,
+            background: `hsl(${p.hue}, 80%, 65%)`,
+            boxShadow: `0 0 ${p.size * 3}px hsla(${p.hue}, 80%, 65%, 0.6)`,
+            animation: `particle-float ${p.duration}s ease-in-out ${p.delay}s infinite`,
+            opacity: p.opacity,
+            ["--drift" as string]: `${p.drift}px`,
           }}
-        >
-          Z
-        </div>
-      </div>
+        />
+      ))}
+    </>
+  );
+}
 
-      <style>{`
-        @keyframes spin-slow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        @keyframes breathe {
-          0%, 100% { transform: scale(1); opacity: 0.3; }
-          50% { transform: scale(1.15); opacity: 0.6; }
-        }
-        @keyframes twinkle {
-          0%, 100% { opacity: 0.2; transform: translate(-50%, -50%) scale(1); }
-          50% { opacity: 1; transform: translate(-50%, -50%) scale(1.8); }
-        }
-        @keyframes gradient-drift {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-      `}</style>
+/** Full-screen atmospheric idle background */
+function IdleAtmosphere() {
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      {/* Base deep gradient */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: "radial-gradient(ellipse at 50% 120%, #0c1929 0%, #0a0a0f 60%)",
+        }}
+      />
+
+      {/* Aurora band 1 — wide, slow, top area */}
+      <div
+        className="absolute w-[140%] h-[300px] -left-[20%] top-[10%]"
+        style={{
+          background: "linear-gradient(90deg, transparent 0%, rgba(37,99,235,0.06) 20%, rgba(14,165,233,0.08) 40%, rgba(59,130,246,0.05) 60%, rgba(0,240,255,0.04) 80%, transparent 100%)",
+          filter: "blur(60px)",
+          animation: "aurora-drift-1 20s ease-in-out infinite",
+          transform: "rotate(-3deg)",
+        }}
+      />
+
+      {/* Aurora band 2 — mid area, counter-drift */}
+      <div
+        className="absolute w-[130%] h-[250px] -left-[15%] top-[35%]"
+        style={{
+          background: "linear-gradient(90deg, transparent 0%, rgba(0,200,255,0.04) 25%, rgba(37,99,235,0.07) 50%, rgba(96,165,250,0.05) 75%, transparent 100%)",
+          filter: "blur(70px)",
+          animation: "aurora-drift-2 25s ease-in-out infinite",
+          transform: "rotate(2deg)",
+        }}
+      />
+
+      {/* Aurora band 3 — lower, subtle warm blue */}
+      <div
+        className="absolute w-[120%] h-[200px] -left-[10%] bottom-[15%]"
+        style={{
+          background: "linear-gradient(90deg, transparent 0%, rgba(59,130,246,0.05) 30%, rgba(14,165,233,0.06) 50%, rgba(37,99,235,0.04) 70%, transparent 100%)",
+          filter: "blur(80px)",
+          animation: "aurora-drift-3 18s ease-in-out infinite",
+          transform: "rotate(-1deg)",
+        }}
+      />
+
+      {/* Mesh gradient overlay — slowly shifting */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `
+            radial-gradient(ellipse at 20% 50%, rgba(37,99,235,0.04) 0%, transparent 50%),
+            radial-gradient(ellipse at 80% 30%, rgba(0,200,255,0.03) 0%, transparent 50%),
+            radial-gradient(ellipse at 50% 80%, rgba(59,130,246,0.03) 0%, transparent 50%)
+          `,
+          animation: "mesh-shift 30s ease-in-out infinite",
+        }}
+      />
+
+      {/* Particles */}
+      <ParticleField count={35} speed={1} />
+
+      {/* Subtle horizontal light streaks */}
+      <div
+        className="absolute top-[25%] left-0 w-full h-[1px]"
+        style={{
+          background: "linear-gradient(90deg, transparent 0%, rgba(96,165,250,0.1) 30%, rgba(0,200,255,0.15) 50%, rgba(96,165,250,0.1) 70%, transparent 100%)",
+          animation: "streak-glow 8s ease-in-out infinite",
+        }}
+      />
+      <div
+        className="absolute top-[55%] left-0 w-full h-[1px]"
+        style={{
+          background: "linear-gradient(90deg, transparent 0%, rgba(37,99,235,0.08) 20%, rgba(14,165,233,0.12) 45%, rgba(37,99,235,0.08) 80%, transparent 100%)",
+          animation: "streak-glow 10s ease-in-out 3s infinite",
+        }}
+      />
+
+      {/* Bottom glow — like light reflecting off water */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-[40%]"
+        style={{
+          background: "linear-gradient(to top, rgba(37,99,235,0.04) 0%, transparent 100%)",
+          animation: "bottom-breathe 12s ease-in-out infinite",
+        }}
+      />
     </div>
   );
 }
 
-/** Dramatic rotating blue light vortex for the generating state */
-function GeneratingVortex() {
+/** Full-screen atmospheric generating background — everything intensified */
+function GeneratingAtmosphere() {
   return (
-    <div className="relative w-80 h-80 flex items-center justify-center select-none">
-      {/* Outer electric-blue rotating ring */}
+    <div className="absolute inset-0 overflow-hidden">
+      {/* Base deep gradient — slightly more alive */}
       <div
-        className="absolute inset-0 rounded-full"
+        className="absolute inset-0"
         style={{
-          background: "conic-gradient(from 0deg, transparent 0%, #0066ff 15%, #00ccff 30%, transparent 45%, #3399ff 60%, #00eeff 75%, transparent 90%)",
-          animation: "vortex-spin 2s linear infinite",
-          opacity: 0.7,
-          filter: "blur(2px)",
-        }}
-      />
-      {/* Middle fast counter-rotating ring */}
-      <div
-        className="absolute inset-6 rounded-full"
-        style={{
-          background: "conic-gradient(from 90deg, transparent 0%, #00eeff 20%, #2563eb 40%, transparent 55%, #00aaff 70%, #3b82f6 85%, transparent 100%)",
-          animation: "vortex-spin 1.5s linear infinite reverse",
-          opacity: 0.6,
-          filter: "blur(1px)",
-        }}
-      />
-      {/* Inner fastest spinning ring */}
-      <div
-        className="absolute inset-14 rounded-full"
-        style={{
-          background: "conic-gradient(from 270deg, transparent, #00ddff, #4488ff, transparent, #00eeff, transparent)",
-          animation: "vortex-spin 1s linear infinite",
-          opacity: 0.8,
-          filter: "blur(1px)",
+          background: "radial-gradient(ellipse at 50% 50%, #0d1f3c 0%, #0a0a0f 70%)",
         }}
       />
 
-      {/* Electric glow pulse behind center */}
+      {/* Aurora band 1 — FASTER, BRIGHTER */}
       <div
-        className="absolute inset-16 rounded-full"
+        className="absolute w-[160%] h-[350px] -left-[30%] top-[5%]"
         style={{
-          background: "radial-gradient(circle, rgba(0,200,255,0.4) 0%, rgba(0,100,255,0.15) 50%, transparent 70%)",
-          animation: "electric-pulse 1.2s ease-in-out infinite",
+          background: "linear-gradient(90deg, transparent 0%, rgba(37,99,235,0.12) 15%, rgba(14,165,233,0.18) 35%, rgba(0,200,255,0.14) 55%, rgba(59,130,246,0.10) 75%, transparent 100%)",
+          filter: "blur(50px)",
+          animation: "aurora-gen-1 8s ease-in-out infinite",
+          transform: "rotate(-4deg)",
         }}
       />
 
-      {/* Orbiting light particles */}
-      {[...Array(18)].map((_, i) => {
-        const angle = (i / 18) * 360;
-        const radius = 100 + (i % 4) * 20;
-        const size = 2 + (i % 3) * 1.5;
-        const isBlue = i % 3 !== 2;
-        const color = isBlue ? (i % 2 === 0 ? "#00ddff" : "#3388ff") : "#3b82f6";
-        return (
-          <div
-            key={i}
-            className="absolute rounded-full"
-            style={{
-              width: size,
-              height: size,
-              background: color,
-              boxShadow: `0 0 ${size * 4}px ${color}, 0 0 ${size * 8}px ${color}40`,
-              top: `calc(50% + ${Math.sin((angle * Math.PI) / 180) * radius}px)`,
-              left: `calc(50% + ${Math.cos((angle * Math.PI) / 180) * radius}px)`,
-              animation: `orbit-particle ${3 + (i % 3)}s linear ${i * 0.15}s infinite`,
-              transform: "translate(-50%, -50%)",
-            }}
-          />
-        );
-      })}
+      {/* Aurora band 2 — mid, pulsing */}
+      <div
+        className="absolute w-[150%] h-[300px] -left-[25%] top-[30%]"
+        style={{
+          background: "linear-gradient(90deg, transparent 0%, rgba(0,200,255,0.10) 20%, rgba(37,99,235,0.16) 45%, rgba(96,165,250,0.12) 65%, rgba(0,240,255,0.08) 85%, transparent 100%)",
+          filter: "blur(55px)",
+          animation: "aurora-gen-2 10s ease-in-out infinite",
+          transform: "rotate(3deg)",
+        }}
+      />
 
-      {/* Lightning streaks */}
-      {[...Array(6)].map((_, i) => {
-        const angle = (i / 6) * 360;
-        return (
-          <div
-            key={`streak-${i}`}
-            className="absolute"
-            style={{
-              width: "2px",
-              height: "40px",
-              background: `linear-gradient(to bottom, transparent, ${i % 2 === 0 ? "#00ddff" : "#4488ff"}, transparent)`,
-              top: "50%",
-              left: "50%",
-              transformOrigin: "center center",
-              transform: `rotate(${angle}deg) translateY(-90px)`,
-              animation: `lightning-flash ${0.8 + (i % 3) * 0.4}s ease-in-out ${i * 0.2}s infinite`,
-              opacity: 0,
-            }}
-          />
-        );
-      })}
+      {/* Aurora band 3 — lower, waves */}
+      <div
+        className="absolute w-[140%] h-[280px] -left-[20%] bottom-[5%]"
+        style={{
+          background: "linear-gradient(90deg, transparent 0%, rgba(59,130,246,0.10) 25%, rgba(14,165,233,0.14) 50%, rgba(37,99,235,0.08) 75%, transparent 100%)",
+          filter: "blur(60px)",
+          animation: "aurora-gen-3 7s ease-in-out infinite",
+          transform: "rotate(-2deg)",
+        }}
+      />
 
-      {/* Center pulsing Z */}
-      <div className="relative z-10 flex flex-col items-center">
-        <div
-          className="text-5xl font-black"
-          style={{
-            background: "linear-gradient(135deg, #00ddff, #4488ff, #3b82f6)",
-            backgroundSize: "200% 200%",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            backgroundClip: "text",
-            animation: "gradient-drift 2s ease-in-out infinite",
-            filter: "drop-shadow(0 0 30px rgba(0,180,255,0.6))",
-          }}
-        >
-          Z
-        </div>
-      </div>
+      {/* Active mesh gradient — shifts faster */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `
+            radial-gradient(ellipse at 30% 40%, rgba(37,99,235,0.08) 0%, transparent 50%),
+            radial-gradient(ellipse at 70% 60%, rgba(0,200,255,0.06) 0%, transparent 50%),
+            radial-gradient(ellipse at 50% 20%, rgba(96,165,250,0.05) 0%, transparent 50%)
+          `,
+          animation: "mesh-shift-fast 12s ease-in-out infinite",
+        }}
+      />
 
-      <style>{`
-        @keyframes vortex-spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        @keyframes electric-pulse {
-          0%, 100% { transform: scale(1); opacity: 0.4; }
-          50% { transform: scale(1.3); opacity: 0.9; }
-        }
-        @keyframes orbit-particle {
-          0% { opacity: 0.2; transform: translate(-50%, -50%) scale(0.5); }
-          25% { opacity: 1; transform: translate(-50%, -50%) scale(1.5); }
-          50% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
-          75% { opacity: 0.9; transform: translate(-50%, -50%) scale(1.3); }
-          100% { opacity: 0.2; transform: translate(-50%, -50%) scale(0.5); }
-        }
-        @keyframes lightning-flash {
-          0%, 100% { opacity: 0; }
-          15% { opacity: 0.9; }
-          30% { opacity: 0; }
-          45% { opacity: 0.7; }
-          55% { opacity: 0; }
-        }
-        @keyframes gradient-drift {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-      `}</style>
+      {/* MORE particles, FASTER */}
+      <ParticleField count={60} speed={2} />
+
+      {/* Energy wave pulses — horizontal bands that wash across */}
+      <div
+        className="absolute top-[20%] left-0 w-full h-[2px]"
+        style={{
+          background: "linear-gradient(90deg, transparent 0%, rgba(96,165,250,0.25) 30%, rgba(0,240,255,0.35) 50%, rgba(96,165,250,0.25) 70%, transparent 100%)",
+          animation: "energy-wave 3s ease-in-out infinite",
+        }}
+      />
+      <div
+        className="absolute top-[45%] left-0 w-full h-[2px]"
+        style={{
+          background: "linear-gradient(90deg, transparent 0%, rgba(37,99,235,0.20) 25%, rgba(14,165,233,0.30) 50%, rgba(37,99,235,0.20) 75%, transparent 100%)",
+          animation: "energy-wave 4s ease-in-out 1s infinite",
+        }}
+      />
+      <div
+        className="absolute top-[70%] left-0 w-full h-[2px]"
+        style={{
+          background: "linear-gradient(90deg, transparent 0%, rgba(0,200,255,0.15) 20%, rgba(59,130,246,0.25) 50%, rgba(0,200,255,0.15) 80%, transparent 100%)",
+          animation: "energy-wave 3.5s ease-in-out 2s infinite",
+        }}
+      />
+
+      {/* Vertical light columns — like creation beams */}
+      <div
+        className="absolute top-0 bottom-0 left-[25%] w-[1px]"
+        style={{
+          background: "linear-gradient(to bottom, transparent 0%, rgba(96,165,250,0.12) 30%, rgba(0,200,255,0.18) 50%, rgba(96,165,250,0.12) 70%, transparent 100%)",
+          animation: "column-pulse 5s ease-in-out infinite",
+        }}
+      />
+      <div
+        className="absolute top-0 bottom-0 left-[50%] w-[1px]"
+        style={{
+          background: "linear-gradient(to bottom, transparent 0%, rgba(37,99,235,0.10) 25%, rgba(14,165,233,0.15) 50%, rgba(37,99,235,0.10) 75%, transparent 100%)",
+          animation: "column-pulse 6s ease-in-out 2s infinite",
+        }}
+      />
+      <div
+        className="absolute top-0 bottom-0 left-[75%] w-[1px]"
+        style={{
+          background: "linear-gradient(to bottom, transparent 0%, rgba(0,200,255,0.08) 20%, rgba(59,130,246,0.14) 50%, rgba(0,200,255,0.08) 80%, transparent 100%)",
+          animation: "column-pulse 4.5s ease-in-out 1s infinite",
+        }}
+      />
+
+      {/* Bottom glow — intensified */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-[50%]"
+        style={{
+          background: "linear-gradient(to top, rgba(37,99,235,0.08) 0%, rgba(14,165,233,0.03) 40%, transparent 100%)",
+          animation: "bottom-breathe-fast 6s ease-in-out infinite",
+        }}
+      />
+
+      {/* Central convergence glow — where creation happens */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: "radial-gradient(ellipse at 50% 50%, rgba(37,99,235,0.06) 0%, transparent 50%)",
+          animation: "core-pulse 3s ease-in-out infinite",
+        }}
+      />
     </div>
   );
 }
@@ -257,62 +266,138 @@ function GeneratingVortex() {
 export default function PreviewPanel({ html, isGenerating }: PreviewPanelProps) {
   const srcDoc = useMemo(() => html || "", [html]);
 
+  const sharedStyles = `
+    @keyframes particle-float {
+      0%, 100% {
+        transform: translateY(0) translateX(0);
+        opacity: var(--base-opacity, 0.3);
+      }
+      25% {
+        transform: translateY(calc(var(--drift) * -1)) translateX(calc(var(--drift) * 0.5));
+        opacity: 0.7;
+      }
+      50% {
+        transform: translateY(calc(var(--drift) * -0.5)) translateX(calc(var(--drift) * -0.3));
+        opacity: 0.2;
+      }
+      75% {
+        transform: translateY(calc(var(--drift) * 0.3)) translateX(calc(var(--drift) * -0.8));
+        opacity: 0.6;
+      }
+    }
+    @keyframes aurora-drift-1 {
+      0%, 100% { transform: rotate(-3deg) translateX(0); }
+      50% { transform: rotate(-3deg) translateX(80px); }
+    }
+    @keyframes aurora-drift-2 {
+      0%, 100% { transform: rotate(2deg) translateX(0); }
+      50% { transform: rotate(2deg) translateX(-60px); }
+    }
+    @keyframes aurora-drift-3 {
+      0%, 100% { transform: rotate(-1deg) translateX(0) scaleY(1); }
+      50% { transform: rotate(-1deg) translateX(50px) scaleY(1.3); }
+    }
+    @keyframes aurora-gen-1 {
+      0%, 100% { transform: rotate(-4deg) translateX(0); opacity: 0.7; }
+      50% { transform: rotate(-4deg) translateX(120px); opacity: 1; }
+    }
+    @keyframes aurora-gen-2 {
+      0%, 100% { transform: rotate(3deg) translateX(0); opacity: 0.6; }
+      50% { transform: rotate(3deg) translateX(-100px); opacity: 1; }
+    }
+    @keyframes aurora-gen-3 {
+      0%, 100% { transform: rotate(-2deg) translateX(0) scaleY(1); opacity: 0.7; }
+      50% { transform: rotate(-2deg) translateX(80px) scaleY(1.4); opacity: 1; }
+    }
+    @keyframes mesh-shift {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    @keyframes mesh-shift-fast {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.05); }
+    }
+    @keyframes streak-glow {
+      0%, 100% { opacity: 0.3; transform: scaleX(0.8); }
+      50% { opacity: 1; transform: scaleX(1); }
+    }
+    @keyframes bottom-breathe {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+    @keyframes bottom-breathe-fast {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+    @keyframes energy-wave {
+      0% { opacity: 0; transform: scaleX(0.3) translateX(-30%); }
+      50% { opacity: 1; transform: scaleX(1) translateX(0); }
+      100% { opacity: 0; transform: scaleX(0.3) translateX(30%); }
+    }
+    @keyframes column-pulse {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 0.8; }
+    }
+    @keyframes core-pulse {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.1); }
+    }
+    @keyframes text-shimmer {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 300% 50%; }
+    }
+  `;
+
   if (isGenerating) {
     return (
-      <div className="flex items-center justify-center h-full relative overflow-hidden">
-        {/* Ambient background glow */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background: "radial-gradient(ellipse at center, rgba(0,100,255,0.08) 0%, rgba(0,50,200,0.03) 40%, transparent 70%)",
-            animation: "bg-breathe 3s ease-in-out infinite",
-          }}
-        />
-        <div className="text-center relative z-10">
-          <GeneratingVortex />
-          <p
-            className="text-sm font-bold uppercase tracking-[4px] mt-4"
-            style={{
-              background: "linear-gradient(90deg, #00ddff, #4488ff, #3b82f6, #00ddff)",
-              backgroundSize: "300% 100%",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-              animation: "text-shimmer 2s linear infinite",
-            }}
-          >
-            Building
-          </p>
-          <p className="text-[10px] text-blue-400/40 mt-2 tracking-wide">
-            Claude is crafting your website...
-          </p>
+      <div className="relative h-full overflow-hidden">
+        <GeneratingAtmosphere />
+
+        {/* Centered text — minimal, floating over the atmosphere */}
+        <div className="absolute inset-0 flex items-center justify-center z-10">
+          <div className="text-center">
+            <p
+              className="text-sm font-bold uppercase tracking-[6px]"
+              style={{
+                background: "linear-gradient(90deg, #60a5fa, #00ddff, #3b82f6, #60a5fa)",
+                backgroundSize: "300% 100%",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+                animation: "text-shimmer 2.5s linear infinite",
+              }}
+            >
+              Creating
+            </p>
+            <p className="text-[10px] text-blue-400/30 mt-3 tracking-widest uppercase">
+              Claude is building your site
+            </p>
+          </div>
         </div>
-        <style>{`
-          @keyframes bg-breathe {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-          }
-          @keyframes text-shimmer {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 300% 50%; }
-          }
-        `}</style>
+
+        <style>{sharedStyles}</style>
       </div>
     );
   }
 
   if (!html) {
     return (
-      <div className="flex items-center justify-center h-full bg-[#0a0a0f]">
-        <div className="text-center">
-          <AnimatedLogo />
-          <p className="text-sm text-white/30 uppercase tracking-[3px] mt-2 mb-3">
-            Ready to build
-          </p>
-          <p className="text-xs text-white/15 leading-relaxed max-w-xs mx-auto">
-            Describe your website and hit Build to see it come to life.
-          </p>
+      <div className="relative h-full overflow-hidden">
+        <IdleAtmosphere />
+
+        {/* Centered text — minimal, floating over the atmosphere */}
+        <div className="absolute inset-0 flex items-center justify-center z-10">
+          <div className="text-center">
+            <p className="text-sm text-white/25 uppercase tracking-[5px] mb-3">
+              Ready to build
+            </p>
+            <p className="text-xs text-white/12 leading-relaxed max-w-xs mx-auto">
+              Describe your website and watch it come to life
+            </p>
+          </div>
         </div>
+
+        <style>{sharedStyles}</style>
       </div>
     );
   }
