@@ -229,7 +229,7 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
           disabled={!canSubmit || loading}
           className={`mt-6 w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl text-sm font-semibold transition-all duration-200 ${
             canSubmit && !loading
-              ? "bg-gradient-to-r from-[#5b7cf7] to-[#8b5cf6] text-white hover:shadow-lg hover:shadow-purple-500/20 cursor-pointer"
+              ? "bg-gradient-to-r from-[#5b7cf7] to-[#3b82f6] text-white hover:shadow-lg hover:shadow-blue-500/20 cursor-pointer"
               : "bg-[#1a1a2e] text-[#444] cursor-not-allowed"
           }`}
         >
@@ -316,7 +316,7 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
             {/* Fonts */}
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <Type className="w-4 h-4 text-[#8b5cf6]" />
+                <Type className="w-4 h-4 text-[#3b82f6]" />
                 <span className="text-sm font-medium text-[#999]">
                   Fonts ({result.designTokens.fonts.length})
                 </span>
@@ -365,7 +365,7 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
           {/* Use This Design Button */}
           <button
             onClick={() => onImport(result.html)}
-            className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl text-sm font-semibold bg-gradient-to-r from-[#5b7cf7] to-[#8b5cf6] text-white hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-200 cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl text-sm font-semibold bg-gradient-to-r from-[#5b7cf7] to-[#3b82f6] text-white hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-200 cursor-pointer"
           >
             Use This Design
             <ArrowRight className="w-4 h-4" />

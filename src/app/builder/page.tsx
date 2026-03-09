@@ -360,7 +360,7 @@ export default function BuilderPage() {
         <div
           className="absolute -top-40 -left-40 w-96 h-96 rounded-full"
           style={{
-            background: "radial-gradient(circle, rgba(124,58,237,0.08) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(37,99,235,0.08) 0%, transparent 70%)",
             filter: "blur(60px)",
             animation: "ambient-float 20s ease-in-out infinite",
           }}

@@ -16,10 +16,10 @@ const DEMO_CODE = `<!DOCTYPE html>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: #e0e0e8; }
     .hero { padding: 80px 20px; text-align: center; background: linear-gradient(135deg, #0a0a1a, #1a0a2e); }
-    .hero h1 { font-size: 3rem; font-weight: 800; margin-bottom: 16px; background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero h1 { font-size: 3rem; font-weight: 800; margin-bottom: 16px; background: linear-gradient(135deg, #60a5fa, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .hero p { font-size: 1.1rem; color: #888; max-width: 500px; margin: 0 auto 32px; }
     .btn { padding: 14px 32px; border-radius: 12px; font-weight: 600; font-size: 0.95rem; cursor: pointer; border: none; }
-    .btn-primary { background: linear-gradient(135deg, #5b7cf7, #8b5cf6); color: white; }
+    .btn-primary { background: linear-gradient(135deg, #5b7cf7, #3b82f6); color: white; }
     .features { padding: 60px 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 900px; margin: 0 auto; }
     .feature-card { background: #12121a; border: 1px solid #1e1e2e; border-radius: 16px; padding: 28px; }
     .feature-card h3 { font-size: 1.1rem; margin-bottom: 8px; color: #fff; }

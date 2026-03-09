@@ -202,7 +202,7 @@ export default function PromptInput({
               : "bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04] hover:border-brand-500/20"
           }`}
           style={tier === "premium" ? {
-            background: "linear-gradient(135deg, rgba(124,58,237,0.15), rgba(139,92,246,0.08), rgba(0,200,255,0.05))",
+            background: "linear-gradient(135deg, rgba(37,99,235,0.15), rgba(59,130,246,0.08), rgba(0,200,255,0.05))",
           } : undefined}
         >
           {/* Animated shimmer on premium when selected */}
@@ -210,7 +210,7 @@ export default function PromptInput({
             <div
               className="absolute inset-0 opacity-20"
               style={{
-                background: "linear-gradient(90deg, transparent, rgba(124,58,237,0.3), transparent)",
+                background: "linear-gradient(90deg, transparent, rgba(37,99,235,0.3), transparent)",
                 backgroundSize: "200% 100%",
                 animation: "premium-shimmer 3s linear infinite",
               }}

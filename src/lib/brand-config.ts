@@ -67,12 +67,12 @@ const ZOOBICON_CONFIG: BrandConfig = {
     icon: "Zap",
   },
   colors: {
-    primary: "#7c3aed",
-    primaryHover: "#6d28d9",
-    primaryLight: "rgba(124, 58, 237, 0.15)",
-    gradientFrom: "#7c3aed",
-    gradientTo: "#4f46e5",
-    accentGlow: "rgba(124, 58, 237, 0.3)",
+    primary: "#2563eb",
+    primaryHover: "#1d4ed8",
+    primaryLight: "rgba(37, 99, 235, 0.15)",
+    gradientFrom: "#2563eb",
+    gradientTo: "#0ea5e9",
+    accentGlow: "rgba(37, 99, 235, 0.3)",
   },
   meta: {
     title: "Zoobicon — AI Website Builder & Generator Platform",

@@ -32,7 +32,7 @@ export default function GlobalError({
             width: "64px",
             height: "64px",
             borderRadius: "16px",
-            background: "linear-gradient(135deg, #7c3aed, #6d28d9)",
+            background: "linear-gradient(135deg, #2563eb, #1d4ed8)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -66,7 +66,7 @@ export default function GlobalError({
           style={{
             padding: "12px 32px",
             borderRadius: "12px",
-            background: "linear-gradient(135deg, #7c3aed, #6d28d9)",
+            background: "linear-gradient(135deg, #2563eb, #1d4ed8)",
             color: "white",
             border: "none",
             fontWeight: 600,

@@ -475,7 +475,7 @@ export default function ZoobiconIOPage() {
       {/* ─── Hero ─── */}
       <section className="relative pt-32 pb-24 px-4">
         {/* Grid background */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(124,58,237,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(37,99,235,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(37,99,235,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-brand-500/5 rounded-full blur-[120px]" />
 
         <motion.div
@@ -662,7 +662,7 @@ export default function ZoobiconIOPage() {
 
       {/* ─── Rate Limits & Pricing ─── */}
       <section className="relative py-24 px-4">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(124,58,237,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(124,58,237,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(37,99,235,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(37,99,235,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
         <div className="relative max-w-5xl mx-auto">
           <motion.div
@@ -693,7 +693,7 @@ export default function ZoobiconIOPage() {
                 variants={scaleIn}
                 className={`relative p-8 rounded-xl border transition-all ${
                   tier.highlight
-                    ? "border-brand-500/40 bg-brand-500/[0.03] shadow-[0_0_60px_-15px_rgba(124,58,237,0.15)]"
+                    ? "border-brand-500/40 bg-brand-500/[0.03] shadow-[0_0_60px_-15px_rgba(37,99,235,0.15)]"
                     : "border-white/10 bg-white/[0.02] hover:border-white/15"
                 }`}
               >
