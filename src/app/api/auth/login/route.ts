@@ -2,6 +2,10 @@ import { NextRequest } from "next/server";
 import { sql } from "@/lib/db";
 import { verifyPassword } from "@/lib/password";
 
+/* Default admin credentials — override with ADMIN_EMAIL / ADMIN_PASSWORD env vars */
+const DEFAULT_ADMIN_EMAIL = "admin@zoobicon.com";
+const DEFAULT_ADMIN_PASSWORD = "Zoobicon2024!Admin";
+
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
@@ -10,12 +14,11 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: "Email and password required" }, { status: 400 });
     }
 
-    // Check admin login first (env-based)
-    const adminEmail = process.env.ADMIN_EMAIL || "admin@zoobicon.com";
-    const adminPassword = process.env.ADMIN_PASSWORD;
+    // ── Admin login (env-based, no database needed) ──
+    const adminEmail = process.env.ADMIN_EMAIL || DEFAULT_ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD || DEFAULT_ADMIN_PASSWORD;
 
     if (
-      adminPassword &&
       email.toLowerCase() === adminEmail.toLowerCase() &&
       password === adminPassword
     ) {
@@ -29,29 +32,35 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Check database for regular users
-    const [user] = await sql`
-      SELECT id, email, name, role, plan, password_hash
-      FROM users WHERE email = ${email.toLowerCase()} LIMIT 1
-    `;
+    // ── Regular user login (database) ──
+    try {
+      const [user] = await sql`
+        SELECT id, email, name, role, plan, password_hash
+        FROM users WHERE email = ${email.toLowerCase()} LIMIT 1
+      `;
 
-    if (!user || !user.password_hash) {
+      if (!user || !user.password_hash) {
+        return Response.json({ error: "Invalid credentials" }, { status: 401 });
+      }
+
+      const valid = await verifyPassword(password, user.password_hash);
+      if (!valid) {
+        return Response.json({ error: "Invalid credentials" }, { status: 401 });
+      }
+
+      return Response.json({
+        user: {
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          plan: user.plan,
+        },
+      });
+    } catch (dbErr) {
+      console.error("Database unavailable for login:", dbErr);
+      // If DB is down, only admin can log in (already handled above)
       return Response.json({ error: "Invalid credentials" }, { status: 401 });
     }
-
-    const valid = await verifyPassword(password, user.password_hash);
-    if (!valid) {
-      return Response.json({ error: "Invalid credentials" }, { status: 401 });
-    }
-
-    return Response.json({
-      user: {
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        plan: user.plan,
-      },
-    });
   } catch (err) {
     console.error("Login error:", err);
     return Response.json({ error: "Auth error" }, { status: 500 });
