@@ -32,6 +32,9 @@ import {
   Figma,
   Search,
   X,
+  Rocket,
+  Check,
+  ExternalLink,
 } from "lucide-react";
 
 type BuildStatus = "idle" | "generating" | "editing" | "complete" | "error";
@@ -71,6 +74,9 @@ export default function BuilderPage() {
   const [activeTab, setActiveTab] = useState<RightTab>("preview");
   const [activeTool, setActiveTool] = useState<ToolId>(null);
   const [tier, setTier] = useState<Tier>("premium");
+  const [isDeploying, setIsDeploying] = useState(false);
+  const [deployUrl, setDeployUrl] = useState("");
+  const [deployStatus, setDeployStatus] = useState<"idle" | "deploying" | "deployed" | "error">("idle");
 
   const hasCode = generatedCode.length > 0;
 
@@ -156,6 +162,40 @@ export default function BuilderPage() {
     },
     []
   );
+
+  const handleDeploy = useCallback(async () => {
+    if (!generatedCode || isDeploying) return;
+
+    setIsDeploying(true);
+    setDeployStatus("deploying");
+
+    try {
+      const userStr = typeof window !== "undefined" ? localStorage.getItem("zoobicon_user") : null;
+      const user = userStr ? JSON.parse(userStr) : null;
+      const email = user?.email || "anonymous@zoobicon.com";
+      const siteName = prompt.trim().slice(0, 50) || "My Site";
+
+      const res = await fetch("/api/hosting/deploy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: siteName, email, code: generatedCode }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Deploy failed");
+      }
+
+      const data = await res.json();
+      setDeployUrl(data.url);
+      setDeployStatus("deployed");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Deploy failed");
+      setDeployStatus("error");
+    } finally {
+      setIsDeploying(false);
+    }
+  }, [generatedCode, isDeploying, prompt]);
 
   const toggleTool = useCallback((toolId: Exclude<ToolId, null>) => {
     setActiveTool((prev) => (prev === toolId ? null : toolId));
@@ -318,7 +358,37 @@ export default function BuilderPage() {
               Code
             </button>
 
-            {status === "error" && (
+            {/* Deploy button */}
+            {hasCode && (
+              <div className="ml-auto flex items-center gap-2 pr-3">
+                {deployStatus === "deployed" && deployUrl && (
+                  <a
+                    href={deployUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
+                  >
+                    <Check size={14} />
+                    <span>Live</span>
+                    <ExternalLink size={12} />
+                  </a>
+                )}
+                <button
+                  onClick={handleDeploy}
+                  disabled={isDeploying}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                    isDeploying
+                      ? "bg-brand-500/10 text-brand-400/50 cursor-wait"
+                      : "bg-brand-500/20 text-brand-400 hover:bg-brand-500/30"
+                  }`}
+                >
+                  <Rocket size={14} className={isDeploying ? "animate-pulse" : ""} />
+                  {isDeploying ? "Deploying..." : "Deploy"}
+                </button>
+              </div>
+            )}
+
+            {status === "error" && !hasCode && (
               <span className="ml-auto text-xs text-red-400 pr-3">
                 {error}
               </span>

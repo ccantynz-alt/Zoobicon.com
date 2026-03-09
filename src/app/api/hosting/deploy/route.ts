@@ -1,125 +1,108 @@
-import { NextRequest, NextResponse } from "next/server";
-import { randomUUID } from "crypto";
+import { NextRequest } from "next/server";
+import { sql } from "@/lib/db";
 
-// ---------------------------------------------------------------------------
-// In-memory storage — would be backed by a database (e.g. Postgres) in prod.
-// ---------------------------------------------------------------------------
-interface Deployment {
-  id: string;
-  siteId: string;
-  environment: "production" | "staging" | "preview";
-  status: "live" | "building" | "failed";
-  url: string;
-  size: number; // bytes
-  createdAt: string;
+function slugify(name: string): string {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
-const deployments = new Map<string, Deployment>();
-
-/** Expose the store so sibling routes (sites, analytics) can read deployments. */
-// Internal storage — not exported
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-const SITE_ID_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/i;
-
-function buildUrl(
-  siteId: string,
-  environment: Deployment["environment"],
-  deploymentId: string
-): string {
-  switch (environment) {
-    case "production":
-      return `https://${siteId}.zoobicon.sh`;
-    case "staging":
-      return `https://${siteId}-staging.zoobicon.sh`;
-    case "preview":
-      return `https://${deploymentId}.preview.zoobicon.sh`;
-  }
-}
-
-// ---------------------------------------------------------------------------
-// POST /api/hosting/deploy — deploy a site
-// ---------------------------------------------------------------------------
+/**
+ * POST /api/hosting/deploy
+ * Body: { name, email, code, siteId?, environment? }
+ *
+ * Creates a site (if needed) and deploys the code.
+ * Returns the live URL.
+ */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { siteId, code, environment = "production" } = body as {
-      siteId?: string;
+    const {
+      name,
+      email,
+      code,
+      siteId: existingSiteSlug,
+      environment = "production",
+    } = body as {
+      name?: string;
+      email?: string;
       code?: string;
+      siteId?: string;
       environment?: string;
     };
 
-    // --- Validation -----------------------------------------------------------
-    if (!siteId || typeof siteId !== "string") {
-      return NextResponse.json(
-        { error: "siteId is required and must be a string." },
-        { status: 400 }
-      );
+    if (!code || typeof code !== "string" || !code.trim()) {
+      return Response.json({ error: "code is required" }, { status: 400 });
     }
 
-    if (!SITE_ID_RE.test(siteId)) {
-      return NextResponse.json(
-        {
-          error:
-            "siteId must be alphanumeric with optional hyphens (e.g. my-site-1).",
-        },
-        { status: 400 }
-      );
+    if (!email || typeof email !== "string") {
+      return Response.json({ error: "email is required" }, { status: 400 });
     }
 
-    if (!code || typeof code !== "string" || code.trim().length === 0) {
-      return NextResponse.json(
-        { error: "code is required and must be a non-empty string." },
-        { status: 400 }
-      );
+    let siteRow: Record<string, unknown> | undefined;
+
+    // If an existing site slug was provided, look it up
+    if (existingSiteSlug) {
+      const [found] = await sql`
+        SELECT id, slug FROM sites
+        WHERE slug = ${existingSiteSlug} AND email = ${email} AND status != 'deleted'
+        LIMIT 1
+      `;
+      siteRow = found;
     }
 
-    const validEnvs = ["production", "staging", "preview"] as const;
-    if (!validEnvs.includes(environment as (typeof validEnvs)[number])) {
-      return NextResponse.json(
-        {
-          error: `environment must be one of: ${validEnvs.join(", ")}.`,
-        },
-        { status: 400 }
-      );
+    // If no existing site, create one
+    if (!siteRow) {
+      const siteName = name || "My Site";
+      let slug = slugify(siteName);
+      if (!slug) slug = "site";
+
+      // Ensure unique slug
+      const [dup] = await sql`SELECT id FROM sites WHERE slug = ${slug} LIMIT 1`;
+      if (dup) {
+        slug = `${slug}-${Math.random().toString(36).substring(2, 8)}`;
+      }
+
+      const [created] = await sql`
+        INSERT INTO sites (name, slug, email, plan)
+        VALUES (${siteName}, ${slug}, ${email}, 'free')
+        RETURNING id, slug
+      `;
+      siteRow = created;
     }
 
-    const env = environment as Deployment["environment"];
+    const siteId = siteRow!.id as string;
+    const slug = siteRow!.slug as string;
+    const size = new TextEncoder().encode(code).length;
 
-    // --- Build deployment record ----------------------------------------------
-    const deploymentId = randomUUID();
-    const size = Buffer.byteLength(code, "utf-8");
-    const url = buildUrl(siteId, env, deploymentId);
-    const now = new Date().toISOString();
+    const url =
+      environment === "staging"
+        ? `https://${slug}-staging.zoobicon.sh`
+        : `https://${slug}.zoobicon.sh`;
 
-    const deployment: Deployment = {
-      id: deploymentId,
-      siteId,
-      environment: env,
-      status: "live",
+    // Create deployment record with the HTML code
+    const [deployment] = await sql`
+      INSERT INTO deployments (site_id, environment, status, url, size, code, commit_message)
+      VALUES (${siteId}, ${environment}, 'live', ${url}, ${size}, ${code}, ${"Deployed from builder"})
+      RETURNING id, environment, status, url, size, created_at
+    `;
+
+    // Update site timestamp
+    await sql`UPDATE sites SET updated_at = NOW() WHERE id = ${siteId}`;
+
+    return Response.json({
+      deploymentId: deployment.id,
+      siteSlug: slug,
       url,
+      environment,
+      status: "live",
       size,
-      createdAt: now,
-    };
-
-    deployments.set(deploymentId, deployment);
-
-    return NextResponse.json(
-      {
-        deploymentId,
-        url,
-        environment: env,
-        status: "live",
-        size,
-        deployedAt: now,
-      },
-      { status: 201 }
-    );
-  } catch (err: unknown) {
-    const message =
-      err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json({ error: message }, { status: 500 });
+      deployedAt: deployment.created_at,
+    }, { status: 201 });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Internal server error";
+    return Response.json({ error: message }, { status: 500 });
   }
 }

@@ -1,235 +1,104 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { sql } from "@/lib/db";
 
-// ---------------------------------------------------------------------------
-// In-memory stores — imported lazily from sibling route modules.
-// In a real app these would be database queries.
-// ---------------------------------------------------------------------------
-// NOTE: Next.js bundles each route independently, so module-level Maps are NOT
-// shared across routes at runtime.  The imports below are for type-reference
-// only; in production you would query a real database.  For local testing with
-// a single-process dev server the re-imports *may* share state.
-// ---------------------------------------------------------------------------
-
-interface Site {
-  id: string;
-  name: string;
-  slug: string;
-  email: string;
-  plan: string;
-  status: string;
-  url: string;
-  createdAt: string;
-  updatedAt: string;
-  settings: Record<string, unknown>;
-  storage: { used: number; limit: number };
-  bandwidth: { used: number; limit: number };
-}
-
-interface Deployment {
-  id: string;
-  siteId: string;
-  environment: string;
-  status: string;
-  url: string;
-  size: number;
-  createdAt: string;
-  commitMessage?: string;
-}
-
-// We maintain our own reference Maps so the route is self-contained.
-// In production, replace with DB calls.
-const sites = new Map<string, Site>();
-const deployments = new Map<string, Deployment>();
-const domains = new Map<
-  string,
-  { domain: string; siteId: string; status: string; sslStatus: string }
->();
-
-// ---------------------------------------------------------------------------
 // GET /api/hosting/sites/[siteId]
-// ---------------------------------------------------------------------------
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ siteId: string }> }
 ) {
   try {
     const { siteId } = await params;
-    const site = sites.get(siteId);
 
-    if (!site || site.status === "deleted") {
-      return NextResponse.json({ error: "Site not found." }, { status: 404 });
+    const [site] = await sql`
+      SELECT id, name, slug, email, plan, status, settings, created_at, updated_at
+      FROM sites WHERE slug = ${siteId} AND status != 'deleted' LIMIT 1
+    `;
+
+    if (!site) {
+      return Response.json({ error: "Site not found" }, { status: 404 });
     }
 
-    // Gather related data
-    const siteDeployments = Array.from(deployments.values())
-      .filter((d) => d.siteId === siteId)
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+    const deployments = await sql`
+      SELECT id, environment, status, url, size, commit_message, created_at
+      FROM deployments WHERE site_id = ${site.id}
+      ORDER BY created_at DESC LIMIT 20
+    `;
 
-    const siteDomains = Array.from(domains.values()).filter(
-      (d) => d.siteId === siteId
-    );
+    const domains = await sql`
+      SELECT id, domain, status, ssl_status, dns_records, created_at
+      FROM custom_domains WHERE site_id = ${site.id}
+    `;
 
-    // Simple analytics snapshot (mock)
-    const analytics = {
-      visitors24h: Math.floor(Math.random() * 5000),
-      pageViews24h: Math.floor(Math.random() * 15000),
-      bandwidthUsed24h: Math.floor(Math.random() * 500 * 1024 * 1024),
-      uptime: 99.95 + Math.random() * 0.05,
-    };
-
-    return NextResponse.json({
-      site,
-      deployments: siteDeployments,
-      domains: siteDomains,
-      analytics,
+    return Response.json({
+      site: { ...site, url: `https://${site.slug}.zoobicon.sh` },
+      deployments,
+      domains,
     });
-  } catch (err: unknown) {
-    const message =
-      err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json({ error: message }, { status: 500 });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Internal server error";
+    return Response.json({ error: message }, { status: 500 });
   }
 }
 
-// ---------------------------------------------------------------------------
-// PUT /api/hosting/sites/[siteId] — update site settings
-// ---------------------------------------------------------------------------
+// PUT /api/hosting/sites/[siteId]
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ siteId: string }> }
 ) {
   try {
     const { siteId } = await params;
-    const site = sites.get(siteId);
+    const { name, plan, settings } = await req.json();
 
-    if (!site || site.status === "deleted") {
-      return NextResponse.json({ error: "Site not found." }, { status: 404 });
+    const [site] = await sql`
+      SELECT id FROM sites WHERE slug = ${siteId} AND status != 'deleted' LIMIT 1
+    `;
+    if (!site) {
+      return Response.json({ error: "Site not found" }, { status: 404 });
     }
 
-    const body = await req.json();
-    const { name, plan, settings } = body as {
-      name?: string;
-      plan?: string;
-      settings?: {
-        redirects?: Array<{ from: string; to: string; type: number }>;
-        headers?: Array<{ path: string; key: string; value: string }>;
-        errorPages?: Record<string, string>;
-      };
-    };
+    const updates: string[] = [];
+    if (name !== undefined) updates.push("name");
+    if (plan !== undefined) updates.push("plan");
+    if (settings !== undefined) updates.push("settings");
 
-    if (name !== undefined) {
-      if (typeof name !== "string" || name.trim().length === 0) {
-        return NextResponse.json(
-          { error: "name must be a non-empty string." },
-          { status: 400 }
-        );
-      }
-      site.name = name.trim();
-    }
+    const [updated] = await sql`
+      UPDATE sites SET
+        name = COALESCE(${name ?? null}, name),
+        plan = COALESCE(${plan ?? null}, plan),
+        settings = COALESCE(${settings ? JSON.stringify(settings) : null}::jsonb, settings),
+        updated_at = NOW()
+      WHERE id = ${site.id}
+      RETURNING id, name, slug, email, plan, status, settings, created_at, updated_at
+    `;
 
-    const VALID_PLANS = ["free", "starter", "business", "enterprise"];
-    if (plan !== undefined) {
-      const normalizedPlan = plan.toLowerCase();
-      if (!VALID_PLANS.includes(normalizedPlan)) {
-        return NextResponse.json(
-          {
-            error: `Invalid plan. Choose one of: ${VALID_PLANS.join(", ")}.`,
-          },
-          { status: 400 }
-        );
-      }
-      site.plan = normalizedPlan;
-    }
-
-    if (settings !== undefined) {
-      if (settings.redirects !== undefined) {
-        if (!Array.isArray(settings.redirects)) {
-          return NextResponse.json(
-            { error: "settings.redirects must be an array." },
-            { status: 400 }
-          );
-        }
-        site.settings.redirects = settings.redirects;
-      }
-      if (settings.headers !== undefined) {
-        if (!Array.isArray(settings.headers)) {
-          return NextResponse.json(
-            { error: "settings.headers must be an array." },
-            { status: 400 }
-          );
-        }
-        site.settings.headers = settings.headers;
-      }
-      if (settings.errorPages !== undefined) {
-        if (
-          typeof settings.errorPages !== "object" ||
-          settings.errorPages === null
-        ) {
-          return NextResponse.json(
-            { error: "settings.errorPages must be an object." },
-            { status: 400 }
-          );
-        }
-        site.settings.errorPages = settings.errorPages;
-      }
-    }
-
-    site.updatedAt = new Date().toISOString();
-    sites.set(siteId, site);
-
-    return NextResponse.json({ site });
-  } catch (err: unknown) {
-    const message =
-      err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return Response.json({ site: { ...updated, url: `https://${updated.slug}.zoobicon.sh` } });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Internal server error";
+    return Response.json({ error: message }, { status: 500 });
   }
 }
 
-// ---------------------------------------------------------------------------
 // DELETE /api/hosting/sites/[siteId]
-// ---------------------------------------------------------------------------
 export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ siteId: string }> }
 ) {
   try {
     const { siteId } = await params;
-    const site = sites.get(siteId);
 
-    if (!site || site.status === "deleted") {
-      return NextResponse.json({ error: "Site not found." }, { status: 404 });
+    const [site] = await sql`
+      UPDATE sites SET status = 'deleted', updated_at = NOW()
+      WHERE slug = ${siteId} AND status != 'deleted'
+      RETURNING id, slug
+    `;
+
+    if (!site) {
+      return Response.json({ error: "Site not found" }, { status: 404 });
     }
 
-    // Soft-delete the site
-    site.status = "deleted";
-    site.updatedAt = new Date().toISOString();
-    sites.set(siteId, site);
-
-    // Remove associated deployments
-    const removed: string[] = [];
-    for (const [id, dep] of deployments) {
-      if (dep.siteId === siteId) {
-        deployments.delete(id);
-        removed.push(id);
-      }
-    }
-
-    // Remove associated domains
-    for (const [key, rec] of domains) {
-      if (rec.siteId === siteId) {
-        domains.delete(key);
-      }
-    }
-
-    return NextResponse.json({
-      message: `Site "${siteId}" and ${removed.length} deployment(s) have been deleted.`,
-      siteId,
-    });
-  } catch (err: unknown) {
-    const message =
-      err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return Response.json({ message: `Site "${siteId}" deleted`, siteId });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Internal server error";
+    return Response.json({ error: message }, { status: 500 });
   }
 }

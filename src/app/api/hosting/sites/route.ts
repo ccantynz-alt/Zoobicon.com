@@ -1,35 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { randomUUID } from "crypto";
+import { NextRequest } from "next/server";
+import { sql } from "@/lib/db";
 
-// ---------------------------------------------------------------------------
-// In-memory storage — would be backed by a database in production.
-// ---------------------------------------------------------------------------
-interface Site {
-  siteId: string;
-  name: string;
-  email: string;
-  url: string;
-  plan: string;
-  status: "active" | "suspended" | "deleted";
-  createdAt: string;
-  updatedAt: string;
-  storage: { used: number; limit: number };
-  bandwidth: { used: number; limit: number };
-  settings: {
-    redirects: Array<{ from: string; to: string; type: number }>;
-    headers: Array<{ path: string; key: string; value: string }>;
-    errorPages: Record<string, string>;
-  };
-}
-
-const sites = new Map<string, Site>();
-
-/** Expose store for sibling routes. */
-// Internal storage — not exported
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 function slugify(name: string): string {
   return name
     .toLowerCase()
@@ -38,139 +9,69 @@ function slugify(name: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-const PLAN_LIMITS: Record<string, { storage: number; bandwidth: number }> = {
-  free: { storage: 500 * 1024 * 1024, bandwidth: 1 * 1024 * 1024 * 1024 },
-  starter: {
-    storage: 10 * 1024 * 1024 * 1024,
-    bandwidth: 50 * 1024 * 1024 * 1024,
-  },
-  business: {
-    storage: 50 * 1024 * 1024 * 1024,
-    bandwidth: 200 * 1024 * 1024 * 1024,
-  },
-  enterprise: {
-    storage: 500 * 1024 * 1024 * 1024,
-    bandwidth: 1024 * 1024 * 1024 * 1024,
-  },
-};
-
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-// ---------------------------------------------------------------------------
 // GET /api/hosting/sites?email=...
-// ---------------------------------------------------------------------------
 export async function GET(req: NextRequest) {
   try {
     const email = req.nextUrl.searchParams.get("email");
-
     if (!email) {
-      return NextResponse.json(
-        { error: "email query parameter is required." },
-        { status: 400 }
-      );
+      return Response.json({ error: "email query parameter is required" }, { status: 400 });
     }
 
-    const userSites = Array.from(sites.values()).filter(
-      (s) => s.email === email && s.status !== "deleted"
-    );
+    const rows = await sql`
+      SELECT id, name, slug, email, plan, status, settings, created_at, updated_at
+      FROM sites WHERE email = ${email} AND status != 'deleted'
+      ORDER BY updated_at DESC
+    `;
 
-    return NextResponse.json({ sites: userSites, count: userSites.length });
-  } catch (err: unknown) {
-    const message =
-      err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    const sites = rows.map((s: Record<string, unknown>) => ({
+      ...s,
+      url: `https://${s.slug}.zoobicon.sh`,
+    }));
+
+    return Response.json({ sites, count: sites.length });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Internal server error";
+    return Response.json({ error: message }, { status: 500 });
   }
 }
 
-// ---------------------------------------------------------------------------
 // POST /api/hosting/sites — create a new site
-// ---------------------------------------------------------------------------
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { name, email, plan = "free" } = body as {
-      name?: string;
-      email?: string;
-      plan?: string;
-    };
+    const { name, email, plan = "free" } = await req.json();
 
-    // --- Validation -----------------------------------------------------------
-    if (!name || typeof name !== "string" || name.trim().length === 0) {
-      return NextResponse.json(
-        { error: "name is required and must be a non-empty string." },
-        { status: 400 }
-      );
+    if (!name || typeof name !== "string" || !name.trim()) {
+      return Response.json({ error: "name is required" }, { status: 400 });
     }
 
-    if (!email || !EMAIL_RE.test(email)) {
-      return NextResponse.json(
-        { error: "A valid email address is required." },
-        { status: 400 }
-      );
+    if (!email || typeof email !== "string") {
+      return Response.json({ error: "email is required" }, { status: 400 });
     }
 
-    const normalizedPlan = plan.toLowerCase();
-    if (!PLAN_LIMITS[normalizedPlan]) {
-      return NextResponse.json(
-        {
-          error: `Invalid plan. Choose one of: ${Object.keys(PLAN_LIMITS).join(", ")}.`,
-        },
-        { status: 400 }
-      );
+    let slug = slugify(name);
+    if (!slug) {
+      return Response.json({ error: "name must contain at least one alphanumeric character" }, { status: 400 });
     }
 
-    let siteId = slugify(name);
-    if (!siteId) {
-      return NextResponse.json(
-        { error: "name must contain at least one alphanumeric character." },
-        { status: 400 }
-      );
+    // Check slug uniqueness, append random suffix if taken
+    const [existing] = await sql`SELECT id FROM sites WHERE slug = ${slug} LIMIT 1`;
+    if (existing) {
+      const suffix = Math.random().toString(36).substring(2, 8);
+      slug = `${slug}-${suffix}`;
     }
 
-    // Ensure uniqueness — append a short suffix if the slug already exists.
-    if (sites.has(siteId)) {
-      siteId = `${siteId}-${randomUUID().slice(0, 6)}`;
-    }
+    const [site] = await sql`
+      INSERT INTO sites (name, slug, email, plan)
+      VALUES (${name.trim()}, ${slug}, ${email}, ${plan})
+      RETURNING id, name, slug, email, plan, status, created_at, updated_at
+    `;
 
-    const limits = PLAN_LIMITS[normalizedPlan];
-    const now = new Date().toISOString();
-
-    const site: Site = {
-      siteId,
-      name: name.trim(),
-      email,
-      url: `https://${siteId}.zoobicon.sh`,
-      plan: normalizedPlan,
-      status: "active",
-      createdAt: now,
-      updatedAt: now,
-      storage: { used: 0, limit: limits.storage },
-      bandwidth: { used: 0, limit: limits.bandwidth },
-      settings: {
-        redirects: [],
-        headers: [],
-        errorPages: {},
-      },
-    };
-
-    sites.set(siteId, site);
-
-    return NextResponse.json(
-      {
-        siteId: site.siteId,
-        name: site.name,
-        url: site.url,
-        plan: site.plan,
-        status: site.status,
-        createdAt: site.createdAt,
-        storage: site.storage,
-        bandwidth: site.bandwidth,
-      },
-      { status: 201 }
-    );
-  } catch (err: unknown) {
-    const message =
-      err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return Response.json({
+      ...site,
+      url: `https://${site.slug}.zoobicon.sh`,
+    }, { status: 201 });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Internal server error";
+    return Response.json({ error: message }, { status: 500 });
   }
 }

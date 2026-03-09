@@ -96,6 +96,7 @@ export async function initSchema() {
     )
   `;
 
+  await sql`ALTER TABLE deployments ADD COLUMN IF NOT EXISTS code TEXT`;
   await sql`CREATE INDEX IF NOT EXISTS deployments_site_id_idx ON deployments (site_id)`;
 
   await sql`
