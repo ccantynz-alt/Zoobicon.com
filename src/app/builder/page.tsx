@@ -566,8 +566,9 @@ export default function BuilderPage() {
         if (improved !== finalHtml) setGeneratedCode(improved);
       });
     } catch (err) {
-      // Fallback to streaming Opus endpoint if pipeline fails
-      setPipelineAgents([]);
+      // Fallback to streaming endpoint if pipeline fails
+      console.warn("[Pipeline] Failed, falling back to stream:", err instanceof Error ? err.message : err);
+      setPipelineAgents(["Pipeline unavailable — using direct generation"]);
       await streamGenerate(prompt.trim());
     }
   }, [prompt, tier, streamGenerate, autoReplaceImages]);
