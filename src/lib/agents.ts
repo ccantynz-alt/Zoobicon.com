@@ -222,10 +222,15 @@ Output a JSON object:
 
 Rules:
 - Every headline is BENEFIT-focused, not feature-focused
-- Testimonials mention specific results/numbers
+- Testimonials mention specific results/numbers — "Increased our conversion rate by 47%" not "Great service!"
 - Address objections in FAQ
 - CTA includes friction-reducer
 - NO lorem ipsum, NO generic placeholder text
+- Copy must match the brand tone: formal/authoritative for legal/finance, warm/inviting for hospitality, aspirational for luxury, energetic for tech
+- Hero headline must be punchy and memorable (6-10 words max), not generic
+- Include 3-4 testimonials with realistic full names, job titles, and companies
+- Stats must be specific and believable: "2,847 homes sold" not "Many homes sold"
+- Footer must include realistic phone, email, address, and business hours
 Output ONLY valid JSON.`;
 
 const ARCHITECT_SYSTEM = `You are a senior web architect. Given a strategy, design spec, and copy, decide the optimal page structure.
@@ -272,7 +277,20 @@ You receive five inputs:
 
 CRITICAL: If the strategy contains "userInstructions", those are non-negotiable requirements from the client. Implement every single one.
 
-Rules:
+## Industry-Aware Design — MANDATORY
+Match the visual treatment to the industry detected in the strategy:
+
+**Luxury / Real Estate / Legal / Financial / Medical:** LIGHT backgrounds (warm whites #fefefe, #faf9f7, #f5f3ef, soft creams). Elegant serif headings (Playfair Display, Cormorant Garamond, DM Serif Display). Muted accents: navy, forest green, gold, charcoal. NO dark themes, NO gradient blobs, NO neon, NO glass-morphism. Understated elegance with thin borders, subtle shadows.
+
+**SaaS / Tech / Startup:** Dark themes OK (#0f172a). Modern sans: Inter, Space Grotesk, Sora. Vibrant accents: indigo, violet, emerald. Tasteful glass-morphism and gradient accents allowed.
+
+**Restaurant / Food / Hospitality:** Warm palettes: cream, terracotta, olive. Serif headings. Large food/venue photography. NO tech aesthetic.
+
+**E-commerce / Retail:** Clean, white-space heavy. Product-focused grids, trust badges, clear pricing.
+
+**Healthcare / Wellness:** Soft calming palettes: sage, lavender, soft blue. Clean and trustworthy.
+
+## Technical Rules
 - Output ONLY the raw HTML. No markdown, no explanation, no code fences.
 - Complete document: <!DOCTYPE html>, <html lang="en">, <head>, <body>.
 - All CSS in <style> in <head>. Import Google Fonts from design spec.
@@ -290,6 +308,30 @@ Rules:
 - FAQ accordion if included in architecture.
 - Animated number counters if stats section exists.
 - Use semantic HTML throughout (header, nav, main, section, footer).
+
+## Typography — CRITICAL for Premium Feel
+- Use clamp() for responsive font sizing: hero clamp(2.5rem, 5vw, 4.5rem)
+- letter-spacing: -0.02em on large headings
+- Body: 16-18px, line-height 1.7-1.8
+- Weight hierarchy: 300 (light sub), 400 (body), 600 (sub-headings), 700-800 (headings)
+- Never use pure #000 text. Use #1a1a2e, #2d3748, or similar near-black.
+
+## Visual Polish — What Separates $30K from $300
+- Backgrounds: alternate between white and very subtle tinted sections (#faf9f7, #f8fafc) for rhythm
+- Shadows: multi-layer (0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.06))
+- Buttons: subtle shadow + translateY(-1px) on hover, not just color change
+- Cards: translateY(-2px) + enhanced shadow on hover
+- Images: scale(1.02) on hover with overflow:hidden container
+- Section transitions: alternate layout direction (text-left/image-right, then image-left/text-right)
+
+## What to NEVER DO
+- Dark cyberpunk theme for a bakery, law firm, or dental practice
+- Same purple/cyan palette regardless of industry
+- Gradient blobs on professional services sites
+- Particle effects or matrix rain on business websites
+- Bootstrap-looking output or free template aesthetics
+- Cramped spacing or walls of text
+- Generic placeholder-sounding copy
 
 CRITICAL quality checklist:
 ✓ CSS custom properties for every color
