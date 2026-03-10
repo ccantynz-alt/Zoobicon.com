@@ -20,40 +20,59 @@ const PLANS = [
     name: "Starter",
     price: "Free",
     period: "Forever",
-    desc: "Perfect for side projects, experiments, and getting started.",
+    desc: "Try the builder. See the quality. No credit card, no credits, no catch.",
     cta: "Start Building",
     ctaHref: "/builder",
     featured: false,
     color: "from-white/5 to-white/0",
     features: [
       "5 AI-generated websites per month",
+      "Industry-aware design intelligence",
       "Basic SEO tools",
-      "Community support",
-      "1 AI support agent",
+      "Export HTML — you own the code",
       "Zoobicon subdomain hosting",
-      "Export HTML files",
+      "Community support",
+    ],
+  },
+  {
+    name: "Creator",
+    price: "$19",
+    period: "/month",
+    desc: "For freelancers and small businesses who need unlimited quality output.",
+    cta: "Start Creator Trial",
+    ctaHref: "/auth/signup",
+    featured: false,
+    color: "from-emerald-500/5 to-white/0",
+    features: [
+      "Unlimited AI-generated websites",
+      "10-agent pipeline (premium quality)",
+      "Custom domain support",
+      "GitHub export & WordPress export",
+      "Basic SEO Campaign Agent",
+      "1 AI support agent",
+      "Priority email support",
+      "API access (10K req/mo)",
     ],
   },
   {
     name: "Pro",
     price: "$49",
     period: "/month",
-    desc: "Everything you need to run a serious digital business.",
+    desc: "The full arsenal. Every AI tool, unlimited usage, zero limits.",
     cta: "Start Pro Trial",
     ctaHref: "/auth/signup",
     featured: true,
     color: "from-brand-500/10 to-accent-purple/5",
     features: [
-      "Unlimited AI-generated websites",
+      "Everything in Creator, plus:",
       "AI Video Creator",
-      "SEO Campaign Agent",
+      "Full SEO Campaign Agent (aggressive mode)",
       "AI Email Support",
       "AI Brand Kit",
-      "Email Marketing",
-      "Social Media Manager",
-      "Analytics dashboard",
+      "Email Marketing Agent",
       "Chatbot Builder",
-      "Custom domain support",
+      "Analytics dashboard",
+      "Figma Import",
       "Priority support",
       "API access (100K req/mo)",
     ],
@@ -69,7 +88,7 @@ const PLANS = [
     isExternal: true,
     color: "from-accent-cyan/5 to-white/0",
     features: [
-      "Everything in Pro",
+      "Everything in Pro, plus:",
       "White-label platform",
       "Custom AI model training",
       "Dedicated AI agents",
@@ -79,47 +98,51 @@ const PLANS = [
       "Custom integrations",
       "SLA guarantee (99.99%)",
       "Dedicated account manager",
-      "On-boarding & training",
       "Invoiced billing",
     ],
   },
 ];
 
 const PRODUCTS = [
-  { icon: Zap, name: "AI Website Builder", starter: "5/mo", pro: "Unlimited" },
-  { icon: BarChart3, name: "SEO Campaign Agent", starter: "Basic", pro: "Full (Aggressive mode)" },
-  { icon: Video, name: "AI Video Creator", starter: false, pro: true },
-  { icon: Mail, name: "AI Email Support", starter: false, pro: true },
-  { icon: Palette, name: "AI Brand Kit", starter: false, pro: true },
-  { icon: Globe, name: "Email Marketing", starter: false, pro: true },
-  { icon: Bot, name: "Social Media Manager", starter: false, pro: true },
-  { icon: Code2, name: "Chatbot Builder", starter: false, pro: true },
+  { icon: Zap, name: "AI Website Builder", starter: "5/mo", creator: "Unlimited", pro: "Unlimited" },
+  { icon: Sparkles, name: "10-Agent Pipeline", starter: false, creator: true, pro: true },
+  { icon: BarChart3, name: "SEO Campaign Agent", starter: "Basic", creator: "Basic", pro: "Full (Aggressive)" },
+  { icon: Video, name: "AI Video Creator", starter: false, creator: false, pro: true },
+  { icon: Mail, name: "AI Email Support", starter: false, creator: false, pro: true },
+  { icon: Palette, name: "AI Brand Kit", starter: false, creator: false, pro: true },
+  { icon: Globe, name: "Email Marketing", starter: false, creator: false, pro: true },
+  { icon: Bot, name: "Chatbot Builder", starter: false, creator: false, pro: true },
+  { icon: Code2, name: "API Access", starter: false, creator: "10K/mo", pro: "100K/mo" },
 ];
 
 const FAQS = [
   {
+    q: "No credits? No usage tokens? What's the catch?",
+    a: "There is no catch. We don't use a credit system because we think credits are designed to confuse people and drain wallets. You get a flat monthly price with clear limits. Starter is free with 5 sites/month. Creator and Pro are unlimited. Simple.",
+  },
+  {
     q: "Can I cancel anytime?",
-    a: "Yes. Cancel anytime from your dashboard settings. You'll keep access until the end of your billing period.",
+    a: "Yes. Cancel anytime from your dashboard settings. You keep access until the end of your billing period. No cancellation fees, no guilt trips.",
   },
   {
-    q: "Is there a free trial for Pro?",
-    a: "Yes — your first 14 days on Pro are free. No credit card required to start.",
+    q: "Is there a free trial for Creator and Pro?",
+    a: "Yes — 14 days free on both Creator and Pro. No credit card required to start the trial. You can downgrade to Starter anytime.",
   },
   {
-    q: "What happens to my websites if I downgrade?",
-    a: "Your sites are preserved. On Starter, you can still view and export your sites, but you won't be able to generate new ones beyond the 5/month limit.",
+    q: "What's the difference between Creator and Pro?",
+    a: "Creator ($19/mo) gives you unlimited website generation with the full 10-agent pipeline, custom domains, and exports. Pro ($49/mo) adds all 12+ AI tools: Video Creator, Brand Kit, Email Marketing, Chatbot Builder, full SEO Campaign Agent, and more. If you just need great websites, Creator is perfect. If you want the full marketing arsenal, go Pro.",
   },
   {
     q: "Do I own the websites I generate?",
-    a: "Yes, 100%. All generated code is yours to export, host anywhere, and use commercially.",
+    a: "Yes, 100%. All generated code is yours — export to GitHub, download as HTML, deploy anywhere. No lock-in. Even on the free tier.",
   },
   {
-    q: "What's included in the API access?",
-    a: "Pro includes 100,000 API requests per month to the zoobicon.io REST API. This lets you embed AI website generation into your own tools and workflows.",
+    q: "What happens to my websites if I downgrade?",
+    a: "Your sites are preserved forever. On Starter, you can still view, edit, and export everything. You just can't generate new ones beyond the 5/month limit.",
   },
   {
     q: "How does white-labeling work on Enterprise?",
-    a: "We give you a fully branded version of the platform — your logo, your domain, your colors. Your clients never see Zoobicon.",
+    a: "We give you a fully branded version of the platform — your logo, your domain, your colors. Your clients never see Zoobicon. Perfect for agencies serving multiple clients.",
   },
 ];
 
@@ -216,7 +239,7 @@ export default function PricingPage() {
         {/* Plans */}
         <section className="pb-20 px-6">
           <div className="max-w-5xl mx-auto">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer} className="grid md:grid-cols-3 gap-6">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer} className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
               {PLANS.map((plan) => (
                 <motion.div
                   key={plan.name}
@@ -286,24 +309,25 @@ export default function PricingPage() {
           <div className="max-w-4xl mx-auto">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer}>
               <motion.h2 variants={fadeInUp} className="text-3xl font-black text-center mb-2">What&apos;s included</motion.h2>
-              <motion.p variants={fadeInUp} className="text-white/30 text-center mb-10">All 8 AI products, broken down by plan.</motion.p>
+              <motion.p variants={fadeInUp} className="text-white/30 text-center mb-10">Every AI product, broken down by plan. No credits. No surprises.</motion.p>
 
-              <motion.div variants={fadeInUp} className="gradient-border rounded-2xl overflow-hidden">
+              <motion.div variants={fadeInUp} className="gradient-border rounded-2xl overflow-hidden overflow-x-auto">
                 {/* Header */}
-                <div className="grid grid-cols-4 gap-0 border-b border-white/[0.06]">
-                  <div className="px-6 py-4 text-xs font-semibold text-white/30 uppercase tracking-wider">Product</div>
-                  <div className="px-6 py-4 text-xs font-semibold text-white/30 uppercase tracking-wider text-center">Starter</div>
-                  <div className="px-6 py-4 text-xs font-semibold text-brand-400 uppercase tracking-wider text-center bg-brand-500/[0.03]">Pro</div>
-                  <div className="px-6 py-4 text-xs font-semibold text-white/30 uppercase tracking-wider text-center">Enterprise</div>
+                <div className="grid grid-cols-5 gap-0 border-b border-white/[0.06] min-w-[640px]">
+                  <div className="px-5 py-4 text-xs font-semibold text-white/30 uppercase tracking-wider">Product</div>
+                  <div className="px-5 py-4 text-xs font-semibold text-white/30 uppercase tracking-wider text-center">Starter</div>
+                  <div className="px-5 py-4 text-xs font-semibold text-emerald-400 uppercase tracking-wider text-center bg-emerald-500/[0.03]">Creator</div>
+                  <div className="px-5 py-4 text-xs font-semibold text-brand-400 uppercase tracking-wider text-center bg-brand-500/[0.03]">Pro</div>
+                  <div className="px-5 py-4 text-xs font-semibold text-white/30 uppercase tracking-wider text-center">Enterprise</div>
                 </div>
 
                 {PRODUCTS.map((p, i) => (
-                  <div key={p.name} className={`grid grid-cols-4 gap-0 border-b border-white/[0.03] ${i % 2 === 0 ? "" : "bg-white/[0.01]"}`}>
-                    <div className="px-6 py-4 flex items-center gap-3">
+                  <div key={p.name} className={`grid grid-cols-5 gap-0 border-b border-white/[0.03] min-w-[640px] ${i % 2 === 0 ? "" : "bg-white/[0.01]"}`}>
+                    <div className="px-5 py-4 flex items-center gap-3">
                       <p.icon className="w-4 h-4 text-white/30 flex-shrink-0" />
                       <span className="text-sm text-white/60">{p.name}</span>
                     </div>
-                    <div className="px-6 py-4 flex items-center justify-center">
+                    <div className="px-5 py-4 flex items-center justify-center">
                       {typeof p.starter === "string" ? (
                         <span className="text-xs text-white/40">{p.starter}</span>
                       ) : p.starter ? (
@@ -312,7 +336,16 @@ export default function PricingPage() {
                         <span className="w-4 h-px bg-white/10 block" />
                       )}
                     </div>
-                    <div className="px-6 py-4 flex items-center justify-center bg-brand-500/[0.02]">
+                    <div className="px-5 py-4 flex items-center justify-center bg-emerald-500/[0.02]">
+                      {typeof p.creator === "string" ? (
+                        <span className="text-xs text-emerald-400">{p.creator}</span>
+                      ) : p.creator ? (
+                        <Check className="w-4 h-4 text-emerald-400" />
+                      ) : (
+                        <span className="w-4 h-px bg-white/10 block" />
+                      )}
+                    </div>
+                    <div className="px-5 py-4 flex items-center justify-center bg-brand-500/[0.02]">
                       {typeof p.pro === "string" ? (
                         <span className="text-xs text-brand-400">{p.pro}</span>
                       ) : p.pro ? (
@@ -321,7 +354,7 @@ export default function PricingPage() {
                         <span className="w-4 h-px bg-white/10 block" />
                       )}
                     </div>
-                    <div className="px-6 py-4 flex items-center justify-center">
+                    <div className="px-5 py-4 flex items-center justify-center">
                       <Check className="w-4 h-4 text-accent-cyan" />
                     </div>
                   </div>

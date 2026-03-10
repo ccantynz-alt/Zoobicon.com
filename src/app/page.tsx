@@ -214,19 +214,19 @@ const STATS = [
 
 const COMPETITOR_FEATURES = [
   { name: "AI Website Generation", zoobicon: true, wix: true, framer: false, durable: true, emergent: true },
-  { name: "Auto-Debugging", zoobicon: true, wix: false, framer: false, durable: false, emergent: false },
-  { name: "GitHub Import", zoobicon: true, wix: false, framer: false, durable: false, emergent: false },
-  { name: "WordPress Export", zoobicon: true, wix: false, framer: false, durable: false, emergent: false },
+  { name: "10-Agent Pipeline", zoobicon: true, wix: false, framer: false, durable: false, emergent: true },
+  { name: "Industry-Aware Design AI", zoobicon: true, wix: false, framer: false, durable: false, emergent: false },
+  { name: "No Credit System", zoobicon: true, wix: true, framer: true, durable: true, emergent: false },
+  { name: "SEO Agent & Auto-Fix", zoobicon: true, wix: true, framer: false, durable: true, emergent: false },
+  { name: "AI Video Creator", zoobicon: true, wix: false, framer: false, durable: false, emergent: false },
+  { name: "GitHub & WP Export", zoobicon: true, wix: false, framer: false, durable: false, emergent: true },
   { name: "Figma Import", zoobicon: true, wix: false, framer: true, durable: false, emergent: false },
   { name: "i18n Translation (30+)", zoobicon: true, wix: true, framer: false, durable: false, emergent: false },
-  { name: "E-commerce Builder", zoobicon: true, wix: true, framer: false, durable: false, emergent: false },
-  { name: "CRM & Invoicing", zoobicon: true, wix: true, framer: false, durable: false, emergent: false },
-  { name: "SEO Scoring & Auto-Fix", zoobicon: true, wix: true, framer: false, durable: true, emergent: false },
+  { name: "E-commerce Builder", zoobicon: true, wix: true, framer: false, durable: false, emergent: true },
   { name: "Animation Editor", zoobicon: true, wix: false, framer: true, durable: false, emergent: false },
-  { name: "Auth Scaffolding", zoobicon: true, wix: false, framer: false, durable: false, emergent: false },
   { name: "White-Label Platform", zoobicon: true, wix: false, framer: false, durable: false, emergent: false },
   { name: "Domain Registration", zoobicon: true, wix: true, framer: false, durable: false, emergent: false },
-  { name: "Full API Access", zoobicon: true, wix: true, framer: false, durable: false, emergent: false },
+  { name: "Flat Pricing from $19/mo", zoobicon: true, wix: true, framer: true, durable: true, emergent: false },
 ];
 
 const NEW_FEATURES = [
@@ -679,13 +679,13 @@ export default function LandingPage() {
                     <span className="text-2xl font-black text-white/20">6/14</span>
                   </div>
                   <div className="p-4 text-center">
-                    <span className="text-2xl font-black text-white/20">2/14</span>
+                    <span className="text-2xl font-black text-white/20">3/14</span>
                   </div>
                   <div className="p-4 text-center">
-                    <span className="text-2xl font-black text-white/20">2/14</span>
+                    <span className="text-2xl font-black text-white/20">3/14</span>
                   </div>
                   <div className="p-4 text-center">
-                    <span className="text-2xl font-black text-white/20">1/14</span>
+                    <span className="text-2xl font-black text-white/20">4/14</span>
                   </div>
                 </div>
               </div>
@@ -999,14 +999,22 @@ export default function LandingPage() {
               </p>
             </motion.div>
 
-            <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {/* No credits banner */}
+            <motion.div variants={fadeInUp} className="text-center mb-10">
+              <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border border-emerald-500/20 bg-emerald-500/[0.04]">
+                <Shield className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="text-xs font-medium text-emerald-300/80">No credits. No tokens. No usage traps. Flat pricing you can actually understand.</span>
+              </div>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 max-w-6xl mx-auto">
               {/* Free */}
-              <motion.div variants={fadeInUp} className="gradient-border p-8 rounded-2xl">
+              <motion.div variants={fadeInUp} className="gradient-border p-7 rounded-2xl">
                 <div className="text-sm font-semibold text-white/50 mb-2">Starter</div>
                 <div className="text-4xl font-black mb-1">Free</div>
-                <div className="text-sm text-white/30 mb-6">Forever</div>
-                <ul className="space-y-3 mb-8">
-                  {["5 websites/month", "Basic SEO tools", "Community support", "1 AI agent"].map((f) => (
+                <div className="text-sm text-white/30 mb-5">Forever</div>
+                <ul className="space-y-2.5 mb-7">
+                  {["5 websites/month", "Industry-aware AI", "Basic SEO tools", "Export HTML"].map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm text-white/50">
                       <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
                       {f}
@@ -1021,16 +1029,34 @@ export default function LandingPage() {
                 </Link>
               </motion.div>
 
+              {/* Creator */}
+              <motion.div variants={fadeInUp} className="relative p-7 rounded-2xl border border-emerald-500/25 bg-emerald-500/[0.03]">
+                <div className="text-sm font-semibold text-emerald-400 mb-2">Creator</div>
+                <div className="text-4xl font-black mb-1">$19<span className="text-lg font-normal text-white/30">/mo</span></div>
+                <div className="text-sm text-white/30 mb-5">Unlimited quality</div>
+                <ul className="space-y-2.5 mb-7">
+                  {["Unlimited websites", "10-agent pipeline", "Custom domains", "GitHub & WP export", "Basic SEO agent"].map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-sm text-white/60">
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/auth/signup" className="block w-full py-3 rounded-xl text-sm font-bold text-center bg-emerald-600 hover:bg-emerald-500 text-white transition-all">
+                  Start Creator Trial
+                </Link>
+              </motion.div>
+
               {/* Pro - Featured */}
-              <motion.div variants={fadeInUp} className="relative p-8 rounded-2xl border border-brand-500/30 bg-brand-500/[0.03] shadow-glow">
+              <motion.div variants={fadeInUp} className="relative p-7 rounded-2xl border border-brand-500/30 bg-brand-500/[0.03] shadow-glow">
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-brand-500 to-brand-400 text-xs font-bold text-white">
                   Most Popular
                 </div>
                 <div className="text-sm font-semibold text-brand-400 mb-2">Pro</div>
                 <div className="text-4xl font-black mb-1">$49<span className="text-lg font-normal text-white/30">/mo</span></div>
-                <div className="text-sm text-white/30 mb-6">Everything you need</div>
-                <ul className="space-y-3 mb-8">
-                  {["Unlimited websites", "AI Video Creator", "SEO Campaign Agent", "All 12+ AI tools", "GitHub Import & WP Export", "Priority support"].map((f) => (
+                <div className="text-sm text-white/30 mb-5">Full arsenal</div>
+                <ul className="space-y-2.5 mb-7">
+                  {["Everything in Creator", "AI Video Creator", "Full SEO Agent", "AI Brand Kit", "All 12+ AI tools"].map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm text-white/60">
                       <div className="w-1.5 h-1.5 rounded-full bg-brand-400" />
                       {f}
@@ -1043,12 +1069,12 @@ export default function LandingPage() {
               </motion.div>
 
               {/* Enterprise */}
-              <motion.div variants={fadeInUp} className="gradient-border p-8 rounded-2xl">
+              <motion.div variants={fadeInUp} className="gradient-border p-7 rounded-2xl">
                 <div className="text-sm font-semibold text-white/50 mb-2">Enterprise</div>
                 <div className="text-4xl font-black mb-1">Custom</div>
-                <div className="text-sm text-white/30 mb-6">For teams & agencies</div>
-                <ul className="space-y-3 mb-8">
-                  {["White-label platform", "Custom AI training", "Dedicated agents", "API access (zoobicon.io)", "24/7 premium support"].map((f) => (
+                <div className="text-sm text-white/30 mb-5">Teams & agencies</div>
+                <ul className="space-y-2.5 mb-7">
+                  {["White-label platform", "Custom AI training", "Dedicated agents", "Unlimited API", "24/7 support"].map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm text-white/50">
                       <div className="w-1.5 h-1.5 rounded-full bg-accent-cyan" />
                       {f}
