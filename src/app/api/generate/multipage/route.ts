@@ -107,7 +107,7 @@ Premium, sophisticated, industry-appropriate designs. NOT generic templates.
 - Clear headline + prominent CTA. NO particle effects unless tech/gaming.
 
 **Images:**
-- Use https://picsum.photos/WIDTH/HEIGHT. object-fit: cover. border-radius: 8-16px.
+- Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT (use a unique keyword per image like hero, about, team, service1). object-fit: cover. border-radius: 8-16px.
 - Subtle shadow. Clean inline SVGs for icons.
 
 **Responsive:**

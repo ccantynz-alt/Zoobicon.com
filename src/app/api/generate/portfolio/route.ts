@@ -24,7 +24,7 @@ const PORTFOLIO_SYSTEM = `You are Zoobicon's Portfolio & Case Study Generator. Y
 
 ### Project Cards/Sections (CRITICAL)
 Each project must include:
-- Large hero image (picsum.photos with unique seeds).
+- Large hero image (picsum.photos/seed/KEYWORD/WIDTH/HEIGHT with a unique descriptive keyword per project).
 - Project title (prominent).
 - Client/company name.
 - Category tags (branding, web design, UI/UX, photography, etc.).
@@ -53,7 +53,7 @@ When a project is clicked/expanded, show:
 - Professional bio with personality.
 - Skills/expertise list with visual bars or tags.
 - Experience timeline (optional).
-- Professional headshot (picsum.photos).
+- Professional headshot (picsum.photos/seed/headshot/WIDTH/HEIGHT).
 - Contact CTA.
 
 ### Metrics/Stats Section

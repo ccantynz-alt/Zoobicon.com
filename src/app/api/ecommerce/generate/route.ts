@@ -44,7 +44,7 @@ Rules:
 - The page must be fully responsive and work on mobile, tablet, and desktop.
 - Use Google Fonts via @import for polished typography.
 - Add subtle animations and micro-interactions (hover effects, transitions, loading states).
-- If product images are needed, use https://picsum.photos with varied seed parameters for each product.
+- If product images are needed, use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT with a unique descriptive keyword per product.
 - The storefront must feel complete and production-ready.
 - Shopping cart must use localStorage for persistence.
 - All interactive features must be fully functional with vanilla JavaScript.

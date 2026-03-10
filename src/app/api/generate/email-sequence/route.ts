@@ -60,7 +60,7 @@ const EMAIL_SEQUENCE_SYSTEM = `You are Zoobicon's Email Sequence Generator. You 
 - Unsubscribe link in footer.
 - Company address in footer (CAN-SPAM compliance).
 - Alt text on all images.
-- Use picsum.photos for placeholder images.
+- Use picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for placeholder images (unique descriptive keyword per image).
 
 ## Sequence Design Principles
 - Each email builds on the previous one (progressive engagement).

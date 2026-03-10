@@ -44,7 +44,7 @@ const RESTAURANT_SYSTEM = `You are Zoobicon's Restaurant Website Generator. You 
    - Downloadable PDF placeholder.
 
 4. **Gallery**:
-   - Masonry or grid of food/ambiance photos (picsum.photos with food-appropriate seeds).
+   - Masonry or grid of food/ambiance photos (picsum.photos/seed/KEYWORD/WIDTH/HEIGHT with food-appropriate keywords like "pasta", "steak", "interior").
    - Lightbox on click.
    - Mix of food close-ups, interior shots, and chef/team.
    - Instagram feed placeholder.

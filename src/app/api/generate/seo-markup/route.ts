@@ -76,7 +76,7 @@ Include as many relevant properties as possible:
 - Add role="complementary" to sidebar/secondary content.
 
 ### 8. Performance Hints
-- Add <link rel="preconnect"> for external domains (Google Fonts, picsum.photos).
+- Add <link rel="preconnect"> for external domains (Google Fonts, picsum.photos/seed/KEYWORD/WIDTH/HEIGHT).
 - Add <link rel="dns-prefetch"> for external domains.
 - Add <meta name="theme-color"> matching the brand primary color.
 

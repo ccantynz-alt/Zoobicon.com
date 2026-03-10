@@ -195,7 +195,7 @@ export async function generateImage(opts: GenerateOptions): Promise<GeneratedIma
 
   // Last resort placeholder
   return {
-    url: `https://picsum.photos/${opts.width || 1024}/${opts.height || 768}`,
+    url: `https://picsum.photos/seed/${Date.now()}/${opts.width || 1024}/${opts.height || 768}`,
     provider: "placeholder",
     prompt: opts.prompt,
     width: opts.width || 1024,

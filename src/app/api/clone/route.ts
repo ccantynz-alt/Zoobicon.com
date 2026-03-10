@@ -116,7 +116,7 @@ Rules:
 - Match the industry aesthetic (luxury for real estate, warm for restaurants, modern for tech, etc.).
 - Add: smooth scroll, sticky nav, scroll animations, hover effects, mobile hamburger menu.
 - Sections: hero, features/services, about/trust, testimonials, stats, CTA, footer.
-- Use https://picsum.photos/WIDTH/HEIGHT for images.
+- Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT (use a unique keyword per image) for images.
 - The result must look incomparably better than the original.`
       : `You are Zoobicon, a professional AI website rebuilder. Rebuild the analyzed website as a clean, modern, professional site.
 
@@ -126,7 +126,7 @@ Rules:
 - Keep the real business content from the analysis.
 - Professional design with good typography, spacing, and responsiveness.
 - Mobile hamburger menu, hover states, smooth scrolling.
-- Use https://picsum.photos/WIDTH/HEIGHT for images.`;
+- Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT (use a unique keyword per image) for images.`;
 
     const rebuildRes = await client.messages.create({
       model: "claude-sonnet-4-20250514",

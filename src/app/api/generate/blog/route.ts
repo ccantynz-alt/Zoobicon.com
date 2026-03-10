@@ -22,11 +22,11 @@ const BLOG_SYSTEM = `You are Zoobicon's Blog & Content Site Generator. You creat
 4. **Editorial**: Large typography-driven layout with pull quotes.
 
 ### Article Cards
-- Featured image (picsum.photos with unique seeds per article).
+- Featured image (picsum.photos/seed/KEYWORD/WIDTH/HEIGHT with a unique descriptive keyword per article).
 - Category badge/tag with color coding.
 - Title (linked, hover effect).
 - Excerpt (2-3 lines, truncated with ellipsis).
-- Author: avatar (small picsum), name, date.
+- Author: avatar (small picsum.photos/seed/author-name/WIDTH/HEIGHT), name, date.
 - Reading time estimate.
 - Hover: subtle lift + shadow enhancement.
 
