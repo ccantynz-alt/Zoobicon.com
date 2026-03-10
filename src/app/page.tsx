@@ -1090,6 +1090,46 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Add-on Upsell Strip */}
+      <section className="relative py-16 border-t border-white/[0.04]">
+        <div className="max-w-6xl mx-auto px-6 lg:px-8">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            variants={staggerContainer}
+          >
+            <motion.div variants={fadeInUp} className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
+              <div>
+                <h2 className="text-2xl font-black tracking-tight mb-1">Clip the ticket on every service</h2>
+                <p className="text-sm text-white/30">Domains, hosting, AI agents, templates — add what you need, skip what you don&apos;t.</p>
+              </div>
+              <Link href="/marketplace" className="text-sm font-medium text-brand-400 hover:text-brand-300 transition-colors flex items-center gap-1.5 whitespace-nowrap">
+                Explore the Marketplace <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </motion.div>
+
+            <motion.div variants={staggerContainer} className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+              {[
+                { label: "Domains", price: "from $2.99/yr", href: "/domains", color: "text-brand-400 border-brand-500/15" },
+                { label: "Hosting", price: "$12.99/mo", href: "/hosting", color: "text-accent-cyan border-accent-cyan/15" },
+                { label: "SEO Agent", price: "$29/mo", href: "/marketplace", color: "text-emerald-400 border-emerald-500/15" },
+                { label: "Video Creator", price: "$19/mo", href: "/marketplace", color: "text-purple-400 border-purple-500/15" },
+                { label: "Email Marketing", price: "$14/mo", href: "/marketplace", color: "text-amber-400 border-amber-500/15" },
+                { label: "Chatbot", price: "$14/mo", href: "/marketplace", color: "text-pink-400 border-pink-500/15" },
+              ].map((item) => (
+                <motion.div key={item.label} variants={fadeInUp}>
+                  <Link href={item.href} className={`block text-center p-4 rounded-xl border ${item.color} bg-white/[0.01] hover:bg-white/[0.03] transition-all`}>
+                    <div className="text-xs font-bold text-white/70 mb-1">{item.label}</div>
+                    <div className="text-[10px] text-white/30">{item.price}</div>
+                  </Link>
+                </motion.div>
+              ))}
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section className="relative py-24 lg:py-32 border-t border-white/[0.04] overflow-hidden">
         <div className="absolute inset-0">

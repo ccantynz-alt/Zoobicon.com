@@ -6,7 +6,8 @@ import { motion } from "framer-motion";
 import {
   Check, Zap, ArrowRight, HelpCircle, Sparkles, Globe, Video, BarChart3,
   Mail, Bot, Palette, Code2, Shield, Users, Building2, Loader2,
-  LayoutDashboard, LogOut,
+  LayoutDashboard, LogOut, Plus, ShoppingCart, Server, AtSign, Lock,
+  Blocks, Languages, TestTube2, Megaphone,
 } from "lucide-react";
 
 const fadeInUp = {
@@ -359,6 +360,160 @@ export default function PricingPage() {
                     </div>
                   </div>
                 ))}
+              </motion.div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Popular Add-ons */}
+        <section className="py-20 border-t border-white/[0.04] px-6">
+          <div className="max-w-5xl mx-auto">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer}>
+              <motion.div variants={fadeInUp} className="flex items-center gap-2 justify-center mb-2">
+                <Plus className="w-5 h-5 text-brand-400" />
+                <h2 className="text-3xl font-black">Power up your plan</h2>
+              </motion.div>
+              <motion.p variants={fadeInUp} className="text-white/30 text-center mb-4 max-w-xl mx-auto">
+                Add individual AI agents and tools to any plan. Pay only for what you need.
+              </motion.p>
+              <motion.p variants={fadeInUp} className="text-xs text-brand-400/60 text-center mb-10">
+                Pro plan includes all add-ons at no extra cost
+              </motion.p>
+
+              <motion.div variants={staggerContainer} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[
+                  { icon: BarChart3, name: "SEO Campaign Agent", price: "$29", period: "/mo", desc: "Autonomous SEO: keyword discovery, content gen, rank tracking", color: "text-emerald-400", borderColor: "border-emerald-500/15 hover:border-emerald-500/30" },
+                  { icon: Video, name: "AI Video Creator", price: "$19", period: "/mo", desc: "Auto-generate social videos for TikTok, Reels, YouTube", color: "text-brand-400", borderColor: "border-brand-500/15 hover:border-brand-500/30" },
+                  { icon: Mail, name: "AI Email Support", price: "$24", period: "/mo", desc: "AI auto-reply, smart inbox, sentiment analysis, <30s response", color: "text-accent-cyan", borderColor: "border-accent-cyan/15 hover:border-accent-cyan/30" },
+                  { icon: Megaphone, name: "Email Marketing Suite", price: "$14", period: "/mo", desc: "Campaigns, automations, A/B testing, deliverability tools", color: "text-amber-400", borderColor: "border-amber-500/15 hover:border-amber-500/30" },
+                  { icon: Bot, name: "AI Chatbot Builder", price: "$14", period: "/mo", desc: "Train on your content, embed anywhere, capture leads", color: "text-purple-400", borderColor: "border-purple-500/15 hover:border-purple-500/30" },
+                  { icon: Languages, name: "Multi-Language (i18n)", price: "$14", period: "/mo", desc: "Auto-translate your site into 30+ languages", color: "text-pink-400", borderColor: "border-pink-500/15 hover:border-pink-500/30" },
+                  { icon: TestTube2, name: "A/B Testing Engine", price: "$19", period: "/mo", desc: "Split test pages, CTAs, and layouts with AI recommendations", color: "text-orange-400", borderColor: "border-orange-500/15 hover:border-orange-500/30" },
+                  { icon: Palette, name: "AI Brand Kit", price: "$19", period: "one-time", desc: "Logo, color palette, typography, brand guidelines — AI generated", color: "text-rose-400", borderColor: "border-rose-500/15 hover:border-rose-500/30" },
+                  { icon: Blocks, name: "Component Library", price: "$19", period: "one-time", desc: "500+ premium components: heroes, CTAs, navs, footers, forms", color: "text-teal-400", borderColor: "border-teal-500/15 hover:border-teal-500/30" },
+                ].map((addon) => (
+                  <motion.div key={addon.name} variants={fadeInUp}>
+                    <Link href="/marketplace" className={`block p-5 rounded-xl border ${addon.borderColor} bg-white/[0.01] transition-all group`}>
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-2.5">
+                          <addon.icon className={`w-4 h-4 ${addon.color}`} />
+                          <span className="text-sm font-semibold text-white/80">{addon.name}</span>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-sm font-black text-white">{addon.price}</span>
+                          <span className="text-[10px] text-white/30 ml-0.5">{addon.period}</span>
+                        </div>
+                      </div>
+                      <p className="text-xs text-white/30 leading-relaxed">{addon.desc}</p>
+                      <div className="mt-3 text-[10px] font-semibold text-white/20 group-hover:text-white/40 transition-colors flex items-center gap-1">
+                        Add to plan <ArrowRight className="w-2.5 h-2.5" />
+                      </div>
+                    </Link>
+                  </motion.div>
+                ))}
+              </motion.div>
+
+              <motion.div variants={fadeInUp} className="mt-6 text-center">
+                <Link href="/marketplace" className="inline-flex items-center gap-2 text-sm text-brand-400 hover:text-brand-300 transition-colors font-medium">
+                  <ShoppingCart className="w-3.5 h-3.5" />
+                  View all 20+ add-ons in the Marketplace
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </motion.div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Domain + Hosting Bundle */}
+        <section className="py-20 border-t border-white/[0.04] px-6">
+          <div className="max-w-5xl mx-auto">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer}>
+              <motion.h2 variants={fadeInUp} className="text-3xl font-black text-center mb-2">Launch the complete stack</motion.h2>
+              <motion.p variants={fadeInUp} className="text-white/30 text-center mb-10 max-w-lg mx-auto">Domain, hosting, SSL, email — everything to go live. Bundle and save.</motion.p>
+
+              <motion.div variants={staggerContainer} className="grid md:grid-cols-3 gap-5">
+                {/* Domain */}
+                <motion.div variants={fadeInUp}>
+                  <Link href="/domains" className="block gradient-border rounded-2xl p-7 h-full hover:bg-white/[0.01] transition-all group">
+                    <Globe className="w-8 h-8 text-brand-400 mb-4" />
+                    <h3 className="text-lg font-bold mb-1">Custom Domain</h3>
+                    <div className="flex items-baseline gap-1 mb-3">
+                      <span className="text-2xl font-black">$2.99</span>
+                      <span className="text-sm text-white/30">/year</span>
+                    </div>
+                    <ul className="space-y-2 mb-4">
+                      {[".com from $12.99/yr", ".ai from $69.99/yr", ".io, .dev, .app available", "Free WHOIS privacy included"].map((f) => (
+                        <li key={f} className="flex items-center gap-2 text-xs text-white/40">
+                          <Check className="w-3 h-3 text-brand-400/60 flex-shrink-0" /> {f}
+                        </li>
+                      ))}
+                    </ul>
+                    <span className="text-xs text-white/20 group-hover:text-brand-400 transition-colors flex items-center gap-1 font-medium">
+                      Browse domains <ArrowRight className="w-3 h-3" />
+                    </span>
+                  </Link>
+                </motion.div>
+
+                {/* Hosting */}
+                <motion.div variants={fadeInUp}>
+                  <Link href="/hosting" className="block gradient-border rounded-2xl p-7 h-full hover:bg-white/[0.01] transition-all group">
+                    <Server className="w-8 h-8 text-accent-cyan mb-4" />
+                    <h3 className="text-lg font-bold mb-1">Premium Hosting</h3>
+                    <div className="flex items-baseline gap-1 mb-3">
+                      <span className="text-2xl font-black">$12.99</span>
+                      <span className="text-sm text-white/30">/month</span>
+                    </div>
+                    <ul className="space-y-2 mb-4">
+                      {["Global CDN (300+ edge nodes)", "99.99% uptime SLA", "Auto SSL & DDoS protection", "Instant rollbacks & staging"].map((f) => (
+                        <li key={f} className="flex items-center gap-2 text-xs text-white/40">
+                          <Check className="w-3 h-3 text-accent-cyan/60 flex-shrink-0" /> {f}
+                        </li>
+                      ))}
+                    </ul>
+                    <span className="text-xs text-white/20 group-hover:text-accent-cyan transition-colors flex items-center gap-1 font-medium">
+                      View hosting <ArrowRight className="w-3 h-3" />
+                    </span>
+                  </Link>
+                </motion.div>
+
+                {/* Email + Security bundle */}
+                <motion.div variants={fadeInUp}>
+                  <div className="gradient-border rounded-2xl p-7 h-full">
+                    <AtSign className="w-8 h-8 text-emerald-400 mb-4" />
+                    <h3 className="text-lg font-bold mb-1">Email + Security</h3>
+                    <div className="flex items-baseline gap-1 mb-3">
+                      <span className="text-2xl font-black">$14.98</span>
+                      <span className="text-sm text-white/30">/month</span>
+                    </div>
+                    <ul className="space-y-2 mb-4">
+                      {["Professional email (you@domain)", "10GB storage per mailbox", "Wildcard SSL certificate", "Malware scanning & firewall"].map((f) => (
+                        <li key={f} className="flex items-center gap-2 text-xs text-white/40">
+                          <Check className="w-3 h-3 text-emerald-400/60 flex-shrink-0" /> {f}
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="flex items-center gap-1.5 text-[10px] text-white/20">
+                      <Lock className="w-3 h-3" /> Email $4.99/mo + SSL & Security $9.99/mo
+                    </div>
+                  </div>
+                </motion.div>
+              </motion.div>
+
+              {/* Bundle callout */}
+              <motion.div variants={fadeInUp} className="mt-6 gradient-border rounded-xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div>
+                  <span className="text-sm font-bold text-white/80">Full Stack Bundle: </span>
+                  <span className="text-sm text-white/40">Creator plan + domain + hosting + email + SSL</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <div className="text-xs text-white/20 line-through">$51.96/mo + domain</div>
+                    <div className="text-sm font-black text-brand-400">From $46.98/mo + $2.99/yr</div>
+                  </div>
+                  <Link href="/domains" className="btn-gradient px-5 py-2.5 rounded-lg text-xs font-bold text-white whitespace-nowrap flex items-center gap-1.5">
+                    Start with a domain <ArrowRight className="w-3 h-3" />
+                  </Link>
+                </div>
               </motion.div>
             </motion.div>
           </div>
