@@ -359,6 +359,29 @@ export default function BuilderPage() {
     } catch { /* ignore */ }
   }, []);
 
+  // Auto-replace picsum placeholder images with contextually relevant ones
+  const autoReplaceImages = useCallback(async (html: string): Promise<string> => {
+    // Only replace if HTML contains picsum placeholder images
+    if (!html.includes("picsum.photos")) return html;
+    try {
+      const res = await fetch("/api/generate/images", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ html }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.html && data.imageCount > 0) {
+          console.log(`[Auto-Images] Replaced ${data.imageCount} placeholder images`);
+          return data.html;
+        }
+      }
+    } catch (err) {
+      console.warn("[Auto-Images] Failed to replace images, using placeholders:", err);
+    }
+    return html;
+  }, []);
+
   const streamGenerate = useCallback(
     async (userPrompt: string, existingCode?: string) => {
       setStatus("generating");
@@ -406,6 +429,10 @@ export default function BuilderPage() {
           if (fbEnd !== -1) fbHtml = fbHtml.slice(0, fbEnd + "</html>".length);
           setGeneratedCode(fbHtml);
           setStatus("complete");
+          // Auto-replace placeholder images
+          autoReplaceImages(fbHtml).then((improved) => {
+            if (improved !== fbHtml) setGeneratedCode(improved);
+          });
           return;
         }
 
@@ -453,6 +480,10 @@ export default function BuilderPage() {
           if (he !== -1) clean = clean.slice(0, he + "</html>".length);
           setGeneratedCode(clean);
           setStatus("complete");
+          // Auto-replace placeholder images
+          autoReplaceImages(clean).then((improved) => {
+            if (improved !== clean) setGeneratedCode(improved);
+          });
         }
       } catch (err) {
         if ((err as Error).name === "AbortError") return;
@@ -460,7 +491,7 @@ export default function BuilderPage() {
         setStatus("error");
       }
     },
-    [tier]
+    [tier, autoReplaceImages]
   );
 
   const handleGenerate = useCallback(async () => {
@@ -529,12 +560,17 @@ export default function BuilderPage() {
       console.log("[Pipeline] HTML length:", finalHtml.length, "starts with:", finalHtml.substring(0, 50));
       setGeneratedCode(finalHtml);
       setStatus("complete");
+
+      // Auto-replace placeholder images with contextually relevant ones
+      autoReplaceImages(finalHtml).then((improved) => {
+        if (improved !== finalHtml) setGeneratedCode(improved);
+      });
     } catch (err) {
       // Fallback to streaming Opus endpoint if pipeline fails
       setPipelineAgents([]);
       await streamGenerate(prompt.trim());
     }
-  }, [prompt, tier, streamGenerate]);
+  }, [prompt, tier, streamGenerate, autoReplaceImages]);
 
   const handleEdit = useCallback(async () => {
     if (!editPrompt.trim() || !generatedCode) return;

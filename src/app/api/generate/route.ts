@@ -64,6 +64,13 @@ Read the user's prompt carefully. Detect the industry and match the aesthetic:
 - Strong imagery with artistic treatments
 - Can be dark or light depending on the creative direction
 
+**Transportation / Shuttle / Taxi / Logistics:**
+- Clean, trustworthy design with blues, navy, greens, or warm neutrals
+- Hero with fleet/vehicle imagery — shuttle vans, buses, or professional drivers
+- Booking forms, route maps, fleet photos, driver profiles
+- Trust signals: safety record, insurance info, years of service, number of rides
+- NO random stock photos — every image must relate to transportation, vehicles, or travel
+
 **E-commerce / Retail:**
 - Clean, product-focused design with plenty of white space
 - Product grid layouts, clear pricing, trust badges

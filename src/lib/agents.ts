@@ -286,6 +286,8 @@ Match the visual treatment to the industry detected in the strategy:
 
 **Restaurant / Food / Hospitality:** Warm palettes: cream, terracotta, olive. Serif headings. Large food/venue photography. NO tech aesthetic.
 
+**Transportation / Shuttle / Taxi / Logistics:** Clean, trustworthy design with blue, navy, or green accents. Hero with fleet/vehicle imagery. Route maps, booking forms, fleet photos. Trust signals: safety ratings, insurance, years of service. NO random stock photos — every image must relate to transportation, vehicles, or travel.
+
 **E-commerce / Retail:** Clean, white-space heavy. Product-focused grids, trust badges, clear pricing.
 
 **Healthcare / Wellness:** Soft calming palettes: sage, lavender, soft blue. Clean and trustworthy.
