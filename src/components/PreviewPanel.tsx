@@ -83,8 +83,9 @@ function RisingStreaks({ count, speed }: { count: number; speed: number }) {
 }
 
 /**
- * Animated tiger made of blue glowing dots — walks around, sits, gets up, walks again.
- * Full-screen canvas overlay that represents Zoobic Safari (the Philippines zoo).
+ * Tiger HEAD made of blue glowing dots — front-facing, realistic silhouette.
+ * Uses an SVG path rendered to an off-screen canvas, then sampled as particles.
+ * Represents Zoobic Safari in the Philippines.
  */
 function TigerCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -104,271 +105,287 @@ function TigerCanvas() {
     resize();
     window.addEventListener("resize", resize);
 
-    // Dot type: [relX, relY, radius, brightness, group]
-    // group: 'body'|'head'|'leg-fl'|'leg-fr'|'leg-bl'|'leg-br'|'tail'|'stripe'|'ear'|'eye'|'whisker'
-    type Dot = { rx: number; ry: number; r: number; b: number; g: string };
-    type Pose = { dots: Dot[]; w: number; h: number };
+    // Front-facing tiger head SVG path — carefully traced outline
+    // Viewbox: 0 0 400 400, centered tiger face
+    const tigerPath = new Path2D();
 
-    const line = (dots: Dot[], x1: number, y1: number, x2: number, y2: number, n: number, r: number, b: number, g: string) => {
-      for (let i = 0; i <= n; i++) {
-        const t = i / n;
-        dots.push({ rx: x1 + (x2 - x1) * t, ry: y1 + (y2 - y1) * t, r, b, g });
+    // --- Outer face shape (wide at cheeks, narrower at chin & top) ---
+    tigerPath.moveTo(200, 360); // chin center
+    tigerPath.bezierCurveTo(140, 355, 90, 320, 70, 280); // chin to left jaw
+    tigerPath.bezierCurveTo(50, 245, 40, 210, 42, 180); // left jaw to left cheek
+    tigerPath.bezierCurveTo(44, 150, 50, 125, 65, 105); // left cheek up to temple
+
+    // Left ear
+    tigerPath.bezierCurveTo(55, 80, 40, 45, 60, 15); // outer left ear
+    tigerPath.bezierCurveTo(75, 0, 95, 5, 110, 30); // left ear tip
+    tigerPath.bezierCurveTo(120, 48, 125, 70, 130, 90); // inner left ear to forehead
+
+    // Forehead
+    tigerPath.bezierCurveTo(150, 75, 175, 68, 200, 66); // left forehead to center
+    tigerPath.bezierCurveTo(225, 68, 250, 75, 270, 90); // center to right forehead
+
+    // Right ear
+    tigerPath.bezierCurveTo(275, 70, 280, 48, 290, 30); // inner right ear
+    tigerPath.bezierCurveTo(305, 5, 325, 0, 340, 15); // right ear tip
+    tigerPath.bezierCurveTo(360, 45, 345, 80, 335, 105); // outer right ear
+
+    // Right side down
+    tigerPath.bezierCurveTo(350, 125, 356, 150, 358, 180); // right temple to cheek
+    tigerPath.bezierCurveTo(360, 210, 350, 245, 330, 280); // right cheek to jaw
+    tigerPath.bezierCurveTo(310, 320, 260, 355, 200, 360); // right jaw to chin
+    tigerPath.closePath();
+
+    // --- Inner features as separate paths for density variation ---
+    // Left eye
+    const leftEye = new Path2D();
+    leftEye.ellipse(148, 185, 28, 18, -0.1, 0, Math.PI * 2);
+
+    // Right eye
+    const rightEye = new Path2D();
+    rightEye.ellipse(252, 185, 28, 18, 0.1, 0, Math.PI * 2);
+
+    // Nose
+    const nose = new Path2D();
+    nose.moveTo(200, 240);
+    nose.bezierCurveTo(185, 240, 178, 252, 182, 262);
+    nose.bezierCurveTo(186, 270, 194, 275, 200, 278);
+    nose.bezierCurveTo(206, 275, 214, 270, 218, 262);
+    nose.bezierCurveTo(222, 252, 215, 240, 200, 240);
+    nose.closePath();
+
+    // --- Sample points from the tiger shape ---
+    const offscreen = document.createElement("canvas");
+    offscreen.width = 400;
+    offscreen.height = 400;
+    const offCtx = offscreen.getContext("2d")!;
+
+    type Dot = { x: number; y: number; r: number; b: number; phase: number; hue: number };
+    const dots: Dot[] = [];
+
+    // Helper: sample points inside a path
+    const samplePath = (path: Path2D, count: number, rMin: number, rMax: number, bMin: number, bMax: number) => {
+      let placed = 0;
+      let attempts = 0;
+      while (placed < count && attempts < count * 20) {
+        attempts++;
+        const x = Math.random() * 400;
+        const y = Math.random() * 400;
+        offCtx.clearRect(0, 0, 400, 400);
+        offCtx.fill(path);
+        if (offCtx.isPointInPath(path, x, y)) {
+          dots.push({
+            x, y,
+            r: rMin + Math.random() * (rMax - rMin),
+            b: bMin + Math.random() * (bMax - bMin),
+            phase: Math.random() * Math.PI * 2,
+            hue: 195 + Math.random() * 35,
+          });
+          placed++;
+        }
       }
     };
-    const arc = (dots: Dot[], cx: number, cy: number, rad: number, a1: number, a2: number, n: number, r: number, b: number, g: string) => {
-      for (let i = 0; i <= n; i++) {
-        const a = a1 + (a2 - a1) * (i / n);
-        dots.push({ rx: cx + Math.cos(a) * rad, ry: cy + Math.sin(a) * rad, r, b, g });
+
+    // Sample outline more densely (stroke the path shape's edge)
+    // Outline dots — sample near the edge
+    const sampleEdge = (path: Path2D, count: number, r: number, b: number, thickness: number) => {
+      let placed = 0;
+      let attempts = 0;
+      while (placed < count && attempts < count * 30) {
+        attempts++;
+        const x = Math.random() * 400;
+        const y = Math.random() * 400;
+        const inside = offCtx.isPointInPath(path, x, y);
+        // Check if near edge by checking a few pixels away
+        if (inside) {
+          const nearEdge =
+            !offCtx.isPointInPath(path, x - thickness, y) ||
+            !offCtx.isPointInPath(path, x + thickness, y) ||
+            !offCtx.isPointInPath(path, x, y - thickness) ||
+            !offCtx.isPointInPath(path, x, y + thickness);
+          if (nearEdge) {
+            dots.push({ x, y, r, b, phase: Math.random() * Math.PI * 2, hue: 200 + Math.random() * 30 });
+            placed++;
+          }
+        }
       }
     };
-    const scatter = (dots: Dot[], cx: number, cy: number, rx: number, ry: number, n: number, r: number, b: number, g: string) => {
-      for (let i = 0; i < n; i++) {
-        const a = Math.random() * Math.PI * 2;
-        const d = Math.sqrt(Math.random());
-        dots.push({ rx: cx + Math.cos(a) * d * rx, ry: cy + Math.sin(a) * d * ry, r, b, g });
+
+    // Face outline — dense bright dots on the edge
+    sampleEdge(tigerPath, 250, 1.6, 0.75, 8);
+
+    // Face fill — scattered softer dots
+    samplePath(tigerPath, 350, 0.8, 1.4, 0.15, 0.35);
+
+    // Eyes — very bright, dense
+    samplePath(leftEye, 50, 1.2, 2.0, 0.85, 1.0);
+    samplePath(rightEye, 50, 1.2, 2.0, 0.85, 1.0);
+    // Eye outlines
+    sampleEdge(leftEye, 40, 1.5, 0.9, 4);
+    sampleEdge(rightEye, 40, 1.5, 0.9, 4);
+    // Pupils — center bright points
+    dots.push({ x: 148, y: 185, r: 3.5, b: 1.0, phase: 0, hue: 210 });
+    dots.push({ x: 252, y: 185, r: 3.5, b: 1.0, phase: 1, hue: 210 });
+
+    // Nose — bright, dense
+    samplePath(nose, 35, 1.0, 1.8, 0.8, 1.0);
+    sampleEdge(nose, 25, 1.4, 0.9, 3);
+
+    // Forehead stripes — the iconic tiger markings
+    const addStripe = (x1: number, y1: number, x2: number, y2: number, count: number) => {
+      for (let i = 0; i <= count; i++) {
+        const t = i / count;
+        dots.push({
+          x: x1 + (x2 - x1) * t + (Math.random() - 0.5) * 4,
+          y: y1 + (y2 - y1) * t + (Math.random() - 0.5) * 4,
+          r: 1.3 + Math.random() * 0.5,
+          b: 0.7 + Math.random() * 0.25,
+          phase: Math.random() * Math.PI * 2,
+          hue: 205 + Math.random() * 20,
+        });
       }
     };
 
-    // Build side-view walking tiger (facing right) — origin at center-bottom
-    function buildTiger(): Pose {
-      const dots: Dot[] = [];
-      // Body — elongated oval
-      arc(dots, 0, -40, 55, 0, Math.PI * 2, 50, 1.5, 0.6, "body");
-      arc(dots, 0, -40, 48, 0, Math.PI * 2, 40, 1.2, 0.4, "body");
-      scatter(dots, 0, -40, 45, 28, 40, 1.0, 0.3, "body");
+    // Center V stripe
+    addStripe(200, 80, 190, 135, 10);
+    addStripe(200, 80, 210, 135, 10);
+    // Left forehead stripes
+    addStripe(170, 90, 145, 140, 9);
+    addStripe(150, 95, 120, 140, 8);
+    addStripe(130, 105, 105, 148, 7);
+    // Right forehead stripes
+    addStripe(230, 90, 255, 140, 9);
+    addStripe(250, 95, 280, 140, 8);
+    addStripe(270, 105, 295, 148, 7);
 
-      // Body stripes (vertical dark bands)
-      line(dots, -20, -65, -25, -18, 6, 1.4, 0.9, "stripe");
-      line(dots, -5, -68, -8, -15, 6, 1.4, 0.9, "stripe");
-      line(dots, 10, -66, 8, -16, 6, 1.4, 0.9, "stripe");
-      line(dots, 25, -62, 22, -20, 5, 1.4, 0.9, "stripe");
+    // Cheek stripes
+    addStripe(85, 180, 110, 230, 7);
+    addStripe(78, 200, 100, 250, 7);
+    addStripe(75, 220, 95, 265, 6);
+    addStripe(315, 180, 290, 230, 7);
+    addStripe(322, 200, 300, 250, 7);
+    addStripe(325, 220, 305, 265, 6);
 
-      // Head — circle, offset right (facing direction)
-      const hx = 62, hy = -52;
-      arc(dots, hx, hy, 26, 0, Math.PI * 2, 30, 1.5, 0.7, "head");
-      arc(dots, hx, hy, 22, 0, Math.PI * 2, 24, 1.2, 0.5, "head");
-      scatter(dots, hx, hy, 18, 18, 15, 1.0, 0.35, "head");
-
-      // Ears
-      line(dots, hx - 12, hy - 22, hx - 20, hy - 40, 6, 1.3, 0.8, "ear");
-      line(dots, hx - 20, hy - 40, hx - 5, hy - 32, 5, 1.3, 0.8, "ear");
-      line(dots, hx + 8, hy - 24, hx + 14, hy - 42, 6, 1.3, 0.8, "ear");
-      line(dots, hx + 14, hy - 42, hx + 22, hy - 30, 5, 1.3, 0.8, "ear");
-
-      // Face stripes
-      line(dots, hx - 5, hy - 24, hx - 10, hy - 8, 4, 1.2, 0.85, "stripe");
-      line(dots, hx + 5, hy - 24, hx + 10, hy - 8, 4, 1.2, 0.85, "stripe");
-
-      // Eyes — bright dots
-      dots.push({ rx: hx + 12, ry: hy - 6, r: 2.5, b: 1.0, g: "eye" });
-      dots.push({ rx: hx + 12, ry: hy - 7, r: 1.5, b: 1.0, g: "eye" });
-
-      // Nose
-      dots.push({ rx: hx + 24, ry: hy + 2, r: 2.5, b: 0.95, g: "head" });
-      // Muzzle
-      arc(dots, hx + 18, hy + 4, 10, -0.5, 0.5, 6, 1.2, 0.6, "head");
-
-      // Whiskers (facing right)
-      line(dots, hx + 20, hy - 2, hx + 45, hy - 10, 6, 0.8, 0.5, "whisker");
-      line(dots, hx + 22, hy + 2, hx + 48, hy + 2, 6, 0.8, 0.5, "whisker");
-      line(dots, hx + 20, hy + 6, hx + 44, hy + 12, 6, 0.8, 0.5, "whisker");
-
-      // Front legs (will be animated via leg group offset)
-      line(dots, 30, -15, 35, 0, 6, 1.4, 0.65, "leg-fr");
-      line(dots, 28, -15, 28, 0, 5, 1.3, 0.55, "leg-fr");
-
-      line(dots, 20, -15, 22, 0, 6, 1.4, 0.65, "leg-fl");
-      line(dots, 18, -15, 15, 0, 5, 1.3, 0.55, "leg-fl");
-
-      // Back legs
-      line(dots, -32, -18, -30, 0, 6, 1.4, 0.65, "leg-br");
-      line(dots, -34, -18, -38, 0, 5, 1.3, 0.55, "leg-br");
-
-      line(dots, -42, -18, -45, 0, 6, 1.4, 0.65, "leg-bl");
-      line(dots, -44, -18, -48, 0, 5, 1.3, 0.55, "leg-bl");
-
-      // Paws — small clusters at leg bottoms
-      scatter(dots, 33, 2, 4, 3, 4, 1.0, 0.6, "leg-fr");
-      scatter(dots, 19, 2, 4, 3, 4, 1.0, 0.6, "leg-fl");
-      scatter(dots, -31, 2, 4, 3, 4, 1.0, 0.6, "leg-br");
-      scatter(dots, -46, 2, 4, 3, 4, 1.0, 0.6, "leg-bl");
-
-      // Tail — curved upward from back
-      const tailPts: [number, number][] = [[-55, -35], [-65, -50], [-72, -60], [-76, -68], [-78, -74], [-75, -80]];
-      for (let i = 0; i < tailPts.length - 1; i++) {
-        line(dots, tailPts[i][0], tailPts[i][1], tailPts[i + 1][0], tailPts[i + 1][1], 3, 1.3, 0.6, "tail");
-      }
-      // Tail stripes
-      dots.push({ rx: -68, ry: -56, r: 1.5, b: 0.9, g: "stripe" });
-      dots.push({ rx: -75, ry: -72, r: 1.5, b: 0.9, g: "stripe" });
-
-      return { dots, w: 180, h: 100 };
+    // Mouth line
+    addStripe(200, 278, 200, 300, 4);
+    // Mouth curves
+    for (let i = 0; i <= 8; i++) {
+      const t = i / 8;
+      const angle = -0.4 + t * 0.8;
+      dots.push({ x: 175 + Math.cos(angle) * 25, y: 305 + Math.sin(angle) * 12, r: 1.2, b: 0.6, phase: Math.random() * 6, hue: 210 });
+      dots.push({ x: 225 + Math.cos(Math.PI - angle) * 25, y: 305 + Math.sin(Math.PI - angle) * 12, r: 1.2, b: 0.6, phase: Math.random() * 6, hue: 210 });
     }
 
-    const tiger = buildTiger();
+    // Whiskers
+    const addWhisker = (x1: number, y1: number, x2: number, y2: number) => {
+      for (let i = 0; i <= 12; i++) {
+        const t = i / 12;
+        dots.push({
+          x: x1 + (x2 - x1) * t,
+          y: y1 + (y2 - y1) * t + Math.sin(t * Math.PI) * 3,
+          r: 0.8 + (1 - t) * 0.4,
+          b: 0.4 + (1 - t) * 0.2,
+          phase: Math.random() * 6,
+          hue: 205 + Math.random() * 15,
+        });
+      }
+    };
+    // Left whiskers
+    addWhisker(160, 258, 50, 240);
+    addWhisker(158, 268, 45, 268);
+    addWhisker(160, 278, 52, 295);
+    // Right whiskers
+    addWhisker(240, 258, 350, 240);
+    addWhisker(242, 268, 355, 268);
+    addWhisker(240, 278, 348, 295);
 
-    // Behavior state machine: walk-right → sit → walk-left → sit → repeat
-    type State = "walk-right" | "sitting-down" | "sitting" | "standing-up" | "walk-left";
-    let state: State = "walk-right";
-    let stateTime = 0;
-    let posX = -100;
-    let posY = 0; // bottom offset
-    let facingRight = true;
-    let walkCycle = 0;
-    let sitProgress = 0; // 0 = standing, 1 = fully sitting
+    // Inner ear details
+    samplePath(tigerPath, 15, 0.9, 1.3, 0.6, 0.8); // sparse inner ear fill
 
-    const WALK_SPEED = 0.8;
-    const SIT_DURATION = 240; // frames sitting
-    const TRANSITION_FRAMES = 40; // sit/stand transition
+    // Nose bridge
+    addStripe(200, 210, 200, 240, 5);
 
+    // Muzzle area — denser dots around nose/mouth
+    for (let i = 0; i < 30; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = Math.random() * 30;
+      const x = 200 + Math.cos(angle) * dist;
+      const y = 265 + Math.sin(angle) * dist * 0.7;
+      if (offCtx.isPointInPath(tigerPath, x, y)) {
+        dots.push({ x, y, r: 0.8 + Math.random() * 0.6, b: 0.3 + Math.random() * 0.2, phase: Math.random() * 6, hue: 200 + Math.random() * 25 });
+      }
+    }
+
+    // Brow ridges
+    for (let i = 0; i <= 12; i++) {
+      const t = i / 12;
+      const angle = Math.PI + 0.5 + t * (Math.PI - 1);
+      dots.push({ x: 148 + Math.cos(angle) * 32, y: 175 + Math.sin(angle) * 10, r: 1.3, b: 0.65, phase: Math.random() * 6, hue: 208 });
+      dots.push({ x: 252 + Math.cos(angle) * 32, y: 175 + Math.sin(angle) * 10, r: 1.3, b: 0.65, phase: Math.random() * 6, hue: 208 });
+    }
+
+    // --- Animate ---
     let frame = 0;
     let animId: number;
 
     const draw = () => {
       frame++;
-      stateTime++;
       const W = canvas.width;
       const H = canvas.height;
       ctx.clearRect(0, 0, W, H);
 
-      const groundY = H * 0.72; // tiger walks in lower portion, above the text
-      const scale = Math.min(W, H) / 450; // responsive scale
+      // Tiger head size and position — drifts gently across the screen
+      const tigerSize = Math.min(W * 0.5, H * 0.42);
+      const scale = tigerSize / 400;
 
-      // State machine
-      switch (state) {
-        case "walk-right":
-          posX += WALK_SPEED;
-          walkCycle += 0.06;
-          sitProgress = Math.max(0, sitProgress - 0.03);
-          if (posX > W * 0.6 / scale) {
-            state = "sitting-down";
-            stateTime = 0;
-          }
-          break;
-        case "sitting-down":
-          sitProgress = Math.min(1, stateTime / TRANSITION_FRAMES);
-          walkCycle += 0.01; // slow to stop
-          if (sitProgress >= 1) {
-            state = "sitting";
-            stateTime = 0;
-          }
-          break;
-        case "sitting":
-          if (stateTime > SIT_DURATION) {
-            state = "standing-up";
-            stateTime = 0;
-          }
-          break;
-        case "standing-up":
-          sitProgress = Math.max(0, 1 - stateTime / TRANSITION_FRAMES);
-          if (sitProgress <= 0) {
-            state = "walk-left";
-            stateTime = 0;
-            facingRight = false;
-          }
-          break;
-        case "walk-left":
-          posX -= WALK_SPEED;
-          walkCycle += 0.06;
-          if (posX < W * 0.25 / scale) {
-            state = "sitting-down";
-            stateTime = 0;
-            facingRight = true;
-          }
-          // Wrap if gone off screen
-          if (posX < -150) {
-            posX = -100;
-            state = "walk-right";
-            facingRight = true;
-            stateTime = 0;
-          }
-          break;
-      }
+      // Slow drift: moves left-right over ~20 seconds, bobs up-down gently
+      const driftX = Math.sin(frame * 0.003) * W * 0.12;
+      const driftY = Math.sin(frame * 0.005) * H * 0.03;
+      const tilt = Math.sin(frame * 0.004) * 0.03; // very subtle head tilt
 
-      // Leg animation offsets based on walk cycle
-      const legSwing = (state === "sitting" || sitProgress > 0.5) ? 0 : 8;
-      const legOffsets: Record<string, [number, number]> = {
-        "leg-fl": [Math.sin(walkCycle) * legSwing, Math.abs(Math.sin(walkCycle)) * -3 * (1 - sitProgress)],
-        "leg-fr": [Math.sin(walkCycle + Math.PI * 0.5) * legSwing, Math.abs(Math.sin(walkCycle + Math.PI * 0.5)) * -3 * (1 - sitProgress)],
-        "leg-bl": [Math.sin(walkCycle + Math.PI) * legSwing, Math.abs(Math.sin(walkCycle + Math.PI)) * -3 * (1 - sitProgress)],
-        "leg-br": [Math.sin(walkCycle + Math.PI * 1.5) * legSwing, Math.abs(Math.sin(walkCycle + Math.PI * 1.5)) * -3 * (1 - sitProgress)],
-      };
+      const offsetX = (W - 400 * scale) / 2 + driftX;
+      const offsetY = H * 0.06 + driftY;
 
-      // Sitting: back legs tuck, body lowers, tail wraps
-      const bodyDip = sitProgress * 12;
-      const backLegTuck = sitProgress * 15;
-      const tailCurl = sitProgress;
+      for (let i = 0; i < dots.length; i++) {
+        const d = dots[i];
 
-      // Draw each dot
-      for (let i = 0; i < tiger.dots.length; i++) {
-        const d = tiger.dots[i];
-        let dx = d.rx;
-        let dy = d.ry;
+        // Subtle floating motion
+        const ox = Math.sin(frame * 0.012 + d.phase * 3) * 1.0;
+        const oy = Math.cos(frame * 0.010 + d.phase * 2) * 1.0;
 
-        // Apply sitting deformation
-        if (d.g === "leg-bl" || d.g === "leg-br") {
-          dx += (d.g === "leg-bl" ? -1 : 1) * backLegTuck * 0.5;
-          dy += backLegTuck * 0.3;
-        }
-        if (d.g === "body" || d.g === "stripe" || d.g === "head" || d.g === "ear" || d.g === "eye" || d.g === "whisker") {
-          dy += bodyDip;
-        }
-        if (d.g === "tail") {
-          dx += tailCurl * 15;
-          dy += bodyDip * 0.5 + tailCurl * 8;
-        }
-
-        // Leg walk offsets
-        const lo = legOffsets[d.g];
-        if (lo) {
-          dx += lo[0];
-          dy += lo[1];
-        }
-
-        // Mirror if facing left
-        const fx = facingRight ? dx : -dx;
-
-        // Transform to screen coords
-        const sx = posX * scale + fx * scale + W * 0.15;
-        const sy = groundY + dy * scale;
-
-        // Skip if off screen
-        if (sx < -20 || sx > W + 20 || sy < -20 || sy > H + 20) continue;
-
-        // Subtle floating per dot
-        const ox = Math.sin(frame * 0.015 + i * 0.7) * 0.8;
-        const oy = Math.cos(frame * 0.012 + i * 0.5) * 0.8;
-        const pulse = 0.7 + 0.3 * Math.sin(frame * 0.03 + i * 0.3);
+        // Pulsing glow
+        const pulse = 0.7 + 0.3 * Math.sin(frame * 0.025 + d.phase);
         const alpha = d.b * pulse;
-        const hue = 200 + (i % 30);
+
+        // Apply subtle tilt rotation around center of tiger
+        const cx = 200 * scale, cy = 200 * scale;
+        const rx = d.x * scale - cx;
+        const ry = d.y * scale - cy;
+        const rotX = rx * Math.cos(tilt) - ry * Math.sin(tilt) + cx;
+        const rotY = rx * Math.sin(tilt) + ry * Math.cos(tilt) + cy;
+
+        const sx = offsetX + rotX + ox;
+        const sy = offsetY + rotY + oy;
         const dotR = d.r * scale;
 
-        // Glow
-        const grad = ctx.createRadialGradient(sx + ox, sy + oy, 0, sx + ox, sy + oy, dotR * 4);
-        grad.addColorStop(0, `hsla(${hue}, 85%, 65%, ${alpha * 0.5})`);
-        grad.addColorStop(0.4, `hsla(${hue}, 80%, 55%, ${alpha * 0.15})`);
-        grad.addColorStop(1, `hsla(${hue}, 80%, 50%, 0)`);
+        // Skip if off screen
+        if (sx < -10 || sx > W + 10 || sy < -10 || sy > H + 10) continue;
+
+        // Outer glow
+        const grad = ctx.createRadialGradient(sx, sy, 0, sx, sy, dotR * 3.5);
+        grad.addColorStop(0, `hsla(${d.hue}, 85%, 65%, ${alpha * 0.5})`);
+        grad.addColorStop(0.5, `hsla(${d.hue}, 80%, 55%, ${alpha * 0.12})`);
+        grad.addColorStop(1, `hsla(${d.hue}, 80%, 50%, 0)`);
         ctx.beginPath();
-        ctx.arc(sx + ox, sy + oy, dotR * 4, 0, Math.PI * 2);
+        ctx.arc(sx, sy, dotR * 3.5, 0, Math.PI * 2);
         ctx.fillStyle = grad;
         ctx.fill();
 
-        // Core
+        // Core dot
         ctx.beginPath();
-        ctx.arc(sx + ox, sy + oy, dotR, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(${hue}, 85%, 70%, ${alpha})`;
+        ctx.arc(sx, sy, dotR, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${d.hue}, 85%, 72%, ${alpha})`;
         ctx.fill();
       }
-
-      // Faint ground line / reflection under the tiger
-      const gx = posX * scale + W * 0.15;
-      const groundGrad = ctx.createRadialGradient(gx, groundY + 5 * scale, 0, gx, groundY + 5 * scale, 80 * scale);
-      groundGrad.addColorStop(0, "rgba(59,130,246,0.06)");
-      groundGrad.addColorStop(1, "transparent");
-      ctx.beginPath();
-      ctx.arc(gx, groundY + 5 * scale, 80 * scale, 0, Math.PI * 2);
-      ctx.fillStyle = groundGrad;
-      ctx.fill();
 
       animId = requestAnimationFrame(draw);
     };
@@ -727,8 +744,8 @@ export default function PreviewPanel({ html, isGenerating }: PreviewPanelProps) 
         {/* Animated walking tiger */}
         <TigerCanvas />
 
-        {/* Centered text — floating over the atmosphere */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+        {/* Text at bottom — below the tiger head */}
+        <div className="absolute bottom-[12%] left-0 right-0 flex flex-col items-center z-10">
           <p
             className="text-lg font-bold uppercase tracking-[8px]"
             style={{
