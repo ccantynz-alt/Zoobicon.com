@@ -9,16 +9,21 @@ function getClient() {
   });
 }
 
-const SYSTEM_PROMPT = `You are ZOOBICON's AI editing assistant. The user has a generated HTML website and wants to make changes to it.
+const SYSTEM_PROMPT = `You are ZOOBICON's elite AI editing assistant. The user has a generated HTML website and wants to make changes.
 
-RULES:
-- You will receive the current HTML code and a user instruction for changes.
-- Output ONLY the complete updated HTML. No markdown, no explanation, no backticks.
-- Preserve all existing structure and styles unless the user asks to change them.
-- Make only the changes the user requests.
-- Keep the code clean and well-organized.
-- Maintain responsiveness.
-- NEVER include any text before or after the HTML. Just the complete updated HTML.`;
+CRITICAL RULES:
+- Output ONLY the complete updated HTML document. No markdown, no explanation, no backticks, no code fences.
+- Start with <!DOCTYPE html> and end with </html>. The output MUST be a complete, valid HTML document.
+- NEVER truncate, abbreviate, or skip sections. Every section, every style rule, every script block from the original MUST be preserved unless the user explicitly asks to remove it.
+- Make ONLY the changes the user requests. Do not remove, reorganize, or "clean up" anything else.
+- Preserve ALL existing: CSS custom properties, media queries, animations, keyframes, JavaScript, IntersectionObserver code, form validation, meta tags, JSON-LD, and responsive behavior.
+- Preserve ALL existing sections in their original order.
+- If the edit is cosmetic (colors, fonts, spacing, text), change ONLY those specific values.
+- If adding a new section, match the existing design language exactly.
+- Maintain all hover states, transitions, and micro-interactions.
+- NEVER output partial HTML. The document must be complete from <!DOCTYPE html> to </html>.`;
+
+export const maxDuration = 120; // Allow up to 2 minutes for large edits
 
 export async function POST(request: NextRequest) {
   // API key auth — valid zbk_live_ key gets higher rate limit
@@ -64,15 +69,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Classify edit complexity to pick the right model + tokens
+    const isSimpleEdit = /^(change|make|set|update|replace|switch)\s+(the\s+)?(color|colour|font|text|heading|title|background|bg|padding|margin|spacing|size|border)/i.test(instruction)
+      || /^(change|replace|update)\s+["'].+["']\s+(to|with)\s+["']/i.test(instruction)
+      || instruction.split(/\s+/).length <= 8;
+
     const userMessage = currentCode
-      ? `Here is the current website HTML:\n\n${currentCode}\n\nPlease make this change: ${instruction}`
+      ? `Here is the current website HTML:\n\n${currentCode}\n\n---\n\nIMPORTANT: Output the COMPLETE updated HTML from <!DOCTYPE html> to </html>. Do NOT skip or truncate any sections.\n\nEdit instruction: ${instruction}`
       : `Create a website with this requirement: ${instruction}`;
+
+    // Simple edits (color/text changes) → Sonnet for speed
+    // Complex edits (add sections, restructure) → Sonnet with higher tokens
+    const model = "claude-sonnet-4-6";
+    const maxTokens = isSimpleEdit ? 32000 : 64000;
 
     let stream;
     try {
       stream = await getClient().messages.stream({
-        model: "claude-sonnet-4-6",
-        max_tokens: 16000,
+        model,
+        max_tokens: maxTokens,
         system: SYSTEM_PROMPT,
         messages: [{ role: "user", content: userMessage }],
       });

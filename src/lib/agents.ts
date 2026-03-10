@@ -385,9 +385,9 @@ export async function runPipeline(
   const isUltra = input.tier === "ultra";
 
   // Smart model routing — use the right model per agent for best output
-  const MODEL_FAST = "claude-haiku-4-5-20241022";       // Fast structured JSON agents
-  const MODEL_BALANCED = "claude-sonnet-4-20250514";     // Enhancement & QA agents
-  const MODEL_PREMIUM = "claude-opus-4-20250514";        // Developer agent — the money shot
+  const MODEL_FAST = "claude-haiku-4-5-20251001";        // Fast structured JSON agents
+  const MODEL_BALANCED = "claude-sonnet-4-6";             // Enhancement & QA agents
+  const MODEL_PREMIUM = "claude-sonnet-4-6";              // Developer agent — Sonnet 4.6 for speed + quality balance
 
   // ── Phase 1: Strategist ──
   onProgress?.("strategist", "analyzing market & audience");
