@@ -264,7 +264,7 @@ export default function PromptInput({
           onChange={(e) => onPromptChange(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={isGenerating}
-          maxLength={5000}
+          maxLength={20000}
         />
         {/* Mic button inside textarea */}
         {micSupported && (
@@ -285,7 +285,7 @@ export default function PromptInput({
 
       {/* Character count + shortcut */}
       <div className="flex justify-between items-center text-[10px] text-white/20">
-        <span>{prompt.length} / 5000</span>
+        <span>{prompt.length.toLocaleString()} / 20,000</span>
         <span className="text-brand-400/50">
           {isMac ? "Cmd" : "Ctrl"}+Enter to build
         </span>
