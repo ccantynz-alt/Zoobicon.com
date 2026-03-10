@@ -395,7 +395,13 @@ export default function BuilderPage() {
             throw new Error(data.error || "Generation failed");
           }
           const data = await fallbackRes.json();
-          setGeneratedCode(data.html);
+          let fbHtml = (data.html || "").trim();
+          fbHtml = fbHtml.replace(/^```(?:html|HTML)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
+          const fbStart = fbHtml.search(/<!doctype\s+html|<html/i);
+          if (fbStart > 0) fbHtml = fbHtml.slice(fbStart);
+          const fbEnd = fbHtml.lastIndexOf("</html>");
+          if (fbEnd !== -1) fbHtml = fbHtml.slice(0, fbEnd + "</html>".length);
+          setGeneratedCode(fbHtml);
           setStatus("complete");
           return;
         }
@@ -434,7 +440,17 @@ export default function BuilderPage() {
           }
         }
 
-        if (accumulated) setStatus("complete");
+        if (accumulated) {
+          // Clean accumulated HTML — strip code fences, preamble
+          let clean = accumulated.trim();
+          clean = clean.replace(/^```(?:html|HTML)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
+          const ds = clean.search(/<!doctype\s+html|<html/i);
+          if (ds > 0) clean = clean.slice(ds);
+          const he = clean.lastIndexOf("</html>");
+          if (he !== -1) clean = clean.slice(0, he + "</html>".length);
+          setGeneratedCode(clean);
+          setStatus("complete");
+        }
       } catch (err) {
         if ((err as Error).name === "AbortError") return;
         setError(err instanceof Error ? err.message : "Something went wrong");
@@ -496,7 +512,19 @@ export default function BuilderPage() {
           `${a.name} — ${(a.duration / 1000).toFixed(1)}s`
         )
       );
-      setGeneratedCode(data.html);
+
+      // Client-side HTML safety net — ensure clean HTML reaches preview
+      let finalHtml = (data.html || "").trim();
+      // Strip code fences if model wrapped output
+      finalHtml = finalHtml.replace(/^```(?:html|HTML)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
+      // Extract from <!DOCTYPE or <html to </html>
+      const docStart = finalHtml.search(/<!doctype\s+html|<html/i);
+      if (docStart > 0) finalHtml = finalHtml.slice(docStart);
+      const htmlEnd = finalHtml.lastIndexOf("</html>");
+      if (htmlEnd !== -1) finalHtml = finalHtml.slice(0, htmlEnd + "</html>".length);
+
+      console.log("[Pipeline] HTML length:", finalHtml.length, "starts with:", finalHtml.substring(0, 50));
+      setGeneratedCode(finalHtml);
       setStatus("complete");
     } catch (err) {
       // Fallback to streaming Opus endpoint if pipeline fails
