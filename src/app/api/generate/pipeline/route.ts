@@ -11,15 +11,15 @@ import { runPipeline } from "@/lib/agents";
  *   tier?: "standard"|"premium"|"ultra"
  * }
  *
- * Tiers:
- * - standard (default): 6-agent pipeline (Strategist → Brand+Copy → Architect → Developer → QA)
- * - premium: Same as standard with enhanced prompts
- * - ultra: 10-agent pipeline adds Animation, SEO, and Forms agents in parallel
+ * All tiers run the full 10-agent pipeline with smart model routing:
+ * - Haiku 4.5 for fast JSON agents (Strategist, Brand, Copywriter, Architect)
+ * - Opus 4.6 for the Developer agent (the actual website build)
+ * - Sonnet 4.6 for enhancement agents (Animation, SEO, Forms, Integrations, QA)
  *
  * Returns the final HTML plus agent metadata.
  */
 
-export const maxDuration = 300; // Allow up to 5 minutes for ultra pipeline
+export const maxDuration = 300; // Allow up to 5 minutes for full pipeline
 
 export async function POST(req: NextRequest) {
   try {
