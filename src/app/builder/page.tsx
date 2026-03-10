@@ -121,6 +121,7 @@ export default function BuilderPage() {
   const [isDeploying, setIsDeploying] = useState(false);
   const [deployUrl, setDeployUrl] = useState("");
   const [deployStatus, setDeployStatus] = useState<"idle" | "deploying" | "deployed" | "error">("idle");
+  const [pipelineAgents, setPipelineAgents] = useState<string[]>([]);
 
   const abortRef = useRef<AbortController | null>(null);
   const hasCode = generatedCode.length > 0;
@@ -228,8 +229,64 @@ export default function BuilderPage() {
 
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim()) return;
-    await streamGenerate(prompt.trim());
-  }, [prompt, streamGenerate]);
+
+    // Use the full 10-agent pipeline for new builds
+    setStatus("generating");
+    setError("");
+    setGeneratedCode("");
+    setActiveTab("preview");
+    setPipelineAgents([]);
+
+    try {
+      // Show pipeline progress in status
+      const agentSteps = [
+        "Strategist analyzing market...",
+        "Brand Designer + Copywriter working...",
+        "Architect planning structure...",
+        "Developer building website (Opus)...",
+        "Animation + SEO + Forms enhancing...",
+        "Integrations agent adding features...",
+        "QA reviewing quality...",
+      ];
+      let stepIndex = 0;
+      const progressInterval = setInterval(() => {
+        if (stepIndex < agentSteps.length) {
+          setPipelineAgents(prev => [...prev, agentSteps[stepIndex]]);
+          stepIndex++;
+        }
+      }, 8000);
+
+      const res = await fetch("/api/generate/pipeline", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: prompt.trim(),
+          style: "modern",
+          tier,
+        }),
+      });
+
+      clearInterval(progressInterval);
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Pipeline failed");
+      }
+
+      const data = await res.json();
+      setPipelineAgents(
+        (data.agents || []).map((a: { name: string; duration: number }) =>
+          `${a.name} — ${(a.duration / 1000).toFixed(1)}s`
+        )
+      );
+      setGeneratedCode(data.html);
+      setStatus("complete");
+    } catch (err) {
+      // Fallback to streaming Opus endpoint if pipeline fails
+      setPipelineAgents([]);
+      await streamGenerate(prompt.trim());
+    }
+  }, [prompt, tier, streamGenerate]);
 
   const handleEdit = useCallback(async () => {
     if (!editPrompt.trim() || !generatedCode) return;
@@ -574,7 +631,7 @@ export default function BuilderPage() {
         </div>
       </div>
 
-      <StatusBar status={status} />
+      <StatusBar status={status} pipelineStep={pipelineAgents.length > 0 ? pipelineAgents[pipelineAgents.length - 1] : undefined} />
     </div>
   );
 }
