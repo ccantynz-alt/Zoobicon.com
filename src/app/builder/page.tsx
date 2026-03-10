@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import TopBar from "@/components/TopBar";
 import PromptInput from "@/components/PromptInput";
 import type { Tier } from "@/components/PromptInput";
@@ -108,6 +108,223 @@ const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }
   { id: "figma", label: "Figma Import", icon: <Figma size={18} /> },
   { id: "wordpress", label: "WordPress Export", icon: <FileArchive size={18} /> },
 ];
+
+/* ─── Interactive particle constellation background ─── */
+function BuilderBackground({ isGenerating }: { isGenerating: boolean }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const mouseRef = useRef({ x: -1000, y: -1000 });
+  const isGeneratingRef = useRef(isGenerating);
+  isGeneratingRef.current = isGenerating;
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animId: number;
+    let w = 0, h = 0;
+
+    const resize = () => {
+      const dpr = window.devicePixelRatio || 1;
+      w = canvas.clientWidth;
+      h = canvas.clientHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    // Particles
+    const PARTICLE_COUNT = 80;
+    const CONNECTION_DIST = 140;
+    const MOUSE_RADIUS = 200;
+
+    interface Particle {
+      x: number; y: number;
+      vx: number; vy: number;
+      baseVx: number; baseVy: number;
+      size: number;
+      hue: number;
+      pulse: number;
+      pulseSpeed: number;
+    }
+
+    const particles: Particle[] = [];
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      const speed = 0.15 + Math.random() * 0.3;
+      const angle = Math.random() * Math.PI * 2;
+      const vx = Math.cos(angle) * speed;
+      const vy = Math.sin(angle) * speed;
+      particles.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx, vy,
+        baseVx: vx, baseVy: vy,
+        size: 1.2 + Math.random() * 2,
+        hue: 210 + Math.random() * 30, // blue range
+        pulse: Math.random() * Math.PI * 2,
+        pulseSpeed: 0.01 + Math.random() * 0.02,
+      });
+    }
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      mouseRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    };
+    const handleMouseLeave = () => {
+      mouseRef.current = { x: -1000, y: -1000 };
+    };
+    canvas.addEventListener("mousemove", handleMouseMove);
+    canvas.addEventListener("mouseleave", handleMouseLeave);
+
+    let time = 0;
+
+    const draw = () => {
+      time += 1;
+      ctx.clearRect(0, 0, w, h);
+
+      const gen = isGeneratingRef.current;
+      const mx = mouseRef.current.x;
+      const my = mouseRef.current.y;
+
+      // Update particles
+      for (const p of particles) {
+        p.pulse += p.pulseSpeed;
+
+        // During generation, particles orbit and speed up
+        if (gen) {
+          const cx = w / 2, cy = h / 2;
+          const dx = p.x - cx, dy = p.y - cy;
+          const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+          const orbitStrength = 0.0004;
+          p.vx += (-dy / dist) * orbitStrength + (cx - p.x) * 0.00003;
+          p.vy += (dx / dist) * orbitStrength + (cy - p.y) * 0.00003;
+        } else {
+          // Slowly return to base velocity
+          p.vx += (p.baseVx - p.vx) * 0.005;
+          p.vy += (p.baseVy - p.vy) * 0.005;
+        }
+
+        // Mouse repulsion with elastic return
+        const dmx = p.x - mx;
+        const dmy = p.y - my;
+        const distMouse = Math.sqrt(dmx * dmx + dmy * dmy);
+        if (distMouse < MOUSE_RADIUS) {
+          const force = (1 - distMouse / MOUSE_RADIUS) * 0.8;
+          p.vx += (dmx / distMouse) * force;
+          p.vy += (dmy / distMouse) * force;
+        }
+
+        // Damping
+        p.vx *= 0.99;
+        p.vy *= 0.99;
+
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Wrap edges
+        if (p.x < -10) p.x = w + 10;
+        if (p.x > w + 10) p.x = -10;
+        if (p.y < -10) p.y = h + 10;
+        if (p.y > h + 10) p.y = -10;
+      }
+
+      // Draw connections
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const a = particles[i], b = particles[j];
+          const dx = a.x - b.x, dy = a.y - b.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < CONNECTION_DIST) {
+            const alpha = (1 - dist / CONNECTION_DIST) * (gen ? 0.25 : 0.12);
+            const hue = gen ? 200 + Math.sin(time * 0.02) * 20 : 220;
+            ctx.strokeStyle = `hsla(${hue}, 80%, 60%, ${alpha})`;
+            ctx.lineWidth = (1 - dist / CONNECTION_DIST) * 1.5;
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Draw mouse attraction lines
+      if (mx > 0 && my > 0) {
+        for (const p of particles) {
+          const dx = p.x - mx, dy = p.y - my;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < MOUSE_RADIUS * 1.2) {
+            const alpha = (1 - dist / (MOUSE_RADIUS * 1.2)) * 0.15;
+            ctx.strokeStyle = `hsla(200, 90%, 70%, ${alpha})`;
+            ctx.lineWidth = 0.5;
+            ctx.beginPath();
+            ctx.moveTo(mx, my);
+            ctx.lineTo(p.x, p.y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Draw particles
+      for (const p of particles) {
+        const pulseSize = p.size + Math.sin(p.pulse) * 0.6;
+        const brightness = gen ? 70 + Math.sin(p.pulse * 2) * 15 : 55;
+        const alpha = gen ? 0.7 + Math.sin(p.pulse) * 0.3 : 0.4 + Math.sin(p.pulse) * 0.15;
+
+        // Outer glow
+        const glowRadius = pulseSize * (gen ? 4 : 2.5);
+        const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glowRadius);
+        glow.addColorStop(0, `hsla(${p.hue}, 80%, ${brightness}%, ${alpha * 0.4})`);
+        glow.addColorStop(1, `hsla(${p.hue}, 80%, ${brightness}%, 0)`);
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, glowRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Core
+        ctx.fillStyle = `hsla(${p.hue}, 85%, ${brightness + 15}%, ${alpha})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, pulseSize, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Generation energy ring
+      if (gen) {
+        const cx = w / 2, cy = h / 2;
+        const ringRadius = 100 + Math.sin(time * 0.03) * 30;
+        const ringGlow = ctx.createRadialGradient(cx, cy, ringRadius - 20, cx, cy, ringRadius + 40);
+        ringGlow.addColorStop(0, "hsla(210, 90%, 60%, 0)");
+        ringGlow.addColorStop(0.5, `hsla(210, 90%, 60%, ${0.04 + Math.sin(time * 0.05) * 0.02})`);
+        ringGlow.addColorStop(1, "hsla(210, 90%, 60%, 0)");
+        ctx.fillStyle = ringGlow;
+        ctx.beginPath();
+        ctx.arc(cx, cy, ringRadius + 40, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      animId = requestAnimationFrame(draw);
+    };
+
+    draw();
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener("resize", resize);
+      canvas.removeEventListener("mousemove", handleMouseMove);
+      canvas.removeEventListener("mouseleave", handleMouseLeave);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 w-full h-full"
+      style={{ zIndex: 0 }}
+    />
+  );
+}
 
 export default function BuilderPage() {
   const [prompt, setPrompt] = useState("");
@@ -412,61 +629,8 @@ export default function BuilderPage() {
 
   return (
     <div className="flex flex-col h-screen bg-[#0a0a0f] relative overflow-hidden">
-      {/* Ambient atmospheric background */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {/* Deep base gradient */}
-        <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at 30% 80%, rgba(37,99,235,0.04) 0%, transparent 60%)" }} />
-
-        {/* Slow-drifting aurora along the top edge */}
-        <div
-          className="absolute -top-20 -left-[10%] w-[120%] h-[200px]"
-          style={{
-            background: "linear-gradient(90deg, transparent, rgba(37,99,235,0.06) 30%, rgba(14,165,233,0.08) 50%, rgba(37,99,235,0.04) 70%, transparent)",
-            filter: "blur(60px)",
-            animation: "builder-aurora 25s ease-in-out infinite",
-          }}
-        />
-
-        {/* Bottom edge glow */}
-        <div
-          className="absolute -bottom-10 -left-[10%] w-[120%] h-[150px]"
-          style={{
-            background: "linear-gradient(90deg, transparent, rgba(0,200,255,0.04) 40%, rgba(37,99,235,0.05) 60%, transparent)",
-            filter: "blur(50px)",
-            animation: "builder-aurora 20s ease-in-out 8s infinite reverse",
-          }}
-        />
-
-        {/* Right edge accent */}
-        <div
-          className="absolute top-[20%] -right-10 w-[150px] h-[60%]"
-          style={{
-            background: "linear-gradient(to bottom, transparent, rgba(96,165,250,0.04) 40%, rgba(37,99,235,0.03) 60%, transparent)",
-            filter: "blur(40px)",
-            animation: "builder-edge 18s ease-in-out infinite",
-          }}
-        />
-
-        {/* Subtle grid */}
-        <div
-          className="absolute inset-0 opacity-[0.012]"
-          style={{
-            backgroundImage: "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)",
-            backgroundSize: "80px 80px",
-          }}
-        />
-      </div>
-
-      <style>{`
-        @keyframes builder-aurora {
-          0%, 100% { transform: translateX(0) scaleY(1); opacity: 0.7; }
-          50% { transform: translateX(60px) scaleY(1.2); opacity: 1; }
-        }
-        @keyframes builder-edge {
-          0%, 100% { transform: translateY(0); opacity: 0.5; }
-          50% { transform: translateY(30px); opacity: 1; }
-        }
-      `}</style>
+      {/* Interactive particle constellation background */}
+      <BuilderBackground isGenerating={status === "generating"} />
 
       <TopBar />
 
