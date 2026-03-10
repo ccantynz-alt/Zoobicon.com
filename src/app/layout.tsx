@@ -22,8 +22,8 @@ export const viewport: Viewport = {
   maximumScale: 5,
   viewportFit: "cover", // Extend content into safe areas (iPhone notch, Dynamic Island)
   themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0f" },
-    { media: "(prefers-color-scheme: light)", color: "#0a0a0f" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b0b11" },
+    { media: "(prefers-color-scheme: light)", color: "#0b0b11" },
   ],
 };
 
@@ -38,10 +38,10 @@ export default function RootLayout({
         {/* iOS splash screens & icons */}
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
         {/* Windows tile color */}
-        <meta name="msapplication-TileColor" content="#0a0a0f" />
+        <meta name="msapplication-TileColor" content="#0b0b11" />
         <meta name="msapplication-config" content="none" />
       </head>
-      <body>{children}</body>
+      <body className="grain">{children}</body>
     </html>
   );
 }

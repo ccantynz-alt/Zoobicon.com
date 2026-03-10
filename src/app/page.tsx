@@ -367,7 +367,7 @@ export default function LandingPage() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-8">
               <Link href="/" className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-400 flex items-center justify-center">
                   <Zap className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-lg font-bold tracking-tight">Zoobicon</span>
@@ -463,6 +463,11 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="relative pt-32 pb-24 lg:pt-44 lg:pb-36 overflow-hidden">
+        {/* Aurora background */}
+        <div className="aurora" />
+        {/* Radial gradient fade at bottom */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-dark-300 pointer-events-none" />
+
         <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center relative z-10">
           <motion.div
             initial="hidden"
@@ -470,30 +475,30 @@ export default function LandingPage() {
             variants={staggerContainer}
           >
             {/* Badge */}
-            <motion.div variants={fadeInUp} className="flex justify-center mb-8">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/[0.08] bg-white/[0.03] backdrop-blur-sm">
-                <div className="w-2 h-2 rounded-full bg-accent-cyan animate-pulse" />
-                <span className="text-xs font-medium text-white/60">The Future of Digital Creation is Here</span>
-                <ChevronRight className="w-3 h-3 text-white/40" />
+            <motion.div variants={fadeInUp} className="flex justify-center mb-10">
+              <div className="glass inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full">
+                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-xs font-medium text-white/70 tracking-wide">AI Website Builder — Trusted by 10,000+ creators</span>
+                <ChevronRight className="w-3 h-3 text-white/30" />
               </div>
             </motion.div>
 
             {/* Main Headline */}
             <motion.h1
               variants={fadeInUp}
-              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[0.95] mb-8"
+              className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-black tracking-[-0.03em] leading-[0.92] mb-8"
             >
-              <span className="block">Build the Future</span>
-              <span className="block gradient-text-hero mt-2">With AI That Dominates</span>
+              <span className="block text-white">Websites that build</span>
+              <span className="block gradient-text-hero mt-2">themselves.</span>
             </motion.h1>
 
             {/* Sub headline */}
             <motion.p
               variants={fadeInUp}
-              className="max-w-4xl mx-auto text-lg md:text-xl text-white/40 leading-relaxed mb-6"
+              className="max-w-2xl mx-auto text-lg md:text-xl text-white/45 leading-relaxed mb-8 font-light"
             >
-              The only AI platform with auto-debugging, GitHub import, WordPress export, Figma-to-code,
-              30+ language translation, and full-stack scaffolding — all in one builder.
+              Describe any website. Watch AI build it in real-time — full-stack, responsive, production-ready.
+              With auto-debugging, SEO, and one-click deploy.
             </motion.p>
 
             {/* Feature pills */}
@@ -504,25 +509,25 @@ export default function LandingPage() {
               {["Auto-Debug", "GitHub Import", "WP Export", "Figma Import", "30+ Languages", "E-commerce", "Auth Scaffold", "SEO Auto-Fix"].map((pill) => (
                 <span
                   key={pill}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] text-xs font-medium text-white/50"
+                  className="glass inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium text-white/55"
                 >
-                  <Check className="w-3 h-3 text-accent-cyan" />
+                  <Check className="w-3 h-3 text-emerald-400/80" />
                   {pill}
                 </span>
               ))}
             </motion.div>
 
             {/* CTAs */}
-            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
               <Link
                 href="/builder"
-                className="group btn-gradient px-8 py-4 rounded-2xl text-base font-bold text-white flex items-center gap-3 shadow-glow"
+                className="group btn-gradient px-8 py-4 rounded-2xl text-base font-semibold text-white flex items-center gap-3"
               >
                 <span>Start Building Free</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <button className="group px-8 py-4 rounded-2xl text-base font-medium text-white/60 border border-white/[0.08] hover:border-white/20 hover:text-white/80 transition-all flex items-center gap-3 bg-white/[0.02]">
-                <Play className="w-5 h-5" />
+              <button className="group glass px-8 py-4 rounded-2xl text-base font-medium text-white/60 hover:text-white/80 transition-all flex items-center gap-3">
+                <Play className="w-4 h-4" />
                 <span>Watch Demo</span>
               </button>
             </motion.div>
@@ -532,9 +537,12 @@ export default function LandingPage() {
               variants={fadeInUp}
               className="relative max-w-5xl mx-auto"
             >
-              <BuilderDemo />
-              {/* Glow under the preview */}
-              <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 w-[80%] h-40 bg-brand-500/10 blur-[100px] rounded-full" />
+              {/* Premium frame with glass morphism */}
+              <div className="rounded-2xl overflow-hidden shadow-premium ring-1 ring-white/[0.08]">
+                <BuilderDemo />
+              </div>
+              {/* Soft ambient glow under the preview */}
+              <div className="absolute -bottom-24 left-1/2 -translate-x-1/2 w-[70%] h-48 bg-brand-500/8 blur-[120px] rounded-full pointer-events-none" />
             </motion.div>
           </motion.div>
         </div>
@@ -596,7 +604,7 @@ export default function LandingPage() {
                 <div className="grid grid-cols-6 gap-0 mb-2">
                   <div className="p-4" />
                   <div className="p-4 text-center">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-brand-500/20 to-accent-purple/20 border border-brand-500/30">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-brand-500/20 to-brand-400/10 border border-brand-500/30">
                       <Zap className="w-4 h-4 text-brand-400" />
                       <span className="text-sm font-bold text-white">Zoobicon</span>
                     </div>
@@ -762,9 +770,9 @@ export default function LandingPage() {
             variants={staggerContainer}
           >
             <motion.div variants={fadeInUp} className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-purple/20 bg-accent-purple/5 mb-6">
-                <Sparkles className="w-3 h-3 text-accent-purple" />
-                <span className="text-xs font-medium text-accent-purple">Product Suite</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand-500/20 bg-brand-500/5 mb-6">
+                <Sparkles className="w-3 h-3 text-brand-400" />
+                <span className="text-xs font-medium text-brand-400">Product Suite</span>
               </div>
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-6">
                 Everything You Need to<br />
@@ -1004,7 +1012,7 @@ export default function LandingPage() {
 
               {/* Pro - Featured */}
               <motion.div variants={fadeInUp} className="relative p-8 rounded-2xl border border-brand-500/30 bg-brand-500/[0.03] shadow-glow">
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-brand-500 to-accent-purple text-xs font-bold text-white">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-brand-500 to-brand-400 text-xs font-bold text-white">
                   Most Popular
                 </div>
                 <div className="text-sm font-semibold text-brand-400 mb-2">Pro</div>
@@ -1091,7 +1099,7 @@ export default function LandingPage() {
             {/* Brand */}
             <div className="md:col-span-2">
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-400 flex items-center justify-center">
                   <Zap className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-lg font-bold">Zoobicon</span>

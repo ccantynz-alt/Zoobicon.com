@@ -57,6 +57,10 @@ export function middleware(request: NextRequest) {
     const response = NextResponse.rewrite(url);
     response.headers.set("x-zoobicon-domain", domainLabel);
     response.headers.set("x-brand-id", brandId);
+    // CDN caching — rewritten domain pages are static, cache at edge
+    response.headers.set("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
+    // Vary by host so CDN caches each domain separately
+    response.headers.set("Vary", "Host");
     return response;
   }
 

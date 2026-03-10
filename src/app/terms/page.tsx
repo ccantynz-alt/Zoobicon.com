@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Zap } from "lucide-react";
 import type { Metadata } from "next";
 
+export const revalidate = 86400; // Revalidate once per day
+
 export const metadata: Metadata = {
   title: "Terms of Service - Zoobicon",
   description: "Zoobicon Terms of Service — the rules and conditions for using our platform.",
