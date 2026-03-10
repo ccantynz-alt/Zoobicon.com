@@ -12,14 +12,19 @@ export function getSQL() {
   return _sql;
 }
 
-export const sql = new Proxy({} as NeonQueryFunction<false, false>, {
-  apply(_target, thisArg, args) {
-    return Reflect.apply(getSQL(), thisArg, args);
-  },
-  get(_target, prop) {
-    return Reflect.get(getSQL(), prop);
-  },
-});
+// Proxy target must be callable for tagged template usage (sql`...`)
+// Using a function as target so the `apply` trap fires correctly.
+export const sql = new Proxy(
+  Object.assign(function () {} as unknown as NeonQueryFunction<false, false>),
+  {
+    apply(_target, thisArg, args) {
+      return Reflect.apply(getSQL(), thisArg, args);
+    },
+    get(_target, prop) {
+      return Reflect.get(getSQL(), prop);
+    },
+  }
+);
 
 /**
  * Initialize database schema. Call this from /api/db/init or at startup.
