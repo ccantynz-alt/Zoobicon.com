@@ -2,6 +2,7 @@
 
 interface StatusBarProps {
   status: "idle" | "generating" | "editing" | "complete" | "error";
+  pipelineStep?: string;
 }
 
 const STATUS_CONFIG = {
@@ -12,7 +13,7 @@ const STATUS_CONFIG = {
   error: { color: "bg-red-500", label: "Error" },
 } as const;
 
-export default function StatusBar({ status }: StatusBarProps) {
+export default function StatusBar({ status, pipelineStep }: StatusBarProps) {
   const isGenerating = status === "generating";
 
   return (
@@ -42,7 +43,7 @@ export default function StatusBar({ status }: StatusBarProps) {
           {status === "idle"
             ? "Ready"
             : status === "generating"
-            ? "Building your website..."
+            ? (pipelineStep || "Building your website...")
             : status === "complete"
             ? "Build Complete"
             : "Error"}
