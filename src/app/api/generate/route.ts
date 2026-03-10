@@ -201,19 +201,19 @@ export async function POST(req: NextRequest) {
 
     if (isEdit) {
       systemPrompt = EDIT_SYSTEM;
-      userMessage = `Here is the current website HTML:\n\n${existingCode}\n\n---\n\nApply this edit: ${prompt}`;
-      model = "claude-sonnet-4-20250514";
-      maxTokens = 32000;
+      userMessage = `Here is the current website HTML:\n\n${existingCode}\n\n---\n\nIMPORTANT: Output the COMPLETE updated HTML from <!DOCTYPE html> to </html>. Do NOT skip or truncate any sections.\n\nApply this edit: ${prompt}`;
+      model = "claude-sonnet-4-6";
+      maxTokens = 64000;
     } else if (isPremium) {
       systemPrompt = PREMIUM_SYSTEM;
       userMessage = `Build me a stunning, high-end website for: ${prompt}\n\nThis must look like it was designed by a top-tier agency. Match the aesthetic to the industry — if this is a luxury, executive, or professional brand, use elegant typography, aspirational imagery, warm whites, and sophisticated restraint. If this is a tech/startup brand, use modern clean design with tasteful accents. Always include: hero with clear value proposition, social proof, services/features, testimonials, stats, CTA, and comprehensive footer. The design must feel premium, polished, and trustworthy.`;
-      model = "claude-opus-4-20250514";
+      model = "claude-sonnet-4-6";
       maxTokens = 64000;
     } else {
       systemPrompt = STANDARD_SYSTEM;
       userMessage = `Build me a clean, professional website: ${prompt}`;
-      model = "claude-opus-4-20250514";
-      maxTokens = 32000;
+      model = "claude-sonnet-4-6";
+      maxTokens = 64000;
     }
 
     const message = await client.messages.create({
