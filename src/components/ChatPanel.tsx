@@ -77,10 +77,14 @@ export default function ChatPanel({ currentCode, onCodeUpdate, isVisible }: Chat
         }
       }
 
-      const cleanCode = fullCode
-        .replace(/^```html?\n?/i, "")
-        .replace(/\n?```$/i, "")
-        .trim();
+      // Robust HTML cleaning — strip code fences, preamble, trailing text
+      let cleanCode = fullCode.trim();
+      cleanCode = cleanCode.replace(/^```(?:html|HTML)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
+      const docStart = cleanCode.search(/<!doctype\s+html|<html/i);
+      if (docStart > 0) cleanCode = cleanCode.slice(docStart);
+      const htmlEnd = cleanCode.lastIndexOf("</html>");
+      if (htmlEnd !== -1) cleanCode = cleanCode.slice(0, htmlEnd + "</html>".length);
+      cleanCode = cleanCode.trim();
 
       if (cleanCode) {
         onCodeUpdate(cleanCode);
