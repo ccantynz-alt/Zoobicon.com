@@ -24,7 +24,7 @@ const FEATURE_DESCRIPTIONS: Record<string, string> = {
   "service-selection":
     "Service category picker: cards or list with service name, duration, price, and brief description. Select one service before choosing time. Filter by category if multiple service types.",
   "staff-selection":
-    "Staff/provider picker: cards with photo (picsum.photos), name, title, and available times. Filter calendar by selected staff member. Brief bio on hover/click.",
+    "Staff/provider picker: cards with photo (picsum.photos/seed/STAFF-NAME/WIDTH/HEIGHT), name, title, and available times. Filter calendar by selected staff member. Brief bio on hover/click.",
   "client-form":
     "Client booking form: name, email, phone, optional notes/special requests. Form validation with inline errors. Auto-fill from localStorage if returning client. Terms checkbox.",
   "confirmation-email":

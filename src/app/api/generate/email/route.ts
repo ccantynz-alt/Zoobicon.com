@@ -39,7 +39,7 @@ Output ONLY valid JSON. No markdown, no explanation, no code fences.
 **Images:**
 - Always include alt text on images.
 - Always specify width and height attributes.
-- Use absolute URLs for image sources (use https://picsum.photos/WIDTH/HEIGHT for placeholders).
+- Use absolute URLs for image sources (use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for placeholders, with a unique descriptive keyword per image).
 - Add display:block and border:0 to images.
 
 **Buttons/CTAs:**

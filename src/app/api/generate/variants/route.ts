@@ -51,7 +51,7 @@ Each variant MUST differ significantly in these areas:
 - All CSS in a <style> tag in <head>. No external stylesheets except Google Fonts.
 - All JS in a <script> tag before </body>.
 - Fully responsive with mobile hamburger menu.
-- Use https://picsum.photos/WIDTH/HEIGHT for placeholder images (use different seed params like ?random=1 for each image).
+- Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for placeholder images (use a unique descriptive keyword per image for deterministic results).
 - Add hover states, transitions, and scroll animations.
 - Use CSS custom properties (--variables) for the color palette for easy theming.
 - Each variant should feel like it was designed by a different designer with a different aesthetic philosophy.

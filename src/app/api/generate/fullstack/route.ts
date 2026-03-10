@@ -82,7 +82,7 @@ You must produce a frontend that looks premium, sophisticated, and visually stun
 - Parse and display API error messages to the user.
 
 **Images:**
-- Use https://picsum.photos/WIDTH/HEIGHT for any placeholder images.
+- Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for any placeholder images (unique descriptive keyword per image).
 - Use inline SVGs for icons with brand colors.
 
 **Responsive:**

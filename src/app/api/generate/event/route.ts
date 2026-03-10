@@ -23,7 +23,7 @@ const EVENT_SYSTEM = `You are Zoobicon's Event & Conference Site Generator. You 
 - Animated counters on scroll.
 
 ### 3. Speakers
-- Speaker grid: photo (picsum.photos), name, title, company, social links.
+- Speaker grid: photo (picsum.photos/seed/SPEAKER-NAME/WIDTH/HEIGHT), name, title, company, social links.
 - Hover: bio overlay or expand.
 - Featured keynote speakers larger than regular.
 - 8-12 speakers minimum.

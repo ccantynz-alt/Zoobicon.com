@@ -45,7 +45,7 @@ const ADMIN_SYSTEM = `You are Zoobicon's Admin Panel / CMS Generator. You create
 - Auto-save to localStorage.
 
 ### Media Library
-- Grid of uploaded media (use picsum.photos for demo images).
+- Grid of uploaded media (use picsum.photos/seed/KEYWORD/WIDTH/HEIGHT with unique keywords for demo images).
 - Upload zone (drag-and-drop placeholder).
 - Image details: filename, size, dimensions, upload date.
 - Copy URL button.

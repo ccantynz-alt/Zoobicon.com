@@ -137,7 +137,7 @@ Rules:
 - Preserve the original project's core functionality, content, and purpose.
 - Modernize outdated patterns (jQuery -> vanilla JS, old CSS -> modern CSS, etc.).
 - If the original uses a framework (React, Vue, etc.), convert the key UI to a standalone HTML page.
-- If images are needed, use placeholder services like https://picsum.photos or solid color blocks.
+- If images are needed, use placeholder services like https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT (use unique descriptive keywords per image) or solid color blocks.
 - The page should feel complete and production-ready.`;
 
 export async function POST(req: NextRequest) {

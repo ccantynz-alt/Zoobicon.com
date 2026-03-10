@@ -15,7 +15,8 @@ const STANDARD_SYSTEM = `You are Zoobicon, a professional AI website generator. 
 - Fully responsive with mobile hamburger menu.
 - Generous whitespace — sections with 80-120px vertical padding.
 - CSS transitions on all interactive elements.
-- Use https://picsum.photos/WIDTH/HEIGHT for placeholder images with object-fit: cover.
+- For images, use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT where KEYWORD is a unique descriptive word for each image (e.g., seed/hero, seed/team, seed/office, seed/service1). This ensures each image is unique and loads reliably. Apply object-fit: cover.
+- Add this CSS rule to handle any broken images gracefully: img { background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); min-height: 200px; }
 - Write realistic, compelling copy — not Lorem ipsum.
 - Include: hero, features/services, about/trust section, CTA, and footer.
 - The result must look like a real business website, not a student project or free template.`;
@@ -113,10 +114,11 @@ Read the user's prompt carefully. Detect the industry and match the aesthetic:
 - NO particle effects, NO matrix animations, NO typing effects unless specifically a tech/developer site.
 
 ## Images
-- Use https://picsum.photos/WIDTH/HEIGHT for placeholder photos.
+- Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for placeholder photos, where KEYWORD is a unique descriptive word for each image (e.g., seed/hero, seed/about, seed/team, seed/service1, seed/service2, seed/testimonial1). Each image MUST have a different seed keyword so they show different photos. Never use the bare https://picsum.photos/WIDTH/HEIGHT URL (it's unreliable).
 - Apply object-fit: cover on all images.
 - border-radius: 8-16px depending on context.
 - Subtle shadow: 0 8px 30px rgba(0,0,0,0.08).
+- Add this CSS rule to handle broken images gracefully: img { background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); min-height: 120px; }
 - For icons, use clean inline SVGs with consistent stroke width and brand colors.
 
 ## Micro-interactions

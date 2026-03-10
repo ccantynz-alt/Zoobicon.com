@@ -252,7 +252,7 @@ Rules:
 - Follow the design spec EXACTLY — use specified colors, fonts, spacing.
 - Use the copy EXACTLY as provided — do not rewrite.
 - Follow the architecture EXACTLY — section order, layouts, components.
-- Use https://picsum.photos/WIDTH/HEIGHT for images with object-fit: cover.
+- Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for images (where KEYWORD is a unique descriptive word per image, e.g., seed/hero, seed/team, seed/office, seed/service1). Never use bare picsum.photos/WIDTH/HEIGHT. Apply object-fit: cover. Add CSS: img { background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); min-height: 120px; } for graceful fallback.
 - CSS custom properties for ALL colors (enables dark mode later).
 - Fully responsive with mobile hamburger menu.
 - CSS transitions: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) on interactive elements.
@@ -311,7 +311,7 @@ Rules:
 - Fix heading hierarchy (one h1, sequential h2→h3).
 - Add descriptive alt text to all images.
 - Add loading="lazy" to below-fold images, loading="eager" to hero.
-- Add <link rel="preconnect"> for Google Fonts and picsum.photos.
+- Add <link rel="preconnect"> for Google Fonts.
 - Do NOT change any visible content or design.`;
 
 const FORMS_SYSTEM = `You are a forms specialist. Take the HTML and make all forms fully functional.

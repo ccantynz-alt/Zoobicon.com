@@ -17,7 +17,7 @@ const DIRECTORY_SYSTEM = `You are Zoobicon's Business Directory Generator. You c
 - Advanced filters: rating, price range, open now, distance.
 
 ### Listing Cards
-- Business image (picsum.photos).
+- Business image (picsum.photos/seed/KEYWORD/WIDTH/HEIGHT with a unique keyword per business).
 - Business name (linked).
 - Star rating (1-5) with review count.
 - Category badges.
