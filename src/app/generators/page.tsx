@@ -27,7 +27,7 @@ const GENERATOR_CATEGORIES = [
   },
   {
     name: "Business Applications",
-    color: "from-violet-500 to-purple-500",
+    color: "from-blue-500 to-blue-500",
     generators: [
       { name: "SaaS Dashboard", description: "Full SaaS apps with user management, analytics, billing, settings, and team features", endpoint: "/api/generate/saas", icon: Layout, tag: "Popular" },
       { name: "Booking System", description: "Appointment booking with calendar, time slots, services, staff selection, and confirmations", endpoint: "/api/generate/booking", icon: Calendar },
@@ -212,7 +212,7 @@ export default function GeneratorsPage() {
       <section className="max-w-7xl mx-auto px-6 pb-16">
         <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-8 mb-16">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-purple-500 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-blue-500 flex items-center justify-center">
               <Workflow size={20} />
             </div>
             <div>

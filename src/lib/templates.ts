@@ -15,7 +15,7 @@ export const TEMPLATES: Template[] = [
     category: "Business",
     description: "Modern SaaS product page with hero, features, pricing, and CTA sections.",
     prompt: "A modern SaaS landing page with a bold hero section featuring a gradient background, feature cards with icons, a pricing table with 3 tiers, testimonials section, and a strong call-to-action footer. Use a professional color scheme with blues and purples.",
-    thumbnail: "from-blue-600 to-purple-600",
+    thumbnail: "from-blue-600 to-blue-600",
     tags: ["SaaS", "Startup", "Landing"],
   },
   {
@@ -87,7 +87,7 @@ export const TEMPLATES: Template[] = [
     category: "Events",
     description: "Conference page with speaker lineup, schedule, and ticket registration.",
     prompt: "A tech conference landing page with a countdown timer hero, speaker lineup cards with photos and bios, a multi-track schedule/agenda, sponsor logos, venue information, and a ticket purchase section with different tiers. Modern and professional with a blue color scheme.",
-    thumbnail: "from-violet-600 to-blue-600",
+    thumbnail: "from-blue-600 to-blue-600",
     tags: ["Event", "Conference", "Tickets"],
   },
   {
@@ -105,7 +105,7 @@ export const TEMPLATES: Template[] = [
     category: "Entertainment",
     description: "Artist page with album showcase, tour dates, and merch store.",
     prompt: "A music artist/band website with a full-screen hero with artist name, a latest album showcase section, a tour dates list with venue and ticket links, a music player UI element, a merch store section, and social media links. Dark and moody with neon accent colors.",
-    thumbnail: "from-purple-900 to-pink-600",
+    thumbnail: "from-blue-900 to-pink-600",
     tags: ["Music", "Artist", "Entertainment"],
   },
   {

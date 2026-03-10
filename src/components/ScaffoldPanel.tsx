@@ -199,7 +199,7 @@ export default function ScaffoldPanel({
         key={feature.id}
         className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
           isSelected
-            ? "border-purple-500/50 bg-purple-500/10"
+            ? "border-blue-500/50 bg-blue-500/10"
             : "border-white/5 bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.04]"
         }`}
       >
@@ -212,7 +212,7 @@ export default function ScaffoldPanel({
         <div
           className={`mt-0.5 w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-colors ${
             isSelected
-              ? "bg-purple-500 border-purple-500"
+              ? "bg-blue-500 border-blue-500"
               : "border-white/20 bg-transparent"
           }`}
         >
@@ -220,7 +220,7 @@ export default function ScaffoldPanel({
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="text-purple-400">{feature.icon}</span>
+            <span className="text-blue-400">{feature.icon}</span>
             <span className="text-sm font-medium text-white">
               {feature.label}
             </span>
@@ -235,7 +235,7 @@ export default function ScaffoldPanel({
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600/20 border border-purple-500/30 text-purple-300 hover:bg-purple-600/30 hover:border-purple-500/50 transition-all text-sm font-medium"
+        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600/20 border border-blue-500/30 text-blue-300 hover:bg-blue-600/30 hover:border-blue-500/50 transition-all text-sm font-medium"
       >
         <Database className="w-4 h-4" />
         Add Full-Stack Features
@@ -249,8 +249,8 @@ export default function ScaffoldPanel({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
-              <Database className="w-4 h-4 text-purple-400" />
+            <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
+              <Database className="w-4 h-4 text-blue-400" />
             </div>
             <div>
               <h2 className="text-white font-semibold text-lg">
@@ -280,7 +280,7 @@ export default function ScaffoldPanel({
               {/* Auth Section */}
               <div>
                 <h3 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-purple-400" />
+                  <Shield className="w-4 h-4 text-blue-400" />
                   Authentication
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -410,7 +410,7 @@ export default function ScaffoldPanel({
                 className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-all ${
                   selectedFeatures.length === 0 || isLoading
                     ? "bg-white/5 text-white/20 cursor-not-allowed"
-                    : "bg-purple-600 text-white hover:bg-purple-500"
+                    : "bg-blue-600 text-white hover:bg-blue-500"
                 }`}
               >
                 {isLoading ? (

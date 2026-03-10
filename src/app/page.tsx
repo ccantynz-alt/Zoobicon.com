@@ -159,7 +159,7 @@ const PRODUCTS = [
     icon: Bot,
     name: "AI Chatbot Builder",
     description: "Deploy custom AI chatbots on any website. Trained on your content, branded to your style.",
-    color: "from-violet-500 to-indigo-600",
+    color: "from-blue-500 to-indigo-600",
     glowColor: "shadow-glow-purple",
     domain: "zoobicon.ai",
     tag: "Builder",
@@ -255,8 +255,8 @@ const NEW_FEATURES = [
     icon: Figma,
     title: "Figma Import",
     description: "Design in Figma, deploy with Zoobicon",
-    color: "from-purple-500 to-pink-500",
-    glowColor: "shadow-purple-500/20",
+    color: "from-blue-500 to-pink-500",
+    glowColor: "shadow-blue-500/20",
   },
   {
     icon: Languages,
@@ -297,8 +297,8 @@ const NEW_FEATURES = [
     icon: Wand2,
     title: "Animation Editor",
     description: "Professional animations, no code",
-    color: "from-violet-500 to-fuchsia-500",
-    glowColor: "shadow-violet-500/20",
+    color: "from-blue-500 to-fuchsia-500",
+    glowColor: "shadow-blue-500/20",
   },
 ];
 

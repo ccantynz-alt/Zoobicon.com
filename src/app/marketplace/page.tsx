@@ -127,7 +127,7 @@ const MARKETPLACE_ITEMS: MarketplaceItem[] = [
     rating: 4.8,
     installs: "15.1K",
     icon: CreditCard,
-    gradient: "from-indigo-500 to-purple-600",
+    gradient: "from-indigo-500 to-blue-600",
   },
   {
     name: "Google Analytics",
@@ -171,7 +171,7 @@ const MARKETPLACE_ITEMS: MarketplaceItem[] = [
     rating: 4.6,
     installs: "3.8K",
     icon: Bot,
-    gradient: "from-violet-500 to-indigo-600",
+    gradient: "from-blue-500 to-indigo-600",
   },
   {
     name: "Custom Code Injection",
@@ -259,7 +259,7 @@ const MARKETPLACE_ITEMS: MarketplaceItem[] = [
     rating: 4.8,
     installs: "2.9K",
     icon: TrendingUp,
-    gradient: "from-purple-500 to-violet-600",
+    gradient: "from-blue-500 to-blue-600",
     tag: "New",
   },
   {

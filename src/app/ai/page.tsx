@@ -83,8 +83,8 @@ const AI_TOOLS = [
     icon: Bot,
     name: "AI Chatbot Builder",
     description: "Deploy intelligent chatbots that understand your business.",
-    color: "from-violet-500 to-indigo-600",
-    glowColor: "shadow-violet-500/25",
+    color: "from-blue-500 to-indigo-600",
+    glowColor: "shadow-blue-500/25",
     tag: "Agent",
   },
   {
@@ -92,7 +92,7 @@ const AI_TOOLS = [
     name: "AI Video Creator",
     description: "Transform text scripts into professional marketing videos.",
     color: "from-accent-purple to-pink-600",
-    glowColor: "shadow-purple-500/25",
+    glowColor: "shadow-blue-500/25",
     tag: "Creator",
   },
   {
@@ -153,7 +153,7 @@ const HOW_IT_WORKS = [
     subtitle: "AI builds it in seconds with auto-debugging",
     description: "Our AI writes production-grade code, designs responsive layouts, and auto-debugs every error — all in under 60 seconds.",
     color: "from-accent-purple to-pink-600",
-    glowColor: "shadow-purple-500/30",
+    glowColor: "shadow-blue-500/30",
   },
   {
     step: "03",

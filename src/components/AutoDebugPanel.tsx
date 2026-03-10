@@ -127,7 +127,7 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
       <button
         onClick={handleDebug}
         disabled={isLoading || !code.trim()}
-        className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg bg-purple-600 hover:bg-purple-500 disabled:bg-gray-700 disabled:text-gray-500 text-white text-sm font-medium transition-colors"
+        className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:text-gray-500 text-white text-sm font-medium transition-colors"
       >
         {isLoading ? (
           <>
@@ -158,7 +158,7 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
             className="w-full flex items-center justify-between p-3 hover:bg-white/5 transition-colors"
           >
             <div className="flex items-center gap-3">
-              <Shield className="w-5 h-5 text-purple-400" />
+              <Shield className="w-5 h-5 text-blue-400" />
               <span className="text-sm font-medium text-white">Debug Results</span>
 
               {/* Issue count badges */}

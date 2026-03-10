@@ -71,7 +71,7 @@ const CLI_COMMANDS = [
   { cmd: "zb generate \"[prompt]\"", desc: "Generate a website from prompt", icon: Sparkles, color: "text-amber-400" },
   { cmd: "zb edit \"[instruction]\"", desc: "Edit with natural language", icon: Pencil, color: "text-sky-400" },
   { cmd: "zb deploy", desc: "Deploy to zoobicon.sh subdomain", icon: Upload, color: "text-brand-400" },
-  { cmd: "zb deploy --domain custom.com", desc: "Deploy to custom domain", icon: Globe, color: "text-violet-400" },
+  { cmd: "zb deploy --domain custom.com", desc: "Deploy to custom domain", icon: Globe, color: "text-blue-400" },
   { cmd: "zb export --wordpress", desc: "Export as WordPress theme", icon: ExternalLink, color: "text-blue-400" },
   { cmd: "zb translate --lang es,fr,de", desc: "Add translations", icon: Languages, color: "text-pink-400" },
   { cmd: "zb seo --analyze", desc: "Run SEO analysis", icon: Search, color: "text-orange-400" },
