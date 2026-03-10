@@ -83,8 +83,8 @@ function RisingStreaks({ count, speed }: { count: number; speed: number }) {
 }
 
 /**
- * Tiger HEAD made of blue glowing dots — front-facing, realistic silhouette.
- * Uses an SVG path rendered to an off-screen canvas, then sampled as particles.
+ * Tiger HEAD — clean line-drawn, glowing blue tiger face.
+ * Uses direct canvas drawing with bezier curves for a clearly recognizable tiger.
  * Represents Zoobic Safari in the Philippines.
  */
 function TigerCanvas() {
@@ -105,227 +105,323 @@ function TigerCanvas() {
     resize();
     window.addEventListener("resize", resize);
 
-    // Front-facing tiger head SVG path — carefully traced outline
-    // Viewbox: 0 0 400 400, centered tiger face
-    const tigerPath = new Path2D();
-
-    // --- Outer face shape (wide at cheeks, narrower at chin & top) ---
-    tigerPath.moveTo(200, 360); // chin center
-    tigerPath.bezierCurveTo(140, 355, 90, 320, 70, 280); // chin to left jaw
-    tigerPath.bezierCurveTo(50, 245, 40, 210, 42, 180); // left jaw to left cheek
-    tigerPath.bezierCurveTo(44, 150, 50, 125, 65, 105); // left cheek up to temple
-
-    // Left ear
-    tigerPath.bezierCurveTo(55, 80, 40, 45, 60, 15); // outer left ear
-    tigerPath.bezierCurveTo(75, 0, 95, 5, 110, 30); // left ear tip
-    tigerPath.bezierCurveTo(120, 48, 125, 70, 130, 90); // inner left ear to forehead
-
-    // Forehead
-    tigerPath.bezierCurveTo(150, 75, 175, 68, 200, 66); // left forehead to center
-    tigerPath.bezierCurveTo(225, 68, 250, 75, 270, 90); // center to right forehead
-
-    // Right ear
-    tigerPath.bezierCurveTo(275, 70, 280, 48, 290, 30); // inner right ear
-    tigerPath.bezierCurveTo(305, 5, 325, 0, 340, 15); // right ear tip
-    tigerPath.bezierCurveTo(360, 45, 345, 80, 335, 105); // outer right ear
-
-    // Right side down
-    tigerPath.bezierCurveTo(350, 125, 356, 150, 358, 180); // right temple to cheek
-    tigerPath.bezierCurveTo(360, 210, 350, 245, 330, 280); // right cheek to jaw
-    tigerPath.bezierCurveTo(310, 320, 260, 355, 200, 360); // right jaw to chin
-    tigerPath.closePath();
-
-    // --- Inner features as separate paths for density variation ---
-    // Left eye
-    const leftEye = new Path2D();
-    leftEye.ellipse(148, 185, 28, 18, -0.1, 0, Math.PI * 2);
-
-    // Right eye
-    const rightEye = new Path2D();
-    rightEye.ellipse(252, 185, 28, 18, 0.1, 0, Math.PI * 2);
-
-    // Nose
-    const nose = new Path2D();
-    nose.moveTo(200, 240);
-    nose.bezierCurveTo(185, 240, 178, 252, 182, 262);
-    nose.bezierCurveTo(186, 270, 194, 275, 200, 278);
-    nose.bezierCurveTo(206, 275, 214, 270, 218, 262);
-    nose.bezierCurveTo(222, 252, 215, 240, 200, 240);
-    nose.closePath();
-
-    // --- Sample points from the tiger shape ---
-    const offscreen = document.createElement("canvas");
-    offscreen.width = 400;
-    offscreen.height = 400;
-    const offCtx = offscreen.getContext("2d")!;
-
-    type Dot = { x: number; y: number; r: number; b: number; phase: number; hue: number };
-    const dots: Dot[] = [];
-
-    // Helper: sample points inside a path
-    const samplePath = (path: Path2D, count: number, rMin: number, rMax: number, bMin: number, bMax: number) => {
-      let placed = 0;
-      let attempts = 0;
-      while (placed < count && attempts < count * 20) {
-        attempts++;
-        const x = Math.random() * 400;
-        const y = Math.random() * 400;
-        offCtx.clearRect(0, 0, 400, 400);
-        offCtx.fill(path);
-        if (offCtx.isPointInPath(path, x, y)) {
-          dots.push({
-            x, y,
-            r: rMin + Math.random() * (rMax - rMin),
-            b: bMin + Math.random() * (bMax - bMin),
-            phase: Math.random() * Math.PI * 2,
-            hue: 195 + Math.random() * 35,
-          });
-          placed++;
-        }
-      }
-    };
-
-    // Sample outline more densely (stroke the path shape's edge)
-    // Outline dots — sample near the edge
-    const sampleEdge = (path: Path2D, count: number, r: number, b: number, thickness: number) => {
-      let placed = 0;
-      let attempts = 0;
-      while (placed < count && attempts < count * 30) {
-        attempts++;
-        const x = Math.random() * 400;
-        const y = Math.random() * 400;
-        const inside = offCtx.isPointInPath(path, x, y);
-        // Check if near edge by checking a few pixels away
-        if (inside) {
-          const nearEdge =
-            !offCtx.isPointInPath(path, x - thickness, y) ||
-            !offCtx.isPointInPath(path, x + thickness, y) ||
-            !offCtx.isPointInPath(path, x, y - thickness) ||
-            !offCtx.isPointInPath(path, x, y + thickness);
-          if (nearEdge) {
-            dots.push({ x, y, r, b, phase: Math.random() * Math.PI * 2, hue: 200 + Math.random() * 30 });
-            placed++;
-          }
-        }
-      }
-    };
-
-    // Face outline — dense bright dots on the edge
-    sampleEdge(tigerPath, 250, 1.6, 0.75, 8);
-
-    // Face fill — scattered softer dots
-    samplePath(tigerPath, 350, 0.8, 1.4, 0.15, 0.35);
-
-    // Eyes — very bright, dense
-    samplePath(leftEye, 50, 1.2, 2.0, 0.85, 1.0);
-    samplePath(rightEye, 50, 1.2, 2.0, 0.85, 1.0);
-    // Eye outlines
-    sampleEdge(leftEye, 40, 1.5, 0.9, 4);
-    sampleEdge(rightEye, 40, 1.5, 0.9, 4);
-    // Pupils — center bright points
-    dots.push({ x: 148, y: 185, r: 3.5, b: 1.0, phase: 0, hue: 210 });
-    dots.push({ x: 252, y: 185, r: 3.5, b: 1.0, phase: 1, hue: 210 });
-
-    // Nose — bright, dense
-    samplePath(nose, 35, 1.0, 1.8, 0.8, 1.0);
-    sampleEdge(nose, 25, 1.4, 0.9, 3);
-
-    // Forehead stripes — the iconic tiger markings
-    const addStripe = (x1: number, y1: number, x2: number, y2: number, count: number) => {
-      for (let i = 0; i <= count; i++) {
-        const t = i / count;
-        dots.push({
-          x: x1 + (x2 - x1) * t + (Math.random() - 0.5) * 4,
-          y: y1 + (y2 - y1) * t + (Math.random() - 0.5) * 4,
-          r: 1.3 + Math.random() * 0.5,
-          b: 0.7 + Math.random() * 0.25,
-          phase: Math.random() * Math.PI * 2,
-          hue: 205 + Math.random() * 20,
-        });
-      }
-    };
-
-    // Center V stripe
-    addStripe(200, 80, 190, 135, 10);
-    addStripe(200, 80, 210, 135, 10);
-    // Left forehead stripes
-    addStripe(170, 90, 145, 140, 9);
-    addStripe(150, 95, 120, 140, 8);
-    addStripe(130, 105, 105, 148, 7);
-    // Right forehead stripes
-    addStripe(230, 90, 255, 140, 9);
-    addStripe(250, 95, 280, 140, 8);
-    addStripe(270, 105, 295, 148, 7);
-
-    // Cheek stripes
-    addStripe(85, 180, 110, 230, 7);
-    addStripe(78, 200, 100, 250, 7);
-    addStripe(75, 220, 95, 265, 6);
-    addStripe(315, 180, 290, 230, 7);
-    addStripe(322, 200, 300, 250, 7);
-    addStripe(325, 220, 305, 265, 6);
-
-    // Mouth line
-    addStripe(200, 278, 200, 300, 4);
-    // Mouth curves
-    for (let i = 0; i <= 8; i++) {
-      const t = i / 8;
-      const angle = -0.4 + t * 0.8;
-      dots.push({ x: 175 + Math.cos(angle) * 25, y: 305 + Math.sin(angle) * 12, r: 1.2, b: 0.6, phase: Math.random() * 6, hue: 210 });
-      dots.push({ x: 225 + Math.cos(Math.PI - angle) * 25, y: 305 + Math.sin(Math.PI - angle) * 12, r: 1.2, b: 0.6, phase: Math.random() * 6, hue: 210 });
-    }
-
-    // Whiskers
-    const addWhisker = (x1: number, y1: number, x2: number, y2: number) => {
-      for (let i = 0; i <= 12; i++) {
-        const t = i / 12;
-        dots.push({
-          x: x1 + (x2 - x1) * t,
-          y: y1 + (y2 - y1) * t + Math.sin(t * Math.PI) * 3,
-          r: 0.8 + (1 - t) * 0.4,
-          b: 0.4 + (1 - t) * 0.2,
-          phase: Math.random() * 6,
-          hue: 205 + Math.random() * 15,
-        });
-      }
-    };
-    // Left whiskers
-    addWhisker(160, 258, 50, 240);
-    addWhisker(158, 268, 45, 268);
-    addWhisker(160, 278, 52, 295);
-    // Right whiskers
-    addWhisker(240, 258, 350, 240);
-    addWhisker(242, 268, 355, 268);
-    addWhisker(240, 278, 348, 295);
-
-    // Inner ear details
-    samplePath(tigerPath, 15, 0.9, 1.3, 0.6, 0.8); // sparse inner ear fill
-
-    // Nose bridge
-    addStripe(200, 210, 200, 240, 5);
-
-    // Muzzle area — denser dots around nose/mouth
-    for (let i = 0; i < 30; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const dist = Math.random() * 30;
-      const x = 200 + Math.cos(angle) * dist;
-      const y = 265 + Math.sin(angle) * dist * 0.7;
-      if (offCtx.isPointInPath(tigerPath, x, y)) {
-        dots.push({ x, y, r: 0.8 + Math.random() * 0.6, b: 0.3 + Math.random() * 0.2, phase: Math.random() * 6, hue: 200 + Math.random() * 25 });
-      }
-    }
-
-    // Brow ridges
-    for (let i = 0; i <= 12; i++) {
-      const t = i / 12;
-      const angle = Math.PI + 0.5 + t * (Math.PI - 1);
-      dots.push({ x: 148 + Math.cos(angle) * 32, y: 175 + Math.sin(angle) * 10, r: 1.3, b: 0.65, phase: Math.random() * 6, hue: 208 });
-      dots.push({ x: 252 + Math.cos(angle) * 32, y: 175 + Math.sin(angle) * 10, r: 1.3, b: 0.65, phase: Math.random() * 6, hue: 208 });
-    }
-
-    // --- Animate ---
     let frame = 0;
     let animId: number;
+
+    const drawTiger = (
+      ctx: CanvasRenderingContext2D,
+      cx: number,
+      cy: number,
+      size: number,
+      time: number
+    ) => {
+      const s = size / 400; // scale factor (design at 400x400)
+      const breathe = Math.sin(time * 0.8) * 2 * s;
+      const tilt = Math.sin(time * 0.4) * 0.02;
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(tilt);
+
+      // --- Helper to draw a glowing stroke ---
+      const glowStroke = (
+        drawFn: () => void,
+        color: string,
+        width: number,
+        glowSize: number
+      ) => {
+        // Outer glow
+        ctx.save();
+        ctx.shadowColor = color;
+        ctx.shadowBlur = glowSize * s;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width * s;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.beginPath();
+        drawFn();
+        ctx.stroke();
+        ctx.restore();
+
+        // Core line
+        ctx.strokeStyle = color.replace(/[\d.]+\)$/, "0.9)");
+        ctx.lineWidth = width * s * 0.6;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.beginPath();
+        drawFn();
+        ctx.stroke();
+      };
+
+      const glowFill = (
+        drawFn: () => void,
+        color: string,
+        glowSize: number
+      ) => {
+        ctx.save();
+        ctx.shadowColor = color;
+        ctx.shadowBlur = glowSize * s;
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        drawFn();
+        ctx.fill();
+        ctx.restore();
+      };
+
+      const blue1 = "hsla(210, 90%, 65%, 0.8)";
+      const blue2 = "hsla(200, 85%, 60%, 0.7)";
+      const cyan = "hsla(190, 90%, 65%, 0.75)";
+      const brightBlue = "hsla(210, 95%, 75%, 0.95)";
+      const dimBlue = "hsla(210, 80%, 55%, 0.4)";
+      const stripe = "hsla(205, 85%, 50%, 0.6)";
+
+      // ===== FACE OUTLINE =====
+      glowStroke(
+        () => {
+          ctx.moveTo(0, 160 * s + breathe); // chin
+          ctx.bezierCurveTo(-60 * s, 155 * s, -110 * s, 120 * s, -130 * s, 80 * s);
+          ctx.bezierCurveTo(-150 * s, 40 * s, -158 * s, 0, -155 * s, -30 * s);
+          ctx.bezierCurveTo(-150 * s, -65 * s, -138 * s, -90 * s, -120 * s, -105 * s);
+          // Left ear
+          ctx.bezierCurveTo(-135 * s, -130 * s, -145 * s, -170 * s, -125 * s, -195 * s);
+          ctx.bezierCurveTo(-110 * s, -210 * s, -90 * s, -205 * s, -75 * s, -185 * s);
+          ctx.bezierCurveTo(-65 * s, -165 * s, -60 * s, -140 * s, -60 * s, -120 * s);
+          // Forehead
+          ctx.bezierCurveTo(-40 * s, -135 * s, -15 * s, -140 * s, 0, -142 * s);
+          ctx.bezierCurveTo(15 * s, -140 * s, 40 * s, -135 * s, 60 * s, -120 * s);
+          // Right ear
+          ctx.bezierCurveTo(60 * s, -140 * s, 65 * s, -165 * s, 75 * s, -185 * s);
+          ctx.bezierCurveTo(90 * s, -205 * s, 110 * s, -210 * s, 125 * s, -195 * s);
+          ctx.bezierCurveTo(145 * s, -170 * s, 135 * s, -130 * s, 120 * s, -105 * s);
+          // Right side down
+          ctx.bezierCurveTo(138 * s, -90 * s, 150 * s, -65 * s, 155 * s, -30 * s);
+          ctx.bezierCurveTo(158 * s, 0, 150 * s, 40 * s, 130 * s, 80 * s);
+          ctx.bezierCurveTo(110 * s, 120 * s, 60 * s, 155 * s, 0, 160 * s + breathe);
+        },
+        blue1,
+        2.5,
+        20
+      );
+
+      // ===== INNER EAR LINES =====
+      glowStroke(
+        () => {
+          ctx.moveTo(-110 * s, -155 * s);
+          ctx.bezierCurveTo(-100 * s, -175 * s, -88 * s, -180 * s, -80 * s, -165 * s);
+          ctx.bezierCurveTo(-72 * s, -148 * s, -70 * s, -130 * s, -72 * s, -115 * s);
+        },
+        dimBlue,
+        1.5,
+        8
+      );
+      glowStroke(
+        () => {
+          ctx.moveTo(110 * s, -155 * s);
+          ctx.bezierCurveTo(100 * s, -175 * s, 88 * s, -180 * s, 80 * s, -165 * s);
+          ctx.bezierCurveTo(72 * s, -148 * s, 70 * s, -130 * s, 72 * s, -115 * s);
+        },
+        dimBlue,
+        1.5,
+        8
+      );
+
+      // ===== EYES =====
+      // Eye shapes — almond-shaped
+      const drawLeftEye = () => {
+        ctx.moveTo(-72 * s, -15 * s);
+        ctx.bezierCurveTo(-68 * s, -30 * s, -48 * s, -38 * s, -30 * s, -32 * s);
+        ctx.bezierCurveTo(-18 * s, -28 * s, -15 * s, -18 * s, -18 * s, -10 * s);
+        ctx.bezierCurveTo(-22 * s, 0, -38 * s, 5 * s, -52 * s, 0);
+        ctx.bezierCurveTo(-65 * s, -5 * s, -74 * s, -8 * s, -72 * s, -15 * s);
+      };
+      const drawRightEye = () => {
+        ctx.moveTo(72 * s, -15 * s);
+        ctx.bezierCurveTo(68 * s, -30 * s, 48 * s, -38 * s, 30 * s, -32 * s);
+        ctx.bezierCurveTo(18 * s, -28 * s, 15 * s, -18 * s, 18 * s, -10 * s);
+        ctx.bezierCurveTo(22 * s, 0, 38 * s, 5 * s, 52 * s, 0);
+        ctx.bezierCurveTo(65 * s, -5 * s, 74 * s, -8 * s, 72 * s, -15 * s);
+      };
+
+      glowStroke(drawLeftEye, brightBlue, 2.2, 15);
+      glowStroke(drawRightEye, brightBlue, 2.2, 15);
+
+      // Pupils — glowing dots
+      const pupilPulse = 0.8 + 0.2 * Math.sin(time * 2);
+      glowFill(
+        () => { ctx.arc(-45 * s, -16 * s, 5 * s * pupilPulse, 0, Math.PI * 2); },
+        brightBlue,
+        25
+      );
+      glowFill(
+        () => { ctx.arc(45 * s, -16 * s, 5 * s * pupilPulse, 0, Math.PI * 2); },
+        brightBlue,
+        25
+      );
+
+      // ===== NOSE =====
+      glowStroke(
+        () => {
+          ctx.moveTo(0, 30 * s);
+          ctx.bezierCurveTo(-14 * s, 30 * s, -20 * s, 40 * s, -16 * s, 50 * s);
+          ctx.bezierCurveTo(-12 * s, 58 * s, -4 * s, 62 * s, 0, 64 * s);
+          ctx.bezierCurveTo(4 * s, 62 * s, 12 * s, 58 * s, 16 * s, 50 * s);
+          ctx.bezierCurveTo(20 * s, 40 * s, 14 * s, 30 * s, 0, 30 * s);
+        },
+        cyan,
+        2,
+        12
+      );
+      // Nose fill (subtle)
+      glowFill(
+        () => {
+          ctx.moveTo(0, 32 * s);
+          ctx.bezierCurveTo(-12 * s, 32 * s, -17 * s, 40 * s, -14 * s, 48 * s);
+          ctx.bezierCurveTo(-10 * s, 55 * s, -3 * s, 59 * s, 0, 60 * s);
+          ctx.bezierCurveTo(3 * s, 59 * s, 10 * s, 55 * s, 14 * s, 48 * s);
+          ctx.bezierCurveTo(17 * s, 40 * s, 12 * s, 32 * s, 0, 32 * s);
+        },
+        "hsla(200, 85%, 60%, 0.15)",
+        8
+      );
+
+      // ===== NOSE BRIDGE =====
+      glowStroke(
+        () => {
+          ctx.moveTo(0, 5 * s);
+          ctx.lineTo(0, 30 * s);
+        },
+        dimBlue,
+        1.5,
+        6
+      );
+
+      // ===== MOUTH =====
+      // Center line down from nose
+      glowStroke(
+        () => {
+          ctx.moveTo(0, 64 * s);
+          ctx.lineTo(0, 78 * s);
+        },
+        blue2,
+        1.5,
+        8
+      );
+      // Mouth curves
+      glowStroke(
+        () => {
+          ctx.moveTo(0, 78 * s);
+          ctx.bezierCurveTo(-8 * s, 85 * s, -22 * s, 90 * s, -35 * s, 85 * s);
+        },
+        blue2,
+        1.8,
+        10
+      );
+      glowStroke(
+        () => {
+          ctx.moveTo(0, 78 * s);
+          ctx.bezierCurveTo(8 * s, 85 * s, 22 * s, 90 * s, 35 * s, 85 * s);
+        },
+        blue2,
+        1.8,
+        10
+      );
+
+      // ===== CHIN =====
+      glowStroke(
+        () => {
+          ctx.moveTo(-30 * s, 100 * s);
+          ctx.bezierCurveTo(-15 * s, 115 * s, 15 * s, 115 * s, 30 * s, 100 * s);
+        },
+        dimBlue,
+        1.2,
+        6
+      );
+
+      // ===== WHISKERS =====
+      const whiskerWave = Math.sin(time * 1.2) * 3 * s;
+      // Left whiskers
+      glowStroke(() => {
+        ctx.moveTo(-30 * s, 60 * s); ctx.quadraticCurveTo(-80 * s, 48 * s + whiskerWave, -145 * s, 42 * s + whiskerWave);
+      }, blue2, 1.2, 8);
+      glowStroke(() => {
+        ctx.moveTo(-28 * s, 68 * s); ctx.quadraticCurveTo(-80 * s, 68 * s - whiskerWave, -148 * s, 65 * s - whiskerWave);
+      }, blue2, 1.2, 8);
+      glowStroke(() => {
+        ctx.moveTo(-26 * s, 76 * s); ctx.quadraticCurveTo(-75 * s, 85 * s + whiskerWave, -140 * s, 90 * s + whiskerWave);
+      }, blue2, 1.2, 8);
+      // Right whiskers
+      glowStroke(() => {
+        ctx.moveTo(30 * s, 60 * s); ctx.quadraticCurveTo(80 * s, 48 * s - whiskerWave, 145 * s, 42 * s - whiskerWave);
+      }, blue2, 1.2, 8);
+      glowStroke(() => {
+        ctx.moveTo(28 * s, 68 * s); ctx.quadraticCurveTo(80 * s, 68 * s + whiskerWave, 148 * s, 65 * s + whiskerWave);
+      }, blue2, 1.2, 8);
+      glowStroke(() => {
+        ctx.moveTo(26 * s, 76 * s); ctx.quadraticCurveTo(75 * s, 85 * s - whiskerWave, 140 * s, 90 * s - whiskerWave);
+      }, blue2, 1.2, 8);
+
+      // ===== TIGER STRIPES — forehead =====
+      // Center V
+      glowStroke(() => {
+        ctx.moveTo(0, -130 * s); ctx.bezierCurveTo(-5 * s, -110 * s, -12 * s, -85 * s, -8 * s, -60 * s);
+      }, stripe, 3, 6);
+      glowStroke(() => {
+        ctx.moveTo(0, -130 * s); ctx.bezierCurveTo(5 * s, -110 * s, 12 * s, -85 * s, 8 * s, -60 * s);
+      }, stripe, 3, 6);
+
+      // Left forehead stripes
+      glowStroke(() => {
+        ctx.moveTo(-30 * s, -120 * s); ctx.bezierCurveTo(-40 * s, -100 * s, -55 * s, -75 * s, -50 * s, -55 * s);
+      }, stripe, 2.5, 5);
+      glowStroke(() => {
+        ctx.moveTo(-55 * s, -110 * s); ctx.bezierCurveTo(-68 * s, -90 * s, -80 * s, -70 * s, -78 * s, -52 * s);
+      }, stripe, 2.2, 5);
+      glowStroke(() => {
+        ctx.moveTo(-80 * s, -98 * s); ctx.bezierCurveTo(-95 * s, -80 * s, -105 * s, -60 * s, -100 * s, -45 * s);
+      }, stripe, 2, 4);
+
+      // Right forehead stripes
+      glowStroke(() => {
+        ctx.moveTo(30 * s, -120 * s); ctx.bezierCurveTo(40 * s, -100 * s, 55 * s, -75 * s, 50 * s, -55 * s);
+      }, stripe, 2.5, 5);
+      glowStroke(() => {
+        ctx.moveTo(55 * s, -110 * s); ctx.bezierCurveTo(68 * s, -90 * s, 80 * s, -70 * s, 78 * s, -52 * s);
+      }, stripe, 2.2, 5);
+      glowStroke(() => {
+        ctx.moveTo(80 * s, -98 * s); ctx.bezierCurveTo(95 * s, -80 * s, 105 * s, -60 * s, 100 * s, -45 * s);
+      }, stripe, 2, 4);
+
+      // ===== CHEEK STRIPES =====
+      glowStroke(() => {
+        ctx.moveTo(-120 * s, -20 * s); ctx.bezierCurveTo(-110 * s, 0, -105 * s, 25 * s, -108 * s, 45 * s);
+      }, stripe, 2, 4);
+      glowStroke(() => {
+        ctx.moveTo(-128 * s, 5 * s); ctx.bezierCurveTo(-118 * s, 25 * s, -112 * s, 48 * s, -115 * s, 65 * s);
+      }, stripe, 2, 4);
+      glowStroke(() => {
+        ctx.moveTo(-132 * s, 30 * s); ctx.bezierCurveTo(-122 * s, 50 * s, -115 * s, 70 * s, -118 * s, 85 * s);
+      }, stripe, 1.8, 4);
+
+      glowStroke(() => {
+        ctx.moveTo(120 * s, -20 * s); ctx.bezierCurveTo(110 * s, 0, 105 * s, 25 * s, 108 * s, 45 * s);
+      }, stripe, 2, 4);
+      glowStroke(() => {
+        ctx.moveTo(128 * s, 5 * s); ctx.bezierCurveTo(118 * s, 25 * s, 112 * s, 48 * s, 115 * s, 65 * s);
+      }, stripe, 2, 4);
+      glowStroke(() => {
+        ctx.moveTo(132 * s, 30 * s); ctx.bezierCurveTo(122 * s, 50 * s, 115 * s, 70 * s, 118 * s, 85 * s);
+      }, stripe, 1.8, 4);
+
+      // ===== BROW LINES =====
+      glowStroke(() => {
+        ctx.moveTo(-70 * s, -40 * s); ctx.bezierCurveTo(-55 * s, -48 * s, -35 * s, -48 * s, -18 * s, -42 * s);
+      }, blue2, 1.8, 10);
+      glowStroke(() => {
+        ctx.moveTo(70 * s, -40 * s); ctx.bezierCurveTo(55 * s, -48 * s, 35 * s, -48 * s, 18 * s, -42 * s);
+      }, blue2, 1.8, 10);
+
+      ctx.restore();
+    };
 
     const draw = () => {
       frame++;
@@ -333,59 +429,12 @@ function TigerCanvas() {
       const H = canvas.height;
       ctx.clearRect(0, 0, W, H);
 
-      // Tiger head size and position — drifts gently across the screen
-      const tigerSize = Math.min(W * 0.5, H * 0.42);
-      const scale = tigerSize / 400;
+      const time = frame / 60;
+      const tigerSize = Math.min(W * 0.55, H * 0.48);
+      const driftX = Math.sin(time * 0.15) * W * 0.06;
+      const driftY = Math.sin(time * 0.25) * H * 0.015;
 
-      // Slow drift: moves left-right over ~20 seconds, bobs up-down gently
-      const driftX = Math.sin(frame * 0.003) * W * 0.12;
-      const driftY = Math.sin(frame * 0.005) * H * 0.03;
-      const tilt = Math.sin(frame * 0.004) * 0.03; // very subtle head tilt
-
-      const offsetX = (W - 400 * scale) / 2 + driftX;
-      const offsetY = H * 0.06 + driftY;
-
-      for (let i = 0; i < dots.length; i++) {
-        const d = dots[i];
-
-        // Subtle floating motion
-        const ox = Math.sin(frame * 0.012 + d.phase * 3) * 1.0;
-        const oy = Math.cos(frame * 0.010 + d.phase * 2) * 1.0;
-
-        // Pulsing glow
-        const pulse = 0.7 + 0.3 * Math.sin(frame * 0.025 + d.phase);
-        const alpha = d.b * pulse;
-
-        // Apply subtle tilt rotation around center of tiger
-        const cx = 200 * scale, cy = 200 * scale;
-        const rx = d.x * scale - cx;
-        const ry = d.y * scale - cy;
-        const rotX = rx * Math.cos(tilt) - ry * Math.sin(tilt) + cx;
-        const rotY = rx * Math.sin(tilt) + ry * Math.cos(tilt) + cy;
-
-        const sx = offsetX + rotX + ox;
-        const sy = offsetY + rotY + oy;
-        const dotR = d.r * scale;
-
-        // Skip if off screen
-        if (sx < -10 || sx > W + 10 || sy < -10 || sy > H + 10) continue;
-
-        // Outer glow
-        const grad = ctx.createRadialGradient(sx, sy, 0, sx, sy, dotR * 3.5);
-        grad.addColorStop(0, `hsla(${d.hue}, 85%, 65%, ${alpha * 0.5})`);
-        grad.addColorStop(0.5, `hsla(${d.hue}, 80%, 55%, ${alpha * 0.12})`);
-        grad.addColorStop(1, `hsla(${d.hue}, 80%, 50%, 0)`);
-        ctx.beginPath();
-        ctx.arc(sx, sy, dotR * 3.5, 0, Math.PI * 2);
-        ctx.fillStyle = grad;
-        ctx.fill();
-
-        // Core dot
-        ctx.beginPath();
-        ctx.arc(sx, sy, dotR, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(${d.hue}, 85%, 72%, ${alpha})`;
-        ctx.fill();
-      }
+      drawTiger(ctx, W / 2 + driftX, H * 0.42 + driftY, tigerSize, time);
 
       animId = requestAnimationFrame(draw);
     };
