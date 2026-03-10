@@ -203,9 +203,9 @@ export default function BuilderDemo() {
               </div>
               <div className={`mt-2 h-8 rounded-lg flex items-center justify-center gap-1.5 text-xs font-medium transition-all ${
                 phase === "generating"
-                  ? "bg-gradient-to-r from-brand-600 to-accent-purple text-white"
+                  ? "bg-gradient-to-r from-brand-600 to-brand-500 text-white"
                   : phase === "done"
-                  ? "bg-accent-cyan/20 text-accent-cyan border border-accent-cyan/20"
+                  ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20"
                   : "bg-white/[0.04] text-white/30 border border-white/[0.06]"
               }`}>
                 {phase === "generating" && <><Sparkles className="w-3 h-3 animate-pulse" /> Generating...</>}
@@ -221,7 +221,7 @@ export default function BuilderDemo() {
                 <div
                   key={i}
                   className={`py-0.5 animate-fade-in ${
-                    line.includes("complete") ? "text-accent-cyan" : "text-white/30"
+                    line.includes("complete") ? "text-emerald-400" : "text-white/30"
                   }`}
                 >
                   <span className="text-white/10 mr-1.5">{String(i + 1).padStart(2, "0")}</span>
@@ -288,7 +288,7 @@ export default function BuilderDemo() {
                       onClick={startDemo}
                       className="group flex flex-col items-center gap-3 cursor-pointer"
                     >
-                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500/20 to-accent-purple/20 border border-brand-500/20 flex items-center justify-center group-hover:scale-105 transition-transform">
+                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500/15 to-brand-400/10 border border-brand-500/20 flex items-center justify-center group-hover:scale-105 transition-transform">
                         <Play className="w-7 h-7 text-brand-400/80 ml-0.5" />
                       </div>
                       <span className="text-xs text-white/30 group-hover:text-white/50 transition-colors">Watch the demo</span>
