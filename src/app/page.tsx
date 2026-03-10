@@ -462,13 +462,19 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-24 lg:pt-44 lg:pb-36 overflow-hidden">
-        {/* Aurora background */}
-        <div className="aurora" />
+      <section className="relative pt-32 pb-24 lg:pt-48 lg:pb-40 overflow-hidden min-h-screen flex items-center">
+        {/* Layered background effects */}
+        <div className="aurora-hero" />
+        <div className="hero-grid" />
+        <div className="hero-spotlight" />
+        <div className="hero-light-line" style={{ top: "30%" }} />
+        <div className="hero-light-line" style={{ top: "70%", animationDelay: "3s" }} />
         {/* Radial gradient fade at bottom */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-dark-300 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0b0b11]/30 via-transparent to-[#0b0b11] pointer-events-none" />
+        {/* Top edge glow */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/30 to-transparent" />
 
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center relative z-10">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center relative z-10 w-full">
           <motion.div
             initial="hidden"
             animate="visible"
@@ -476,26 +482,26 @@ export default function LandingPage() {
           >
             {/* Badge */}
             <motion.div variants={fadeInUp} className="flex justify-center mb-10">
-              <div className="glass inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full">
-                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-xs font-medium text-white/70 tracking-wide">AI Website Builder — Trusted by 10,000+ creators</span>
-                <ChevronRight className="w-3 h-3 text-white/30" />
+              <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border border-blue-500/20 bg-blue-500/[0.06] backdrop-blur-xl">
+                <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.6)]" />
+                <span className="text-xs font-medium text-blue-200/80 tracking-wide">AI Website Builder — Trusted by 10,000+ creators</span>
+                <ChevronRight className="w-3 h-3 text-blue-400/50" />
               </div>
             </motion.div>
 
             {/* Main Headline */}
             <motion.h1
               variants={fadeInUp}
-              className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-black tracking-[-0.03em] leading-[0.92] mb-8"
+              className="text-5xl sm:text-6xl md:text-7xl lg:text-[6rem] font-black tracking-[-0.03em] leading-[0.9] mb-8"
             >
-              <span className="block text-white">Websites that build</span>
-              <span className="block gradient-text-hero mt-2">themselves.</span>
+              <span className="block text-white drop-shadow-[0_0_40px_rgba(59,130,246,0.15)]">Websites that build</span>
+              <span className="block gradient-text-hero mt-3 drop-shadow-[0_0_60px_rgba(59,130,246,0.25)]">themselves.</span>
             </motion.h1>
 
             {/* Sub headline */}
             <motion.p
               variants={fadeInUp}
-              className="max-w-2xl mx-auto text-lg md:text-xl text-white/45 leading-relaxed mb-8 font-light"
+              className="max-w-2xl mx-auto text-lg md:text-xl text-slate-400 leading-relaxed mb-10 font-light"
             >
               Describe any website. Watch AI build it in real-time — full-stack, responsive, production-ready.
               With auto-debugging, SEO, and one-click deploy.
@@ -504,29 +510,29 @@ export default function LandingPage() {
             {/* Feature pills */}
             <motion.div
               variants={fadeInUp}
-              className="flex flex-wrap justify-center gap-2 mb-12 max-w-3xl mx-auto"
+              className="flex flex-wrap justify-center gap-2.5 mb-14 max-w-3xl mx-auto"
             >
               {["Auto-Debug", "GitHub Import", "WP Export", "Figma Import", "30+ Languages", "E-commerce", "Auth Scaffold", "SEO Auto-Fix"].map((pill) => (
                 <span
                   key={pill}
-                  className="glass inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium text-white/55"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium text-blue-200/70 border border-blue-500/15 bg-blue-500/[0.04] backdrop-blur-sm"
                 >
-                  <Check className="w-3 h-3 text-emerald-400/80" />
+                  <Check className="w-3 h-3 text-blue-400" />
                   {pill}
                 </span>
               ))}
             </motion.div>
 
             {/* CTAs */}
-            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
+            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-24">
               <Link
                 href="/builder"
-                className="group btn-gradient px-8 py-4 rounded-2xl text-base font-semibold text-white flex items-center gap-3"
+                className="group relative px-10 py-4.5 rounded-2xl text-base font-semibold text-white flex items-center gap-3 bg-gradient-to-r from-blue-600 to-blue-500 shadow-[0_0_30px_rgba(37,99,235,0.3),0_4px_16px_rgba(37,99,235,0.2)] hover:shadow-[0_0_40px_rgba(37,99,235,0.45),0_8px_24px_rgba(37,99,235,0.3)] hover:-translate-y-0.5 transition-all duration-300"
               >
                 <span>Start Building Free</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <button className="group glass px-8 py-4 rounded-2xl text-base font-medium text-white/60 hover:text-white/80 transition-all flex items-center gap-3">
+              <button className="group px-10 py-4.5 rounded-2xl text-base font-medium text-slate-300 hover:text-white transition-all flex items-center gap-3 border border-white/10 hover:border-white/20 bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-sm">
                 <Play className="w-4 h-4" />
                 <span>Watch Demo</span>
               </button>
@@ -537,12 +543,14 @@ export default function LandingPage() {
               variants={fadeInUp}
               className="relative max-w-5xl mx-auto"
             >
-              {/* Premium frame with glass morphism */}
-              <div className="rounded-2xl overflow-hidden shadow-premium ring-1 ring-white/[0.08]">
+              {/* Glow behind the demo */}
+              <div className="absolute -inset-4 bg-gradient-to-r from-blue-600/10 via-blue-500/5 to-indigo-600/10 rounded-3xl blur-2xl pointer-events-none" />
+              {/* Premium frame */}
+              <div className="relative rounded-2xl overflow-hidden ring-1 ring-white/[0.1] shadow-[0_20px_80px_rgba(37,99,235,0.12),0_8px_32px_rgba(0,0,0,0.4)]">
                 <BuilderDemo />
               </div>
-              {/* Soft ambient glow under the preview */}
-              <div className="absolute -bottom-24 left-1/2 -translate-x-1/2 w-[70%] h-48 bg-brand-500/8 blur-[120px] rounded-full pointer-events-none" />
+              {/* Ambient glow under the preview */}
+              <div className="absolute -bottom-32 left-1/2 -translate-x-1/2 w-[80%] h-64 bg-blue-500/10 blur-[120px] rounded-full pointer-events-none" />
             </motion.div>
           </motion.div>
         </div>
