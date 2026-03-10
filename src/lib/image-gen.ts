@@ -231,10 +231,21 @@ export function buildImagePrompts(html: string, industry: string): Array<{
   style: GenerateOptions["style"];
 }> {
   const placeholders: Array<{ url: string; width: number; height: number }> = [];
-  const pattern = /https?:\/\/(?:picsum\.photos|source\.unsplash\.com)\/(\d+)(?:[x/](\d+))?/g;
-  let match;
 
-  while ((match = pattern.exec(html)) !== null) {
+  // Match seeded picsum URLs: picsum.photos/seed/KEYWORD/WIDTH/HEIGHT
+  const seededPattern = /https?:\/\/picsum\.photos\/seed\/[a-zA-Z0-9_-]+\/(\d+)(?:\/(\d+))?/g;
+  let match;
+  while ((match = seededPattern.exec(html)) !== null) {
+    const w = parseInt(match[1]);
+    const h = match[2] ? parseInt(match[2]) : w;
+    if (!placeholders.find((p) => p.url === match[0])) {
+      placeholders.push({ url: match[0], width: w, height: h });
+    }
+  }
+
+  // Also match bare picsum URLs and unsplash source URLs
+  const barePattern = /https?:\/\/(?:picsum\.photos|source\.unsplash\.com)\/(\d+)(?:[x/](\d+))?/g;
+  while ((match = barePattern.exec(html)) !== null) {
     const w = parseInt(match[1]);
     const h = match[2] ? parseInt(match[2]) : w;
     if (!placeholders.find((p) => p.url === match[0])) {
@@ -291,6 +302,38 @@ export function buildImagePrompts(html: string, industry: string): Array<{
       "Personal trainer coaching client, fitness motivation",
       "Healthy meal prep with colorful ingredients, nutrition photography",
       "Group fitness class with energetic atmosphere, gym community",
+    ],
+    transportation: [
+      "Modern shuttle bus or passenger van on the road, professional transportation photography",
+      "Airport shuttle service picking up passengers, travel transportation",
+      "Professional driver in uniform opening vehicle door, chauffeur service",
+      "Fleet of clean shuttle vans parked in a row, transportation company",
+      "Happy passengers boarding a shuttle van, ride service photography",
+      "Scenic highway with transportation vehicle, professional travel service",
+    ],
+    shuttle: [
+      "Airport shuttle van at terminal pickup area, transportation service photography",
+      "Comfortable shuttle interior with passenger seats, ride service",
+      "Professional shuttle driver assisting passengers with luggage, chauffeur service",
+      "Modern passenger van fleet, shuttle transportation company",
+      "City shuttle bus at a stop, urban transportation service",
+      "Family boarding a shuttle van for travel, transportation photography",
+    ],
+    taxi: [
+      "Professional ride service vehicle on city street, taxi photography",
+      "Chauffeur opening car door for passenger, premium ride service",
+      "Modern taxi fleet in urban setting, transportation company",
+      "Passenger hailing a ride on a city street, taxi service",
+      "Clean luxury sedan for private car service, chauffeur photography",
+      "Airport pickup area with ride service vehicles, transportation",
+    ],
+    logistics: [
+      "Fleet of delivery trucks at loading dock, logistics photography",
+      "Modern warehouse with organized inventory, supply chain",
+      "Cargo containers at shipping port, freight transportation",
+      "Delivery driver scanning packages, logistics service",
+      "Aerial view of distribution center, supply chain photography",
+      "Semi truck on highway at sunset, freight transportation",
     ],
     default: [
       "Professional team meeting in modern office, corporate photography",

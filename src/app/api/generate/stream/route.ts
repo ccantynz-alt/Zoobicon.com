@@ -43,6 +43,13 @@ Read the user's prompt carefully. Detect the industry and match the aesthetic:
 - Asymmetric layouts, creative grid breaks
 - Strong imagery with artistic treatments
 
+**Transportation / Shuttle / Taxi / Logistics:**
+- Clean, trustworthy design with blues, navy, greens, or warm neutrals
+- Hero with fleet/vehicle imagery — shuttle vans, buses, or professional drivers
+- Booking forms, route maps, fleet photos, driver profiles
+- Trust signals: safety record, insurance info, years of service, number of rides
+- NO random stock photos — every image must relate to transportation, vehicles, or travel
+
 **E-commerce / Retail:**
 - Clean, product-focused design with plenty of white space
 - Product grid layouts, clear pricing, trust badges
@@ -74,49 +81,54 @@ Read the user's prompt carefully. Detect the industry and match the aesthetic:
 - Alternate section layouts: left-right, grid, full-width image breaks.
 - Use CSS Grid for complex layouts, Flexbox for component alignment.
 
-## Visual Polish
+## Visual Polish — The "$15K Agency" Techniques
+- CSS custom properties (--primary, --text, etc.) for ALL colors.
 - CSS transitions on ALL interactive elements: transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1).
-- Button hover: subtle shadow increase, slight translateY(-1px), background color shift.
-- Card hover: translateY(-2px), refined shadow enhancement.
-- Scroll-triggered fade-in animations using Intersection Observer (subtle, professional).
-- Sticky navbar with subtle background on scroll.
-- Smooth scroll behavior.
-- Image hover: subtle scale(1.02) with overflow hidden on container.
+- Buttons: translateY(-2px) + enhanced multi-layer shadow on hover, not just color change.
+- Cards: translateY(-4px) + elevated shadow on hover.
+- Images: scale(1.03) on hover with overflow:hidden container.
+- Scroll-triggered fade-in animations via IntersectionObserver (opacity:0 translateY(30px) → opacity:1 translateY(0), 0.6s ease-out, stagger siblings by 0.1s).
+- Sticky navbar: transparent on top → solid with shadow on scroll.
+- Smooth scroll for anchor links.
+- Animated number counters on stats (count from 0 to value on scroll).
+- Decorative accents: small colored lines (40px wide, 3px tall) above section headings.
+- Thin accent-colored top border (3-4px) on the page.
+- SVG wave/curve dividers between key sections.
 
-## Hero Section
-- Full viewport height or 85-90vh minimum. Maximum visual impact.
-- For luxury/professional: large aspirational photography, refined text overlay.
-- For tech/SaaS: gradient backgrounds or product imagery.
-- Clear headline communicating the core value proposition.
-- Prominent CTA button. Secondary CTA optional.
-- NO particle effects, NO matrix animations, NO typing effects unless specifically a tech/developer site.
+## Hero Section — First Impression Is Everything
+- 90-100vh height. Maximum visual impact.
+- Overlay gradient on hero image: linear-gradient(135deg, rgba(primary, 0.85), rgba(primaryDark, 0.7)).
+- Hero headline must be BIG and punchy — the single most impactful element.
+- TWO CTA buttons: primary (filled) + secondary (outlined/ghost).
+- Social proof directly under CTAs: "Trusted by 500+ clients" or star ratings.
+- Subtle scroll-down indicator (animated chevron).
 
 ## Images
-- Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT (where KEYWORD is a unique descriptive word per image like hero, team, about, service1) for placeholder photos.
-- Apply object-fit: cover on all images.
-- border-radius: 8-16px depending on context.
-- Add CSS: img { background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); min-height: 120px; } for graceful fallback.
+- Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT (unique KEYWORD per image). Never bare picsum.photos/WIDTH/HEIGHT.
+- object-fit: cover, border-radius: 12-16px, subtle shadow.
+- CSS: img { background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); min-height: 120px; }
+- For icons, use clean inline SVGs with brand colors.
 
 ## Responsive Design
-- Mobile-first. Use clamp() for typography sizing.
-- Navigation: clean hamburger menu with smooth animation.
-- Touch-friendly: all interactive elements minimum 44px tap target.
+- Mobile-first. clamp() for all typography.
+- Clean hamburger menu with smooth slide animation.
+- Touch-friendly: 44px minimum tap targets.
 
 ## Content Quality — CRITICAL
-- Write compelling, realistic copy that sounds like it was written by a professional copywriter.
-- Match the tone to the industry.
-- Include ALL these sections: hero with value proposition, trust/social proof, services/features grid, about/story, testimonials with realistic names, stats/achievements, CTA section, comprehensive footer.
+- Write like a premium copywriter. Every headline is BENEFIT-focused.
+- Include ALL these sections: hero, social proof/trust bar, services/features (3-4 with SVG icons), about with image, testimonials (3 cards with specific results like "Increased bookings by 47%"), animated stats (3-4), FAQ accordion (4-5 questions), CTA section, 4-column footer.
+- Stats must be specific: "2,847 projects" not "Many projects."
+- Footer: About, Services, Contact (realistic phone/email/address), Social links.
 - NO lorem ipsum, NO generic placeholder text.
-- Testimonials must sound authentic and specific to the industry.
 
-## What to AVOID — READ THIS
+## What to AVOID — CRITICAL
+- ANYTHING that looks like Elementor, Wix, or a free template.
 - Dark/cyberpunk themes for non-tech businesses.
-- Gradient blobs and neon glow effects on professional/corporate sites.
-- Glass-morphism everywhere — use it only where contextually appropriate (tech products).
-- Particle effects, matrix rain, or sci-fi aesthetics on business websites.
-- Over-animating. Subtle is professional. Flashy is amateur.
-- Generic "Lorem ipsum" or placeholder-sounding copy.
-- Thin, hard-to-read text on dark backgrounds.
+- Gradient blobs and neon glow on professional/corporate sites.
+- Particle effects, matrix rain, sci-fi aesthetics on business websites.
+- Over-animating. Subtle is professional.
+- Flat, unshadowed cards. Single-shadow buttons.
+- Missing hover states. Generic copy.
 - Using the same dark purple/cyan color scheme for every site regardless of industry.
 - ANYTHING that looks like a free template, Bootstrap default, or student project.
 - Cramped spacing, tiny text, or walls of text.`;
@@ -164,93 +176,78 @@ Read the user's prompt carefully. Detect the industry and match the aesthetic:
 - Strong imagery with artistic treatments
 - Can be dark or light depending on the creative direction
 
+**Transportation / Shuttle / Taxi / Logistics:**
+- Clean, trustworthy design with blues, navy, greens, or warm neutrals
+- Hero with fleet/vehicle imagery — shuttle vans, buses, or professional drivers
+- Booking forms, route maps, fleet photos, driver profiles
+- Trust signals: safety record, insurance info, years of service, number of rides
+
 **E-commerce / Retail:**
 - Clean, product-focused design with plenty of white space
 - Product grid layouts, clear pricing, trust badges
-- Professional photography emphasis
-- Straightforward navigation, clear CTAs
 
 **Healthcare / Wellness / Beauty:**
 - Soft, calming palettes: sage green, lavender, soft blues, warm neutrals
 - Clean, trustworthy design with clear hierarchy
-- Team photos, credentials, patient/client testimonials
 
 ## Typography — CRITICAL
 - Always import 2 complementary Google Fonts via Google Fonts API.
-- Headings: clamp(2rem, 4.5vw, 4.5rem) for hero, clear weight hierarchy (300, 400, 600, 700).
-- Body: 16-18px, line-height 1.7-1.8. Comfortable reading.
-- Use letter-spacing: -0.02em on large headings for refinement.
-- Subheadings in a lighter weight or different color for hierarchy.
+- Headings: clamp(2.5rem, 5vw, 4.5rem) for hero. Weight hierarchy: 300, 400, 600, 700.
+- Body: 16-18px, line-height 1.7-1.8.
+- letter-spacing: -0.02em on large headings.
+- Never use pure #000 text. Use #1a1a2e, #2d3748, or similar near-black.
 
 ## Color & Visual Design
-- Create a cohesive palette appropriate to the industry (see above).
-- Never use pure #000 or pure #fff. Use near-equivalents.
-- Accent color used SPARINGLY — only on primary CTAs, key highlights, and active states.
-- Create depth with refined box-shadows: 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.06).
-- Backgrounds: use subtle warm or cool tints rather than flat gray. Light sections alternate with slightly tinted sections for visual rhythm.
+- CSS custom properties (--primary, --text, etc.) for ALL colors.
+- Cohesive palette appropriate to the industry.
+- Multi-layer box-shadows: 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.06).
+- Alternate section backgrounds for visual rhythm: white → subtle tint (#faf9f7) → white.
 
 ## Layout & Spacing
-- Generous whitespace — sections: 100-140px vertical padding on desktop, 60-80px mobile.
-- Max content width 1200px, centered with comfortable side margins.
-- Cards: border-radius 12-16px, 1px solid border in a very subtle color, refined shadows.
-- Alternate section layouts: left-right, grid, full-width image breaks.
-- Use CSS Grid for complex layouts, Flexbox for component alignment.
+- 100-140px vertical padding desktop, 60-80px mobile.
+- Max content width 1200px. Cards: border-radius 12-16px, multi-layer shadows.
+- Alternate layouts: text-left/image-right, then image-left/text-right.
+- Include a social proof / logo strip near the hero.
+- Include a process/how-it-works section with numbered steps.
 
-## Visual Polish
-- CSS transitions on ALL interactive elements: transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1).
-- Button hover: subtle shadow increase, slight translateY(-1px), background color shift.
-- Card hover: translateY(-2px), refined shadow enhancement.
-- Scroll-triggered fade-in animations using Intersection Observer (subtle, not dramatic).
-- Sticky navbar with subtle background on scroll (JS scroll listener).
-- Smooth scroll behavior.
-- Image hover: subtle scale(1.02) with overflow hidden on container.
+## Visual Polish — "$20K Agency" Techniques
+- CSS transitions: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) on everything interactive.
+- Buttons: translateY(-2px) + enhanced shadow on hover.
+- Cards: translateY(-4px) + elevated shadow on hover.
+- Images: scale(1.03) on hover with overflow:hidden.
+- Scroll-triggered fade-in via IntersectionObserver (opacity:0 translateY(30px) → opacity:1 translateY(0), staggered 0.1s).
+- Sticky navbar: transparent → solid with shadow on scroll.
+- Animated number counters (0 → target on scroll).
+- Decorative accents: small colored lines above section headings.
+- Thin accent-colored top border (3-4px) on the page.
+- SVG wave/curve dividers between key sections.
 
-## Hero Section
-- Full viewport height or 85-90vh minimum. Maximum visual impact.
-- For luxury/executive: large aspirational photography as background or side image, with text overlay using a refined text-shadow or semi-transparent overlay.
-- For tech/SaaS: can use gradient backgrounds or product imagery.
-- Clear headline communicating the core value proposition.
-- Prominent CTA button with professional styling. Secondary CTA optional.
-- NO particle effects, NO matrix animations, NO typing effects unless specifically a tech/developer site.
+## Hero Section — First Impression Is Everything
+- 90-100vh height. Overlay gradient on hero image.
+- Hero headline must be BIG and punchy.
+- TWO CTA buttons: primary (filled) + secondary (outlined/ghost).
+- Social proof under CTAs: "Trusted by 500+ clients" or star ratings.
+- Subtle scroll-down indicator (animated chevron).
 
 ## Images
-- Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT (where KEYWORD is a unique descriptive word per image like hero, team, about, service1) for placeholder photos.
-- Apply object-fit: cover on all images.
-- border-radius: 8-16px depending on context.
-- Subtle shadow: 0 8px 30px rgba(0,0,0,0.08).
-- For icons, use clean inline SVGs with consistent stroke width and brand colors.
-
-## Micro-interactions
-- Navbar: sticky with background transition on scroll, subtle bottom border or shadow.
-- Number counters that animate on scroll (IntersectionObserver + JS).
-- Smooth scroll navigation for anchor links.
-- Form inputs with clear focus states (outline or border color change).
+- Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT (unique KEYWORD per image).
+- object-fit: cover, border-radius: 12-16px.
+- CSS: img { background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); min-height: 120px; }
+- SVG icons with brand colors.
 
 ## Responsive Design
-- Mobile-first. Use clamp() for typography sizing.
-- Navigation: clean hamburger menu with smooth animation.
-- Cards: single column on mobile, maintain quality spacing.
-- Images: full width on mobile, maintain aspect ratios.
-- Touch-friendly: all interactive elements minimum 44px tap target.
+- Mobile-first. clamp() for typography. Hamburger menu. 44px tap targets.
 
 ## Content Quality — CRITICAL
-- Write compelling, realistic copy that sounds like it was written by a professional copywriter.
-- Match the tone to the industry: formal for legal/finance, warm for hospitality, aspirational for luxury.
-- Include ALL these sections: hero with value proposition, trust/social proof section, services/features grid, about/story section, testimonials with realistic names and titles, stats/achievements, clear CTA section, comprehensive footer with contact info.
-- Use realistic names, company details, phone numbers, and addresses.
-- Testimonials must sound authentic and specific to the industry.
+- Every headline BENEFIT-focused. Testimonials with specific metrics ("Increased bookings by 47%").
+- Include ALL: hero, social proof bar, services (3-4 with SVG icons), about with image, testimonials (3 cards), animated stats (3-4), FAQ accordion, CTA, 4-column footer.
+- Realistic names, phone numbers, addresses. NO lorem ipsum.
 
-## What to AVOID — READ THIS
-- Dark/cyberpunk themes for non-tech businesses. A real estate site should NOT look like a hacker terminal.
-- Gradient blobs and neon glow effects on professional/corporate sites.
-- Glass-morphism everywhere — use it only where contextually appropriate (tech products).
-- Particle effects, matrix rain, or sci-fi aesthetics on business websites.
-- Over-animating. Subtle is professional. Flashy is amateur.
-- Generic "Lorem ipsum" or placeholder-sounding copy.
-- Thin, hard-to-read text on dark backgrounds.
-- Using the same dark purple/cyan color scheme for every site regardless of industry.
-- ANYTHING that looks like a free template, Bootstrap default, or student project.
-- Cramped spacing, tiny text, or walls of text.`;
+## What to AVOID — CRITICAL
+- ANYTHING that looks like Elementor, Wix, or a free template.
+- Dark themes for non-tech businesses. Gradient blobs on corporate sites.
+- Flat unshadowed cards. Single-shadow buttons. Missing hover states.
+- Generic copy. Cramped spacing.`;
 
 const EDIT_SYSTEM = `You are Zoobicon, an AI website editor. You are given an existing HTML website and an edit instruction. Apply the requested changes and return the complete, updated HTML file.
 

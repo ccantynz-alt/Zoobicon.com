@@ -21,7 +21,8 @@ interface ImageReplacement {
 }
 
 function extractPlaceholderImages(html: string): string[] {
-  const pattern = /https?:\/\/picsum\.photos\/\d+(?:\/\d+)?/g;
+  // Match both seeded URLs (picsum.photos/seed/KEYWORD/WIDTH/HEIGHT) and bare URLs (picsum.photos/WIDTH/HEIGHT)
+  const pattern = /https?:\/\/picsum\.photos\/(?:seed\/[a-zA-Z0-9_-]+\/)\d+(?:\/\d+)?|https?:\/\/picsum\.photos\/\d+(?:\/\d+)?/g;
   const matches = html.match(pattern);
   return matches ? [...new Set(matches)] : [];
 }
@@ -69,6 +70,10 @@ function generateSearchQuery(context: string[], imageIndex: number): string {
     legal: ["law office", "professional handshake", "courthouse", "business meeting"],
     salon: ["hair salon interior", "beauty treatment", "spa wellness", "cosmetics"],
     automotive: ["car showroom", "automotive repair", "luxury vehicle", "mechanic workshop"],
+    transport: ["shuttle bus service", "airport shuttle van", "passenger transportation", "chauffeur driving"],
+    shuttle: ["airport shuttle van", "passenger shuttle bus", "travel transportation service", "professional driver"],
+    taxi: ["taxi cab service", "ride service vehicle", "professional chauffeur", "airport pickup"],
+    logistics: ["delivery fleet trucks", "logistics warehouse", "shipping transportation", "cargo delivery"],
   };
 
   const contextStr = context.join(" ").toLowerCase();
@@ -102,6 +107,14 @@ function generateSearchQuery(context: string[], imageIndex: number): string {
 }
 
 function parseDimensions(url: string): { width: number; height: number } {
+  // Handle seeded URLs: picsum.photos/seed/KEYWORD/WIDTH/HEIGHT
+  const seededMatch = url.match(/picsum\.photos\/seed\/[^/]+\/(\d+)(?:\/(\d+))?/);
+  if (seededMatch) {
+    const width = parseInt(seededMatch[1], 10);
+    const height = seededMatch[2] ? parseInt(seededMatch[2], 10) : width;
+    return { width, height };
+  }
+  // Handle bare URLs: picsum.photos/WIDTH/HEIGHT
   const match = url.match(/picsum\.photos\/(\d+)(?:\/(\d+))?/);
   if (match) {
     const width = parseInt(match[1], 10);
