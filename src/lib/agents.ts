@@ -331,6 +331,21 @@ Rules:
 - Do NOT change any non-form content or design.
 - Keep existing form styling, only enhance functionality.`;
 
+const INTEGRATIONS_SYSTEM = `You are an integrations specialist. Take the HTML website and add essential third-party integrations.
+
+Rules:
+- Output ONLY the complete updated HTML. No markdown, no explanation, no code fences.
+- Add Google Analytics 4 placeholder (gtag.js) with a configurable GA_MEASUREMENT_ID.
+- Add a cookie consent banner (GDPR-compliant, simple bottom bar with Accept/Decline).
+- If a map/address section exists, add a Google Maps embed placeholder.
+- If a booking/calendar section exists, add Calendly or cal.com embed placeholder.
+- Add a "Back to top" smooth-scroll button (appears after scrolling 300px).
+- Add a simple live chat widget stub (floating button bottom-right, expandable).
+- Add social media share meta tags if not already present.
+- Add print stylesheet (@media print) that hides nav, footer, chat widget.
+- Do NOT change any existing content, colors, layout, or functionality.
+- All integrations must be non-blocking (async/defer scripts).`;
+
 const QA_SYSTEM = `You are a senior QA engineer. Review the website HTML and return a JSON report:
 
 {
@@ -368,14 +383,18 @@ export async function runPipeline(
   const agents: AgentResult[] = [];
   const startTime = Date.now();
   const isUltra = input.tier === "ultra";
-  const model = "claude-sonnet-4-20250514";
+
+  // Smart model routing — use the right model per agent for best output
+  const MODEL_FAST = "claude-haiku-4-5-20241022";       // Fast structured JSON agents
+  const MODEL_BALANCED = "claude-sonnet-4-20250514";     // Enhancement & QA agents
+  const MODEL_PREMIUM = "claude-opus-4-20250514";        // Developer agent — the money shot
 
   // ── Phase 1: Strategist ──
   onProgress?.("strategist", "analyzing market & audience");
   const strategyStart = Date.now();
 
   const strategyRes = await client.messages.create({
-    model,
+    model: MODEL_FAST,
     max_tokens: 4096,
     system: STRATEGIST_SYSTEM,
     messages: [{ role: "user", content: `Analyze and create strategy for: ${input.prompt}${input.style ? `\nPreferred style: ${input.style}` : ""}` }],
@@ -392,13 +411,13 @@ export async function runPipeline(
 
   const [brandRes, copyRes] = await Promise.all([
     client.messages.create({
-      model,
+      model: MODEL_FAST,
       max_tokens: 4096,
       system: BRAND_SYSTEM,
       messages: [{ role: "user", content: `Strategy:\n${strategySpec}\n\nBrief: ${input.prompt}${input.style ? `\nStyle: ${input.style}` : ""}\n\nCreate a premium design system.` }],
     }),
     client.messages.create({
-      model,
+      model: MODEL_FAST,
       max_tokens: 8192,
       system: COPYWRITER_SYSTEM,
       messages: [{ role: "user", content: `Strategy:\n${strategySpec}\n\nBrief: ${input.prompt}\n\nWrite all website copy. Match tone to audience.` }],
@@ -418,7 +437,7 @@ export async function runPipeline(
   const archStart = Date.now();
 
   const archRes = await client.messages.create({
-    model,
+    model: MODEL_FAST,
     max_tokens: 4096,
     system: ARCHITECT_SYSTEM,
     messages: [{
@@ -435,7 +454,7 @@ export async function runPipeline(
   const devStart = Date.now();
 
   const devRes = await client.messages.create({
-    model,
+    model: MODEL_PREMIUM,
     max_tokens: 64000,
     system: DEVELOPER_SYSTEM,
     messages: [{
@@ -450,8 +469,8 @@ export async function runPipeline(
   }
   agents.push({ agent: "Developer", output: `[${html.length} chars HTML]`, duration: Date.now() - devStart });
 
-  // ── Phase 4: Animation + SEO + Forms (Parallel) — Ultra tier only ──
-  if (isUltra) {
+  // ── Phase 4: Animation + SEO + Forms (Parallel) — ALL tiers ──
+  {
     onProgress?.("animation", "adding scroll effects");
     onProgress?.("seo", "optimizing for search");
     onProgress?.("forms", "enhancing form functionality");
@@ -459,19 +478,19 @@ export async function runPipeline(
 
     const [animRes, seoRes, formsRes] = await Promise.all([
       client.messages.create({
-        model,
+        model: MODEL_BALANCED,
         max_tokens: 64000,
         system: ANIMATION_SYSTEM,
         messages: [{ role: "user", content: `Add premium animations to this website:\n\n${html}` }],
       }),
       client.messages.create({
-        model,
+        model: MODEL_BALANCED,
         max_tokens: 64000,
         system: SEO_SYSTEM,
         messages: [{ role: "user", content: `Add comprehensive SEO markup to this website:\n\n${html}` }],
       }),
       client.messages.create({
-        model,
+        model: MODEL_BALANCED,
         max_tokens: 64000,
         system: FORMS_SYSTEM,
         messages: [{ role: "user", content: `Make all forms functional in this website:\n\n${html}` }],
@@ -520,12 +539,32 @@ export async function runPipeline(
     agents.push({ agent: "Forms Engineer", output: `[forms enhanced]`, duration: Date.now() - phase4Start });
   }
 
+  // ── Phase 5: Integrations Agent ──
+  onProgress?.("integrations", "adding third-party integrations");
+  const intStart = Date.now();
+
+  const intRes = await client.messages.create({
+    model: MODEL_BALANCED,
+    max_tokens: 64000,
+    system: INTEGRATIONS_SYSTEM,
+    messages: [{ role: "user", content: `Add essential integrations to this website:\n\n${html}` }],
+  });
+
+  let intHtml = intRes.content.find((b) => b.type === "text")?.text || "";
+  if (intHtml.trim().startsWith("```")) {
+    intHtml = intHtml.trim().replace(/^```(?:html)?\n?/, "").replace(/\n?```$/, "");
+  }
+  if (intHtml.trim().length > 100) {
+    html = intHtml;
+  }
+  agents.push({ agent: "Integrations", output: `[integrations added]`, duration: Date.now() - intStart });
+
   // ── Final Phase: QA Agent ──
   onProgress?.("qa", "quality review");
   const qaStart = Date.now();
 
   const qaRes = await client.messages.create({
-    model,
+    model: MODEL_BALANCED,
     max_tokens: 64000,
     system: QA_SYSTEM,
     messages: [{
