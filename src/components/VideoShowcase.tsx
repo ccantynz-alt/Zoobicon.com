@@ -42,7 +42,7 @@ const SHOWCASE_VIDEOS: VideoCard[] = [
     duration: "1:20",
     views: "890K",
     style: "Cinematic",
-    gradient: "from-blue-600 via-indigo-600 to-purple-600",
+    gradient: "from-blue-600 via-indigo-600 to-blue-600",
     aspectRatio: "aspect-video",
     mockContent: {
       headline: "Ship 10x Faster",
@@ -102,7 +102,7 @@ const SHOWCASE_VIDEOS: VideoCard[] = [
     duration: "0:20",
     views: "5.7M",
     style: "Neon",
-    gradient: "from-purple-600 via-pink-500 to-cyan-400",
+    gradient: "from-blue-600 via-pink-500 to-cyan-400",
     aspectRatio: "aspect-[9/16]",
     mockContent: {
       headline: "SOUNDWAVE 2026",

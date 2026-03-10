@@ -19,7 +19,7 @@ const DEMO_CODE = `<!DOCTYPE html>
     .hero h1 { font-size: 3rem; font-weight: 800; margin-bottom: 16px; background: linear-gradient(135deg, #60a5fa, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .hero p { font-size: 1.1rem; color: #888; max-width: 500px; margin: 0 auto 32px; }
     .btn { padding: 14px 32px; border-radius: 12px; font-weight: 600; font-size: 0.95rem; cursor: pointer; border: none; }
-    .btn-primary { background: linear-gradient(135deg, #5b7cf7, #3b82f6); color: white; }
+    .btn-primary { background: linear-gradient(135deg, #3b82f6, #3b82f6); color: white; }
     .features { padding: 60px 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 900px; margin: 0 auto; }
     .feature-card { background: #12121a; border: 1px solid #1e1e2e; border-radius: 16px; padding: 28px; }
     .feature-card h3 { font-size: 1.1rem; margin-bottom: 8px; color: #fff; }
@@ -28,7 +28,7 @@ const DEMO_CODE = `<!DOCTYPE html>
     .pricing h2 { font-size: 2rem; font-weight: 800; margin-bottom: 32px; }
     .plans { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
     .plan { background: #12121a; border: 1px solid #1e1e2e; border-radius: 16px; padding: 32px; width: 260px; }
-    .plan.featured { border-color: #5b7cf7; box-shadow: 0 0 40px -10px rgba(91,124,247,0.3); }
+    .plan.featured { border-color: #3b82f6; box-shadow: 0 0 40px -10px rgba(91,124,247,0.3); }
     .plan h3 { margin-bottom: 4px; }
     .price { font-size: 2.5rem; font-weight: 800; margin: 8px 0; }
     .price span { font-size: 1rem; color: #666; font-weight: 400; }

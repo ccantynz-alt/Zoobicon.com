@@ -41,17 +41,17 @@ const QUICK_ACTIONS = [
   { icon: Globe, label: "New Website", href: "/builder", color: "from-brand-500 to-brand-700" },
   { icon: Sparkles, label: "SEO Agent", href: "/builder", color: "from-accent-cyan to-emerald-600" },
   { icon: Video, label: "Video Creator", href: "/builder", color: "from-accent-purple to-pink-600" },
-  { icon: Bot, label: "Chatbot", href: "/builder", color: "from-violet-500 to-indigo-600" },
+  { icon: Bot, label: "Chatbot", href: "/builder", color: "from-blue-500 to-indigo-600" },
 ];
 
 const ADMIN_QUICK_ACTIONS = [
   { icon: Globe, label: "AI Builder", desc: "Premium generation", href: "/builder", color: "from-brand-500 to-brand-700" },
-  { icon: Layers, label: "Multi-Page", desc: "Full site builds", href: "/builder", color: "from-indigo-500 to-violet-600" },
+  { icon: Layers, label: "Multi-Page", desc: "Full site builds", href: "/builder", color: "from-indigo-500 to-blue-600" },
   { icon: Server, label: "Hosting", desc: "Deploy & manage", href: "/hosting", color: "from-emerald-500 to-teal-600" },
   { icon: Pencil, label: "Live Editor", desc: "Edit deployed sites", href: "/edit", color: "from-amber-500 to-orange-600" },
   { icon: Shield, label: "Admin Panel", desc: "System controls", href: "/admin", color: "from-red-500 to-rose-600" },
   { icon: Key, label: "API Keys", desc: "Developer access", href: "/auth/settings", color: "from-cyan-500 to-blue-600" },
-  { icon: BarChart3, label: "Analytics", desc: "Site performance", href: "/hosting", color: "from-purple-500 to-fuchsia-600" },
+  { icon: BarChart3, label: "Analytics", desc: "Site performance", href: "/hosting", color: "from-blue-500 to-fuchsia-600" },
   { icon: Settings, label: "Settings", desc: "Account config", href: "/auth/settings", color: "from-gray-500 to-slate-600" },
 ];
 

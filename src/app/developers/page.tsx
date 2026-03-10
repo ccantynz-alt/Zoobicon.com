@@ -130,7 +130,7 @@ const SDKS = [
   { lang: "Python", pkg: "zoobicon", install: "pip install zoobicon", color: "text-blue-400" },
   { lang: "Go", pkg: "go-zoobicon", install: "go get github.com/zoobicon/go-zoobicon", color: "text-cyan-400" },
   { lang: "Ruby", pkg: "zoobicon-ruby", install: "gem install zoobicon", color: "text-red-400" },
-  { lang: "PHP", pkg: "zoobicon/sdk", install: "composer require zoobicon/sdk", color: "text-purple-400" },
+  { lang: "PHP", pkg: "zoobicon/sdk", install: "composer require zoobicon/sdk", color: "text-blue-400" },
   { lang: "cURL", pkg: "REST API", install: "Works with any HTTP client", color: "text-green-400" },
 ];
 

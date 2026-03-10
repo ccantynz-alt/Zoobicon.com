@@ -341,7 +341,7 @@ export default function AnimationEditor({
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-500"
+        className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-500"
       >
         <Wand2 size={16} />
         Add Animations
@@ -358,7 +358,7 @@ export default function AnimationEditor({
       {/* Header */}
       <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
         <div className="flex items-center gap-2">
-          <Wand2 size={18} className="text-purple-400" />
+          <Wand2 size={18} className="text-blue-400" />
           <h2 className="text-sm font-semibold">Animation Editor</h2>
         </div>
         <button
@@ -380,9 +380,9 @@ export default function AnimationEditor({
               <button
                 key={preset.name}
                 onClick={() => applyPreset(preset)}
-                className="rounded-lg border border-white/10 bg-white/5 p-3 text-left transition-all hover:border-purple-500/50 hover:bg-white/10"
+                className="rounded-lg border border-white/10 bg-white/5 p-3 text-left transition-all hover:border-blue-500/50 hover:bg-white/10"
               >
-                <div className="flex items-center gap-1.5 text-sm font-medium text-purple-300">
+                <div className="flex items-center gap-1.5 text-sm font-medium text-blue-300">
                   <Sparkles size={14} />
                   {preset.name}
                 </div>
@@ -405,7 +405,7 @@ export default function AnimationEditor({
                 onClick={() => setActiveCategory(cat)}
                 className={`whitespace-nowrap rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
                   activeCategory === cat
-                    ? "bg-purple-600 text-white"
+                    ? "bg-blue-600 text-white"
                     : "bg-white/5 text-white/50 hover:bg-white/10 hover:text-white/70"
                 }`}
               >
@@ -419,9 +419,9 @@ export default function AnimationEditor({
               <button
                 key={anim.type}
                 onClick={() => addToQueue(anim.type)}
-                className="group flex items-start gap-2.5 rounded-lg border border-white/10 bg-white/5 p-3 text-left transition-all hover:border-purple-500/50 hover:bg-white/10"
+                className="group flex items-start gap-2.5 rounded-lg border border-white/10 bg-white/5 p-3 text-left transition-all hover:border-blue-500/50 hover:bg-white/10"
               >
-                <div className="mt-0.5 shrink-0 text-purple-400 group-hover:text-purple-300">
+                <div className="mt-0.5 shrink-0 text-blue-400 group-hover:text-blue-300">
                   {anim.icon}
                 </div>
                 <div className="min-w-0">
@@ -468,7 +468,7 @@ export default function AnimationEditor({
                 <select
                   value={customType}
                   onChange={(e) => setCustomType(e.target.value)}
-                  className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white outline-none focus:border-purple-500"
+                  className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white outline-none focus:border-blue-500"
                 >
                   {ANIMATION_LIBRARY.map((a) => (
                     <option key={a.type} value={a.type}>
@@ -493,13 +493,13 @@ export default function AnimationEditor({
                     }}
                     disabled={applyToAll}
                     placeholder="e.g., .hero, #about, section"
-                    className="flex-1 rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white placeholder-white/30 outline-none focus:border-purple-500 disabled:opacity-50"
+                    className="flex-1 rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white placeholder-white/30 outline-none focus:border-blue-500 disabled:opacity-50"
                   />
                   <button
                     onClick={() => setApplyToAll(!applyToAll)}
                     className={`whitespace-nowrap rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
                       applyToAll
-                        ? "bg-purple-600 text-white"
+                        ? "bg-blue-600 text-white"
                         : "bg-white/10 text-white/50 hover:text-white"
                     }`}
                   >
@@ -512,7 +512,7 @@ export default function AnimationEditor({
               <div>
                 <label className="mb-1 flex items-center justify-between text-xs text-white/50">
                   <span>Duration</span>
-                  <span className="text-purple-300">{customDuration}s</span>
+                  <span className="text-blue-300">{customDuration}s</span>
                 </label>
                 <input
                   type="range"
@@ -529,7 +529,7 @@ export default function AnimationEditor({
               <div>
                 <label className="mb-1 flex items-center justify-between text-xs text-white/50">
                   <span>Delay</span>
-                  <span className="text-purple-300">{customDelay}s</span>
+                  <span className="text-blue-300">{customDelay}s</span>
                 </label>
                 <input
                   type="range"
@@ -550,7 +550,7 @@ export default function AnimationEditor({
                 <select
                   value={customEasing}
                   onChange={(e) => setCustomEasing(e.target.value)}
-                  className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white outline-none focus:border-purple-500"
+                  className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white outline-none focus:border-blue-500"
                 >
                   {EASING_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>
@@ -563,7 +563,7 @@ export default function AnimationEditor({
               {/* Add Button */}
               <button
                 onClick={() => addToQueue(customType)}
-                className="flex w-full items-center justify-center gap-2 rounded-md bg-purple-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-500"
+                className="flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-500"
               >
                 <Plus size={14} />
                 Add Animation
@@ -623,7 +623,7 @@ export default function AnimationEditor({
         <button
           onClick={handleApplyAll}
           disabled={isLoading || queue.length === 0}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isLoading ? (
             <>

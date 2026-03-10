@@ -346,7 +346,7 @@ export default function AdminPage() {
               ].map((f) => (
                 <div key={f.title} className="gradient-border rounded-2xl p-5">
                   <div className={`w-10 h-10 rounded-xl bg-${f.color === "brand" ? "brand-500" : f.color === "accent-cyan" ? "cyan-500" : "purple-500"}/10 flex items-center justify-center mb-3`}>
-                    <f.icon className={`w-5 h-5 ${f.color === "brand" ? "text-brand-400" : f.color === "accent-cyan" ? "text-cyan-400" : "text-purple-400"}`} />
+                    <f.icon className={`w-5 h-5 ${f.color === "brand" ? "text-brand-400" : f.color === "accent-cyan" ? "text-cyan-400" : "text-blue-400"}`} />
                   </div>
                   <h3 className="text-sm font-bold mb-1">{f.title}</h3>
                   <p className="text-xs text-white/30 leading-relaxed">{f.desc}</p>
@@ -502,7 +502,7 @@ export default function AdminPage() {
               ].map((s) => (
                 <div key={s.label} className="gradient-border rounded-2xl p-5">
                   <div className="flex items-center justify-between mb-3">
-                    <s.icon className={`w-5 h-5 ${s.color === "brand" ? "text-brand-400" : s.color === "purple" ? "text-purple-400" : s.color === "cyan" ? "text-cyan-400" : "text-emerald-400"}`} />
+                    <s.icon className={`w-5 h-5 ${s.color === "brand" ? "text-brand-400" : s.color === "purple" ? "text-blue-400" : s.color === "cyan" ? "text-cyan-400" : "text-emerald-400"}`} />
                   </div>
                   <div className="text-3xl font-black">{s.value}</div>
                   <div className="text-xs text-white/30 mt-1">{s.label}</div>
@@ -563,7 +563,7 @@ export default function AdminPage() {
             {/* Recent projects */}
             <div className="gradient-border rounded-2xl p-6">
               <h2 className="text-base font-bold mb-4 flex items-center gap-2">
-                <FolderOpen className="w-4 h-4 text-purple-400" />
+                <FolderOpen className="w-4 h-4 text-blue-400" />
                 Recent Projects
               </h2>
               {analytics?.recentProjects && analytics.recentProjects.length > 0 ? (

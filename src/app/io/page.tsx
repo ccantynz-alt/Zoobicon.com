@@ -314,9 +314,9 @@ const SDK_CARDS = [
     install: "npm install -g zoobicon-cli",
     description:
       "Generate, deploy, and manage sites from your terminal. Perfect for scripting and automation.",
-    color: "text-purple-400",
-    borderColor: "border-purple-500/30",
-    bgGlow: "bg-purple-500/5",
+    color: "text-blue-400",
+    borderColor: "border-blue-500/30",
+    bgGlow: "bg-blue-500/5",
   },
   {
     icon: GitBranch,

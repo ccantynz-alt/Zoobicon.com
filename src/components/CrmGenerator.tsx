@@ -183,7 +183,7 @@ export default function CrmGenerator({ onGenerate }: CrmGeneratorProps) {
     return (
       <button
         onClick={() => setShowConfig(true)}
-        className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
+        className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-600 hover:from-blue-500 hover:to-blue-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
       >
         <Briefcase className="w-5 h-5" />
         Generate CRM System
@@ -194,7 +194,7 @@ export default function CrmGenerator({ onGenerate }: CrmGeneratorProps) {
   return (
     <div className="w-full max-w-4xl mx-auto bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl overflow-hidden">
       {/* Header */}
-      <div className="px-6 py-5 bg-gradient-to-r from-blue-600/20 to-purple-600/20 border-b border-gray-700">
+      <div className="px-6 py-5 bg-gradient-to-r from-blue-600/20 to-blue-600/20 border-b border-gray-700">
         <h2 className="text-xl font-bold text-white flex items-center gap-2">
           <Briefcase className="w-6 h-6 text-blue-400" />
           CRM System Generator
@@ -345,7 +345,7 @@ export default function CrmGenerator({ onGenerate }: CrmGeneratorProps) {
           <button
             onClick={handleGenerate}
             disabled={loading}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 disabled:from-gray-600 disabled:to-gray-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl disabled:shadow-none transition-all duration-200 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-600 hover:from-blue-500 hover:to-blue-500 disabled:from-gray-600 disabled:to-gray-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl disabled:shadow-none transition-all duration-200 disabled:cursor-not-allowed"
           >
             {loading ? (
               <>
