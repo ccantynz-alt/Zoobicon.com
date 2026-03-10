@@ -465,6 +465,9 @@ export default function LandingPage() {
       <section className="relative pt-32 pb-24 lg:pt-48 lg:pb-40 overflow-hidden min-h-screen flex items-center">
         {/* Layered background effects */}
         <div className="aurora-hero" />
+        <div className="hero-orb hero-orb-1" />
+        <div className="hero-orb hero-orb-2" />
+        <div className="hero-orb hero-orb-3" />
         <div className="hero-grid" />
         <div className="hero-spotlight" />
         <div className="hero-light-line" style={{ top: "30%" }} />
