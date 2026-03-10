@@ -491,10 +491,7 @@ export async function runPipeline(
     }],
   });
 
-  let html = devRes.content.find((b) => b.type === "text")?.text || "";
-  if (html.startsWith("```")) {
-    html = html.replace(/^```(?:html)?\n?/, "").replace(/\n?```$/, "");
-  }
+  let html = cleanHtml(devRes.content.find((b) => b.type === "text")?.text || "");
   agents.push({ agent: "Developer", output: `[${html.length} chars HTML]`, duration: Date.now() - devStart });
 
   // ── Phase 4: Animation + SEO + Forms (Parallel) — ALL tiers ──
@@ -526,11 +523,7 @@ export async function runPipeline(
     ]);
 
     // Use animation result as base (it adds the most visual code)
-    const animHtml = animRes.content.find((b) => b.type === "text")?.text || "";
-    let enhancedHtml = animHtml.trim();
-    if (enhancedHtml.startsWith("```")) {
-      enhancedHtml = enhancedHtml.replace(/^```(?:html)?\n?/, "").replace(/\n?```$/, "");
-    }
+    let enhancedHtml = cleanHtml(animRes.content.find((b) => b.type === "text")?.text || "");
 
     // Extract SEO additions from seo result
     const seoHtml = seoRes.content.find((b) => b.type === "text")?.text || "";
@@ -578,11 +571,8 @@ export async function runPipeline(
     messages: [{ role: "user", content: `Add essential integrations to this website:\n\n${html}` }],
   });
 
-  let intHtml = intRes.content.find((b) => b.type === "text")?.text || "";
-  if (intHtml.trim().startsWith("```")) {
-    intHtml = intHtml.trim().replace(/^```(?:html)?\n?/, "").replace(/\n?```$/, "");
-  }
-  if (intHtml.trim().length > 100) {
+  const intHtml = cleanHtml(intRes.content.find((b) => b.type === "text")?.text || "");
+  if (intHtml.length > 100) {
     html = intHtml;
   }
   agents.push({ agent: "Integrations", output: `[integrations added]`, duration: Date.now() - intStart });
@@ -608,11 +598,7 @@ export async function runPipeline(
   try {
     const qaJSON = JSON.parse(extractJSON(qaText));
     if (qaJSON.fixedHtml && qaJSON.fixedHtml.trim().length > 100) {
-      let fixedHtml = qaJSON.fixedHtml;
-      if (fixedHtml.startsWith("```")) {
-        fixedHtml = fixedHtml.replace(/^```(?:html)?\n?/, "").replace(/\n?```$/, "");
-      }
-      html = fixedHtml;
+      html = cleanHtml(qaJSON.fixedHtml);
     }
   } catch {
     // QA output wasn't valid JSON, keep current HTML
@@ -628,4 +614,22 @@ export async function runPipeline(
 function extractJSON(text: string): string {
   const jsonMatch = text.match(/\{[\s\S]*\}/);
   return jsonMatch ? jsonMatch[0] : text;
+}
+
+/** Strip code fences, preamble text, and trailing commentary from HTML output */
+function cleanHtml(raw: string): string {
+  let html = raw.trim();
+  // Remove markdown code fences (```html ... ``` or ``` ... ```)
+  html = html.replace(/^```(?:html|HTML)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
+  // Remove any preamble text before <!DOCTYPE or <html
+  const docStart = html.search(/<!doctype\s+html|<html/i);
+  if (docStart > 0) {
+    html = html.slice(docStart);
+  }
+  // Remove any trailing text after </html>
+  const htmlEnd = html.lastIndexOf("</html>");
+  if (htmlEnd !== -1) {
+    html = html.slice(0, htmlEnd + "</html>".length);
+  }
+  return html.trim();
 }

@@ -29,8 +29,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "A prompt is required" }, { status: 400 });
     }
 
-    if (prompt.length > 5000) {
-      return NextResponse.json({ error: "Prompt too long (max 5000 characters)" }, { status: 400 });
+    if (prompt.length > 20000) {
+      return NextResponse.json({ error: "Prompt too long (max 20,000 characters)" }, { status: 400 });
     }
 
     const validTiers = ["standard", "premium", "ultra"];
