@@ -319,12 +319,21 @@ Match the visual treatment to the industry detected in the strategy:
 - Never use pure #000 text. Use #1a1a2e, #2d3748, or similar near-black.
 
 ## Visual Polish — What Separates $30K from $300
-- Backgrounds: alternate between white and very subtle tinted sections (#faf9f7, #f8fafc) for rhythm
-- Shadows: multi-layer (0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.06))
-- Buttons: subtle shadow + translateY(-1px) on hover, not just color change
-- Cards: translateY(-2px) + enhanced shadow on hover
-- Images: scale(1.02) on hover with overflow:hidden container
-- Section transitions: alternate layout direction (text-left/image-right, then image-left/text-right)
+- Backgrounds: alternate white → subtle tint (#faf9f7, #f8fafc) → white for rhythm. Never flat same-color sections.
+- Shadows: multi-layer (0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.06)). Cards get ELEVATED shadow on hover.
+- Buttons: translateY(-2px) + enhanced multi-layer shadow + slight scale on hover, not just color change.
+- Cards: translateY(-4px) + elevated shadow on hover with 0.3s cubic-bezier transition.
+- Images: scale(1.03) on hover with overflow:hidden container and border-radius.
+- Section transitions: alternate layout direction (text-left/image-right, then image-left/text-right).
+- Decorative accents: small colored lines (40px wide, 3px tall, border-radius) above section headings.
+- Thin accent-colored top border (3-4px) on the page body for brand touch.
+- SVG wave or curve dividers between hero and first section, and between key sections.
+- Social proof strip near hero: "Trusted by" with company names/logos in a muted horizontal bar.
+- Include a process/how-it-works section with numbered steps connected by lines or a timeline.
+- Stats section with animated counters (JS: count from 0 to target number on scroll).
+- FAQ section with smooth accordion expand/collapse.
+- TWO CTA buttons in hero: primary (filled, prominent shadow) + secondary (outlined/ghost style).
+- Scroll-down indicator in hero: animated bouncing chevron.
 
 ## What to NEVER DO
 - Dark cyberpunk theme for a bakery, law firm, or dental practice
