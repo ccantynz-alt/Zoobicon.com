@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: "Zoobicon",
   },
   formatDetection: {
-    telephone: false, // Prevent iOS from auto-linking phone numbers
+    telephone: false,
   },
 };
 
@@ -20,7 +20,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
-  viewportFit: "cover", // Extend content into safe areas (iPhone notch, Dynamic Island)
+  viewportFit: "cover",
   themeColor: [
     { media: "(prefers-color-scheme: dark)", color: "#0b0b11" },
     { media: "(prefers-color-scheme: light)", color: "#0b0b11" },
@@ -35,9 +35,14 @@ export default function RootLayout({
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <head>
-        {/* iOS splash screens & icons */}
+        {/* Fonts loaded with display=swap to prevent FOIT (white screen) */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap"
+          rel="stylesheet"
+        />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
-        {/* Windows tile color */}
         <meta name="msapplication-TileColor" content="#0b0b11" />
         <meta name="msapplication-config" content="none" />
       </head>
