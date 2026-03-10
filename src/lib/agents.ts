@@ -50,7 +50,9 @@ export interface PipelineResult {
 
 // ── Agent System Prompts ──
 
-const STRATEGIST_SYSTEM = `You are an elite brand strategist. Given a website brief, analyze the market and produce a strategy document.
+const STRATEGIST_SYSTEM = `You are an elite brand strategist who produces the master blueprint that every downstream agent follows. Given a website brief, analyze it deeply and produce a comprehensive strategy.
+
+CRITICAL: If the user provides a detailed brief with specific instructions (visual direction, copy ideas, content structure, color palettes, typography, section layouts, etc.), you MUST incorporate ALL of those details into your strategy. Do NOT simplify or ignore user-specified instructions — they are the client's vision and take priority over your defaults.
 
 Output a JSON object:
 {
@@ -72,10 +74,33 @@ Output a JSON object:
     "secondary": "secondary goal",
     "keyMetric": "what success looks like"
   },
+  "visualDirection": {
+    "heroTreatment": "describe the hero approach (cinematic video, full-bleed photo, gradient, etc.)",
+    "imageStrategy": "full-bleed|gallery|editorial|minimal — describe the photo treatment style",
+    "whitespaceLevel": "generous|moderate|compact — how much breathing room",
+    "animationStyle": "cinematic|subtle|bold|minimal — what the motion should feel like",
+    "navStyle": "transparent-sticky|solid|minimal|overlay — navigation treatment"
+  },
+  "colorDirection": {
+    "palette": "describe the palette (e.g., 'Coastal Executive: slate, sand, charcoal, white')",
+    "mood": "the emotional feel the colors should evoke",
+    "avoidColors": ["colors to avoid and why"]
+  },
+  "typographyDirection": {
+    "headingStyle": "serif|sans-serif|slab — with specific font suggestions if user provided them",
+    "bodyStyle": "serif|sans-serif — with specific font suggestions",
+    "feel": "elegant|modern|bold|editorial"
+  },
+  "contentStructure": {
+    "sitemap": ["ordered list of sections/pages as specified by user or inferred"],
+    "heroApproach": "describe what the hero section should contain and feel like",
+    "keyDifferentiator": "the one thing that makes this site stand out from competitors"
+  },
   "contentPriority": ["most important section", "second", "third"],
   "trustSignals": ["specific trust signals for this industry"],
   "objections": ["common objections visitors will have"],
-  "keywords": ["5-10 SEO keywords for this business"]
+  "keywords": ["5-10 SEO keywords for this business"],
+  "userInstructions": ["list any SPECIFIC instructions from the user brief that must be followed exactly"]
 }
 
 Output ONLY valid JSON, nothing else.`;
@@ -238,11 +263,14 @@ Output ONLY valid JSON.`;
 
 const DEVELOPER_SYSTEM = `You are an elite front-end developer. Given a complete specification (strategy, design, copy, and architecture), produce a single HTML file that looks like it was built by a $30,000 agency.
 
-You receive four inputs:
-1. STRATEGY — audience, positioning, goals
+You receive five inputs:
+1. STRATEGY — audience, positioning, goals, visual direction, color direction, typography direction, and any specific user instructions
 2. DESIGN SPEC — colors, fonts, layout, shadows
 3. COPY — all text content
 4. ARCHITECTURE — section order, layouts, interactivity
+5. ORIGINAL BRIEF — the user's own words (if they specified exact visual treatments, copy, colors, or layouts — follow them EXACTLY)
+
+CRITICAL: If the strategy contains "userInstructions", those are non-negotiable requirements from the client. Implement every single one.
 
 Rules:
 - Output ONLY the raw HTML. No markdown, no explanation, no code fences.
@@ -384,20 +412,20 @@ export async function runPipeline(
   const startTime = Date.now();
   const isUltra = input.tier === "ultra";
 
-  // Smart model routing — use the right model per agent for best output
-  const MODEL_FAST = "claude-haiku-4-5-20251001";        // Fast structured JSON agents
+  // Smart model routing — Sonnet 4.6 across all agents for maximum quality
+  const MODEL_PLANNER = "claude-sonnet-4-6";              // Strategist, Brand, Copywriter, Architect — the build plan brain
   const MODEL_BALANCED = "claude-sonnet-4-6";             // Enhancement & QA agents
-  const MODEL_PREMIUM = "claude-sonnet-4-6";              // Developer agent — Sonnet 4.6 for speed + quality balance
+  const MODEL_PREMIUM = "claude-sonnet-4-6";              // Developer agent — builds the actual HTML
 
   // ── Phase 1: Strategist ──
   onProgress?.("strategist", "analyzing market & audience");
   const strategyStart = Date.now();
 
   const strategyRes = await client.messages.create({
-    model: MODEL_FAST,
-    max_tokens: 4096,
+    model: MODEL_PLANNER,
+    max_tokens: 8192,
     system: STRATEGIST_SYSTEM,
-    messages: [{ role: "user", content: `Analyze and create strategy for: ${input.prompt}${input.style ? `\nPreferred style: ${input.style}` : ""}` }],
+    messages: [{ role: "user", content: `Analyze and create a comprehensive strategy for this brief. If the user has provided specific design/content instructions, incorporate ALL of them into your strategy — do not ignore or simplify any user-specified details.\n\nBRIEF:\n${input.prompt}${input.style ? `\nPreferred style: ${input.style}` : ""}` }],
   });
 
   const strategyText = strategyRes.content.find((b) => b.type === "text")?.text || "";
@@ -411,16 +439,16 @@ export async function runPipeline(
 
   const [brandRes, copyRes] = await Promise.all([
     client.messages.create({
-      model: MODEL_FAST,
-      max_tokens: 4096,
+      model: MODEL_PLANNER,
+      max_tokens: 8192,
       system: BRAND_SYSTEM,
-      messages: [{ role: "user", content: `Strategy:\n${strategySpec}\n\nBrief: ${input.prompt}${input.style ? `\nStyle: ${input.style}` : ""}\n\nCreate a premium design system.` }],
+      messages: [{ role: "user", content: `Strategy:\n${strategySpec}\n\nOriginal Brief:\n${input.prompt}${input.style ? `\nStyle: ${input.style}` : ""}\n\nCreate a premium design system. If the brief specifies exact colors, typography, or visual direction, follow those instructions precisely.` }],
     }),
     client.messages.create({
-      model: MODEL_FAST,
-      max_tokens: 8192,
+      model: MODEL_PLANNER,
+      max_tokens: 16000,
       system: COPYWRITER_SYSTEM,
-      messages: [{ role: "user", content: `Strategy:\n${strategySpec}\n\nBrief: ${input.prompt}\n\nWrite all website copy. Match tone to audience.` }],
+      messages: [{ role: "user", content: `Strategy:\n${strategySpec}\n\nOriginal Brief:\n${input.prompt}\n\nWrite all website copy. If the brief includes specific copy suggestions, section names, or content structure, incorporate them exactly as specified. Match tone to audience.` }],
     }),
   ]);
 
@@ -437,12 +465,12 @@ export async function runPipeline(
   const archStart = Date.now();
 
   const archRes = await client.messages.create({
-    model: MODEL_FAST,
-    max_tokens: 4096,
+    model: MODEL_PLANNER,
+    max_tokens: 8192,
     system: ARCHITECT_SYSTEM,
     messages: [{
       role: "user",
-      content: `Strategy:\n${strategySpec}\n\nDesign:\n${brandSpec}\n\nCopy:\n${copySpec}\n\nPlan the optimal page structure and section order.`,
+      content: `Strategy:\n${strategySpec}\n\nDesign:\n${brandSpec}\n\nCopy:\n${copySpec}\n\nOriginal Brief:\n${input.prompt}\n\nPlan the optimal page structure and section order. If the brief specifies a sitemap, section order, or specific page structure, follow that structure.`,
     }],
   });
 
@@ -459,7 +487,7 @@ export async function runPipeline(
     system: DEVELOPER_SYSTEM,
     messages: [{
       role: "user",
-      content: `STRATEGY:\n${strategySpec}\n\nDESIGN SPEC:\n${brandSpec}\n\nCOPY:\n${copySpec}\n\nARCHITECTURE:\n${archSpec}\n\nBuild the complete HTML website. Follow all specs exactly.`,
+      content: `STRATEGY:\n${strategySpec}\n\nDESIGN SPEC:\n${brandSpec}\n\nCOPY:\n${copySpec}\n\nARCHITECTURE:\n${archSpec}\n\nORIGINAL BRIEF:\n${input.prompt}\n\nBuild the complete HTML website. Follow all specs exactly. If the original brief contains specific visual, copy, or structural instructions, those take priority.`,
     }],
   });
 
