@@ -617,21 +617,38 @@ export async function runPipeline(
   let bodyCheck = hasBodyContent(html);
   console.log(`[Pipeline] Developer attempt 1: ${html.length} chars HTML, ${bodyCheck.bodyChars} body text chars, stop: ${devResult.stopReason}`);
 
-  // If body is empty or response was truncated, retry with a focused prompt
+  // If body is empty or response was truncated, retry with increasingly focused prompts
   if (!bodyCheck.valid || devResult.stopReason === "max_tokens") {
-    console.warn(`[Pipeline] Developer output invalid (body: ${bodyCheck.bodyChars} chars, stop: ${devResult.stopReason}). Retrying with focused prompt...`);
+    console.warn(`[Pipeline] Developer output invalid (body: ${bodyCheck.bodyChars} chars, stop: ${devResult.stopReason}). Retrying...`);
     onProgress?.("developer", "retrying build (body was empty)...");
 
     devResult = await llmCall({
       model: MODEL_PREMIUM,
       maxTokens: 64000,
       system: DEVELOPER_SYSTEM,
-      userMessage: `IMPORTANT: Your previous attempt produced an HTML page with CSS but NO BODY CONTENT. The <body> was empty.\n\nYou MUST write the full page content inside <body>. Keep CSS concise — do NOT write more than 200 lines of CSS. Focus on the BODY CONTENT.\n\n${devUserMessage}`,
+      userMessage: `CRITICAL FAILURE: Your previous attempt produced HTML with CSS but the <body> was EMPTY — zero visible content.\n\nSTRICT RULES FOR THIS ATTEMPT:\n1. Write the <body> content FIRST. Start with <!DOCTYPE html><html><head> (brief CSS only), then IMMEDIATELY write <body> with ALL sections.\n2. CSS budget: MAXIMUM 80 lines. Use inline styles if needed — body content is more important than perfect CSS.\n3. Every section MUST appear: hero, features, about, testimonials, stats, FAQ, CTA, footer.\n4. Do NOT write elaborate CSS animations, custom properties blocks, or media queries until AFTER all body content is written.\n\n${devUserMessage}`,
     });
 
     html = cleanHtml(devResult.text);
     bodyCheck = hasBodyContent(html);
     console.log(`[Pipeline] Developer attempt 2: ${html.length} chars HTML, ${bodyCheck.bodyChars} body text chars, stop: ${devResult.stopReason}`);
+  }
+
+  // Third attempt — absolutely minimal CSS, maximum body content
+  if (!bodyCheck.valid || devResult.stopReason === "max_tokens") {
+    console.warn(`[Pipeline] Developer still empty after retry 1 (body: ${bodyCheck.bodyChars} chars). Final attempt...`);
+    onProgress?.("developer", "final retry (minimal CSS)...");
+
+    devResult = await llmCall({
+      model: MODEL_PREMIUM,
+      maxTokens: 64000,
+      system: DEVELOPER_SYSTEM,
+      userMessage: `FINAL ATTEMPT — YOUR PREVIOUS TWO ATTEMPTS HAD EMPTY BODIES.\n\nWrite a MINIMAL but COMPLETE page. Use barely any CSS — just basic inline styles if needed. The ONLY thing that matters is that <body> contains real, visible content with all sections. Fancy styling is NOT needed — content is everything.\n\n${devUserMessage}`,
+    });
+
+    html = cleanHtml(devResult.text);
+    bodyCheck = hasBodyContent(html);
+    console.log(`[Pipeline] Developer attempt 3: ${html.length} chars HTML, ${bodyCheck.bodyChars} body text chars, stop: ${devResult.stopReason}`);
   }
 
   agents.push({ agent: "Developer", output: `[${html.length} chars HTML, ${bodyCheck.bodyChars} body text, stop: ${devResult.stopReason}]`, duration: Date.now() - devStart });

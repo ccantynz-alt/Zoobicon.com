@@ -381,7 +381,7 @@ export async function POST(req: NextRequest) {
       html = html.replace(/^```(?:html)?\n?/, "").replace(/\n?```$/, "");
     }
 
-    // Validate body content — retry if empty (same logic as pipeline's hasBodyContent)
+    // Validate body content — retry up to 2 times if empty
     if (!isEdit) {
       const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
       const bodyText = bodyMatch
@@ -425,7 +425,8 @@ Output ONLY raw HTML — no markdown, no code fences, no explanation.`;
           if (retryHtml.startsWith("```")) {
             retryHtml = retryHtml.replace(/^```(?:html)?\n?/, "").replace(/\n?```$/, "");
           }
-          html = retryHtml;
+        } catch (retryErr) {
+          console.error(`[Generate] Retry ${retry + 1} failed:`, retryErr);
         }
       }
     }
