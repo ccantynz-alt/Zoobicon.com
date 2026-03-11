@@ -187,12 +187,13 @@ pre code {
 }
 
 .gradient-text-hero {
-  background: linear-gradient(135deg, #818cf8, #60a5fa, #34d399, #a78bfa, #818cf8);
-  background-size: 400% 400%;
+  background: linear-gradient(135deg, #a5b4fc, #60a5fa, #34d399, #c084fc, #818cf8);
+  background-size: 300% 300%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: gradient-shift 6s ease-in-out infinite;
+  animation: gradient-shift 5s ease-in-out infinite;
+  filter: drop-shadow(0 0 40px rgba(139, 92, 246, 0.6)) drop-shadow(0 0 80px rgba(99, 102, 241, 0.4));
 }
 
 .gradient-text-static {
@@ -208,27 +209,9 @@ pre code {
   66% { background-position: 100% 50%; }
 }
 
-/* Hero headline shimmer sweep */
+/* Hero headline — no sweep, just bold static text */
 .hero-shimmer {
   position: relative;
-  overflow: hidden;
-}
-
-.hero-shimmer::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 60%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
-  animation: shimmer-sweep 4s ease-in-out infinite;
-  pointer-events: none;
-}
-
-@keyframes shimmer-sweep {
-  0%, 100% { left: -100%; }
-  50% { left: 140%; }
 }
 
 /* Animated CTA pulse glow */
@@ -385,7 +368,7 @@ pre code {
   top: -35%;
   left: 0%;
   border-radius: 50%;
-  background: radial-gradient(ellipse 80% 60%, rgba(37, 99, 235, 0.5), rgba(59, 130, 246, 0.2), transparent 60%);
+  background: radial-gradient(ellipse 80% 60%, rgba(37, 99, 235, 0.7), rgba(59, 130, 246, 0.35), transparent 60%);
   filter: blur(70px);
   animation: aurora-hero-1 12s ease-in-out infinite;
 }
@@ -398,7 +381,7 @@ pre code {
   bottom: -15%;
   right: -10%;
   border-radius: 50%;
-  background: radial-gradient(ellipse 70% 80%, rgba(139, 92, 246, 0.45), rgba(99, 102, 241, 0.2), transparent 60%);
+  background: radial-gradient(ellipse 70% 80%, rgba(139, 92, 246, 0.65), rgba(99, 102, 241, 0.35), transparent 60%);
   filter: blur(70px);
   animation: aurora-hero-2 16s ease-in-out infinite;
 }
@@ -502,19 +485,82 @@ pre code {
   transform: rotate(-5deg);
 }
 
-/* Horizontal light line */
-.hero-light-line {
+/* Hero impact burst — fires once on page load */
+.hero-impact-burst {
   position: absolute;
-  width: 100%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 1px;
   height: 1px;
-  left: 0;
-  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3), rgba(139, 92, 246, 0.2), transparent);
-  animation: light-line-sweep 6s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
 }
 
-@keyframes light-line-sweep {
-  0%, 100% { opacity: 0.3; transform: scaleX(0.5); }
-  50% { opacity: 1; transform: scaleX(1); }
+.hero-impact-burst::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(99, 102, 241, 0.5) 0%, rgba(59, 130, 246, 0.25) 30%, transparent 70%);
+  animation: hero-burst 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.hero-impact-burst::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 900px;
+  height: 900px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(139, 92, 246, 0.3) 0%, rgba(99, 102, 241, 0.12) 35%, transparent 65%);
+  animation: hero-burst 1.8s 0.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes hero-burst {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+}
+
+/* Shockwave ring */
+.hero-shockwave {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(99, 102, 241, 0.5);
+  pointer-events: none;
+  z-index: 0;
+  animation: hero-shockwave 1.2s 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.hero-shockwave-2 {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  pointer-events: none;
+  z-index: 0;
+  animation: hero-shockwave 1s 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes hero-shockwave {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
 }
 
 @keyframes aurora-drift {
