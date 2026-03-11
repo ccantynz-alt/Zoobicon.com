@@ -10,7 +10,7 @@ export default function CodePanel({ html }: CodePanelProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(html);
+    try { await navigator.clipboard.writeText(html); } catch {}
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

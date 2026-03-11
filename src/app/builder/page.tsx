@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import TopBar from "@/components/TopBar";
 import PromptInput from "@/components/PromptInput";
-import type { Tier } from "@/components/PromptInput";
+import type { Tier, AIModel } from "@/components/PromptInput";
 import PreviewPanel from "@/components/PreviewPanel";
 import CodePanel from "@/components/CodePanel";
 import ChatPanel from "@/components/ChatPanel";
@@ -342,6 +342,8 @@ export default function BuilderPage() {
   const [deployUrl, setDeployUrl] = useState("");
   const [deployStatus, setDeployStatus] = useState<"idle" | "deploying" | "deployed" | "error">("idle");
   const [pipelineAgents, setPipelineAgents] = useState<string[]>([]);
+  const [selectedModel, setSelectedModel] = useState("claude-sonnet-4-6");
+  const [availableModels, setAvailableModels] = useState<AIModel[]>([]);
 
   const abortRef = useRef<AbortController | null>(null);
   const hasCode = generatedCode.length > 0;
@@ -357,6 +359,16 @@ export default function BuilderPage() {
         }
       }
     } catch { /* ignore */ }
+  }, []);
+
+  // Fetch available models on mount
+  useEffect(() => {
+    fetch("/api/models")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.models?.length) setAvailableModels(data.models);
+      })
+      .catch(() => { /* models API not available, use defaults */ });
   }, []);
 
   // Auto-replace picsum placeholder images with contextually relevant ones
@@ -530,6 +542,7 @@ export default function BuilderPage() {
           prompt: prompt.trim(),
           style: "modern",
           tier,
+          model: selectedModel,
         }),
       });
 
@@ -567,9 +580,20 @@ export default function BuilderPage() {
       });
     } catch (err) {
       // Fallback to streaming endpoint if pipeline fails
-      console.warn("[Pipeline] Failed, falling back to stream:", err instanceof Error ? err.message : err);
-      setPipelineAgents(["Pipeline unavailable — using direct generation"]);
-      await streamGenerate(prompt.trim());
+      const errMsg = err instanceof Error ? err.message : String(err);
+      console.warn("[Pipeline] Failed, falling back to stream:", errMsg);
+      setPipelineAgents([`Pipeline fallback — generating directly (${errMsg})`]);
+
+      try {
+        await streamGenerate(prompt.trim());
+      } catch (streamErr) {
+        // If stream also fails, show a clear error instead of white screen
+        console.error("[Stream fallback] Also failed:", streamErr);
+        setError(
+          "Generation temporarily unavailable. Please try again in a moment."
+        );
+        setStatus("idle");
+      }
     }
   }, [prompt, tier, streamGenerate, autoReplaceImages]);
 
@@ -724,6 +748,9 @@ export default function BuilderPage() {
                   editPrompt={editPrompt}
                   onEditPromptChange={setEditPrompt}
                   onEdit={handleEdit}
+                  selectedModel={selectedModel}
+                  onModelChange={setSelectedModel}
+                  availableModels={availableModels}
                 />
               </div>
             </>

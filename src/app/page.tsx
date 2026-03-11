@@ -343,11 +343,11 @@ export default function LandingPage() {
     try {
       const stored = localStorage.getItem("zoobicon_user");
       if (stored) setUser(JSON.parse(stored));
-    } catch {}
+    } catch { /* Safari private mode / storage unavailable */ }
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("zoobicon_user");
+    try { localStorage.removeItem("zoobicon_user"); } catch {}
     setUser(null);
   };
 

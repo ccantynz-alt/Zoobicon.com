@@ -43,7 +43,7 @@ export default function EmailTemplatePanel({
 
   const copyHtml = async () => {
     if (!result?.html) return;
-    await navigator.clipboard.writeText(result.html);
+    try { await navigator.clipboard.writeText(result.html); } catch {}
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

@@ -194,7 +194,7 @@ export default function AiImagesPanel({ code, onApplyImages }: AiImagesPanelProp
             <img src={singleResult} alt="AI Generated" className="w-full h-40 object-cover" />
             <div className="p-2 bg-white/[0.02]">
               <button
-                onClick={() => navigator.clipboard.writeText(singleResult)}
+                onClick={() => navigator.clipboard.writeText(singleResult).catch(() => {})}
                 className="text-[10px] text-brand-400 hover:text-brand-300 transition-colors"
               >
                 Copy URL

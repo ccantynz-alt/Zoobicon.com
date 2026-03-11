@@ -39,7 +39,7 @@ export default function SignupPage() {
         return;
       }
 
-      localStorage.setItem("zoobicon_user", JSON.stringify(data.user));
+      try { localStorage.setItem("zoobicon_user", JSON.stringify(data.user)); } catch {}
       window.location.href = "/dashboard";
     } catch {
       setAuthError("Network error. Please try again.");

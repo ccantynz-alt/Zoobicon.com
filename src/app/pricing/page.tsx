@@ -200,7 +200,7 @@ export default function PricingPage() {
                   <LayoutDashboard className="w-3.5 h-3.5" /> Dashboard
                 </Link>
                 <button
-                  onClick={() => { localStorage.removeItem("zoobicon_user"); setUser(null); }}
+                  onClick={() => { try { localStorage.removeItem("zoobicon_user"); } catch {} setUser(null); }}
                   className="text-sm text-white/50 hover:text-white transition-colors px-3 py-2 flex items-center gap-1.5"
                 >
                   <LogOut className="w-3.5 h-3.5" /> Sign out
