@@ -76,8 +76,8 @@ export default function SettingsPage() {
       if (res.ok && data.key) {
         setApiKey(data.key);
         setShowApiKey(true);
-        localStorage.setItem("zoobicon_api_key", data.key);
-        localStorage.setItem("zoobicon_api_key_version", String(apiKeyVersion));
+        try { localStorage.setItem("zoobicon_api_key", data.key); } catch {}
+        try { localStorage.setItem("zoobicon_api_key_version", String(apiKeyVersion)); } catch {}
       }
     } catch {
       // silently fail
@@ -91,8 +91,8 @@ export default function SettingsPage() {
     setApiKeyVersion(newVersion);
     setApiKey("");
     setShowApiKey(false);
-    localStorage.removeItem("zoobicon_api_key");
-    localStorage.setItem("zoobicon_api_key_version", String(newVersion));
+    try { localStorage.removeItem("zoobicon_api_key"); } catch {}
+    try { localStorage.setItem("zoobicon_api_key_version", String(newVersion)); } catch {}
     // Re-generate with new version immediately
     if (!user) return;
     setApiKeyLoading(true);
@@ -107,7 +107,7 @@ export default function SettingsPage() {
       if (res.ok && data.key) {
         setApiKey(data.key);
         setShowApiKey(true);
-        localStorage.setItem("zoobicon_api_key", data.key);
+        try { localStorage.setItem("zoobicon_api_key", data.key); } catch {}
       }
     } catch {
       // silently fail
@@ -117,7 +117,7 @@ export default function SettingsPage() {
   };
 
   const copyApiKey = () => {
-    navigator.clipboard.writeText(apiKey);
+    navigator.clipboard.writeText(apiKey).catch(() => {});
     setApiKeyCopied(true);
     setTimeout(() => setApiKeyCopied(false), 2000);
   };
@@ -164,7 +164,7 @@ export default function SettingsPage() {
   };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(`ADMIN_PASSWORD=${newPassword || envInstruction}`);
+    navigator.clipboard.writeText(`ADMIN_PASSWORD=${newPassword || envInstruction}`).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

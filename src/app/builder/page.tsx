@@ -567,9 +567,20 @@ export default function BuilderPage() {
       });
     } catch (err) {
       // Fallback to streaming endpoint if pipeline fails
-      console.warn("[Pipeline] Failed, falling back to stream:", err instanceof Error ? err.message : err);
-      setPipelineAgents(["Pipeline unavailable — using direct generation"]);
-      await streamGenerate(prompt.trim());
+      const errMsg = err instanceof Error ? err.message : String(err);
+      console.warn("[Pipeline] Failed, falling back to stream:", errMsg);
+      setPipelineAgents([`Pipeline fallback — generating directly (${errMsg})`]);
+
+      try {
+        await streamGenerate(prompt.trim());
+      } catch (streamErr) {
+        // If stream also fails, show a clear error instead of white screen
+        console.error("[Stream fallback] Also failed:", streamErr);
+        setError(
+          "Generation temporarily unavailable. Please try again in a moment."
+        );
+        setStatus("idle");
+      }
     }
   }, [prompt, tier, streamGenerate, autoReplaceImages]);
 

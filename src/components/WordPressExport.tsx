@@ -84,7 +84,7 @@ export default function WordPressExport({ code }: WordPressExportProps) {
   };
 
   const copyToClipboard = async (text: string, id?: string) => {
-    await navigator.clipboard.writeText(text);
+    try { await navigator.clipboard.writeText(text); } catch {}
     if (id === "wxr") {
       setCopiedWxr(true);
       setTimeout(() => setCopiedWxr(false), 2000);

@@ -148,7 +148,7 @@ export default function DevelopersPage() {
   const [copiedEndpoint, setCopiedEndpoint] = useState<string | null>(null);
 
   const copyCode = (code: string, id: string) => {
-    navigator.clipboard.writeText(code);
+    navigator.clipboard.writeText(code).catch(() => {});
     setCopiedEndpoint(id);
     setTimeout(() => setCopiedEndpoint(null), 2000);
   };

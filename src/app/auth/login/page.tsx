@@ -28,7 +28,7 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (res.ok) {
-        localStorage.setItem("zoobicon_user", JSON.stringify(data.user));
+        try { localStorage.setItem("zoobicon_user", JSON.stringify(data.user)); } catch {}
         window.location.href = "/dashboard";
         return;
       }

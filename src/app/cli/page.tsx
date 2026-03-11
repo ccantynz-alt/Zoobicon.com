@@ -123,7 +123,7 @@ export default function CLIPage() {
   const [copied, setCopied] = useState<string | null>(null);
 
   const copyText = (text: string, id: string) => {
-    navigator.clipboard.writeText(text);
+    navigator.clipboard.writeText(text).catch(() => {});
     setCopied(id);
     setTimeout(() => setCopied(null), 2000);
   };

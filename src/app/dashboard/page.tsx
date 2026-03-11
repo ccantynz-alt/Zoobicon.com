@@ -133,7 +133,7 @@ export default function DashboardPage() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("zoobicon_user");
+    try { localStorage.removeItem("zoobicon_user"); } catch {}
     window.location.href = "/";
   };
 

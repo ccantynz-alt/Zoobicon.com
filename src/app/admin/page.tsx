@@ -76,12 +76,12 @@ export default function AdminPage() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("zoobicon_user");
+    try { localStorage.removeItem("zoobicon_user"); } catch {}
     window.location.href = "/";
   };
 
   const copyToClipboard = (text: string, key: string) => {
-    navigator.clipboard.writeText(text);
+    navigator.clipboard.writeText(text).catch(() => {});
     setCopied(key);
     setTimeout(() => setCopied(""), 2000);
   };

@@ -29,7 +29,7 @@ export function saveProject(project: Omit<SavedProject, "id" | "createdAt" | "up
     updatedAt: Date.now(),
   };
   projects.unshift(newProject);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(projects)); } catch {}
   return newProject;
 }
 
@@ -38,7 +38,7 @@ export function updateProject(id: string, updates: Partial<Pick<SavedProject, "n
   const index = projects.findIndex((p) => p.id === id);
   if (index === -1) return null;
   projects[index] = { ...projects[index], ...updates, updatedAt: Date.now() };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(projects)); } catch {}
   return projects[index];
 }
 
@@ -46,7 +46,7 @@ export function deleteProject(id: string): boolean {
   const projects = getProjects();
   const filtered = projects.filter((p) => p.id !== id);
   if (filtered.length === projects.length) return false;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered)); } catch {}
   return true;
 }
 

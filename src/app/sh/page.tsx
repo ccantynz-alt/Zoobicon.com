@@ -266,7 +266,7 @@ export default function ZoobiconShPage() {
   const [activeTab, setActiveTab] = useState<"github" | "gitlab">("github");
 
   const copyText = (text: string, id: string) => {
-    navigator.clipboard.writeText(text);
+    navigator.clipboard.writeText(text).catch(() => {});
     setCopied(id);
     setTimeout(() => setCopied(null), 2000);
   };
