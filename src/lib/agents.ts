@@ -473,10 +473,10 @@ export async function runPipeline(
   const userModel = input.model;
   const useMultiLLM = userModel && !userModel.startsWith("claude");
 
-  // Smart model routing — default Claude models, overridden by user selection
-  const MODEL_PLANNER = userModel || "claude-sonnet-4-6";
-  const MODEL_BALANCED = userModel || "claude-sonnet-4-6";
-  const MODEL_PREMIUM = userModel || "claude-sonnet-4-6";
+  // Smart model routing — Haiku for fast JSON, Opus for the build, Sonnet for enhancements
+  const MODEL_PLANNER = userModel || "claude-haiku-4-5-20251001";   // Fast JSON agents (strategy, brand, copy, architecture)
+  const MODEL_BALANCED = userModel || "claude-sonnet-4-6";           // Enhancement agents (animation, SEO, forms, integrations, QA)
+  const MODEL_PREMIUM = userModel || "claude-opus-4-6";              // Developer agent — the actual website build
 
   // Helper: call the right LLM based on user selection
   const llmCall = async (opts: { model: string; maxTokens: number; system: string; userMessage: string }) => {
