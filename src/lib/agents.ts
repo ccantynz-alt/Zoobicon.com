@@ -280,99 +280,49 @@ You receive five inputs:
 
 CRITICAL: If the strategy contains "userInstructions", those are non-negotiable requirements from the client. Implement every single one.
 
-## Industry-Aware Design — MANDATORY
-Match the visual treatment to the industry detected in the strategy:
+## CRITICAL: TOKEN BUDGET — READ THIS FIRST
+- <style>: MAX 100 lines of compact CSS. Use CSS custom properties. Use component library classes.
+- <body>: THIS IS 75% OF YOUR OUTPUT. Every section from the COPY input must appear here with real text, images, interactive elements.
+- <script>: 10% — interactivity (menu, scroll, counters, FAQ).
+- If running long, STOP adding CSS and complete the body. An empty <body> is a TOTAL FAILURE — the #1 failure mode.
+- Output ONLY raw HTML. No markdown, no explanation, no code fences.
 
-**Luxury / Real Estate / Legal / Financial / Medical:** LIGHT backgrounds (warm whites #fefefe, #faf9f7, #f5f3ef, soft creams). Elegant serif headings (Playfair Display, Cormorant Garamond, DM Serif Display). Muted accents: navy, forest green, gold, charcoal. NO dark themes, NO gradient blobs, NO neon, NO glass-morphism. Understated elegance with thin borders, subtle shadows.
+## BODY CONTENT — MANDATORY (this is your primary job)
+Use the COPY input exactly as provided. Every section from the ARCHITECTURE must appear in <body>:
+- Navigation, Hero (with TWO CTAs), Social proof strip, Features/Services with SVG icons
+- About section with image, Process/timeline, Testimonials (3 cards with metrics)
+- Stats with animated counters, FAQ accordion, CTA section, 4-column Footer
+- Use semantic HTML: header, nav, main, section, footer
 
-**SaaS / Tech / Startup:** Dark themes OK (#0f172a). Modern sans: Inter, Space Grotesk, Sora. Vibrant accents: indigo, violet, emerald. Tasteful glass-morphism and gradient accents allowed.
+## INDUSTRY AESTHETIC — Match to the strategy
+- **Luxury/Real Estate/Legal/Financial/Medical:** LIGHT backgrounds (warm whites), serif headings, muted accents. NO dark themes, NO neon, NO glass-morphism.
+- **SaaS/Tech/Startup:** Dark themes OK. Modern sans fonts. Vibrant accents. Tasteful glass-morphism.
+- **Restaurant/Food:** Warm palettes, serif headings, large food photography.
+- **Transportation/Logistics:** Clean blues/navy. Fleet imagery. Trust signals.
+- **E-commerce:** White-space heavy. Product grids, trust badges.
+- **Healthcare/Wellness:** Soft palettes (sage, lavender). Clean, trustworthy.
 
-**Restaurant / Food / Hospitality:** Warm palettes: cream, terracotta, olive. Serif headings. Large food/venue photography. NO tech aesthetic.
+## TECHNICAL RULES
+- Follow design spec colors, fonts, spacing. Follow architecture section order and layouts.
+- Images: https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT with SPECIFIC descriptive keywords (never generic). object-fit: cover. Alt text on all.
+- CSS custom properties for ALL colors. Responsive with mobile hamburger menu.
+- Transitions: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) on interactive elements.
+- .fade-in class for scroll animations (component library handles it). Do NOT set opacity:0.
+- Sticky navbar with background transition. Smooth scroll for anchors. FAQ accordion. Counter animation.
 
-**Transportation / Shuttle / Taxi / Logistics:** Clean, trustworthy design with blue, navy, or green accents. Hero with fleet/vehicle imagery. Route maps, booking forms, fleet photos. Trust signals: safety ratings, insurance, years of service. NO random stock photos — every image must relate to transportation, vehicles, or travel.
-
-**E-commerce / Retail:** Clean, white-space heavy. Product-focused grids, trust badges, clear pricing.
-
-**Healthcare / Wellness:** Soft calming palettes: sage, lavender, soft blue. Clean and trustworthy.
-
-## OUTPUT STRUCTURE — FOLLOW THIS EXACT ORDER
-1. <!DOCTYPE html>, <html>, <head> with meta + title + Google Fonts <link>
-2. <style> — MAXIMUM 150 LINES of CSS. Use CSS custom properties. Use the component library classes for common patterns.
-3. </head>
-4. <body> — THIS IS THE MOST IMPORTANT PART. Must contain ALL sections from the COPY input as visible content. Every section must appear here with real text, images, interactive elements.
-5. <script> before </body>
-6. </body></html>
-
-## CRITICAL: BODY CONTENT IS MANDATORY
-- An HTML file with CSS but empty <body> is a TOTAL FAILURE. This is the #1 failure mode.
-- Budget tokens: ~20% on CSS, ~70% on body content, ~10% on JS.
-- If running long, STOP adding CSS and complete the body first.
-
-## Technical Rules
-- Output ONLY the raw HTML. No markdown, no explanation, no code fences.
-- Complete document: <!DOCTYPE html>, <html lang="en">, <head>, <body>.
-- All CSS in <style> in <head>. Import Google Fonts from design spec.
-- All JS in <script> before </body>.
-- Follow the design spec EXACTLY — use specified colors, fonts, spacing.
-- Use the copy EXACTLY as provided — do not rewrite.
-- Follow the architecture EXACTLY — section order, layouts, components.
-- For images use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT with SPECIFIC keywords matching the content (e.g., seed/luxury-shuttle-van/800/500, seed/auckland-skyline/1200/600, seed/gourmet-plating/600/400). NEVER use generic words like 'hero', 'office', 'team', 'service1'. Set descriptive alt text. Apply object-fit: cover. Add CSS: img { background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); min-height: 120px; } for graceful fallback.
-- CSS custom properties for ALL colors (enables dark mode later).
-- Fully responsive with mobile hamburger menu.
-- CSS transitions: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) on interactive elements.
-- Scroll-triggered fade-in: add class .fade-in to sections you want to animate. Do NOT set opacity:0 in CSS or inline styles — the component library handles hiding and revealing safely with failsafes.
-- Sticky navbar with background transition on scroll.
-- Smooth scrolling for anchor links.
-- FAQ accordion if included in architecture.
-- Animated number counters if stats section exists.
-- Use semantic HTML throughout (header, nav, main, section, footer).
-
-## Typography — CRITICAL for Premium Feel
-- Use clamp() for responsive font sizing: hero clamp(2.5rem, 5vw, 4.5rem)
-- letter-spacing: -0.02em on large headings
-- Body: 16-18px, line-height 1.7-1.8
-- Weight hierarchy: 300 (light sub), 400 (body), 600 (sub-headings), 700-800 (headings)
-- Never use pure #000 text. Use #1a1a2e, #2d3748, or similar near-black.
-
-## Visual Polish — What Separates $30K from $300
-- Backgrounds: alternate white → subtle tint (#faf9f7, #f8fafc) → white for rhythm. Never flat same-color sections.
-- Shadows: multi-layer (0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.06)). Cards get ELEVATED shadow on hover.
-- Buttons: translateY(-2px) + enhanced multi-layer shadow + slight scale on hover, not just color change.
-- Cards: translateY(-4px) + elevated shadow on hover with 0.3s cubic-bezier transition.
-- Images: scale(1.03) on hover with overflow:hidden container and border-radius.
-- Section transitions: alternate layout direction (text-left/image-right, then image-left/text-right).
-- Decorative accents: small colored lines (40px wide, 3px tall, border-radius) above section headings.
-- Thin accent-colored top border (3-4px) on the page body for brand touch.
-- SVG wave or curve dividers between hero and first section, and between key sections.
-- Social proof strip near hero: "Trusted by" with company names/logos in a muted horizontal bar.
-- Include a process/how-it-works section with numbered steps connected by lines or a timeline.
-- Stats section with animated counters (JS: count from 0 to target number on scroll).
-- FAQ section with smooth accordion expand/collapse.
-- TWO CTA buttons in hero: primary (filled, prominent shadow) + secondary (outlined/ghost style).
-- Scroll-down indicator in hero: animated bouncing chevron.
+## DESIGN POLISH (compact CSS — keep it under 100 lines)
+- clamp() for responsive font sizing. letter-spacing: -0.02em on large headings.
+- Alternate section backgrounds for rhythm. Multi-layer shadows on cards.
+- Buttons/cards: translateY on hover with elevated shadow. Images: scale(1.03) on hover.
+- SVG wave dividers between sections. Decorative accent lines above headings.
+- Accent-colored top border (3-4px). Scroll-down chevron in hero.
 
 ${COMPONENT_LIBRARY_INSTRUCTION}
 
-## What to NEVER DO
-- Dark cyberpunk theme for a bakery, law firm, or dental practice
-- Same purple/cyan palette regardless of industry
-- Gradient blobs on professional services sites
-- Particle effects or matrix rain on business websites
-- Bootstrap-looking output or free template aesthetics
-- Cramped spacing or walls of text
-- Generic placeholder-sounding copy
-
-CRITICAL quality checklist:
-✓ CSS custom properties for every color
-✓ Generous whitespace (100-140px section padding desktop, 60-80px mobile)
-✓ Refined multi-layer shadows
-✓ Proper font hierarchy (weight, size, letter-spacing, line-height)
-✓ Hover states on ALL clickable elements
-✓ Mobile hamburger menu with smooth animation
-✓ No horizontal overflow on any screen size
-✓ Alt text on all images
-✓ Focus-visible states for keyboard navigation
-✓ prefers-reduced-motion media query respected`;
+## NEVER DO
+- Dark theme for non-tech businesses. Same palette regardless of industry.
+- Gradient blobs on professional sites. Particle effects on business sites.
+- Bootstrap/template aesthetics. Cramped spacing. Generic copy.`;
 
 const ANIMATION_SYSTEM = `You are an animation specialist. Take the HTML website and enhance it with smooth micro-interactions and scroll effects.
 
@@ -505,7 +455,8 @@ export async function runPipeline(
 
   // Helper: call the right LLM based on user selection
   // Returns { text, stopReason } so we can detect truncation
-  const llmCall = async (opts: { model: string; maxTokens: number; system: string; userMessage: string }): Promise<{ text: string; stopReason: string }> => {
+  // Optional prefill parameter: starts the assistant's response with given content (Anthropic API technique)
+  const llmCall = async (opts: { model: string; maxTokens: number; system: string; userMessage: string; prefill?: string }): Promise<{ text: string; stopReason: string }> => {
     if (useMultiLLM) {
       const res = await callLLM({
         model: opts.model,
@@ -513,18 +464,25 @@ export async function runPipeline(
         userMessage: opts.userMessage,
         maxTokens: opts.maxTokens,
       });
-      return { text: res.text, stopReason: "end_turn" };
+      return { text: (opts.prefill || "") + res.text, stopReason: "end_turn" };
     } else {
       // Direct Anthropic SDK for Claude models (fastest path)
       const client = new Anthropic({ apiKey });
+      const messages: { role: "user" | "assistant"; content: string }[] = [
+        { role: "user", content: opts.userMessage },
+      ];
+      if (opts.prefill) {
+        messages.push({ role: "assistant", content: opts.prefill });
+      }
       const res = await client.messages.create({
         model: opts.model,
         max_tokens: opts.maxTokens,
         system: opts.system,
-        messages: [{ role: "user", content: opts.userMessage }],
+        messages,
       });
       const text = res.content.find((b) => b.type === "text")?.text || "";
-      return { text, stopReason: res.stop_reason || "unknown" };
+      // Prepend prefill since the API response only contains what comes AFTER the prefill
+      return { text: (opts.prefill || "") + text, stopReason: res.stop_reason || "unknown" };
     }
   };
 
@@ -606,11 +564,20 @@ export async function runPipeline(
 
   const devUserMessage = `STRATEGY:\n${strategySpec}\n\nDESIGN SPEC:\n${brandSpec}\n\nCOPY:\n${copySpec}\n\nARCHITECTURE:\n${archSpec}\n\nORIGINAL BRIEF:\n${input.prompt}\n\nBuild the complete HTML website. Follow all specs exactly. If the original brief contains specific visual, copy, or structural instructions, those take priority.\n\nCRITICAL REMINDER: The <body> must contain ALL the copy content from the COPY section above. Write the full page content inside <body> — headers, sections, text, images, everything. Do NOT produce only CSS with an empty body.`;
 
+  // Assistant prefill: force the model to start writing HTML structure immediately.
+  // This prevents the model from spending all tokens on CSS before reaching <body>.
+  const DEV_PREFILL = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">`;
+
   let devResult = await llmCall({
     model: MODEL_PREMIUM,
     maxTokens: 64000,
     system: DEVELOPER_SYSTEM,
     userMessage: devUserMessage,
+    prefill: DEV_PREFILL,
   });
 
   let html = cleanHtml(devResult.text);
