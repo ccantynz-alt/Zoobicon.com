@@ -346,6 +346,7 @@ export default function BuilderPage() {
   const [availableModels, setAvailableModels] = useState<AIModel[]>([]);
 
   const abortRef = useRef<AbortController | null>(null);
+  const generationIdRef = useRef(0); // Tracks current generation to prevent stale image replacements
   const hasCode = generatedCode.length > 0;
 
   // Admin always gets premium tier locked
@@ -413,6 +414,7 @@ export default function BuilderPage() {
             prompt: userPrompt,
             tier,
             ...(existingCode ? { existingCode } : {}),
+            ...(selectedModel ? { model: selectedModel } : {}),
           }),
           signal: controller.signal,
         });
@@ -426,6 +428,7 @@ export default function BuilderPage() {
               prompt: userPrompt,
               tier,
               ...(existingCode ? { existingCode } : {}),
+              ...(selectedModel ? { model: selectedModel } : {}),
             }),
           });
           if (!fallbackRes.ok) {
@@ -509,13 +512,14 @@ export default function BuilderPage() {
         setStatus("error");
       }
     },
-    [tier, autoReplaceImages]
+    [tier, autoReplaceImages, selectedModel]
   );
 
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim()) return;
 
     // Use the full 10-agent pipeline for new builds
+    const currentGenId = ++generationIdRef.current;
     setStatus("generating");
     setError("");
     setGeneratedCode("");
@@ -560,11 +564,13 @@ export default function BuilderPage() {
       }
 
       const data = await res.json();
-      setPipelineAgents(
-        (data.agents || []).map((a: { name: string; duration: number }) =>
-          `${a.name} — ${(a.duration / 1000).toFixed(1)}s`
-        )
+      const agentSummary = (data.agents || []).map((a: { name: string; duration: number }) =>
+        `${a.name} — ${(a.duration / 1000).toFixed(1)}s`
       );
+      setPipelineAgents([
+        ...agentSummary,
+        `✓ 10-Agent Pipeline — ${data.agentCount} agents in ${(data.totalDuration / 1000).toFixed(1)}s`,
+      ]);
 
       // Client-side HTML safety net — ensure clean HTML reaches preview
       let finalHtml = (data.html || "").trim();
@@ -581,8 +587,11 @@ export default function BuilderPage() {
       setStatus("complete");
 
       // Auto-replace placeholder images with contextually relevant ones
+      // Only apply if this is still the current generation (prevents stale updates)
       autoReplaceImages(finalHtml).then((improved) => {
-        if (improved !== finalHtml) setGeneratedCode(improved);
+        if (improved !== finalHtml && generationIdRef.current === currentGenId) {
+          setGeneratedCode(improved);
+        }
       });
     } catch (err) {
       // Fallback to streaming endpoint if pipeline fails
@@ -601,7 +610,7 @@ export default function BuilderPage() {
         setStatus("idle");
       }
     }
-  }, [prompt, tier, streamGenerate, autoReplaceImages]);
+  }, [prompt, tier, streamGenerate, autoReplaceImages, selectedModel]);
 
   const handleEdit = useCallback(async () => {
     if (!editPrompt.trim() || !generatedCode) return;
@@ -813,16 +822,33 @@ export default function BuilderPage() {
             {hasCode && (
               <div className="ml-auto flex items-center gap-2 pr-3">
                 {deployStatus === "deployed" && deployUrl && (
-                  <a
-                    href={deployUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
-                  >
-                    <Check size={14} />
-                    <span>Live</span>
-                    <ExternalLink size={12} />
-                  </a>
+                  <div className="flex items-center gap-3">
+                    <a
+                      href={deployUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
+                    >
+                      <Check size={14} />
+                      <span>Live</span>
+                      <ExternalLink size={12} />
+                    </a>
+                    {(() => {
+                      try {
+                        const u = localStorage.getItem("zoobicon_user");
+                        const parsed = u ? JSON.parse(u) : null;
+                        const isPaid = parsed?.plan === "unlimited" || parsed?.plan === "pro" || parsed?.plan === "premium" || parsed?.role === "admin";
+                        if (!isPaid) {
+                          return (
+                            <a href="/pricing" className="text-[10px] text-amber-400/60 hover:text-amber-400 transition-colors">
+                              7-day free preview — Upgrade to keep
+                            </a>
+                          );
+                        }
+                      } catch { /* ignore */ }
+                      return null;
+                    })()}
+                  </div>
                 )}
                 <button
                   onClick={handleDeploy}

@@ -196,18 +196,108 @@ export async function POST(req: NextRequest) {
           replacement = `https://images.unsplash.com/photo-1497366216548-37526070297c?w=${width}&h=${height}&fit=crop&auto=format&q=80`;
         }
       } else {
-        // Fallback: use Unsplash source (no API key needed, less control)
-        const encodedQuery = encodeURIComponent(query);
-        replacement = `https://images.unsplash.com/photo-1497366216548-37526070297c?w=${width}&h=${height}&fit=crop&auto=format&q=80&s=${encodedQuery}`;
-
-        // Better fallback: use picsum with specific seed for consistency
-        // but upgrade to Unsplash source URLs for better quality
-        const styleMap: Record<string, string> = {
-          photo: `https://source.unsplash.com/${width}x${height}/?${encodedQuery}`,
-          illustration: `https://source.unsplash.com/${width}x${height}/?${encodedQuery},illustration`,
-          minimal: `https://source.unsplash.com/${width}x${height}/?${encodedQuery},minimal`,
+        // No Unsplash API key — use curated Unsplash photo IDs per category
+        // These are hand-picked high-quality photos that match common business types
+        const curatedPhotos: Record<string, string[]> = {
+          "shuttle": [
+            "photo-1544620347-c4fd4a3d5957", // white van on road
+            "photo-1570125909232-eb263c188f7e", // bus on road
+            "photo-1544620347-c4fd4a3d5957", // transport van
+            "photo-1506521781263-d8422e82f27a", // airport terminal
+          ],
+          "airport": [
+            "photo-1506521781263-d8422e82f27a", // airport terminal
+            "photo-1436491865332-7a61a109db05", // airplane
+            "photo-1529074766086-4aae35b4d7ad", // airport interior
+            "photo-1488085061387-422e29b40080", // travel/plane
+          ],
+          "transport": [
+            "photo-1544620347-c4fd4a3d5957", // van driving
+            "photo-1570125909232-eb263c188f7e", // bus
+            "photo-1549317661-bd32c8ce0832", // road trip
+            "photo-1473042904451-00571b0401ea", // driver
+          ],
+          "restaurant": [
+            "photo-1517248135467-4c7edcad34c4", // restaurant interior
+            "photo-1414235077428-338989a2e8c0", // food plating
+            "photo-1555396273-367ea4eb4db5", // restaurant dining
+            "photo-1504674900247-0877df9cc836", // food close up
+          ],
+          "real_estate": [
+            "photo-1600596542815-ffad4c1539a9", // luxury home
+            "photo-1600585154340-be6161a56a0c", // modern interior
+            "photo-1512917774080-9991f1c4c750", // house exterior
+            "photo-1560448204-e02f11c3d0e2", // living room
+          ],
+          "dental": [
+            "photo-1629909613654-28e377c37b09", // dental office
+            "photo-1606811841689-23dfddce3e95", // smile
+            "photo-1588776814546-1ffcf47267a5", // dental care
+            "photo-1598256989800-fe5f95da9787", // dentist
+          ],
+          "legal": [
+            "photo-1589829545856-d10d557cf95f", // law books
+            "photo-1450101499163-c8848e968f93", // courthouse
+            "photo-1507679799987-c73779587ccf", // business suit
+            "photo-1521791055366-0d553872125f", // handshake
+          ],
+          "fitness": [
+            "photo-1534438327276-14e5300c3a48", // gym
+            "photo-1571019613454-1cb2f99b2d8b", // workout
+            "photo-1518611012118-696072aa579a", // yoga
+            "photo-1576678927484-cc907957088c", // fitness
+          ],
+          "tech": [
+            "photo-1531297484001-80022131f5a1", // laptop workspace
+            "photo-1518770660439-4636190af475", // circuit board
+            "photo-1504384308090-c894fdcc538d", // tech abstract
+            "photo-1522071820081-009f0129c71c", // team meeting
+          ],
+          "salon": [
+            "photo-1560066984-138dadb4c035", // salon interior
+            "photo-1522337360788-8b13dee7a37e", // beauty
+            "photo-1487412720507-e7ab37603c6f", // hair styling
+            "photo-1519699047748-de8e457a634e", // spa
+          ],
         };
-        replacement = styleMap[style] || styleMap.photo;
+
+        // Find matching category from query
+        const queryLower = query.toLowerCase();
+        let photoIds: string[] | undefined;
+        for (const [category, ids] of Object.entries(curatedPhotos)) {
+          if (queryLower.includes(category)) {
+            photoIds = ids;
+            break;
+          }
+        }
+
+        // Also check context for category matching
+        if (!photoIds) {
+          const contextLower = context.join(" ").toLowerCase();
+          for (const [category, ids] of Object.entries(curatedPhotos)) {
+            if (contextLower.includes(category)) {
+              photoIds = ids;
+              break;
+            }
+          }
+        }
+
+        if (photoIds) {
+          const photoId = photoIds[i % photoIds.length];
+          replacement = `https://images.unsplash.com/${photoId}?w=${width}&h=${height}&fit=crop&auto=format&q=80`;
+        } else {
+          // Generic professional fallback photos
+          const genericPhotos = [
+            "photo-1497366216548-37526070297c", // modern office
+            "photo-1522071820081-009f0129c71c", // team collaboration
+            "photo-1460925895917-afdab827c52f", // workspace
+            "photo-1531973576160-7125cd663d86", // business meeting
+            "photo-1454165804606-c3d57bc86b40", // analytics
+            "photo-1552664730-d307ca884978", // teamwork
+          ];
+          const photoId = genericPhotos[i % genericPhotos.length];
+          replacement = `https://images.unsplash.com/${photoId}?w=${width}&h=${height}&fit=crop&auto=format&q=80`;
+        }
       }
 
       replacements.push({ original, replacement, query });
