@@ -470,8 +470,9 @@ export default function LandingPage() {
         <div className="hero-orb hero-orb-3" />
         <div className="hero-grid" />
         <div className="hero-spotlight" />
-        <div className="hero-light-line" style={{ top: "30%" }} />
-        <div className="hero-light-line" style={{ top: "70%", animationDelay: "3s" }} />
+        <div className="hero-light-line" style={{ top: "25%" }} />
+        <div className="hero-light-line" style={{ top: "55%", animationDelay: "2s" }} />
+        <div className="hero-light-line" style={{ top: "80%", animationDelay: "4s" }} />
         {/* Floating particles */}
         <div className="hero-particles">
           <div className="hero-particle" />
@@ -481,10 +482,13 @@ export default function LandingPage() {
           <div className="hero-particle" />
           <div className="hero-particle" />
         </div>
+        {/* Center radial glow — the "wow" layer */}
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-blue-500/[0.12] rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-[40%] left-[45%] -translate-x-1/2 -translate-y-1/2 w-[500px] h-[400px] bg-indigo-500/[0.1] rounded-full blur-[100px] pointer-events-none" />
         {/* Radial gradient fade at bottom */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0b0b11]/30 via-transparent to-[#0b0b11] pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0b0b11]/20 via-transparent to-[#0b0b11] pointer-events-none" />
         {/* Top edge glow */}
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/30 to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-blue-400/50 to-transparent" />
 
         <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center relative z-10 w-full">
           <motion.div
@@ -494,9 +498,9 @@ export default function LandingPage() {
           >
             {/* Badge */}
             <motion.div variants={fadeInUp} className="flex justify-center mb-10">
-              <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border border-violet-400/30 bg-gradient-to-r from-violet-500/[0.1] to-blue-500/[0.1] backdrop-blur-xl shadow-[0_0_20px_rgba(139,92,246,0.15)]">
-                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
-                <span className="text-xs font-semibold text-white/90 tracking-wide">AI Website Builder — Trusted by 10,000+ creators</span>
+              <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border border-blue-400/40 bg-gradient-to-r from-blue-500/[0.15] to-indigo-500/[0.15] backdrop-blur-xl shadow-[0_0_30px_rgba(59,130,246,0.2),0_0_60px_rgba(99,102,241,0.08)]">
+                <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse shadow-[0_0_12px_rgba(96,165,250,0.9)]" />
+                <span className="text-xs font-semibold text-white/95 tracking-wide">AI Website Builder — Trusted by 10,000+ creators</span>
                 <ChevronRight className="w-3 h-3 text-violet-300/70" />
               </div>
             </motion.div>
@@ -506,8 +510,8 @@ export default function LandingPage() {
               variants={fadeInUp}
               className="hero-shimmer text-5xl sm:text-6xl md:text-7xl lg:text-[6rem] font-black tracking-[-0.03em] leading-[0.9] mb-8"
             >
-              <span className="block text-white drop-shadow-[0_0_50px_rgba(139,92,246,0.2)]">Websites that build</span>
-              <span className="block gradient-text-hero mt-3 drop-shadow-[0_0_80px_rgba(99,102,241,0.3)]" style={{ filter: "brightness(1.15)" }}>themselves.</span>
+              <span className="block text-white drop-shadow-[0_0_60px_rgba(59,130,246,0.3)]">Websites that build</span>
+              <span className="block gradient-text-hero mt-3 drop-shadow-[0_0_100px_rgba(59,130,246,0.4)]">themselves.</span>
             </motion.h1>
 
             {/* Sub headline */}
@@ -527,7 +531,7 @@ export default function LandingPage() {
               {["Auto-Debug", "GitHub Import", "WP Export", "Figma Import", "30+ Languages", "E-commerce", "Auth Scaffold", "SEO Auto-Fix"].map((pill) => (
                 <span
                   key={pill}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium text-slate-200/80 border border-white/10 bg-white/[0.05] backdrop-blur-sm hover:bg-white/[0.08] hover:border-white/15 transition-colors"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium text-slate-100/90 border border-blue-400/15 bg-blue-500/[0.06] backdrop-blur-sm hover:bg-blue-500/[0.12] hover:border-blue-400/25 transition-colors"
                 >
                   <Check className="w-3 h-3 text-emerald-400" />
                   {pill}
@@ -539,7 +543,7 @@ export default function LandingPage() {
             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-24">
               <Link
                 href="/builder"
-                className="cta-glow group relative px-10 py-4.5 rounded-2xl text-base font-bold text-white flex items-center gap-3 bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-500 hover:shadow-[0_0_60px_rgba(99,102,241,0.5),0_0_100px_rgba(37,99,235,0.2),0_8px_24px_rgba(37,99,235,0.3)] hover:-translate-y-1 transition-all duration-300"
+                className="cta-glow group relative px-10 py-4.5 rounded-2xl text-base font-bold text-white flex items-center gap-3 bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-400 shadow-[0_0_40px_rgba(59,130,246,0.4),0_4px_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_80px_rgba(59,130,246,0.6),0_0_120px_rgba(37,99,235,0.25),0_8px_32px_rgba(37,99,235,0.4)] hover:-translate-y-1 transition-all duration-300"
               >
                 <span>Start Building Free</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
@@ -556,13 +560,14 @@ export default function LandingPage() {
               className="relative max-w-5xl mx-auto"
             >
               {/* Glow behind the demo */}
-              <div className="absolute -inset-4 bg-gradient-to-r from-blue-600/10 via-blue-500/5 to-indigo-600/10 rounded-3xl blur-2xl pointer-events-none" />
+              <div className="absolute -inset-6 bg-gradient-to-r from-blue-500/15 via-indigo-500/10 to-blue-500/15 rounded-3xl blur-2xl pointer-events-none" />
+              <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 via-indigo-500/10 to-cyan-500/20 rounded-2xl blur-md pointer-events-none" />
               {/* Premium frame */}
-              <div className="relative rounded-2xl overflow-hidden ring-1 ring-white/[0.1] shadow-[0_20px_80px_rgba(37,99,235,0.12),0_8px_32px_rgba(0,0,0,0.4)]">
+              <div className="relative rounded-2xl overflow-hidden ring-1 ring-blue-400/20 shadow-[0_20px_80px_rgba(59,130,246,0.2),0_8px_32px_rgba(0,0,0,0.5),0_0_0_1px_rgba(59,130,246,0.1)]">
                 <BuilderDemo />
               </div>
               {/* Ambient glow under the preview */}
-              <div className="absolute -bottom-32 left-1/2 -translate-x-1/2 w-[80%] h-64 bg-blue-500/10 blur-[120px] rounded-full pointer-events-none" />
+              <div className="absolute -bottom-32 left-1/2 -translate-x-1/2 w-[80%] h-64 bg-blue-500/15 blur-[120px] rounded-full pointer-events-none" />
             </motion.div>
           </motion.div>
         </div>
