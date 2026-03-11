@@ -6,7 +6,18 @@
 
   "regions": ["iad1"],
 
+  "crons": [
+    {
+      "path": "/api/health?deep=true",
+      "schedule": "0 */2 * * *"
+    }
+  ],
+
   "functions": {
+    "src/app/api/health/route.ts": {
+      "maxDuration": 120,
+      "memory": 1024
+    },
     "src/app/api/generate/route.ts": {
       "maxDuration": 300,
       "memory": 1024
