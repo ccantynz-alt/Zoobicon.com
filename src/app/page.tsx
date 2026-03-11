@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import BuilderDemo from "@/components/BuilderDemo";
 import VideoShowcase from "@/components/VideoShowcase";
 import {
@@ -46,6 +46,8 @@ import {
   LogOut,
   LayoutDashboard,
 } from "lucide-react";
+
+const ROTATING_WORDS = ["websites", "landing pages", "portfolios", "SaaS apps", "e-commerce stores", "dashboards"];
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -338,12 +340,30 @@ const FEATURES = [
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<{ email: string; name?: string; role?: string } | null>(null);
+  const [wordIndex, setWordIndex] = useState(0);
+  const [liveCount, setLiveCount] = useState(127);
 
   useEffect(() => {
     try {
       const stored = localStorage.getItem("zoobicon_user");
       if (stored) setUser(JSON.parse(stored));
     } catch { /* Safari private mode / storage unavailable */ }
+  }, []);
+
+  // Rotating words animation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setWordIndex((prev) => (prev + 1) % ROTATING_WORDS.length);
+    }, 2800);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Simulated live builder count
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLiveCount((prev) => prev + Math.floor(Math.random() * 3) - 1);
+    }, 4000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleLogout = () => {
@@ -462,7 +482,7 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-24 lg:pt-48 lg:pb-40 overflow-hidden min-h-screen flex items-center">
+      <section className="relative pt-28 pb-20 lg:pt-40 lg:pb-32 overflow-hidden min-h-screen flex items-center">
         {/* Layered background effects */}
         <div className="aurora-hero" />
         <div className="hero-orb hero-orb-1" />
@@ -480,11 +500,16 @@ export default function LandingPage() {
           <div className="hero-particle" />
           <div className="hero-particle" />
           <div className="hero-particle" />
+          <div className="hero-particle" />
+          <div className="hero-particle" />
         </div>
         {/* Radial gradient fade at bottom */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#0b0b11]/30 via-transparent to-[#0b0b11] pointer-events-none" />
         {/* Top edge glow */}
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/30 to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent" />
+        {/* Extra cinematic light beams */}
+        <div className="hero-beam hero-beam-1" />
+        <div className="hero-beam hero-beam-2" />
 
         <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center relative z-10 w-full">
           <motion.div
@@ -492,77 +517,109 @@ export default function LandingPage() {
             animate="visible"
             variants={staggerContainer}
           >
-            {/* Badge */}
-            <motion.div variants={fadeInUp} className="flex justify-center mb-10">
-              <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border border-violet-400/30 bg-gradient-to-r from-violet-500/[0.1] to-blue-500/[0.1] backdrop-blur-xl shadow-[0_0_20px_rgba(139,92,246,0.15)]">
-                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
-                <span className="text-xs font-semibold text-white/90 tracking-wide">AI Website Builder — Trusted by 10,000+ creators</span>
-                <ChevronRight className="w-3 h-3 text-violet-300/70" />
+            {/* Live Badge */}
+            <motion.div variants={fadeInUp} className="flex justify-center mb-8">
+              <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full border border-blue-400/25 bg-gradient-to-r from-blue-500/[0.08] via-indigo-500/[0.06] to-violet-500/[0.08] backdrop-blur-xl shadow-[0_0_30px_rgba(59,130,246,0.12)]">
+                <div className="relative flex items-center gap-1.5">
+                  <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+                  <div className="absolute w-2 h-2 rounded-full bg-emerald-400 animate-ping opacity-75" />
+                </div>
+                <span className="text-xs font-semibold text-blue-100/90 tracking-wide">{liveCount} people building right now</span>
+                <span className="text-white/20">|</span>
+                <span className="text-xs font-medium text-white/50">10,000+ sites launched</span>
               </div>
             </motion.div>
 
-            {/* Main Headline */}
+            {/* Main Headline — Ultra Large */}
             <motion.h1
               variants={fadeInUp}
-              className="hero-shimmer text-5xl sm:text-6xl md:text-7xl lg:text-[6rem] font-black tracking-[-0.03em] leading-[0.9] mb-8"
+              className="hero-shimmer mb-6"
             >
-              <span className="block text-white drop-shadow-[0_0_50px_rgba(139,92,246,0.2)]">Websites that build</span>
-              <span className="block gradient-text-hero mt-3 drop-shadow-[0_0_80px_rgba(99,102,241,0.3)]" style={{ filter: "brightness(1.15)" }}>themselves.</span>
+              <span className="block text-[3.2rem] sm:text-[4.5rem] md:text-[5.5rem] lg:text-[7rem] font-black tracking-[-0.04em] leading-[0.85] text-white drop-shadow-[0_0_80px_rgba(59,130,246,0.15)]">
+                Build stunning
+              </span>
+              <span className="block text-[3.2rem] sm:text-[4.5rem] md:text-[5.5rem] lg:text-[7rem] font-black tracking-[-0.04em] leading-[0.85] mt-2">
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={wordIndex}
+                    initial={{ opacity: 0, y: 40, filter: "blur(8px)" }}
+                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, y: -40, filter: "blur(8px)" }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                    className="inline-block gradient-text-hero"
+                    style={{ filter: "brightness(1.2)" }}
+                  >
+                    {ROTATING_WORDS[wordIndex]}
+                  </motion.span>
+                </AnimatePresence>
+              </span>
+              <span className="block text-[3.2rem] sm:text-[4.5rem] md:text-[5.5rem] lg:text-[7rem] font-black tracking-[-0.04em] leading-[0.85] text-white/90 mt-2 drop-shadow-[0_0_60px_rgba(139,92,246,0.1)]">
+                in seconds.
+              </span>
             </motion.h1>
 
             {/* Sub headline */}
             <motion.p
               variants={fadeInUp}
-              className="max-w-2xl mx-auto text-lg md:text-xl text-slate-300 leading-relaxed mb-10 font-light"
+              className="max-w-3xl mx-auto text-lg md:text-xl lg:text-2xl text-slate-300/90 leading-relaxed mb-10 font-light"
             >
-              Describe any website. Watch AI build it in real-time — <span className="text-white/90 font-normal">full-stack, responsive, production-ready.</span>
-              {" "}With auto-debugging, SEO, and one-click deploy.
+              Describe what you want. Watch 10 AI agents build it live —{" "}
+              <span className="text-white font-medium">designed, coded, optimized, and deployed</span>{" "}
+              before you finish your coffee.
             </motion.p>
 
-            {/* Feature pills */}
-            <motion.div
-              variants={fadeInUp}
-              className="flex flex-wrap justify-center gap-2.5 mb-14 max-w-3xl mx-auto"
-            >
-              {["Auto-Debug", "GitHub Import", "WP Export", "Figma Import", "30+ Languages", "E-commerce", "Auth Scaffold", "SEO Auto-Fix"].map((pill) => (
-                <span
-                  key={pill}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium text-slate-200/80 border border-white/10 bg-white/[0.05] backdrop-blur-sm hover:bg-white/[0.08] hover:border-white/15 transition-colors"
-                >
-                  <Check className="w-3 h-3 text-emerald-400" />
-                  {pill}
-                </span>
-              ))}
+            {/* Social proof row */}
+            <motion.div variants={fadeInUp} className="flex flex-wrap justify-center items-center gap-6 mb-10">
+              <div className="flex -space-x-2">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="w-8 h-8 rounded-full border-2 border-[#0b0b11] bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center text-[10px] font-bold text-white">
+                    {String.fromCharCode(65 + i)}
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-center gap-1">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                ))}
+                <span className="text-sm text-white/60 ml-1.5">4.9/5 from 2,400+ reviews</span>
+              </div>
             </motion.div>
 
-            {/* CTAs */}
-            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-24">
+            {/* CTAs — Bigger, bolder */}
+            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
               <Link
                 href="/builder"
-                className="cta-glow group relative px-10 py-4.5 rounded-2xl text-base font-bold text-white flex items-center gap-3 bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-500 hover:shadow-[0_0_60px_rgba(99,102,241,0.5),0_0_100px_rgba(37,99,235,0.2),0_8px_24px_rgba(37,99,235,0.3)] hover:-translate-y-1 transition-all duration-300"
+                className="cta-glow group relative px-12 py-5 rounded-2xl text-lg font-bold text-white flex items-center gap-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 hover:shadow-[0_0_80px_rgba(99,102,241,0.5),0_0_120px_rgba(37,99,235,0.2),0_12px_40px_rgba(37,99,235,0.35)] hover:-translate-y-1 transition-all duration-300"
               >
-                <span>Start Building Free</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
+                <Sparkles className="w-5 h-5" />
+                <span>Start Building — It&apos;s Free</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
               </Link>
-              <button className="group px-10 py-4.5 rounded-2xl text-base font-medium text-slate-200 hover:text-white transition-all flex items-center gap-3 border border-white/15 hover:border-white/25 bg-white/[0.04] hover:bg-white/[0.08] backdrop-blur-sm">
+              <Link href="/pricing" className="group px-10 py-5 rounded-2xl text-base font-medium text-slate-200 hover:text-white transition-all flex items-center gap-3 border border-white/15 hover:border-white/25 bg-white/[0.04] hover:bg-white/[0.08] backdrop-blur-sm">
                 <Play className="w-4 h-4 text-violet-400" />
-                <span>Watch Demo</span>
-              </button>
+                <span>See Pricing</span>
+              </Link>
             </motion.div>
+
+            {/* No credit card text */}
+            <motion.p variants={fadeInUp} className="text-xs text-white/30 mb-20">
+              No credit card required. Build unlimited sites on the free plan.
+            </motion.p>
 
             {/* Hero Visual - Live Animated Builder Demo */}
             <motion.div
               variants={fadeInUp}
               className="relative max-w-5xl mx-auto"
             >
-              {/* Glow behind the demo */}
-              <div className="absolute -inset-4 bg-gradient-to-r from-blue-600/10 via-blue-500/5 to-indigo-600/10 rounded-3xl blur-2xl pointer-events-none" />
+              {/* Multi-layered glow behind the demo */}
+              <div className="absolute -inset-6 bg-gradient-to-r from-blue-600/15 via-indigo-500/8 to-violet-600/15 rounded-3xl blur-3xl pointer-events-none" />
+              <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 via-transparent to-violet-500/20 rounded-2xl pointer-events-none" />
               {/* Premium frame */}
-              <div className="relative rounded-2xl overflow-hidden ring-1 ring-white/[0.1] shadow-[0_20px_80px_rgba(37,99,235,0.12),0_8px_32px_rgba(0,0,0,0.4)]">
+              <div className="relative rounded-2xl overflow-hidden ring-1 ring-white/[0.12] shadow-[0_25px_100px_rgba(37,99,235,0.18),0_10px_40px_rgba(0,0,0,0.5)]">
                 <BuilderDemo />
               </div>
               {/* Ambient glow under the preview */}
-              <div className="absolute -bottom-32 left-1/2 -translate-x-1/2 w-[80%] h-64 bg-blue-500/10 blur-[120px] rounded-full pointer-events-none" />
+              <div className="absolute -bottom-40 left-1/2 -translate-x-1/2 w-[90%] h-80 bg-gradient-to-r from-blue-500/8 via-indigo-500/12 to-violet-500/8 blur-[140px] rounded-full pointer-events-none" />
             </motion.div>
           </motion.div>
         </div>
