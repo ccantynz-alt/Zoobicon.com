@@ -311,93 +311,75 @@ function GeneratingAtmosphere() {
 
 /**
  * Nuclear visibility failsafe — injected into EVERY srcDoc.
- * Fixes the #1 cause of blank white previews: AI-generated CSS that sets
- * elements to opacity:0 for scroll animations, but the IntersectionObserver
- * JS either doesn't fire, uses wrong class names, or breaks in the iframe.
  *
- * Strategy:
- * 1. After DOM loads, set up a proper IntersectionObserver for common animation classes
- * 2. After 2s, force ALL hidden elements visible (catches broken JS)
- * 3. High-specificity CSS rule as final backstop
+ * Two-layer approach:
+ * 1. CSS: Forces body and all children visible with !important rules
+ * 2. JS: After 1.5s, UNCONDITIONALLY sets every single element to
+ *    opacity:1, visibility:visible, transform:none — no checks, no conditions.
+ *    This is a sledgehammer, but it guarantees no blank pages.
  */
 const VISIBILITY_FAILSAFE = `
 <style id="zbcn-failsafe">
-  /* Nuclear failsafe: ensure body and critical elements are ALWAYS visible */
-  html, body { opacity: 1 !important; visibility: visible !important; display: block !important; min-height: 100vh !important; }
-  body > * { visibility: visible !important; }
-  /* After 2s, force ALL animation classes visible via CSS animation */
-  @keyframes zbcn-nuke { to { opacity: 1 !important; transform: none !important; visibility: visible !important; } }
+  /* Layer 1: CSS nuclear override — ensures nothing can hide body or its children */
+  html, body {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
+    min-height: 100vh !important;
+    color-scheme: light !important;
+  }
+  /* Force all sections and content containers visible */
+  body > *, body section, body header, body main, body footer,
+  body article, body div, body aside {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
 </style>
 <script>
 (function(){
-  var SKIP = {SCRIPT:1,STYLE:1,META:1,LINK:1,HEAD:1,BR:1,HR:1};
-
-  function forceVisible() {
-    // 1. Force body always visible
-    var b = document.body;
-    if (b) {
-      b.style.setProperty('opacity','1','important');
-      b.style.setProperty('visibility','visible','important');
-      b.style.setProperty('display','block','important');
-    }
-
-    // 2. Check ALL elements for any hiding technique
-    var all = document.querySelectorAll('body *');
-    for (var i = 0; i < all.length; i++) {
-      var el = all[i];
-      if (SKIP[el.tagName]) continue;
-      try {
-        var cs = window.getComputedStyle(el);
-        var dominated = false;
-        // Check opacity
-        if (parseFloat(cs.opacity) < 0.1) dominated = true;
-        // Check visibility
-        if (cs.visibility === 'hidden') dominated = true;
-        // Check display (but not for elements that should be hidden like mobile menus)
-        if (cs.display === 'none' && !el.closest('nav') && !el.classList.contains('mobile-menu')) dominated = true;
-        // Check if element is pushed off-screen
-        if (cs.position === 'absolute' || cs.position === 'fixed') {
-          var r = el.getBoundingClientRect();
-          if (r.right < -500 || r.bottom < -500 || r.left > window.innerWidth + 500) dominated = true;
+  // Layer 2: JS brute force — NO getComputedStyle, NO conditions, just force everything
+  function nukeHidden() {
+    try {
+      var els = document.querySelectorAll('body, body *');
+      for (var i = 0; i < els.length; i++) {
+        var t = els[i].tagName;
+        if (t === 'SCRIPT' || t === 'STYLE' || t === 'META' || t === 'LINK') continue;
+        var s = els[i].style;
+        s.setProperty('opacity', '1', 'important');
+        s.setProperty('visibility', 'visible', 'important');
+        // Only reset transform on non-nav elements (preserve nav positioning)
+        if (t !== 'NAV' && !els[i].closest('nav')) {
+          s.setProperty('transform', 'none', 'important');
         }
-        // Check max-height: 0 on non-accordion elements
-        if (cs.maxHeight === '0px' && !el.classList.contains('faq-answer') && !el.closest('.accordion')) dominated = true;
-
-        if (dominated) {
-          el.style.setProperty('opacity','1','important');
-          el.style.setProperty('visibility','visible','important');
-          el.style.setProperty('transform','none','important');
-          if (cs.display === 'none' && !el.closest('nav')) {
-            el.style.setProperty('display','block','important');
-          }
-          if (cs.maxHeight === '0px' && !el.classList.contains('faq-answer')) {
-            el.style.setProperty('max-height','none','important');
-          }
-          el.classList.add('visible');
-        }
-      } catch(e) {}
-    }
+        // Add visible class for component library
+        els[i].classList.add('visible');
+      }
+    } catch(e) { console.warn('[zbcn-failsafe]', e); }
   }
 
-  // Run at multiple intervals — catches scripts that re-hide elements
-  function schedule() {
-    setTimeout(forceVisible, 500);
-    setTimeout(forceVisible, 1500);
-    setTimeout(forceVisible, 3000);
-    setTimeout(forceVisible, 6000);
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', schedule);
-  } else {
-    schedule();
-  }
+  // Run at multiple intervals
+  setTimeout(nukeHidden, 1500);
+  setTimeout(nukeHidden, 3500);
 })();
 </script>`;
 
 export default function PreviewPanel({ html, isGenerating }: PreviewPanelProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [blankDetected, setBlankDetected] = useState(false);
+
+  // Extract body text to validate content exists
+  const bodyTextLength = useMemo(() => {
+    if (!html) return 0;
+    const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+    if (!bodyMatch) return 0;
+    return bodyMatch[1]
+      .replace(/<script[\s\S]*?<\/script>/gi, "")
+      .replace(/<style[\s\S]*?<\/style>/gi, "")
+      .replace(/<[^>]+>/g, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .length;
+  }, [html]);
 
   // Inject visibility failsafe into every srcDoc to prevent blank white pages
   const srcDoc = useMemo(() => {
@@ -616,6 +598,26 @@ export default function PreviewPanel({ html, isGenerating }: PreviewPanelProps) 
           <p className="text-yellow-200/60 text-xs">The AI returned text that doesn&apos;t appear to be a complete HTML document. First 200 characters shown below:</p>
         </div>
         <pre className="text-xs text-blue-300/70 whitespace-pre-wrap break-all font-mono">{srcDoc.substring(0, 500)}</pre>
+      </div>
+    );
+  }
+
+  // Safety check — if body has no visible text content, show diagnostic instead of blank white
+  if (html && bodyTextLength < 50) {
+    return (
+      <div className="h-full overflow-auto bg-gray-950 p-6">
+        <div className="bg-red-900/30 border border-red-600/40 rounded-lg p-4 mb-4">
+          <p className="text-red-300 text-sm font-medium mb-2">Generation incomplete — empty page detected</p>
+          <p className="text-red-200/60 text-xs mb-3">
+            The AI generated HTML structure ({html.length.toLocaleString()} chars) but the body has very little visible text content ({bodyTextLength} chars).
+            This usually means the AI produced CSS/JS but forgot the actual page content.
+          </p>
+          <p className="text-red-200/60 text-xs">Try clicking &quot;New Site&quot; and generating again, or switch to the Code tab to inspect the output.</p>
+        </div>
+        <div className="bg-gray-900/50 rounded-lg p-4">
+          <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">Raw HTML (first 1000 chars)</p>
+          <pre className="text-[11px] text-blue-300/50 whitespace-pre-wrap break-all font-mono leading-relaxed">{html.substring(0, 1000)}</pre>
+        </div>
       </div>
     );
   }

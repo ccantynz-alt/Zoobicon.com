@@ -580,10 +580,26 @@ export async function runPipeline(
   let html = cleanHtml(devText);
   agents.push({ agent: "Developer", output: `[${html.length} chars HTML]`, duration: Date.now() - devStart });
 
-  // Critical check: if Developer didn't produce valid HTML, don't waste time on enhancement agents
+  // Critical check: Developer MUST produce valid HTML with actual body content
   if (html.length < 500 || !/<body/i.test(html)) {
     console.error("[Pipeline] Developer agent produced invalid/empty HTML, aborting enhancements");
     throw new Error("Developer agent failed to produce a valid website. Please try again.");
+  }
+
+  // Check body has actual text content — not just CSS/JS with empty body
+  const devBodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+  if (devBodyMatch) {
+    const devBodyText = devBodyMatch[1]
+      .replace(/<script[\s\S]*?<\/script>/gi, "")
+      .replace(/<style[\s\S]*?<\/style>/gi, "")
+      .replace(/<[^>]+>/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (devBodyText.length < 100) {
+      console.error(`[Pipeline] Developer produced HTML with empty body (${devBodyText.length} chars text). HTML length: ${html.length}`);
+      throw new Error("Developer agent produced a page with no visible content. Please try again.");
+    }
+    console.log(`[Pipeline] Developer body text: ${devBodyText.length} chars — content validated`);
   }
 
   // ── Phase 4: Animation + SEO + Forms (Parallel) — ALL tiers ──
