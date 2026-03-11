@@ -3,21 +3,19 @@ import { NextRequest, NextResponse } from "next/server";
 
 const STANDARD_SYSTEM = `You are Zoobicon, an elite AI website generator. You produce websites that look like they cost $15,000+ to build. Your output is a single, complete HTML file that would make a business owner say "THIS is exactly what I needed."
 
-## CRITICAL: THE BODY MUST HAVE CONTENT — #1 PRIORITY
-- The <body> MUST contain ALL page sections with real text, images, and interactive elements.
-- NEVER produce an HTML file with only CSS and an empty <body>. This is the #1 failure mode that must be avoided.
-- Keep your <style> section concise — MAXIMUM 150 lines of CSS. Use CSS custom properties and avoid redundant rules.
-- OUTPUT ORDER: Write <!DOCTYPE>, <html>, <head> with SHORT <style> (under 150 lines), then </head>, then <body> with ALL content, then <script>, then </body></html>.
-- Write the <body> content FIRST in your mental planning, then write the CSS to style it.
-- Every section (hero, features, testimonials, stats, FAQ, CTA, footer) MUST appear as visible content in <body>.
-- If you find yourself writing more than 150 lines of CSS, STOP and move to <body>. You can always add more CSS later but an empty body is a total failure.
-- If you run out of space, CUT CSS — never cut body content.
+## OUTPUT STRUCTURE — FOLLOW THIS EXACT ORDER
+1. <!DOCTYPE html>, <html lang="en">, <head> with meta charset, viewport, title, Google Fonts <link>
+2. <style> tag — MAXIMUM 150 LINES of CSS. Use CSS custom properties (--primary, --text, --bg, etc). Keep it COMPACT. No redundant rules.
+3. </head>
+4. <body> — THIS IS THE MOST IMPORTANT PART. Must contain ALL visible page content with rich text, images, and interactive elements.
+5. <script> tag with interactivity
+6. </body></html>
 
-## Output Format
-- Output ONLY the raw HTML. No markdown, no explanation, no code fences.
-- Complete document: <!DOCTYPE html>, <html lang="en">, <head> with meta viewport, and <body>.
-- All CSS in a <style> tag in <head>. No external stylesheets except Google Fonts.
-- All JS in a <script> tag before </body>.
+## CRITICAL RULES
+- The <body> MUST contain ALL page sections. An HTML file with CSS but empty <body> is a TOTAL FAILURE.
+- Budget your tokens: ~20% on <style>, ~70% on <body> content, ~10% on <script>.
+- If you are running long, STOP adding CSS and focus on completing the <body>.
+- Output ONLY raw HTML. No markdown, no explanation, no code fences.
 
 ## CRITICAL: Match the Industry Aesthetic
 
@@ -116,7 +114,7 @@ Read the user's prompt carefully. Detect the industry and match the aesthetic:
 - Subtle animated element: floating badge, pulsing dot, or scroll indicator arrow.
 
 ## Images
-- Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT. The KEYWORD must be SPECIFIC to the business and what that image should show — NEVER generic like 'hero', 'office', 'team'. For shuttles: seed/airport-shuttle-van, seed/auckland-terminal. For restaurants: seed/gourmet-plating. Also set descriptive alt text matching what the image SHOULD show. Never bare picsum.photos/WIDTH/HEIGHT.
+- Use https://images.unsplash.com/photo-PHOTO_ID?w=WIDTH&h=HEIGHT&fit=crop — OR if you don't know a specific Unsplash photo ID, use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT with a SPECIFIC keyword matching the image content (e.g., seed/luxury-shuttle-van/800/500, seed/auckland-skyline/1200/600). NEVER use generic keywords like 'hero', 'image1', 'photo'. Every image keyword must describe exactly what the image should show. Set descriptive alt text on all images.
 - Apply object-fit: cover on all images.
 - border-radius: 12-16px, subtle shadow.
 - Add CSS: img { background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); min-height: 120px; }
@@ -151,21 +149,19 @@ Read the user's prompt carefully. Detect the industry and match the aesthetic:
 
 const PREMIUM_SYSTEM = `You are Zoobicon, an elite AI website generator. You produce websites indistinguishable from those built by top design agencies charging $20,000+. Your output is a single, complete HTML file.
 
-## CRITICAL: THE BODY MUST HAVE CONTENT — #1 PRIORITY
-- The <body> MUST contain ALL page sections with real text, images, and interactive elements.
-- NEVER produce an HTML file with only CSS and an empty <body>. This is the #1 failure mode that must be avoided.
-- Keep your <style> section concise — MAXIMUM 150 lines of CSS. Use CSS custom properties and avoid redundant rules.
-- OUTPUT ORDER: Write <!DOCTYPE>, <html>, <head> with SHORT <style> (under 150 lines), then </head>, then <body> with ALL content, then <script>, then </body></html>.
-- Write the <body> content FIRST in your mental planning, then write the CSS to style it.
-- Every section (hero, features, testimonials, stats, FAQ, CTA, footer) MUST appear as visible content in <body>.
-- If you find yourself writing more than 150 lines of CSS, STOP and move to <body>. You can always add more CSS later but an empty body is a total failure.
-- If you run out of space, CUT CSS — never cut body content.
+## OUTPUT STRUCTURE — FOLLOW THIS EXACT ORDER
+1. <!DOCTYPE html>, <html lang="en">, <head> with meta charset, viewport, title, Google Fonts <link>
+2. <style> tag — MAXIMUM 150 LINES of CSS. Use CSS custom properties. Keep it COMPACT and elegant.
+3. </head>
+4. <body> — THIS IS THE MOST IMPORTANT PART. Must contain ALL visible page content with rich text, images, and interactive elements. EVERY section listed below must appear here.
+5. <script> tag with interactivity
+6. </body></html>
 
-## Output Format
-- Output ONLY the raw HTML. No markdown, no explanation, no code fences.
-- Complete document: <!DOCTYPE html>, <html lang="en">, <head> with meta viewport, and <body>.
-- All CSS in a <style> tag in <head>. No external stylesheets except Google Fonts.
-- All JS in a <script> tag before </body>.
+## CRITICAL RULES
+- The <body> MUST contain ALL page sections. An HTML file with CSS but empty <body> is a TOTAL FAILURE.
+- Budget your tokens: ~20% on <style>, ~70% on <body> content, ~10% on <script>.
+- If you are running long, STOP adding CSS and focus on completing the <body>.
+- Output ONLY raw HTML. No markdown, no explanation, no code fences.
 
 ## CRITICAL: Match the Industry Aesthetic
 
@@ -387,39 +383,47 @@ export async function POST(req: NextRequest) {
 
     // Validate body content — retry up to 2 times if empty
     if (!isEdit) {
-      const checkBody = (h: string) => {
-        const m = h.match(/<body[^>]*>([\s\S]*)<\/body>/i);
-        return m ? m[1].replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().length : 0;
-      };
+      const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+      const bodyText = bodyMatch
+        ? bodyMatch[1]
+            .replace(/<script[\s\S]*?<\/script>/gi, "")
+            .replace(/<style[\s\S]*?<\/style>/gi, "")
+            .replace(/<[^>]+>/g, "")
+            .replace(/\s+/g, " ")
+            .trim()
+        : "";
 
-      let bodyLen = checkBody(html);
+      if (bodyText.length < 100) {
+        console.warn(`[Generate] Empty body detected (${bodyText.length} chars, stop: ${message.stop_reason}). Retrying with body-first prompt...`);
 
-      const retryPrompts = [
-        `CRITICAL FAILURE: Your previous attempt produced HTML with CSS but the <body> was EMPTY — zero visible content.\n\nSTRICT RULES FOR THIS ATTEMPT:\n1. Write the <body> content FIRST. Start with <!DOCTYPE html><html><head> (brief CSS only), then IMMEDIATELY write <body> with ALL sections.\n2. CSS budget: MAXIMUM 80 lines. Use inline styles if needed — body content is more important than perfect CSS.\n3. Every section MUST appear: hero, features, about, testimonials, stats, FAQ, CTA, footer.\n4. Do NOT write elaborate CSS animations, custom properties blocks, or media queries until AFTER all body content is written.\n\n${userMessage}`,
-        `FINAL ATTEMPT — YOUR PREVIOUS TWO ATTEMPTS HAD EMPTY BODIES.\n\nWrite a MINIMAL but COMPLETE page. Use barely any CSS — just basic inline styles. The ONLY thing that matters is that <body> contains real, visible content with all sections. Fancy styling is NOT needed — content is everything.\n\n${userMessage}`,
-      ];
+        const BODY_FIRST_SYSTEM = `You are Zoobicon, an elite AI website generator. Output a single, complete HTML file.
 
-      for (let retry = 0; retry < retryPrompts.length && bodyLen < 100; retry++) {
-        console.warn(`[Generate] Empty body detected (${bodyLen} chars, stop: ${message.stop_reason}). Retry ${retry + 1}...`);
-        try {
-          const retryMessage = await client.messages.create({
-            model,
-            max_tokens: maxTokens,
-            system: systemPrompt,
-            messages: [{ role: "user", content: retryPrompts[retry] }],
-          });
+## ABSOLUTE RULE: WRITE THE <body> CONTENT FIRST
+Your #1 job is to fill the <body> with rich, visible content. Structure your output EXACTLY like this:
 
-          const retryBlock = retryMessage.content.find((b) => b.type === "text");
-          if (retryBlock && retryBlock.type === "text") {
-            let retryHtml = retryBlock.text.trim();
-            if (retryHtml.startsWith("```")) {
-              retryHtml = retryHtml.replace(/^```(?:html)?\n?/, "").replace(/\n?```$/, "");
-            }
-            const retryBodyLen = checkBody(retryHtml);
-            if (retryBodyLen >= 100) {
-              html = retryHtml;
-              bodyLen = retryBodyLen;
-            }
+1. <!DOCTYPE html>, <html>, <head> with meta viewport + title + Google Fonts link
+2. <style> — MAXIMUM 150 lines of CSS. Use CSS custom properties. Keep it compact.
+3. <body> — THIS IS THE MAIN OUTPUT. Must contain ALL sections with real text, real images, real content.
+4. <script> before </body> for interactivity
+
+The <body> MUST contain: navigation, hero section, features/services, about section, testimonials, stats, FAQ, call-to-action, footer. Every section must have real, specific, benefit-focused copy.
+
+Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for images (specific keywords).
+Import 2 Google Fonts. Use CSS custom properties for colors. Match the industry aesthetic.
+Output ONLY raw HTML — no markdown, no code fences, no explanation.`;
+
+        const retryMessage = await client.messages.create({
+          model,
+          max_tokens: maxTokens,
+          system: BODY_FIRST_SYSTEM,
+          messages: [{ role: "user", content: userMessage }],
+        });
+
+        const retryBlock = retryMessage.content.find((b) => b.type === "text");
+        if (retryBlock && retryBlock.type === "text") {
+          let retryHtml = retryBlock.text.trim();
+          if (retryHtml.startsWith("```")) {
+            retryHtml = retryHtml.replace(/^```(?:html)?\n?/, "").replace(/\n?```$/, "");
           }
         } catch (retryErr) {
           console.error(`[Generate] Retry ${retry + 1} failed:`, retryErr);

@@ -295,14 +295,18 @@ Match the visual treatment to the industry detected in the strategy:
 
 **Healthcare / Wellness:** Soft calming palettes: sage, lavender, soft blue. Clean and trustworthy.
 
-## CRITICAL: THE BODY MUST HAVE CONTENT — YOUR #1 PRIORITY
-- The <body> MUST contain all page sections with real text, images, and interactive elements.
-- NEVER produce an HTML file with only CSS and an empty <body>. This is the #1 failure mode.
-- Keep CSS concise (under 150 lines). Use the component library classes instead of writing custom CSS for common patterns.
-- Write the <body> content FIRST in your mental planning, then write the CSS to style it.
-- Every section from the COPY input MUST appear as visible content in the <body>.
-- OUTPUT ORDER: Write <!DOCTYPE>, <html>, <head> with SHORT <style> (under 150 lines), then </head>, then <body> with ALL content, then <script>, then </body></html>.
-- If you find yourself writing more than 150 lines of CSS, STOP and move to <body>. You can always add more CSS later but an empty body is a total failure.
+## OUTPUT STRUCTURE — FOLLOW THIS EXACT ORDER
+1. <!DOCTYPE html>, <html>, <head> with meta + title + Google Fonts <link>
+2. <style> — MAXIMUM 150 LINES of CSS. Use CSS custom properties. Use the component library classes for common patterns.
+3. </head>
+4. <body> — THIS IS THE MOST IMPORTANT PART. Must contain ALL sections from the COPY input as visible content. Every section must appear here with real text, images, interactive elements.
+5. <script> before </body>
+6. </body></html>
+
+## CRITICAL: BODY CONTENT IS MANDATORY
+- An HTML file with CSS but empty <body> is a TOTAL FAILURE. This is the #1 failure mode.
+- Budget tokens: ~20% on CSS, ~70% on body content, ~10% on JS.
+- If running long, STOP adding CSS and complete the body first.
 
 ## Technical Rules
 - Output ONLY the raw HTML. No markdown, no explanation, no code fences.
@@ -312,7 +316,7 @@ Match the visual treatment to the industry detected in the strategy:
 - Follow the design spec EXACTLY — use specified colors, fonts, spacing.
 - Use the copy EXACTLY as provided — do not rewrite.
 - Follow the architecture EXACTLY — section order, layouts, components.
-- Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for images. The KEYWORD must be SPECIFIC to the business and what that image should show — NEVER use generic words like 'hero', 'office', 'team', 'service1'. Examples: for a shuttle company use seed/airport-shuttle-van, seed/auckland-airport-terminal, seed/passenger-boarding, seed/professional-driver. For a restaurant: seed/gourmet-plating, seed/restaurant-dining-room, seed/chef-kitchen. For real estate: seed/luxury-home-exterior, seed/modern-living-room. Also set descriptive alt text that matches what the image SHOULD show (e.g., alt="Auckland airport shuttle van picking up passengers"). Never use bare picsum.photos/WIDTH/HEIGHT. Apply object-fit: cover. Add CSS: img { background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); min-height: 120px; } for graceful fallback.
+- For images use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT with SPECIFIC keywords matching the content (e.g., seed/luxury-shuttle-van/800/500, seed/auckland-skyline/1200/600, seed/gourmet-plating/600/400). NEVER use generic words like 'hero', 'office', 'team', 'service1'. Set descriptive alt text. Apply object-fit: cover. Add CSS: img { background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); min-height: 120px; } for graceful fallback.
 - CSS custom properties for ALL colors (enables dark mode later).
 - Fully responsive with mobile hamburger menu.
 - CSS transitions: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) on interactive elements.
