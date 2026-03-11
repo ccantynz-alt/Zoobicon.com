@@ -337,16 +337,58 @@ export async function POST(req: NextRequest) {
     const readable = new ReadableStream({
       async start(controller) {
         try {
+          let accumulated = "";
           for await (const event of stream) {
             if (
               event.type === "content_block_delta" &&
               event.delta.type === "text_delta"
             ) {
+              accumulated += event.delta.text;
               controller.enqueue(
                 encoder.encode(`data: ${JSON.stringify({ type: "chunk", content: event.delta.text })}\n\n`)
               );
             }
           }
+
+          // Validate body content — same logic as the pipeline's hasBodyContent()
+          const bodyMatch = accumulated.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+          const bodyText = bodyMatch
+            ? bodyMatch[1]
+                .replace(/<script[\s\S]*?<\/script>/gi, "")
+                .replace(/<style[\s\S]*?<\/style>/gi, "")
+                .replace(/<[^>]+>/g, "")
+                .replace(/\s+/g, " ")
+                .trim()
+            : "";
+
+          if (!isEdit && bodyText.length < 100) {
+            // Body is empty/near-empty — retry with a focused prompt
+            console.warn(`[Stream] Empty body detected (${bodyText.length} chars). Retrying...`);
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify({ type: "status", message: "Retrying — body was empty..." })}\n\n`)
+            );
+
+            try {
+              const retryResponse = await client.messages.create({
+                model,
+                max_tokens: maxTokens,
+                system: systemPrompt,
+                messages: [{ role: "user", content: `IMPORTANT: Your previous attempt produced HTML with CSS but NO BODY CONTENT. The <body> was empty or near-empty.\n\nYou MUST write the full page content inside <body>. Keep CSS concise — do NOT write more than 200 lines of CSS. Focus on the BODY CONTENT with all sections: hero, features, testimonials, stats, FAQ, CTA, footer.\n\n${userMessage}` }],
+              });
+
+              const retryBlock = retryResponse.content.find((b) => b.type === "text");
+              if (retryBlock && retryBlock.type === "text") {
+                // Send the complete retry HTML as a replacement
+                controller.enqueue(
+                  encoder.encode(`data: ${JSON.stringify({ type: "replace", content: retryBlock.text })}\n\n`)
+                );
+              }
+            } catch (retryErr) {
+              console.error("[Stream] Retry also failed:", retryErr);
+              // Fall through — client will see the empty body warning from PreviewPanel
+            }
+          }
+
           controller.enqueue(
             encoder.encode(`data: ${JSON.stringify({ type: "done" })}\n\n`)
           );

@@ -365,6 +365,38 @@ export async function POST(req: NextRequest) {
       html = html.replace(/^```(?:html)?\n?/, "").replace(/\n?```$/, "");
     }
 
+    // Validate body content — retry if empty (same logic as pipeline's hasBodyContent)
+    if (!isEdit) {
+      const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+      const bodyText = bodyMatch
+        ? bodyMatch[1]
+            .replace(/<script[\s\S]*?<\/script>/gi, "")
+            .replace(/<style[\s\S]*?<\/style>/gi, "")
+            .replace(/<[^>]+>/g, "")
+            .replace(/\s+/g, " ")
+            .trim()
+        : "";
+
+      if (bodyText.length < 100) {
+        console.warn(`[Generate] Empty body detected (${bodyText.length} chars, stop: ${message.stop_reason}). Retrying...`);
+        const retryMessage = await client.messages.create({
+          model,
+          max_tokens: maxTokens,
+          system: systemPrompt,
+          messages: [{ role: "user", content: `IMPORTANT: Your previous attempt produced HTML with CSS but NO BODY CONTENT. The <body> was empty or near-empty.\n\nYou MUST write the full page content inside <body>. Keep CSS concise — do NOT write more than 200 lines of CSS. Focus on the BODY CONTENT with all sections: hero, features, testimonials, stats, FAQ, CTA, footer.\n\n${userMessage}` }],
+        });
+
+        const retryBlock = retryMessage.content.find((b) => b.type === "text");
+        if (retryBlock && retryBlock.type === "text") {
+          let retryHtml = retryBlock.text.trim();
+          if (retryHtml.startsWith("```")) {
+            retryHtml = retryHtml.replace(/^```(?:html)?\n?/, "").replace(/\n?```$/, "");
+          }
+          html = retryHtml;
+        }
+      }
+    }
+
     return NextResponse.json({ html });
   } catch (err) {
     console.error("Generation error:", err);
