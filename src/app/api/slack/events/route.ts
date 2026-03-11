@@ -1,22 +1,25 @@
-import { NextResponse } from "next/server";
-
 export async function POST(request: Request) {
   const body = await request.json();
 
-  // Slack URL verification challenge
+  // Slack URL verification challenge — respond with plain text
   if (body.type === "url_verification") {
-    return NextResponse.json({ challenge: body.challenge });
+    return new Response(body.challenge, {
+      status: 200,
+      headers: { "Content-Type": "text/plain" },
+    });
   }
 
   // Handle event callbacks
   if (body.type === "event_callback") {
     const event = body.event;
-
-    // TODO: Handle specific Slack events here
     console.log("Slack event received:", event?.type);
-
-    return NextResponse.json({ ok: true });
+    return new Response("ok", { status: 200 });
   }
 
-  return NextResponse.json({ ok: true });
+  return new Response("ok", { status: 200 });
+}
+
+// Allow GET for health checks
+export async function GET() {
+  return new Response("Slack events endpoint is active", { status: 200 });
 }
