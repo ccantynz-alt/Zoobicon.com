@@ -6,9 +6,11 @@ const STANDARD_SYSTEM = `You are Zoobicon, an elite AI website generator. You pr
 ## CRITICAL: THE BODY MUST HAVE CONTENT — #1 PRIORITY
 - The <body> MUST contain ALL page sections with real text, images, and interactive elements.
 - NEVER produce an HTML file with only CSS and an empty <body>. This is the #1 failure mode that must be avoided.
-- Keep your <style> section concise — MAXIMUM 200 lines of CSS. Use CSS custom properties and avoid redundant rules.
+- Keep your <style> section concise — MAXIMUM 150 lines of CSS. Use CSS custom properties and avoid redundant rules.
+- OUTPUT ORDER: Write <!DOCTYPE>, <html>, <head> with SHORT <style> (under 150 lines), then </head>, then <body> with ALL content, then <script>, then </body></html>.
 - Write the <body> content FIRST in your mental planning, then write the CSS to style it.
 - Every section (hero, features, testimonials, stats, FAQ, CTA, footer) MUST appear as visible content in <body>.
+- If you find yourself writing more than 150 lines of CSS, STOP and move to <body>. You can always add more CSS later but an empty body is a total failure.
 - If you run out of space, CUT CSS — never cut body content.
 
 ## Output Format
@@ -146,9 +148,11 @@ const PREMIUM_SYSTEM = `You are Zoobicon, an elite AI website generator. You pro
 ## CRITICAL: THE BODY MUST HAVE CONTENT — #1 PRIORITY
 - The <body> MUST contain ALL page sections with real text, images, and interactive elements.
 - NEVER produce an HTML file with only CSS and an empty <body>. This is the #1 failure mode that must be avoided.
-- Keep your <style> section concise — MAXIMUM 200 lines of CSS. Use CSS custom properties and avoid redundant rules.
+- Keep your <style> section concise — MAXIMUM 150 lines of CSS. Use CSS custom properties and avoid redundant rules.
+- OUTPUT ORDER: Write <!DOCTYPE>, <html>, <head> with SHORT <style> (under 150 lines), then </head>, then <body> with ALL content, then <script>, then </body></html>.
 - Write the <body> content FIRST in your mental planning, then write the CSS to style it.
 - Every section (hero, features, testimonials, stats, FAQ, CTA, footer) MUST appear as visible content in <body>.
+- If you find yourself writing more than 150 lines of CSS, STOP and move to <body>. You can always add more CSS later but an empty body is a total failure.
 - If you run out of space, CUT CSS — never cut body content.
 
 ## Output Format
@@ -378,30 +382,45 @@ export async function POST(req: NextRequest) {
             : "";
 
           if (!isEdit && bodyText.length < 100) {
-            // Body is empty/near-empty — retry with a focused prompt
+            // Body is empty/near-empty — retry up to 2 times with increasingly focused prompts
             console.warn(`[Stream] Empty body detected (${bodyText.length} chars). Retrying...`);
             controller.enqueue(
               encoder.encode(`data: ${JSON.stringify({ type: "status", message: "Retrying — body was empty..." })}\n\n`)
             );
 
-            try {
-              const retryResponse = await client.messages.create({
-                model,
-                max_tokens: maxTokens,
-                system: systemPrompt,
-                messages: [{ role: "user", content: `IMPORTANT: Your previous attempt produced HTML with CSS but NO BODY CONTENT. The <body> was empty or near-empty.\n\nYou MUST write the full page content inside <body>. Keep CSS concise — do NOT write more than 200 lines of CSS. Focus on the BODY CONTENT with all sections: hero, features, testimonials, stats, FAQ, CTA, footer.\n\n${userMessage}` }],
-              });
+            const retryPrompts = [
+              `CRITICAL FAILURE: Your previous attempt produced HTML with CSS but the <body> was EMPTY — zero visible content.\n\nSTRICT RULES FOR THIS ATTEMPT:\n1. Write the <body> content FIRST. Start with <!DOCTYPE html><html><head> (brief CSS only), then IMMEDIATELY write <body> with ALL sections.\n2. CSS budget: MAXIMUM 80 lines. Use inline styles if needed — body content is more important than perfect CSS.\n3. Every section MUST appear: hero, features, about, testimonials, stats, FAQ, CTA, footer.\n4. Do NOT write elaborate CSS animations, custom properties blocks, or media queries until AFTER all body content is written.\n\n${userMessage}`,
+              `FINAL ATTEMPT — YOUR PREVIOUS TWO ATTEMPTS HAD EMPTY BODIES.\n\nWrite a MINIMAL but COMPLETE page. Use barely any CSS — just basic inline styles. The ONLY thing that matters is that <body> contains real, visible content with all sections. Fancy styling is NOT needed — content is everything.\n\n${userMessage}`,
+            ];
 
-              const retryBlock = retryResponse.content.find((b) => b.type === "text");
-              if (retryBlock && retryBlock.type === "text") {
-                // Send the complete retry HTML as a replacement
-                controller.enqueue(
-                  encoder.encode(`data: ${JSON.stringify({ type: "replace", content: retryBlock.text })}\n\n`)
-                );
+            for (let retry = 0; retry < retryPrompts.length; retry++) {
+              try {
+                const retryResponse = await client.messages.create({
+                  model,
+                  max_tokens: maxTokens,
+                  system: systemPrompt,
+                  messages: [{ role: "user", content: retryPrompts[retry] }],
+                });
+
+                const retryBlock = retryResponse.content.find((b) => b.type === "text");
+                if (retryBlock && retryBlock.type === "text") {
+                  // Check if this retry actually has body content
+                  const retryBodyMatch = retryBlock.text.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+                  const retryBodyText = retryBodyMatch
+                    ? retryBodyMatch[1].replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim()
+                    : "";
+
+                  if (retryBodyText.length >= 100) {
+                    controller.enqueue(
+                      encoder.encode(`data: ${JSON.stringify({ type: "replace", content: retryBlock.text })}\n\n`)
+                    );
+                    break; // Success — stop retrying
+                  }
+                  console.warn(`[Stream] Retry ${retry + 1} still empty (${retryBodyText.length} chars)`);
+                }
+              } catch (retryErr) {
+                console.error(`[Stream] Retry ${retry + 1} failed:`, retryErr);
               }
-            } catch (retryErr) {
-              console.error("[Stream] Retry also failed:", retryErr);
-              // Fall through — client will see the empty body warning from PreviewPanel
             }
           }
 
