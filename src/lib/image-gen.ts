@@ -234,22 +234,24 @@ export function buildImagePrompts(html: string, industry: string): Array<{
 
   // Match seeded picsum URLs: picsum.photos/seed/KEYWORD/WIDTH/HEIGHT
   const seededPattern = /https?:\/\/picsum\.photos\/seed\/[a-zA-Z0-9_-]+\/(\d+)(?:\/(\d+))?/g;
-  let match;
+  let match: RegExpExecArray | null;
   while ((match = seededPattern.exec(html)) !== null) {
+    const url = match[0];
     const w = parseInt(match[1]);
     const h = match[2] ? parseInt(match[2]) : w;
-    if (!placeholders.find((p) => p.url === match[0])) {
-      placeholders.push({ url: match[0], width: w, height: h });
+    if (!placeholders.find((p) => p.url === url)) {
+      placeholders.push({ url, width: w, height: h });
     }
   }
 
   // Also match bare picsum URLs and unsplash source URLs
   const barePattern = /https?:\/\/(?:picsum\.photos|source\.unsplash\.com)\/(\d+)(?:[x/](\d+))?/g;
   while ((match = barePattern.exec(html)) !== null) {
+    const url = match[0];
     const w = parseInt(match[1]);
     const h = match[2] ? parseInt(match[2]) : w;
-    if (!placeholders.find((p) => p.url === match[0])) {
-      placeholders.push({ url: match[0], width: w, height: h });
+    if (!placeholders.find((p) => p.url === url)) {
+      placeholders.push({ url, width: w, height: h });
     }
   }
 

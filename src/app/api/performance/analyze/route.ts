@@ -319,7 +319,7 @@ function checkJS(html: string, issues: PerformanceIssue[]): void {
 }
 
 function checkImages(html: string, issues: PerformanceIssue[]): void {
-  const imgTags = html.match(/<img[^>]*>/gi) || [];
+  const imgTags: string[] = html.match(/<img[^>]*>/gi) || [];
 
   let missingLazy = 0;
   let missingDimensions = 0;

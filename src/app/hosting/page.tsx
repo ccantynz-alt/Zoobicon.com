@@ -129,12 +129,12 @@ const STATUS_CODES = [
 ];
 
 const DEPLOYMENTS = [
-  { id: "d-001", commit: "feat: update hero section", hash: "a3f8c21", time: "2 minutes ago", status: "live" as const, env: "production" as const },
-  { id: "d-002", commit: "fix: mobile nav overflow", hash: "b7e1d09", time: "1 hour ago", status: "superseded" as const, env: "production" as const },
-  { id: "d-003", commit: "chore: update deps", hash: "c2a4f11", time: "3 hours ago", status: "superseded" as const, env: "production" as const },
-  { id: "d-004", commit: "feat: new pricing page", hash: "d9b3e22", time: "5 minutes ago", status: "live" as const, env: "staging" as const },
-  { id: "d-005", commit: "test: add unit tests", hash: "e1c7a33", time: "20 minutes ago", status: "superseded" as const, env: "staging" as const },
-  { id: "d-006", commit: "feat: preview dark mode", hash: "f4d2b44", time: "10 minutes ago", status: "live" as const, env: "preview" as const },
+  { id: "d-001", commit: "feat: update hero section", hash: "a3f8c21", time: "2 minutes ago", status: "live" as const, env: "production" as const, url: "", slug: "portfolio-pro" },
+  { id: "d-002", commit: "fix: mobile nav overflow", hash: "b7e1d09", time: "1 hour ago", status: "superseded" as const, env: "production" as const, url: "", slug: "portfolio-pro" },
+  { id: "d-003", commit: "chore: update deps", hash: "c2a4f11", time: "3 hours ago", status: "superseded" as const, env: "production" as const, url: "", slug: "portfolio-pro" },
+  { id: "d-004", commit: "feat: new pricing page", hash: "d9b3e22", time: "5 minutes ago", status: "live" as const, env: "staging" as const, url: "", slug: "staging-portfolio-pro" },
+  { id: "d-005", commit: "test: add unit tests", hash: "e1c7a33", time: "20 minutes ago", status: "superseded" as const, env: "staging" as const, url: "", slug: "staging-portfolio-pro" },
+  { id: "d-006", commit: "feat: preview dark mode", hash: "f4d2b44", time: "10 minutes ago", status: "live" as const, env: "preview" as const, url: "", slug: "preview-d4f2b44" },
 ];
 
 const PLANS = [

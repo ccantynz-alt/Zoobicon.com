@@ -478,6 +478,13 @@ export default function BuilderPage() {
               if (event.type === "chunk" && event.content) {
                 accumulated += event.content;
                 setGeneratedCode(accumulated);
+              } else if (event.type === "replace" && event.content) {
+                // Server retried due to empty body — replace accumulated HTML entirely
+                accumulated = event.content;
+                setGeneratedCode(accumulated);
+              } else if (event.type === "status") {
+                // Informational status update (e.g., "Retrying...")
+                // Could show in UI if desired
               } else if (event.type === "done") {
                 setStatus("complete");
               } else if (event.type === "error") {
