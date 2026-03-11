@@ -295,6 +295,13 @@ Match the visual treatment to the industry detected in the strategy:
 
 **Healthcare / Wellness:** Soft calming palettes: sage, lavender, soft blue. Clean and trustworthy.
 
+## CRITICAL: THE BODY MUST HAVE CONTENT
+- The <body> MUST contain all page sections with real text, images, and interactive elements.
+- NEVER produce an HTML file with only CSS and an empty <body>. This is the #1 failure mode.
+- Keep CSS concise (under 250 lines). Use the component library classes instead of writing custom CSS for common patterns.
+- Write the <body> content FIRST in your mental planning, then write the CSS to style it.
+- Every section from the COPY input MUST appear as visible content in the <body>.
+
 ## Technical Rules
 - Output ONLY the raw HTML. No markdown, no explanation, no code fences.
 - Complete document: <!DOCTYPE html>, <html lang="en">, <head>, <body>.
@@ -491,7 +498,8 @@ export async function runPipeline(
   const MODEL_PREMIUM = userModel || "claude-opus-4-6";              // Developer agent — the actual website build
 
   // Helper: call the right LLM based on user selection
-  const llmCall = async (opts: { model: string; maxTokens: number; system: string; userMessage: string }) => {
+  // Returns { text, stopReason } so we can detect truncation
+  const llmCall = async (opts: { model: string; maxTokens: number; system: string; userMessage: string }): Promise<{ text: string; stopReason: string }> => {
     if (useMultiLLM) {
       const res = await callLLM({
         model: opts.model,
@@ -499,7 +507,7 @@ export async function runPipeline(
         userMessage: opts.userMessage,
         maxTokens: opts.maxTokens,
       });
-      return res.text;
+      return { text: res.text, stopReason: "end_turn" };
     } else {
       // Direct Anthropic SDK for Claude models (fastest path)
       const client = new Anthropic({ apiKey });
@@ -509,15 +517,22 @@ export async function runPipeline(
         system: opts.system,
         messages: [{ role: "user", content: opts.userMessage }],
       });
-      return res.content.find((b) => b.type === "text")?.text || "";
+      const text = res.content.find((b) => b.type === "text")?.text || "";
+      return { text, stopReason: res.stop_reason || "unknown" };
     }
+  };
+
+  // Convenience: just get text (for agents where we don't need stop_reason)
+  const llmText = async (opts: { model: string; maxTokens: number; system: string; userMessage: string }): Promise<string> => {
+    const r = await llmCall(opts);
+    return r.text;
   };
 
   // ── Phase 1: Strategist ──
   onProgress?.("strategist", "analyzing market & audience");
   const strategyStart = Date.now();
 
-  const strategyText = await llmCall({
+  const strategyText = await llmText({
     model: MODEL_PLANNER,
     maxTokens: 8192,
     system: STRATEGIST_SYSTEM,
@@ -533,13 +548,13 @@ export async function runPipeline(
   const phase2Start = Date.now();
 
   const [brandText, copyText] = await Promise.all([
-    llmCall({
+    llmText({
       model: MODEL_PLANNER,
       maxTokens: 8192,
       system: BRAND_SYSTEM,
       userMessage: `Strategy:\n${strategySpec}\n\nOriginal Brief:\n${input.prompt}${input.style ? `\nStyle: ${input.style}` : ""}\n\nCreate a premium design system. If the brief specifies exact colors, typography, or visual direction, follow those instructions precisely.`,
     }),
-    llmCall({
+    llmText({
       model: MODEL_PLANNER,
       maxTokens: 16000,
       system: COPYWRITER_SYSTEM,
@@ -557,7 +572,7 @@ export async function runPipeline(
   onProgress?.("architect", "planning structure");
   const archStart = Date.now();
 
-  const archText = await llmCall({
+  const archText = await llmText({
     model: MODEL_PLANNER,
     maxTokens: 8192,
     system: ARCHITECT_SYSTEM,
@@ -570,36 +585,59 @@ export async function runPipeline(
   onProgress?.("developer", "building website");
   const devStart = Date.now();
 
-  const devText = await llmCall({
-    model: MODEL_PREMIUM,
-    maxTokens: 64000,
-    system: DEVELOPER_SYSTEM,
-    userMessage: `STRATEGY:\n${strategySpec}\n\nDESIGN SPEC:\n${brandSpec}\n\nCOPY:\n${copySpec}\n\nARCHITECTURE:\n${archSpec}\n\nORIGINAL BRIEF:\n${input.prompt}\n\nBuild the complete HTML website. Follow all specs exactly. If the original brief contains specific visual, copy, or structural instructions, those take priority.`,
-  });
-
-  let html = cleanHtml(devText);
-  agents.push({ agent: "Developer", output: `[${html.length} chars HTML]`, duration: Date.now() - devStart });
-
-  // Critical check: Developer MUST produce valid HTML with actual body content
-  if (html.length < 500 || !/<body/i.test(html)) {
-    console.error("[Pipeline] Developer agent produced invalid/empty HTML, aborting enhancements");
-    throw new Error("Developer agent failed to produce a valid website. Please try again.");
-  }
-
-  // Check body has actual text content — not just CSS/JS with empty body
-  const devBodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
-  if (devBodyMatch) {
-    const devBodyText = devBodyMatch[1]
+  // Helper: validate that HTML has real body content
+  function hasBodyContent(rawHtml: string): { valid: boolean; bodyChars: number } {
+    const m = rawHtml.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+    if (!m) return { valid: false, bodyChars: 0 };
+    const bodyText = m[1]
       .replace(/<script[\s\S]*?<\/script>/gi, "")
       .replace(/<style[\s\S]*?<\/style>/gi, "")
       .replace(/<[^>]+>/g, "")
       .replace(/\s+/g, " ")
       .trim();
-    if (devBodyText.length < 100) {
-      console.error(`[Pipeline] Developer produced HTML with empty body (${devBodyText.length} chars text). HTML length: ${html.length}`);
-      throw new Error("Developer agent produced a page with no visible content. Please try again.");
-    }
-    console.log(`[Pipeline] Developer body text: ${devBodyText.length} chars — content validated`);
+    return { valid: bodyText.length >= 100, bodyChars: bodyText.length };
+  }
+
+  const devUserMessage = `STRATEGY:\n${strategySpec}\n\nDESIGN SPEC:\n${brandSpec}\n\nCOPY:\n${copySpec}\n\nARCHITECTURE:\n${archSpec}\n\nORIGINAL BRIEF:\n${input.prompt}\n\nBuild the complete HTML website. Follow all specs exactly. If the original brief contains specific visual, copy, or structural instructions, those take priority.\n\nCRITICAL REMINDER: The <body> must contain ALL the copy content from the COPY section above. Write the full page content inside <body> — headers, sections, text, images, everything. Do NOT produce only CSS with an empty body.`;
+
+  let devResult = await llmCall({
+    model: MODEL_PREMIUM,
+    maxTokens: 64000,
+    system: DEVELOPER_SYSTEM,
+    userMessage: devUserMessage,
+  });
+
+  let html = cleanHtml(devResult.text);
+  let bodyCheck = hasBodyContent(html);
+  console.log(`[Pipeline] Developer attempt 1: ${html.length} chars HTML, ${bodyCheck.bodyChars} body text chars, stop: ${devResult.stopReason}`);
+
+  // If body is empty or response was truncated, retry with a focused prompt
+  if (!bodyCheck.valid || devResult.stopReason === "max_tokens") {
+    console.warn(`[Pipeline] Developer output invalid (body: ${bodyCheck.bodyChars} chars, stop: ${devResult.stopReason}). Retrying with focused prompt...`);
+    onProgress?.("developer", "retrying build (body was empty)...");
+
+    devResult = await llmCall({
+      model: MODEL_PREMIUM,
+      maxTokens: 64000,
+      system: DEVELOPER_SYSTEM,
+      userMessage: `IMPORTANT: Your previous attempt produced an HTML page with CSS but NO BODY CONTENT. The <body> was empty.\n\nYou MUST write the full page content inside <body>. Keep CSS concise — do NOT write more than 200 lines of CSS. Focus on the BODY CONTENT.\n\n${devUserMessage}`,
+    });
+
+    html = cleanHtml(devResult.text);
+    bodyCheck = hasBodyContent(html);
+    console.log(`[Pipeline] Developer attempt 2: ${html.length} chars HTML, ${bodyCheck.bodyChars} body text chars, stop: ${devResult.stopReason}`);
+  }
+
+  agents.push({ agent: "Developer", output: `[${html.length} chars HTML, ${bodyCheck.bodyChars} body text, stop: ${devResult.stopReason}]`, duration: Date.now() - devStart });
+
+  // Final validation
+  if (html.length < 500 || !/<body/i.test(html)) {
+    console.error("[Pipeline] Developer agent produced invalid/empty HTML after retry");
+    throw new Error("Developer agent failed to produce a valid website. Please try again.");
+  }
+  if (!bodyCheck.valid) {
+    console.error(`[Pipeline] Developer produced empty body after retry (${bodyCheck.bodyChars} chars)`);
+    throw new Error("Developer agent produced a page with no visible content after retry. Please try again.");
   }
 
   // ── Phase 4: Animation + SEO + Forms (Parallel) — ALL tiers ──
@@ -613,19 +651,19 @@ export async function runPipeline(
 
     try {
       const [animText, seoText, formsText] = await Promise.all([
-        llmCall({
+        llmText({
           model: MODEL_BALANCED,
           maxTokens: 64000,
           system: ANIMATION_SYSTEM,
           userMessage: `Add premium animations to this website:\n\n${html}`,
         }).catch((err) => { console.warn("[Pipeline] Animation agent failed:", err.message); return ""; }),
-        llmCall({
+        llmText({
           model: MODEL_BALANCED,
           maxTokens: 64000,
           system: SEO_SYSTEM,
           userMessage: `Add comprehensive SEO markup to this website:\n\n${html}`,
         }).catch((err) => { console.warn("[Pipeline] SEO agent failed:", err.message); return ""; }),
-        llmCall({
+        llmText({
           model: MODEL_BALANCED,
           maxTokens: 64000,
           system: FORMS_SYSTEM,
@@ -680,7 +718,7 @@ export async function runPipeline(
     const intStart = Date.now();
 
     try {
-      const intText = await llmCall({
+      const intText = await llmText({
         model: MODEL_BALANCED,
         maxTokens: 64000,
         system: INTEGRATIONS_SYSTEM,
@@ -702,7 +740,7 @@ export async function runPipeline(
     const qaStart = Date.now();
 
     try {
-      const qaText = await llmCall({
+      const qaText = await llmText({
         model: MODEL_BALANCED,
         maxTokens: 64000,
         system: QA_SYSTEM,

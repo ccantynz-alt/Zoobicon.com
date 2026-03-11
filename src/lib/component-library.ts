@@ -245,7 +245,7 @@ The following CSS classes are automatically available in every generated website
 **Animation:** \`.fade-in\`, \`.fade-in-left\`, \`.fade-in-right\`, \`.scale-in\` (add \`.visible\` class via IntersectionObserver)
 **Patterns:** \`.testimonial-card\`, \`.stat-item\`, \`.stat-number\`, \`.stat-label\`, \`.faq-item\`, \`.faq-question\`, \`.faq-answer\`, \`.logo-strip\`
 
-IMPORTANT: Include the full component library CSS at the TOP of your <style> block (it will be injected automatically). Then add your custom styles below it. Use the component classes to build sections — this gives a shadcn/ui-level polish to every output.
+IMPORTANT: The component library CSS is injected automatically — do NOT duplicate it in your <style> block. Only write CUSTOM styles specific to this website. Use the component classes above to build sections — this reduces your CSS and gives shadcn/ui-level polish.
 `;
 
 /**
