@@ -203,7 +203,7 @@ export async function POST(req: NextRequest) {
     userMessage += `\n\nThis must look like it was built by a world-class design agency. Use animated gradients, scroll animations, glass-morphism, floating decorative elements, multi-layered shadows, and impeccable typography. Every page must share the same design system, navigation, and footer. Each page should have rich, unique content appropriate to its purpose.`;
 
     const message = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 64000,
       system: MULTIPAGE_SYSTEM,
       messages: [

@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
     const dataContext = data ? `\n\nData to include:\n${JSON.stringify(data, null, 2)}` : "\nGenerate realistic sample data appropriate to the report type.";
 
     const message = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 64000,
       system: REPORT_SYSTEM,
       messages: [{

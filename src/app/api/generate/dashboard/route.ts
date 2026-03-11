@@ -161,7 +161,7 @@ export async function POST(req: NextRequest) {
     const themeNote = theme === "dark" ? "Use a DARK theme." : theme === "light" ? "Use a LIGHT theme." : "Include a dark/light mode toggle. Default to dark theme.";
 
     const message = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 64000,
       system: DASHBOARD_SYSTEM,
       messages: [

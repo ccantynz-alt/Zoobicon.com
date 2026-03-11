@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
     const client = new Anthropic({ apiKey });
 
     const analysisRes = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 8192,
       system: `You are a website analyst. Given HTML source code, extract the website's structure, content, and purpose into a JSON analysis.
 
@@ -129,7 +129,7 @@ Rules:
 - Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT (use a unique keyword per image) for images.`;
 
     const rebuildRes = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 64000,
       system: rebuildSystem,
       messages: [{

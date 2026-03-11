@@ -124,7 +124,7 @@ Requirements:
     const client = new Anthropic();
 
     const message = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 16000,
       messages: [
         {
