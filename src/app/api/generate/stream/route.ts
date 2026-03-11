@@ -87,7 +87,7 @@ Read the user's prompt carefully. Detect the industry and match the aesthetic:
 - Buttons: translateY(-2px) + enhanced multi-layer shadow on hover, not just color change.
 - Cards: translateY(-4px) + elevated shadow on hover.
 - Images: scale(1.03) on hover with overflow:hidden container.
-- Scroll-triggered fade-in animations via IntersectionObserver (opacity:0 translateY(30px) → opacity:1 translateY(0), 0.6s ease-out, stagger siblings by 0.1s).
+- Scroll-triggered fade-in animations: add class .fade-in to sections (CSS handles the rest via the component library). Do NOT set opacity:0 in CSS or inline styles — use .fade-in class only.
 - Sticky navbar: transparent on top → solid with shadow on scroll.
 - Smooth scroll for anchor links.
 - Animated number counters on stats (count from 0 to value on scroll).
@@ -215,7 +215,7 @@ Read the user's prompt carefully. Detect the industry and match the aesthetic:
 - Buttons: translateY(-2px) + enhanced shadow on hover.
 - Cards: translateY(-4px) + elevated shadow on hover.
 - Images: scale(1.03) on hover with overflow:hidden.
-- Scroll-triggered fade-in via IntersectionObserver (opacity:0 translateY(30px) → opacity:1 translateY(0), staggered 0.1s).
+- Scroll-triggered fade-in animations: add class .fade-in to sections (CSS handles the rest via the component library). Do NOT set opacity:0 in CSS or inline styles.
 - Sticky navbar: transparent → solid with shadow on scroll.
 - Animated number counters (0 → target on scroll).
 - Decorative accents: small colored lines above section headings.

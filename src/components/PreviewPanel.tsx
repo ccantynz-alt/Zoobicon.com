@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useEffect } from "react";
+import { useMemo, useRef, useEffect, useState } from "react";
 
 interface PreviewPanelProps {
   html: string;
@@ -322,65 +322,83 @@ function GeneratingAtmosphere() {
  */
 const VISIBILITY_FAILSAFE = `
 <style id="zbcn-failsafe">
-  /* Backstop: after 3s animation, force visibility on common animation classes.
-     Uses animation so it doesn't override working IntersectionObserver immediately. */
-  @keyframes zbcn-force-show { to { opacity: 1 !important; transform: none !important; } }
+  /* Nuclear failsafe: ensure body and critical elements are ALWAYS visible */
+  html, body { opacity: 1 !important; visibility: visible !important; display: block !important; min-height: 100vh !important; }
+  body > * { visibility: visible !important; }
+  /* After 2s, force ALL animation classes visible via CSS animation */
+  @keyframes zbcn-nuke { to { opacity: 1 !important; transform: none !important; visibility: visible !important; } }
 </style>
 <script>
 (function(){
-  // Wait for DOM to be ready
-  function init() {
-    var selectors = '.fade-in, .fade-in-left, .fade-in-right, .scale-in, .slide-up, .slide-in, .reveal, .animate-on-scroll, [data-animate], [data-aos]';
-    var els = document.querySelectorAll(selectors);
+  var SKIP = {SCRIPT:1,STYLE:1,META:1,LINK:1,HEAD:1,BR:1,HR:1};
 
-    // Set up IntersectionObserver that works
-    if ('IntersectionObserver' in window && els.length > 0) {
-      var obs = new IntersectionObserver(function(entries) {
-        entries.forEach(function(entry) {
-          if (entry.isIntersecting) {
-            var el = entry.target;
-            el.style.opacity = '1';
-            el.style.transform = 'none';
-            el.classList.add('visible');
-            el.classList.add('aos-animate');
-            obs.unobserve(el);
-          }
-        });
-      }, { threshold: 0.05, rootMargin: '50px' });
-      els.forEach(function(el) { obs.observe(el); });
+  function forceVisible() {
+    // 1. Force body always visible
+    var b = document.body;
+    if (b) {
+      b.style.setProperty('opacity','1','important');
+      b.style.setProperty('visibility','visible','important');
+      b.style.setProperty('display','block','important');
     }
 
-    // HARD FAILSAFE: After 2 seconds, force everything visible
-    setTimeout(function() {
-      // Find ALL elements with opacity 0 (computed)
-      var all = document.querySelectorAll('*');
-      for (var i = 0; i < all.length; i++) {
-        var el = all[i];
-        var style = window.getComputedStyle(el);
-        if (style.opacity === '0' && el.tagName !== 'SCRIPT' && el.tagName !== 'STYLE' && el.tagName !== 'META' && el.tagName !== 'LINK') {
-          el.style.setProperty('opacity', '1', 'important');
-          el.style.setProperty('transform', 'none', 'important');
-          el.style.setProperty('visibility', 'visible', 'important');
+    // 2. Check ALL elements for any hiding technique
+    var all = document.querySelectorAll('body *');
+    for (var i = 0; i < all.length; i++) {
+      var el = all[i];
+      if (SKIP[el.tagName]) continue;
+      try {
+        var cs = window.getComputedStyle(el);
+        var dominated = false;
+        // Check opacity
+        if (parseFloat(cs.opacity) < 0.1) dominated = true;
+        // Check visibility
+        if (cs.visibility === 'hidden') dominated = true;
+        // Check display (but not for elements that should be hidden like mobile menus)
+        if (cs.display === 'none' && !el.closest('nav') && !el.classList.contains('mobile-menu')) dominated = true;
+        // Check if element is pushed off-screen
+        if (cs.position === 'absolute' || cs.position === 'fixed') {
+          var r = el.getBoundingClientRect();
+          if (r.right < -500 || r.bottom < -500 || r.left > window.innerWidth + 500) dominated = true;
         }
-      }
-      // Also force-reveal by class
-      document.querySelectorAll(selectors).forEach(function(el) {
-        el.style.setProperty('opacity', '1', 'important');
-        el.style.setProperty('transform', 'none', 'important');
-        el.classList.add('visible');
-      });
-    }, 2000);
+        // Check max-height: 0 on non-accordion elements
+        if (cs.maxHeight === '0px' && !el.classList.contains('faq-answer') && !el.closest('.accordion')) dominated = true;
+
+        if (dominated) {
+          el.style.setProperty('opacity','1','important');
+          el.style.setProperty('visibility','visible','important');
+          el.style.setProperty('transform','none','important');
+          if (cs.display === 'none' && !el.closest('nav')) {
+            el.style.setProperty('display','block','important');
+          }
+          if (cs.maxHeight === '0px' && !el.classList.contains('faq-answer')) {
+            el.style.setProperty('max-height','none','important');
+          }
+          el.classList.add('visible');
+        }
+      } catch(e) {}
+    }
+  }
+
+  // Run at multiple intervals — catches scripts that re-hide elements
+  function schedule() {
+    setTimeout(forceVisible, 500);
+    setTimeout(forceVisible, 1500);
+    setTimeout(forceVisible, 3000);
+    setTimeout(forceVisible, 6000);
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', schedule);
   } else {
-    init();
+    schedule();
   }
 })();
 </script>`;
 
 export default function PreviewPanel({ html, isGenerating }: PreviewPanelProps) {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [blankDetected, setBlankDetected] = useState(false);
+
   // Inject visibility failsafe into every srcDoc to prevent blank white pages
   const srcDoc = useMemo(() => {
     if (!html) return "";
@@ -395,6 +413,33 @@ export default function PreviewPanel({ html, isGenerating }: PreviewPanelProps) 
     }
     return doc;
   }, [html]);
+
+  // Reset blank detection when html changes
+  useEffect(() => {
+    setBlankDetected(false);
+  }, [html]);
+
+  // Detect blank iframe content after load
+  useEffect(() => {
+    if (!html || isGenerating) return;
+    const timer = setTimeout(() => {
+      try {
+        const iframe = iframeRef.current;
+        if (!iframe) return;
+        const doc = iframe.contentDocument;
+        if (!doc || !doc.body) return;
+        // Check if body has any visible text content
+        const bodyText = (doc.body.innerText || "").trim();
+        if (bodyText.length < 20) {
+          console.warn("[PreviewPanel] Blank page detected — body text length:", bodyText.length);
+          setBlankDetected(true);
+        }
+      } catch {
+        // Cross-origin issues, skip detection
+      }
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [html, isGenerating]);
 
   const sharedStyles = `
     @keyframes particle-float {
@@ -576,11 +621,44 @@ export default function PreviewPanel({ html, isGenerating }: PreviewPanelProps) 
   }
 
   return (
-    <iframe
-      srcDoc={srcDoc}
-      className="w-full h-full border-0 bg-white"
-      title="Website preview"
-      sandbox="allow-scripts allow-same-origin"
-    />
+    <div className="relative w-full h-full">
+      <iframe
+        ref={iframeRef}
+        srcDoc={srcDoc}
+        className="w-full h-full border-0 bg-white"
+        title="Website preview"
+        sandbox="allow-scripts allow-same-origin"
+      />
+      {blankDetected && (
+        <div className="absolute bottom-4 left-4 right-4 bg-yellow-900/90 border border-yellow-600/50 rounded-lg p-3 backdrop-blur-sm z-10">
+          <p className="text-yellow-300 text-xs font-medium mb-1">Preview may be blank</p>
+          <p className="text-yellow-200/60 text-[10px] mb-2">
+            The generated site appears empty. This can happen when AI-generated animations hide content.
+          </p>
+          <button
+            onClick={() => {
+              try {
+                const doc = iframeRef.current?.contentDocument;
+                if (doc?.body) {
+                  const all = doc.body.querySelectorAll("*");
+                  all.forEach((el: Element) => {
+                    const htmlEl = el as HTMLElement;
+                    htmlEl.style.setProperty("opacity", "1", "important");
+                    htmlEl.style.setProperty("visibility", "visible", "important");
+                    htmlEl.style.setProperty("transform", "none", "important");
+                    const cs = window.getComputedStyle(htmlEl);
+                    if (cs.display === "none") htmlEl.style.setProperty("display", "block", "important");
+                  });
+                  setBlankDetected(false);
+                }
+              } catch { /* cross-origin */ }
+            }}
+            className="text-[10px] px-3 py-1 rounded bg-yellow-600/30 text-yellow-200 hover:bg-yellow-600/50 transition-colors"
+          >
+            Force Show Content
+          </button>
+        </div>
+      )}
+    </div>
   );
 }

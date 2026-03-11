@@ -307,7 +307,7 @@ Match the visual treatment to the industry detected in the strategy:
 - CSS custom properties for ALL colors (enables dark mode later).
 - Fully responsive with mobile hamburger menu.
 - CSS transitions: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) on interactive elements.
-- Scroll-triggered fade-in animations via IntersectionObserver.
+- Scroll-triggered fade-in: add class .fade-in to sections you want to animate. Do NOT set opacity:0 in CSS or inline styles — the component library handles hiding and revealing safely with failsafes.
 - Sticky navbar with background transition on scroll.
 - Smooth scrolling for anchor links.
 - FAQ accordion if included in architecture.
@@ -361,23 +361,35 @@ CRITICAL quality checklist:
 ✓ Focus-visible states for keyboard navigation
 ✓ prefers-reduced-motion media query respected`;
 
-const ANIMATION_SYSTEM = `You are an animation specialist. Take the HTML website and add premium scroll animations and micro-interactions.
+const ANIMATION_SYSTEM = `You are an animation specialist. Take the HTML website and enhance it with smooth micro-interactions and scroll effects.
 
-Rules:
+## CRITICAL: DO NOT HIDE ELEMENTS
+- NEVER set any element to opacity:0 in CSS or inline styles.
+- NEVER add visibility:hidden, display:none, or height:0 to content elements.
+- Elements MUST remain VISIBLE at all times — even before animation triggers.
+- The page MUST look complete and fully visible with JavaScript disabled.
+
+## How to Add Scroll Animations SAFELY
+Use ONLY the component library's animation system:
+1. Add class \`.fade-in\` (or \`.fade-in-left\`, \`.fade-in-right\`, \`.scale-in\`) to elements you want to animate.
+2. Do NOT add \`.will-animate\` — the component library's failsafe script handles that automatically.
+3. Do NOT write your own IntersectionObserver for fade-in animations — it's already handled.
+4. Do NOT set opacity:0 anywhere — the component library handles the initial hidden state safely with failsafes.
+
+## What You CAN Add
+- Parallax effect on hero background (0.3x scroll speed via transform, NOT by hiding content).
+- Animated number counters (0 → target value on scroll) — numbers must START visible at their target value as a fallback.
+- Scroll progress bar at page top (a thin colored bar).
+- Smooth hover micro-interactions (scale, shadow changes).
+- CSS transition enhancements on buttons, cards, links.
+- \`prefers-reduced-motion\` media query that disables all animation.
+
+## Rules
 - Output ONLY the complete updated HTML. No markdown, no explanation, no code fences.
-- Add scroll-triggered animations using IntersectionObserver:
-  - fadeInUp: opacity 0→1, translateY(30px→0), 0.8s
-  - fadeInLeft/Right for alternating sections
-  - scaleIn for cards: scale(0.95→1), 0.6s
-  - Stagger delays for grouped items (+0.1s each)
-- Add parallax effect on hero background (0.3x scroll speed).
-- Add animated number counters (0 → target value on scroll).
-- Add text word-by-word reveal on hero headline.
-- Add scroll progress bar at page top.
-- Add smooth hover micro-interactions (magnetic buttons optional).
-- Respect prefers-reduced-motion — disable all if set.
-- Use ONLY transform and opacity for performance.
-- Do NOT change any content, colors, or layout.`;
+- Use ONLY transform and opacity for animation performance.
+- Do NOT change any content, colors, or layout.
+- Do NOT duplicate IntersectionObserver code that the component library already provides.
+- Keep all existing JavaScript intact — do not remove or rewrite scripts.`;
 
 const SEO_SYSTEM = `You are an SEO specialist. Take the HTML and inject comprehensive SEO markup.
 
@@ -757,5 +769,29 @@ function safeReplaceHtml(current: string, candidate: string, agentName: string):
     console.warn(`[Pipeline] ${agentName} output suspiciously small (${cleaned.length} chars), keeping previous version`);
     return current;
   }
+
+  // Body content check: extract text from body and ensure it has real content
+  const bodyMatch = cleaned.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+  if (bodyMatch) {
+    const bodyContent = bodyMatch[1]
+      .replace(/<script[\s\S]*?<\/script>/gi, "")
+      .replace(/<style[\s\S]*?<\/style>/gi, "")
+      .replace(/<[^>]+>/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (bodyContent.length < 100) {
+      console.warn(`[Pipeline] ${agentName} body has too little text content (${bodyContent.length} chars), keeping previous version`);
+      return current;
+    }
+  }
+
+  // Opacity check: if the candidate has significantly more opacity:0 declarations, reject it
+  const currentHiddenCount = (current.match(/opacity\s*:\s*0/gi) || []).length;
+  const candidateHiddenCount = (cleaned.match(/opacity\s*:\s*0/gi) || []).length;
+  if (candidateHiddenCount > currentHiddenCount + 10) {
+    console.warn(`[Pipeline] ${agentName} added ${candidateHiddenCount - currentHiddenCount} opacity:0 declarations (was ${currentHiddenCount}), rejecting to prevent blank page`);
+    return current;
+  }
+
   return cleaned;
 }
