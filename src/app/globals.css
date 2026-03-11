@@ -187,12 +187,12 @@ pre code {
 }
 
 .gradient-text-hero {
-  background: linear-gradient(135deg, #3b82f6, #60a5fa, #38bdf8, #2563eb);
-  background-size: 300% 300%;
+  background: linear-gradient(135deg, #818cf8, #60a5fa, #34d399, #a78bfa, #818cf8);
+  background-size: 400% 400%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: gradient-shift 8s ease-in-out infinite;
+  animation: gradient-shift 6s ease-in-out infinite;
 }
 
 .gradient-text-static {
@@ -204,7 +204,73 @@ pre code {
 
 @keyframes gradient-shift {
   0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  33% { background-position: 50% 100%; }
+  66% { background-position: 100% 50%; }
+}
+
+/* Hero headline shimmer sweep */
+.hero-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-shimmer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+  animation: shimmer-sweep 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes shimmer-sweep {
+  0%, 100% { left: -100%; }
+  50% { left: 140%; }
+}
+
+/* Animated CTA pulse glow */
+.cta-glow {
+  animation: cta-pulse 3s ease-in-out infinite;
+}
+
+@keyframes cta-pulse {
+  0%, 100% { box-shadow: 0 0 30px rgba(37, 99, 235, 0.3), 0 4px 16px rgba(37, 99, 235, 0.2); }
+  50% { box-shadow: 0 0 50px rgba(99, 102, 241, 0.5), 0 0 80px rgba(37, 99, 235, 0.25), 0 4px 20px rgba(37, 99, 235, 0.3); }
+}
+
+/* Floating particles */
+.hero-particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hero-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(147, 197, 253, 0.6);
+  animation: particle-float linear infinite;
+}
+
+.hero-particle:nth-child(1) { left: 15%; top: 20%; animation-duration: 12s; animation-delay: 0s; width: 2px; height: 2px; background: rgba(167, 139, 250, 0.7); }
+.hero-particle:nth-child(2) { left: 75%; top: 40%; animation-duration: 10s; animation-delay: -2s; width: 4px; height: 4px; background: rgba(96, 165, 250, 0.5); }
+.hero-particle:nth-child(3) { left: 40%; top: 60%; animation-duration: 14s; animation-delay: -4s; width: 2px; height: 2px; background: rgba(52, 211, 153, 0.6); }
+.hero-particle:nth-child(4) { left: 85%; top: 15%; animation-duration: 11s; animation-delay: -1s; width: 3px; height: 3px; background: rgba(167, 139, 250, 0.5); }
+.hero-particle:nth-child(5) { left: 25%; top: 75%; animation-duration: 13s; animation-delay: -6s; width: 2px; height: 2px; background: rgba(96, 165, 250, 0.6); }
+.hero-particle:nth-child(6) { left: 60%; top: 25%; animation-duration: 15s; animation-delay: -3s; width: 3px; height: 3px; background: rgba(52, 211, 153, 0.4); }
+
+@keyframes particle-float {
+  0% { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+  10% { opacity: 1; }
+  50% { transform: translateY(-80px) translateX(30px) scale(1.5); opacity: 0.8; }
+  90% { opacity: 0; }
+  100% { transform: translateY(-160px) translateX(-20px) scale(0.5); opacity: 0; }
 }
 
 /* ============================================
@@ -351,7 +417,7 @@ pre code {
   height: 60%;
   top: 10%;
   right: -5%;
-  background: radial-gradient(ellipse, rgba(236, 72, 153, 0.3), rgba(219, 39, 119, 0.1), transparent 65%);
+  background: radial-gradient(ellipse, rgba(236, 72, 153, 0.45), rgba(219, 39, 119, 0.18), transparent 65%);
   animation: orb-morph-1 20s ease-in-out infinite;
 }
 
@@ -360,7 +426,7 @@ pre code {
   height: 50%;
   bottom: 5%;
   left: -5%;
-  background: radial-gradient(ellipse, rgba(6, 182, 212, 0.35), rgba(34, 211, 238, 0.12), transparent 65%);
+  background: radial-gradient(ellipse, rgba(52, 211, 153, 0.4), rgba(16, 185, 129, 0.18), transparent 65%);
   animation: orb-morph-2 14s ease-in-out infinite;
 }
 
@@ -369,7 +435,7 @@ pre code {
   height: 40%;
   top: 25%;
   left: 30%;
-  background: radial-gradient(ellipse, rgba(99, 102, 241, 0.3), rgba(168, 85, 247, 0.15), transparent 65%);
+  background: radial-gradient(ellipse, rgba(139, 92, 246, 0.4), rgba(168, 85, 247, 0.2), transparent 65%);
   animation: orb-morph-3 18s ease-in-out infinite;
 }
 

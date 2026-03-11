@@ -472,6 +472,15 @@ export default function LandingPage() {
         <div className="hero-spotlight" />
         <div className="hero-light-line" style={{ top: "30%" }} />
         <div className="hero-light-line" style={{ top: "70%", animationDelay: "3s" }} />
+        {/* Floating particles */}
+        <div className="hero-particles">
+          <div className="hero-particle" />
+          <div className="hero-particle" />
+          <div className="hero-particle" />
+          <div className="hero-particle" />
+          <div className="hero-particle" />
+          <div className="hero-particle" />
+        </div>
         {/* Radial gradient fade at bottom */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#0b0b11]/30 via-transparent to-[#0b0b11] pointer-events-none" />
         {/* Top edge glow */}
@@ -485,29 +494,29 @@ export default function LandingPage() {
           >
             {/* Badge */}
             <motion.div variants={fadeInUp} className="flex justify-center mb-10">
-              <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border border-blue-500/20 bg-blue-500/[0.06] backdrop-blur-xl">
-                <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.6)]" />
-                <span className="text-xs font-medium text-blue-200/80 tracking-wide">AI Website Builder — Trusted by 10,000+ creators</span>
-                <ChevronRight className="w-3 h-3 text-blue-400/50" />
+              <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border border-violet-400/30 bg-gradient-to-r from-violet-500/[0.1] to-blue-500/[0.1] backdrop-blur-xl shadow-[0_0_20px_rgba(139,92,246,0.15)]">
+                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+                <span className="text-xs font-semibold text-white/90 tracking-wide">AI Website Builder — Trusted by 10,000+ creators</span>
+                <ChevronRight className="w-3 h-3 text-violet-300/70" />
               </div>
             </motion.div>
 
             {/* Main Headline */}
             <motion.h1
               variants={fadeInUp}
-              className="text-5xl sm:text-6xl md:text-7xl lg:text-[6rem] font-black tracking-[-0.03em] leading-[0.9] mb-8"
+              className="hero-shimmer text-5xl sm:text-6xl md:text-7xl lg:text-[6rem] font-black tracking-[-0.03em] leading-[0.9] mb-8"
             >
-              <span className="block text-white drop-shadow-[0_0_40px_rgba(59,130,246,0.15)]">Websites that build</span>
-              <span className="block gradient-text-hero mt-3 drop-shadow-[0_0_60px_rgba(59,130,246,0.25)]">themselves.</span>
+              <span className="block text-white drop-shadow-[0_0_50px_rgba(139,92,246,0.2)]">Websites that build</span>
+              <span className="block gradient-text-hero mt-3 drop-shadow-[0_0_80px_rgba(99,102,241,0.3)]" style={{ filter: "brightness(1.15)" }}>themselves.</span>
             </motion.h1>
 
             {/* Sub headline */}
             <motion.p
               variants={fadeInUp}
-              className="max-w-2xl mx-auto text-lg md:text-xl text-slate-400 leading-relaxed mb-10 font-light"
+              className="max-w-2xl mx-auto text-lg md:text-xl text-slate-300 leading-relaxed mb-10 font-light"
             >
-              Describe any website. Watch AI build it in real-time — full-stack, responsive, production-ready.
-              With auto-debugging, SEO, and one-click deploy.
+              Describe any website. Watch AI build it in real-time — <span className="text-white/90 font-normal">full-stack, responsive, production-ready.</span>
+              {" "}With auto-debugging, SEO, and one-click deploy.
             </motion.p>
 
             {/* Feature pills */}
@@ -518,9 +527,9 @@ export default function LandingPage() {
               {["Auto-Debug", "GitHub Import", "WP Export", "Figma Import", "30+ Languages", "E-commerce", "Auth Scaffold", "SEO Auto-Fix"].map((pill) => (
                 <span
                   key={pill}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium text-blue-200/70 border border-blue-500/15 bg-blue-500/[0.04] backdrop-blur-sm"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium text-slate-200/80 border border-white/10 bg-white/[0.05] backdrop-blur-sm hover:bg-white/[0.08] hover:border-white/15 transition-colors"
                 >
-                  <Check className="w-3 h-3 text-blue-400" />
+                  <Check className="w-3 h-3 text-emerald-400" />
                   {pill}
                 </span>
               ))}
@@ -530,13 +539,13 @@ export default function LandingPage() {
             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-24">
               <Link
                 href="/builder"
-                className="group relative px-10 py-4.5 rounded-2xl text-base font-semibold text-white flex items-center gap-3 bg-gradient-to-r from-blue-600 to-blue-500 shadow-[0_0_30px_rgba(37,99,235,0.3),0_4px_16px_rgba(37,99,235,0.2)] hover:shadow-[0_0_40px_rgba(37,99,235,0.45),0_8px_24px_rgba(37,99,235,0.3)] hover:-translate-y-0.5 transition-all duration-300"
+                className="cta-glow group relative px-10 py-4.5 rounded-2xl text-base font-bold text-white flex items-center gap-3 bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-500 hover:shadow-[0_0_60px_rgba(99,102,241,0.5),0_0_100px_rgba(37,99,235,0.2),0_8px_24px_rgba(37,99,235,0.3)] hover:-translate-y-1 transition-all duration-300"
               >
                 <span>Start Building Free</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
               </Link>
-              <button className="group px-10 py-4.5 rounded-2xl text-base font-medium text-slate-300 hover:text-white transition-all flex items-center gap-3 border border-white/10 hover:border-white/20 bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-sm">
-                <Play className="w-4 h-4" />
+              <button className="group px-10 py-4.5 rounded-2xl text-base font-medium text-slate-200 hover:text-white transition-all flex items-center gap-3 border border-white/15 hover:border-white/25 bg-white/[0.04] hover:bg-white/[0.08] backdrop-blur-sm">
+                <Play className="w-4 h-4 text-violet-400" />
                 <span>Watch Demo</span>
               </button>
             </motion.div>
