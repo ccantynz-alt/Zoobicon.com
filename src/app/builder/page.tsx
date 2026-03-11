@@ -453,13 +453,17 @@ export default function BuilderPage() {
 
         const decoder = new TextDecoder();
         let accumulated = "";
+        let lineBuffer = ""; // Buffer for incomplete SSE lines split across chunks
 
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
 
           const text = decoder.decode(value, { stream: true });
-          const lines = text.split("\n");
+          lineBuffer += text;
+          const lines = lineBuffer.split("\n");
+          // Keep the last (potentially incomplete) line in the buffer
+          lineBuffer = lines.pop() || "";
 
           for (const line of lines) {
             if (!line.startsWith("data: ")) continue;
@@ -474,9 +478,11 @@ export default function BuilderPage() {
               } else if (event.type === "done") {
                 setStatus("complete");
               } else if (event.type === "error") {
-                throw new Error(event.message || "Stream error");
+                setError(event.message || "Stream error");
+                setStatus("error");
+                return;
               }
-            } catch (parseErr) {
+            } catch {
               // Skip malformed SSE lines
             }
           }
