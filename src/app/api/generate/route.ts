@@ -328,12 +328,13 @@ export async function POST(req: NextRequest) {
     } else if (isPremium) {
       systemPrompt = PREMIUM_SYSTEM;
       userMessage = `Build me a stunning, high-end website for: ${prompt}\n\nThis must look like it was designed by a top-tier agency. Match the aesthetic to the industry — if this is a luxury, executive, or professional brand, use elegant typography, aspirational imagery, warm whites, and sophisticated restraint. If this is a tech/startup brand, use modern clean design with tasteful accents. Always include: hero with clear value proposition, social proof, services/features, testimonials, stats, CTA, and comprehensive footer. The design must feel premium, polished, and trustworthy.`;
-      model = "claude-sonnet-4-6";
+      model = "claude-opus-4-6";
       maxTokens = 64000;
     } else {
+      // Standard tier also uses Opus — output quality must impress to convert users
       systemPrompt = STANDARD_SYSTEM;
       userMessage = `Build me a stunning, high-end website for: ${prompt}\n\nThis must look like it was designed by a top-tier agency. Match the aesthetic to the industry. Include: hero with clear value proposition, social proof bar, services/features with SVG icons, about section with image, testimonials with specific results, animated stats, FAQ accordion, CTA section, and comprehensive footer. Every section must have premium spacing, refined shadows, and smooth hover animations. The design must make someone say "I need to hire these people."`;
-      model = "claude-sonnet-4-6";
+      model = "claude-opus-4-6";
       maxTokens = 64000;
     }
 

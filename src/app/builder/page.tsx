@@ -342,7 +342,7 @@ export default function BuilderPage() {
   const [deployUrl, setDeployUrl] = useState("");
   const [deployStatus, setDeployStatus] = useState<"idle" | "deploying" | "deployed" | "error">("idle");
   const [pipelineAgents, setPipelineAgents] = useState<string[]>([]);
-  const [selectedModel, setSelectedModel] = useState("claude-sonnet-4-6");
+  const [selectedModel, setSelectedModel] = useState("");  // Empty = use pipeline's smart routing (Haiku/Opus/Sonnet)
   const [availableModels, setAvailableModels] = useState<AIModel[]>([]);
 
   const abortRef = useRef<AbortController | null>(null);

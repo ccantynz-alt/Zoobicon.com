@@ -279,7 +279,7 @@ export default function PromptInput({
               <Cpu className="w-3.5 h-3.5 text-brand-400/60 flex-shrink-0" />
               <span className="text-[10px] uppercase tracking-wider text-white/40 flex-shrink-0">Model</span>
               <span className="text-xs text-white/70 truncate">
-                {availableModels.find(m => m.id === selectedModel)?.label || "Claude Sonnet 4.6"}
+                {availableModels.find(m => m.id === selectedModel)?.label || "Auto (Opus Build)"}
               </span>
             </div>
             <ChevronDown className={`w-3.5 h-3.5 text-white/30 transition-transform ${showModelPicker ? "rotate-180" : ""}`} />
