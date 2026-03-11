@@ -402,31 +402,56 @@ export async function POST(req: NextRequest) {
 Your #1 job is to fill the <body> with rich, visible content. Structure your output EXACTLY like this:
 
 1. <!DOCTYPE html>, <html>, <head> with meta viewport + title + Google Fonts link
-2. <style> — MAXIMUM 150 lines of CSS. Use CSS custom properties. Keep it compact.
-3. <body> — THIS IS THE MAIN OUTPUT. Must contain ALL sections with real text, real images, real content.
+2. <style> — MAXIMUM 80 lines of CSS. Bare minimum styling only. Use CSS custom properties. NO animations, NO media queries, NO elaborate selectors — just basic layout and colors.
+3. <body> — THIS IS THE MAIN OUTPUT. Must contain ALL sections with real text, real images, real content. This should be 80% of your output.
 4. <script> before </body> for interactivity
 
 The <body> MUST contain: navigation, hero section, features/services, about section, testimonials, stats, FAQ, call-to-action, footer. Every section must have real, specific, benefit-focused copy.
+
+CRITICAL: Your previous attempt produced a page with CSS but ZERO visible content in the body. This time, write MINIMAL CSS and focus ALL your output on the <body> content.
 
 Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for images (specific keywords).
 Import 2 Google Fonts. Use CSS custom properties for colors. Match the industry aesthetic.
 Output ONLY raw HTML — no markdown, no code fences, no explanation.`;
 
-        const retryMessage = await client.messages.create({
-          model,
-          max_tokens: maxTokens,
-          system: BODY_FIRST_SYSTEM,
-          messages: [{ role: "user", content: userMessage }],
-        });
+        for (let retry = 0; retry < 2; retry++) {
+          try {
+            const retryMessage = await client.messages.create({
+              model,
+              max_tokens: maxTokens,
+              system: BODY_FIRST_SYSTEM,
+              messages: [{ role: "user", content: userMessage }],
+            });
 
-        const retryBlock = retryMessage.content.find((b) => b.type === "text");
-        if (retryBlock && retryBlock.type === "text") {
-          let retryHtml = retryBlock.text.trim();
-          if (retryHtml.startsWith("```")) {
-            retryHtml = retryHtml.replace(/^```(?:html)?\n?/, "").replace(/\n?```$/, "");
+            const retryBlock = retryMessage.content.find((b) => b.type === "text");
+            if (retryBlock && retryBlock.type === "text") {
+              let retryHtml = retryBlock.text.trim();
+              if (retryHtml.startsWith("```")) {
+                retryHtml = retryHtml.replace(/^```(?:html)?\n?/, "").replace(/\n?```$/, "");
+              }
+
+              // Validate the retry actually has body content
+              const retryBodyMatch = retryHtml.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+              const retryBodyText = retryBodyMatch
+                ? retryBodyMatch[1]
+                    .replace(/<script[\s\S]*?<\/script>/gi, "")
+                    .replace(/<style[\s\S]*?<\/style>/gi, "")
+                    .replace(/<[^>]+>/g, "")
+                    .replace(/\s+/g, " ")
+                    .trim()
+                : "";
+
+              if (retryBodyText.length >= 100) {
+                console.log(`[Generate] Retry ${retry + 1} succeeded (${retryBodyText.length} body chars)`);
+                html = retryHtml;
+                break;
+              } else {
+                console.warn(`[Generate] Retry ${retry + 1} still empty (${retryBodyText.length} body chars)`);
+              }
+            }
+          } catch (retryErr) {
+            console.error(`[Generate] Retry ${retry + 1} failed:`, retryErr);
           }
-        } catch (retryErr) {
-          console.error(`[Generate] Retry ${retry + 1} failed:`, retryErr);
         }
       }
     }

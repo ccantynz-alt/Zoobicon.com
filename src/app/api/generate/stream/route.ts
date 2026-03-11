@@ -378,54 +378,79 @@ export async function POST(req: NextRequest) {
             : "";
 
           if (!isEdit && bodyText.length < 100) {
-            // Body is empty/near-empty — retry with a stripped-down, body-focused prompt
+            // Body is empty/near-empty — retry up to 2 times with increasingly aggressive body-first prompts
             console.warn(`[Stream] Empty body detected (${bodyText.length} chars). Retrying with body-first prompt...`);
             controller.enqueue(
               encoder.encode(`data: ${JSON.stringify({ type: "status", message: "Retrying — generating content..." })}\n\n`)
             );
 
-            const BODY_FIRST_SYSTEM = `You are Zoobicon, an elite AI website generator. Output a single, complete HTML file.
+            const retryPrompts = [
+              `You are Zoobicon, an elite AI website generator. Output a single, complete HTML file.
 
 ## ABSOLUTE RULE: WRITE THE <body> CONTENT FIRST
 Your #1 job is to fill the <body> with rich, visible content. Structure your output EXACTLY like this:
 
 1. <!DOCTYPE html>, <html>, <head> with meta viewport + title + Google Fonts link
-2. <style> — MAXIMUM 150 lines of CSS. Use CSS custom properties. Keep it compact.
-3. <body> — THIS IS THE MAIN OUTPUT. Must contain ALL sections with real text, real images, real content.
+2. <style> — MAXIMUM 80 lines of CSS. Use CSS custom properties. Keep it MINIMAL — just colors, fonts, and basic layout. NO animations, NO elaborate selectors.
+3. <body> — THIS IS THE MAIN OUTPUT (80%+ of your response). Must contain ALL sections with real text, real images, real content.
 4. <script> before </body> for interactivity
+
+CRITICAL: Your previous attempt produced CSS but ZERO visible content. This time, write MINIMAL CSS and focus ALL output on <body> content.
 
 The <body> MUST contain: navigation, hero section, features/services, about section, testimonials, stats, FAQ, call-to-action, footer. Every section must have real, specific, benefit-focused copy.
 
 Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for images (specific keywords like seed/luxury-shuttle/800/500).
 Import 2 Google Fonts. Use CSS custom properties for colors. Match the industry aesthetic.
-Output ONLY raw HTML — no markdown, no code fences, no explanation.`;
+Output ONLY raw HTML — no markdown, no code fences, no explanation.`,
 
-            try {
-              const retryResponse = await client.messages.create({
-                model,
-                max_tokens: maxTokens,
-                system: BODY_FIRST_SYSTEM,
-                messages: [{ role: "user", content: userMessage }],
-              });
+              `You are Zoobicon. Output a COMPLETE HTML page. Your ONLY job is to produce visible content.
 
-              const retryBlock = retryResponse.content.find((b) => b.type === "text");
-              if (retryBlock && retryBlock.type === "text") {
-                // Validate retry also has body content
-                const retryBodyMatch = retryBlock.text.match(/<body[^>]*>([\s\S]*)<\/body>/i);
-                const retryBodyText = retryBodyMatch
-                  ? retryBodyMatch[1].replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim()
-                  : "";
+WRITE BARELY ANY CSS — use inline styles if needed. The BODY is everything.
 
-                if (retryBodyText.length >= 100) {
-                  controller.enqueue(
-                    encoder.encode(`data: ${JSON.stringify({ type: "replace", content: retryBlock.text })}\n\n`)
-                  );
-                } else {
-                  console.error(`[Stream] Retry ALSO produced empty body (${retryBodyText.length} chars)`);
+Output: <!DOCTYPE html><html><head><title>Site</title><style>/* minimal */</style></head><body>
+THEN write ALL page content: nav, hero, features, about, testimonials, stats, FAQ, CTA, footer.
+Use real text, real images (https://picsum.photos/seed/KEYWORD/W/H), real content.
+Output ONLY raw HTML.`
+            ];
+
+            let retrySucceeded = false;
+            for (let i = 0; i < retryPrompts.length && !retrySucceeded; i++) {
+              try {
+                const retryResponse = await client.messages.create({
+                  model,
+                  max_tokens: maxTokens,
+                  system: retryPrompts[i],
+                  messages: [{ role: "user", content: userMessage }],
+                });
+
+                const retryBlock = retryResponse.content.find((b) => b.type === "text");
+                if (retryBlock && retryBlock.type === "text") {
+                  // Validate retry also has body content
+                  const retryBodyMatch = retryBlock.text.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+                  const retryBodyText = retryBodyMatch
+                    ? retryBodyMatch[1].replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim()
+                    : "";
+
+                  if (retryBodyText.length >= 100) {
+                    console.log(`[Stream] Retry ${i + 1} succeeded (${retryBodyText.length} body chars)`);
+                    controller.enqueue(
+                      encoder.encode(`data: ${JSON.stringify({ type: "replace", content: retryBlock.text })}\n\n`)
+                    );
+                    retrySucceeded = true;
+                  } else {
+                    console.warn(`[Stream] Retry ${i + 1} still empty (${retryBodyText.length} body chars)`);
+                  }
                 }
+              } catch (retryErr) {
+                console.error(`[Stream] Retry ${i + 1} failed:`, retryErr);
               }
-            } catch (retryErr) {
-              console.error("[Stream] Retry also failed:", retryErr);
+            }
+
+            if (!retrySucceeded) {
+              console.error("[Stream] All retries produced empty body");
+              controller.enqueue(
+                encoder.encode(`data: ${JSON.stringify({ type: "error", message: "Generation produced empty content after retries. Please try again with a different prompt." })}\n\n`)
+              );
             }
           }
 
