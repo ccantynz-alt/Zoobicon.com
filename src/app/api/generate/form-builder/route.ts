@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
       : "Generate appropriate fields based on the form type.";
 
     const message = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 64000,
       system: FORM_BUILDER_SYSTEM,
       messages: [{

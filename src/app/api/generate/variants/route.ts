@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
     const userMessage = `Generate exactly ${variantCount} distinct design variants for this website:\n\n${prompt}\n\nEach variant must have a completely different color scheme, layout approach, and typography pairing. All variants must share the same content/copy. Return the result as a JSON object with a "variants" array containing ${variantCount} variant objects, each with "id", "name", "description", "style", and "html" fields.`;
 
     const message = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 64000,
       system: VARIANTS_SYSTEM,
       messages: [

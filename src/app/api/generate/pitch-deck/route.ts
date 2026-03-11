@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
       : "Include all standard pitch deck slides (problem, solution, market, product, business model, traction, competition, team, financials, the ask).";
 
     const message = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 64000,
       system: PITCH_DECK_SYSTEM,
       messages: [{

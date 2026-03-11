@@ -124,7 +124,7 @@ export async function POST(req: NextRequest) {
         : `Only add these animation types: ${selectedAnimations.join(", ")}. Skip the others.`;
 
     const message = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 64000,
       system: ANIMATIONS_SYSTEM,
       messages: [

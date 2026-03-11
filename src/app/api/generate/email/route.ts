@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
     const userMessage = `Generate a ${type} email template for the following:\n\n${prompt}\n\nThe email type is "${type}"${type === "marketing" ? " — include an unsubscribe link and company address in the footer" : ""}. Return the result as a JSON object with "subject", "html", and "plainText" fields.`;
 
     const message = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 16000,
       system: EMAIL_SYSTEM,
       messages: [

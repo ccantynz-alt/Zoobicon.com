@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
       : "Include ALL component categories listed in your instructions.";
 
     const message = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 64000,
       system: COMPONENT_LIB_SYSTEM,
       messages: [{

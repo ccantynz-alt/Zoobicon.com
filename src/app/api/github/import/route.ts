@@ -281,7 +281,7 @@ Create a stunning, modern single-page HTML version of this project. Preserve the
     const client = new Anthropic({ apiKey });
 
     const message = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 16000,
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userPrompt }],

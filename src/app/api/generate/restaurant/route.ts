@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
       : "\nGenerate a full realistic menu (15-25 items across categories).";
 
     const message = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 64000,
       system: RESTAURANT_SYSTEM,
       messages: [{

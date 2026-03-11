@@ -133,7 +133,7 @@ Generate a production-quality database schema, RESTful API routes, and a jaw-dro
 Return ONLY a JSON object with keys: schema, api, html, description.`;
 
     const message = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 64000,
       system: FULLSTACK_SYSTEM,
       messages: [

@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
       : "Generate 5-6 appropriate categories for this directory.";
 
     const message = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 64000,
       system: DIRECTORY_SYSTEM,
       messages: [{
