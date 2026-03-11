@@ -506,6 +506,42 @@ export default function BuilderPage() {
           if (ds > 0) clean = clean.slice(ds);
           const he = clean.lastIndexOf("</html>");
           if (he !== -1) clean = clean.slice(0, he + "</html>".length);
+
+          // Client-side body check — last line of defense against empty pages
+          const bodyM = clean.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+          const bodyChars = bodyM
+            ? bodyM[1].replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().length
+            : 0;
+
+          if (!existingCode && bodyChars < 50) {
+            // Body is empty even after server retry — do one client-side retry via non-streaming endpoint
+            console.warn(`[Builder] Empty body after stream (${bodyChars} chars). Client-side retry...`);
+            try {
+              const retryRes = await fetch("/api/generate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  prompt: userPrompt,
+                  tier,
+                  ...(selectedModel ? { model: selectedModel } : {}),
+                }),
+                signal: controller.signal,
+              });
+              if (retryRes.ok) {
+                const retryData = await retryRes.json();
+                let retryHtml = (retryData.html || "").trim();
+                retryHtml = retryHtml.replace(/^```(?:html|HTML)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
+                const rds = retryHtml.search(/<!doctype\s+html|<html/i);
+                if (rds > 0) retryHtml = retryHtml.slice(rds);
+                const rhe = retryHtml.lastIndexOf("</html>");
+                if (rhe !== -1) retryHtml = retryHtml.slice(0, rhe + "</html>".length);
+                clean = retryHtml;
+              }
+            } catch (retryErr) {
+              console.error("[Builder] Client-side retry failed:", retryErr);
+            }
+          }
+
           setGeneratedCode(clean);
           setStatus("complete");
           // Auto-replace placeholder images
