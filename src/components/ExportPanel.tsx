@@ -13,8 +13,19 @@ export default function ExportPanel({ code }: { code: string }) {
   const [exportType, setExportType] = useState<"static" | "nextjs">("static");
   const [projectName, setProjectName] = useState("my-zoobicon-site");
 
+  // Check if user has a paid plan
+  const isPaidUser = (() => {
+    try {
+      const user = localStorage.getItem("zoobicon_user");
+      if (!user) return false;
+      const parsed = JSON.parse(user);
+      return parsed.plan === "unlimited" || parsed.plan === "pro" || parsed.plan === "premium" || parsed.role === "admin";
+    } catch { return false; }
+  })();
+
   const handleExport = async () => {
     if (!code) return;
+    if (!isPaidUser) return; // Guard rail: free tier cannot export
     setLoading(true);
     try {
       const res = await fetch("/api/export/github", {
@@ -53,6 +64,46 @@ export default function ExportPanel({ code }: { code: string }) {
       setLoading(false);
     }
   };
+
+  // Free tier guard rail: show upgrade prompt
+  if (!isPaidUser) {
+    return (
+      <div className="p-4 space-y-4">
+        <div className="p-4 rounded-xl bg-gradient-to-br from-brand-500/10 to-purple-500/10 border border-brand-500/20">
+          <div className="flex items-center gap-2 mb-3">
+            <Download size={18} className="text-brand-400" />
+            <h3 className="text-sm font-semibold text-white">Export Your Site</h3>
+          </div>
+          <p className="text-xs text-white/50 leading-relaxed mb-4">
+            Upgrade to a paid plan to export your site as a clean project with all files — ready for GitHub, Vercel, Netlify, or any hosting platform.
+          </p>
+          <div className="space-y-2 mb-4">
+            <div className="flex items-center gap-2 text-xs text-white/40">
+              <span className="w-1 h-1 rounded-full bg-brand-400" /> Static HTML export
+            </div>
+            <div className="flex items-center gap-2 text-xs text-white/40">
+              <span className="w-1 h-1 rounded-full bg-brand-400" /> Next.js project scaffold
+            </div>
+            <div className="flex items-center gap-2 text-xs text-white/40">
+              <span className="w-1 h-1 rounded-full bg-brand-400" /> GitHub-ready with configs
+            </div>
+            <div className="flex items-center gap-2 text-xs text-white/40">
+              <span className="w-1 h-1 rounded-full bg-brand-400" /> Unlimited exports
+            </div>
+          </div>
+          <a
+            href="/pricing"
+            className="block w-full py-2.5 rounded-lg text-sm font-medium text-center bg-brand-500/20 text-brand-400 hover:bg-brand-500/30 transition-colors"
+          >
+            Upgrade to Export
+          </a>
+        </div>
+        <p className="text-[10px] text-white/20 text-center">
+          Free sites are hosted for 7 days. Upgrade to keep them permanently.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 space-y-4">

@@ -104,7 +104,7 @@ Read the user's prompt carefully. Detect the industry and match the aesthetic:
 - Subtle scroll-down indicator (animated chevron).
 
 ## Images
-- Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT (unique KEYWORD per image). Never bare picsum.photos/WIDTH/HEIGHT.
+- Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT. The KEYWORD must be SPECIFIC to the business and what that image should show — NEVER generic like 'hero', 'office', 'team'. For shuttles: seed/airport-shuttle-van, seed/auckland-terminal. For restaurants: seed/gourmet-plating. Also set descriptive alt text matching what the image SHOULD show. Never bare picsum.photos/WIDTH/HEIGHT.
 - object-fit: cover, border-radius: 12-16px, subtle shadow.
 - CSS: img { background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); min-height: 120px; }
 - For icons, use clean inline SVGs with brand colors.

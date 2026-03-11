@@ -303,7 +303,7 @@ Match the visual treatment to the industry detected in the strategy:
 - Follow the design spec EXACTLY — use specified colors, fonts, spacing.
 - Use the copy EXACTLY as provided — do not rewrite.
 - Follow the architecture EXACTLY — section order, layouts, components.
-- Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for images (where KEYWORD is a unique descriptive word per image, e.g., seed/hero, seed/team, seed/office, seed/service1). Never use bare picsum.photos/WIDTH/HEIGHT. Apply object-fit: cover. Add CSS: img { background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); min-height: 120px; } for graceful fallback.
+- Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for images. The KEYWORD must be SPECIFIC to the business and what that image should show — NEVER use generic words like 'hero', 'office', 'team', 'service1'. Examples: for a shuttle company use seed/airport-shuttle-van, seed/auckland-airport-terminal, seed/passenger-boarding, seed/professional-driver. For a restaurant: seed/gourmet-plating, seed/restaurant-dining-room, seed/chef-kitchen. For real estate: seed/luxury-home-exterior, seed/modern-living-room. Also set descriptive alt text that matches what the image SHOULD show (e.g., alt="Auckland airport shuttle van picking up passengers"). Never use bare picsum.photos/WIDTH/HEIGHT. Apply object-fit: cover. Add CSS: img { background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); min-height: 120px; } for graceful fallback.
 - CSS custom properties for ALL colors (enables dark mode later).
 - Fully responsive with mobile hamburger menu.
 - CSS transitions: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) on interactive elements.
@@ -575,99 +575,127 @@ export async function runPipeline(
   }
 
   // ── Phase 4: Animation + SEO + Forms (Parallel) — ALL tiers ──
+  // These are ENHANCEMENT agents — failures should not destroy the developer's output.
+  // We also race against a timeout for hosting platforms with short request limits.
   {
     onProgress?.("animation", "adding scroll effects");
     onProgress?.("seo", "optimizing for search");
     onProgress?.("forms", "enhancing form functionality");
     const phase4Start = Date.now();
 
-    const [animText, seoText, formsText] = await Promise.all([
-      llmCall({
-        model: MODEL_BALANCED,
-        maxTokens: 64000,
-        system: ANIMATION_SYSTEM,
-        userMessage: `Add premium animations to this website:\n\n${html}`,
-      }),
-      llmCall({
-        model: MODEL_BALANCED,
-        maxTokens: 64000,
-        system: SEO_SYSTEM,
-        userMessage: `Add comprehensive SEO markup to this website:\n\n${html}`,
-      }),
-      llmCall({
-        model: MODEL_BALANCED,
-        maxTokens: 64000,
-        system: FORMS_SYSTEM,
-        userMessage: `Make all forms functional in this website:\n\n${html}`,
-      }),
-    ]);
+    try {
+      const [animText, seoText, formsText] = await Promise.all([
+        llmCall({
+          model: MODEL_BALANCED,
+          maxTokens: 64000,
+          system: ANIMATION_SYSTEM,
+          userMessage: `Add premium animations to this website:\n\n${html}`,
+        }).catch((err) => { console.warn("[Pipeline] Animation agent failed:", err.message); return ""; }),
+        llmCall({
+          model: MODEL_BALANCED,
+          maxTokens: 64000,
+          system: SEO_SYSTEM,
+          userMessage: `Add comprehensive SEO markup to this website:\n\n${html}`,
+        }).catch((err) => { console.warn("[Pipeline] SEO agent failed:", err.message); return ""; }),
+        llmCall({
+          model: MODEL_BALANCED,
+          maxTokens: 64000,
+          system: FORMS_SYSTEM,
+          userMessage: `Make all forms functional in this website:\n\n${html}`,
+        }).catch((err) => { console.warn("[Pipeline] Forms agent failed:", err.message); return ""; }),
+      ]);
 
-    // Safely use animation result as base — only if it's valid and substantial
-    let enhancedHtml = safeReplaceHtml(html, animText, "Animator");
-
-    // Merge SEO meta tags from the SEO agent into the enhanced HTML
-    const seoHeadMatch = seoText.match(/<head>([\s\S]*?)<\/head>/i);
-    if (seoHeadMatch) {
-      const seoMetaTags = seoHeadMatch[1].match(/<meta[^>]*>|<link[^>]*>|<script type="application\/ld\+json">[\s\S]*?<\/script>/gi) || [];
-      const newTags = seoMetaTags.filter(tag =>
-        tag.includes('og:') || tag.includes('twitter:') || tag.includes('ld+json') || tag.includes('canonical')
-      );
-      if (newTags.length > 0) {
-        enhancedHtml = enhancedHtml.replace('</head>', `${newTags.join('\n')}\n</head>`);
+      // Safely use animation result as base — only if it's valid and substantial
+      if (animText) {
+        const enhancedHtml = safeReplaceHtml(html, animText, "Animator");
+        if (enhancedHtml !== html) html = enhancedHtml;
       }
-    }
 
-    // Extract form enhancements from forms result
-    const formsScriptMatch = formsText.match(/<script>([\s\S]*?)<\/script>\s*<\/body>/i);
-    if (formsScriptMatch && formsScriptMatch[1].includes('addEventListener')) {
-      const formJS = formsScriptMatch[1];
-      if (formJS.length > 200) {
-        enhancedHtml = enhancedHtml.replace('</body>', `<script>\n// Form Enhancement\n${formJS}\n</script>\n</body>`);
+      // Merge SEO meta tags from the SEO agent into the HTML
+      if (seoText) {
+        const seoHeadMatch = seoText.match(/<head>([\s\S]*?)<\/head>/i);
+        if (seoHeadMatch) {
+          const seoMetaTags = seoHeadMatch[1].match(/<meta[^>]*>|<link[^>]*>|<script type="application\/ld\+json">[\s\S]*?<\/script>/gi) || [];
+          const newTags = seoMetaTags.filter(tag =>
+            tag.includes('og:') || tag.includes('twitter:') || tag.includes('ld+json') || tag.includes('canonical')
+          );
+          if (newTags.length > 0) {
+            html = html.replace('</head>', `${newTags.join('\n')}\n</head>`);
+          }
+        }
       }
+
+      // Extract form enhancements from forms result
+      if (formsText) {
+        const formsScriptMatch = formsText.match(/<script>([\s\S]*?)<\/script>\s*<\/body>/i);
+        if (formsScriptMatch && formsScriptMatch[1].includes('addEventListener')) {
+          const formJS = formsScriptMatch[1];
+          if (formJS.length > 200) {
+            html = html.replace('</body>', `<script>\n// Form Enhancement\n${formJS}\n</script>\n</body>`);
+          }
+        }
+      }
+
+      agents.push({ agent: "Animator", output: `[animations ${animText ? "applied" : "skipped"}]`, duration: Date.now() - phase4Start });
+      agents.push({ agent: "SEO Specialist", output: `[SEO ${seoText ? "applied" : "skipped"}]`, duration: Date.now() - phase4Start });
+      agents.push({ agent: "Forms Engineer", output: `[forms ${formsText ? "applied" : "skipped"}]`, duration: Date.now() - phase4Start });
+    } catch (phase4Err) {
+      console.warn("[Pipeline] Phase 4 failed entirely, keeping developer HTML:", phase4Err);
+      agents.push({ agent: "Enhancement Phase", output: `[skipped: ${phase4Err instanceof Error ? phase4Err.message : "error"}]`, duration: Date.now() - phase4Start });
     }
-
-    html = enhancedHtml;
-
-    agents.push({ agent: "Animator", output: `[animations applied]`, duration: Date.now() - phase4Start });
-    agents.push({ agent: "SEO Specialist", output: `[SEO markup injected]`, duration: Date.now() - phase4Start });
-    agents.push({ agent: "Forms Engineer", output: `[forms enhanced]`, duration: Date.now() - phase4Start });
   }
 
   // ── Phase 5: Integrations Agent ──
-  onProgress?.("integrations", "adding third-party integrations");
-  const intStart = Date.now();
+  // Optional enhancement — failure is non-fatal
+  {
+    onProgress?.("integrations", "adding third-party integrations");
+    const intStart = Date.now();
 
-  const intText = await llmCall({
-    model: MODEL_BALANCED,
-    maxTokens: 64000,
-    system: INTEGRATIONS_SYSTEM,
-    userMessage: `Add essential integrations to this website:\n\n${html}`,
-  });
+    try {
+      const intText = await llmCall({
+        model: MODEL_BALANCED,
+        maxTokens: 64000,
+        system: INTEGRATIONS_SYSTEM,
+        userMessage: `Add essential integrations to this website:\n\n${html}`,
+      });
 
-  html = safeReplaceHtml(html, intText, "Integrations");
-  agents.push({ agent: "Integrations", output: `[integrations added]`, duration: Date.now() - intStart });
+      html = safeReplaceHtml(html, intText, "Integrations");
+      agents.push({ agent: "Integrations", output: `[integrations added]`, duration: Date.now() - intStart });
+    } catch (intErr) {
+      console.warn("[Pipeline] Integrations agent failed, skipping:", intErr);
+      agents.push({ agent: "Integrations", output: `[skipped]`, duration: Date.now() - intStart });
+    }
+  }
 
   // ── Final Phase: QA Agent ──
-  onProgress?.("qa", "quality review");
-  const qaStart = Date.now();
+  // Optional — failure is non-fatal
+  {
+    onProgress?.("qa", "quality review");
+    const qaStart = Date.now();
 
-  const qaText = await llmCall({
-    model: MODEL_BALANCED,
-    maxTokens: 64000,
-    system: QA_SYSTEM,
-    userMessage: `Review this website HTML for quality:\n\n${html}`,
-  });
+    try {
+      const qaText = await llmCall({
+        model: MODEL_BALANCED,
+        maxTokens: 64000,
+        system: QA_SYSTEM,
+        userMessage: `Review this website HTML for quality:\n\n${html}`,
+      });
 
-  agents.push({ agent: "QA Engineer", output: qaText, duration: Date.now() - qaStart });
+      agents.push({ agent: "QA Engineer", output: qaText, duration: Date.now() - qaStart });
 
-  // Apply QA fixes if any — safely validated
-  try {
-    const qaJSON = JSON.parse(extractJSON(qaText));
-    if (qaJSON.fixedHtml && qaJSON.fixedHtml.trim().length > 100) {
-      html = safeReplaceHtml(html, qaJSON.fixedHtml, "QA Engineer");
+      // Apply QA fixes if any — safely validated
+      try {
+        const qaJSON = JSON.parse(extractJSON(qaText));
+        if (qaJSON.fixedHtml && qaJSON.fixedHtml.trim().length > 100) {
+          html = safeReplaceHtml(html, qaJSON.fixedHtml, "QA Engineer");
+        }
+      } catch {
+        // QA output wasn't valid JSON, keep current HTML
+      }
+    } catch (qaErr) {
+      console.warn("[Pipeline] QA agent failed, skipping:", qaErr);
+      agents.push({ agent: "QA Engineer", output: `[skipped]`, duration: Date.now() - qaStart });
     }
-  } catch {
-    // QA output wasn't valid JSON, keep current HTML
   }
 
   // Inject the Zoobicon Component Library CSS for consistent polish

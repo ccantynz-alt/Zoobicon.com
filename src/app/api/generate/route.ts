@@ -106,7 +106,7 @@ Read the user's prompt carefully. Detect the industry and match the aesthetic:
 - Subtle animated element: floating badge, pulsing dot, or scroll indicator arrow.
 
 ## Images
-- Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT where KEYWORD is a unique descriptive word per image. Never use bare picsum.photos/WIDTH/HEIGHT.
+- Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT. The KEYWORD must be SPECIFIC to the business and what that image should show — NEVER generic like 'hero', 'office', 'team'. For shuttles: seed/airport-shuttle-van, seed/auckland-terminal. For restaurants: seed/gourmet-plating. Also set descriptive alt text matching what the image SHOULD show. Never bare picsum.photos/WIDTH/HEIGHT.
 - Apply object-fit: cover on all images.
 - border-radius: 12-16px, subtle shadow.
 - Add CSS: img { background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); min-height: 120px; }
