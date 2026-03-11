@@ -309,8 +309,92 @@ function GeneratingAtmosphere() {
   );
 }
 
+/**
+ * Nuclear visibility failsafe — injected into EVERY srcDoc.
+ * Fixes the #1 cause of blank white previews: AI-generated CSS that sets
+ * elements to opacity:0 for scroll animations, but the IntersectionObserver
+ * JS either doesn't fire, uses wrong class names, or breaks in the iframe.
+ *
+ * Strategy:
+ * 1. After DOM loads, set up a proper IntersectionObserver for common animation classes
+ * 2. After 2s, force ALL hidden elements visible (catches broken JS)
+ * 3. High-specificity CSS rule as final backstop
+ */
+const VISIBILITY_FAILSAFE = `
+<style id="zbcn-failsafe">
+  /* Backstop: after 3s animation, force visibility on common animation classes.
+     Uses animation so it doesn't override working IntersectionObserver immediately. */
+  @keyframes zbcn-force-show { to { opacity: 1 !important; transform: none !important; } }
+</style>
+<script>
+(function(){
+  // Wait for DOM to be ready
+  function init() {
+    var selectors = '.fade-in, .fade-in-left, .fade-in-right, .scale-in, .slide-up, .slide-in, .reveal, .animate-on-scroll, [data-animate], [data-aos]';
+    var els = document.querySelectorAll(selectors);
+
+    // Set up IntersectionObserver that works
+    if ('IntersectionObserver' in window && els.length > 0) {
+      var obs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            var el = entry.target;
+            el.style.opacity = '1';
+            el.style.transform = 'none';
+            el.classList.add('visible');
+            el.classList.add('aos-animate');
+            obs.unobserve(el);
+          }
+        });
+      }, { threshold: 0.05, rootMargin: '50px' });
+      els.forEach(function(el) { obs.observe(el); });
+    }
+
+    // HARD FAILSAFE: After 2 seconds, force everything visible
+    setTimeout(function() {
+      // Find ALL elements with opacity 0 (computed)
+      var all = document.querySelectorAll('*');
+      for (var i = 0; i < all.length; i++) {
+        var el = all[i];
+        var style = window.getComputedStyle(el);
+        if (style.opacity === '0' && el.tagName !== 'SCRIPT' && el.tagName !== 'STYLE' && el.tagName !== 'META' && el.tagName !== 'LINK') {
+          el.style.setProperty('opacity', '1', 'important');
+          el.style.setProperty('transform', 'none', 'important');
+          el.style.setProperty('visibility', 'visible', 'important');
+        }
+      }
+      // Also force-reveal by class
+      document.querySelectorAll(selectors).forEach(function(el) {
+        el.style.setProperty('opacity', '1', 'important');
+        el.style.setProperty('transform', 'none', 'important');
+        el.classList.add('visible');
+      });
+    }, 2000);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>`;
+
 export default function PreviewPanel({ html, isGenerating }: PreviewPanelProps) {
-  const srcDoc = useMemo(() => html || "", [html]);
+  // Inject visibility failsafe into every srcDoc to prevent blank white pages
+  const srcDoc = useMemo(() => {
+    if (!html) return "";
+    let doc = html;
+    // Inject failsafe before </body> if present, otherwise append
+    if (doc.includes("</body>")) {
+      doc = doc.replace(/<\/body>/i, VISIBILITY_FAILSAFE + "\n</body>");
+    } else if (doc.includes("</html>")) {
+      doc = doc.replace(/<\/html>/i, VISIBILITY_FAILSAFE + "\n</html>");
+    } else {
+      doc = doc + VISIBILITY_FAILSAFE;
+    }
+    return doc;
+  }, [html]);
 
   const sharedStyles = `
     @keyframes particle-float {
