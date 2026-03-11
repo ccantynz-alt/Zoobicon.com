@@ -839,13 +839,5 @@ function safeReplaceHtml(current: string, candidate: string, agentName: string):
     }
   }
 
-  // Opacity check: if the candidate has significantly more opacity:0 declarations, reject it
-  const currentHiddenCount = (current.match(/opacity\s*:\s*0/gi) || []).length;
-  const candidateHiddenCount = (cleaned.match(/opacity\s*:\s*0/gi) || []).length;
-  if (candidateHiddenCount > currentHiddenCount + 10) {
-    console.warn(`[Pipeline] ${agentName} added ${candidateHiddenCount - currentHiddenCount} opacity:0 declarations (was ${currentHiddenCount}), rejecting to prevent blank page`);
-    return current;
-  }
-
   return cleaned;
 }

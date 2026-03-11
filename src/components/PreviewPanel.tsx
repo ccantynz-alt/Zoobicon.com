@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useEffect, useState } from "react";
+import { useMemo } from "react";
 
 interface PreviewPanelProps {
   html: string;
@@ -309,63 +309,7 @@ function GeneratingAtmosphere() {
   );
 }
 
-/**
- * Nuclear visibility failsafe — injected into EVERY srcDoc.
- *
- * Two-layer approach:
- * 1. CSS: Forces body and all children visible with !important rules
- * 2. JS: After 1.5s, UNCONDITIONALLY sets every single element to
- *    opacity:1, visibility:visible, transform:none — no checks, no conditions.
- *    This is a sledgehammer, but it guarantees no blank pages.
- */
-const VISIBILITY_FAILSAFE = `
-<style id="zbcn-failsafe">
-  /* Layer 1: CSS nuclear override — ensures nothing can hide body or its children */
-  html, body {
-    opacity: 1 !important;
-    visibility: visible !important;
-    display: block !important;
-    min-height: 100vh !important;
-    color-scheme: light !important;
-  }
-  /* Force all sections and content containers visible */
-  body > *, body section, body header, body main, body footer,
-  body article, body div, body aside {
-    opacity: 1 !important;
-    visibility: visible !important;
-  }
-</style>
-<script>
-(function(){
-  // Layer 2: JS brute force — NO getComputedStyle, NO conditions, just force everything
-  function nukeHidden() {
-    try {
-      var els = document.querySelectorAll('body, body *');
-      for (var i = 0; i < els.length; i++) {
-        var t = els[i].tagName;
-        if (t === 'SCRIPT' || t === 'STYLE' || t === 'META' || t === 'LINK') continue;
-        var s = els[i].style;
-        s.setProperty('opacity', '1', 'important');
-        s.setProperty('visibility', 'visible', 'important');
-        // Only reset transform on non-nav elements (preserve nav positioning)
-        if (t !== 'NAV' && !els[i].closest('nav')) {
-          s.setProperty('transform', 'none', 'important');
-        }
-        // Add visible class for component library
-        els[i].classList.add('visible');
-      }
-    } catch(e) { console.warn('[zbcn-failsafe]', e); }
-  }
-
-  // Run at multiple intervals
-  setTimeout(nukeHidden, 1500);
-  setTimeout(nukeHidden, 3500);
-})();
-</script>`;
-
 export default function PreviewPanel({ html, isGenerating }: PreviewPanelProps) {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [blankDetected, setBlankDetected] = useState(false);
 
   // Extract body text to validate content exists
   const bodyTextLength = useMemo(() => {
@@ -381,47 +325,6 @@ export default function PreviewPanel({ html, isGenerating }: PreviewPanelProps) 
       .length;
   }, [html]);
 
-  // Inject visibility failsafe into every srcDoc to prevent blank white pages
-  const srcDoc = useMemo(() => {
-    if (!html) return "";
-    let doc = html;
-    // Inject failsafe before </body> if present, otherwise append
-    if (doc.includes("</body>")) {
-      doc = doc.replace(/<\/body>/i, VISIBILITY_FAILSAFE + "\n</body>");
-    } else if (doc.includes("</html>")) {
-      doc = doc.replace(/<\/html>/i, VISIBILITY_FAILSAFE + "\n</html>");
-    } else {
-      doc = doc + VISIBILITY_FAILSAFE;
-    }
-    return doc;
-  }, [html]);
-
-  // Reset blank detection when html changes
-  useEffect(() => {
-    setBlankDetected(false);
-  }, [html]);
-
-  // Detect blank iframe content after load
-  useEffect(() => {
-    if (!html || isGenerating) return;
-    const timer = setTimeout(() => {
-      try {
-        const iframe = iframeRef.current;
-        if (!iframe) return;
-        const doc = iframe.contentDocument;
-        if (!doc || !doc.body) return;
-        // Check if body has any visible text content
-        const bodyText = (doc.body.innerText || "").trim();
-        if (bodyText.length < 20) {
-          console.warn("[PreviewPanel] Blank page detected — body text length:", bodyText.length);
-          setBlankDetected(true);
-        }
-      } catch {
-        // Cross-origin issues, skip detection
-      }
-    }, 4000);
-    return () => clearTimeout(timer);
-  }, [html, isGenerating]);
 
   const sharedStyles = `
     @keyframes particle-float {
@@ -588,16 +491,16 @@ export default function PreviewPanel({ html, isGenerating }: PreviewPanelProps) 
   }
 
   // Safety check — if html exists but doesn't look like valid HTML, show diagnostic
-  const looksLikeHtml = srcDoc.includes("<html") || srcDoc.includes("<!doctype") || srcDoc.includes("<!DOCTYPE");
+  const looksLikeHtml = html.includes("<html") || html.includes("<!doctype") || html.includes("<!DOCTYPE");
 
-  if (!looksLikeHtml && srcDoc.length > 0) {
+  if (!looksLikeHtml && html.length > 0) {
     return (
       <div className="h-full overflow-auto bg-gray-950 p-6">
         <div className="bg-yellow-900/30 border border-yellow-600/40 rounded-lg p-4 mb-4">
           <p className="text-yellow-300 text-sm font-medium mb-2">Preview Issue — Generated output is not valid HTML</p>
           <p className="text-yellow-200/60 text-xs">The AI returned text that doesn&apos;t appear to be a complete HTML document. First 200 characters shown below:</p>
         </div>
-        <pre className="text-xs text-blue-300/70 whitespace-pre-wrap break-all font-mono">{srcDoc.substring(0, 500)}</pre>
+        <pre className="text-xs text-blue-300/70 whitespace-pre-wrap break-all font-mono">{html.substring(0, 500)}</pre>
       </div>
     );
   }
@@ -625,42 +528,11 @@ export default function PreviewPanel({ html, isGenerating }: PreviewPanelProps) 
   return (
     <div className="relative w-full h-full">
       <iframe
-        ref={iframeRef}
-        srcDoc={srcDoc}
+        srcDoc={html}
         className="w-full h-full border-0 bg-white"
         title="Website preview"
         sandbox="allow-scripts allow-same-origin"
       />
-      {blankDetected && (
-        <div className="absolute bottom-4 left-4 right-4 bg-yellow-900/90 border border-yellow-600/50 rounded-lg p-3 backdrop-blur-sm z-10">
-          <p className="text-yellow-300 text-xs font-medium mb-1">Preview may be blank</p>
-          <p className="text-yellow-200/60 text-[10px] mb-2">
-            The generated site appears empty. This can happen when AI-generated animations hide content.
-          </p>
-          <button
-            onClick={() => {
-              try {
-                const doc = iframeRef.current?.contentDocument;
-                if (doc?.body) {
-                  const all = doc.body.querySelectorAll("*");
-                  all.forEach((el: Element) => {
-                    const htmlEl = el as HTMLElement;
-                    htmlEl.style.setProperty("opacity", "1", "important");
-                    htmlEl.style.setProperty("visibility", "visible", "important");
-                    htmlEl.style.setProperty("transform", "none", "important");
-                    const cs = window.getComputedStyle(htmlEl);
-                    if (cs.display === "none") htmlEl.style.setProperty("display", "block", "important");
-                  });
-                  setBlankDetected(false);
-                }
-              } catch { /* cross-origin */ }
-            }}
-            className="text-[10px] px-3 py-1 rounded bg-yellow-600/30 text-yellow-200 hover:bg-yellow-600/50 transition-colors"
-          >
-            Force Show Content
-          </button>
-        </div>
-      )}
     </div>
   );
 }
