@@ -27,6 +27,8 @@
  */
 
 import Anthropic from "@anthropic-ai/sdk";
+import { callLLM, type LLMProvider } from "./llm-provider";
+import { COMPONENT_LIBRARY_INSTRUCTION, injectComponentLibrary } from "./component-library";
 
 export interface PipelineInput {
   prompt: string;
@@ -34,6 +36,7 @@ export interface PipelineInput {
   style?: "modern" | "classic" | "bold" | "minimal";
   pages?: string[];
   tier?: "standard" | "premium" | "ultra";
+  model?: string; // User-selected model (e.g., "claude-sonnet-4-6", "gpt-4o", "gemini-2.5-pro")
 }
 
 export interface AgentResult {
@@ -335,6 +338,8 @@ Match the visual treatment to the industry detected in the strategy:
 - TWO CTA buttons in hero: primary (filled, prominent shadow) + secondary (outlined/ghost style).
 - Scroll-down indicator in hero: animated bouncing chevron.
 
+${COMPONENT_LIBRARY_INSTRUCTION}
+
 ## What to NEVER DO
 - Dark cyberpunk theme for a bakery, law firm, or dental practice
 - Same purple/cyan palette regardless of industry
@@ -460,28 +465,53 @@ export async function runPipeline(
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error("ANTHROPIC_API_KEY not configured");
 
-  const client = new Anthropic({ apiKey });
   const agents: AgentResult[] = [];
   const startTime = Date.now();
   const isUltra = input.tier === "ultra";
 
-  // Smart model routing — Sonnet 4.6 across all agents for maximum quality
-  const MODEL_PLANNER = "claude-sonnet-4-6";              // Strategist, Brand, Copywriter, Architect — the build plan brain
-  const MODEL_BALANCED = "claude-sonnet-4-6";             // Enhancement & QA agents
-  const MODEL_PREMIUM = "claude-sonnet-4-6";              // Developer agent — builds the actual HTML
+  // Multi-LLM support: if user selected a non-Claude model, use the unified provider
+  const userModel = input.model;
+  const useMultiLLM = userModel && !userModel.startsWith("claude");
+
+  // Smart model routing — default Claude models, overridden by user selection
+  const MODEL_PLANNER = userModel || "claude-sonnet-4-6";
+  const MODEL_BALANCED = userModel || "claude-sonnet-4-6";
+  const MODEL_PREMIUM = userModel || "claude-sonnet-4-6";
+
+  // Helper: call the right LLM based on user selection
+  const llmCall = async (opts: { model: string; maxTokens: number; system: string; userMessage: string }) => {
+    if (useMultiLLM) {
+      const res = await callLLM({
+        model: opts.model,
+        system: opts.system,
+        userMessage: opts.userMessage,
+        maxTokens: opts.maxTokens,
+      });
+      return res.text;
+    } else {
+      // Direct Anthropic SDK for Claude models (fastest path)
+      const client = new Anthropic({ apiKey });
+      const res = await client.messages.create({
+        model: opts.model,
+        max_tokens: opts.maxTokens,
+        system: opts.system,
+        messages: [{ role: "user", content: opts.userMessage }],
+      });
+      return res.content.find((b) => b.type === "text")?.text || "";
+    }
+  };
 
   // ── Phase 1: Strategist ──
   onProgress?.("strategist", "analyzing market & audience");
   const strategyStart = Date.now();
 
-  const strategyRes = await client.messages.create({
+  const strategyText = await llmCall({
     model: MODEL_PLANNER,
-    max_tokens: 8192,
+    maxTokens: 8192,
     system: STRATEGIST_SYSTEM,
-    messages: [{ role: "user", content: `Analyze and create a comprehensive strategy for this brief. If the user has provided specific design/content instructions, incorporate ALL of them into your strategy — do not ignore or simplify any user-specified details.\n\nBRIEF:\n${input.prompt}${input.style ? `\nPreferred style: ${input.style}` : ""}` }],
+    userMessage: `Analyze and create a comprehensive strategy for this brief. If the user has provided specific design/content instructions, incorporate ALL of them into your strategy — do not ignore or simplify any user-specified details.\n\nBRIEF:\n${input.prompt}${input.style ? `\nPreferred style: ${input.style}` : ""}`,
   });
 
-  const strategyText = strategyRes.content.find((b) => b.type === "text")?.text || "";
   const strategySpec = extractJSON(strategyText);
   agents.push({ agent: "Strategist", output: strategyText, duration: Date.now() - strategyStart });
 
@@ -490,26 +520,24 @@ export async function runPipeline(
   onProgress?.("copywriter", "writing content");
   const phase2Start = Date.now();
 
-  const [brandRes, copyRes] = await Promise.all([
-    client.messages.create({
+  const [brandText, copyText] = await Promise.all([
+    llmCall({
       model: MODEL_PLANNER,
-      max_tokens: 8192,
+      maxTokens: 8192,
       system: BRAND_SYSTEM,
-      messages: [{ role: "user", content: `Strategy:\n${strategySpec}\n\nOriginal Brief:\n${input.prompt}${input.style ? `\nStyle: ${input.style}` : ""}\n\nCreate a premium design system. If the brief specifies exact colors, typography, or visual direction, follow those instructions precisely.` }],
+      userMessage: `Strategy:\n${strategySpec}\n\nOriginal Brief:\n${input.prompt}${input.style ? `\nStyle: ${input.style}` : ""}\n\nCreate a premium design system. If the brief specifies exact colors, typography, or visual direction, follow those instructions precisely.`,
     }),
-    client.messages.create({
+    llmCall({
       model: MODEL_PLANNER,
-      max_tokens: 16000,
+      maxTokens: 16000,
       system: COPYWRITER_SYSTEM,
-      messages: [{ role: "user", content: `Strategy:\n${strategySpec}\n\nOriginal Brief:\n${input.prompt}\n\nWrite all website copy. If the brief includes specific copy suggestions, section names, or content structure, incorporate them exactly as specified. Match tone to audience.` }],
+      userMessage: `Strategy:\n${strategySpec}\n\nOriginal Brief:\n${input.prompt}\n\nWrite all website copy. If the brief includes specific copy suggestions, section names, or content structure, incorporate them exactly as specified. Match tone to audience.`,
     }),
   ]);
 
-  const brandText = brandRes.content.find((b) => b.type === "text")?.text || "";
   const brandSpec = extractJSON(brandText);
   agents.push({ agent: "Brand Designer", output: brandText, duration: Date.now() - phase2Start });
 
-  const copyText = copyRes.content.find((b) => b.type === "text")?.text || "";
   const copySpec = extractJSON(copyText);
   agents.push({ agent: "Copywriter", output: copyText, duration: Date.now() - phase2Start });
 
@@ -517,34 +545,27 @@ export async function runPipeline(
   onProgress?.("architect", "planning structure");
   const archStart = Date.now();
 
-  const archRes = await client.messages.create({
+  const archText = await llmCall({
     model: MODEL_PLANNER,
-    max_tokens: 8192,
+    maxTokens: 8192,
     system: ARCHITECT_SYSTEM,
-    messages: [{
-      role: "user",
-      content: `Strategy:\n${strategySpec}\n\nDesign:\n${brandSpec}\n\nCopy:\n${copySpec}\n\nOriginal Brief:\n${input.prompt}\n\nPlan the optimal page structure and section order. If the brief specifies a sitemap, section order, or specific page structure, follow that structure.`,
-    }],
+    userMessage: `Strategy:\n${strategySpec}\n\nDesign:\n${brandSpec}\n\nCopy:\n${copySpec}\n\nOriginal Brief:\n${input.prompt}\n\nPlan the optimal page structure and section order. If the brief specifies a sitemap, section order, or specific page structure, follow that structure.`,
   });
 
-  const archText = archRes.content.find((b) => b.type === "text")?.text || "";
   const archSpec = extractJSON(archText);
   agents.push({ agent: "Architect", output: archText, duration: Date.now() - archStart });
 
   onProgress?.("developer", "building website");
   const devStart = Date.now();
 
-  const devRes = await client.messages.create({
+  const devText = await llmCall({
     model: MODEL_PREMIUM,
-    max_tokens: 64000,
+    maxTokens: 64000,
     system: DEVELOPER_SYSTEM,
-    messages: [{
-      role: "user",
-      content: `STRATEGY:\n${strategySpec}\n\nDESIGN SPEC:\n${brandSpec}\n\nCOPY:\n${copySpec}\n\nARCHITECTURE:\n${archSpec}\n\nORIGINAL BRIEF:\n${input.prompt}\n\nBuild the complete HTML website. Follow all specs exactly. If the original brief contains specific visual, copy, or structural instructions, those take priority.`,
-    }],
+    userMessage: `STRATEGY:\n${strategySpec}\n\nDESIGN SPEC:\n${brandSpec}\n\nCOPY:\n${copySpec}\n\nARCHITECTURE:\n${archSpec}\n\nORIGINAL BRIEF:\n${input.prompt}\n\nBuild the complete HTML website. Follow all specs exactly. If the original brief contains specific visual, copy, or structural instructions, those take priority.`,
   });
 
-  let html = cleanHtml(devRes.content.find((b) => b.type === "text")?.text || "");
+  let html = cleanHtml(devText);
   agents.push({ agent: "Developer", output: `[${html.length} chars HTML]`, duration: Date.now() - devStart });
 
   // ── Phase 4: Animation + SEO + Forms (Parallel) — ALL tiers ──
@@ -554,39 +575,33 @@ export async function runPipeline(
     onProgress?.("forms", "enhancing form functionality");
     const phase4Start = Date.now();
 
-    const [animRes, seoRes, formsRes] = await Promise.all([
-      client.messages.create({
+    const [animText, seoText, formsText] = await Promise.all([
+      llmCall({
         model: MODEL_BALANCED,
-        max_tokens: 64000,
+        maxTokens: 64000,
         system: ANIMATION_SYSTEM,
-        messages: [{ role: "user", content: `Add premium animations to this website:\n\n${html}` }],
+        userMessage: `Add premium animations to this website:\n\n${html}`,
       }),
-      client.messages.create({
+      llmCall({
         model: MODEL_BALANCED,
-        max_tokens: 64000,
+        maxTokens: 64000,
         system: SEO_SYSTEM,
-        messages: [{ role: "user", content: `Add comprehensive SEO markup to this website:\n\n${html}` }],
+        userMessage: `Add comprehensive SEO markup to this website:\n\n${html}`,
       }),
-      client.messages.create({
+      llmCall({
         model: MODEL_BALANCED,
-        max_tokens: 64000,
+        maxTokens: 64000,
         system: FORMS_SYSTEM,
-        messages: [{ role: "user", content: `Make all forms functional in this website:\n\n${html}` }],
+        userMessage: `Make all forms functional in this website:\n\n${html}`,
       }),
     ]);
 
     // Use animation result as base (it adds the most visual code)
-    let enhancedHtml = cleanHtml(animRes.content.find((b) => b.type === "text")?.text || "");
-
-    // Extract SEO additions from seo result
-    const seoHtml = seoRes.content.find((b) => b.type === "text")?.text || "";
-    const formsHtml = formsRes.content.find((b) => b.type === "text")?.text || "";
+    let enhancedHtml = cleanHtml(animText);
 
     // Use the animation-enhanced version as the primary, with SEO meta injected
-    // Extract <head> content from SEO version and merge meta tags
-    const seoHeadMatch = seoHtml.match(/<head>([\s\S]*?)<\/head>/i);
+    const seoHeadMatch = seoText.match(/<head>([\s\S]*?)<\/head>/i);
     if (seoHeadMatch) {
-      // Extract meta/link/script tags from SEO head that don't exist in current
       const seoMetaTags = seoHeadMatch[1].match(/<meta[^>]*>|<link[^>]*>|<script type="application\/ld\+json">[\s\S]*?<\/script>/gi) || [];
       const newTags = seoMetaTags.filter(tag =>
         tag.includes('og:') || tag.includes('twitter:') || tag.includes('ld+json') || tag.includes('canonical')
@@ -597,9 +612,8 @@ export async function runPipeline(
     }
 
     // Extract form enhancements from forms result
-    const formsScriptMatch = formsHtml.match(/<script>([\s\S]*?)<\/script>\s*<\/body>/i);
+    const formsScriptMatch = formsText.match(/<script>([\s\S]*?)<\/script>\s*<\/body>/i);
     if (formsScriptMatch && formsScriptMatch[1].includes('addEventListener')) {
-      // Merge form validation JS into existing script
       const formJS = formsScriptMatch[1];
       if (formJS.length > 200) {
         enhancedHtml = enhancedHtml.replace('</body>', `<script>\n// Form Enhancement\n${formJS}\n</script>\n</body>`);
@@ -617,14 +631,14 @@ export async function runPipeline(
   onProgress?.("integrations", "adding third-party integrations");
   const intStart = Date.now();
 
-  const intRes = await client.messages.create({
+  const intText = await llmCall({
     model: MODEL_BALANCED,
-    max_tokens: 64000,
+    maxTokens: 64000,
     system: INTEGRATIONS_SYSTEM,
-    messages: [{ role: "user", content: `Add essential integrations to this website:\n\n${html}` }],
+    userMessage: `Add essential integrations to this website:\n\n${html}`,
   });
 
-  const intHtml = cleanHtml(intRes.content.find((b) => b.type === "text")?.text || "");
+  const intHtml = cleanHtml(intText);
   if (intHtml.length > 100) {
     html = intHtml;
   }
@@ -634,17 +648,13 @@ export async function runPipeline(
   onProgress?.("qa", "quality review");
   const qaStart = Date.now();
 
-  const qaRes = await client.messages.create({
+  const qaText = await llmCall({
     model: MODEL_BALANCED,
-    max_tokens: 64000,
+    maxTokens: 64000,
     system: QA_SYSTEM,
-    messages: [{
-      role: "user",
-      content: `Review this website HTML for quality:\n\n${html}`,
-    }],
+    userMessage: `Review this website HTML for quality:\n\n${html}`,
   });
 
-  const qaText = qaRes.content.find((b) => b.type === "text")?.text || "";
   agents.push({ agent: "QA Engineer", output: qaText, duration: Date.now() - qaStart });
 
   // Apply QA fixes if any
@@ -656,6 +666,9 @@ export async function runPipeline(
   } catch {
     // QA output wasn't valid JSON, keep current HTML
   }
+
+  // Inject the Zoobicon Component Library CSS for consistent polish
+  html = injectComponentLibrary(html);
 
   return {
     html,

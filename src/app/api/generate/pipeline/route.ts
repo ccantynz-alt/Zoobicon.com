@@ -23,7 +23,7 @@ export const maxDuration = 300; // Allow up to 5 minutes for full pipeline
 
 export async function POST(req: NextRequest) {
   try {
-    const { prompt, style, tier } = await req.json();
+    const { prompt, style, tier, model } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       return NextResponse.json({ error: "A prompt is required" }, { status: 400 });
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     const validTiers = ["standard", "premium", "ultra"];
     const selectedTier = validTiers.includes(tier) ? tier : "standard";
 
-    const result = await runPipeline({ prompt, style, tier: selectedTier });
+    const result = await runPipeline({ prompt, style, tier: selectedTier, model });
 
     return NextResponse.json({
       html: result.html,

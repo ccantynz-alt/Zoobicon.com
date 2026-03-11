@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState, useCallback } from "react";
-import { Mic, MicOff, Sparkles, Zap, Pencil, Send, Check } from "lucide-react";
+import { Mic, MicOff, Sparkles, Zap, Pencil, Send, Check, ChevronDown, Cpu } from "lucide-react";
 
 interface SpeechResult {
   isFinal: boolean;
@@ -26,6 +26,13 @@ interface SpeechRecognitionInstance {
 
 export type Tier = "standard" | "premium";
 
+export interface AIModel {
+  provider: string;
+  id: string;
+  label: string;
+  tier: string;
+}
+
 interface PromptInputProps {
   prompt: string;
   onPromptChange: (value: string) => void;
@@ -37,6 +44,9 @@ interface PromptInputProps {
   editPrompt: string;
   onEditPromptChange: (value: string) => void;
   onEdit: () => void;
+  selectedModel?: string;
+  onModelChange?: (modelId: string) => void;
+  availableModels?: AIModel[];
 }
 
 const EXAMPLE_PROMPTS = [
@@ -61,12 +71,16 @@ export default function PromptInput({
   editPrompt,
   onEditPromptChange,
   onEdit,
+  selectedModel,
+  onModelChange,
+  availableModels,
 }: PromptInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const editInputRef = useRef<HTMLTextAreaElement>(null);
   const [isMac, setIsMac] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [micSupported, setMicSupported] = useState(false);
+  const [showModelPicker, setShowModelPicker] = useState(false);
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
 
   useEffect(() => {
@@ -253,6 +267,60 @@ export default function PromptInput({
           100% { background-position: 200% 0; }
         }
       `}</style>
+
+      {/* Model selector */}
+      {availableModels && availableModels.length > 0 && onModelChange && (
+        <div className="relative">
+          <button
+            onClick={() => setShowModelPicker(!showModelPicker)}
+            className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.06] hover:border-white/10 transition-colors text-left"
+          >
+            <div className="flex items-center gap-2 min-w-0">
+              <Cpu className="w-3.5 h-3.5 text-brand-400/60 flex-shrink-0" />
+              <span className="text-[10px] uppercase tracking-wider text-white/40 flex-shrink-0">Model</span>
+              <span className="text-xs text-white/70 truncate">
+                {availableModels.find(m => m.id === selectedModel)?.label || "Claude Sonnet 4.6"}
+              </span>
+            </div>
+            <ChevronDown className={`w-3.5 h-3.5 text-white/30 transition-transform ${showModelPicker ? "rotate-180" : ""}`} />
+          </button>
+          {showModelPicker && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-[#12121a] border border-white/[0.08] rounded-lg shadow-2xl z-50 max-h-[240px] overflow-y-auto">
+              {(["claude", "openai", "gemini"] as const).map(provider => {
+                const providerModels = availableModels.filter(m => m.provider === provider);
+                if (providerModels.length === 0) return null;
+                return (
+                  <div key={provider}>
+                    <div className="px-3 py-1.5 text-[9px] uppercase tracking-widest text-white/20 border-b border-white/[0.04]">
+                      {provider === "claude" ? "Anthropic" : provider === "openai" ? "OpenAI" : "Google"}
+                    </div>
+                    {providerModels.map(model => (
+                      <button
+                        key={model.id}
+                        onClick={() => { onModelChange(model.id); setShowModelPicker(false); }}
+                        className={`w-full flex items-center justify-between px-3 py-2 text-left hover:bg-white/[0.04] transition-colors ${
+                          selectedModel === model.id ? "bg-brand-500/10" : ""
+                        }`}
+                      >
+                        <span className={`text-xs ${selectedModel === model.id ? "text-brand-400" : "text-white/60"}`}>
+                          {model.label}
+                        </span>
+                        <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${
+                          model.tier === "premium" ? "bg-amber-500/10 text-amber-400/60" :
+                          model.tier === "fast" ? "bg-emerald-500/10 text-emerald-400/60" :
+                          "bg-blue-500/10 text-blue-400/60"
+                        }`}>
+                          {model.tier}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Main textarea */}
       <div className="relative flex-1 min-h-0">
