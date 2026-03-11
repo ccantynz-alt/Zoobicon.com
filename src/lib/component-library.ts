@@ -133,17 +133,34 @@ ul, ol { list-style: none; }
 .font-semibold { font-weight: 600; }
 
 /* ── Animation Utilities ── */
-.fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
-.fade-in.visible { opacity: 1; transform: translateY(0); }
-.fade-in-left { opacity: 0; transform: translateX(-30px); transition: opacity 0.6s ease, transform 0.6s ease; }
-.fade-in-left.visible { opacity: 1; transform: translateX(0); }
-.fade-in-right { opacity: 0; transform: translateX(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
-.fade-in-right.visible { opacity: 1; transform: translateX(0); }
-.scale-in { opacity: 0; transform: scale(0.95); transition: opacity 0.5s ease, transform 0.5s ease; }
-.scale-in.visible { opacity: 1; transform: scale(1); }
+/* Progressive enhancement: elements are VISIBLE by default.
+   JS adds .will-animate to hide them, then IntersectionObserver adds .visible to reveal.
+   If JS fails, content stays visible — no more blank pages. */
+.fade-in, .fade-in-left, .fade-in-right, .scale-in {
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.fade-in.will-animate { opacity: 0; transform: translateY(20px); }
+.fade-in-left.will-animate { opacity: 0; transform: translateX(-30px); }
+.fade-in-right.will-animate { opacity: 0; transform: translateX(30px); }
+.scale-in.will-animate { opacity: 0; transform: scale(0.95); }
+.fade-in.visible, .fade-in-left.visible, .fade-in-right.visible, .scale-in.visible {
+  opacity: 1; transform: translate(0) scale(1);
+}
+
+/* Failsafe: auto-reveal after 2.5s even if JS observer never fires */
+@keyframes zbcn-auto-reveal { to { opacity: 1; transform: none; } }
+.fade-in.will-animate, .fade-in-left.will-animate, .fade-in-right.will-animate, .scale-in.will-animate {
+  animation: zbcn-auto-reveal 0.6s ease forwards 2.5s;
+}
+.fade-in.visible, .fade-in-left.visible, .fade-in-right.visible, .scale-in.visible {
+  animation: none; /* Cancel failsafe once properly revealed */
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .fade-in, .fade-in-left, .fade-in-right, .scale-in { transition: none; opacity: 1; transform: none; }
+  .fade-in, .fade-in-left, .fade-in-right, .scale-in,
+  .fade-in.will-animate, .fade-in-left.will-animate, .fade-in-right.will-animate, .scale-in.will-animate {
+    transition: none; opacity: 1; transform: none; animation: none;
+  }
 }
 
 /* ── Scroll Progress Bar ── */
@@ -232,21 +249,61 @@ IMPORTANT: Include the full component library CSS at the TOP of your <style> blo
 `;
 
 /**
- * Inject the component library CSS into generated HTML
+ * Failsafe observer script — ensures fade-in elements actually appear.
+ * 1. Adds .will-animate to hide elements (progressive enhancement)
+ * 2. Uses IntersectionObserver to add .visible when scrolled into view
+ * 3. Has a hard timeout: force-reveals everything after 3s no matter what
+ */
+const FAILSAFE_OBSERVER_SCRIPT = `
+<script>
+(function(){
+  var sel = '.fade-in, .fade-in-left, .fade-in-right, .scale-in';
+  var els = document.querySelectorAll(sel);
+  // Step 1: hide elements that JS will animate
+  els.forEach(function(el){ el.classList.add('will-animate'); });
+  // Step 2: reveal on scroll
+  if ('IntersectionObserver' in window) {
+    var obs = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    els.forEach(function(el){ obs.observe(el); });
+  } else {
+    els.forEach(function(el){ el.classList.add('visible'); });
+  }
+  // Step 3: hard failsafe — show EVERYTHING after 3s
+  setTimeout(function(){
+    document.querySelectorAll(sel + ':not(.visible)').forEach(function(el){
+      el.classList.add('visible');
+    });
+  }, 3000);
+})();
+</script>`;
+
+/**
+ * Inject the component library CSS + failsafe observer into generated HTML
  */
 export function injectComponentLibrary(html: string): string {
   // Check if already injected
   if (html.includes("ZOOBICON COMPONENT LIBRARY")) return html;
 
-  // Inject at the top of the <style> block
+  // Inject CSS at the top of the <style> block
   const styleMatch = html.match(/<style>/i);
   if (styleMatch) {
-    return html.replace(/<style>/i, `<style>\n${COMPONENT_LIBRARY_CSS}\n\n/* ── Custom Styles ── */\n`);
+    html = html.replace(/<style>/i, `<style>\n${COMPONENT_LIBRARY_CSS}\n\n/* ── Custom Styles ── */\n`);
+  } else {
+    // If no style tag, inject before </head>
+    html = html.replace(
+      /<\/head>/i,
+      `<style>\n${COMPONENT_LIBRARY_CSS}\n</style>\n</head>`
+    );
   }
 
-  // If no style tag, inject before </head>
-  return html.replace(
-    /<\/head>/i,
-    `<style>\n${COMPONENT_LIBRARY_CSS}\n</style>\n</head>`
-  );
+  // Inject failsafe observer script before </body>
+  if (html.includes("</body>")) {
+    html = html.replace(/<\/body>/i, `${FAILSAFE_OBSERVER_SCRIPT}\n</body>`);
+  }
+
+  return html;
 }

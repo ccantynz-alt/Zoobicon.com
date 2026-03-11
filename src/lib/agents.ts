@@ -568,6 +568,12 @@ export async function runPipeline(
   let html = cleanHtml(devText);
   agents.push({ agent: "Developer", output: `[${html.length} chars HTML]`, duration: Date.now() - devStart });
 
+  // Critical check: if Developer didn't produce valid HTML, don't waste time on enhancement agents
+  if (html.length < 500 || !/<body/i.test(html)) {
+    console.error("[Pipeline] Developer agent produced invalid/empty HTML, aborting enhancements");
+    throw new Error("Developer agent failed to produce a valid website. Please try again.");
+  }
+
   // ── Phase 4: Animation + SEO + Forms (Parallel) — ALL tiers ──
   {
     onProgress?.("animation", "adding scroll effects");
@@ -596,10 +602,10 @@ export async function runPipeline(
       }),
     ]);
 
-    // Use animation result as base (it adds the most visual code)
-    let enhancedHtml = cleanHtml(animText);
+    // Safely use animation result as base — only if it's valid and substantial
+    let enhancedHtml = safeReplaceHtml(html, animText, "Animator");
 
-    // Use the animation-enhanced version as the primary, with SEO meta injected
+    // Merge SEO meta tags from the SEO agent into the enhanced HTML
     const seoHeadMatch = seoText.match(/<head>([\s\S]*?)<\/head>/i);
     if (seoHeadMatch) {
       const seoMetaTags = seoHeadMatch[1].match(/<meta[^>]*>|<link[^>]*>|<script type="application\/ld\+json">[\s\S]*?<\/script>/gi) || [];
@@ -638,10 +644,7 @@ export async function runPipeline(
     userMessage: `Add essential integrations to this website:\n\n${html}`,
   });
 
-  const intHtml = cleanHtml(intText);
-  if (intHtml.length > 100) {
-    html = intHtml;
-  }
+  html = safeReplaceHtml(html, intText, "Integrations");
   agents.push({ agent: "Integrations", output: `[integrations added]`, duration: Date.now() - intStart });
 
   // ── Final Phase: QA Agent ──
@@ -657,11 +660,11 @@ export async function runPipeline(
 
   agents.push({ agent: "QA Engineer", output: qaText, duration: Date.now() - qaStart });
 
-  // Apply QA fixes if any
+  // Apply QA fixes if any — safely validated
   try {
     const qaJSON = JSON.parse(extractJSON(qaText));
     if (qaJSON.fixedHtml && qaJSON.fixedHtml.trim().length > 100) {
-      html = cleanHtml(qaJSON.fixedHtml);
+      html = safeReplaceHtml(html, qaJSON.fixedHtml, "QA Engineer");
     }
   } catch {
     // QA output wasn't valid JSON, keep current HTML
@@ -698,4 +701,33 @@ function cleanHtml(raw: string): string {
     html = html.slice(0, htmlEnd + "</html>".length);
   }
   return html.trim();
+}
+
+/**
+ * Safely replace HTML only if the new version is valid and substantial.
+ * Prevents enhancement agents from destroying the Developer's output
+ * with truncated, empty, or non-HTML responses.
+ */
+function safeReplaceHtml(current: string, candidate: string, agentName: string): string {
+  const cleaned = cleanHtml(candidate);
+  // Must contain basic HTML structure
+  const hasHtmlTag = /<html/i.test(cleaned);
+  const hasBody = /<body/i.test(cleaned);
+  const hasClosingHtml = /<\/html>/i.test(cleaned);
+  // Must be at least 50% the size of the original (enhancement shouldn't halve the page)
+  const sizeRatio = cleaned.length / current.length;
+
+  if (!hasHtmlTag || !hasBody || !hasClosingHtml) {
+    console.warn(`[Pipeline] ${agentName} returned invalid HTML (missing tags), keeping previous version`);
+    return current;
+  }
+  if (sizeRatio < 0.5) {
+    console.warn(`[Pipeline] ${agentName} output too small (${Math.round(sizeRatio * 100)}% of original), keeping previous version`);
+    return current;
+  }
+  if (cleaned.length < 500) {
+    console.warn(`[Pipeline] ${agentName} output suspiciously small (${cleaned.length} chars), keeping previous version`);
+    return current;
+  }
+  return cleaned;
 }
