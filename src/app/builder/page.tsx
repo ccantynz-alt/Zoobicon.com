@@ -631,9 +631,14 @@ export default function BuilderPage() {
                   return;
                 }
               } else {
-                // Retry request failed — clear HTML and show error
+                // Retry request failed — read actual error and show it
+                let retryErrMsg = "Generation failed after retries. Please try again.";
+                try {
+                  const retryErrData = await retryRes.json();
+                  if (retryErrData.error) retryErrMsg = retryErrData.error;
+                } catch { /* ignore parse errors */ }
                 setGeneratedCode("");
-                setError("Generation failed after retries. Please try again.");
+                setError(retryErrMsg);
                 setStatus("error");
                 return;
               }
