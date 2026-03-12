@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -19,6 +20,9 @@ import {
   Check,
   Star,
   MonitorPlay,
+  LayoutDashboard,
+  LogOut,
+  User,
 } from "lucide-react";
 
 const fadeInUp = {
@@ -54,6 +58,20 @@ const STYLES = [
 ];
 
 export default function VideoCreatorPage() {
+  const [user, setUser] = useState<{ email: string; name?: string; role?: string } | null>(null);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("zoobicon_user");
+      if (stored) setUser(JSON.parse(stored));
+    } catch { /* Safari private mode / storage unavailable */ }
+  }, []);
+
+  const handleLogout = () => {
+    try { localStorage.removeItem("zoobicon_user"); } catch {}
+    setUser(null);
+  };
+
   return (
     <div className="relative min-h-screen">
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
@@ -74,9 +92,33 @@ export default function VideoCreatorPage() {
             <span className="text-xs text-white/20">/</span>
             <span className="text-sm text-white/50">AI Video Creator</span>
           </div>
-          <Link href="/auth/signup" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white">
-            <span>Create Video</span>
-          </Link>
+          <div className="flex items-center gap-4">
+            {user ? (
+              <>
+                <Link href="/dashboard" className="text-sm text-white/50 hover:text-white transition-colors px-4 py-2 flex items-center gap-1.5">
+                  <LayoutDashboard className="w-3.5 h-3.5" />
+                  Dashboard
+                </Link>
+                <button onClick={handleLogout} className="text-sm text-white/50 hover:text-white transition-colors px-4 py-2 flex items-center gap-1.5">
+                  <LogOut className="w-3.5 h-3.5" />
+                  Sign out
+                </button>
+                <Link href="/builder" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white flex items-center gap-2">
+                  <User className="w-3.5 h-3.5" />
+                  <span>{user.name || user.email.split("@")[0]}</span>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href="/auth/login" className="text-sm text-white/50 hover:text-white transition-colors px-4 py-2">
+                  Sign in
+                </Link>
+                <Link href="/auth/signup" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white">
+                  <span>Create Video</span>
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </nav>
 
@@ -100,9 +142,9 @@ export default function VideoCreatorPage() {
             </motion.p>
 
             <motion.div variants={fadeInUp} className="flex flex-wrap gap-4 mb-16">
-              <Link href="/auth/signup" className="group btn-gradient px-8 py-4 rounded-2xl text-base font-bold text-white flex items-center gap-3 shadow-glow-purple">
+              <Link href={user ? "/builder" : "/auth/signup"} className="group btn-gradient px-8 py-4 rounded-2xl text-base font-bold text-white flex items-center gap-3 shadow-glow-purple">
                 <Play className="w-5 h-5" />
-                <span>Create Your First Video</span>
+                <span>{user ? "Go to Builder" : "Create Your First Video"}</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </motion.div>
@@ -228,9 +270,9 @@ export default function VideoCreatorPage() {
             Your First Video<br /><span className="gradient-text">In Under 2 Minutes</span>
           </h2>
           <p className="text-lg text-white/40 mb-8">No editing skills. No scripts. No templates. Just AI magic.</p>
-          <Link href="/auth/signup" className="inline-flex group btn-gradient px-10 py-4 rounded-2xl text-lg font-bold text-white items-center gap-3 shadow-glow-lg">
+          <Link href={user ? "/builder" : "/auth/signup"} className="inline-flex group btn-gradient px-10 py-4 rounded-2xl text-lg font-bold text-white items-center gap-3 shadow-glow-lg">
             <Play className="w-5 h-5" />
-            <span>Create Your First Video</span>
+            <span>{user ? "Go to Builder" : "Create Your First Video"}</span>
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
