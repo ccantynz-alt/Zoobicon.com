@@ -545,7 +545,6 @@ export async function runPipeline(
 
   // Helper: call the right LLM based on user selection
   // Returns { text, stopReason } so we can detect truncation
-  // Optional prefill parameter: starts the assistant's response with given content (Anthropic API technique)
   const llmCall = async (opts: { model: string; maxTokens: number; system: string; userMessage: string }): Promise<{ text: string; stopReason: string }> => {
     if (useMultiLLM) {
       const res = await callLLM({
