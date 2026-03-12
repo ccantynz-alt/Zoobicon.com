@@ -482,154 +482,127 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-28 pb-20 lg:pt-40 lg:pb-32 overflow-hidden min-h-screen flex items-center">
-        {/* Deep space nebula background */}
-        <div className="aurora-hero" />
-        <div className="hero-orb hero-orb-1" />
-        <div className="hero-orb hero-orb-2" />
-        <div className="hero-orb hero-orb-3" />
-        {/* Central energy core — soft radial glow */}
-        <div className="hero-core" />
-        {/* Starfield */}
-        <div className="hero-starfield">
-          <div className="hero-star" />
-          <div className="hero-star" />
-          <div className="hero-star" />
-          <div className="hero-star" />
-          <div className="hero-star" />
-          <div className="hero-star" />
-          <div className="hero-star" />
-          <div className="hero-star" />
-          <div className="hero-star" />
-          <div className="hero-star" />
-          <div className="hero-star" />
-          <div className="hero-star" />
+      <section className="relative overflow-hidden min-h-screen flex items-center pt-16">
+        {/* Clean dark background with subtle ambient light */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-[800px] h-[800px] rounded-full bg-blue-600/[0.04] blur-[150px]" />
+          <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] rounded-full bg-indigo-600/[0.03] blur-[130px]" />
         </div>
-        {/* Floating energy particles */}
-        <div className="hero-particles">
-          <div className="hero-particle" />
-          <div className="hero-particle" />
-          <div className="hero-particle" />
-          <div className="hero-particle" />
-          <div className="hero-particle" />
-          <div className="hero-particle" />
-          <div className="hero-particle" />
-          <div className="hero-particle" />
-        </div>
-        {/* Depth vignette */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#06060e]/60 via-transparent to-[#06060e] pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,#06060e_100%)] pointer-events-none" />
-        {/* Top accent line */}
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-500/30 to-transparent" />
 
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center relative z-10 w-full">
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={staggerContainer}
-          >
-            {/* Live Badge */}
-            <motion.div variants={fadeInUp} className="flex justify-center mb-8">
-              <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full border border-violet-400/15 bg-white/[0.03] backdrop-blur-xl shadow-[0_0_30px_rgba(139,92,246,0.06)]">
-                <div className="relative flex items-center gap-1.5">
-                  <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
-                  <div className="absolute w-2 h-2 rounded-full bg-emerald-400 animate-ping opacity-75" />
-                </div>
-                <span className="text-xs font-medium text-white/70">{liveCount} building right now</span>
-                <span className="text-white/10">|</span>
-                <span className="text-xs text-white/35">10,000+ sites launched</span>
-              </div>
-            </motion.div>
-
-            {/* Main Headline */}
-            <motion.h1
-              variants={fadeInUp}
-              className="hero-shimmer mb-8"
-            >
-              <span className="block text-[3.2rem] sm:text-[4.5rem] md:text-[5.5rem] lg:text-[7rem] font-black tracking-[-0.04em] leading-[0.85] text-white">
-                The AI that builds
-              </span>
-              <span className="block text-[3.2rem] sm:text-[4.5rem] md:text-[5.5rem] lg:text-[7rem] font-black tracking-[-0.04em] leading-[0.85] mt-2">
-                <AnimatePresence mode="wait">
-                  <motion.span
-                    key={wordIndex}
-                    initial={{ opacity: 0, y: 40, filter: "blur(10px)" }}
-                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                    exit={{ opacity: 0, y: -40, filter: "blur(10px)" }}
-                    transition={{ duration: 0.5, ease: "easeOut" }}
-                    className="inline-block gradient-text-hero"
-                  >
-                    {ROTATING_WORDS[wordIndex]}
-                  </motion.span>
-                </AnimatePresence>
-              </span>
-              <span className="block text-[2.8rem] sm:text-[3.8rem] md:text-[4.5rem] lg:text-[5.5rem] font-black tracking-[-0.03em] leading-[0.9] mt-2 gradient-text-sub">
-                while you watch.
-              </span>
-            </motion.h1>
-
-            {/* Sub headline */}
-            <motion.p
-              variants={fadeInUp}
-              className="max-w-2xl mx-auto text-lg md:text-xl lg:text-2xl text-white/50 leading-relaxed mb-10"
-            >
-              Describe what you want. <span className="text-white/80">10 AI agents</span> design, code,
-              optimize, and deploy it live — in seconds, not weeks.
-            </motion.p>
-
-            {/* Social proof row */}
-            <motion.div variants={fadeInUp} className="flex flex-wrap justify-center items-center gap-6 mb-10">
-              <div className="flex -space-x-2">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="w-8 h-8 rounded-full border-2 border-[#06060e] bg-gradient-to-br from-violet-400 to-fuchsia-600 flex items-center justify-center text-[10px] font-bold text-white">
-                    {String.fromCharCode(65 + i)}
-                  </div>
-                ))}
-              </div>
-              <div className="flex items-center gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-                ))}
-                <span className="text-sm text-white/40 ml-1.5">4.9/5 from 2,400+ reviews</span>
-              </div>
-            </motion.div>
-
-            {/* CTAs */}
-            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-              <Link
-                href="/builder"
-                className="cta-glow group relative px-12 py-5 rounded-2xl text-lg font-bold text-white flex items-center gap-3 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-violet-600 hover:shadow-[0_0_60px_rgba(139,92,246,0.4),0_0_100px_rgba(217,70,239,0.15)] hover:-translate-y-1 transition-all duration-300"
-              >
-                <Sparkles className="w-5 h-5" />
-                <span>Start Building — It&apos;s Free</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
-              </Link>
-              <Link href="/pricing" className="group px-10 py-5 rounded-2xl text-base font-medium text-slate-200 hover:text-white transition-all flex items-center gap-3 border border-white/10 hover:border-white/20 bg-white/[0.03] hover:bg-white/[0.06] backdrop-blur-sm">
-                <Play className="w-4 h-4 text-violet-400" />
-                <span>See Pricing</span>
-              </Link>
-            </motion.div>
-
-            {/* No credit card text */}
-            <motion.p variants={fadeInUp} className="text-xs text-white/25 mb-20">
-              No credit card required. Build unlimited sites on the free plan.
-            </motion.p>
-
-            {/* Hero Visual - Builder Demo */}
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 w-full relative z-10 py-20 lg:py-28">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Left — Text */}
             <motion.div
-              variants={fadeInUp}
-              className="relative max-w-5xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
             >
-              {/* Glow behind the demo */}
-              <div className="absolute -inset-8 bg-gradient-to-r from-violet-600/12 via-fuchsia-500/6 to-violet-600/12 rounded-3xl blur-3xl pointer-events-none" />
-              <div className="absolute -inset-1 rounded-2xl pointer-events-none bg-gradient-to-r from-violet-500/15 via-transparent to-fuchsia-500/15" />
-              {/* Frame */}
-              <div className="relative rounded-2xl overflow-hidden ring-1 ring-white/[0.08] shadow-[0_25px_100px_rgba(139,92,246,0.15),0_0_60px_rgba(217,70,239,0.06),0_10px_40px_rgba(0,0,0,0.5)]">
-                <BuilderDemo />
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-bold uppercase tracking-wider mb-8">
+                AI-POWERED PLATFORM
               </div>
-              {/* Ambient glow underneath */}
-              <div className="absolute -bottom-40 left-1/2 -translate-x-1/2 w-[80%] h-80 bg-gradient-to-r from-violet-500/8 via-fuchsia-500/10 to-violet-500/8 blur-[140px] rounded-full pointer-events-none" />
+
+              <h1 className="text-[2.75rem] sm:text-[3.5rem] lg:text-[4.5rem] font-black tracking-[-0.03em] leading-[1.05] mb-6 text-white">
+                Build, deploy, grow{" "}
+                <span className="block text-white/50">your online presence</span>
+              </h1>
+
+              <p className="text-lg text-white/45 leading-relaxed mb-8 max-w-lg">
+                Your all-in-one AI platform for building websites, marketing, and scaling online.
+                10 AI agents work together to create production-ready sites in seconds.
+              </p>
+
+              <div className="flex flex-wrap items-center gap-4 mb-10">
+                <Link
+                  href="/builder"
+                  className="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl text-base font-bold hover:from-blue-600 hover:to-indigo-700 transition-all shadow-[0_0_30px_rgba(59,130,246,0.2),0_8px_24px_rgba(59,130,246,0.15)] hover:shadow-[0_0_40px_rgba(59,130,246,0.3),0_12px_32px_rgba(59,130,246,0.2)] hover:-translate-y-0.5 duration-300"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  Start Building Free
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+                <Link
+                  href="#products"
+                  className="inline-flex items-center gap-2 px-6 py-4 text-white/60 text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors border border-white/10 hover:border-white/20 rounded-xl"
+                >
+                  Explore Services
+                </Link>
+              </div>
+
+              <p className="text-xs text-white/25">
+                No credit card required. Build unlimited sites on the free plan.
+              </p>
             </motion.div>
+
+            {/* Right — Service cards (SiteGround style) */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.2 }}
+              className="hidden lg:block"
+            >
+              <div className="space-y-3">
+                {[
+                  { icon: Globe, label: "Build a website", active: false },
+                  { icon: Search, label: "Optimize for SEO", active: false },
+                  { icon: Sparkles, label: "Generate with AI", active: true },
+                  { icon: Video, label: "Create videos", active: false },
+                  { icon: Mail, label: "Send email campaigns", active: false },
+                  { icon: Globe, label: "Register a domain", active: false },
+                ].map((item, i) => (
+                  <motion.div
+                    key={item.label}
+                    initial={{ opacity: 0, x: 30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 0.3 + i * 0.08 }}
+                  >
+                    <Link
+                      href={i === 0 ? "/products/website-builder" : i === 1 ? "/products/seo-agent" : i === 2 ? "/builder" : i === 3 ? "/products/video-creator" : i === 5 ? "/domains" : "#products"}
+                      className={`flex items-center gap-4 px-6 py-4 rounded-xl transition-all duration-200 group ${
+                        item.active
+                          ? "bg-white/[0.08] border border-white/[0.12] shadow-[0_0_20px_rgba(59,130,246,0.06)]"
+                          : "bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] hover:border-white/[0.1]"
+                      }`}
+                    >
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                        item.active ? "bg-blue-500/15" : "bg-white/[0.04]"
+                      }`}>
+                        <item.icon className={`w-5 h-5 ${item.active ? "text-blue-400" : "text-white/40 group-hover:text-white/60"} transition-colors`} />
+                      </div>
+                      <span className={`text-sm font-medium ${item.active ? "text-white" : "text-white/50 group-hover:text-white/70"} transition-colors`}>
+                        {item.label}
+                      </span>
+                      {item.active && (
+                        <div className="ml-auto w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
+                          <Check className="w-3 h-3 text-white" />
+                        </div>
+                      )}
+                      {!item.active && (
+                        <ChevronRight className="ml-auto w-4 h-4 text-white/15 group-hover:text-white/30 transition-colors" />
+                      )}
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Trust bar at bottom of hero */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="mt-16 lg:mt-24 pt-8 border-t border-white/[0.06]"
+          >
+            <div className="flex flex-wrap items-center justify-center gap-6">
+              <div className="flex items-center gap-1.5">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-emerald-400 text-emerald-400" />
+                ))}
+              </div>
+              <span className="text-sm text-white/50">
+                Top rated — <span className="text-white/70 font-semibold">4.9 out of 5 stars</span>. Trusted by the builders of 10,000+ websites.
+              </span>
+            </div>
           </motion.div>
         </div>
       </section>
