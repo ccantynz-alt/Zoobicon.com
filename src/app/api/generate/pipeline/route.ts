@@ -48,6 +48,7 @@ export async function POST(req: NextRequest) {
       tier: selectedTier,
       agentCount: result.agents.length,
       pipeline: true,
+      ...(result.reactComponents ? { reactComponents: result.reactComponents } : {}),
     });
   } catch (err) {
     console.error("Pipeline error:", err);

@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
+import { generateImage } from "@/lib/image-gen";
 
 /**
  * AI Image Engine — replaces placeholder images with contextually relevant ones.
  *
- * Phase 1 (current): Uses Unsplash API for high-quality, relevant photos based on
- * semantic analysis of the page content.
- *
- * Phase 2 (future): Integrate with image generation APIs (DALL-E, Stability AI)
- * for truly custom, unique images.
+ * Uses a multi-provider cascade:
+ * 1. DALL-E 3 (if OPENAI_API_KEY set) — AI-generated custom images
+ * 2. Stability AI SDXL (if STABILITY_API_KEY set) — alternative AI generation
+ * 3. Unsplash API (if UNSPLASH_ACCESS_KEY set) — high-quality stock photos
+ * 4. Curated Unsplash photos (no key needed) — hand-picked fallbacks
  *
  * POST /api/generate/images
- * Body: { html: string, style?: "photo" | "illustration" | "minimal" }
+ * Body: { html: string, style?: "photo" | "illustration" | "minimal", useAI?: boolean }
  * Returns: { html: string, replacements: Array<{ original: string, replacement: string, query: string }> }
  */
 
@@ -126,7 +127,7 @@ function parseDimensions(url: string): { width: number; height: number } {
 
 export async function POST(req: NextRequest) {
   try {
-    const { html, style = "photo" } = await req.json();
+    const { html, style = "photo", useAI = false } = await req.json();
 
     if (!html || typeof html !== "string") {
       return NextResponse.json({ error: "HTML content is required" }, { status: 400 });
@@ -155,6 +156,27 @@ export async function POST(req: NextRequest) {
       const query = generateSearchQuery(context, i);
 
       let replacement: string;
+
+      // Try AI image generation if requested and API keys are available
+      if (useAI && (process.env.OPENAI_API_KEY || process.env.STABILITY_API_KEY)) {
+        try {
+          const aiImage = await generateImage({
+            prompt: `${query}, high quality professional ${style} for website`,
+            width,
+            height,
+            style: style as "photo" | "illustration" | "3d" | "artistic",
+            quality: "standard",
+          });
+          if (aiImage && aiImage.provider !== "placeholder") {
+            replacement = aiImage.url;
+            replacements.push({ original, replacement, query: `[AI:${aiImage.provider}] ${query}` });
+            updatedHtml = updatedHtml.split(original).join(replacement);
+            continue;
+          }
+        } catch {
+          // Fall through to Unsplash
+        }
+      }
 
       if (unsplashKey) {
         // Use Unsplash API for high-quality contextual images

@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Loader2 } from "lucide-react";
+import { Send, Bot, User, Loader2, Zap } from "lucide-react";
 
 interface ChatMessage {
   role: "user" | "assistant";
   content: string;
   timestamp: number;
+  editMode?: string;
 }
 
 interface ChatPanelProps {
@@ -15,10 +16,53 @@ interface ChatPanelProps {
   isVisible: boolean;
 }
 
+/** Splice an edited section back into the full HTML using the original section as anchor */
+function spliceSection(fullHtml: string, originalSection: string, editedSection: string): string {
+  const idx = fullHtml.indexOf(originalSection);
+  if (idx === -1) return fullHtml; // fallback: can't find section, return unchanged
+  return fullHtml.slice(0, idx) + editedSection + fullHtml.slice(idx + originalSection.length);
+}
+
+/** Splice edited CSS back into the <style> block */
+function spliceCss(fullHtml: string, editedCss: string): string {
+  return fullHtml.replace(
+    /(<style[^>]*>)([\s\S]*?)(<\/style>)/i,
+    `$1${editedCss}$3`
+  );
+}
+
+/** Detect the section from HTML that matches a section name (mirrors server-side detection) */
+function findSectionHtml(html: string, sectionName: string): string | null {
+  const SECTION_PATTERNS: Record<string, RegExp[]> = {
+    hero: [/<section[^>]*(?:hero|banner|jumbotron)[^>]*>[\s\S]*?<\/section>/gi],
+    header: [/<header[^>]*>[\s\S]*?<\/header>/gi, /<nav[^>]*>[\s\S]*?<\/nav>/gi],
+    nav: [/<nav[^>]*>[\s\S]*?<\/nav>/gi],
+    footer: [/<footer[^>]*>[\s\S]*?<\/footer>/gi],
+    pricing: [/<section[^>]*(?:pricing|plans)[^>]*>[\s\S]*?<\/section>/gi],
+    features: [/<section[^>]*(?:features|benefits|services)[^>]*>[\s\S]*?<\/section>/gi],
+    about: [/<section[^>]*(?:about|story|mission)[^>]*>[\s\S]*?<\/section>/gi],
+    testimonials: [/<section[^>]*(?:testimonial|review|quote)[^>]*>[\s\S]*?<\/section>/gi],
+    contact: [/<section[^>]*(?:contact|form|cta)[^>]*>[\s\S]*?<\/section>/gi],
+    faq: [/<section[^>]*(?:faq|question|accordion)[^>]*>[\s\S]*?<\/section>/gi],
+    cta: [/<section[^>]*(?:cta|call-to-action)[^>]*>[\s\S]*?<\/section>/gi],
+  };
+
+  const patterns = SECTION_PATTERNS[sectionName];
+  if (!patterns) return null;
+
+  for (const pattern of patterns) {
+    pattern.lastIndex = 0;
+    const match = pattern.exec(html);
+    if (match) return match[0];
+  }
+  return null;
+}
+
 export default function ChatPanel({ currentCode, onCodeUpdate, isVisible }: ChatPanelProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [editMode, setEditMode] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -35,6 +79,7 @@ export default function ChatPanel({ currentCode, onCodeUpdate, isVisible }: Chat
     const userMsg: ChatMessage = { role: "user", content: instruction, timestamp: Date.now() };
     setMessages((prev) => [...prev, userMsg]);
     setIsLoading(true);
+    setEditMode(null);
 
     try {
       const response = await fetch("/api/chat", {
@@ -52,7 +97,9 @@ export default function ChatPanel({ currentCode, onCodeUpdate, isVisible }: Chat
       if (!reader) throw new Error("No stream");
 
       const decoder = new TextDecoder();
-      let fullCode = "";
+      let fullOutput = "";
+      let mode: string = "full";
+      let sectionName: string | null = null;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -65,8 +112,12 @@ export default function ChatPanel({ currentCode, onCodeUpdate, isVisible }: Chat
           if (!line.startsWith("data: ")) continue;
           try {
             const data = JSON.parse(line.slice(6));
-            if (data.type === "chunk") {
-              fullCode += data.content;
+            if (data.type === "meta") {
+              mode = data.editMode || "full";
+              sectionName = data.sectionName || null;
+              setEditMode(mode);
+            } else if (data.type === "chunk") {
+              fullOutput += data.content;
             } else if (data.type === "error") {
               throw new Error(data.content);
             }
@@ -77,23 +128,43 @@ export default function ChatPanel({ currentCode, onCodeUpdate, isVisible }: Chat
         }
       }
 
-      // Robust HTML cleaning — strip code fences, preamble, trailing text
-      let cleanCode = fullCode.trim();
-      cleanCode = cleanCode.replace(/^```(?:html|HTML)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
-      const docStart = cleanCode.search(/<!doctype\s+html|<html/i);
-      if (docStart > 0) cleanCode = cleanCode.slice(docStart);
-      const htmlEnd = cleanCode.lastIndexOf("</html>");
-      if (htmlEnd !== -1) cleanCode = cleanCode.slice(0, htmlEnd + "</html>".length);
-      cleanCode = cleanCode.trim();
+      // Clean the output
+      let cleanOutput = fullOutput.trim();
+      cleanOutput = cleanOutput.replace(/^```(?:html|css|HTML|CSS)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
 
-      if (cleanCode) {
-        onCodeUpdate(cleanCode);
+      let finalHtml: string;
+
+      if (mode === "css-only" && currentCode) {
+        // Splice edited CSS back into the style block
+        finalHtml = spliceCss(currentCode, cleanOutput);
+      } else if (mode === "targeted" && sectionName && currentCode) {
+        // Find the original section and splice in the edited version
+        const originalSection = findSectionHtml(currentCode, sectionName);
+        if (originalSection) {
+          finalHtml = spliceSection(currentCode, originalSection, cleanOutput);
+        } else {
+          // Fallback: treat as full replacement
+          finalHtml = cleanOutput;
+        }
+      } else {
+        // Full document edit — standard cleaning
+        const docStart = cleanOutput.search(/<!doctype\s+html|<html/i);
+        if (docStart > 0) cleanOutput = cleanOutput.slice(docStart);
+        const htmlEnd = cleanOutput.lastIndexOf("</html>");
+        if (htmlEnd !== -1) cleanOutput = cleanOutput.slice(0, htmlEnd + "</html>".length);
+        finalHtml = cleanOutput.trim();
       }
 
+      if (finalHtml) {
+        onCodeUpdate(finalHtml);
+      }
+
+      const modeLabel = mode === "css-only" ? "Style update" : mode === "targeted" ? `${sectionName} section updated` : "Full edit";
       const assistantMsg: ChatMessage = {
         role: "assistant",
-        content: "Changes applied! Check the preview.",
+        content: `${modeLabel} applied! Check the preview.`,
         timestamp: Date.now(),
+        editMode: mode,
       };
       setMessages((prev) => [...prev, assistantMsg]);
     } catch (err) {
@@ -104,6 +175,7 @@ export default function ChatPanel({ currentCode, onCodeUpdate, isVisible }: Chat
       ]);
     } finally {
       setIsLoading(false);
+      setEditMode(null);
     }
   };
 
@@ -175,6 +247,11 @@ export default function ChatPanel({ currentCode, onCodeUpdate, isVisible }: Chat
               }`}
             >
               {msg.content}
+              {msg.editMode && msg.editMode !== "full" && (
+                <span className="flex items-center gap-1 mt-1 text-[10px] text-brand-400/60">
+                  <Zap className="w-2.5 h-2.5" /> {msg.editMode === "css-only" ? "Fast CSS edit" : "Targeted edit"}
+                </span>
+              )}
             </div>
             {msg.role === "user" && (
               <div className="w-6 h-6 rounded-full bg-white/[0.06] flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -190,7 +267,11 @@ export default function ChatPanel({ currentCode, onCodeUpdate, isVisible }: Chat
               <Loader2 className="w-3 h-3 text-brand-400 animate-spin" />
             </div>
             <div className="px-3 py-2 rounded-xl text-xs bg-white/[0.04] text-white/40">
-              Editing your website...
+              {editMode === "css-only"
+                ? "Updating styles..."
+                : editMode === "targeted"
+                ? "Editing section..."
+                : "Editing your website..."}
             </div>
           </div>
         )}
