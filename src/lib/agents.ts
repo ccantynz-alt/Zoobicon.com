@@ -546,7 +546,7 @@ export async function runPipeline(
   // Helper: call the right LLM based on user selection
   // Returns { text, stopReason } so we can detect truncation
   // Optional prefill parameter: starts the assistant's response with given content (Anthropic API technique)
-  const llmCall = async (opts: { model: string; maxTokens: number; system: string; userMessage: string; prefill?: string }): Promise<{ text: string; stopReason: string }> => {
+  const llmCall = async (opts: { model: string; maxTokens: number; system: string; userMessage: string }): Promise<{ text: string; stopReason: string }> => {
     if (useMultiLLM) {
       const res = await callLLM({
         model: opts.model,
@@ -554,16 +554,13 @@ export async function runPipeline(
         userMessage: opts.userMessage,
         maxTokens: opts.maxTokens,
       });
-      return { text: (opts.prefill || "") + res.text, stopReason: "end_turn" };
+      return { text: res.text, stopReason: "end_turn" };
     } else {
       // Direct Anthropic SDK for Claude models (fastest path)
       const client = new Anthropic({ apiKey });
       const messages: { role: "user" | "assistant"; content: string }[] = [
         { role: "user", content: opts.userMessage },
       ];
-      if (opts.prefill) {
-        messages.push({ role: "assistant", content: opts.prefill });
-      }
       const res = await client.messages.create({
         model: opts.model,
         max_tokens: opts.maxTokens,
@@ -571,8 +568,7 @@ export async function runPipeline(
         messages,
       });
       const text = res.content.find((b) => b.type === "text")?.text || "";
-      // Prepend prefill since the API response only contains what comes AFTER the prefill
-      return { text: (opts.prefill || "") + text, stopReason: res.stop_reason || "unknown" };
+      return { text, stopReason: res.stop_reason || "unknown" };
     }
   };
 
@@ -652,22 +648,13 @@ export async function runPipeline(
     return { valid: bodyText.length >= 100, bodyChars: bodyText.length };
   }
 
-  const devUserMessage = `STRATEGY:\n${strategySpec}\n\nDESIGN SPEC:\n${brandSpec}\n\nCOPY:\n${copySpec}\n\nARCHITECTURE:\n${archSpec}\n\nORIGINAL BRIEF:\n${input.prompt}\n\nBuild the complete HTML website. Follow all specs exactly. If the original brief contains specific visual, copy, or structural instructions, those take priority.\n\nCRITICAL REMINDER: The <body> must contain ALL the copy content from the COPY section above. Write the full page content inside <body> — headers, sections, text, images, everything. Do NOT produce only CSS with an empty body.`;
-
-  // Assistant prefill: force the model to start writing HTML structure immediately.
-  // This prevents the model from spending all tokens on CSS before reaching <body>.
-  const DEV_PREFILL = `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">`;
+  const devUserMessage = `STRATEGY:\n${strategySpec}\n\nDESIGN SPEC:\n${brandSpec}\n\nCOPY:\n${copySpec}\n\nARCHITECTURE:\n${archSpec}\n\nORIGINAL BRIEF:\n${input.prompt}\n\nBuild the complete HTML website. Follow all specs exactly. If the original brief contains specific visual, copy, or structural instructions, those take priority.\n\nCRITICAL REMINDER: The <body> must contain ALL the copy content from the COPY section above. Write the full page content inside <body> — headers, sections, text, images, everything. Do NOT produce only CSS with an empty body.\n\nIMPORTANT: Start your response IMMEDIATELY with <!DOCTYPE html> — no preamble, no explanation, no code fences. Output raw HTML only.`;
 
   let devResult = await llmCall({
     model: MODEL_PREMIUM,
     maxTokens: 64000,
     system: DEVELOPER_SYSTEM,
     userMessage: devUserMessage,
-    prefill: DEV_PREFILL,
   });
 
   let html = cleanHtml(devResult.text);
