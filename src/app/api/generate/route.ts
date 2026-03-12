@@ -136,23 +136,9 @@ export async function POST(req: NextRequest) {
       maxTokens = 64000;
     }
 
-    // Assistant prefill: force the model to start writing HTML structure immediately.
-    // This prevents the model from spending all tokens on CSS with an empty body.
-    const PREFILL_NEW = `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">`;
-
     const messages: { role: "user" | "assistant"; content: string }[] = [
-      { role: "user", content: userMessage },
+      { role: "user", content: userMessage + (!isEdit ? "\n\nIMPORTANT: Start your response IMMEDIATELY with <!DOCTYPE html> — no preamble, no explanation, no code fences. Output raw HTML only." : "") },
     ];
-
-    // Only prefill for new builds (not edits)
-    const prefill = !isEdit ? PREFILL_NEW : "";
-    if (prefill) {
-      messages.push({ role: "assistant", content: prefill });
-    }
 
     const message = await client.messages.create({
       model,
@@ -169,8 +155,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Prepend the prefill content since the API response only contains what comes AFTER the prefill
-    let html = (prefill + textBlock.text).trim();
+    let html = textBlock.text.trim();
 
     // Strip markdown code fences if present
     if (html.startsWith("```")) {

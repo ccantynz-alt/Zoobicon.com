@@ -134,24 +134,9 @@ export async function POST(req: NextRequest) {
       maxTokens = 64000;
     }
 
-    // Assistant prefill: force the model to start writing HTML structure immediately.
-    // This prevents the model from spending all tokens on CSS with an empty body.
-    // For new builds, we prefill through </head><body> so the model MUST write body content.
-    const PREFILL_NEW = `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">`;
-
     const messages: { role: "user" | "assistant"; content: string }[] = [
-      { role: "user", content: userMessage },
+      { role: "user", content: userMessage + (!isEdit ? "\n\nIMPORTANT: Start your response IMMEDIATELY with <!DOCTYPE html> — no preamble, no explanation, no code fences. Output raw HTML only." : "") },
     ];
-
-    // Only prefill for new builds (not edits) — edits need to see the full existing HTML first
-    const prefill = !isEdit ? PREFILL_NEW : "";
-    if (prefill) {
-      messages.push({ role: "assistant", content: prefill });
-    }
 
     let stream;
     try {
@@ -179,13 +164,7 @@ export async function POST(req: NextRequest) {
     const readable = new ReadableStream({
       async start(controller) {
         try {
-          // Send the prefill content as the first chunk so the client has the full HTML
-          let accumulated = prefill;
-          if (prefill) {
-            controller.enqueue(
-              encoder.encode(`data: ${JSON.stringify({ type: "chunk", content: prefill })}\n\n`)
-            );
-          }
+          let accumulated = "";
 
           for await (const event of stream) {
             if (
