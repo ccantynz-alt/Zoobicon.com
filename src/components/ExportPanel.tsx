@@ -8,9 +8,9 @@ interface ExportResult {
   projectName: string;
 }
 
-export default function ExportPanel({ code }: { code: string }) {
+export default function ExportPanel({ code, reactSource }: { code: string; reactSource?: Record<string, string> | null }) {
   const [loading, setLoading] = useState(false);
-  const [exportType, setExportType] = useState<"static" | "nextjs">("static");
+  const [exportType, setExportType] = useState<"static" | "nextjs" | "react">("static");
   const [projectName, setProjectName] = useState("my-zoobicon-site");
 
   // Check if user has a paid plan
@@ -23,11 +23,113 @@ export default function ExportPanel({ code }: { code: string }) {
     } catch { return false; }
   })();
 
+  const hasReact = reactSource && Object.keys(reactSource).length >= 3;
+
+  const downloadFiles = async (files: Record<string, string>) => {
+    for (const [path, content] of Object.entries(files)) {
+      const fileBlob = new Blob([content], { type: "text/plain" });
+      const url = URL.createObjectURL(fileBlob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = path.replace(/\//g, "_");
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      await new Promise((r) => setTimeout(r, 200));
+    }
+  };
+
+  const buildReactProject = (name: string, components: Record<string, string>): Record<string, string> => {
+    const files: Record<string, string> = {};
+
+    files["package.json"] = JSON.stringify({
+      name,
+      version: "0.1.0",
+      private: true,
+      scripts: {
+        dev: "next dev",
+        build: "next build",
+        start: "next start",
+        lint: "next lint",
+      },
+      dependencies: {
+        next: "^14.2.0",
+        react: "^18.3.0",
+        "react-dom": "^18.3.0",
+        "class-variance-authority": "^0.7.0",
+        clsx: "^2.1.0",
+        "tailwind-merge": "^2.2.0",
+        "lucide-react": "^0.400.0",
+      },
+      devDependencies: {
+        typescript: "^5.4.0",
+        "@types/node": "^20.0.0",
+        "@types/react": "^18.3.0",
+        "@types/react-dom": "^18.3.0",
+        tailwindcss: "^3.4.0",
+        postcss: "^8.4.0",
+        autoprefixer: "^10.4.0",
+      },
+    }, null, 2);
+
+    files["tsconfig.json"] = JSON.stringify({
+      compilerOptions: {
+        target: "es5",
+        lib: ["dom", "dom.iterable", "esnext"],
+        allowJs: true,
+        skipLibCheck: true,
+        strict: true,
+        noEmit: true,
+        esModuleInterop: true,
+        module: "esnext",
+        moduleResolution: "bundler",
+        resolveJsonModule: true,
+        isolatedModules: true,
+        jsx: "preserve",
+        incremental: true,
+        plugins: [{ name: "next" }],
+        paths: { "@/*": ["./src/*"] },
+      },
+      include: ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+      exclude: ["node_modules"],
+    }, null, 2);
+
+    files["next.config.js"] = `/** @type {import('next').NextConfig} */\nconst nextConfig = {};\nmodule.exports = nextConfig;\n`;
+
+    files["tailwind.config.ts"] = `import type { Config } from "tailwindcss";\n\nconst config: Config = {\n  content: ["./src/**/*.{ts,tsx}"],\n  theme: { extend: {} },\n  plugins: [],\n};\nexport default config;\n`;
+
+    files["postcss.config.js"] = `module.exports = {\n  plugins: {\n    tailwindcss: {},\n    autoprefixer: {},\n  },\n};\n`;
+
+    files[".gitignore"] = "node_modules/\n.next/\nout/\n.env*.local\n";
+
+    files["src/app/globals.css"] = "@tailwind base;\n@tailwind components;\n@tailwind utilities;\n";
+
+    files["src/app/layout.tsx"] = `import type { Metadata } from "next";\nimport "./globals.css";\n\nexport const metadata: Metadata = {\n  title: "${name}",\n  description: "Built with Zoobicon",\n};\n\nexport default function RootLayout({ children }: { children: React.ReactNode }) {\n  return (\n    <html lang="en">\n      <body>{children}</body>\n    </html>\n  );\n}\n`;
+
+    files["src/lib/utils.ts"] = `import { clsx, type ClassValue } from "clsx";\nimport { twMerge } from "tailwind-merge";\n\nexport function cn(...inputs: ClassValue[]) {\n  return twMerge(clsx(inputs));\n}\n`;
+
+    // Add all decomposed components
+    for (const [filename, source] of Object.entries(components)) {
+      const path = filename.startsWith("src/") ? filename : `src/components/${filename}`;
+      files[path] = source;
+    }
+
+    return files;
+  };
+
   const handleExport = async () => {
     if (!code) return;
     if (!isPaidUser) return; // Guard rail: free tier cannot export
     setLoading(true);
     try {
+      // React export: build project from decomposed components
+      if (exportType === "react" && reactSource && Object.keys(reactSource).length > 0) {
+        const files = buildReactProject(projectName, reactSource);
+        await downloadFiles(files);
+        return;
+      }
+
       const res = await fetch("/api/export/github", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -38,26 +140,7 @@ export default function ExportPanel({ code }: { code: string }) {
 
       const data: ExportResult = await res.json();
 
-      // Create a downloadable zip-like structure as individual files
-      // For now, download as a single JSON with all files
-      const blob = new Blob([JSON.stringify(data.files, null, 2)], {
-        type: "application/json",
-      });
-
-      // Create individual file downloads
-      for (const [path, content] of Object.entries(data.files)) {
-        const fileBlob = new Blob([content], { type: "text/plain" });
-        const url = URL.createObjectURL(fileBlob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = path.replace(/\//g, "_");
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        // Small delay between downloads
-        await new Promise((r) => setTimeout(r, 200));
-      }
+      await downloadFiles(data.files);
     } catch {
       // silent
     } finally {
@@ -83,6 +166,9 @@ export default function ExportPanel({ code }: { code: string }) {
             </div>
             <div className="flex items-center gap-2 text-xs text-white/40">
               <span className="w-1 h-1 rounded-full bg-brand-400" /> Next.js project scaffold
+            </div>
+            <div className="flex items-center gap-2 text-xs text-white/40">
+              <span className="w-1 h-1 rounded-full bg-purple-400" /> React + shadcn/ui components
             </div>
             <div className="flex items-center gap-2 text-xs text-white/40">
               <span className="w-1 h-1 rounded-full bg-brand-400" /> GitHub-ready with configs
@@ -147,6 +233,21 @@ export default function ExportPanel({ code }: { code: string }) {
             <FolderOpen size={14} />
             Next.js
           </button>
+          <button
+            onClick={() => setExportType("react")}
+            disabled={!hasReact}
+            title={hasReact ? "React + shadcn/ui components" : "Generate a site first to get React components"}
+            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-medium transition-colors ${
+              exportType === "react"
+                ? "bg-purple-500/20 text-purple-400 border border-purple-500/30"
+                : hasReact
+                  ? "bg-white/5 text-white/50 border border-white/10 hover:text-white/70"
+                  : "bg-white/5 text-white/20 border border-white/10 cursor-not-allowed"
+            }`}
+          >
+            <FileCode size={14} />
+            React
+          </button>
         </div>
       </div>
 
@@ -177,7 +278,7 @@ export default function ExportPanel({ code }: { code: string }) {
             <div>vercel.json</div>
             <div>netlify.toml</div>
           </div>
-        ) : (
+        ) : exportType === "nextjs" ? (
           <div className="text-xs text-white/60 space-y-0.5 font-mono">
             <div>src/app/page.tsx</div>
             <div>src/app/layout.tsx</div>
@@ -187,6 +288,19 @@ export default function ExportPanel({ code }: { code: string }) {
             <div>tailwind.config.ts</div>
             <div>tsconfig.json</div>
             <div>.gitignore</div>
+          </div>
+        ) : (
+          <div className="text-xs text-white/60 space-y-0.5 font-mono">
+            <div>src/app/page.tsx</div>
+            <div>src/app/layout.tsx</div>
+            <div>src/app/globals.css</div>
+            <div>src/lib/utils.ts</div>
+            {hasReact && Object.keys(reactSource!).map((f) => (
+              <div key={f}>{f.startsWith("src/") ? f : `src/components/${f}`}</div>
+            ))}
+            <div>package.json</div>
+            <div>tailwind.config.ts</div>
+            <div>tsconfig.json</div>
           </div>
         )}
       </div>
