@@ -481,18 +481,33 @@ export default function LandingPage() {
         )}
       </nav>
 
-      {/* Hero Section */}
+      {/* Hero Section — Sci-Fi Portal */}
       <section className="relative pt-28 pb-20 lg:pt-40 lg:pb-32 overflow-hidden min-h-screen flex items-center">
-        {/* Layered background effects */}
+        {/* Deep space background layers */}
         <div className="aurora-hero" />
         <div className="hero-orb hero-orb-1" />
         <div className="hero-orb hero-orb-2" />
         <div className="hero-orb hero-orb-3" />
         <div className="hero-grid" />
         <div className="hero-spotlight" />
-        <div className="hero-light-line" style={{ top: "30%" }} />
-        <div className="hero-light-line" style={{ top: "70%", animationDelay: "3s" }} />
-        {/* Floating particles */}
+        <div className="hero-scanlines" />
+        {/* Portal rings */}
+        <div className="hero-ring hero-ring-1" />
+        <div className="hero-ring hero-ring-2" />
+        <div className="hero-ring hero-ring-3" />
+        {/* Energy lines */}
+        <div className="hero-light-line" style={{ top: "25%" }} />
+        <div className="hero-light-line" style={{ top: "75%", animationDelay: "2.5s" }} />
+        {/* Warp speed streaks */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="hero-warp-line" />
+          <div className="hero-warp-line" />
+          <div className="hero-warp-line" />
+          <div className="hero-warp-line" />
+          <div className="hero-warp-line" />
+          <div className="hero-warp-line" />
+        </div>
+        {/* Floating energy particles */}
         <div className="hero-particles">
           <div className="hero-particle" />
           <div className="hero-particle" />
@@ -503,11 +518,12 @@ export default function LandingPage() {
           <div className="hero-particle" />
           <div className="hero-particle" />
         </div>
-        {/* Radial gradient fade at bottom */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0b0b11]/30 via-transparent to-[#0b0b11] pointer-events-none" />
-        {/* Top edge glow */}
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent" />
-        {/* Extra cinematic light beams */}
+        {/* Radial vignette */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050510]/40 via-transparent to-[#050510] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,#050510_100%)] pointer-events-none" />
+        {/* Top neon edge */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#00f0ff]/50 to-transparent" />
+        {/* Energy beams */}
         <div className="hero-beam hero-beam-1" />
         <div className="hero-beam hero-beam-2" />
 
@@ -517,109 +533,108 @@ export default function LandingPage() {
             animate="visible"
             variants={staggerContainer}
           >
-            {/* Live Badge */}
-            <motion.div variants={fadeInUp} className="flex justify-center mb-8">
-              <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full border border-blue-400/25 bg-gradient-to-r from-blue-500/[0.08] via-indigo-500/[0.06] to-violet-500/[0.08] backdrop-blur-xl shadow-[0_0_30px_rgba(59,130,246,0.12)]">
+            {/* Holographic Status Badge */}
+            <motion.div variants={fadeInUp} className="flex justify-center mb-10">
+              <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full border border-[#00f0ff]/20 bg-gradient-to-r from-[#00f0ff]/[0.06] via-purple-500/[0.04] to-[#00f0ff]/[0.06] backdrop-blur-2xl shadow-[0_0_40px_rgba(0,240,255,0.08),inset_0_0_20px_rgba(0,240,255,0.03)]">
                 <div className="relative flex items-center gap-1.5">
-                  <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
-                  <div className="absolute w-2 h-2 rounded-full bg-emerald-400 animate-ping opacity-75" />
+                  <div className="w-2 h-2 rounded-full bg-[#00f0ff] shadow-[0_0_10px_rgba(0,240,255,0.9)]" />
+                  <div className="absolute w-2 h-2 rounded-full bg-[#00f0ff] animate-ping opacity-60" />
                 </div>
-                <span className="text-xs font-semibold text-blue-100/90 tracking-wide">{liveCount} people building right now</span>
-                <span className="text-white/20">|</span>
-                <span className="text-xs font-medium text-white/50">10,000+ sites launched</span>
+                <span className="text-xs font-semibold text-[#00f0ff]/90 tracking-wider uppercase">{liveCount} Agents Online</span>
+                <span className="text-[#00f0ff]/20">|</span>
+                <span className="text-xs font-medium text-white/40 tracking-wide">10,000+ sites materialized</span>
               </div>
             </motion.div>
 
-            {/* Main Headline — Ultra Large */}
+            {/* Main Headline — Sci-Fi Dramatic */}
             <motion.h1
               variants={fadeInUp}
-              className="hero-shimmer mb-6"
+              className="hero-shimmer mb-8"
             >
-              <span className="block text-[3.2rem] sm:text-[4.5rem] md:text-[5.5rem] lg:text-[7rem] font-black tracking-[-0.04em] leading-[0.85] text-white drop-shadow-[0_0_80px_rgba(59,130,246,0.15)]">
-                Build stunning
+              <span className="block text-[3rem] sm:text-[4rem] md:text-[5rem] lg:text-[6.5rem] font-black tracking-[-0.04em] leading-[0.85] text-white/95 drop-shadow-[0_0_80px_rgba(0,240,255,0.12)]">
+                Conjure
               </span>
-              <span className="block text-[3.2rem] sm:text-[4.5rem] md:text-[5.5rem] lg:text-[7rem] font-black tracking-[-0.04em] leading-[0.85] mt-2">
+              <span className="block text-[3.2rem] sm:text-[4.5rem] md:text-[5.5rem] lg:text-[7rem] font-black tracking-[-0.04em] leading-[0.85] mt-3">
                 <AnimatePresence mode="wait">
                   <motion.span
                     key={wordIndex}
-                    initial={{ opacity: 0, y: 40, filter: "blur(8px)" }}
-                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                    exit={{ opacity: 0, y: -40, filter: "blur(8px)" }}
-                    transition={{ duration: 0.5, ease: "easeOut" }}
+                    initial={{ opacity: 0, y: 50, filter: "blur(12px)", scale: 0.9 }}
+                    animate={{ opacity: 1, y: 0, filter: "blur(0px)", scale: 1 }}
+                    exit={{ opacity: 0, y: -50, filter: "blur(12px)", scale: 1.1 }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
                     className="inline-block gradient-text-hero"
-                    style={{ filter: "brightness(1.2)" }}
                   >
                     {ROTATING_WORDS[wordIndex]}
                   </motion.span>
                 </AnimatePresence>
               </span>
-              <span className="block text-[3.2rem] sm:text-[4.5rem] md:text-[5.5rem] lg:text-[7rem] font-black tracking-[-0.04em] leading-[0.85] text-white/90 mt-2 drop-shadow-[0_0_60px_rgba(139,92,246,0.1)]">
-                in seconds.
+              <span className="block text-[2.8rem] sm:text-[3.8rem] md:text-[4.5rem] lg:text-[5.5rem] font-black tracking-[-0.03em] leading-[0.9] text-white/60 mt-3">
+                from thin air.
               </span>
             </motion.h1>
 
-            {/* Sub headline */}
+            {/* Sub headline — mystical tone */}
             <motion.p
               variants={fadeInUp}
-              className="max-w-3xl mx-auto text-lg md:text-xl lg:text-2xl text-slate-300/90 leading-relaxed mb-10 font-light"
+              className="max-w-2xl mx-auto text-lg md:text-xl lg:text-2xl text-slate-400/90 leading-relaxed mb-10 font-light"
             >
-              Describe what you want. Watch 10 AI agents build it live —{" "}
-              <span className="text-white font-medium">designed, coded, optimized, and deployed</span>{" "}
-              before you finish your coffee.
+              Speak your vision into existence. <span className="text-[#00f0ff]/80 font-medium">10 AI agents</span> materialize it
+              in real-time — designed, coded, and deployed{" "}
+              <span className="text-purple-300/80 font-medium">before your eyes</span>.
             </motion.p>
 
-            {/* Social proof row */}
+            {/* Social proof with holographic feel */}
             <motion.div variants={fadeInUp} className="flex flex-wrap justify-center items-center gap-6 mb-10">
               <div className="flex -space-x-2">
                 {[...Array(5)].map((_, i) => (
-                  <div key={i} className="w-8 h-8 rounded-full border-2 border-[#0b0b11] bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center text-[10px] font-bold text-white">
+                  <div key={i} className="w-8 h-8 rounded-full border-2 border-[#050510] bg-gradient-to-br from-[#00f0ff] to-purple-600 flex items-center justify-center text-[10px] font-bold text-white shadow-[0_0_8px_rgba(0,240,255,0.3)]">
                     {String.fromCharCode(65 + i)}
                   </div>
                 ))}
               </div>
               <div className="flex items-center gap-1">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                  <Star key={i} className="w-4 h-4 fill-[#00f0ff] text-[#00f0ff]" />
                 ))}
-                <span className="text-sm text-white/60 ml-1.5">4.9/5 from 2,400+ reviews</span>
+                <span className="text-sm text-white/40 ml-1.5">4.9/5 from 2,400+ builders</span>
               </div>
             </motion.div>
 
-            {/* CTAs — Bigger, bolder */}
+            {/* CTAs — Neon sci-fi */}
             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
               <Link
                 href="/builder"
-                className="cta-glow group relative px-12 py-5 rounded-2xl text-lg font-bold text-white flex items-center gap-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 hover:shadow-[0_0_80px_rgba(99,102,241,0.5),0_0_120px_rgba(37,99,235,0.2),0_12px_40px_rgba(37,99,235,0.35)] hover:-translate-y-1 transition-all duration-300"
+                className="cta-glow group relative px-12 py-5 rounded-2xl text-lg font-bold text-white flex items-center gap-3 bg-gradient-to-r from-[#00c8ff] via-purple-600 to-[#00f0ff] hover:shadow-[0_0_80px_rgba(0,240,255,0.4),0_0_120px_rgba(168,85,247,0.2)] hover:-translate-y-1 transition-all duration-300 overflow-hidden"
               >
-                <Sparkles className="w-5 h-5" />
-                <span>Start Building — It&apos;s Free</span>
+                <Wand2 className="w-5 h-5" />
+                <span>Summon Your Website</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
               </Link>
-              <Link href="/pricing" className="group px-10 py-5 rounded-2xl text-base font-medium text-slate-200 hover:text-white transition-all flex items-center gap-3 border border-white/15 hover:border-white/25 bg-white/[0.04] hover:bg-white/[0.08] backdrop-blur-sm">
-                <Play className="w-4 h-4 text-violet-400" />
+              <Link href="/pricing" className="group px-10 py-5 rounded-2xl text-base font-medium text-slate-300 hover:text-white transition-all flex items-center gap-3 border border-[#00f0ff]/15 hover:border-[#00f0ff]/30 bg-[#00f0ff]/[0.03] hover:bg-[#00f0ff]/[0.07] backdrop-blur-sm">
+                <Play className="w-4 h-4 text-[#00f0ff]" />
                 <span>See Pricing</span>
               </Link>
             </motion.div>
 
-            {/* No credit card text */}
-            <motion.p variants={fadeInUp} className="text-xs text-white/30 mb-20">
-              No credit card required. Build unlimited sites on the free plan.
+            {/* Subtext */}
+            <motion.p variants={fadeInUp} className="text-xs text-white/25 mb-20 tracking-wide">
+              No credit card required. Unlimited builds on the free tier.
             </motion.p>
 
-            {/* Hero Visual - Live Animated Builder Demo */}
+            {/* Hero Visual - Builder Demo with sci-fi frame */}
             <motion.div
               variants={fadeInUp}
               className="relative max-w-5xl mx-auto"
             >
-              {/* Multi-layered glow behind the demo */}
-              <div className="absolute -inset-6 bg-gradient-to-r from-blue-600/15 via-indigo-500/8 to-violet-600/15 rounded-3xl blur-3xl pointer-events-none" />
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 via-transparent to-violet-500/20 rounded-2xl pointer-events-none" />
-              {/* Premium frame */}
-              <div className="relative rounded-2xl overflow-hidden ring-1 ring-white/[0.12] shadow-[0_25px_100px_rgba(37,99,235,0.18),0_10px_40px_rgba(0,0,0,0.5)]">
+              {/* Multi-layered neon glow behind the demo */}
+              <div className="absolute -inset-8 bg-gradient-to-r from-[#00f0ff]/10 via-purple-600/5 to-[#00f0ff]/10 rounded-3xl blur-3xl pointer-events-none" />
+              <div className="absolute -inset-1 rounded-2xl pointer-events-none bg-gradient-to-r from-[#00f0ff]/15 via-transparent to-purple-500/15" />
+              {/* Sci-fi frame */}
+              <div className="relative rounded-2xl overflow-hidden ring-1 ring-[#00f0ff]/[0.15] shadow-[0_25px_100px_rgba(0,240,255,0.12),0_0_60px_rgba(168,85,247,0.08),0_10px_40px_rgba(0,0,0,0.5)]">
                 <BuilderDemo />
               </div>
-              {/* Ambient glow under the preview */}
-              <div className="absolute -bottom-40 left-1/2 -translate-x-1/2 w-[90%] h-80 bg-gradient-to-r from-blue-500/8 via-indigo-500/12 to-violet-500/8 blur-[140px] rounded-full pointer-events-none" />
+              {/* Portal glow underneath */}
+              <div className="absolute -bottom-40 left-1/2 -translate-x-1/2 w-[90%] h-80 bg-gradient-to-r from-[#00f0ff]/6 via-purple-500/10 to-[#00f0ff]/6 blur-[140px] rounded-full pointer-events-none" />
             </motion.div>
           </motion.div>
         </div>
