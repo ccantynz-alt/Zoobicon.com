@@ -164,100 +164,87 @@ export async function POST(req: NextRequest) {
       messages.push({ role: "assistant", content: prefill });
     }
 
-    const message = await client.messages.create({
-      model,
-      max_tokens: maxTokens,
-      system: systemPrompt,
-      messages,
-    });
-
-    const textBlock = message.content.find((block) => block.type === "text");
-    if (!textBlock || textBlock.type !== "text") {
-      return NextResponse.json(
-        { error: "No response generated" },
-        { status: 500 }
-      );
+    // Helper: extract body text length
+    function getBodyTextLength(rawHtml: string): number {
+      const bodyMatch = rawHtml.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+      if (!bodyMatch) return 0;
+      return bodyMatch[1]
+        .replace(/<script[\s\S]*?<\/script>/gi, "")
+        .replace(/<style[\s\S]*?<\/style>/gi, "")
+        .replace(/<[^>]+>/g, "")
+        .replace(/\s+/g, " ")
+        .trim().length;
     }
 
-    // Prepend the prefill content since the API response only contains what comes AFTER the prefill
-    let html = (prefill + textBlock.text).trim();
-
-    // Strip markdown code fences if present
-    if (html.startsWith("```")) {
-      html = html.replace(/^```(?:html)?\n?/, "").replace(/\n?```$/, "");
+    // Helper: try generating with a specific model
+    async function tryGenerate(tryModel: string, trySystem: string, tryMessages: { role: "user" | "assistant"; content: string }[], tryPrefill: string): Promise<{ html: string; bodyChars: number } | null> {
+      try {
+        const res = await client.messages.create({
+          model: tryModel,
+          max_tokens: maxTokens,
+          system: trySystem,
+          messages: tryMessages,
+        });
+        const textBlock = res.content.find((b) => b.type === "text");
+        const text = textBlock && textBlock.type === "text" ? textBlock.text : "";
+        console.log(`[Generate] model=${tryModel} stop=${res.stop_reason} text_len=${text.length} blocks=${res.content.length}`);
+        let result = (tryPrefill + text).trim();
+        if (result.startsWith("```")) {
+          result = result.replace(/^```(?:html)?\n?/, "").replace(/\n?```$/, "");
+        }
+        const bodyChars = getBodyTextLength(result);
+        return { html: result, bodyChars };
+      } catch (err) {
+        console.error(`[Generate] ${tryModel} error: ${err instanceof Error ? err.message : err}`);
+        return null;
+      }
     }
 
-    // Validate body content — retry up to 2 times if empty
-    if (!isEdit) {
-      const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
-      const bodyText = bodyMatch
-        ? bodyMatch[1]
-            .replace(/<script[\s\S]*?<\/script>/gi, "")
-            .replace(/<style[\s\S]*?<\/style>/gi, "")
-            .replace(/<[^>]+>/g, "")
-            .replace(/\s+/g, " ")
-            .trim()
-        : "";
+    // First attempt: primary model with prefill
+    let result = await tryGenerate(model, systemPrompt, messages, prefill);
+    let html = result?.html || "";
 
-      if (bodyText.length < 100) {
-        console.warn(`[Generate] Empty body detected (${bodyText.length} chars, stop: ${message.stop_reason}). Retrying with body-first prompt...`);
+    // If body is empty, retry with model fallback chain
+    if (!isEdit && (!result || result.bodyChars < 100)) {
+      console.warn(`[Generate] Empty body (${result?.bodyChars || 0} chars). Starting fallback chain...`);
 
-        const BODY_FIRST_SYSTEM = `You are Zoobicon, an elite AI website generator. Output a single, complete HTML file.
+      const BODY_FIRST_SYSTEM = `You are Zoobicon, an elite AI website generator. Output a single, complete HTML file.
 
 ## ABSOLUTE RULE: WRITE THE <body> CONTENT FIRST
-Your #1 job is to fill the <body> with rich, visible content. Structure your output EXACTLY like this:
-
 1. <!DOCTYPE html>, <html>, <head> with meta viewport + title + Google Fonts link
-2. <style> — MAXIMUM 80 lines of CSS. Bare minimum styling only. Use CSS custom properties. NO animations, NO media queries, NO elaborate selectors — just basic layout and colors.
-3. <body> — THIS IS THE MAIN OUTPUT. Must contain ALL sections with real text, real images, real content. This should be 80% of your output.
-4. <script> before </body> for interactivity
+2. <style> — MAXIMUM 80 lines. Bare minimum.
+3. <body> — 80% of output. ALL sections with real content.
+4. <script> before </body>
 
-The <body> MUST contain: navigation, hero section, features/services, about section, testimonials, stats, FAQ, call-to-action, footer. Every section must have real, specific, benefit-focused copy.
+The <body> MUST contain: navigation, hero, features, about, testimonials, stats, FAQ, CTA, footer.
+Output ONLY raw HTML.`;
 
-CRITICAL: Your previous attempt produced a page with CSS but ZERO visible content in the body. This time, write MINIMAL CSS and focus ALL your output on the <body> content.
+      // Fallback chain: same model without prefill → Sonnet with prefill → Sonnet without prefill
+      const fallbackAttempts = [
+        { model: model, system: BODY_FIRST_SYSTEM, usePrefill: false, label: `${model} (no prefill)` },
+        { model: "claude-sonnet-4-6", system: systemPrompt, usePrefill: true, label: "sonnet (with prefill)" },
+        { model: "claude-sonnet-4-6", system: BODY_FIRST_SYSTEM, usePrefill: false, label: "sonnet (no prefill)" },
+      ];
 
-Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for images (specific keywords).
-Import 2 Google Fonts. Use CSS custom properties for colors. Match the industry aesthetic.
-Output ONLY raw HTML — no markdown, no code fences, no explanation.`;
+      for (const attempt of fallbackAttempts) {
+        // Skip if model is same as primary and we already tried (deduplicate Sonnet if primary is already Sonnet)
+        const attemptMessages: { role: "user" | "assistant"; content: string }[] = [
+          { role: "user", content: userMessage },
+        ];
+        const attemptPrefill = attempt.usePrefill ? prefill : "";
+        if (attemptPrefill) {
+          attemptMessages.push({ role: "assistant", content: attemptPrefill });
+        }
 
-        for (let retry = 0; retry < 2; retry++) {
-          try {
-            const retryMessage = await client.messages.create({
-              model,
-              max_tokens: maxTokens,
-              system: BODY_FIRST_SYSTEM,
-              messages: [{ role: "user", content: userMessage }],
-            });
+        console.log(`[Generate] Trying fallback: ${attempt.label}...`);
+        const retryResult = await tryGenerate(attempt.model, attempt.system, attemptMessages, attemptPrefill);
 
-            const retryBlock = retryMessage.content.find((b) => b.type === "text");
-            if (retryBlock && retryBlock.type === "text") {
-              let retryHtml = retryBlock.text.trim();
-              if (retryHtml.startsWith("```")) {
-                retryHtml = retryHtml.replace(/^```(?:html)?\n?/, "").replace(/\n?```$/, "");
-              }
-
-              // Validate the retry actually has body content
-              const retryBodyMatch = retryHtml.match(/<body[^>]*>([\s\S]*)<\/body>/i);
-              const retryBodyText = retryBodyMatch
-                ? retryBodyMatch[1]
-                    .replace(/<script[\s\S]*?<\/script>/gi, "")
-                    .replace(/<style[\s\S]*?<\/style>/gi, "")
-                    .replace(/<[^>]+>/g, "")
-                    .replace(/\s+/g, " ")
-                    .trim()
-                : "";
-
-              if (retryBodyText.length >= 100) {
-                console.log(`[Generate] Retry ${retry + 1} succeeded (${retryBodyText.length} body chars)`);
-                html = retryHtml;
-                break;
-              } else {
-                console.warn(`[Generate] Retry ${retry + 1} still empty (${retryBodyText.length} body chars)`);
-              }
-            }
-          } catch (retryErr) {
-            console.error(`[Generate] Retry ${retry + 1} failed:`, retryErr);
-          }
+        if (retryResult && retryResult.bodyChars >= 100) {
+          console.log(`[Generate] Fallback ${attempt.label} succeeded (${retryResult.bodyChars} body chars)`);
+          html = retryResult.html;
+          break;
+        } else {
+          console.warn(`[Generate] Fallback ${attempt.label} empty (${retryResult?.bodyChars || 0} body chars)`);
         }
       }
     }

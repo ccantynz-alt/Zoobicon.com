@@ -163,7 +163,9 @@ export async function POST(req: NextRequest) {
       messages.push({ role: "assistant", content: prefill });
     }
 
+    // Try to create the stream — with model fallback if the primary model fails
     let stream;
+    let activeModel = model;
     try {
       stream = await client.messages.stream({
         model,
@@ -181,8 +183,27 @@ export async function POST(req: NextRequest) {
           { status: 503, headers: { "Content-Type": "application/json" } }
         );
       }
-      throw apiErr;
+      // If primary model fails (e.g. Opus unavailable), try Sonnet
+      const errMsg = apiErr instanceof Error ? apiErr.message : String(apiErr);
+      console.error(`[Stream] ${model} failed: ${errMsg}. Trying Sonnet fallback...`);
+      if (model !== "claude-sonnet-4-6") {
+        try {
+          activeModel = "claude-sonnet-4-6";
+          stream = await client.messages.stream({
+            model: activeModel,
+            max_tokens: maxTokens,
+            system: systemPrompt,
+            messages,
+          });
+        } catch (fallbackErr) {
+          console.error(`[Stream] Sonnet fallback also failed:`, fallbackErr instanceof Error ? fallbackErr.message : fallbackErr);
+          throw apiErr; // Throw original error
+        }
+      } else {
+        throw apiErr;
+      }
     }
+    console.log(`[Stream] Using model: ${activeModel} (requested: ${model})`);
 
     const encoder = new TextEncoder();
 
@@ -221,78 +242,76 @@ export async function POST(req: NextRequest) {
             : "";
 
           if (!isEdit && bodyText.length < 100) {
-            // Body is empty/near-empty — retry up to 2 times with increasingly aggressive body-first prompts
-            console.warn(`[Stream] Empty body detected (${bodyText.length} chars). Retrying with body-first prompt...`);
+            // Body is empty/near-empty — retry with model fallback: same model without prefill, then Sonnet
+            console.warn(`[Stream] Empty body detected (${bodyText.length} chars, model=${activeModel}). Retrying...`);
             controller.enqueue(
               encoder.encode(`data: ${JSON.stringify({ type: "status", message: "Retrying — generating content..." })}\n\n`)
             );
 
-            const retryPrompts = [
-              `You are Zoobicon, an elite AI website generator. Output a single, complete HTML file.
+            const RETRY_SYSTEM = `You are Zoobicon, an elite AI website generator. Output a single, complete HTML file.
 
 ## ABSOLUTE RULE: WRITE THE <body> CONTENT FIRST
-Your #1 job is to fill the <body> with rich, visible content. Structure your output EXACTLY like this:
-
+Your #1 job is to fill the <body> with rich, visible content:
 1. <!DOCTYPE html>, <html>, <head> with meta viewport + title + Google Fonts link
-2. <style> — MAXIMUM 80 lines of CSS. Use CSS custom properties. Keep it MINIMAL — just colors, fonts, and basic layout. NO animations, NO elaborate selectors.
-3. <body> — THIS IS THE MAIN OUTPUT (80%+ of your response). Must contain ALL sections with real text, real images, real content.
-4. <script> before </body> for interactivity
+2. <style> — MAXIMUM 80 lines of CSS. Keep it MINIMAL.
+3. <body> — THIS IS THE MAIN OUTPUT (80%+). Must contain ALL sections.
+4. <script> before </body>
 
-CRITICAL: Your previous attempt produced CSS but ZERO visible content. This time, write MINIMAL CSS and focus ALL output on <body> content.
+The <body> MUST contain: navigation, hero, features/services, about, testimonials, stats, FAQ, CTA, footer.
+Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for images.
+Output ONLY raw HTML — no markdown, no code fences, no explanation.`;
 
-The <body> MUST contain: navigation, hero section, features/services, about section, testimonials, stats, FAQ, call-to-action, footer. Every section must have real, specific, benefit-focused copy.
-
-Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for images (specific keywords like seed/luxury-shuttle/800/500).
-Import 2 Google Fonts. Use CSS custom properties for colors. Match the industry aesthetic.
-Output ONLY raw HTML — no markdown, no code fences, no explanation.`,
-
-              `You are Zoobicon. Output a COMPLETE HTML page. Your ONLY job is to produce visible content.
-
-WRITE BARELY ANY CSS — use inline styles if needed. The BODY is everything.
-
-Output: <!DOCTYPE html><html><head><title>Site</title><style>/* minimal */</style></head><body>
-THEN write ALL page content: nav, hero, features, about, testimonials, stats, FAQ, CTA, footer.
-Use real text, real images (https://picsum.photos/seed/KEYWORD/W/H), real content.
-Output ONLY raw HTML.`
-            ];
+            // Try models in order: current model (without prefill), then Sonnet as fallback
+            const retryModels = [activeModel, "claude-sonnet-4-6"];
+            // Deduplicate if model is already Sonnet
+            const uniqueRetryModels = [...new Set(retryModels)];
 
             let retrySucceeded = false;
-            for (let i = 0; i < retryPrompts.length && !retrySucceeded; i++) {
+            for (const retryModel of uniqueRetryModels) {
+              if (retrySucceeded) break;
+              const isFallback = retryModel !== activeModel;
+              if (isFallback) {
+                console.log(`[Stream] Falling back to ${retryModel}...`);
+                controller.enqueue(
+                  encoder.encode(`data: ${JSON.stringify({ type: "status", message: "Trying alternate model..." })}\n\n`)
+                );
+              }
+
               try {
                 const retryResponse = await client.messages.create({
-                  model,
+                  model: retryModel,
                   max_tokens: maxTokens,
-                  system: retryPrompts[i],
+                  system: RETRY_SYSTEM,
                   messages: [{ role: "user", content: userMessage }],
                 });
 
                 const retryBlock = retryResponse.content.find((b) => b.type === "text");
+                console.log(`[Stream] Retry (${retryModel}): stop=${retryResponse.stop_reason} text_len=${retryBlock && retryBlock.type === "text" ? retryBlock.text.length : 0} blocks=${retryResponse.content.length}`);
                 if (retryBlock && retryBlock.type === "text") {
-                  // Validate retry also has body content
                   const retryBodyMatch = retryBlock.text.match(/<body[^>]*>([\s\S]*)<\/body>/i);
                   const retryBodyText = retryBodyMatch
                     ? retryBodyMatch[1].replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim()
                     : "";
 
                   if (retryBodyText.length >= 100) {
-                    console.log(`[Stream] Retry ${i + 1} succeeded (${retryBodyText.length} body chars)`);
+                    console.log(`[Stream] Retry ${retryModel} succeeded (${retryBodyText.length} body chars)`);
                     controller.enqueue(
                       encoder.encode(`data: ${JSON.stringify({ type: "replace", content: retryBlock.text })}\n\n`)
                     );
                     retrySucceeded = true;
                   } else {
-                    console.warn(`[Stream] Retry ${i + 1} still empty (${retryBodyText.length} body chars)`);
+                    console.warn(`[Stream] Retry ${retryModel} still empty (${retryBodyText.length} body chars)`);
                   }
                 }
               } catch (retryErr) {
-                console.error(`[Stream] Retry ${i + 1} failed:`, retryErr);
+                console.error(`[Stream] Retry ${retryModel} error:`, retryErr instanceof Error ? retryErr.message : retryErr);
               }
             }
 
             if (!retrySucceeded) {
-              console.error("[Stream] All retries produced empty body");
+              console.error("[Stream] All model retries produced empty body");
               controller.enqueue(
-                encoder.encode(`data: ${JSON.stringify({ type: "error", message: "Generation produced empty content after retries. Please try again with a different prompt." })}\n\n`)
+                encoder.encode(`data: ${JSON.stringify({ type: "error", message: "Generation produced empty content after retries. Please try again." })}\n\n`)
               );
             }
           }

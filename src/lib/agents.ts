@@ -474,15 +474,22 @@ export async function runPipeline(
       if (opts.prefill) {
         messages.push({ role: "assistant", content: opts.prefill });
       }
-      const res = await client.messages.create({
-        model: opts.model,
-        max_tokens: opts.maxTokens,
-        system: opts.system,
-        messages,
-      });
-      const text = res.content.find((b) => b.type === "text")?.text || "";
-      // Prepend prefill since the API response only contains what comes AFTER the prefill
-      return { text: (opts.prefill || "") + text, stopReason: res.stop_reason || "unknown" };
+      try {
+        const res = await client.messages.create({
+          model: opts.model,
+          max_tokens: opts.maxTokens,
+          system: opts.system,
+          messages,
+        });
+        const text = res.content.find((b) => b.type === "text")?.text || "";
+        console.log(`[llmCall] model=${opts.model} stop=${res.stop_reason} text_len=${text.length} blocks=${res.content.length}`);
+        // Prepend prefill since the API response only contains what comes AFTER the prefill
+        return { text: (opts.prefill || "") + text, stopReason: res.stop_reason || "unknown" };
+      } catch (err) {
+        const errMsg = err instanceof Error ? err.message : String(err);
+        console.error(`[llmCall] API error model=${opts.model}: ${errMsg}`);
+        throw err;
+      }
     }
   };
 
@@ -572,62 +579,78 @@ export async function runPipeline(
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">`;
 
-  let devResult = await llmCall({
-    model: MODEL_PREMIUM,
-    maxTokens: 64000,
-    system: DEVELOPER_SYSTEM,
-    userMessage: devUserMessage,
-    prefill: DEV_PREFILL,
-  });
+  // Model fallback chain: try Opus first, then Sonnet if Opus fails or returns empty.
+  // This prevents total failure when Opus is rate-limited, unavailable, or returns 0 tokens.
+  const FALLBACK_MODEL = "claude-sonnet-4-6";
+  const devModels = [MODEL_PREMIUM, FALLBACK_MODEL];
 
-  let html = cleanHtml(devResult.text);
-  let bodyCheck = hasBodyContent(html);
-  console.log(`[Pipeline] Developer attempt 1: ${html.length} chars HTML, ${bodyCheck.bodyChars} body text chars, stop: ${devResult.stopReason}`);
+  let devResult: { text: string; stopReason: string } = { text: "", stopReason: "unknown" };
+  let html = "";
+  let bodyCheck = { valid: false, bodyChars: 0 };
 
-  // If body is empty or response was truncated, retry with increasingly focused prompts
-  if (!bodyCheck.valid || devResult.stopReason === "max_tokens") {
-    console.warn(`[Pipeline] Developer output invalid (body: ${bodyCheck.bodyChars} chars, stop: ${devResult.stopReason}). Retrying...`);
-    onProgress?.("developer", "retrying build (body was empty)...");
+  for (const devModel of devModels) {
+    const isRetryModel = devModel !== MODEL_PREMIUM;
+    if (isRetryModel) {
+      console.warn(`[Pipeline] Opus failed/empty. Falling back to Sonnet...`);
+      onProgress?.("developer", "retrying with alternate model...");
+    }
 
-    devResult = await llmCall({
-      model: MODEL_PREMIUM,
-      maxTokens: 64000,
-      system: DEVELOPER_SYSTEM,
-      userMessage: `CRITICAL FAILURE: Your previous attempt produced HTML with CSS but the <body> was EMPTY — zero visible content.\n\nSTRICT RULES FOR THIS ATTEMPT:\n1. Write the <body> content FIRST. Start with <!DOCTYPE html><html><head> (brief CSS only), then IMMEDIATELY write <body> with ALL sections.\n2. CSS budget: MAXIMUM 80 lines. Use inline styles if needed — body content is more important than perfect CSS.\n3. Every section MUST appear: hero, features, about, testimonials, stats, FAQ, CTA, footer.\n4. Do NOT write elaborate CSS animations, custom properties blocks, or media queries until AFTER all body content is written.\n\n${devUserMessage}`,
-    });
+    try {
+      devResult = await llmCall({
+        model: devModel,
+        maxTokens: 64000,
+        system: DEVELOPER_SYSTEM,
+        userMessage: isRetryModel
+          ? `IMPORTANT: A previous model attempt returned empty output. You MUST produce a complete HTML page with visible body content.\n\n${devUserMessage}`
+          : devUserMessage,
+        prefill: DEV_PREFILL,
+      });
 
-    html = cleanHtml(devResult.text);
-    bodyCheck = hasBodyContent(html);
-    console.log(`[Pipeline] Developer attempt 2: ${html.length} chars HTML, ${bodyCheck.bodyChars} body text chars, stop: ${devResult.stopReason}`);
-  }
+      html = cleanHtml(devResult.text);
+      bodyCheck = hasBodyContent(html);
+      console.log(`[Pipeline] Developer (${devModel}): ${html.length} chars HTML, ${bodyCheck.bodyChars} body text, stop: ${devResult.stopReason}`);
 
-  // Third attempt — absolutely minimal CSS, maximum body content
-  if (!bodyCheck.valid || devResult.stopReason === "max_tokens") {
-    console.warn(`[Pipeline] Developer still empty after retry 1 (body: ${bodyCheck.bodyChars} chars). Final attempt...`);
-    onProgress?.("developer", "final retry (minimal CSS)...");
+      // If body has content, we're done
+      if (bodyCheck.valid && devResult.stopReason !== "max_tokens") {
+        break;
+      }
 
-    devResult = await llmCall({
-      model: MODEL_PREMIUM,
-      maxTokens: 64000,
-      system: DEVELOPER_SYSTEM,
-      userMessage: `FINAL ATTEMPT — YOUR PREVIOUS TWO ATTEMPTS HAD EMPTY BODIES.\n\nWrite a MINIMAL but COMPLETE page. Use barely any CSS — just basic inline styles if needed. The ONLY thing that matters is that <body> contains real, visible content with all sections. Fancy styling is NOT needed — content is everything.\n\n${devUserMessage}`,
-    });
+      // Body empty — retry WITHOUT prefill (in case prefill is causing the issue with this model)
+      if (!bodyCheck.valid) {
+        console.warn(`[Pipeline] ${devModel} returned empty body (${bodyCheck.bodyChars} chars). Retrying without prefill...`);
+        onProgress?.("developer", `retrying ${isRetryModel ? "Sonnet" : "Opus"} (no prefill)...`);
 
-    html = cleanHtml(devResult.text);
-    bodyCheck = hasBodyContent(html);
-    console.log(`[Pipeline] Developer attempt 3: ${html.length} chars HTML, ${bodyCheck.bodyChars} body text chars, stop: ${devResult.stopReason}`);
+        devResult = await llmCall({
+          model: devModel,
+          maxTokens: 64000,
+          system: DEVELOPER_SYSTEM,
+          userMessage: `CRITICAL: Your previous attempt produced ZERO visible content in the <body>. This time you MUST write all body sections.\n\n${devUserMessage}`,
+          // No prefill — in case the model doesn't handle prefill well
+        });
+
+        html = cleanHtml(devResult.text);
+        bodyCheck = hasBodyContent(html);
+        console.log(`[Pipeline] Developer retry (${devModel}, no prefill): ${html.length} chars, ${bodyCheck.bodyChars} body text, stop: ${devResult.stopReason}`);
+
+        if (bodyCheck.valid) break;
+      }
+    } catch (err) {
+      const errMsg = err instanceof Error ? err.message : String(err);
+      console.error(`[Pipeline] Developer ${devModel} threw: ${errMsg}`);
+      // Continue to next model in fallback chain
+    }
   }
 
   agents.push({ agent: "Developer", output: `[${html.length} chars HTML, ${bodyCheck.bodyChars} body text, stop: ${devResult.stopReason}]`, duration: Date.now() - devStart });
 
   // Final validation
   if (html.length < 500 || !/<body/i.test(html)) {
-    console.error("[Pipeline] Developer agent produced invalid/empty HTML after retry");
+    console.error("[Pipeline] Developer agent produced invalid/empty HTML after all fallbacks");
     throw new Error("Developer agent failed to produce a valid website. Please try again.");
   }
   if (!bodyCheck.valid) {
-    console.error(`[Pipeline] Developer produced empty body after retry (${bodyCheck.bodyChars} chars)`);
-    throw new Error("Developer agent produced a page with no visible content after retry. Please try again.");
+    console.error(`[Pipeline] Developer produced empty body after all fallbacks (${bodyCheck.bodyChars} chars)`);
+    throw new Error("Developer agent produced a page with no visible content. Please try again.");
   }
 
   // ── Phase 4: Animation + SEO + Forms (Parallel) — ALL tiers ──
