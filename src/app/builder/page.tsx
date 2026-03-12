@@ -8,6 +8,7 @@ import PreviewPanel from "@/components/PreviewPanel";
 import CodePanel from "@/components/CodePanel";
 import ChatPanel from "@/components/ChatPanel";
 import StatusBar from "@/components/StatusBar";
+import SeoPreview from "@/components/SeoPreview";
 
 import AutoDebugPanel from "@/components/AutoDebugPanel";
 import GitHubImport from "@/components/GitHubImport";
@@ -57,10 +58,14 @@ import {
   Globe,
   ImagePlus,
   Workflow,
+  Undo2,
+  Redo2,
+  Search as SearchIcon,
+  Save,
 } from "lucide-react";
 
 type BuildStatus = "idle" | "generating" | "editing" | "complete" | "error";
-type RightTab = "preview" | "code";
+type RightTab = "preview" | "code" | "seo";
 type ToolId =
   | "pipeline"
   | "clone"
@@ -345,10 +350,18 @@ export default function BuilderPage() {
   const [selectedModel, setSelectedModel] = useState("");  // Empty = use pipeline's smart routing (Haiku/Opus/Sonnet)
   const [availableModels, setAvailableModels] = useState<AIModel[]>([]);
   const [reactSource, setReactSource] = useState<Record<string, string> | null>(null);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
+
+  // Undo/Redo history
+  const [history, setHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const isUndoRedoRef = useRef(false);
 
   const abortRef = useRef<AbortController | null>(null);
   const generationIdRef = useRef(0); // Tracks current generation to prevent stale image replacements
   const hasCode = generatedCode.length > 0;
+  const canUndo = historyIndex > 0;
+  const canRedo = historyIndex < history.length - 1;
 
   // Admin always gets premium tier locked
   useEffect(() => {
@@ -373,15 +386,71 @@ export default function BuilderPage() {
       .catch(() => { /* models API not available, use defaults */ });
   }, []);
 
+  // Track code changes in undo/redo history
+  useEffect(() => {
+    if (!generatedCode || isUndoRedoRef.current) {
+      isUndoRedoRef.current = false;
+      return;
+    }
+    setHistory(prev => {
+      const truncated = prev.slice(0, historyIndex + 1);
+      const newHistory = [...truncated, generatedCode].slice(-50); // Keep last 50
+      setHistoryIndex(newHistory.length - 1);
+      return newHistory;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [generatedCode]);
+
+  const handleUndo = useCallback(() => {
+    if (!canUndo) return;
+    isUndoRedoRef.current = true;
+    const newIndex = historyIndex - 1;
+    setHistoryIndex(newIndex);
+    setGeneratedCode(history[newIndex]);
+  }, [canUndo, historyIndex, history]);
+
+  const handleRedo = useCallback(() => {
+    if (!canRedo) return;
+    isUndoRedoRef.current = true;
+    const newIndex = historyIndex + 1;
+    setHistoryIndex(newIndex);
+    setGeneratedCode(history[newIndex]);
+  }, [canRedo, historyIndex, history]);
+
+  // Keyboard shortcuts for undo/redo
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "z") {
+        e.preventDefault();
+        if (e.shiftKey) handleRedo();
+        else handleUndo();
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === "y") {
+        e.preventDefault();
+        handleRedo();
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [handleUndo, handleRedo]);
+
   // Auto-replace picsum placeholder images with contextually relevant ones
+  // Paid users get AI-generated images (DALL-E/Stability), free users get Unsplash
   const autoReplaceImages = useCallback(async (html: string): Promise<string> => {
-    // Only replace if HTML contains picsum placeholder images
     if (!html.includes("picsum.photos")) return html;
+    let useAI = false;
+    try {
+      const u = localStorage.getItem("zoobicon_user");
+      if (u) {
+        const p = JSON.parse(u);
+        useAI = p.plan === "unlimited" || p.plan === "pro" || p.plan === "premium" || p.role === "admin";
+      }
+    } catch { /* ignore */ }
     try {
       const res = await fetch("/api/generate/images", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ html }),
+        body: JSON.stringify({ html, useAI }),
       });
       if (res.ok) {
         const data = await res.json();
@@ -697,6 +766,8 @@ export default function BuilderPage() {
     setStatus("idle");
     setError("");
     setActiveTool(null);
+    setHistory([]);
+    setHistoryIndex(-1);
   }, []);
 
   const handleSeoFixRequest = useCallback(
@@ -739,6 +810,27 @@ export default function BuilderPage() {
       setIsDeploying(false);
     }
   }, [generatedCode, isDeploying, prompt]);
+
+  const handleSaveTemplate = useCallback(async () => {
+    if (!generatedCode || saveStatus === "saving") return;
+    setSaveStatus("saving");
+    try {
+      const res = await fetch("/api/templates", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: prompt.trim().slice(0, 80) || "Untitled Template",
+          html: generatedCode,
+          prompt: prompt.trim(),
+        }),
+      });
+      if (!res.ok) throw new Error("Save failed");
+      setSaveStatus("saved");
+      setTimeout(() => setSaveStatus("idle"), 3000);
+    } catch {
+      setSaveStatus("idle");
+    }
+  }, [generatedCode, saveStatus, prompt]);
 
   const toggleTool = useCallback((toolId: Exclude<ToolId, null>) => {
     setActiveTool((prev) => (prev === toolId ? null : toolId));
@@ -884,6 +976,40 @@ export default function BuilderPage() {
             >
               Code
             </button>
+            {hasCode && (
+              <button
+                className={`px-4 py-2.5 text-xs font-medium transition-colors border-b-2 ${
+                  activeTab === "seo"
+                    ? "border-brand-500 text-brand-400"
+                    : "border-transparent text-white/30 hover:text-white/50"
+                }`}
+                onClick={() => setActiveTab("seo")}
+              >
+                SEO
+              </button>
+            )}
+
+            {/* Undo / Redo */}
+            {hasCode && (
+              <div className="flex items-center gap-0.5 ml-3 border-l border-white/[0.06] pl-3">
+                <button
+                  onClick={handleUndo}
+                  disabled={!canUndo}
+                  title="Undo (Ctrl+Z)"
+                  className="p-1.5 rounded text-white/30 hover:text-white/60 hover:bg-white/[0.04] transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+                >
+                  <Undo2 size={14} />
+                </button>
+                <button
+                  onClick={handleRedo}
+                  disabled={!canRedo}
+                  title="Redo (Ctrl+Shift+Z)"
+                  className="p-1.5 rounded text-white/30 hover:text-white/60 hover:bg-white/[0.04] transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+                >
+                  <Redo2 size={14} />
+                </button>
+              </div>
+            )}
 
             {/* Deploy button */}
             {hasCode && (
@@ -918,6 +1044,15 @@ export default function BuilderPage() {
                   </div>
                 )}
                 <button
+                  onClick={handleSaveTemplate}
+                  disabled={saveStatus === "saving"}
+                  title="Save as reusable template"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-white/[0.04] text-white/40 hover:text-white/60 hover:bg-white/[0.08]"
+                >
+                  {saveStatus === "saved" ? <Check size={14} className="text-emerald-400" /> : <Save size={14} />}
+                  {saveStatus === "saving" ? "Saving..." : saveStatus === "saved" ? "Saved" : "Save"}
+                </button>
+                <button
                   onClick={handleDeploy}
                   disabled={isDeploying}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
@@ -946,6 +1081,8 @@ export default function BuilderPage() {
                 html={generatedCode}
                 isGenerating={status === "generating"}
               />
+            ) : activeTab === "seo" ? (
+              <SeoPreview html={generatedCode} />
             ) : (
               <CodePanel html={generatedCode} reactSource={reactSource} />
             )}
