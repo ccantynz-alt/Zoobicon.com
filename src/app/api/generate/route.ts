@@ -82,6 +82,8 @@ const EDIT_SYSTEM = `You are Zoobicon, an AI website editor. You are given an ex
 - If adding new sections, match the existing visual style perfectly.
 - The output must be a complete, valid HTML document — not a diff or partial.`;
 
+export const maxDuration = 120; // Allow up to 2 minutes
+
 export async function POST(req: NextRequest) {
   try {
     const { prompt, tier, existingCode } = await req.json();
