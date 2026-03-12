@@ -27,11 +27,12 @@ const PLANS = [
     featured: false,
     color: "from-white/5 to-white/0",
     features: [
-      "5 AI-generated websites per month",
+      "3 AI-generated websites per month",
+      "10 edits per month",
       "Industry-aware design intelligence",
       "Basic SEO tools",
       "Export HTML — you own the code",
-      "Zoobicon subdomain hosting",
+      "7-day free hosting preview",
       "Community support",
     ],
   },
@@ -39,19 +40,21 @@ const PLANS = [
     name: "Creator",
     price: "$19",
     period: "/month",
-    desc: "For freelancers and small businesses who need unlimited quality output.",
+    desc: "For freelancers and small businesses shipping real sites.",
     cta: "Start Creator Trial",
     ctaHref: "/auth/signup",
     featured: false,
     color: "from-emerald-500/5 to-white/0",
     features: [
-      "Unlimited AI-generated websites",
+      "15 AI-generated websites per month",
+      "100 edits per month",
       "10-agent pipeline (premium quality)",
       "Custom domain support",
+      "React + Next.js export",
       "GitHub export & WordPress export",
-      "Basic SEO Campaign Agent",
-      "1 AI support agent",
-      "Priority email support",
+      "Permanent hosting included",
+      "Basic SEO tools",
+      "Email support",
       "API access (10K req/mo)",
     ],
   },
@@ -59,67 +62,92 @@ const PLANS = [
     name: "Pro",
     price: "$49",
     period: "/month",
-    desc: "The full arsenal. Every AI tool, unlimited usage, zero limits.",
+    desc: "The full arsenal. Every AI tool, high limits, zero compromise.",
     cta: "Start Pro Trial",
     ctaHref: "/auth/signup",
     featured: true,
     color: "from-brand-500/10 to-accent-purple/5",
     features: [
+      "50 AI-generated websites per month",
+      "500 edits per month",
       "Everything in Creator, plus:",
+      "AI-generated images (DALL-E)",
+      "Full SEO Campaign Agent",
       "AI Video Creator",
-      "Full SEO Campaign Agent (aggressive mode)",
-      "AI Email Support",
+      "AI Email Support & Marketing",
       "AI Brand Kit",
-      "Email Marketing Agent",
       "Chatbot Builder",
-      "Analytics dashboard",
+      "A/B Testing & Analytics",
       "Figma Import",
       "Priority support",
       "API access (100K req/mo)",
     ],
   },
   {
+    name: "Agency",
+    price: "$99",
+    period: "/month",
+    desc: "For agencies building sites at scale. White-label and client handoff.",
+    cta: "Start Agency Trial",
+    ctaHref: "/auth/signup",
+    featured: false,
+    color: "from-purple-500/5 to-white/0",
+    features: [
+      "200 AI-generated websites per month",
+      "Unlimited edits",
+      "Everything in Pro, plus:",
+      "White-label platform (your brand)",
+      "Client handoff & management",
+      "Team seats (up to 10)",
+      "Template marketplace access",
+      "Bulk operations & automation",
+      "API access (500K req/mo)",
+      "Priority Slack support",
+    ],
+  },
+  {
     name: "Enterprise",
-    price: "Custom",
-    period: "",
-    desc: "White-label, custom AI, and dedicated agents for agencies and large teams.",
+    price: "$299",
+    period: "/month",
+    desc: "Unlimited everything. Custom AI, SSO, SLA, and dedicated support.",
     cta: "Contact Sales",
     ctaHref: "mailto:sales@zoobicon.com?subject=Enterprise Inquiry",
     featured: false,
     isExternal: true,
     color: "from-accent-cyan/5 to-white/0",
     features: [
-      "Everything in Pro, plus:",
-      "White-label platform",
+      "Unlimited generations & edits",
+      "Everything in Agency, plus:",
       "Custom AI model training",
       "Dedicated AI agents",
       "Unlimited API access",
-      "Client management portal",
-      "Bulk operations & automation",
+      "SSO / SAML authentication",
       "Custom integrations",
       "SLA guarantee (99.99%)",
       "Dedicated account manager",
-      "Invoiced billing",
+      "Invoiced billing (NET 30)",
     ],
   },
 ];
 
 const PRODUCTS = [
-  { icon: Zap, name: "AI Website Builder", starter: "5/mo", creator: "Unlimited", pro: "Unlimited" },
-  { icon: Sparkles, name: "10-Agent Pipeline", starter: false, creator: true, pro: true },
-  { icon: BarChart3, name: "SEO Campaign Agent", starter: "Basic", creator: "Basic", pro: "Full (Aggressive)" },
-  { icon: Video, name: "AI Video Creator", starter: false, creator: false, pro: true },
-  { icon: Mail, name: "AI Email Support", starter: false, creator: false, pro: true },
-  { icon: Palette, name: "AI Brand Kit", starter: false, creator: false, pro: true },
-  { icon: Globe, name: "Email Marketing", starter: false, creator: false, pro: true },
-  { icon: Bot, name: "Chatbot Builder", starter: false, creator: false, pro: true },
-  { icon: Code2, name: "API Access", starter: false, creator: "10K/mo", pro: "100K/mo" },
+  { icon: Zap, name: "AI Website Builder", starter: "3/mo", creator: "15/mo", pro: "50/mo", agency: "200/mo", enterprise: "Unlimited" },
+  { icon: Code2, name: "AI Edits", starter: "10/mo", creator: "100/mo", pro: "500/mo", agency: "Unlimited", enterprise: "Unlimited" },
+  { icon: Sparkles, name: "10-Agent Pipeline", starter: false, creator: true, pro: true, agency: true, enterprise: true },
+  { icon: Palette, name: "React + shadcn/ui Export", starter: false, creator: true, pro: true, agency: true, enterprise: true },
+  { icon: BarChart3, name: "SEO Campaign Agent", starter: "Basic", creator: "Basic", pro: "Full", agency: "Full", enterprise: "Full" },
+  { icon: Video, name: "AI Video Creator", starter: false, creator: false, pro: true, agency: true, enterprise: true },
+  { icon: Mail, name: "AI Email Support", starter: false, creator: false, pro: true, agency: true, enterprise: true },
+  { icon: Bot, name: "Chatbot Builder", starter: false, creator: false, pro: true, agency: true, enterprise: true },
+  { icon: Users, name: "White-Label & Teams", starter: false, creator: false, pro: false, agency: "10 seats", enterprise: "Unlimited" },
+  { icon: Shield, name: "SLA Guarantee", starter: false, creator: false, pro: false, agency: false, enterprise: "99.99%" },
+  { icon: Code2, name: "API Access", starter: false, creator: "10K/mo", pro: "100K/mo", agency: "500K/mo", enterprise: "Unlimited" },
 ];
 
 const FAQS = [
   {
     q: "No credits? No usage tokens? What's the catch?",
-    a: "There is no catch. We don't use a credit system because we think credits are designed to confuse people and drain wallets. You get a flat monthly price with clear limits. Starter is free with 5 sites/month. Creator and Pro are unlimited. Simple.",
+    a: "There is no catch. We don't use a credit system because we think credits are designed to confuse people and drain wallets. You get a flat monthly price with clear generation limits. Starter is free with 3 sites/month. Creator gets 15, Pro gets 50, Agency gets 200. Enterprise is truly unlimited. Simple.",
   },
   {
     q: "Can I cancel anytime?",
@@ -130,8 +158,8 @@ const FAQS = [
     a: "Yes — 14 days free on both Creator and Pro. No credit card required to start the trial. You can downgrade to Starter anytime.",
   },
   {
-    q: "What's the difference between Creator and Pro?",
-    a: "Creator ($19/mo) gives you unlimited website generation with the full 10-agent pipeline, custom domains, and exports. Pro ($49/mo) adds all 12+ AI tools: Video Creator, Brand Kit, Email Marketing, Chatbot Builder, full SEO Campaign Agent, and more. If you just need great websites, Creator is perfect. If you want the full marketing arsenal, go Pro.",
+    q: "What's the difference between Creator, Pro, and Agency?",
+    a: "Creator ($19/mo) gives you 15 websites/month with the full 10-agent pipeline, custom domains, React export, and permanent hosting. Pro ($49/mo) bumps to 50/month and adds all 12+ AI tools: Video Creator, DALL-E images, Brand Kit, Email Marketing, Chatbot Builder, and more. Agency ($99/mo) adds 200/month, white-labeling, team seats, and client management — perfect for agencies building sites for clients. Enterprise ($299/mo) is truly unlimited with custom AI training, SSO, and SLA.",
   },
   {
     q: "Do I own the websites I generate?",
@@ -139,7 +167,7 @@ const FAQS = [
   },
   {
     q: "What happens to my websites if I downgrade?",
-    a: "Your sites are preserved forever. On Starter, you can still view, edit, and export everything. You just can't generate new ones beyond the 5/month limit.",
+    a: "Your sites are preserved forever. On Starter, you can still view, edit, and export everything. You just can't generate new ones beyond the 3/month limit. Hosted sites stay live as long as you have a paid plan — Starter sites get 7-day previews.",
   },
   {
     q: "How does white-labeling work on Enterprise?",
@@ -240,7 +268,7 @@ export default function PricingPage() {
         {/* Plans */}
         <section className="pb-20 px-6">
           <div className="max-w-5xl mx-auto">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer} className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer} className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
               {PLANS.map((plan) => (
                 <motion.div
                   key={plan.name}
@@ -314,50 +342,43 @@ export default function PricingPage() {
 
               <motion.div variants={fadeInUp} className="gradient-border rounded-2xl overflow-hidden overflow-x-auto">
                 {/* Header */}
-                <div className="grid grid-cols-5 gap-0 border-b border-white/[0.06] min-w-[640px]">
-                  <div className="px-5 py-4 text-xs font-semibold text-white/30 uppercase tracking-wider">Product</div>
-                  <div className="px-5 py-4 text-xs font-semibold text-white/30 uppercase tracking-wider text-center">Starter</div>
-                  <div className="px-5 py-4 text-xs font-semibold text-emerald-400 uppercase tracking-wider text-center bg-emerald-500/[0.03]">Creator</div>
-                  <div className="px-5 py-4 text-xs font-semibold text-brand-400 uppercase tracking-wider text-center bg-brand-500/[0.03]">Pro</div>
-                  <div className="px-5 py-4 text-xs font-semibold text-white/30 uppercase tracking-wider text-center">Enterprise</div>
+                <div className="grid grid-cols-6 gap-0 border-b border-white/[0.06] min-w-[800px]">
+                  <div className="px-4 py-4 text-xs font-semibold text-white/30 uppercase tracking-wider">Product</div>
+                  <div className="px-3 py-4 text-xs font-semibold text-white/30 uppercase tracking-wider text-center">Starter</div>
+                  <div className="px-3 py-4 text-xs font-semibold text-emerald-400 uppercase tracking-wider text-center bg-emerald-500/[0.03]">Creator</div>
+                  <div className="px-3 py-4 text-xs font-semibold text-brand-400 uppercase tracking-wider text-center bg-brand-500/[0.03]">Pro</div>
+                  <div className="px-3 py-4 text-xs font-semibold text-purple-400 uppercase tracking-wider text-center bg-purple-500/[0.03]">Agency</div>
+                  <div className="px-3 py-4 text-xs font-semibold text-accent-cyan uppercase tracking-wider text-center">Enterprise</div>
                 </div>
 
                 {PRODUCTS.map((p, i) => (
-                  <div key={p.name} className={`grid grid-cols-5 gap-0 border-b border-white/[0.03] min-w-[640px] ${i % 2 === 0 ? "" : "bg-white/[0.01]"}`}>
-                    <div className="px-5 py-4 flex items-center gap-3">
-                      <p.icon className="w-4 h-4 text-white/30 flex-shrink-0" />
-                      <span className="text-sm text-white/60">{p.name}</span>
+                  <div key={p.name} className={`grid grid-cols-6 gap-0 border-b border-white/[0.03] min-w-[800px] ${i % 2 === 0 ? "" : "bg-white/[0.01]"}`}>
+                    <div className="px-4 py-3 flex items-center gap-2">
+                      <p.icon className="w-3.5 h-3.5 text-white/30 flex-shrink-0" />
+                      <span className="text-xs text-white/60">{p.name}</span>
                     </div>
-                    <div className="px-5 py-4 flex items-center justify-center">
-                      {typeof p.starter === "string" ? (
-                        <span className="text-xs text-white/40">{p.starter}</span>
-                      ) : p.starter ? (
-                        <Check className="w-4 h-4 text-emerald-400" />
-                      ) : (
-                        <span className="w-4 h-px bg-white/10 block" />
-                      )}
-                    </div>
-                    <div className="px-5 py-4 flex items-center justify-center bg-emerald-500/[0.02]">
-                      {typeof p.creator === "string" ? (
-                        <span className="text-xs text-emerald-400">{p.creator}</span>
-                      ) : p.creator ? (
-                        <Check className="w-4 h-4 text-emerald-400" />
-                      ) : (
-                        <span className="w-4 h-px bg-white/10 block" />
-                      )}
-                    </div>
-                    <div className="px-5 py-4 flex items-center justify-center bg-brand-500/[0.02]">
-                      {typeof p.pro === "string" ? (
-                        <span className="text-xs text-brand-400">{p.pro}</span>
-                      ) : p.pro ? (
-                        <Check className="w-4 h-4 text-brand-400" />
-                      ) : (
-                        <span className="w-4 h-px bg-white/10 block" />
-                      )}
-                    </div>
-                    <div className="px-5 py-4 flex items-center justify-center">
-                      <Check className="w-4 h-4 text-accent-cyan" />
-                    </div>
+                    {(["starter", "creator", "pro", "agency", "enterprise"] as const).map((tier) => {
+                      const val = p[tier];
+                      const tierColors: Record<string, string> = {
+                        starter: "text-white/40",
+                        creator: "text-emerald-400",
+                        pro: "text-brand-400",
+                        agency: "text-purple-400",
+                        enterprise: "text-accent-cyan",
+                      };
+                      const bgClass = tier === "creator" ? "bg-emerald-500/[0.02]" : tier === "pro" ? "bg-brand-500/[0.02]" : tier === "agency" ? "bg-purple-500/[0.02]" : "";
+                      return (
+                        <div key={tier} className={`px-3 py-3 flex items-center justify-center ${bgClass}`}>
+                          {typeof val === "string" ? (
+                            <span className={`text-[11px] ${tierColors[tier]}`}>{val}</span>
+                          ) : val ? (
+                            <Check className={`w-3.5 h-3.5 ${tierColors[tier]}`} />
+                          ) : (
+                            <span className="w-3.5 h-px bg-white/10 block" />
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 ))}
               </motion.div>
