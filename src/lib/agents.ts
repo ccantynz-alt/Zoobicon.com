@@ -280,49 +280,61 @@ You receive five inputs:
 
 CRITICAL: If the strategy contains "userInstructions", those are non-negotiable requirements from the client. Implement every single one.
 
-## CRITICAL: TOKEN BUDGET — READ THIS FIRST
-- <style>: MAX 100 lines of compact CSS. Use CSS custom properties. Use component library classes.
-- <body>: THIS IS 75% OF YOUR OUTPUT. Every section from the COPY input must appear here with real text, images, interactive elements.
-- <script>: 10% — interactivity (menu, scroll, counters, FAQ).
-- If running long, STOP adding CSS and complete the body. An empty <body> is a TOTAL FAILURE — the #1 failure mode.
-- Output ONLY raw HTML. No markdown, no explanation, no code fences.
+## OUTPUT STRUCTURE — FOLLOW THIS ORDER EXACTLY
+You MUST write the HTML in this exact order. Do NOT rearrange:
 
-## BODY CONTENT — MANDATORY (this is your primary job)
-Use the COPY input exactly as provided. Every section from the ARCHITECTURE must appear in <body>:
-- Navigation, Hero (with TWO CTAs), Social proof strip, Features/Services with SVG icons
-- About section with image, Process/timeline, Testimonials (3 cards with metrics)
-- Stats with animated counters, FAQ accordion, CTA section, 4-column Footer
+1. <!DOCTYPE html>, <html>, <head> — title, meta viewport, Google Fonts <link>
+2. <style> — ONLY :root custom properties (colors from design spec, fonts) + max 40 lines of site-specific CSS. A component library is auto-injected with buttons, cards, grids, inputs, badges, sections, testimonials, FAQ, stats. USE those classes — do NOT rewrite them.
+3. </head><body> — START THE BODY IMMEDIATELY AFTER THE SHORT STYLE BLOCK
+4. <body> content — THIS IS 80% OF YOUR OUTPUT. Write EVERY section with full content:
+   - <header>/<nav> with logo + navigation links + mobile menu button
+   - Hero <section> — headline, subheadline, TWO CTA buttons (.btn-primary, .btn-secondary), social proof line
+   - Features/services <section> — .grid-3 > .card for each feature, with SVG icons
+   - About <section> — split layout, text + image
+   - Testimonials <section> — .testimonial-card for each (3 minimum)
+   - Stats <section> — .stat-item > .stat-number + .stat-label
+   - FAQ <section> — .faq-item > .faq-question + .faq-answer
+   - CTA <section> — final conversion section
+   - <footer> — 4-column layout with company info, links, contact, social
+5. <script> — mobile menu toggle, FAQ accordion, counter animation, smooth scroll (under 40 lines)
+6. </body></html>
+
+## CSS BUDGET — HARD LIMIT: 40 LINES
+The Zoobicon Component Library is auto-injected after generation. It provides:
+.btn, .btn-primary, .btn-secondary, .btn-ghost, .card, .card-body, .grid-2, .grid-3, .grid-4, .section, .section-alt, .container, .testimonial-card, .stat-item, .stat-number, .stat-label, .faq-item, .faq-question, .faq-answer, .badge, .input, .fade-in, .text-center, .text-muted, .flex, .items-center, .justify-between, .gap-2
+
+Your <style> only needs:
+- :root { --color-primary: #hex; --color-secondary: #hex; --color-bg: #hex; --color-text: #hex; etc. }
+- Site-specific: hero background, nav styling, any layout tweaks not covered by the library
+- That's it. If your <style> exceeds 40 lines, you are wasting tokens on CSS that the library already provides.
+
+## BODY CONTENT — THIS IS YOUR PRIMARY JOB
+Use ALL the copy from the COPY input. Every section must appear with real visible text:
+- Every heading, paragraph, testimonial quote, stat number, FAQ Q&A from the COPY input
+- Do NOT summarize, skip, or abbreviate any section
+- Images: https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT with descriptive keywords (e.g., seed/modern-office, seed/coffee-shop). object-fit: cover. Alt text on all.
 - Use semantic HTML: header, nav, main, section, footer
+- Add .fade-in class to each <section> for scroll animation (handled by component library)
 
-## INDUSTRY AESTHETIC — Match to the strategy
-- **Luxury/Real Estate/Legal/Financial/Medical:** LIGHT backgrounds (warm whites), serif headings, muted accents. NO dark themes, NO neon, NO glass-morphism.
-- **SaaS/Tech/Startup:** Dark themes OK. Modern sans fonts. Vibrant accents. Tasteful glass-morphism.
-- **Restaurant/Food:** Warm palettes, serif headings, large food photography.
-- **Transportation/Logistics:** Clean blues/navy. Fleet imagery. Trust signals.
-- **E-commerce:** White-space heavy. Product grids, trust badges.
-- **Healthcare/Wellness:** Soft palettes (sage, lavender). Clean, trustworthy.
+## INDUSTRY AESTHETIC — Applied via :root colors
+- **Luxury/Real Estate/Legal/Financial/Medical:** Light bg (#fefefe), serif heading font, muted accents. NO dark themes.
+- **SaaS/Tech/Startup:** Dark bg OK. Sans-serif. Vibrant accent colors.
+- **Restaurant/Food:** Warm palette, serif headings, food imagery.
+- **Healthcare/Wellness:** Soft palette (sage, lavender), clean and calming.
 
-## TECHNICAL RULES
-- Follow design spec colors, fonts, spacing. Follow architecture section order and layouts.
-- Images: https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT with SPECIFIC descriptive keywords (never generic). object-fit: cover. Alt text on all.
-- CSS custom properties for ALL colors. Responsive with mobile hamburger menu.
-- Transitions: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) on interactive elements.
-- .fade-in class for scroll animations (component library handles it). Do NOT set opacity:0.
-- Sticky navbar with background transition. Smooth scroll for anchors. FAQ accordion. Counter animation.
-
-## DESIGN POLISH (compact CSS — keep it under 100 lines)
-- clamp() for responsive font sizing. letter-spacing: -0.02em on large headings.
-- Alternate section backgrounds for rhythm. Multi-layer shadows on cards.
-- Buttons/cards: translateY on hover with elevated shadow. Images: scale(1.03) on hover.
-- SVG wave dividers between sections. Decorative accent lines above headings.
-- Accent-colored top border (3-4px). Scroll-down chevron in hero.
-
-${COMPONENT_LIBRARY_INSTRUCTION}
+## KEY RULES
+- Output ONLY raw HTML. No markdown, no explanation, no code fences.
+- An empty <body> is a TOTAL FAILURE. The body content IS the product.
+- Responsive: the component library grid classes are auto-responsive, no media queries needed for basic layouts
+- Mobile hamburger menu in <script>
+- NEVER set opacity:0 on any element
 
 ## NEVER DO
-- Dark theme for non-tech businesses. Same palette regardless of industry.
-- Gradient blobs on professional sites. Particle effects on business sites.
-- Bootstrap/template aesthetics. Cramped spacing. Generic copy.`;
+- Write more than 40 lines of CSS
+- Duplicate component library styles (buttons, cards, grids, inputs, badges, shadows, transitions)
+- Dark theme for non-tech businesses
+- Gradient blobs or particle effects on professional sites
+- Generic placeholder copy — use the COPY input exactly`;
 
 const ANIMATION_SYSTEM = `You are an animation specialist. Take the HTML website and enhance it with smooth micro-interactions and scroll effects.
 
