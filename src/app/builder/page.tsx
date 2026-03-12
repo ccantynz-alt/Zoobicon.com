@@ -490,6 +490,16 @@ export default function BuilderPage() {
         });
 
         if (!res.ok) {
+          // Check if this is a configuration error — don't retry, surface immediately
+          try {
+            const errData = await res.clone().json();
+            if (errData.error && (errData.error.includes("API_KEY") || errData.error.includes("not configured") || errData.error.includes("API key"))) {
+              setError(errData.error);
+              setStatus("error");
+              return;
+            }
+          } catch { /* not JSON, continue to fallback */ }
+
           // Fallback to non-streaming endpoint
           const fallbackRes = await fetch("/api/generate", {
             method: "POST",
@@ -757,8 +767,18 @@ export default function BuilderPage() {
         }
       });
     } catch (err) {
-      // Fallback to streaming endpoint if pipeline fails
       const errMsg = err instanceof Error ? err.message : String(err);
+
+      // If this is a configuration error (missing API key), don't retry — surface immediately
+      if (errMsg.includes("API_KEY") || errMsg.includes("not configured") || errMsg.includes("API key")) {
+        console.error("[Pipeline] Configuration error:", errMsg);
+        setGeneratedCode("");
+        setError(errMsg);
+        setStatus("error");
+        return;
+      }
+
+      // Fallback to streaming endpoint if pipeline fails
       console.warn("[Pipeline] Failed, falling back to stream:", errMsg);
       setPipelineAgents([`Pipeline fallback — generating directly (${errMsg})`]);
 
