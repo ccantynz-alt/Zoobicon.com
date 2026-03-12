@@ -187,12 +187,13 @@ pre code {
 }
 
 .gradient-text-hero {
-  background: linear-gradient(135deg, #818cf8, #60a5fa, #34d399, #a78bfa, #818cf8);
-  background-size: 400% 400%;
+  background: linear-gradient(135deg, #00f0ff, #a855f7, #f0abfc, #00f0ff, #3b82f6, #a855f7);
+  background-size: 500% 500%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: gradient-shift 6s ease-in-out infinite;
+  animation: gradient-shift 5s ease-in-out infinite;
+  filter: drop-shadow(0 0 30px rgba(0, 240, 255, 0.3));
 }
 
 .gradient-text-static {
@@ -208,7 +209,7 @@ pre code {
   66% { background-position: 100% 50%; }
 }
 
-/* Hero headline shimmer sweep */
+/* Hero headline shimmer sweep — holographic */
 .hero-shimmer {
   position: relative;
   overflow: hidden;
@@ -219,10 +220,10 @@ pre code {
   position: absolute;
   top: 0;
   left: -100%;
-  width: 60%;
+  width: 40%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
-  animation: shimmer-sweep 4s ease-in-out infinite;
+  background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.15), rgba(168, 85, 247, 0.1), transparent);
+  animation: shimmer-sweep 3s ease-in-out infinite;
   pointer-events: none;
 }
 
@@ -231,17 +232,31 @@ pre code {
   50% { left: 140%; }
 }
 
-/* Animated CTA pulse glow */
+/* Animated CTA — neon pulse */
 .cta-glow {
-  animation: cta-pulse 3s ease-in-out infinite;
+  animation: cta-pulse 2.5s ease-in-out infinite;
+  position: relative;
+}
+
+.cta-glow::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #00f0ff, #a855f7, #f0abfc, #00f0ff);
+  background-size: 300% 300%;
+  animation: gradient-shift 4s ease-in-out infinite;
+  z-index: -1;
+  filter: blur(12px);
+  opacity: 0.6;
 }
 
 @keyframes cta-pulse {
-  0%, 100% { box-shadow: 0 0 30px rgba(37, 99, 235, 0.3), 0 4px 16px rgba(37, 99, 235, 0.2); }
-  50% { box-shadow: 0 0 50px rgba(99, 102, 241, 0.5), 0 0 80px rgba(37, 99, 235, 0.25), 0 4px 20px rgba(37, 99, 235, 0.3); }
+  0%, 100% { box-shadow: 0 0 30px rgba(0, 240, 255, 0.25), 0 0 60px rgba(168, 85, 247, 0.15), 0 4px 16px rgba(0, 0, 0, 0.3); }
+  50% { box-shadow: 0 0 50px rgba(0, 240, 255, 0.45), 0 0 100px rgba(168, 85, 247, 0.3), 0 4px 20px rgba(0, 0, 0, 0.4); }
 }
 
-/* Floating particles */
+/* === SCI-FI FLOATING PARTICLES — energy motes === */
 .hero-particles {
   position: absolute;
   inset: 0;
@@ -251,64 +266,154 @@ pre code {
 
 .hero-particle {
   position: absolute;
-  width: 3px;
-  height: 3px;
   border-radius: 50%;
-  background: rgba(147, 197, 253, 0.6);
-  animation: particle-float linear infinite;
+  animation: particle-drift linear infinite;
 }
 
-.hero-particle:nth-child(1) { left: 15%; top: 20%; animation-duration: 12s; animation-delay: 0s; width: 2px; height: 2px; background: rgba(167, 139, 250, 0.7); }
-.hero-particle:nth-child(2) { left: 75%; top: 40%; animation-duration: 10s; animation-delay: -2s; width: 4px; height: 4px; background: rgba(96, 165, 250, 0.5); }
-.hero-particle:nth-child(3) { left: 40%; top: 60%; animation-duration: 14s; animation-delay: -4s; width: 2px; height: 2px; background: rgba(52, 211, 153, 0.6); }
-.hero-particle:nth-child(4) { left: 85%; top: 15%; animation-duration: 11s; animation-delay: -1s; width: 3px; height: 3px; background: rgba(167, 139, 250, 0.5); }
-.hero-particle:nth-child(5) { left: 25%; top: 75%; animation-duration: 13s; animation-delay: -6s; width: 2px; height: 2px; background: rgba(96, 165, 250, 0.6); }
-.hero-particle:nth-child(6) { left: 60%; top: 25%; animation-duration: 15s; animation-delay: -3s; width: 3px; height: 3px; background: rgba(52, 211, 153, 0.4); }
-.hero-particle:nth-child(7) { left: 10%; top: 50%; animation-duration: 16s; animation-delay: -5s; width: 2px; height: 2px; background: rgba(129, 140, 248, 0.5); }
-.hero-particle:nth-child(8) { left: 90%; top: 65%; animation-duration: 11s; animation-delay: -7s; width: 3px; height: 3px; background: rgba(167, 139, 250, 0.6); }
+.hero-particle:nth-child(1) { left: 10%; top: 15%; animation-duration: 18s; animation-delay: 0s; width: 3px; height: 3px; background: rgba(0, 240, 255, 0.9); box-shadow: 0 0 8px rgba(0, 240, 255, 0.6); }
+.hero-particle:nth-child(2) { left: 80%; top: 35%; animation-duration: 14s; animation-delay: -3s; width: 4px; height: 4px; background: rgba(168, 85, 247, 0.8); box-shadow: 0 0 10px rgba(168, 85, 247, 0.5); }
+.hero-particle:nth-child(3) { left: 35%; top: 70%; animation-duration: 20s; animation-delay: -7s; width: 2px; height: 2px; background: rgba(0, 240, 255, 0.7); box-shadow: 0 0 6px rgba(0, 240, 255, 0.5); }
+.hero-particle:nth-child(4) { left: 90%; top: 10%; animation-duration: 16s; animation-delay: -2s; width: 3px; height: 3px; background: rgba(240, 171, 252, 0.8); box-shadow: 0 0 8px rgba(240, 171, 252, 0.5); }
+.hero-particle:nth-child(5) { left: 20%; top: 80%; animation-duration: 22s; animation-delay: -9s; width: 2px; height: 2px; background: rgba(59, 130, 246, 0.8); box-shadow: 0 0 6px rgba(59, 130, 246, 0.5); }
+.hero-particle:nth-child(6) { left: 65%; top: 20%; animation-duration: 19s; animation-delay: -5s; width: 3px; height: 3px; background: rgba(0, 240, 255, 0.6); box-shadow: 0 0 8px rgba(0, 240, 255, 0.4); }
+.hero-particle:nth-child(7) { left: 5%; top: 55%; animation-duration: 24s; animation-delay: -11s; width: 2px; height: 2px; background: rgba(168, 85, 247, 0.7); box-shadow: 0 0 6px rgba(168, 85, 247, 0.4); }
+.hero-particle:nth-child(8) { left: 95%; top: 60%; animation-duration: 15s; animation-delay: -8s; width: 4px; height: 4px; background: rgba(0, 240, 255, 0.8); box-shadow: 0 0 12px rgba(0, 240, 255, 0.6); }
 
-/* Cinematic light beams */
+@keyframes particle-drift {
+  0% { transform: translateY(0) translateX(0) scale(0.5); opacity: 0; }
+  5% { opacity: 1; }
+  25% { transform: translateY(-40px) translateX(20px) scale(1.2); opacity: 0.9; }
+  50% { transform: translateY(-100px) translateX(-15px) scale(0.8); opacity: 0.5; }
+  75% { transform: translateY(-60px) translateX(30px) scale(1.4); opacity: 0.8; }
+  95% { opacity: 0; }
+  100% { transform: translateY(-160px) translateX(-10px) scale(0.3); opacity: 0; }
+}
+
+/* === SCI-FI ENERGY BEAMS — vertical neon streaks === */
 .hero-beam {
   position: absolute;
   pointer-events: none;
-  filter: blur(40px);
   opacity: 0;
-  animation: beam-sweep 8s ease-in-out infinite;
 }
 
 .hero-beam-1 {
-  width: 2px;
-  height: 120%;
-  top: -10%;
-  left: 25%;
-  background: linear-gradient(180deg, transparent, rgba(59, 130, 246, 0.4), rgba(139, 92, 246, 0.2), transparent);
-  transform: rotate(15deg);
-  animation-delay: 0s;
+  width: 1px;
+  height: 150%;
+  top: -25%;
+  left: 20%;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 240, 255, 0.6) 30%, rgba(168, 85, 247, 0.4) 60%, transparent 100%);
+  filter: blur(2px);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.3), 0 0 40px rgba(0, 240, 255, 0.1);
+  transform: rotate(8deg);
+  animation: beam-flash 6s ease-in-out infinite;
 }
 
 .hero-beam-2 {
-  width: 2px;
-  height: 120%;
-  top: -10%;
-  right: 30%;
-  background: linear-gradient(180deg, transparent, rgba(139, 92, 246, 0.3), rgba(59, 130, 246, 0.2), transparent);
-  transform: rotate(-12deg);
-  animation-delay: 4s;
+  width: 1px;
+  height: 150%;
+  top: -25%;
+  right: 25%;
+  background: linear-gradient(180deg, transparent 0%, rgba(168, 85, 247, 0.5) 30%, rgba(0, 240, 255, 0.3) 60%, transparent 100%);
+  filter: blur(2px);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.3), 0 0 40px rgba(168, 85, 247, 0.1);
+  transform: rotate(-6deg);
+  animation: beam-flash 6s ease-in-out infinite 3s;
 }
 
-@keyframes beam-sweep {
-  0%, 100% { opacity: 0; transform: rotate(15deg) translateX(0); }
-  20% { opacity: 0.6; }
-  50% { opacity: 0.3; transform: rotate(15deg) translateX(40px); }
-  80% { opacity: 0.5; }
+@keyframes beam-flash {
+  0%, 100% { opacity: 0; }
+  10% { opacity: 0.8; }
+  20% { opacity: 0.1; }
+  30% { opacity: 0.6; }
+  50% { opacity: 0; }
 }
 
-@keyframes particle-float {
-  0% { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
-  10% { opacity: 1; }
-  50% { transform: translateY(-80px) translateX(30px) scale(1.5); opacity: 0.8; }
-  90% { opacity: 0; }
-  100% { transform: translateY(-160px) translateX(-20px) scale(0.5); opacity: 0; }
+/* === SCI-FI PORTAL RINGS === */
+.hero-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid;
+  pointer-events: none;
+  animation: ring-pulse 4s ease-in-out infinite;
+}
+
+.hero-ring-1 {
+  width: 500px;
+  height: 500px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-color: rgba(0, 240, 255, 0.12);
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.05), inset 0 0 30px rgba(0, 240, 255, 0.03);
+}
+
+.hero-ring-2 {
+  width: 700px;
+  height: 700px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-color: rgba(168, 85, 247, 0.08);
+  box-shadow: 0 0 40px rgba(168, 85, 247, 0.04), inset 0 0 40px rgba(168, 85, 247, 0.02);
+  animation-delay: -1.5s;
+}
+
+.hero-ring-3 {
+  width: 900px;
+  height: 900px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-color: rgba(0, 240, 255, 0.05);
+  box-shadow: 0 0 50px rgba(0, 240, 255, 0.03);
+  animation-delay: -3s;
+}
+
+@keyframes ring-pulse {
+  0%, 100% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+}
+
+/* === HOLOGRAPHIC SCANLINES === */
+.hero-scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 240, 255, 0.015) 2px,
+    rgba(0, 240, 255, 0.015) 4px
+  );
+  animation: scanline-scroll 8s linear infinite;
+}
+
+@keyframes scanline-scroll {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(4px); }
+}
+
+/* === WARP SPEED STREAKS === */
+.hero-warp-line {
+  position: absolute;
+  height: 1px;
+  pointer-events: none;
+  opacity: 0;
+  animation: warp-streak 3s ease-out infinite;
+}
+
+.hero-warp-line:nth-child(1) { top: 20%; left: 0; width: 120px; background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.5), transparent); animation-delay: 0s; }
+.hero-warp-line:nth-child(2) { top: 40%; right: 0; width: 100px; background: linear-gradient(270deg, transparent, rgba(168, 85, 247, 0.4), transparent); animation-delay: 0.8s; }
+.hero-warp-line:nth-child(3) { top: 65%; left: 5%; width: 80px; background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.3), transparent); animation-delay: 1.6s; }
+.hero-warp-line:nth-child(4) { top: 80%; right: 10%; width: 140px; background: linear-gradient(270deg, transparent, rgba(240, 171, 252, 0.3), transparent); animation-delay: 2.2s; }
+.hero-warp-line:nth-child(5) { top: 30%; left: 15%; width: 60px; background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.4), transparent); animation-delay: 0.4s; }
+.hero-warp-line:nth-child(6) { top: 55%; right: 5%; width: 110px; background: linear-gradient(270deg, transparent, rgba(0, 240, 255, 0.35), transparent); animation-delay: 1.2s; }
+
+@keyframes warp-streak {
+  0% { opacity: 0; transform: scaleX(0.3) translateX(0); }
+  15% { opacity: 1; transform: scaleX(1) translateX(0); }
+  100% { opacity: 0; transform: scaleX(2) translateX(200px); }
 }
 
 /* ============================================
@@ -407,7 +512,7 @@ pre code {
   animation-direction: reverse;
 }
 
-/* Hero-specific intense aurora */
+/* === SCI-FI NEBULA BACKGROUND === */
 .aurora-hero {
   position: absolute;
   inset: 0;
@@ -418,141 +523,143 @@ pre code {
 .aurora-hero::before {
   content: "";
   position: absolute;
-  width: 100%;
-  height: 100%;
-  top: -35%;
-  left: 0%;
+  width: 120%;
+  height: 120%;
+  top: -40%;
+  left: -10%;
   border-radius: 50%;
-  background: radial-gradient(ellipse 80% 60%, rgba(37, 99, 235, 0.5), rgba(59, 130, 246, 0.2), transparent 60%);
-  filter: blur(70px);
-  animation: aurora-hero-1 12s ease-in-out infinite;
+  background: radial-gradient(ellipse 60% 50%, rgba(0, 240, 255, 0.25), rgba(168, 85, 247, 0.15), transparent 60%);
+  filter: blur(80px);
+  animation: nebula-drift-1 14s ease-in-out infinite;
 }
 
 .aurora-hero::after {
   content: "";
   position: absolute;
-  width: 80%;
-  height: 80%;
-  bottom: -15%;
-  right: -10%;
+  width: 100%;
+  height: 100%;
+  bottom: -20%;
+  right: -15%;
   border-radius: 50%;
-  background: radial-gradient(ellipse 70% 80%, rgba(139, 92, 246, 0.45), rgba(99, 102, 241, 0.2), transparent 60%);
-  filter: blur(70px);
-  animation: aurora-hero-2 16s ease-in-out infinite;
+  background: radial-gradient(ellipse 50% 70%, rgba(168, 85, 247, 0.3), rgba(0, 240, 255, 0.1), transparent 55%);
+  filter: blur(80px);
+  animation: nebula-drift-2 18s ease-in-out infinite;
 }
 
-/* Extra morphing gradient orbs */
+/* Cosmic nebula orbs */
 .hero-orb {
   position: absolute;
   border-radius: 50%;
-  filter: blur(80px);
+  filter: blur(90px);
   pointer-events: none;
   will-change: transform, opacity;
 }
 
 .hero-orb-1 {
-  width: 50%;
-  height: 60%;
-  top: 10%;
-  right: -5%;
-  background: radial-gradient(ellipse, rgba(236, 72, 153, 0.45), rgba(219, 39, 119, 0.18), transparent 65%);
-  animation: orb-morph-1 20s ease-in-out infinite;
+  width: 55%;
+  height: 55%;
+  top: 5%;
+  right: -10%;
+  background: radial-gradient(ellipse, rgba(168, 85, 247, 0.4), rgba(139, 92, 246, 0.15), transparent 60%);
+  animation: orb-morph-1 22s ease-in-out infinite;
 }
 
 .hero-orb-2 {
-  width: 45%;
-  height: 50%;
-  bottom: 5%;
-  left: -5%;
-  background: radial-gradient(ellipse, rgba(52, 211, 153, 0.4), rgba(16, 185, 129, 0.18), transparent 65%);
-  animation: orb-morph-2 14s ease-in-out infinite;
+  width: 40%;
+  height: 45%;
+  bottom: 0%;
+  left: -8%;
+  background: radial-gradient(ellipse, rgba(0, 240, 255, 0.3), rgba(59, 130, 246, 0.12), transparent 60%);
+  animation: orb-morph-2 16s ease-in-out infinite;
 }
 
 .hero-orb-3 {
-  width: 35%;
-  height: 40%;
-  top: 25%;
-  left: 30%;
-  background: radial-gradient(ellipse, rgba(139, 92, 246, 0.4), rgba(168, 85, 247, 0.2), transparent 65%);
-  animation: orb-morph-3 18s ease-in-out infinite;
+  width: 30%;
+  height: 35%;
+  top: 30%;
+  left: 35%;
+  background: radial-gradient(ellipse, rgba(240, 171, 252, 0.3), rgba(168, 85, 247, 0.15), transparent 60%);
+  animation: orb-morph-3 20s ease-in-out infinite;
 }
 
-@keyframes aurora-hero-1 {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 1; }
-  25% { transform: translate(12%, 8%) scale(1.15); opacity: 0.85; }
-  50% { transform: translate(-8%, 12%) scale(0.9); opacity: 1; }
-  75% { transform: translate(6%, -5%) scale(1.1); opacity: 0.9; }
+@keyframes nebula-drift-1 {
+  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 0.8; }
+  25% { transform: translate(8%, 5%) scale(1.1) rotate(2deg); opacity: 1; }
+  50% { transform: translate(-5%, 10%) scale(0.95) rotate(-1deg); opacity: 0.7; }
+  75% { transform: translate(3%, -6%) scale(1.05) rotate(1deg); opacity: 0.9; }
 }
 
-@keyframes aurora-hero-2 {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.9; }
-  33% { transform: translate(-15%, -8%) scale(1.2); opacity: 1; }
-  66% { transform: translate(10%, 5%) scale(0.85); opacity: 0.8; }
+@keyframes nebula-drift-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.7; }
+  33% { transform: translate(-10%, -5%) scale(1.15); opacity: 1; }
+  66% { transform: translate(8%, 6%) scale(0.9); opacity: 0.6; }
 }
 
 @keyframes orb-morph-1 {
-  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 0.7; }
-  25% { transform: translate(-10%, 8%) scale(1.2) rotate(3deg); opacity: 1; }
-  50% { transform: translate(5%, -5%) scale(0.9) rotate(-2deg); opacity: 0.6; }
-  75% { transform: translate(-5%, -10%) scale(1.15) rotate(1deg); opacity: 0.9; }
+  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 0.6; }
+  25% { transform: translate(-8%, 6%) scale(1.15) rotate(2deg); opacity: 0.9; }
+  50% { transform: translate(4%, -4%) scale(0.9) rotate(-1deg); opacity: 0.5; }
+  75% { transform: translate(-3%, -8%) scale(1.1) rotate(1deg); opacity: 0.8; }
 }
 
 @keyframes orb-morph-2 {
-  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 0.8; }
-  30% { transform: translate(12%, -6%) scale(1.15) rotate(-2deg); opacity: 1; }
-  60% { transform: translate(-8%, 10%) scale(0.95) rotate(3deg); opacity: 0.7; }
+  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 0.7; }
+  30% { transform: translate(10%, -5%) scale(1.1) rotate(-2deg); opacity: 1; }
+  60% { transform: translate(-6%, 8%) scale(0.95) rotate(2deg); opacity: 0.6; }
 }
 
 @keyframes orb-morph-3 {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
-  33% { transform: translate(8%, 12%) scale(1.3); opacity: 0.9; }
-  66% { transform: translate(-12%, -8%) scale(0.85); opacity: 0.6; }
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+  33% { transform: translate(6%, 10%) scale(1.25); opacity: 0.8; }
+  66% { transform: translate(-10%, -6%) scale(0.85); opacity: 0.5; }
 }
 
-/* Animated grid background */
+/* === SCI-FI PERSPECTIVE GRID === */
 .hero-grid {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(59, 130, 246, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(59, 130, 246, 0.06) 1px, transparent 1px);
-  background-size: 60px 60px;
-  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 30%, transparent 70%);
-  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 30%, transparent 70%);
-  animation: grid-pulse 8s ease-in-out infinite;
+    linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: radial-gradient(ellipse 80% 50% at 50% 50%, black 20%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 50% at 50% 50%, black 20%, transparent 70%);
+  animation: grid-breathe 6s ease-in-out infinite;
+  perspective: 400px;
+  transform: rotateX(25deg) scale(1.5);
+  transform-origin: center 80%;
 }
 
-@keyframes grid-pulse {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
+@keyframes grid-breathe {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
 }
 
-/* Hero spotlight beam */
+/* Central spotlight — eerie top-down cone */
 .hero-spotlight {
   position: absolute;
-  width: 40%;
-  height: 120%;
-  top: -20%;
-  left: 30%;
-  background: linear-gradient(180deg, rgba(59, 130, 246, 0.08) 0%, transparent 60%);
-  filter: blur(60px);
+  width: 50%;
+  height: 130%;
+  top: -30%;
+  left: 25%;
+  background: conic-gradient(from 180deg at 50% 0%, transparent 40%, rgba(0, 240, 255, 0.06) 47%, rgba(168, 85, 247, 0.04) 50%, rgba(0, 240, 255, 0.06) 53%, transparent 60%);
+  filter: blur(40px);
   pointer-events: none;
-  transform: rotate(-5deg);
 }
 
-/* Horizontal light line */
+/* Horizontal energy lines */
 .hero-light-line {
   position: absolute;
   width: 100%;
   height: 1px;
   left: 0;
-  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3), rgba(139, 92, 246, 0.2), transparent);
-  animation: light-line-sweep 6s ease-in-out infinite;
+  background: linear-gradient(90deg, transparent 10%, rgba(0, 240, 255, 0.4) 30%, rgba(168, 85, 247, 0.3) 50%, rgba(0, 240, 255, 0.4) 70%, transparent 90%);
+  animation: energy-line-pulse 5s ease-in-out infinite;
 }
 
-@keyframes light-line-sweep {
-  0%, 100% { opacity: 0.3; transform: scaleX(0.5); }
-  50% { opacity: 1; transform: scaleX(1); }
+@keyframes energy-line-pulse {
+  0%, 100% { opacity: 0.15; transform: scaleX(0.6); }
+  50% { opacity: 0.7; transform: scaleX(1); }
 }
 
 @keyframes aurora-drift {
