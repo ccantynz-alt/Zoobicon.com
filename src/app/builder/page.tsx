@@ -566,6 +566,8 @@ export default function BuilderPage() {
               } else if (event.type === "done") {
                 setStatus("complete");
               } else if (event.type === "error") {
+                // Clear empty/partial HTML so PreviewPanel shows error state, not "empty page detected"
+                setGeneratedCode("");
                 setError(event.message || "Stream error");
                 setStatus("error");
                 return;
@@ -622,10 +624,25 @@ export default function BuilderPage() {
                   clean = retryHtml;
                 } else {
                   console.warn(`[Builder] Client-side retry also empty (${retryBodyChars} body chars)`);
+                  // All retries exhausted — clear HTML and show error instead of empty page warning
+                  setGeneratedCode("");
+                  setError("Generation produced empty content after multiple retries. Your API key may be invalid or rate-limited — check /api/health for diagnostics, then try again.");
+                  setStatus("error");
+                  return;
                 }
+              } else {
+                // Retry request failed — clear HTML and show error
+                setGeneratedCode("");
+                setError("Generation failed after retries. Please try again.");
+                setStatus("error");
+                return;
               }
             } catch (retryErr) {
               console.error("[Builder] Client-side retry failed:", retryErr);
+              setGeneratedCode("");
+              setError("Generation failed — please try again.");
+              setStatus("error");
+              return;
             }
           }
 
@@ -718,6 +735,17 @@ export default function BuilderPage() {
       if (htmlEnd !== -1) finalHtml = finalHtml.slice(0, htmlEnd + "</html>".length);
 
       console.log("[Pipeline] HTML length:", finalHtml.length, "starts with:", finalHtml.substring(0, 50));
+
+      // Client-side body validation — catch cases where pipeline returned HTML but body is empty
+      const pipeBodyM = finalHtml.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+      const pipeBodyChars = pipeBodyM
+        ? pipeBodyM[1].replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().length
+        : 0;
+      if (pipeBodyChars < 50) {
+        console.warn(`[Pipeline] Client-side empty body detected (${pipeBodyChars} chars). Falling back to stream...`);
+        throw new Error(`Pipeline returned empty body (${pipeBodyChars} visible chars)`);
+      }
+
       setGeneratedCode(finalHtml);
       setStatus("complete");
 
@@ -736,9 +764,12 @@ export default function BuilderPage() {
 
       try {
         await streamGenerate(prompt.trim());
+        // After stream fallback, verify we didn't end up with empty HTML
+        // (streamGenerate handles its own errors internally, so check state)
       } catch (streamErr) {
         // If stream also fails, show a clear error instead of white screen
         console.error("[Stream fallback] Also failed:", streamErr);
+        setGeneratedCode("");
         setError(
           `Generation failed: ${errMsg}. Stream fallback also failed: ${streamErr instanceof Error ? streamErr.message : String(streamErr)}`
         );
@@ -1076,7 +1107,23 @@ export default function BuilderPage() {
 
           {/* Content */}
           <div className="flex-1 overflow-hidden relative">
-            {activeTab === "preview" ? (
+            {status === "error" && error && !hasCode ? (
+              <div className="h-full flex items-center justify-center bg-gray-950">
+                <div className="max-w-md text-center px-6">
+                  <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-6 h-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
+                  </div>
+                  <p className="text-red-300 text-sm font-medium mb-2">Generation Failed</p>
+                  <p className="text-red-200/60 text-xs mb-4">{error}</p>
+                  <button
+                    onClick={() => { setError(""); setStatus("idle"); }}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded-lg transition-colors"
+                  >
+                    Try Again
+                  </button>
+                </div>
+              </div>
+            ) : activeTab === "preview" ? (
               <PreviewPanel
                 html={generatedCode}
                 isGenerating={status === "generating"}
