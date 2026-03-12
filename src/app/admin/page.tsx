@@ -48,6 +48,8 @@ export default function AdminPage() {
   const [copied, setCopied] = useState("");
   const [apiTest, setApiTest] = useState<"idle" | "loading" | "ok" | "error">("idle");
   const [apiError, setApiError] = useState("");
+  const [healthStatus, setHealthStatus] = useState<"loading" | "healthy" | "unhealthy">("loading");
+  const [healthChecks, setHealthChecks] = useState<Array<{ name: string; status: string; message: string }>>([]);
 
   // Data states
   const [users, setUsers] = useState<UserRecord[]>([]);
@@ -74,6 +76,18 @@ export default function AdminPage() {
       window.location.href = "/auth/login";
     }
   }, []);
+
+  // Fetch live health status on mount
+  useEffect(() => {
+    if (!isAdmin) return;
+    fetch("/api/health")
+      .then((res) => res.json())
+      .then((data) => {
+        setHealthStatus(data.status === "healthy" ? "healthy" : "unhealthy");
+        setHealthChecks(data.checks || []);
+      })
+      .catch(() => setHealthStatus("unhealthy"));
+  }, [isAdmin]);
 
   const handleLogout = () => {
     try { localStorage.removeItem("zoobicon_user"); } catch {}
@@ -355,33 +369,63 @@ export default function AdminPage() {
             </div>
 
             <div className="grid lg:grid-cols-2 gap-6">
-              {/* System Checks */}
+              {/* System Checks — Live from /api/health */}
               <div className="gradient-border rounded-2xl p-6">
                 <div className="flex items-center justify-between mb-5">
                   <h2 className="text-base font-bold">System Status</h2>
                   <div className="flex items-center gap-1.5">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-xs text-emerald-400/80">Operational</span>
+                    {healthStatus === "loading" ? (
+                      <>
+                        <RefreshCw className="w-3 h-3 text-white/40 animate-spin" />
+                        <span className="text-xs text-white/40">Checking...</span>
+                      </>
+                    ) : healthStatus === "healthy" ? (
+                      <>
+                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="text-xs text-emerald-400/80">Operational</span>
+                      </>
+                    ) : (
+                      <>
+                        <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                        <span className="text-xs text-red-400/80">Issues Detected</span>
+                      </>
+                    )}
                   </div>
                 </div>
                 <div className="space-y-3">
-                  {[
-                    { label: "AI Generation Engine", detail: "Claude Sonnet + streaming SSE" },
-                    { label: "Multi-Agent Pipeline", detail: "10 agents · 3 tiers · Parallel execution" },
-                    { label: "AI Generators", detail: "32+ specialized generators across 6 categories" },
-                    { label: "Dominat8 Brand", detail: "dominat8.io + dominat8.com white-label active" },
-                    { label: "AI Image Engine", detail: "DALL-E 3 / Stability AI / Unsplash" },
-                    { label: "Website Cloner", detail: "Fetch, analyze, rebuild premium" },
-                    { label: "Rate Limiting", detail: "10 gen/min · 20 chat/min · 30 support/min" },
-                  ].map((c) => (
-                    <div key={c.label} className="flex items-start gap-3">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                  {healthChecks.length > 0 ? healthChecks.map((c) => (
+                    <div key={c.name} className="flex items-start gap-3">
+                      {c.status === "pass" ? (
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                      ) : c.status === "warn" ? (
+                        <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                      ) : (
+                        <XCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                      )}
                       <div>
-                        <div className="text-sm font-medium">{c.label}</div>
-                        <div className="text-xs text-white/30">{c.detail}</div>
+                        <div className="text-sm font-medium">{c.name.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}</div>
+                        <div className={`text-xs ${c.status === "fail" ? "text-red-400/70" : "text-white/30"}`}>{c.message}</div>
                       </div>
                     </div>
-                  ))}
+                  )) : (
+                    // Static fallback while loading
+                    [
+                      { label: "AI Generation Engine", detail: "Claude Opus + streaming SSE" },
+                      { label: "Multi-Agent Pipeline", detail: "10 agents · 3 tiers · Parallel execution" },
+                      { label: "AI Generators", detail: "32+ specialized generators across 6 categories" },
+                      { label: "Dominat8 Brand", detail: "dominat8.io + dominat8.com white-label active" },
+                      { label: "AI Image Engine", detail: "DALL-E 3 / Stability AI / Unsplash" },
+                      { label: "Rate Limiting", detail: "10 gen/min · 20 chat/min · 30 support/min" },
+                    ].map((c) => (
+                      <div key={c.label} className="flex items-start gap-3">
+                        <RefreshCw className="w-4 h-4 text-white/20 animate-spin flex-shrink-0 mt-0.5" />
+                        <div>
+                          <div className="text-sm font-medium text-white/40">{c.label}</div>
+                          <div className="text-xs text-white/20">{c.detail}</div>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
 
                 <div className="mt-5 pt-5 border-t border-white/[0.06]">
