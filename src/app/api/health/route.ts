@@ -64,7 +64,35 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // 3. Check OpenAI key (optional)
+  // 3. Test Opus access (the model used for builds — if this fails, generation will always fail)
+  if (apiKey) {
+    const opusStart = Date.now();
+    try {
+      const client = new Anthropic({ apiKey });
+      const res = await client.messages.create({
+        model: "claude-opus-4-6",
+        max_tokens: 10,
+        messages: [{ role: "user", content: "Say OK" }],
+      });
+      const text = res.content.find((b) => b.type === "text")?.text || "";
+      checks.push({
+        name: "opus_access",
+        status: text ? "pass" : "fail",
+        message: text ? "Opus model accessible" : "Opus returned empty response",
+        durationMs: Date.now() - opusStart,
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      checks.push({
+        name: "opus_access",
+        status: "fail",
+        message: `Opus NOT accessible: ${msg}. This means ALL new builds will fail. The Developer agent requires Opus.`,
+        durationMs: Date.now() - opusStart,
+      });
+    }
+  }
+
+  // 4. Check OpenAI key (optional)
   checks.push({
     name: "openai_api_key",
     status: process.env.OPENAI_API_KEY ? "pass" : "warn",

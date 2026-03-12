@@ -96,7 +96,7 @@ export const maxDuration = 120; // Allow up to 2 minutes
 
 export async function POST(req: NextRequest) {
   try {
-    const { prompt, tier, existingCode } = await req.json();
+    const { prompt, tier, existingCode, model: requestedModel } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       return new Response(
@@ -133,14 +133,14 @@ export async function POST(req: NextRequest) {
     if (isEdit) {
       systemPrompt = EDIT_SYSTEM;
       userMessage = `Here is the current website HTML:\n\n${existingCode}\n\n---\n\nIMPORTANT: Output the COMPLETE updated HTML from <!DOCTYPE html> to </html>. Do NOT skip or truncate any sections.\n\nApply this edit: ${prompt}`;
-      model = "claude-sonnet-4-6";
+      model = requestedModel || "claude-sonnet-4-6";
       maxTokens = 64000;
     } else {
       // New builds use Opus for maximum quality — this is the stream fallback
       // when the 10-agent pipeline is unavailable. Edits stay on Sonnet for speed.
       systemPrompt = isPremium ? PREMIUM_SYSTEM : STANDARD_SYSTEM;
       userMessage = `Build me a stunning, high-end website for: ${prompt}\n\nThis must look like it was designed by a top-tier agency. Match the aesthetic to the industry — if this is a luxury, executive, or professional brand, use elegant typography, aspirational imagery, warm whites, and sophisticated restraint. If this is a tech/startup brand, use modern clean design with tasteful accents. Always include: hero with clear value proposition, social proof, services/features, testimonials, stats, CTA, and comprehensive footer. The design must feel premium, polished, and trustworthy.`;
-      model = "claude-opus-4-6";
+      model = requestedModel || "claude-opus-4-6";
       maxTokens = 64000;
     }
 
