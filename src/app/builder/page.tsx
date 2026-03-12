@@ -442,6 +442,14 @@ export default function BuilderPage() {
           if (fbStart > 0) fbHtml = fbHtml.slice(fbStart);
           const fbEnd = fbHtml.lastIndexOf("</html>");
           if (fbEnd !== -1) fbHtml = fbHtml.slice(0, fbEnd + "</html>".length);
+          // Validate body content before accepting fallback
+          const fbBodyM = fbHtml.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+          const fbBodyChars = fbBodyM
+            ? fbBodyM[1].replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().length
+            : 0;
+          if (fbBodyChars < 50) {
+            throw new Error(`Fallback generation produced empty body (${fbBodyChars} chars). The AI model may be unavailable — check /api/health for diagnostics.`);
+          }
           setGeneratedCode(fbHtml);
           setStatus("complete");
           // Auto-replace placeholder images
@@ -535,7 +543,16 @@ export default function BuilderPage() {
                 if (rds > 0) retryHtml = retryHtml.slice(rds);
                 const rhe = retryHtml.lastIndexOf("</html>");
                 if (rhe !== -1) retryHtml = retryHtml.slice(0, rhe + "</html>".length);
-                clean = retryHtml;
+                // Only accept retry if it actually has body content
+                const retryBodyM = retryHtml.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+                const retryBodyChars = retryBodyM
+                  ? retryBodyM[1].replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().length
+                  : 0;
+                if (retryBodyChars >= 50) {
+                  clean = retryHtml;
+                } else {
+                  console.warn(`[Builder] Client-side retry also empty (${retryBodyChars} body chars)`);
+                }
               }
             } catch (retryErr) {
               console.error("[Builder] Client-side retry failed:", retryErr);
@@ -648,9 +665,9 @@ export default function BuilderPage() {
         // If stream also fails, show a clear error instead of white screen
         console.error("[Stream fallback] Also failed:", streamErr);
         setError(
-          "Generation temporarily unavailable. Please try again in a moment."
+          `Generation failed: ${errMsg}. Stream fallback also failed: ${streamErr instanceof Error ? streamErr.message : String(streamErr)}`
         );
-        setStatus("idle");
+        setStatus("error");
       }
     }
   }, [prompt, tier, streamGenerate, autoReplaceImages, selectedModel]);

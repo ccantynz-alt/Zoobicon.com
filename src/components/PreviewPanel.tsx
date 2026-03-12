@@ -507,15 +507,45 @@ export default function PreviewPanel({ html, isGenerating }: PreviewPanelProps) 
 
   // Safety check — if body has no visible text content, show diagnostic instead of blank white
   if (html && bodyTextLength < 50) {
+    // Detect likely causes from the HTML content
+    const hasHead = /<head/i.test(html);
+    const hasBody = /<body/i.test(html);
+    const hasStyle = /<style/i.test(html);
+    const hasScript = /<script/i.test(html);
+    const htmlLen = html.length;
+
+    let likelyCause = "";
+    if (!hasBody) {
+      likelyCause = "The HTML has no <body> tag at all. This usually means the AI model returned an incomplete response — it may have been cut off due to token limits or the API key may lack access to the selected model (Opus).";
+    } else if (hasStyle && htmlLen > 500) {
+      likelyCause = "The HTML contains CSS but the <body> is empty. The AI spent all its tokens on styling and never got to the page content.";
+    } else if (htmlLen < 200) {
+      likelyCause = "The HTML is very short (" + htmlLen + " chars). The AI returned almost nothing — this often means the API key is invalid, rate-limited, or doesn't have access to the model being used.";
+    } else {
+      likelyCause = "The AI generated some HTML but the body lacks visible text content.";
+    }
+
     return (
       <div className="h-full overflow-auto bg-gray-950 p-6">
         <div className="bg-red-900/30 border border-red-600/40 rounded-lg p-4 mb-4">
           <p className="text-red-300 text-sm font-medium mb-2">Generation incomplete — empty page detected</p>
           <p className="text-red-200/60 text-xs mb-3">
-            The AI generated HTML structure ({html.length.toLocaleString()} chars) but the body has very little visible text content ({bodyTextLength} chars).
-            This usually means the AI produced CSS/JS but forgot the actual page content.
+            {likelyCause}
           </p>
-          <p className="text-red-200/60 text-xs">Try clicking &quot;New Site&quot; and generating again, or switch to the Code tab to inspect the output.</p>
+          <div className="bg-red-950/50 rounded p-3 mb-3">
+            <p className="text-[10px] text-red-300/60 uppercase tracking-wider mb-2">Diagnostics</p>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-red-200/50 font-mono">
+              <span>Total HTML:</span><span>{htmlLen.toLocaleString()} chars</span>
+              <span>Body text:</span><span>{bodyTextLength} chars</span>
+              <span>Has &lt;head&gt;:</span><span>{hasHead ? "yes" : "NO"}</span>
+              <span>Has &lt;body&gt;:</span><span>{hasBody ? "yes" : "NO"}</span>
+              <span>Has &lt;style&gt;:</span><span>{hasStyle ? "yes" : "no"}</span>
+              <span>Has &lt;script&gt;:</span><span>{hasScript ? "yes" : "no"}</span>
+            </div>
+          </div>
+          <p className="text-red-200/60 text-xs">
+            <strong className="text-red-300/80">Next steps:</strong> Visit <code className="text-red-300/70 bg-red-950/50 px-1 rounded">/api/health</code> to check if your API key and models are working. Then try &quot;New Site&quot; again.
+          </p>
         </div>
         <div className="bg-gray-900/50 rounded-lg p-4">
           <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">Raw HTML (first 1000 chars)</p>
