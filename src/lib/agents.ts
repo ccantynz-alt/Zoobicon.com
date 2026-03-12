@@ -45,10 +45,15 @@ export interface AgentResult {
   duration: number;
 }
 
+export interface ReactComponents {
+  [filename: string]: string;
+}
+
 export interface PipelineResult {
   html: string;
   agents: AgentResult[];
   totalDuration: number;
+  reactComponents?: ReactComponents;
 }
 
 // ── Agent System Prompts ──
@@ -443,6 +448,79 @@ If score >= 90 and no critical issues, set fixedHtml to empty string.
 If there are fixable issues, return the COMPLETE fixed HTML in fixedHtml.
 Output ONLY valid JSON.`;
 
+const REACT_DECOMPOSER_SYSTEM = `You are a React specialist. You take a complete HTML website and decompose it into clean, modular React components using Tailwind CSS and shadcn/ui patterns.
+
+Output a JSON object where each key is a filename and the value is the complete React component source code:
+
+{
+  "components/Navbar.tsx": "source code...",
+  "components/Hero.tsx": "source code...",
+  "components/Features.tsx": "source code...",
+  "components/About.tsx": "source code...",
+  "components/Testimonials.tsx": "source code...",
+  "components/Stats.tsx": "source code...",
+  "components/FAQ.tsx": "source code...",
+  "components/CTA.tsx": "source code...",
+  "components/Footer.tsx": "source code...",
+  "app/page.tsx": "source code...",
+  "app/globals.css": "CSS custom properties and Tailwind imports..."
+}
+
+## Rules for Each Component
+
+1. Each component is a default-exported React function component with TypeScript
+2. Use Tailwind CSS utility classes for ALL styling — no inline styles, no CSS modules
+3. Use shadcn/ui patterns:
+   - Import \`{ cn }\` from "@/lib/utils" when combining classes conditionally
+   - Use \`<Button>\` from "@/components/ui/button" instead of raw \`<button>\`
+   - Use \`<Card, CardHeader, CardContent>\` from "@/components/ui/card" instead of raw divs with card classes
+   - Use \`<Badge>\` from "@/components/ui/badge"
+   - Use \`<Input>\` from "@/components/ui/input"
+   - Use \`<Accordion, AccordionItem, AccordionTrigger, AccordionContent>\` from "@/components/ui/accordion" for FAQ
+4. Preserve ALL text content, images, links, and functionality from the original HTML
+5. Convert inline SVG icons to JSX (self-closing tags, camelCase attributes)
+6. Convert CSS custom properties from the HTML into Tailwind theme extensions in globals.css
+7. The app/page.tsx imports and composes all section components in order
+8. Include "use client" directive on components that need interactivity (FAQ accordion, mobile menu, counter animations)
+9. Keep components focused — one section per file
+10. Images keep their picsum.photos URLs with proper Next.js Image alt text
+
+## globals.css format
+\`\`\`
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --primary: [extracted from HTML];
+    --primary-foreground: [extracted];
+    /* ... shadcn/ui CSS variable format (HSL values without hsl()) */
+  }
+}
+\`\`\`
+
+## app/page.tsx format
+\`\`\`tsx
+import Navbar from "@/components/Navbar";
+import Hero from "@/components/Hero";
+// ... all imports
+export default function Home() {
+  return (
+    <main>
+      <Navbar />
+      <Hero />
+      {/* ... all sections in order */}
+      <Footer />
+    </main>
+  );
+}
+\`\`\`
+
+Output ONLY valid JSON. No markdown, no code fences around the outer JSON.`;
+
 // ── Pipeline Execution ──
 
 export async function runPipeline(
@@ -642,17 +720,19 @@ export async function runPipeline(
     throw new Error("Developer agent produced a page with no visible content after retry. Please try again.");
   }
 
-  // ── Phase 4: Animation + SEO + Forms (Parallel) — ALL tiers ──
-  // These are ENHANCEMENT agents — failures should not destroy the developer's output.
-  // We also race against a timeout for hosting platforms with short request limits.
+  // ── Phase 4: Animation + SEO + Forms + React Decomposition (Parallel) ──
+  // Enhancement agents + React source generation run in parallel.
+  // Failures should not destroy the developer's output.
+  let reactComponents: ReactComponents | undefined;
   {
     onProgress?.("animation", "adding scroll effects");
     onProgress?.("seo", "optimizing for search");
     onProgress?.("forms", "enhancing form functionality");
+    onProgress?.("react", "generating React components");
     const phase4Start = Date.now();
 
     try {
-      const [animText, seoText, formsText] = await Promise.all([
+      const [animText, seoText, formsText, reactText] = await Promise.all([
         llmText({
           model: MODEL_BALANCED,
           maxTokens: 64000,
@@ -671,6 +751,12 @@ export async function runPipeline(
           system: FORMS_SYSTEM,
           userMessage: `Make all forms functional in this website:\n\n${html}`,
         }).catch((err) => { console.warn("[Pipeline] Forms agent failed:", err.message); return ""; }),
+        llmText({
+          model: MODEL_BALANCED,
+          maxTokens: 64000,
+          system: REACT_DECOMPOSER_SYSTEM,
+          userMessage: `Decompose this HTML website into modular React components with shadcn/ui and Tailwind CSS. Preserve ALL content, images, and functionality.\n\nHTML:\n${html}`,
+        }).catch((err) => { console.warn("[Pipeline] React Decomposer failed:", err.message); return ""; }),
       ]);
 
       // Safely use animation result as base — only if it's valid and substantial
@@ -704,9 +790,23 @@ export async function runPipeline(
         }
       }
 
+      // Parse React components from decomposer output
+      if (reactText) {
+        try {
+          const parsed = JSON.parse(extractJSON(reactText));
+          if (typeof parsed === "object" && Object.keys(parsed).length >= 3) {
+            reactComponents = parsed;
+            console.log(`[Pipeline] React Decomposer produced ${Object.keys(parsed).length} component files`);
+          }
+        } catch {
+          console.warn("[Pipeline] React Decomposer output was not valid JSON");
+        }
+      }
+
       agents.push({ agent: "Animator", output: `[animations ${animText ? "applied" : "skipped"}]`, duration: Date.now() - phase4Start });
       agents.push({ agent: "SEO Specialist", output: `[SEO ${seoText ? "applied" : "skipped"}]`, duration: Date.now() - phase4Start });
       agents.push({ agent: "Forms Engineer", output: `[forms ${formsText ? "applied" : "skipped"}]`, duration: Date.now() - phase4Start });
+      agents.push({ agent: "React Decomposer", output: `[${reactComponents ? Object.keys(reactComponents).length + " files" : "skipped"}]`, duration: Date.now() - phase4Start });
     } catch (phase4Err) {
       console.warn("[Pipeline] Phase 4 failed entirely, keeping developer HTML:", phase4Err);
       agents.push({ agent: "Enhancement Phase", output: `[skipped: ${phase4Err instanceof Error ? phase4Err.message : "error"}]`, duration: Date.now() - phase4Start });
@@ -773,6 +873,7 @@ export async function runPipeline(
     html,
     agents,
     totalDuration: Date.now() - startTime,
+    reactComponents,
   };
 }
 

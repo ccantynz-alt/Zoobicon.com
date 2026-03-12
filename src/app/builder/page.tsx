@@ -344,6 +344,7 @@ export default function BuilderPage() {
   const [pipelineAgents, setPipelineAgents] = useState<string[]>([]);
   const [selectedModel, setSelectedModel] = useState("");  // Empty = use pipeline's smart routing (Haiku/Opus/Sonnet)
   const [availableModels, setAvailableModels] = useState<AIModel[]>([]);
+  const [reactSource, setReactSource] = useState<Record<string, string> | null>(null);
 
   const abortRef = useRef<AbortController | null>(null);
   const generationIdRef = useRef(0); // Tracks current generation to prevent stale image replacements
@@ -624,6 +625,11 @@ export default function BuilderPage() {
       }
 
       const data = await res.json();
+      // Store React component source if available (for export)
+      if (data.reactComponents && Object.keys(data.reactComponents).length > 0) {
+        setReactSource(data.reactComponents);
+        console.log(`[Pipeline] Received ${Object.keys(data.reactComponents).length} React component files`);
+      }
       const agentSummary = (data.agents || []).map((a: { name: string; duration: number }) =>
         `${a.name} — ${(a.duration / 1000).toFixed(1)}s`
       );
@@ -687,6 +693,7 @@ export default function BuilderPage() {
   const handleNewSite = useCallback(() => {
     setGeneratedCode("");
     setPrompt("");
+    setReactSource(null);
     setStatus("idle");
     setError("");
     setActiveTool(null);
@@ -778,7 +785,7 @@ export default function BuilderPage() {
       case "perf":
         return <PerformancePanel code={generatedCode} />;
       case "export":
-        return <ExportPanel code={generatedCode} />;
+        return <ExportPanel code={generatedCode} reactSource={reactSource} />;
       case "variants":
         return <VariantsPanel code={generatedCode} onApplyVariant={handleCodeUpdate} />;
       case "multipage":
@@ -940,7 +947,7 @@ export default function BuilderPage() {
                 isGenerating={status === "generating"}
               />
             ) : (
-              <CodePanel html={generatedCode} />
+              <CodePanel html={generatedCode} reactSource={reactSource} />
             )}
           </div>
         </div>
