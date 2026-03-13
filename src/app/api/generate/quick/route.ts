@@ -199,14 +199,28 @@ Output a JSON object with site theme settings:
 }
 </config>
 
-Font choices by industry:
-- Luxury/Legal/Finance: font1: "Playfair Display", font2: "Inter" — warm whites, gold/navy
-- SaaS/Tech: font1: "Inter", font2: "Inter" — modern, can use dark bg
-- Restaurant/Food: font1: "Playfair Display", font2: "Lato" — warm earth tones
-- Healthcare: font1: "Inter", font2: "Inter" — soft blues/greens
-- Creative/Agency: font1: "Space Grotesk", font2: "Inter" — bold, high contrast
+## COLOR RULES — CRITICAL
+DEFAULT TO LIGHT/WHITE BACKGROUNDS. Most professional websites use white or very light backgrounds. Only use a dark background (bg: "#0a0a0a" or similar) if the business explicitly requires it (nightclub, gaming, cinema, goth brand).
+
+Light theme examples by industry:
+- Luxury/Legal/Finance: bg "#fffdf8", bgAlt "#faf7f2", text "#1a1a2e", primary "#b8860b" or "#1e3a5f" — warm cream + gold/navy
+- SaaS/Tech: bg "#ffffff", bgAlt "#f0f4ff", text "#1a1a2e", primary "#2563eb" — clean white + blue
+- Restaurant/Food: bg "#fffaf5", bgAlt "#fdf2e9", text "#2d1810", primary "#c4611a" — warm cream + terracotta
+- Healthcare: bg "#f8fffe", bgAlt "#f0faf7", text "#1a2e2a", primary "#0d9488" — soft white + teal
+- Creative/Agency: bg "#ffffff", bgAlt "#faf5ff", text "#1a1a2e", primary "#7c3aed" — white + purple
+- Real Estate: bg "#ffffff", bgAlt "#f8f6f3", text "#1a1a2e", primary "#1e3a5f" — white + navy
+- Fitness: bg "#ffffff", bgAlt "#fef2f2", text "#1a1a2e", primary "#dc2626" — white + red
+
+Font pairings:
+- Luxury/Legal/Finance: font1: "Playfair Display", font2: "Inter"
+- SaaS/Tech: font1: "Inter", font2: "Inter"
+- Restaurant/Food: font1: "Playfair Display", font2: "Lato"
+- Healthcare: font1: "Inter", font2: "Inter"
+- Creative/Agency: font1: "Space Grotesk", font2: "Inter"
 
 The "customCss" field is for ONLY site-specific CSS that the component library doesn't cover (max 30 lines). Things like hero gradient overlays, custom nav styling, accent decorations. Most sites need very little here.
+
+NEVER use neon colors (#00ff00, #ff00ff, #00ffff, etc.) unless explicitly requested. Use sophisticated, muted accent colors.
 
 ## STEP 2: BODY HTML
 Output the complete body content wrapped in <body-html>...</body-html> tags.
@@ -237,12 +251,22 @@ const STANDARD_SECTIONS = `
 9. CTA — <section class="section fade-in" with dark/accent background via inline style, text-center> Compelling headline, subtext, .btn-primary.btn-lg, trust line.
 10. Footer — <footer class="section fade-in" style="background:var(--color-text);color:#fff;padding:60px var(--container-padding)"> with .container > .grid.grid-4: about blurb, quick links, services, contact info.
 
-## IMAGE RULES
-- Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for ALL images
-- EVERY image MUST have a DIFFERENT, UNIQUE seed keyword
-- Good seeds: seed/modern-workspace/800/500, seed/team-collaboration/600/400, seed/happy-client-portrait/100/100
-- Vary sizes by context: hero bg (1200/600), about (800/500), cards (400/300), avatars (100/100)
-- NEVER repeat a seed keyword. If you have 10 images, you need 10 unique keywords.
+## IMAGE RULES — MANDATORY
+Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for ALL images.
+Each image MUST use a UNIQUE seed from this list (assign in order):
+- img1: hero image (1200/600)
+- img2: about photo (800/500)
+- img3: feature card 1 (400/300)
+- img4: feature card 2 (400/300)
+- img5: feature card 3 (400/300)
+- img6: testimonial avatar 1 (80/80)
+- img7: testimonial avatar 2 (80/80)
+- img8: testimonial avatar 3 (80/80)
+
+For KEYWORD, combine the business type with the image purpose. Examples for a bakery:
+img1=artisan-bread-display, img2=baker-kneading-dough, img3=fresh-pastries, img4=cozy-cafe-interior, img5=wedding-cake-design, img6=woman-smiling-portrait, img7=man-chef-portrait, img8=young-couple-portrait
+
+NEVER reuse a keyword. Every src must be different.
 
 ## RULES
 - Output ONLY the <config> block and <body-html> block. Nothing else.
@@ -251,7 +275,8 @@ const STANDARD_SECTIONS = `
 - Every headline is BENEFIT-FOCUSED (what the customer gets, not what the product does).
 - Testimonials must include specific metrics and results.
 - WRITE REAL, DETAILED CONTENT. Every section should have multiple sentences/paragraphs.
-- An empty body is UNACCEPTABLE.`;
+- An empty body is UNACCEPTABLE.
+- BACKGROUND: Use WHITE or LIGHT backgrounds unless the business is explicitly dark-themed.`;
 
 const PREMIUM_SECTIONS = `
 1. <nav> — Use: <nav style="position:sticky;top:0;z-index:100;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:rgba(255,255,255,0.85);border-bottom:1px solid var(--color-border)"><div class="container flex justify-between items-center" style="padding:1rem var(--container-padding)">. Logo text, nav links, CTA button (.btn .btn-primary .btn-sm), mobile hamburger (.mobile-menu-btn). Feels floating/premium.
@@ -262,34 +287,46 @@ const PREMIUM_SECTIONS = `
 6. About/Story — <section class="section section-alt fade-in-left"> with .grid.grid-2. One side: large image. Other: founder story, mission, 3-4 stats inline using .stat-item.
 7. Process/How it works — <section class="section fade-in"> with .section-header then numbered steps (1→2→3→4) with icons in accent circles, connected by a subtle line. Each step: number badge, heading, description.
 8. Testimonials — <section class="section section-alt fade-in"> with .grid.grid-3 > .testimonial-card. Each: stars, DETAILED quote with specific metrics ("Increased conversion by 47% in 3 months"), avatar image (picsum 80x80), name, title, company. 3 testimonials.
-9. Stats — <section class="section fade-in" with accent/dark background via inline style, light text> with .grid.grid-4 > .stat-item. Use animated counters: <div class="stat-number" data-target="NUMBER" data-suffix="%" data-prefix="">0</div>. 4 impressive stats.
+9. Stats — <section class="section fade-in" with subtle accent background (e.g. deep navy #1e3a5f or brand primary, NOT neon) via inline style, white text> with .grid.grid-4 > .stat-item. Use animated counters: <div class="stat-number" data-target="NUMBER" data-suffix="%" data-prefix="">0</div>. 4 impressive stats.
 10. Pricing — <section class="section section-alt fade-in"> with .section-header then .grid.grid-3 for 3 pricing tiers. Middle card gets scale(1.05), accent border, "Most Popular" .badge-primary. Each: price, feature list with checkmarks (✓), CTA button.
 11. FAQ — <section class="section fade-in"> with .section-header then .faq-item > .faq-question (text + <span class="faq-icon">+</span>) + .faq-answer > p. 6 Q&As handling real objections.
 12. Final CTA — <section class="section fade-in" with dramatic dark/gradient background via inline style, centered text, light colors> Big emotional headline, urgency line, .btn-primary.btn-lg, trust badges ("30-day guarantee • No credit card • Cancel anytime").
 13. Footer — <footer class="section" style="background:var(--color-text);color:rgba(255,255,255,0.9);padding:80px var(--container-padding) 40px"> with .container > .grid.grid-4: about + newsletter .input, nav links, services, contact + social icons. Bottom: copyright bar.
 
-## IMAGE RULES
-- Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for ALL images
-- EVERY image MUST have a DIFFERENT, UNIQUE seed keyword — NEVER repeat
-- Use highly descriptive, industry-specific keywords:
-  - Hero: seed/luxury-modern-office/1200/600 or seed/gourmet-restaurant-ambiance/1200/600
-  - About: seed/professional-team-meeting/800/500 or seed/artisan-craft-workshop/800/500
-  - Testimonials: seed/confident-business-woman/80/80, seed/smiling-executive-man/80/80, seed/creative-professional/80/80
-  - Features: seed/data-analytics-screen/400/300, seed/cloud-technology-abstract/400/300
-- NEVER reuse a seed. 15 images = 15 unique keywords.
+## IMAGE RULES — MANDATORY
+Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for ALL images.
+Each image MUST use a UNIQUE seed. Assign in order:
+- img1: hero (1200/600)
+- img2: about/story (800/500)
+- img3: feature 1 (400/300)
+- img4: feature 2 (400/300)
+- img5: feature 3 (400/300)
+- img6: feature 4 (400/300)
+- img7: process step (600/400)
+- img8: testimonial avatar 1 (80/80)
+- img9: testimonial avatar 2 (80/80)
+- img10: testimonial avatar 3 (80/80)
+- img11: additional section (800/500)
+
+For KEYWORD, combine business type + image purpose. Example for a law firm:
+img1=modern-law-office-lobby, img2=legal-team-conference, img3=courthouse-architecture, img4=contract-signing, img5=client-consultation, img6=legal-library-books, img7=justice-scales-closeup, img8=professional-woman-lawyer, img9=senior-businessman, img10=young-entrepreneur-portrait, img11=city-skyline-downtown
+
+NEVER reuse a keyword. Every src must be different.
 
 ## PREMIUM QUALITY MARKERS
 - Inline SVG icons should be colorful and detailed (not generic), using the primary/accent color
-- Use inline styles for premium touches: gradient backgrounds on stats/CTA sections, accent borders on featured cards, generous padding (120px+ on hero/CTA)
+- Use inline styles for premium touches: subtle gradient backgrounds on stats/CTA sections (prefer dark navy or deep brand-color gradients, NOT neon), accent borders on featured cards, generous padding (120px+ on hero/CTA)
 - Testimonial quotes must be LONG and SPECIFIC — at least 2-3 sentences with real metrics
 - Copy should handle objections, build trust, and create urgency
-- The overall feel should be "expensive" — think lots of whitespace, big typography, confident copy
+- The overall feel should be "high-end agency" — lots of whitespace, big typography, confident copy, LIGHT backgrounds with pops of color
+- Think Apple.com or Stripe.com — clean, white, spacious. NOT dark/neon/cyberpunk.
 
 ## RULES
 - Output ONLY the <config> block and <body-html> block. Nothing else.
 - No <!DOCTYPE>, <html>, <head>, <style> tags. The server handles all of that.
 - Use ONLY the component classes listed above plus inline styles for unique touches.
-- An empty body is UNACCEPTABLE.`;
+- An empty body is UNACCEPTABLE.
+- BACKGROUND: Use WHITE or LIGHT backgrounds. "Premium" means Apple/Stripe clean — NOT dark/neon.`;
 
 export async function POST(req: NextRequest) {
   try {
@@ -323,7 +360,7 @@ export async function POST(req: NextRequest) {
     const userMessage = isPremium
       ? `Build a world-class PREMIUM website for: ${prompt}
 
-This must look like a $30,000 agency built it. Include ALL 13 sections with rich, specific content. Every testimonial mentions real metrics. Every headline drives action. The design should feel expensive and intentional.
+This must look like a $30,000 agency built it. Think Apple.com or Stripe.com — clean white background, generous whitespace, sophisticated typography. Include ALL 13 sections with rich, specific content. Every testimonial mentions real metrics. Every headline drives action. Use a LIGHT color scheme with white/cream backgrounds. Every image must use a unique picsum seed.
 
 Output the <config> block first, then the <body-html> block. Nothing else.`
       : `Build a stunning website for: ${prompt}
