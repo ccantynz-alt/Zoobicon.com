@@ -538,10 +538,13 @@ export async function runPipeline(
   const userModel = input.model;
   const useMultiLLM = userModel && !userModel.startsWith("claude");
 
-  // Smart model routing — Haiku for fast JSON, Opus for the build, Sonnet for enhancements
+  // Smart model routing — Haiku for fast JSON, Sonnet for everything else in the pipeline
+  // Opus is too slow for a 10-agent pipeline within Vercel's 300s limit (single call takes 90-120s).
+  // Sonnet produces great HTML and finishes in ~20-30s, leaving room for all enhancement agents.
+  // Opus is still used in the single-call stream/direct routes where there's only 1 API call.
   const MODEL_PLANNER = userModel || "claude-haiku-4-5-20251001";   // Fast JSON agents (strategy, brand, copy, architecture)
   const MODEL_BALANCED = userModel || "claude-sonnet-4-6";           // Enhancement agents (animation, SEO, forms, integrations, QA)
-  const MODEL_PREMIUM = userModel || "claude-opus-4-6";              // Developer agent — the actual website build
+  const MODEL_PREMIUM = userModel || "claude-sonnet-4-6";            // Developer agent — Sonnet for pipeline speed
 
   // Helper: call the right LLM based on user selection
   // Returns { text, stopReason } so we can detect truncation
