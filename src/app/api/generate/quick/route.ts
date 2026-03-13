@@ -376,10 +376,18 @@ Output the <config> block first, then the <body-html> block. Nothing else.`;
         };
 
         const generate = async (useModel: string, useMaxTokens: number, useTimeout: number): Promise<string> => {
-          const c = new Anthropic({ apiKey, timeout: useTimeout });
+          const isOpus = useModel.includes("opus");
+          const c = new Anthropic({
+            apiKey,
+            timeout: useTimeout,
+            // Enable fast mode for Opus: 2.5x faster output tokens/second
+            ...(isOpus ? { defaultHeaders: { "anthropic-beta": "fast-mode-2026-02-01" } } : {}),
+          });
           const stream = c.messages.stream({
             model: useModel,
             max_tokens: useMaxTokens,
+            // Fast mode: speed-prioritized inference on Opus 4.6
+            ...(isOpus ? { speed: "fast" as const } : {}),
             // Prompt caching: cache the system prompt (identical across requests)
             // Saves ~90% latency on time-to-first-token for repeated calls
             system: [
@@ -389,7 +397,7 @@ Output the <config> block first, then the <body-html> block. Nothing else.`;
                 cache_control: { type: "ephemeral" as const },
               },
             ],
-            messages: useModel.includes("opus")
+            messages: isOpus
               ? [{ role: "user", content: userMessage }]
               : [
                   { role: "user", content: userMessage },
@@ -399,7 +407,7 @@ Output the <config> block first, then the <body-html> block. Nothing else.`;
           });
 
           // Prepend prefill for non-Opus models so parsing regexes still match
-          let accumulated = useModel.includes("opus") ? "" : "<config>\n{";
+          let accumulated = isOpus ? "" : "<config>\n{";
           for await (const ev of stream) {
             if (ev.type === "content_block_delta" && ev.delta.type === "text_delta") {
               accumulated += ev.delta.text;
