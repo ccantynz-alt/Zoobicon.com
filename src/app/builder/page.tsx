@@ -893,10 +893,90 @@ export default function BuilderPage() {
       try {
         await streamGenerate(prompt.trim());
       } catch (streamErr) {
-        console.error("[Stream fallback] Also failed:", streamErr);
-        setGeneratedCode("");
-        setError(`Generation failed: ${errMsg}. Fallback also failed: ${streamErr instanceof Error ? streamErr.message : String(streamErr)}`);
-        setStatus("error");
+        console.warn("[Stream fallback] Also failed:", streamErr);
+
+        // Last resort: /api/generate/quick — simplified Sonnet call that guarantees body content
+        console.log("[Quick fallback] Trying /api/generate/quick...");
+        setPipelineAgents(prev => [...prev, "Using quick generation mode..."]);
+
+        try {
+          const quickRes = await fetch("/api/generate/quick", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              prompt: prompt.trim(),
+              ...(selectedModel ? { model: selectedModel } : {}),
+            }),
+            signal: abortRef.current?.signal,
+          });
+
+          if (!quickRes.ok) {
+            const qErr = await quickRes.json().catch(() => ({ error: "Unknown" }));
+            throw new Error(qErr.error || `HTTP ${quickRes.status}`);
+          }
+
+          const quickReader = quickRes.body?.getReader();
+          if (!quickReader) throw new Error("No response stream");
+
+          const quickDecoder = new TextDecoder();
+          let quickAccum = "";
+          let quickBuf = "";
+
+          while (true) {
+            const { done, value } = await quickReader.read();
+            if (done) break;
+            quickBuf += quickDecoder.decode(value, { stream: true });
+            const qLines = quickBuf.split("\n");
+            quickBuf = qLines.pop() || "";
+            for (const ql of qLines) {
+              if (!ql.startsWith("data: ")) continue;
+              try {
+                const qe = JSON.parse(ql.slice(6).trim());
+                if (qe.type === "chunk" && qe.content) {
+                  quickAccum += qe.content;
+                  setGeneratedCode(quickAccum);
+                } else if (qe.type === "replace" && qe.content) {
+                  quickAccum = qe.content;
+                  setGeneratedCode(quickAccum);
+                } else if (qe.type === "error") {
+                  throw new Error(qe.message || "Quick generation failed");
+                }
+              } catch (parseErr) {
+                if (parseErr instanceof Error && parseErr.message.includes("Quick generation")) throw parseErr;
+              }
+            }
+          }
+          // Flush remaining buffer
+          if (quickBuf.trim()) {
+            for (const ql of (quickDecoder.decode() + quickBuf).split("\n")) {
+              if (!ql.startsWith("data: ")) continue;
+              try {
+                const qe = JSON.parse(ql.slice(6).trim());
+                if (qe.type === "replace" && qe.content) {
+                  quickAccum = qe.content;
+                  setGeneratedCode(quickAccum);
+                }
+              } catch { /* skip */ }
+            }
+          }
+
+          if (quickAccum) {
+            setStatus("complete");
+            setPipelineAgents(prev => [...prev, "Quick generation complete"]);
+            autoReplaceImages(quickAccum).then((improved) => {
+              if (improved !== quickAccum && generationIdRef.current === currentGenId) {
+                setGeneratedCode(improved);
+              }
+            });
+          } else {
+            throw new Error("Quick generation returned empty");
+          }
+        } catch (quickErr) {
+          console.error("[Quick fallback] Also failed:", quickErr);
+          setGeneratedCode("");
+          setError(`Generation failed after all attempts. ${quickErr instanceof Error ? quickErr.message : String(quickErr)}`);
+          setStatus("error");
+        }
       }
     }
   }, [prompt, tier, streamGenerate, autoReplaceImages, selectedModel, status]);
