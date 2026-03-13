@@ -255,14 +255,17 @@ export async function POST(req: NextRequest) {
           // Try Opus, fall back to Sonnet on any error (timeout, API error, etc.)
           try {
             devHtml = await streamDeveloper(MODEL_PREMIUM);
+            console.log(`[Pipeline-Stream] Opus completed: ${devHtml.length} chars total`);
           } catch (opusErr) {
             const opusMsg = opusErr instanceof Error ? opusErr.message : "unknown";
             console.warn(`[Pipeline-Stream] Opus failed (${opusMsg}), falling back to Sonnet`);
             sendEvent(controller, { type: "status", message: `Opus unavailable, using Sonnet (${opusMsg.slice(0, 60)})` });
             // Clear any partial Opus output and retry with Sonnet
             devHtml = "";
+            sendEvent(controller, { type: "replace", content: "" }); // Reset client accumulator
             try {
               devHtml = await streamDeveloper(MODEL_BALANCED);
+              console.log(`[Pipeline-Stream] Sonnet fallback completed: ${devHtml.length} chars total`);
               // Send a replace event since we cleared and restarted
               if (devHtml) {
                 sendEvent(controller, { type: "replace", content: cleanHtml(devHtml) });
@@ -278,33 +281,96 @@ export async function POST(req: NextRequest) {
 
           let html = cleanHtml(devHtml);
           const bodyCheck = hasBodyContent(html);
-          sendEvent(controller, { type: "agent", agent: "Developer", status: "done", duration: Date.now() - devStart });
+          const devDuration = Date.now() - devStart;
+          console.log(`[Pipeline-Stream] Developer done in ${(devDuration/1000).toFixed(1)}s — HTML: ${html.length} chars, body: ${bodyCheck.bodyChars} chars, valid: ${bodyCheck.valid}`);
+          sendEvent(controller, { type: "agent", agent: "Developer", status: "done", duration: devDuration });
 
-          // Retry if body is empty
+          // Retry up to 2 times if body is empty, with increasingly aggressive prompts
           if (!bodyCheck.valid) {
-            console.warn(`[Pipeline-Stream] Developer empty body (${bodyCheck.bodyChars} chars). Retrying with Sonnet...`);
+            console.warn(`[Pipeline-Stream] Developer empty body (${bodyCheck.bodyChars} chars). HTML starts with: ${html.slice(0, 200)}`);
             sendEvent(controller, { type: "status", message: "Retrying build..." });
 
-            try {
-              const retryResult = await llmText({
-                model: MODEL_BALANCED, maxTokens: 32000, system: DEVELOPER_SYSTEM,
-                userMessage: `CRITICAL: Previous attempt had an EMPTY <body>. Write MINIMAL CSS. Focus ALL output on <body> content.\n\n${devUserMessage}`,
-              });
+            const BODY_FIRST_DEVELOPER = `You are an elite front-end developer building a complete website.
 
-              html = cleanHtml(retryResult);
-              const retryCheck = hasBodyContent(html);
+## CRITICAL INSTRUCTION — READ CAREFULLY
+Your ONLY job is to produce a complete HTML page with RICH VISIBLE CONTENT in the <body>.
 
-              if (retryCheck.valid) {
-                sendEvent(controller, { type: "replace", content: html });
-              } else {
-                sendEvent(controller, { type: "error", message: "Developer agent produced empty content after retry." });
-                controller.close();
-                return;
+## OUTPUT STRUCTURE — THIS EXACT ORDER:
+1. <!DOCTYPE html><html lang="en"><head> — title, meta viewport, ONE Google Fonts link
+2. <style> — MAXIMUM 30 lines. Only :root variables and minimal overrides. The component library handles everything else.
+3. </head><body>
+4. BODY CONTENT — THIS IS 90% OF YOUR OUTPUT. Every section with FULL text content.
+5. <script> — under 30 lines for interactivity
+6. </body></html>
+
+## AVAILABLE CSS CLASSES (from auto-injected component library):
+.btn-primary, .btn-secondary, .card, .grid-2, .grid-3, .section, .section-alt, .container, .testimonial-card, .stat-item, .faq-item, .badge, .input, .fade-in
+
+## BODY MUST CONTAIN ALL OF THESE SECTIONS:
+- <nav> with logo and links
+- Hero section with headline, description, CTA buttons
+- Features/services grid
+- About section
+- Testimonials
+- Stats with numbers
+- FAQ accordion
+- Final CTA
+- Footer with columns
+
+Images: https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT
+Output ONLY raw HTML. No markdown. No code fences. Start with <!DOCTYPE html>.
+An empty <body> is an ABSOLUTE FAILURE.`;
+
+            for (let retry = 0; retry < 2; retry++) {
+              try {
+                const retryModel = retry === 0 ? MODEL_BALANCED : MODEL_PLANNER;
+                const retryLabel = retry === 0 ? "Sonnet" : "Haiku";
+                console.log(`[Pipeline-Stream] Retry ${retry + 1} with ${retryLabel}...`);
+
+                // On retry, use the simplified system prompt and include the copy directly
+                const retryResult = await llmText({
+                  model: retryModel, maxTokens: 32000, system: BODY_FIRST_DEVELOPER,
+                  userMessage: `Build a complete website using this specification.
+
+WEBSITE COPY (use ALL of this in the body):
+${copySpec}
+
+DESIGN COLORS & FONTS:
+${brandSpec}
+
+ORIGINAL BRIEF: ${prompt}
+
+Remember: The <body> content is 90% of your output. Write MINIMAL CSS. Use the component library classes.
+Start IMMEDIATELY with <!DOCTYPE html>.`,
+                });
+
+                html = cleanHtml(retryResult);
+                const retryCheck = hasBodyContent(html);
+                console.log(`[Pipeline-Stream] Retry ${retry + 1} result: ${html.length} chars, body: ${retryCheck.bodyChars} chars, valid: ${retryCheck.valid}`);
+
+                if (retryCheck.valid) {
+                  sendEvent(controller, { type: "replace", content: html });
+                  break;
+                } else if (retry === 1) {
+                  // Both retries failed — send what we have with a warning
+                  console.error(`[Pipeline-Stream] All retries failed. Sending best effort.`);
+                  if (html.length > 500) {
+                    sendEvent(controller, { type: "replace", content: html });
+                    sendEvent(controller, { type: "status", message: "Warning: Generated page may have limited content. Try regenerating." });
+                  } else {
+                    sendEvent(controller, { type: "error", message: "Developer agent could not produce page content. Please try again with a different prompt." });
+                    controller.close();
+                    return;
+                  }
+                }
+              } catch (retryErr) {
+                console.error(`[Pipeline-Stream] Retry ${retry + 1} failed:`, retryErr instanceof Error ? retryErr.message : retryErr);
+                if (retry === 1) {
+                  sendEvent(controller, { type: "error", message: `Retry failed: ${retryErr instanceof Error ? retryErr.message : "unknown"}` });
+                  controller.close();
+                  return;
+                }
               }
-            } catch (retryErr) {
-              sendEvent(controller, { type: "error", message: `Retry failed: ${retryErr instanceof Error ? retryErr.message : "unknown"}` });
-              controller.close();
-              return;
             }
           }
 
