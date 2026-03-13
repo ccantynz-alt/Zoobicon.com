@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const client = new Anthropic({ apiKey });
+    const client = new Anthropic({ apiKey, timeout: 120_000 });
 
     const isEdit = typeof existingCode === "string" && existingCode.trim().length > 0;
     const isPremium = tier === "premium";
