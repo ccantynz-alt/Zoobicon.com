@@ -343,6 +343,7 @@ export default function BuilderPage() {
   const [activeTab, setActiveTab] = useState<RightTab>("preview");
   const [activeTool, setActiveTool] = useState<ToolId>(null);
   const [tier, setTier] = useState<Tier>("premium");
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isDeploying, setIsDeploying] = useState(false);
   const [deployUrl, setDeployUrl] = useState("");
   const [deployStatus, setDeployStatus] = useState<"idle" | "deploying" | "deployed" | "error">("idle");
@@ -380,6 +381,7 @@ export default function BuilderPage() {
         const parsed = JSON.parse(user);
         if (parsed.role === "admin" || parsed.plan === "unlimited") {
           setTier("premium");
+          setIsAdmin(true);
         }
       }
     } catch { /* ignore */ }
@@ -802,6 +804,7 @@ export default function BuilderPage() {
           prompt: prompt.trim(),
           tier,
           ...(selectedModel ? { model: selectedModel } : {}),
+          ...(isAdmin ? { isAdmin: true } : {}),
         }),
         signal: controller.signal,
       });

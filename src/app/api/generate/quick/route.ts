@@ -330,7 +330,7 @@ NEVER reuse a keyword. Every src must be different.
 
 export async function POST(req: NextRequest) {
   try {
-    const { prompt, tier, model: requestedModel } = await req.json();
+    const { prompt, tier, model: requestedModel, isAdmin } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       return new Response(
@@ -348,9 +348,10 @@ export async function POST(req: NextRequest) {
     }
 
     const isPremium = tier === "premium";
-    const model = requestedModel || (isPremium ? "claude-opus-4-6" : "claude-sonnet-4-6");
-    const maxTokens = isPremium ? 32000 : 16000;
-    const timeout = isPremium ? 180_000 : 90_000;
+    // Admin: full throttle — Opus + fast mode, max tokens, max timeout
+    const model = requestedModel || (isAdmin ? "claude-opus-4-6" : isPremium ? "claude-opus-4-6" : "claude-sonnet-4-6");
+    const maxTokens = isAdmin ? 64000 : isPremium ? 32000 : 16000;
+    const timeout = isAdmin ? 300_000 : isPremium ? 180_000 : 90_000;
 
     const systemPrompt = BODY_ONLY_SYSTEM + (isPremium ? PREMIUM_SECTIONS : STANDARD_SECTIONS);
 
