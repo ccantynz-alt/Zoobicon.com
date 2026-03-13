@@ -158,7 +158,7 @@ export default function ExportPanel({ code, reactSource }: { code: string; react
             <h3 className="text-sm font-semibold text-white">Export Your Site</h3>
           </div>
           <p className="text-xs text-white/50 leading-relaxed mb-4">
-            Upgrade to a paid plan to export your site as a clean project with all files — ready for GitHub, Vercel, Netlify, or any hosting platform.
+            Your site is live for 7 days on free hosting. Upgrade to export as a clean project and keep it hosted permanently — ready for GitHub, Vercel, Netlify, or any hosting platform.
           </p>
           <div className="space-y-2 mb-4">
             <div className="flex items-center gap-2 text-xs text-white/40">

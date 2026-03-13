@@ -1062,7 +1062,7 @@ export default function LandingPage() {
                 <div className="text-4xl font-black mb-1">Free</div>
                 <div className="text-sm text-white/30 mb-5">Forever</div>
                 <ul className="space-y-2.5 mb-7">
-                  {["5 websites/month", "Industry-aware AI", "Basic SEO tools", "Export HTML"].map((f) => (
+                  {["3 websites/month", "Full 10-agent pipeline", "Opus-powered builds", "7-day hosting preview"].map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm text-white/50">
                       <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
                       {f}

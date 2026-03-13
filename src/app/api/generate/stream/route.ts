@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
 
-const STANDARD_SYSTEM = `You are Zoobicon, an elite AI website generator. Output a single, complete HTML file.
+const STANDARD_SYSTEM = `You are Zoobicon, an elite AI website generator producing $20K+ agency-quality sites. Output a single, complete HTML file.
 
 ## OUTPUT ORDER — FOLLOW EXACTLY
 1. <head>: title, meta, Google Fonts link
@@ -14,17 +14,19 @@ The component library handles buttons, cards, grids, inputs, badges, sections, s
 
 ## BODY SECTIONS — WRITE ALL OF THESE
 1. <nav> — sticky, logo + links + CTA button
-2. Hero — big headline, subheading, TWO CTAs, social proof, scroll indicator
-3. Features — .grid-3 > .card with SVG icons, benefit titles, descriptions
-4. About — split layout, text + image
-5. Testimonials — .testimonial-card (3 cards, specific metrics)
-6. Stats — .stat-item > .stat-number + .stat-label (specific numbers)
-7. FAQ — .faq-item > .faq-question + .faq-answer (4-5 questions)
-8. CTA — compelling heading, button, friction-reducer
-9. Footer — 4 columns: about, services, contact (phone/email/address), social
+2. Hero — 90-100vh, punchy headline, subheading, TWO CTAs, social proof
+3. Social proof bar — company names/badges in muted strip
+4. Features — .grid-3 > .card with SVG icons, benefit titles, descriptions
+5. About — split layout, compelling story + image + stats
+6. Process/Timeline — numbered steps
+7. Testimonials — .testimonial-card (3 cards, specific metrics like "47% increase")
+8. Stats — .stat-item with animated counters (specific numbers)
+9. FAQ — .faq-item accordion (4-5 objection-handling questions)
+10. CTA — compelling heading, button, friction-reducer ("No credit card required")
+11. Footer — 4 columns: about, services, contact (phone/email/address), social
 
 ## INDUSTRY AESTHETIC — Via :root colors
-- Luxury/Legal/Medical: light bg, serif headings, muted accents. NO dark themes.
+- Luxury/Legal/Medical: light bg (#fefefe), serif headings, muted accents. NO dark themes.
 - SaaS/Tech: dark bg OK, sans-serif, vibrant accents.
 - Restaurant/Food: warm palette, serif headings, food imagery.
 - Healthcare: soft palette, clean and calming.
@@ -33,7 +35,8 @@ The component library handles buttons, cards, grids, inputs, badges, sections, s
 - Output ONLY raw HTML. No markdown, no code fences.
 - Images: https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT with descriptive keywords. object-fit: cover.
 - .fade-in on sections for scroll animation (component library handles it). NEVER set opacity:0.
-- An empty <body> is a TOTAL FAILURE. Body content is the product.`;
+- An empty <body> is a TOTAL FAILURE. Body content is the product.
+- NO: gradient blobs on professional sites, dark themes for non-tech, generic copy.`;
 
 const PREMIUM_SYSTEM = `You are Zoobicon, an elite AI website generator producing $20K+ agency-quality sites. Output a single, complete HTML file.
 
