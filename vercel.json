@@ -39,7 +39,7 @@
       "memory": 1024
     },
     "src/app/api/generate/quick/route.ts": {
-      "maxDuration": 120,
+      "maxDuration": 300,
       "memory": 1024
     },
     "src/app/api/slack/events/route.ts": {

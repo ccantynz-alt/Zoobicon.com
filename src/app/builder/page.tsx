@@ -738,7 +738,6 @@ export default function BuilderPage() {
     const readSSEStream = async (
       res: Response,
       onChunk?: (accumulated: string) => void,
-      onAgent?: (event: Record<string, unknown>) => void,
     ): Promise<string> => {
       const reader = res.body?.getReader();
       if (!reader) throw new Error("No response stream");
@@ -760,21 +759,18 @@ export default function BuilderPage() {
             } else if (event.type === "replace" && event.content) {
               accumulated = event.content;
               onChunk?.(accumulated);
-            } else if (event.type === "agent" && onAgent) {
-              onAgent(event);
-            } else if (event.type === "status" && onAgent) {
-              onAgent(event);
+            } else if (event.type === "status") {
+              setPipelineAgents(prev => [...prev, event.message || "Processing..."]);
             } else if (event.type === "done") {
               // Stream complete
             } else if (event.type === "error") {
               throw new Error(event.message || "Generation error");
             }
           } catch (e) {
-            if (e instanceof Error && e.message !== "Generation error" && !e.message.includes("Generation")) {
-              // Skip JSON parse errors
-            } else {
+            if (e instanceof Error && (e.message.includes("Generation") || e.message.includes("error") || e.message.includes("failed"))) {
               throw e;
             }
+            // Skip JSON parse errors
           }
         }
       };
@@ -795,26 +791,16 @@ export default function BuilderPage() {
       return accumulated;
     };
 
-    // ── Helper: clean HTML output ──
-    const cleanHtml = (raw: string): string => {
-      let h = raw.trim();
-      h = h.replace(/^```(?:html|HTML)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
-      const ds = h.search(/<!doctype\s+html|<html/i);
-      if (ds > 0) h = h.slice(ds);
-      const he = h.lastIndexOf("</html>");
-      if (he !== -1) h = h.slice(0, he + "</html>".length);
-      return h;
-    };
-
-    // ── Helper: quick generation (fast, reliable) ──
-    const quickGenerate = async (): Promise<string> => {
-      setPipelineAgents(prev => [...prev, "Generating website..."]);
+    try {
+      // Both tiers use /api/generate/quick — Standard gets Sonnet, Premium gets Opus
+      setPipelineAgents([tier === "premium" ? "Building premium website..." : "Generating website..."]);
 
       const res = await fetch("/api/generate/quick", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prompt: prompt.trim(),
+          tier,
           ...(selectedModel ? { model: selectedModel } : {}),
         }),
         signal: controller.signal,
@@ -826,86 +812,14 @@ export default function BuilderPage() {
       }
 
       const html = await readSSEStream(res, (acc) => setGeneratedCode(acc));
-      return cleanHtml(html);
-    };
 
-    try {
-      let finalHtml = "";
-
-      if (tier === "premium") {
-        // Premium: try the 7-agent pipeline with a 90-second client timeout
-        // If it fails or times out, fall back to quick
-        try {
-          const timeoutId = setTimeout(() => controller.abort(), 90_000);
-
-          const res = await fetch("/api/generate/pipeline-stream", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              prompt: prompt.trim(),
-              style: "modern",
-              tier,
-              model: selectedModel,
-            }),
-            signal: controller.signal,
-          });
-
-          clearTimeout(timeoutId);
-
-          if (!res.ok) {
-            throw new Error(`Pipeline HTTP ${res.status}`);
-          }
-
-          const html = await readSSEStream(
-            res,
-            (acc) => setGeneratedCode(acc),
-            (event) => {
-              if (event.type === "agent") {
-                if (event.status === "running") {
-                  setPipelineAgents(prev => [...prev, `${event.agent} working...`]);
-                } else if (event.status === "done") {
-                  setPipelineAgents(prev => {
-                    const updated = prev.filter(a => !(a as string).startsWith(event.agent as string));
-                    return [...updated, `${event.agent} — ${(((event.duration as number) || 0) / 1000).toFixed(1)}s`];
-                  });
-                } else if (event.status === "skipped") {
-                  setPipelineAgents(prev => [...prev, `${event.agent} — skipped`]);
-                }
-              } else if (event.type === "status") {
-                setPipelineAgents(prev => [...prev, (event.message as string) || "Processing..."]);
-              }
-            }
-          );
-
-          finalHtml = cleanHtml(html);
-
-          // Validate body content
-          const bodyM = finalHtml.match(/<body[^>]*>([\s\S]*)<\/body>/i);
-          const bodyChars = bodyM
-            ? bodyM[1].replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().length
-            : 0;
-
-          if (bodyChars < 50) {
-            throw new Error(`Pipeline produced empty body (${bodyChars} chars)`);
-          }
-        } catch (pipelineErr) {
-          if ((pipelineErr as Error).name === "AbortError") {
-            // Could be our timeout — recreate controller and try quick
-            const newController = new AbortController();
-            abortRef.current = newController;
-          }
-          const msg = pipelineErr instanceof Error ? pipelineErr.message : String(pipelineErr);
-          console.warn("[Pipeline] Failed:", msg);
-          setPipelineAgents([`Pipeline unavailable — using fast mode`]);
-          setGeneratedCode("");
-
-          // Fall back to quick
-          finalHtml = await quickGenerate();
-        }
-      } else {
-        // Standard: go straight to quick (fast, reliable, ~20-30s)
-        finalHtml = await quickGenerate();
-      }
+      // Clean HTML
+      let finalHtml = html.trim();
+      finalHtml = finalHtml.replace(/^```(?:html|HTML)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
+      const ds = finalHtml.search(/<!doctype\s+html|<html/i);
+      if (ds > 0) finalHtml = finalHtml.slice(ds);
+      const he = finalHtml.lastIndexOf("</html>");
+      if (he !== -1) finalHtml = finalHtml.slice(0, he + "</html>".length);
 
       if (finalHtml && generationIdRef.current === currentGenId) {
         setGeneratedCode(finalHtml);
