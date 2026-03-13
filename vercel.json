@@ -30,6 +30,14 @@
       "maxDuration": 300,
       "memory": 1024
     },
+    "src/app/api/generate/pipeline-stream/route.ts": {
+      "maxDuration": 300,
+      "memory": 1024
+    },
+    "src/app/api/generate/edit-diff/route.ts": {
+      "maxDuration": 120,
+      "memory": 1024
+    },
     "src/app/api/slack/events/route.ts": {
       "maxDuration": 30,
       "memory": 512
