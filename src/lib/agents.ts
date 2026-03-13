@@ -544,6 +544,7 @@ export async function runPipeline(
 
   // Helper: call the right LLM based on user selection
   // Returns { text, stopReason } so we can detect truncation
+  // Uses streaming for large outputs (>16K tokens) to avoid SDK timeout warnings
   const llmCall = async (opts: { model: string; maxTokens: number; system: string; userMessage: string }): Promise<{ text: string; stopReason: string }> => {
     if (useMultiLLM) {
       const res = await callLLM({
@@ -554,19 +555,50 @@ export async function runPipeline(
       });
       return { text: res.text, stopReason: "end_turn" };
     } else {
-      // Direct Anthropic SDK for Claude models (fastest path)
-      const client = new Anthropic({ apiKey });
+      // Direct Anthropic SDK for Claude models
+      // Timeout: 90s for planners (small output), 240s for builders (large output)
+      const timeoutMs = opts.maxTokens <= 16384 ? 90_000 : 240_000;
+      const client = new Anthropic({ apiKey, timeout: timeoutMs });
       const messages: { role: "user" | "assistant"; content: string }[] = [
         { role: "user", content: opts.userMessage },
       ];
-      const res = await client.messages.create({
-        model: opts.model,
-        max_tokens: opts.maxTokens,
-        system: opts.system,
-        messages,
-      });
-      const text = res.content.find((b) => b.type === "text")?.text || "";
-      return { text, stopReason: res.stop_reason || "unknown" };
+
+      // Use streaming for large token requests to avoid SDK "operation may take longer than 10 minutes" error
+      const useStreaming = opts.maxTokens > 16384;
+
+      const callWithModel = async (model: string): Promise<{ text: string; stopReason: string }> => {
+        if (useStreaming) {
+          const stream = client.messages.stream({
+            model,
+            max_tokens: opts.maxTokens,
+            system: opts.system,
+            messages,
+          });
+          const finalMessage = await stream.finalMessage();
+          const text = finalMessage.content.find((b) => b.type === "text")?.text || "";
+          return { text, stopReason: finalMessage.stop_reason || "unknown" };
+        } else {
+          const res = await client.messages.create({
+            model,
+            max_tokens: opts.maxTokens,
+            system: opts.system,
+            messages,
+          });
+          const text = res.content.find((b) => b.type === "text")?.text || "";
+          return { text, stopReason: res.stop_reason || "unknown" };
+        }
+      };
+
+      try {
+        return await callWithModel(opts.model);
+      } catch (err) {
+        // If Opus fails, automatically fall back to Sonnet (still good quality)
+        if (opts.model === "claude-opus-4-6") {
+          console.warn(`[Pipeline] Opus failed (${err instanceof Error ? err.message : "unknown"}), falling back to Sonnet`);
+          return await callWithModel("claude-sonnet-4-6");
+        }
+        throw err;
+      }
     }
   };
 
@@ -720,25 +752,25 @@ export async function runPipeline(
       const [animText, seoText, formsText, reactText] = await Promise.all([
         llmText({
           model: MODEL_BALANCED,
-          maxTokens: 64000,
+          maxTokens: 32000,
           system: ANIMATION_SYSTEM,
           userMessage: `Add premium animations to this website:\n\n${html}`,
         }).catch((err) => { console.warn("[Pipeline] Animation agent failed:", err.message); return ""; }),
         llmText({
           model: MODEL_BALANCED,
-          maxTokens: 64000,
+          maxTokens: 8192,
           system: SEO_SYSTEM,
           userMessage: `Add comprehensive SEO markup to this website:\n\n${html}`,
         }).catch((err) => { console.warn("[Pipeline] SEO agent failed:", err.message); return ""; }),
         llmText({
           model: MODEL_BALANCED,
-          maxTokens: 64000,
+          maxTokens: 8192,
           system: FORMS_SYSTEM,
           userMessage: `Make all forms functional in this website:\n\n${html}`,
         }).catch((err) => { console.warn("[Pipeline] Forms agent failed:", err.message); return ""; }),
         llmText({
           model: MODEL_BALANCED,
-          maxTokens: 64000,
+          maxTokens: 32000,
           system: REACT_DECOMPOSER_SYSTEM,
           userMessage: `Decompose this HTML website into modular React components with shadcn/ui and Tailwind CSS. Preserve ALL content, images, and functionality.\n\nHTML:\n${html}`,
         }).catch((err) => { console.warn("[Pipeline] React Decomposer failed:", err.message); return ""; }),
@@ -798,45 +830,44 @@ export async function runPipeline(
     }
   }
 
-  // ── Phase 5: Integrations Agent ──
-  // Optional enhancement — failure is non-fatal
+  // ── Phase 5: Integrations + QA (Parallel) ──
+  // Both are optional enhancements — failures are non-fatal
   {
     onProgress?.("integrations", "adding third-party integrations");
-    const intStart = Date.now();
+    onProgress?.("qa", "quality review");
+    const phase5Start = Date.now();
 
-    try {
-      const intText = await llmText({
+    const [intResult, qaResult] = await Promise.all([
+      llmText({
         model: MODEL_BALANCED,
-        maxTokens: 64000,
+        maxTokens: 16384,
         system: INTEGRATIONS_SYSTEM,
         userMessage: `Add essential integrations to this website:\n\n${html}`,
-      });
-
-      html = safeReplaceHtml(html, intText, "Integrations");
-      agents.push({ agent: "Integrations", output: `[integrations added]`, duration: Date.now() - intStart });
-    } catch (intErr) {
-      console.warn("[Pipeline] Integrations agent failed, skipping:", intErr);
-      agents.push({ agent: "Integrations", output: `[skipped]`, duration: Date.now() - intStart });
-    }
-  }
-
-  // ── Final Phase: QA Agent ──
-  // Optional — failure is non-fatal
-  {
-    onProgress?.("qa", "quality review");
-    const qaStart = Date.now();
-
-    try {
-      const qaText = await llmText({
+      }).then(text => ({ ok: true as const, text })).catch((err) => {
+        console.warn("[Pipeline] Integrations agent failed, skipping:", err);
+        return { ok: false as const, text: "" };
+      }),
+      llmText({
         model: MODEL_BALANCED,
-        maxTokens: 64000,
+        maxTokens: 16384,
         system: QA_SYSTEM,
         userMessage: `Review this website HTML for quality:\n\n${html}`,
-      });
+      }).then(text => ({ ok: true as const, text })).catch((err) => {
+        console.warn("[Pipeline] QA agent failed, skipping:", err);
+        return { ok: false as const, text: "" };
+      }),
+    ]);
 
-      agents.push({ agent: "QA Engineer", output: qaText, duration: Date.now() - qaStart });
+    if (intResult.ok && intResult.text) {
+      html = safeReplaceHtml(html, intResult.text, "Integrations");
+    }
+    agents.push({ agent: "Integrations", output: `[${intResult.ok ? "added" : "skipped"}]`, duration: Date.now() - phase5Start });
 
-      // Apply QA fixes if any — safely validated
+    // Apply QA fixes
+    const qaText = qaResult.ok ? qaResult.text : "";
+    agents.push({ agent: "QA Engineer", output: qaText || "[skipped]", duration: Date.now() - phase5Start });
+
+    if (qaText) {
       try {
         const qaJSON = JSON.parse(extractJSON(qaText));
         if (qaJSON.fixedHtml && qaJSON.fixedHtml.trim().length > 100) {
@@ -845,9 +876,6 @@ export async function runPipeline(
       } catch {
         // QA output wasn't valid JSON, keep current HTML
       }
-    } catch (qaErr) {
-      console.warn("[Pipeline] QA agent failed, skipping:", qaErr);
-      agents.push({ agent: "QA Engineer", output: `[skipped]`, duration: Date.now() - qaStart });
     }
   }
 

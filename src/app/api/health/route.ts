@@ -37,59 +37,41 @@ export async function GET(req: NextRequest) {
     durationMs: Date.now() - keyStart,
   });
 
-  // 2. API key valid (tiny call to verify auth)
+  // 2 & 3. Test Haiku auth + Opus access IN PARALLEL to cut wait time
   if (apiKey) {
-    const authStart = Date.now();
-    try {
-      const client = new Anthropic({ apiKey });
-      await client.messages.create({
-        model: "claude-haiku-4-5-20251001",
-        max_tokens: 10,
-        messages: [{ role: "user", content: "Say OK" }],
-      });
-      checks.push({
-        name: "anthropic_auth",
-        status: "pass",
-        message: "API key valid, Anthropic reachable",
-        durationMs: Date.now() - authStart,
-      });
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      checks.push({
-        name: "anthropic_auth",
-        status: "fail",
-        message: `API auth failed: ${msg}`,
-        durationMs: Date.now() - authStart,
-      });
-    }
-  }
+    const authCheck = async (): Promise<CheckResult> => {
+      const start = Date.now();
+      try {
+        const c = new Anthropic({ apiKey, timeout: 15_000 });
+        await c.messages.create({
+          model: "claude-haiku-4-5-20251001",
+          max_tokens: 10,
+          messages: [{ role: "user", content: "Say OK" }],
+        });
+        return { name: "anthropic_auth", status: "pass", message: "API key valid, Anthropic reachable", durationMs: Date.now() - start };
+      } catch (err) {
+        return { name: "anthropic_auth", status: "fail", message: `API auth failed: ${err instanceof Error ? err.message : String(err)}`, durationMs: Date.now() - start };
+      }
+    };
 
-  // 3. Test Opus access (the model used for builds — if this fails, generation will always fail)
-  if (apiKey) {
-    const opusStart = Date.now();
-    try {
-      const client = new Anthropic({ apiKey });
-      const res = await client.messages.create({
-        model: "claude-opus-4-6",
-        max_tokens: 10,
-        messages: [{ role: "user", content: "Say OK" }],
-      });
-      const text = res.content.find((b) => b.type === "text")?.text || "";
-      checks.push({
-        name: "opus_access",
-        status: text ? "pass" : "fail",
-        message: text ? "Opus model accessible" : "Opus returned empty response",
-        durationMs: Date.now() - opusStart,
-      });
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      checks.push({
-        name: "opus_access",
-        status: "fail",
-        message: `Opus NOT accessible: ${msg}. This means ALL new builds will fail. The Developer agent requires Opus.`,
-        durationMs: Date.now() - opusStart,
-      });
-    }
+    const opusCheck = async (): Promise<CheckResult> => {
+      const start = Date.now();
+      try {
+        const c = new Anthropic({ apiKey, timeout: 30_000 });
+        const res = await c.messages.create({
+          model: "claude-opus-4-6",
+          max_tokens: 10,
+          messages: [{ role: "user", content: "Say OK" }],
+        });
+        const text = res.content.find((b) => b.type === "text")?.text || "";
+        return { name: "opus_access", status: text ? "pass" : "fail", message: text ? "Opus model accessible" : "Opus returned empty response", durationMs: Date.now() - start };
+      } catch (err) {
+        return { name: "opus_access", status: "fail", message: `Opus NOT accessible: ${err instanceof Error ? err.message : String(err)}. This means ALL new builds will fail.`, durationMs: Date.now() - start };
+      }
+    };
+
+    const [authResult, opusResult] = await Promise.all([authCheck(), opusCheck()]);
+    checks.push(authResult, opusResult);
   }
 
   // 4. Check OpenAI key (optional)
@@ -121,11 +103,11 @@ export async function GET(req: NextRequest) {
   const hasFail = checks.some((c) => c.status === "fail");
   const deep = req.nextUrl.searchParams.get("deep") === "true";
 
-  // If deep=true, also run a quick generation test
+  // If deep=true, also run a quick generation test — 45s timeout
   if (deep && apiKey) {
     const genStart = Date.now();
     try {
-      const client = new Anthropic({ apiKey });
+      const client = new Anthropic({ apiKey, timeout: 45_000 });
       const res = await client.messages.create({
         model: "claude-haiku-4-5-20251001",
         max_tokens: 2000,

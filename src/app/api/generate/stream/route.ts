@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const client = new Anthropic({ apiKey });
+    const client = new Anthropic({ apiKey, timeout: 120_000 });
 
     const isEdit = typeof existingCode === "string" && existingCode.trim().length > 0;
     const isPremium = tier === "premium";
@@ -159,7 +159,22 @@ export async function POST(req: NextRequest) {
           { status: 503, headers: { "Content-Type": "application/json" } }
         );
       }
-      throw apiErr;
+      // If Opus fails, try Sonnet as fallback
+      if (model === "claude-opus-4-6") {
+        console.warn(`[Stream] Opus failed (${apiErr instanceof Error ? apiErr.message : "unknown"}), falling back to Sonnet`);
+        try {
+          stream = await client.messages.stream({
+            model: "claude-sonnet-4-6",
+            max_tokens: maxTokens,
+            system: systemPrompt,
+            messages,
+          });
+        } catch {
+          throw apiErr; // If Sonnet also fails, throw the original Opus error
+        }
+      } else {
+        throw apiErr;
+      }
     }
 
     const encoder = new TextEncoder();
@@ -293,16 +308,31 @@ Output ONLY raw HTML.`
   } catch (err) {
     console.error("Generation stream error:", err);
 
+    // Always extract a meaningful error message
+    let errorMsg = "Unknown generation error";
+    let statusCode = 500;
+
     if (err instanceof Anthropic.APIError) {
-      return new Response(
-        JSON.stringify({ error: `API error: ${err.message}` }),
-        { status: err.status || 500, headers: { "Content-Type": "application/json" } }
-      );
+      errorMsg = `Anthropic API error (${err.status}): ${err.message}`;
+      statusCode = err.status || 500;
+    } else if (err instanceof Anthropic.APIConnectionError) {
+      errorMsg = "Cannot reach Anthropic API — check network connectivity";
+      statusCode = 503;
+    } else if (err instanceof Error) {
+      errorMsg = err.message;
+      if (err.message.includes("timed out") || err.message.includes("timeout") || err.message.includes("ETIMEDOUT")) {
+        errorMsg = `AI model timed out: ${err.message}. The model may be overloaded — try again in a minute.`;
+        statusCode = 504;
+      }
+    } else if (typeof err === "string") {
+      errorMsg = err;
+    } else {
+      errorMsg = `Stream error: ${JSON.stringify(err)}`;
     }
 
     return new Response(
-      JSON.stringify({ error: "Internal server error" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
+      JSON.stringify({ error: errorMsg }),
+      { status: statusCode, headers: { "Content-Type": "application/json" } }
     );
   }
 }

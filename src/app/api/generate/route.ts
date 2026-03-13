@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const client = new Anthropic({ apiKey });
+    const client = new Anthropic({ apiKey, timeout: 240_000 });
 
     const isEdit = typeof existingCode === "string" && existingCode.trim().length > 0;
     const isPremium = tier === "premium";
@@ -145,12 +145,29 @@ export async function POST(req: NextRequest) {
       { role: "user", content: userMessage + (!isEdit ? "\n\nIMPORTANT: Start your response IMMEDIATELY with <!DOCTYPE html> — no preamble, no explanation, no code fences. Output raw HTML only." : "") },
     ];
 
-    const message = await client.messages.create({
-      model,
-      max_tokens: maxTokens,
-      system: systemPrompt,
-      messages,
-    });
+    // Use streaming to avoid SDK "operation may take longer than 10 minutes" error with large max_tokens
+    const streamCall = async (m: string): Promise<Anthropic.Message> => {
+      const stream = client.messages.stream({
+        model: m,
+        max_tokens: maxTokens,
+        system: systemPrompt,
+        messages,
+      });
+      return await stream.finalMessage();
+    };
+
+    let message;
+    try {
+      message = await streamCall(model);
+    } catch (err) {
+      // If Opus fails, try Sonnet as fallback
+      if (model === "claude-opus-4-6") {
+        console.warn(`[Generate] Opus failed (${err instanceof Error ? err.message : "unknown"}), falling back to Sonnet`);
+        message = await streamCall("claude-sonnet-4-6");
+      } else {
+        throw err;
+      }
+    }
 
     const textBlock = message.content.find((block) => block.type === "text");
     if (!textBlock || textBlock.type !== "text") {
@@ -202,12 +219,13 @@ Output ONLY raw HTML — no markdown, no code fences, no explanation.`;
 
         for (let retry = 0; retry < 2; retry++) {
           try {
-            const retryMessage = await client.messages.create({
+            const retryStream = client.messages.stream({
               model,
               max_tokens: maxTokens,
               system: BODY_FIRST_SYSTEM,
               messages: [{ role: "user", content: userMessage }],
             });
+            const retryMessage = await retryStream.finalMessage();
 
             const retryBlock = retryMessage.content.find((b) => b.type === "text");
             if (retryBlock && retryBlock.type === "text") {
@@ -246,16 +264,32 @@ Output ONLY raw HTML — no markdown, no code fences, no explanation.`;
   } catch (err) {
     console.error("Generation error:", err);
 
+    // Always extract a meaningful error message — never return generic "Internal server error"
+    let errorMsg = "Unknown generation error";
+    let statusCode = 500;
+
     if (err instanceof Anthropic.APIError) {
-      return NextResponse.json(
-        { error: `API error: ${err.message}` },
-        { status: err.status || 500 }
-      );
+      errorMsg = `Anthropic API error (${err.status}): ${err.message}`;
+      statusCode = err.status || 500;
+    } else if (err instanceof Anthropic.APIConnectionError) {
+      errorMsg = "Cannot reach Anthropic API — check network connectivity";
+      statusCode = 503;
+    } else if (err instanceof Error) {
+      errorMsg = err.message;
+      // Detect timeout errors
+      if (err.message.includes("timed out") || err.message.includes("timeout") || err.message.includes("ETIMEDOUT")) {
+        errorMsg = `AI model timed out: ${err.message}. The model may be overloaded — try again in a minute.`;
+        statusCode = 504;
+      }
+    } else if (typeof err === "string") {
+      errorMsg = err;
+    } else {
+      errorMsg = `Generation error: ${JSON.stringify(err)}`;
     }
 
     return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
+      { error: errorMsg },
+      { status: statusCode }
     );
   }
 }
