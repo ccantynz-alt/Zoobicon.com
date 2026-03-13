@@ -22,3 +22,15 @@ export const stripe = new Proxy({} as Stripe, {
 });
 
 export const PRO_PRICE_ID = process.env.STRIPE_PRO_PRICE_ID ?? "";
+export const CREATOR_PRICE_ID = process.env.STRIPE_CREATOR_PRICE_ID ?? "";
+export const AGENCY_PRICE_ID = process.env.STRIPE_AGENCY_PRICE_ID ?? "";
+
+/** Map plan name → Stripe Price ID */
+export function getPriceId(plan: string): string {
+  switch (plan) {
+    case "creator": return CREATOR_PRICE_ID;
+    case "pro": return PRO_PRICE_ID;
+    case "agency": return AGENCY_PRICE_ID;
+    default: return PRO_PRICE_ID;
+  }
+}

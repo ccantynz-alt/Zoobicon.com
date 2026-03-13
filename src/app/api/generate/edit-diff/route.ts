@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
 import { callLLM } from "@/lib/llm-provider";
+import { authenticateRequest, checkUsageQuota, trackUsage } from "@/lib/auth-guard";
 
 /**
  * Diff-Based Edit API — Fast edits via search/replace blocks
@@ -95,6 +96,12 @@ export async function POST(req: NextRequest) {
         status: 400, headers: { "Content-Type": "application/json" },
       });
     }
+
+    // Auth + usage enforcement
+    const auth = await authenticateRequest(req);
+    if (auth.error) return auth.error;
+    const quota = await checkUsageQuota(auth.user.email, auth.user.plan, "edit");
+    if (quota.error) return quota.error;
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
@@ -246,8 +253,10 @@ export async function POST(req: NextRequest) {
 
             sendEvent(controller, { type: "fallback", html: clean });
             sendEvent(controller, { type: "done", diffCount: 0, fallback: true });
+            trackUsage(auth.user.email, "edit").catch(() => {});
           } else {
             sendEvent(controller, { type: "done", diffCount: applied });
+            trackUsage(auth.user.email, "edit").catch(() => {});
           }
 
           controller.close();

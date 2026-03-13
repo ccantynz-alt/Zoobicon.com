@@ -187,15 +187,15 @@ export default function PricingPage() {
     } catch {}
   }, []);
 
-  async function handleProCheckout() {
+  async function handleCheckout(plan: string) {
     setCheckoutLoading(true);
-    const email = window.prompt("Enter your email to start the Pro trial:");
-    if (!email) { setCheckoutLoading(false); return; }
+    const userEmail = user?.email || window.prompt(`Enter your email to start the ${plan} trial:`);
+    if (!userEmail) { setCheckoutLoading(false); return; }
 
     const res = await fetch("/api/stripe/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email: userEmail, plan }),
     });
     const data = await res.json();
     if (data.url) {
@@ -311,22 +311,26 @@ export default function PricingPage() {
                     >
                       {plan.cta}
                     </a>
-                  ) : plan.featured ? (
-                    <button
-                      onClick={handleProCheckout}
-                      disabled={checkoutLoading}
-                      className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold btn-gradient text-white shadow-glow disabled:opacity-60 disabled:cursor-not-allowed"
-                    >
-                      {checkoutLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                      {plan.cta}
-                    </button>
-                  ) : (
+                  ) : plan.price === "Free" ? (
                     <Link
                       href={plan.ctaHref}
                       className="block w-full py-3 rounded-xl text-sm font-bold text-center border border-white/[0.1] text-white/70 hover:text-white hover:border-white/20 transition-all"
                     >
                       {plan.cta}
                     </Link>
+                  ) : (
+                    <button
+                      onClick={() => handleCheckout(plan.name.toLowerCase())}
+                      disabled={checkoutLoading}
+                      className={`flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold ${
+                        plan.featured
+                          ? "btn-gradient text-white shadow-glow"
+                          : "border border-white/[0.1] text-white/70 hover:text-white hover:border-white/20"
+                      } transition-all disabled:opacity-60 disabled:cursor-not-allowed`}
+                    >
+                      {checkoutLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                      {plan.cta}
+                    </button>
                   )}
                 </motion.div>
               ))}

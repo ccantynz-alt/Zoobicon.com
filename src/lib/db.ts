@@ -147,4 +147,21 @@ export async function initSchema() {
   `;
 
   await sql`CREATE INDEX IF NOT EXISTS site_analytics_site_id_idx ON site_analytics (site_id)`;
+
+  // ---- Usage tracking for monthly quotas ----
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS usage_tracking (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      email       TEXT NOT NULL,
+      usage_type  TEXT NOT NULL,
+      month       DATE NOT NULL,
+      count       INTEGER NOT NULL DEFAULT 0,
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      UNIQUE (email, usage_type, month)
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS usage_tracking_email_idx ON usage_tracking (email)`;
 }

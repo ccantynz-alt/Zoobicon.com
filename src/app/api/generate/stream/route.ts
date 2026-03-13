@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
+import { authenticateRequest, checkUsageQuota, trackUsage } from "@/lib/auth-guard";
 
 const STANDARD_SYSTEM = `You are Zoobicon, an elite AI website generator producing $20K+ agency-quality sites. Output a single, complete HTML file.
 
@@ -105,6 +106,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Auth + usage enforcement
+    const auth = await authenticateRequest(req);
+    if (auth.error) return auth.error;
+
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
       return new Response(
@@ -117,6 +122,11 @@ export async function POST(req: NextRequest) {
 
     const isEdit = typeof existingCode === "string" && existingCode.trim().length > 0;
     const isPremium = tier === "premium";
+
+    // Check usage quota
+    const usageType = isEdit ? "edit" as const : "generation" as const;
+    const quota = await checkUsageQuota(auth.user.email, auth.user.plan, usageType);
+    if (quota.error) return quota.error;
 
     let systemPrompt: string;
     let userMessage: string;
@@ -283,6 +293,9 @@ Output ONLY raw HTML.`
               );
             }
           }
+
+          // Track successful usage
+          trackUsage(auth.user.email, usageType).catch(() => {});
 
           controller.enqueue(
             encoder.encode(`data: ${JSON.stringify({ type: "done" })}\n\n`)

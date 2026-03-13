@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
 import { callLLM } from "@/lib/llm-provider";
 import { injectComponentLibrary } from "@/lib/component-library";
+import { authenticateRequest, checkUsageQuota, trackUsage } from "@/lib/auth-guard";
 
 /**
  * Streaming Pipeline API — Real-time 7-agent pipeline with SSE
@@ -124,6 +125,12 @@ export async function POST(req: NextRequest) {
         headers: { "Content-Type": "application/json" },
       });
     }
+
+    // Auth + usage enforcement
+    const auth = await authenticateRequest(req);
+    if (auth.error) return auth.error;
+    const quota = await checkUsageQuota(auth.user.email, auth.user.plan, "generation");
+    if (quota.error) return quota.error;
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
@@ -376,6 +383,9 @@ export async function POST(req: NextRequest) {
             html = injectComponentLibrary(html);
             sendEvent(controller, { type: "replace", content: html });
           }
+
+          // Track successful generation
+          trackUsage(auth.user.email, "generation").catch(() => {});
 
           sendEvent(controller, { type: "done", totalDuration: Date.now() - startTime });
           controller.close();
