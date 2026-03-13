@@ -352,10 +352,19 @@ export default function BuilderPage() {
   const [reactSource, setReactSource] = useState<Record<string, string> | null>(null);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
 
-  // Undo/Redo history
-  const [history, setHistory] = useState<string[]>([]);
-  const [historyIndex, setHistoryIndex] = useState(-1);
+  // Snapshot system — captures state on every AI action for perfect undo
+  interface Snapshot {
+    html: string;
+    label: string;      // e.g., "Initial build", "Edit: change color to blue"
+    timestamp: number;
+  }
+  const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
+  const [snapshotIndex, setSnapshotIndex] = useState(-1);
   const isUndoRedoRef = useRef(false);
+
+  // Legacy compat
+  const history = snapshots.map(s => s.html);
+  const historyIndex = snapshotIndex;
 
   const abortRef = useRef<AbortController | null>(null);
   const generationIdRef = useRef(0); // Tracks current generation to prevent stale image replacements
@@ -386,17 +395,33 @@ export default function BuilderPage() {
       .catch(() => { /* models API not available, use defaults */ });
   }, []);
 
-  // Track code changes in undo/redo history
+  // Track code changes in snapshot system
+  const pendingLabelRef = useRef<string>("Manual change");
+  const addSnapshot = useCallback((html: string, label: string) => {
+    if (!html) return;
+    isUndoRedoRef.current = true; // Prevent the effect from double-adding
+    setSnapshots(prev => {
+      const truncated = prev.slice(0, snapshotIndex + 1);
+      const newSnapshots = [...truncated, { html, label, timestamp: Date.now() }].slice(-50);
+      setSnapshotIndex(newSnapshots.length - 1);
+      return newSnapshots;
+    });
+    setGeneratedCode(html);
+  }, [snapshotIndex]);
+
+  // Auto-snapshot on generatedCode changes (manual edits, code panel updates)
   useEffect(() => {
     if (!generatedCode || isUndoRedoRef.current) {
       isUndoRedoRef.current = false;
       return;
     }
-    setHistory(prev => {
-      const truncated = prev.slice(0, historyIndex + 1);
-      const newHistory = [...truncated, generatedCode].slice(-50); // Keep last 50
-      setHistoryIndex(newHistory.length - 1);
-      return newHistory;
+    setSnapshots(prev => {
+      const truncated = prev.slice(0, snapshotIndex + 1);
+      const label = pendingLabelRef.current || "Manual change";
+      pendingLabelRef.current = "Manual change"; // Reset
+      const newSnapshots = [...truncated, { html: generatedCode, label, timestamp: Date.now() }].slice(-50);
+      setSnapshotIndex(newSnapshots.length - 1);
+      return newSnapshots;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [generatedCode]);
@@ -404,18 +429,18 @@ export default function BuilderPage() {
   const handleUndo = useCallback(() => {
     if (!canUndo) return;
     isUndoRedoRef.current = true;
-    const newIndex = historyIndex - 1;
-    setHistoryIndex(newIndex);
-    setGeneratedCode(history[newIndex]);
-  }, [canUndo, historyIndex, history]);
+    const newIndex = snapshotIndex - 1;
+    setSnapshotIndex(newIndex);
+    setGeneratedCode(snapshots[newIndex].html);
+  }, [canUndo, snapshotIndex, snapshots]);
 
   const handleRedo = useCallback(() => {
     if (!canRedo) return;
     isUndoRedoRef.current = true;
-    const newIndex = historyIndex + 1;
-    setHistoryIndex(newIndex);
-    setGeneratedCode(history[newIndex]);
-  }, [canRedo, historyIndex, history]);
+    const newIndex = snapshotIndex + 1;
+    setSnapshotIndex(newIndex);
+    setGeneratedCode(snapshots[newIndex].html);
+  }, [canRedo, snapshotIndex, snapshots]);
 
   // Keyboard shortcuts for undo/redo
   useEffect(() => {
@@ -688,34 +713,21 @@ export default function BuilderPage() {
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim()) return;
 
-    // Use the full 10-agent pipeline for new builds
+    // Use the streaming pipeline — real-time agent progress + live HTML rendering
     const currentGenId = ++generationIdRef.current;
     setStatus("generating");
     setError("");
     setGeneratedCode("");
     setActiveTab("preview");
     setPipelineAgents([]);
+    pendingLabelRef.current = `Build: ${prompt.trim().slice(0, 50)}`;
+
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     try {
-      // Show pipeline progress in status
-      const agentSteps = [
-        "Strategist analyzing market...",
-        "Brand Designer + Copywriter working...",
-        "Architect planning structure...",
-        "Developer building website (Opus)...",
-        "Animation + SEO + Forms enhancing...",
-        "Integrations agent adding features...",
-        "QA reviewing quality...",
-      ];
-      let stepIndex = 0;
-      const progressInterval = setInterval(() => {
-        if (stepIndex < agentSteps.length) {
-          setPipelineAgents(prev => [...prev, agentSteps[stepIndex]]);
-          stepIndex++;
-        }
-      }, 8000);
-
-      const res = await fetch("/api/generate/pipeline", {
+      const res = await fetch("/api/generate/pipeline-stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -724,109 +736,249 @@ export default function BuilderPage() {
           tier,
           model: selectedModel,
         }),
+        signal: controller.signal,
       });
 
-      clearInterval(progressInterval);
-
       if (!res.ok) {
+        // Check for config errors
+        try {
+          const errData = await res.clone().json();
+          if (errData.error && (errData.error.includes("API_KEY") || errData.error.includes("not configured"))) {
+            setError(errData.error);
+            setStatus("error");
+            return;
+          }
+        } catch { /* not JSON */ }
+
         let errorMsg = `Pipeline returned HTTP ${res.status}`;
         try {
           const data = await res.json();
           errorMsg = data.error || errorMsg;
         } catch {
-          // Vercel timeout or non-JSON error response
           if (res.status === 504 || res.status === 502) {
-            errorMsg = "Pipeline timed out — the AI model took too long. Try again with a simpler prompt.";
-          } else {
-            errorMsg = `Pipeline error (HTTP ${res.status}). Check Vercel function logs for details.`;
+            errorMsg = "Pipeline timed out — try again with a simpler prompt.";
           }
         }
         throw new Error(errorMsg);
       }
 
-      const data = await res.json();
-      // Store React component source if available (for export)
-      if (data.reactComponents && Object.keys(data.reactComponents).length > 0) {
-        setReactSource(data.reactComponents);
-        console.log(`[Pipeline] Received ${Object.keys(data.reactComponents).length} React component files`);
-      }
-      const agentSummary = (data.agents || []).map((a: { name: string; duration: number }) =>
-        `${a.name} — ${(a.duration / 1000).toFixed(1)}s`
-      );
-      setPipelineAgents([
-        ...agentSummary,
-        `✓ 10-Agent Pipeline — ${data.agentCount} agents in ${(data.totalDuration / 1000).toFixed(1)}s`,
-      ]);
+      const reader = res.body?.getReader();
+      if (!reader) throw new Error("No response stream");
 
-      // Client-side HTML safety net — ensure clean HTML reaches preview
-      let finalHtml = (data.html || "").trim();
-      // Strip code fences if model wrapped output
-      finalHtml = finalHtml.replace(/^```(?:html|HTML)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
-      // Extract from <!DOCTYPE or <html to </html>
-      const docStart = finalHtml.search(/<!doctype\s+html|<html/i);
-      if (docStart > 0) finalHtml = finalHtml.slice(docStart);
-      const htmlEnd = finalHtml.lastIndexOf("</html>");
-      if (htmlEnd !== -1) finalHtml = finalHtml.slice(0, htmlEnd + "</html>".length);
+      const decoder = new TextDecoder();
+      let accumulated = "";
+      let lineBuffer = "";
 
-      console.log("[Pipeline] HTML length:", finalHtml.length, "starts with:", finalHtml.substring(0, 50));
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
 
-      // Client-side body validation — catch cases where pipeline returned HTML but body is empty
-      const pipeBodyM = finalHtml.match(/<body[^>]*>([\s\S]*)<\/body>/i);
-      const pipeBodyChars = pipeBodyM
-        ? pipeBodyM[1].replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().length
-        : 0;
-      if (pipeBodyChars < 50) {
-        console.warn(`[Pipeline] Client-side empty body detected (${pipeBodyChars} chars). Falling back to stream...`);
-        throw new Error(`Pipeline returned empty body (${pipeBodyChars} visible chars)`);
-      }
+        const text = decoder.decode(value, { stream: true });
+        lineBuffer += text;
+        const lines = lineBuffer.split("\n");
+        lineBuffer = lines.pop() || "";
 
-      setGeneratedCode(finalHtml);
-      setStatus("complete");
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const jsonStr = line.slice(6).trim();
+          if (!jsonStr) continue;
 
-      // Auto-replace placeholder images with contextually relevant ones
-      // Only apply if this is still the current generation (prevents stale updates)
-      autoReplaceImages(finalHtml).then((improved) => {
-        if (improved !== finalHtml && generationIdRef.current === currentGenId) {
-          setGeneratedCode(improved);
+          try {
+            const event = JSON.parse(jsonStr);
+
+            if (event.type === "agent") {
+              // Real agent progress from the pipeline
+              if (event.status === "running") {
+                setPipelineAgents(prev => [...prev, `${event.agent} working...`]);
+              } else if (event.status === "done") {
+                setPipelineAgents(prev => {
+                  const updated = prev.filter(a => !a.startsWith(event.agent));
+                  return [...updated, `${event.agent} — ${((event.duration || 0) / 1000).toFixed(1)}s`];
+                });
+              } else if (event.status === "skipped") {
+                setPipelineAgents(prev => [...prev, `${event.agent} — skipped`]);
+              }
+            } else if (event.type === "chunk" && event.content) {
+              // Developer HTML streaming in real-time
+              accumulated += event.content;
+              setGeneratedCode(accumulated);
+            } else if (event.type === "replace" && event.content) {
+              // Enhancement agent replaced the full HTML (SEO/Animation applied)
+              accumulated = event.content;
+              setGeneratedCode(accumulated);
+            } else if (event.type === "status") {
+              setPipelineAgents(prev => [...prev, event.message || "Processing..."]);
+            } else if (event.type === "done") {
+              const totalSec = ((event.totalDuration || 0) / 1000).toFixed(1);
+              setPipelineAgents(prev => [...prev, `Pipeline complete — ${totalSec}s`]);
+              setStatus("complete");
+            } else if (event.type === "error") {
+              setGeneratedCode("");
+              setError(event.message || "Pipeline error");
+              setStatus("error");
+              return;
+            }
+          } catch {
+            // Skip malformed SSE lines
+          }
         }
-      });
+      }
+
+      // Final cleanup of accumulated HTML
+      if (accumulated) {
+        let clean = accumulated.trim();
+        clean = clean.replace(/^```(?:html|HTML)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
+        const ds = clean.search(/<!doctype\s+html|<html/i);
+        if (ds > 0) clean = clean.slice(ds);
+        const he = clean.lastIndexOf("</html>");
+        if (he !== -1) clean = clean.slice(0, he + "</html>".length);
+
+        // Client-side body validation
+        const bodyM = clean.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+        const bodyChars = bodyM
+          ? bodyM[1].replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().length
+          : 0;
+
+        if (bodyChars < 50) {
+          console.warn(`[Pipeline-Stream] Empty body (${bodyChars} chars). Falling back...`);
+          throw new Error(`Pipeline returned empty body (${bodyChars} visible chars)`);
+        }
+
+        setGeneratedCode(clean);
+        if (status !== "complete") setStatus("complete");
+
+        // Auto-replace placeholder images
+        autoReplaceImages(clean).then((improved) => {
+          if (improved !== clean && generationIdRef.current === currentGenId) {
+            setGeneratedCode(improved);
+          }
+        });
+      }
     } catch (err) {
+      if ((err as Error).name === "AbortError") return;
       const errMsg = err instanceof Error ? err.message : String(err);
 
-      // If this is a configuration error (missing API key), don't retry — surface immediately
       if (errMsg.includes("API_KEY") || errMsg.includes("not configured") || errMsg.includes("API key")) {
-        console.error("[Pipeline] Configuration error:", errMsg);
         setGeneratedCode("");
         setError(errMsg);
         setStatus("error");
         return;
       }
 
-      // Fallback to streaming endpoint if pipeline fails
-      console.warn("[Pipeline] Failed, falling back to stream:", errMsg);
-      setPipelineAgents([`Pipeline fallback — generating directly (${errMsg})`]);
+      // Fallback to single-call stream if pipeline stream fails
+      console.warn("[Pipeline-Stream] Failed, falling back:", errMsg);
+      setPipelineAgents([`Fallback mode — generating directly (${errMsg})`]);
 
       try {
         await streamGenerate(prompt.trim());
-        // After stream fallback, verify we didn't end up with empty HTML
-        // (streamGenerate handles its own errors internally, so check state)
       } catch (streamErr) {
-        // If stream also fails, show a clear error instead of white screen
         console.error("[Stream fallback] Also failed:", streamErr);
         setGeneratedCode("");
-        setError(
-          `Generation failed: ${errMsg}. Stream fallback also failed: ${streamErr instanceof Error ? streamErr.message : String(streamErr)}`
-        );
+        setError(`Generation failed: ${errMsg}. Fallback also failed: ${streamErr instanceof Error ? streamErr.message : String(streamErr)}`);
         setStatus("error");
       }
     }
-  }, [prompt, tier, streamGenerate, autoReplaceImages, selectedModel]);
+  }, [prompt, tier, streamGenerate, autoReplaceImages, selectedModel, status]);
 
   const handleEdit = useCallback(async () => {
     if (!editPrompt.trim() || !generatedCode) return;
-    await streamGenerate(editPrompt.trim(), generatedCode);
-    setEditPrompt("");
-  }, [editPrompt, generatedCode, streamGenerate]);
+
+    const instruction = editPrompt.trim();
+    setStatus("generating");
+    setError("");
+
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    try {
+      // Try diff-based edit first (5-10x faster than full rewrite)
+      const res = await fetch("/api/generate/edit-diff", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: instruction,
+          existingCode: generatedCode,
+          ...(selectedModel ? { model: selectedModel } : {}),
+        }),
+        signal: controller.signal,
+      });
+
+      if (!res.ok) {
+        // Diff endpoint failed — fall back to full rewrite
+        throw new Error("Diff endpoint unavailable");
+      }
+
+      const reader = res.body?.getReader();
+      if (!reader) throw new Error("No response stream");
+
+      const decoder = new TextDecoder();
+      let lineBuffer = "";
+      let modifiedHtml = generatedCode;
+      let usedFallback = false;
+      let diffCount = 0;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const text = decoder.decode(value, { stream: true });
+        lineBuffer += text;
+        const lines = lineBuffer.split("\n");
+        lineBuffer = lines.pop() || "";
+
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const jsonStr = line.slice(6).trim();
+          if (!jsonStr) continue;
+
+          try {
+            const event = JSON.parse(jsonStr);
+
+            if (event.type === "diff" && event.search && event.replace !== undefined) {
+              // Apply diff to the HTML
+              const before = modifiedHtml;
+              modifiedHtml = modifiedHtml.replace(event.search, event.replace);
+              if (modifiedHtml !== before) {
+                diffCount++;
+                setGeneratedCode(modifiedHtml); // Live update preview
+              }
+            } else if (event.type === "fallback" && event.html) {
+              // Full HTML fallback from server
+              modifiedHtml = event.html;
+              usedFallback = true;
+            } else if (event.type === "done") {
+              // Diff complete
+              console.log(`[Edit-Diff] ${event.diffCount || diffCount} diffs applied${event.fallback ? " (fallback)" : ""}`);
+            } else if (event.type === "error") {
+              throw new Error(event.message || "Edit error");
+            }
+          } catch (e) {
+            if (e instanceof SyntaxError) continue; // Skip malformed SSE
+            throw e;
+          }
+        }
+      }
+
+      // Create a labeled snapshot for this edit
+      pendingLabelRef.current = `Edit: ${instruction.slice(0, 50)}`;
+      setGeneratedCode(modifiedHtml);
+      setStatus("complete");
+      setEditPrompt("");
+
+      const method = usedFallback ? "full rewrite" : `${diffCount} diffs`;
+      setPipelineAgents(prev => [...prev, `Edit applied (${method})`]);
+
+    } catch (err) {
+      if ((err as Error).name === "AbortError") return;
+
+      // Fall back to stream-based full rewrite
+      console.warn("[Edit] Diff failed, falling back to full rewrite:", err instanceof Error ? err.message : err);
+      pendingLabelRef.current = `Edit: ${instruction.slice(0, 50)}`;
+      await streamGenerate(instruction, generatedCode);
+      setEditPrompt("");
+    }
+  }, [editPrompt, generatedCode, streamGenerate, selectedModel]);
 
   const handleCodeUpdate = useCallback((newCode: string) => {
     setGeneratedCode(newCode);
@@ -841,8 +993,8 @@ export default function BuilderPage() {
     setStatus("idle");
     setError("");
     setActiveTool(null);
-    setHistory([]);
-    setHistoryIndex(-1);
+    setSnapshots([]);
+    setSnapshotIndex(-1);
   }, []);
 
   const handleSeoFixRequest = useCallback(

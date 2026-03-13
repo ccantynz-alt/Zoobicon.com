@@ -11,10 +11,12 @@ import { runPipeline } from "@/lib/agents";
  *   tier?: "standard"|"premium"|"ultra"
  * }
  *
- * All tiers run the full 10-agent pipeline with smart model routing:
- * - Haiku 4.5 for fast JSON agents (Strategist, Brand, Copywriter, Architect)
- * - Opus 4.6 for the Developer agent (the actual website build)
- * - Sonnet 4.6 for enhancement agents (Animation, SEO, Forms, Integrations, QA)
+ * Restructured 7-agent pipeline optimized for QUALITY + SPEED:
+ * Phase 1: Strategist (Haiku) — ~4s
+ * Phase 2: Brand + Copywriter + Architect in PARALLEL (Haiku) — ~6s
+ * Phase 3: Developer (Opus 4.6) — ~70s — the quality differentiator
+ * Phase 4: SEO + Animation in PARALLEL (Sonnet) — ~15s — high-impact polish
+ * Total: ~95s — well within 300s limit
  *
  * Returns the final HTML plus agent metadata.
  */
