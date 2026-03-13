@@ -690,40 +690,23 @@ export async function runPipeline(
 
   let html = cleanHtml(devResult.text);
   let bodyCheck = hasBodyContent(html);
-  console.log(`[Pipeline] Developer attempt 1: ${html.length} chars HTML, ${bodyCheck.bodyChars} body text chars, stop: ${devResult.stopReason}`);
+  console.log(`[Pipeline] Developer: ${html.length} chars HTML, ${bodyCheck.bodyChars} body text chars, stop: ${devResult.stopReason}`);
 
-  // If body is empty or response was truncated, retry with increasingly focused prompts
+  // If body is empty, ONE retry with Sonnet (faster than another Opus attempt)
   if (!bodyCheck.valid || devResult.stopReason === "max_tokens") {
-    console.warn(`[Pipeline] Developer output invalid (body: ${bodyCheck.bodyChars} chars, stop: ${devResult.stopReason}). Retrying...`);
-    onProgress?.("developer", "retrying build (body was empty)...");
+    console.warn(`[Pipeline] Developer output invalid (body: ${bodyCheck.bodyChars} chars, stop: ${devResult.stopReason}). Retrying with Sonnet...`);
+    onProgress?.("developer", "retrying build...");
 
     devResult = await llmCall({
-      model: MODEL_PREMIUM,
+      model: MODEL_BALANCED, // Sonnet — faster retry, still good quality
       maxTokens: 32000,
       system: DEVELOPER_SYSTEM,
-      userMessage: `CRITICAL FAILURE: Your previous attempt produced HTML with CSS but the <body> was EMPTY — zero visible content.\n\nSTRICT RULES FOR THIS ATTEMPT:\n1. Write the <body> content FIRST. Start with <!DOCTYPE html><html><head> (brief CSS only), then IMMEDIATELY write <body> with ALL sections.\n2. CSS budget: MAXIMUM 80 lines. Use inline styles if needed — body content is more important than perfect CSS.\n3. Every section MUST appear: hero, features, about, testimonials, stats, FAQ, CTA, footer.\n4. Do NOT write elaborate CSS animations, custom properties blocks, or media queries until AFTER all body content is written.\n\n${devUserMessage}`,
+      userMessage: `CRITICAL: Your previous attempt produced CSS but the <body> was EMPTY. This time write MINIMAL CSS and focus ALL output on <body> content. Every section MUST appear: hero, features, about, testimonials, stats, FAQ, CTA, footer.\n\n${devUserMessage}`,
     });
 
     html = cleanHtml(devResult.text);
     bodyCheck = hasBodyContent(html);
-    console.log(`[Pipeline] Developer attempt 2: ${html.length} chars HTML, ${bodyCheck.bodyChars} body text chars, stop: ${devResult.stopReason}`);
-  }
-
-  // Third attempt — absolutely minimal CSS, maximum body content
-  if (!bodyCheck.valid || devResult.stopReason === "max_tokens") {
-    console.warn(`[Pipeline] Developer still empty after retry 1 (body: ${bodyCheck.bodyChars} chars). Final attempt...`);
-    onProgress?.("developer", "final retry (minimal CSS)...");
-
-    devResult = await llmCall({
-      model: MODEL_PREMIUM,
-      maxTokens: 32000,
-      system: DEVELOPER_SYSTEM,
-      userMessage: `FINAL ATTEMPT — YOUR PREVIOUS TWO ATTEMPTS HAD EMPTY BODIES.\n\nWrite a MINIMAL but COMPLETE page. Use barely any CSS — just basic inline styles if needed. The ONLY thing that matters is that <body> contains real, visible content with all sections. Fancy styling is NOT needed — content is everything.\n\n${devUserMessage}`,
-    });
-
-    html = cleanHtml(devResult.text);
-    bodyCheck = hasBodyContent(html);
-    console.log(`[Pipeline] Developer attempt 3: ${html.length} chars HTML, ${bodyCheck.bodyChars} body text chars, stop: ${devResult.stopReason}`);
+    console.log(`[Pipeline] Developer retry: ${html.length} chars HTML, ${bodyCheck.bodyChars} body text chars, stop: ${devResult.stopReason}`);
   }
 
   agents.push({ agent: "Developer", output: `[${html.length} chars HTML, ${bodyCheck.bodyChars} body text, stop: ${devResult.stopReason}]`, duration: Date.now() - devStart });
@@ -738,29 +721,27 @@ export async function runPipeline(
     throw new Error("Developer agent produced a page with no visible content after retry. Please try again.");
   }
 
-  // ── Phase 4: Animation + SEO + Forms + React Decomposition (Parallel) ──
-  // Enhancement agents + React source generation run in parallel.
-  // Failures should not destroy the developer's output.
-  // Time budget: skip if we've already used >200s (need margin for Vercel's 300s limit)
+  // ── Phase 4: Animation + SEO + Forms (Parallel) ──
+  // Enhancement agents run in parallel. Failures are non-fatal.
+  // Time budget: skip if we've already used >150s (need margin for Vercel's 300s limit)
   let reactComponents: ReactComponents | undefined;
   const elapsedSoFar = Date.now() - startTime;
-  const TIME_BUDGET_MS = 200_000; // 200s — leave 100s for Phase 4+5
+  const PHASE4_BUDGET_MS = 150_000; // 150s
 
-  if (elapsedSoFar > TIME_BUDGET_MS) {
-    console.warn(`[Pipeline] Skipping Phase 4 — already ${Math.round(elapsedSoFar / 1000)}s elapsed (budget: ${TIME_BUDGET_MS / 1000}s)`);
+  if (elapsedSoFar > PHASE4_BUDGET_MS) {
+    console.warn(`[Pipeline] Skipping Phase 4 — already ${Math.round(elapsedSoFar / 1000)}s elapsed`);
     agents.push({ agent: "Enhancement Phase", output: "[skipped: time budget exceeded]", duration: 0 });
   } else {
     onProgress?.("animation", "adding scroll effects");
     onProgress?.("seo", "optimizing for search");
     onProgress?.("forms", "enhancing form functionality");
-    onProgress?.("react", "generating React components");
     const phase4Start = Date.now();
 
     try {
-      const [animText, seoText, formsText, reactText] = await Promise.all([
+      const [animText, seoText, formsText] = await Promise.all([
         llmText({
           model: MODEL_BALANCED,
-          maxTokens: 16384,
+          maxTokens: 8192,
           system: ANIMATION_SYSTEM,
           userMessage: `Add premium animations to this website:\n\n${html}`,
         }).catch((err) => { console.warn("[Pipeline] Animation agent failed:", err.message); return ""; }),
@@ -776,12 +757,6 @@ export async function runPipeline(
           system: FORMS_SYSTEM,
           userMessage: `Make all forms functional in this website:\n\n${html}`,
         }).catch((err) => { console.warn("[Pipeline] Forms agent failed:", err.message); return ""; }),
-        llmText({
-          model: MODEL_BALANCED,
-          maxTokens: 16384,
-          system: REACT_DECOMPOSER_SYSTEM,
-          userMessage: `Decompose this HTML website into modular React components with shadcn/ui and Tailwind CSS. Preserve ALL content, images, and functionality.\n\nHTML:\n${html}`,
-        }).catch((err) => { console.warn("[Pipeline] React Decomposer failed:", err.message); return ""; }),
       ]);
 
       // Safely use animation result as base — only if it's valid and substantial
@@ -815,23 +790,9 @@ export async function runPipeline(
         }
       }
 
-      // Parse React components from decomposer output
-      if (reactText) {
-        try {
-          const parsed = JSON.parse(extractJSON(reactText));
-          if (typeof parsed === "object" && Object.keys(parsed).length >= 3) {
-            reactComponents = parsed;
-            console.log(`[Pipeline] React Decomposer produced ${Object.keys(parsed).length} component files`);
-          }
-        } catch {
-          console.warn("[Pipeline] React Decomposer output was not valid JSON");
-        }
-      }
-
       agents.push({ agent: "Animator", output: `[animations ${animText ? "applied" : "skipped"}]`, duration: Date.now() - phase4Start });
       agents.push({ agent: "SEO Specialist", output: `[SEO ${seoText ? "applied" : "skipped"}]`, duration: Date.now() - phase4Start });
       agents.push({ agent: "Forms Engineer", output: `[forms ${formsText ? "applied" : "skipped"}]`, duration: Date.now() - phase4Start });
-      agents.push({ agent: "React Decomposer", output: `[${reactComponents ? Object.keys(reactComponents).length + " files" : "skipped"}]`, duration: Date.now() - phase4Start });
     } catch (phase4Err) {
       console.warn("[Pipeline] Phase 4 failed entirely, keeping developer HTML:", phase4Err);
       agents.push({ agent: "Enhancement Phase", output: `[skipped: ${phase4Err instanceof Error ? phase4Err.message : "error"}]`, duration: Date.now() - phase4Start });
@@ -840,9 +801,9 @@ export async function runPipeline(
 
   // ── Phase 5: Integrations + QA (Parallel) ──
   // Both are optional enhancements — failures are non-fatal
-  // Also time-budgeted: skip if >250s elapsed
+  // Tight time budget: skip if >200s elapsed (need margin for Vercel's 300s limit)
   const elapsed5 = Date.now() - startTime;
-  if (elapsed5 > 250_000) {
+  if (elapsed5 > 200_000) {
     console.warn(`[Pipeline] Skipping Phase 5 — already ${Math.round(elapsed5 / 1000)}s elapsed`);
     agents.push({ agent: "Integrations", output: "[skipped: time budget]", duration: 0 });
     agents.push({ agent: "QA Engineer", output: "[skipped: time budget]", duration: 0 });
@@ -854,7 +815,7 @@ export async function runPipeline(
     const [intResult, qaResult] = await Promise.all([
       llmText({
         model: MODEL_BALANCED,
-        maxTokens: 16384,
+        maxTokens: 8192,
         system: INTEGRATIONS_SYSTEM,
         userMessage: `Add essential integrations to this website:\n\n${html}`,
       }).then(text => ({ ok: true as const, text })).catch((err) => {
@@ -863,7 +824,7 @@ export async function runPipeline(
       }),
       llmText({
         model: MODEL_BALANCED,
-        maxTokens: 16384,
+        maxTokens: 8192,
         system: QA_SYSTEM,
         userMessage: `Review this website HTML for quality:\n\n${html}`,
       }).then(text => ({ ok: true as const, text })).catch((err) => {
