@@ -21,18 +21,19 @@ const PLANS = [
     name: "Starter",
     price: "Free",
     period: "Forever",
-    desc: "Try the builder. See the quality. No credit card, no credits, no catch.",
-    cta: "Start Building",
+    desc: "Full-power AI builds. See exactly what Zoobicon can do — no credit card, no catch.",
+    cta: "Start Building Free",
     ctaHref: "/builder",
     featured: false,
     color: "from-white/5 to-white/0",
     features: [
       "3 AI-generated websites per month",
       "10 edits per month",
+      "Full 10-agent pipeline (same AI as paid)",
+      "Opus-powered builds — agency quality",
       "Industry-aware design intelligence",
       "Basic SEO tools",
-      "Export HTML — you own the code",
-      "7-day free hosting preview",
+      "7-day hosting preview — then upgrade to keep",
       "Community support",
     ],
   },
@@ -133,7 +134,7 @@ const PLANS = [
 const PRODUCTS = [
   { icon: Zap, name: "AI Website Builder", starter: "3/mo", creator: "15/mo", pro: "50/mo", agency: "200/mo", enterprise: "Unlimited" },
   { icon: Code2, name: "AI Edits", starter: "10/mo", creator: "100/mo", pro: "500/mo", agency: "Unlimited", enterprise: "Unlimited" },
-  { icon: Sparkles, name: "10-Agent Pipeline", starter: false, creator: true, pro: true, agency: true, enterprise: true },
+  { icon: Sparkles, name: "10-Agent Pipeline", starter: true, creator: true, pro: true, agency: true, enterprise: true },
   { icon: Palette, name: "React + shadcn/ui Export", starter: false, creator: true, pro: true, agency: true, enterprise: true },
   { icon: BarChart3, name: "SEO Campaign Agent", starter: "Basic", creator: "Basic", pro: "Full", agency: "Full", enterprise: "Full" },
   { icon: Video, name: "AI Video Creator", starter: false, creator: false, pro: true, agency: true, enterprise: true },
@@ -147,7 +148,7 @@ const PRODUCTS = [
 const FAQS = [
   {
     q: "No credits? No usage tokens? What's the catch?",
-    a: "There is no catch. We don't use a credit system because we think credits are designed to confuse people and drain wallets. You get a flat monthly price with clear generation limits. Starter is free with 3 sites/month. Creator gets 15, Pro gets 50, Agency gets 200. Enterprise is truly unlimited. Simple.",
+    a: "There is no catch. We don't use a credit system because we think credits are designed to confuse people and drain wallets. You get a flat monthly price with clear generation limits. Starter is free with 3 sites/month and the FULL 10-agent AI pipeline — same Opus-powered quality as paid plans. We want you to see exactly what Zoobicon can do. Free sites are hosted for 7 days so you can share them, then upgrade to keep them permanently.",
   },
   {
     q: "Can I cancel anytime?",

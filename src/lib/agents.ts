@@ -532,7 +532,6 @@ export async function runPipeline(
 
   const agents: AgentResult[] = [];
   const startTime = Date.now();
-  const isUltra = input.tier === "ultra";
 
   // Multi-LLM support: if user selected a non-Claude model, use the unified provider
   const userModel = input.model;

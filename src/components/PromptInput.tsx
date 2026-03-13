@@ -57,8 +57,8 @@ const EXAMPLE_PROMPTS = [
   "A SaaS pricing page with three tiers, toggle for monthly/annual, and FAQ section",
 ];
 
-const STANDARD_FEATURES = ["Clean layout", "Responsive", "Fast build"];
-const PREMIUM_FEATURES = ["Agency-quality", "Animations", "Glass effects", "Rich layouts"];
+const STANDARD_FEATURES = ["Opus-powered", "Responsive", "Fast single-pass"];
+const PREMIUM_FEATURES = ["10-agent pipeline", "Animations", "SEO + Forms", "React export"];
 
 export default function PromptInput({
   prompt,
