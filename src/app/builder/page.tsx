@@ -722,7 +722,6 @@ export default function BuilderPage() {
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim()) return;
 
-    // Use the streaming pipeline — real-time agent progress + live HTML rendering
     const currentGenId = ++generationIdRef.current;
     setStatus("generating");
     setError("");
@@ -735,42 +734,12 @@ export default function BuilderPage() {
     const controller = new AbortController();
     abortRef.current = controller;
 
-    try {
-      const res = await fetch("/api/generate/pipeline-stream", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt: prompt.trim(),
-          style: "modern",
-          tier,
-          model: selectedModel,
-        }),
-        signal: controller.signal,
-      });
-
-      if (!res.ok) {
-        // Check for config errors
-        try {
-          const errData = await res.clone().json();
-          if (errData.error && (errData.error.includes("API_KEY") || errData.error.includes("not configured"))) {
-            setError(errData.error);
-            setStatus("error");
-            return;
-          }
-        } catch { /* not JSON */ }
-
-        let errorMsg = `Pipeline returned HTTP ${res.status}`;
-        try {
-          const data = await res.json();
-          errorMsg = data.error || errorMsg;
-        } catch {
-          if (res.status === 504 || res.status === 502) {
-            errorMsg = "Pipeline timed out — try again with a simpler prompt.";
-          }
-        }
-        throw new Error(errorMsg);
-      }
-
+    // ── Helper: read SSE stream into accumulated HTML ──
+    const readSSEStream = async (
+      res: Response,
+      onChunk?: (accumulated: string) => void,
+      onAgent?: (event: Record<string, unknown>) => void,
+    ): Promise<string> => {
       const reader = res.body?.getReader();
       if (!reader) throw new Error("No response stream");
 
@@ -778,50 +747,34 @@ export default function BuilderPage() {
       let accumulated = "";
       let lineBuffer = "";
 
-      // Process SSE lines from either the stream or the leftover buffer
       const processLines = (lines: string[]) => {
         for (const line of lines) {
           if (!line.startsWith("data: ")) continue;
           const jsonStr = line.slice(6).trim();
           if (!jsonStr) continue;
-
           try {
             const event = JSON.parse(jsonStr);
-
-            if (event.type === "agent") {
-              // Real agent progress from the pipeline
-              if (event.status === "running") {
-                setPipelineAgents(prev => [...prev, `${event.agent} working...`]);
-              } else if (event.status === "done") {
-                setPipelineAgents(prev => {
-                  const updated = prev.filter(a => !a.startsWith(event.agent));
-                  return [...updated, `${event.agent} — ${((event.duration || 0) / 1000).toFixed(1)}s`];
-                });
-              } else if (event.status === "skipped") {
-                setPipelineAgents(prev => [...prev, `${event.agent} — skipped`]);
-              }
-            } else if (event.type === "chunk" && event.content) {
-              // Developer HTML streaming in real-time
+            if (event.type === "chunk" && event.content) {
               accumulated += event.content;
-              setGeneratedCode(accumulated);
+              onChunk?.(accumulated);
             } else if (event.type === "replace" && event.content) {
-              // Enhancement agent replaced the full HTML (SEO/Animation applied)
               accumulated = event.content;
-              setGeneratedCode(accumulated);
-            } else if (event.type === "status") {
-              setPipelineAgents(prev => [...prev, event.message || "Processing..."]);
+              onChunk?.(accumulated);
+            } else if (event.type === "agent" && onAgent) {
+              onAgent(event);
+            } else if (event.type === "status" && onAgent) {
+              onAgent(event);
             } else if (event.type === "done") {
-              const totalSec = ((event.totalDuration || 0) / 1000).toFixed(1);
-              setPipelineAgents(prev => [...prev, `Pipeline complete — ${totalSec}s`]);
-              setStatus("complete");
+              // Stream complete
             } else if (event.type === "error") {
-              setGeneratedCode("");
-              setError(event.message || "Pipeline error");
-              setStatus("error");
-              return;
+              throw new Error(event.message || "Generation error");
             }
-          } catch {
-            // Skip malformed SSE lines
+          } catch (e) {
+            if (e instanceof Error && e.message !== "Generation error" && !e.message.includes("Generation")) {
+              // Skip JSON parse errors
+            } else {
+              throw e;
+            }
           }
         }
       };
@@ -829,48 +782,139 @@ export default function BuilderPage() {
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-
-        const text = decoder.decode(value, { stream: true });
-        lineBuffer += text;
+        lineBuffer += decoder.decode(value, { stream: true });
         const lines = lineBuffer.split("\n");
         lineBuffer = lines.pop() || "";
         processLines(lines);
       }
-
-      // Flush any remaining data in the line buffer after stream closes
-      // This prevents losing the final replace/done/error events
+      // Flush remaining buffer
       if (lineBuffer.trim()) {
-        const finalText = decoder.decode(); // flush decoder
-        lineBuffer += finalText;
-        processLines(lineBuffer.split("\n"));
+        processLines((decoder.decode() + lineBuffer).split("\n"));
       }
 
-      // Final cleanup of accumulated HTML
-      if (accumulated) {
-        let clean = accumulated.trim();
-        clean = clean.replace(/^```(?:html|HTML)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
-        const ds = clean.search(/<!doctype\s+html|<html/i);
-        if (ds > 0) clean = clean.slice(ds);
-        const he = clean.lastIndexOf("</html>");
-        if (he !== -1) clean = clean.slice(0, he + "</html>".length);
+      return accumulated;
+    };
 
-        // Client-side body validation
-        const bodyM = clean.match(/<body[^>]*>([\s\S]*)<\/body>/i);
-        const bodyChars = bodyM
-          ? bodyM[1].replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().length
-          : 0;
+    // ── Helper: clean HTML output ──
+    const cleanHtml = (raw: string): string => {
+      let h = raw.trim();
+      h = h.replace(/^```(?:html|HTML)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
+      const ds = h.search(/<!doctype\s+html|<html/i);
+      if (ds > 0) h = h.slice(ds);
+      const he = h.lastIndexOf("</html>");
+      if (he !== -1) h = h.slice(0, he + "</html>".length);
+      return h;
+    };
 
-        if (bodyChars < 50) {
-          console.warn(`[Pipeline-Stream] Empty body (${bodyChars} chars). Falling back...`);
-          throw new Error(`Pipeline returned empty body (${bodyChars} visible chars)`);
+    // ── Helper: quick generation (fast, reliable) ──
+    const quickGenerate = async (): Promise<string> => {
+      setPipelineAgents(prev => [...prev, "Generating website..."]);
+
+      const res = await fetch("/api/generate/quick", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: prompt.trim(),
+          ...(selectedModel ? { model: selectedModel } : {}),
+        }),
+        signal: controller.signal,
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+        throw new Error(errData.error || `HTTP ${res.status}`);
+      }
+
+      const html = await readSSEStream(res, (acc) => setGeneratedCode(acc));
+      return cleanHtml(html);
+    };
+
+    try {
+      let finalHtml = "";
+
+      if (tier === "premium") {
+        // Premium: try the 7-agent pipeline with a 90-second client timeout
+        // If it fails or times out, fall back to quick
+        try {
+          const timeoutId = setTimeout(() => controller.abort(), 90_000);
+
+          const res = await fetch("/api/generate/pipeline-stream", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              prompt: prompt.trim(),
+              style: "modern",
+              tier,
+              model: selectedModel,
+            }),
+            signal: controller.signal,
+          });
+
+          clearTimeout(timeoutId);
+
+          if (!res.ok) {
+            throw new Error(`Pipeline HTTP ${res.status}`);
+          }
+
+          const html = await readSSEStream(
+            res,
+            (acc) => setGeneratedCode(acc),
+            (event) => {
+              if (event.type === "agent") {
+                if (event.status === "running") {
+                  setPipelineAgents(prev => [...prev, `${event.agent} working...`]);
+                } else if (event.status === "done") {
+                  setPipelineAgents(prev => {
+                    const updated = prev.filter(a => !(a as string).startsWith(event.agent as string));
+                    return [...updated, `${event.agent} — ${(((event.duration as number) || 0) / 1000).toFixed(1)}s`];
+                  });
+                } else if (event.status === "skipped") {
+                  setPipelineAgents(prev => [...prev, `${event.agent} — skipped`]);
+                }
+              } else if (event.type === "status") {
+                setPipelineAgents(prev => [...prev, (event.message as string) || "Processing..."]);
+              }
+            }
+          );
+
+          finalHtml = cleanHtml(html);
+
+          // Validate body content
+          const bodyM = finalHtml.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+          const bodyChars = bodyM
+            ? bodyM[1].replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().length
+            : 0;
+
+          if (bodyChars < 50) {
+            throw new Error(`Pipeline produced empty body (${bodyChars} chars)`);
+          }
+        } catch (pipelineErr) {
+          if ((pipelineErr as Error).name === "AbortError") {
+            // Could be our timeout — recreate controller and try quick
+            const newController = new AbortController();
+            abortRef.current = newController;
+          }
+          const msg = pipelineErr instanceof Error ? pipelineErr.message : String(pipelineErr);
+          console.warn("[Pipeline] Failed:", msg);
+          setPipelineAgents([`Pipeline unavailable — using fast mode`]);
+          setGeneratedCode("");
+
+          // Fall back to quick
+          finalHtml = await quickGenerate();
         }
+      } else {
+        // Standard: go straight to quick (fast, reliable, ~20-30s)
+        finalHtml = await quickGenerate();
+      }
 
-        setGeneratedCode(clean);
-        if (status !== "complete") setStatus("complete");
+      if (finalHtml && generationIdRef.current === currentGenId) {
+        setGeneratedCode(finalHtml);
+        setStatus("complete");
+        setPipelineAgents(prev => [...prev, "Complete"]);
 
         // Auto-replace placeholder images
-        autoReplaceImages(clean).then((improved) => {
-          if (improved !== clean && generationIdRef.current === currentGenId) {
+        autoReplaceImages(finalHtml).then((improved) => {
+          if (improved !== finalHtml && generationIdRef.current === currentGenId) {
             setGeneratedCode(improved);
           }
         });
@@ -878,108 +922,14 @@ export default function BuilderPage() {
     } catch (err) {
       if ((err as Error).name === "AbortError") return;
       const errMsg = err instanceof Error ? err.message : String(err);
-
-      if (errMsg.includes("API_KEY") || errMsg.includes("not configured") || errMsg.includes("API key")) {
-        setGeneratedCode("");
-        setError(errMsg);
-        setStatus("error");
-        return;
-      }
-
-      // Fallback to single-call stream if pipeline stream fails
-      console.warn("[Pipeline-Stream] Failed, falling back:", errMsg);
-      setPipelineAgents([`Fallback mode — generating directly (${errMsg})`]);
-
-      try {
-        await streamGenerate(prompt.trim());
-      } catch (streamErr) {
-        console.warn("[Stream fallback] Also failed:", streamErr);
-
-        // Last resort: /api/generate/quick — simplified Sonnet call that guarantees body content
-        console.log("[Quick fallback] Trying /api/generate/quick...");
-        setPipelineAgents(prev => [...prev, "Using quick generation mode..."]);
-
-        try {
-          const quickRes = await fetch("/api/generate/quick", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              prompt: prompt.trim(),
-              ...(selectedModel ? { model: selectedModel } : {}),
-            }),
-            signal: abortRef.current?.signal,
-          });
-
-          if (!quickRes.ok) {
-            const qErr = await quickRes.json().catch(() => ({ error: "Unknown" }));
-            throw new Error(qErr.error || `HTTP ${quickRes.status}`);
-          }
-
-          const quickReader = quickRes.body?.getReader();
-          if (!quickReader) throw new Error("No response stream");
-
-          const quickDecoder = new TextDecoder();
-          let quickAccum = "";
-          let quickBuf = "";
-
-          while (true) {
-            const { done, value } = await quickReader.read();
-            if (done) break;
-            quickBuf += quickDecoder.decode(value, { stream: true });
-            const qLines = quickBuf.split("\n");
-            quickBuf = qLines.pop() || "";
-            for (const ql of qLines) {
-              if (!ql.startsWith("data: ")) continue;
-              try {
-                const qe = JSON.parse(ql.slice(6).trim());
-                if (qe.type === "chunk" && qe.content) {
-                  quickAccum += qe.content;
-                  setGeneratedCode(quickAccum);
-                } else if (qe.type === "replace" && qe.content) {
-                  quickAccum = qe.content;
-                  setGeneratedCode(quickAccum);
-                } else if (qe.type === "error") {
-                  throw new Error(qe.message || "Quick generation failed");
-                }
-              } catch (parseErr) {
-                if (parseErr instanceof Error && parseErr.message.includes("Quick generation")) throw parseErr;
-              }
-            }
-          }
-          // Flush remaining buffer
-          if (quickBuf.trim()) {
-            for (const ql of (quickDecoder.decode() + quickBuf).split("\n")) {
-              if (!ql.startsWith("data: ")) continue;
-              try {
-                const qe = JSON.parse(ql.slice(6).trim());
-                if (qe.type === "replace" && qe.content) {
-                  quickAccum = qe.content;
-                  setGeneratedCode(quickAccum);
-                }
-              } catch { /* skip */ }
-            }
-          }
-
-          if (quickAccum) {
-            setStatus("complete");
-            setPipelineAgents(prev => [...prev, "Quick generation complete"]);
-            autoReplaceImages(quickAccum).then((improved) => {
-              if (improved !== quickAccum && generationIdRef.current === currentGenId) {
-                setGeneratedCode(improved);
-              }
-            });
-          } else {
-            throw new Error("Quick generation returned empty");
-          }
-        } catch (quickErr) {
-          console.error("[Quick fallback] Also failed:", quickErr);
-          setGeneratedCode("");
-          setError(`Generation failed after all attempts. ${quickErr instanceof Error ? quickErr.message : String(quickErr)}`);
-          setStatus("error");
-        }
-      }
+      console.error("[Generate] Failed:", errMsg);
+      setGeneratedCode("");
+      setError(errMsg.includes("API_KEY") || errMsg.includes("not configured")
+        ? errMsg
+        : `Generation failed: ${errMsg}. Please try again.`);
+      setStatus("error");
     }
-  }, [prompt, tier, streamGenerate, autoReplaceImages, selectedModel, status]);
+  }, [prompt, tier, autoReplaceImages, selectedModel]);
 
   const handleEdit = useCallback(async () => {
     if (!editPrompt.trim() || !generatedCode) return;
