@@ -579,16 +579,7 @@ export default function BuilderPage() {
         let accumulated = "";
         let lineBuffer = ""; // Buffer for incomplete SSE lines split across chunks
 
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const text = decoder.decode(value, { stream: true });
-          lineBuffer += text;
-          const lines = lineBuffer.split("\n");
-          // Keep the last (potentially incomplete) line in the buffer
-          lineBuffer = lines.pop() || "";
-
+        const processStreamLines = (lines: string[]) => {
           for (const line of lines) {
             if (!line.startsWith("data: ")) continue;
             const jsonStr = line.slice(6).trim();
@@ -605,7 +596,6 @@ export default function BuilderPage() {
                 setGeneratedCode(accumulated);
               } else if (event.type === "status") {
                 // Informational status update (e.g., "Retrying...")
-                // Could show in UI if desired
               } else if (event.type === "done") {
                 setStatus("complete");
               } else if (event.type === "error") {
@@ -619,6 +609,25 @@ export default function BuilderPage() {
               // Skip malformed SSE lines
             }
           }
+        };
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const text = decoder.decode(value, { stream: true });
+          lineBuffer += text;
+          const lines = lineBuffer.split("\n");
+          // Keep the last (potentially incomplete) line in the buffer
+          lineBuffer = lines.pop() || "";
+          processStreamLines(lines);
+        }
+
+        // Flush any remaining data after stream closes
+        if (lineBuffer.trim()) {
+          const finalText = decoder.decode();
+          lineBuffer += finalText;
+          processStreamLines(lineBuffer.split("\n"));
         }
 
         if (accumulated) {
@@ -769,15 +778,8 @@ export default function BuilderPage() {
       let accumulated = "";
       let lineBuffer = "";
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        const text = decoder.decode(value, { stream: true });
-        lineBuffer += text;
-        const lines = lineBuffer.split("\n");
-        lineBuffer = lines.pop() || "";
-
+      // Process SSE lines from either the stream or the leftover buffer
+      const processLines = (lines: string[]) => {
         for (const line of lines) {
           if (!line.startsWith("data: ")) continue;
           const jsonStr = line.slice(6).trim();
@@ -822,6 +824,25 @@ export default function BuilderPage() {
             // Skip malformed SSE lines
           }
         }
+      };
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const text = decoder.decode(value, { stream: true });
+        lineBuffer += text;
+        const lines = lineBuffer.split("\n");
+        lineBuffer = lines.pop() || "";
+        processLines(lines);
+      }
+
+      // Flush any remaining data in the line buffer after stream closes
+      // This prevents losing the final replace/done/error events
+      if (lineBuffer.trim()) {
+        const finalText = decoder.decode(); // flush decoder
+        lineBuffer += finalText;
+        processLines(lineBuffer.split("\n"));
       }
 
       // Final cleanup of accumulated HTML
