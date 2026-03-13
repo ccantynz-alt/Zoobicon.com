@@ -562,14 +562,30 @@ export async function runPipeline(
       const messages: { role: "user" | "assistant"; content: string }[] = [
         { role: "user", content: opts.userMessage },
       ];
-      const res = await client.messages.create({
-        model: opts.model,
-        max_tokens: opts.maxTokens,
-        system: opts.system,
-        messages,
-      });
-      const text = res.content.find((b) => b.type === "text")?.text || "";
-      return { text, stopReason: res.stop_reason || "unknown" };
+      try {
+        const res = await client.messages.create({
+          model: opts.model,
+          max_tokens: opts.maxTokens,
+          system: opts.system,
+          messages,
+        });
+        const text = res.content.find((b) => b.type === "text")?.text || "";
+        return { text, stopReason: res.stop_reason || "unknown" };
+      } catch (err) {
+        // If Opus fails, automatically fall back to Sonnet (still good quality)
+        if (opts.model === "claude-opus-4-6") {
+          console.warn(`[Pipeline] Opus failed (${err instanceof Error ? err.message : "unknown"}), falling back to Sonnet`);
+          const fallbackRes = await client.messages.create({
+            model: "claude-sonnet-4-6",
+            max_tokens: opts.maxTokens,
+            system: opts.system,
+            messages,
+          });
+          const text = fallbackRes.content.find((b) => b.type === "text")?.text || "";
+          return { text, stopReason: fallbackRes.stop_reason || "unknown" };
+        }
+        throw err;
+      }
     }
   };
 

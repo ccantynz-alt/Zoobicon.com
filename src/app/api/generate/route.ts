@@ -142,12 +142,28 @@ export async function POST(req: NextRequest) {
       { role: "user", content: userMessage + (!isEdit ? "\n\nIMPORTANT: Start your response IMMEDIATELY with <!DOCTYPE html> — no preamble, no explanation, no code fences. Output raw HTML only." : "") },
     ];
 
-    const message = await client.messages.create({
-      model,
-      max_tokens: maxTokens,
-      system: systemPrompt,
-      messages,
-    });
+    let message;
+    try {
+      message = await client.messages.create({
+        model,
+        max_tokens: maxTokens,
+        system: systemPrompt,
+        messages,
+      });
+    } catch (err) {
+      // If Opus fails, try Sonnet as fallback
+      if (model === "claude-opus-4-6") {
+        console.warn(`[Generate] Opus failed (${err instanceof Error ? err.message : "unknown"}), falling back to Sonnet`);
+        message = await client.messages.create({
+          model: "claude-sonnet-4-6",
+          max_tokens: maxTokens,
+          system: systemPrompt,
+          messages,
+        });
+      } else {
+        throw err;
+      }
+    }
 
     const textBlock = message.content.find((block) => block.type === "text");
     if (!textBlock || textBlock.type !== "text") {
@@ -251,7 +267,7 @@ Output ONLY raw HTML — no markdown, no code fences, no explanation.`;
     }
 
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: err instanceof Error ? err.message : "Internal server error" },
       { status: 500 }
     );
   }

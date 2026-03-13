@@ -156,7 +156,22 @@ export async function POST(req: NextRequest) {
           { status: 503, headers: { "Content-Type": "application/json" } }
         );
       }
-      throw apiErr;
+      // If Opus fails, try Sonnet as fallback
+      if (model === "claude-opus-4-6") {
+        console.warn(`[Stream] Opus failed (${apiErr instanceof Error ? apiErr.message : "unknown"}), falling back to Sonnet`);
+        try {
+          stream = await client.messages.stream({
+            model: "claude-sonnet-4-6",
+            max_tokens: maxTokens,
+            system: systemPrompt,
+            messages,
+          });
+        } catch {
+          throw apiErr; // If Sonnet also fails, throw the original Opus error
+        }
+      } else {
+        throw apiErr;
+      }
     }
 
     const encoder = new TextEncoder();
@@ -298,7 +313,7 @@ Output ONLY raw HTML.`
     }
 
     return new Response(
-      JSON.stringify({ error: "Internal server error" }),
+      JSON.stringify({ error: err instanceof Error ? err.message : "Internal server error" }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
