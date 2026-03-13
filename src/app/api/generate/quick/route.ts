@@ -1,134 +1,295 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
-import { injectComponentLibrary } from "@/lib/component-library";
+import { COMPONENT_LIBRARY_CSS } from "@/lib/component-library";
 
 /**
- * POST /api/generate/quick — Primary generation endpoint
+ * POST /api/generate/quick — Primary generation endpoint (v2 architecture)
  *
- * Single-call architecture: one model, one prompt, reliable output.
- * - Standard tier: Sonnet (~20-30s) — fast, impressive, hooks users
- * - Premium tier: Opus (~60-90s) — best quality, the upgrade incentive
+ * KEY INSIGHT: Lovable/Bolt/v0 never ask the AI to write CSS from scratch.
+ * They have pre-built design systems. The AI only writes structure + content.
  *
- * No multi-agent pipeline. The model is smart enough to be strategist,
- * designer, copywriter, and developer in a single call.
+ * Our approach:
+ * 1. AI outputs ONLY a JSON config (colors, fonts, business name) + body HTML
+ * 2. We wrap it in a pre-built template with the component library
+ * 3. The AI spends 95% of tokens on CONTENT, not CSS
+ *
+ * This eliminates the "spent all tokens on CSS, empty body" problem permanently.
  */
 
 export const maxDuration = 300;
 
-// ── Standard System Prompt (Sonnet) ──
-// Focused on speed + impressive output. Body-first, minimal CSS.
-const STANDARD_SYSTEM = `You are Zoobicon, an elite AI website generator that produces agency-quality websites. Output a single, complete HTML file.
+// ── The template that wraps AI output ──
+// AI never writes this. We control it. Zero tokens wasted.
+function buildFullPage(config: SiteConfig, bodyHtml: string): string {
+  const { title, description, font1, font2, colors, customCss } = config;
 
-## OUTPUT STRUCTURE — FOLLOW EXACTLY
-1. <!DOCTYPE html>, <html lang="en">, <head> — title, meta viewport, meta description, TWO Google Fonts via <link>
-2. <style> — ONLY :root custom properties (colors, fonts, sizes) + max 50 lines of site-specific CSS. A component library is auto-injected with .btn-primary, .btn-secondary, .card, .grid-2, .grid-3, .section, .section-alt, .container, .testimonial-card, .stat-item, .faq-item, .badge, .input, .fade-in — USE those classes.
-3. <body> — THIS IS 80% OF YOUR OUTPUT. Every section with full, real content.
-4. <script> — mobile menu, FAQ accordion, counter animation, smooth scroll (under 40 lines)
+  const fontUrl = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(font1)}:wght@400;500;600;700;800;900&family=${encodeURIComponent(font2)}:wght@400;500;600;700&display=swap`;
 
-## CSS BUDGET: 50 LINES MAX
-The component library handles buttons, cards, grids, inputs, badges, sections, shadows, hover states, transitions, responsive design. You only write :root variables and site-specific overrides.
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="${description.replace(/"/g, "&quot;")}">
+  <title>${title}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="${fontUrl}" rel="stylesheet">
+  <style>
+${COMPONENT_LIBRARY_CSS}
 
-## BODY SECTIONS — WRITE ALL OF THESE
-1. <nav> — sticky, logo text + navigation links + CTA button, mobile hamburger
-2. Hero — full-viewport, punchy benefit-driven headline, subheading, TWO CTA buttons, social proof line
-3. Social proof bar — 4-5 company/client names in a muted horizontal strip
-4. Features/Services — .grid-3 > .card with inline SVG icons, benefit-focused titles, 2-line descriptions
-5. About — split layout with image + compelling story + 3 stats with numbers
-6. Testimonials — 3x .testimonial-card with specific quotes mentioning metrics ("increased revenue by 47%")
-7. Stats — .stat-item with big numbers (use specific impressive figures)
-8. FAQ — .faq-item accordion with 4-5 objection-handling questions and answers
-9. CTA — compelling headline, description, button, trust line ("No credit card required")
-10. Footer — 4-column grid: about blurb, quick links, services, contact (phone/email/address)
+/* ── Site Theme ── */
+:root {
+  --color-primary: ${colors.primary};
+  --color-primary-dark: ${colors.primaryDark || colors.primary};
+  --color-bg: ${colors.bg};
+  --color-bg-alt: ${colors.bgAlt};
+  --color-surface: ${colors.surface};
+  --color-text: ${colors.text};
+  --color-text-muted: ${colors.textMuted};
+  --color-border: ${colors.border};
+  --color-accent: ${colors.accent || colors.primary};
+  --font-heading: '${font1}', ${font1 === "Playfair Display" || font1 === "Cormorant Garamond" || font1 === "Merriweather" ? "serif" : "sans-serif"};
+  --font-body: '${font2}', sans-serif;
+  --section-padding: 100px;
+  --container-padding: 24px;
+  --max-width: 1200px;
+  --btn-radius: 8px;
+  --card-radius: 12px;
+}
+body {
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  line-height: 1.15;
+}
+${customCss || ""}
+  </style>
+</head>
+<body>
+${bodyHtml}
+<script>
+// Mobile menu
+(function(){
+  var btn = document.querySelector('.mobile-menu-btn');
+  var nav = document.querySelector('.nav-links');
+  if (btn && nav) {
+    btn.addEventListener('click', function() {
+      nav.classList.toggle('open');
+      btn.classList.toggle('open');
+    });
+    nav.querySelectorAll('a').forEach(function(a) {
+      a.addEventListener('click', function() { nav.classList.remove('open'); btn.classList.remove('open'); });
+    });
+  }
+})();
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(function(a){
+  a.addEventListener('click',function(e){
+    var t=document.querySelector(this.getAttribute('href'));
+    if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'});}
+  });
+});
+// FAQ accordion
+document.querySelectorAll('.faq-question').forEach(function(q){
+  q.addEventListener('click',function(){
+    var a=this.nextElementSibling;
+    if(a){a.classList.toggle('open');}
+    var icon=this.querySelector('.faq-icon');
+    if(icon){icon.textContent=a&&a.classList.contains('open')?'−':'+';}
+  });
+});
+// Scroll animations
+(function(){
+  var sel='.fade-in,.fade-in-left,.fade-in-right,.scale-in';
+  var els=document.querySelectorAll(sel);
+  els.forEach(function(el){el.classList.add('will-animate');});
+  if('IntersectionObserver' in window){
+    var obs=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}
+      });
+    },{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
+    els.forEach(function(el){obs.observe(el);});
+  } else {
+    els.forEach(function(el){el.classList.add('visible');});
+  }
+  setTimeout(function(){
+    document.querySelectorAll(sel+':not(.visible)').forEach(function(el){el.classList.add('visible');});
+  },3000);
+})();
+// Animated counters
+document.querySelectorAll('.stat-number[data-target]').forEach(function(el){
+  var obs=new IntersectionObserver(function(entries){
+    if(entries[0].isIntersecting){
+      var target=parseInt(el.dataset.target);
+      var suffix=el.dataset.suffix||'';
+      var prefix=el.dataset.prefix||'';
+      var duration=1500;
+      var start=Date.now();
+      (function animate(){
+        var p=Math.min((Date.now()-start)/duration,1);
+        p=1-Math.pow(1-p,3);
+        el.textContent=prefix+Math.floor(target*p).toLocaleString()+suffix;
+        if(p<1)requestAnimationFrame(animate);
+      })();
+      obs.unobserve(el);
+    }
+  },{threshold:0.5});
+  obs.observe(el);
+});
+</script>
+</body>
+</html>`;
+}
 
-## INDUSTRY AESTHETIC — Match via :root colors + font choice
-- Luxury/Legal/Medical: light backgrounds (#fafaf9), serif headings (Playfair Display), muted earth tones. NO dark themes.
-- SaaS/Tech/Startup: can use dark hero, sans-serif (Inter), vibrant accent colors.
-- Restaurant/Food: warm palette, serif headings, appetizing imagery.
-- Creative/Portfolio: bold typography, high contrast, dramatic spacing.
-- Healthcare: soft blues/greens, clean, calming, lots of whitespace.
+interface SiteConfig {
+  title: string;
+  description: string;
+  font1: string;
+  font2: string;
+  colors: {
+    primary: string;
+    primaryDark?: string;
+    bg: string;
+    bgAlt: string;
+    surface: string;
+    text: string;
+    textMuted: string;
+    border: string;
+    accent?: string;
+  };
+  customCss?: string;
+}
 
-## IMAGE RULES — CRITICAL
+// ── System Prompt: Body-Only Architecture ──
+// The AI outputs a JSON config block + raw body HTML. That's it.
+// No <!DOCTYPE>, no <head>, no <style>, no <script>. Just content.
+const BODY_ONLY_SYSTEM = `You are Zoobicon, an elite AI website builder. You output ONLY two things:
+
+1. A JSON config block (wrapped in <config>...</config> tags)
+2. Raw HTML for the <body> content (wrapped in <body-html>...</body-html> tags)
+
+You do NOT write <!DOCTYPE>, <html>, <head>, <style>, or <script>. Those are handled by the server. You ONLY write body content using pre-built component classes.
+
+## STEP 1: CONFIG BLOCK
+Output a JSON object with site theme settings:
+<config>
+{
+  "title": "Business Name | Tagline",
+  "description": "Meta description for SEO, 1-2 sentences",
+  "font1": "Inter",
+  "font2": "Inter",
+  "colors": {
+    "primary": "#2563eb",
+    "primaryDark": "#1d4ed8",
+    "bg": "#ffffff",
+    "bgAlt": "#f8fafc",
+    "surface": "#ffffff",
+    "text": "#1a1a2e",
+    "textMuted": "#64748b",
+    "border": "#e2e8f0",
+    "accent": "#7c3aed"
+  },
+  "customCss": ""
+}
+</config>
+
+Font choices by industry:
+- Luxury/Legal/Finance: font1: "Playfair Display", font2: "Inter" — warm whites, gold/navy
+- SaaS/Tech: font1: "Inter", font2: "Inter" — modern, can use dark bg
+- Restaurant/Food: font1: "Playfair Display", font2: "Lato" — warm earth tones
+- Healthcare: font1: "Inter", font2: "Inter" — soft blues/greens
+- Creative/Agency: font1: "Space Grotesk", font2: "Inter" — bold, high contrast
+
+The "customCss" field is for ONLY site-specific CSS that the component library doesn't cover (max 30 lines). Things like hero gradient overlays, custom nav styling, accent decorations. Most sites need very little here.
+
+## STEP 2: BODY HTML
+Output the complete body content wrapped in <body-html>...</body-html> tags.
+
+AVAILABLE COMPONENT CLASSES (these are pre-styled — just use them):
+- Buttons: .btn .btn-primary .btn-secondary .btn-ghost .btn-lg .btn-sm
+- Cards: .card .card-body .card-img .card-flat
+- Layout: .section .section-alt .container .section-header .section-accent
+- Grid: .grid .grid-2 .grid-3 .grid-4 (auto-responsive at 768px)
+- Flex: .flex .flex-col .items-center .justify-center .justify-between .gap-1 .gap-2 .gap-3 .gap-4
+- Text: .text-center .text-muted .text-primary .text-sm .text-lg .font-bold .font-semibold
+- Animations: .fade-in .fade-in-left .fade-in-right .scale-in (on each <section>)
+- Patterns: .testimonial-card .stat-item .stat-number .stat-label .faq-item .faq-question .faq-answer .logo-strip
+- Badges: .badge .badge-primary .badge-success
+- Inputs: .input .input-group
+
+## BODY SECTIONS — WRITE ALL OF THESE:`;
+
+const STANDARD_SECTIONS = `
+1. <nav> — Use: <nav style="position:sticky;top:0;z-index:100;background:var(--color-bg);border-bottom:1px solid var(--color-border)"><div class="container flex justify-between items-center" style="padding:1rem var(--container-padding)">. Include logo text, nav links, CTA button (.btn .btn-primary .btn-sm), and a mobile hamburger button (.mobile-menu-btn).
+2. Hero <section> — class="section fade-in" with full-viewport feel. Big headline in <h1>, subheading in <p class="text-lg text-muted">, two CTAs (.btn-primary.btn-lg + .btn-ghost.btn-lg), and a social proof line.
+3. Social proof — <section class="section-alt fade-in"> with <div class="logo-strip"> containing 4-5 company name spans.
+4. Features — <section class="section fade-in"> with .section-header (h2 + p) then .grid.grid-3 > .card > .card-body. Each card: inline SVG icon (24x24), <h3>, <p class="text-muted">. Write 6 cards.
+5. About — <section class="section section-alt fade-in"> with .grid.grid-2: one side = <img> (picsum, 800x500), other side = story text + stats in .flex.gap-3 using .stat-item.
+6. Testimonials — <section class="section fade-in"> with .section-header then .grid.grid-3 > .testimonial-card. Each: .testimonial-stars ("★★★★★"), <p> with specific quote mentioning metrics, <div> with name+title. 3 testimonials.
+7. Stats — <section class="section section-alt fade-in" with dark or accent background via inline style> with .grid.grid-4 > .stat-item. Use <div class="stat-number" data-target="NUMBER" data-suffix="+" data-prefix="">0</div> for animated counters + .stat-label. 4 stats.
+8. FAQ — <section class="section fade-in"> with .section-header then .faq-item > .faq-question (text + <span class="faq-icon">+</span>) + .faq-answer > p. Write 5 Q&As.
+9. CTA — <section class="section fade-in" with dark/accent background via inline style, text-center> Compelling headline, subtext, .btn-primary.btn-lg, trust line.
+10. Footer — <footer class="section fade-in" style="background:var(--color-text);color:#fff;padding:60px var(--container-padding)"> with .container > .grid.grid-4: about blurb, quick links, services, contact info.
+
+## IMAGE RULES
 - Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for ALL images
-- EVERY image must use a DIFFERENT, UNIQUE seed keyword — NEVER repeat a seed
-- Good examples: seed/modern-office-desk/800/500, seed/happy-customer-portrait/100/100, seed/fresh-organic-food/600/400
-- Vary sizes: hero (1200x600), content (800x500), cards (400x300), avatars (100/100)
-- NEVER use the same seed keyword twice on the page
+- EVERY image MUST have a DIFFERENT, UNIQUE seed keyword
+- Good seeds: seed/modern-workspace/800/500, seed/team-collaboration/600/400, seed/happy-client-portrait/100/100
+- Vary sizes by context: hero bg (1200/600), about (800/500), cards (400/300), avatars (100/100)
+- NEVER repeat a seed keyword. If you have 10 images, you need 10 unique keywords.
 
 ## RULES
-- Output ONLY raw HTML. No markdown, no code fences, no explanation.
-- Start IMMEDIATELY with <!DOCTYPE html>.
-- Add .fade-in class to each <section> for scroll animations.
-- NEVER set opacity:0 on any element.
-- Every headline is BENEFIT-FOCUSED, not feature-focused.
-- Testimonials mention SPECIFIC results with real numbers.
-- An empty <body> is a TOTAL FAILURE.`;
+- Output ONLY the <config> block and <body-html> block. Nothing else.
+- No <!DOCTYPE>, <html>, <head>, <style> tags. The server handles all of that.
+- Use ONLY the component classes listed above. They are already styled.
+- Every headline is BENEFIT-FOCUSED (what the customer gets, not what the product does).
+- Testimonials must include specific metrics and results.
+- WRITE REAL, DETAILED CONTENT. Every section should have multiple sentences/paragraphs.
+- An empty body is UNACCEPTABLE.`;
 
-// ── Premium System Prompt (Opus) ──
-// Richer, more detailed — Opus can handle the complexity for jaw-dropping results.
-const PREMIUM_SYSTEM = `You are Zoobicon, a world-class AI website generator. You produce websites that look like they were built by a $30,000+ design agency. Output a single, complete HTML file.
+const PREMIUM_SECTIONS = `
+1. <nav> — Use: <nav style="position:sticky;top:0;z-index:100;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:rgba(255,255,255,0.85);border-bottom:1px solid var(--color-border)"><div class="container flex justify-between items-center" style="padding:1rem var(--container-padding)">. Logo text, nav links, CTA button (.btn .btn-primary .btn-sm), mobile hamburger (.mobile-menu-btn). Feels floating/premium.
+2. Hero <section> — class="section fade-in" with dramatic presence. Large <h1> with letter-spacing, <p class="text-lg text-muted"> addressing pain point, TWO CTAs (.btn-primary.btn-lg + .btn-ghost.btn-lg), social proof with avatars or star rating, optional hero image. Use generous spacing (padding: 140px+ via inline style).
+3. Social proof bar — <section class="fade-in" style="padding:2.5rem var(--container-padding);border-top:1px solid var(--color-border);border-bottom:1px solid var(--color-border)"> with company names.
+4. Problem/Pain — <section class="section section-alt fade-in"> addressing frustrations with empathy. "Tired of X? Struggling with Y?" Use .grid.grid-2 or .grid.grid-3 for pain point cards.
+5. Solution/Features — <section class="section fade-in"> with .section-header then .grid.grid-3 > .card > .card-body. Each: colorful inline SVG icon in a tinted circle (via inline style), benefit headline, 3-line description connecting feature→benefit→outcome. 6 cards.
+6. About/Story — <section class="section section-alt fade-in-left"> with .grid.grid-2. One side: large image. Other: founder story, mission, 3-4 stats inline using .stat-item.
+7. Process/How it works — <section class="section fade-in"> with .section-header then numbered steps (1→2→3→4) with icons in accent circles, connected by a subtle line. Each step: number badge, heading, description.
+8. Testimonials — <section class="section section-alt fade-in"> with .grid.grid-3 > .testimonial-card. Each: stars, DETAILED quote with specific metrics ("Increased conversion by 47% in 3 months"), avatar image (picsum 80x80), name, title, company. 3 testimonials.
+9. Stats — <section class="section fade-in" with accent/dark background via inline style, light text> with .grid.grid-4 > .stat-item. Use animated counters: <div class="stat-number" data-target="NUMBER" data-suffix="%" data-prefix="">0</div>. 4 impressive stats.
+10. Pricing — <section class="section section-alt fade-in"> with .section-header then .grid.grid-3 for 3 pricing tiers. Middle card gets scale(1.05), accent border, "Most Popular" .badge-primary. Each: price, feature list with checkmarks (✓), CTA button.
+11. FAQ — <section class="section fade-in"> with .section-header then .faq-item > .faq-question (text + <span class="faq-icon">+</span>) + .faq-answer > p. 6 Q&As handling real objections.
+12. Final CTA — <section class="section fade-in" with dramatic dark/gradient background via inline style, centered text, light colors> Big emotional headline, urgency line, .btn-primary.btn-lg, trust badges ("30-day guarantee • No credit card • Cancel anytime").
+13. Footer — <footer class="section" style="background:var(--color-text);color:rgba(255,255,255,0.9);padding:80px var(--container-padding) 40px"> with .container > .grid.grid-4: about + newsletter .input, nav links, services, contact + social icons. Bottom: copyright bar.
 
-## OUTPUT STRUCTURE — FOLLOW EXACTLY
-1. <!DOCTYPE html>, <html lang="en">, <head> — SEO-optimized title, meta description, Open Graph tags, TWO complementary Google Fonts via <link>
-2. <style> — :root custom properties + up to 100 lines of site-specific CSS for premium visual polish. A component library is auto-injected with .btn-primary, .btn-secondary, .btn-ghost, .card, .card-body, .grid-2, .grid-3, .grid-4, .section, .section-alt, .container, .testimonial-card, .stat-item, .stat-number, .stat-label, .faq-item, .faq-question, .faq-answer, .badge, .input, .fade-in, .fade-in-left, .fade-in-right, .scale-in, .text-center, .text-muted — USE those classes extensively.
-3. <body> — THIS IS 80% OF YOUR OUTPUT. Every section richly detailed.
-4. <script> — mobile menu, FAQ accordion, animated counters, smooth scroll, scroll-triggered animations (under 60 lines)
-
-## CSS BUDGET: 100 LINES — USE THEM FOR PREMIUM POLISH
-The auto-injected component library handles base styling. You write :root variables PLUS premium visual treatments:
-- Hero: gradient overlays (e.g., linear-gradient(135deg, var(--color-primary), var(--accent-2)))
-- Sections: subtle background patterns using CSS (radial-gradient dots, repeating-linear-gradient lines)
-- Cards: layered box-shadows (e.g., 0 4px 6px -1px rgba(0,0,0,.1), 0 20px 40px -10px rgba(primary,.15)), gradient accent borders (border-top: 3px solid; border-image: linear-gradient(...) 1)
-- Typography: letter-spacing on headings, clamp() for fluid sizing, accent underlines on key headings using ::after pseudo-elements
-- Decorative: subtle ::before/::after accents on sections (angled dividers, accent dots, gradient lines)
-- Nav: backdrop-filter: blur(16px) + semi-transparent background
-- Hover states: more sophisticated transforms (scale + translateY + shadow change simultaneously)
-- Spacing: generous padding (sections at 120px+), large gaps between elements
-
-## BODY SECTIONS — WRITE ALL, MAKE EACH EXCEPTIONAL
-1. <nav> — sticky with backdrop-filter blur, semi-transparent bg, logo text + nav links + CTA button, mobile hamburger with slide-in menu. The nav should feel "floating" and premium.
-2. Hero — full-viewport, gradient or image overlay background, magnetic headline (benefit-driven, emotionally resonant) with accent decoration, subheading addressing the visitor's pain point, TWO distinct CTAs (primary + ghost), social proof line (e.g., "Trusted by 2,500+ companies" with avatars or star rating). The hero should feel DRAMATIC — big type, lots of breathing room, a single powerful image or gradient.
-3. Social proof bar — 5-6 company names in a muted horizontal strip with separator dots
-4. Problem/Pain section — Address the visitor's frustrations with empathy. "Tired of X? Struggling with Y?" Use a different background treatment (gradient, alt color) to visually separate it.
-5. Solution/Features — .grid-3 > .card with custom inline SVG icons (colorful, not generic), benefit-focused headlines, 3-line descriptions that connect feature → benefit → outcome. Cards should have subtle gradient top borders or icon accent circles.
-6. About/Story — split layout (.grid-2) with a large image + compelling story text + 3-4 impressive stats. Use a different visual rhythm here — maybe a accent-colored stat bar or bordered stats inline.
-7. Process/How it works — 3-4 numbered steps with a connecting line/timeline visual between them. Each step has an icon in an accent-colored circle, headline, and description.
-8. Testimonials — 3x .testimonial-card with DETAILED quotes mentioning specific metrics ("Increased our conversion rate by 47% in just 3 months"), real names, titles, companies, star ratings. Cards should feel distinct from feature cards — different shadow treatment, quote marks, maybe a subtle accent border.
-9. Stats/Social proof — .stat-item with BIG impressive numbers, animated counters, accent-colored numbers. This section should use a dark or accent background to pop.
-10. Pricing or packages — if appropriate, show 2-3 tier cards with a "Popular" badge on the middle one. Include checkmark lists. Make the recommended tier visually prominent (border, scale, shadow).
-11. FAQ — .faq-item accordion with 5-6 objection-handling questions, thorough answers
-12. Final CTA — dark or gradient background, emotionally compelling large headline, prominent button with hover animation, trust signals ("30-day money-back guarantee • No credit card required • Cancel anytime"). This section should feel like a premium closing statement.
-13. Footer — 4-column: about blurb + newsletter signup input, navigation links, services, contact details + social icons with hover effects. Subtle top border or accent line.
-
-## INDUSTRY AESTHETIC — Match via :root + typography + imagery
-- Luxury/Legal/Finance: warm whites (#fdfcfb), serif headings (Playfair Display, Cormorant Garamond), muted gold (#c9a96e)/navy (#1a2332) accents, generous whitespace, elegant restraint. NEVER dark theme. Think Rolex, not neon.
-- SaaS/Tech: dark hero allowed (deep navy/charcoal, NOT pure black), modern sans-serif (Inter, Plus Jakarta Sans), vibrant gradient accents, clean cards with colored top borders, data-driven copy.
-- Restaurant/Hospitality: warm earth tones, serif headings, food/atmosphere imagery, inviting warm language.
-- Healthcare/Wellness: soft blue-green palette, clean sans-serif, calming, professional, trust-building, lots of whitespace.
-- Creative/Agency: bold typography, high contrast, dramatic whitespace, asymmetric layouts, portfolio-style grids.
-- E-commerce/Retail: product-focused, clean grid layouts, prominent colored CTAs, urgency elements, pricing displays.
-
-## IMAGE RULES — CRITICAL
+## IMAGE RULES
 - Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for ALL images
-- EVERY image must use a DIFFERENT, UNIQUE seed keyword — NEVER repeat a seed
-- Use highly specific, descriptive keywords relevant to the section context:
-  - Hero: seed/modern-glass-office/1200/600 or seed/luxury-restaurant-interior/1200/600
-  - About: seed/professional-team-meeting/800/500 or seed/chef-preparing-food/800/500
-  - Testimonials: seed/happy-business-woman/100/100, seed/confident-man-suit/100/100, seed/smiling-professional/100/100
-  - Features: seed/data-analytics-dashboard/600/400, seed/mobile-app-design/600/400
-  - Cards: seed/creative-workspace/400/300, seed/modern-technology/400/300
-- Vary image sizes: hero (1200x600), about (800x500), cards (400x300), avatars (100/100)
-- NEVER use the same seed keyword twice on the page. Every single image = unique keyword.
+- EVERY image MUST have a DIFFERENT, UNIQUE seed keyword — NEVER repeat
+- Use highly descriptive, industry-specific keywords:
+  - Hero: seed/luxury-modern-office/1200/600 or seed/gourmet-restaurant-ambiance/1200/600
+  - About: seed/professional-team-meeting/800/500 or seed/artisan-craft-workshop/800/500
+  - Testimonials: seed/confident-business-woman/80/80, seed/smiling-executive-man/80/80, seed/creative-professional/80/80
+  - Features: seed/data-analytics-screen/400/300, seed/cloud-technology-abstract/400/300
+- NEVER reuse a seed. 15 images = 15 unique keywords.
+
+## PREMIUM QUALITY MARKERS
+- Inline SVG icons should be colorful and detailed (not generic), using the primary/accent color
+- Use inline styles for premium touches: gradient backgrounds on stats/CTA sections, accent borders on featured cards, generous padding (120px+ on hero/CTA)
+- Testimonial quotes must be LONG and SPECIFIC — at least 2-3 sentences with real metrics
+- Copy should handle objections, build trust, and create urgency
+- The overall feel should be "expensive" — think lots of whitespace, big typography, confident copy
 
 ## RULES
-- Output ONLY raw HTML. No markdown, no code fences, no explanation.
-- Start IMMEDIATELY with <!DOCTYPE html>.
-- Add .fade-in, .fade-in-left, .fade-in-right, .scale-in classes to sections for scroll animations.
-- NEVER set opacity:0 on any element.
-- Every headline is BENEFIT-FOCUSED and emotionally engaging.
-- Copy should handle objections, build trust, and drive action.
-- Include specific numbers, percentages, and results throughout.
-- The design must feel PREMIUM — not just "clean" but luxurious, intentional, with visual depth. Think layered shadows, gradient accents, generous spacing, decorative details. A Standard website is clean and professional. A Premium website makes you say "wow, this looks expensive."
-- An empty <body> is a TOTAL FAILURE.`;
+- Output ONLY the <config> block and <body-html> block. Nothing else.
+- No <!DOCTYPE>, <html>, <head>, <style> tags. The server handles all of that.
+- Use ONLY the component classes listed above plus inline styles for unique touches.
+- An empty body is UNACCEPTABLE.`;
 
 export async function POST(req: NextRequest) {
   try {
@@ -150,35 +311,26 @@ export async function POST(req: NextRequest) {
     }
 
     const isPremium = tier === "premium";
-
-    // Model selection: Premium = Opus, Standard = Sonnet
-    // User-selected model overrides (for multi-LLM support)
     const model = requestedModel || (isPremium ? "claude-opus-4-6" : "claude-sonnet-4-6");
-    const systemPrompt = isPremium ? PREMIUM_SYSTEM : STANDARD_SYSTEM;
     const maxTokens = isPremium ? 32000 : 16000;
     const timeout = isPremium ? 180_000 : 90_000;
+
+    const systemPrompt = BODY_ONLY_SYSTEM + (isPremium ? PREMIUM_SECTIONS : STANDARD_SECTIONS);
 
     const client = new Anthropic({ apiKey, timeout });
     const encoder = new TextEncoder();
 
     const userMessage = isPremium
-      ? `Build me a stunning, world-class PREMIUM website for: ${prompt}
+      ? `Build a world-class PREMIUM website for: ${prompt}
 
-PREMIUM QUALITY REQUIREMENTS — this must look noticeably better than a standard website:
-1. VISUAL DEPTH: Use gradient overlays on the hero, layered box-shadows on cards, decorative ::before/::after accents, accent border-top gradients. The site should feel rich and layered, not flat.
-2. TYPOGRAPHY: Large, dramatic headings with letter-spacing, fluid clamp() sizes, accent underlines or highlight decorations on key headlines.
-3. SPACING: Generous — sections at 120px+ padding, large gaps, breathing room everywhere. Premium = space.
-4. COLOR: Rich palette with primary + secondary accent. Use the accent on stats backgrounds, CTA sections, card borders, icon circles.
-5. IMAGES: Use a DIFFERENT unique picsum seed keyword for EVERY image. Hero (1200x600), about (800x500), cards (400x300), testimonial avatars (100/100). NEVER reuse a seed.
-6. SECTIONS: Include ALL 13 sections. Each should have distinct visual treatment — alternate backgrounds, different card styles, varied layouts.
-7. COPY: Emotionally resonant, objection-handling, specific metrics in testimonials. Make visitors think "this company is the real deal."
+This must look like a $30,000 agency built it. Include ALL 13 sections with rich, specific content. Every testimonial mentions real metrics. Every headline drives action. The design should feel expensive and intentional.
 
-Start IMMEDIATELY with <!DOCTYPE html>. Output raw HTML only.`
+Output the <config> block first, then the <body-html> block. Nothing else.`
       : `Build a stunning website for: ${prompt}
 
-Include: navigation, hero with headline and CTA, features/services grid, about section, testimonials with specific results, stats, FAQ, call-to-action, and footer with contact info. Match the design aesthetic to the industry.
+Include all 10 sections with real, detailed content. Match the aesthetic to the industry. Make it impressive.
 
-Start IMMEDIATELY with <!DOCTYPE html>. Output raw HTML only.`;
+Output the <config> block first, then the <body-html> block. Nothing else.`;
 
     const readable = new ReadableStream({
       async start(controller) {
@@ -186,138 +338,141 @@ Start IMMEDIATELY with <!DOCTYPE html>. Output raw HTML only.`;
           controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
         };
 
-        try {
-          let stream;
-
-          // Try primary model
-          try {
-            stream = client.messages.stream({
-              model,
-              max_tokens: maxTokens,
-              system: systemPrompt,
-              messages: [{ role: "user", content: userMessage }],
-            });
-          } catch (initErr) {
-            // If Opus init fails, fall back to Sonnet
-            if (isPremium) {
-              console.warn(`[Quick] Opus init failed: ${initErr instanceof Error ? initErr.message : "unknown"}, using Sonnet`);
-              sendEvent({ type: "status", message: "Using fast mode..." });
-              stream = client.messages.stream({
-                model: "claude-sonnet-4-6",
-                max_tokens: 16000,
-                system: STANDARD_SYSTEM,
-                messages: [{ role: "user", content: userMessage }],
-              });
-            } else {
-              throw initErr;
-            }
-          }
+        const generate = async (useModel: string, useMaxTokens: number, useTimeout: number): Promise<string> => {
+          const c = new Anthropic({ apiKey, timeout: useTimeout });
+          const stream = c.messages.stream({
+            model: useModel,
+            max_tokens: useMaxTokens,
+            system: systemPrompt,
+            messages: [{ role: "user", content: userMessage }],
+          });
 
           let accumulated = "";
-
           for await (const ev of stream) {
             if (ev.type === "content_block_delta" && ev.delta.type === "text_delta") {
               accumulated += ev.delta.text;
-              sendEvent({ type: "chunk", content: ev.delta.text });
-            }
-          }
-
-          // Clean up
-          let html = accumulated.trim();
-          html = html.replace(/^```(?:html|HTML)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
-          const ds = html.search(/<!doctype\s+html|<html/i);
-          if (ds > 0) html = html.slice(ds);
-          const he = html.lastIndexOf("</html>");
-          if (he !== -1) html = html.slice(0, he + "</html>".length);
-
-          // Validate body content
-          const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
-          const bodyText = bodyMatch
-            ? bodyMatch[1]
-                .replace(/<script[\s\S]*?<\/script>/gi, "")
-                .replace(/<style[\s\S]*?<\/style>/gi, "")
-                .replace(/<[^>]+>/g, "")
-                .replace(/\s+/g, " ")
-                .trim()
-            : "";
-
-          console.log(`[Quick] ${isPremium ? "Premium/Opus" : "Standard/Sonnet"}: ${html.length} chars, body: ${bodyText.length} chars`);
-
-          // If body is empty and this was Opus, retry with Sonnet
-          if (bodyText.length < 50 && isPremium) {
-            console.warn(`[Quick] Opus empty body (${bodyText.length} chars), retrying with Sonnet`);
-            sendEvent({ type: "status", message: "Optimizing output..." });
-
-            const retryClient = new Anthropic({ apiKey, timeout: 90_000 });
-            const retryStream = retryClient.messages.stream({
-              model: "claude-sonnet-4-6",
-              max_tokens: 16000,
-              system: STANDARD_SYSTEM,
-              messages: [{ role: "user", content: userMessage }],
-            });
-
-            accumulated = "";
-            for await (const ev of retryStream) {
-              if (ev.type === "content_block_delta" && ev.delta.type === "text_delta") {
-                accumulated += ev.delta.text;
+              // Stream body-html chunks to client for live preview
+              if (accumulated.includes("<body-html>")) {
+                sendEvent({ type: "chunk", content: ev.delta.text });
               }
             }
+          }
+          return accumulated;
+        };
 
-            html = accumulated.trim();
-            html = html.replace(/^```(?:html|HTML)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
-            const rds = html.search(/<!doctype\s+html|<html/i);
-            if (rds > 0) html = html.slice(rds);
-            const rhe = html.lastIndexOf("</html>");
-            if (rhe !== -1) html = html.slice(0, rhe + "</html>".length);
+        try {
+          let raw = "";
+
+          // Try primary model
+          try {
+            raw = await generate(model, maxTokens, timeout);
+          } catch (primaryErr) {
+            if (isPremium) {
+              console.warn(`[Quick] ${model} failed: ${primaryErr instanceof Error ? primaryErr.message : "unknown"}, falling back to Sonnet`);
+              sendEvent({ type: "status", message: "Using fast mode..." });
+              raw = await generate("claude-sonnet-4-6", 16000, 90_000);
+            } else {
+              throw primaryErr;
+            }
           }
 
-          // Inject component library
-          html = injectComponentLibrary(html);
+          // Parse the config block
+          const configMatch = raw.match(/<config>\s*([\s\S]*?)\s*<\/config>/);
+          const bodyMatch = raw.match(/<body-html>\s*([\s\S]*?)\s*<\/body-html>/);
 
-          // Send final version
-          sendEvent({ type: "replace", content: html });
+          // Fallback: if AI didn't use tags, try to find JSON + HTML directly
+          let config: SiteConfig;
+          let bodyHtml: string;
+
+          if (configMatch && bodyMatch) {
+            try {
+              config = JSON.parse(configMatch[1]);
+            } catch {
+              // If JSON parse fails, use defaults
+              config = getDefaultConfig(prompt);
+            }
+            bodyHtml = bodyMatch[1].trim();
+          } else {
+            // AI didn't follow format — check if it output raw HTML instead
+            console.warn("[Quick] AI didn't use config/body-html tags, attempting raw HTML extraction");
+
+            // Try to extract body from raw HTML output
+            const rawBodyMatch = raw.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+            if (rawBodyMatch) {
+              bodyHtml = rawBodyMatch[1].trim();
+              // Strip scripts — our template adds them
+              bodyHtml = bodyHtml.replace(/<script[\s\S]*?<\/script>/gi, "");
+            } else {
+              // Last resort: strip any HTML boilerplate and use everything
+              bodyHtml = raw
+                .replace(/```(?:html|HTML)?\s*\n?/g, "")
+                .replace(/\n?\s*```\s*/g, "")
+                .replace(/<!DOCTYPE[^>]*>/i, "")
+                .replace(/<\/?html[^>]*>/gi, "")
+                .replace(/<head>[\s\S]*?<\/head>/i, "")
+                .replace(/<\/?body[^>]*>/gi, "")
+                .replace(/<script[\s\S]*?<\/script>/gi, "")
+                .trim();
+            }
+            config = getDefaultConfig(prompt);
+          }
+
+          // Validate body content
+          const textContent = bodyHtml
+            .replace(/<[^>]+>/g, "")
+            .replace(/\s+/g, " ")
+            .trim();
+
+          console.log(`[Quick] ${isPremium ? "Premium" : "Standard"} (${model}): body=${textContent.length} chars`);
+
+          // If body is empty after primary attempt, retry with Sonnet
+          if (textContent.length < 50 && isPremium) {
+            console.warn(`[Quick] Empty body (${textContent.length} chars), retrying with Sonnet`);
+            sendEvent({ type: "status", message: "Optimizing..." });
+
+            const retryRaw = await generate("claude-sonnet-4-6", 16000, 90_000);
+            const retryConfig = retryRaw.match(/<config>\s*([\s\S]*?)\s*<\/config>/);
+            const retryBody = retryRaw.match(/<body-html>\s*([\s\S]*?)\s*<\/body-html>/);
+
+            if (retryBody) {
+              bodyHtml = retryBody[1].trim();
+              if (retryConfig) {
+                try { config = JSON.parse(retryConfig[1]); } catch { /* keep existing */ }
+              }
+            }
+          }
+
+          // Build the complete page
+          const fullPage = buildFullPage(config, bodyHtml);
+
+          sendEvent({ type: "replace", content: fullPage });
           sendEvent({ type: "done" });
           controller.close();
         } catch (err) {
           const message = err instanceof Error ? err.message : "Generation error";
-          console.error(`[Quick] Error:`, message);
+          console.error("[Quick] Error:", message);
 
-          // If Opus streaming failed mid-way, try Sonnet as complete fallback
-          if (isPremium && !message.includes("API_KEY") && !message.includes("not configured")) {
+          // If primary failed entirely and this was premium, try full Sonnet fallback
+          if (isPremium && !message.includes("API_KEY")) {
             try {
-              console.warn(`[Quick] Opus stream failed, full Sonnet fallback`);
               sendEvent({ type: "status", message: "Switching to fast mode..." });
+              const fallbackRaw = await generate("claude-sonnet-4-6", 16000, 90_000);
+              const fbConfig = fallbackRaw.match(/<config>\s*([\s\S]*?)\s*<\/config>/);
+              const fbBody = fallbackRaw.match(/<body-html>\s*([\s\S]*?)\s*<\/body-html>/);
 
-              const fallbackClient = new Anthropic({ apiKey, timeout: 90_000 });
-              const fallbackStream = fallbackClient.messages.stream({
-                model: "claude-sonnet-4-6",
-                max_tokens: 16000,
-                system: STANDARD_SYSTEM,
-                messages: [{ role: "user", content: userMessage }],
-              });
+              let config = getDefaultConfig(prompt);
+              let bodyHtml = "";
+              if (fbConfig) { try { config = JSON.parse(fbConfig[1]); } catch { /* default */ } }
+              if (fbBody) { bodyHtml = fbBody[1].trim(); }
 
-              let fallbackHtml = "";
-              for await (const ev of fallbackStream) {
-                if (ev.type === "content_block_delta" && ev.delta.type === "text_delta") {
-                  fallbackHtml += ev.delta.text;
-                  sendEvent({ type: "chunk", content: ev.delta.text });
-                }
+              if (bodyHtml) {
+                sendEvent({ type: "replace", content: buildFullPage(config, bodyHtml) });
+                sendEvent({ type: "done" });
+                controller.close();
+                return;
               }
-
-              let cleaned = fallbackHtml.trim();
-              cleaned = cleaned.replace(/^```(?:html|HTML)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
-              const fds = cleaned.search(/<!doctype\s+html|<html/i);
-              if (fds > 0) cleaned = cleaned.slice(fds);
-              const fhe = cleaned.lastIndexOf("</html>");
-              if (fhe !== -1) cleaned = cleaned.slice(0, fhe + "</html>".length);
-
-              cleaned = injectComponentLibrary(cleaned);
-              sendEvent({ type: "replace", content: cleaned });
-              sendEvent({ type: "done" });
-              controller.close();
-              return;
-            } catch (fallbackErr) {
-              console.error(`[Quick] Sonnet fallback also failed:`, fallbackErr);
+            } catch (fbErr) {
+              console.error("[Quick] Sonnet fallback also failed:", fbErr);
             }
           }
 
@@ -341,4 +496,26 @@ Start IMMEDIATELY with <!DOCTYPE html>. Output raw HTML only.`;
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
+}
+
+// Default config when AI doesn't provide one or JSON parsing fails
+function getDefaultConfig(prompt: string): SiteConfig {
+  const name = prompt.trim().split(/\s+/).slice(0, 3).join(" ");
+  return {
+    title: `${name} — Professional Services`,
+    description: `${name} provides professional services tailored to your needs.`,
+    font1: "Inter",
+    font2: "Inter",
+    colors: {
+      primary: "#2563eb",
+      primaryDark: "#1d4ed8",
+      bg: "#ffffff",
+      bgAlt: "#f8fafc",
+      surface: "#ffffff",
+      text: "#1a1a2e",
+      textMuted: "#64748b",
+      border: "#e2e8f0",
+      accent: "#7c3aed",
+    },
+  };
 }
