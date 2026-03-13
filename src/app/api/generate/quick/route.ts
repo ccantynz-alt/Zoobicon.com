@@ -389,15 +389,17 @@ Output the <config> block first, then the <body-html> block. Nothing else.`;
                 cache_control: { type: "ephemeral" as const },
               },
             ],
-            messages: [
-              { role: "user", content: userMessage },
-              // Assistant prefill: skip AI preamble, jump straight to config output
-              { role: "assistant", content: "<config>\n{" },
-            ],
+            messages: useModel.includes("opus")
+              ? [{ role: "user", content: userMessage }]
+              : [
+                  { role: "user", content: userMessage },
+                  // Assistant prefill: skip preamble (not supported on Opus 4.6)
+                  { role: "assistant", content: "<config>\n{" },
+                ],
           });
 
-          // Prepend the assistant prefill so parsing regexes still match
-          let accumulated = "<config>\n{";
+          // Prepend prefill for non-Opus models so parsing regexes still match
+          let accumulated = useModel.includes("opus") ? "" : "<config>\n{";
           for await (const ev of stream) {
             if (ev.type === "content_block_delta" && ev.delta.type === "text_delta") {
               accumulated += ev.delta.text;
