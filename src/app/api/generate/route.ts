@@ -259,16 +259,32 @@ Output ONLY raw HTML — no markdown, no code fences, no explanation.`;
   } catch (err) {
     console.error("Generation error:", err);
 
+    // Always extract a meaningful error message — never return generic "Internal server error"
+    let errorMsg = "Unknown generation error";
+    let statusCode = 500;
+
     if (err instanceof Anthropic.APIError) {
-      return NextResponse.json(
-        { error: `API error: ${err.message}` },
-        { status: err.status || 500 }
-      );
+      errorMsg = `Anthropic API error (${err.status}): ${err.message}`;
+      statusCode = err.status || 500;
+    } else if (err instanceof Anthropic.APIConnectionError) {
+      errorMsg = "Cannot reach Anthropic API — check network connectivity";
+      statusCode = 503;
+    } else if (err instanceof Error) {
+      errorMsg = err.message;
+      // Detect timeout errors
+      if (err.message.includes("timed out") || err.message.includes("timeout") || err.message.includes("ETIMEDOUT")) {
+        errorMsg = `AI model timed out: ${err.message}. The model may be overloaded — try again in a minute.`;
+        statusCode = 504;
+      }
+    } else if (typeof err === "string") {
+      errorMsg = err;
+    } else {
+      errorMsg = `Generation error: ${JSON.stringify(err)}`;
     }
 
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Internal server error" },
-      { status: 500 }
+      { error: errorMsg },
+      { status: statusCode }
     );
   }
 }

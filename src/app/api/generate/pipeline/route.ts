@@ -52,9 +52,25 @@ export async function POST(req: NextRequest) {
     });
   } catch (err) {
     console.error("Pipeline error:", err);
+
+    let errorMsg = "Pipeline failed — unknown error";
+    let statusCode = 500;
+
+    if (err instanceof Error) {
+      errorMsg = err.message;
+      if (err.message.includes("timed out") || err.message.includes("timeout")) {
+        errorMsg = `Pipeline timed out: ${err.message}. Try again — the AI model may be overloaded.`;
+        statusCode = 504;
+      }
+    } else if (typeof err === "string") {
+      errorMsg = err;
+    } else {
+      errorMsg = `Pipeline error: ${JSON.stringify(err)}`;
+    }
+
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Pipeline failed" },
-      { status: 500 }
+      { error: errorMsg },
+      { status: statusCode }
     );
   }
 }

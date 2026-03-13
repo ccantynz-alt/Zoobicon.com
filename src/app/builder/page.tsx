@@ -512,8 +512,16 @@ export default function BuilderPage() {
             }),
           });
           if (!fallbackRes.ok) {
-            const data = await fallbackRes.json();
-            throw new Error(data.error || "Generation failed");
+            let fbErrMsg = `Generation returned HTTP ${fallbackRes.status}`;
+            try {
+              const data = await fallbackRes.json();
+              fbErrMsg = data.error || fbErrMsg;
+            } catch {
+              if (fallbackRes.status === 504 || fallbackRes.status === 502) {
+                fbErrMsg = "AI model timed out. Try again with a simpler prompt.";
+              }
+            }
+            throw new Error(fbErrMsg);
           }
           const data = await fallbackRes.json();
           let fbHtml = (data.html || "").trim();
@@ -721,8 +729,19 @@ export default function BuilderPage() {
       clearInterval(progressInterval);
 
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Pipeline failed");
+        let errorMsg = `Pipeline returned HTTP ${res.status}`;
+        try {
+          const data = await res.json();
+          errorMsg = data.error || errorMsg;
+        } catch {
+          // Vercel timeout or non-JSON error response
+          if (res.status === 504 || res.status === 502) {
+            errorMsg = "Pipeline timed out — the AI model took too long. Try again with a simpler prompt.";
+          } else {
+            errorMsg = `Pipeline error (HTTP ${res.status}). Check Vercel function logs for details.`;
+          }
+        }
+        throw new Error(errorMsg);
       }
 
       const data = await res.json();
