@@ -380,11 +380,24 @@ Output the <config> block first, then the <body-html> block. Nothing else.`;
           const stream = c.messages.stream({
             model: useModel,
             max_tokens: useMaxTokens,
-            system: systemPrompt,
-            messages: [{ role: "user", content: userMessage }],
+            // Prompt caching: cache the system prompt (identical across requests)
+            // Saves ~90% latency on time-to-first-token for repeated calls
+            system: [
+              {
+                type: "text" as const,
+                text: systemPrompt,
+                cache_control: { type: "ephemeral" as const },
+              },
+            ],
+            messages: [
+              { role: "user", content: userMessage },
+              // Assistant prefill: skip AI preamble, jump straight to config output
+              { role: "assistant", content: "<config>\n{" },
+            ],
           });
 
-          let accumulated = "";
+          // Prepend the assistant prefill so parsing regexes still match
+          let accumulated = "<config>\n{";
           for await (const ev of stream) {
             if (ev.type === "content_block_delta" && ev.delta.type === "text_delta") {
               accumulated += ev.delta.text;
