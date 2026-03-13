@@ -352,10 +352,19 @@ export default function BuilderPage() {
   const [reactSource, setReactSource] = useState<Record<string, string> | null>(null);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
 
-  // Undo/Redo history
-  const [history, setHistory] = useState<string[]>([]);
-  const [historyIndex, setHistoryIndex] = useState(-1);
+  // Snapshot system — captures state on every AI action for perfect undo
+  interface Snapshot {
+    html: string;
+    label: string;      // e.g., "Initial build", "Edit: change color to blue"
+    timestamp: number;
+  }
+  const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
+  const [snapshotIndex, setSnapshotIndex] = useState(-1);
   const isUndoRedoRef = useRef(false);
+
+  // Legacy compat
+  const history = snapshots.map(s => s.html);
+  const historyIndex = snapshotIndex;
 
   const abortRef = useRef<AbortController | null>(null);
   const generationIdRef = useRef(0); // Tracks current generation to prevent stale image replacements
@@ -386,17 +395,33 @@ export default function BuilderPage() {
       .catch(() => { /* models API not available, use defaults */ });
   }, []);
 
-  // Track code changes in undo/redo history
+  // Track code changes in snapshot system
+  const pendingLabelRef = useRef<string>("Manual change");
+  const addSnapshot = useCallback((html: string, label: string) => {
+    if (!html) return;
+    isUndoRedoRef.current = true; // Prevent the effect from double-adding
+    setSnapshots(prev => {
+      const truncated = prev.slice(0, snapshotIndex + 1);
+      const newSnapshots = [...truncated, { html, label, timestamp: Date.now() }].slice(-50);
+      setSnapshotIndex(newSnapshots.length - 1);
+      return newSnapshots;
+    });
+    setGeneratedCode(html);
+  }, [snapshotIndex]);
+
+  // Auto-snapshot on generatedCode changes (manual edits, code panel updates)
   useEffect(() => {
     if (!generatedCode || isUndoRedoRef.current) {
       isUndoRedoRef.current = false;
       return;
     }
-    setHistory(prev => {
-      const truncated = prev.slice(0, historyIndex + 1);
-      const newHistory = [...truncated, generatedCode].slice(-50); // Keep last 50
-      setHistoryIndex(newHistory.length - 1);
-      return newHistory;
+    setSnapshots(prev => {
+      const truncated = prev.slice(0, snapshotIndex + 1);
+      const label = pendingLabelRef.current || "Manual change";
+      pendingLabelRef.current = "Manual change"; // Reset
+      const newSnapshots = [...truncated, { html: generatedCode, label, timestamp: Date.now() }].slice(-50);
+      setSnapshotIndex(newSnapshots.length - 1);
+      return newSnapshots;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [generatedCode]);
@@ -404,18 +429,18 @@ export default function BuilderPage() {
   const handleUndo = useCallback(() => {
     if (!canUndo) return;
     isUndoRedoRef.current = true;
-    const newIndex = historyIndex - 1;
-    setHistoryIndex(newIndex);
-    setGeneratedCode(history[newIndex]);
-  }, [canUndo, historyIndex, history]);
+    const newIndex = snapshotIndex - 1;
+    setSnapshotIndex(newIndex);
+    setGeneratedCode(snapshots[newIndex].html);
+  }, [canUndo, snapshotIndex, snapshots]);
 
   const handleRedo = useCallback(() => {
     if (!canRedo) return;
     isUndoRedoRef.current = true;
-    const newIndex = historyIndex + 1;
-    setHistoryIndex(newIndex);
-    setGeneratedCode(history[newIndex]);
-  }, [canRedo, historyIndex, history]);
+    const newIndex = snapshotIndex + 1;
+    setSnapshotIndex(newIndex);
+    setGeneratedCode(snapshots[newIndex].html);
+  }, [canRedo, snapshotIndex, snapshots]);
 
   // Keyboard shortcuts for undo/redo
   useEffect(() => {
@@ -695,6 +720,7 @@ export default function BuilderPage() {
     setGeneratedCode("");
     setActiveTab("preview");
     setPipelineAgents([]);
+    pendingLabelRef.current = `Build: ${prompt.trim().slice(0, 50)}`;
 
     abortRef.current?.abort();
     const controller = new AbortController();
@@ -856,9 +882,103 @@ export default function BuilderPage() {
 
   const handleEdit = useCallback(async () => {
     if (!editPrompt.trim() || !generatedCode) return;
-    await streamGenerate(editPrompt.trim(), generatedCode);
-    setEditPrompt("");
-  }, [editPrompt, generatedCode, streamGenerate]);
+
+    const instruction = editPrompt.trim();
+    setStatus("generating");
+    setError("");
+
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    try {
+      // Try diff-based edit first (5-10x faster than full rewrite)
+      const res = await fetch("/api/generate/edit-diff", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: instruction,
+          existingCode: generatedCode,
+          ...(selectedModel ? { model: selectedModel } : {}),
+        }),
+        signal: controller.signal,
+      });
+
+      if (!res.ok) {
+        // Diff endpoint failed — fall back to full rewrite
+        throw new Error("Diff endpoint unavailable");
+      }
+
+      const reader = res.body?.getReader();
+      if (!reader) throw new Error("No response stream");
+
+      const decoder = new TextDecoder();
+      let lineBuffer = "";
+      let modifiedHtml = generatedCode;
+      let usedFallback = false;
+      let diffCount = 0;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const text = decoder.decode(value, { stream: true });
+        lineBuffer += text;
+        const lines = lineBuffer.split("\n");
+        lineBuffer = lines.pop() || "";
+
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const jsonStr = line.slice(6).trim();
+          if (!jsonStr) continue;
+
+          try {
+            const event = JSON.parse(jsonStr);
+
+            if (event.type === "diff" && event.search && event.replace !== undefined) {
+              // Apply diff to the HTML
+              const before = modifiedHtml;
+              modifiedHtml = modifiedHtml.replace(event.search, event.replace);
+              if (modifiedHtml !== before) {
+                diffCount++;
+                setGeneratedCode(modifiedHtml); // Live update preview
+              }
+            } else if (event.type === "fallback" && event.html) {
+              // Full HTML fallback from server
+              modifiedHtml = event.html;
+              usedFallback = true;
+            } else if (event.type === "done") {
+              // Diff complete
+              console.log(`[Edit-Diff] ${event.diffCount || diffCount} diffs applied${event.fallback ? " (fallback)" : ""}`);
+            } else if (event.type === "error") {
+              throw new Error(event.message || "Edit error");
+            }
+          } catch (e) {
+            if (e instanceof SyntaxError) continue; // Skip malformed SSE
+            throw e;
+          }
+        }
+      }
+
+      // Create a labeled snapshot for this edit
+      pendingLabelRef.current = `Edit: ${instruction.slice(0, 50)}`;
+      setGeneratedCode(modifiedHtml);
+      setStatus("complete");
+      setEditPrompt("");
+
+      const method = usedFallback ? "full rewrite" : `${diffCount} diffs`;
+      setPipelineAgents(prev => [...prev, `Edit applied (${method})`]);
+
+    } catch (err) {
+      if ((err as Error).name === "AbortError") return;
+
+      // Fall back to stream-based full rewrite
+      console.warn("[Edit] Diff failed, falling back to full rewrite:", err instanceof Error ? err.message : err);
+      pendingLabelRef.current = `Edit: ${instruction.slice(0, 50)}`;
+      await streamGenerate(instruction, generatedCode);
+      setEditPrompt("");
+    }
+  }, [editPrompt, generatedCode, streamGenerate, selectedModel]);
 
   const handleCodeUpdate = useCallback((newCode: string) => {
     setGeneratedCode(newCode);
@@ -873,8 +993,8 @@ export default function BuilderPage() {
     setStatus("idle");
     setError("");
     setActiveTool(null);
-    setHistory([]);
-    setHistoryIndex(-1);
+    setSnapshots([]);
+    setSnapshotIndex(-1);
   }, []);
 
   const handleSeoFixRequest = useCallback(
