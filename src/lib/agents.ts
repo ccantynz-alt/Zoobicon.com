@@ -559,8 +559,8 @@ export async function runPipeline(
       return { text: res.text, stopReason: "end_turn" };
     } else {
       // Direct Anthropic SDK for Claude models
-      // Timeout: 90s for planners (small output), 240s for builders (large output)
-      const timeoutMs = opts.maxTokens <= 16384 ? 90_000 : 240_000;
+      // Timeout: 60s for planners (small output), 120s for builders (large output)
+      const timeoutMs = opts.maxTokens <= 16384 ? 60_000 : 120_000;
       const client = new Anthropic({ apiKey, timeout: timeoutMs });
       const messages: { role: "user" | "assistant"; content: string }[] = [
         { role: "user", content: opts.userMessage },
@@ -723,138 +723,14 @@ export async function runPipeline(
     throw new Error("Developer agent produced a page with no visible content after retry. Please try again.");
   }
 
-  // ── Phase 4: Animation + SEO + Forms (Parallel) ──
-  // Enhancement agents run in parallel. Failures are non-fatal.
-  // Time budget: skip if we've already used >150s (need margin for Vercel's 300s limit)
-  let reactComponents: ReactComponents | undefined;
-  const elapsedSoFar = Date.now() - startTime;
-  const PHASE4_BUDGET_MS = 150_000; // 150s
-
-  if (elapsedSoFar > PHASE4_BUDGET_MS) {
-    console.warn(`[Pipeline] Skipping Phase 4 — already ${Math.round(elapsedSoFar / 1000)}s elapsed`);
-    agents.push({ agent: "Enhancement Phase", output: "[skipped: time budget exceeded]", duration: 0 });
-  } else {
-    onProgress?.("animation", "adding scroll effects");
-    onProgress?.("seo", "optimizing for search");
-    onProgress?.("forms", "enhancing form functionality");
-    const phase4Start = Date.now();
-
-    try {
-      const [animText, seoText, formsText] = await Promise.all([
-        llmText({
-          model: MODEL_BALANCED,
-          maxTokens: 8192,
-          system: ANIMATION_SYSTEM,
-          userMessage: `Add premium animations to this website:\n\n${html}`,
-        }).catch((err) => { console.warn("[Pipeline] Animation agent failed:", err.message); return ""; }),
-        llmText({
-          model: MODEL_BALANCED,
-          maxTokens: 8192,
-          system: SEO_SYSTEM,
-          userMessage: `Add comprehensive SEO markup to this website:\n\n${html}`,
-        }).catch((err) => { console.warn("[Pipeline] SEO agent failed:", err.message); return ""; }),
-        llmText({
-          model: MODEL_BALANCED,
-          maxTokens: 8192,
-          system: FORMS_SYSTEM,
-          userMessage: `Make all forms functional in this website:\n\n${html}`,
-        }).catch((err) => { console.warn("[Pipeline] Forms agent failed:", err.message); return ""; }),
-      ]);
-
-      // Safely use animation result as base — only if it's valid and substantial
-      if (animText) {
-        const enhancedHtml = safeReplaceHtml(html, animText, "Animator");
-        if (enhancedHtml !== html) html = enhancedHtml;
-      }
-
-      // Merge SEO meta tags from the SEO agent into the HTML
-      if (seoText) {
-        const seoHeadMatch = seoText.match(/<head>([\s\S]*?)<\/head>/i);
-        if (seoHeadMatch) {
-          const seoMetaTags = seoHeadMatch[1].match(/<meta[^>]*>|<link[^>]*>|<script type="application\/ld\+json">[\s\S]*?<\/script>/gi) || [];
-          const newTags = seoMetaTags.filter(tag =>
-            tag.includes('og:') || tag.includes('twitter:') || tag.includes('ld+json') || tag.includes('canonical')
-          );
-          if (newTags.length > 0) {
-            html = html.replace('</head>', `${newTags.join('\n')}\n</head>`);
-          }
-        }
-      }
-
-      // Extract form enhancements from forms result
-      if (formsText) {
-        const formsScriptMatch = formsText.match(/<script>([\s\S]*?)<\/script>\s*<\/body>/i);
-        if (formsScriptMatch && formsScriptMatch[1].includes('addEventListener')) {
-          const formJS = formsScriptMatch[1];
-          if (formJS.length > 200) {
-            html = html.replace('</body>', `<script>\n// Form Enhancement\n${formJS}\n</script>\n</body>`);
-          }
-        }
-      }
-
-      agents.push({ agent: "Animator", output: `[animations ${animText ? "applied" : "skipped"}]`, duration: Date.now() - phase4Start });
-      agents.push({ agent: "SEO Specialist", output: `[SEO ${seoText ? "applied" : "skipped"}]`, duration: Date.now() - phase4Start });
-      agents.push({ agent: "Forms Engineer", output: `[forms ${formsText ? "applied" : "skipped"}]`, duration: Date.now() - phase4Start });
-    } catch (phase4Err) {
-      console.warn("[Pipeline] Phase 4 failed entirely, keeping developer HTML:", phase4Err);
-      agents.push({ agent: "Enhancement Phase", output: `[skipped: ${phase4Err instanceof Error ? phase4Err.message : "error"}]`, duration: Date.now() - phase4Start });
-    }
-  } // end else (time budget check)
-
-  // ── Phase 5: Integrations + QA (Parallel) ──
-  // Both are optional enhancements — failures are non-fatal
-  // Tight time budget: skip if >200s elapsed (need margin for Vercel's 300s limit)
-  const elapsed5 = Date.now() - startTime;
-  if (elapsed5 > 200_000) {
-    console.warn(`[Pipeline] Skipping Phase 5 — already ${Math.round(elapsed5 / 1000)}s elapsed`);
-    agents.push({ agent: "Integrations", output: "[skipped: time budget]", duration: 0 });
-    agents.push({ agent: "QA Engineer", output: "[skipped: time budget]", duration: 0 });
-  } else {
-    onProgress?.("integrations", "adding third-party integrations");
-    onProgress?.("qa", "quality review");
-    const phase5Start = Date.now();
-
-    const [intResult, qaResult] = await Promise.all([
-      llmText({
-        model: MODEL_BALANCED,
-        maxTokens: 8192,
-        system: INTEGRATIONS_SYSTEM,
-        userMessage: `Add essential integrations to this website:\n\n${html}`,
-      }).then(text => ({ ok: true as const, text })).catch((err) => {
-        console.warn("[Pipeline] Integrations agent failed, skipping:", err);
-        return { ok: false as const, text: "" };
-      }),
-      llmText({
-        model: MODEL_BALANCED,
-        maxTokens: 8192,
-        system: QA_SYSTEM,
-        userMessage: `Review this website HTML for quality:\n\n${html}`,
-      }).then(text => ({ ok: true as const, text })).catch((err) => {
-        console.warn("[Pipeline] QA agent failed, skipping:", err);
-        return { ok: false as const, text: "" };
-      }),
-    ]);
-
-    if (intResult.ok && intResult.text) {
-      html = safeReplaceHtml(html, intResult.text, "Integrations");
-    }
-    agents.push({ agent: "Integrations", output: `[${intResult.ok ? "added" : "skipped"}]`, duration: Date.now() - phase5Start });
-
-    // Apply QA fixes
-    const qaText = qaResult.ok ? qaResult.text : "";
-    agents.push({ agent: "QA Engineer", output: qaText || "[skipped]", duration: Date.now() - phase5Start });
-
-    if (qaText) {
-      try {
-        const qaJSON = JSON.parse(extractJSON(qaText));
-        if (qaJSON.fixedHtml && qaJSON.fixedHtml.trim().length > 100) {
-          html = safeReplaceHtml(html, qaJSON.fixedHtml, "QA Engineer");
-        }
-      } catch {
-        // QA output wasn't valid JSON, keep current HTML
-      }
-    }
-  } // end else (Phase 5 time budget)
+  // ── Phases 4 & 5: Enhancement agents (DISABLED for speed) ──
+  // Enhancement agents (Animation, SEO, Forms, Integrations, QA) each receive the full
+  // HTML as input (~20-30K chars), making them too slow even with Sonnet. The Developer
+  // agent output + component library injection is already high-quality. These can be
+  // re-enabled as a post-generation background job later.
+  const reactComponents: ReactComponents | undefined = undefined;
+  console.log(`[Pipeline] Developer done in ${Math.round((Date.now() - startTime) / 1000)}s. Skipping enhancement phases for speed.`);
+  agents.push({ agent: "Enhancement Phase", output: "[skipped: fast mode]", duration: 0 });
 
   console.log(`[Pipeline] Total elapsed: ${Math.round((Date.now() - startTime) / 1000)}s`);
 
