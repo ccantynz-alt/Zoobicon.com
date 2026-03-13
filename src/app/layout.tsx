@@ -1,20 +1,39 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: "ZOOBICON — AI Website Builder",
-  description:
-    "Build stunning websites with AI. Describe what you want, Zoobicon brings it to life.",
-  manifest: "/manifest.json",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "black-translucent",
-    title: "Zoobicon",
+const BRAND_META: Record<string, { title: string; description: string; appleTitle: string }> = {
+  zoobicon: {
+    title: "ZOOBICON — AI Website Builder",
+    description: "Build stunning websites with AI. Describe what you want, Zoobicon brings it to life.",
+    appleTitle: "Zoobicon",
   },
-  formatDetection: {
-    telephone: false,
+  dominat8: {
+    title: "DOMINAT8 — AI Website Builder",
+    description: "Dominate your market with AI-powered websites. Build, deploy, conquer.",
+    appleTitle: "Dominat8",
   },
 };
+
+export async function generateMetadata(): Promise<Metadata> {
+  const headersList = await headers();
+  const brandId = headersList.get("x-brand-id") || "zoobicon";
+  const meta = BRAND_META[brandId] || BRAND_META.zoobicon;
+
+  return {
+    title: meta.title,
+    description: meta.description,
+    manifest: "/manifest.json",
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "black-translucent",
+      title: meta.appleTitle,
+    },
+    formatDetection: {
+      telephone: false,
+    },
+  };
+}
 
 export const viewport: Viewport = {
   width: "device-width",
