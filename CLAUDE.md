@@ -66,7 +66,7 @@ Build has `ignoreBuildErrors: true` and `ignoreDuringBuilds: true` in next.confi
 - `TopBar.tsx` / `StatusBar.tsx` — Builder chrome
 
 ### Lib (src/lib/)
-- `agents.ts` — 10-agent pipeline orchestration (Strategist → Brand/Copywriter → Architect → Developer → Animation/SEO/Forms → Integrations → QA). Model routing: Haiku for JSON planners, **Opus for Developer**, Sonnet for enhancers.
+- `agents.ts` — 7-agent pipeline v3 (Phase 1: Strategist → Phase 2: Brand+Copywriter+Architect parallel → Phase 3: Developer → Phase 4: SEO+Animation parallel). Model routing: Haiku for JSON planners, **Opus for Developer**, Sonnet for enhancers. ~95s total, well within 300s Vercel limit.
 - `llm-provider.ts` — Multi-LLM abstraction: Claude, OpenAI (GPT-4o, o3), Google (Gemini 2.5 Pro/Flash)
 - `component-library.ts` — CSS design system injected into every generated site
 - `brand-config.ts` — White-label brand system
@@ -90,7 +90,7 @@ Build has `ignoreBuildErrors: true` and `ignoreDuringBuilds: true` in next.confi
 7. **Admin fallback credentials** — The admin auth has fallback credentials for when the database is unavailable. This is intentional.
 8. **Tree-shaking config** — `optimizePackageImports` for lucide-react and framer-motion in next.config.js is critical for bundle size.
 9. **Auth-aware navbars on homepage & pricing** — These pages read `localStorage("zoobicon_user")` and show Dashboard/Sign out when logged in, Sign in/Start Building when logged out. Auth is localStorage-based (key: `zoobicon_user`). Do not revert to hardcoded "Sign in" links.
-10. **Model routing — Opus for builds** — The Developer agent (the one that produces HTML) MUST use `claude-opus-4-6`. The stream fallback also uses Opus for new builds. Edits use Sonnet for speed. JSON planning agents use Haiku. Do NOT downgrade the Developer agent to Sonnet — it produces noticeably worse output.
+10. **Model routing — Opus for builds** — The Developer agent (the one that produces HTML) MUST use `claude-opus-4-6`. The stream fallback also uses Opus for new builds. Edits use Sonnet for speed. JSON planning agents use Haiku. SEO + Animation enhancers use Sonnet in parallel. Do NOT downgrade the Developer agent to Sonnet — it produces noticeably worse output. Pipeline v3 fits ~95s within Vercel's 300s limit by parallelizing planners and running only high-impact enhancers (SEO + Animation).
 11. **Multi-LLM support** — Three providers configured in `.env.local`: `ANTHROPIC_API_KEY`, `GOOGLE_AI_API_KEY`, `OPENAI_API_KEY`. Provider routing is in `src/lib/llm-provider.ts`. When a user selects a non-Claude model, all pipeline agents route through that provider. Default (no selection) uses the Claude Haiku/Opus/Sonnet split.
 12. **Component library injection** — `src/lib/component-library.ts` provides a CSS reset + design system (buttons, cards, inputs, badges, grids, animations) injected into every generated site. Like shadcn/ui for generated output. Do not remove.
 

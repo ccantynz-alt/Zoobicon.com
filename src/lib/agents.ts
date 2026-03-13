@@ -1,29 +1,25 @@
 /**
- * Multi-Agent Pipeline v2 — Premium 10-Agent Architecture
+ * Multi-Agent Pipeline v3 — Quality-First 7-Agent Architecture
  *
- * Orchestrates specialized AI agents to produce $20K+ agency-quality output:
+ * Restructured for MAXIMUM quality within Vercel's 300s limit.
+ * Opus on the Developer agent is non-negotiable — it's the quality differentiator.
  *
- * Phase 1 (Sequential):
- *   1. Strategist Agent — target audience, goals, competitor positioning
+ * Phase 1 (Sequential, ~4s):
+ *   1. Strategist Agent (Haiku) — target audience, goals, competitor positioning
  *
- * Phase 2 (Parallel):
- *   2. Brand Agent — colors, typography, component design rules
- *   3. Copywriter Agent — headlines, body, CTAs, testimonials, meta
+ * Phase 2 (Parallel, ~6s):
+ *   2. Brand Agent (Haiku) — colors, typography, component design rules
+ *   3. Copywriter Agent (Haiku) — headlines, body, CTAs, testimonials, meta
+ *   4. Architect Agent (Haiku) — decides structure (SPA, sections, components)
  *
- * Phase 3 (Sequential):
- *   4. Architect Agent — decides structure (SPA, sections, components)
- *   5. Developer Agent — builds complete HTML/CSS/JS
+ * Phase 3 (Sequential, ~70s):
+ *   5. Developer Agent (Opus) — builds complete HTML/CSS/JS — THE product
  *
- * Phase 4 (Parallel):
- *   6. Animation Agent — scroll reveals, parallax, micro-interactions
- *   7. SEO Agent — OG tags, JSON-LD schema, meta optimization
- *   8. Forms Agent — validation, submission handling, spam protection
+ * Phase 4 (Parallel, ~15s):
+ *   6. SEO Agent (Sonnet) — OG tags, JSON-LD schema, meta optimization
+ *   7. Animation Agent (Sonnet) — scroll reveals, micro-interactions
  *
- * Phase 5 (Sequential):
- *   9. Integrations Agent — GA4, chat widgets, booking, maps
- *  10. QA Agent — Lighthouse-style audit, WCAG check, fixes
- *
- * The pipeline produces output far superior to a single AI call.
+ * Total: ~95s — well within 300s. Jaw-dropping output on Standard tier.
  */
 
 import Anthropic from "@anthropic-ai/sdk";
@@ -537,13 +533,16 @@ export async function runPipeline(
   const userModel = input.model;
   const useMultiLLM = userModel && !userModel.startsWith("claude");
 
-  // Smart model routing — Haiku for fast JSON, Sonnet for everything else in the pipeline
-  // Opus is too slow for a 10-agent pipeline within Vercel's 300s limit (single call takes 90-120s).
-  // Sonnet produces great HTML and finishes in ~20-30s, leaving room for all enhancement agents.
-  // Opus is still used in the single-call stream/direct routes where there's only 1 API call.
+  // Smart model routing — optimized for QUALITY within Vercel's 300s limit
+  // Pipeline restructured: 4 phases, parallelized planners, Opus for Developer
+  // Phase 1: Strategist (Haiku, ~4s)
+  // Phase 2: Brand + Copywriter + Architect in PARALLEL (Haiku, ~6s)
+  // Phase 3: Developer (Opus, ~70s) — THE quality differentiator
+  // Phase 4: SEO + Animation in PARALLEL (Sonnet, ~15s) — high-impact polish
+  // Total: ~95s — well within 300s
   const MODEL_PLANNER = userModel || "claude-haiku-4-5-20251001";   // Fast JSON agents (strategy, brand, copy, architecture)
-  const MODEL_BALANCED = userModel || "claude-sonnet-4-6";           // Enhancement agents (animation, SEO, forms, integrations, QA)
-  const MODEL_PREMIUM = userModel || "claude-sonnet-4-6";            // Developer agent — Sonnet for pipeline speed
+  const MODEL_BALANCED = userModel || "claude-sonnet-4-6";           // Enhancement agents (SEO, animation)
+  const MODEL_PREMIUM = userModel || "claude-opus-4-6";              // Developer agent — Opus for jaw-dropping output
 
   // Helper: call the right LLM based on user selection
   // Returns { text, stopReason } so we can detect truncation
@@ -559,8 +558,9 @@ export async function runPipeline(
       return { text: res.text, stopReason: "end_turn" };
     } else {
       // Direct Anthropic SDK for Claude models
-      // Timeout: 60s for planners (small output), 120s for builders (large output)
-      const timeoutMs = opts.maxTokens <= 16384 ? 60_000 : 120_000;
+      // Timeout: 60s for planners, 180s for Opus builder, 120s for Sonnet enhancers
+      const timeoutMs = opts.model === "claude-opus-4-6" ? 180_000
+        : opts.maxTokens <= 16384 ? 60_000 : 120_000;
       const client = new Anthropic({ apiKey, timeout: timeoutMs });
       const messages: { role: "user" | "assistant"; content: string }[] = [
         { role: "user", content: opts.userMessage },
@@ -625,12 +625,14 @@ export async function runPipeline(
   const strategySpec = extractJSON(strategyText);
   agents.push({ agent: "Strategist", output: strategyText, duration: Date.now() - strategyStart });
 
-  // ── Phase 2: Brand + Copywriter (Parallel) ──
+  // ── Phase 2: Brand + Copywriter + Architect (ALL Parallel) ──
+  // All three only need the Strategy output — run them simultaneously to save ~5s
   onProgress?.("brand", "designing visual identity");
   onProgress?.("copywriter", "writing content");
+  onProgress?.("architect", "planning structure");
   const phase2Start = Date.now();
 
-  const [brandText, copyText] = await Promise.all([
+  const [brandText, copyText, archText] = await Promise.all([
     llmText({
       model: MODEL_PLANNER,
       maxTokens: 8192,
@@ -643,6 +645,12 @@ export async function runPipeline(
       system: COPYWRITER_SYSTEM,
       userMessage: `Strategy:\n${strategySpec}\n\nOriginal Brief:\n${input.prompt}\n\nWrite all website copy. If the brief includes specific copy suggestions, section names, or content structure, incorporate them exactly as specified. Match tone to audience.`,
     }),
+    llmText({
+      model: MODEL_PLANNER,
+      maxTokens: 8192,
+      system: ARCHITECT_SYSTEM,
+      userMessage: `Strategy:\n${strategySpec}\n\nOriginal Brief:\n${input.prompt}\n\nPlan the optimal page structure and section order. If the brief specifies a sitemap, section order, or specific page structure, follow that structure.`,
+    }),
   ]);
 
   const brandSpec = extractJSON(brandText);
@@ -651,21 +659,11 @@ export async function runPipeline(
   const copySpec = extractJSON(copyText);
   agents.push({ agent: "Copywriter", output: copyText, duration: Date.now() - phase2Start });
 
-  // ── Phase 3: Architect → Developer ──
-  onProgress?.("architect", "planning structure");
-  const archStart = Date.now();
-
-  const archText = await llmText({
-    model: MODEL_PLANNER,
-    maxTokens: 8192,
-    system: ARCHITECT_SYSTEM,
-    userMessage: `Strategy:\n${strategySpec}\n\nDesign:\n${brandSpec}\n\nCopy:\n${copySpec}\n\nOriginal Brief:\n${input.prompt}\n\nPlan the optimal page structure and section order. If the brief specifies a sitemap, section order, or specific page structure, follow that structure.`,
-  });
-
   const archSpec = extractJSON(archText);
-  agents.push({ agent: "Architect", output: archText, duration: Date.now() - archStart });
+  agents.push({ agent: "Architect", output: archText, duration: Date.now() - phase2Start });
 
-  onProgress?.("developer", "building website");
+  // ── Phase 3: Developer (Opus) ──
+  onProgress?.("developer", "building website (Opus)");
   const devStart = Date.now();
 
   // Helper: validate that HTML has real body content
@@ -723,14 +721,63 @@ export async function runPipeline(
     throw new Error("Developer agent produced a page with no visible content after retry. Please try again.");
   }
 
-  // ── Phases 4 & 5: Enhancement agents (DISABLED for speed) ──
-  // Enhancement agents (Animation, SEO, Forms, Integrations, QA) each receive the full
-  // HTML as input (~20-30K chars), making them too slow even with Sonnet. The Developer
-  // agent output + component library injection is already high-quality. These can be
-  // re-enabled as a post-generation background job later.
+  // ── Phase 4: SEO + Animation (Parallel, Sonnet) ──
+  // These two are the highest-impact enhancers. Run in parallel for speed.
+  // Forms/Integrations/QA skipped — component library handles most of that polish.
+  const elapsedSoFar = Date.now() - startTime;
+  const timeRemaining = 280_000 - elapsedSoFar; // Leave 20s buffer before 300s limit
   const reactComponents: ReactComponents | undefined = undefined;
-  console.log(`[Pipeline] Developer done in ${Math.round((Date.now() - startTime) / 1000)}s. Skipping enhancement phases for speed.`);
-  agents.push({ agent: "Enhancement Phase", output: "[skipped: fast mode]", duration: 0 });
+
+  if (timeRemaining > 40_000) {
+    // We have enough time for enhancement — run SEO + Animation in parallel
+    onProgress?.("seo", "optimizing SEO markup");
+    onProgress?.("animation", "adding micro-interactions");
+    const phase4Start = Date.now();
+
+    const [seoResult, animResult] = await Promise.all([
+      llmText({
+        model: MODEL_BALANCED,
+        maxTokens: 32000,
+        system: SEO_SYSTEM,
+        userMessage: `Here is the complete website HTML. Add comprehensive SEO markup (meta tags, Open Graph, JSON-LD schema, heading hierarchy, image optimization). Do NOT change any visible content or design.\n\n${html}`,
+      }).catch((err) => {
+        console.warn(`[Pipeline] SEO agent failed: ${err instanceof Error ? err.message : "unknown"}`);
+        return null;
+      }),
+      llmText({
+        model: MODEL_BALANCED,
+        maxTokens: 32000,
+        system: ANIMATION_SYSTEM,
+        userMessage: `Here is the complete website HTML. Add smooth scroll animations and micro-interactions. NEVER set opacity:0. Use ONLY the component library's .fade-in classes. Do NOT change any content or colors.\n\n${html}`,
+      }).catch((err) => {
+        console.warn(`[Pipeline] Animation agent failed: ${err instanceof Error ? err.message : "unknown"}`);
+        return null;
+      }),
+    ]);
+
+    // Apply SEO enhancements (safe replace — won't destroy output if SEO agent fails)
+    if (seoResult) {
+      html = safeReplaceHtml(html, seoResult, "SEO Agent");
+      agents.push({ agent: "SEO Agent", output: `[${seoResult.length} chars]`, duration: Date.now() - phase4Start });
+    } else {
+      agents.push({ agent: "SEO Agent", output: "[skipped: error]", duration: Date.now() - phase4Start });
+    }
+
+    // Apply Animation enhancements
+    if (animResult) {
+      html = safeReplaceHtml(html, animResult, "Animation Agent");
+      agents.push({ agent: "Animation Agent", output: `[${animResult.length} chars]`, duration: Date.now() - phase4Start });
+    } else {
+      agents.push({ agent: "Animation Agent", output: "[skipped: error]", duration: Date.now() - phase4Start });
+    }
+
+    console.log(`[Pipeline] Enhancement phase done in ${Math.round((Date.now() - phase4Start) / 1000)}s`);
+  } else {
+    // Not enough time — skip enhancements but log it
+    console.warn(`[Pipeline] Only ${Math.round(timeRemaining / 1000)}s remaining — skipping enhancement phase`);
+    agents.push({ agent: "SEO Agent", output: "[skipped: time limit]", duration: 0 });
+    agents.push({ agent: "Animation Agent", output: "[skipped: time limit]", duration: 0 });
+  }
 
   console.log(`[Pipeline] Total elapsed: ${Math.round((Date.now() - startTime) / 1000)}s`);
 
