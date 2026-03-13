@@ -224,7 +224,8 @@ export async function POST(req: NextRequest) {
           sendEvent(controller, { type: "agent", agent: "Copywriter", status: "done", duration: phase2Duration });
           sendEvent(controller, { type: "agent", agent: "Architect", status: "done", duration: phase2Duration });
 
-          // ── Phase 3: Developer (Opus) — STREAMED LIVE ──
+          // ── Phase 3: Developer — STREAMED LIVE ──
+          // Try Opus first for quality. If it fails/times out mid-stream, fall back to Sonnet.
           sendEvent(controller, { type: "agent", agent: "Developer", status: "running" });
           const devStart = Date.now();
 
@@ -232,31 +233,46 @@ export async function POST(req: NextRequest) {
 
           let devHtml = "";
 
-          // Stream Developer output — this is what users see building in real-time
-          const devClient = new Anthropic({ apiKey, timeout: 180_000 });
-          let devStream;
-          try {
-            devStream = devClient.messages.stream({
-              model: MODEL_PREMIUM,
+          // Helper: stream a model and return accumulated HTML
+          const streamDeveloper = async (model: string): Promise<string> => {
+            const client = new Anthropic({ apiKey, timeout: 180_000 });
+            const stream = client.messages.stream({
+              model,
               max_tokens: 32000,
               system: DEVELOPER_SYSTEM,
               messages: [{ role: "user", content: devUserMessage }],
             });
-          } catch {
-            // Opus failed to start, fall back to Sonnet
-            console.warn("[Pipeline-Stream] Opus failed to start, falling back to Sonnet");
-            devStream = devClient.messages.stream({
-              model: MODEL_BALANCED,
-              max_tokens: 32000,
-              system: DEVELOPER_SYSTEM,
-              messages: [{ role: "user", content: devUserMessage }],
-            });
-          }
+            let accumulated = "";
+            for await (const ev of stream) {
+              if (ev.type === "content_block_delta" && ev.delta.type === "text_delta") {
+                accumulated += ev.delta.text;
+                sendEvent(controller, { type: "chunk", content: ev.delta.text });
+              }
+            }
+            return accumulated;
+          };
 
-          for await (const event of devStream) {
-            if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
-              devHtml += event.delta.text;
-              sendEvent(controller, { type: "chunk", content: event.delta.text });
+          // Try Opus, fall back to Sonnet on any error (timeout, API error, etc.)
+          try {
+            devHtml = await streamDeveloper(MODEL_PREMIUM);
+          } catch (opusErr) {
+            const opusMsg = opusErr instanceof Error ? opusErr.message : "unknown";
+            console.warn(`[Pipeline-Stream] Opus failed (${opusMsg}), falling back to Sonnet`);
+            sendEvent(controller, { type: "status", message: `Opus unavailable, using Sonnet (${opusMsg.slice(0, 60)})` });
+            // Clear any partial Opus output and retry with Sonnet
+            devHtml = "";
+            try {
+              devHtml = await streamDeveloper(MODEL_BALANCED);
+              // Send a replace event since we cleared and restarted
+              if (devHtml) {
+                sendEvent(controller, { type: "replace", content: cleanHtml(devHtml) });
+              }
+            } catch (sonnetErr) {
+              const msg = sonnetErr instanceof Error ? sonnetErr.message : "unknown";
+              console.error(`[Pipeline-Stream] Sonnet also failed: ${msg}`);
+              sendEvent(controller, { type: "error", message: `Both Opus and Sonnet failed: ${msg}` });
+              controller.close();
+              return;
             }
           }
 
@@ -269,18 +285,24 @@ export async function POST(req: NextRequest) {
             console.warn(`[Pipeline-Stream] Developer empty body (${bodyCheck.bodyChars} chars). Retrying with Sonnet...`);
             sendEvent(controller, { type: "status", message: "Retrying build..." });
 
-            const retryResult = await llmText({
-              model: MODEL_BALANCED, maxTokens: 32000, system: DEVELOPER_SYSTEM,
-              userMessage: `CRITICAL: Previous attempt had an EMPTY <body>. Write MINIMAL CSS. Focus ALL output on <body> content.\n\n${devUserMessage}`,
-            });
+            try {
+              const retryResult = await llmText({
+                model: MODEL_BALANCED, maxTokens: 32000, system: DEVELOPER_SYSTEM,
+                userMessage: `CRITICAL: Previous attempt had an EMPTY <body>. Write MINIMAL CSS. Focus ALL output on <body> content.\n\n${devUserMessage}`,
+              });
 
-            html = cleanHtml(retryResult);
-            const retryCheck = hasBodyContent(html);
+              html = cleanHtml(retryResult);
+              const retryCheck = hasBodyContent(html);
 
-            if (retryCheck.valid) {
-              sendEvent(controller, { type: "replace", content: html });
-            } else {
-              sendEvent(controller, { type: "error", message: "Developer agent produced empty content after retry." });
+              if (retryCheck.valid) {
+                sendEvent(controller, { type: "replace", content: html });
+              } else {
+                sendEvent(controller, { type: "error", message: "Developer agent produced empty content after retry." });
+                controller.close();
+                return;
+              }
+            } catch (retryErr) {
+              sendEvent(controller, { type: "error", message: `Retry failed: ${retryErr instanceof Error ? retryErr.message : "unknown"}` });
               controller.close();
               return;
             }
