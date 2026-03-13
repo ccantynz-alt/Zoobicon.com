@@ -545,6 +545,7 @@ export async function runPipeline(
 
   // Helper: call the right LLM based on user selection
   // Returns { text, stopReason } so we can detect truncation
+  // Uses streaming for large outputs (>16K tokens) to avoid SDK timeout warnings
   const llmCall = async (opts: { model: string; maxTokens: number; system: string; userMessage: string }): Promise<{ text: string; stopReason: string }> => {
     if (useMultiLLM) {
       const res = await callLLM({
@@ -555,34 +556,47 @@ export async function runPipeline(
       });
       return { text: res.text, stopReason: "end_turn" };
     } else {
-      // Direct Anthropic SDK for Claude models (fastest path)
-      // Timeout: 90s for planners (small output), 180s for builders (large output)
-      const timeoutMs = opts.maxTokens <= 16384 ? 90_000 : 180_000;
+      // Direct Anthropic SDK for Claude models
+      // Timeout: 90s for planners (small output), 240s for builders (large output)
+      const timeoutMs = opts.maxTokens <= 16384 ? 90_000 : 240_000;
       const client = new Anthropic({ apiKey, timeout: timeoutMs });
       const messages: { role: "user" | "assistant"; content: string }[] = [
         { role: "user", content: opts.userMessage },
       ];
-      try {
-        const res = await client.messages.create({
-          model: opts.model,
-          max_tokens: opts.maxTokens,
-          system: opts.system,
-          messages,
-        });
-        const text = res.content.find((b) => b.type === "text")?.text || "";
-        return { text, stopReason: res.stop_reason || "unknown" };
-      } catch (err) {
-        // If Opus fails, automatically fall back to Sonnet (still good quality)
-        if (opts.model === "claude-opus-4-6") {
-          console.warn(`[Pipeline] Opus failed (${err instanceof Error ? err.message : "unknown"}), falling back to Sonnet`);
-          const fallbackRes = await client.messages.create({
-            model: "claude-sonnet-4-6",
+
+      // Use streaming for large token requests to avoid SDK "operation may take longer than 10 minutes" error
+      const useStreaming = opts.maxTokens > 16384;
+
+      const callWithModel = async (model: string): Promise<{ text: string; stopReason: string }> => {
+        if (useStreaming) {
+          const stream = client.messages.stream({
+            model,
             max_tokens: opts.maxTokens,
             system: opts.system,
             messages,
           });
-          const text = fallbackRes.content.find((b) => b.type === "text")?.text || "";
-          return { text, stopReason: fallbackRes.stop_reason || "unknown" };
+          const finalMessage = await stream.finalMessage();
+          const text = finalMessage.content.find((b) => b.type === "text")?.text || "";
+          return { text, stopReason: finalMessage.stop_reason || "unknown" };
+        } else {
+          const res = await client.messages.create({
+            model,
+            max_tokens: opts.maxTokens,
+            system: opts.system,
+            messages,
+          });
+          const text = res.content.find((b) => b.type === "text")?.text || "";
+          return { text, stopReason: res.stop_reason || "unknown" };
+        }
+      };
+
+      try {
+        return await callWithModel(opts.model);
+      } catch (err) {
+        // If Opus fails, automatically fall back to Sonnet (still good quality)
+        if (opts.model === "claude-opus-4-6") {
+          console.warn(`[Pipeline] Opus failed (${err instanceof Error ? err.message : "unknown"}), falling back to Sonnet`);
+          return await callWithModel("claude-sonnet-4-6");
         }
         throw err;
       }

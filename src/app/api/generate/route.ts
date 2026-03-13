@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const client = new Anthropic({ apiKey, timeout: 120_000 });
+    const client = new Anthropic({ apiKey, timeout: 240_000 });
 
     const isEdit = typeof existingCode === "string" && existingCode.trim().length > 0;
     const isPremium = tier === "premium";
@@ -142,24 +142,25 @@ export async function POST(req: NextRequest) {
       { role: "user", content: userMessage + (!isEdit ? "\n\nIMPORTANT: Start your response IMMEDIATELY with <!DOCTYPE html> — no preamble, no explanation, no code fences. Output raw HTML only." : "") },
     ];
 
-    let message;
-    try {
-      message = await client.messages.create({
-        model,
+    // Use streaming to avoid SDK "operation may take longer than 10 minutes" error with large max_tokens
+    const streamCall = async (m: string): Promise<Anthropic.Message> => {
+      const stream = client.messages.stream({
+        model: m,
         max_tokens: maxTokens,
         system: systemPrompt,
         messages,
       });
+      return await stream.finalMessage();
+    };
+
+    let message;
+    try {
+      message = await streamCall(model);
     } catch (err) {
       // If Opus fails, try Sonnet as fallback
       if (model === "claude-opus-4-6") {
         console.warn(`[Generate] Opus failed (${err instanceof Error ? err.message : "unknown"}), falling back to Sonnet`);
-        message = await client.messages.create({
-          model: "claude-sonnet-4-6",
-          max_tokens: maxTokens,
-          system: systemPrompt,
-          messages,
-        });
+        message = await streamCall("claude-sonnet-4-6");
       } else {
         throw err;
       }
@@ -215,12 +216,13 @@ Output ONLY raw HTML — no markdown, no code fences, no explanation.`;
 
         for (let retry = 0; retry < 2; retry++) {
           try {
-            const retryMessage = await client.messages.create({
+            const retryStream = client.messages.stream({
               model,
               max_tokens: maxTokens,
               system: BODY_FIRST_SYSTEM,
               messages: [{ role: "user", content: userMessage }],
             });
+            const retryMessage = await retryStream.finalMessage();
 
             const retryBlock = retryMessage.content.find((b) => b.type === "text");
             if (retryBlock && retryBlock.type === "text") {
