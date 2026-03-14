@@ -11,6 +11,16 @@ import Anthropic from "@anthropic-ai/sdk";
  * as a premium, modern website. Not a pixel-copy — it's a premium upgrade.
  */
 
+export const maxDuration = 300;
+
+/** Check if an error warrants a model fallback */
+function isRetryableError(err: unknown): boolean {
+  if (err instanceof Anthropic.RateLimitError) return true;
+  if (err instanceof Anthropic.InternalServerError) return true;
+  const msg = err instanceof Error ? err.message : String(err);
+  return /rate.limit|overloaded|529|too many/i.test(msg);
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { url, upgradeTier = "premium" } = await req.json();
@@ -64,12 +74,9 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Step 2: Analyze the website structure ──
-    const client = new Anthropic({ apiKey });
+    const client = new Anthropic({ apiKey, timeout: 120_000 });
 
-    const analysisRes = await client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 8192,
-      system: `You are a website analyst. Given HTML source code, extract the website's structure, content, and purpose into a JSON analysis.
+    const analysisSystem = `You are a website analyst. Given HTML source code, extract the website's structure, content, and purpose into a JSON analysis.
 
 Output ONLY valid JSON:
 {
@@ -93,14 +100,38 @@ Output ONLY valid JSON:
   "strengths": ["what the current site does well"],
   "weaknesses": ["what needs improvement"],
   "redesignNotes": "specific suggestions for a premium upgrade"
-}`,
-      messages: [{
-        role: "user",
-        content: `Analyze this website from ${parsedUrl.hostname}:\n\n${pageContent.slice(0, 100000)}`,
-      }],
-    });
+}`;
 
-    const analysisText = analysisRes.content.find((b) => b.type === "text")?.text || "";
+    let analysisText: string;
+    try {
+      const analysisRes = await client.messages.create({
+        model: "claude-sonnet-4-6",
+        max_tokens: 8192,
+        system: analysisSystem,
+        messages: [{
+          role: "user",
+          content: `Analyze this website from ${parsedUrl.hostname}:\n\n${pageContent.slice(0, 100000)}`,
+        }],
+      });
+      analysisText = analysisRes.content.find((b) => b.type === "text")?.text || "";
+    } catch (analysisErr) {
+      // If Sonnet fails, try Haiku for analysis (it's just JSON extraction)
+      if (isRetryableError(analysisErr)) {
+        console.warn("[Clone] Sonnet analysis failed, falling back to Haiku");
+        const analysisRes = await client.messages.create({
+          model: "claude-haiku-4-5-20251001",
+          max_tokens: 8192,
+          system: analysisSystem,
+          messages: [{
+            role: "user",
+            content: `Analyze this website from ${parsedUrl.hostname}:\n\n${pageContent.slice(0, 100000)}`,
+          }],
+        });
+        analysisText = analysisRes.content.find((b) => b.type === "text")?.text || "";
+      } else {
+        throw analysisErr;
+      }
+    }
 
     // ── Step 3: Rebuild as premium ──
     const rebuildSystem = upgradeTier === "premium"
@@ -116,7 +147,7 @@ Rules:
 - Match the industry aesthetic (luxury for real estate, warm for restaurants, modern for tech, etc.).
 - Add: smooth scroll, sticky nav, scroll animations, hover effects, mobile hamburger menu.
 - Sections: hero, features/services, about/trust, testimonials, stats, CTA, footer.
-- Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT (use a unique keyword per image) for images.
+- Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for images. Include the business INDUSTRY in the KEYWORD (e.g. restaurant-chef-cooking, legal-courthouse-architecture). Each image needs a unique keyword.
 - The result must look incomparably better than the original.`
       : `You are Zoobicon, a professional AI website rebuilder. Rebuild the analyzed website as a clean, modern, professional site.
 
@@ -126,21 +157,42 @@ Rules:
 - Keep the real business content from the analysis.
 - Professional design with good typography, spacing, and responsiveness.
 - Mobile hamburger menu, hover states, smooth scrolling.
-- Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT (use a unique keyword per image) for images.`;
+- Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for images. Include the business INDUSTRY in the KEYWORD. Each image needs a unique keyword.`;
 
-    const rebuildRes = await client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 64000,
-      system: rebuildSystem,
-      messages: [{
-        role: "user",
-        content: `Here is the analysis of ${parsedUrl.hostname}:\n\n${analysisText}\n\nRebuild this website as a premium, modern site. Keep all the real business content but dramatically upgrade the design and user experience.`,
-      }],
-    });
+    let html: string;
+    try {
+      const rebuildRes = await client.messages.create({
+        model: "claude-sonnet-4-6",
+        max_tokens: 64000,
+        system: rebuildSystem,
+        messages: [{
+          role: "user",
+          content: `Here is the analysis of ${parsedUrl.hostname}:\n\n${analysisText}\n\nRebuild this website as a premium, modern site. Keep all the real business content but dramatically upgrade the design and user experience.`,
+        }],
+      });
+      html = rebuildRes.content.find((b) => b.type === "text")?.text || "";
+    } catch (rebuildErr) {
+      // If primary model fails, retry with Sonnet (or Haiku as last resort)
+      if (isRetryableError(rebuildErr)) {
+        console.warn("[Clone] Rebuild failed, retrying with fallback model");
+        const rebuildRes = await client.messages.create({
+          model: "claude-sonnet-4-6",
+          max_tokens: 32000,
+          system: rebuildSystem,
+          messages: [{
+            role: "user",
+            content: `Here is the analysis of ${parsedUrl.hostname}:\n\n${analysisText}\n\nRebuild this website as a premium, modern site. Keep all the real business content but dramatically upgrade the design and user experience.`,
+          }],
+        });
+        html = rebuildRes.content.find((b) => b.type === "text")?.text || "";
+      } else {
+        throw rebuildErr;
+      }
+    }
 
-    let html = rebuildRes.content.find((b) => b.type === "text")?.text || "";
+    // Strip markdown code fences if present
     if (html.startsWith("```")) {
-      html = html.replace(/^```(?:html)?\n?/, "").replace(/\n?```$/, "");
+      html = html.replace(/^```(?:html|HTML)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
     }
 
     return NextResponse.json({
@@ -152,13 +204,28 @@ Rules:
   } catch (err) {
     console.error("Clone error:", err);
 
+    if (err instanceof Anthropic.AuthenticationError) {
+      return NextResponse.json(
+        { error: "AI service is temporarily unavailable. The site owner needs to update their API key." },
+        { status: 500 }
+      );
+    }
+    if (err instanceof Anthropic.RateLimitError) {
+      return NextResponse.json(
+        { error: "AI service is busy. Please wait a moment and try again." },
+        { status: 429 }
+      );
+    }
     if (err instanceof Anthropic.APIError) {
       return NextResponse.json(
-        { error: `API error: ${err.message}` },
+        { error: `AI service error: ${err.message}` },
         { status: err.status || 500 }
       );
     }
 
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Internal server error" },
+      { status: 500 }
+    );
   }
 }
