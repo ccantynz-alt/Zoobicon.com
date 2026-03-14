@@ -232,4 +232,98 @@ export async function initSchema() {
   `;
 
   await sql`CREATE INDEX IF NOT EXISTS bulk_jobs_agency_id_idx ON bulk_jobs (agency_id)`;
+
+  // ---- Email platform tables (zoobicon.io) ----
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS email_domains (
+      id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      domain              TEXT UNIQUE NOT NULL,
+      user_email          TEXT NOT NULL,
+      status              VARCHAR(20) NOT NULL DEFAULT 'pending',
+      verification_token  TEXT,
+      dkim_tokens         JSONB DEFAULT '[]',
+      spf_record          TEXT,
+      dmarc_record        TEXT,
+      required_records    JSONB DEFAULT '[]',
+      created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      verified_at         TIMESTAMPTZ
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS email_domains_user_email_idx ON email_domains (user_email)`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS email_mailboxes (
+      id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      address           TEXT UNIQUE NOT NULL,
+      domain            TEXT NOT NULL,
+      local_part        TEXT NOT NULL,
+      display_name      TEXT NOT NULL DEFAULT '',
+      forward_to        TEXT,
+      auto_reply        TEXT,
+      status            VARCHAR(20) NOT NULL DEFAULT 'active',
+      storage_used_mb   INTEGER NOT NULL DEFAULT 0,
+      storage_limit_mb  INTEGER NOT NULL DEFAULT 1000,
+      user_email        TEXT NOT NULL,
+      created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS email_mailboxes_user_email_idx ON email_mailboxes (user_email)`;
+  await sql`CREATE INDEX IF NOT EXISTS email_mailboxes_domain_idx ON email_mailboxes (domain)`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS email_inbound (
+      id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      mailbox_address   TEXT NOT NULL,
+      from_address      TEXT NOT NULL,
+      to_address        TEXT NOT NULL,
+      subject           TEXT,
+      text_body         TEXT,
+      html_body         TEXT,
+      headers           JSONB DEFAULT '{}',
+      received_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      size              INTEGER NOT NULL DEFAULT 0,
+      read              BOOLEAN NOT NULL DEFAULT false,
+      folder            VARCHAR(20) NOT NULL DEFAULT 'inbox'
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS email_inbound_mailbox_idx ON email_inbound (mailbox_address)`;
+  await sql`CREATE INDEX IF NOT EXISTS email_inbound_received_idx ON email_inbound (received_at)`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS email_events (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      message_id  TEXT NOT NULL,
+      type        VARCHAR(20) NOT NULL,
+      domain      TEXT NOT NULL,
+      recipient   TEXT,
+      timestamp   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      metadata    JSONB DEFAULT '{}'
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS email_events_domain_idx ON email_events (domain)`;
+  await sql`CREATE INDEX IF NOT EXISTS email_events_timestamp_idx ON email_events (timestamp)`;
+
+  // ---- Domain reseller tables (Tucows/OpenSRS) ----
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS registered_domains (
+      id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      domain              TEXT UNIQUE NOT NULL,
+      user_email          TEXT NOT NULL,
+      status              VARCHAR(20) NOT NULL DEFAULT 'active',
+      registered_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      expires_at          TIMESTAMPTZ NOT NULL,
+      auto_renew          BOOLEAN NOT NULL DEFAULT true,
+      privacy_protection  BOOLEAN NOT NULL DEFAULT true,
+      nameservers         JSONB DEFAULT '["ns1.zoobicon.io", "ns2.zoobicon.io"]'
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS registered_domains_user_email_idx ON registered_domains (user_email)`;
 }

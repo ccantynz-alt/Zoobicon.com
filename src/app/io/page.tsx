@@ -4,29 +4,28 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
-  Terminal,
-  Code2,
+  Mail,
   Globe,
-  Zap,
-  Key,
-  Webhook,
-  Package,
-  GitBranch,
-  ArrowRight,
-  Copy,
-  Check,
-  Server,
-  Cpu,
-  Languages,
-  Search,
-  Building2,
-  Layers,
-  Paintbrush,
-  Bot,
-  Rocket,
   Shield,
-  Clock,
+  Zap,
+  Server,
+  BarChart3,
+  ArrowRight,
+  Check,
+  Copy,
+  Search,
+  Lock,
+  Send,
+  Inbox,
+  Users,
+  Bot,
   ChevronRight,
+  Rocket,
+  Code2,
+  Terminal,
+  Clock,
+  AlertTriangle,
+  MousePointerClick,
 } from "lucide-react";
 
 const fadeInUp = {
@@ -52,236 +51,221 @@ const scaleIn = {
   },
 };
 
-/* ─── Code Examples ─── */
+/* ─── Domain Search Component ─── */
+
+function DomainSearch() {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<
+    Array<{ domain: string; available: boolean; price?: number }>
+  >([]);
+  const [searching, setSearching] = useState(false);
+  const [searched, setSearched] = useState(false);
+
+  const handleSearch = async () => {
+    if (!query.trim() || query.trim().length < 2) return;
+    setSearching(true);
+    setSearched(false);
+
+    try {
+      const res = await fetch(
+        `/api/domains/search?q=${encodeURIComponent(query.trim())}`
+      );
+      const data = await res.json();
+      setResults(data.results || []);
+    } catch {
+      setResults([]);
+    } finally {
+      setSearching(false);
+      setSearched(true);
+    }
+  };
+
+  return (
+    <div className="max-w-2xl mx-auto">
+      <div className="flex gap-2">
+        <div className="flex-1 relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            placeholder="Find your perfect domain..."
+            className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:border-brand-500/50 focus:outline-none focus:ring-1 focus:ring-brand-500/30 text-lg"
+          />
+        </div>
+        <button
+          onClick={handleSearch}
+          disabled={searching}
+          className="btn-gradient px-8 py-4 rounded-xl font-semibold text-white disabled:opacity-50"
+        >
+          {searching ? "Searching..." : "Search"}
+        </button>
+      </div>
+
+      {searched && results.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-4 bg-white/[0.03] border border-white/10 rounded-xl overflow-hidden"
+        >
+          {results.slice(0, 8).map((r) => (
+            <div
+              key={r.domain}
+              className="flex items-center justify-between px-5 py-3 border-b border-white/5 last:border-0"
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    r.available ? "bg-green-400" : "bg-red-400"
+                  }`}
+                />
+                <span className="font-mono text-sm text-white">{r.domain}</span>
+              </div>
+              {r.available ? (
+                <div className="flex items-center gap-3">
+                  <span className="text-brand-400 font-semibold">
+                    ${r.price?.toFixed(2)}/yr
+                  </span>
+                  <Link
+                    href="/auth/signup"
+                    className="px-3 py-1.5 bg-brand-500/10 text-brand-400 rounded-lg text-xs font-semibold hover:bg-brand-500/20 transition-colors"
+                  >
+                    Register
+                  </Link>
+                </div>
+              ) : (
+                <span className="text-gray-600 text-sm">Taken</span>
+              )}
+            </div>
+          ))}
+        </motion.div>
+      )}
+    </div>
+  );
+}
+
+/* ─── Copy Button ─── */
+
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      onClick={() => {
+        navigator.clipboard.writeText(text).catch(() => {});
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }}
+      className="p-1.5 rounded bg-white/5 hover:bg-white/10 transition-colors text-gray-400 hover:text-white"
+      aria-label="Copy to clipboard"
+    >
+      {copied ? (
+        <Check className="w-4 h-4 text-brand-400" />
+      ) : (
+        <Copy className="w-4 h-4" />
+      )}
+    </button>
+  );
+}
+
+/* ─── API Example Tabs ─── */
 
 const API_EXAMPLES = [
   {
-    id: "generate",
-    label: "Generate Website",
+    id: "send",
+    label: "Send Email",
     method: "POST",
-    endpoint: "/api/generate",
-    curl: `curl -X POST https://api.zoobicon.io/v1/generate \\
+    code: `curl -X POST https://api.zoobicon.io/v1/email/send \\
   -H "Authorization: Bearer zbk_live_abc123..." \\
   -H "Content-Type: application/json" \\
   -d '{
-    "prompt": "Modern SaaS landing page for a project management tool",
-    "style": "minimal",
-    "pages": ["home", "pricing", "about"],
-    "framework": "nextjs"
+    "from": "hello@yourdomain.com",
+    "to": "customer@gmail.com",
+    "subject": "Welcome aboard!",
+    "html": "<h1>Welcome!</h1><p>Thanks for signing up.</p>",
+    "tags": { "campaign": "onboarding" }
   }'`,
-    javascript: `import { Zoobicon } from "@zoobicon/sdk";
-
-const zb = new Zoobicon("zbk_live_abc123...");
-
-const site = await zb.generate({
-  prompt: "Modern SaaS landing page for a project management tool",
-  style: "minimal",
-  pages: ["home", "pricing", "about"],
-  framework: "nextjs",
-});
-
-console.log(site.url);       // https://my-site.zoobicon.app
-console.log(site.previewUrl); // https://preview.zoobicon.io/abc123`,
-    python: `import zoobicon
-
-client = zoobicon.Client("zbk_live_abc123...")
-
-site = client.generate(
-    prompt="Modern SaaS landing page for a project management tool",
-    style="minimal",
-    pages=["home", "pricing", "about"],
-    framework="nextjs",
-)
-
-print(site.url)         # https://my-site.zoobicon.app
-print(site.preview_url) # https://preview.zoobicon.io/abc123`,
   },
   {
-    id: "chat",
-    label: "Edit with AI",
+    id: "domain",
+    label: "Add Domain",
     method: "POST",
-    endpoint: "/api/chat",
-    curl: `curl -N -X POST https://api.zoobicon.io/v1/chat \\
+    code: `curl -X POST https://api.zoobicon.io/v1/email/domains \\
   -H "Authorization: Bearer zbk_live_abc123..." \\
-  -H "Accept: text/event-stream" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "site_id": "site_abc123",
-    "message": "Change the hero background to a gradient and add a CTA button",
-    "stream": true
+    "domain": "yourdomain.com",
+    "email": "you@yourdomain.com"
   }'
 
-# Response (Server-Sent Events):
-# data: {"type":"delta","content":"Updating hero section..."}
-# data: {"type":"delta","content":"Adding gradient background..."}
-# data: {"type":"delta","content":"Inserting CTA button..."}
-# data: {"type":"done","site_url":"https://my-site.zoobicon.app"}`,
-    javascript: `import { Zoobicon } from "@zoobicon/sdk";
-
-const zb = new Zoobicon("zbk_live_abc123...");
-
-const stream = await zb.chat({
-  siteId: "site_abc123",
-  message: "Change the hero background to a gradient and add a CTA button",
-  stream: true,
-});
-
-for await (const event of stream) {
-  if (event.type === "delta") {
-    process.stdout.write(event.content);
-  }
-  if (event.type === "done") {
-    console.log("\\nUpdated:", event.siteUrl);
-  }
-}`,
-    python: `import zoobicon
-
-client = zoobicon.Client("zbk_live_abc123...")
-
-stream = client.chat(
-    site_id="site_abc123",
-    message="Change the hero background to a gradient and add a CTA button",
-    stream=True,
-)
-
-for event in stream:
-    if event.type == "delta":
-        print(event.content, end="", flush=True)
-    if event.type == "done":
-        print(f"\\nUpdated: {event.site_url}")`,
+# Returns DNS records to configure:
+# SPF, DKIM (3 selectors), DMARC — all auto-generated`,
   },
   {
-    id: "export",
-    label: "Export to WordPress",
+    id: "register",
+    label: "Register Domain",
     method: "POST",
-    endpoint: "/api/export/wordpress",
-    curl: `curl -X POST https://api.zoobicon.io/v1/export/wordpress \\
+    code: `curl -X POST https://api.zoobicon.io/v1/domains/register \\
   -H "Authorization: Bearer zbk_live_abc123..." \\
   -H "Content-Type: application/json" \\
   -d '{
-    "site_id": "site_abc123",
-    "wordpress_url": "https://mysite.com",
-    "username": "admin",
-    "app_password": "xxxx xxxx xxxx xxxx",
-    "include_media": true
+    "domain": "myawesomesite.com",
+    "period": 1,
+    "privacyProtection": true,
+    "registrant": {
+      "firstName": "Jane",
+      "lastName": "Doe",
+      "email": "jane@example.com",
+      "phone": "+1.5555551234",
+      "address1": "123 Main St",
+      "city": "Austin",
+      "state": "TX",
+      "postalCode": "78701",
+      "country": "US"
+    }
   }'`,
-    javascript: `import { Zoobicon } from "@zoobicon/sdk";
-
-const zb = new Zoobicon("zbk_live_abc123...");
-
-const result = await zb.export.wordpress({
-  siteId: "site_abc123",
-  wordpressUrl: "https://mysite.com",
-  username: "admin",
-  appPassword: "xxxx xxxx xxxx xxxx",
-  includeMedia: true,
-});
-
-console.log(result.status);  // "exported"
-console.log(result.pages);   // 5 pages exported`,
-    python: `import zoobicon
-
-client = zoobicon.Client("zbk_live_abc123...")
-
-result = client.export.wordpress(
-    site_id="site_abc123",
-    wordpress_url="https://mysite.com",
-    username="admin",
-    app_password="xxxx xxxx xxxx xxxx",
-    include_media=True,
-)
-
-print(result.status)  # "exported"
-print(result.pages)   # 5 pages exported`,
   },
   {
-    id: "seo",
-    label: "SEO Analysis",
-    method: "POST",
-    endpoint: "/api/seo/analyze",
-    curl: `curl -X POST https://api.zoobicon.io/v1/seo/analyze \\
-  -H "Authorization: Bearer zbk_live_abc123..." \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "site_id": "site_abc123",
-    "checks": ["meta", "performance", "accessibility", "keywords"],
-    "competitors": ["competitor1.com", "competitor2.com"]
-  }'`,
-    javascript: `import { Zoobicon } from "@zoobicon/sdk";
+    id: "analytics",
+    label: "Email Analytics",
+    method: "GET",
+    code: `curl https://api.zoobicon.io/v1/email/analytics?domain=yourdomain.com&period=30d \\
+  -H "Authorization: Bearer zbk_live_abc123..."
 
-const zb = new Zoobicon("zbk_live_abc123...");
-
-const report = await zb.seo.analyze({
-  siteId: "site_abc123",
-  checks: ["meta", "performance", "accessibility", "keywords"],
-  competitors: ["competitor1.com", "competitor2.com"],
-});
-
-console.log(report.score);          // 94
-console.log(report.suggestions);    // [{...}, {...}]
-console.log(report.competitorGap);  // keyword opportunities`,
-    python: `import zoobicon
-
-client = zoobicon.Client("zbk_live_abc123...")
-
-report = client.seo.analyze(
-    site_id="site_abc123",
-    checks=["meta", "performance", "accessibility", "keywords"],
-    competitors=["competitor1.com", "competitor2.com"],
-)
-
-print(report.score)           # 94
-print(report.suggestions)     # [{...}, {...}]
-print(report.competitor_gap)  # keyword opportunities`,
-  },
-  {
-    id: "translate",
-    label: "Translate",
-    method: "POST",
-    endpoint: "/api/translate",
-    curl: `curl -X POST https://api.zoobicon.io/v1/translate \\
-  -H "Authorization: Bearer zbk_live_abc123..." \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "site_id": "site_abc123",
-    "target_languages": ["es", "fr", "de", "ja"],
-    "preserve_seo": true,
-    "localize_images": true
-  }'`,
-    javascript: `import { Zoobicon } from "@zoobicon/sdk";
-
-const zb = new Zoobicon("zbk_live_abc123...");
-
-const result = await zb.translate({
-  siteId: "site_abc123",
-  targetLanguages: ["es", "fr", "de", "ja"],
-  preserveSeo: true,
-  localizeImages: true,
-});
-
-console.log(result.translations); // { es: "https://...", fr: "https://..." }
-console.log(result.wordCount);    // 12,450 words translated`,
-    python: `import zoobicon
-
-client = zoobicon.Client("zbk_live_abc123...")
-
-result = client.translate(
-    site_id="site_abc123",
-    target_languages=["es", "fr", "de", "ja"],
-    preserve_seo=True,
-    localize_images=True,
-)
-
-print(result.translations)  # {"es": "https://...", "fr": "https://..."}
-print(result.word_count)    # 12,450 words translated`,
+# Response:
+# {
+#   "stats": { "sent": 12450, "delivered": 12301, "opened": 4892 },
+#   "rates": {
+#     "deliveryRate": "98.8%",
+#     "openRate": "39.8%",
+#     "bounceRate": "0.4%"
+#   }
+# }`,
   },
 ];
 
-const SDK_CARDS = [
+/* ─── Features ─── */
+
+const EMAIL_FEATURES = [
   {
-    icon: Code2,
-    title: "JavaScript / TypeScript SDK",
-    install: "npm install @zoobicon/sdk  (coming soon)",
+    icon: Send,
+    title: "Transactional Email API",
+    description:
+      "Send via REST API or SMTP relay. Automatic retry, queuing, and throttling. $0.10 per 1,000 emails.",
+    color: "text-blue-400",
+    border: "border-blue-500/20",
+  },
+  {
+    icon: Inbox,
+    title: "Email Receiving & Routing",
+    description:
+      "Receive email on your domain. Forward, store, or process with webhooks. Catch-all and per-address rules.",
+    color: "text-green-400",
+    border: "border-green-500/20",
+  },
+  {
+    icon: Shield,
+    title: "Auto Authentication",
     description:
       "Full-featured SDK with TypeScript types, streaming support, and automatic retries. Coming soon.",
     color: "text-yellow-400",
@@ -289,9 +273,8 @@ const SDK_CARDS = [
     bgGlow: "bg-yellow-500/8",
   },
   {
-    icon: Terminal,
-    title: "Python SDK",
-    install: "pip install zoobicon  (coming soon)",
+    icon: Bot,
+    title: "AI Deliverability Agent",
     description:
       "Pythonic interface with async support, Pydantic models, and comprehensive type hints. Coming soon.",
     color: "text-blue-400",
@@ -299,9 +282,27 @@ const SDK_CARDS = [
     bgGlow: "bg-blue-500/8",
   },
   {
+    icon: BarChart3,
+    title: "Real-Time Analytics",
+    description:
+      "Track sends, deliveries, opens, clicks, bounces, and complaints. Webhooks for every event.",
+    color: "text-cyan-400",
+    border: "border-cyan-500/20",
+  },
+  {
+    icon: Users,
+    title: "Mailbox Hosting",
+    description:
+      "Create mailboxes on your domain. info@, support@, hello@ — with forwarding, auto-reply, and 1GB storage.",
+    color: "text-pink-400",
+    border: "border-pink-500/20",
+  },
+];
+
+const DOMAIN_FEATURES = [
+  {
     icon: Globe,
-    title: "REST API",
-    install: "https://api.zoobicon.io/v1",
+    title: "Domain Registration",
     description:
       "Direct HTTP calls with JSON. OpenAPI 3.1 spec available. Works with any language.",
     color: "text-brand-400",
@@ -309,9 +310,8 @@ const SDK_CARDS = [
     bgGlow: "bg-green-500/8",
   },
   {
-    icon: Terminal,
-    title: "CLI",
-    install: "npm install -g zoobicon-cli",
+    icon: Lock,
+    title: "Free WHOIS Privacy",
     description:
       "Generate, deploy, and manage sites from your terminal. Perfect for scripting and automation.",
     color: "text-blue-400",
@@ -319,9 +319,8 @@ const SDK_CARDS = [
     bgGlow: "bg-blue-500/8",
   },
   {
-    icon: GitBranch,
-    title: "GitHub Actions",
-    install: "zoobicon/deploy-action@v1  (coming soon)",
+    icon: Server,
+    title: "DNS Management",
     description:
       "Auto-deploy on push. Preview environments for PRs. Full CI/CD integration. Coming soon.",
     color: "text-gray-300",
@@ -329,9 +328,8 @@ const SDK_CARDS = [
     bgGlow: "bg-gray-500/8",
   },
   {
-    icon: Webhook,
-    title: "Webhooks",
-    install: "POST your-endpoint.com/webhook",
+    icon: Zap,
+    title: "One-Click Email Setup",
     description:
       "Real-time notifications for build completion, deployment, SEO alerts, and more.",
     color: "text-orange-400",
@@ -340,94 +338,73 @@ const SDK_CARDS = [
   },
 ];
 
-const PRICING_TIERS = [
+/* ─── Pricing ─── */
+
+const PRICING = [
   {
-    name: "Free",
+    name: "Starter",
     price: "$0",
     period: "/mo",
-    generations: "50 generations/month",
-    rateLimit: "20 req/min",
+    description: "For personal projects",
     features: [
-      "Community support",
+      "1,000 emails/month",
+      "1 domain",
+      "2 mailboxes",
       "Basic analytics",
-      "Single project",
-      "Zoobicon subdomain",
+      "Community support",
     ],
     cta: "Start Free",
     highlight: false,
   },
   {
-    name: "Pro",
-    price: "$49",
+    name: "Growth",
+    price: "$25",
     period: "/mo",
-    generations: "1,000 generations/month",
-    rateLimit: "120 req/min",
+    description: "For growing businesses",
     features: [
+      "50,000 emails/month",
+      "10 domains",
+      "25 mailboxes",
+      "Full analytics + webhooks",
+      "AI deliverability agent",
       "Priority support",
-      "Advanced analytics",
-      "Unlimited projects",
-      "Custom domains",
-      "Webhooks",
-      "Team access (5 seats)",
+      "Custom DKIM signing",
     ],
-    cta: "Upgrade to Pro",
+    cta: "Start Growing",
     highlight: true,
   },
   {
-    name: "Enterprise",
-    price: "Custom",
-    period: "",
-    generations: "Unlimited generations",
-    rateLimit: "Dedicated infrastructure",
+    name: "Scale",
+    price: "$99",
+    period: "/mo",
+    description: "For high-volume senders",
     features: [
-      "Dedicated support",
+      "500,000 emails/month",
+      "Unlimited domains",
+      "Unlimited mailboxes",
+      "Dedicated IP pool",
+      "AI deliverability + abuse detection",
       "SLA guarantee",
-      "Unlimited everything",
-      "Custom integrations",
       "Dedicated account manager",
+      "Domain reseller API",
     ],
     cta: "Contact Sales",
     highlight: false,
   },
 ];
 
-const USE_CASES = [
-  {
-    icon: Building2,
-    title: "Bulk Website Generation",
-    description:
-      "Agencies can generate hundreds of client sites programmatically from templates or prompts.",
-  },
-  {
-    icon: GitBranch,
-    title: "CI/CD Automated Deployment",
-    description:
-      "Push to main and auto-deploy. Preview environments on every PR. Rollback in seconds.",
-  },
-  {
-    icon: Paintbrush,
-    title: "White-Label Integration",
-    description:
-      "Embed Zoobicon's builder in your own platform. Full customization, your branding.",
-  },
-  {
-    icon: Layers,
-    title: "Headless CMS + AI Generation",
-    description:
-      "Use your CMS content with AI to auto-generate and update website pages.",
-  },
-  {
-    icon: Search,
-    title: "Automated SEO Pipeline",
-    description:
-      "Continuously analyze, optimize, and track SEO performance across all your sites.",
-  },
-  {
-    icon: Languages,
-    title: "Multi-Language Deployment",
-    description:
-      "Deploy sites in 30+ languages simultaneously with SEO-optimized translations.",
-  },
+/* ─── Comparison ─── */
+
+const COMPARISON = [
+  { feature: "Transactional Email API", zoobicon: true, mailgun: true, sendgrid: true },
+  { feature: "Domain Registration", zoobicon: true, mailgun: false, sendgrid: false },
+  { feature: "AI Deliverability Agent", zoobicon: true, mailgun: false, sendgrid: false },
+  { feature: "Auto SPF/DKIM/DMARC Setup", zoobicon: true, mailgun: false, sendgrid: false },
+  { feature: "Mailbox Hosting", zoobicon: true, mailgun: false, sendgrid: false },
+  { feature: "Website Builder Integration", zoobicon: true, mailgun: false, sendgrid: false },
+  { feature: "Site Hosting", zoobicon: true, mailgun: false, sendgrid: false },
+  { feature: "Free WHOIS Privacy", zoobicon: true, mailgun: false, sendgrid: false },
+  { feature: "Starting Price", zoobicon: "Free", mailgun: "$35/mo", sendgrid: "$19.95/mo" },
 ];
 
 /* ─── Helper Components ─── */
@@ -464,15 +441,11 @@ function CodeBlock({ code, language }: { code: string; language: string }) {
 
 export default function ZoobiconIOPage() {
   const [activeExample, setActiveExample] = useState(0);
-  const [activeLang, setActiveLang] = useState<"curl" | "javascript" | "python">("curl");
-
-  const example = API_EXAMPLES[activeExample];
 
   return (
     <div className="min-h-screen bg-[#0d1525] text-white overflow-hidden">
       {/* ─── Hero ─── */}
-      <section className="relative pt-32 pb-24 px-4">
-        {/* Grid background */}
+      <section className="relative pt-36 pb-24 px-4">
         <div className="absolute inset-0 bg-[linear-gradient(rgba(37,99,235,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(37,99,235,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-brand-500/8 rounded-full blur-[120px]" />
 
@@ -482,44 +455,52 @@ export default function ZoobiconIOPage() {
           animate="visible"
           variants={staggerContainer}
         >
-          <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-brand-500/30 bg-brand-500/5 text-brand-400 text-sm font-mono mb-8">
-            <Terminal className="w-4 h-4" />
-            Developer Platform
+          <motion.div
+            variants={fadeInUp}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-brand-500/30 bg-brand-500/5 text-brand-400 text-sm font-mono mb-8"
+          >
+            <Mail className="w-4 h-4" />
+            Email Infrastructure + Domain Registration
           </motion.div>
 
           <motion.h1
             variants={fadeInUp}
             className="text-5xl md:text-7xl font-bold tracking-tight mb-6"
           >
-            <span className="gradient-text">Zoobicon.io</span>
+            <span className="gradient-text">Your email.</span>
             <br />
-            <span className="text-white/90">The Developer Platform</span>
+            <span className="gradient-text">Your domain.</span>
+            <br />
+            <span className="text-white/90">Your platform.</span>
           </motion.h1>
 
           <motion.p
             variants={fadeInUp}
             className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-10 leading-relaxed"
           >
-            REST API, SDKs, webhooks, and CI/CD integrations.
-            <br className="hidden md:block" />
-            Build AI-powered websites programmatically at scale.
+            Register domains, send transactional email, host mailboxes, and
+            monitor deliverability — all from one platform. AI handles the
+            hard parts so you don&apos;t need a team.
           </motion.p>
 
-          <motion.div variants={fadeInUp} className="flex flex-wrap justify-center gap-4">
+          <motion.div
+            variants={fadeInUp}
+            className="flex flex-wrap justify-center gap-4 mb-16"
+          >
             <Link
-              href="/auth/settings"
-              className="btn-gradient inline-flex items-center gap-2 px-6 py-3 text-white font-semibold rounded-lg"
+              href="/auth/signup"
+              className="btn-gradient inline-flex items-center gap-2 px-8 py-4 text-white font-bold rounded-xl text-lg"
             >
-              Get Your API Key
-              <Key className="w-4 h-4" />
+              Start Free
+              <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
               href="/developers"
               className="inline-flex items-center gap-2 px-6 py-3 border border-white/15 hover:border-white/20 bg-white/8 hover:bg-white/10 rounded-lg transition-colors font-mono text-sm"
             >
-              $ zoobicon --docs
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+              View API Docs
+              <Code2 className="w-5 h-5" />
+            </a>
           </motion.div>
 
           {/* Quick install */}
@@ -533,8 +514,8 @@ export default function ZoobiconIOPage() {
         </motion.div>
       </section>
 
-      {/* ─── API Showcase ─── */}
-      <section className="relative py-24 px-4">
+      {/* ─── Email Features ─── */}
+      <section id="email" className="relative py-24 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial="hidden"
@@ -543,8 +524,228 @@ export default function ZoobiconIOPage() {
             variants={staggerContainer}
             className="text-center mb-16"
           >
-            <motion.h2 variants={fadeInUp} className="text-3xl md:text-4xl font-bold mb-4">
-              <span className="text-brand-400">API</span> Showcase
+            <motion.h2
+              variants={fadeInUp}
+              className="text-3xl md:text-4xl font-bold mb-4"
+            >
+              Email Infrastructure{" "}
+              <span className="text-brand-400">That Just Works</span>
+            </motion.h2>
+            <motion.p
+              variants={fadeInUp}
+              className="text-gray-400 max-w-2xl mx-auto"
+            >
+              Send, receive, and monitor email on your own domain. AI handles
+              authentication, deliverability, and abuse detection automatically.
+            </motion.p>
+          </motion.div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-5"
+          >
+            {EMAIL_FEATURES.map((feature) => (
+              <motion.div
+                key={feature.title}
+                variants={scaleIn}
+                className={`relative group p-6 rounded-xl border ${feature.border} bg-white/[0.01] hover:bg-white/[0.03] transition-all`}
+              >
+                <div
+                  className={`w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center mb-4`}
+                >
+                  <feature.icon className={`w-5 h-5 ${feature.color}`} />
+                </div>
+                <h3 className="font-semibold text-white mb-2">
+                  {feature.title}
+                </h3>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  {feature.description}
+                </p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ─── How It Works ─── */}
+      <section className="relative py-24 px-4">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(37,99,235,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(37,99,235,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
+
+        <div className="relative max-w-4xl mx-auto">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+            className="text-center mb-16"
+          >
+            <motion.h2
+              variants={fadeInUp}
+              className="text-3xl md:text-4xl font-bold mb-4"
+            >
+              Sending in{" "}
+              <span className="text-brand-400">Under 5 Minutes</span>
+            </motion.h2>
+          </motion.div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+            className="space-y-8"
+          >
+            {[
+              {
+                step: "1",
+                title: "Add your domain",
+                desc: "Enter your domain name. We generate all required DNS records (SPF, DKIM, DMARC) automatically.",
+                icon: Globe,
+              },
+              {
+                step: "2",
+                title: "Configure DNS",
+                desc: "Copy the generated records to your DNS provider. Or if you registered through us, it's already done.",
+                icon: Shield,
+              },
+              {
+                step: "3",
+                title: "Start sending",
+                desc: "Use the REST API or SMTP relay to send. AI monitors deliverability in real-time.",
+                icon: Send,
+              },
+            ].map((item) => (
+              <motion.div
+                key={item.step}
+                variants={fadeInUp}
+                className="flex gap-5 items-start"
+              >
+                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center font-mono text-brand-400 font-bold text-lg">
+                  {item.step}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <item.icon className="w-4 h-4 text-brand-400" />
+                    <h3 className="font-semibold text-white">{item.title}</h3>
+                  </div>
+                  <p className="text-sm text-gray-400">{item.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ─── Domain Registration ─── */}
+      <section id="domains" className="relative py-24 px-4">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+            className="text-center mb-16"
+          >
+            <motion.h2
+              variants={fadeInUp}
+              className="text-3xl md:text-4xl font-bold mb-4"
+            >
+              Domain Registration{" "}
+              <span className="text-brand-400">+ Email in One Place</span>
+            </motion.h2>
+            <motion.p
+              variants={fadeInUp}
+              className="text-gray-400 max-w-2xl mx-auto"
+            >
+              Register your domain and get email set up in a single flow. No
+              separate registrar, no manual DNS configuration.
+            </motion.p>
+          </motion.div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+            className="grid md:grid-cols-2 lg:grid-cols-4 gap-5"
+          >
+            {DOMAIN_FEATURES.map((feature) => (
+              <motion.div
+                key={feature.title}
+                variants={scaleIn}
+                className="p-6 rounded-xl border border-white/5 bg-white/[0.01] hover:border-brand-500/20 hover:bg-brand-500/[0.02] transition-all"
+              >
+                <div className="w-10 h-10 rounded-lg bg-brand-500/10 border border-brand-500/20 flex items-center justify-center mb-4">
+                  <feature.icon className="w-5 h-5 text-brand-400" />
+                </div>
+                <h3 className="font-semibold text-white mb-2">
+                  {feature.title}
+                </h3>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  {feature.description}
+                </p>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* TLD pricing preview */}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={fadeInUp}
+            className="mt-12 max-w-3xl mx-auto"
+          >
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {[
+                { tld: ".com", price: "$12.99" },
+                { tld: ".io", price: "$39.99" },
+                { tld: ".ai", price: "$79.99" },
+                { tld: ".dev", price: "$14.99" },
+                { tld: ".sh", price: "$24.99" },
+                { tld: ".co", price: "$29.99" },
+                { tld: ".org", price: "$11.99" },
+                { tld: ".xyz", price: "$9.99" },
+              ].map((item) => (
+                <div
+                  key={item.tld}
+                  className="flex items-center justify-between px-4 py-3 bg-white/[0.02] border border-white/5 rounded-lg"
+                >
+                  <span className="font-mono text-white font-semibold">
+                    {item.tld}
+                  </span>
+                  <span className="text-brand-400 text-sm font-semibold">
+                    {item.price}/yr
+                  </span>
+                </div>
+              ))}
+            </div>
+            <p className="text-center text-gray-600 text-xs mt-3">
+              100+ TLDs available. All include free WHOIS privacy.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ─── API Showcase ─── */}
+      <section id="api" className="relative py-24 px-4">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+            className="text-center mb-16"
+          >
+            <motion.h2
+              variants={fadeInUp}
+              className="text-3xl md:text-4xl font-bold mb-4"
+            >
+              Developer-First{" "}
+              <span className="text-brand-400">REST API</span>
             </motion.h2>
             <motion.p variants={fadeInUp} className="text-gray-300 max-w-2xl mx-auto">
               Powerful endpoints for every step of the website lifecycle. Generate, edit, analyze, translate, and export — all through simple API calls.
@@ -569,7 +770,9 @@ export default function ZoobiconIOPage() {
                       : "bg-white/8 text-gray-300 border border-white/10 hover:border-white/15 hover:text-gray-300"
                   }`}
                 >
-                  <span className="text-xs font-bold mr-2 opacity-60">{ex.method}</span>
+                  <span className="text-xs font-bold mr-2 opacity-60">
+                    {ex.method}
+                  </span>
                   {ex.label}
                 </button>
               ))}
@@ -603,28 +806,98 @@ export default function ZoobiconIOPage() {
                   ))}
                 </div>
               </div>
+              <pre className="overflow-x-auto p-5 text-sm leading-relaxed font-mono text-gray-300">
+                <code>{API_EXAMPLES[activeExample].code}</code>
+              </pre>
+            </div>
 
-              <CodeBlock
-                code={example[activeLang]}
-                language={activeLang}
-              />
+            {/* API endpoints summary */}
+            <div className="mt-8 grid md:grid-cols-2 gap-3">
+              {[
+                {
+                  method: "POST",
+                  path: "/api/email/send",
+                  desc: "Send transactional or marketing email",
+                },
+                {
+                  method: "POST",
+                  path: "/api/email/domains",
+                  desc: "Add domain with auto SPF/DKIM/DMARC",
+                },
+                {
+                  method: "POST",
+                  path: "/api/email/mailboxes",
+                  desc: "Create mailboxes on your domain",
+                },
+                {
+                  method: "GET",
+                  path: "/api/email/analytics",
+                  desc: "Delivery stats, opens, clicks, bounces",
+                },
+                {
+                  method: "POST",
+                  path: "/api/email/inbound",
+                  desc: "Receive email via webhook",
+                },
+                {
+                  method: "GET",
+                  path: "/api/domains/search",
+                  desc: "Search domain availability + pricing",
+                },
+                {
+                  method: "POST",
+                  path: "/api/domains/register",
+                  desc: "Register, renew, transfer domains",
+                },
+                {
+                  method: "GET",
+                  path: "/api/domains/manage",
+                  desc: "WHOIS, pricing, domain management",
+                },
+              ].map((endpoint) => (
+                <div
+                  key={endpoint.path}
+                  className="flex items-center gap-3 px-4 py-3 bg-white/[0.02] border border-white/5 rounded-lg"
+                >
+                  <span
+                    className={`text-xs font-mono font-bold px-2 py-0.5 rounded ${
+                      endpoint.method === "POST"
+                        ? "bg-green-500/10 text-green-400"
+                        : "bg-blue-500/10 text-blue-400"
+                    }`}
+                  >
+                    {endpoint.method}
+                  </span>
+                  <span className="font-mono text-sm text-gray-300 flex-1">
+                    {endpoint.path}
+                  </span>
+                  <span className="text-xs text-gray-600 hidden lg:block">
+                    {endpoint.desc}
+                  </span>
+                </div>
+              ))}
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* ─── SDK Cards ─── */}
+      {/* ─── Comparison Table ─── */}
       <section className="relative py-24 px-4">
-        <div className="max-w-6xl mx-auto">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(37,99,235,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(37,99,235,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
+
+        <div className="relative max-w-4xl mx-auto">
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-100px" }}
             variants={staggerContainer}
-            className="text-center mb-16"
+            className="text-center mb-12"
           >
-            <motion.h2 variants={fadeInUp} className="text-3xl md:text-4xl font-bold mb-4">
-              SDKs & <span className="text-brand-400">Integrations</span>
+            <motion.h2
+              variants={fadeInUp}
+              className="text-3xl md:text-4xl font-bold mb-4"
+            >
+              Why <span className="text-brand-400">Zoobicon.io</span>?
             </motion.h2>
             <motion.p variants={fadeInUp} className="text-gray-300 max-w-2xl mx-auto">
               First-class support for every workflow. Choose your language, your tools, your way.
@@ -635,8 +908,8 @@ export default function ZoobiconIOPage() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-5"
+            variants={fadeInUp}
+            className="border border-white/10 rounded-xl overflow-hidden"
           >
             {SDK_CARDS.map((sdk) => (
               <motion.div
@@ -658,11 +931,9 @@ export default function ZoobiconIOPage() {
         </div>
       </section>
 
-      {/* ─── Rate Limits & Pricing ─── */}
-      <section className="relative py-24 px-4">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(37,99,235,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(37,99,235,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
-
-        <div className="relative max-w-5xl mx-auto">
+      {/* ─── Pricing ─── */}
+      <section id="pricing" className="relative py-24 px-4">
+        <div className="max-w-5xl mx-auto">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -670,8 +941,12 @@ export default function ZoobiconIOPage() {
             variants={staggerContainer}
             className="text-center mb-16"
           >
-            <motion.h2 variants={fadeInUp} className="text-3xl md:text-4xl font-bold mb-4">
-              Rate Limits & <span className="text-brand-400">Pricing</span>
+            <motion.h2
+              variants={fadeInUp}
+              className="text-3xl md:text-4xl font-bold mb-4"
+            >
+              Simple, <span className="text-brand-400">Transparent</span>{" "}
+              Pricing
             </motion.h2>
             <motion.p variants={fadeInUp} className="text-gray-300 max-w-2xl mx-auto">
               Transparent pricing. No hidden fees. Scale as you grow.
@@ -685,7 +960,7 @@ export default function ZoobiconIOPage() {
             variants={staggerContainer}
             className="grid md:grid-cols-3 gap-6"
           >
-            {PRICING_TIERS.map((tier) => (
+            {PRICING.map((tier) => (
               <motion.div
                 key={tier.name}
                 variants={scaleIn}
@@ -700,7 +975,8 @@ export default function ZoobiconIOPage() {
                     Most Popular
                   </div>
                 )}
-                <h3 className="text-xl font-bold mb-2">{tier.name}</h3>
+                <h3 className="text-xl font-bold mb-1">{tier.name}</h3>
+                <p className="text-sm text-gray-500 mb-4">{tier.description}</p>
                 <div className="flex items-baseline gap-1 mb-6">
                   <span className="text-4xl font-bold text-brand-400">{tier.price}</span>
                   <span className="text-gray-300 text-sm">{tier.period}</span>
@@ -727,7 +1003,9 @@ export default function ZoobiconIOPage() {
                 </ul>
 
                 <Link
-                  href={tier.name === "Enterprise" ? "/contact" : "/auth/settings"}
+                  href={
+                    tier.name === "Scale" ? "/support" : "/auth/signup"
+                  }
                   className={`block w-full text-center py-3 rounded-lg font-semibold text-sm transition-colors ${
                     tier.highlight
                       ? "btn-gradient text-white"
@@ -739,17 +1017,13 @@ export default function ZoobiconIOPage() {
               </motion.div>
             ))}
           </motion.div>
-        </div>
-      </section>
 
-      {/* ─── Authentication ─── */}
-      <section className="relative py-24 px-4">
-        <div className="max-w-4xl mx-auto">
-          <motion.div
+          <motion.p
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            className="text-center text-gray-600 text-sm mt-8"
           >
             <motion.div variants={fadeInUp} className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -830,18 +1104,22 @@ export default function ZoobiconIOPage() {
         </div>
       </section>
 
-      {/* ─── Use Cases Grid ─── */}
+      {/* ─── Platform Integration ─── */}
       <section className="relative py-24 px-4">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-100px" }}
             variants={staggerContainer}
-            className="text-center mb-16"
+            className="text-center mb-12"
           >
-            <motion.h2 variants={fadeInUp} className="text-3xl md:text-4xl font-bold mb-4">
-              Built for <span className="text-brand-400">Every Workflow</span>
+            <motion.h2
+              variants={fadeInUp}
+              className="text-3xl md:text-4xl font-bold mb-4"
+            >
+              Part of the{" "}
+              <span className="text-brand-400">Zoobicon Platform</span>
             </motion.h2>
             <motion.p variants={fadeInUp} className="text-gray-300 max-w-2xl mx-auto">
               From solo developers to enterprise teams, the API adapts to your use case.
@@ -853,16 +1131,46 @@ export default function ZoobiconIOPage() {
             whileInView="visible"
             viewport={{ once: true, margin: "-100px" }}
             variants={staggerContainer}
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-5"
+            className="grid md:grid-cols-3 gap-6"
           >
-            {USE_CASES.map((useCase) => (
+            {[
+              {
+                domain: "zoobicon.ai",
+                tagline: "Build it",
+                desc: "AI website builder with 32+ generators, multi-page sites, and full-stack apps.",
+                href: "/ai",
+                icon: Bot,
+              },
+              {
+                domain: "zoobicon.sh",
+                tagline: "Host it",
+                desc: "Deploy to zoobicon.sh with CDN, SSL, and custom domains. One-click from the builder.",
+                href: "/sh",
+                icon: Server,
+              },
+              {
+                domain: "zoobicon.io",
+                tagline: "Email it",
+                desc: "Register domains, send email, host mailboxes. AI deliverability built in.",
+                href: "/io",
+                icon: Mail,
+                active: true,
+              },
+            ].map((platform) => (
               <motion.div
-                key={useCase.title}
+                key={platform.domain}
                 variants={scaleIn}
                 className="group p-6 rounded-xl border border-white/10 bg-white/[0.03] hover:border-brand-500/20 hover:bg-brand-500/[0.02] transition-all"
               >
-                <div className="w-10 h-10 rounded-lg bg-brand-500/10 border border-brand-500/20 flex items-center justify-center mb-4">
-                  <useCase.icon className="w-5 h-5 text-brand-400" />
+                <div className="flex items-center gap-3 mb-3">
+                  <platform.icon
+                    className={`w-5 h-5 ${
+                      platform.active ? "text-brand-400" : "text-gray-400"
+                    }`}
+                  />
+                  <span className="font-mono text-sm text-gray-400">
+                    {platform.domain}
+                  </span>
                 </div>
                 <h3 className="font-semibold text-white mb-2">{useCase.title}</h3>
                 <p className="text-sm text-gray-300 leading-relaxed">{useCase.description}</p>
@@ -884,36 +1192,45 @@ export default function ZoobiconIOPage() {
           variants={staggerContainer}
           className="relative max-w-3xl mx-auto text-center"
         >
-          <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand-500/30 bg-brand-500/5 text-brand-400 text-xs font-mono mb-8">
+          <motion.div
+            variants={fadeInUp}
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand-500/30 bg-brand-500/5 text-brand-400 text-xs font-mono mb-8"
+          >
             <Rocket className="w-3 h-3" />
-            Ready to ship?
+            Ready to own your email?
           </motion.div>
 
-          <motion.h2 variants={fadeInUp} className="text-4xl md:text-5xl font-bold mb-6">
-            Start building with the
+          <motion.h2
+            variants={fadeInUp}
+            className="text-4xl md:text-5xl font-bold mb-6"
+          >
+            Stop renting.
             <br />
-            <span className="text-brand-400">Zoobicon API</span> today
+            <span className="text-brand-400">Start owning.</span>
           </motion.h2>
 
           <motion.p variants={fadeInUp} className="text-gray-300 mb-10 text-lg">
             Free tier included. No credit card required.
             <br />
-            Go from zero to deployed in minutes.
+            No third-party lock-in. No per-seat pricing.
           </motion.p>
 
-          <motion.div variants={fadeInUp} className="flex flex-wrap justify-center gap-4">
+          <motion.div
+            variants={fadeInUp}
+            className="flex flex-wrap justify-center gap-4"
+          >
             <Link
-              href="/auth/settings"
-              className="btn-gradient inline-flex items-center gap-2 px-8 py-4 text-white font-bold rounded-lg text-lg"
+              href="/auth/signup"
+              className="btn-gradient inline-flex items-center gap-2 px-8 py-4 text-white font-bold rounded-xl text-lg"
             >
-              Get Your API Key
-              <Key className="w-5 h-5" />
+              Get Started Free
+              <Mail className="w-5 h-5" />
             </Link>
             <Link
               href="/developers"
               className="inline-flex items-center gap-2 px-8 py-4 border border-white/15 hover:border-brand-500/30 bg-white/8 hover:bg-white/10 rounded-lg transition-colors font-semibold"
             >
-              Read the Docs
+              API Documentation
               <ChevronRight className="w-5 h-5" />
             </Link>
           </motion.div>
@@ -924,6 +1241,125 @@ export default function ZoobiconIOPage() {
           </motion.div>
         </motion.div>
       </section>
+
+      {/* ─── Footer ─── */}
+      <footer className="border-t border-white/5 py-12 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Mail className="w-5 h-5 text-brand-400" />
+                <span className="font-bold">
+                  Zoobicon<span className="text-brand-400">.io</span>
+                </span>
+              </div>
+              <p className="text-sm text-gray-500">
+                Email infrastructure and domain registration platform. Part of
+                the Zoobicon ecosystem.
+              </p>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-white mb-3 text-sm">Email</h4>
+              <ul className="space-y-2 text-sm text-gray-500">
+                <li>
+                  <Link href="/io" className="hover:text-gray-300">
+                    Transactional API
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/io" className="hover:text-gray-300">
+                    Mailbox Hosting
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/io" className="hover:text-gray-300">
+                    Deliverability
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/io" className="hover:text-gray-300">
+                    Analytics
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-white mb-3 text-sm">
+                Domains
+              </h4>
+              <ul className="space-y-2 text-sm text-gray-500">
+                <li>
+                  <Link href="/io" className="hover:text-gray-300">
+                    Register Domain
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/io" className="hover:text-gray-300">
+                    Transfer Domain
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/io" className="hover:text-gray-300">
+                    DNS Management
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/io" className="hover:text-gray-300">
+                    TLD Pricing
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-white mb-3 text-sm">
+                Platform
+              </h4>
+              <ul className="space-y-2 text-sm text-gray-500">
+                <li>
+                  <Link href="/" className="hover:text-gray-300">
+                    zoobicon.com
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/ai" className="hover:text-gray-300">
+                    zoobicon.ai
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/sh" className="hover:text-gray-300">
+                    zoobicon.sh
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/developers" className="hover:text-gray-300">
+                    Developer Docs
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-sm text-gray-600">
+              &copy; {new Date().getFullYear()} Zoobicon. All rights reserved.
+            </p>
+            <div className="flex gap-6 text-sm text-gray-600">
+              <Link href="/privacy" className="hover:text-gray-400">
+                Privacy
+              </Link>
+              <Link href="/terms" className="hover:text-gray-400">
+                Terms
+              </Link>
+              <Link href="/support" className="hover:text-gray-400">
+                Support
+              </Link>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
