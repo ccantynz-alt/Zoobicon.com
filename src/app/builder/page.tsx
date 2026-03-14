@@ -70,6 +70,30 @@ import {
   History,
 } from "lucide-react";
 
+/** Sanitize raw API error messages for user display */
+function cleanErrorMessage(raw: string): string {
+  // Try to extract message from JSON error strings like {"type":"error","error":{"type":"rate_limit_error","message":"..."}}
+  try {
+    const parsed = JSON.parse(raw.replace(/^[^{]*/, "").replace(/[^}]*$/, ""));
+    const msg = parsed?.error?.message || parsed?.message;
+    if (msg) {
+      // Strip org IDs, request IDs, and docs URLs
+      return msg
+        .replace(/\s*\(org:\s*[^)]+\)/g, "")
+        .replace(/,?\s*model:\s*\S+/g, "")
+        .replace(/\.\s*For details,?\s*refer to:.*$/s, ".")
+        .replace(/\.\s*You can see the response.*$/s, ".")
+        .replace(/,?\s*"?request_id"?:\s*"?[^"}\s]+"?/g, "")
+        .trim();
+    }
+  } catch { /* not JSON */ }
+  // If it looks like a raw JSON blob, return a generic message
+  if (raw.includes('"type":"error"') || raw.includes('"rate_limit_error"')) {
+    return "AI service is busy. Please wait a moment and try again.";
+  }
+  return raw;
+}
+
 type BuildStatus = "idle" | "generating" | "editing" | "complete" | "error";
 type RightTab = "preview" | "code" | "seo";
 type ToolId =
@@ -557,7 +581,7 @@ function BuilderPage() {
           try {
             const errData = await res.clone().json();
             if (errData.error && (errData.error.includes("API_KEY") || errData.error.includes("not configured") || errData.error.includes("API key"))) {
-              setError(errData.error);
+              setError(cleanErrorMessage(errData.error));
               setStatus("error");
               return;
             }
@@ -639,7 +663,7 @@ function BuilderPage() {
               } else if (event.type === "error") {
                 // Clear empty/partial HTML so PreviewPanel shows error state, not "empty page detected"
                 setGeneratedCode("");
-                setError(event.message || "Stream error");
+                setError(cleanErrorMessage(event.message || "Stream error"));
                 setStatus("error");
                 return;
               }
@@ -752,7 +776,7 @@ function BuilderPage() {
         }
       } catch (err) {
         if ((err as Error).name === "AbortError") return;
-        setError(err instanceof Error ? err.message : "Something went wrong");
+        setError(cleanErrorMessage(err instanceof Error ? err.message : "Something went wrong"));
         setStatus("error");
       }
     },
@@ -887,9 +911,11 @@ function BuilderPage() {
       const errMsg = err instanceof Error ? err.message : String(err);
       console.error("[Generate] Failed:", errMsg);
       setGeneratedCode("");
-      setError(errMsg.includes("API_KEY") || errMsg.includes("not configured")
-        ? errMsg
-        : `Generation failed: ${errMsg}. Please try again.`);
+      setError(cleanErrorMessage(
+        errMsg.includes("API_KEY") || errMsg.includes("not configured")
+          ? errMsg
+          : `Generation failed: ${errMsg}. Please try again.`
+      ));
       setStatus("error");
     }
   }, [prompt, tier, autoReplaceImages, selectedModel]);

@@ -2,6 +2,35 @@ import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
 import { COMPONENT_LIBRARY_CSS } from "@/lib/component-library";
 
+/** Check if an error is a rate limit or overload that warrants model fallback */
+function isRetryableError(err: unknown): boolean {
+  if (err instanceof Anthropic.RateLimitError) return true;
+  if (err instanceof Anthropic.InternalServerError) return true;
+  const msg = err instanceof Error ? err.message : String(err);
+  return /rate.limit|overloaded|529|too many/i.test(msg);
+}
+
+/** Extract a user-friendly error message from Anthropic SDK errors */
+function friendlyError(err: unknown): string {
+  if (err instanceof Anthropic.AuthenticationError) {
+    return "AI service is temporarily unavailable. The site owner needs to update their API key.";
+  }
+  if (err instanceof Anthropic.RateLimitError) {
+    return "AI service is busy. Please wait a moment and try again.";
+  }
+  if (err instanceof Anthropic.InternalServerError) {
+    return "AI service is temporarily overloaded. Please try again in a moment.";
+  }
+  const msg = err instanceof Error ? err.message : String(err);
+  if (/rate.limit|too many/i.test(msg)) {
+    return "AI service is busy. Please wait a moment and try again.";
+  }
+  if (/api.key|auth/i.test(msg)) {
+    return "AI service is temporarily unavailable. The site owner needs to update their API key.";
+  }
+  return "Generation failed. Please try again.";
+}
+
 /**
  * POST /api/generate/quick — Primary generation endpoint (v2 architecture)
  *
@@ -435,13 +464,14 @@ Output the <config> block first, then the <body-html> block. Nothing else.`;
         try {
           let raw = "";
 
-          // Try primary model
+          // Try primary model, fall back to Sonnet on rate limit/overload
           try {
             raw = await generate(model, maxTokens, timeout);
           } catch (primaryErr) {
-            if (isPremium) {
-              console.warn(`[Quick] ${model} failed: ${primaryErr instanceof Error ? primaryErr.message : "unknown"}, falling back to Sonnet`);
-              sendEvent({ type: "status", message: "Using fast mode..." });
+            const canFallback = model !== "claude-sonnet-4-6" && isRetryableError(primaryErr);
+            if (canFallback) {
+              console.warn(`[Quick] ${model} failed (${primaryErr instanceof Error ? primaryErr.message : "unknown"}), falling back to Sonnet`);
+              sendEvent({ type: "status", message: "Switching to fast mode..." });
               raw = await generate("claude-sonnet-4-6", 16000, 90_000);
             } else {
               throw primaryErr;
@@ -546,8 +576,8 @@ Output the <config> block first, then the <body-html> block. Nothing else.`;
           const message = err instanceof Error ? err.message : "Generation error";
           console.error("[Quick] Error:", message);
 
-          // If primary failed entirely and this was premium, try full Sonnet fallback
-          if (isPremium && !message.includes("API_KEY")) {
+          // If primary failed and error is retryable, try Sonnet fallback (any tier)
+          if (isRetryableError(err) && model !== "claude-sonnet-4-6") {
             try {
               sendEvent({ type: "status", message: "Switching to fast mode..." });
               const fallbackRaw = await generate("claude-sonnet-4-6", 16000, 90_000);
@@ -570,7 +600,7 @@ Output the <config> block first, then the <body-html> block. Nothing else.`;
             }
           }
 
-          sendEvent({ type: "error", message });
+          sendEvent({ type: "error", message: friendlyError(err) });
           controller.close();
         }
       },
