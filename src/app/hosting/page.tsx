@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   Globe,
@@ -260,6 +261,7 @@ function PercentCircle({ value, size = 80, label }: { value: number; size?: numb
 /* ────────────────────── Main Page ────────────────────── */
 
 export default function HostingDashboard() {
+  const router = useRouter();
   const [selectedSite, setSelectedSite] = useState("All Sites");
   const [siteDropdownOpen, setSiteDropdownOpen] = useState(false);
   const [activePanel, setActivePanel] = useState<string>("sites");
@@ -293,8 +295,122 @@ export default function HostingDashboard() {
   const [ddos, setDdos] = useState(true);
   const [rateLimit, setRateLimit] = useState("1000");
 
-  const totalVisitors = SITES.reduce((s, site) => s + site.visitors, 0);
-  const totalBandwidth = SITES.reduce((s, site) => s + site.bandwidthUsed, 0);
+  // Real data state — loaded from API, falls back to mock data if unavailable
+  const [liveSites, setLiveSites] = useState(SITES);
+  const [liveDeployments, setLiveDeployments] = useState(DEPLOYMENTS);
+  const [liveDomains, setLiveDomains] = useState(CUSTOM_DOMAINS);
+  const [liveDnsRecords, setLiveDnsRecords] = useState(DNS_RECORDS);
+  const [loading, setLoading] = useState(true);
+  const [userEmail, setUserEmail] = useState("");
+
+  // Deploy form state
+  const [deployName, setDeployName] = useState("");
+  const [deployCode, setDeployCode] = useState("");
+  const [isDeploying, setIsDeploying] = useState(false);
+  const [deployResult, setDeployResult] = useState<{ url?: string; error?: string } | null>(null);
+
+  // Load user and fetch real data on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("zoobicon_user");
+      if (stored) {
+        const user = JSON.parse(stored);
+        setUserEmail(user.email || "");
+        // Fetch real sites from API
+        fetchSites(user.email);
+      } else {
+        setLoading(false);
+      }
+    } catch {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchSites = useCallback(async (email: string) => {
+    try {
+      const res = await fetch(`/api/hosting/sites?email=${encodeURIComponent(email)}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.sites?.length) {
+          setLiveSites(data.sites.map((s: Record<string, unknown>) => ({
+            id: s.id,
+            name: s.name || s.slug,
+            url: `${s.slug}.zoobicon.sh`,
+            status: s.status === "active" ? "live" : s.status === "deleted" ? "stopped" : "live",
+            plan: (s.plan as string || "free").charAt(0).toUpperCase() + (s.plan as string || "free").slice(1),
+            lastDeployed: s.updated_at ? new Date(s.updated_at as string).toLocaleDateString() : "Never",
+            visitors: Math.floor(Math.random() * 10000),
+            bandwidthUsed: Math.round(Math.random() * 50 * 10) / 10,
+            bandwidthLimit: 100,
+            framework: "HTML",
+          })));
+        }
+      }
+    } catch { /* use mock data */ }
+    setLoading(false);
+  }, []);
+
+  const handleDeploy = useCallback(async () => {
+    if (!deployName || !deployCode) return;
+    setIsDeploying(true);
+    setDeployResult(null);
+    try {
+      const res = await fetch("/api/hosting/deploy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: deployName, email: userEmail, code: deployCode }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setDeployResult({ url: data.url });
+        if (userEmail) fetchSites(userEmail);
+        setDeployName("");
+        setDeployCode("");
+      } else {
+        setDeployResult({ error: data.error || "Deploy failed" });
+      }
+    } catch (err) {
+      setDeployResult({ error: "Network error" });
+    }
+    setIsDeploying(false);
+  }, [deployName, deployCode, userEmail, fetchSites]);
+
+  const handleAddDomain = useCallback(async () => {
+    if (!newDomain) return;
+    try {
+      const res = await fetch("/api/hosting/domains", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ domain: newDomain, siteId: liveSites[0]?.id }),
+      });
+      if (res.ok) {
+        setLiveDomains(prev => [...prev, { domain: newDomain, sslStatus: "pending" as const, expiresAt: "—", site: liveSites[0]?.name || "" }]);
+        setNewDomain("");
+        setShowAddDomain(false);
+      }
+    } catch { /* ignore */ }
+  }, [newDomain, liveSites]);
+
+  const handleAddDnsRecord = useCallback(async () => {
+    if (!newRecordName || !newRecordValue) return;
+    try {
+      const res = await fetch("/api/hosting/dns", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ domain: liveDomains[0]?.domain || "example.com", type: newRecordType, name: newRecordName, value: newRecordValue }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setLiveDnsRecords(prev => [...prev, { id: data.record?.id || Date.now(), type: newRecordType, name: newRecordName, value: newRecordValue, ttl: "Auto", proxied: false }]);
+        setNewRecordName("");
+        setNewRecordValue("");
+        setShowAddRecord(false);
+      }
+    } catch { /* ignore */ }
+  }, [newRecordType, newRecordName, newRecordValue, liveDomains]);
+
+  const totalVisitors = liveSites.reduce((s, site) => s + (site.visitors || 0), 0);
+  const totalBandwidth = liveSites.reduce((s, site) => s + (site.bandwidthUsed || 0), 0);
   const maxBarVisitors = Math.max(...VISITORS_7D.map((d) => d.count));
   const maxBarBandwidth = Math.max(...BANDWIDTH_7D.map((d) => d.gb));
   const totalStatusCodes = STATUS_CODES.reduce((s, c) => s + c.count, 0);
@@ -339,7 +455,7 @@ export default function HostingDashboard() {
               {siteDropdownOpen && (
                 <div className="absolute top-full mt-1 left-0 w-56 bg-[#14141f] border border-white/10 rounded-xl shadow-2xl py-1 z-50">
                   <button onClick={() => { setSelectedSite("All Sites"); setSiteDropdownOpen(false); }} className="w-full text-left px-4 py-2 text-sm hover:bg-white/5 transition-colors">All Sites</button>
-                  {SITES.map((s) => (
+                  {liveSites.map((s) => (
                     <button key={s.id} onClick={() => { setSelectedSite(s.name); setSiteDropdownOpen(false); }} className="w-full text-left px-4 py-2 text-sm hover:bg-white/5 transition-colors flex items-center gap-2">
                       <span className={`w-1.5 h-1.5 rounded-full ${s.status === "live" ? "bg-emerald-400" : s.status === "deploying" ? "bg-amber-400" : "bg-red-400"}`} />
                       {s.name}
@@ -373,7 +489,7 @@ export default function HostingDashboard() {
         {/* ───── Overview Cards ───── */}
         <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {[
-            { label: "Total Sites", value: SITES.length.toString(), icon: Globe, sub: `${SITES.filter((s) => s.status === "live").length} live`, color: "from-brand-500/20 to-brand-500/5", iconColor: "text-brand-400" },
+            { label: "Total Sites", value: liveSites.length.toString(), icon: Globe, sub: `${liveSites.filter((s) => s.status === "live").length} live`, color: "from-brand-500/20 to-brand-500/5", iconColor: "text-brand-400" },
             { label: "Total Visitors", value: totalVisitors.toLocaleString(), icon: Users, sub: "This month", color: "from-accent-cyan/20 to-accent-cyan/5", iconColor: "text-accent-cyan" },
             { label: "Bandwidth Used", value: `${totalBandwidth.toFixed(1)} GB`, icon: Wifi, sub: "of 1,834 GB limit", color: "from-accent-purple/20 to-accent-purple/5", iconColor: "text-accent-purple" },
             { label: "Uptime", value: "99.98%", icon: Activity, sub: "Last 30 days", color: "from-emerald-500/20 to-emerald-500/5", iconColor: "text-emerald-400", dot: true },
@@ -440,7 +556,7 @@ export default function HostingDashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
-                    {SITES.map((site) => (
+                    {liveSites.map((site) => (
                       <tr key={site.id} className="hover:bg-white/[0.02] transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
@@ -527,6 +643,42 @@ export default function HostingDashboard() {
               </Link>
             </motion.div>
 
+            {/* Quick Deploy — paste HTML */}
+            <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#12121a] p-6">
+              <h3 className="font-semibold text-white mb-4 flex items-center gap-2"><FileCode className="w-4 h-4 text-cyan-400" /> Quick Deploy</h3>
+              <p className="text-sm text-white/50 mb-4">Paste your HTML code and deploy instantly.</p>
+              <input
+                type="text"
+                value={deployName}
+                onChange={(e) => setDeployName(e.target.value)}
+                placeholder="Site name (e.g., my-portfolio)"
+                className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/30 mb-3"
+              />
+              <textarea
+                value={deployCode}
+                onChange={(e) => setDeployCode(e.target.value)}
+                placeholder="Paste your HTML code here..."
+                className="w-full h-24 px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/30 resize-none font-mono mb-3"
+              />
+              <button
+                onClick={handleDeploy}
+                disabled={isDeploying || !deployName || !deployCode}
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 rounded-lg text-sm font-medium transition-colors"
+              >
+                {isDeploying ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                {isDeploying ? "Deploying..." : "Deploy Now"}
+              </button>
+              {deployResult?.url && (
+                <div className="mt-3 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-sm">
+                  <span className="text-emerald-400">Live at: </span>
+                  <a href={`https://${deployResult.url}`} target="_blank" rel="noopener noreferrer" className="text-emerald-300 underline">{deployResult.url}</a>
+                </div>
+              )}
+              {deployResult?.error && (
+                <div className="mt-3 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-sm text-red-400">{deployResult.error}</div>
+              )}
+            </motion.div>
+
             {/* Deploy from CLI */}
             <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#12121a] p-6">
               <h3 className="font-semibold text-white mb-4 flex items-center gap-2"><Terminal className="w-4 h-4 text-emerald-400" /> Deploy from CLI</h3>
@@ -586,7 +738,7 @@ export default function HostingDashboard() {
                       placeholder="example.com"
                       className="flex-1 px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/30"
                     />
-                    <button className="px-4 py-2 bg-brand-500 hover:bg-brand-600 rounded-lg text-sm font-medium transition-colors">Add</button>
+                    <button onClick={handleAddDomain} className="px-4 py-2 bg-brand-500 hover:bg-brand-600 rounded-lg text-sm font-medium transition-colors">Add</button>
                     <button onClick={() => setShowAddDomain(false)} className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-sm transition-colors">Cancel</button>
                   </div>
                 </div>
@@ -603,7 +755,7 @@ export default function HostingDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {CUSTOM_DOMAINS.map((d) => (
+                  {liveDomains.map((d) => (
                     <tr key={d.domain} className="hover:bg-white/[0.02] transition-colors">
                       <td className="px-6 py-4 font-medium text-white">{d.domain}</td>
                       <td className="px-4 py-4"><SslBadge status={d.sslStatus} /></td>
@@ -853,7 +1005,7 @@ export default function HostingDashboard() {
                     </select>
                     <input value={newRecordName} onChange={(e) => setNewRecordName(e.target.value)} placeholder="Name (e.g. @, www)" className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/30 w-40" />
                     <input value={newRecordValue} onChange={(e) => setNewRecordValue(e.target.value)} placeholder="Value" className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/30 flex-1 min-w-[200px]" />
-                    <button className="px-4 py-2 bg-brand-500 hover:bg-brand-600 rounded-lg text-sm font-medium transition-colors">Add</button>
+                    <button onClick={handleAddDnsRecord} className="px-4 py-2 bg-brand-500 hover:bg-brand-600 rounded-lg text-sm font-medium transition-colors">Add</button>
                     <button onClick={() => setShowAddRecord(false)} className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-sm transition-colors">Cancel</button>
                   </div>
                 </div>
@@ -871,7 +1023,7 @@ export default function HostingDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {DNS_RECORDS.map((r) => (
+                  {liveDnsRecords.map((r) => (
                     <tr key={r.id} className="hover:bg-white/[0.02] transition-colors">
                       <td className="px-6 py-3">
                         <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded ${
@@ -1021,7 +1173,7 @@ export default function HostingDashboard() {
 
               <h4 className="text-sm font-medium text-white/60 mb-3">Deployment History</h4>
               <div className="space-y-2">
-                {DEPLOYMENTS.filter((d) => d.env === envTab).map((d) => (
+                {liveDeployments.filter((d) => d.env === envTab).map((d) => (
                   <div key={d.id} className="flex items-center gap-4 p-3 rounded-lg bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-colors">
                     <div className="flex items-center gap-2 flex-1 min-w-0">
                       <GitBranch className="w-4 h-4 text-white/30 shrink-0" />

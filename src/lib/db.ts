@@ -147,4 +147,89 @@ export async function initSchema() {
   `;
 
   await sql`CREATE INDEX IF NOT EXISTS site_analytics_site_id_idx ON site_analytics (site_id)`;
+
+  // ---- Agency tables ----
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS agencies (
+      id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      name              VARCHAR(255) NOT NULL,
+      slug              VARCHAR(255) UNIQUE NOT NULL,
+      owner_email       VARCHAR(255) NOT NULL,
+      plan              VARCHAR(50) DEFAULT 'starter',
+      status            VARCHAR(50) DEFAULT 'active',
+      brand_config      JSONB DEFAULT '{}',
+      settings          JSONB DEFAULT '{}',
+      stripe_customer_id VARCHAR(255),
+      created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS agencies_owner_email_idx ON agencies (owner_email)`;
+  await sql`CREATE INDEX IF NOT EXISTS agencies_slug_idx ON agencies (slug)`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS agency_members (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      agency_id   UUID REFERENCES agencies(id) ON DELETE CASCADE,
+      email       VARCHAR(255) NOT NULL,
+      name        VARCHAR(255),
+      role        VARCHAR(50) DEFAULT 'designer',
+      status      VARCHAR(50) DEFAULT 'active',
+      invited_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      joined_at   TIMESTAMPTZ,
+      UNIQUE(agency_id, email)
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS agency_members_agency_id_idx ON agency_members (agency_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS agency_members_email_idx ON agency_members (email)`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS agency_clients (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      agency_id   UUID REFERENCES agencies(id) ON DELETE CASCADE,
+      name        VARCHAR(255) NOT NULL,
+      email       VARCHAR(255),
+      company     VARCHAR(255),
+      status      VARCHAR(50) DEFAULT 'active',
+      notes       TEXT,
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS agency_clients_agency_id_idx ON agency_clients (agency_id)`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS agency_client_sites (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      agency_id   UUID REFERENCES agencies(id) ON DELETE CASCADE,
+      client_id   UUID REFERENCES agency_clients(id) ON DELETE CASCADE,
+      site_id     UUID REFERENCES sites(id) ON DELETE CASCADE,
+      status      VARCHAR(50) DEFAULT 'active',
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS agency_client_sites_agency_id_idx ON agency_client_sites (agency_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS agency_client_sites_client_id_idx ON agency_client_sites (client_id)`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS bulk_jobs (
+      id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      agency_id       UUID REFERENCES agencies(id) ON DELETE CASCADE,
+      status          VARCHAR(50) DEFAULT 'pending',
+      total_count     INTEGER DEFAULT 0,
+      completed_count INTEGER DEFAULT 0,
+      failed_count    INTEGER DEFAULT 0,
+      input_data      JSONB NOT NULL,
+      results         JSONB DEFAULT '[]',
+      created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      completed_at    TIMESTAMPTZ
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS bulk_jobs_agency_id_idx ON bulk_jobs (agency_id)`;
 }

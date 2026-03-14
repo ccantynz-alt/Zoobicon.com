@@ -35,6 +35,11 @@ import AiImagesPanel from "@/components/AiImagesPanel";
 import PipelinePanel from "@/components/PipelinePanel";
 import DiffPanel from "@/components/DiffPanel";
 import WelcomeModal, { shouldShowWelcomeModal, dismissWelcomeModal } from "@/components/WelcomeModal";
+import VisualEditor from "@/components/VisualEditor";
+import ProjectTree from "@/components/ProjectTree";
+import type { SelectedElement } from "@/lib/dom-bridge";
+import { applyStyleToHtml, applyTextToHtml, reorderSections } from "@/lib/dom-bridge";
+import { downloadZip } from "@/lib/zip-export";
 
 import {
   Bug,
@@ -68,6 +73,9 @@ import {
   Save,
   Sparkles,
   History,
+  MousePointer2,
+  FolderTree,
+  Package,
 } from "lucide-react";
 
 /** Sanitize raw API error messages for user display */
@@ -118,6 +126,8 @@ type ToolId =
   | "multipage"
   | "fullstack"
   | "email"
+  | "visual-editor"
+  | "project"
   | null;
 
 const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }[] = [
@@ -142,6 +152,8 @@ const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }
   { id: "github", label: "GitHub Import", icon: <Github size={18} /> },
   { id: "figma", label: "Figma Import", icon: <Figma size={18} /> },
   { id: "wordpress", label: "WordPress Export", icon: <FileArchive size={18} /> },
+  { id: "visual-editor", label: "Visual Editor", icon: <MousePointer2 size={18} /> },
+  { id: "project", label: "Project Mode", icon: <FolderTree size={18} /> },
 ];
 
 /* ─── Interactive particle constellation background ─── */
@@ -390,6 +402,13 @@ function BuilderPage() {
   const [availableModels, setAvailableModels] = useState<AIModel[]>([]);
   const [reactSource, setReactSource] = useState<Record<string, string> | null>(null);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
+  // Phase 2: Visual editing
+  const [visualEditMode, setVisualEditMode] = useState(false);
+  const [selectedElement, setSelectedElement] = useState<SelectedElement | null>(null);
+  // Phase 3: Project mode
+  const [projectFiles, setProjectFiles] = useState<{ path: string; content: string; language: string; isModified?: boolean }[]>([]);
+  const [activeProjectFile, setActiveProjectFile] = useState<string | null>(null);
+  const [isGeneratingProject, setIsGeneratingProject] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [generatorBanner, setGeneratorBanner] = useState<{ id: string; name: string } | null>(null);
   const [showDiffPanel, setShowDiffPanel] = useState(false);
@@ -1096,7 +1115,13 @@ function BuilderPage() {
   }, [generatedCode, saveStatus, prompt]);
 
   const toggleTool = useCallback((toolId: Exclude<ToolId, null>) => {
-    setActiveTool((prev) => (prev === toolId ? null : toolId));
+    setActiveTool((prev) => {
+      const next = prev === toolId ? null : toolId;
+      // Toggle visual edit mode when the visual editor tool is activated/deactivated
+      setVisualEditMode(next === "visual-editor");
+      if (next !== "visual-editor") setSelectedElement(null);
+      return next;
+    });
   }, []);
 
   const renderToolPanel = () => {
@@ -1149,6 +1174,75 @@ function BuilderPage() {
         return <FullStackPanel onApplyCode={handleCodeUpdate} />;
       case "email":
         return <EmailTemplatePanel onApplyCode={handleCodeUpdate} />;
+      case "visual-editor":
+        return (
+          <VisualEditor
+            selectedElement={selectedElement}
+            onStyleChange={(prop, val) => {
+              if (selectedElement) {
+                const updated = applyStyleToHtml(generatedCode, selectedElement.xpath, prop, val);
+                handleCodeUpdate(updated);
+              }
+            }}
+            onTextChange={(newText) => {
+              if (selectedElement) {
+                const updated = applyTextToHtml(generatedCode, selectedElement.xpath, newText);
+                handleCodeUpdate(updated);
+              }
+            }}
+            onSectionReorder={(from, to) => {
+              const updated = reorderSections(generatedCode, from, to);
+              handleCodeUpdate(updated);
+            }}
+            html={generatedCode}
+          />
+        );
+      case "project":
+        return (
+          <div className="flex flex-col gap-4 p-4">
+            <button
+              onClick={async () => {
+                setIsGeneratingProject(true);
+                try {
+                  const res = await fetch("/api/generate/project", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ prompt: prompt || "Convert the current site", framework: "nextjs" }),
+                  });
+                  if (res.ok) {
+                    const data = await res.json();
+                    setProjectFiles(data.files || []);
+                    if (data.files?.length) setActiveProjectFile(data.files[0].path);
+                  }
+                } finally {
+                  setIsGeneratingProject(false);
+                }
+              }}
+              disabled={isGeneratingProject}
+              className="btn btn-primary text-sm"
+            >
+              <Package size={16} />
+              {isGeneratingProject ? "Generating..." : "Generate Project"}
+            </button>
+            {projectFiles.length > 0 && (
+              <>
+                <ProjectTree
+                  files={projectFiles}
+                  activeFile={activeProjectFile}
+                  onFileSelect={setActiveProjectFile}
+                  projectName="my-project"
+                />
+                <button
+                  onClick={() => downloadZip(projectFiles.map(f => ({ path: f.path, content: f.content })), "my-project")}
+                  className="btn btn-secondary text-sm mt-2"
+                >
+                  <Download size={16} />
+                  Download ZIP
+                </button>
+              </>
+            )}
+          </div>
+        );
       default:
         return null;
     }
@@ -1401,6 +1495,8 @@ function BuilderPage() {
               <PreviewPanel
                 html={generatedCode}
                 isGenerating={status === "generating"}
+                visualEditMode={visualEditMode}
+                onElementSelected={setSelectedElement}
               />
             ) : activeTab === "seo" ? (
               <SeoPreview html={generatedCode} />
