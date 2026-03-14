@@ -289,7 +289,15 @@ Output ONLY raw HTML.`
           );
           controller.close();
         } catch (err) {
-          const message = err instanceof Error ? err.message : "Stream error";
+          let message = err instanceof Error ? err.message : "Stream error";
+          // Sanitize raw API error messages for user display
+          if (err instanceof Anthropic.RateLimitError) {
+            message = "AI service is busy. Please wait a moment and try again.";
+          } else if (err instanceof Anthropic.AuthenticationError) {
+            message = "AI service is temporarily unavailable. The site owner needs to update their API key.";
+          } else if (/rate.limit|too many/i.test(message)) {
+            message = "AI service is busy. Please wait a moment and try again.";
+          }
           controller.enqueue(
             encoder.encode(`data: ${JSON.stringify({ type: "error", message })}\n\n`)
           );
