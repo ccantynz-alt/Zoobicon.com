@@ -107,6 +107,12 @@ Output a JSON object:
   "userInstructions": ["list any SPECIFIC instructions from the user brief that must be followed exactly"]
 }
 
+INDUSTRY-SPECIFIC DEFAULTS (override if user brief specifies something different):
+- Real Estate / Luxury Real Estate: heroTreatment = "full-bleed property carousel with 3-5 stunning property images", imageStrategy = "full-bleed", animationStyle = "cinematic", whitespaceLevel = "moderate"
+- Restaurant / Hospitality: heroTreatment = "full-bleed food/ambiance image with overlay text", imageStrategy = "editorial"
+- Portfolio / Creative: heroTreatment = "full-screen showcase image or video placeholder", imageStrategy = "gallery"
+- E-commerce: heroTreatment = "hero with featured product or seasonal campaign image", imageStrategy = "gallery"
+
 Output ONLY valid JSON, nothing else.`;
 
 const BRAND_SYSTEM = `You are an elite brand designer. Given a strategy and brief, produce a comprehensive design specification.
@@ -235,6 +241,12 @@ Rules:
 - Include 3-4 testimonials with realistic full names, job titles, and companies
 - Stats must be specific and believable: "2,847 homes sold" not "Many homes sold"
 - Footer must include realistic phone, email, address, and business hours
+- For REAL ESTATE sites: also generate these additional fields in the JSON:
+  "propertyListings": [{ "name": "property name", "price": "$X,XXX,XXX", "beds": 4, "baths": 3, "sqft": "3,200", "location": "neighborhood, city", "description": "1-2 sentences highlighting luxury features", "status": "For Sale|Sold|Open House", "imageKeyword": "luxury-house or modern-villa etc" }] (generate 4-6 listings),
+  "agentProfiles": [{ "name": "full name", "title": "Senior Real Estate Agent", "phone": "phone", "email": "email", "bio": "1-2 sentence professional bio", "imageKeyword": "business-woman or professional-man" }] (generate 2-3 agents),
+  "neighborhoods": [{ "name": "neighborhood name", "description": "1-2 sentences about the area", "imageKeyword": "picsum keyword" }] (generate 3-4 neighborhoods)
+- For RESTAURANT sites: also generate "menuItems" with categories, items, prices, descriptions
+- For E-COMMERCE sites: also generate "products" with name, price, description, category, imageKeyword
 Output ONLY valid JSON.`;
 
 const ARCHITECT_SYSTEM = `You are a senior web architect. Given a strategy, design spec, and copy, decide the optimal page structure.
@@ -250,8 +262,8 @@ Output a JSON object:
     "testimonials": "3 cards in a row",
     "faq": "accordion layout"
   },
-  "interactivity": ["smooth-scroll", "mobile-menu", "faq-accordion", "scroll-animations", "sticky-nav", "counter-animation"],
-  "specialComponents": ["announcement-bar", "social-proof-logo-strip", "process-timeline"],
+  "interactivity": ["smooth-scroll", "mobile-menu", "faq-accordion", "scroll-animations", "sticky-nav", "counter-animation", "hero-carousel", "property-carousel", "image-gallery", "lightbox"],
+  "specialComponents": ["announcement-bar", "social-proof-logo-strip", "process-timeline", "hero-slideshow", "property-grid", "property-carousel", "image-gallery", "agent-profile-grid", "neighborhood-showcase"],
   "responsive": {
     "breakpoints": ["768px", "1024px"],
     "mobileLayout": "stacked single column, full-width images"
@@ -268,6 +280,12 @@ Choose section order strategically:
 - Testimonials → reinforce with social proof
 - FAQ → handle objections
 - CTA → convert
+
+INDUSTRY-SPECIFIC LAYOUTS:
+- Real Estate: hero-carousel → featured-properties (property-grid) → about/why-us → agent-profiles → neighborhoods → testimonials → stats → contact-form → footer. Use hero-carousel and property-carousel interactivity. Use property-grid and agent-profile-grid special components.
+- Restaurant: hero-image → menu-highlights → gallery → about-chef → hours/location → reservation-form → testimonials → footer
+- Portfolio: hero-fullscreen → project-gallery → about → services → testimonials → contact → footer
+- E-commerce: hero-image → featured-products → categories → about → testimonials → newsletter → footer
 Output ONLY valid JSON.`;
 
 const DEVELOPER_SYSTEM = `You are an elite front-end developer. Given a complete specification (strategy, design, copy, and architecture), produce a single HTML file that looks like it was built by a $30,000 agency.
@@ -290,7 +308,12 @@ You MUST write the HTML in this exact order. Do NOT rearrange:
 4. <body> content — THIS IS 80% OF YOUR OUTPUT. Write EVERY section with full content:
    - <header>/<nav> with logo + navigation links + mobile menu button
    - Hero <section> — headline, subheadline, TWO CTA buttons (.btn-primary, .btn-secondary), social proof line
+     * REAL ESTATE: Use .hero-carousel or .hero-image with full-viewport property photos. Overlay text (.overlay-text) with white headline. Include "Schedule Viewing" or "Browse Properties" CTA.
+     * RESTAURANT: Use .hero-image with atmospheric food/interior photo and .overlay-text.
+     * TECH/SAAS: Use .hero-aurora or .hero-mesh for animated gradient backgrounds.
+     * PORTFOLIO: Use .hero-image with full-bleed project showcase photo.
    - Features/services <section> — .grid-3 > .card for each feature, with SVG icons
+     * REAL ESTATE: Use .property-grid > .property-card instead. Each card has .property-card-img (with .status-badge), .property-card-details, .property-card-price, .property-card-meta with .feature-badge for beds/baths/sqft.
    - About <section> — split layout, text + image
    - Testimonials <section> — .testimonial-card for each (3 minimum)
    - Stats <section> — .stat-item > .stat-number + .stat-label
@@ -303,6 +326,7 @@ You MUST write the HTML in this exact order. Do NOT rearrange:
 ## CSS BUDGET — HARD LIMIT: 40 LINES
 The Zoobicon Component Library is auto-injected after generation. It provides:
 .btn, .btn-primary, .btn-secondary, .btn-ghost, .card, .card-body, .grid-2, .grid-3, .grid-4, .section, .section-alt, .container, .testimonial-card, .stat-item, .stat-number, .stat-label, .faq-item, .faq-question, .faq-answer, .badge, .input, .fade-in, .text-center, .text-muted, .flex, .items-center, .justify-between, .gap-2
+Also available: .carousel, .carousel-track, .carousel-slide, .carousel-nav, .carousel-dot, .carousel-arrow, .carousel-arrow-prev, .carousel-arrow-next, .hero-image, .hero-carousel, .overlay-text, .overlay-gradient, .property-card, .property-card-img, .property-card-details, .property-card-price, .property-card-meta, .property-grid, .image-gallery, .image-gallery-item, .price-tag, .feature-badge, .status-badge, .status-for-sale, .status-sold, .status-open-house
 
 Your <style> only needs:
 - :root { --color-primary: #hex; --color-secondary: #hex; --color-bg: #hex; --color-text: #hex; etc. }
@@ -313,15 +337,23 @@ Your <style> only needs:
 Use ALL the copy from the COPY input. Every section must appear with real visible text:
 - Every heading, paragraph, testimonial quote, stat number, FAQ Q&A from the COPY input
 - Do NOT summarize, skip, or abbreviate any section
-- Images: https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT with descriptive keywords (e.g., seed/modern-office, seed/coffee-shop). object-fit: cover. Alt text on all.
+- Images: https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT with INDUSTRY-SPECIFIC descriptive keywords. object-fit: cover. Alt text on all.
+  Real estate: seed/luxury-house, seed/modern-villa, seed/mansion-interior, seed/penthouse-view, seed/pool-villa, seed/estate-garden, seed/luxury-kitchen, seed/marble-bathroom
+  Restaurant: seed/gourmet-food, seed/restaurant-interior, seed/chef-cooking, seed/wine-cellar, seed/fine-dining
+  Tech/SaaS: seed/modern-office, seed/coding-workspace, seed/team-meeting, seed/server-room
+  Portfolio: seed/creative-workspace, seed/design-studio, seed/art-gallery
+  General: seed/city-skyline, seed/coffee-shop, seed/nature-landscape
 - Use semantic HTML: header, nav, main, section, footer
 - Add .fade-in class to each <section> for scroll animation (handled by component library)
 
-## INDUSTRY AESTHETIC — Applied via :root colors
-- **Luxury/Real Estate/Legal/Financial/Medical:** Light bg (#fefefe), serif heading font, muted accents. NO dark themes.
-- **SaaS/Tech/Startup:** Dark bg OK. Sans-serif. Vibrant accent colors.
-- **Restaurant/Food:** Warm palette, serif headings, food imagery.
+## INDUSTRY AESTHETIC — Applied via :root colors + visual treatment
+- **Real Estate / Luxury Real Estate:** ASPIRATIONAL, cinematic. Use .hero-image or .hero-carousel for full-bleed property photos. Use .property-card + .property-grid for listings (show price, beds, baths, sqft with .feature-badge). Use .status-badge on property images. Navy (#1a365d) and gold (#c9a96e) accents, serif headings (Playfair Display). Full-bleed imagery throughout — NOT sparse white pages. Agent profiles with photos. Neighborhood sections with large images.
+- **Luxury (non-real-estate):** Light bg (#fefefe), serif headings, generous whitespace, full-bleed hero image (.hero-image) with .overlay-text. Muted golds and neutrals. Cinematic feel.
+- **Legal / Financial / Medical:** Light bg (#fefefe), serif or clean sans-serif, muted accents. Conservative but polished. NO dark themes.
+- **SaaS/Tech/Startup:** Dark bg OK. Sans-serif. Vibrant accent colors. Hero effects like .hero-aurora or .hero-mesh are excellent here.
+- **Restaurant/Food:** Warm palette, serif headings, food imagery. Full-bleed .hero-image of food/ambiance with .overlay-text.
 - **Healthcare/Wellness:** Soft palette (sage, lavender), clean and calming.
+- **Portfolio/Creative:** Bold typography, full-bleed .hero-image, .image-gallery for project showcase. Dark themes OK.
 
 ## KEY RULES
 - Output ONLY raw HTML. No markdown, no explanation, no code fences.
@@ -333,8 +365,8 @@ Use ALL the copy from the COPY input. Every section must appear with real visibl
 ## NEVER DO
 - Write more than 40 lines of CSS
 - Duplicate component library styles (buttons, cards, grids, inputs, badges, shadows, transitions)
-- Dark theme for non-tech businesses
-- Gradient blobs or particle effects on professional sites
+- Dark theme for conservative industries (legal, accounting, medical) — dark themes ARE fine for real estate, restaurants, portfolios, creative agencies
+- Gradient blobs on conservative industries (legal, accounting) — hero effects (.hero-aurora, .hero-mesh, .hero-image) ARE appropriate for real estate, restaurants, creative, and tech
 - Generic placeholder copy — use the COPY input exactly`;
 
 const ANIMATION_SYSTEM = `You are an animation specialist. Take the HTML website and enhance it with smooth micro-interactions and scroll effects.

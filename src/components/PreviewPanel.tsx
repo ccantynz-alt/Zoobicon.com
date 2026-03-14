@@ -1,11 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import { Monitor, Tablet, Smartphone } from "lucide-react";
+import { injectVisualEditingScript } from "@/lib/dom-bridge";
+import type { SelectedElement, BridgeMessage } from "@/lib/dom-bridge";
 
 interface PreviewPanelProps {
   html: string;
   isGenerating: boolean;
+  visualEditMode?: boolean;
+  onElementSelected?: (element: SelectedElement | null) => void;
+  onElementHover?: (element: SelectedElement | null) => void;
 }
 
 /** Particle field — scattered glowing dots across the entire canvas */
@@ -318,8 +323,59 @@ const viewportConfig: Record<ViewportMode, { width: string; icon: typeof Monitor
   mobile: { width: "375px", icon: Smartphone, label: "Mobile" },
 };
 
-export default function PreviewPanel({ html, isGenerating }: PreviewPanelProps) {
+export default function PreviewPanel({
+  html,
+  isGenerating,
+  visualEditMode = false,
+  onElementSelected,
+  onElementHover,
+}: PreviewPanelProps) {
   const [viewport, setViewport] = useState<ViewportMode>("desktop");
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // Listen for postMessage from the iframe when visual editing is active
+  useEffect(() => {
+    if (!visualEditMode) return;
+
+    function handleMessage(event: MessageEvent) {
+      const data = event.data as BridgeMessage;
+      if (!data || !data.type) return;
+
+      switch (data.type) {
+        case "element-selected":
+          onElementSelected?.(data.element);
+          break;
+        case "element-hover":
+          onElementHover?.(data.element);
+          break;
+        case "text-updated":
+          // Text was updated inline in the iframe — parent can handle syncing
+          break;
+        case "visual-editing-enabled":
+          // Visual editing script loaded successfully
+          break;
+      }
+    }
+
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [visualEditMode, onElementSelected, onElementHover]);
+
+  // Send style/text changes to iframe via postMessage
+  const sendToIframe = useCallback(
+    (message: Record<string, unknown>) => {
+      if (iframeRef.current?.contentWindow) {
+        iframeRef.current.contentWindow.postMessage(message, "*");
+      }
+    },
+    []
+  );
+
+  // Prepare HTML with visual editing script injected when in edit mode
+  const previewHtml = useMemo(() => {
+    if (!html || !visualEditMode) return html;
+    return injectVisualEditingScript(html);
+  }, [html, visualEditMode]);
 
   // Extract body text to validate content exists
   const bodyTextLength = useMemo(() => {
@@ -589,6 +645,14 @@ export default function PreviewPanel({ html, isGenerating }: PreviewPanelProps) 
             </button>
           );
         })}
+        {visualEditMode && (
+          <div className="ml-auto flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+            <span className="text-[10px] text-blue-400/70 uppercase tracking-wider font-medium">
+              Visual Edit
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Preview area */}
@@ -605,7 +669,8 @@ export default function PreviewPanel({ html, isGenerating }: PreviewPanelProps) 
           }}
         >
           <iframe
-            srcDoc={html}
+            ref={iframeRef}
+            srcDoc={previewHtml}
             className="w-full h-full border-0 bg-white"
             title="Website preview"
             sandbox="allow-scripts allow-same-origin"

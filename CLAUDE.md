@@ -2,7 +2,7 @@
 
 ## What is this project?
 
-Zoobicon is a **white-label AI website builder platform** built with Next.js 14, React 18, TypeScript, and Tailwind CSS. It uses the Anthropic Claude API for AI generation through a 10-agent pipeline architecture. The platform supports multiple brands from a single codebase via `src/lib/brand-config.ts`.
+Zoobicon is a **white-label AI website builder platform** built with Next.js 14, React 18, TypeScript, and Tailwind CSS. It uses a multi-LLM pipeline architecture (Claude, GPT, Gemini) with a 7-agent build pipeline. The platform supports multiple brands from a single codebase via `src/lib/brand-config.ts`.
 
 ### Brands / Domains
 - **Zoobicon** (primary): zoobicon.com, zoobicon.ai, zoobicon.sh
@@ -33,6 +33,89 @@ Build has `ignoreBuildErrors: true` and `ignoreDuringBuilds: true` in next.confi
 
 ## Architecture
 
+### AI Generation Pipeline (src/lib/agents.ts)
+
+7-agent multi-phase pipeline, ~95s total (within Vercel 300s limit):
+
+**Phase 1 — Strategy (Sequential, ~4s):**
+- Strategist Agent (Haiku): Brief → JSON strategy (audience, positioning, visual direction, content structure)
+
+**Phase 2 — Planning (Parallel, ~6s):**
+- Brand Designer (Haiku): Strategy → design spec (colors, typography, layout, dark mode)
+- Copywriter (Haiku): Strategy → copy spec (hero, features, testimonials, FAQ, CTA, meta SEO)
+- Architect (Haiku): Strategy → architecture (section order, layouts, interactivity, breakpoints)
+
+**Phase 3 — Build (Sequential, ~70s):**
+- Developer (Opus): ALL specs → complete HTML (~32K tokens). **Opus is non-negotiable for quality.**
+
+**Phase 4 — Enhancement (Parallel, ~15s, if time permits):**
+- SEO Agent (Sonnet): Adds meta tags, OG tags, JSON-LD schema, heading hierarchy
+- Animation Agent (Sonnet): Adds scroll animations, micro-interactions, parallax
+
+**Model routing:** Haiku for JSON planners → Opus for Developer → Sonnet for enhancers. User-selected models (GPT-4o, Gemini 2.5 Pro) route through `llm-provider.ts` with automatic failover.
+
+**Body content validation:** If HTML body has <100 chars visible text, retries with "body-first" prompt.
+
+### Generation Endpoints (src/app/api/generate/)
+
+| Route | Model | Tokens | What It Does |
+|-------|-------|--------|-------------|
+| `/api/generate` (POST) | Opus | 32K | Non-streaming single-page build with retry |
+| `/api/generate/stream` (POST) | Opus | 32K | Streaming build, cross-provider failover |
+| `/api/generate/pipeline` (POST) | Pipeline | — | Direct 7-agent pipeline invocation |
+| `/api/generate/multipage` (POST) | Sonnet | 64K | 3-6 page sites with shared design system |
+| `/api/generate/fullstack` (POST) | Sonnet | 64K | Complete apps: DB schema + API routes + HTML frontend with CRUD |
+| `/api/generate/variants` (POST) | Sonnet | 32K | 2-3 design variants for A/B testing |
+| `/api/generate/email` (POST) | Sonnet | 16K | Email template generation |
+| `/api/generate/quick` (POST) | Haiku | 8K | Lightweight fast generation |
+| `/api/generate/images` (POST) | — | — | AI image generation (Replicate/Stability) |
+| `/api/generate/ai-images` (POST) | — | — | Embed AI images into existing HTML |
+| `/api/generate/edit-diff` (POST) | — | — | Diff generation for variant comparison |
+
+### Output Formats
+
+**Single-page (default):** Complete `.html` file — CSS + JS inlined, no external dependencies, images via picsum.photos. Component library CSS auto-injected.
+
+**Multi-page:** JSON with `{ siteName, pages: [{ slug, title, html }], navigation: [{ label, href }] }`. Each page is standalone HTML with shared design (fonts, colors, nav, footer). Max 6 pages.
+
+**Full-stack:** JSON with `{ description, schema (SQL), apiEndpoints: [{ method, path, handler }], code (HTML with CRUD UI) }`. Real PostgreSQL schemas, RESTful Next.js handlers, interactive frontend with forms/tables/modals.
+
+### Hosting & Deployment (src/app/api/hosting/)
+
+| Route | What It Does |
+|-------|-------------|
+| `POST /api/hosting/deploy` | Deploy HTML → creates DB record → returns `https://[slug].zoobicon.sh` |
+| `GET /api/hosting/serve/[slug]` | Serves live HTML from DB with caching headers |
+| `GET /api/hosting/sites/[siteId]/code` | Fetch live code + version history |
+| `PUT /api/hosting/sites/[siteId]/code` | Update code, creates new deployment version |
+| `GET /api/hosting/sites/[siteId]/versions/[versionId]` | Fetch previous version for rollback |
+| `GET /api/hosting/sites` | List user's sites |
+| `/api/hosting/analytics` | Page view tracking |
+| `/api/hosting/dns` | DNS management (stub — needs Cloudflare integration) |
+| `/api/hosting/ssl` | SSL provisioning (stub — needs Cloudflare integration) |
+| `/api/hosting/cdn` | CDN caching (stub — needs Cloudflare integration) |
+
+**Database schema:** `sites` (id, name, slug, email, plan, status) + `deployments` (site_id, environment, status, code, url, size, commit_message)
+
+### E-commerce Generation (src/app/api/ecommerce/)
+
+`POST /api/ecommerce/generate` — Generates complete storefronts with:
+- Shopping cart (localStorage), checkout form, product grid, search/filters
+- Wishlist, reviews with star ratings, stock badges, discount codes ("SAVE10")
+- Shipping calculator, order tracking
+- Request: `{ businessType, products: [{name, price, description}], features: [...], theme }`
+
+### Scaffolding (src/app/api/scaffold/)
+
+`POST /api/scaffold` — Takes existing HTML and adds full-stack features:
+- Auth (email/Google/GitHub with JWT)
+- Database tables (users, posts, products, orders)
+- Admin panel (stats, user management, moderation)
+- User profiles (avatar, bio, settings, history)
+- File uploads (drag-drop, preview, progress)
+- Comments (threaded, timestamps)
+- Notifications (bell icon, unread badge)
+
 ### Page Routes (src/app/)
 30 pages total. All verified working. Key routes:
 - `/` — Landing page
@@ -48,25 +131,62 @@ Build has `ignoreBuildErrors: true` and `ignoreDuringBuilds: true` in next.confi
 - `/developers`, `/cli`, `/sh`, `/ai`, `/io` — Developer/branded routes
 - `/agencies` — Agency-focused page
 
-### API Routes (src/app/api/)
-89 route handlers across 26 directories. All verified working. Key APIs:
-- `/api/generate/*` — AI generation endpoints (the core pipeline)
+### Other API Routes (src/app/api/)
+89 route handlers across 26 directories. All verified working:
 - `/api/auth/*` — Authentication (signup, login, reset)
-- `/api/hosting/*` — Site hosting and deployment
 - `/api/projects/*` — Project CRUD
 - `/api/contact` — Contact form handler
-- Plus: admin, animate, chat, clone, crm, db, debug, ecommerce, export, figma, github, invoice, keys, performance, qa, scaffold, seo, stripe, support, translate
+- `/api/seo/analyze` — SEO analysis endpoint
+- `/api/clone` — Import existing website URL → convert to editable HTML
+- Plus: admin, animate, chat, crm, db, debug, export, figma, github, invoice, keys, performance, qa, stripe, support, translate
 
 ### Components (src/components/)
-32 components. All imports verified. Key ones:
-- `PromptInput.tsx` — Main AI prompt input
-- `PipelinePanel.tsx` — Shows 10-agent pipeline progress
-- `CodePanel.tsx` — Code editor/viewer
-- `PreviewPanel.tsx` — Live preview
-- `TopBar.tsx` / `StatusBar.tsx` — Builder chrome
+32 components. All imports verified:
+
+**Builder Core:**
+- `PromptInput.tsx` — AI prompt input with style/tier/model selectors + template quick-start
+- `PipelinePanel.tsx` — 7-agent pipeline progress visualization
+- `CodePanel.tsx` — Code editor/viewer with copy/download
+- `PreviewPanel.tsx` — Live preview with Desktop/Tablet/Mobile viewports + atmospheric effects
+- `TopBar.tsx` / `StatusBar.tsx` — Builder chrome with real-time agent status
+
+**Builder Tools (21 sidebar panels):**
+- `MultiPagePanel.tsx` — Generate 3-6 page sites with consistent design
+- `FullStackPanel.tsx` — Generate DB schema + API + frontend with tabbed view
+- `EcommercePanel.tsx` — E-commerce storefront generator
+- `QAPanel.tsx` — Automated quality audit
+- `AccessibilityPanel.tsx` — A11y scanning
+- `PerformancePanel.tsx` — Lighthouse-style metrics
+- `ABTestPanel.tsx` — 2-3 design variant generation
+- `EmailPanel.tsx` — Email template generator
+- `ExportPanel.tsx` — Download as .html/.zip/React
+- `AutoDebugPanel.tsx` — Broken element detection
+- `SEOScorePanel.tsx` — SEO scoring and fixes
+- `AnimationsPanel.tsx` — Scroll/hover animation editor
+- `CRMPanel.tsx` — Contact form / lead management
+- `ScaffoldPanel.tsx` — Full-stack feature injection
+- `TranslatePanel.tsx` — Multi-language generation
+- `GitHubImportPanel.tsx` — GitHub repo → buildability estimate
+- `FigmaImportPanel.tsx` — Figma design → HTML
+- `WordPressExportPanel.tsx` — HTML → WordPress theme
+- `ClonePanel.tsx` — Import existing website
+- `AIImagePanel.tsx` — AI image generation + embedding
+
+### Component Library (src/lib/component-library.ts)
+
+Auto-injected CSS design system (like shadcn/ui for generated output):
+- **Buttons**: `.btn`, `.btn-primary`, `.btn-secondary`, `.btn-ghost`, `.btn-lg`, `.btn-sm`
+- **Cards**: `.card`, `.card-body`, `.card-img`, `.card-flat`
+- **Inputs**: `.input`, `.input-group`, `.input-icon`
+- **Badges**: `.badge`, `.badge-primary`, `.badge-success`, `.badge-warning`, `.badge-error`
+- **Layout**: `.section`, `.section-alt`, `.container`, `.grid-2`, `.grid-3`, `.grid-4`
+- **Animation**: `.fade-in`, `.fade-in-left`, `.fade-in-right`, `.scale-in`
+- **Hero effects**: `.hero-aurora`, `.hero-mesh`, `.hero-glass`, `.hero-gradient-text`, `.hero-float`, `.hero-orb`, `.hero-cursor-glow`
+- **Patterns**: `.testimonial-card`, `.stat-item`, `.faq-item`, `.logo-strip`
+- **Failsafe**: IntersectionObserver with 3s hard timeout (no blank pages if JS fails)
 
 ### Lib (src/lib/)
-- `agents.ts` — 7-agent pipeline v3 (Phase 1: Strategist → Phase 2: Brand+Copywriter+Architect parallel → Phase 3: Developer → Phase 4: SEO+Animation parallel). Model routing: Haiku for JSON planners, **Opus for Developer**, Sonnet for enhancers. ~95s total, well within 300s Vercel limit.
+- `agents.ts` — 7-agent pipeline v3 (see Pipeline section above)
 - `llm-provider.ts` — Multi-LLM abstraction: Claude, OpenAI (GPT-4o, o3), Google (Gemini 2.5 Pro/Flash)
 - `component-library.ts` — CSS design system injected into every generated site
 - `brand-config.ts` — White-label brand system
@@ -77,7 +197,16 @@ Build has `ignoreBuildErrors: true` and `ignoreDuringBuilds: true` in next.confi
 - `password.ts` / `resetToken.ts` — Auth utilities
 - `apiKey.ts` / `rateLimit.ts` — API security
 - `image-gen.ts` — AI image generation
-- `templates.ts` — Site templates
+- `templates.ts` — 12 site templates (saas-landing, portfolio-creative, ecommerce-store, restaurant-menu, agency-dark, blog-minimal, fitness-gym, tech-startup, event-conference, real-estate, music-artist, nonprofit-charity)
+
+### Edit Flow (src/app/edit/[slug]/)
+
+Post-deployment live editor:
+1. `GET /api/hosting/sites/[slug]/code` → fetches deployed HTML + version history
+2. ChatPanel streams edits via `/api/generate/stream` (Sonnet for speed)
+3. `PUT /api/hosting/sites/[slug]/code` → saves new version
+4. Full version history with rollback support
+5. 16 sidebar tools available in edit mode
 
 ## Important Decisions (Do Not Revert)
 
@@ -136,3 +265,65 @@ Generators are highest priority because they extend the core product with minima
 - Use lucide-react for icons
 - Use framer-motion for animations
 - API routes export named HTTP method functions: `export async function POST(request: Request)`
+
+## Competitive Roadmap — Closing the Gap with v0/Lovable/Bolt
+
+### Competitive Position (as of March 2026)
+
+**Where we match or beat competitors:**
+- Single-page generation quality (Opus-powered, best output in market)
+- Multi-page site generation (3-6 pages, shared design — REAL, working)
+- Full-stack app generation (DB schema + API + CRUD frontend — REAL, working)
+- E-commerce generation (10+ features, cart, checkout — REAL, working)
+- Scaffolding (auth, admin, uploads, comments, notifications — REAL, working)
+- White-label / agency architecture (UNIQUE — no competitor offers this)
+- Tool density: 21 integrated tools vs competitors' 3-5
+- 32 specialized generators (UNIQUE — competitors are generic)
+- Multi-LLM support (Claude, GPT-4o, Gemini 2.5 Pro)
+
+**Where competitors lead:**
+- In-browser runtime (Bolt: WebContainers, v0: sandboxes) — we generate server-side
+- Visual editing (click-to-edit on preview) — we use chat-based edits only
+- One-click deploy to custom domains — we deploy to zoobicon.sh but DNS/SSL are stubs
+- Real-time collaboration — not implemented
+- Design system ecosystem — shadcn/ui vs our custom component library
+
+### Build Plan — 5 Phases
+
+**Phase 1: Deploy Pipeline (closes biggest user pain point)**
+- Cloudflare API integration for custom domains, automatic SSL, DNS management
+- Deploy dashboard showing all user sites with status/analytics
+- One-click redeploy from edit view
+- Staging preview URLs before going live
+- Files: `/api/hosting/dns/`, `/api/hosting/ssl/`, `/api/hosting/cdn/`, dashboard enhancements
+
+**Phase 2: Visual Editing (closes biggest competitive gap)**
+- Click-to-select overlay in preview iframe (highlight on hover, select on click)
+- Inline property editor sidebar (text, colors, spacing, fonts for selected element)
+- Direct DOM manipulation with sync back to source HTML
+- Drag-and-drop section reordering
+- "Add Section" with pre-built section templates
+- Files: `PreviewPanel.tsx` (postMessage bridge), new `VisualEditor.tsx`, `SectionLibrary.tsx`, `dom-bridge.ts`
+
+**Phase 3: Project Mode (compete with Bolt V2)**
+- File tree view for multi-file projects
+- File-by-file editing in CodePanel with tabs
+- Package.json generation with dependency management
+- GitHub export (push to user's repo via GitHub API)
+- Download as complete project zip (ready for `npm install && npm run dev`)
+- Files: new `ProjectTree.tsx`, new `/api/generate/project/`, `/api/export/github/`, `CodePanel.tsx` enhancements
+
+**Phase 4: Generator Domination (amplify unique advantage)**
+- 32 type-specific system prompts for industry-perfect output
+- Generator-specific UI with custom input fields per type
+- 100+ templates (3-5 per generator type, up from 12 total)
+- One-click generate → preview → deploy flow
+- Files: new `generator-prompts.ts`, `/generators/[type]/page.tsx`, expand `templates.ts`
+
+**Phase 5: Agency Platform (blue ocean — no competitor here)**
+- Agency dashboard managing multiple client sites
+- Client handoff (transfer editing access)
+- White-label deploys (agency branding on builder, client branding on output)
+- Bulk generation with CSV import of business details
+- Revenue sharing (agency markup on hosting)
+- Files: `/agencies/dashboard/`, `/api/agencies/`, expand `brand-config.ts`, new `/api/generate/bulk/`

@@ -41,12 +41,12 @@ const GENERATOR_PROMPTS: Record<string, GeneratorDef> = {
   restaurant: {
     name: "Restaurant",
     prompt:
-      "Create an elegant restaurant website for [restaurant name]. Include a hero with ambiance photo, interactive menu organized by categories with prices, photo gallery, online reservation form with date/time picker, hours and location, and customer reviews.",
+      "Create an elegant fine-dining restaurant website. HERO: Full-viewport hero image (.hero-image) of a beautifully plated gourmet dish (use seed/gourmet-food/1400/800) with warm overlay text (.overlay-text) and serif typography. MENU: Interactive menu organized by categories (Starters, Mains, Desserts, Wine) with dish names, descriptions, and prices. GALLERY: Photo gallery (.image-gallery) showing food, interior ambiance, and chef at work (use seed/restaurant-interior, seed/chef-cooking, seed/fine-dining, seed/wine-cellar). ABOUT: Chef profile section with story and philosophy. RESERVATION: Elegant booking form with date, time, party size, and special occasions. HOURS: Opening times with address and Google Maps placeholder. TESTIMONIALS: Dining reviews with specific dish mentions and ratings. Warm earth tones (#78350f amber, #fef3c7 cream, #1c1917 dark), Playfair Display headings, full-bleed food photography throughout. Must feel intimate, luxurious, and appetizing.",
   },
   realestate: {
     name: "Real Estate",
     prompt:
-      "Create a real estate listing website for [describe your market]. Include property search with filters (price, beds, location), property cards with photos and key details, mortgage calculator, agent profiles, and a contact/inquiry form.",
+      "Create a premium luxury real estate website. HERO: Full-viewport hero carousel (.hero-carousel) with 3-5 stunning property photos using picsum seed/luxury-house, seed/modern-villa, seed/penthouse-view, seed/pool-villa, seed/estate-garden. White overlay headline text. LISTINGS: Property grid (.property-grid) with 6 property cards (.property-card) showing price, beds/baths/sqft (.feature-badge), and status badges (.status-for-sale). AGENTS: 3 agent profiles with photos, contact info, and bios. NEIGHBORHOODS: Full-width neighborhood showcase with descriptions and images. STATS: Properties sold, years experience, average sale price, client satisfaction. Navy (#1a365d) and gold (#c9a96e) palette, Playfair Display serif headings, full-bleed imagery throughout. Cinematic, aspirational, visually stunning.",
   },
   marketplace: {
     name: "Marketplace",
