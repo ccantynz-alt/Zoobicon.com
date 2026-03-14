@@ -558,8 +558,8 @@ export default function AiPage() {
       {/* ───────── Powered by Claude ───────── */}
       <section className="relative py-24 px-6">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/2 left-1/4 w-[500px] h-[500px] bg-accent-purple/5 rounded-full blur-[120px]" />
-          <div className="absolute top-1/2 right-1/4 w-[400px] h-[400px] bg-accent-cyan/4 rounded-full blur-[100px]" />
+          <div className="absolute top-1/2 left-1/4 w-[500px] h-[500px] bg-accent-purple/8 rounded-full blur-[120px]" />
+          <div className="absolute top-1/2 right-1/4 w-[400px] h-[400px] bg-accent-cyan/7 rounded-full blur-[100px]" />
         </div>
 
         <div className="relative max-w-5xl mx-auto">
@@ -606,7 +606,7 @@ export default function AiPage() {
               <motion.div variants={slideInRight} className="relative bg-gradient-to-br from-accent-purple/5 to-brand-500/5 p-10 md:p-12 flex items-center justify-center border-l border-white/10">
                 <div className="relative">
                   {/* Glow ring */}
-                  <div className="absolute inset-0 w-48 h-48 mx-auto rounded-full bg-gradient-to-br from-accent-purple/20 to-brand-500/20 blur-2xl" />
+                  <div className="absolute inset-0 w-48 h-48 mx-auto rounded-full bg-gradient-to-br from-accent-purple/30 to-brand-500/30 blur-2xl" />
                   <div className="relative w-48 h-48 mx-auto rounded-full border border-white/15 bg-[#0d1525]/80 flex items-center justify-center">
                     <div className="w-36 h-36 rounded-full border border-accent-purple/20 bg-gradient-to-br from-accent-purple/10 to-brand-500/10 flex items-center justify-center">
                       <div className="text-center">
@@ -633,7 +633,7 @@ export default function AiPage() {
       {/* ───────── CTA ───────── */}
       <section className="relative py-32 px-6">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-gradient-to-r from-brand-500/10 via-accent-purple/10 to-accent-cyan/10 rounded-full blur-[150px]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-gradient-to-r from-brand-500/15 via-accent-purple/15 to-accent-cyan/15 rounded-full blur-[150px]" />
         </div>
 
         <div className="relative max-w-3xl mx-auto text-center">

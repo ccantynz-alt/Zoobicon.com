@@ -286,7 +286,7 @@ const SDK_CARDS = [
       "Full-featured SDK with TypeScript types, streaming support, and automatic retries. Coming soon.",
     color: "text-yellow-400",
     borderColor: "border-yellow-500/30",
-    bgGlow: "bg-yellow-500/5",
+    bgGlow: "bg-yellow-500/8",
   },
   {
     icon: Terminal,
@@ -296,7 +296,7 @@ const SDK_CARDS = [
       "Pythonic interface with async support, Pydantic models, and comprehensive type hints. Coming soon.",
     color: "text-blue-400",
     borderColor: "border-blue-500/30",
-    bgGlow: "bg-blue-500/5",
+    bgGlow: "bg-blue-500/8",
   },
   {
     icon: Globe,
@@ -306,7 +306,7 @@ const SDK_CARDS = [
       "Direct HTTP calls with JSON. OpenAPI 3.1 spec available. Works with any language.",
     color: "text-brand-400",
     borderColor: "border-green-500/30",
-    bgGlow: "bg-green-500/5",
+    bgGlow: "bg-green-500/8",
   },
   {
     icon: Terminal,
@@ -316,7 +316,7 @@ const SDK_CARDS = [
       "Generate, deploy, and manage sites from your terminal. Perfect for scripting and automation.",
     color: "text-blue-400",
     borderColor: "border-blue-500/30",
-    bgGlow: "bg-blue-500/5",
+    bgGlow: "bg-blue-500/8",
   },
   {
     icon: GitBranch,
@@ -326,7 +326,7 @@ const SDK_CARDS = [
       "Auto-deploy on push. Preview environments for PRs. Full CI/CD integration. Coming soon.",
     color: "text-gray-300",
     borderColor: "border-gray-500/30",
-    bgGlow: "bg-gray-500/5",
+    bgGlow: "bg-gray-500/8",
   },
   {
     icon: Webhook,
@@ -336,7 +336,7 @@ const SDK_CARDS = [
       "Real-time notifications for build completion, deployment, SEO alerts, and more.",
     color: "text-orange-400",
     borderColor: "border-orange-500/30",
-    bgGlow: "bg-orange-500/5",
+    bgGlow: "bg-orange-500/8",
   },
 ];
 
@@ -474,7 +474,7 @@ export default function ZoobiconIOPage() {
       <section className="relative pt-32 pb-24 px-4">
         {/* Grid background */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(37,99,235,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(37,99,235,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-brand-500/5 rounded-full blur-[120px]" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-brand-500/8 rounded-full blur-[120px]" />
 
         <motion.div
           className="relative max-w-5xl mx-auto text-center"
@@ -875,7 +875,7 @@ export default function ZoobiconIOPage() {
       {/* ─── Final CTA ─── */}
       <section className="relative py-32 px-4">
         <div className="absolute inset-0 bg-gradient-to-t from-brand-500/[0.03] to-transparent" />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-brand-500/5 rounded-full blur-[100px]" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-brand-500/8 rounded-full blur-[100px]" />
 
         <motion.div
           initial="hidden"

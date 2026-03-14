@@ -300,7 +300,7 @@ export default function ZoobiconShPage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="hidden md:flex items-center gap-2 bg-dark-200 border border-white/[0.10] rounded-lg px-3 py-1.5 font-mono text-xs text-white/40">
+            <div className="hidden md:flex items-center gap-2 bg-dark-200 border border-white/[0.10] rounded-lg px-3 py-1.5 font-mono text-xs text-white/60">
               <span className="text-green-400">$</span> npm i -g zoobicon-cli
               <button onClick={() => copyText("npm i -g zoobicon-cli", "nav")} className="text-white/40 hover:text-white/50 ml-1">
                 {copied === "nav" ? <Check className="w-3 h-3 text-accent-cyan" /> : <Copy className="w-3 h-3" />}
@@ -327,7 +327,7 @@ export default function ZoobiconShPage() {
               </span>
             </motion.h1>
 
-            <motion.p variants={fadeInUp} className="max-w-2xl text-lg text-white/40 leading-relaxed mb-10">
+            <motion.p variants={fadeInUp} className="max-w-2xl text-lg text-white/60 leading-relaxed mb-10">
               Generate, build, and deploy AI-powered websites without leaving your command line.
               Free subdomains included.
             </motion.p>
@@ -366,7 +366,7 @@ export default function ZoobiconShPage() {
                 CLI Commands<br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-purple">Reference</span>
               </h2>
-              <p className="text-white/40 max-w-xl mx-auto">Everything you need, right from your terminal.</p>
+              <p className="text-white/60 max-w-xl mx-auto">Everything you need, right from your terminal.</p>
             </motion.div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-3">
@@ -414,7 +414,7 @@ export default function ZoobiconShPage() {
                   Every Project Gets a Free<br />
                   <span className="text-brand-400 font-mono">*.zoobicon.sh</span> Subdomain
                 </h2>
-                <p className="text-lg text-white/40 max-w-2xl mx-auto">
+                <p className="text-lg text-white/60 max-w-2xl mx-auto">
                   Deploy instantly with zero configuration. Free subdomains for every project.
                 </p>
               </div>
@@ -461,7 +461,7 @@ export default function ZoobiconShPage() {
                 From Idea to<br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-cyan">Production</span>
               </h2>
-              <p className="text-white/40 max-w-xl mx-auto">A streamlined pipeline from local development to live deployment.</p>
+              <p className="text-white/60 max-w-xl mx-auto">A streamlined pipeline from local development to live deployment.</p>
             </motion.div>
 
             {/* Pipeline visual */}
@@ -524,7 +524,7 @@ export default function ZoobiconShPage() {
                   Deploy on<br />
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-purple">Every Push</span>
                 </h2>
-                <p className="text-lg text-white/40 leading-relaxed mb-8">
+                <p className="text-lg text-white/60 leading-relaxed mb-8">
                   Drop Zoobicon into any CI/CD pipeline. Generate, test, and deploy automatically on every commit to main.
                 </p>
                 <div className="space-y-3">
@@ -599,7 +599,7 @@ export default function ZoobiconShPage() {
               <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
                 Install the <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-cyan">CLI</span>
               </h2>
-              <p className="text-lg text-white/40 mb-8">One command to deploy AI-powered websites from your terminal.</p>
+              <p className="text-lg text-white/60 mb-8">One command to deploy AI-powered websites from your terminal.</p>
             </motion.div>
 
             <motion.div variants={fadeInUp}>
