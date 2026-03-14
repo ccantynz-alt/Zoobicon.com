@@ -51,7 +51,7 @@ const ADMIN_QUICK_ACTIONS = [
   { icon: Pencil, label: "Live Editor", desc: "Edit deployed sites", href: "/edit", color: "from-amber-500 to-orange-600" },
   { icon: Shield, label: "Admin Panel", desc: "System controls", href: "/admin", color: "from-red-500 to-rose-600" },
   { icon: Key, label: "API Keys", desc: "Developer access", href: "/auth/settings", color: "from-cyan-500 to-blue-600" },
-  { icon: BarChart3, label: "Analytics", desc: "Site performance", href: "/hosting", color: "from-blue-500 to-fuchsia-600" },
+  { icon: BarChart3, label: "Analytics", desc: "Site performance", href: "/analytics", color: "from-blue-500 to-fuchsia-600" },
   { icon: Settings, label: "Settings", desc: "Account config", href: "/auth/settings", color: "from-gray-500 to-slate-600" },
 ];
 
@@ -177,6 +177,9 @@ export default function DashboardPage() {
                 </Link>
                 <Link href="/builder" className="px-3 py-1.5 text-sm text-white/40 hover:text-white/60 rounded-lg transition-colors">
                   Builder
+                </Link>
+                <Link href="/analytics" className="px-3 py-1.5 text-sm text-white/40 hover:text-white/60 rounded-lg transition-colors">
+                  Analytics
                 </Link>
               </div>
             </div>
