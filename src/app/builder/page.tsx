@@ -1251,7 +1251,7 @@ function BuilderPage() {
   const activeToolLabel = TOOLS.find((t) => t.id === activeTool)?.label ?? "";
 
   return (
-    <div className="flex flex-col h-screen bg-[#0a0a0f] relative overflow-hidden">
+    <div className="flex flex-col h-screen bg-[#111a2e] relative overflow-hidden">
       {/* Welcome modal for first-time users */}
       {showWelcome && (
         <WelcomeModal onClose={() => { setShowWelcome(false); dismissWelcomeModal(); }} />
@@ -1276,10 +1276,10 @@ function BuilderPage() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Left panel — Prompt (before generation) or Chat editor (after) */}
-        <div className="w-[400px] min-w-[340px] flex flex-col border-r border-white/[0.06] bg-[#12121a]">
+        <div className="w-[400px] min-w-[340px] flex flex-col border-r border-white/[0.10] bg-[#141e33]">
           {!hasCode ? (
             <>
-              <div className="px-4 py-3 border-b border-white/[0.06]">
+              <div className="px-4 py-3 border-b border-white/[0.10]">
                 {generatorBanner ? (
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -1290,7 +1290,7 @@ function BuilderPage() {
                     </div>
                     <button
                       onClick={() => setGeneratorBanner(null)}
-                      className="text-white/30 hover:text-white/60 text-xs"
+                      className="text-white/50 hover:text-white/60 text-xs"
                     >
                       ✕
                     </button>
@@ -1321,7 +1321,7 @@ function BuilderPage() {
             </>
           ) : (
             <>
-              <div className="px-4 py-3 border-b border-white/[0.06] flex items-center justify-between">
+              <div className="px-4 py-3 border-b border-white/[0.10] flex items-center justify-between">
                 <span className="text-[11px] uppercase tracking-[2px] text-brand-400/50">
                   AI Editor
                 </span>
@@ -1344,14 +1344,14 @@ function BuilderPage() {
         </div>
 
         {/* Center panel — Preview / Code */}
-        <div className="flex-1 flex flex-col bg-[#0a0a0f]/80 backdrop-blur-sm">
+        <div className="flex-1 flex flex-col bg-[#111a2e]/80 backdrop-blur-sm">
           {/* Tabs */}
-          <div className="flex items-center border-b border-white/[0.06] px-2">
+          <div className="flex items-center border-b border-white/[0.10] px-2">
             <button
               className={`px-4 py-2.5 text-xs font-medium transition-colors border-b-2 ${
                 activeTab === "preview"
                   ? "border-brand-500 text-brand-400"
-                  : "border-transparent text-white/30 hover:text-white/50"
+                  : "border-transparent text-white/50 hover:text-white/65"
               }`}
               onClick={() => setActiveTab("preview")}
             >
@@ -1361,7 +1361,7 @@ function BuilderPage() {
               className={`px-4 py-2.5 text-xs font-medium transition-colors border-b-2 ${
                 activeTab === "code"
                   ? "border-brand-500 text-brand-400"
-                  : "border-transparent text-white/30 hover:text-white/50"
+                  : "border-transparent text-white/50 hover:text-white/65"
               }`}
               onClick={() => setActiveTab("code")}
             >
@@ -1372,7 +1372,7 @@ function BuilderPage() {
                 className={`px-4 py-2.5 text-xs font-medium transition-colors border-b-2 ${
                   activeTab === "seo"
                     ? "border-brand-500 text-brand-400"
-                    : "border-transparent text-white/30 hover:text-white/50"
+                    : "border-transparent text-white/50 hover:text-white/65"
                 }`}
                 onClick={() => setActiveTab("seo")}
               >
@@ -1382,12 +1382,12 @@ function BuilderPage() {
 
             {/* Undo / Redo */}
             {hasCode && (
-              <div className="flex items-center gap-0.5 ml-3 border-l border-white/[0.06] pl-3">
+              <div className="flex items-center gap-0.5 ml-3 border-l border-white/[0.10] pl-3">
                 <button
                   onClick={handleUndo}
                   disabled={!canUndo}
                   title="Undo (Ctrl+Z)"
-                  className="p-1.5 rounded text-white/30 hover:text-white/60 hover:bg-white/[0.04] transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+                  className="p-1.5 rounded text-white/50 hover:text-white/60 hover:bg-white/[0.07] transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
                 >
                   <Undo2 size={14} />
                 </button>
@@ -1395,7 +1395,7 @@ function BuilderPage() {
                   onClick={handleRedo}
                   disabled={!canRedo}
                   title="Redo (Ctrl+Shift+Z)"
-                  className="p-1.5 rounded text-white/30 hover:text-white/60 hover:bg-white/[0.04] transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+                  className="p-1.5 rounded text-white/50 hover:text-white/60 hover:bg-white/[0.07] transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
                 >
                   <Redo2 size={14} />
                 </button>
@@ -1403,7 +1403,7 @@ function BuilderPage() {
                   onClick={() => setShowDiffPanel(true)}
                   disabled={snapshots.length < 2}
                   title="Version History"
-                  className="p-1.5 rounded text-white/30 hover:text-white/60 hover:bg-white/[0.04] transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+                  className="p-1.5 rounded text-white/50 hover:text-white/60 hover:bg-white/[0.07] transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
                 >
                   <History size={14} />
                 </button>
@@ -1446,7 +1446,7 @@ function BuilderPage() {
                   onClick={handleSaveTemplate}
                   disabled={saveStatus === "saving"}
                   title="Save as reusable template"
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-white/[0.04] text-white/40 hover:text-white/60 hover:bg-white/[0.08]"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-white/[0.07] text-white/60 hover:text-white/60 hover:bg-white/[0.08]"
                 >
                   {saveStatus === "saved" ? <Check size={14} className="text-emerald-400" /> : <Save size={14} />}
                   {saveStatus === "saving" ? "Saving..." : saveStatus === "saved" ? "Saved" : "Save"}
@@ -1508,8 +1508,8 @@ function BuilderPage() {
 
         {/* Tool panel (slides open when a tool is active) */}
         {activeTool && (
-          <div className="w-[380px] flex flex-col border-l border-white/[0.06] bg-[#0a0a0f]/90 backdrop-blur-sm animate-in slide-in-from-right duration-200">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+          <div className="w-[380px] flex flex-col border-l border-white/[0.10] bg-[#111a2e]/90 backdrop-blur-sm animate-in slide-in-from-right duration-200">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.10]">
               <span className="text-[11px] uppercase tracking-[2px] text-brand-400/50">
                 {activeToolLabel}
               </span>
@@ -1525,7 +1525,7 @@ function BuilderPage() {
         )}
 
         {/* Right toolbar — Tool icons */}
-        <div className="w-12 flex flex-col items-center py-2 gap-1 border-l border-white/[0.06] bg-[#0a0a0f]/90 backdrop-blur-sm">
+        <div className="w-12 flex flex-col items-center py-2 gap-1 border-l border-white/[0.10] bg-[#111a2e]/90 backdrop-blur-sm">
           {TOOLS.map((tool) => (
             <button
               key={tool.id}

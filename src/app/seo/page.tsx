@@ -159,7 +159,7 @@ function ScoreCircle({ score, size = 160 }: { score: number; size?: number }) {
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <span className={`text-4xl font-black ${getScoreColor(score)}`}>{score}</span>
-        <span className="text-xs text-white/40 mt-1">{getScoreLabel(score)}</span>
+        <span className="text-xs text-white/60 mt-1">{getScoreLabel(score)}</span>
       </div>
     </div>
   );
@@ -172,10 +172,10 @@ function CategoryCard({ category }: { category: SeoCategory }) {
   const pct = category.maxScore > 0 ? Math.round((category.score / category.maxScore) * 100) : 0;
 
   return (
-    <div className="border border-white/[0.06] bg-white/[0.02] rounded-xl overflow-hidden">
+    <div className="border border-white/[0.10] bg-white/[0.05] rounded-xl overflow-hidden">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-4 hover:bg-white/[0.02] transition-colors text-left"
+        className="w-full flex items-center justify-between p-4 hover:bg-white/[0.05] transition-colors text-left"
       >
         <div className="flex items-center gap-3">
           <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold border ${getScoreBg(pct)}`}>
@@ -183,16 +183,16 @@ function CategoryCard({ category }: { category: SeoCategory }) {
           </div>
           <div>
             <span className="font-semibold text-sm">{category.name}</span>
-            <div className="text-xs text-white/30 mt-0.5">
+            <div className="text-xs text-white/50 mt-0.5">
               {category.checks.filter(c => c.passed).length}/{category.checks.length} checks passed
             </div>
           </div>
         </div>
-        <ChevronRight className={`w-4 h-4 text-white/30 transition-transform ${expanded ? "rotate-90" : ""}`} />
+        <ChevronRight className={`w-4 h-4 text-white/50 transition-transform ${expanded ? "rotate-90" : ""}`} />
       </button>
 
       {expanded && (
-        <div className="border-t border-white/[0.04] p-4 space-y-2">
+        <div className="border-t border-white/[0.08] p-4 space-y-2">
           {category.checks.map((check, i) => (
             <div key={i} className="flex items-start gap-2.5">
               {check.passed ? (
@@ -202,7 +202,7 @@ function CategoryCard({ category }: { category: SeoCategory }) {
               )}
               <div>
                 <div className="text-sm font-medium">{check.name}</div>
-                <div className="text-xs text-white/40 mt-0.5">{check.message}</div>
+                <div className="text-xs text-white/60 mt-0.5">{check.message}</div>
                 <span className={`inline-block text-[10px] mt-1 px-1.5 py-0.5 rounded ${
                   check.impact === "high" ? "bg-red-500/10 text-red-400" :
                   check.impact === "medium" ? "bg-yellow-500/10 text-yellow-400" :
@@ -409,9 +409,9 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
 
   // ─── Render ───
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white">
+    <div className="min-h-screen bg-[#111a2e] text-white">
       {/* Top Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.04] bg-[#050507]/90 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08] bg-[#0d1525]/90 backdrop-blur-2xl">
         <div className="max-w-[1600px] mx-auto px-4 lg:px-6 flex items-center justify-between h-14">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2">
@@ -420,28 +420,28 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
               </div>
               <span className="text-sm font-bold tracking-tight">Zoobicon</span>
             </Link>
-            <span className="text-white/10">/</span>
-            <span className="text-sm text-white/40 font-medium">SEO Agent</span>
+            <span className="text-white/30">/</span>
+            <span className="text-sm text-white/60 font-medium">SEO Agent</span>
           </div>
           <div className="flex items-center gap-3">
             {user ? (
               <>
-                <Link href="/dashboard" className="text-xs text-white/40 hover:text-white/70 transition-colors px-3 py-1.5 flex items-center gap-1.5">
+                <Link href="/dashboard" className="text-xs text-white/60 hover:text-white/70 transition-colors px-3 py-1.5 flex items-center gap-1.5">
                   <LayoutDashboard className="w-3 h-3" />
                   Dashboard
                 </Link>
-                <button onClick={handleLogout} className="text-xs text-white/40 hover:text-white/70 transition-colors px-3 py-1.5 flex items-center gap-1.5">
+                <button onClick={handleLogout} className="text-xs text-white/60 hover:text-white/70 transition-colors px-3 py-1.5 flex items-center gap-1.5">
                   <LogOut className="w-3 h-3" />
                   Sign out
                 </button>
-                <div className="flex items-center gap-1.5 text-xs bg-white/[0.04] px-3 py-1.5 rounded-lg">
+                <div className="flex items-center gap-1.5 text-xs bg-white/[0.07] px-3 py-1.5 rounded-lg">
                   <User className="w-3 h-3 text-cyan-400" />
                   <span className="text-white/60">{user.name || user.email.split("@")[0]}</span>
                 </div>
               </>
             ) : (
               <>
-                <Link href="/auth/login" className="text-xs text-white/40 hover:text-white/70 transition-colors px-3 py-1.5">
+                <Link href="/auth/login" className="text-xs text-white/60 hover:text-white/70 transition-colors px-3 py-1.5">
                   Sign in
                 </Link>
                 <Link href="/auth/signup" className="text-xs bg-gradient-to-r from-cyan-500 to-emerald-500 px-4 py-1.5 rounded-lg font-semibold text-white">
@@ -455,7 +455,7 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
 
       <div className="flex pt-14">
         {/* Sidebar */}
-        <aside className="fixed left-0 top-14 bottom-0 w-56 border-r border-white/[0.04] bg-[#07070c]/80 backdrop-blur-xl hidden lg:block">
+        <aside className="fixed left-0 top-14 bottom-0 w-56 border-r border-white/[0.08] bg-[#0d1525]/80 backdrop-blur-xl hidden lg:block">
           <div className="p-4 space-y-1">
             {NAV_ITEMS.map(item => (
               <button
@@ -464,7 +464,7 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
                 className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-all ${
                   activeView === item.id
                     ? "bg-cyan-500/10 text-cyan-400 font-medium"
-                    : "text-white/40 hover:text-white/70 hover:bg-white/[0.03]"
+                    : "text-white/60 hover:text-white/70 hover:bg-white/[0.06]"
                 }`}
               >
                 <item.icon className="w-4 h-4" />
@@ -473,10 +473,10 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
             ))}
           </div>
 
-          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/[0.04]">
+          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/[0.08]">
             <Link
               href="/products/seo-agent"
-              className="flex items-center gap-2 text-xs text-white/20 hover:text-white/40 transition-colors"
+              className="flex items-center gap-2 text-xs text-white/40 hover:text-white/60 transition-colors"
             >
               <ExternalLink className="w-3 h-3" />
               About SEO Agent
@@ -485,7 +485,7 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
         </aside>
 
         {/* Mobile nav */}
-        <div className="lg:hidden fixed top-14 left-0 right-0 z-40 border-b border-white/[0.04] bg-[#07070c]/90 backdrop-blur-xl">
+        <div className="lg:hidden fixed top-14 left-0 right-0 z-40 border-b border-white/[0.08] bg-[#0d1525]/90 backdrop-blur-xl">
           <div className="flex overflow-x-auto px-4 py-2 gap-1">
             {NAV_ITEMS.map(item => (
               <button
@@ -494,7 +494,7 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
                 className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs whitespace-nowrap transition-all ${
                   activeView === item.id
                     ? "bg-cyan-500/10 text-cyan-400 font-medium"
-                    : "text-white/40 hover:text-white/70"
+                    : "text-white/60 hover:text-white/70"
                 }`}
               >
                 <item.icon className="w-3.5 h-3.5" />
@@ -513,20 +513,20 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
               <div className="space-y-8">
                 <div>
                   <h1 className="text-2xl font-bold mb-1">SEO Agent Dashboard</h1>
-                  <p className="text-white/40 text-sm">Analyze, optimize, and track your website SEO performance.</p>
+                  <p className="text-white/60 text-sm">Analyze, optimize, and track your website SEO performance.</p>
                 </div>
 
                 {/* Quick action cards */}
                 <div className="grid md:grid-cols-2 gap-4">
                   {/* Analyze by URL */}
-                  <div className="border border-white/[0.06] bg-white/[0.02] rounded-xl p-6">
+                  <div className="border border-white/[0.10] bg-white/[0.05] rounded-xl p-6">
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center">
                         <Globe className="w-5 h-5 text-cyan-400" />
                       </div>
                       <div>
                         <h3 className="font-semibold text-sm">Analyze a Website</h3>
-                        <p className="text-xs text-white/30">Enter a URL to scan</p>
+                        <p className="text-xs text-white/50">Enter a URL to scan</p>
                       </div>
                     </div>
                     <div className="flex gap-2">
@@ -536,7 +536,7 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
                         onChange={e => setUrlInput(e.target.value)}
                         onKeyDown={e => e.key === "Enter" && handleUrlAnalysis()}
                         placeholder="https://example.com"
-                        className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-sm placeholder:text-white/20 focus:outline-none focus:border-cyan-500/30"
+                        className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-lg px-3 py-2 text-sm placeholder:text-white/40 focus:outline-none focus:border-cyan-500/30"
                       />
                       <button
                         onClick={handleUrlAnalysis}
@@ -550,14 +550,14 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
                   </div>
 
                   {/* Analyze by HTML */}
-                  <div className="border border-white/[0.06] bg-white/[0.02] rounded-xl p-6">
+                  <div className="border border-white/[0.10] bg-white/[0.05] rounded-xl p-6">
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
                         <Code2 className="w-5 h-5 text-purple-400" />
                       </div>
                       <div>
                         <h3 className="font-semibold text-sm">Paste HTML Code</h3>
-                        <p className="text-xs text-white/30">Analyze raw HTML source</p>
+                        <p className="text-xs text-white/50">Analyze raw HTML source</p>
                       </div>
                     </div>
                     <textarea
@@ -565,7 +565,7 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
                       onChange={e => setHtmlInput(e.target.value)}
                       placeholder="<!DOCTYPE html>&#10;<html>..."
                       rows={3}
-                      className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-sm placeholder:text-white/20 focus:outline-none focus:border-purple-500/30 resize-none font-mono text-xs"
+                      className="w-full bg-white/[0.07] border border-white/[0.12] rounded-lg px-3 py-2 text-sm placeholder:text-white/40 focus:outline-none focus:border-purple-500/30 resize-none font-mono text-xs"
                     />
                     <div className="flex gap-2 mt-2">
                       <input
@@ -573,7 +573,7 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
                         value={keywordInput}
                         onChange={e => setKeywordInput(e.target.value)}
                         placeholder="Target keyword (optional)"
-                        className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-sm placeholder:text-white/20 focus:outline-none focus:border-white/10"
+                        className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-lg px-3 py-2 text-sm placeholder:text-white/40 focus:outline-none focus:border-white/10"
                       />
                       <button
                         onClick={handleHtmlAnalysis}
@@ -593,7 +593,7 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
                     <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
                     <div>
                       <div className="text-sm font-medium text-red-400">Analysis Error</div>
-                      <div className="text-xs text-white/50 mt-1">{analysisError}</div>
+                      <div className="text-xs text-white/65 mt-1">{analysisError}</div>
                     </div>
                   </div>
                 )}
@@ -607,19 +607,19 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
                         <button
                           key={record.id}
                           onClick={() => viewRecord(record)}
-                          className="w-full flex items-center gap-4 border border-white/[0.06] bg-white/[0.02] rounded-xl p-4 hover:bg-white/[0.04] transition-colors text-left group"
+                          className="w-full flex items-center gap-4 border border-white/[0.10] bg-white/[0.05] rounded-xl p-4 hover:bg-white/[0.07] transition-colors text-left group"
                         >
                           <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold border ${getScoreBg(record.score)}`}>
                             <span className={getScoreColor(record.score)}>{record.score}</span>
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="text-sm font-medium truncate">{record.label}</div>
-                            <div className="text-xs text-white/30 mt-0.5">
+                            <div className="text-xs text-white/50 mt-0.5">
                               {new Date(record.timestamp).toLocaleDateString()} &middot;
                               {record.targetKeyword ? ` Keyword: ${record.targetKeyword}` : " No keyword"}
                             </div>
                           </div>
-                          <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-white/40 transition-colors" />
+                          <ChevronRight className="w-4 h-4 text-white/40 group-hover:text-white/60 transition-colors" />
                         </button>
                       ))}
                     </div>
@@ -646,19 +646,19 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
                       <Link
                         key={i}
                         href={item.href!}
-                        className="flex flex-col items-center gap-2 border border-white/[0.06] bg-white/[0.02] rounded-xl p-4 hover:bg-white/[0.04] transition-colors"
+                        className="flex flex-col items-center gap-2 border border-white/[0.10] bg-white/[0.05] rounded-xl p-4 hover:bg-white/[0.07] transition-colors"
                       >
-                        <item.icon className="w-5 h-5 text-white/30" />
-                        <span className="text-xs text-white/40">{item.label}</span>
+                        <item.icon className="w-5 h-5 text-white/50" />
+                        <span className="text-xs text-white/60">{item.label}</span>
                       </Link>
                     ) : (
                       <button
                         key={i}
                         onClick={() => setActiveView(item.view!)}
-                        className="flex flex-col items-center gap-2 border border-white/[0.06] bg-white/[0.02] rounded-xl p-4 hover:bg-white/[0.04] transition-colors"
+                        className="flex flex-col items-center gap-2 border border-white/[0.10] bg-white/[0.05] rounded-xl p-4 hover:bg-white/[0.07] transition-colors"
                       >
-                        <item.icon className="w-5 h-5 text-white/30" />
-                        <span className="text-xs text-white/40">{item.label}</span>
+                        <item.icon className="w-5 h-5 text-white/50" />
+                        <span className="text-xs text-white/60">{item.label}</span>
                       </button>
                     )
                   ))}
@@ -670,14 +670,14 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
             {activeView === "analyze" && (
               <div className="space-y-6">
                 {/* Input area at top */}
-                <div className="border border-white/[0.06] bg-white/[0.02] rounded-xl p-5">
+                <div className="border border-white/[0.10] bg-white/[0.05] rounded-xl p-5">
                   <h2 className="text-sm font-semibold mb-3">Analyze HTML</h2>
                   <textarea
                     value={htmlInput}
                     onChange={e => setHtmlInput(e.target.value)}
                     placeholder="Paste your full HTML source code here..."
                     rows={4}
-                    className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2.5 text-xs font-mono placeholder:text-white/20 focus:outline-none focus:border-cyan-500/30 resize-none"
+                    className="w-full bg-white/[0.07] border border-white/[0.12] rounded-lg px-3 py-2.5 text-xs font-mono placeholder:text-white/40 focus:outline-none focus:border-cyan-500/30 resize-none"
                   />
                   <div className="flex gap-2 mt-3">
                     <input
@@ -685,7 +685,7 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
                       value={keywordInput}
                       onChange={e => setKeywordInput(e.target.value)}
                       placeholder="Target keyword (optional)"
-                      className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-sm placeholder:text-white/20 focus:outline-none focus:border-white/10"
+                      className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-lg px-3 py-2 text-sm placeholder:text-white/40 focus:outline-none focus:border-white/10"
                     />
                     <button
                       onClick={handleHtmlAnalysis}
@@ -719,13 +719,13 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
                 {currentResult && (
                   <div className="space-y-6">
                     {/* Score header */}
-                    <div className="border border-white/[0.06] bg-white/[0.02] rounded-xl p-6">
+                    <div className="border border-white/[0.10] bg-white/[0.05] rounded-xl p-6">
                       <div className="flex flex-col md:flex-row items-center gap-6">
                         <ScoreCircle score={currentResult.score} />
                         <div className="flex-1 text-center md:text-left">
                           <h2 className="text-xl font-bold mb-1">SEO Score: {currentResult.score}/100</h2>
-                          <p className="text-sm text-white/40 mb-1">{currentLabel}</p>
-                          <p className="text-sm text-white/30">
+                          <p className="text-sm text-white/60 mb-1">{currentLabel}</p>
+                          <p className="text-sm text-white/50">
                             {currentResult.categories.reduce((sum, c) => sum + c.checks.filter(ch => ch.passed).length, 0)}/
                             {currentResult.categories.reduce((sum, c) => sum + c.checks.length, 0)} checks passed
                             {" "}&middot;{" "}
@@ -759,7 +759,7 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
                         </h3>
                         <div className="space-y-2">
                           {currentResult.suggestions.map((s, i) => (
-                            <div key={i} className="flex items-start gap-3 border border-white/[0.06] bg-white/[0.02] rounded-lg p-3">
+                            <div key={i} className="flex items-start gap-3 border border-white/[0.10] bg-white/[0.05] rounded-lg p-3">
                               <span className={`flex-shrink-0 text-[10px] font-bold uppercase px-2 py-0.5 rounded mt-0.5 ${
                                 s.priority === "high" ? "bg-red-500/10 text-red-400" :
                                 s.priority === "medium" ? "bg-yellow-500/10 text-yellow-400" :
@@ -769,7 +769,7 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
                               </span>
                               <div className="flex-1">
                                 <p className="text-sm">{s.message}</p>
-                                <span className="text-xs text-white/20 mt-0.5">{s.category}</span>
+                                <span className="text-xs text-white/40 mt-0.5">{s.category}</span>
                               </div>
                             </div>
                           ))}
@@ -784,7 +784,7 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
                           <Sparkles className="w-6 h-6 text-cyan-400 flex-shrink-0 mt-0.5" />
                           <div className="flex-1">
                             <h3 className="font-semibold mb-1">Auto-Fix with AI</h3>
-                            <p className="text-sm text-white/40 mb-3">
+                            <p className="text-sm text-white/60 mb-3">
                               Let the AI agent automatically fix the SEO issues found in your HTML.
                               It will apply the high-priority recommendations and return improved code.
                             </p>
@@ -803,7 +803,7 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
 
                 {/* Empty state */}
                 {!currentResult && !analyzing && !analysisError && (
-                  <div className="text-center py-16 text-white/20">
+                  <div className="text-center py-16 text-white/40">
                     <Search className="w-12 h-12 mx-auto mb-4 opacity-30" />
                     <p className="text-sm">Paste HTML code above and click Analyze to get your SEO score.</p>
                   </div>
@@ -816,10 +816,10 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
               <div className="space-y-6">
                 <div>
                   <h1 className="text-2xl font-bold mb-1">Keyword Research</h1>
-                  <p className="text-white/40 text-sm">Get AI-powered keyword suggestions for your business.</p>
+                  <p className="text-white/60 text-sm">Get AI-powered keyword suggestions for your business.</p>
                 </div>
 
-                <div className="border border-white/[0.06] bg-white/[0.02] rounded-xl p-5">
+                <div className="border border-white/[0.10] bg-white/[0.05] rounded-xl p-5">
                   <h3 className="text-sm font-semibold mb-3">Describe your business or industry</h3>
                   <div className="flex gap-2">
                     <input
@@ -828,7 +828,7 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
                       onChange={e => setKeywordBusiness(e.target.value)}
                       onKeyDown={e => e.key === "Enter" && handleKeywordSearch()}
                       placeholder="e.g., online pet food store, SaaS project management tool, local dentist..."
-                      className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm placeholder:text-white/20 focus:outline-none focus:border-cyan-500/30"
+                      className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-lg px-3 py-2.5 text-sm placeholder:text-white/40 focus:outline-none focus:border-cyan-500/30"
                     />
                     <button
                       onClick={handleKeywordSearch}
@@ -858,23 +858,23 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
                 )}
 
                 {keywordSuggestions.length > 0 && (
-                  <div className="border border-white/[0.06] bg-white/[0.02] rounded-xl overflow-hidden">
+                  <div className="border border-white/[0.10] bg-white/[0.05] rounded-xl overflow-hidden">
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b border-white/[0.06]">
-                            <th className="text-left py-3 px-4 text-xs text-white/40 font-medium uppercase tracking-wide">Keyword</th>
-                            <th className="text-left py-3 px-4 text-xs text-white/40 font-medium uppercase tracking-wide">Volume</th>
-                            <th className="text-left py-3 px-4 text-xs text-white/40 font-medium uppercase tracking-wide">Difficulty</th>
-                            <th className="text-left py-3 px-4 text-xs text-white/40 font-medium uppercase tracking-wide">Relevance</th>
-                            <th className="text-left py-3 px-4 text-xs text-white/40 font-medium uppercase tracking-wide">Intent</th>
+                          <tr className="border-b border-white/[0.10]">
+                            <th className="text-left py-3 px-4 text-xs text-white/60 font-medium uppercase tracking-wide">Keyword</th>
+                            <th className="text-left py-3 px-4 text-xs text-white/60 font-medium uppercase tracking-wide">Volume</th>
+                            <th className="text-left py-3 px-4 text-xs text-white/60 font-medium uppercase tracking-wide">Difficulty</th>
+                            <th className="text-left py-3 px-4 text-xs text-white/60 font-medium uppercase tracking-wide">Relevance</th>
+                            <th className="text-left py-3 px-4 text-xs text-white/60 font-medium uppercase tracking-wide">Intent</th>
                           </tr>
                         </thead>
                         <tbody>
                           {keywordSuggestions.map((kw, i) => (
-                            <tr key={i} className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
+                            <tr key={i} className="border-b border-white/[0.07] hover:bg-white/[0.05] transition-colors">
                               <td className="py-3 px-4 font-medium">{kw.keyword}</td>
-                              <td className="py-3 px-4 text-white/50">{kw.searchVolume}</td>
+                              <td className="py-3 px-4 text-white/65">{kw.searchVolume}</td>
                               <td className="py-3 px-4">
                                 <span className={`inline-block text-xs px-2 py-0.5 rounded ${
                                   kw.difficulty === "Low" ? "bg-emerald-500/10 text-emerald-400" :
@@ -887,13 +887,13 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
                               <td className="py-3 px-4">
                                 <span className={`inline-block text-xs px-2 py-0.5 rounded ${
                                   kw.relevance === "High" ? "bg-cyan-500/10 text-cyan-400" :
-                                  kw.relevance === "Medium" ? "bg-white/10 text-white/50" :
-                                  "bg-white/5 text-white/30"
+                                  kw.relevance === "Medium" ? "bg-white/10 text-white/65" :
+                                  "bg-white/5 text-white/50"
                                 }`}>
                                   {kw.relevance}
                                 </span>
                               </td>
-                              <td className="py-3 px-4 text-white/40 text-xs">{kw.intent}</td>
+                              <td className="py-3 px-4 text-white/60 text-xs">{kw.intent}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -903,7 +903,7 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
                 )}
 
                 {!keywordLoading && keywordSuggestions.length === 0 && !keywordError && (
-                  <div className="text-center py-16 text-white/20">
+                  <div className="text-center py-16 text-white/40">
                     <Tag className="w-12 h-12 mx-auto mb-4 opacity-30" />
                     <p className="text-sm">Enter your business type above to get keyword suggestions.</p>
                   </div>
@@ -917,7 +917,7 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
                 <div className="flex items-center justify-between">
                   <div>
                     <h1 className="text-2xl font-bold mb-1">Analysis History</h1>
-                    <p className="text-white/40 text-sm">{history.length} analysis record{history.length !== 1 ? "s" : ""} stored locally.</p>
+                    <p className="text-white/60 text-sm">{history.length} analysis record{history.length !== 1 ? "s" : ""} stored locally.</p>
                   </div>
                   {history.length > 0 && (
                     <button
@@ -936,7 +936,7 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
                 </div>
 
                 {history.length === 0 ? (
-                  <div className="text-center py-16 text-white/20">
+                  <div className="text-center py-16 text-white/40">
                     <History className="w-12 h-12 mx-auto mb-4 opacity-30" />
                     <p className="text-sm">No analyses yet. Run your first analysis to see results here.</p>
                     <button
@@ -951,14 +951,14 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
                     {history.map(record => (
                       <div
                         key={record.id}
-                        className="flex items-center gap-4 border border-white/[0.06] bg-white/[0.02] rounded-xl p-4 group"
+                        className="flex items-center gap-4 border border-white/[0.10] bg-white/[0.05] rounded-xl p-4 group"
                       >
                         <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-sm font-bold border ${getScoreBg(record.score)}`}>
                           <span className={getScoreColor(record.score)}>{record.score}</span>
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="text-sm font-medium truncate">{record.label}</div>
-                          <div className="text-xs text-white/30 mt-0.5">
+                          <div className="text-xs text-white/50 mt-0.5">
                             {new Date(record.timestamp).toLocaleString()} &middot;
                             {record.inputType === "url" ? " URL" : " HTML"} analysis
                             {record.targetKeyword ? ` &middot; Keyword: ${record.targetKeyword}` : ""}
@@ -973,7 +973,7 @@ Output ONLY a valid JSON array of objects with these exact keys, no other text. 
                           </button>
                           <button
                             onClick={() => deleteRecord(record.id)}
-                            className="text-xs text-white/20 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-500/5 transition-colors opacity-0 group-hover:opacity-100"
+                            className="text-xs text-white/40 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-500/5 transition-colors opacity-0 group-hover:opacity-100"
                           >
                             <Trash2 className="w-3 h-3" />
                           </button>

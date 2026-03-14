@@ -132,13 +132,13 @@ export default function CLIPage() {
     <div className="relative min-h-screen">
       {/* Background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="glow-orb glow-orb-cyan w-[500px] h-[500px] top-[10%] -right-[100px] opacity-10" />
-        <div className="glow-orb glow-orb-blue w-[400px] h-[400px] bottom-[20%] left-[5%] opacity-10" />
+        <div className="glow-orb glow-orb-cyan w-[500px] h-[500px] top-[10%] -right-[100px] opacity-15" />
+        <div className="glow-orb glow-orb-blue w-[400px] h-[400px] bottom-[20%] left-[5%] opacity-15" />
         <div className="grid-pattern fixed inset-0" />
       </div>
 
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.04] bg-[#050507]/80 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08] bg-[#0d1525]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2">
@@ -149,15 +149,15 @@ export default function CLIPage() {
               <span className="text-xs font-mono text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">.sh</span>
             </Link>
             <div className="hidden md:flex items-center gap-4">
-              <a href="#commands" className="text-sm text-white/40 hover:text-white transition-colors">Commands</a>
-              <a href="#pipelines" className="text-sm text-white/40 hover:text-white transition-colors">CI/CD</a>
-              <a href="#features" className="text-sm text-white/40 hover:text-white transition-colors">Features</a>
+              <a href="#commands" className="text-sm text-white/60 hover:text-white transition-colors">Commands</a>
+              <a href="#pipelines" className="text-sm text-white/60 hover:text-white transition-colors">CI/CD</a>
+              <a href="#features" className="text-sm text-white/60 hover:text-white transition-colors">Features</a>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="hidden md:flex items-center gap-2 bg-dark-200 border border-white/[0.06] rounded-lg px-3 py-1.5 font-mono text-xs text-white/40">
+            <div className="hidden md:flex items-center gap-2 bg-dark-200 border border-white/[0.10] rounded-lg px-3 py-1.5 font-mono text-xs text-white/60">
               <span className="text-amber-400">$</span> npm i -g @zoobicon/cli
-              <button onClick={() => copyText("npm i -g @zoobicon/cli", "nav")} className="text-white/20 hover:text-white/50 ml-1">
+              <button onClick={() => copyText("npm i -g @zoobicon/cli", "nav")} className="text-white/40 hover:text-white/65 ml-1">
                 {copied === "nav" ? <Check className="w-3 h-3 text-accent-cyan" /> : <Copy className="w-3 h-3" />}
               </button>
             </div>
@@ -172,7 +172,7 @@ export default function CLIPage() {
             <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-amber-500/20 bg-amber-500/5 mb-6">
               <Terminal className="w-3 h-3 text-amber-400" />
               <span className="text-xs font-medium text-amber-400">Command Line Interface</span>
-              <span className="text-xs text-white/20 font-mono">zoobicon.sh</span>
+              <span className="text-xs text-white/40 font-mono">zoobicon.sh</span>
             </motion.div>
 
             <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[0.95] mb-6">
@@ -180,7 +180,7 @@ export default function CLIPage() {
               <span className="gradient-text">Terminal.</span>
             </motion.h1>
 
-            <motion.p variants={fadeInUp} className="max-w-2xl text-lg text-white/40 leading-relaxed mb-10">
+            <motion.p variants={fadeInUp} className="max-w-2xl text-lg text-white/60 leading-relaxed mb-10">
               The full power of Zoobicon in your command line. Generate sites, deploy, run SEO campaigns,
               and automate everything — all without leaving your terminal. Pipe-friendly. Script-ready. CI/CD-native.
             </motion.p>
@@ -188,12 +188,12 @@ export default function CLIPage() {
             <motion.div variants={fadeInUp} className="flex flex-wrap gap-3 mb-16">
               <button
                 onClick={() => copyText("npm install -g @zoobicon/cli", "hero")}
-                className="group flex items-center gap-3 bg-dark-200 border border-white/[0.08] hover:border-amber-500/30 rounded-xl px-6 py-3 font-mono text-sm text-white/60 transition-all"
+                className="group flex items-center gap-3 bg-dark-200 border border-white/[0.12] hover:border-amber-500/30 rounded-xl px-6 py-3 font-mono text-sm text-white/60 transition-all"
               >
                 <span className="text-amber-400">$</span> npm install -g @zoobicon/cli
-                {copied === "hero" ? <Check className="w-4 h-4 text-accent-cyan" /> : <Copy className="w-4 h-4 text-white/20 group-hover:text-white/50" />}
+                {copied === "hero" ? <Check className="w-4 h-4 text-accent-cyan" /> : <Copy className="w-4 h-4 text-white/40 group-hover:text-white/65" />}
               </button>
-              <a href="#commands" className="px-6 py-3 rounded-xl text-sm font-medium text-white/50 border border-white/[0.08] hover:border-white/20 transition-all flex items-center gap-2">
+              <a href="#commands" className="px-6 py-3 rounded-xl text-sm font-medium text-white/65 border border-white/[0.12] hover:border-white/20 transition-all flex items-center gap-2">
                 <Package className="w-4 h-4" />
                 View All Commands
               </a>
@@ -203,15 +203,15 @@ export default function CLIPage() {
             <motion.div variants={fadeInUp}>
               <div className="gradient-border rounded-2xl overflow-hidden">
                 <div className="bg-dark-300/80 backdrop-blur-xl">
-                  <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.06]">
+                  <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.10]">
                     <div className="flex gap-1.5">
                       <div className="w-3 h-3 rounded-full bg-red-500/60" />
                       <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
                       <div className="w-3 h-3 rounded-full bg-green-500/60" />
                     </div>
-                    <div className="flex-1 text-center text-xs text-white/20 font-mono">zsh — zoobicon</div>
+                    <div className="flex-1 text-center text-xs text-white/40 font-mono">zsh — zoobicon</div>
                   </div>
-                  <pre className="p-6 overflow-x-auto text-sm font-mono leading-relaxed text-white/50 max-h-[500px] overflow-y-auto">
+                  <pre className="p-6 overflow-x-auto text-sm font-mono leading-relaxed text-white/65 max-h-[500px] overflow-y-auto">
                     <code>{TERMINAL_DEMO}</code>
                   </pre>
                 </div>
@@ -222,7 +222,7 @@ export default function CLIPage() {
       </section>
 
       {/* Commands */}
-      <section id="commands" className="py-20 border-t border-white/[0.04]">
+      <section id="commands" className="py-20 border-t border-white/[0.08]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="text-center mb-12">
@@ -234,17 +234,17 @@ export default function CLIPage() {
             <motion.div variants={fadeInUp} className="gradient-border rounded-2xl overflow-hidden">
               <div className="bg-dark-300/60">
                 {CLI_COMMANDS.map((cmd, i) => (
-                  <div key={i} className={`flex items-center gap-4 px-6 py-3 ${i !== CLI_COMMANDS.length - 1 ? "border-b border-white/[0.03]" : ""} hover:bg-white/[0.02] transition-colors group`}>
+                  <div key={i} className={`flex items-center gap-4 px-6 py-3 ${i !== CLI_COMMANDS.length - 1 ? "border-b border-white/[0.07]" : ""} hover:bg-white/[0.05] transition-colors group`}>
                     <span className="text-[9px] font-bold uppercase tracking-wider text-amber-400/60 bg-amber-500/10 px-2 py-0.5 rounded w-16 text-center flex-shrink-0">
                       {cmd.category}
                     </span>
                     <code className="text-sm font-mono text-accent-cyan/80 flex-shrink-0">{cmd.cmd}</code>
-                    <span className="text-xs text-white/25 hidden md:block flex-1">{cmd.desc}</span>
+                    <span className="text-xs text-white/45 hidden md:block flex-1">{cmd.desc}</span>
                     <button
                       onClick={() => copyText(cmd.cmd, `cmd-${i}`)}
                       className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
                     >
-                      {copied === `cmd-${i}` ? <Check className="w-3 h-3 text-accent-cyan" /> : <Copy className="w-3 h-3 text-white/20" />}
+                      {copied === `cmd-${i}` ? <Check className="w-3 h-3 text-accent-cyan" /> : <Copy className="w-3 h-3 text-white/40" />}
                     </button>
                   </div>
                 ))}
@@ -255,7 +255,7 @@ export default function CLIPage() {
       </section>
 
       {/* CI/CD */}
-      <section id="pipelines" className="py-20 border-t border-white/[0.04]">
+      <section id="pipelines" className="py-20 border-t border-white/[0.08]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="grid lg:grid-cols-2 gap-12 items-center">
@@ -267,7 +267,7 @@ export default function CLIPage() {
                 <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
                   Deploy on<br /><span className="gradient-text">Every Push</span>
                 </h2>
-                <p className="text-lg text-white/40 leading-relaxed mb-6">
+                <p className="text-lg text-white/60 leading-relaxed mb-6">
                   Drop Zoobicon into your CI/CD pipeline. Generate, audit, and deploy automatically
                   on every commit. Works with GitHub Actions, GitLab CI, and any pipeline runner.
                 </p>
@@ -275,7 +275,7 @@ export default function CLIPage() {
                   {["Generate sites from config files in your repo", "Run SEO audits as quality gates", "Auto-deploy to production on merge to main", "Slack/Discord notifications on deploy"].map((item, i) => (
                     <div key={i} className="flex items-center gap-3">
                       <Check className="w-4 h-4 text-accent-cyan flex-shrink-0" />
-                      <span className="text-sm text-white/50">{item}</span>
+                      <span className="text-sm text-white/65">{item}</span>
                     </div>
                   ))}
                 </div>
@@ -283,11 +283,11 @@ export default function CLIPage() {
 
               <div className="gradient-border rounded-2xl overflow-hidden">
                 <div className="bg-dark-300/80">
-                  <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/[0.06]">
-                    <GitBranch className="w-3.5 h-3.5 text-white/30" />
-                    <span className="text-xs font-mono text-white/30">.github/workflows/zoobicon.yml</span>
+                  <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/[0.10]">
+                    <GitBranch className="w-3.5 h-3.5 text-white/50" />
+                    <span className="text-xs font-mono text-white/50">.github/workflows/zoobicon.yml</span>
                   </div>
-                  <pre className="p-5 overflow-x-auto text-xs font-mono leading-relaxed text-white/50">
+                  <pre className="p-5 overflow-x-auto text-xs font-mono leading-relaxed text-white/65">
                     <code>{PIPELINE_DEMO}</code>
                   </pre>
                 </div>
@@ -298,7 +298,7 @@ export default function CLIPage() {
       </section>
 
       {/* Features */}
-      <section id="features" className="py-20 border-t border-white/[0.04]">
+      <section id="features" className="py-20 border-t border-white/[0.08]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -306,7 +306,7 @@ export default function CLIPage() {
                 <motion.div key={i} variants={fadeInUp} className="gradient-border card-hover p-6 rounded-xl group">
                   <f.icon className="w-8 h-8 text-amber-400/50 mb-4 group-hover:text-amber-400 transition-colors" />
                   <h3 className="text-lg font-bold mb-2">{f.title}</h3>
-                  <p className="text-sm text-white/40 leading-relaxed">{f.desc}</p>
+                  <p className="text-sm text-white/60 leading-relaxed">{f.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -315,7 +315,7 @@ export default function CLIPage() {
       </section>
 
       {/* Hosting */}
-      <section className="py-20 border-t border-white/[0.04]">
+      <section className="py-20 border-t border-white/[0.08]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="gradient-border rounded-2xl p-8 md:p-12 text-center">
@@ -326,18 +326,18 @@ export default function CLIPage() {
               <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-4">
                 Every Site Gets a<br /><span className="text-amber-400">yourname.zoobicon.sh</span> Domain
               </h2>
-              <p className="text-lg text-white/40 max-w-2xl mx-auto mb-8">
+              <p className="text-lg text-white/60 max-w-2xl mx-auto mb-8">
                 Instant deployment to our global CDN. Free SSL, DDoS protection, and 99.9% uptime.
                 Upgrade to custom domains anytime.
               </p>
               <div className="flex flex-wrap justify-center gap-3">
-                <div className="bg-dark-400 border border-white/[0.06] rounded-lg px-4 py-2 font-mono text-sm text-white/50">
+                <div className="bg-dark-400 border border-white/[0.10] rounded-lg px-4 py-2 font-mono text-sm text-white/65">
                   <span className="text-accent-cyan">myportfolio</span>.zoobicon.sh
                 </div>
-                <div className="bg-dark-400 border border-white/[0.06] rounded-lg px-4 py-2 font-mono text-sm text-white/50">
+                <div className="bg-dark-400 border border-white/[0.10] rounded-lg px-4 py-2 font-mono text-sm text-white/65">
                   <span className="text-accent-cyan">client-store</span>.zoobicon.sh
                 </div>
-                <div className="bg-dark-400 border border-white/[0.06] rounded-lg px-4 py-2 font-mono text-sm text-white/50">
+                <div className="bg-dark-400 border border-white/[0.10] rounded-lg px-4 py-2 font-mono text-sm text-white/65">
                   <span className="text-accent-cyan">my-startup</span>.zoobicon.sh
                 </div>
               </div>
@@ -347,27 +347,27 @@ export default function CLIPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 border-t border-white/[0.04]">
+      <section className="py-20 border-t border-white/[0.08]">
         <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
           <Terminal className="w-12 h-12 text-amber-400/30 mx-auto mb-6" />
           <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
             Install in <span className="gradient-text">10 Seconds</span>
           </h2>
-          <p className="text-lg text-white/40 mb-8">One command. Infinite power.</p>
+          <p className="text-lg text-white/60 mb-8">One command. Infinite power.</p>
           <button
             onClick={() => copyText("npm install -g @zoobicon/cli && zb auth login", "cta")}
             className="group inline-flex items-center gap-3 bg-dark-200 border border-amber-500/20 hover:border-amber-500/40 rounded-xl px-8 py-4 font-mono text-sm text-white/60 transition-all mb-6"
           >
             <span className="text-amber-400">$</span>
             npm install -g @zoobicon/cli && zb auth login
-            {copied === "cta" ? <Check className="w-4 h-4 text-accent-cyan" /> : <Copy className="w-4 h-4 text-white/20 group-hover:text-white/50" />}
+            {copied === "cta" ? <Check className="w-4 h-4 text-accent-cyan" /> : <Copy className="w-4 h-4 text-white/40 group-hover:text-white/65" />}
           </button>
           <div className="flex justify-center gap-4">
             <Link href="/auth/signup" className="btn-gradient px-8 py-3 rounded-xl text-sm font-bold text-white flex items-center gap-2">
               <span>Get API Key</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link href="/developers" className="px-8 py-3 rounded-xl text-sm font-medium text-white/50 border border-white/[0.08] hover:border-white/20 transition-all">
+            <Link href="/developers" className="px-8 py-3 rounded-xl text-sm font-medium text-white/65 border border-white/[0.12] hover:border-white/20 transition-all">
               API Docs
             </Link>
           </div>
@@ -375,13 +375,13 @@ export default function CLIPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/[0.04] py-8">
+      <footer className="border-t border-white/[0.08] py-8">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <div className="text-xs text-white/20">&copy; 2026 Zoobicon. All rights reserved.</div>
+          <div className="text-xs text-white/40">&copy; 2026 Zoobicon. All rights reserved.</div>
           <div className="flex gap-4">
-            <Link href="/" className="text-xs text-white/20 hover:text-white/40">Home</Link>
-            <Link href="/developers" className="text-xs text-white/20 hover:text-white/40">Developers</Link>
-            <Link href="/agencies" className="text-xs text-white/20 hover:text-white/40">Agencies</Link>
+            <Link href="/" className="text-xs text-white/40 hover:text-white/60">Home</Link>
+            <Link href="/developers" className="text-xs text-white/40 hover:text-white/60">Developers</Link>
+            <Link href="/agencies" className="text-xs text-white/40 hover:text-white/60">Agencies</Link>
           </div>
         </div>
       </footer>

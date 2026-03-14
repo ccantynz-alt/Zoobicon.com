@@ -248,11 +248,11 @@ export default function PricingPage() {
     <div className="relative min-h-screen">
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="glow-orb glow-orb-blue w-[700px] h-[700px] -top-40 -left-40 opacity-20" />
-        <div className="glow-orb glow-orb-purple w-[500px] h-[500px] top-1/2 right-0 opacity-10" />
+        <div className="glow-orb glow-orb-purple w-[500px] h-[500px] top-1/2 right-0 opacity-15" />
       </div>
 
       {/* Nav */}
-      <nav className="sticky top-0 z-50 border-b border-white/[0.04] bg-dark-400/80 backdrop-blur-2xl">
+      <nav className="sticky top-0 z-50 border-b border-white/[0.08] bg-dark-400/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
@@ -263,19 +263,19 @@ export default function PricingPage() {
           <div className="flex items-center gap-3">
             {user ? (
               <>
-                <Link href="/dashboard" className="text-sm text-white/50 hover:text-white transition-colors px-3 py-2 flex items-center gap-1.5">
+                <Link href="/dashboard" className="text-sm text-white/65 hover:text-white transition-colors px-3 py-2 flex items-center gap-1.5">
                   <LayoutDashboard className="w-3.5 h-3.5" /> Dashboard
                 </Link>
                 <button
                   onClick={() => { try { localStorage.removeItem("zoobicon_user"); } catch {} setUser(null); }}
-                  className="text-sm text-white/50 hover:text-white transition-colors px-3 py-2 flex items-center gap-1.5"
+                  className="text-sm text-white/65 hover:text-white transition-colors px-3 py-2 flex items-center gap-1.5"
                 >
                   <LogOut className="w-3.5 h-3.5" /> Sign out
                 </button>
               </>
             ) : (
               <>
-                <Link href="/auth/login" className="text-sm text-white/50 hover:text-white transition-colors px-3 py-2">Sign in</Link>
+                <Link href="/auth/login" className="text-sm text-white/65 hover:text-white transition-colors px-3 py-2">Sign in</Link>
                 <Link href="/auth/signup" className="btn-gradient px-4 py-2 rounded-xl text-sm font-semibold text-white">
                   Get Started
                 </Link>
@@ -297,7 +297,7 @@ export default function PricingPage() {
               <motion.h1 variants={fadeInUp} className="text-5xl md:text-7xl font-black tracking-tight mb-6">
                 Ready to<br /><span className="gradient-text">Dominate?</span>
               </motion.h1>
-              <motion.p variants={fadeInUp} className="text-lg text-white/40 max-w-xl mx-auto">
+              <motion.p variants={fadeInUp} className="text-lg text-white/60 max-w-xl mx-auto">
                 Start free. Scale when you&apos;re ready. No credit card required for Starter or the 14-day Pro trial.
               </motion.p>
             </motion.div>
@@ -325,19 +325,19 @@ export default function PricingPage() {
                   )}
 
                   <div className="mb-6">
-                    <div className={`text-sm font-semibold mb-2 ${plan.featured ? "text-brand-400" : "text-white/50"}`}>{plan.name}</div>
+                    <div className={`text-sm font-semibold mb-2 ${plan.featured ? "text-brand-400" : "text-white/65"}`}>{plan.name}</div>
                     <div className="flex items-baseline gap-1 mb-1">
                       <span className="text-4xl font-black">{plan.price}</span>
-                      {plan.period && <span className="text-white/30 text-sm">{plan.period}</span>}
+                      {plan.period && <span className="text-white/50 text-sm">{plan.period}</span>}
                     </div>
-                    <p className="text-xs text-white/30 leading-relaxed">{plan.desc}</p>
+                    <p className="text-xs text-white/50 leading-relaxed">{plan.desc}</p>
                   </div>
 
                   <ul className="space-y-3 mb-8 flex-1">
                     {plan.features.map((f) => (
                       <li key={f} className="flex items-start gap-2">
-                        <Check className={`w-3.5 h-3.5 flex-shrink-0 mt-0.5 ${plan.featured ? "text-brand-400" : "text-white/30"}`} />
-                        <span className="text-sm text-white/50">{f}{SOON_FEATURES.has(f) && <SoonBadge />}</span>
+                        <Check className={`w-3.5 h-3.5 flex-shrink-0 mt-0.5 ${plan.featured ? "text-brand-400" : "text-white/50"}`} />
+                        <span className="text-sm text-white/65">{f}{SOON_FEATURES.has(f) && <SoonBadge />}</span>
                       </li>
                     ))}
                   </ul>
@@ -373,17 +373,17 @@ export default function PricingPage() {
         </section>
 
         {/* Feature comparison */}
-        <section className="py-20 border-t border-white/[0.04] px-6">
+        <section className="py-20 border-t border-white/[0.08] px-6">
           <div className="max-w-4xl mx-auto">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer}>
               <motion.h2 variants={fadeInUp} className="text-3xl font-black text-center mb-2">What&apos;s included</motion.h2>
-              <motion.p variants={fadeInUp} className="text-white/30 text-center mb-10">Every AI product, broken down by plan. No credits. No surprises.</motion.p>
+              <motion.p variants={fadeInUp} className="text-white/50 text-center mb-10">Every AI product, broken down by plan. No credits. No surprises.</motion.p>
 
               <motion.div variants={fadeInUp} className="gradient-border rounded-2xl overflow-hidden overflow-x-auto">
                 {/* Header */}
-                <div className="grid grid-cols-6 gap-0 border-b border-white/[0.06] min-w-[800px]">
-                  <div className="px-4 py-4 text-xs font-semibold text-white/30 uppercase tracking-wider">Product</div>
-                  <div className="px-3 py-4 text-xs font-semibold text-white/30 uppercase tracking-wider text-center">Starter</div>
+                <div className="grid grid-cols-6 gap-0 border-b border-white/[0.10] min-w-[800px]">
+                  <div className="px-4 py-4 text-xs font-semibold text-white/50 uppercase tracking-wider">Product</div>
+                  <div className="px-3 py-4 text-xs font-semibold text-white/50 uppercase tracking-wider text-center">Starter</div>
                   <div className="px-3 py-4 text-xs font-semibold text-emerald-400 uppercase tracking-wider text-center bg-emerald-500/[0.03]">Creator</div>
                   <div className="px-3 py-4 text-xs font-semibold text-brand-400 uppercase tracking-wider text-center bg-brand-500/[0.03]">Pro</div>
                   <div className="px-3 py-4 text-xs font-semibold text-purple-400 uppercase tracking-wider text-center bg-purple-500/[0.03]">Agency</div>
@@ -391,15 +391,15 @@ export default function PricingPage() {
                 </div>
 
                 {PRODUCTS.map((p, i) => (
-                  <div key={p.name} className={`grid grid-cols-6 gap-0 border-b border-white/[0.03] min-w-[800px] ${i % 2 === 0 ? "" : "bg-white/[0.01]"}`}>
+                  <div key={p.name} className={`grid grid-cols-6 gap-0 border-b border-white/[0.07] min-w-[800px] ${i % 2 === 0 ? "" : "bg-white/[0.04]"}`}>
                     <div className="px-4 py-3 flex items-center gap-2">
-                      <p.icon className="w-3.5 h-3.5 text-white/30 flex-shrink-0" />
+                      <p.icon className="w-3.5 h-3.5 text-white/50 flex-shrink-0" />
                       <span className="text-xs text-white/60">{p.name}{SOON_PRODUCTS.has(p.name) && <SoonBadge />}</span>
                     </div>
                     {(["starter", "creator", "pro", "agency", "enterprise"] as const).map((tier) => {
                       const val = p[tier];
                       const tierColors: Record<string, string> = {
-                        starter: "text-white/40",
+                        starter: "text-white/60",
                         creator: "text-emerald-400",
                         pro: "text-brand-400",
                         agency: "text-purple-400",
@@ -426,14 +426,14 @@ export default function PricingPage() {
         </section>
 
         {/* Popular Add-ons */}
-        <section className="py-20 border-t border-white/[0.04] px-6">
+        <section className="py-20 border-t border-white/[0.08] px-6">
           <div className="max-w-5xl mx-auto">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer}>
               <motion.div variants={fadeInUp} className="flex items-center gap-2 justify-center mb-2">
                 <Plus className="w-5 h-5 text-brand-400" />
                 <h2 className="text-3xl font-black">Power up your plan</h2>
               </motion.div>
-              <motion.p variants={fadeInUp} className="text-white/30 text-center mb-4 max-w-xl mx-auto">
+              <motion.p variants={fadeInUp} className="text-white/50 text-center mb-4 max-w-xl mx-auto">
                 Add individual AI agents and tools to any plan. Pay only for what you need.
               </motion.p>
               <motion.p variants={fadeInUp} className="text-xs text-brand-400/60 text-center mb-10">
@@ -453,7 +453,7 @@ export default function PricingPage() {
                   { icon: Blocks, name: "Component Library", price: "$19", period: "one-time", desc: "500+ premium components: heroes, CTAs, navs, footers, forms", color: "text-teal-400", borderColor: "border-teal-500/15 hover:border-teal-500/30", soon: false },
                 ].map((addon) => (
                   <motion.div key={addon.name} variants={fadeInUp}>
-                    <Link href="/marketplace" className={`block p-5 rounded-xl border ${addon.borderColor} bg-white/[0.01] transition-all group`}>
+                    <Link href="/marketplace" className={`block p-5 rounded-xl border ${addon.borderColor} bg-white/[0.04] transition-all group`}>
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center gap-2.5">
                           <addon.icon className={`w-4 h-4 ${addon.color}`} />
@@ -461,11 +461,11 @@ export default function PricingPage() {
                         </div>
                         <div className="text-right">
                           <span className="text-sm font-black text-white">{addon.price}</span>
-                          <span className="text-[10px] text-white/30 ml-0.5">{addon.period}</span>
+                          <span className="text-[10px] text-white/50 ml-0.5">{addon.period}</span>
                         </div>
                       </div>
-                      <p className="text-xs text-white/30 leading-relaxed">{addon.desc}</p>
-                      <div className="mt-3 text-[10px] font-semibold text-white/20 group-hover:text-white/40 transition-colors flex items-center gap-1">
+                      <p className="text-xs text-white/50 leading-relaxed">{addon.desc}</p>
+                      <div className="mt-3 text-[10px] font-semibold text-white/40 group-hover:text-white/60 transition-colors flex items-center gap-1">
                         Add to plan <ArrowRight className="w-2.5 h-2.5" />
                       </div>
                     </Link>
@@ -485,30 +485,30 @@ export default function PricingPage() {
         </section>
 
         {/* Domain + Hosting Bundle */}
-        <section className="py-20 border-t border-white/[0.04] px-6">
+        <section className="py-20 border-t border-white/[0.08] px-6">
           <div className="max-w-5xl mx-auto">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer}>
               <motion.h2 variants={fadeInUp} className="text-3xl font-black text-center mb-2">Launch the complete stack</motion.h2>
-              <motion.p variants={fadeInUp} className="text-white/30 text-center mb-10 max-w-lg mx-auto">Domain, hosting, SSL, email — everything to go live. Bundle and save.</motion.p>
+              <motion.p variants={fadeInUp} className="text-white/50 text-center mb-10 max-w-lg mx-auto">Domain, hosting, SSL, email — everything to go live. Bundle and save.</motion.p>
 
               <motion.div variants={staggerContainer} className="grid md:grid-cols-3 gap-5">
                 {/* Domain */}
                 <motion.div variants={fadeInUp}>
-                  <Link href="/domains" className="block gradient-border rounded-2xl p-7 h-full hover:bg-white/[0.01] transition-all group">
+                  <Link href="/domains" className="block gradient-border rounded-2xl p-7 h-full hover:bg-white/[0.04] transition-all group">
                     <Globe className="w-8 h-8 text-brand-400 mb-4" />
                     <h3 className="text-lg font-bold mb-1">Custom Domain<SoonBadge /></h3>
                     <div className="flex items-baseline gap-1 mb-3">
                       <span className="text-2xl font-black">$2.99</span>
-                      <span className="text-sm text-white/30">/year</span>
+                      <span className="text-sm text-white/50">/year</span>
                     </div>
                     <ul className="space-y-2 mb-4">
                       {[".com from $12.99/yr", ".ai from $69.99/yr", ".io, .dev, .app available", "Free WHOIS privacy included"].map((f) => (
-                        <li key={f} className="flex items-center gap-2 text-xs text-white/40">
+                        <li key={f} className="flex items-center gap-2 text-xs text-white/60">
                           <Check className="w-3 h-3 text-brand-400/60 flex-shrink-0" /> {f}
                         </li>
                       ))}
                     </ul>
-                    <span className="text-xs text-white/20 group-hover:text-brand-400 transition-colors flex items-center gap-1 font-medium">
+                    <span className="text-xs text-white/40 group-hover:text-brand-400 transition-colors flex items-center gap-1 font-medium">
                       Browse domains <ArrowRight className="w-3 h-3" />
                     </span>
                   </Link>
@@ -516,21 +516,21 @@ export default function PricingPage() {
 
                 {/* Hosting */}
                 <motion.div variants={fadeInUp}>
-                  <Link href="/hosting" className="block gradient-border rounded-2xl p-7 h-full hover:bg-white/[0.01] transition-all group">
+                  <Link href="/hosting" className="block gradient-border rounded-2xl p-7 h-full hover:bg-white/[0.04] transition-all group">
                     <Server className="w-8 h-8 text-accent-cyan mb-4" />
                     <h3 className="text-lg font-bold mb-1">Premium Hosting</h3>
                     <div className="flex items-baseline gap-1 mb-3">
                       <span className="text-2xl font-black">$12.99</span>
-                      <span className="text-sm text-white/30">/month</span>
+                      <span className="text-sm text-white/50">/month</span>
                     </div>
                     <ul className="space-y-2 mb-4">
                       {["Global CDN (300+ edge nodes)", "99.99% uptime SLA", "Auto SSL & DDoS protection", "Instant rollbacks & staging"].map((f) => (
-                        <li key={f} className="flex items-center gap-2 text-xs text-white/40">
+                        <li key={f} className="flex items-center gap-2 text-xs text-white/60">
                           <Check className="w-3 h-3 text-accent-cyan/60 flex-shrink-0" /> {f}
                         </li>
                       ))}
                     </ul>
-                    <span className="text-xs text-white/20 group-hover:text-accent-cyan transition-colors flex items-center gap-1 font-medium">
+                    <span className="text-xs text-white/40 group-hover:text-accent-cyan transition-colors flex items-center gap-1 font-medium">
                       View hosting <ArrowRight className="w-3 h-3" />
                     </span>
                   </Link>
@@ -543,16 +543,16 @@ export default function PricingPage() {
                     <h3 className="text-lg font-bold mb-1">Email + Security<SoonBadge /></h3>
                     <div className="flex items-baseline gap-1 mb-3">
                       <span className="text-2xl font-black">$14.98</span>
-                      <span className="text-sm text-white/30">/month</span>
+                      <span className="text-sm text-white/50">/month</span>
                     </div>
                     <ul className="space-y-2 mb-4">
                       {["Professional email (you@domain)", "10GB storage per mailbox", "Wildcard SSL certificate", "Malware scanning & firewall"].map((f) => (
-                        <li key={f} className="flex items-center gap-2 text-xs text-white/40">
+                        <li key={f} className="flex items-center gap-2 text-xs text-white/60">
                           <Check className="w-3 h-3 text-emerald-400/60 flex-shrink-0" /> {f}
                         </li>
                       ))}
                     </ul>
-                    <div className="flex items-center gap-1.5 text-[10px] text-white/20">
+                    <div className="flex items-center gap-1.5 text-[10px] text-white/40">
                       <Lock className="w-3 h-3" /> Email $4.99/mo + SSL & Security $9.99/mo
                     </div>
                   </div>
@@ -563,11 +563,11 @@ export default function PricingPage() {
               <motion.div variants={fadeInUp} className="mt-6 gradient-border rounded-xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
                   <span className="text-sm font-bold text-white/80">Full Stack Bundle: </span>
-                  <span className="text-sm text-white/40">Creator plan + domain + hosting + email + SSL</span>
+                  <span className="text-sm text-white/60">Creator plan + domain + hosting + email + SSL</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-right">
-                    <div className="text-xs text-white/20 line-through">$51.96/mo + domain</div>
+                    <div className="text-xs text-white/40 line-through">$51.96/mo + domain</div>
                     <div className="text-sm font-black text-brand-400">From $46.98/mo + $2.99/yr</div>
                   </div>
                   <Link href="/domains" className="btn-gradient px-5 py-2.5 rounded-lg text-xs font-bold text-white whitespace-nowrap flex items-center gap-1.5">
@@ -580,7 +580,7 @@ export default function PricingPage() {
         </section>
 
         {/* For Agencies */}
-        <section className="py-20 border-t border-white/[0.04] px-6">
+        <section className="py-20 border-t border-white/[0.08] px-6">
           <div className="max-w-4xl mx-auto">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer}>
               <motion.div variants={fadeInUp} className="gradient-border rounded-2xl p-10 md:p-16 flex flex-col md:flex-row items-center gap-10">
@@ -590,7 +590,7 @@ export default function PricingPage() {
                     <span className="text-sm font-semibold text-accent-cyan">For Agencies</span>
                   </div>
                   <h2 className="text-3xl font-black tracking-tight mb-3">Scale your agency with Zoobicon</h2>
-                  <p className="text-white/40 leading-relaxed">
+                  <p className="text-white/60 leading-relaxed">
                     White-label the entire platform. Manage all your clients from one dashboard.
                     Bulk-generate websites. Custom pricing on request.
                   </p>
@@ -599,7 +599,7 @@ export default function PricingPage() {
                   <Link href="/agencies" className="btn-gradient px-8 py-4 rounded-xl text-sm font-bold text-white flex items-center gap-2">
                     View Agency Plans <ArrowRight className="w-4 h-4" />
                   </Link>
-                  <a href="mailto:sales@zoobicon.com?subject=Agency Demo Request" className="px-8 py-4 rounded-xl text-sm font-semibold text-white/50 border border-white/[0.08] hover:border-white/20 transition-all text-center flex items-center gap-2 justify-center">
+                  <a href="mailto:sales@zoobicon.com?subject=Agency Demo Request" className="px-8 py-4 rounded-xl text-sm font-semibold text-white/65 border border-white/[0.12] hover:border-white/20 transition-all text-center flex items-center gap-2 justify-center">
                     <Users className="w-4 h-4" /> Book a Demo
                   </a>
                 </div>
@@ -609,20 +609,20 @@ export default function PricingPage() {
         </section>
 
         {/* FAQ */}
-        <section className="py-20 border-t border-white/[0.04] px-6">
+        <section className="py-20 border-t border-white/[0.08] px-6">
           <div className="max-w-3xl mx-auto">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer}>
               <motion.div variants={fadeInUp} className="flex items-center gap-2 justify-center mb-2">
-                <HelpCircle className="w-5 h-5 text-white/30" />
+                <HelpCircle className="w-5 h-5 text-white/50" />
                 <h2 className="text-3xl font-black">FAQ</h2>
               </motion.div>
-              <motion.p variants={fadeInUp} className="text-white/30 text-center mb-12">Everything you need to know.</motion.p>
+              <motion.p variants={fadeInUp} className="text-white/50 text-center mb-12">Everything you need to know.</motion.p>
 
               <motion.div variants={staggerContainer} className="space-y-4">
                 {FAQS.map((faq) => (
                   <motion.div key={faq.q} variants={fadeInUp} className="gradient-border rounded-xl p-6">
                     <h3 className="text-sm font-bold mb-2">{faq.q}</h3>
-                    <p className="text-sm text-white/40 leading-relaxed">{faq.a}</p>
+                    <p className="text-sm text-white/60 leading-relaxed">{faq.a}</p>
                   </motion.div>
                 ))}
               </motion.div>
@@ -631,18 +631,18 @@ export default function PricingPage() {
         </section>
 
         {/* Footer CTA */}
-        <section className="py-24 text-center border-t border-white/[0.04] px-6">
+        <section className="py-24 text-center border-t border-white/[0.08] px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer}>
             <motion.h2 variants={fadeInUp} className="text-4xl md:text-6xl font-black tracking-tight mb-6">
               Start free today.
             </motion.h2>
-            <motion.p variants={fadeInUp} className="text-white/40 mb-8">No credit card required. Cancel anytime.</motion.p>
+            <motion.p variants={fadeInUp} className="text-white/60 mb-8">No credit card required. Cancel anytime.</motion.p>
             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/builder" className="group btn-gradient px-8 py-4 rounded-2xl text-base font-bold text-white flex items-center gap-2 shadow-glow">
                 <span>Try the Builder</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link href="/auth/signup" className="px-8 py-4 rounded-2xl text-base font-semibold text-white/50 border border-white/[0.08] hover:border-white/20 transition-all">
+              <Link href="/auth/signup" className="px-8 py-4 rounded-2xl text-base font-semibold text-white/65 border border-white/[0.12] hover:border-white/20 transition-all">
                 Create Free Account
               </Link>
             </motion.div>

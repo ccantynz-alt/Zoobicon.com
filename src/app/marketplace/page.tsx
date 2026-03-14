@@ -371,12 +371,12 @@ export default function MarketplacePage() {
   return (
     <div className="relative min-h-screen">
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="glow-orb glow-orb-purple w-[500px] h-[500px] -top-[150px] right-[20%] opacity-10" />
-        <div className="glow-orb glow-orb-blue w-[400px] h-[400px] bottom-[30%] -left-[100px] opacity-10" />
+        <div className="glow-orb glow-orb-purple w-[500px] h-[500px] -top-[150px] right-[20%] opacity-15" />
+        <div className="glow-orb glow-orb-blue w-[400px] h-[400px] bottom-[30%] -left-[100px] opacity-15" />
         <div className="grid-pattern fixed inset-0" />
       </div>
 
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.04] bg-[#050507]/80 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08] bg-[#0d1525]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
@@ -385,8 +385,8 @@ export default function MarketplacePage() {
               </div>
               <span className="text-lg font-bold tracking-tight">Zoobicon</span>
             </Link>
-            <span className="text-xs text-white/20">/</span>
-            <span className="text-sm text-white/50">Marketplace</span>
+            <span className="text-xs text-white/40">/</span>
+            <span className="text-sm text-white/65">Marketplace</span>
           </div>
           <Link href="/auth/signup" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white">
             <span>Get Started</span>
@@ -413,24 +413,24 @@ export default function MarketplacePage() {
               <span className="gradient-text-hero">Your Stack.</span>
             </motion.h1>
 
-            <motion.p variants={fadeInUp} className="max-w-2xl text-lg md:text-xl text-white/40 leading-relaxed mb-10">
+            <motion.p variants={fadeInUp} className="max-w-2xl text-lg md:text-xl text-white/60 leading-relaxed mb-10">
               Discover premium templates, AI agents, integrations, and tools that extend the power
               of your Zoobicon platform. Install with one click.
             </motion.p>
 
             {/* Search */}
             <motion.div variants={fadeInUp} className="max-w-2xl flex items-center gap-3 mb-8">
-              <div className="flex-1 flex items-center bg-white/[0.04] border border-white/[0.08] rounded-xl overflow-hidden focus-within:border-accent-purple/30 transition-colors">
-                <Search className="w-4 h-4 text-white/30 ml-4 flex-shrink-0" />
+              <div className="flex-1 flex items-center bg-white/[0.07] border border-white/[0.12] rounded-xl overflow-hidden focus-within:border-accent-purple/30 transition-colors">
+                <Search className="w-4 h-4 text-white/50 ml-4 flex-shrink-0" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search add-ons, templates, agents..."
-                  className="flex-1 bg-transparent px-3 py-3 text-white placeholder:text-white/25 outline-none text-sm"
+                  className="flex-1 bg-transparent px-3 py-3 text-white placeholder:text-white/45 outline-none text-sm"
                 />
               </div>
-              <div className="flex items-center gap-1 bg-white/[0.04] border border-white/[0.08] rounded-xl p-1">
+              <div className="flex items-center gap-1 bg-white/[0.07] border border-white/[0.12] rounded-xl p-1">
                 {(["all", "free", "paid"] as const).map((filter) => (
                   <button
                     key={filter}
@@ -438,7 +438,7 @@ export default function MarketplacePage() {
                     className={`px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                       priceFilter === filter
                         ? "bg-accent-purple/20 text-accent-purple"
-                        : "text-white/30 hover:text-white/50"
+                        : "text-white/50 hover:text-white/65"
                     }`}
                   >
                     {filter.charAt(0).toUpperCase() + filter.slice(1)}
@@ -457,7 +457,7 @@ export default function MarketplacePage() {
               ].map((stat) => (
                 <div key={stat.label} className="gradient-border p-4 rounded-xl text-center">
                   <div className="text-2xl font-black gradient-text-static">{stat.value}</div>
-                  <div className="text-xs text-white/30 mt-1">{stat.label}</div>
+                  <div className="text-xs text-white/50 mt-1">{stat.label}</div>
                 </div>
               ))}
             </motion.div>
@@ -466,7 +466,7 @@ export default function MarketplacePage() {
       </section>
 
       {/* Featured */}
-      <section className="pb-16 border-b border-white/[0.04]">
+      <section className="pb-16 border-b border-white/[0.08]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="flex items-center gap-3 mb-6">
@@ -491,14 +491,14 @@ export default function MarketplacePage() {
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-0.5">
                           <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-                          <span className="text-xs text-white/50">{item.rating}</span>
+                          <span className="text-xs text-white/65">{item.rating}</span>
                         </div>
-                        <span className="text-[10px] text-white/20">•</span>
-                        <span className="text-xs text-white/30">{item.installs} installs</span>
+                        <span className="text-[10px] text-white/40">•</span>
+                        <span className="text-xs text-white/50">{item.installs} installs</span>
                       </div>
                     </div>
                   </div>
-                  <p className="text-xs text-white/40 leading-relaxed mb-4">{item.description}</p>
+                  <p className="text-xs text-white/60 leading-relaxed mb-4">{item.description}</p>
                   <div className="flex items-center justify-between">
                     <span className={`text-sm font-bold ${item.priceType === "free" ? "text-emerald-400" : "text-white/70"}`}>
                       {item.price}
@@ -547,7 +547,7 @@ export default function MarketplacePage() {
                   className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${
                     activeCategory === cat
                       ? "bg-accent-purple/20 text-accent-purple border border-accent-purple/30"
-                      : "border border-white/[0.06] bg-white/[0.02] text-white/40 hover:text-white/60 hover:border-white/10"
+                      : "border border-white/[0.10] bg-white/[0.05] text-white/60 hover:text-white/60 hover:border-white/10"
                   }`}
                 >
                   {cat}
@@ -557,8 +557,8 @@ export default function MarketplacePage() {
 
             {/* Results count */}
             <motion.div variants={fadeInUp} className="flex items-center gap-2 mb-6">
-              <Filter className="w-4 h-4 text-white/20" />
-              <span className="text-sm text-white/30">{filteredItems.length} add-ons</span>
+              <Filter className="w-4 h-4 text-white/40" />
+              <span className="text-sm text-white/50">{filteredItems.length} add-ons</span>
             </motion.div>
 
             {/* Grid */}
@@ -580,17 +580,17 @@ export default function MarketplacePage() {
                     </div>
                     <div className="min-w-0">
                       <h3 className="text-sm font-bold truncate group-hover:text-white transition-colors">{item.name}</h3>
-                      <span className="text-[10px] text-white/20">{item.category}</span>
+                      <span className="text-[10px] text-white/40">{item.category}</span>
                     </div>
                   </div>
-                  <p className="text-[11px] text-white/35 leading-relaxed mb-3 line-clamp-2">{item.description}</p>
+                  <p className="text-[11px] text-white/55 leading-relaxed mb-3 line-clamp-2">{item.description}</p>
                   <div className="flex items-center justify-between mt-auto">
                     <div className="flex items-center gap-2">
                       <div className="flex items-center gap-0.5">
                         <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-                        <span className="text-[10px] text-white/50">{item.rating}</span>
+                        <span className="text-[10px] text-white/65">{item.rating}</span>
                       </div>
-                      <span className={`text-[10px] font-semibold ${item.priceType === "free" ? "text-emerald-400/70" : "text-white/40"}`}>
+                      <span className={`text-[10px] font-semibold ${item.priceType === "free" ? "text-emerald-400/70" : "text-white/60"}`}>
                         {item.price}
                       </span>
                     </div>
@@ -624,9 +624,9 @@ export default function MarketplacePage() {
 
             {filteredItems.length === 0 && (
               <div className="text-center py-20">
-                <Search className="w-12 h-12 text-white/10 mx-auto mb-4" />
-                <div className="text-lg font-bold text-white/30 mb-2">No add-ons found</div>
-                <div className="text-sm text-white/20">Try a different search or category</div>
+                <Search className="w-12 h-12 text-white/30 mx-auto mb-4" />
+                <div className="text-lg font-bold text-white/50 mb-2">No add-ons found</div>
+                <div className="text-sm text-white/40">Try a different search or category</div>
               </div>
             )}
           </motion.div>
@@ -634,7 +634,7 @@ export default function MarketplacePage() {
       </section>
 
       {/* For Developers */}
-      <section className="py-20 border-t border-white/[0.04]">
+      <section className="py-20 border-t border-white/[0.08]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="gradient-border p-10 md:p-16 rounded-2xl relative overflow-hidden">
@@ -648,7 +648,7 @@ export default function MarketplacePage() {
                   <h3 className="text-3xl md:text-4xl font-black mb-4">
                     Build & Sell Your<br /><span className="gradient-text">Own Add-ons</span>
                   </h3>
-                  <p className="text-base text-white/40 leading-relaxed mb-6">
+                  <p className="text-base text-white/60 leading-relaxed mb-6">
                     Join our developer marketplace. Build custom templates, integrations, and tools — sell them to
                     thousands of Zoobicon users. Earn 80% revenue share on every sale.
                   </p>
@@ -659,7 +659,7 @@ export default function MarketplacePage() {
                       "Marketplace analytics dashboard",
                       "Featured placement opportunities",
                     ].map((item) => (
-                      <li key={item} className="flex items-center gap-2 text-sm text-white/50">
+                      <li key={item} className="flex items-center gap-2 text-sm text-white/65">
                         <Zap className="w-4 h-4 text-accent-purple flex-shrink-0" />
                         {item}
                       </li>
@@ -678,7 +678,7 @@ export default function MarketplacePage() {
                     <div className="text-center">
                       <Code2 className="w-16 h-16 text-accent-purple/40 mx-auto mb-4" />
                       <div className="text-3xl font-black gradient-text-static">80%</div>
-                      <div className="text-xs text-white/30 mt-1">Revenue Share</div>
+                      <div className="text-xs text-white/50 mt-1">Revenue Share</div>
                     </div>
                   </div>
                 </div>
@@ -689,13 +689,13 @@ export default function MarketplacePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 border-t border-white/[0.04]">
+      <section className="py-20 border-t border-white/[0.08]">
         <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
           <Store className="w-12 h-12 text-accent-purple/30 mx-auto mb-6" />
           <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
             Everything You Need.<br /><span className="gradient-text">One Marketplace.</span>
           </h2>
-          <p className="text-lg text-white/40 mb-8">Templates, AI agents, integrations, and tools — all designed to work perfectly with Zoobicon.</p>
+          <p className="text-lg text-white/60 mb-8">Templates, AI agents, integrations, and tools — all designed to work perfectly with Zoobicon.</p>
           <Link href="/auth/signup" className="inline-flex group btn-gradient px-10 py-4 rounded-2xl text-lg font-bold text-white items-center gap-3 shadow-glow-lg">
             <span>Explore Marketplace</span>
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -709,7 +709,7 @@ export default function MarketplacePage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-dark-300 border border-white/[0.08] rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl"
+            className="bg-dark-300 border border-white/[0.12] rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-3 mb-4">
@@ -718,7 +718,7 @@ export default function MarketplacePage() {
               </span>
             </div>
             <h3 className="text-xl font-black mb-2">Join the Waitlist for {waitlistItem}</h3>
-            <p className="text-sm text-white/40 mb-6">This add-on is coming soon. Enter your email and we&apos;ll notify you when it launches.</p>
+            <p className="text-sm text-white/60 mb-6">This add-on is coming soon. Enter your email and we&apos;ll notify you when it launches.</p>
             <form onSubmit={handleWaitlistSubmit} className="flex items-center gap-3">
               <input
                 type="email"
@@ -726,7 +726,7 @@ export default function MarketplacePage() {
                 value={waitlistEmail}
                 onChange={(e) => setWaitlistEmail(e.target.value)}
                 placeholder="Enter your email"
-                className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-white placeholder:text-white/25 outline-none text-sm focus:border-accent-purple/30 transition-colors"
+                className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-xl px-4 py-3 text-white placeholder:text-white/45 outline-none text-sm focus:border-accent-purple/30 transition-colors"
               />
               <button
                 type="submit"
@@ -740,13 +740,13 @@ export default function MarketplacePage() {
         </div>
       )}
 
-      <footer className="border-t border-white/[0.04] py-8">
+      <footer className="border-t border-white/[0.08] py-8">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <div className="text-xs text-white/20">&copy; 2026 Zoobicon</div>
+          <div className="text-xs text-white/40">&copy; 2026 Zoobicon</div>
           <div className="flex gap-4">
-            <Link href="/" className="text-xs text-white/20 hover:text-white/40">Home</Link>
-            <Link href="/domains" className="text-xs text-white/20 hover:text-white/40">Domains</Link>
-            <Link href="/products/website-builder" className="text-xs text-white/20 hover:text-white/40">Builder</Link>
+            <Link href="/" className="text-xs text-white/40 hover:text-white/60">Home</Link>
+            <Link href="/domains" className="text-xs text-white/40 hover:text-white/60">Domains</Link>
+            <Link href="/products/website-builder" className="text-xs text-white/40 hover:text-white/60">Builder</Link>
           </div>
         </div>
       </footer>

@@ -94,12 +94,12 @@ export default function VideoCreatorPage() {
   return (
     <div className="relative min-h-screen">
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="glow-orb glow-orb-purple w-[500px] h-[500px] -top-[150px] left-[30%] opacity-10" />
-        <div className="glow-orb glow-orb-blue w-[400px] h-[400px] bottom-[20%] right-[5%] opacity-10" />
+        <div className="glow-orb glow-orb-purple w-[500px] h-[500px] -top-[150px] left-[30%] opacity-15" />
+        <div className="glow-orb glow-orb-blue w-[400px] h-[400px] bottom-[20%] right-[5%] opacity-15" />
         <div className="grid-pattern fixed inset-0" />
       </div>
 
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.04] bg-[#050507]/80 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08] bg-[#0d1525]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
@@ -108,17 +108,17 @@ export default function VideoCreatorPage() {
               </div>
               <span className="text-lg font-bold tracking-tight">Zoobicon</span>
             </Link>
-            <span className="text-xs text-white/20">/</span>
-            <span className="text-sm text-white/50">AI Video Creator</span>
+            <span className="text-xs text-white/40">/</span>
+            <span className="text-sm text-white/65">AI Video Creator</span>
           </div>
           <div className="flex items-center gap-4">
             {user ? (
               <>
-                <Link href="/dashboard" className="text-sm text-white/50 hover:text-white transition-colors px-4 py-2 flex items-center gap-1.5">
+                <Link href="/dashboard" className="text-sm text-white/65 hover:text-white transition-colors px-4 py-2 flex items-center gap-1.5">
                   <LayoutDashboard className="w-3.5 h-3.5" />
                   Dashboard
                 </Link>
-                <button onClick={handleLogout} className="text-sm text-white/50 hover:text-white transition-colors px-4 py-2 flex items-center gap-1.5">
+                <button onClick={handleLogout} className="text-sm text-white/65 hover:text-white transition-colors px-4 py-2 flex items-center gap-1.5">
                   <LogOut className="w-3.5 h-3.5" />
                   Sign out
                 </button>
@@ -129,7 +129,7 @@ export default function VideoCreatorPage() {
               </>
             ) : (
               <>
-                <Link href="/auth/login" className="text-sm text-white/50 hover:text-white transition-colors px-4 py-2">
+                <Link href="/auth/login" className="text-sm text-white/65 hover:text-white transition-colors px-4 py-2">
                   Sign in
                 </Link>
                 <Link href="/auth/signup" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white">
@@ -160,7 +160,7 @@ export default function VideoCreatorPage() {
               <span className="gradient-text-hero">Zero Effort.</span>
             </motion.h1>
 
-            <motion.p variants={fadeInUp} className="max-w-2xl text-lg md:text-xl text-white/40 leading-relaxed mb-10">
+            <motion.p variants={fadeInUp} className="max-w-2xl text-lg md:text-xl text-white/60 leading-relaxed mb-10">
               Create scroll-stopping videos for every platform. No scripts. No storyboards. No editing.
               Just describe what you want and get broadcast-quality video in minutes.
             </motion.p>
@@ -179,7 +179,7 @@ export default function VideoCreatorPage() {
                     value={waitlistEmail}
                     onChange={(e) => setWaitlistEmail(e.target.value)}
                     placeholder="Enter your email for early access"
-                    className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-xl px-5 py-4 text-white placeholder:text-white/25 outline-none text-sm focus:border-accent-purple/30 transition-colors"
+                    className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-xl px-5 py-4 text-white placeholder:text-white/45 outline-none text-sm focus:border-accent-purple/30 transition-colors"
                   />
                   <button
                     type="submit"
@@ -198,7 +198,7 @@ export default function VideoCreatorPage() {
               {PLATFORMS.map((p) => (
                 <div key={p.name} className="gradient-border p-4 rounded-xl text-center group card-hover">
                   <div className="text-sm font-bold mb-1 group-hover:text-white transition-colors">{p.name}</div>
-                  <div className="text-[10px] text-white/25">{p.format}</div>
+                  <div className="text-[10px] text-white/45">{p.format}</div>
                   <div className="text-[10px] text-accent-purple/60">{p.duration}</div>
                 </div>
               ))}
@@ -208,7 +208,7 @@ export default function VideoCreatorPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-20 border-t border-white/[0.04]">
+      <section className="py-20 border-t border-white/[0.08]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="text-center mb-12">
@@ -227,7 +227,7 @@ export default function VideoCreatorPage() {
                   <div className="text-6xl font-black text-white/[0.03] absolute top-4 right-6">{step.num}</div>
                   <div className="text-sm font-bold text-accent-purple mb-1">{step.num}</div>
                   <h3 className="text-2xl font-black mb-3">{step.title}</h3>
-                  <p className="text-sm text-white/40 leading-relaxed">{step.desc}</p>
+                  <p className="text-sm text-white/60 leading-relaxed">{step.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -236,19 +236,19 @@ export default function VideoCreatorPage() {
       </section>
 
       {/* Styles */}
-      <section className="py-20 border-t border-white/[0.04]">
+      <section className="py-20 border-t border-white/[0.08]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="text-center mb-12">
               <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
                 12+ Video <span className="gradient-text">Styles</span>
               </h2>
-              <p className="text-lg text-white/40">Pick a vibe or let AI choose the best style for your content.</p>
+              <p className="text-lg text-white/60">Pick a vibe or let AI choose the best style for your content.</p>
             </motion.div>
 
             <motion.div variants={fadeInUp} className="flex flex-wrap justify-center gap-2">
               {STYLES.map((style) => (
-                <div key={style} className="px-5 py-2.5 rounded-full border border-white/[0.06] bg-white/[0.02] text-sm text-white/50 hover:text-accent-purple hover:border-accent-purple/30 hover:bg-accent-purple/5 transition-all cursor-pointer">
+                <div key={style} className="px-5 py-2.5 rounded-full border border-white/[0.10] bg-white/[0.05] text-sm text-white/65 hover:text-accent-purple hover:border-accent-purple/30 hover:bg-accent-purple/5 transition-all cursor-pointer">
                   {style}
                 </div>
               ))}
@@ -258,7 +258,7 @@ export default function VideoCreatorPage() {
       </section>
 
       {/* Features */}
-      <section className="py-20 border-t border-white/[0.04]">
+      <section className="py-20 border-t border-white/[0.08]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="text-center mb-12">
@@ -272,7 +272,7 @@ export default function VideoCreatorPage() {
                 <motion.div key={i} variants={fadeInUp} className="gradient-border card-hover p-6 rounded-xl group">
                   <f.icon className="w-7 h-7 text-accent-purple/50 mb-3 group-hover:text-accent-purple transition-colors" />
                   <h3 className="text-base font-bold mb-1.5">{f.title}</h3>
-                  <p className="text-xs text-white/40 leading-relaxed">{f.desc}</p>
+                  <p className="text-xs text-white/60 leading-relaxed">{f.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -281,7 +281,7 @@ export default function VideoCreatorPage() {
       </section>
 
       {/* Platform deep dive */}
-      <section className="py-20 border-t border-white/[0.04]">
+      <section className="py-20 border-t border-white/[0.08]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="text-center mb-12">
@@ -297,8 +297,8 @@ export default function VideoCreatorPage() {
                     <h3 className="text-lg font-bold">{p.name}</h3>
                     <span className="text-[10px] font-mono text-accent-purple bg-accent-purple/10 px-2 py-0.5 rounded">{p.format}</span>
                   </div>
-                  <p className="text-sm text-white/40 leading-relaxed mb-2">{p.desc}</p>
-                  <div className="text-xs text-white/20">Duration: {p.duration}</div>
+                  <p className="text-sm text-white/60 leading-relaxed mb-2">{p.desc}</p>
+                  <div className="text-xs text-white/40">Duration: {p.duration}</div>
                 </motion.div>
               ))}
             </div>
@@ -307,13 +307,13 @@ export default function VideoCreatorPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 border-t border-white/[0.04]">
+      <section className="py-20 border-t border-white/[0.08]">
         <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
           <MonitorPlay className="w-12 h-12 text-accent-purple/30 mx-auto mb-6" />
           <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
             Your First Video<br /><span className="gradient-text">In Under 2 Minutes</span>
           </h2>
-          <p className="text-lg text-white/40 mb-4">No editing skills. No scripts. No templates. Just AI magic.</p>
+          <p className="text-lg text-white/60 mb-4">No editing skills. No scripts. No templates. Just AI magic.</p>
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium mb-8">
             <Clock size={12} /> Coming Soon
           </span>
@@ -331,7 +331,7 @@ export default function VideoCreatorPage() {
                   value={waitlistEmail}
                   onChange={(e) => setWaitlistEmail(e.target.value)}
                   placeholder="Enter your email for early access"
-                  className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-xl px-5 py-4 text-white placeholder:text-white/25 outline-none text-sm focus:border-accent-purple/30 transition-colors"
+                  className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-xl px-5 py-4 text-white placeholder:text-white/45 outline-none text-sm focus:border-accent-purple/30 transition-colors"
                 />
                 <button
                   type="submit"
@@ -347,13 +347,13 @@ export default function VideoCreatorPage() {
         </div>
       </section>
 
-      <footer className="border-t border-white/[0.04] py-8">
+      <footer className="border-t border-white/[0.08] py-8">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <div className="text-xs text-white/20">&copy; 2026 Zoobicon</div>
+          <div className="text-xs text-white/40">&copy; 2026 Zoobicon</div>
           <div className="flex gap-4">
-            <Link href="/" className="text-xs text-white/20 hover:text-white/40">Home</Link>
-            <Link href="/products/website-builder" className="text-xs text-white/20 hover:text-white/40">Builder</Link>
-            <Link href="/products/seo-agent" className="text-xs text-white/20 hover:text-white/40">SEO Agent</Link>
+            <Link href="/" className="text-xs text-white/40 hover:text-white/60">Home</Link>
+            <Link href="/products/website-builder" className="text-xs text-white/40 hover:text-white/60">Builder</Link>
+            <Link href="/products/seo-agent" className="text-xs text-white/40 hover:text-white/60">SEO Agent</Link>
           </div>
         </div>
       </footer>

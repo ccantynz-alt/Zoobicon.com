@@ -317,11 +317,11 @@ export default function EditSitePage() {
       case "versions":
         return (
           <div className="p-4 space-y-3">
-            <p className="text-xs text-white/40">
+            <p className="text-xs text-white/60">
               View and rollback to previous versions of your site.
             </p>
             {versions.length === 0 ? (
-              <p className="text-xs text-white/30 text-center py-4">No versions yet</p>
+              <p className="text-xs text-white/50 text-center py-4">No versions yet</p>
             ) : (
               versions.map((v, i) => (
                 <div
@@ -336,17 +336,17 @@ export default function EditSitePage() {
                     <span className="text-xs text-white font-medium">
                       {i === 0 ? "Current" : `v${versions.length - i}`}
                     </span>
-                    <span className="text-[10px] text-white/30">
+                    <span className="text-[10px] text-white/50">
                       {new Date(v.created_at).toLocaleDateString()} {new Date(v.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
-                  <p className="text-[11px] text-white/50 mb-2">
+                  <p className="text-[11px] text-white/65 mb-2">
                     {v.commit_message || "No description"}
                   </p>
                   {i > 0 && (
                     <button
                       onClick={() => rollbackToVersion(v.id)}
-                      className="flex items-center gap-1 px-2 py-1 rounded text-[10px] bg-white/5 text-white/50 hover:text-white hover:bg-white/10 transition-colors"
+                      className="flex items-center gap-1 px-2 py-1 rounded text-[10px] bg-white/5 text-white/65 hover:text-white hover:bg-white/10 transition-colors"
                     >
                       <RotateCcw size={10} /> Restore this version
                     </button>
@@ -398,12 +398,12 @@ export default function EditSitePage() {
   // Loading state
   if (status === "loading") {
     return (
-      <div className="flex flex-col h-screen bg-[#0a0a0f]">
+      <div className="flex flex-col h-screen bg-[#111a2e]">
         <TopBar />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <Loader2 size={32} className="text-brand-400 animate-spin mx-auto mb-4" />
-            <div className="text-sm text-white/50">Loading {slug}...</div>
+            <div className="text-sm text-white/65">Loading {slug}...</div>
           </div>
         </div>
       </div>
@@ -413,13 +413,13 @@ export default function EditSitePage() {
   // Error state
   if (status === "error" && !hasCode) {
     return (
-      <div className="flex flex-col h-screen bg-[#0a0a0f]">
+      <div className="flex flex-col h-screen bg-[#111a2e]">
         <TopBar />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center max-w-md">
             <div className="text-4xl mb-4">404</div>
             <div className="text-lg font-bold text-white mb-2">Site Not Found</div>
-            <div className="text-sm text-white/40 mb-6">{error}</div>
+            <div className="text-sm text-white/60 mb-6">{error}</div>
             <a
               href="/builder"
               className="px-6 py-2.5 rounded-lg bg-brand-500/20 text-brand-400 hover:bg-brand-500/30 transition-colors text-sm font-medium"
@@ -433,11 +433,11 @@ export default function EditSitePage() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-[#0a0a0f] relative overflow-hidden">
+    <div className="flex flex-col h-screen bg-[#111a2e] relative overflow-hidden">
       <TopBar />
 
       {/* Site info bar */}
-      <div className="flex items-center justify-between px-4 py-2 border-b border-white/[0.06] bg-[#12121a]">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-white/[0.10] bg-[#141e33]">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -448,7 +448,7 @@ export default function EditSitePage() {
               href={site.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-xs text-white/30 hover:text-white/60 transition-colors"
+              className="flex items-center gap-1 text-xs text-white/50 hover:text-white/60 transition-colors"
             >
               {site.url} <ExternalLink size={10} />
             </a>
@@ -472,7 +472,7 @@ export default function EditSitePage() {
             className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${
               isDirty
                 ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
-                : "bg-white/5 text-white/20 cursor-not-allowed"
+                : "bg-white/5 text-white/40 cursor-not-allowed"
             }`}
           >
             {isSaving ? (
@@ -490,12 +490,12 @@ export default function EditSitePage() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Left panel — AI Chat Editor */}
-        <div className="w-[400px] min-w-[340px] flex flex-col border-r border-white/[0.06] bg-[#12121a]">
-          <div className="px-4 py-3 border-b border-white/[0.06] flex items-center justify-between">
+        <div className="w-[400px] min-w-[340px] flex flex-col border-r border-white/[0.10] bg-[#141e33]">
+          <div className="px-4 py-3 border-b border-white/[0.10] flex items-center justify-between">
             <span className="text-[11px] uppercase tracking-[2px] text-brand-400/50">
               AI Editor
             </span>
-            <span className="text-[10px] text-white/20">
+            <span className="text-[10px] text-white/40">
               Editing live site
             </span>
           </div>
@@ -509,13 +509,13 @@ export default function EditSitePage() {
         </div>
 
         {/* Center panel — Preview / Code */}
-        <div className="flex-1 flex flex-col bg-[#0a0a0f]/80 backdrop-blur-sm">
-          <div className="flex items-center border-b border-white/[0.06] px-2">
+        <div className="flex-1 flex flex-col bg-[#111a2e]/80 backdrop-blur-sm">
+          <div className="flex items-center border-b border-white/[0.10] px-2">
             <button
               className={`px-4 py-2.5 text-xs font-medium transition-colors border-b-2 ${
                 activeTab === "preview"
                   ? "border-brand-500 text-brand-400"
-                  : "border-transparent text-white/30 hover:text-white/50"
+                  : "border-transparent text-white/50 hover:text-white/65"
               }`}
               onClick={() => setActiveTab("preview")}
             >
@@ -525,7 +525,7 @@ export default function EditSitePage() {
               className={`px-4 py-2.5 text-xs font-medium transition-colors border-b-2 ${
                 activeTab === "code"
                   ? "border-brand-500 text-brand-400"
-                  : "border-transparent text-white/30 hover:text-white/50"
+                  : "border-transparent text-white/50 hover:text-white/65"
               }`}
               onClick={() => setActiveTab("code")}
             >
@@ -544,8 +544,8 @@ export default function EditSitePage() {
 
         {/* Tool panel */}
         {activeTool && (
-          <div className="w-[380px] flex flex-col border-l border-white/[0.06] bg-[#0a0a0f]/90 backdrop-blur-sm animate-in slide-in-from-right duration-200">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+          <div className="w-[380px] flex flex-col border-l border-white/[0.10] bg-[#111a2e]/90 backdrop-blur-sm animate-in slide-in-from-right duration-200">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.10]">
               <span className="text-[11px] uppercase tracking-[2px] text-brand-400/50">
                 {activeToolLabel}
               </span>
@@ -561,7 +561,7 @@ export default function EditSitePage() {
         )}
 
         {/* Right toolbar */}
-        <div className="w-12 flex flex-col items-center py-2 gap-1 border-l border-white/[0.06] bg-[#0a0a0f]/90 backdrop-blur-sm overflow-y-auto">
+        <div className="w-12 flex flex-col items-center py-2 gap-1 border-l border-white/[0.10] bg-[#111a2e]/90 backdrop-blur-sm overflow-y-auto">
           {TOOLS.map((tool) => (
             <button
               key={tool.id}

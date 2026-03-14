@@ -137,13 +137,13 @@ export default function AgenciesPage() {
     <div className="relative min-h-screen">
       {/* Background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="glow-orb glow-orb-purple w-[500px] h-[500px] -top-[150px] left-[20%] opacity-10" />
-        <div className="glow-orb glow-orb-blue w-[400px] h-[400px] bottom-[30%] right-[5%] opacity-10" />
+        <div className="glow-orb glow-orb-purple w-[500px] h-[500px] -top-[150px] left-[20%] opacity-15" />
+        <div className="glow-orb glow-orb-blue w-[400px] h-[400px] bottom-[30%] right-[5%] opacity-15" />
         <div className="grid-pattern fixed inset-0" />
       </div>
 
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.04] bg-[#050507]/80 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08] bg-[#0d1525]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2">
@@ -154,9 +154,9 @@ export default function AgenciesPage() {
               <span className="text-xs font-semibold text-accent-purple bg-accent-purple/10 px-2 py-0.5 rounded-md border border-accent-purple/20">Agencies</span>
             </Link>
             <div className="hidden md:flex items-center gap-4">
-              <a href="#white-label" className="text-sm text-white/40 hover:text-white transition-colors">White Label</a>
-              <a href="#tools" className="text-sm text-white/40 hover:text-white transition-colors">Tools</a>
-              <a href="#pricing" className="text-sm text-white/40 hover:text-white transition-colors">Pricing</a>
+              <a href="#white-label" className="text-sm text-white/60 hover:text-white transition-colors">White Label</a>
+              <a href="#tools" className="text-sm text-white/60 hover:text-white transition-colors">Tools</a>
+              <a href="#pricing" className="text-sm text-white/60 hover:text-white transition-colors">Pricing</a>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -181,7 +181,7 @@ export default function AgenciesPage() {
               <span className="gradient-text-hero">Supercharged by AI.</span>
             </motion.h1>
 
-            <motion.p variants={fadeInUp} className="max-w-2xl text-lg text-white/40 leading-relaxed mb-10">
+            <motion.p variants={fadeInUp} className="max-w-2xl text-lg text-white/60 leading-relaxed mb-10">
               White-label the most advanced AI platform under your brand. Generate client websites in bulk,
               run autonomous SEO campaigns, and scale your agency to 100+ clients without hiring.
             </motion.p>
@@ -191,7 +191,7 @@ export default function AgenciesPage() {
                 <span>Start 14-Day Free Trial</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <a href="mailto:sales@zoobicon.com?subject=Agency Demo Request" className="px-8 py-4 rounded-2xl text-base font-medium text-white/50 border border-white/[0.08] hover:border-white/20 transition-all flex items-center gap-3">
+              <a href="mailto:sales@zoobicon.com?subject=Agency Demo Request" className="px-8 py-4 rounded-2xl text-base font-medium text-white/65 border border-white/[0.12] hover:border-white/20 transition-all flex items-center gap-3">
                 <Briefcase className="w-5 h-5" />
                 <span>Book a Demo</span>
               </a>
@@ -207,7 +207,7 @@ export default function AgenciesPage() {
               ].map((stat) => (
                 <div key={stat.label} className="gradient-border p-4 rounded-xl text-center">
                   <div className="text-2xl font-black gradient-text-static">{stat.value}</div>
-                  <div className="text-xs text-white/30 mt-1">{stat.label}</div>
+                  <div className="text-xs text-white/50 mt-1">{stat.label}</div>
                 </div>
               ))}
             </motion.div>
@@ -216,7 +216,7 @@ export default function AgenciesPage() {
       </section>
 
       {/* White Label */}
-      <section id="white-label" className="py-20 border-t border-white/[0.04]">
+      <section id="white-label" className="py-20 border-t border-white/[0.08]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="text-center mb-12">
@@ -227,7 +227,7 @@ export default function AgenciesPage() {
               <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
                 Your Platform.<br /><span className="gradient-text">Your Rules.</span>
               </h2>
-              <p className="text-lg text-white/40 max-w-2xl mx-auto">
+              <p className="text-lg text-white/60 max-w-2xl mx-auto">
                 Rebrand Zoobicon as your own AI platform. Your logo, your colors, your domain.
                 Clients will think you built it.
               </p>
@@ -238,7 +238,7 @@ export default function AgenciesPage() {
                 <motion.div key={i} variants={fadeInUp} className="gradient-border card-hover p-6 rounded-xl group">
                   <f.icon className="w-8 h-8 text-accent-purple/60 mb-4 group-hover:text-accent-purple transition-colors" />
                   <h3 className="text-lg font-bold mb-2">{f.title}</h3>
-                  <p className="text-sm text-white/40 leading-relaxed">{f.desc}</p>
+                  <p className="text-sm text-white/60 leading-relaxed">{f.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -247,7 +247,7 @@ export default function AgenciesPage() {
       </section>
 
       {/* Agency Tools */}
-      <section id="tools" className="py-20 border-t border-white/[0.04]">
+      <section id="tools" className="py-20 border-t border-white/[0.08]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="text-center mb-12">
@@ -264,7 +264,7 @@ export default function AgenciesPage() {
                     <span className="text-xs font-bold text-accent-cyan bg-accent-cyan/10 px-2.5 py-1 rounded-full">{tool.stat}</span>
                   </div>
                   <h3 className="text-xl font-bold mb-2">{tool.title}</h3>
-                  <p className="text-sm text-white/40 leading-relaxed">{tool.desc}</p>
+                  <p className="text-sm text-white/60 leading-relaxed">{tool.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -273,7 +273,7 @@ export default function AgenciesPage() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 border-t border-white/[0.04]">
+      <section className="py-20 border-t border-white/[0.08]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="text-center mb-12">
@@ -293,7 +293,7 @@ export default function AgenciesPage() {
                   <p className="text-sm text-white/60 leading-relaxed mb-4">&ldquo;{t.text}&rdquo;</p>
                   <div>
                     <div className="text-sm font-semibold">{t.name}</div>
-                    <div className="text-xs text-white/30">{t.role}</div>
+                    <div className="text-xs text-white/50">{t.role}</div>
                   </div>
                 </motion.div>
               ))}
@@ -303,14 +303,14 @@ export default function AgenciesPage() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-20 border-t border-white/[0.04]">
+      <section id="pricing" className="py-20 border-t border-white/[0.08]">
         <div className="max-w-6xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="text-center mb-12">
               <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
                 Agency <span className="gradient-text">Pricing</span>
               </h2>
-              <p className="text-lg text-white/40">14-day free trial. No credit card required.</p>
+              <p className="text-lg text-white/60">14-day free trial. No credit card required.</p>
             </motion.div>
 
             <div className="grid md:grid-cols-3 gap-4">
@@ -329,12 +329,12 @@ export default function AgenciesPage() {
                       Best Value
                     </div>
                   )}
-                  <div className="text-sm font-semibold text-white/50 mb-2">{tier.name}</div>
-                  <div className="text-3xl font-black mb-0.5">{tier.price}<span className="text-base font-normal text-white/30">{tier.period}</span></div>
-                  <div className="text-xs text-white/30 mb-4">{tier.desc}</div>
+                  <div className="text-sm font-semibold text-white/65 mb-2">{tier.name}</div>
+                  <div className="text-3xl font-black mb-0.5">{tier.price}<span className="text-base font-normal text-white/50">{tier.period}</span></div>
+                  <div className="text-xs text-white/50 mb-4">{tier.desc}</div>
                   <ul className="space-y-2 mb-6">
                     {tier.features.map((f) => (
-                      <li key={f} className="flex items-center gap-2 text-sm text-white/50">
+                      <li key={f} className="flex items-center gap-2 text-sm text-white/65">
                         <Check className="w-3.5 h-3.5 text-accent-cyan flex-shrink-0" />
                         {f}
                       </li>
@@ -343,7 +343,7 @@ export default function AgenciesPage() {
                   {tier.cta === "Contact Sales" ? (
                     <a
                       href="mailto:sales@zoobicon.com?subject=Agency Enterprise Inquiry"
-                      className="block w-full py-2.5 rounded-xl text-sm font-bold text-center border border-white/[0.08] text-white/60 hover:border-white/20 transition-all"
+                      className="block w-full py-2.5 rounded-xl text-sm font-bold text-center border border-white/[0.12] text-white/60 hover:border-white/20 transition-all"
                     >
                       Contact Sales
                     </a>
@@ -353,7 +353,7 @@ export default function AgenciesPage() {
                       className={`block w-full py-2.5 rounded-xl text-sm font-bold text-center ${
                         tier.featured
                           ? "btn-gradient text-white"
-                          : "border border-white/[0.08] text-white/60 hover:border-white/20 transition-all"
+                          : "border border-white/[0.12] text-white/60 hover:border-white/20 transition-all"
                       }`}
                     >
                       {tier.cta}
@@ -367,12 +367,12 @@ export default function AgenciesPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 border-t border-white/[0.04]">
+      <section className="py-20 border-t border-white/[0.08]">
         <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
           <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
             Ready to Scale <span className="gradient-text">Your Agency?</span>
           </h2>
-          <p className="text-lg text-white/40 mb-8">Join hundreds of agencies using Zoobicon to 10x their output.</p>
+          <p className="text-lg text-white/60 mb-8">Join hundreds of agencies using Zoobicon to 10x their output.</p>
           <Link href="/auth/signup" className="inline-flex group btn-gradient px-10 py-4 rounded-2xl text-lg font-bold text-white items-center gap-3 shadow-glow-lg">
             <span>Start 14-Day Free Trial</span>
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -381,13 +381,13 @@ export default function AgenciesPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/[0.04] py-8">
+      <footer className="border-t border-white/[0.08] py-8">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <div className="text-xs text-white/20">&copy; 2026 Zoobicon. All rights reserved.</div>
+          <div className="text-xs text-white/40">&copy; 2026 Zoobicon. All rights reserved.</div>
           <div className="flex gap-4">
-            <Link href="/" className="text-xs text-white/20 hover:text-white/40">Home</Link>
-            <Link href="/developers" className="text-xs text-white/20 hover:text-white/40">Developers</Link>
-            <Link href="/cli" className="text-xs text-white/20 hover:text-white/40">CLI</Link>
+            <Link href="/" className="text-xs text-white/40 hover:text-white/60">Home</Link>
+            <Link href="/developers" className="text-xs text-white/40 hover:text-white/60">Developers</Link>
+            <Link href="/cli" className="text-xs text-white/40 hover:text-white/60">CLI</Link>
           </div>
         </div>
       </footer>

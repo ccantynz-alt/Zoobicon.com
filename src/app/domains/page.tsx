@@ -114,12 +114,12 @@ export default function DomainsPage() {
   return (
     <div className="relative min-h-screen">
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="glow-orb glow-orb-blue w-[500px] h-[500px] -top-[150px] left-[20%] opacity-10" />
-        <div className="glow-orb glow-orb-cyan w-[400px] h-[400px] bottom-[20%] right-[5%] opacity-10" />
+        <div className="glow-orb glow-orb-blue w-[500px] h-[500px] -top-[150px] left-[20%] opacity-15" />
+        <div className="glow-orb glow-orb-cyan w-[400px] h-[400px] bottom-[20%] right-[5%] opacity-15" />
         <div className="grid-pattern fixed inset-0" />
       </div>
 
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.04] bg-[#050507]/80 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08] bg-[#0d1525]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
@@ -128,8 +128,8 @@ export default function DomainsPage() {
               </div>
               <span className="text-lg font-bold tracking-tight">Zoobicon</span>
             </Link>
-            <span className="text-xs text-white/20">/</span>
-            <span className="text-sm text-white/50">Domains</span>
+            <span className="text-xs text-white/40">/</span>
+            <span className="text-sm text-white/65">Domains</span>
           </div>
           <div className="flex items-center gap-4">
             {cart.length > 0 && (
@@ -167,7 +167,7 @@ export default function DomainsPage() {
                   value={waitlistEmail}
                   onChange={(e) => setWaitlistEmail(e.target.value)}
                   placeholder="your@email.com"
-                  className="bg-white/[0.06] border border-white/[0.1] rounded-lg px-3 py-1.5 text-white placeholder:text-white/25 outline-none text-xs w-48 focus:border-amber-500/30 transition-colors"
+                  className="bg-white/[0.09] border border-white/[0.1] rounded-lg px-3 py-1.5 text-white placeholder:text-white/45 outline-none text-xs w-48 focus:border-amber-500/30 transition-colors"
                 />
                 <button
                   type="submit"
@@ -201,7 +201,7 @@ export default function DomainsPage() {
               <span className="gradient-text-hero">Digital Territory.</span>
             </motion.h1>
 
-            <motion.p variants={fadeInUp} className="max-w-2xl text-lg md:text-xl text-white/40 leading-relaxed mb-10">
+            <motion.p variants={fadeInUp} className="max-w-2xl text-lg md:text-xl text-white/60 leading-relaxed mb-10">
               Register premium domains at unbeatable prices. Every domain comes with free WHOIS privacy,
               DNS management, and seamless integration with the Zoobicon AI platform.
             </motion.p>
@@ -209,8 +209,8 @@ export default function DomainsPage() {
             {/* Search Bar */}
             <motion.div variants={fadeInUp} className="max-w-3xl">
               <form onSubmit={handleSearch} className="relative">
-                <div className="flex items-center bg-white/[0.04] border border-white/[0.08] rounded-2xl overflow-hidden focus-within:border-accent-cyan/30 transition-colors">
-                  <Search className="w-5 h-5 text-white/30 ml-5 flex-shrink-0" />
+                <div className="flex items-center bg-white/[0.07] border border-white/[0.12] rounded-2xl overflow-hidden focus-within:border-accent-cyan/30 transition-colors">
+                  <Search className="w-5 h-5 text-white/50 ml-5 flex-shrink-0" />
                   <input
                     type="text"
                     value={searchQuery}
@@ -219,7 +219,7 @@ export default function DomainsPage() {
                       if (!e.target.value.trim()) setShowResults(false);
                     }}
                     placeholder="Search for your perfect domain name..."
-                    className="flex-1 bg-transparent px-4 py-5 text-white placeholder:text-white/25 outline-none text-lg"
+                    className="flex-1 bg-transparent px-4 py-5 text-white placeholder:text-white/45 outline-none text-lg"
                   />
                   <button
                     type="submit"
@@ -236,10 +236,10 @@ export default function DomainsPage() {
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mt-4 border border-white/[0.06] rounded-2xl overflow-hidden bg-dark-300/80 backdrop-blur-xl"
+                  className="mt-4 border border-white/[0.10] rounded-2xl overflow-hidden bg-dark-300/80 backdrop-blur-xl"
                 >
-                  <div className="p-4 border-b border-white/[0.06]">
-                    <div className="text-xs text-white/30 font-medium uppercase tracking-wider">
+                  <div className="p-4 border-b border-white/[0.10]">
+                    <div className="text-xs text-white/50 font-medium uppercase tracking-wider">
                       {displayResults.filter((r) => r.available).length} domains available
                     </div>
                   </div>
@@ -248,7 +248,7 @@ export default function DomainsPage() {
                       <div
                         key={result.domain}
                         className={`flex items-center justify-between px-5 py-4 transition-colors ${
-                          result.available ? "hover:bg-white/[0.02]" : "opacity-50"
+                          result.available ? "hover:bg-white/[0.05]" : "opacity-50"
                         }`}
                       >
                         <div className="flex items-center gap-3">
@@ -262,7 +262,7 @@ export default function DomainsPage() {
                         <div className="flex items-center gap-4">
                           <span className="text-lg font-black">
                             ${result.price}
-                            <span className="text-xs text-white/30 font-normal">/yr</span>
+                            <span className="text-xs text-white/50 font-normal">/yr</span>
                           </span>
                           {result.available ? (
                             <button
@@ -289,7 +289,7 @@ export default function DomainsPage() {
                     ))}
                   </div>
                   {cart.length > 0 && (
-                    <div className="p-4 border-t border-white/[0.06] bg-amber-500/[0.03]">
+                    <div className="p-4 border-t border-white/[0.10] bg-amber-500/[0.03]">
                       <div className="flex items-center justify-between">
                         <div>
                           <span className="text-sm font-bold">{cart.length} domain{cart.length > 1 ? "s" : ""} selected</span>
@@ -315,7 +315,7 @@ export default function DomainsPage() {
               ].map((stat) => (
                 <div key={stat.label} className="gradient-border p-4 rounded-xl text-center">
                   <div className="text-2xl font-black gradient-text-static">{stat.value}</div>
-                  <div className="text-xs text-white/30 mt-1">{stat.label}</div>
+                  <div className="text-xs text-white/50 mt-1">{stat.label}</div>
                 </div>
               ))}
             </motion.div>
@@ -324,14 +324,14 @@ export default function DomainsPage() {
       </section>
 
       {/* Popular TLDs */}
-      <section className="py-20 border-t border-white/[0.04]">
+      <section className="py-20 border-t border-white/[0.08]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="text-center mb-12">
               <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
                 Popular <span className="gradient-text">Extensions</span>
               </h2>
-              <p className="text-lg text-white/40">Premium domains at competitive prices. Register for years and save more.</p>
+              <p className="text-lg text-white/60">Premium domains at competitive prices. Register for years and save more.</p>
             </motion.div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -353,15 +353,15 @@ export default function DomainsPage() {
                     <div className="text-right">
                       <div className="text-2xl font-black">
                         ${tld.price}
-                        <span className="text-xs text-white/30 font-normal">/yr</span>
+                        <span className="text-xs text-white/50 font-normal">/yr</span>
                       </div>
-                      <div className="text-[10px] text-white/20">
+                      <div className="text-[10px] text-white/40">
                         Renews at ${tld.renewal}/yr
                       </div>
                     </div>
                   </div>
-                  <p className="text-sm text-white/40 mb-4">{tld.desc}</p>
-                  <div className="flex items-center gap-2 text-[10px] text-white/20">
+                  <p className="text-sm text-white/60 mb-4">{tld.desc}</p>
+                  <div className="flex items-center gap-2 text-[10px] text-white/40">
                     <Shield className="w-3 h-3" />
                     <span>Free WHOIS Privacy</span>
                     <span className="mx-1">•</span>
@@ -379,14 +379,14 @@ export default function DomainsPage() {
       </section>
 
       {/* Bundle & Upsells */}
-      <section className="py-20 border-t border-white/[0.04]">
+      <section className="py-20 border-t border-white/[0.08]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="text-center mb-12">
               <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
                 Power Up Your<br /><span className="gradient-text">Domain</span>
               </h2>
-              <p className="text-lg text-white/40">Every domain connects to the full Zoobicon ecosystem. Add what you need.</p>
+              <p className="text-lg text-white/60">Every domain connects to the full Zoobicon ecosystem. Add what you need.</p>
             </motion.div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -406,7 +406,7 @@ export default function DomainsPage() {
                       </span>
                     )}
                   </h3>
-                  <p className="text-xs text-white/40 leading-relaxed">{upsell.desc}</p>
+                  <p className="text-xs text-white/60 leading-relaxed">{upsell.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -415,7 +415,7 @@ export default function DomainsPage() {
       </section>
 
       {/* Why Zoobicon Domains */}
-      <section className="py-20 border-t border-white/[0.04]">
+      <section className="py-20 border-t border-white/[0.08]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="text-center mb-12">
@@ -434,7 +434,7 @@ export default function DomainsPage() {
                 <motion.div key={i} variants={fadeInUp} className="gradient-border p-6 rounded-xl group card-hover">
                   <item.icon className="w-8 h-8 text-brand-400/50 mb-4 group-hover:text-brand-400 transition-colors" />
                   <h3 className="text-lg font-bold mb-2">{item.title}</h3>
-                  <p className="text-sm text-white/40 leading-relaxed">{item.desc}</p>
+                  <p className="text-sm text-white/60 leading-relaxed">{item.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -443,7 +443,7 @@ export default function DomainsPage() {
       </section>
 
       {/* Domain + AI Bundle */}
-      <section className="py-20 border-t border-white/[0.04]">
+      <section className="py-20 border-t border-white/[0.08]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="relative gradient-border p-10 md:p-16 rounded-2xl overflow-hidden">
@@ -457,7 +457,7 @@ export default function DomainsPage() {
                   <h3 className="text-3xl md:text-4xl font-black mb-4">
                     Domain + AI Website<br /><span className="gradient-text">From $2.99</span>
                   </h3>
-                  <p className="text-base text-white/40 leading-relaxed mb-6">
+                  <p className="text-base text-white/60 leading-relaxed mb-6">
                     Register a domain and build your entire website with AI in minutes. The fastest way to go from
                     idea to live website. Includes free hosting, SSL, and WHOIS privacy.
                   </p>
@@ -469,7 +469,7 @@ export default function DomainsPage() {
                       "Global CDN hosting included",
                       "SEO Agent add-on available",
                     ].map((item) => (
-                      <li key={item} className="flex items-center gap-2 text-sm text-white/50">
+                      <li key={item} className="flex items-center gap-2 text-sm text-white/65">
                         <Check className="w-4 h-4 text-accent-cyan flex-shrink-0" />
                         {item}
                       </li>
@@ -489,7 +489,7 @@ export default function DomainsPage() {
                           value={waitlistEmail}
                           onChange={(e) => setWaitlistEmail(e.target.value)}
                           placeholder="Enter your email for early access"
-                          className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-white placeholder:text-white/25 outline-none text-sm focus:border-accent-cyan/30 transition-colors"
+                          className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-xl px-4 py-3 text-white placeholder:text-white/45 outline-none text-sm focus:border-accent-cyan/30 transition-colors"
                         />
                         <button
                           type="submit"
@@ -508,7 +508,7 @@ export default function DomainsPage() {
                     <div className="text-center">
                       <Globe className="w-16 h-16 text-accent-cyan/40 mx-auto mb-4" />
                       <div className="text-3xl font-black gradient-text-static">$2.99</div>
-                      <div className="text-xs text-white/30 mt-1">Domain + AI Site</div>
+                      <div className="text-xs text-white/50 mt-1">Domain + AI Site</div>
                     </div>
                   </div>
                 </div>
@@ -519,13 +519,13 @@ export default function DomainsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 border-t border-white/[0.04]">
+      <section className="py-20 border-t border-white/[0.08]">
         <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
           <Globe className="w-12 h-12 text-accent-cyan/30 mx-auto mb-6" />
           <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
             Your Perfect Domain<br /><span className="gradient-text">Is Waiting</span>
           </h2>
-          <p className="text-lg text-white/40 mb-4">500+ extensions. Unbeatable prices. Free privacy protection. Instant AI website builder.</p>
+          <p className="text-lg text-white/60 mb-4">500+ extensions. Unbeatable prices. Free privacy protection. Instant AI website builder.</p>
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium mb-8">
             <Clock size={12} /> Coming Soon
           </span>
@@ -543,7 +543,7 @@ export default function DomainsPage() {
                   value={waitlistEmail}
                   onChange={(e) => setWaitlistEmail(e.target.value)}
                   placeholder="Enter your email for early access"
-                  className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-xl px-5 py-4 text-white placeholder:text-white/25 outline-none text-sm focus:border-accent-cyan/30 transition-colors"
+                  className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-xl px-5 py-4 text-white placeholder:text-white/45 outline-none text-sm focus:border-accent-cyan/30 transition-colors"
                 />
                 <button
                   type="submit"
@@ -559,13 +559,13 @@ export default function DomainsPage() {
         </div>
       </section>
 
-      <footer className="border-t border-white/[0.04] py-8">
+      <footer className="border-t border-white/[0.08] py-8">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <div className="text-xs text-white/20">&copy; 2026 Zoobicon</div>
+          <div className="text-xs text-white/40">&copy; 2026 Zoobicon</div>
           <div className="flex gap-4">
-            <Link href="/" className="text-xs text-white/20 hover:text-white/40">Home</Link>
-            <Link href="/products/website-builder" className="text-xs text-white/20 hover:text-white/40">Builder</Link>
-            <Link href="/marketplace" className="text-xs text-white/20 hover:text-white/40">Marketplace</Link>
+            <Link href="/" className="text-xs text-white/40 hover:text-white/60">Home</Link>
+            <Link href="/products/website-builder" className="text-xs text-white/40 hover:text-white/60">Builder</Link>
+            <Link href="/marketplace" className="text-xs text-white/40 hover:text-white/60">Marketplace</Link>
           </div>
         </div>
       </footer>
