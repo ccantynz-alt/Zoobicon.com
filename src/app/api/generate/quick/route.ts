@@ -461,6 +461,8 @@ Output the <config> block first, then the <body-html> block. Nothing else.`;
           return accumulated;
         };
 
+        let sonnetAlreadyTried = false;
+
         try {
           let raw = "";
 
@@ -472,6 +474,7 @@ Output the <config> block first, then the <body-html> block. Nothing else.`;
             if (canFallback) {
               console.warn(`[Quick] ${model} failed (${primaryErr instanceof Error ? primaryErr.message : "unknown"}), falling back to Sonnet`);
               sendEvent({ type: "status", message: "Switching to fast mode..." });
+              sonnetAlreadyTried = true;
               raw = await generate("claude-sonnet-4-6", 16000, 90_000);
             } else {
               throw primaryErr;
@@ -576,8 +579,8 @@ Output the <config> block first, then the <body-html> block. Nothing else.`;
           const message = err instanceof Error ? err.message : "Generation error";
           console.error("[Quick] Error:", message);
 
-          // If primary failed and error is retryable, try Sonnet fallback (any tier)
-          if (isRetryableError(err) && model !== "claude-sonnet-4-6") {
+          // If primary failed and error is retryable, try Sonnet fallback (skip if already tried)
+          if (isRetryableError(err) && !sonnetAlreadyTried && model !== "claude-sonnet-4-6") {
             try {
               sendEvent({ type: "status", message: "Switching to fast mode..." });
               const fallbackRaw = await generate("claude-sonnet-4-6", 16000, 90_000);

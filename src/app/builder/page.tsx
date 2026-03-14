@@ -911,11 +911,7 @@ function BuilderPage() {
       const errMsg = err instanceof Error ? err.message : String(err);
       console.error("[Generate] Failed:", errMsg);
       setGeneratedCode("");
-      setError(cleanErrorMessage(
-        errMsg.includes("API_KEY") || errMsg.includes("not configured")
-          ? errMsg
-          : `Generation failed: ${errMsg}. Please try again.`
-      ));
+      setError(cleanErrorMessage(errMsg));
       setStatus("error");
     }
   }, [prompt, tier, autoReplaceImages, selectedModel]);
