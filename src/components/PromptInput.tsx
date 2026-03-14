@@ -399,9 +399,9 @@ export default function PromptInput({
       </div>
 
       {/* Character count + shortcut */}
-      <div className="flex justify-between items-center text-[10px] text-white/20">
+      <div className="flex justify-between items-center text-[10px] text-white/40">
         <span>{prompt.length.toLocaleString()} / 20,000</span>
-        <span className="text-brand-400/50">
+        <span className="text-brand-400/70">
           {isMac ? "Cmd" : "Ctrl"}+Enter to build
         </span>
       </div>
@@ -479,13 +479,13 @@ export default function PromptInput({
       {!hasExistingCode && (
         <div className="mt-1">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] uppercase tracking-[2px] text-white/20">
+            <span className="text-[10px] uppercase tracking-[2px] text-white/40">
               Try an example
             </span>
             <button
               onClick={() => setShowTemplateGallery(true)}
               disabled={isGenerating}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-medium text-brand-400/60 hover:text-brand-400 bg-brand-500/[0.06] hover:bg-brand-500/[0.12] border border-brand-500/10 hover:border-brand-500/25 transition-all disabled:opacity-40"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-medium text-brand-400/80 hover:text-brand-400 bg-brand-500/[0.08] hover:bg-brand-500/[0.14] border border-brand-500/15 hover:border-brand-500/30 transition-all disabled:opacity-40"
             >
               <LayoutTemplate className="w-3 h-3" />
               Browse Templates
@@ -495,7 +495,7 @@ export default function PromptInput({
             {EXAMPLE_PROMPTS.map((example, i) => (
               <button
                 key={i}
-                className="text-left text-xs text-brand-400/50 hover:text-brand-400 transition-colors p-2 rounded-lg hover:bg-white/[0.03] leading-relaxed"
+                className="text-left text-xs text-white/50 hover:text-brand-400 transition-colors p-2 rounded-lg hover:bg-white/[0.03] leading-relaxed"
                 onClick={() => onPromptChange(example)}
                 disabled={isGenerating}
               >
