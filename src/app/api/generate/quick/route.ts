@@ -468,6 +468,24 @@ Output the <config> block first, then the <body-html> block. Nothing else.`;
             // AI didn't follow format — check if it output raw HTML instead
             console.warn("[Quick] AI didn't use config/body-html tags, attempting raw HTML extraction");
 
+            // Try to extract a leading JSON config even without <config> tags
+            // Opus sometimes outputs raw JSON before the HTML
+            const leadingJsonMatch = raw.match(/^\s*(\{[\s\S]*?\})\s*(?=<[a-zA-Z!])/);
+            if (leadingJsonMatch) {
+              try {
+                const parsed = JSON.parse(leadingJsonMatch[1]);
+                if (parsed.title || parsed.colors || parsed.font1) {
+                  config = { ...getDefaultConfig(prompt), ...parsed };
+                  if (parsed.colors) config.colors = { ...getDefaultConfig(prompt).colors, ...parsed.colors };
+                  console.log("[Quick] Extracted inline JSON config from raw output");
+                }
+              } catch {
+                // JSON parse failed — use defaults
+              }
+              // Strip the JSON from raw before extracting body
+              raw = raw.slice(leadingJsonMatch[0].length).trim();
+            }
+
             // Try to extract body from raw HTML output
             const rawBodyMatch = raw.match(/<body[^>]*>([\s\S]*)<\/body>/i);
             if (rawBodyMatch) {
@@ -484,9 +502,13 @@ Output the <config> block first, then the <body-html> block. Nothing else.`;
                 .replace(/<head>[\s\S]*?<\/head>/i, "")
                 .replace(/<\/?body[^>]*>/gi, "")
                 .replace(/<script[\s\S]*?<\/script>/gi, "")
+                // Strip any remaining leading JSON objects (safety net)
+                .replace(/^\s*\{[\s\S]*?\}\s*(?=<)/, "")
                 .trim();
             }
-            config = getDefaultConfig(prompt);
+            if (!config.title || config.title === getDefaultConfig(prompt).title) {
+              config = getDefaultConfig(prompt);
+            }
           }
 
           // Validate body content

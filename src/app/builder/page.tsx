@@ -669,9 +669,11 @@ function BuilderPage() {
         }
 
         if (accumulated) {
-          // Clean accumulated HTML — strip code fences, preamble
+          // Clean accumulated HTML — strip code fences, JSON preamble
           let clean = accumulated.trim();
           clean = clean.replace(/^```(?:html|HTML)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
+          // Strip any leading JSON config that leaked through
+          clean = clean.replace(/^\s*\{[\s\S]*?\}\s*(?=<[a-zA-Z!])/, "");
           const ds = clean.search(/<!doctype\s+html|<html/i);
           if (ds > 0) clean = clean.slice(ds);
           const he = clean.lastIndexOf("</html>");
@@ -858,9 +860,11 @@ function BuilderPage() {
 
       const html = await readSSEStream(res, (acc) => setGeneratedCode(acc));
 
-      // Clean HTML
+      // Clean HTML — strip code fences, JSON preamble, trailing text
       let finalHtml = html.trim();
       finalHtml = finalHtml.replace(/^```(?:html|HTML)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
+      // Strip any leading JSON config that leaked through (e.g. { "title": "...", ... })
+      finalHtml = finalHtml.replace(/^\s*\{[\s\S]*?\}\s*(?=<[a-zA-Z!])/, "");
       const ds = finalHtml.search(/<!doctype\s+html|<html/i);
       if (ds > 0) finalHtml = finalHtml.slice(ds);
       const he = finalHtml.lastIndexOf("</html>");

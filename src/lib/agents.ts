@@ -797,11 +797,13 @@ function extractJSON(text: string): string {
   return jsonMatch ? jsonMatch[0] : text;
 }
 
-/** Strip code fences, preamble text, and trailing commentary from HTML output */
+/** Strip code fences, preamble text, JSON metadata, and trailing commentary from HTML output */
 function cleanHtml(raw: string): string {
   let html = raw.trim();
   // Remove markdown code fences (```html ... ``` or ``` ... ```)
   html = html.replace(/^```(?:html|HTML)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
+  // Remove any leading JSON config block (e.g. { "title": "...", ... })
+  html = html.replace(/^\s*\{[\s\S]*?\}\s*(?=<[a-zA-Z!])/, "");
   // Remove any preamble text before <!DOCTYPE or <html
   const docStart = html.search(/<!doctype\s+html|<html/i);
   if (docStart > 0) {
