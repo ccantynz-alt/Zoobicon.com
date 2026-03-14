@@ -233,6 +233,7 @@ AVAILABLE COMPONENT CLASSES (these are pre-styled — just use them):
 - Flex: .flex .flex-col .items-center .justify-center .justify-between .gap-1 .gap-2 .gap-3 .gap-4
 - Text: .text-center .text-muted .text-primary .text-sm .text-lg .font-bold .font-semibold
 - Animations: .fade-in .fade-in-left .fade-in-right .scale-in (on each <section>)
+- Hero: .hero (full-viewport section) .hero-aurora (animated conic gradient bg) .hero-mesh (layered radial gradients) .hero-grain (film grain overlay) .hero-glass (glassmorphism panel) .hero-gradient-text (gradient text fill) .hero-float .hero-float-delay .hero-float-slow (bobbing) .hero-orb (blurred glow ball — set size/position via inline style) .hero-cursor-glow (mouse-following glow — add empty div) .hero-reveal (stagger-animate children on load) .hero-btn-glow (animated CTA border glow) .hero-typed (typing effect on span)
 - Patterns: .testimonial-card .stat-item .stat-number .stat-label .faq-item .faq-question .faq-answer .logo-strip
 - Badges: .badge .badge-primary .badge-success
 - Inputs: .input .input-group
@@ -241,7 +242,7 @@ AVAILABLE COMPONENT CLASSES (these are pre-styled — just use them):
 
 const STANDARD_SECTIONS = `
 1. <nav> — Use: <nav style="position:sticky;top:0;z-index:100;background:var(--color-bg);border-bottom:1px solid var(--color-border)"><div class="container flex justify-between items-center" style="padding:1rem var(--container-padding)">. Include logo text, nav links, CTA button (.btn .btn-primary .btn-sm), and a mobile hamburger button (.mobile-menu-btn).
-2. Hero <section> — class="section fade-in" with full-viewport feel. Big headline in <h1>, subheading in <p class="text-lg text-muted">, two CTAs (.btn-primary.btn-lg + .btn-ghost.btn-lg), and a social proof line.
+2. Hero <section> — class="hero hero-mesh fade-in" with full-viewport feel. Wrap text in <div class="container hero-reveal">. Big headline in <h1> with <span class="hero-gradient-text"> on key words, subheading in <p class="text-lg text-muted">, two CTAs (.btn-primary.btn-lg.hero-btn-glow + .btn-ghost.btn-lg), and a social proof line. Add 1-2 <div class="hero-orb"> for ambient glow.
 3. Social proof — <section class="section-alt fade-in"> with <div class="logo-strip"> containing 4-5 company name spans.
 4. Features — <section class="section fade-in"> with .section-header (h2 + p) then .grid.grid-3 > .card > .card-body. Each card: inline SVG icon (24x24), <h3>, <p class="text-muted">. Write 6 cards.
 5. About — <section class="section section-alt fade-in"> with .grid.grid-2: one side = <img> (picsum, 800x500), other side = story text + stats in .flex.gap-3 using .stat-item.
@@ -280,7 +281,17 @@ NEVER reuse a keyword. Every src must be different.
 
 const PREMIUM_SECTIONS = `
 1. <nav> — Use: <nav style="position:sticky;top:0;z-index:100;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:rgba(255,255,255,0.85);border-bottom:1px solid var(--color-border)"><div class="container flex justify-between items-center" style="padding:1rem var(--container-padding)">. Logo text, nav links, CTA button (.btn .btn-primary .btn-sm), mobile hamburger (.mobile-menu-btn). Feels floating/premium.
-2. Hero <section> — class="section fade-in" with dramatic presence. Large <h1> with letter-spacing, <p class="text-lg text-muted"> addressing pain point, TWO CTAs (.btn-primary.btn-lg + .btn-ghost.btn-lg), social proof with avatars or star rating, optional hero image. Use generous spacing (padding: 140px+ via inline style).
+2. Hero <section> — class="hero hero-aurora hero-grain fade-in" (or "hero hero-mesh hero-grain fade-in" for a softer look). Uses dedicated hero system:
+   - Wrap all text content in <div class="container hero-reveal"> for staggered entrance animation
+   - Add 2-3 decorative <div class="hero-orb"> positioned via inline style (e.g. style="width:400px;height:400px;top:-100px;right:-100px") for ambient glow
+   - Add <div class="hero-cursor-glow"></div> for interactive mouse-follow glow effect
+   - Large <h1> with <span class="hero-gradient-text"> on the key phrase (e.g. "Build <span class='hero-gradient-text'>Stunning Websites</span> in Seconds")
+   - Optionally add class "hero-typed" to a <span> inside <h1> for a typing animation on the tagline
+   - <p class="text-lg text-muted"> addressing the customer's pain point
+   - TWO CTAs: .btn-primary.btn-lg.hero-btn-glow (animated glow border) + .btn-ghost.btn-lg
+   - Social proof line with avatars or star rating
+   - For SaaS/tech sites: add a .hero-glass panel showing a product UI preview or floating feature cards with .hero-float
+   - Think Linear.app / Stripe.com level polish — the hero should feel alive and premium.
 3. Social proof bar — <section class="fade-in" style="padding:2.5rem var(--container-padding);border-top:1px solid var(--color-border);border-bottom:1px solid var(--color-border)"> with company names.
 4. Problem/Pain — <section class="section section-alt fade-in"> addressing frustrations with empathy. "Tired of X? Struggling with Y?" Use .grid.grid-2 or .grid.grid-3 for pain point cards.
 5. Solution/Features — <section class="section fade-in"> with .section-header then .grid.grid-3 > .card > .card-body. Each: colorful inline SVG icon in a tinted circle (via inline style), benefit headline, 3-line description connecting feature→benefit→outcome. 6 cards.
