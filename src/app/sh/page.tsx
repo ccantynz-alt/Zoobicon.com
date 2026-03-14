@@ -378,14 +378,14 @@ export default function ZoobiconShPage() {
                 >
                   <div className="p-4 flex items-start gap-4">
                     <div className="mt-0.5 flex-shrink-0">
-                      <cmd.icon className={`w-5 h-5 ${cmd.color} opacity-60 group-hover:opacity-150 transition-opacity`} />
+                      <cmd.icon className={`w-5 h-5 ${cmd.color} opacity-60 group-hover:opacity-100 transition-opacity`} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <code className="text-sm font-mono text-brand-400/90 truncate">{cmd.cmd}</code>
                         <button
                           onClick={() => copyText(cmd.cmd, `cmd-${i}`)}
-                          className="opacity-0 group-hover:opacity-150 transition-opacity flex-shrink-0"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
                         >
                           {copied === `cmd-${i}` ? <Check className="w-3 h-3 text-accent-cyan" /> : <Copy className="w-3 h-3 text-white/40" />}
                         </button>
@@ -536,7 +536,7 @@ export default function ZoobiconShPage() {
                   ].map((item, i) => (
                     <div key={i} className="flex items-center gap-3">
                       <Check className="w-4 h-4 text-brand-400 flex-shrink-0" />
-                      <span className="text-sm text-white/50">{item}</span>
+                      <span className="text-sm text-white/65">{item}</span>
                     </div>
                   ))}
                 </div>
@@ -572,12 +572,12 @@ export default function ZoobiconShPage() {
                       </button>
                     </div>
                     <div className="relative">
-                      <pre className="p-5 overflow-x-auto text-xs font-mono leading-relaxed text-white/50 max-h-[420px] overflow-y-auto">
+                      <pre className="p-5 overflow-x-auto text-xs font-mono leading-relaxed text-white/65 max-h-[420px] overflow-y-auto">
                         <code>{activeTab === "github" ? GITHUB_ACTIONS_YAML : GITLAB_CI_YAML}</code>
                       </pre>
                       <button
                         onClick={() => copyText(activeTab === "github" ? GITHUB_ACTIONS_YAML : GITLAB_CI_YAML, "cicd")}
-                        className="absolute top-3 right-3 p-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] transition-colors"
+                        className="absolute top-3 right-3 p-2 rounded-lg bg-white/[0.06] hover:bg-white/[0.12] transition-colors"
                       >
                         {copied === "cicd" ? <Check className="w-3.5 h-3.5 text-accent-cyan" /> : <Copy className="w-3.5 h-3.5 text-white/40" />}
                       </button>
@@ -638,10 +638,10 @@ export default function ZoobiconShPage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
           <div className="text-xs text-white/40">&copy; 2026 Zoobicon. All rights reserved.</div>
           <div className="flex gap-4">
-            <Link href="/" className="text-xs text-white/40 hover:text-white/40">Home</Link>
-            <Link href="/cli" className="text-xs text-white/40 hover:text-white/40">CLI Docs</Link>
-            <Link href="/developers" className="text-xs text-white/40 hover:text-white/40">Developers</Link>
-            <Link href="/pricing" className="text-xs text-white/40 hover:text-white/40">Pricing</Link>
+            <Link href="/" className="text-xs text-white/40 hover:text-white/60">Home</Link>
+            <Link href="/cli" className="text-xs text-white/40 hover:text-white/60">CLI Docs</Link>
+            <Link href="/developers" className="text-xs text-white/40 hover:text-white/60">Developers</Link>
+            <Link href="/pricing" className="text-xs text-white/40 hover:text-white/60">Pricing</Link>
           </div>
         </div>
       </footer>
