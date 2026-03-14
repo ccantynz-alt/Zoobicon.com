@@ -366,6 +366,72 @@ ul, ol { list-style: none; }
   position: relative; z-index: 2;
 }
 
+/* ── Carousel System ── */
+.carousel { position: relative; overflow: hidden; width: 100%; }
+.carousel-track { display: flex; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); will-change: transform; }
+.carousel-slide { flex: 0 0 100%; min-width: 100%; }
+.carousel-slide img { width: 100%; height: 100%; object-fit: cover; }
+.carousel-nav { position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%); display: flex; gap: 0.5rem; z-index: 10; }
+.carousel-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #fff; background: transparent; cursor: pointer; transition: all 0.3s; box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+.carousel-dot.active { background: #fff; }
+.carousel-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.9); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 10; font-size: 1.25rem; color: #1a1a2e; transition: all 0.3s; }
+.carousel-arrow:hover { background: #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+.carousel-arrow-prev { left: 1rem; }
+.carousel-arrow-next { right: 1rem; }
+
+/* ── Hero Image (full-bleed background photo) ── */
+.hero-image { position: relative; min-height: 100vh; overflow: hidden; display: flex; align-items: center; background-size: cover; background-position: center; background-repeat: no-repeat; }
+.hero-image::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.25) 50%, rgba(0,0,0,0.6) 100%); z-index: 1; }
+.hero-image > * { position: relative; z-index: 2; }
+
+/* ── Hero Carousel (full-bleed slideshow) ── */
+.hero-carousel { position: relative; min-height: 100vh; overflow: hidden; }
+.hero-carousel .carousel-track { min-height: 100vh; }
+.hero-carousel .carousel-slide { min-height: 100vh; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; position: relative; }
+.hero-carousel .carousel-slide::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.55)); z-index: 1; }
+.hero-carousel .carousel-slide > * { position: relative; z-index: 2; }
+
+/* ── Overlay Text (white text readable over images) ── */
+.overlay-text { position: relative; color: #fff; text-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+.overlay-text h1, .overlay-text h2, .overlay-text h3, .overlay-text p { color: #fff; }
+.overlay-gradient { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%); z-index: 1; }
+
+/* ── Property Card ── */
+.property-card { background: var(--color-surface, #fff); border-radius: var(--card-radius, 12px); overflow: hidden; border: 1px solid var(--color-border, #e2e8f0); box-shadow: 0 1px 3px rgba(0,0,0,0.04); transition: all 0.3s; }
+.property-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(0,0,0,0.12); }
+.property-card-img { position: relative; height: 240px; overflow: hidden; }
+.property-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
+.property-card:hover .property-card-img img { transform: scale(1.05); }
+.property-card-details { padding: 1.25rem; }
+.property-card-price { font-size: 1.5rem; font-weight: 800; color: var(--color-primary, #1a365d); margin-bottom: 0.5rem; }
+.property-card-meta { display: flex; gap: 1rem; color: var(--color-text-muted, #64748b); font-size: 0.875rem; margin-bottom: 0.75rem; }
+.property-card-meta span { display: flex; align-items: center; gap: 0.25rem; }
+
+/* ── Property Grid ── */
+.property-grid { display: grid; gap: 2rem; grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 1024px) { .property-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) { .property-grid { grid-template-columns: 1fr; } }
+
+/* ── Image Gallery ── */
+.image-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+.image-gallery-item { position: relative; overflow: hidden; border-radius: 8px; aspect-ratio: 4/3; cursor: pointer; }
+.image-gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
+.image-gallery-item:hover img { transform: scale(1.08); }
+
+/* ── Price Tag ── */
+.price-tag { font-size: 1.75rem; font-weight: 800; color: var(--color-primary, #1a365d); letter-spacing: -0.02em; }
+.price-tag-sm { font-size: 1.25rem; }
+
+/* ── Feature Badge (beds/baths/sqft) ── */
+.feature-badge { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.375rem 0.75rem; border-radius: 6px; background: var(--color-bg-alt, #f8fafc); font-size: 0.8125rem; color: var(--color-text-muted, #64748b); font-weight: 500; }
+.feature-badge svg, .feature-badge img { width: 16px; height: 16px; }
+
+/* ── Status Badge (For Sale / Sold / Open House) ── */
+.status-badge { position: absolute; top: 1rem; left: 1rem; z-index: 5; padding: 0.375rem 0.875rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+.status-for-sale { background: #059669; color: #fff; }
+.status-sold { background: #dc2626; color: #fff; }
+.status-open-house { background: #d97706; color: #fff; }
+
 /* ── Divider Shapes ── */
 .wave-divider { width: 100%; overflow: hidden; line-height: 0; }
 .wave-divider svg { display: block; width: calc(100% + 1.3px); height: 60px; }
@@ -391,6 +457,16 @@ The following CSS classes are automatically available in every generated website
 **Animation:** \`.fade-in\`, \`.fade-in-left\`, \`.fade-in-right\`, \`.scale-in\` (add \`.visible\` class via IntersectionObserver)
 **Hero:** \`.hero\` (full-viewport), \`.hero-aurora\` (animated conic gradient bg), \`.hero-mesh\` (layered radial gradient bg), \`.hero-grain\` (subtle film grain overlay), \`.hero-glass\` (glassmorphism panel), \`.hero-gradient-text\` (gradient text fill), \`.hero-float\` / \`.hero-float-delay\` / \`.hero-float-slow\` (bobbing animation), \`.hero-orb\` (blurred glow decoration — position via inline style), \`.hero-cursor-glow\` (mouse-following glow — needs empty div), \`.hero-reveal\` (stagger-animate child elements on load), \`.hero-btn-glow\` (animated border glow on CTA button), \`.hero-typed\` (JS typing effect on a span)
 **Patterns:** \`.testimonial-card\`, \`.stat-item\`, \`.stat-number\`, \`.stat-label\`, \`.faq-item\`, \`.faq-question\`, \`.faq-answer\`, \`.logo-strip\`
+**Carousel:** \`.carousel\`, \`.carousel-track\`, \`.carousel-slide\`, \`.carousel-nav\`, \`.carousel-dot\`, \`.carousel-dot.active\`, \`.carousel-arrow\`, \`.carousel-arrow-prev\`, \`.carousel-arrow-next\` (JS auto-rotation + touch swipe included)
+**Hero Image:** \`.hero-image\` (full-viewport bg image with gradient overlay — set background-image inline, content auto z-indexed above)
+**Hero Carousel:** \`.hero-carousel\` (full-viewport slideshow — combine with \`.carousel-track\` + \`.carousel-slide\` using background-image on each slide)
+**Overlay:** \`.overlay-text\` (white text + text-shadow for readability over images), \`.overlay-gradient\` (bottom-up dark gradient overlay)
+**Property Card:** \`.property-card\`, \`.property-card-img\`, \`.property-card-details\`, \`.property-card-price\`, \`.property-card-meta\` (hover lift + image zoom)
+**Property Grid:** \`.property-grid\` (responsive 3→2→1 column grid for property listings)
+**Image Gallery:** \`.image-gallery\`, \`.image-gallery-item\` (auto-fill grid with hover zoom, 4:3 aspect ratio)
+**Price:** \`.price-tag\`, \`.price-tag-sm\`
+**Feature Badge:** \`.feature-badge\` (inline pill for beds/baths/sqft indicators)
+**Status Badge:** \`.status-badge\`, \`.status-for-sale\` (green), \`.status-sold\` (red), \`.status-open-house\` (amber) — position absolute on \`.property-card-img\`
 
 IMPORTANT: The component library CSS is injected automatically — do NOT duplicate it in your <style> block. Only write CUSTOM styles specific to this website. Use the component classes above to build sections — this reduces your CSS and gives shadcn/ui-level polish.
 `;
@@ -470,6 +546,35 @@ const FAILSAFE_OBSERVER_SCRIPT = `
       setTimeout(function(){ el.style.borderRight = 'none'; }, 1500);
     }
   })();
+})();
+// Carousel auto-init — rotation, arrows, dots, touch swipe
+(function(){
+  document.querySelectorAll('.carousel').forEach(function(carousel){
+    var track = carousel.querySelector('.carousel-track');
+    var slides = carousel.querySelectorAll('.carousel-slide');
+    var dots = carousel.querySelectorAll('.carousel-dot');
+    var prevBtn = carousel.querySelector('.carousel-arrow-prev');
+    var nextBtn = carousel.querySelector('.carousel-arrow-next');
+    if (!track || slides.length < 2) return;
+    var current = 0, total = slides.length, interval;
+    function goTo(idx) {
+      current = ((idx % total) + total) % total;
+      track.style.transform = 'translateX(-' + (current * 100) + '%)';
+      dots.forEach(function(d, i){ d.classList.toggle('active', i === current); });
+    }
+    if (nextBtn) nextBtn.addEventListener('click', function(){ goTo(current + 1); resetAuto(); });
+    if (prevBtn) prevBtn.addEventListener('click', function(){ goTo(current - 1); resetAuto(); });
+    dots.forEach(function(d, i){ d.addEventListener('click', function(){ goTo(i); resetAuto(); }); });
+    var startX = 0;
+    carousel.addEventListener('touchstart', function(e){ startX = e.touches[0].clientX; }, {passive:true});
+    carousel.addEventListener('touchend', function(e){
+      var diff = startX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 50) { goTo(current + (diff > 0 ? 1 : -1)); resetAuto(); }
+    });
+    function startAuto(){ interval = setInterval(function(){ goTo(current + 1); }, 5000); }
+    function resetAuto(){ clearInterval(interval); startAuto(); }
+    startAuto(); goTo(0);
+  });
 })();
 </script>`;
 

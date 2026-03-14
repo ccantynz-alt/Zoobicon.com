@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 interface StatusBarProps {
   status: "idle" | "generating" | "editing" | "complete" | "error";
@@ -11,6 +11,37 @@ export default function StatusBar({ status, pipelineStep }: StatusBarProps) {
   const isActive = status === "generating" || status === "editing";
   const isComplete = status === "complete";
   const isError = status === "error";
+
+  // Generation timer — live elapsed time
+  const timerStartRef = useRef<number | null>(null);
+  const [elapsed, setElapsed] = useState(0);
+  const [finalTime, setFinalTime] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (isActive) {
+      timerStartRef.current = Date.now();
+      setFinalTime(null);
+      setElapsed(0);
+      const tick = setInterval(() => {
+        if (timerStartRef.current) {
+          setElapsed(Math.floor((Date.now() - timerStartRef.current) / 1000));
+        }
+      }, 1000);
+      return () => clearInterval(tick);
+    } else if (isComplete && timerStartRef.current) {
+      const total = Math.round((Date.now() - timerStartRef.current) / 1000);
+      setFinalTime(total);
+      timerStartRef.current = null;
+    } else if (isError) {
+      timerStartRef.current = null;
+    }
+  }, [isActive, isComplete, isError]);
+
+  const formatTime = (s: number) => {
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return m > 0 ? `${m}m ${sec}s` : `${sec}s`;
+  };
 
   // Animate progress from 0→90% during generation, jump to 100% on complete
   const [progress, setProgress] = useState(0);
@@ -45,7 +76,9 @@ export default function StatusBar({ status, pipelineStep }: StatusBarProps) {
       : status === "editing"
       ? pipelineStep || "Applying edits..."
       : status === "complete"
-      ? "Build Complete!"
+      ? finalTime !== null
+        ? `Built in ${formatTime(finalTime)}`
+        : "Build Complete!"
       : "Error";
 
   const dotColor =
@@ -146,8 +179,18 @@ export default function StatusBar({ status, pipelineStep }: StatusBarProps) {
         </div>
       )}
 
-      {/* Right: branding */}
+      {/* Right: timer + branding */}
       <div className="ml-auto flex items-center gap-4 text-white/20 z-10">
+        {isActive && (
+          <span className="text-blue-400/70 tabular-nums font-mono">
+            {formatTime(elapsed)}
+          </span>
+        )}
+        {isComplete && finalTime !== null && (
+          <span className="text-green-400/70 tabular-nums font-mono">
+            {formatTime(finalTime)}
+          </span>
+        )}
         <span>Powered by Claude</span>
         <span>Zoobicon v0.1.0</span>
       </div>
