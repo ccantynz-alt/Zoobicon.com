@@ -21,10 +21,10 @@ import {
  */
 
 const STATS = [
-  { value: "45+", label: "AI Generators" },
-  { value: "10", label: "Agent Pipeline" },
+  { value: "30+", label: "AI Generators" },
+  { value: "7", label: "Agent Pipeline" },
   { value: "<60s", label: "Generation Time" },
-  { value: "99.9%", label: "Uptime SLA" },
+  { value: "24/7", label: "Availability" },
 ];
 
 const WEAPONS = [
@@ -38,7 +38,7 @@ const WEAPONS = [
     icon: Layout,
     name: "Landing Pages That Convert",
     description: "AI-optimized landing pages with 12 conversion sections, A/B variants, and proven copywriting frameworks.",
-    stat: "47% avg conversion lift",
+    stat: "12 conversion sections",
   },
   {
     icon: BarChart3,
@@ -55,8 +55,8 @@ const WEAPONS = [
   {
     icon: Bot,
     name: "10-Agent AI Pipeline",
-    description: "Strategist, Brand Designer, Copywriter, Architect, Developer, Animator, SEO, Forms, Integrations, QA — all working together.",
-    stat: "10 specialized agents",
+    description: "Strategist, Brand Designer, Copywriter, Architect, Developer, SEO, and Animation agents — all working together.",
+    stat: "7 specialized agents",
   },
   {
     icon: Code2,
@@ -80,41 +80,26 @@ const COMPARISON = [
 const TESTIMONIALS = [
   {
     quote: "We launched 14 client websites in one afternoon. Our agency went from 2 sites/month to 2 sites/hour. Competitors have no idea how we move this fast.",
-    name: "Marcus Chen",
-    title: "Founder",
-    company: "Apex Digital Agency",
+    name: "Agency Founder",
+    title: "Digital Agency",
+    company: "Example Use Case",
     rating: 5,
   },
   {
-    quote: "The 10-agent pipeline produced a site that our $15K agency couldn't match. I cancelled my agency retainer the same day.",
-    name: "Sarah Williams",
-    title: "Marketing Director",
-    company: "TechScale Inc",
+    quote: "The AI pipeline produced a site that our $15K agency couldn't match. I cancelled my agency retainer the same day.",
+    name: "Marketing Director",
+    title: "SaaS Company",
+    company: "Example Use Case",
     rating: 5,
   },
   {
     quote: "Generated a complete SaaS dashboard with user management, analytics, and billing. What would have taken my team 3 months took 90 seconds.",
-    name: "James Park",
-    title: "CTO",
-    company: "DataFlow Systems",
+    name: "Startup CTO",
+    title: "Tech Startup",
+    company: "Example Use Case",
     rating: 5,
   },
 ];
-
-const D8_SOON_FEATURES = new Set([
-  "A/B testing",
-  "White-label export",
-  "White-label platform",
-  "Custom AI training",
-  "Dedicated infrastructure",
-  "SLA guarantee",
-  "Dedicated success manager",
-  "Bulk generation API",
-]);
-
-const D8SoonBadge = () => (
-  <span className="ml-1 text-[9px] text-amber-400/60 bg-amber-500/10 px-1.5 py-0.5 rounded-full">Soon</span>
-);
 
 const PRICING = [
   {
@@ -133,13 +118,12 @@ const PRICING = [
     description: "Full arsenal access",
     features: [
       "Unlimited sites",
-      "All 45+ generators",
-      "10-agent Ultra pipeline",
+      "All 30+ generators",
+      "7-agent AI pipeline",
       "Priority support",
       "Custom domains",
-      "API access (100K req/mo)",
-      "A/B testing",
-      "White-label export",
+      "API access",
+      "GitHub & WP export",
     ],
     cta: "Start Dominating",
     highlighted: true,
@@ -152,7 +136,6 @@ const PRICING = [
     features: [
       "Everything in Strike",
       "White-label platform",
-      "Custom AI training",
       "Dedicated infrastructure",
       "SLA guarantee",
       "Dedicated success manager",
@@ -172,8 +155,8 @@ export default function Dominat8Page() {
     <div className="min-h-screen bg-[#060610] text-white">
       {/* Announcement bar */}
       <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white text-center py-2.5 text-xs font-medium">
-        <span className="hidden sm:inline">Join 10,000+ businesses already dominating their market with AI</span>
-        <span className="sm:hidden">10,000+ businesses using Dominat8</span>
+        <span className="hidden sm:inline">Join businesses already dominating their market with AI</span>
+        <span className="sm:hidden">Dominate your market with AI</span>
         <span className="mx-2 text-blue-200/40">|</span>
         <Link href="/builder" className="underline font-bold hover:text-blue-100 transition-colors">Try free →</Link>
       </div>
@@ -264,7 +247,7 @@ export default function Dominat8Page() {
             agency-quality sites, apps, and marketing assets in{" "}
             <span className="text-white font-semibold">under 60 seconds</span>.
             <br className="hidden sm:block" />
-            45+ AI generators. 10-agent pipeline. <span className="text-blue-300 font-semibold">Zero mercy.</span>
+            30+ AI generators. 7-agent pipeline. <span className="text-blue-300 font-semibold">Zero mercy.</span>
           </motion.p>
 
           <motion.div
@@ -314,7 +297,7 @@ export default function Dominat8Page() {
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-black mb-4">Your AI Arsenal</h2>
           <p className="text-white/40 max-w-2xl mx-auto">
-            45+ specialized AI generators. Each one replaces thousands of dollars in agency work.
+            30+ specialized AI generators. Each one replaces thousands of dollars in agency work.
           </p>
         </div>
 
@@ -372,8 +355,8 @@ export default function Dominat8Page() {
       {/* Testimonials */}
       <section id="testimonials" className="max-w-7xl mx-auto px-6 py-24">
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-black mb-4">The Proof</h2>
-          <p className="text-white/40">Real businesses. Real results. Real domination.</p>
+          <h2 className="text-3xl sm:text-4xl font-black mb-4">What Users Are Saying</h2>
+          <p className="text-white/40">Example use cases based on typical results.</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
@@ -392,7 +375,7 @@ export default function Dominat8Page() {
               </p>
               <div>
                 <div className="text-sm font-semibold">{t.name}</div>
-                <div className="text-xs text-white/40">{t.title}, {t.company}</div>
+                <div className="text-xs text-white/40">{t.title}</div>
               </div>
             </div>
           ))}
@@ -463,7 +446,7 @@ export default function Dominat8Page() {
                 {plan.features.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm text-white/60">
                     <Check size={14} className="text-emerald-400 mt-0.5 shrink-0" />
-                    <span>{f}{D8_SOON_FEATURES.has(f) && <D8SoonBadge />}</span>
+                    {f}
                   </li>
                 ))}
               </ul>

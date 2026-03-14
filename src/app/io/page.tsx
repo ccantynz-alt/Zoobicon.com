@@ -281,9 +281,9 @@ const SDK_CARDS = [
   {
     icon: Code2,
     title: "JavaScript / TypeScript SDK",
-    install: "npm install @zoobicon/sdk",
+    install: "npm install @zoobicon/sdk  (coming soon)",
     description:
-      "Full-featured SDK with TypeScript types, streaming support, and automatic retries.",
+      "Full-featured SDK with TypeScript types, streaming support, and automatic retries. Coming soon.",
     color: "text-yellow-400",
     borderColor: "border-yellow-500/30",
     bgGlow: "bg-yellow-500/5",
@@ -291,9 +291,9 @@ const SDK_CARDS = [
   {
     icon: Terminal,
     title: "Python SDK",
-    install: "pip install zoobicon",
+    install: "pip install zoobicon  (coming soon)",
     description:
-      "Pythonic interface with async support, Pydantic models, and comprehensive type hints.",
+      "Pythonic interface with async support, Pydantic models, and comprehensive type hints. Coming soon.",
     color: "text-blue-400",
     borderColor: "border-blue-500/30",
     bgGlow: "bg-blue-500/5",
@@ -321,9 +321,9 @@ const SDK_CARDS = [
   {
     icon: GitBranch,
     title: "GitHub Actions",
-    install: "zoobicon/deploy-action@v1",
+    install: "zoobicon/deploy-action@v1  (coming soon)",
     description:
-      "Auto-deploy on push. Preview environments for PRs. Full CI/CD integration.",
+      "Auto-deploy on push. Preview environments for PRs. Full CI/CD integration. Coming soon.",
     color: "text-gray-300",
     borderColor: "border-gray-500/30",
     bgGlow: "bg-gray-500/5",
@@ -380,12 +380,10 @@ const PRICING_TIERS = [
     generations: "Unlimited generations",
     rateLimit: "Dedicated infrastructure",
     features: [
-      "24/7 dedicated support",
-      "SLA guarantee (99.99%)",
+      "Dedicated support",
+      "SLA guarantee",
       "Unlimited everything",
-      "On-premise option",
       "Custom integrations",
-      "SSO / SAML",
       "Dedicated account manager",
     ],
     cta: "Contact Sales",
@@ -428,7 +426,7 @@ const USE_CASES = [
     icon: Languages,
     title: "Multi-Language Deployment",
     description:
-      "Deploy sites in 50+ languages simultaneously with SEO-optimized translations.",
+      "Deploy sites in 30+ languages simultaneously with SEO-optimized translations.",
   },
 ];
 
