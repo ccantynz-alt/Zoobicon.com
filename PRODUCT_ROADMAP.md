@@ -263,77 +263,106 @@ The core builder works but needs polish to compete with market leaders.
 
 ---
 
-## Section 5: Competitive Gaps (vs Market)
+## Section 5: Competitive Analysis (vs 10 Market Competitors)
 
-*Features that competitors offer which Zoobicon should evaluate adding.*
+*Researched March 2026: Wix AI, Squarespace Blueprint, Framer AI, Hostinger, Durable, 10Web, Relume, v0 (Vercel), Bolt.new, Lovable.dev*
 
-### 5.1 Table-Stakes (Must Have)
-| # | Feature | Competitors Who Have It | Zoobicon Status |
-|---|---------|------------------------|-----------------|
-| 1 | Drag-and-drop editor | Wix, Squarespace, Framer, Hostinger | MISSING |
-| 2 | Mobile preview simulator | All competitors | MISSING |
-| 3 | Template gallery with previews | All competitors | HIDDEN (exists but not exposed) |
-| 4 | E-commerce (product pages, cart, checkout) | Wix, Squarespace, Hostinger, 10Web | PARTIAL (generator exists) |
-| 5 | Contact form builder with submissions | All competitors | PARTIAL (forms-backend generator) |
-| 6 | Custom domain connection | All competitors | PARTIAL (hosting has it, UI incomplete) |
-| 7 | Basic analytics | All competitors | MISSING |
-| 8 | Multi-page sites | All competitors | PARTIAL (exists in API, not primary flow) |
+### 5.1 Critical Gaps (Table-stakes every competitor has)
 
-### 5.2 Differentiators (Competitive Edge)
-| # | Feature | Who Has It | Zoobicon Status |
-|---|---------|-----------|-----------------|
-| 1 | Multi-LLM choice (Claude/GPT/Gemini) | Only Zoobicon | DONE — unique advantage |
-| 2 | 10-agent pipeline architecture | Unique to Zoobicon | DONE — unique advantage |
-| 3 | Code export (HTML, React, Vue) | v0, Bolt, Lovable | DONE |
-| 4 | API/CLI for developers | v0 (limited) | DONE — unique advantage |
-| 5 | White-label / multi-brand | None in this space | DONE — unique advantage |
-| 6 | 32+ generator types | None match breadth | PARTIAL (need backends) |
-| 7 | Figma/image to code | v0, Framer | EXISTS (tool in builder) |
-| 8 | Voice input for prompts | None | DONE — unique advantage |
+| # | Feature | Who Has It | Zoobicon Status | Priority |
+|---|---------|-----------|-----------------|----------|
+| 1 | **Drag-and-drop visual editor** | Wix, Squarespace, Framer, Hostinger | MISSING — code panel + preview only | HIGH (biggest UX gap vs mainstream builders) |
+| 2 | **Mobile preview simulator** | All 10 competitors | MISSING | CRITICAL |
+| 3 | **Template gallery with previews** | All 10 competitors (Wix: 2,500+, Hostinger: 170+) | HIDDEN — 15+ exist in code, not exposed in UI | CRITICAL |
+| 4 | **Built-in analytics dashboard** | Wix, Squarespace, Framer, Hostinger, Durable, Bolt | MISSING — API exists, no user-facing dashboard | HIGH |
+| 5 | **Functional e-commerce** (products, cart, checkout) | Wix (full), Squarespace (full), Hostinger, 10Web (WooCommerce) | PARTIAL — API endpoint exists, no product dashboard | MEDIUM |
+| 6 | **AI content/blog writer** (standalone) | Wix, Squarespace, Framer, Hostinger, Durable | MISSING — pipeline generates copy but no standalone tool | MEDIUM |
+| 7 | **Custom domain connection** (working flow) | All 10 competitors | PARTIAL — hosting API exists, UI workflow incomplete | CRITICAL |
+| 8 | **SSL/CDN fully operational** | All 10 competitors (out of box) | PARTIAL — APIs exist, not battle-tested | CRITICAL |
 
-### 5.3 Advanced Features to Evaluate
-| # | Feature | Who Has It | Priority |
-|---|---------|-----------|----------|
-| 1 | AI chat editing post-generation | v0, Bolt, Lovable | DONE |
-| 2 | Real-time collaboration | Framer, Wix | LOW (nice to have) |
-| 3 | A/B testing built-in | None natively | LOW (tool exists) |
-| 4 | CMS / blog management | Wix, Squarespace, Framer | MEDIUM |
-| 5 | Email marketing integration | Wix, Squarespace | LOW |
-| 6 | Booking/scheduling | Wix, Squarespace | LOW |
-| 7 | Password-protected pages | Framer, Squarespace | LOW |
-| 8 | Localization / i18n | Wix | EXISTS (translate tool) |
+### 5.2 Zoobicon's Unique Advantages (Defend & Amplify)
+
+| # | Feature | Competitor Comparison | Status |
+|---|---------|----------------------|--------|
+| 1 | **7-agent pipeline with transparency** | No competitor shows AI agent workflow to users | DONE — unique |
+| 2 | **Multi-LLM model choice** (Claude/GPT-4o/o3/Gemini) | Only Bolt.new has model selector; no one matches breadth | DONE — unique |
+| 3 | **Code export** (HTML, React, Next.js, WordPress, GitHub) | Wix/Squarespace/Framer/Hostinger/Durable lock you in. Only Bolt + Lovable also export | DONE — major differentiator |
+| 4 | **White-label / multi-brand** | Zero competitors offer white-label rebranding | DONE — unique |
+| 5 | **Website cloning** (`/api/clone`) | Only 10Web also offers this | DONE — rare |
+| 6 | **Developer API + CLI** | v0 has limited API; no competitor has CLI | DONE — unique |
+| 7 | **Voice input for prompts** | No competitor has this | DONE — unique |
+| 8 | **32+ generator types** | No competitor matches breadth (Wix has ~10 AI tools) | PARTIAL — need type-specific backends |
+| 9 | **Opus-quality code generation** | Competitors use cheaper models; Opus output is noticeably higher quality | DONE — quality edge |
+| 10 | **Client handoff / agency workflow** | Only Relume targets agencies similarly, but doesn't generate finished sites | DONE — differentiator |
+
+### 5.3 High-Priority Gaps (Competitors shipping, we should evaluate)
+
+| # | Feature | Who Has It | Impact | Zoobicon Status |
+|---|---------|-----------|--------|-----------------|
+| 1 | **AI Visibility / AIO tracking** (how site appears in ChatGPT/Gemini/Perplexity) | Wix (new, novel) | Forward-looking differentiator | NOT BUILT |
+| 2 | **Real-time collaborative editing** | Wix, Squarespace, Framer | Important for teams/agencies | NOT BUILT |
+| 3 | **AI logo / brand identity generator** | Wix, Squarespace, Durable | Quick win using existing image-gen | NOT BUILT |
+| 4 | **AI email marketing campaigns** | Wix, Hostinger (Reach), Durable | Listed on pricing page but NOT BUILT | CREDIBILITY RISK |
+| 5 | **Mobile app / PWA builder** | Wix (app builder), Lovable (mobile builder) | Emerging capability | NOT BUILT |
+| 6 | **CMS / blog management** | Wix, Squarespace, Framer | Common for content sites | NOT BUILT |
+| 7 | **Booking / scheduling** | Wix, Squarespace | Vertical-specific | NOT BUILT |
+| 8 | **In-app domain purchasing** | Squarespace, Hostinger, Durable, Bolt.new | Convenience feature | NOT BUILT |
+
+### 5.4 Pricing Comparison
+
+| Builder | Free | Entry | Mid | High | Enterprise |
+|---------|------|-------|-----|------|-----------|
+| **Zoobicon** | Free (3 sites/mo) | $19/mo Creator | $49/mo Pro | $99/mo Agency | $299/mo |
+| **Wix** | Free (branded) | $17/mo Light | $29/mo Core | $36/mo Business | $159/mo Elite |
+| **Squarespace** | 14-day trial | $16/mo Basic | $23/mo Core | $39/mo Plus | $99/mo Advanced |
+| **Framer** | Free (branded) | $10/mo Basic | $30/mo Pro | $100/mo Scale | Custom |
+| **Hostinger** | No free | $2.99/mo Starter | $4.99/mo Business | $7.99/mo Cloud | — |
+| **Durable** | Free (basic) | $22/mo Launch | — | — | — |
+| **v0 (Vercel)** | Free ($5 credits) | $20/mo Premium | $30/user Team | — | Custom |
+| **Bolt.new** | Free (limited) | $25/mo Pro | $50/mo Pro 50 | $100-200/mo | Custom |
+| **Lovable** | Free (5/day) | $25/mo Pro | $50/mo Business | — | Custom |
+
+**CREDIBILITY WARNING:** Zoobicon's Pro ($49) and Agency ($99) tiers list features that are NOT YET BUILT (Video Creator, Email Support, SEO Agent dashboard). Users who pay and discover these are missing will feel misled. Either build them or update the pricing page to say "Coming Soon."
 
 ---
 
 ## Priority Execution Order
 
 ### Phase 1 — Stop the Bleeding (Week 1-2)
-1. Expose template gallery in builder UI
-2. Add onboarding welcome modal
-3. Add responsive preview (mobile/tablet/desktop)
-4. Fix all product page CTAs to either work or say "Coming Soon"
-5. Verify domain pages don't promise non-existent features
+*Fix credibility issues and expose what already exists*
+1. Expose template gallery in builder UI (15+ templates already coded, just hidden)
+2. Add onboarding welcome modal for first-time users
+3. Add responsive preview toolbar (mobile/tablet/desktop)
+4. Fix ALL product page CTAs — if backend doesn't exist, change to "Coming Soon" + waitlist
+5. Audit pricing page — remove or mark "Coming Soon" on features not yet built
+6. Verify all 5 domain pages don't overpromise
 
 ### Phase 2 — Make Products Real (Week 3-6)
-6. Build generator routing (type-specific prompts through pipeline)
-7. Build SEO Agent dashboard
-8. Complete hosting serving layer
-9. Add pre-generation customization controls (colors, typography, industry)
-10. Add diff view for version history
+*Build the backends that product pages promise*
+7. Build generator routing (type-specific prompts through pipeline)
+8. Build SEO Agent dashboard (extend existing `/api/seo/analyze`)
+9. Complete hosting serving layer (SSL, CDN, custom domains)
+10. Add pre-generation customization controls (colors, typography, industry)
+11. Add diff view for version history
+12. Build analytics dashboard (page views, SEO trends, generation stats)
 
 ### Phase 3 — Platform Maturity (Week 7-10)
-11. Build marketplace backend with Stripe
-12. Add per-project analytics
-13. Build domain registration integration
-14. Add OAuth (Google, GitHub) for auth
-15. Add collaboration (sharing, commenting)
+*Close competitive gaps*
+13. Build marketplace backend with Stripe
+14. Build domain registration integration
+15. Add OAuth (Google, GitHub) for faster auth
+16. Add collaboration features (sharing, commenting)
+17. Add AI content/blog writer (extend pipeline for standalone content)
+18. Add AI logo/brand kit generator (use existing image-gen API)
 
 ### Phase 4 — Advanced Features (Week 11+)
-16. Build email support system
-17. Build video creator integration
-18. Add drag-and-drop editing
-19. Add CMS/blog management
-20. Add e-commerce flows (cart, checkout, payments)
+*Differentiate and expand*
+19. Build email support system
+20. Build video creator integration
+21. Add drag-and-drop visual editing (biggest engineering effort)
+22. Add CMS/blog management
+23. Add e-commerce dashboard (products, cart, checkout)
+24. Evaluate AI visibility tracking (Wix-style AIO)
 
 ---
 
