@@ -20,6 +20,7 @@ import {
   Check,
   Star,
   MonitorPlay,
+  Clock,
   LayoutDashboard,
   LogOut,
   User,
@@ -59,6 +60,8 @@ const STYLES = [
 
 export default function VideoCreatorPage() {
   const [user, setUser] = useState<{ email: string; name?: string; role?: string } | null>(null);
+  const [waitlistEmail, setWaitlistEmail] = useState("");
+  const [waitlistStatus, setWaitlistStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
   useEffect(() => {
     try {
@@ -70,6 +73,22 @@ export default function VideoCreatorPage() {
   const handleLogout = () => {
     try { localStorage.removeItem("zoobicon_user"); } catch {}
     setUser(null);
+  };
+
+  const handleWaitlistSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!waitlistEmail.trim() || waitlistStatus === "loading") return;
+    setWaitlistStatus("loading");
+    try {
+      await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: waitlistEmail, source: "video-creator-waitlist" }),
+      });
+      setWaitlistStatus("success");
+    } catch {
+      setWaitlistStatus("error");
+    }
   };
 
   return (
@@ -114,7 +133,7 @@ export default function VideoCreatorPage() {
                   Sign in
                 </Link>
                 <Link href="/auth/signup" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white">
-                  <span>Create Video</span>
+                  <span>Get Started</span>
                 </Link>
               </>
             )}
@@ -126,9 +145,14 @@ export default function VideoCreatorPage() {
       <section className="pt-32 pb-20 lg:pt-44 lg:pb-28">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
-            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-pink/20 bg-accent-pink/5 mb-6">
-              <Video className="w-3 h-3 text-accent-pink" />
-              <span className="text-xs font-medium text-accent-pink">AI Video Creator</span>
+            <motion.div variants={fadeInUp} className="flex flex-wrap items-center gap-3 mb-6">
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-pink/20 bg-accent-pink/5">
+                <Video className="w-3 h-3 text-accent-pink" />
+                <span className="text-xs font-medium text-accent-pink">AI Video Creator</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium">
+                <Clock size={12} /> Coming Soon
+              </span>
             </motion.div>
 
             <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl lg:text-8xl font-black tracking-tight leading-[0.9] mb-6">
@@ -141,12 +165,32 @@ export default function VideoCreatorPage() {
               Just describe what you want and get broadcast-quality video in minutes.
             </motion.p>
 
-            <motion.div variants={fadeInUp} className="flex flex-wrap gap-4 mb-16">
-              <Link href={user ? "/builder" : "/auth/signup"} className="group btn-gradient px-8 py-4 rounded-2xl text-base font-bold text-white flex items-center gap-3 shadow-glow-purple">
-                <Play className="w-5 h-5" />
-                <span>{user ? "Go to Builder" : "Create Your First Video"}</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
+            <motion.div variants={fadeInUp} className="max-w-lg mb-16">
+              {waitlistStatus === "success" ? (
+                <div className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                  <Check className="w-5 h-5 flex-shrink-0" />
+                  <span className="text-sm font-medium">You&apos;re on the list! We&apos;ll notify you when AI Video Creator launches.</span>
+                </div>
+              ) : (
+                <form onSubmit={handleWaitlistSubmit} className="flex items-center gap-3">
+                  <input
+                    type="email"
+                    required
+                    value={waitlistEmail}
+                    onChange={(e) => setWaitlistEmail(e.target.value)}
+                    placeholder="Enter your email for early access"
+                    className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-xl px-5 py-4 text-white placeholder:text-white/25 outline-none text-sm focus:border-accent-purple/30 transition-colors"
+                  />
+                  <button
+                    type="submit"
+                    disabled={waitlistStatus === "loading"}
+                    className="group btn-gradient px-6 py-4 rounded-xl text-sm font-bold text-white flex items-center gap-2 shadow-glow-purple whitespace-nowrap disabled:opacity-50"
+                  >
+                    <span>{waitlistStatus === "loading" ? "Joining..." : "Join Early Access"}</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </form>
+              )}
             </motion.div>
 
             {/* Platform cards */}
@@ -269,12 +313,37 @@ export default function VideoCreatorPage() {
           <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
             Your First Video<br /><span className="gradient-text">In Under 2 Minutes</span>
           </h2>
-          <p className="text-lg text-white/40 mb-8">No editing skills. No scripts. No templates. Just AI magic.</p>
-          <Link href={user ? "/builder" : "/auth/signup"} className="inline-flex group btn-gradient px-10 py-4 rounded-2xl text-lg font-bold text-white items-center gap-3 shadow-glow-lg">
-            <Play className="w-5 h-5" />
-            <span>{user ? "Go to Builder" : "Create Your First Video"}</span>
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </Link>
+          <p className="text-lg text-white/40 mb-4">No editing skills. No scripts. No templates. Just AI magic.</p>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium mb-8">
+            <Clock size={12} /> Coming Soon
+          </span>
+          <div className="max-w-lg mx-auto">
+            {waitlistStatus === "success" ? (
+              <div className="flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                <Check className="w-5 h-5 flex-shrink-0" />
+                <span className="text-sm font-medium">You&apos;re on the list! We&apos;ll notify you when AI Video Creator launches.</span>
+              </div>
+            ) : (
+              <form onSubmit={handleWaitlistSubmit} className="flex items-center gap-3">
+                <input
+                  type="email"
+                  required
+                  value={waitlistEmail}
+                  onChange={(e) => setWaitlistEmail(e.target.value)}
+                  placeholder="Enter your email for early access"
+                  className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-xl px-5 py-4 text-white placeholder:text-white/25 outline-none text-sm focus:border-accent-purple/30 transition-colors"
+                />
+                <button
+                  type="submit"
+                  disabled={waitlistStatus === "loading"}
+                  className="group btn-gradient px-6 py-4 rounded-xl text-sm font-bold text-white flex items-center gap-2 shadow-glow-purple whitespace-nowrap disabled:opacity-50"
+                >
+                  <span>{waitlistStatus === "loading" ? "Joining..." : "Join Waitlist"}</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </form>
+            )}
+          </div>
         </div>
       </section>
 

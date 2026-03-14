@@ -309,14 +309,18 @@ export default function MarketplacePage() {
     } catch { return new Set(); }
   });
   const [installing, setInstalling] = useState<string | null>(null);
+  const [waitlistItem, setWaitlistItem] = useState<string | null>(null);
+  const [waitlistEmail, setWaitlistEmail] = useState("");
+  const [waitlistedItems, setWaitlistedItems] = useState<Set<string>>(new Set());
+  const [waitlistLoading, setWaitlistLoading] = useState(false);
 
   const handleInstall = (itemName: string, priceType: string) => {
     if (installing) return;
     if (installed.has(itemName)) return;
 
     if (priceType !== "free") {
-      // Paid — redirect to signup/billing
-      window.location.href = "/auth/signup";
+      // Paid — show waitlist form
+      setWaitlistItem(itemName);
       return;
     }
 
@@ -330,6 +334,23 @@ export default function MarketplacePage() {
       });
       setInstalling(null);
     }, 800);
+  };
+
+  const handleWaitlistSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!waitlistEmail.trim() || waitlistLoading || !waitlistItem) return;
+    setWaitlistLoading(true);
+    try {
+      await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: waitlistEmail, source: `marketplace-${waitlistItem.toLowerCase().replace(/\s+/g, "-")}-waitlist` }),
+      });
+      setWaitlistedItems((prev) => new Set(prev).add(waitlistItem));
+      setWaitlistItem(null);
+      setWaitlistEmail("");
+    } catch { /* silently fail */ }
+    setWaitlistLoading(false);
   };
 
   const filteredItems = MARKETPLACE_ITEMS.filter((item) => {
@@ -377,9 +398,14 @@ export default function MarketplacePage() {
       <section className="pt-32 pb-16 lg:pt-44 lg:pb-24">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
-            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-purple/20 bg-accent-purple/5 mb-6">
-              <Store className="w-3 h-3 text-accent-purple" />
-              <span className="text-xs font-medium text-accent-purple">Add-ons Marketplace</span>
+            <motion.div variants={fadeInUp} className="flex flex-wrap items-center gap-3 mb-6">
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-purple/20 bg-accent-purple/5">
+                <Store className="w-3 h-3 text-accent-purple" />
+                <span className="text-xs font-medium text-accent-purple">Add-ons Marketplace</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium">
+                <Clock size={12} /> Coming Soon &mdash; Paid add-ons launching soon
+              </span>
             </motion.div>
 
             <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl lg:text-8xl font-black tracking-tight leading-[0.9] mb-6">
@@ -482,15 +508,20 @@ export default function MarketplacePage() {
                       className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
                         installed.has(item.name)
                           ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                          : waitlistedItems.has(item.name)
+                          ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
                           : "btn-gradient text-white"
                       }`}
+                      disabled={waitlistedItems.has(item.name)}
                     >
                       {installed.has(item.name) ? (
                         <><Check className="w-3.5 h-3.5" />Installed</>
+                      ) : waitlistedItems.has(item.name) ? (
+                        <><Check className="w-3.5 h-3.5" />Waitlisted</>
                       ) : installing === item.name ? (
                         <><RefreshCw className="w-3.5 h-3.5 animate-spin" />Installing…</>
                       ) : item.priceType !== "free" ? (
-                        <><Download className="w-3.5 h-3.5" />Get</>
+                        <><Clock className="w-3.5 h-3.5" />Join Waitlist</>
                       ) : (
                         <><Download className="w-3.5 h-3.5" />Install</>
                       )}
@@ -568,15 +599,22 @@ export default function MarketplacePage() {
                       className={`px-3 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all ${
                         installed.has(item.name)
                           ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                          : waitlistedItems.has(item.name)
+                          ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
                           : "btn-gradient text-white"
                       }`}
+                      disabled={waitlistedItems.has(item.name)}
                     >
                       {installed.has(item.name) ? (
                         <><Check className="w-3 h-3" />Installed</>
+                      ) : waitlistedItems.has(item.name) ? (
+                        <><Check className="w-3 h-3" />Waitlisted</>
                       ) : installing === item.name ? (
                         <><RefreshCw className="w-3 h-3 animate-spin" />…</>
+                      ) : item.priceType !== "free" ? (
+                        <><Clock className="w-3 h-3" />Waitlist</>
                       ) : (
-                        <><Download className="w-3 h-3" />{item.priceType !== "free" ? "Get" : "Install"}</>
+                        <><Download className="w-3 h-3" />Install</>
                       )}
                     </button>
                   </div>
@@ -664,6 +702,43 @@ export default function MarketplacePage() {
           </Link>
         </div>
       </section>
+
+      {/* Waitlist Modal */}
+      {waitlistItem && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setWaitlistItem(null)}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-dark-300 border border-white/[0.08] rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium">
+                <Clock size={12} /> Coming Soon
+              </span>
+            </div>
+            <h3 className="text-xl font-black mb-2">Join the Waitlist for {waitlistItem}</h3>
+            <p className="text-sm text-white/40 mb-6">This add-on is coming soon. Enter your email and we&apos;ll notify you when it launches.</p>
+            <form onSubmit={handleWaitlistSubmit} className="flex items-center gap-3">
+              <input
+                type="email"
+                required
+                value={waitlistEmail}
+                onChange={(e) => setWaitlistEmail(e.target.value)}
+                placeholder="Enter your email"
+                className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-white placeholder:text-white/25 outline-none text-sm focus:border-accent-purple/30 transition-colors"
+              />
+              <button
+                type="submit"
+                disabled={waitlistLoading}
+                className="btn-gradient px-5 py-3 rounded-xl text-sm font-bold text-white whitespace-nowrap disabled:opacity-50"
+              >
+                {waitlistLoading ? "Joining..." : "Join Waitlist"}
+              </button>
+            </form>
+          </motion.div>
+        </div>
+      )}
 
       <footer className="border-t border-white/[0.04] py-8">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
