@@ -145,6 +145,44 @@ const PRODUCTS = [
   { icon: Code2, name: "API Access", starter: false, creator: "10K/mo", pro: "100K/mo", agency: "500K/mo", enterprise: "Unlimited" },
 ];
 
+// Features that are not yet fully built — show a subtle "Soon" badge
+const SOON_FEATURES = new Set([
+  // Creator tier
+  "Custom domain support",
+  "Email support",
+  // Pro tier
+  "Full SEO Campaign Agent",
+  "AI Video Creator",
+  "AI Email Support & Marketing",
+  "AI Brand Kit",
+  "Chatbot Builder",
+  "A/B Testing & Analytics",
+  // Agency tier
+  "Client handoff & management",
+  "Template marketplace access",
+  "Bulk operations & automation",
+  // Enterprise tier
+  "Custom AI model training",
+  "Dedicated AI agents",
+  "SSO / SAML authentication",
+  "Custom integrations",
+  "SLA guarantee (99.99%)",
+  "Invoiced billing (NET 30)",
+]);
+
+// Products in the comparison table that are not yet built
+const SOON_PRODUCTS = new Set([
+  "SEO Campaign Agent",
+  "AI Video Creator",
+  "AI Email Support",
+  "Chatbot Builder",
+  "White-Label & Teams",
+]);
+
+const SoonBadge = () => (
+  <span className="ml-1 text-[9px] text-amber-400/60 bg-amber-500/10 px-1.5 py-0.5 rounded-full">Soon</span>
+);
+
 const FAQS = [
   {
     q: "No credits? No usage tokens? What's the catch?",
@@ -299,7 +337,7 @@ export default function PricingPage() {
                     {plan.features.map((f) => (
                       <li key={f} className="flex items-start gap-2">
                         <Check className={`w-3.5 h-3.5 flex-shrink-0 mt-0.5 ${plan.featured ? "text-brand-400" : "text-white/30"}`} />
-                        <span className="text-sm text-white/50">{f}</span>
+                        <span className="text-sm text-white/50">{f}{SOON_FEATURES.has(f) && <SoonBadge />}</span>
                       </li>
                     ))}
                   </ul>
@@ -356,7 +394,7 @@ export default function PricingPage() {
                   <div key={p.name} className={`grid grid-cols-6 gap-0 border-b border-white/[0.03] min-w-[800px] ${i % 2 === 0 ? "" : "bg-white/[0.01]"}`}>
                     <div className="px-4 py-3 flex items-center gap-2">
                       <p.icon className="w-3.5 h-3.5 text-white/30 flex-shrink-0" />
-                      <span className="text-xs text-white/60">{p.name}</span>
+                      <span className="text-xs text-white/60">{p.name}{SOON_PRODUCTS.has(p.name) && <SoonBadge />}</span>
                     </div>
                     {(["starter", "creator", "pro", "agency", "enterprise"] as const).map((tier) => {
                       const val = p[tier];
@@ -404,22 +442,22 @@ export default function PricingPage() {
 
               <motion.div variants={staggerContainer} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[
-                  { icon: BarChart3, name: "SEO Campaign Agent", price: "$29", period: "/mo", desc: "Autonomous SEO: keyword discovery, content gen, rank tracking", color: "text-emerald-400", borderColor: "border-emerald-500/15 hover:border-emerald-500/30" },
-                  { icon: Video, name: "AI Video Creator", price: "$19", period: "/mo", desc: "Auto-generate social videos for TikTok, Reels, YouTube", color: "text-brand-400", borderColor: "border-brand-500/15 hover:border-brand-500/30" },
-                  { icon: Mail, name: "AI Email Support", price: "$24", period: "/mo", desc: "AI auto-reply, smart inbox, sentiment analysis, <30s response", color: "text-accent-cyan", borderColor: "border-accent-cyan/15 hover:border-accent-cyan/30" },
-                  { icon: Megaphone, name: "Email Marketing Suite", price: "$14", period: "/mo", desc: "Campaigns, automations, A/B testing, deliverability tools", color: "text-amber-400", borderColor: "border-amber-500/15 hover:border-amber-500/30" },
-                  { icon: Bot, name: "AI Chatbot Builder", price: "$14", period: "/mo", desc: "Train on your content, embed anywhere, capture leads", color: "text-purple-400", borderColor: "border-purple-500/15 hover:border-purple-500/30" },
-                  { icon: Languages, name: "Multi-Language (i18n)", price: "$14", period: "/mo", desc: "Auto-translate your site into 30+ languages", color: "text-pink-400", borderColor: "border-pink-500/15 hover:border-pink-500/30" },
-                  { icon: TestTube2, name: "A/B Testing Engine", price: "$19", period: "/mo", desc: "Split test pages, CTAs, and layouts with AI recommendations", color: "text-orange-400", borderColor: "border-orange-500/15 hover:border-orange-500/30" },
-                  { icon: Palette, name: "AI Brand Kit", price: "$19", period: "one-time", desc: "Logo, color palette, typography, brand guidelines — AI generated", color: "text-rose-400", borderColor: "border-rose-500/15 hover:border-rose-500/30" },
-                  { icon: Blocks, name: "Component Library", price: "$19", period: "one-time", desc: "500+ premium components: heroes, CTAs, navs, footers, forms", color: "text-teal-400", borderColor: "border-teal-500/15 hover:border-teal-500/30" },
+                  { icon: BarChart3, name: "SEO Campaign Agent", price: "$29", period: "/mo", desc: "Autonomous SEO: keyword discovery, content gen, rank tracking", color: "text-emerald-400", borderColor: "border-emerald-500/15 hover:border-emerald-500/30", soon: true },
+                  { icon: Video, name: "AI Video Creator", price: "$19", period: "/mo", desc: "Auto-generate social videos for TikTok, Reels, YouTube", color: "text-brand-400", borderColor: "border-brand-500/15 hover:border-brand-500/30", soon: true },
+                  { icon: Mail, name: "AI Email Support", price: "$24", period: "/mo", desc: "AI auto-reply, smart inbox, sentiment analysis, <30s response", color: "text-accent-cyan", borderColor: "border-accent-cyan/15 hover:border-accent-cyan/30", soon: true },
+                  { icon: Megaphone, name: "Email Marketing Suite", price: "$14", period: "/mo", desc: "Campaigns, automations, A/B testing, deliverability tools", color: "text-amber-400", borderColor: "border-amber-500/15 hover:border-amber-500/30", soon: true },
+                  { icon: Bot, name: "AI Chatbot Builder", price: "$14", period: "/mo", desc: "Train on your content, embed anywhere, capture leads", color: "text-purple-400", borderColor: "border-purple-500/15 hover:border-purple-500/30", soon: true },
+                  { icon: Languages, name: "Multi-Language (i18n)", price: "$14", period: "/mo", desc: "Auto-translate your site into 30+ languages", color: "text-pink-400", borderColor: "border-pink-500/15 hover:border-pink-500/30", soon: true },
+                  { icon: TestTube2, name: "A/B Testing Engine", price: "$19", period: "/mo", desc: "Split test pages, CTAs, and layouts with AI recommendations", color: "text-orange-400", borderColor: "border-orange-500/15 hover:border-orange-500/30", soon: true },
+                  { icon: Palette, name: "AI Brand Kit", price: "$19", period: "one-time", desc: "Logo, color palette, typography, brand guidelines — AI generated", color: "text-rose-400", borderColor: "border-rose-500/15 hover:border-rose-500/30", soon: true },
+                  { icon: Blocks, name: "Component Library", price: "$19", period: "one-time", desc: "500+ premium components: heroes, CTAs, navs, footers, forms", color: "text-teal-400", borderColor: "border-teal-500/15 hover:border-teal-500/30", soon: false },
                 ].map((addon) => (
                   <motion.div key={addon.name} variants={fadeInUp}>
                     <Link href="/marketplace" className={`block p-5 rounded-xl border ${addon.borderColor} bg-white/[0.01] transition-all group`}>
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center gap-2.5">
                           <addon.icon className={`w-4 h-4 ${addon.color}`} />
-                          <span className="text-sm font-semibold text-white/80">{addon.name}</span>
+                          <span className="text-sm font-semibold text-white/80">{addon.name}{addon.soon && <SoonBadge />}</span>
                         </div>
                         <div className="text-right">
                           <span className="text-sm font-black text-white">{addon.price}</span>
@@ -458,7 +496,7 @@ export default function PricingPage() {
                 <motion.div variants={fadeInUp}>
                   <Link href="/domains" className="block gradient-border rounded-2xl p-7 h-full hover:bg-white/[0.01] transition-all group">
                     <Globe className="w-8 h-8 text-brand-400 mb-4" />
-                    <h3 className="text-lg font-bold mb-1">Custom Domain</h3>
+                    <h3 className="text-lg font-bold mb-1">Custom Domain<SoonBadge /></h3>
                     <div className="flex items-baseline gap-1 mb-3">
                       <span className="text-2xl font-black">$2.99</span>
                       <span className="text-sm text-white/30">/year</span>
@@ -502,7 +540,7 @@ export default function PricingPage() {
                 <motion.div variants={fadeInUp}>
                   <div className="gradient-border rounded-2xl p-7 h-full">
                     <AtSign className="w-8 h-8 text-emerald-400 mb-4" />
-                    <h3 className="text-lg font-bold mb-1">Email + Security</h3>
+                    <h3 className="text-lg font-bold mb-1">Email + Security<SoonBadge /></h3>
                     <div className="flex items-baseline gap-1 mb-3">
                       <span className="text-2xl font-black">$14.98</span>
                       <span className="text-sm text-white/30">/month</span>

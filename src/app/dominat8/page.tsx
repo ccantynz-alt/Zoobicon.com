@@ -101,6 +101,21 @@ const TESTIMONIALS = [
   },
 ];
 
+const D8_SOON_FEATURES = new Set([
+  "A/B testing",
+  "White-label export",
+  "White-label platform",
+  "Custom AI training",
+  "Dedicated infrastructure",
+  "SLA guarantee",
+  "Dedicated success manager",
+  "Bulk generation API",
+]);
+
+const D8SoonBadge = () => (
+  <span className="ml-1 text-[9px] text-amber-400/60 bg-amber-500/10 px-1.5 py-0.5 rounded-full">Soon</span>
+);
+
 const PRICING = [
   {
     name: "Recon",
@@ -448,7 +463,7 @@ export default function Dominat8Page() {
                 {plan.features.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm text-white/60">
                     <Check size={14} className="text-emerald-400 mt-0.5 shrink-0" />
-                    {f}
+                    <span>{f}{D8_SOON_FEATURES.has(f) && <D8SoonBadge />}</span>
                   </li>
                 ))}
               </ul>
