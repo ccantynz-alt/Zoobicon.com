@@ -487,7 +487,7 @@ Output the <config> block first, then the <body-html> block. Nothing else.`;
           const bodyMatch = raw.match(/<body-html>\s*([\s\S]*?)\s*<\/body-html>/);
 
           // Fallback: if AI didn't use tags, try to find JSON + HTML directly
-          let config: SiteConfig;
+          let config: SiteConfig = getDefaultConfig(prompt);
           let bodyHtml: string;
 
           if (configMatch && bodyMatch) {
