@@ -10,32 +10,32 @@
 These products have landing pages but lack working backends. Priority order: top to bottom.
 
 ### 1.1 Generators (32 types) — HIGHEST PRIORITY
-**Status:** PARTIAL — UI labels exist, all funnel to generic `/builder`
+**Status:** DONE (routing) — Generator routing with type-specific prompts built. URL param pre-fills builder.
 **Why first:** Extends core product with minimal new infrastructure
 
 | # | Task | Status |
 |---|------|--------|
-| 1 | Create `/api/generate/[type]/route.ts` dynamic route handler | TODO |
-| 2 | Write type-specific system prompts for each generator category (Websites, Business Apps, Marketing, Dev Tools, Design Systems) | TODO |
-| 3 | Pre-populate builder prompt when user clicks a generator card | TODO |
+| 1 | Create `/api/generate/[type]/route.ts` dynamic route handler | DONE (2026-03-14) — routes through existing pipeline |
+| 2 | Write type-specific system prompts for each generator category | DONE (2026-03-14) — `src/lib/generator-prompts.ts` |
+| 3 | Pre-populate builder prompt when user clicks a generator card | DONE (2026-03-14) — `/builder?generator={id}` URL param |
 | 4 | Add example outputs/thumbnails for each generator on hub page | TODO |
-| 5 | Add generator-specific constraints (e.g., restaurant → menu sections, portfolio → gallery) | TODO |
+| 5 | Add generator-specific constraints (e.g., restaurant → menu sections, portfolio → gallery) | DONE (2026-03-14) — in generator prompts |
 | 6 | Route Enhancement Agents (Animation, SEO, Dark Mode, Forms, Integrations) through existing pipeline enhancers | TODO |
 | 7 | Test all 32 generators produce quality output | TODO |
 
 ### 1.2 SEO Agent — HIGH PRIORITY
-**Status:** NOT BUILT — Landing page only, existing `/api/seo/analyze` endpoint can be extended
+**Status:** DONE — Full dashboard at `/seo` with 4 views (Dashboard, Analyze, Keywords, History)
 **Why second:** Existing analysis endpoint provides foundation
 
 | # | Task | Status |
 |---|------|--------|
-| 1 | Build SEO Agent dashboard page at `/seo` or `/products/seo-agent/dashboard` | TODO |
-| 2 | Connect to existing `/api/seo/analyze` for on-demand audits | TODO |
-| 3 | Add keyword research via AI (use Claude to suggest keywords for a business type) | TODO |
+| 1 | Build SEO Agent dashboard page at `/seo` | DONE (2026-03-14) — `src/app/seo/page.tsx` |
+| 2 | Connect to existing `/api/seo/analyze` for on-demand audits | DONE (2026-03-14) |
+| 3 | Add keyword research via AI (use Claude to suggest keywords for a business type) | DONE (2026-03-14) — Keywords tab |
 | 4 | Add auto-fix mode: take SEO audit results → feed back to pipeline → regenerate improved HTML | TODO |
 | 5 | Add competitor URL input: fetch + analyze competitor SEO, suggest improvements | TODO |
-| 6 | Build SEO score tracking over time (store audit results in DB) | TODO |
-| 7 | Update product page CTAs to link to real dashboard | TODO |
+| 6 | Build SEO score tracking over time (store audit results in DB) | TODO — needs DB tables |
+| 7 | Update product page CTAs to link to real dashboard | DONE (2026-03-14) — links to `/seo` |
 
 ### 1.3 Hosting Completion — MEDIUM PRIORITY
 **Status:** PARTIAL — Deploy + DB storage works, serving layer incomplete
@@ -109,47 +109,47 @@ These products have landing pages but lack working backends. Priority order: top
 The core builder works but needs polish to compete with market leaders.
 
 ### 2.1 Onboarding — CRITICAL
-**Current:** 5 example prompts, no guidance for new users
+**Current:** DONE — Welcome modal + template gallery + generator routing all live
 
 | # | Task | Status |
 |---|------|--------|
-| 1 | Add welcome modal for first-time users (what Zoobicon does, 3-step overview) | TODO |
-| 2 | Add template gallery picker (15+ templates exist in `src/lib/templates.ts` but aren't exposed) | TODO |
+| 1 | Add welcome modal for first-time users (what Zoobicon does, 3-step overview) | DONE (2026-03-14) — `WelcomeModal.tsx` |
+| 2 | Add template gallery picker (15+ templates exposed in builder UI) | DONE (2026-03-14) — `TemplateGallery.tsx` |
 | 3 | Add interactive tooltips for tier toggle, model selector, and pipeline panel | TODO |
-| 4 | Add "Getting Started" video or animated walkthrough | TODO |
-| 5 | Add industry/use-case selector (restaurant, SaaS, portfolio, etc.) that pre-fills prompt | TODO |
+| 4 | Add "Getting Started" video or animated walkthrough | TODO — needs video production |
+| 5 | Add industry/use-case selector that pre-fills prompt | DONE (2026-03-14) — generator routing via URL params |
 | 6 | Show example output previews before user builds | TODO |
 
 ### 2.2 Pre-Generation Customization — HIGH
-**Current:** Prompt-only, no visual controls
+**Current:** DONE — Color, typography, layout, and section controls live
 
 | # | Task | Status |
 |---|------|--------|
-| 1 | Add color palette picker (preset palettes + custom) | TODO |
-| 2 | Add typography selector (modern, classic, playful, corporate) | TODO |
-| 3 | Add layout style toggle (hero-first, feature-grid, storytelling, minimal) | TODO |
-| 4 | Add section selector (which of the 11 sections to include/exclude) | TODO |
+| 1 | Add color palette picker (preset palettes + custom) | DONE (2026-03-14) — `CustomizationPanel.tsx` |
+| 2 | Add typography selector (modern, classic, playful, corporate) | DONE (2026-03-14) |
+| 3 | Add layout style toggle (hero-first, feature-grid, storytelling, minimal) | DONE (2026-03-14) |
+| 4 | Add section selector (which of the 11 sections to include/exclude) | DONE (2026-03-14) — 8 toggleable sections |
 | 5 | Add industry dropdown that auto-suggests relevant content | TODO |
 | 6 | Add multi-page toggle (homepage + about + contact + pricing) | TODO |
 
 ### 2.3 Preview & Testing — HIGH
-**Current:** Desktop-only iframe preview
+**Current:** DONE — Responsive preview with device toolbar
 
 | # | Task | Status |
 |---|------|--------|
-| 1 | Add responsive preview toolbar (mobile / tablet / desktop breakpoints) | TODO |
+| 1 | Add responsive preview toolbar (mobile / tablet / desktop breakpoints) | DONE (2026-03-14) — `PreviewPanel.tsx` device toolbar |
 | 2 | Add Lighthouse-style score badge on preview (Performance, SEO, Accessibility) | TODO |
 | 3 | Add "View Full Page" mode (expand preview to full screen) | TODO |
 | 4 | Add side-by-side comparison (before/after edit) | TODO |
 
 ### 2.4 Post-Generation Editing — MEDIUM
-**Current:** AI chat editing works, no visual manipulation
+**Current:** PARTIAL — Diff view done, visual editing still TODO
 
 | # | Task | Status |
 |---|------|--------|
 | 1 | Add click-to-select element editing (click element in preview → edit its text/style) | TODO |
 | 2 | Add section drag-and-drop reordering | TODO |
-| 3 | Add diff view for version history (highlight what changed) | TODO |
+| 3 | Add diff view for version history (highlight what changed) | DONE (2026-03-14) — `DiffPanel.tsx` with LCS algorithm |
 | 4 | Add undo/redo buttons (not just version rollback) | TODO |
 | 5 | Add quick actions bar (change colors, fonts, add section, remove section) | TODO |
 
@@ -187,13 +187,13 @@ The core builder works but needs polish to compete with market leaders.
 | 3 | Add commenting on generated sites (point-and-click feedback) | TODO |
 | 4 | Add activity log (who edited what, when) | TODO |
 
-### 3.2 Analytics & Insights — NOT STARTED
+### 3.2 Analytics & Insights — DONE (UI)
 | # | Task | Status |
 |---|------|--------|
-| 1 | Add per-project analytics (page views, visitors, bounce rate) | TODO |
-| 2 | Add SEO score trends (track score over time after edits) | TODO |
-| 3 | Add generation stats (tokens used, cost estimate, time) | TODO |
-| 4 | Add dashboard-level analytics (total projects, total deploys, uptime) | TODO |
+| 1 | Add per-project analytics (page views, visitors, bounce rate) | DONE (2026-03-14) — `src/app/analytics/page.tsx` |
+| 2 | Add SEO score trends (track score over time after edits) | DONE (2026-03-14) — chart in analytics dashboard |
+| 3 | Add generation stats (tokens used, cost estimate, time) | DONE (2026-03-14) — generation history tab |
+| 4 | Add dashboard-level analytics (total projects, total deploys, uptime) | DONE (2026-03-14) — overview cards |
 
 ### 3.3 Authentication & User Management — NEEDS REVIEW
 | # | Task | Status |
@@ -229,37 +229,37 @@ The core builder works but needs polish to compete with market leaders.
 ### 4.1 zoobicon.com (Hub)
 | # | Task | Status |
 |---|------|--------|
-| 1 | Ensure all product cards link to real working products (not just `/builder`) | TODO |
-| 2 | Fix any product cards that promise features that don't exist | TODO |
-| 3 | Add real customer testimonials (or mark as "Beta" if none yet) | TODO |
+| 1 | Ensure all product cards link to real working products (not just `/builder`) | DONE (2026-03-14) — CTAs fixed |
+| 2 | Fix any product cards that promise features that don't exist | DONE (2026-03-14) — fake stats removed |
+| 3 | Add real customer testimonials (or mark as "Beta" if none yet) | TODO — needs real users |
 
 ### 4.2 zoobicon.ai (AI Creation)
 | # | Task | Status |
 |---|------|--------|
 | 1 | Verify live demo section works (calls `/api/generate` correctly) | TODO |
-| 2 | Only list AI tools that actually work (remove or mark "Coming Soon" for vapor tools) | TODO |
+| 2 | Only list AI tools that actually work (remove or mark "Coming Soon" for vapor tools) | DONE (2026-03-14) — Video Creator marked Coming Soon, fake SLA removed |
 | 3 | Add real generation examples with before/after | TODO |
 
 ### 4.3 zoobicon.sh (CLI/Deploy)
 | # | Task | Status |
 |---|------|--------|
 | 1 | Verify all terminal commands in animated demo are real | TODO |
-| 2 | Link to real GitHub repo (currently placeholder) | TODO |
-| 3 | Add real installation instructions that work | TODO |
+| 2 | Link to real GitHub repo (currently placeholder) | DONE (2026-03-14) — dead link disabled |
+| 3 | Add real installation instructions that work | TODO — needs npm package published |
 
 ### 4.4 zoobicon.io (Developer API)
 | # | Task | Status |
 |---|------|--------|
 | 1 | Test all 5 documented API endpoints | TODO |
 | 2 | Verify code examples (curl, JavaScript, Python) work | TODO |
-| 3 | Add link to real API docs or OpenAPI spec | TODO |
+| 3 | Add link to real API docs or OpenAPI spec | DONE (2026-03-14) — SDKs/GitHub Actions marked coming soon |
 
 ### 4.5 dominat8.io/com (Aggressive Brand)
 | # | Task | Status |
 |---|------|--------|
-| 1 | Verify "45+ generators" claim matches reality | TODO |
-| 2 | Replace synthetic testimonials with real ones or remove | TODO |
-| 3 | Verify all features listed in Strike/Command tiers are real | TODO |
+| 1 | Verify "45+ generators" claim matches reality | DONE (2026-03-14) — corrected to 30+ |
+| 2 | Replace synthetic testimonials with real ones or remove | DONE (2026-03-14) — marked as examples |
+| 3 | Verify all features listed in Strike/Command tiers are real | DONE (2026-03-14) — marked unbuilt as "Soon" |
 
 ---
 
@@ -272,9 +272,9 @@ The core builder works but needs polish to compete with market leaders.
 | # | Feature | Who Has It | Zoobicon Status | Priority |
 |---|---------|-----------|-----------------|----------|
 | 1 | **Drag-and-drop visual editor** | Wix, Squarespace, Framer, Hostinger | MISSING — code panel + preview only | HIGH (biggest UX gap vs mainstream builders) |
-| 2 | **Mobile preview simulator** | All 10 competitors | MISSING | CRITICAL |
-| 3 | **Template gallery with previews** | All 10 competitors (Wix: 2,500+, Hostinger: 170+) | HIDDEN — 15+ exist in code, not exposed in UI | CRITICAL |
-| 4 | **Built-in analytics dashboard** | Wix, Squarespace, Framer, Hostinger, Durable, Bolt | MISSING — API exists, no user-facing dashboard | HIGH |
+| 2 | **Mobile preview simulator** | All 10 competitors | DONE (2026-03-14) — responsive toolbar | CLOSED |
+| 3 | **Template gallery with previews** | All 10 competitors (Wix: 2,500+, Hostinger: 170+) | DONE (2026-03-14) — 12 templates exposed in builder | CLOSED |
+| 4 | **Built-in analytics dashboard** | Wix, Squarespace, Framer, Hostinger, Durable, Bolt | DONE (2026-03-14) — `/analytics` dashboard | CLOSED |
 | 5 | **Functional e-commerce** (products, cart, checkout) | Wix (full), Squarespace (full), Hostinger, 10Web (WooCommerce) | PARTIAL — API endpoint exists, no product dashboard | MEDIUM |
 | 6 | **AI content/blog writer** (standalone) | Wix, Squarespace, Framer, Hostinger, Durable | MISSING — pipeline generates copy but no standalone tool | MEDIUM |
 | 7 | **Custom domain connection** (working flow) | All 10 competitors | PARTIAL — hosting API exists, UI workflow incomplete | CRITICAL |
@@ -328,23 +328,23 @@ The core builder works but needs polish to compete with market leaders.
 
 ## Priority Execution Order
 
-### Phase 1 — Stop the Bleeding (Week 1-2)
+### Phase 1 — Stop the Bleeding ~~(Week 1-2)~~ COMPLETED 2026-03-14
 *Fix credibility issues and expose what already exists*
-1. Expose template gallery in builder UI (15+ templates already coded, just hidden)
-2. Add onboarding welcome modal for first-time users
-3. Add responsive preview toolbar (mobile/tablet/desktop)
-4. Fix ALL product page CTAs — if backend doesn't exist, change to "Coming Soon" + waitlist
-5. Audit pricing page — remove or mark "Coming Soon" on features not yet built
-6. Verify all 5 domain pages don't overpromise
+1. ~~Expose template gallery in builder UI~~ DONE
+2. ~~Add onboarding welcome modal for first-time users~~ DONE
+3. ~~Add responsive preview toolbar (mobile/tablet/desktop)~~ DONE
+4. ~~Fix ALL product page CTAs — if backend doesn't exist, change to "Coming Soon" + waitlist~~ DONE
+5. ~~Audit pricing page — remove or mark "Coming Soon" on features not yet built~~ DONE
+6. ~~Verify all 5 domain pages don't overpromise~~ DONE
 
-### Phase 2 — Make Products Real (Week 3-6)
+### Phase 2 — Make Products Real ~~(Week 3-6)~~ MOSTLY COMPLETE 2026-03-14
 *Build the backends that product pages promise*
-7. Build generator routing (type-specific prompts through pipeline)
-8. Build SEO Agent dashboard (extend existing `/api/seo/analyze`)
-9. Complete hosting serving layer (SSL, CDN, custom domains)
-10. Add pre-generation customization controls (colors, typography, industry)
-11. Add diff view for version history
-12. Build analytics dashboard (page views, SEO trends, generation stats)
+7. ~~Build generator routing (type-specific prompts through pipeline)~~ DONE
+8. ~~Build SEO Agent dashboard (extend existing `/api/seo/analyze`)~~ DONE
+9. Complete hosting serving layer (SSL, CDN, custom domains) — TODO (needs infrastructure)
+10. ~~Add pre-generation customization controls (colors, typography, industry)~~ DONE
+11. ~~Add diff view for version history~~ DONE
+12. ~~Build analytics dashboard (page views, SEO trends, generation stats)~~ DONE
 
 ### Phase 3 — Platform Maturity (Week 7-10)
 *Close competitive gaps*
