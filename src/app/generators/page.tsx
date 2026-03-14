@@ -9,6 +9,7 @@ import {
   Home, FileBarChart, Chrome, PaintBucket, Users, FolderKanban, GraduationCap,
   Package, Workflow, ArrowRight, Zap, Bot, Layers, Star, Menu, X,
 } from "lucide-react";
+import { endpointToGeneratorId } from "@/lib/generator-prompts";
 
 const GENERATOR_CATEGORIES = [
   {
@@ -317,9 +318,10 @@ export default function GeneratorsPage() {
 
 function GeneratorCard({ gen }: { gen: { name: string; description: string; endpoint: string; icon: React.ElementType; tag?: string; category: string; color: string } }) {
   const Icon = gen.icon;
+  const generatorId = endpointToGeneratorId(gen.endpoint);
   return (
     <Link
-      href="/builder"
+      href={`/builder?generator=${generatorId}`}
       className="group relative rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 hover:border-brand-500/30 hover:bg-brand-500/[0.03] transition-all duration-200"
     >
       {gen.tag && (
