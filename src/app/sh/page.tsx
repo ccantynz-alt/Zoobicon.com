@@ -553,7 +553,7 @@ export default function ZoobiconShPage() {
                         className={`flex items-center gap-2 px-5 py-3 text-xs font-mono transition-colors border-b-2 ${
                           activeTab === "github"
                             ? "border-brand-500 text-brand-400"
-                            : "border-transparent text-white/50 hover:text-white/50"
+                            : "border-transparent text-white/50 hover:text-white/70"
                         }`}
                       >
                         <GitBranch className="w-3.5 h-3.5" />
@@ -564,7 +564,7 @@ export default function ZoobiconShPage() {
                         className={`flex items-center gap-2 px-5 py-3 text-xs font-mono transition-colors border-b-2 ${
                           activeTab === "gitlab"
                             ? "border-brand-500 text-brand-400"
-                            : "border-transparent text-white/50 hover:text-white/50"
+                            : "border-transparent text-white/50 hover:text-white/70"
                         }`}
                       >
                         <Server className="w-3.5 h-3.5" />
