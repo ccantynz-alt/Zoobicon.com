@@ -283,7 +283,10 @@ const STANDARD_SECTIONS = `
 10. Footer — <footer class="section fade-in" style="background:var(--color-text);color:#fff;padding:60px var(--container-padding)"> with .container > .grid.grid-4: about blurb, quick links, services, contact info.
 
 ## IMAGE RULES — MANDATORY
-Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for ALL images.
+Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for ALL images. These are PLACEHOLDER URLs — the server automatically replaces them with real, contextually matched stock photos based on the KEYWORD you provide.
+
+THE KEYWORD IS CRITICAL — it determines which real photo is shown. Make keywords descriptive and include the business industry.
+
 Each image MUST use a UNIQUE seed from this list (assign in order):
 - img1: hero image (1200/600)
 - img2: about photo (800/500)
@@ -294,8 +297,14 @@ Each image MUST use a UNIQUE seed from this list (assign in order):
 - img7: testimonial avatar 2 (80/80)
 - img8: testimonial avatar 3 (80/80)
 
-For KEYWORD, combine the business type with the image purpose. Examples for a bakery:
-img1=artisan-bread-display, img2=baker-kneading-dough, img3=fresh-pastries, img4=cozy-cafe-interior, img5=wedding-cake-design, img6=woman-smiling-portrait, img7=man-chef-portrait, img8=young-couple-portrait
+For KEYWORD: use the business INDUSTRY plus image purpose, separated by hyphens. Include the core industry word so our photo matcher can find the right category.
+Examples for a bakery (note "restaurant" and "food" keywords for matching):
+img1=restaurant-bakery-interior, img2=food-baker-kneading-dough, img3=restaurant-fresh-pastries, img4=food-cafe-interior, img5=restaurant-wedding-cake, img6=professional-woman-portrait, img7=professional-man-portrait, img8=professional-young-portrait
+
+Examples for a cybersecurity startup:
+img1=cybersecurity-dark-operations-center, img2=technology-security-team, img3=cybersecurity-shield-protection, img4=technology-code-screen, img5=cybersecurity-network-monitoring, img6=technology-professional-man, img7=technology-professional-woman, img8=business-young-professional
+
+ALWAYS include a descriptive alt="" attribute on every <img> tag describing what the image should show.
 
 NEVER reuse a keyword. Every src must be different.
 
@@ -335,7 +344,10 @@ const PREMIUM_SECTIONS = `
 13. Footer — <footer class="section" style="background:var(--color-text);color:rgba(255,255,255,0.9);padding:80px var(--container-padding) 40px"> with .container > .grid.grid-4: about + newsletter .input, nav links, services, contact + social icons. Bottom: copyright bar.
 
 ## IMAGE RULES — MANDATORY
-Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for ALL images.
+Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for ALL images. These are PLACEHOLDER URLs — the server automatically replaces them with real, contextually matched stock photos based on the KEYWORD.
+
+THE KEYWORD IS CRITICAL — it determines which real photo is shown. Make keywords descriptive and include the business industry.
+
 Each image MUST use a UNIQUE seed. Assign in order:
 - img1: hero (1200/600)
 - img2: about/story (800/500)
@@ -349,8 +361,11 @@ Each image MUST use a UNIQUE seed. Assign in order:
 - img10: testimonial avatar 3 (80/80)
 - img11: additional section (800/500)
 
-For KEYWORD, combine business type + image purpose. Example for a law firm:
-img1=modern-law-office-lobby, img2=legal-team-conference, img3=courthouse-architecture, img4=contract-signing, img5=client-consultation, img6=legal-library-books, img7=justice-scales-closeup, img8=professional-woman-lawyer, img9=senior-businessman, img10=young-entrepreneur-portrait, img11=city-skyline-downtown
+For KEYWORD: use the business INDUSTRY plus image purpose, separated by hyphens. Include the core industry word so our photo matcher can find the right category.
+Example for a law firm (note "legal" and "law" keywords):
+img1=legal-modern-law-office-lobby, img2=legal-team-conference-room, img3=legal-courthouse-architecture, img4=legal-contract-signing, img5=legal-client-consultation, img6=legal-library-books, img7=legal-justice-scales-closeup, img8=business-professional-woman, img9=business-senior-businessman, img10=business-young-entrepreneur, img11=legal-city-skyline-downtown
+
+ALWAYS include a descriptive alt="" attribute on every <img> tag describing what the image should show.
 
 NEVER reuse a keyword. Every src must be different.
 
