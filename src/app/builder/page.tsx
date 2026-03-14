@@ -31,6 +31,7 @@ import EmailTemplatePanel from "@/components/EmailTemplatePanel";
 import ClonePanel from "@/components/ClonePanel";
 import AiImagesPanel from "@/components/AiImagesPanel";
 import PipelinePanel from "@/components/PipelinePanel";
+import WelcomeModal, { shouldShowWelcomeModal, dismissWelcomeModal } from "@/components/WelcomeModal";
 
 import {
   Bug,
@@ -352,6 +353,14 @@ export default function BuilderPage() {
   const [availableModels, setAvailableModels] = useState<AIModel[]>([]);
   const [reactSource, setReactSource] = useState<Record<string, string> | null>(null);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  // Show welcome modal on first visit
+  useEffect(() => {
+    if (shouldShowWelcomeModal()) {
+      setShowWelcome(true);
+    }
+  }, []);
 
   // Snapshot system — captures state on every AI action for perfect undo
   interface Snapshot {
@@ -724,6 +733,12 @@ export default function BuilderPage() {
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim()) return;
 
+    // Close welcome modal if open
+    if (showWelcome) {
+      setShowWelcome(false);
+      dismissWelcomeModal();
+    }
+
     const currentGenId = ++generationIdRef.current;
     setStatus("generating");
     setError("");
@@ -1090,6 +1105,10 @@ export default function BuilderPage() {
 
   return (
     <div className="flex flex-col h-screen bg-[#0a0a0f] relative overflow-hidden">
+      {/* Welcome modal for first-time users */}
+      {showWelcome && (
+        <WelcomeModal onClose={() => { setShowWelcome(false); dismissWelcomeModal(); }} />
+      )}
       {/* Interactive particle constellation background */}
       <BuilderBackground isGenerating={status === "generating"} />
 
