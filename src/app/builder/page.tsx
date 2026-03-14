@@ -33,6 +33,7 @@ import EmailTemplatePanel from "@/components/EmailTemplatePanel";
 import ClonePanel from "@/components/ClonePanel";
 import AiImagesPanel from "@/components/AiImagesPanel";
 import PipelinePanel from "@/components/PipelinePanel";
+import DiffPanel from "@/components/DiffPanel";
 import WelcomeModal, { shouldShowWelcomeModal, dismissWelcomeModal } from "@/components/WelcomeModal";
 
 import {
@@ -66,6 +67,7 @@ import {
   Search as SearchIcon,
   Save,
   Sparkles,
+  History,
 } from "lucide-react";
 
 type BuildStatus = "idle" | "generating" | "editing" | "complete" | "error";
@@ -366,6 +368,7 @@ function BuilderPage() {
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   const [showWelcome, setShowWelcome] = useState(false);
   const [generatorBanner, setGeneratorBanner] = useState<{ id: string; name: string } | null>(null);
+  const [showDiffPanel, setShowDiffPanel] = useState(false);
 
   // Show welcome modal on first visit
   useEffect(() => {
@@ -1133,6 +1136,19 @@ function BuilderPage() {
       {showWelcome && (
         <WelcomeModal onClose={() => { setShowWelcome(false); dismissWelcomeModal(); }} />
       )}
+      {showDiffPanel && (
+        <div className="fixed inset-0 z-50">
+          <DiffPanel
+            snapshots={snapshots}
+            currentIndex={snapshotIndex}
+            onClose={() => setShowDiffPanel(false)}
+            onRestore={(index) => {
+              addSnapshot(snapshots[index].html, `Restored: ${snapshots[index].label}`);
+              setShowDiffPanel(false);
+            }}
+          />
+        </div>
+      )}
       {/* Interactive particle constellation background */}
       <BuilderBackground isGenerating={status === "generating"} />
 
@@ -1262,6 +1278,14 @@ function BuilderPage() {
                   className="p-1.5 rounded text-white/30 hover:text-white/60 hover:bg-white/[0.04] transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
                 >
                   <Redo2 size={14} />
+                </button>
+                <button
+                  onClick={() => setShowDiffPanel(true)}
+                  disabled={snapshots.length < 2}
+                  title="Version History"
+                  className="p-1.5 rounded text-white/30 hover:text-white/60 hover:bg-white/[0.04] transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+                >
+                  <History size={14} />
                 </button>
               </div>
             )}
