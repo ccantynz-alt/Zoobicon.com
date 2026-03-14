@@ -422,14 +422,10 @@ Output the <config> block first, then the <body-html> block. Nothing else.`;
           const c = new Anthropic({
             apiKey,
             timeout: useTimeout,
-            // Enable fast mode for Opus: 2.5x faster output tokens/second
-            ...(isOpus ? { defaultHeaders: { "anthropic-beta": "fast-mode-2026-02-01" } } : {}),
           });
           const stream = c.messages.stream({
             model: useModel,
             max_tokens: useMaxTokens,
-            // Fast mode: speed-prioritized inference on Opus 4.6
-            ...(isOpus ? { speed: "fast" as const } : {}),
             // Prompt caching: cache the system prompt (identical across requests)
             // Saves ~90% latency on time-to-first-token for repeated calls
             system: [
@@ -467,11 +463,13 @@ Output the <config> block first, then the <body-html> block. Nothing else.`;
         try {
           let raw = "";
 
-          // Try primary model, fall back to Sonnet on rate limit/overload
+          // Try primary model, fall back to Sonnet on any failure
           try {
             raw = await generate(model, maxTokens, timeout);
           } catch (primaryErr) {
-            const canFallback = model !== "claude-sonnet-4-6" && isRetryableError(primaryErr);
+            // Fall back to Sonnet for any error when primary is Opus
+            // (rate limits, bad requests, timeouts, auth issues, etc.)
+            const canFallback = model !== "claude-sonnet-4-6";
             if (canFallback) {
               console.warn(`[Quick] ${model} failed (${primaryErr instanceof Error ? primaryErr.message : "unknown"}), falling back to Sonnet`);
               sendEvent({ type: "status", message: "Switching to fast mode..." });
