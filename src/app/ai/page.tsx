@@ -90,10 +90,10 @@ const AI_TOOLS = [
   {
     icon: Video,
     name: "AI Video Creator",
-    description: "Transform text scripts into professional marketing videos.",
+    description: "Transform text scripts into professional marketing videos. Coming soon.",
     color: "from-accent-purple to-pink-600",
     glowColor: "shadow-blue-500/25",
-    tag: "Creator",
+    tag: "Coming Soon",
   },
   {
     icon: Mail,
@@ -287,7 +287,7 @@ export default function AiPage() {
               { value: "60s", label: "Average Build Time" },
               { value: "8+", label: "AI Tools" },
               { value: "30+", label: "Languages" },
-              { value: "99.9%", label: "Uptime" },
+              { value: "24/7", label: "Availability" },
             ].map((stat) => (
               <motion.div
                 key={stat.label}
@@ -654,7 +654,7 @@ export default function AiPage() {
             </motion.h2>
 
             <motion.p variants={fadeInUp} className="text-lg text-gray-400 mb-10 max-w-xl mx-auto">
-              Join thousands of creators using Zoobicon.ai to build websites, brands, and businesses at the speed of thought.
+              Join creators using Zoobicon.ai to build websites, brands, and businesses at the speed of thought.
             </motion.p>
 
             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4">

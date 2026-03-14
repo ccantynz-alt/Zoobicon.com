@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
-import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+import { checkRateLimit, checkRateLimitAdmin, getClientIp } from "@/lib/rateLimit";
 import { validateApiKey } from "@/lib/apiKey";
 
 function getClient() {
@@ -162,11 +162,14 @@ export async function POST(request: NextRequest) {
   const apiKeyResult = bearerKey ? await validateApiKey(bearerKey) : null;
   const isApiKeyRequest = apiKeyResult?.valid === true;
 
-  // Rate limit: 20 edits/min for browsers, 120/min for valid API key holders
+  // Admin bypass: no rate limits
+  const isAdminRequest = request.headers.get("x-admin") === "1";
+
+  // Rate limit: unlimited for admin, 120/min for API keys, 20/min for browsers
   const ip = getClientIp(request);
   const rateLimitId = isApiKeyRequest ? `chat:key:${bearerKey.slice(-8)}` : `chat:${ip}`;
   const rateLimit = isApiKeyRequest ? { limit: 120, windowMs: 60_000 } : { limit: 20, windowMs: 60_000 };
-  const rl = checkRateLimit(rateLimitId, rateLimit);
+  const rl = isAdminRequest ? checkRateLimitAdmin() : checkRateLimit(rateLimitId, rateLimit);
   if (!rl.allowed) {
     return new Response(
       JSON.stringify({ error: "Too many requests. Please wait a moment and try again." }),

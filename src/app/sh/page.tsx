@@ -415,7 +415,7 @@ export default function ZoobiconShPage() {
                   <span className="text-brand-400 font-mono">*.zoobicon.sh</span> Subdomain
                 </h2>
                 <p className="text-lg text-white/40 max-w-2xl mx-auto">
-                  Deploy instantly to our global edge network. Zero configuration, zero cost.
+                  Deploy instantly with zero configuration. Free subdomains for every project.
                 </p>
               </div>
 
@@ -423,9 +423,9 @@ export default function ZoobiconShPage() {
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
                 {[
                   { icon: Lock, title: "SSL Included", desc: "Automatic HTTPS on every subdomain" },
-                  { icon: Network, title: "Global CDN", desc: "Edge distribution worldwide" },
-                  { icon: Globe, title: "Custom Domains", desc: "Bring your own domain on Pro" },
-                  { icon: Shield, title: "DDoS Protection", desc: "Enterprise-grade security" },
+                  { icon: Network, title: "Fast Hosting", desc: "Reliable site delivery" },
+                  { icon: Globe, title: "Custom Domains", desc: "Bring your own domain — coming soon" },
+                  { icon: Shield, title: "Secure by Default", desc: "Built with security in mind" },
                 ].map((feat, i) => (
                   <motion.div key={i} variants={scaleIn} className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 text-center">
                     <feat.icon className="w-6 h-6 text-brand-400/60 mx-auto mb-2" />
@@ -621,15 +621,13 @@ export default function ZoobiconShPage() {
                 <span>Get Started</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
-              <a
-                href="https://github.com/zoobicon"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-8 py-3 rounded-xl text-sm font-medium text-white/50 border border-white/[0.08] hover:border-white/20 transition-all flex items-center gap-2"
+              <span
+                className="px-8 py-3 rounded-xl text-sm font-medium text-white/30 border border-white/[0.06] flex items-center gap-2 cursor-default"
+                title="GitHub repo coming soon"
               >
                 <GitBranch className="w-4 h-4" />
-                View on GitHub
-              </a>
+                GitHub — Coming Soon
+              </span>
             </motion.div>
           </motion.div>
         </div>

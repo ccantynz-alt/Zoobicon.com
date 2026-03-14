@@ -82,9 +82,19 @@ export default function ChatPanel({ currentCode, onCodeUpdate, isVisible }: Chat
     setEditMode(null);
 
     try {
+      // Admin flag for rate limit bypass
+      let adminFlag = false;
+      try {
+        const u = JSON.parse(localStorage.getItem("zoobicon_user") || "{}");
+        adminFlag = u.role === "admin" || u.plan === "unlimited";
+      } catch { /* ignore */ }
+
       const response = await fetch("/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(adminFlag ? { "x-admin": "1" } : {}),
+        },
         body: JSON.stringify({ currentCode, instruction }),
       });
 

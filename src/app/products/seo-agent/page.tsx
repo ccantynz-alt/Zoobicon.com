@@ -135,8 +135,8 @@ export default function SEOAgentPage() {
             </motion.p>
 
             <motion.div variants={fadeInUp} className="flex flex-wrap gap-4 mb-16">
-              <Link href={user ? "/builder" : "/auth/signup"} className="group btn-gradient px-8 py-4 rounded-2xl text-base font-bold text-white flex items-center gap-3 shadow-glow-cyan">
-                <span>{user ? "Go to Builder" : "Launch Your SEO Agent"}</span>
+              <Link href="/seo" className="group btn-gradient px-8 py-4 rounded-2xl text-base font-bold text-white flex items-center gap-3 shadow-glow-cyan">
+                <span>Launch SEO Dashboard</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </motion.div>
@@ -218,8 +218,8 @@ export default function SEOAgentPage() {
             Stop Doing SEO.<br /><span className="gradient-text">Let AI Do It.</span>
           </h2>
           <p className="text-lg text-white/40 mb-8">Launch your first autonomous SEO campaign in under 2 minutes.</p>
-          <Link href={user ? "/builder" : "/auth/signup"} className="inline-flex group btn-gradient px-10 py-4 rounded-2xl text-lg font-bold text-white items-center gap-3 shadow-glow-lg">
-            <span>{user ? "Go to Builder" : "Launch SEO Agent"}</span>
+          <Link href="/seo" className="inline-flex group btn-gradient px-10 py-4 rounded-2xl text-lg font-bold text-white items-center gap-3 shadow-glow-lg">
+            <span>Launch SEO Dashboard</span>
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>

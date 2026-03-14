@@ -93,14 +93,40 @@ Build has `ignoreBuildErrors: true` and `ignoreDuringBuilds: true` in next.confi
 10. **Model routing — Opus for builds** — The Developer agent (the one that produces HTML) MUST use `claude-opus-4-6`. The stream fallback also uses Opus for new builds. Edits use Sonnet for speed. JSON planning agents use Haiku. SEO + Animation enhancers use Sonnet in parallel. Do NOT downgrade the Developer agent to Sonnet — it produces noticeably worse output. Pipeline v3 fits ~95s within Vercel's 300s limit by parallelizing planners and running only high-impact enhancers (SEO + Animation).
 11. **Multi-LLM support** — Three providers configured in `.env.local`: `ANTHROPIC_API_KEY`, `GOOGLE_AI_API_KEY`, `OPENAI_API_KEY`. Provider routing is in `src/lib/llm-provider.ts`. When a user selects a non-Claude model, all pipeline agents route through that provider. Default (no selection) uses the Claude Haiku/Opus/Sonnet split.
 12. **Component library injection** — `src/lib/component-library.ts` provides a CSS reset + design system (buttons, cards, inputs, badges, grids, animations) injected into every generated site. Like shadcn/ui for generated output. Do not remove.
+13. **Mediocre is failure** — Every product page must have a working backend. No fake CTAs, no mock data presented as real, no landing pages that funnel to unrelated products. If a feature isn't built yet, it must say "Coming Soon" with a waitlist — never "Launch Now." When encountering broken flows during any work, fix them immediately or flag as top priority. See the Quality Standard checklist above.
 
 ## Route Audit Status
 
-Full audit completed. **0 broken routes, 0 broken links, 0 missing API endpoints.** The codebase is clean. If you add new routes, make sure:
+Full audit completed. **0 broken routes, 0 broken links, 0 missing API endpoints.** However, several product pages have CTAs that link to `/builder` or `/auth/signup` instead of dedicated product experiences — see the Quality Standard checklist above for the full list. If you add new routes, make sure:
 - Page routes have a `page.tsx`
 - API routes have a `route.ts`
 - Any `fetch()` calls to `/api/*` have a corresponding handler
 - Any `Link href` or `<a href>` points to an existing page (no `href="#"`)
+
+## Quality Standard — Mediocre Is Failure
+
+**CRITICAL: Every feature, page, and product on the platform MUST work end-to-end.** If a button says "Launch SEO Agent," there must be a real SEO agent behind it. If a page promises video creation, there must be a real video creation flow. No mock data presented as real. No CTAs that funnel to an unrelated product.
+
+**The rule:** If it's on the site, it works. If it doesn't work yet, it says "Coming Soon" with a waitlist — never a fake "Launch Now" button. Whenever you encounter a broken flow, dead-end CTA, mock data posing as real, or a feature that doesn't deliver on its promise, **fix it immediately** or flag it as a top priority. This is non-negotiable.
+
+### Current Product Readiness Checklist
+
+Products that need backends built to match their landing pages:
+
+| # | Product | Status | What's Needed |
+|---|---------|--------|---------------|
+| 1 | **Website Builder** | DONE | Core product, fully functional |
+| 2 | **Hosting** | PARTIAL | Serving layer, CDN, SSL, custom domains need completion |
+| 3 | **Generators (32)** | PARTIAL | Need type-specific system prompts routed through pipeline |
+| 4 | **SEO Agent** | NOT BUILT | Need dedicated dashboard + autonomous SEO workflow using existing `/api/seo/analyze` |
+| 5 | **Video Creator** | NOT BUILT | Need external video API integration (Runway/Pika/Sora) + dedicated UI |
+| 6 | **Email Support** | NOT BUILT | Need email provider integration + real ticketing system |
+| 7 | **Marketplace** | NOT BUILT | Need real product catalog, Stripe integration for add-on purchases, delivery system |
+| 8 | **Domains** | NOT BUILT | Need registrar API integration (Namecheap/Cloudflare reseller) + DNS management |
+
+**Priority order:** Generators (#3) → SEO Agent (#4) → Hosting completion (#2) → Marketplace (#7) → Domains (#8) → Email Support (#6) → Video Creator (#5)
+
+Generators are highest priority because they extend the core product with minimal new infrastructure. Video Creator is last because it requires the most external API integration.
 
 ## Code Style
 

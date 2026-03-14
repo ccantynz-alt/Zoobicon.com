@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { Monitor, Tablet, Smartphone } from "lucide-react";
 
 interface PreviewPanelProps {
   html: string;
@@ -309,7 +310,16 @@ function GeneratingAtmosphere() {
   );
 }
 
+type ViewportMode = "desktop" | "tablet" | "mobile";
+
+const viewportConfig: Record<ViewportMode, { width: string; icon: typeof Monitor; label: string }> = {
+  desktop: { width: "100%", icon: Monitor, label: "Desktop" },
+  tablet: { width: "768px", icon: Tablet, label: "Tablet" },
+  mobile: { width: "375px", icon: Smartphone, label: "Mobile" },
+};
+
 export default function PreviewPanel({ html, isGenerating }: PreviewPanelProps) {
+  const [viewport, setViewport] = useState<ViewportMode>("desktop");
 
   // Extract body text to validate content exists
   const bodyTextLength = useMemo(() => {
@@ -556,13 +566,52 @@ export default function PreviewPanel({ html, isGenerating }: PreviewPanelProps) 
   }
 
   return (
-    <div className="relative w-full h-full">
-      <iframe
-        srcDoc={html}
-        className="w-full h-full border-0 bg-white"
-        title="Website preview"
-        sandbox="allow-scripts allow-same-origin"
-      />
+    <div className="relative w-full h-full flex flex-col">
+      {/* Device toolbar */}
+      <div className="flex items-center gap-1 px-3 bg-gray-900/50 border-b border-white/5" style={{ height: 32, minHeight: 32 }}>
+        {(Object.keys(viewportConfig) as ViewportMode[]).map((mode) => {
+          const config = viewportConfig[mode];
+          const Icon = config.icon;
+          const isActive = viewport === mode;
+          return (
+            <button
+              key={mode}
+              onClick={() => setViewport(mode)}
+              className={`flex items-center gap-1.5 px-2 py-1 rounded text-[11px] transition-colors duration-150 ${
+                isActive
+                  ? "text-blue-400"
+                  : "text-white/40 hover:text-white/70"
+              }`}
+              title={config.label}
+            >
+              <Icon size={14} />
+              <span className="hidden sm:inline">{config.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Preview area */}
+      <div className="flex-1 overflow-hidden bg-gray-950 flex items-start justify-center">
+        <div
+          className={`h-full transition-all duration-300 ease-in-out ${
+            viewport !== "desktop"
+              ? "my-0 border-x border-white/10 rounded-md shadow-lg shadow-black/30"
+              : ""
+          }`}
+          style={{
+            width: viewportConfig[viewport].width,
+            maxWidth: "100%",
+          }}
+        >
+          <iframe
+            srcDoc={html}
+            className="w-full h-full border-0 bg-white"
+            title="Website preview"
+            sandbox="allow-scripts allow-same-origin"
+          />
+        </div>
+      </div>
     </div>
   );
 }

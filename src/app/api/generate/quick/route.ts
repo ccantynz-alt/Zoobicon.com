@@ -199,14 +199,28 @@ Output a JSON object with site theme settings:
 }
 </config>
 
-Font choices by industry:
-- Luxury/Legal/Finance: font1: "Playfair Display", font2: "Inter" — warm whites, gold/navy
-- SaaS/Tech: font1: "Inter", font2: "Inter" — modern, can use dark bg
-- Restaurant/Food: font1: "Playfair Display", font2: "Lato" — warm earth tones
-- Healthcare: font1: "Inter", font2: "Inter" — soft blues/greens
-- Creative/Agency: font1: "Space Grotesk", font2: "Inter" — bold, high contrast
+## COLOR RULES — CRITICAL
+DEFAULT TO LIGHT/WHITE BACKGROUNDS. Most professional websites use white or very light backgrounds. Only use a dark background (bg: "#0a0a0a" or similar) if the business explicitly requires it (nightclub, gaming, cinema, goth brand).
+
+Light theme examples by industry:
+- Luxury/Legal/Finance: bg "#fffdf8", bgAlt "#faf7f2", text "#1a1a2e", primary "#b8860b" or "#1e3a5f" — warm cream + gold/navy
+- SaaS/Tech: bg "#ffffff", bgAlt "#f0f4ff", text "#1a1a2e", primary "#2563eb" — clean white + blue
+- Restaurant/Food: bg "#fffaf5", bgAlt "#fdf2e9", text "#2d1810", primary "#c4611a" — warm cream + terracotta
+- Healthcare: bg "#f8fffe", bgAlt "#f0faf7", text "#1a2e2a", primary "#0d9488" — soft white + teal
+- Creative/Agency: bg "#ffffff", bgAlt "#faf5ff", text "#1a1a2e", primary "#7c3aed" — white + purple
+- Real Estate: bg "#ffffff", bgAlt "#f8f6f3", text "#1a1a2e", primary "#1e3a5f" — white + navy
+- Fitness: bg "#ffffff", bgAlt "#fef2f2", text "#1a1a2e", primary "#dc2626" — white + red
+
+Font pairings:
+- Luxury/Legal/Finance: font1: "Playfair Display", font2: "Inter"
+- SaaS/Tech: font1: "Inter", font2: "Inter"
+- Restaurant/Food: font1: "Playfair Display", font2: "Lato"
+- Healthcare: font1: "Inter", font2: "Inter"
+- Creative/Agency: font1: "Space Grotesk", font2: "Inter"
 
 The "customCss" field is for ONLY site-specific CSS that the component library doesn't cover (max 30 lines). Things like hero gradient overlays, custom nav styling, accent decorations. Most sites need very little here.
+
+NEVER use neon colors (#00ff00, #ff00ff, #00ffff, etc.) unless explicitly requested. Use sophisticated, muted accent colors.
 
 ## STEP 2: BODY HTML
 Output the complete body content wrapped in <body-html>...</body-html> tags.
@@ -219,6 +233,7 @@ AVAILABLE COMPONENT CLASSES (these are pre-styled — just use them):
 - Flex: .flex .flex-col .items-center .justify-center .justify-between .gap-1 .gap-2 .gap-3 .gap-4
 - Text: .text-center .text-muted .text-primary .text-sm .text-lg .font-bold .font-semibold
 - Animations: .fade-in .fade-in-left .fade-in-right .scale-in (on each <section>)
+- Hero: .hero (full-viewport section) .hero-aurora (animated conic gradient bg) .hero-mesh (layered radial gradients) .hero-grain (film grain overlay) .hero-glass (glassmorphism panel) .hero-gradient-text (gradient text fill) .hero-float .hero-float-delay .hero-float-slow (bobbing) .hero-orb (blurred glow ball — set size/position via inline style) .hero-cursor-glow (mouse-following glow — add empty div) .hero-reveal (stagger-animate children on load) .hero-btn-glow (animated CTA border glow) .hero-typed (typing effect on span)
 - Patterns: .testimonial-card .stat-item .stat-number .stat-label .faq-item .faq-question .faq-answer .logo-strip
 - Badges: .badge .badge-primary .badge-success
 - Inputs: .input .input-group
@@ -227,7 +242,7 @@ AVAILABLE COMPONENT CLASSES (these are pre-styled — just use them):
 
 const STANDARD_SECTIONS = `
 1. <nav> — Use: <nav style="position:sticky;top:0;z-index:100;background:var(--color-bg);border-bottom:1px solid var(--color-border)"><div class="container flex justify-between items-center" style="padding:1rem var(--container-padding)">. Include logo text, nav links, CTA button (.btn .btn-primary .btn-sm), and a mobile hamburger button (.mobile-menu-btn).
-2. Hero <section> — class="section fade-in" with full-viewport feel. Big headline in <h1>, subheading in <p class="text-lg text-muted">, two CTAs (.btn-primary.btn-lg + .btn-ghost.btn-lg), and a social proof line.
+2. Hero <section> — class="hero hero-mesh fade-in" with full-viewport feel. Wrap text in <div class="container hero-reveal">. Big headline in <h1> with <span class="hero-gradient-text"> on key words, subheading in <p class="text-lg text-muted">, two CTAs (.btn-primary.btn-lg.hero-btn-glow + .btn-ghost.btn-lg), and a social proof line. Add 1-2 <div class="hero-orb"> for ambient glow.
 3. Social proof — <section class="section-alt fade-in"> with <div class="logo-strip"> containing 4-5 company name spans.
 4. Features — <section class="section fade-in"> with .section-header (h2 + p) then .grid.grid-3 > .card > .card-body. Each card: inline SVG icon (24x24), <h3>, <p class="text-muted">. Write 6 cards.
 5. About — <section class="section section-alt fade-in"> with .grid.grid-2: one side = <img> (picsum, 800x500), other side = story text + stats in .flex.gap-3 using .stat-item.
@@ -237,12 +252,22 @@ const STANDARD_SECTIONS = `
 9. CTA — <section class="section fade-in" with dark/accent background via inline style, text-center> Compelling headline, subtext, .btn-primary.btn-lg, trust line.
 10. Footer — <footer class="section fade-in" style="background:var(--color-text);color:#fff;padding:60px var(--container-padding)"> with .container > .grid.grid-4: about blurb, quick links, services, contact info.
 
-## IMAGE RULES
-- Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for ALL images
-- EVERY image MUST have a DIFFERENT, UNIQUE seed keyword
-- Good seeds: seed/modern-workspace/800/500, seed/team-collaboration/600/400, seed/happy-client-portrait/100/100
-- Vary sizes by context: hero bg (1200/600), about (800/500), cards (400/300), avatars (100/100)
-- NEVER repeat a seed keyword. If you have 10 images, you need 10 unique keywords.
+## IMAGE RULES — MANDATORY
+Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for ALL images.
+Each image MUST use a UNIQUE seed from this list (assign in order):
+- img1: hero image (1200/600)
+- img2: about photo (800/500)
+- img3: feature card 1 (400/300)
+- img4: feature card 2 (400/300)
+- img5: feature card 3 (400/300)
+- img6: testimonial avatar 1 (80/80)
+- img7: testimonial avatar 2 (80/80)
+- img8: testimonial avatar 3 (80/80)
+
+For KEYWORD, combine the business type with the image purpose. Examples for a bakery:
+img1=artisan-bread-display, img2=baker-kneading-dough, img3=fresh-pastries, img4=cozy-cafe-interior, img5=wedding-cake-design, img6=woman-smiling-portrait, img7=man-chef-portrait, img8=young-couple-portrait
+
+NEVER reuse a keyword. Every src must be different.
 
 ## RULES
 - Output ONLY the <config> block and <body-html> block. Nothing else.
@@ -251,49 +276,72 @@ const STANDARD_SECTIONS = `
 - Every headline is BENEFIT-FOCUSED (what the customer gets, not what the product does).
 - Testimonials must include specific metrics and results.
 - WRITE REAL, DETAILED CONTENT. Every section should have multiple sentences/paragraphs.
-- An empty body is UNACCEPTABLE.`;
+- An empty body is UNACCEPTABLE.
+- BACKGROUND: Use WHITE or LIGHT backgrounds unless the business is explicitly dark-themed.`;
 
 const PREMIUM_SECTIONS = `
 1. <nav> — Use: <nav style="position:sticky;top:0;z-index:100;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:rgba(255,255,255,0.85);border-bottom:1px solid var(--color-border)"><div class="container flex justify-between items-center" style="padding:1rem var(--container-padding)">. Logo text, nav links, CTA button (.btn .btn-primary .btn-sm), mobile hamburger (.mobile-menu-btn). Feels floating/premium.
-2. Hero <section> — class="section fade-in" with dramatic presence. Large <h1> with letter-spacing, <p class="text-lg text-muted"> addressing pain point, TWO CTAs (.btn-primary.btn-lg + .btn-ghost.btn-lg), social proof with avatars or star rating, optional hero image. Use generous spacing (padding: 140px+ via inline style).
+2. Hero <section> — class="hero hero-aurora hero-grain fade-in" (or "hero hero-mesh hero-grain fade-in" for a softer look). Uses dedicated hero system:
+   - Wrap all text content in <div class="container hero-reveal"> for staggered entrance animation
+   - Add 2-3 decorative <div class="hero-orb"> positioned via inline style (e.g. style="width:400px;height:400px;top:-100px;right:-100px") for ambient glow
+   - Add <div class="hero-cursor-glow"></div> for interactive mouse-follow glow effect
+   - Large <h1> with <span class="hero-gradient-text"> on the key phrase (e.g. "Build <span class='hero-gradient-text'>Stunning Websites</span> in Seconds")
+   - Optionally add class "hero-typed" to a <span> inside <h1> for a typing animation on the tagline
+   - <p class="text-lg text-muted"> addressing the customer's pain point
+   - TWO CTAs: .btn-primary.btn-lg.hero-btn-glow (animated glow border) + .btn-ghost.btn-lg
+   - Social proof line with avatars or star rating
+   - For SaaS/tech sites: add a .hero-glass panel showing a product UI preview or floating feature cards with .hero-float
+   - Think Linear.app / Stripe.com level polish — the hero should feel alive and premium.
 3. Social proof bar — <section class="fade-in" style="padding:2.5rem var(--container-padding);border-top:1px solid var(--color-border);border-bottom:1px solid var(--color-border)"> with company names.
 4. Problem/Pain — <section class="section section-alt fade-in"> addressing frustrations with empathy. "Tired of X? Struggling with Y?" Use .grid.grid-2 or .grid.grid-3 for pain point cards.
 5. Solution/Features — <section class="section fade-in"> with .section-header then .grid.grid-3 > .card > .card-body. Each: colorful inline SVG icon in a tinted circle (via inline style), benefit headline, 3-line description connecting feature→benefit→outcome. 6 cards.
 6. About/Story — <section class="section section-alt fade-in-left"> with .grid.grid-2. One side: large image. Other: founder story, mission, 3-4 stats inline using .stat-item.
 7. Process/How it works — <section class="section fade-in"> with .section-header then numbered steps (1→2→3→4) with icons in accent circles, connected by a subtle line. Each step: number badge, heading, description.
 8. Testimonials — <section class="section section-alt fade-in"> with .grid.grid-3 > .testimonial-card. Each: stars, DETAILED quote with specific metrics ("Increased conversion by 47% in 3 months"), avatar image (picsum 80x80), name, title, company. 3 testimonials.
-9. Stats — <section class="section fade-in" with accent/dark background via inline style, light text> with .grid.grid-4 > .stat-item. Use animated counters: <div class="stat-number" data-target="NUMBER" data-suffix="%" data-prefix="">0</div>. 4 impressive stats.
+9. Stats — <section class="section fade-in" with subtle accent background (e.g. deep navy #1e3a5f or brand primary, NOT neon) via inline style, white text> with .grid.grid-4 > .stat-item. Use animated counters: <div class="stat-number" data-target="NUMBER" data-suffix="%" data-prefix="">0</div>. 4 impressive stats.
 10. Pricing — <section class="section section-alt fade-in"> with .section-header then .grid.grid-3 for 3 pricing tiers. Middle card gets scale(1.05), accent border, "Most Popular" .badge-primary. Each: price, feature list with checkmarks (✓), CTA button.
 11. FAQ — <section class="section fade-in"> with .section-header then .faq-item > .faq-question (text + <span class="faq-icon">+</span>) + .faq-answer > p. 6 Q&As handling real objections.
 12. Final CTA — <section class="section fade-in" with dramatic dark/gradient background via inline style, centered text, light colors> Big emotional headline, urgency line, .btn-primary.btn-lg, trust badges ("30-day guarantee • No credit card • Cancel anytime").
 13. Footer — <footer class="section" style="background:var(--color-text);color:rgba(255,255,255,0.9);padding:80px var(--container-padding) 40px"> with .container > .grid.grid-4: about + newsletter .input, nav links, services, contact + social icons. Bottom: copyright bar.
 
-## IMAGE RULES
-- Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for ALL images
-- EVERY image MUST have a DIFFERENT, UNIQUE seed keyword — NEVER repeat
-- Use highly descriptive, industry-specific keywords:
-  - Hero: seed/luxury-modern-office/1200/600 or seed/gourmet-restaurant-ambiance/1200/600
-  - About: seed/professional-team-meeting/800/500 or seed/artisan-craft-workshop/800/500
-  - Testimonials: seed/confident-business-woman/80/80, seed/smiling-executive-man/80/80, seed/creative-professional/80/80
-  - Features: seed/data-analytics-screen/400/300, seed/cloud-technology-abstract/400/300
-- NEVER reuse a seed. 15 images = 15 unique keywords.
+## IMAGE RULES — MANDATORY
+Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for ALL images.
+Each image MUST use a UNIQUE seed. Assign in order:
+- img1: hero (1200/600)
+- img2: about/story (800/500)
+- img3: feature 1 (400/300)
+- img4: feature 2 (400/300)
+- img5: feature 3 (400/300)
+- img6: feature 4 (400/300)
+- img7: process step (600/400)
+- img8: testimonial avatar 1 (80/80)
+- img9: testimonial avatar 2 (80/80)
+- img10: testimonial avatar 3 (80/80)
+- img11: additional section (800/500)
+
+For KEYWORD, combine business type + image purpose. Example for a law firm:
+img1=modern-law-office-lobby, img2=legal-team-conference, img3=courthouse-architecture, img4=contract-signing, img5=client-consultation, img6=legal-library-books, img7=justice-scales-closeup, img8=professional-woman-lawyer, img9=senior-businessman, img10=young-entrepreneur-portrait, img11=city-skyline-downtown
+
+NEVER reuse a keyword. Every src must be different.
 
 ## PREMIUM QUALITY MARKERS
 - Inline SVG icons should be colorful and detailed (not generic), using the primary/accent color
-- Use inline styles for premium touches: gradient backgrounds on stats/CTA sections, accent borders on featured cards, generous padding (120px+ on hero/CTA)
+- Use inline styles for premium touches: subtle gradient backgrounds on stats/CTA sections (prefer dark navy or deep brand-color gradients, NOT neon), accent borders on featured cards, generous padding (120px+ on hero/CTA)
 - Testimonial quotes must be LONG and SPECIFIC — at least 2-3 sentences with real metrics
 - Copy should handle objections, build trust, and create urgency
-- The overall feel should be "expensive" — think lots of whitespace, big typography, confident copy
+- The overall feel should be "high-end agency" — lots of whitespace, big typography, confident copy, LIGHT backgrounds with pops of color
+- Think Apple.com or Stripe.com — clean, white, spacious. NOT dark/neon/cyberpunk.
 
 ## RULES
 - Output ONLY the <config> block and <body-html> block. Nothing else.
 - No <!DOCTYPE>, <html>, <head>, <style> tags. The server handles all of that.
 - Use ONLY the component classes listed above plus inline styles for unique touches.
-- An empty body is UNACCEPTABLE.`;
+- An empty body is UNACCEPTABLE.
+- BACKGROUND: Use WHITE or LIGHT backgrounds. "Premium" means Apple/Stripe clean — NOT dark/neon.`;
 
 export async function POST(req: NextRequest) {
   try {
-    const { prompt, tier, model: requestedModel } = await req.json();
+    const { prompt, tier, model: requestedModel, isAdmin } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       return new Response(
@@ -311,9 +359,10 @@ export async function POST(req: NextRequest) {
     }
 
     const isPremium = tier === "premium";
-    const model = requestedModel || (isPremium ? "claude-opus-4-6" : "claude-sonnet-4-6");
-    const maxTokens = isPremium ? 32000 : 16000;
-    const timeout = isPremium ? 180_000 : 90_000;
+    // Admin: full throttle — Opus + fast mode, max tokens, max timeout
+    const model = requestedModel || (isAdmin ? "claude-opus-4-6" : isPremium ? "claude-opus-4-6" : "claude-sonnet-4-6");
+    const maxTokens = isAdmin ? 64000 : isPremium ? 32000 : 16000;
+    const timeout = isAdmin ? 300_000 : isPremium ? 180_000 : 90_000;
 
     const systemPrompt = BODY_ONLY_SYSTEM + (isPremium ? PREMIUM_SECTIONS : STANDARD_SECTIONS);
 
@@ -323,7 +372,7 @@ export async function POST(req: NextRequest) {
     const userMessage = isPremium
       ? `Build a world-class PREMIUM website for: ${prompt}
 
-This must look like a $30,000 agency built it. Include ALL 13 sections with rich, specific content. Every testimonial mentions real metrics. Every headline drives action. The design should feel expensive and intentional.
+This must look like a $30,000 agency built it. Think Apple.com or Stripe.com — clean white background, generous whitespace, sophisticated typography. Include ALL 13 sections with rich, specific content. Every testimonial mentions real metrics. Every headline drives action. Use a LIGHT color scheme with white/cream backgrounds. Every image must use a unique picsum seed.
 
 Output the <config> block first, then the <body-html> block. Nothing else.`
       : `Build a stunning website for: ${prompt}
@@ -339,15 +388,38 @@ Output the <config> block first, then the <body-html> block. Nothing else.`;
         };
 
         const generate = async (useModel: string, useMaxTokens: number, useTimeout: number): Promise<string> => {
-          const c = new Anthropic({ apiKey, timeout: useTimeout });
+          const isOpus = useModel.includes("opus");
+          const c = new Anthropic({
+            apiKey,
+            timeout: useTimeout,
+            // Enable fast mode for Opus: 2.5x faster output tokens/second
+            ...(isOpus ? { defaultHeaders: { "anthropic-beta": "fast-mode-2026-02-01" } } : {}),
+          });
           const stream = c.messages.stream({
             model: useModel,
             max_tokens: useMaxTokens,
-            system: systemPrompt,
-            messages: [{ role: "user", content: userMessage }],
+            // Fast mode: speed-prioritized inference on Opus 4.6
+            ...(isOpus ? { speed: "fast" as const } : {}),
+            // Prompt caching: cache the system prompt (identical across requests)
+            // Saves ~90% latency on time-to-first-token for repeated calls
+            system: [
+              {
+                type: "text" as const,
+                text: systemPrompt,
+                cache_control: { type: "ephemeral" as const },
+              },
+            ],
+            messages: isOpus
+              ? [{ role: "user", content: userMessage }]
+              : [
+                  { role: "user", content: userMessage },
+                  // Assistant prefill: skip preamble (not supported on Opus 4.6)
+                  { role: "assistant", content: "<config>\n{" },
+                ],
           });
 
-          let accumulated = "";
+          // Prepend prefill for non-Opus models so parsing regexes still match
+          let accumulated = isOpus ? "" : "<config>\n{";
           for await (const ev of stream) {
             if (ev.type === "content_block_delta" && ev.delta.type === "text_delta") {
               accumulated += ev.delta.text;

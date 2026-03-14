@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect, useMemo } from "react";
+import { useState, useCallback, useRef, useEffect, useMemo, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { getGeneratorDef } from "@/lib/generator-prompts";
 import TopBar from "@/components/TopBar";
 import PromptInput from "@/components/PromptInput";
 import type { Tier, AIModel } from "@/components/PromptInput";
@@ -31,6 +33,8 @@ import EmailTemplatePanel from "@/components/EmailTemplatePanel";
 import ClonePanel from "@/components/ClonePanel";
 import AiImagesPanel from "@/components/AiImagesPanel";
 import PipelinePanel from "@/components/PipelinePanel";
+import DiffPanel from "@/components/DiffPanel";
+import WelcomeModal, { shouldShowWelcomeModal, dismissWelcomeModal } from "@/components/WelcomeModal";
 
 import {
   Bug,
@@ -62,6 +66,8 @@ import {
   Redo2,
   Search as SearchIcon,
   Save,
+  Sparkles,
+  History,
 } from "lucide-react";
 
 type BuildStatus = "idle" | "generating" | "editing" | "complete" | "error";
@@ -334,7 +340,15 @@ function BuilderBackground({ isGenerating }: { isGenerating: boolean }) {
   );
 }
 
-export default function BuilderPage() {
+export default function BuilderPageWrapper() {
+  return (
+    <Suspense>
+      <BuilderPage />
+    </Suspense>
+  );
+}
+
+function BuilderPage() {
   const [prompt, setPrompt] = useState("");
   const [editPrompt, setEditPrompt] = useState("");
   const [generatedCode, setGeneratedCode] = useState("");
@@ -343,6 +357,7 @@ export default function BuilderPage() {
   const [activeTab, setActiveTab] = useState<RightTab>("preview");
   const [activeTool, setActiveTool] = useState<ToolId>(null);
   const [tier, setTier] = useState<Tier>("premium");
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isDeploying, setIsDeploying] = useState(false);
   const [deployUrl, setDeployUrl] = useState("");
   const [deployStatus, setDeployStatus] = useState<"idle" | "deploying" | "deployed" | "error">("idle");
@@ -351,6 +366,28 @@ export default function BuilderPage() {
   const [availableModels, setAvailableModels] = useState<AIModel[]>([]);
   const [reactSource, setReactSource] = useState<Record<string, string> | null>(null);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [generatorBanner, setGeneratorBanner] = useState<{ id: string; name: string } | null>(null);
+  const [showDiffPanel, setShowDiffPanel] = useState(false);
+
+  // Show welcome modal on first visit
+  useEffect(() => {
+    if (shouldShowWelcomeModal()) {
+      setShowWelcome(true);
+    }
+  }, []);
+
+  // Generator routing — read ?generator=TYPE from URL and pre-fill prompt
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    const generatorId = searchParams.get("generator");
+    if (generatorId && !hasCode) {
+      const def = getGeneratorDef(generatorId);
+      setPrompt(def.prompt);
+      setGeneratorBanner({ id: generatorId, name: def.name });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   // Snapshot system — captures state on every AI action for perfect undo
   interface Snapshot {
@@ -380,6 +417,7 @@ export default function BuilderPage() {
         const parsed = JSON.parse(user);
         if (parsed.role === "admin" || parsed.plan === "unlimited") {
           setTier("premium");
+          setIsAdmin(true);
         }
       }
     } catch { /* ignore */ }
@@ -722,6 +760,12 @@ export default function BuilderPage() {
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim()) return;
 
+    // Close welcome modal if open
+    if (showWelcome) {
+      setShowWelcome(false);
+      dismissWelcomeModal();
+    }
+
     const currentGenId = ++generationIdRef.current;
     setStatus("generating");
     setError("");
@@ -802,6 +846,7 @@ export default function BuilderPage() {
           prompt: prompt.trim(),
           tier,
           ...(selectedModel ? { model: selectedModel } : {}),
+          ...(isAdmin ? { isAdmin: true } : {}),
         }),
         signal: controller.signal,
       });
@@ -1087,6 +1132,23 @@ export default function BuilderPage() {
 
   return (
     <div className="flex flex-col h-screen bg-[#0a0a0f] relative overflow-hidden">
+      {/* Welcome modal for first-time users */}
+      {showWelcome && (
+        <WelcomeModal onClose={() => { setShowWelcome(false); dismissWelcomeModal(); }} />
+      )}
+      {showDiffPanel && (
+        <div className="fixed inset-0 z-50">
+          <DiffPanel
+            snapshots={snapshots}
+            currentIndex={snapshotIndex}
+            onClose={() => setShowDiffPanel(false)}
+            onRestore={(index) => {
+              addSnapshot(snapshots[index].html, `Restored: ${snapshots[index].label}`);
+              setShowDiffPanel(false);
+            }}
+          />
+        </div>
+      )}
       {/* Interactive particle constellation background */}
       <BuilderBackground isGenerating={status === "generating"} />
 
@@ -1098,9 +1160,26 @@ export default function BuilderPage() {
           {!hasCode ? (
             <>
               <div className="px-4 py-3 border-b border-white/[0.06]">
-                <span className="text-[11px] uppercase tracking-[2px] text-brand-400/50">
-                  Prompt
-                </span>
+                {generatorBanner ? (
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-3.5 h-3.5 text-brand-400" />
+                      <span className="text-[11px] uppercase tracking-[2px] text-brand-400">
+                        {generatorBanner.name} Generator
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => setGeneratorBanner(null)}
+                      className="text-white/30 hover:text-white/60 text-xs"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ) : (
+                  <span className="text-[11px] uppercase tracking-[2px] text-brand-400/50">
+                    Prompt
+                  </span>
+                )}
               </div>
               <div className="flex-1 overflow-hidden">
                 <PromptInput
@@ -1199,6 +1278,14 @@ export default function BuilderPage() {
                   className="p-1.5 rounded text-white/30 hover:text-white/60 hover:bg-white/[0.04] transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
                 >
                   <Redo2 size={14} />
+                </button>
+                <button
+                  onClick={() => setShowDiffPanel(true)}
+                  disabled={snapshots.length < 2}
+                  title="Version History"
+                  className="p-1.5 rounded text-white/30 hover:text-white/60 hover:bg-white/[0.04] transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+                >
+                  <History size={14} />
                 </button>
               </div>
             )}

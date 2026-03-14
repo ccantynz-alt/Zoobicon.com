@@ -216,18 +216,18 @@ const STATS = [
 
 const COMPETITOR_FEATURES = [
   { name: "AI Website Generation", zoobicon: true, wix: true, framer: false, durable: true, emergent: true },
-  { name: "10-Agent Pipeline", zoobicon: true, wix: false, framer: false, durable: false, emergent: true },
+  { name: "Multi-Agent Pipeline", zoobicon: true, wix: false, framer: false, durable: false, emergent: true },
   { name: "Industry-Aware Design AI", zoobicon: true, wix: false, framer: false, durable: false, emergent: false },
   { name: "No Credit System", zoobicon: true, wix: true, framer: true, durable: true, emergent: false },
   { name: "SEO Agent & Auto-Fix", zoobicon: true, wix: true, framer: false, durable: true, emergent: false },
-  { name: "AI Video Creator", zoobicon: true, wix: false, framer: false, durable: false, emergent: false },
+  { name: "AI Video Creator", zoobicon: false, wix: false, framer: false, durable: false, emergent: false },
   { name: "GitHub & WP Export", zoobicon: true, wix: false, framer: false, durable: false, emergent: true },
   { name: "Figma Import", zoobicon: true, wix: false, framer: true, durable: false, emergent: false },
   { name: "i18n Translation (30+)", zoobicon: true, wix: true, framer: false, durable: false, emergent: false },
   { name: "E-commerce Builder", zoobicon: true, wix: true, framer: false, durable: false, emergent: true },
   { name: "Animation Editor", zoobicon: true, wix: false, framer: true, durable: false, emergent: false },
   { name: "White-Label Platform", zoobicon: true, wix: false, framer: false, durable: false, emergent: false },
-  { name: "Domain Registration", zoobicon: true, wix: true, framer: false, durable: false, emergent: false },
+  { name: "Domain Registration", zoobicon: false, wix: true, framer: false, durable: false, emergent: false },
   { name: "Flat Pricing from $19/mo", zoobicon: true, wix: true, framer: true, durable: true, emergent: false },
 ];
 
@@ -318,7 +318,7 @@ const FEATURES = [
   {
     icon: Shield,
     title: "Enterprise-Grade",
-    description: "Built for scale with security-first architecture. SOC 2 compliant infrastructure with 99.9% uptime guarantee.",
+    description: "Built for scale with security-first architecture. Reliable infrastructure designed for production workloads.",
   },
   {
     icon: TrendingUp,
@@ -328,12 +328,12 @@ const FEATURES = [
   {
     icon: Layers,
     title: "Full Ecosystem",
-    description: "Four domains, eight products, one unified platform. Everything you need to build, grow, and dominate online.",
+    description: "Four domains, one unified platform. Everything you need to build, grow, and dominate online.",
   },
   {
     icon: Globe,
     title: "Multi-Platform Publishing",
-    description: "One-click deploy to any platform. Generate content optimized for TikTok, Facebook, Instagram, YouTube, and the web.",
+    description: "One-click deploy to the web. Export to WordPress, GitHub, or host on zoobicon.sh with a custom domain.",
   },
 ];
 
@@ -341,8 +341,6 @@ export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<{ email: string; name?: string; role?: string } | null>(null);
   const [wordIndex, setWordIndex] = useState(0);
-  const [liveCount, setLiveCount] = useState(127);
-
   useEffect(() => {
     try {
       const stored = localStorage.getItem("zoobicon_user");
@@ -355,14 +353,6 @@ export default function LandingPage() {
     const interval = setInterval(() => {
       setWordIndex((prev) => (prev + 1) % ROTATING_WORDS.length);
     }, 2800);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Simulated live builder count
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setLiveCount((prev) => prev + Math.floor(Math.random() * 3) - 1);
-    }, 4000);
     return () => clearInterval(interval);
   }, []);
 
@@ -508,7 +498,7 @@ export default function LandingPage() {
 
               <p className="text-lg text-white/45 leading-relaxed mb-8 max-w-lg">
                 Your all-in-one AI platform for building websites, marketing, and scaling online.
-                10 AI agents work together to create production-ready sites in seconds.
+                7 AI agents work together to create production-ready sites in seconds.
               </p>
 
               <div className="flex flex-wrap items-center gap-4 mb-10">
@@ -600,7 +590,7 @@ export default function LandingPage() {
                 ))}
               </div>
               <span className="text-sm text-white/50">
-                Top rated — <span className="text-white/70 font-semibold">4.9 out of 5 stars</span>. Trusted by the builders of 10,000+ websites.
+                Top rated — <span className="text-white/70 font-semibold">4.9 out of 5 stars</span>. Trusted by builders worldwide.
               </span>
             </div>
           </motion.div>
@@ -721,7 +711,7 @@ export default function LandingPage() {
                     <span className="text-sm font-bold text-white/60">Total Features</span>
                   </div>
                   <div className="p-4 text-center">
-                    <span className="text-2xl font-black gradient-text">14/14</span>
+                    <span className="text-2xl font-black gradient-text">12/14</span>
                   </div>
                   <div className="p-4 text-center">
                     <span className="text-2xl font-black text-white/20">6/14</span>
@@ -838,7 +828,7 @@ export default function LandingPage() {
                 <span className="gradient-text">Dominate Online</span>
               </h2>
               <p className="max-w-2xl mx-auto text-lg text-white/40">
-                Ten AI-powered products working in harmony. Each one best-in-class.
+                AI-powered products working in harmony. Each one best-in-class.
                 Together, an unstoppable digital powerhouse.
               </p>
             </motion.div>
@@ -1062,7 +1052,7 @@ export default function LandingPage() {
                 <div className="text-4xl font-black mb-1">Free</div>
                 <div className="text-sm text-white/30 mb-5">Forever</div>
                 <ul className="space-y-2.5 mb-7">
-                  {["3 websites/month", "Full 10-agent pipeline", "Opus-powered builds", "7-day hosting preview"].map((f) => (
+                  {["3 websites/month", "Full 7-agent AI pipeline", "Opus-powered builds", "7-day hosting preview"].map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm text-white/50">
                       <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
                       {f}
@@ -1083,7 +1073,7 @@ export default function LandingPage() {
                 <div className="text-4xl font-black mb-1">$19<span className="text-lg font-normal text-white/30">/mo</span></div>
                 <div className="text-sm text-white/30 mb-5">Unlimited quality</div>
                 <ul className="space-y-2.5 mb-7">
-                  {["Unlimited websites", "10-agent pipeline", "Custom domains", "GitHub & WP export", "Basic SEO agent"].map((f) => (
+                  {["Unlimited websites", "7-agent AI pipeline", "Custom domains", "GitHub & WP export", "Basic SEO agent"].map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm text-white/60">
                       <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                       {f}

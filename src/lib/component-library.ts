@@ -220,6 +220,152 @@ ul, ol { list-style: none; }
 }
 .logo-strip img { height: 28px; object-fit: contain; }
 
+/* ── Hero System ── */
+.hero {
+  position: relative; overflow: hidden; min-height: 100vh;
+  display: flex; align-items: center;
+  padding: 140px var(--container-padding, 24px) 100px;
+}
+
+/* Aurora gradient background — animated color wash */
+.hero-aurora {
+  position: relative; overflow: hidden;
+}
+.hero-aurora::before {
+  content: ''; position: absolute; inset: -50%;
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    color-mix(in srgb, var(--color-primary, #2563eb) 30%, transparent),
+    color-mix(in srgb, var(--color-primary, #2563eb) 10%, transparent),
+    color-mix(in srgb, var(--color-primary, #2563eb) 5%, transparent),
+    color-mix(in srgb, var(--color-primary, #2563eb) 15%, transparent),
+    color-mix(in srgb, var(--color-primary, #2563eb) 30%, transparent)
+  );
+  animation: hero-aurora-spin 20s linear infinite;
+  filter: blur(80px);
+  z-index: 0;
+}
+@keyframes hero-aurora-spin { to { transform: rotate(360deg); } }
+
+/* Mesh gradient background — layered radial gradients */
+.hero-mesh {
+  position: relative; overflow: hidden;
+}
+.hero-mesh::before {
+  content: ''; position: absolute; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 30%, color-mix(in srgb, var(--color-primary, #2563eb) 15%, transparent), transparent),
+    radial-gradient(ellipse 60% 80% at 80% 70%, color-mix(in srgb, var(--color-primary, #2563eb) 10%, transparent), transparent),
+    radial-gradient(ellipse 50% 50% at 50% 50%, color-mix(in srgb, var(--color-primary, #2563eb) 5%, transparent), transparent);
+  animation: hero-mesh-drift 15s ease-in-out infinite alternate;
+}
+@keyframes hero-mesh-drift {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-30px, 20px) scale(1.05); }
+}
+
+/* Animated grain texture overlay */
+.hero-grain::after {
+  content: ''; position: absolute; inset: -200%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+  animation: hero-grain-shift 8s steps(10) infinite;
+  pointer-events: none; z-index: 1; opacity: 0.5;
+}
+@keyframes hero-grain-shift {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-5%, -10%); }
+  20% { transform: translate(-15%, 5%); }
+  30% { transform: translate(7%, -20%); }
+  40% { transform: translate(-5%, 15%); }
+  50% { transform: translate(-15%, 10%); }
+  60% { transform: translate(15%, 0%); }
+  70% { transform: translate(0%, 10%); }
+  80% { transform: translate(3%, 25%); }
+  90% { transform: translate(-10%, 10%); }
+}
+
+/* Glassmorphism panel */
+.hero-glass {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+}
+
+/* Gradient text effect */
+.hero-gradient-text {
+  background: linear-gradient(135deg, var(--color-primary, #2563eb), color-mix(in srgb, var(--color-primary, #2563eb) 60%, #8b5cf6));
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 30px color-mix(in srgb, var(--color-primary, #2563eb) 20%, transparent));
+}
+
+/* Floating elements — gentle bobbing animation */
+.hero-float {
+  animation: hero-float 6s ease-in-out infinite;
+}
+.hero-float-delay { animation-delay: -2s; }
+.hero-float-slow { animation-duration: 8s; }
+@keyframes hero-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+/* Glow orb background decoration */
+.hero-orb {
+  position: absolute; border-radius: 50%;
+  filter: blur(80px); opacity: 0.2; pointer-events: none;
+  background: radial-gradient(circle, var(--color-primary, #2563eb), transparent 70%);
+}
+
+/* Cursor glow — follows mouse via JS */
+.hero-cursor-glow {
+  position: absolute; width: 600px; height: 600px;
+  border-radius: 50%; pointer-events: none; z-index: 0;
+  background: radial-gradient(circle, color-mix(in srgb, var(--color-primary, #2563eb) 12%, transparent), transparent 70%);
+  transform: translate(-50%, -50%);
+  transition: left 0.3s ease-out, top 0.3s ease-out;
+  will-change: left, top;
+}
+
+/* Staggered reveal for hero text lines */
+.hero-reveal > * {
+  opacity: 0; transform: translateY(30px);
+  animation: hero-reveal-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.hero-reveal > *:nth-child(1) { animation-delay: 0.1s; }
+.hero-reveal > *:nth-child(2) { animation-delay: 0.25s; }
+.hero-reveal > *:nth-child(3) { animation-delay: 0.4s; }
+.hero-reveal > *:nth-child(4) { animation-delay: 0.55s; }
+.hero-reveal > *:nth-child(5) { animation-delay: 0.7s; }
+.hero-reveal > *:nth-child(6) { animation-delay: 0.85s; }
+@keyframes hero-reveal-in {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Animated border glow on CTA */
+.hero-btn-glow {
+  position: relative; z-index: 1;
+}
+.hero-btn-glow::before {
+  content: ''; position: absolute; inset: -2px; border-radius: inherit;
+  background: linear-gradient(135deg, var(--color-primary, #2563eb), #8b5cf6, var(--color-primary, #2563eb));
+  background-size: 200% 200%;
+  animation: hero-btn-glow-shift 3s ease infinite;
+  z-index: -1; filter: blur(8px); opacity: 0.5;
+}
+@keyframes hero-btn-glow-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Hero content always above effects */
+.hero > .container, .hero > .hero-reveal, .hero > div:not(.hero-orb):not(.hero-cursor-glow) {
+  position: relative; z-index: 2;
+}
+
 /* ── Divider Shapes ── */
 .wave-divider { width: 100%; overflow: hidden; line-height: 0; }
 .wave-divider svg { display: block; width: calc(100% + 1.3px); height: 60px; }
@@ -243,6 +389,7 @@ The following CSS classes are automatically available in every generated website
 **Flex:** \`.flex\`, \`.flex-col\`, \`.items-center\`, \`.justify-center\`, \`.justify-between\`, \`.gap-1\` through \`.gap-4\`
 **Text:** \`.text-center\`, \`.text-muted\`, \`.text-primary\`, \`.text-sm\`, \`.text-lg\`, \`.font-bold\`, \`.font-semibold\`
 **Animation:** \`.fade-in\`, \`.fade-in-left\`, \`.fade-in-right\`, \`.scale-in\` (add \`.visible\` class via IntersectionObserver)
+**Hero:** \`.hero\` (full-viewport), \`.hero-aurora\` (animated conic gradient bg), \`.hero-mesh\` (layered radial gradient bg), \`.hero-grain\` (subtle film grain overlay), \`.hero-glass\` (glassmorphism panel), \`.hero-gradient-text\` (gradient text fill), \`.hero-float\` / \`.hero-float-delay\` / \`.hero-float-slow\` (bobbing animation), \`.hero-orb\` (blurred glow decoration — position via inline style), \`.hero-cursor-glow\` (mouse-following glow — needs empty div), \`.hero-reveal\` (stagger-animate child elements on load), \`.hero-btn-glow\` (animated border glow on CTA button), \`.hero-typed\` (JS typing effect on a span)
 **Patterns:** \`.testimonial-card\`, \`.stat-item\`, \`.stat-number\`, \`.stat-label\`, \`.faq-item\`, \`.faq-question\`, \`.faq-answer\`, \`.logo-strip\`
 
 IMPORTANT: The component library CSS is injected automatically — do NOT duplicate it in your <style> block. Only write CUSTOM styles specific to this website. Use the component classes above to build sections — this reduces your CSS and gives shadcn/ui-level polish.
@@ -278,6 +425,51 @@ const FAILSAFE_OBSERVER_SCRIPT = `
       el.classList.add('visible');
     });
   }, 3000);
+})();
+// Hero cursor glow — follows mouse pointer
+(function(){
+  var glow = document.querySelector('.hero-cursor-glow');
+  var hero = glow && glow.closest('.hero');
+  if (hero && glow) {
+    hero.addEventListener('mousemove', function(e) {
+      var r = hero.getBoundingClientRect();
+      glow.style.left = (e.clientX - r.left) + 'px';
+      glow.style.top = (e.clientY - r.top) + 'px';
+    });
+  }
+})();
+// Hero parallax — subtle depth on scroll
+(function(){
+  var hero = document.querySelector('.hero');
+  if (!hero) return;
+  var orbs = hero.querySelectorAll('.hero-orb');
+  var floats = hero.querySelectorAll('.hero-float');
+  if (orbs.length === 0 && floats.length === 0) return;
+  window.addEventListener('scroll', function() {
+    var s = window.pageYOffset;
+    if (s > window.innerHeight) return;
+    orbs.forEach(function(orb, i) {
+      orb.style.transform = 'translateY(' + (s * (0.1 + i * 0.05)) + 'px)';
+    });
+  }, { passive: true });
+})();
+// Typing effect for hero headline spans with .hero-typed
+(function(){
+  var el = document.querySelector('.hero-typed');
+  if (!el) return;
+  var text = el.textContent;
+  el.textContent = '';
+  el.style.borderRight = '2px solid var(--color-primary, #2563eb)';
+  var i = 0;
+  (function type() {
+    if (i < text.length) {
+      el.textContent += text.charAt(i);
+      i++;
+      setTimeout(type, 45);
+    } else {
+      setTimeout(function(){ el.style.borderRight = 'none'; }, 1500);
+    }
+  })();
 })();
 </script>`;
 

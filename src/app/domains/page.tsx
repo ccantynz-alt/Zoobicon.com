@@ -65,6 +65,8 @@ const MOCK_RESULTS = [
 export default function DomainsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showResults, setShowResults] = useState(false);
+  const [waitlistEmail, setWaitlistEmail] = useState("");
+  const [waitlistStatus, setWaitlistStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [cart, setCart] = useState<string[]>(() => {
     if (typeof window === "undefined") return [];
     try {
@@ -72,6 +74,22 @@ export default function DomainsPage() {
       return saved ? JSON.parse(saved) : [];
     } catch { return []; }
   });
+
+  const handleWaitlistSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!waitlistEmail.trim() || waitlistStatus === "loading") return;
+    setWaitlistStatus("loading");
+    try {
+      await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: waitlistEmail, source: "domains-waitlist" }),
+      });
+      setWaitlistStatus("success");
+    } catch {
+      setWaitlistStatus("error");
+    }
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -127,13 +145,55 @@ export default function DomainsPage() {
         </div>
       </nav>
 
+      {/* Coming Soon Banner */}
+      <div className="fixed top-16 left-0 right-0 z-40 bg-amber-500/10 border-b border-amber-500/20 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium">
+              <Clock size={12} /> Coming Soon
+            </span>
+            <span className="text-sm text-amber-200/70">Domain registration is launching soon. Join the waitlist to be first in line.</span>
+          </div>
+          <div className="flex-shrink-0">
+            {waitlistStatus === "success" ? (
+              <span className="flex items-center gap-2 text-sm text-emerald-400 font-medium">
+                <Check className="w-4 h-4" /> You&apos;re on the list!
+              </span>
+            ) : (
+              <form onSubmit={handleWaitlistSubmit} className="flex items-center gap-2">
+                <input
+                  type="email"
+                  required
+                  value={waitlistEmail}
+                  onChange={(e) => setWaitlistEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  className="bg-white/[0.06] border border-white/[0.1] rounded-lg px-3 py-1.5 text-white placeholder:text-white/25 outline-none text-xs w-48 focus:border-amber-500/30 transition-colors"
+                />
+                <button
+                  type="submit"
+                  disabled={waitlistStatus === "loading"}
+                  className="px-4 py-1.5 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs font-bold hover:bg-amber-500/30 transition-colors disabled:opacity-50 whitespace-nowrap"
+                >
+                  {waitlistStatus === "loading" ? "Joining..." : "Join Waitlist"}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Hero */}
-      <section className="pt-32 pb-20 lg:pt-44 lg:pb-28">
+      <section className="pt-44 pb-20 lg:pt-56 lg:pb-28">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
-            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-cyan/20 bg-accent-cyan/5 mb-6">
-              <Globe className="w-3 h-3 text-accent-cyan" />
-              <span className="text-xs font-medium text-accent-cyan">Domain Registration</span>
+            <motion.div variants={fadeInUp} className="flex flex-wrap items-center gap-3 mb-6">
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-cyan/20 bg-accent-cyan/5">
+                <Globe className="w-3 h-3 text-accent-cyan" />
+                <span className="text-xs font-medium text-accent-cyan">Domain Registration</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium">
+                <Clock size={12} /> Coming Soon
+              </span>
             </motion.div>
 
             <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl lg:text-8xl font-black tracking-tight leading-[0.9] mb-6">
@@ -229,18 +289,15 @@ export default function DomainsPage() {
                     ))}
                   </div>
                   {cart.length > 0 && (
-                    <div className="p-4 border-t border-white/[0.06] bg-accent-cyan/[0.03]">
+                    <div className="p-4 border-t border-white/[0.06] bg-amber-500/[0.03]">
                       <div className="flex items-center justify-between">
                         <div>
                           <span className="text-sm font-bold">{cart.length} domain{cart.length > 1 ? "s" : ""} selected</span>
-                          <span className="text-xs text-white/30 ml-2">Free WHOIS privacy included</span>
+                          <span className="text-xs text-amber-400/60 ml-2">Domain registration launching soon</span>
                         </div>
-                        <Link
-                          href="/auth/signup"
-                          className="btn-gradient px-6 py-2.5 rounded-xl text-sm font-bold text-white flex items-center gap-2"
-                        >
-                          Checkout <ArrowRight className="w-4 h-4" />
-                        </Link>
+                        <span className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold">
+                          <Clock size={12} /> Coming Soon
+                        </span>
                       </div>
                     </div>
                   )}
@@ -418,13 +475,33 @@ export default function DomainsPage() {
                       </li>
                     ))}
                   </ul>
-                  <Link
-                    href="/auth/signup"
-                    className="inline-flex group btn-gradient px-8 py-4 rounded-2xl text-base font-bold text-white items-center gap-3 shadow-glow-cyan"
-                  >
-                    <span>Get Your Domain + Site</span>
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </Link>
+                  <div className="max-w-md">
+                    {waitlistStatus === "success" ? (
+                      <div className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                        <Check className="w-5 h-5 flex-shrink-0" />
+                        <span className="text-sm font-medium">You&apos;re on the list! We&apos;ll notify you when Domains launches.</span>
+                      </div>
+                    ) : (
+                      <form onSubmit={handleWaitlistSubmit} className="flex items-center gap-3">
+                        <input
+                          type="email"
+                          required
+                          value={waitlistEmail}
+                          onChange={(e) => setWaitlistEmail(e.target.value)}
+                          placeholder="Enter your email for early access"
+                          className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-white placeholder:text-white/25 outline-none text-sm focus:border-accent-cyan/30 transition-colors"
+                        />
+                        <button
+                          type="submit"
+                          disabled={waitlistStatus === "loading"}
+                          className="group btn-gradient px-6 py-3 rounded-xl text-sm font-bold text-white flex items-center gap-2 shadow-glow-cyan whitespace-nowrap disabled:opacity-50"
+                        >
+                          <span>{waitlistStatus === "loading" ? "Joining..." : "Join Waitlist"}</span>
+                          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </button>
+                      </form>
+                    )}
+                  </div>
                 </div>
                 <div className="flex-shrink-0 hidden md:block">
                   <div className="w-64 h-64 rounded-2xl bg-gradient-to-br from-accent-cyan/20 to-brand-500/20 border border-accent-cyan/10 flex items-center justify-center">
@@ -448,11 +525,37 @@ export default function DomainsPage() {
           <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
             Your Perfect Domain<br /><span className="gradient-text">Is Waiting</span>
           </h2>
-          <p className="text-lg text-white/40 mb-8">500+ extensions. Unbeatable prices. Free privacy protection. Instant AI website builder.</p>
-          <Link href="/auth/signup" className="inline-flex group btn-gradient px-10 py-4 rounded-2xl text-lg font-bold text-white items-center gap-3 shadow-glow-lg">
-            <span>Search Domains</span>
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </Link>
+          <p className="text-lg text-white/40 mb-4">500+ extensions. Unbeatable prices. Free privacy protection. Instant AI website builder.</p>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium mb-8">
+            <Clock size={12} /> Coming Soon
+          </span>
+          <div className="max-w-lg mx-auto">
+            {waitlistStatus === "success" ? (
+              <div className="flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                <Check className="w-5 h-5 flex-shrink-0" />
+                <span className="text-sm font-medium">You&apos;re on the list! We&apos;ll notify you when Domains launches.</span>
+              </div>
+            ) : (
+              <form onSubmit={handleWaitlistSubmit} className="flex items-center gap-3">
+                <input
+                  type="email"
+                  required
+                  value={waitlistEmail}
+                  onChange={(e) => setWaitlistEmail(e.target.value)}
+                  placeholder="Enter your email for early access"
+                  className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-xl px-5 py-4 text-white placeholder:text-white/25 outline-none text-sm focus:border-accent-cyan/30 transition-colors"
+                />
+                <button
+                  type="submit"
+                  disabled={waitlistStatus === "loading"}
+                  className="group btn-gradient px-6 py-4 rounded-xl text-sm font-bold text-white flex items-center gap-2 shadow-glow-cyan whitespace-nowrap disabled:opacity-50"
+                >
+                  <span>{waitlistStatus === "loading" ? "Joining..." : "Join Waitlist"}</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </form>
+            )}
+          </div>
         </div>
       </section>
 
