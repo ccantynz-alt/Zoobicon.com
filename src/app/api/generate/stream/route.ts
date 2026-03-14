@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
+import { callLLMWithFailover } from "@/lib/llm-provider";
 
 const STANDARD_SYSTEM = `You are Zoobicon, an elite AI website generator producing $20K+ agency-quality sites. Output a single, complete HTML file.
 
@@ -290,6 +291,39 @@ Output ONLY raw HTML.`
           controller.close();
         } catch (err) {
           let message = err instanceof Error ? err.message : "Stream error";
+          const isRateLimit = err instanceof Anthropic.RateLimitError
+            || err instanceof Anthropic.InternalServerError
+            || /rate.limit|too many|overloaded|529/i.test(message);
+
+          // Cross-provider failover: try OpenAI/Gemini when Claude is rate-limited
+          if (isRateLimit) {
+            try {
+              controller.enqueue(
+                encoder.encode(`data: ${JSON.stringify({ type: "status", message: "Switching AI provider..." })}\n\n`)
+              );
+              const failoverRes = await callLLMWithFailover(
+                { model: "gpt-4o", system: systemPrompt, userMessage, maxTokens: 16000 },
+                (_p, fbModel) => {
+                  controller.enqueue(
+                    encoder.encode(`data: ${JSON.stringify({ type: "status", message: `Using ${fbModel}...` })}\n\n`)
+                  );
+                }
+              );
+              if (failoverRes.text) {
+                controller.enqueue(
+                  encoder.encode(`data: ${JSON.stringify({ type: "replace", content: failoverRes.text })}\n\n`)
+                );
+                controller.enqueue(
+                  encoder.encode(`data: ${JSON.stringify({ type: "done" })}\n\n`)
+                );
+                controller.close();
+                return;
+              }
+            } catch (crossErr) {
+              console.error("[Stream] Cross-provider failover failed:", crossErr instanceof Error ? crossErr.message : crossErr);
+            }
+          }
+
           // Sanitize raw API error messages for user display
           if (err instanceof Anthropic.RateLimitError) {
             message = "AI service is busy. Please wait a moment and try again.";

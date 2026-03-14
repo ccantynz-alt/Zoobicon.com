@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
 import { COMPONENT_LIBRARY_CSS } from "@/lib/component-library";
+import { callLLMWithFailover } from "@/lib/llm-provider";
 
 /** Check if an error is a rate limit or overload that warrants model fallback */
 function isRetryableError(err: unknown): boolean {
@@ -486,7 +487,7 @@ Output the <config> block first, then the <body-html> block. Nothing else.`;
           const bodyMatch = raw.match(/<body-html>\s*([\s\S]*?)\s*<\/body-html>/);
 
           // Fallback: if AI didn't use tags, try to find JSON + HTML directly
-          let config: SiteConfig;
+          let config: SiteConfig = getDefaultConfig(prompt);
           let bodyHtml: string;
 
           if (configMatch && bodyMatch) {
@@ -600,6 +601,64 @@ Output the <config> block first, then the <body-html> block. Nothing else.`;
               }
             } catch (fbErr) {
               console.error("[Quick] Sonnet fallback also failed:", fbErr);
+            }
+          }
+
+          // Cross-provider failover: try OpenAI / Gemini when all Claude models fail
+          if (isRetryableError(err)) {
+            try {
+              sendEvent({ type: "status", message: "Switching AI provider..." });
+              const failoverRes = await callLLMWithFailover(
+                {
+                  model: "gpt-4o", // start with OpenAI as first non-Claude choice
+                  system: systemPrompt,
+                  userMessage,
+                  maxTokens: 16000,
+                },
+                (_provider, fbModel) => {
+                  console.log(`[Quick] Cross-provider failover → ${fbModel}`);
+                  sendEvent({ type: "status", message: `Using ${fbModel}...` });
+                }
+              );
+
+              if (failoverRes.text) {
+                // Parse the response — other providers may or may not use our tag format
+                const fbRaw = failoverRes.text;
+                const fbConfigMatch = fbRaw.match(/<config>\s*([\s\S]*?)\s*<\/config>/);
+                const fbBodyMatch = fbRaw.match(/<body-html>\s*([\s\S]*?)\s*<\/body-html>/);
+
+                let config = getDefaultConfig(prompt);
+                let bodyHtml = "";
+
+                if (fbConfigMatch) {
+                  try { config = JSON.parse(fbConfigMatch[1]); } catch { /* default */ }
+                }
+                if (fbBodyMatch) {
+                  bodyHtml = fbBodyMatch[1].trim();
+                } else {
+                  // Try extracting raw HTML body if provider didn't use tags
+                  const rawBody = fbRaw.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+                  if (rawBody) {
+                    bodyHtml = rawBody[1].trim().replace(/<script[\s\S]*?<\/script>/gi, "");
+                  } else {
+                    // Last resort: use the whole response if it looks like HTML
+                    const trimmed = fbRaw.replace(/^```(?:html)?\n?/i, "").replace(/\n?```\s*$/, "").trim();
+                    if (trimmed.includes("<") && trimmed.includes(">")) {
+                      bodyHtml = trimmed;
+                    }
+                  }
+                }
+
+                if (bodyHtml) {
+                  console.log(`[Quick] Cross-provider failover succeeded via ${failoverRes.provider}/${failoverRes.model}`);
+                  sendEvent({ type: "replace", content: buildFullPage(config, bodyHtml) });
+                  sendEvent({ type: "done" });
+                  controller.close();
+                  return;
+                }
+              }
+            } catch (crossErr) {
+              console.error("[Quick] Cross-provider failover failed:", crossErr instanceof Error ? crossErr.message : crossErr);
             }
           }
 
