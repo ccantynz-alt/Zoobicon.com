@@ -441,7 +441,7 @@ function CopyButton({ text }: { text: string }) {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       }}
-      className="absolute top-3 right-3 p-1.5 rounded bg-white/5 hover:bg-white/10 transition-colors text-gray-400 hover:text-white"
+      className="absolute top-3 right-3 p-1.5 rounded bg-white/8 hover:bg-white/10 transition-colors text-gray-300 hover:text-white"
       aria-label="Copy to clipboard"
     >
       {copied ? <Check className="w-4 h-4 text-brand-400" /> : <Copy className="w-4 h-4" />}
@@ -453,7 +453,7 @@ function CodeBlock({ code, language }: { code: string; language: string }) {
   return (
     <div className="relative group">
       <CopyButton text={code} />
-      <pre className="overflow-x-auto p-5 pt-4 text-sm leading-relaxed font-mono text-gray-300 bg-[#0d0d14] rounded-b-xl border border-white/5">
+      <pre className="overflow-x-auto p-5 pt-4 text-sm leading-relaxed font-mono text-gray-300 bg-[#111a2e] rounded-b-xl border border-white/10">
         <code>{code}</code>
       </pre>
     </div>
@@ -469,7 +469,7 @@ export default function ZoobiconIOPage() {
   const example = API_EXAMPLES[activeExample];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white overflow-hidden">
+    <div className="min-h-screen bg-[#0d1525] text-white overflow-hidden">
       {/* ─── Hero ─── */}
       <section className="relative pt-32 pb-24 px-4">
         {/* Grid background */}
@@ -498,7 +498,7 @@ export default function ZoobiconIOPage() {
 
           <motion.p
             variants={fadeInUp}
-            className="text-lg md:text-xl text-gray-400 max-w-3xl mx-auto mb-10 leading-relaxed"
+            className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-10 leading-relaxed"
           >
             REST API, SDKs, webhooks, and CI/CD integrations.
             <br className="hidden md:block" />
@@ -515,7 +515,7 @@ export default function ZoobiconIOPage() {
             </Link>
             <Link
               href="/developers"
-              className="inline-flex items-center gap-2 px-6 py-3 border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 rounded-lg transition-colors font-mono text-sm"
+              className="inline-flex items-center gap-2 px-6 py-3 border border-white/15 hover:border-white/20 bg-white/8 hover:bg-white/10 rounded-lg transition-colors font-mono text-sm"
             >
               $ zoobicon --docs
               <ArrowRight className="w-4 h-4" />
@@ -524,7 +524,7 @@ export default function ZoobiconIOPage() {
 
           {/* Quick install */}
           <motion.div variants={fadeInUp} className="mt-12 max-w-lg mx-auto">
-            <div className="flex items-center gap-3 bg-[#0d0d14] border border-white/10 rounded-lg px-5 py-3 font-mono text-sm">
+            <div className="flex items-center gap-3 bg-[#111a2e] border border-white/15 rounded-lg px-5 py-3 font-mono text-sm">
               <span className="text-brand-400">$</span>
               <span className="text-gray-300">npm install @zoobicon/sdk</span>
               <CopyButton text="npm install @zoobicon/sdk" />
@@ -546,7 +546,7 @@ export default function ZoobiconIOPage() {
             <motion.h2 variants={fadeInUp} className="text-3xl md:text-4xl font-bold mb-4">
               <span className="text-brand-400">API</span> Showcase
             </motion.h2>
-            <motion.p variants={fadeInUp} className="text-gray-400 max-w-2xl mx-auto">
+            <motion.p variants={fadeInUp} className="text-gray-300 max-w-2xl mx-auto">
               Powerful endpoints for every step of the website lifecycle. Generate, edit, analyze, translate, and export — all through simple API calls.
             </motion.p>
           </motion.div>
@@ -566,7 +566,7 @@ export default function ZoobiconIOPage() {
                   className={`px-4 py-2 rounded-lg text-sm font-mono transition-all ${
                     activeExample === i
                       ? "bg-brand-500/10 text-brand-400 border border-brand-500/30"
-                      : "bg-white/5 text-gray-400 border border-white/5 hover:border-white/10 hover:text-gray-300"
+                      : "bg-white/8 text-gray-300 border border-white/10 hover:border-white/15 hover:text-gray-300"
                   }`}
                 >
                   <span className="text-xs font-bold mr-2 opacity-60">{ex.method}</span>
@@ -576,15 +576,15 @@ export default function ZoobiconIOPage() {
             </div>
 
             {/* Code window */}
-            <div className="rounded-xl border border-white/10 bg-[#0d0d14] overflow-hidden">
+            <div className="rounded-xl border border-white/15 bg-[#111a2e] overflow-hidden">
               {/* Window header */}
-              <div className="flex items-center justify-between px-5 py-3 border-b border-white/5 bg-white/[0.02]">
+              <div className="flex items-center justify-between px-5 py-3 border-b border-white/10 bg-white/[0.05]">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-red-500/60" />
                   <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
                   <div className="w-3 h-3 rounded-full bg-green-500/60" />
                 </div>
-                <span className="text-xs font-mono text-gray-500">
+                <span className="text-xs font-mono text-gray-300">
                   {example.method} {example.endpoint}
                 </span>
                 <div className="flex gap-1">
@@ -595,7 +595,7 @@ export default function ZoobiconIOPage() {
                       className={`px-3 py-1 rounded text-xs font-mono transition-colors ${
                         activeLang === lang
                           ? "bg-brand-500/15 text-brand-400"
-                          : "text-gray-500 hover:text-gray-300"
+                          : "text-gray-300 hover:text-gray-300"
                       }`}
                     >
                       {lang}
@@ -626,7 +626,7 @@ export default function ZoobiconIOPage() {
             <motion.h2 variants={fadeInUp} className="text-3xl md:text-4xl font-bold mb-4">
               SDKs & <span className="text-brand-400">Integrations</span>
             </motion.h2>
-            <motion.p variants={fadeInUp} className="text-gray-400 max-w-2xl mx-auto">
+            <motion.p variants={fadeInUp} className="text-gray-300 max-w-2xl mx-auto">
               First-class support for every workflow. Choose your language, your tools, your way.
             </motion.p>
           </motion.div>
@@ -642,16 +642,16 @@ export default function ZoobiconIOPage() {
               <motion.div
                 key={sdk.title}
                 variants={scaleIn}
-                className={`relative group p-6 rounded-xl border ${sdk.borderColor} ${sdk.bgGlow} hover:bg-white/[0.03] transition-all`}
+                className={`relative group p-6 rounded-xl border ${sdk.borderColor} ${sdk.bgGlow} hover:bg-white/[0.06] transition-all`}
               >
                 <div className="flex items-center gap-3 mb-4">
                   <sdk.icon className={`w-5 h-5 ${sdk.color}`} />
                   <h3 className="font-semibold text-white">{sdk.title}</h3>
                 </div>
-                <div className="font-mono text-xs bg-black/30 rounded-lg px-3 py-2 mb-4 text-gray-400 border border-white/5">
+                <div className="font-mono text-xs bg-black/30 rounded-lg px-3 py-2 mb-4 text-gray-300 border border-white/10">
                   <span className="text-brand-400 mr-1">$</span> {sdk.install}
                 </div>
-                <p className="text-sm text-gray-500 leading-relaxed">{sdk.description}</p>
+                <p className="text-sm text-gray-300 leading-relaxed">{sdk.description}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -673,7 +673,7 @@ export default function ZoobiconIOPage() {
             <motion.h2 variants={fadeInUp} className="text-3xl md:text-4xl font-bold mb-4">
               Rate Limits & <span className="text-brand-400">Pricing</span>
             </motion.h2>
-            <motion.p variants={fadeInUp} className="text-gray-400 max-w-2xl mx-auto">
+            <motion.p variants={fadeInUp} className="text-gray-300 max-w-2xl mx-auto">
               Transparent pricing. No hidden fees. Scale as you grow.
             </motion.p>
           </motion.div>
@@ -692,7 +692,7 @@ export default function ZoobiconIOPage() {
                 className={`relative p-8 rounded-xl border transition-all ${
                   tier.highlight
                     ? "border-brand-500/40 bg-brand-500/[0.03] shadow-[0_0_60px_-15px_rgba(37,99,235,0.15)]"
-                    : "border-white/10 bg-white/[0.02] hover:border-white/15"
+                    : "border-white/15 bg-white/[0.05] hover:border-white/15"
                 }`}
               >
                 {tier.highlight && (
@@ -703,10 +703,10 @@ export default function ZoobiconIOPage() {
                 <h3 className="text-xl font-bold mb-2">{tier.name}</h3>
                 <div className="flex items-baseline gap-1 mb-6">
                   <span className="text-4xl font-bold text-brand-400">{tier.price}</span>
-                  <span className="text-gray-500 text-sm">{tier.period}</span>
+                  <span className="text-gray-300 text-sm">{tier.period}</span>
                 </div>
 
-                <div className="space-y-3 mb-6 pb-6 border-b border-white/5">
+                <div className="space-y-3 mb-6 pb-6 border-b border-white/10">
                   <div className="flex items-center gap-2 text-sm">
                     <Zap className="w-4 h-4 text-brand-400 flex-shrink-0" />
                     <span className="text-gray-300 font-mono">{tier.generations}</span>
@@ -719,7 +719,7 @@ export default function ZoobiconIOPage() {
 
                 <ul className="space-y-2.5 mb-8">
                   {tier.features.map((feature) => (
-                    <li key={feature} className="flex items-center gap-2 text-sm text-gray-400">
+                    <li key={feature} className="flex items-center gap-2 text-sm text-gray-300">
                       <Check className="w-4 h-4 text-brand-400/70 flex-shrink-0" />
                       {feature}
                     </li>
@@ -731,7 +731,7 @@ export default function ZoobiconIOPage() {
                   className={`block w-full text-center py-3 rounded-lg font-semibold text-sm transition-colors ${
                     tier.highlight
                       ? "btn-gradient text-white"
-                      : "bg-white/5 hover:bg-white/10 text-white border border-white/10"
+                      : "bg-white/8 hover:bg-white/10 text-white border border-white/15"
                   }`}
                 >
                   {tier.cta}
@@ -755,7 +755,7 @@ export default function ZoobiconIOPage() {
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
                 <span className="text-brand-400">Authentication</span>
               </h2>
-              <p className="text-gray-400 max-w-2xl mx-auto">
+              <p className="text-gray-300 max-w-2xl mx-auto">
                 Secure API key authentication. Generate keys in your dashboard and start building in minutes.
               </p>
             </motion.div>
@@ -768,14 +768,14 @@ export default function ZoobiconIOPage() {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-white mb-2">Generate an API key</h3>
-                  <p className="text-sm text-gray-400 mb-3">
+                  <p className="text-sm text-gray-300 mb-3">
                     Navigate to{" "}
                     <Link href="/auth/settings" className="text-brand-400 hover:underline">
                       Settings
                     </Link>{" "}
                     and create a new API key. Keys use the format:
                   </p>
-                  <div className="font-mono text-sm bg-[#0d0d14] border border-white/10 rounded-lg px-4 py-3 text-gray-300">
+                  <div className="font-mono text-sm bg-[#111a2e] border border-white/15 rounded-lg px-4 py-3 text-gray-300">
                     zbk_live_<span className="text-brand-400">xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span>
                   </div>
                 </div>
@@ -788,12 +788,12 @@ export default function ZoobiconIOPage() {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-white mb-2">Add to your request headers</h3>
-                  <p className="text-sm text-gray-400 mb-3">
+                  <p className="text-sm text-gray-300 mb-3">
                     Include your key in the <code className="text-brand-400 bg-brand-500/10 px-1.5 py-0.5 rounded text-xs">Authorization</code> header of every request.
                   </p>
-                  <div className="relative font-mono text-sm bg-[#0d0d14] border border-white/10 rounded-lg px-4 py-3 text-gray-300">
+                  <div className="relative font-mono text-sm bg-[#111a2e] border border-white/15 rounded-lg px-4 py-3 text-gray-300">
                     <CopyButton text='Authorization: Bearer zbk_live_abc123...' />
-                    <span className="text-gray-500">Authorization:</span> Bearer zbk_live_abc123...
+                    <span className="text-gray-300">Authorization:</span> Bearer zbk_live_abc123...
                   </div>
                 </div>
               </div>
@@ -805,7 +805,7 @@ export default function ZoobiconIOPage() {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-white mb-2">Security best practices</h3>
-                  <ul className="space-y-2 text-sm text-gray-400">
+                  <ul className="space-y-2 text-sm text-gray-300">
                     <li className="flex items-center gap-2">
                       <Shield className="w-4 h-4 text-brand-400/70 flex-shrink-0" />
                       Never expose API keys in client-side code or public repositories
@@ -843,7 +843,7 @@ export default function ZoobiconIOPage() {
             <motion.h2 variants={fadeInUp} className="text-3xl md:text-4xl font-bold mb-4">
               Built for <span className="text-brand-400">Every Workflow</span>
             </motion.h2>
-            <motion.p variants={fadeInUp} className="text-gray-400 max-w-2xl mx-auto">
+            <motion.p variants={fadeInUp} className="text-gray-300 max-w-2xl mx-auto">
               From solo developers to enterprise teams, the API adapts to your use case.
             </motion.p>
           </motion.div>
@@ -859,13 +859,13 @@ export default function ZoobiconIOPage() {
               <motion.div
                 key={useCase.title}
                 variants={scaleIn}
-                className="group p-6 rounded-xl border border-white/5 bg-white/[0.01] hover:border-brand-500/20 hover:bg-brand-500/[0.02] transition-all"
+                className="group p-6 rounded-xl border border-white/10 bg-white/[0.03] hover:border-brand-500/20 hover:bg-brand-500/[0.02] transition-all"
               >
                 <div className="w-10 h-10 rounded-lg bg-brand-500/10 border border-brand-500/20 flex items-center justify-center mb-4">
                   <useCase.icon className="w-5 h-5 text-brand-400" />
                 </div>
                 <h3 className="font-semibold text-white mb-2">{useCase.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{useCase.description}</p>
+                <p className="text-sm text-gray-300 leading-relaxed">{useCase.description}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -895,7 +895,7 @@ export default function ZoobiconIOPage() {
             <span className="text-brand-400">Zoobicon API</span> today
           </motion.h2>
 
-          <motion.p variants={fadeInUp} className="text-gray-400 mb-10 text-lg">
+          <motion.p variants={fadeInUp} className="text-gray-300 mb-10 text-lg">
             Free tier included. No credit card required.
             <br />
             Go from zero to deployed in minutes.
@@ -911,14 +911,14 @@ export default function ZoobiconIOPage() {
             </Link>
             <Link
               href="/developers"
-              className="inline-flex items-center gap-2 px-8 py-4 border border-white/10 hover:border-brand-500/30 bg-white/5 hover:bg-white/10 rounded-lg transition-colors font-semibold"
+              className="inline-flex items-center gap-2 px-8 py-4 border border-white/15 hover:border-brand-500/30 bg-white/8 hover:bg-white/10 rounded-lg transition-colors font-semibold"
             >
               Read the Docs
               <ChevronRight className="w-5 h-5" />
             </Link>
           </motion.div>
 
-          <motion.div variants={fadeInUp} className="mt-10 font-mono text-sm text-gray-600">
+          <motion.div variants={fadeInUp} className="mt-10 font-mono text-sm text-gray-300">
             <span className="text-brand-400/50">$</span> curl https://api.zoobicon.io/v1/health
             <span className="text-brand-400 ml-3">{"{ \"status\": \"ok\" }"}</span>
           </motion.div>

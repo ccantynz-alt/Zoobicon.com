@@ -372,7 +372,7 @@ export default function LandingPage() {
       </div>
 
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.04] bg-[#050507]/80 backdrop-blur-2xl" aria-label="Main navigation">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08] bg-[#0d1525]/80 backdrop-blur-2xl" aria-label="Main navigation">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-8">
@@ -442,7 +442,7 @@ export default function LandingPage() {
         </div>
         {/* Mobile menu */}
         {mobileMenuOpen && (
-          <nav className="md:hidden border-t border-white/[0.06] bg-[#050507]/95 backdrop-blur-2xl px-6 py-6 space-y-4" aria-label="Mobile navigation">
+          <nav className="md:hidden border-t border-white/[0.10] bg-[#0d1525]/95 backdrop-blur-2xl px-6 py-6 space-y-4" aria-label="Mobile navigation">
             <a href="#products" className="block text-sm text-white/60 hover:text-white">Products</a>
             <Link href="/marketplace" className="block text-sm text-white/60 hover:text-white">Marketplace</Link>
             <Link href="/domains" className="block text-sm text-white/60 hover:text-white">Domains</Link>
@@ -550,13 +550,13 @@ export default function LandingPage() {
                       className={`flex items-center gap-4 px-6 py-4 rounded-xl transition-all duration-200 group ${
                         item.active
                           ? "bg-white/[0.08] border border-white/[0.12] shadow-[0_0_20px_rgba(59,130,246,0.06)]"
-                          : "bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] hover:border-white/[0.1]"
+                          : "bg-white/[0.03] border border-white/[0.10] hover:bg-white/[0.06] hover:border-white/[0.1]"
                       }`}
                     >
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                        item.active ? "bg-blue-500/15" : "bg-white/[0.04]"
+                        item.active ? "bg-blue-500/15" : "bg-white/[0.07]"
                       }`}>
-                        <item.icon className={`w-5 h-5 ${item.active ? "text-blue-400" : "text-white/40 group-hover:text-white/60"} transition-colors`} />
+                        <item.icon className={`w-5 h-5 ${item.active ? "text-blue-400" : "text-white/60 group-hover:text-white/60"} transition-colors`} />
                       </div>
                       <span className={`text-sm font-medium ${item.active ? "text-white" : "text-white/50 group-hover:text-white/70"} transition-colors`}>
                         {item.label}
@@ -567,7 +567,7 @@ export default function LandingPage() {
                         </div>
                       )}
                       {!item.active && (
-                        <ChevronRight className="ml-auto w-4 h-4 text-white/15 group-hover:text-white/30 transition-colors" />
+                        <ChevronRight className="ml-auto w-4 h-4 text-white/15 group-hover:text-white/50 transition-colors" />
                       )}
                     </Link>
                   </motion.div>
@@ -581,7 +581,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
-            className="mt-16 lg:mt-24 pt-8 border-t border-white/[0.06]"
+            className="mt-16 lg:mt-24 pt-8 border-t border-white/[0.10]"
           >
             <div className="flex flex-wrap items-center justify-center gap-6">
               <div className="flex items-center gap-1.5">
@@ -598,7 +598,7 @@ export default function LandingPage() {
       </section>
 
       {/* Stats Bar */}
-      <section className="relative py-16 border-y border-white/[0.04]">
+      <section className="relative py-16 border-y border-white/[0.08]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div
             initial="hidden"
@@ -612,7 +612,7 @@ export default function LandingPage() {
                 <div className="text-4xl md:text-5xl font-black gradient-text-static mb-2">
                   {stat.value}
                 </div>
-                <div className="text-sm text-white/40">{stat.label}</div>
+                <div className="text-sm text-white/60">{stat.label}</div>
               </motion.div>
             ))}
           </motion.div>
@@ -620,10 +620,10 @@ export default function LandingPage() {
       </section>
 
       {/* Competitor Comparison Banner */}
-      <section className="relative py-24 lg:py-32 border-b border-white/[0.04] overflow-hidden">
+      <section className="relative py-24 lg:py-32 border-b border-white/[0.08] overflow-hidden">
         <div className="absolute inset-0">
-          <div className="glow-orb glow-orb-blue w-[700px] h-[700px] top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 opacity-5" />
-          <div className="glow-orb glow-orb-purple w-[500px] h-[500px] top-1/3 right-0 opacity-5" />
+          <div className="glow-orb glow-orb-blue w-[700px] h-[700px] top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 opacity-15" />
+          <div className="glow-orb glow-orb-purple w-[500px] h-[500px] top-1/3 right-0 opacity-10" />
         </div>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
           <motion.div
@@ -641,7 +641,7 @@ export default function LandingPage() {
                 See Why Builders<br />
                 <span className="gradient-text">Switch to Zoobicon</span>
               </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/40">
+              <p className="max-w-2xl mx-auto text-lg text-white/60">
                 The only platform that does it all. No more juggling tools, plugins, or workarounds.
               </p>
             </motion.div>
@@ -659,16 +659,16 @@ export default function LandingPage() {
                     </div>
                   </div>
                   <div className="p-4 text-center">
-                    <span className="text-sm font-medium text-white/40">Wix</span>
+                    <span className="text-sm font-medium text-white/60">Wix</span>
                   </div>
                   <div className="p-4 text-center">
-                    <span className="text-sm font-medium text-white/40">Framer</span>
+                    <span className="text-sm font-medium text-white/60">Framer</span>
                   </div>
                   <div className="p-4 text-center">
-                    <span className="text-sm font-medium text-white/40">Durable</span>
+                    <span className="text-sm font-medium text-white/60">Durable</span>
                   </div>
                   <div className="p-4 text-center">
-                    <span className="text-sm font-medium text-white/40">Emergent</span>
+                    <span className="text-sm font-medium text-white/60">Emergent</span>
                   </div>
                 </div>
 
@@ -678,7 +678,7 @@ export default function LandingPage() {
                     key={i}
                     variants={fadeInUp}
                     className={`grid grid-cols-6 gap-0 ${
-                      i % 2 === 0 ? "bg-white/[0.02]" : ""
+                      i % 2 === 0 ? "bg-white/[0.05]" : ""
                     } rounded-lg`}
                   >
                     <div className="p-4 flex items-center">
@@ -693,10 +693,10 @@ export default function LandingPage() {
                       <div key={j} className="p-4 flex items-center justify-center">
                         {has ? (
                           <div className="w-7 h-7 rounded-full bg-white/[0.05] border border-white/[0.08] flex items-center justify-center">
-                            <Check className="w-4 h-4 text-white/30" />
+                            <Check className="w-4 h-4 text-white/50" />
                           </div>
                         ) : (
-                          <div className="w-7 h-7 rounded-full bg-white/[0.02] border border-white/[0.04] flex items-center justify-center">
+                          <div className="w-7 h-7 rounded-full bg-white/[0.05] border border-white/[0.08] flex items-center justify-center">
                             <Minus className="w-4 h-4 text-white/10" />
                           </div>
                         )}
@@ -706,7 +706,7 @@ export default function LandingPage() {
                 ))}
 
                 {/* Score Row */}
-                <div className="grid grid-cols-6 gap-0 mt-4 pt-4 border-t border-white/[0.06]">
+                <div className="grid grid-cols-6 gap-0 mt-4 pt-4 border-t border-white/[0.10]">
                   <div className="p-4">
                     <span className="text-sm font-bold text-white/60">Total Features</span>
                   </div>
@@ -714,16 +714,16 @@ export default function LandingPage() {
                     <span className="text-2xl font-black gradient-text">12/14</span>
                   </div>
                   <div className="p-4 text-center">
-                    <span className="text-2xl font-black text-white/20">6/14</span>
+                    <span className="text-2xl font-black text-white/40">6/14</span>
                   </div>
                   <div className="p-4 text-center">
-                    <span className="text-2xl font-black text-white/20">3/14</span>
+                    <span className="text-2xl font-black text-white/40">3/14</span>
                   </div>
                   <div className="p-4 text-center">
-                    <span className="text-2xl font-black text-white/20">3/14</span>
+                    <span className="text-2xl font-black text-white/40">3/14</span>
                   </div>
                   <div className="p-4 text-center">
-                    <span className="text-2xl font-black text-white/20">4/14</span>
+                    <span className="text-2xl font-black text-white/40">4/14</span>
                   </div>
                 </div>
               </div>
@@ -746,7 +746,7 @@ export default function LandingPage() {
       {/* New Features Showcase */}
       <section className="relative py-24 lg:py-32 overflow-hidden">
         <div className="absolute inset-0">
-          <div className="glow-orb glow-orb-cyan w-[500px] h-[500px] top-0 right-1/4 opacity-5" />
+          <div className="glow-orb glow-orb-cyan w-[500px] h-[500px] top-0 right-1/4 opacity-10" />
         </div>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
           <motion.div
@@ -764,7 +764,7 @@ export default function LandingPage() {
                 10 Game-Changing<br />
                 <span className="gradient-text">Features Just Dropped</span>
               </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/40">
+              <p className="max-w-2xl mx-auto text-lg text-white/60">
                 Every feature our competitors wish they had. Built, tested, and shipping today.
               </p>
             </motion.div>
@@ -781,7 +781,7 @@ export default function LandingPage() {
                   key={i}
                   variants={scaleIn}
                   whileHover={{ y: -6, transition: { duration: 0.2, ease: "easeOut" as const } }}
-                  className="group relative p-6 rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.12] transition-all cursor-pointer"
+                  className="group relative p-6 rounded-2xl border border-white/[0.10] bg-white/[0.05] hover:bg-white/[0.07] hover:border-white/[0.12] transition-all cursor-pointer"
                 >
                   {/* Glow effect on hover */}
                   <div className={`absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-br ${feature.color} blur-xl -z-10`} style={{ opacity: 0 }} />
@@ -792,7 +792,7 @@ export default function LandingPage() {
                   <h3 className="text-base font-bold mb-2 group-hover:text-white transition-colors">
                     {feature.title}
                   </h3>
-                  <p className="text-xs text-white/40 leading-relaxed">
+                  <p className="text-xs text-white/60 leading-relaxed">
                     {feature.description}
                   </p>
 
@@ -810,7 +810,7 @@ export default function LandingPage() {
       </section>
 
       {/* Products Section */}
-      <section id="products" className="relative py-24 lg:py-32 border-t border-white/[0.04]">
+      <section id="products" className="relative py-24 lg:py-32 border-t border-white/[0.08]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div
             initial="hidden"
@@ -827,7 +827,7 @@ export default function LandingPage() {
                 Everything You Need to<br />
                 <span className="gradient-text">Dominate Online</span>
               </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/40">
+              <p className="max-w-2xl mx-auto text-lg text-white/60">
                 AI-powered products working in harmony. Each one best-in-class.
                 Together, an unstoppable digital powerhouse.
               </p>
@@ -841,17 +841,17 @@ export default function LandingPage() {
                       <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${product.color} flex items-center justify-center shadow-lg`}>
                         <product.icon className="w-6 h-6 text-white" />
                       </div>
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-white/30 bg-white/[0.04] px-2.5 py-1 rounded-full">
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-white/50 bg-white/[0.07] px-2.5 py-1 rounded-full">
                         {product.tag}
                       </span>
                     </div>
                     <h3 className="text-lg font-bold mb-2 group-hover:text-white transition-colors">
                       {product.name}
                     </h3>
-                    <p className="text-sm text-white/40 leading-relaxed mb-4">
+                    <p className="text-sm text-white/60 leading-relaxed mb-4">
                       {product.description}
                     </p>
-                    <div className="flex items-center gap-2 text-xs text-white/20">
+                    <div className="flex items-center gap-2 text-xs text-white/40">
                       <Globe className="w-3 h-3" />
                       <span>{product.domain}</span>
                     </div>
@@ -877,7 +877,7 @@ export default function LandingPage() {
       </section>
 
       {/* Domain Ecosystem */}
-      <section id="ecosystem" className="relative py-24 lg:py-32 border-t border-white/[0.04]">
+      <section id="ecosystem" className="relative py-24 lg:py-32 border-t border-white/[0.08]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div
             initial="hidden"
@@ -894,7 +894,7 @@ export default function LandingPage() {
                 Four Domains.<br />
                 <span className="gradient-text">One Empire.</span>
               </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/40">
+              <p className="max-w-2xl mx-auto text-lg text-white/60">
                 We own every extension. Complete market presence across .com, .ai, .io, and .sh — an impenetrable brand fortress.
               </p>
             </motion.div>
@@ -904,7 +904,7 @@ export default function LandingPage() {
                 <motion.div key={i} variants={fadeInUp}>
                   <Link
                     href={d.href}
-                    className={`block relative p-6 rounded-2xl border ${d.borderColor} bg-white/[0.02] hover:bg-white/[0.04] transition-all group`}
+                    className={`block relative p-6 rounded-2xl border ${d.borderColor} bg-white/[0.05] hover:bg-white/[0.07] transition-all group`}
                   >
                     <d.icon className={`w-8 h-8 ${d.color} mb-4`} />
                     <div className="text-xl font-bold mb-1 group-hover:text-white transition-colors">
@@ -913,7 +913,7 @@ export default function LandingPage() {
                     <div className={`text-sm font-semibold ${d.color} mb-2`}>
                       {d.label}
                     </div>
-                    <p className="text-sm text-white/40">
+                    <p className="text-sm text-white/60">
                       {d.description}
                     </p>
                   </Link>
@@ -923,7 +923,7 @@ export default function LandingPage() {
 
             {/* Connection visualization */}
             <motion.div variants={fadeInUp} className="mt-12 text-center">
-              <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full border border-white/[0.06] bg-white/[0.02]">
+              <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full border border-white/[0.10] bg-white/[0.05]">
                 <div className="flex -space-x-2">
                   <div className="w-6 h-6 rounded-full bg-brand-500/30 border border-brand-500/40" />
                   <div className="w-6 h-6 rounded-full bg-accent-purple/30 border border-accent-purple/40" />
@@ -938,7 +938,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="relative py-24 lg:py-32 border-t border-white/[0.04]">
+      <section id="features" className="relative py-24 lg:py-32 border-t border-white/[0.08]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div
             initial="hidden"
@@ -955,7 +955,7 @@ export default function LandingPage() {
                 Built Different.<br />
                 <span className="gradient-text">Built to Win.</span>
               </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/40">
+              <p className="max-w-2xl mx-auto text-lg text-white/60">
                 We didn&apos;t build another tool. We built the platform that makes every other tool obsolete.
               </p>
             </motion.div>
@@ -967,11 +967,11 @@ export default function LandingPage() {
                   variants={fadeInUp}
                   className="gradient-border card-hover p-8 rounded-2xl group"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center mb-5 group-hover:border-brand-500/30 transition-colors">
+                  <div className="w-12 h-12 rounded-xl bg-white/[0.07] border border-white/[0.10] flex items-center justify-center mb-5 group-hover:border-brand-500/30 transition-colors">
                     <feature.icon className="w-6 h-6 text-white/60 group-hover:text-brand-400 transition-colors" />
                   </div>
                   <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
-                  <p className="text-sm text-white/40 leading-relaxed">
+                  <p className="text-sm text-white/60 leading-relaxed">
                     {feature.description}
                   </p>
                 </motion.div>
@@ -982,9 +982,9 @@ export default function LandingPage() {
       </section>
 
       {/* Video Creator Showcase Section */}
-      <section className="relative py-24 lg:py-32 border-t border-white/[0.04] overflow-hidden">
+      <section className="relative py-24 lg:py-32 border-t border-white/[0.08] overflow-hidden">
         <div className="absolute inset-0">
-          <div className="glow-orb glow-orb-purple w-[600px] h-[600px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-10" />
+          <div className="glow-orb glow-orb-purple w-[600px] h-[600px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-15" />
         </div>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
           <motion.div
@@ -1002,7 +1002,7 @@ export default function LandingPage() {
                 High-End Videos.<br />
                 <span className="gradient-text">Zero Scripts.</span>
               </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/40 mb-4">
+              <p className="max-w-2xl mx-auto text-lg text-white/60 mb-4">
                 Describe what you want. AI creates scroll-stopping, production-quality videos
                 optimized for every platform. Click any video to preview.
               </p>
@@ -1019,7 +1019,7 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="relative py-24 lg:py-32 border-t border-white/[0.04]">
+      <section id="pricing" className="relative py-24 lg:py-32 border-t border-white/[0.08]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div
             initial="hidden"
@@ -1032,7 +1032,7 @@ export default function LandingPage() {
                 Ready to<br />
                 <span className="gradient-text">Dominate?</span>
               </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/40">
+              <p className="max-w-2xl mx-auto text-lg text-white/60">
                 Start free. Scale when you&apos;re ready. No credit card required.
               </p>
             </motion.div>
@@ -1050,7 +1050,7 @@ export default function LandingPage() {
               <motion.div variants={fadeInUp} className="gradient-border p-7 rounded-2xl">
                 <div className="text-sm font-semibold text-white/50 mb-2">Starter</div>
                 <div className="text-4xl font-black mb-1">Free</div>
-                <div className="text-sm text-white/30 mb-5">Forever</div>
+                <div className="text-sm text-white/50 mb-5">Forever</div>
                 <ul className="space-y-2.5 mb-7">
                   {["3 websites/month", "Full 7-agent AI pipeline", "Opus-powered builds", "7-day hosting preview"].map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm text-white/50">
@@ -1070,8 +1070,8 @@ export default function LandingPage() {
               {/* Creator */}
               <motion.div variants={fadeInUp} className="relative p-7 rounded-2xl border border-emerald-500/25 bg-emerald-500/[0.03]">
                 <div className="text-sm font-semibold text-emerald-400 mb-2">Creator</div>
-                <div className="text-4xl font-black mb-1">$19<span className="text-lg font-normal text-white/30">/mo</span></div>
-                <div className="text-sm text-white/30 mb-5">Unlimited quality</div>
+                <div className="text-4xl font-black mb-1">$19<span className="text-lg font-normal text-white/50">/mo</span></div>
+                <div className="text-sm text-white/50 mb-5">Unlimited quality</div>
                 <ul className="space-y-2.5 mb-7">
                   {["Unlimited websites", "7-agent AI pipeline", "Custom domains", "GitHub & WP export", "Basic SEO agent"].map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm text-white/60">
@@ -1091,8 +1091,8 @@ export default function LandingPage() {
                   Most Popular
                 </div>
                 <div className="text-sm font-semibold text-brand-400 mb-2">Pro</div>
-                <div className="text-4xl font-black mb-1">$49<span className="text-lg font-normal text-white/30">/mo</span></div>
-                <div className="text-sm text-white/30 mb-5">Full arsenal</div>
+                <div className="text-4xl font-black mb-1">$49<span className="text-lg font-normal text-white/50">/mo</span></div>
+                <div className="text-sm text-white/50 mb-5">Full arsenal</div>
                 <ul className="space-y-2.5 mb-7">
                   {["Everything in Creator", "AI Video Creator", "Full SEO Agent", "AI Brand Kit", "All 12+ AI tools"].map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm text-white/60">
@@ -1110,7 +1110,7 @@ export default function LandingPage() {
               <motion.div variants={fadeInUp} className="gradient-border p-7 rounded-2xl">
                 <div className="text-sm font-semibold text-white/50 mb-2">Enterprise</div>
                 <div className="text-4xl font-black mb-1">Custom</div>
-                <div className="text-sm text-white/30 mb-5">Teams & agencies</div>
+                <div className="text-sm text-white/50 mb-5">Teams & agencies</div>
                 <ul className="space-y-2.5 mb-7">
                   {["White-label platform", "Custom AI training", "Dedicated agents", "Unlimited API", "24/7 support"].map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm text-white/50">
@@ -1129,7 +1129,7 @@ export default function LandingPage() {
       </section>
 
       {/* Add-on Upsell Strip */}
-      <section className="relative py-16 border-t border-white/[0.04]">
+      <section className="relative py-16 border-t border-white/[0.08]">
         <div className="max-w-6xl mx-auto px-6 lg:px-8">
           <motion.div
             initial="hidden"
@@ -1140,7 +1140,7 @@ export default function LandingPage() {
             <motion.div variants={fadeInUp} className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
               <div>
                 <h2 className="text-2xl font-black tracking-tight mb-1">Clip the ticket on every service</h2>
-                <p className="text-sm text-white/30">Domains, hosting, AI agents, templates — add what you need, skip what you don&apos;t.</p>
+                <p className="text-sm text-white/50">Domains, hosting, AI agents, templates — add what you need, skip what you don&apos;t.</p>
               </div>
               <Link href="/marketplace" className="text-sm font-medium text-brand-400 hover:text-brand-300 transition-colors flex items-center gap-1.5 whitespace-nowrap">
                 Explore the Marketplace <ArrowRight className="w-3.5 h-3.5" />
@@ -1157,9 +1157,9 @@ export default function LandingPage() {
                 { label: "Chatbot", price: "$14/mo", href: "/marketplace", color: "text-pink-400 border-pink-500/15" },
               ].map((item) => (
                 <motion.div key={item.label} variants={fadeInUp}>
-                  <Link href={item.href} className={`block text-center p-4 rounded-xl border ${item.color} bg-white/[0.01] hover:bg-white/[0.03] transition-all`}>
+                  <Link href={item.href} className={`block text-center p-4 rounded-xl border ${item.color} bg-white/[0.03] hover:bg-white/[0.03] transition-all`}>
                     <div className="text-xs font-bold text-white/70 mb-1">{item.label}</div>
-                    <div className="text-[10px] text-white/30">{item.price}</div>
+                    <div className="text-[10px] text-white/50">{item.price}</div>
                   </Link>
                 </motion.div>
               ))}
@@ -1169,9 +1169,9 @@ export default function LandingPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="relative py-24 lg:py-32 border-t border-white/[0.04] overflow-hidden">
+      <section className="relative py-24 lg:py-32 border-t border-white/[0.08] overflow-hidden">
         <div className="absolute inset-0">
-          <div className="glow-orb glow-orb-blue w-[800px] h-[800px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-10" />
+          <div className="glow-orb glow-orb-blue w-[800px] h-[800px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-15" />
         </div>
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center relative z-10">
           <motion.div
@@ -1189,7 +1189,7 @@ export default function LandingPage() {
             </motion.h2>
             <motion.p
               variants={fadeInUp}
-              className="max-w-2xl mx-auto text-lg text-white/40 mb-10"
+              className="max-w-2xl mx-auto text-lg text-white/60 mb-10"
             >
               Join the next generation of creators, marketers, and entrepreneurs
               who refuse to settle for ordinary tools.
@@ -1208,7 +1208,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/[0.04] py-16">
+      <footer className="border-t border-white/[0.08] py-16">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid md:grid-cols-5 gap-8 mb-12">
             {/* Brand */}
@@ -1219,12 +1219,12 @@ export default function LandingPage() {
                 </div>
                 <span className="text-lg font-bold">Zoobicon</span>
               </div>
-              <p className="text-sm text-white/30 max-w-xs leading-relaxed mb-6">
+              <p className="text-sm text-white/50 max-w-xs leading-relaxed mb-6">
                 The most advanced AI platform for building, marketing, and dominating the digital landscape.
               </p>
               <div className="flex gap-3">
                 {DOMAINS.map((d) => (
-                  <span key={d.domain} className="text-xs text-white/20 bg-white/[0.03] px-2.5 py-1 rounded-full border border-white/[0.04]">
+                  <span key={d.domain} className="text-xs text-white/40 bg-white/[0.03] px-2.5 py-1 rounded-full border border-white/[0.08]">
                     {d.domain}
                   </span>
                 ))}
@@ -1235,30 +1235,30 @@ export default function LandingPage() {
             <div>
               <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">Products</div>
               <ul className="space-y-2.5">
-                <li><Link href="/products/website-builder" className="text-sm text-white/30 hover:text-white/60 transition-colors">Website Builder</Link></li>
-                <li><Link href="/products/seo-agent" className="text-sm text-white/30 hover:text-white/60 transition-colors">SEO Agent</Link></li>
-                <li><Link href="/products/video-creator" className="text-sm text-white/30 hover:text-white/60 transition-colors">Video Creator</Link></li>
-                <li><Link href="/products/email-support" className="text-sm text-white/30 hover:text-white/60 transition-colors">AI Email Support</Link></li>
-                <li><Link href="/domains" className="text-sm text-white/30 hover:text-white/60 transition-colors">Domains</Link></li>
-                <li><Link href="/marketplace" className="text-sm text-white/30 hover:text-white/60 transition-colors">Marketplace</Link></li>
+                <li><Link href="/products/website-builder" className="text-sm text-white/50 hover:text-white/60 transition-colors">Website Builder</Link></li>
+                <li><Link href="/products/seo-agent" className="text-sm text-white/50 hover:text-white/60 transition-colors">SEO Agent</Link></li>
+                <li><Link href="/products/video-creator" className="text-sm text-white/50 hover:text-white/60 transition-colors">Video Creator</Link></li>
+                <li><Link href="/products/email-support" className="text-sm text-white/50 hover:text-white/60 transition-colors">AI Email Support</Link></li>
+                <li><Link href="/domains" className="text-sm text-white/50 hover:text-white/60 transition-colors">Domains</Link></li>
+                <li><Link href="/marketplace" className="text-sm text-white/50 hover:text-white/60 transition-colors">Marketplace</Link></li>
               </ul>
             </div>
             <div>
               <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">Platform</div>
               <ul className="space-y-2.5">
-                <li><Link href="/developers" className="text-sm text-white/30 hover:text-white/60 transition-colors">API Docs</Link></li>
-                <li><Link href="/cli" className="text-sm text-white/30 hover:text-white/60 transition-colors">CLI Tools</Link></li>
-                <li><Link href="/developers#sdks" className="text-sm text-white/30 hover:text-white/60 transition-colors">SDKs</Link></li>
-                <li><Link href="/developers#endpoints" className="text-sm text-white/30 hover:text-white/60 transition-colors">API Reference</Link></li>
+                <li><Link href="/developers" className="text-sm text-white/50 hover:text-white/60 transition-colors">API Docs</Link></li>
+                <li><Link href="/cli" className="text-sm text-white/50 hover:text-white/60 transition-colors">CLI Tools</Link></li>
+                <li><Link href="/developers#sdks" className="text-sm text-white/50 hover:text-white/60 transition-colors">SDKs</Link></li>
+                <li><Link href="/developers#endpoints" className="text-sm text-white/50 hover:text-white/60 transition-colors">API Reference</Link></li>
               </ul>
             </div>
             <div>
               <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">For Teams</div>
               <ul className="space-y-2.5">
-                <li><Link href="/agencies" className="text-sm text-white/30 hover:text-white/60 transition-colors">Agencies</Link></li>
-                <li><Link href="/agencies#white-label" className="text-sm text-white/30 hover:text-white/60 transition-colors">White Label</Link></li>
-                <li><Link href="/support" className="text-sm text-white/30 hover:text-white/60 transition-colors">AI Support</Link></li>
-                <li><Link href="/auth/signup" className="text-sm text-white/30 hover:text-white/60 transition-colors">Sign Up</Link></li>
+                <li><Link href="/agencies" className="text-sm text-white/50 hover:text-white/60 transition-colors">Agencies</Link></li>
+                <li><Link href="/agencies#white-label" className="text-sm text-white/50 hover:text-white/60 transition-colors">White Label</Link></li>
+                <li><Link href="/support" className="text-sm text-white/50 hover:text-white/60 transition-colors">AI Support</Link></li>
+                <li><Link href="/auth/signup" className="text-sm text-white/50 hover:text-white/60 transition-colors">Sign Up</Link></li>
               </ul>
             </div>
           </div>
@@ -1266,13 +1266,13 @@ export default function LandingPage() {
           <div className="section-divider mb-8" />
 
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="text-xs text-white/20">
+            <div className="text-xs text-white/40">
               &copy; 2026 Zoobicon. All rights reserved.
             </div>
             <div className="flex items-center gap-6">
-              <Link href="/privacy" className="text-xs text-white/20 hover:text-white/40 transition-colors">Privacy</Link>
-              <Link href="/terms" className="text-xs text-white/20 hover:text-white/40 transition-colors">Terms</Link>
-              <Link href="/privacy" className="text-xs text-white/20 hover:text-white/40 transition-colors">Cookies</Link>
+              <Link href="/privacy" className="text-xs text-white/40 hover:text-white/60 transition-colors">Privacy</Link>
+              <Link href="/terms" className="text-xs text-white/40 hover:text-white/60 transition-colors">Terms</Link>
+              <Link href="/privacy" className="text-xs text-white/40 hover:text-white/60 transition-colors">Cookies</Link>
             </div>
           </div>
         </div>
