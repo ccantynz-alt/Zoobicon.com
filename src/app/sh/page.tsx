@@ -342,7 +342,7 @@ export default function ZoobiconShPage() {
               </button>
               <a
                 href="#commands"
-                className="px-6 py-3 rounded-xl text-sm font-medium text-white/50 border border-white/[0.12] hover:border-white/20 transition-all flex items-center gap-2"
+                className="px-6 py-3 rounded-xl text-sm font-medium text-white/65 border border-white/[0.12] hover:border-white/20 transition-all flex items-center gap-2"
               >
                 View Commands
                 <ChevronRight className="w-4 h-4" />
@@ -442,7 +442,7 @@ export default function ZoobiconShPage() {
                   { name: "my-startup", highlight: true },
                   { name: "agency-client", highlight: true },
                 ].map((sub, i) => (
-                  <div key={i} className="bg-[#111a2e] border border-white/[0.10] rounded-lg px-4 py-2 font-mono text-sm text-white/50">
+                  <div key={i} className="bg-[#111a2e] border border-white/[0.10] rounded-lg px-4 py-2 font-mono text-sm text-white/65">
                     <span className="text-brand-400">{sub.name}</span>.zoobicon.sh
                   </div>
                 ))}
@@ -480,7 +480,7 @@ export default function ZoobiconShPage() {
                     <div className="w-14 h-14 rounded-xl bg-[#111a2e] border border-white/[0.12] flex items-center justify-center">
                       <step.icon className={`w-6 h-6 ${step.color}`} />
                     </div>
-                    <span className="text-xs font-mono text-white/50 text-center whitespace-nowrap">{step.label}</span>
+                    <span className="text-xs font-mono text-white/65 text-center whitespace-nowrap">{step.label}</span>
                     {i < PIPELINE_STEPS.length - 1 && (
                       <div className="absolute left-full top-1/2 -translate-y-1/2 -translate-x-1/2 hidden md:block">
                         <ChevronRight className="w-4 h-4 text-white/10" />
@@ -497,7 +497,7 @@ export default function ZoobiconShPage() {
                     <div className="w-12 h-12 rounded-xl bg-[#111a2e] border border-white/[0.12] flex items-center justify-center">
                       <step.icon className={`w-5 h-5 ${step.color}`} />
                     </div>
-                    <span className="text-xs font-mono text-white/50 mt-2 mb-1">{step.label}</span>
+                    <span className="text-xs font-mono text-white/65 mt-2 mb-1">{step.label}</span>
                     {i < PIPELINE_STEPS.length - 1 && (
                       <div className="w-px h-6 bg-gradient-to-b from-white/10 to-brand-500/20" />
                     )}
