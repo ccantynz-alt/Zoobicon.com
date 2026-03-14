@@ -1,8 +1,13 @@
 "use client";
 
 import { useRef, useEffect, useState, useCallback } from "react";
-import { Mic, MicOff, Sparkles, Zap, Pencil, Send, Check, ChevronDown, Cpu, LayoutTemplate } from "lucide-react";
+import { Mic, MicOff, Sparkles, Zap, Pencil, Send, Check, ChevronDown, Cpu, LayoutTemplate, SlidersHorizontal } from "lucide-react";
 import TemplateGallery from "./TemplateGallery";
+import CustomizationPanel, {
+  DEFAULT_CUSTOMIZATION,
+  buildCustomizationSuffix,
+  type CustomizationOptions,
+} from "./CustomizationPanel";
 
 interface SpeechResult {
   isFinal: boolean;
@@ -83,6 +88,8 @@ export default function PromptInput({
   const [micSupported, setMicSupported] = useState(false);
   const [showModelPicker, setShowModelPicker] = useState(false);
   const [showTemplateGallery, setShowTemplateGallery] = useState(false);
+  const [showCustomization, setShowCustomization] = useState(false);
+  const [customization, setCustomization] = useState<CustomizationOptions>(DEFAULT_CUSTOMIZATION);
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
 
   useEffect(() => {
@@ -156,10 +163,23 @@ export default function PromptInput({
     setIsListening(true);
   }, [isListening, createRecognition, hasExistingCode, onPromptChange, onEditPromptChange]);
 
+  const handleGenerateWithCustomization = useCallback(() => {
+    if (showCustomization) {
+      const suffix = buildCustomizationSuffix(customization);
+      const currentPrompt = prompt.trim();
+      if (currentPrompt && !currentPrompt.includes("Style preferences:")) {
+        onPromptChange(currentPrompt + "\n\n" + suffix);
+      }
+      setTimeout(() => onGenerate(), 0);
+    } else {
+      onGenerate();
+    }
+  }, [showCustomization, customization, prompt, onPromptChange, onGenerate]);
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
-      onGenerate();
+      handleGenerateWithCustomization();
     }
   };
 
@@ -324,6 +344,31 @@ export default function PromptInput({
         </div>
       )}
 
+      {/* Customization toggle + panel */}
+      {!hasExistingCode && (
+        <>
+          <button
+            onClick={() => setShowCustomization(!showCustomization)}
+            className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg transition-colors text-left ${
+              showCustomization
+                ? "bg-brand-500/10 border border-brand-500/20"
+                : "bg-white/[0.03] border border-white/[0.06] hover:border-white/10"
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <SlidersHorizontal className={`w-3.5 h-3.5 ${showCustomization ? "text-brand-400" : "text-white/30"}`} />
+              <span className={`text-[10px] uppercase tracking-wider ${showCustomization ? "text-brand-300" : "text-white/40"}`}>
+                Customize Style
+              </span>
+            </div>
+            <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showCustomization ? "rotate-180 text-brand-400" : "text-white/30"}`} />
+          </button>
+          {showCustomization && (
+            <CustomizationPanel options={customization} onChange={setCustomization} />
+          )}
+        </>
+      )}
+
       {/* Main textarea */}
       <div className="relative flex-1 min-h-0">
         <textarea
@@ -368,7 +413,7 @@ export default function PromptInput({
             ? "bg-gradient-to-r from-brand-500 via-accent-purple to-brand-600 hover:shadow-glow"
             : "btn-gradient"
         }`}
-        onClick={onGenerate}
+        onClick={handleGenerateWithCustomization}
         disabled={isGenerating || !prompt.trim()}
       >
         {isGenerating ? (
