@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import BackgroundEffects from "@/components/BackgroundEffects";
 import {
   Globe,
   Server,
@@ -428,7 +429,8 @@ export default function HostingDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#111a2e] text-white">
+    <div className="min-h-screen bg-[#111a2e] text-white relative">
+      <BackgroundEffects preset="technical" />
       {/* ───── Top Navigation ───── */}
       <header className="sticky top-0 z-50 border-b border-white/5 bg-[#111a2e]/80 backdrop-blur-xl">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">

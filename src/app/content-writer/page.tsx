@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import BackgroundEffects from "@/components/BackgroundEffects";
 import {
   FileText,
   Copy,
@@ -203,7 +204,8 @@ export default function ContentWriterPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="relative min-h-screen bg-gray-950 text-white">
+      <BackgroundEffects preset="default" />
       {/* Top Bar */}
       <header className="sticky top-0 z-50 border-b border-gray-800 bg-gray-950/90 backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">

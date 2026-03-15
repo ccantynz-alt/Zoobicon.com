@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import BackgroundEffects from "@/components/BackgroundEffects";
 import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
   Terminal,
@@ -274,13 +275,7 @@ export default function ZoobiconShPage() {
 
   return (
     <div className="relative min-h-screen">
-      {/* Background Effects */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="glow-orb glow-orb-cyan w-[500px] h-[500px] top-[5%] -right-[150px] opacity-15" />
-        <div className="glow-orb glow-orb-blue w-[400px] h-[400px] bottom-[30%] -left-[100px] opacity-15" />
-        <div className="glow-orb glow-orb-purple w-[350px] h-[350px] bottom-[10%] right-[20%] opacity-[0.10]" />
-        <div className="grid-pattern fixed inset-0" />
-      </div>
+      <BackgroundEffects preset="technical" />
 
       {/* ─── Navigation ──────────────────────────────────────── */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08] bg-[#0d1525]/80 backdrop-blur-2xl">

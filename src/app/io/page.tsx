@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import BackgroundEffects from "@/components/BackgroundEffects";
 import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
   Mail,
@@ -477,7 +478,8 @@ export default function ZoobiconIOPage() {
   const [activeLang, setActiveLang] = useState<"curl" | "javascript" | "python">("curl");
 
   return (
-    <div className="min-h-screen bg-[#0d1525] text-white overflow-hidden">
+    <div className="min-h-screen bg-[#0d1525] text-white overflow-hidden relative">
+      <BackgroundEffects preset="energetic" />
       <CursorGlowTracker />
 
       {/* ─── Hero ─── */}

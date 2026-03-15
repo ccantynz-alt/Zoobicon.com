@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import BackgroundEffects from "@/components/BackgroundEffects";
 import {
   Zap,
   Building2,
@@ -135,12 +136,7 @@ const TIERS = [
 export default function AgenciesPage() {
   return (
     <div className="relative min-h-screen">
-      {/* Background */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="glow-orb glow-orb-purple w-[500px] h-[500px] -top-[150px] left-[20%] opacity-15" />
-        <div className="glow-orb glow-orb-blue w-[400px] h-[400px] bottom-[30%] right-[5%] opacity-15" />
-        <div className="grid-pattern fixed inset-0" />
-      </div>
+      <BackgroundEffects preset="premium" />
 
       {/* Nav */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08] bg-[#0d1525]/80 backdrop-blur-2xl">

@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import BackgroundEffects from "@/components/BackgroundEffects";
 import {
   Globe,
   Search,
@@ -197,11 +198,7 @@ export default function DomainsPage() {
 
   return (
     <div className="relative min-h-screen">
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="glow-orb glow-orb-blue w-[500px] h-[500px] -top-[150px] left-[20%] opacity-15" />
-        <div className="glow-orb glow-orb-cyan w-[400px] h-[400px] bottom-[20%] right-[5%] opacity-15" />
-        <div className="grid-pattern fixed inset-0" />
-      </div>
+      <BackgroundEffects preset="energetic" />
 
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08] bg-[#0d1525]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">

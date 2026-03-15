@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import BackgroundEffects from "@/components/BackgroundEffects";
 import { Zap, Eye, EyeOff, ArrowRight, Chrome, Check } from "lucide-react";
 
 export default function SignupPage() {
@@ -49,7 +50,8 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex relative">
+      <BackgroundEffects preset="minimal" />
       {/* Left - Form */}
       <div className="flex-1 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-md">

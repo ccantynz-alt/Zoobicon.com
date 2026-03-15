@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import BuilderDemo from "@/components/BuilderDemo";
 import VideoShowcase from "@/components/VideoShowcase";
 import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
+import BackgroundEffects from "@/components/BackgroundEffects";
 import {
   Zap,
   Globe,
@@ -365,12 +366,7 @@ export default function LandingPage() {
   return (
     <div className="relative">
       {/* Background Effects */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="glow-orb glow-orb-blue w-[600px] h-[600px] -top-[200px] -left-[200px] animate-pulse-glow" />
-        <div className="glow-orb glow-orb-purple w-[500px] h-[500px] top-[30%] -right-[150px] animate-pulse-glow" style={{ animationDelay: "2s" }} />
-        <div className="glow-orb glow-orb-cyan w-[400px] h-[400px] bottom-[20%] left-[10%] animate-pulse-glow" style={{ animationDelay: "4s" }} />
-        <div className="grid-pattern fixed inset-0 opacity-100" />
-      </div>
+      <BackgroundEffects preset="energetic" />
 
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.12] bg-[#0d1525]/80 backdrop-blur-2xl" aria-label="Main navigation">
