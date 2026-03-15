@@ -38,7 +38,8 @@ import WelcomeModal, { shouldShowWelcomeModal, dismissWelcomeModal } from "@/com
 import VisualEditor from "@/components/VisualEditor";
 import ProjectTree from "@/components/ProjectTree";
 import type { SelectedElement } from "@/lib/dom-bridge";
-import { applyStyleToHtml, applyTextToHtml, reorderSections } from "@/lib/dom-bridge";
+import { applyStyleToHtml, applyTextToHtml, reorderSections, addSectionToHtml } from "@/lib/dom-bridge";
+import SectionLibrary from "@/components/SectionLibrary";
 import { downloadZip } from "@/lib/zip-export";
 
 import {
@@ -127,6 +128,7 @@ type ToolId =
   | "fullstack"
   | "email"
   | "visual-editor"
+  | "sections"
   | "project"
   | null;
 
@@ -153,6 +155,7 @@ const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }
   { id: "figma", label: "Figma Import", icon: <Figma size={18} /> },
   { id: "wordpress", label: "WordPress Export", icon: <FileArchive size={18} /> },
   { id: "visual-editor", label: "Visual Editor", icon: <MousePointer2 size={18} /> },
+  { id: "sections", label: "Add Section", icon: <Package size={18} /> },
   { id: "project", label: "Project Mode", icon: <FolderTree size={18} /> },
 ];
 
@@ -1197,6 +1200,15 @@ function BuilderPage() {
               handleCodeUpdate(updated);
             }}
             html={generatedCode}
+          />
+        );
+      case "sections":
+        return (
+          <SectionLibrary
+            onAddSection={(sectionHtml) => {
+              const updated = addSectionToHtml(generatedCode, sectionHtml);
+              handleCodeUpdate(updated);
+            }}
           />
         );
       case "project":

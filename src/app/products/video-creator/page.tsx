@@ -151,7 +151,10 @@ export default function VideoCreatorPage() {
                 <span className="text-xs font-medium text-accent-pink">AI Video Creator</span>
               </span>
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium">
-                <Clock size={12} /> Coming Soon
+                <Clock size={12} /> Video Rendering Coming Soon
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
+                <Sparkles size={12} /> Storyboard & Script AI — Live
               </span>
             </motion.div>
 
@@ -160,10 +163,19 @@ export default function VideoCreatorPage() {
               <span className="gradient-text-hero">Zero Effort.</span>
             </motion.h1>
 
-            <motion.p variants={fadeInUp} className="max-w-2xl text-lg md:text-xl text-white/60 leading-relaxed mb-10">
+            <motion.p variants={fadeInUp} className="max-w-2xl text-lg md:text-xl text-white/60 leading-relaxed mb-6">
               Create scroll-stopping videos for every platform. No scripts. No storyboards. No editing.
               Just describe what you want and get broadcast-quality video in minutes.
             </motion.p>
+
+            <motion.div variants={fadeInUp} className="flex flex-wrap items-center gap-3 mb-10">
+              <Link href="/video-creator" className="group btn-gradient px-6 py-3.5 rounded-xl text-sm font-bold text-white flex items-center gap-2 shadow-glow-purple">
+                <Play className="w-4 h-4" />
+                <span>Try Storyboard Creator</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <span className="text-xs text-white/40">AI-powered storyboards & scripts — free to try</span>
+            </motion.div>
 
             <motion.div variants={fadeInUp} className="max-w-lg mb-16">
               {waitlistStatus === "success" ? (
@@ -314,8 +326,15 @@ export default function VideoCreatorPage() {
             Your First Video<br /><span className="gradient-text">In Under 2 Minutes</span>
           </h2>
           <p className="text-lg text-white/60 mb-4">No editing skills. No scripts. No templates. Just AI magic.</p>
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-4">
+            <Link href="/video-creator" className="group btn-gradient px-6 py-3.5 rounded-xl text-sm font-bold text-white flex items-center gap-2 shadow-glow-purple">
+              <Play className="w-4 h-4" />
+              <span>Try Storyboard Creator</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium mb-8">
-            <Clock size={12} /> Coming Soon
+            <Clock size={12} /> Full Video Rendering Coming Soon
           </span>
           <div className="max-w-lg mx-auto">
             {waitlistStatus === "success" ? (

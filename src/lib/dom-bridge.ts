@@ -420,6 +420,45 @@ export function reorderSections(
 }
 
 /**
+ * Add a new section to the HTML body.
+ * Inserts the section HTML before </body> (after all existing sections).
+ */
+export function addSectionToHtml(html: string, sectionHtml: string): string {
+  const parser = typeof DOMParser !== "undefined" ? new DOMParser() : null;
+  if (!parser) return html;
+
+  const doc = parser.parseFromString(html, "text/html");
+
+  // Create a temporary container to parse the section HTML
+  const temp = doc.createElement("div");
+  temp.innerHTML = sectionHtml.trim();
+
+  // Append all children of the temp container to the body
+  while (temp.firstChild) {
+    doc.body.appendChild(temp.firstChild);
+  }
+
+  return "<!DOCTYPE html>\n" + doc.documentElement.outerHTML;
+}
+
+/**
+ * Remove a top-level <section> (or footer) at the given index from the HTML body.
+ */
+export function removeSectionFromHtml(html: string, sectionIndex: number): string {
+  const parser = typeof DOMParser !== "undefined" ? new DOMParser() : null;
+  if (!parser) return html;
+
+  const doc = parser.parseFromString(html, "text/html");
+  const sections = Array.from(doc.body.querySelectorAll(":scope > section, :scope > footer"));
+
+  if (sectionIndex < 0 || sectionIndex >= sections.length) return html;
+
+  sections[sectionIndex].parentElement?.removeChild(sections[sectionIndex]);
+
+  return "<!DOCTYPE html>\n" + doc.documentElement.outerHTML;
+}
+
+/**
  * Inject the visual editing script into HTML before </body>.
  */
 export function injectVisualEditingScript(html: string): string {
