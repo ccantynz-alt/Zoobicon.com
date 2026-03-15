@@ -18,6 +18,7 @@ export default function AiImagesPanel({ code, onApplyImages }: AiImagesPanelProp
   const [singlePrompt, setSinglePrompt] = useState("");
   const [singleResult, setSingleResult] = useState<string | null>(null);
   const [singleStatus, setSingleStatus] = useState<"idle" | "generating" | "done" | "error">("idle");
+  const [singleError, setSingleError] = useState("");
 
   const handleReplaceAll = async () => {
     if (!code) return;
@@ -56,6 +57,7 @@ export default function AiImagesPanel({ code, onApplyImages }: AiImagesPanelProp
 
     setSingleStatus("generating");
     setSingleResult(null);
+    setSingleError("");
 
     try {
       const res = await fetch("/api/generate/ai-images", {
@@ -64,12 +66,16 @@ export default function AiImagesPanel({ code, onApplyImages }: AiImagesPanelProp
         body: JSON.stringify({ prompt: singlePrompt.trim() }),
       });
 
-      if (!res.ok) throw new Error("Generation failed");
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Image generation failed");
+      }
 
       const data = await res.json();
       setSingleResult(data.image?.url || null);
       setSingleStatus("done");
-    } catch {
+    } catch (err) {
+      setSingleError(err instanceof Error ? err.message : "Image generation failed");
       setSingleStatus("error");
     }
   };
@@ -187,6 +193,13 @@ export default function AiImagesPanel({ code, onApplyImages }: AiImagesPanelProp
             </>
           )}
         </button>
+
+        {singleStatus === "error" && (
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+            <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-red-400">{singleError || "Image generation failed"}</p>
+          </div>
+        )}
 
         {singleResult && (
           <div className="rounded-lg overflow-hidden border border-white/[0.08]">

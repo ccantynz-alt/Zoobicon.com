@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
   Globe,
   Palette,
@@ -227,14 +228,11 @@ export default function AiPage() {
         </div>
       </nav>
 
+      <CursorGlowTracker />
+
       {/* ───────── Hero ───────── */}
       <section className="relative pt-32 pb-24 px-6">
-        {/* Background glow effects */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-brand-500/12 rounded-full blur-[120px]" />
-          <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-accent-purple/10 rounded-full blur-[100px]" />
-          <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] bg-accent-cyan/8 rounded-full blur-[100px]" />
-        </div>
+        <HeroEffects variant="purple" cursorGlow particles particleCount={45} interactiveGrid aurora beams />
 
         <div className="relative max-w-5xl mx-auto text-center">
           <motion.div variants={staggerContainer} initial="hidden" animate="visible">

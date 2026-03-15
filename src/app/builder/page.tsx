@@ -591,6 +591,7 @@ function BuilderPage() {
             tier,
             ...(existingCode ? { existingCode } : {}),
             ...(selectedModel ? { model: selectedModel } : {}),
+            ...(generatorBanner ? { generator: generatorBanner.id } : {}),
           }),
           signal: controller.signal,
         });
@@ -615,6 +616,7 @@ function BuilderPage() {
               tier,
               ...(existingCode ? { existingCode } : {}),
               ...(selectedModel ? { model: selectedModel } : {}),
+              ...(generatorBanner ? { generator: generatorBanner.id } : {}),
             }),
           });
           if (!fallbackRes.ok) {

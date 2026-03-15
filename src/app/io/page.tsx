@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
   Mail,
   Globe,
@@ -403,8 +404,7 @@ const SDK_CARDS = [
     borderColor: "border-green-500/20",
     bgGlow: "bg-green-500/8",
     install: "npm install @zoobicon/sdk",
-    description:
-      "Full-featured SDK with TypeScript types, streaming support, and automatic retries.",
+    description: "Full-featured SDK with TypeScript types, streaming support, and automatic retries.",
   },
   {
     icon: Terminal,
@@ -413,8 +413,7 @@ const SDK_CARDS = [
     borderColor: "border-yellow-500/20",
     bgGlow: "bg-yellow-500/8",
     install: "pip install zoobicon",
-    description:
-      "Pythonic interface with async support, Pydantic models, and comprehensive type hints.",
+    description: "Pythonic interface with async support, Pydantic models, and comprehensive type hints.",
   },
   {
     icon: Globe,
@@ -423,8 +422,7 @@ const SDK_CARDS = [
     borderColor: "border-blue-500/20",
     bgGlow: "bg-blue-500/8",
     install: "curl https://api.zoobicon.io/v1/...",
-    description:
-      "Direct HTTP calls with JSON. OpenAPI 3.1 spec available. Works with any language.",
+    description: "Direct HTTP calls with JSON. OpenAPI 3.1 spec available. Works with any language.",
   },
 ];
 
@@ -480,10 +478,11 @@ export default function ZoobiconIOPage() {
 
   return (
     <div className="min-h-screen bg-[#0d1525] text-white overflow-hidden">
+      <CursorGlowTracker />
+
       {/* ─── Hero ─── */}
       <section className="relative pt-36 pb-24 px-4">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(37,99,235,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(37,99,235,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-brand-500/8 rounded-full blur-[120px]" />
+        <HeroEffects variant="default" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
 
         <motion.div
           className="relative max-w-5xl mx-auto text-center"

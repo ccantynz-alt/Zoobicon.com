@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import BuilderDemo from "@/components/BuilderDemo";
 import VideoShowcase from "@/components/VideoShowcase";
+import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
   Zap,
   Globe,
@@ -471,13 +472,21 @@ export default function LandingPage() {
         )}
       </nav>
 
+      {/* Cursor glow tracker — enables CSS-based cursor following */}
+      <CursorGlowTracker />
+
       {/* Hero Section */}
       <section className="relative overflow-hidden min-h-screen flex items-center pt-16">
-        {/* Clean dark background with subtle ambient light */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-[800px] h-[800px] rounded-full bg-blue-600/[0.04] blur-[150px]" />
-          <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] rounded-full bg-indigo-600/[0.03] blur-[130px]" />
-        </div>
+        {/* Interactive background effects */}
+        <HeroEffects
+          variant="default"
+          cursorGlow
+          particles
+          particleCount={50}
+          interactiveGrid
+          aurora
+          beams
+        />
 
         <div className="max-w-7xl mx-auto px-6 lg:px-8 w-full relative z-10 py-20 lg:py-28">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -487,24 +496,44 @@ export default function LandingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-bold uppercase tracking-wider mb-8">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-bold uppercase tracking-wider mb-8"
+              >
+                <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
                 AI-POWERED PLATFORM
-              </div>
+              </motion.div>
 
               <h1 className="text-[2.75rem] sm:text-[3.5rem] lg:text-[4.5rem] font-black tracking-[-0.03em] leading-[1.05] mb-6 text-white">
-                Build, deploy, grow{" "}
-                <span className="block text-white/65">your online presence</span>
+                Build{" "}
+                <span className="relative inline-block">
+                  <AnimatePresence mode="wait">
+                    <motion.span
+                      key={wordIndex}
+                      initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
+                      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                      exit={{ opacity: 0, y: -20, filter: "blur(8px)" }}
+                      transition={{ duration: 0.4, ease: "easeOut" }}
+                      className="gradient-text-hero inline-block"
+                    >
+                      {ROTATING_WORDS[wordIndex]}
+                    </motion.span>
+                  </AnimatePresence>
+                </span>
+                <span className="block text-white/65 mt-1">with AI agents</span>
               </h1>
 
               <p className="text-lg text-white/60 leading-relaxed mb-8 max-w-lg">
-                Your all-in-one AI platform for building websites, marketing, and scaling online.
-                7 AI agents work together to create production-ready sites in seconds.
+                7 AI agents collaborate in real-time to create production-ready sites in seconds.
+                No templates. No limits. Just describe it.
               </p>
 
               <div className="flex flex-wrap items-center gap-4 mb-10">
                 <Link
                   href="/builder"
-                  className="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl text-base font-bold hover:from-blue-600 hover:to-indigo-700 transition-all shadow-[0_0_30px_rgba(59,130,246,0.2),0_8px_24px_rgba(59,130,246,0.15)] hover:shadow-[0_0_40px_rgba(59,130,246,0.3),0_12px_32px_rgba(59,130,246,0.2)] hover:-translate-y-0.5 duration-300"
+                  className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl text-base font-bold hover:from-blue-600 hover:to-indigo-700 transition-all shadow-[0_0_30px_rgba(59,130,246,0.2),0_8px_24px_rgba(59,130,246,0.15)] hover:shadow-[0_0_50px_rgba(59,130,246,0.35),0_12px_32px_rgba(59,130,246,0.25)] hover:-translate-y-0.5 duration-300"
                 >
                   <Sparkles className="w-4 h-4" />
                   Start Building Free
@@ -512,15 +541,23 @@ export default function LandingPage() {
                 </Link>
                 <Link
                   href="#products"
-                  className="inline-flex items-center gap-2 px-6 py-4 text-white/60 text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors border border-white/10 hover:border-white/20 rounded-xl"
+                  className="inline-flex items-center gap-2 px-6 py-4 text-white/60 text-sm font-semibold uppercase tracking-wider hover:text-white transition-colors border border-white/10 hover:border-white/20 rounded-xl backdrop-blur-sm"
                 >
                   Explore Services
                 </Link>
               </div>
 
-              <p className="text-xs text-white/45">
-                No credit card required. Build unlimited sites on the free plan.
-              </p>
+              <div className="flex items-center gap-4 text-xs text-white/45">
+                <span className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-emerald-400/60" /> No credit card
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-emerald-400/60" /> Unlimited builds
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5 text-emerald-400/60" /> Free hosting
+                </span>
+              </div>
             </motion.div>
 
             {/* Right — Service cards (SiteGround style) */}

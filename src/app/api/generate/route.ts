@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
+import { getGeneratorSystemSupplement } from "@/lib/generator-prompts";
 
 const STANDARD_SYSTEM = `You are Zoobicon, an elite AI website generator producing $20K+ agency-quality sites. Output a single, complete HTML file.
 
@@ -89,7 +90,7 @@ export const maxDuration = 120; // Allow up to 2 minutes for Opus generation
 
 export async function POST(req: NextRequest) {
   try {
-    const { prompt, tier, existingCode } = await req.json();
+    const { prompt, tier, existingCode, generator } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       return NextResponse.json(
@@ -139,6 +140,14 @@ export async function POST(req: NextRequest) {
       userMessage = `Build me a stunning, high-end website for: ${prompt}\n\nThis must look like it was designed by a top-tier agency. Match the aesthetic to the industry — if this is a luxury, executive, or professional brand, use elegant typography, aspirational imagery, warm whites, and sophisticated restraint. If this is a tech/startup brand, use modern clean design with tasteful accents. Always include: hero with clear value proposition, social proof, services/features, testimonials, stats, CTA, and comprehensive footer. The design must feel premium, polished, and trustworthy.`;
       model = "claude-opus-4-6";
       maxTokens = 32000;
+    }
+
+    // Append generator-specific instructions when building from a generator page
+    if (!isEdit && generator && typeof generator === "string") {
+      const supplement = getGeneratorSystemSupplement(generator);
+      if (supplement) {
+        systemPrompt += "\n\n" + supplement;
+      }
     }
 
     const messages: { role: "user" | "assistant"; content: string }[] = [
