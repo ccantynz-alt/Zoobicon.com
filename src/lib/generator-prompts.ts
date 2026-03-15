@@ -188,6 +188,11 @@ const GENERATOR_PROMPTS: Record<string, GeneratorDef> = {
     prompt:
       "Create a professional business report for [describe the report topic]. Include a cover page, executive summary, data sections with SVG charts and tables, key findings with callout boxes, recommendations, and a table of contents with page links.",
   },
+  ecommerce: {
+    name: "E-Commerce Store",
+    prompt:
+      "Create a complete e-commerce storefront for [describe your products/business]. Include a hero with featured products, product grid with images/prices/add-to-cart, category navigation, shopping cart UI, customer reviews, and a checkout flow. Responsive with mobile-optimized product browsing.",
+  },
 };
 
 /**
