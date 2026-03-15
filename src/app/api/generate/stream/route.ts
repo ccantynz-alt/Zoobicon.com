@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
 import { callLLMWithFailover } from "@/lib/llm-provider";
+import { getGeneratorSystemSupplement } from "@/lib/generator-prompts";
 
 const STANDARD_SYSTEM = `You are Zoobicon, an elite AI website generator producing $20K+ agency-quality sites. Output a single, complete HTML file.
 
@@ -112,7 +113,7 @@ export const maxDuration = 300; // Match pipeline-stream timeout for Opus builds
 
 export async function POST(req: NextRequest) {
   try {
-    const { prompt, tier, existingCode, model: requestedModel } = await req.json();
+    const { prompt, tier, existingCode, model: requestedModel, generator } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       return new Response(
@@ -155,6 +156,14 @@ export async function POST(req: NextRequest) {
       // New builds use Opus for maximum quality — this is the stream fallback
       // when the 10-agent pipeline is unavailable. Edits stay on Sonnet for speed.
       systemPrompt = isPremium ? PREMIUM_SYSTEM : STANDARD_SYSTEM;
+
+      // Append generator-specific instructions when building from a generator page
+      if (generator && typeof generator === "string") {
+        const supplement = getGeneratorSystemSupplement(generator);
+        if (supplement) {
+          systemPrompt += "\n\n" + supplement;
+        }
+      }
       userMessage = `Build me a stunning, high-end website for: ${prompt}\n\nThis must look like it was designed by a top-tier agency. Match the aesthetic to the industry — if this is a luxury, executive, or professional brand, use elegant typography, aspirational imagery, warm whites, and sophisticated restraint. If this is a tech/startup brand, use modern clean design with tasteful accents. Always include: hero with clear value proposition, social proof, services/features, testimonials, stats, CTA, and comprehensive footer. The design must feel premium, polished, and trustworthy.`;
       model = requestedModel || "claude-opus-4-6";
       maxTokens = 32000;
