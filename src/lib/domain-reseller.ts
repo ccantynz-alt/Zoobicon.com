@@ -160,7 +160,7 @@ async function callOpenSRS(
   action: string,
   object: string,
   attributes: Record<string, unknown>
-): Promise<{ success: boolean; data?: Record<string, unknown>; error?: string }> {
+): Promise<{ success: boolean; responseText?: string; data?: Record<string, unknown>; error?: string }> {
   const config = getOpenSRSConfig();
 
   if (!hasOpenSRSConfig()) {
@@ -184,23 +184,26 @@ async function callOpenSRS(
 
     const text = await response.text();
 
-    // Parse response (simplified — production would use proper XML parser)
+    // Parse response
     const successMatch = text.match(
       /<item key="is_success">(\d)<\/item>/
     );
     const isSuccess = successMatch?.[1] === "1";
 
+    const responseTextMatch = text.match(
+      /<item key="response_text">(.+?)<\/item>/
+    );
+    const responseText = responseTextMatch?.[1] || "";
+
     if (!isSuccess) {
-      const errorMatch = text.match(
-        /<item key="response_text">(.+?)<\/item>/
-      );
       return {
         success: false,
-        error: errorMatch?.[1] || "OpenSRS request failed",
+        responseText,
+        error: responseText || "OpenSRS request failed",
       };
     }
 
-    return { success: true, data: { raw: text } };
+    return { success: true, responseText, data: { raw: text } };
   } catch (err) {
     return {
       success: false,
@@ -229,22 +232,23 @@ export async function searchDomains(
     .replace(/\.[a-z]{2,}$/, "");
 
   if (hasOpenSRSConfig()) {
-    // Use OpenSRS lookup API
-    const results: DomainSearchResult[] = [];
-
-    // OpenSRS supports batch lookup
-    const lookupResult = await callOpenSRS("LOOKUP", "DOMAIN", {
-      domain: `${baseName}.com`,
-      // OpenSRS checks one at a time; we'll batch them
-    });
-
-    // For each TLD, do a lookup
+    // For each TLD, do a lookup via OpenSRS
     const lookupPromises = searchTlds.map(async (tld) => {
       const domain = `${baseName}.${tld}`;
       const result = await callOpenSRS("LOOKUP", "DOMAIN", { domain });
+
+      // OpenSRS LOOKUP: is_success=1 means API call worked.
+      // Availability is determined by response_text:
+      //   "Domain available" → available
+      //   "Domain taken" → not available
+      // If the API call itself fails, treat as unavailable.
+      const available = result.success
+        ? /available/i.test(result.responseText || "")
+        : false;
+
       return {
         domain,
-        available: result.success,
+        available,
         price: getTldPrice(tld),
         currency: "USD",
         premium: false,
