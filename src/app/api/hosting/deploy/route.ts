@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { sql } from "@/lib/db";
+import { notifySiteDeployed } from "@/lib/admin-notify";
 
 function slugify(name: string): string {
   return name
@@ -91,6 +92,13 @@ export async function POST(req: NextRequest) {
 
     // Update site timestamp
     await sql`UPDATE sites SET updated_at = NOW() WHERE id = ${siteId}`;
+
+    // Notify admin of new deployment (fire-and-forget)
+    notifySiteDeployed({
+      siteName: (siteRow as Record<string, unknown>).name as string || name || slug,
+      slug,
+      email,
+    }).catch(() => {});
 
     return Response.json({
       deploymentId: deployment.id,
