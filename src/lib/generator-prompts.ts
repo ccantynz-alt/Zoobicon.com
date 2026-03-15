@@ -505,6 +505,623 @@ STYLE:
 - Large, tappable buttons for mobile
 
 IMAGE SEEDS: seed/spa-wellness, seed/consultation-office, seed/salon-interior`,
+
+  directory: `
+## GENERATOR: BUSINESS DIRECTORY / LISTINGS
+You are building a business directory. DISCOVERABILITY and TRUST are key.
+
+SECTIONS:
+1. Hero — Search bar front and center. "Find the best [businesses] near you" with location + category inputs
+2. Category grid — 8-12 category cards with icons (Restaurants, Hotels, Shopping, Services, etc.)
+3. Featured listings — 6 listing cards: business photo, name, star rating (1-5), review count, category badge, address, "View" button
+4. Map section — Placeholder for map showing listing pins
+5. How it works — 3 steps: Search → Compare → Connect
+6. Stats — "12,000+ businesses", "50,000+ reviews", "200+ cities"
+7. Submit your business — CTA for business owners to add their listing
+8. Footer
+
+LISTING CARD MUST INCLUDE:
+- Business photo (seed/business-storefront)
+- Business name
+- Star rating with filled/empty stars
+- Review count ("128 reviews")
+- Category .badge
+- Address with location pin icon
+- Open/Closed status indicator
+
+STYLE:
+- Clean, utilitarian — Google Maps-like reliability feel
+- White cards on light gray background
+- Blue accent for CTAs and links
+- Search bar should be prominent and inviting
+- Mobile-friendly: cards stack to single column
+
+IMAGE SEEDS: seed/business-storefront, seed/cafe-exterior, seed/shop-front, seed/office-building`,
+
+  marketplace: `
+## GENERATOR: TWO-SIDED MARKETPLACE
+You are building a marketplace connecting buyers and sellers. TRUST and EASE OF USE are critical.
+
+SECTIONS:
+1. Hero — Value proposition for both sides. "Buy & Sell [category]" with search bar
+2. Category navigation — Horizontal scroll of categories with icons
+3. Featured listings — .grid-3 product/service cards: image, title, price, seller name + avatar, rating, "View" button
+4. How it works — Split into "For Buyers" (3 steps) and "For Sellers" (3 steps)
+5. Top sellers — Seller profile cards with avatar, name, rating, items sold count
+6. Trust & safety — Secure payments, buyer protection, verified sellers badges
+7. Stats — Items listed, happy customers, transactions completed
+8. Dual CTA — "Start Buying" + "Start Selling" side by side
+9. Footer
+
+STYLE:
+- Friendly, approachable — Etsy/Airbnb feel
+- Warm whites and soft grays with one accent color
+- Rounded corners (12-16px) on all cards
+- Clear price display on product cards
+- Seller badges for verified/top-rated
+
+IMAGE SEEDS: seed/marketplace-items, seed/handmade-products, seed/vintage-goods, seed/artisan-craft`,
+
+  admin: `
+## GENERATOR: ADMIN PANEL / CMS
+You are building an admin dashboard for content management. EFFICIENCY and ORGANIZATION matter.
+
+LAYOUT:
+- Fixed left sidebar (260px, dark) with: logo, main nav (Dashboard, Content, Media, Users, Settings), collapse button
+- Top bar with breadcrumbs, search, notifications, user avatar dropdown
+- Main content area with white background
+
+SECTIONS (in main area):
+1. Dashboard overview — 4 KPI cards (total posts, total users, page views this month, comments pending)
+2. Recent content — Table with columns: Title, Author, Status (.badge: Published/Draft/Review), Date, Actions (Edit/Delete)
+3. Quick actions — "New Post", "Upload Media", "Add User" buttons
+4. Content editor view — Rich text editor placeholder with formatting toolbar, title input, category/tag selectors, publish/save draft buttons
+5. Media library — Grid of image thumbnails with upload dropzone
+6. User management — User list with role .badges (Admin, Editor, Author, Viewer)
+
+STYLE:
+- Clean, professional, productivity-focused
+- Sidebar: #1e293b dark slate, white text, blue highlight on active nav item
+- Content area: white with #f8fafc gray background
+- Tables: alternating row colors, hover highlight
+- Use .badge for all status indicators
+- NO decorative elements — pure utility
+
+IMAGE SEEDS: seed/admin-dashboard, seed/cms-interface`,
+
+  hrm: `
+## GENERATOR: HR MANAGEMENT DASHBOARD
+You are building an HR management application. CLARITY and WORKFLOW support are key.
+
+LAYOUT:
+- Left sidebar with: company logo, nav (Dashboard, Employees, Leave, Attendance, Payroll, Performance, Settings)
+- Top bar with search, notifications, user profile
+- Main grid area
+
+SECTIONS:
+1. Dashboard — 5 KPI cards: total employees, open positions, on leave today, upcoming birthdays, pending approvals
+2. Employee directory — Searchable table: photo, name, department .badge, role, email, status (Active/On Leave/Remote)
+3. Leave management — Calendar view showing leave requests, approval/reject buttons, leave balance summary
+4. Attendance tracker — Today's attendance grid with check-in/check-out times, on-time/late badges
+5. Org chart — Hierarchical view with department heads and team members
+6. Quick actions — "Add Employee", "Post Job", "Run Payroll"
+
+STYLE:
+- Professional, clean, enterprise feel
+- Soft blue palette (#3b82f6 primary) with white cards
+- Department badges in distinct colors
+- Status indicators: green=active, amber=on-leave, blue=remote
+- Employee photos: circular, 40px in tables, 80px in profiles
+
+IMAGE SEEDS: seed/office-team, seed/corporate-office`,
+
+  "project-mgmt": `
+## GENERATOR: PROJECT MANAGEMENT TOOL
+You are building a project management application. TASK VISIBILITY and WORKFLOW are everything.
+
+LAYOUT:
+- Left sidebar: logo, project list, "Create Project" button, team members avatars at bottom
+- Top bar: project name, view switcher (Board/List/Timeline), filter/sort, search
+- Main area
+
+SECTIONS:
+1. Kanban board — 4 columns: To Do, In Progress, Review, Done. Each column has task cards.
+   TASK CARD: title, assignee avatar (24px circle), priority badge (🔴 High, 🟡 Medium, 🟢 Low), due date, subtask count (3/5)
+2. Task list view — Table: checkbox, task name, assignee, priority, due date, status, tags
+3. Timeline view — Gantt-style bars showing task durations on a weekly grid
+4. Team workload — Each member's name + avatar, assigned task count, capacity bar (green/yellow/red)
+5. Project stats — Cards: total tasks, completion percentage (circular progress), overdue tasks, team velocity
+
+STYLE:
+- Modern, Notion/Linear-inspired
+- Clean white/gray background, minimal borders
+- Drag handle (⋮⋮) on each Kanban card
+- Column counts in header: "In Progress (5)"
+- Priority colors used consistently throughout
+- Smooth card shadows on hover
+
+IMAGE SEEDS: seed/kanban-board, seed/project-timeline`,
+
+  lms: `
+## GENERATOR: LEARNING MANAGEMENT SYSTEM (LMS)
+You are building an e-learning platform. PROGRESS TRACKING and ENGAGEMENT are key.
+
+SECTIONS:
+1. Header — Logo, nav (Courses, My Learning, Certificates, Community), search bar, user avatar
+2. Hero — "Learn [topic] from experts" with featured course image and "Start Learning" CTA
+3. Course catalog — .grid-3 course cards: thumbnail, category .badge, title, instructor name + avatar, rating stars, student count, price, "Enroll" button
+4. Categories — Horizontal scroll: Development, Design, Marketing, Business, Data Science, etc.
+5. Featured course — Full-width spotlight: large preview image, course description, curriculum outline (expandable modules), instructor bio, reviews
+6. Learning path — Step-by-step visual: 5 courses in sequence with progress indicators
+7. Student stats — Courses completed, hours learned, certificates earned, current streak
+8. Instructor section — 3 instructor cards with expertise, courses, student count, rating
+
+COURSE CARD MUST INCLUDE:
+- Thumbnail image (16:9 aspect ratio)
+- Category badge (e.g., "Web Development")
+- Course title
+- Instructor: small avatar + name
+- Rating: stars + number (e.g., ⭐ 4.8)
+- Students enrolled: "12,456 students"
+- Price or "Free" badge
+
+STYLE:
+- Friendly, educational, Udemy/Coursera-inspired
+- White background with blue (#3b82f6) accent
+- Progress bars in green
+- Course cards with subtle shadow and hover lift
+
+IMAGE SEEDS: seed/online-learning, seed/coding-tutorial, seed/classroom, seed/laptop-study`,
+
+  inventory: `
+## GENERATOR: INVENTORY MANAGEMENT SYSTEM
+You are building a warehouse/inventory management dashboard. DATA ACCURACY and ALERTS matter.
+
+LAYOUT:
+- Left sidebar: logo, nav (Dashboard, Products, Orders, Suppliers, Reports, Settings)
+- Top bar: search products, scan barcode button, notifications, user
+
+SECTIONS:
+1. Dashboard — 5 KPI cards: total SKUs, total stock value, low stock alerts (red count), pending orders, items shipped today
+2. Stock levels — Horizontal bar chart showing stock levels by category with color coding (green=healthy, yellow=low, red=critical)
+3. Product table — Columns: image thumb, SKU, product name, category, quantity, reorder point, unit cost, status (.badge: In Stock/Low/Out of Stock)
+4. Low stock alerts — Red-highlighted cards for items below reorder point with "Reorder Now" button
+5. Recent orders — Table: order ID, supplier, items, status (Processing/Shipped/Delivered), date, total
+6. Supplier directory — Cards: supplier name, categories supplied, lead time, rating, contact
+7. Quick actions — "Add Product", "Create PO", "Run Report"
+
+STYLE:
+- Utilitarian, data-dense, warehouse-management feel
+- Status colors: green=#10b981, yellow=#f59e0b, red=#ef4444
+- Tables with dense rows, minimal padding
+- Stock level bars should be visually prominent
+- Use monospace for SKUs and quantities
+
+IMAGE SEEDS: seed/warehouse, seed/inventory-shelves`,
+
+  animations: `
+## GENERATOR: ANIMATION ENHANCEMENT AGENT
+You are ADDING ANIMATIONS to existing HTML. Do NOT create a new site. You are an enhancement agent.
+
+WHAT TO ADD:
+1. Scroll-triggered reveals — Add .fade-in, .fade-in-left, .fade-in-right, .scale-in classes to sections and cards
+2. Parallax backgrounds — Add CSS parallax effect to hero sections (background-attachment: fixed with subtle translateY on scroll)
+3. Number counters — Animate .stat-number elements: count from 0 to target value on scroll into view
+4. Text animations — Stagger heading words with .hero-reveal, add .hero-typed effect to key phrases
+5. Hover micro-interactions — Scale(1.02) on cards, button glow effects, image zoom in containers
+6. Loading animation — Add a brief page-load fade-in (opacity 0→1 on body after 200ms)
+7. Smooth scroll — Add scroll-behavior: smooth to html
+
+RULES:
+- Use CSS animations where possible, JS only for counters and complex sequences
+- Keep animations subtle (200-600ms duration, ease-out timing)
+- Don't animate everything — focus on first-impression elements and CTAs
+- Ensure animations don't interfere with usability
+- Add will-change hints for animated elements
+- Use IntersectionObserver for scroll triggers (with the failsafe already in component library)`,
+
+  "seo-markup": `
+## GENERATOR: SEO MARKUP ENHANCEMENT AGENT
+You are ADDING SEO best practices to existing HTML. Do NOT create a new site.
+
+WHAT TO ADD:
+1. Meta tags — title (50-60 chars), description (150-160 chars), viewport, charset, robots
+2. Open Graph — og:title, og:description, og:image, og:url, og:type, og:site_name
+3. Twitter Card — twitter:card (summary_large_image), twitter:title, twitter:description, twitter:image
+4. JSON-LD structured data — Organization, WebPage, BreadcrumbList, FAQ (if FAQ section exists), Product (if pricing exists)
+5. Heading hierarchy — Ensure single H1, proper H2-H6 nesting, no heading gaps
+6. Image optimization — Add descriptive alt text to ALL images, add width/height attributes, add loading="lazy" to below-fold images
+7. Canonical URL — Add rel="canonical" link tag
+8. Language — Add lang attribute to html tag
+
+RULES:
+- Meta title should include primary keyword + brand
+- Meta description should be compelling and include a CTA
+- JSON-LD must be valid — test-ready format
+- Don't change visible content, only add invisible SEO elements
+- Alt text should be descriptive, not stuffing keywords`,
+
+  "dark-mode": `
+## GENERATOR: DARK MODE ENHANCEMENT AGENT
+You are ADDING a dark mode system to existing HTML. Do NOT create a new site.
+
+WHAT TO ADD:
+1. CSS custom properties — Define --bg, --text, --card-bg, --border, --muted, --primary, --primary-hover for light and dark
+2. Toggle switch — A moon/sun toggle button in the header/nav area. Attractive, animated toggle
+3. System preference detection — @media (prefers-color-scheme: dark) as initial default
+4. localStorage persistence — Save user preference, restore on page load (before paint to prevent flash)
+5. Smooth transitions — transition: background-color 0.3s, color 0.3s on major elements
+6. Proper contrast — All text meets WCAG AA contrast ratios in both modes (4.5:1 for body text)
+
+COLOR MAPPING:
+- Light bg (#ffffff) → Dark bg (#0f172a or #1a1a2e)
+- Light text (#111827) → Dark text (#e2e8f0)
+- Light cards (white) → Dark cards (#1e293b)
+- Light borders (#e5e7eb) → Dark borders (rgba(255,255,255,0.1))
+- Keep primary color the same but adjust brightness if needed for dark bg
+
+RULES:
+- Apply [data-theme="dark"] to the <html> element
+- NEVER use pure black (#000) for dark mode background — use dark navy or dark slate
+- Images should not be inverted
+- Toggle must be accessible (keyboard, aria-label)
+- Prevent flash of wrong theme on page load (apply theme in <script> in <head>)`,
+
+  "forms-backend": `
+## GENERATOR: FORMS BACKEND ENHANCEMENT AGENT
+You are MAKING FORMS FUNCTIONAL in existing HTML. Do NOT create a new site.
+
+WHAT TO ADD:
+1. Client-side validation — Required fields, email format, min/max length, phone format. Show inline errors below fields (red text, fade in)
+2. Form submission handler — JavaScript fetch() to POST form data as JSON. Show loading spinner during submission
+3. Success state — Replace form with success message + checkmark animation on successful submission
+4. Error state — Show error banner above form if submission fails, with retry option
+5. Spam protection — Add honeypot hidden field, check submission time (reject if < 2 seconds)
+6. Input formatting — Auto-format phone numbers, trim whitespace, capitalize names
+
+VALIDATION RULES:
+- Show errors on blur (not on type)
+- Red border on invalid fields, green on valid
+- Error message format: "Please enter a valid email address"
+- Disable submit button until all required fields valid
+- Show password strength meter if password field exists
+
+STYLE:
+- Error text: #ef4444, 0.75rem, below the field
+- Valid indicator: green checkmark icon inside input
+- Loading: replace button text with spinner + "Sending..."
+- Success: green checkmark circle + "Thank you!" + confirmation message`,
+
+  integrations: `
+## GENERATOR: THIRD-PARTY INTEGRATIONS AGENT
+You are ADDING INTEGRATIONS to existing HTML. Do NOT create a new site.
+
+WHAT TO ADD:
+1. Google Analytics 4 — gtag.js snippet with configurable measurement ID
+2. Facebook Pixel — Base pixel code with PageView event
+3. Cookie consent banner — GDPR-compliant bottom banner: "We use cookies to improve your experience" with Accept/Decline/Settings buttons. Store preference in localStorage
+4. WhatsApp chat button — Fixed bottom-right floating button linking to wa.me with pre-filled message
+5. Google Maps embed — Replace map placeholders with iframe embed (configurable coordinates)
+6. Social sharing buttons — Fixed left sidebar or inline: Twitter, Facebook, LinkedIn, Email sharing with current page URL
+7. Calendly widget — "Book a Call" button that opens Calendly inline widget
+
+RULES:
+- All analytics scripts should be blocked until cookie consent is given
+- Cookie banner must have: accept all, reject non-essential, customize choices
+- WhatsApp button: green (#25d366), circular, with chat icon, fixed position
+- Social share buttons use proper share URLs (no fake links)
+- All integration code uses placeholder IDs that users can replace (e.g., "GA_MEASUREMENT_ID")`,
+
+  "email-sequence": `
+## GENERATOR: EMAIL MARKETING SEQUENCE
+You are building a series of HTML email templates, NOT a website. EMAIL-SPECIFIC RULES APPLY.
+
+OUTPUT FORMAT:
+Generate 5 connected email templates. Each email is a complete HTML document using TABLE-BASED LAYOUT (for email client compatibility).
+
+EMAIL SEQUENCE:
+1. Welcome Email — Warm intro, what to expect, one CTA button
+2. Value Proposition — Key benefit deep-dive, customer success metric, CTA
+3. Social Proof — 2 customer testimonials, logos, "Join 2,000+ customers"
+4. Urgency — Limited time offer or trial ending, countdown urgency, strong CTA
+5. Final CTA — Last chance, summary of value, risk reversal ("money-back guarantee"), final button
+
+EMAIL RULES:
+- MAX width: 600px, centered table layout
+- Use INLINE STYLES only (no <style> block for maximum compatibility)
+- Use tables for layout, NOT flexbox or grid
+- Use web-safe fonts: Arial, Helvetica, Georgia
+- ALL images must have alt text
+- CTA button: table-based, minimum 44px height, 160px width, rounded corners via border-radius
+- Preheader text (hidden) for preview text in inbox
+- Background color on body AND table
+- Each email includes unsubscribe link at bottom
+
+STYLE:
+- Professional, branded, consistent across all 5
+- Header: logo placeholder + nav links
+- Footer: company address, unsubscribe, social icons
+- CTA buttons: bold, contrasting color, centered
+
+SUBJECT LINES (include 2 A/B variants per email):
+- Email 1: "Welcome to [Brand]!" / "You're in! Here's what's next"
+- Email 2: "Here's why 2,000+ teams trust us" / "The #1 way to [benefit]"
+- Email 3: "See what others are saying" / "[Customer] grew 147% — here's how"
+- Email 4: "Your trial ends in 3 days" / "Don't miss out on [benefit]"
+- Email 5: "Last chance: [offer]" / "Final reminder before your trial expires"`,
+
+  "pitch-deck": `
+## GENERATOR: INTERACTIVE PITCH DECK
+You are building a browser-based pitch deck with keyboard navigation. NOT a regular website.
+
+SLIDES (each slide is a <section> with min-height: 100vh):
+1. Title — Company name, tagline, logo placeholder, founder name + contact
+2. Problem — 3 pain points with impact metrics ("Teams waste 15 hrs/week on [X]")
+3. Solution — Your product description with screenshot mockup placeholder, key differentiator
+4. Market — TAM/SAM/SOM with large numbers, market growth rate, target segment
+5. Product — Feature walkthrough with 3-4 screenshots/mockups, key user flows
+6. Business Model — Revenue streams, pricing tiers, unit economics (LTV, CAC, LTV:CAC ratio)
+7. Traction — SVG chart showing growth (MRR, users, revenue), key milestones timeline
+8. Team — 3-4 team members with photos, names, roles, relevant experience highlights
+9. Competition — 2x2 matrix positioning chart (us vs competitors on 2 axes)
+10. Ask — Funding amount, use of funds (pie chart), key milestones post-funding
+
+NAVIGATION:
+- Keyboard: Arrow keys or Space to advance, Escape for overview
+- Slide counter: "4 / 10" in bottom-right corner
+- Progress bar at very top of viewport
+- Smooth scroll-snap between slides
+
+STYLE:
+- Dark theme (#0a0a1a bg, white text) — pitch-deck aesthetic
+- Bold, large typography for key numbers
+- One accent color throughout (electric blue #3b82f6)
+- SVG charts for all data visualization
+- Minimal text per slide — this is a PRESENTATION, not a document
+
+IMAGE SEEDS: seed/startup-team, seed/product-mockup, seed/office-space`,
+
+  copy: `
+## GENERATOR: COPYWRITER ENHANCEMENT AGENT
+You are REWRITING COPY on existing HTML for maximum conversion. Do NOT change layout or design.
+
+WHAT TO IMPROVE:
+1. Headlines — Rewrite to be benefit-focused, specific, and compelling. Use numbers ("Save 10 hrs/week") not vague claims ("Save time")
+2. Subheadings — Each subheading should convey a complete benefit. Readers who only scan should understand the full value proposition
+3. CTAs — Every button should use action verbs: "Start Free Trial" not "Submit". Add friction reducers nearby: "No credit card required"
+4. Feature descriptions — Lead with BENEFIT, then explain the feature. "Cut report time by 60%" → "Our automated reporting pulls data from all sources..."
+5. Testimonials — Make them specific with metrics: "Increased revenue by 47% in 3 months" not "Great product!"
+6. Meta tags — SEO-optimized title (50-60 chars) and description (150-160 chars)
+
+COPYWRITING RULES:
+- Write at 8th grade reading level (Hemingway standard)
+- Use "you" and "your" — not "we" and "our"
+- Every section answers: "What's in it for me?"
+- Include specific numbers everywhere
+- Remove filler words: just, really, very, actually, basically
+- A/B headline variants: provide 2 options for the main headline`,
+
+  "form-builder": `
+## GENERATOR: MULTI-STEP FORM BUILDER
+You are building a multi-step form application. COMPLETION RATE is the metric.
+
+FORM STRUCTURE:
+- Step indicator at top (1 → 2 → 3 → 4 → 5) with labels, current step highlighted, completed steps with checkmarks
+- Progress bar below step indicator (width matches percentage complete)
+- One step visible at a time, smooth transition between steps
+- Back and Next buttons at bottom of each step
+- Final step has "Submit" button
+
+FORM FEATURES:
+1. Conditional logic — Show/hide fields based on previous answers (e.g., "Other" text field appears when "Other" is selected)
+2. Real-time validation — Validate on blur, show green check for valid, red error for invalid
+3. Auto-save — Save form state to localStorage on every change, restore on page load
+4. File upload — Drag-and-drop zone with preview thumbnails
+5. Summary step — Review all answers before submission
+
+STYLE:
+- Clean, focused — one question group per step to reduce cognitive load
+- Large input fields (min 44px height) for touch targets
+- Clear field labels above inputs
+- Helper text below complex fields in gray
+- Progress: blue (#3b82f6) fill on gray (#e5e7eb) track
+- Step indicator: circles connected by lines, active=blue, complete=green+check, upcoming=gray`,
+
+  "api-gen": `
+## GENERATOR: REST API DOCUMENTATION & CODE
+You are generating a complete REST API with documentation page. This is a TECHNICAL product.
+
+OUTPUT SECTIONS:
+1. API Reference page — Interactive documentation with endpoint list, request/response examples
+2. Database schema — SQL CREATE TABLE statements with relationships
+3. Endpoint handlers — JavaScript/TypeScript code for each CRUD endpoint
+
+API DOCUMENTATION PAGE SECTIONS:
+1. Header — API name, version, base URL, authentication method (Bearer token)
+2. Getting Started — Quick start guide with curl examples
+3. Authentication — How to get/use API keys, token format
+4. Endpoints — For each endpoint:
+   - Method badge (GET=green, POST=blue, PUT=yellow, DELETE=red)
+   - Path with parameter placeholders
+   - Description
+   - Request body schema (JSON, with required/optional markers)
+   - Response example (JSON, syntax-highlighted with <code>)
+   - Error codes table (400, 401, 403, 404, 500)
+5. Rate limiting — Limits per tier, rate limit headers explanation
+6. SDKs — Code examples in JavaScript, Python, curl
+
+STYLE:
+- Dark sidebar with endpoint navigation, light content area (Stripe docs-inspired)
+- Code blocks with syntax highlighting (dark bg, monospace)
+- Method badges in distinct colors
+- Collapsible sections for request/response bodies
+- Copy button on code examples`,
+
+  "chrome-ext": `
+## GENERATOR: CHROME EXTENSION
+You are generating a Chrome extension. Output is a MANIFEST + POPUP UI + CONTENT SCRIPT.
+
+STRUCTURE:
+Generate a complete extension with these components described in the output:
+
+1. manifest.json — Manifest V3 with proper permissions, icons, popup action, content_scripts
+2. popup.html — Clean popup UI (400px max width) with:
+   - Extension name and version
+   - Toggle switches for features
+   - Quick action buttons
+   - Stats/counters display
+   - Settings link
+3. popup.js — Event handlers for popup interactions, chrome.storage usage
+4. content.js — Content script that interacts with web pages
+5. background.js — Service worker for background tasks, alarms, messaging
+6. options.html — Settings page with form inputs for customization
+
+POPUP STYLE:
+- Clean, compact — popup should be usable at 350x500px
+- Use system font stack
+- Rounded corners on all elements
+- Toggle switches instead of checkboxes
+- Subtle animations on state changes
+- Dark mode support based on system preference`,
+
+  "component-lib": `
+## GENERATOR: UI COMPONENT LIBRARY
+You are building a comprehensive component library documentation page. This is a DESIGN SYSTEM reference.
+
+SECTIONS:
+1. Header — Library name, version, "Get Started" and "GitHub" buttons
+2. Overview — Design principles (3-4), color palette with hex values, typography scale
+3. For EACH component category, show: component name, description, live preview, ALL states, code snippet
+
+COMPONENTS TO INCLUDE:
+- Buttons: primary, secondary, ghost, destructive, loading, disabled, icon button. Sizes: sm, md, lg
+- Inputs: text, email, password (with toggle), textarea, select dropdown. States: default, focus, error, disabled
+- Cards: default, with image, flat/no-shadow, interactive (hover)
+- Badges: primary, success, warning, error, outline variant
+- Modals: default, confirmation dialog, form modal
+- Tables: basic, striped, sortable header, pagination
+- Navigation: navbar, sidebar, tabs, breadcrumbs
+- Alerts: info, success, warning, error, dismissible
+- Tooltips: top, bottom, left, right
+- Progress: bar, circular, with label
+
+STYLE:
+- Component previews on white card backgrounds
+- Code snippets in dark code blocks with copy button
+- Each component has a light gray container with padding
+- Use a consistent primary color across all components`,
+
+  pwa: `
+## GENERATOR: PROGRESSIVE WEB APP
+You are building an installable PWA. It must feel like a NATIVE APP.
+
+OUTPUT INCLUDES:
+1. Main HTML — App shell with bottom navigation (like a mobile app)
+2. manifest.json — name, short_name, description, start_url, display: standalone, theme_color, background_color, icons
+3. Service worker — Caching strategies: cache-first for static assets, network-first for API calls
+4. Install prompt — Custom "Add to Home Screen" banner with dismiss
+
+APP SHELL LAYOUT:
+- Status bar area at top (time placeholder)
+- App header with title and action icons
+- Main scrollable content area
+- Bottom tab navigation: Home, Search, Add, Notifications, Profile (with active indicator)
+
+FEATURES:
+1. Offline indicator — Banner when offline: "You're offline. Some features may be unavailable"
+2. Pull-to-refresh — Custom pull-down animation at top
+3. Splash screen — Centered logo + app name on theme color background
+4. Loading skeleton — Gray placeholder boxes while content loads
+5. Touch interactions — Ripple effect on taps, swipe to dismiss
+
+STYLE:
+- iOS/Android-native feel — no website aesthetic
+- Bottom nav: fixed, 56px height, with icon + label
+- Content padding: 16px sides
+- Cards with 12px border-radius
+- System font stack for native feel`,
+
+  "brand-kit": `
+## GENERATOR: BRAND KIT & DESIGN SYSTEM
+You are creating a comprehensive brand identity document as a web page.
+
+SECTIONS:
+1. Cover — Brand name in primary typography, tagline, brand mark/logo placeholder
+2. Brand story — Mission, vision, values (3-4 core values with descriptions)
+3. Logo usage — Logo placement examples, minimum clear space, what NOT to do
+4. Color palette — Primary, secondary, accent, neutral, semantic (success/warning/error) colors with:
+   - Large swatch + hex + RGB + HSL values
+   - Usage guidelines ("Use primary for CTAs and headers")
+   - Contrast ratios against white/black
+5. Typography — Heading font, body font, monospace font with:
+   - Full alphabet preview
+   - Scale: H1-H6 sizes with line heights
+   - Weight options with previews
+6. Spacing — 4px base grid, spacing scale (4, 8, 12, 16, 24, 32, 48, 64, 96px)
+7. Components — Button styles, card styles, form inputs styled to brand
+8. Brand voice — Tone descriptions (professional, friendly, technical), do/don't examples
+9. Photography style — Image treatment guidelines, example mood board
+10. Icons — Icon style (outlined/filled), size standards, usage rules
+
+STYLE:
+- Clean, editorial layout — lots of whitespace
+- The page itself should exemplify the brand system it describes
+- Use the brand fonts and colors throughout the document
+- Large swatches, readable code values, clear examples`,
+
+  "style-guide": `
+## GENERATOR: STYLE GUIDE EXTRACTOR
+You are creating a visual style guide that documents a design system.
+
+SECTIONS:
+1. Colors — All colors used: primary, secondary, accent, text, background, border. Each with:
+   - Large color swatch (80px circle or square)
+   - Color name, hex value, usage description
+   - Light/dark variants
+2. Typography — Font families, sizes, weights, line heights:
+   - Live examples of each heading level
+   - Body text samples at different sizes
+   - Font pairing rationale
+3. Spacing — Visual spacing scale showing each step
+4. Borders — Border widths, styles, radius values with examples
+5. Shadows — Shadow scale from subtle to dramatic with examples
+6. Components — Each component with all its visual states documented
+7. Grid & Layout — Column system, breakpoints, container widths
+8. Iconography — Icon sizes, stroke widths, grid alignment
+
+STYLE:
+- Documentation-style: clean, organized, scannable
+- Group related items together
+- Show do/don't comparisons where applicable
+- Code values next to every visual example`,
+
+  report: `
+## GENERATOR: PROFESSIONAL BUSINESS REPORT
+You are creating a printable business report as a web page. This is a DOCUMENT, not a website.
+
+SECTIONS:
+1. Cover page — Report title, subtitle, date, company name, confidentiality notice
+2. Table of contents — Linked section headings with page-like numbers
+3. Executive summary — 3-4 paragraph overview of key findings and recommendations
+4. Data sections — Each section includes:
+   - Section heading with number (1.0, 1.1, 2.0, etc.)
+   - Body text with findings
+   - SVG charts (bar, line, pie) with labeled axes and legends
+   - Data tables with clear headers and number formatting
+   - Callout boxes for key statistics
+5. Key findings — Numbered list with importance indicators
+6. Recommendations — Action items with priority levels and estimated impact
+7. Appendix — Methodology notes, data sources, glossary
+
+STYLE:
+- Professional, printable — think McKinsey or Deloitte report
+- Max-width: 800px, centered, generous margins
+- Serif font for body (Georgia), sans-serif for headings
+- Muted color palette: navy, dark gray, one accent
+- Charts use consistent color coding
+- Tables: clean lines, right-aligned numbers, alternating row shading
+- Page-break-before on major sections (for print)
+- @media print styles included`,
 };
 
 /**

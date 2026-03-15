@@ -1987,6 +1987,10 @@ export default function GeneratorTypePage() {
 
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [quickMode, setQuickMode] = useState<"idle" | "generating" | "preview" | "deploying" | "deployed">("idle");
+  const [generatedHtml, setGeneratedHtml] = useState("");
+  const [deployedUrl, setDeployedUrl] = useState("");
+  const [genError, setGenError] = useState("");
 
   useEffect(() => {
     try {
@@ -2030,7 +2034,7 @@ export default function GeneratorTypePage() {
     setFormData((prev) => ({ ...prev, [fieldId]: value }));
   }
 
-  function handleGenerate() {
+  function buildPrompt(): string {
     const parts: string[] = [`Generate a ${generator.name} website`];
     generator.fields.forEach((field) => {
       const value = formData[field.id];
@@ -2038,9 +2042,72 @@ export default function GeneratorTypePage() {
         parts.push(`${field.label}: ${value.trim()}`);
       }
     });
-    const prompt = parts.join(". ");
+    return parts.join(". ");
+  }
+
+  function handleGenerate() {
+    const prompt = buildPrompt();
     const encoded = encodeURIComponent(prompt);
     router.push(`/builder?generator=${type}&prompt=${encoded}`);
+  }
+
+  async function handleQuickGenerate() {
+    setQuickMode("generating");
+    setGenError("");
+    setGeneratedHtml("");
+    const prompt = buildPrompt();
+
+    try {
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt, tier: "standard" }),
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(errText || `Generation failed (${res.status})`);
+      }
+
+      const data = await res.json();
+      const html = data.html || data.code || "";
+
+      if (!html || html.length < 100) {
+        throw new Error("Generation returned empty content. Please try again.");
+      }
+
+      setGeneratedHtml(html);
+      setQuickMode("preview");
+    } catch (err) {
+      setGenError(err instanceof Error ? err.message : "Generation failed");
+      setQuickMode("idle");
+    }
+  }
+
+  async function handleQuickDeploy() {
+    if (!generatedHtml) return;
+    setQuickMode("deploying");
+
+    try {
+      const siteName = formData[generator.fields[0]?.id] || `${generator.name} Site`;
+      const res = await fetch("/api/hosting/deploy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: siteName,
+          code: generatedHtml,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Deploy failed");
+
+      const data = await res.json();
+      setDeployedUrl(data.url || data.siteUrl || "");
+      setQuickMode("deployed");
+    } catch (err) {
+      setGenError(err instanceof Error ? err.message : "Deploy failed");
+      setQuickMode("preview");
+    }
   }
 
   return (
@@ -2211,22 +2278,132 @@ export default function GeneratorTypePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.8 }}
-              className="mt-10 flex flex-col sm:flex-row gap-4"
+              className="mt-10 space-y-4"
             >
-              <button
-                onClick={handleGenerate}
-                className={`inline-flex items-center justify-center gap-2 bg-gradient-to-r ${generator.color} text-white px-8 py-4 rounded-xl font-semibold text-lg hover:opacity-90 transition shadow-lg shadow-blue-500/20`}
-              >
-                <Zap className="w-5 h-5" />
-                Generate {generator.name}
-              </button>
-              <Link
-                href="/generators"
-                className="inline-flex items-center justify-center gap-2 bg-gray-800 text-gray-300 px-6 py-4 rounded-xl font-medium hover:bg-gray-700 transition"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back to All Generators
-              </Link>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button
+                  onClick={handleQuickGenerate}
+                  disabled={quickMode === "generating"}
+                  className={`inline-flex items-center justify-center gap-2 bg-gradient-to-r ${generator.color} text-white px-8 py-4 rounded-xl font-semibold text-lg hover:opacity-90 transition shadow-lg shadow-blue-500/20 disabled:opacity-60`}
+                >
+                  {quickMode === "generating" ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="w-5 h-5" />
+                      One-Click Generate
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={handleGenerate}
+                  className="inline-flex items-center justify-center gap-2 bg-gray-800 text-gray-300 px-6 py-4 rounded-xl font-medium hover:bg-gray-700 transition"
+                >
+                  Open in Builder
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              {genError && (
+                <div className="bg-red-900/30 border border-red-700/50 rounded-xl px-4 py-3 text-sm text-red-300">
+                  {genError}
+                </div>
+              )}
+
+              {/* Quick preview + deploy panel */}
+              {quickMode !== "idle" && quickMode !== "generating" && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-6 bg-gray-900 rounded-2xl border border-gray-700 overflow-hidden"
+                >
+                  {/* Preview toolbar */}
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700/50 bg-gray-900/50">
+                    <div className="flex items-center gap-3">
+                      <div className="flex gap-1.5">
+                        <div className="w-3 h-3 rounded-full bg-red-500/70" />
+                        <div className="w-3 h-3 rounded-full bg-yellow-500/70" />
+                        <div className="w-3 h-3 rounded-full bg-green-500/70" />
+                      </div>
+                      <span className="text-xs text-gray-400">
+                        {quickMode === "deployed" && deployedUrl
+                          ? deployedUrl
+                          : "Preview"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {quickMode === "preview" && (
+                        <>
+                          <button
+                            onClick={handleQuickDeploy}
+                            className="inline-flex items-center gap-1.5 bg-green-600 hover:bg-green-500 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition"
+                          >
+                            <Rocket className="w-3.5 h-3.5" />
+                            Deploy Live
+                          </button>
+                          <button
+                            onClick={() => {
+                              const encoded = encodeURIComponent(buildPrompt());
+                              router.push(`/builder?generator=${type}&prompt=${encoded}`);
+                            }}
+                            className="inline-flex items-center gap-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 text-xs font-medium px-3 py-1.5 rounded-lg transition"
+                          >
+                            Edit in Builder
+                          </button>
+                        </>
+                      )}
+                      {quickMode === "deploying" && (
+                        <div className="flex items-center gap-2 text-xs text-yellow-400">
+                          <div className="w-3.5 h-3.5 border-2 border-yellow-400/30 border-t-yellow-400 rounded-full animate-spin" />
+                          Deploying...
+                        </div>
+                      )}
+                      {quickMode === "deployed" && deployedUrl && (
+                        <a
+                          href={deployedUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition"
+                        >
+                          <Globe className="w-3.5 h-3.5" />
+                          Visit Site
+                        </a>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* iframe preview */}
+                  <div className="bg-white" style={{ height: 500 }}>
+                    <iframe
+                      srcDoc={generatedHtml}
+                      className="w-full h-full border-0"
+                      title="Generated preview"
+                      sandbox="allow-scripts"
+                    />
+                  </div>
+
+                  {/* Deployed success banner */}
+                  {quickMode === "deployed" && deployedUrl && (
+                    <div className="flex items-center gap-3 px-4 py-3 bg-green-900/30 border-t border-green-700/30">
+                      <Check className="w-5 h-5 text-green-400" />
+                      <span className="text-sm text-green-300">
+                        Deployed to{" "}
+                        <a
+                          href={deployedUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline font-medium"
+                        >
+                          {deployedUrl}
+                        </a>
+                      </span>
+                    </div>
+                  )}
+                </motion.div>
+              )}
             </motion.div>
           </motion.div>
 
