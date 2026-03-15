@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
   Zap,
   Code2,
@@ -188,8 +189,11 @@ export default function DevelopersPage() {
         </div>
       </nav>
 
+      <CursorGlowTracker />
+
       {/* Hero */}
-      <section className="pt-32 pb-20 lg:pt-44 lg:pb-28">
+      <section className="relative pt-32 pb-20 lg:pt-44 lg:pb-28">
+        <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="flex items-center gap-2 mb-6">

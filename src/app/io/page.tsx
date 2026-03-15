@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
   Mail,
   Globe,
@@ -393,6 +394,38 @@ const PRICING = [
   },
 ];
 
+/* ─── SDK Cards ─── */
+
+const SDK_CARDS = [
+  {
+    icon: Code2,
+    title: "Node.js / TypeScript",
+    color: "text-green-400",
+    borderColor: "border-green-500/20",
+    bgGlow: "bg-green-500/8",
+    install: "npm install @zoobicon/sdk",
+    description: "Full-featured SDK with TypeScript types, streaming support, and automatic retries.",
+  },
+  {
+    icon: Terminal,
+    title: "Python",
+    color: "text-yellow-400",
+    borderColor: "border-yellow-500/20",
+    bgGlow: "bg-yellow-500/8",
+    install: "pip install zoobicon",
+    description: "Pythonic interface with async support, Pydantic models, and comprehensive type hints.",
+  },
+  {
+    icon: Globe,
+    title: "REST API",
+    color: "text-blue-400",
+    borderColor: "border-blue-500/20",
+    bgGlow: "bg-blue-500/8",
+    install: "curl https://api.zoobicon.io/v1/...",
+    description: "Direct HTTP calls with JSON. OpenAPI 3.1 spec available. Works with any language.",
+  },
+];
+
 /* ─── Comparison ─── */
 
 const COMPARISON = [
@@ -409,7 +442,7 @@ const COMPARISON = [
 
 /* ─── Helper Components ─── */
 
-function CopyButton({ text }: { text: string }) {
+function CodeCopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
   return (
     <button
@@ -429,7 +462,7 @@ function CopyButton({ text }: { text: string }) {
 function CodeBlock({ code, language }: { code: string; language: string }) {
   return (
     <div className="relative group">
-      <CopyButton text={code} />
+      <CodeCopyButton text={code} />
       <pre className="overflow-x-auto p-5 pt-4 text-sm leading-relaxed font-mono text-gray-300 bg-[#111a2e] rounded-b-xl border border-white/10">
         <code>{code}</code>
       </pre>
@@ -441,13 +474,15 @@ function CodeBlock({ code, language }: { code: string; language: string }) {
 
 export default function ZoobiconIOPage() {
   const [activeExample, setActiveExample] = useState(0);
+  const [activeLang, setActiveLang] = useState<"curl" | "javascript" | "python">("curl");
 
   return (
     <div className="min-h-screen bg-[#0d1525] text-white overflow-hidden">
+      <CursorGlowTracker />
+
       {/* ─── Hero ─── */}
       <section className="relative pt-36 pb-24 px-4">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(37,99,235,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(37,99,235,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-brand-500/8 rounded-full blur-[120px]" />
+        <HeroEffects variant="default" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
 
         <motion.div
           className="relative max-w-5xl mx-auto text-center"
@@ -500,7 +535,7 @@ export default function ZoobiconIOPage() {
             >
               View API Docs
               <Code2 className="w-5 h-5" />
-            </a>
+            </Link>
           </motion.div>
 
           {/* Quick install */}
@@ -788,7 +823,7 @@ export default function ZoobiconIOPage() {
                   <div className="w-3 h-3 rounded-full bg-green-500/60" />
                 </div>
                 <span className="text-xs font-mono text-gray-300">
-                  {example.method} {example.endpoint}
+                  {API_EXAMPLES[activeExample].method} {API_EXAMPLES[activeExample].label}
                 </span>
                 <div className="flex gap-1">
                   {(["curl", "javascript", "python"] as const).map((lang) => (
@@ -1018,7 +1053,7 @@ export default function ZoobiconIOPage() {
             ))}
           </motion.div>
 
-          <motion.p
+          <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
@@ -1172,8 +1207,8 @@ export default function ZoobiconIOPage() {
                     {platform.domain}
                   </span>
                 </div>
-                <h3 className="font-semibold text-white mb-2">{useCase.title}</h3>
-                <p className="text-sm text-gray-300 leading-relaxed">{useCase.description}</p>
+                <h3 className="font-semibold text-white mb-2">{platform.tagline}</h3>
+                <p className="text-sm text-gray-300 leading-relaxed">{platform.desc}</p>
               </motion.div>
             ))}
           </motion.div>

@@ -76,9 +76,11 @@ export default function CodePanel({
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(displayCode);
-    } catch {}
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard API unavailable — silently fail
+    }
   };
 
   const handleDownload = () => {

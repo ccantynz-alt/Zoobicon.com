@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import { useState } from "react";
 import {
   Terminal,
@@ -165,8 +166,11 @@ export default function CLIPage() {
         </div>
       </nav>
 
+      <CursorGlowTracker />
+
       {/* Hero */}
-      <section className="pt-32 pb-20 lg:pt-44 lg:pb-28">
+      <section className="relative pt-32 pb-20 lg:pt-44 lg:pb-28">
+        <HeroEffects variant="green" cursorGlow particles particleCount={30} interactiveGrid aurora beams />
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-amber-500/20 bg-amber-500/5 mb-6">
