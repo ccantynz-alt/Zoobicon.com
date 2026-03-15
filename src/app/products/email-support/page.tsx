@@ -181,7 +181,15 @@ export default function EmailSupportPage() {
               all in under 30 seconds. Your customers think they&apos;re talking to your best agent.
             </motion.p>
 
-            <motion.div variants={fadeInUp} className="max-w-lg mb-16">
+            <motion.div variants={fadeInUp} className="max-w-lg mb-16 space-y-4">
+              <Link
+                href="/email-support"
+                className="group inline-flex items-center gap-2.5 btn-gradient px-6 py-4 rounded-xl text-sm font-bold text-white shadow-glow"
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                <span>Try Demo Dashboard</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
               {waitlistStatus === "success" ? (
                 <div className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
                   <Check className="w-5 h-5 flex-shrink-0" />
@@ -194,7 +202,7 @@ export default function EmailSupportPage() {
                     required
                     value={waitlistEmail}
                     onChange={(e) => setWaitlistEmail(e.target.value)}
-                    placeholder="Enter your email for early access"
+                    placeholder="Or enter your email for early access"
                     className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-xl px-5 py-4 text-white placeholder:text-white/45 outline-none text-sm focus:border-brand-500/30 transition-colors"
                   />
                   <button
@@ -358,10 +366,20 @@ export default function EmailSupportPage() {
           <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
             Resolve 94% of Tickets<br /><span className="gradient-text">Automatically</span>
           </h2>
-          <p className="text-lg text-white/60 mb-4">Be the first to know when AI Email Support launches.</p>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium mb-8">
-            <Clock size={12} /> Coming Soon
-          </span>
+          <p className="text-lg text-white/60 mb-4">Be the first to know when AI Email Support launches. Or try the demo now.</p>
+          <div className="flex items-center justify-center gap-3 mb-8">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium">
+              <Clock size={12} /> Full Launch Coming Soon
+            </span>
+            <Link
+              href="/email-support"
+              className="group inline-flex items-center gap-2 px-5 py-2 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 text-xs font-semibold hover:bg-brand-500/20 transition-all"
+            >
+              <LayoutDashboard size={12} />
+              Try Demo Dashboard
+              <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
           <div className="max-w-lg mx-auto">
             {waitlistStatus === "success" ? (
               <div className="flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">

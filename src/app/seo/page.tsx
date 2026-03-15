@@ -1,32 +1,37 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
-  BarChart3,
-  FileText,
-  History,
-  LayoutDashboard,
-  LogOut,
-  User,
-  ArrowRight,
   Code2,
-  Globe,
+  BarChart3,
+  Zap,
+  Download,
+  Clock,
+  Trash2,
+  ChevronRight,
+  AlertTriangle,
   CheckCircle2,
   XCircle,
-  AlertTriangle,
-  ChevronRight,
+  FileText,
+  Image,
+  Link2,
+  Smartphone,
+  Gauge,
+  Share2,
+  Heading,
+  LogOut,
+  LayoutDashboard,
+  Hammer,
+  Globe,
   Loader2,
   Sparkles,
-  Tag,
-  TrendingUp,
-  Trash2,
-  ExternalLink,
-  RefreshCw,
+  X,
 } from "lucide-react";
 
-// ─── Types ───
+/* ─── types matching /api/seo/analyze response ─── */
 
 interface SeoCheck {
   name: string;
@@ -52,90 +57,76 @@ interface SeoResult {
   }>;
 }
 
-interface AnalysisRecord {
+interface HistoryEntry {
   id: string;
-  timestamp: number;
   label: string;
+  url?: string;
   score: number;
-  targetKeyword: string;
-  inputType: "url" | "html";
+  timestamp: number;
   result: SeoResult;
-  html?: string;
+  html: string;
+  keyword?: string;
 }
 
-interface KeywordSuggestion {
-  keyword: string;
-  difficulty: "Low" | "Medium" | "High";
-  relevance: "High" | "Medium" | "Low";
-  searchVolume: string;
-  intent: string;
-}
+/* ─── constants ─── */
 
-// ─── Constants ───
-
-type NavView = "dashboard" | "analyze" | "keywords" | "history";
-
-const NAV_ITEMS: { id: NavView; label: string; icon: React.ElementType }[] = [
-  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { id: "analyze", label: "Analyze", icon: BarChart3 },
-  { id: "keywords", label: "Keywords", icon: Tag },
-  { id: "history", label: "History", icon: History },
-];
+const CATEGORY_ICONS: Record<string, React.ReactNode> = {
+  "Title & Meta": <FileText className="w-5 h-5" />,
+  Headings: <Heading className="w-5 h-5" />,
+  Content: <Code2 className="w-5 h-5" />,
+  Images: <Image className="w-5 h-5" />,
+  Links: <Link2 className="w-5 h-5" />,
+  Mobile: <Smartphone className="w-5 h-5" />,
+  Performance: <Gauge className="w-5 h-5" />,
+  Social: <Share2 className="w-5 h-5" />,
+};
 
 const STORAGE_KEY = "zoobicon_seo_history";
 
-// ─── Helpers ───
-
-function getScoreColor(score: number): string {
+function scoreColor(score: number): string {
   if (score >= 80) return "text-emerald-400";
   if (score >= 50) return "text-yellow-400";
   return "text-red-400";
 }
 
-function getScoreRingColor(score: number): string {
-  if (score >= 80) return "stroke-emerald-400";
-  if (score >= 50) return "stroke-yellow-400";
-  return "stroke-red-400";
+function scoreRingColor(score: number): string {
+  if (score >= 80) return "#34d399";
+  if (score >= 50) return "#facc15";
+  return "#f87171";
 }
 
-function getScoreBg(score: number): string {
-  if (score >= 80) return "bg-emerald-400/10 border-emerald-400/20";
-  if (score >= 50) return "bg-yellow-400/10 border-yellow-400/20";
-  return "bg-red-400/10 border-red-400/20";
+function scoreBg(score: number): string {
+  if (score >= 80) return "bg-emerald-500/10 border-emerald-500/30";
+  if (score >= 50) return "bg-yellow-500/10 border-yellow-500/30";
+  return "bg-red-500/10 border-red-500/30";
 }
 
-function getScoreLabel(score: number): string {
-  if (score >= 90) return "Excellent";
-  if (score >= 80) return "Good";
-  if (score >= 60) return "Needs Work";
-  if (score >= 40) return "Poor";
-  return "Critical";
+function priorityBadge(priority: "high" | "medium" | "low") {
+  const styles = {
+    high: "bg-red-500/20 text-red-300 border-red-500/30",
+    medium: "bg-yellow-500/20 text-yellow-300 border-yellow-500/30",
+    low: "bg-blue-500/20 text-blue-300 border-blue-500/30",
+  };
+  return (
+    <span
+      className={`text-xs font-medium px-2 py-0.5 rounded-full border ${styles[priority]}`}
+    >
+      {priority}
+    </span>
+  );
 }
 
-function loadHistory(): AnalysisRecord[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
+/* ─── circular score ring ─── */
 
-function saveHistory(records: AnalysisRecord[]) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(records.slice(0, 50)));
-  } catch { /* storage full or unavailable */ }
-}
-
-// ─── Score Circle Component ───
-
-function ScoreCircle({ score, size = 160 }: { score: number; size?: number }) {
-  const radius = (size - 16) / 2;
+function ScoreRing({ score, size = 160 }: { score: number; size?: number }) {
+  const strokeWidth = 10;
+  const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (score / 100) * circumference;
+  const color = scoreRingColor(score);
 
   return (
-    <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
+    <div className="relative" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
         <circle
           cx={size / 2}
@@ -143,932 +134,899 @@ function ScoreCircle({ score, size = 160 }: { score: number; size?: number }) {
           r={radius}
           fill="none"
           stroke="rgba(255,255,255,0.06)"
-          strokeWidth={8}
+          strokeWidth={strokeWidth}
         />
-        <circle
+        <motion.circle
           cx={size / 2}
           cy={size / 2}
           r={radius}
           fill="none"
-          className={`${getScoreRingColor(score)} transition-all duration-1000`}
-          strokeWidth={8}
+          stroke={color}
+          strokeWidth={strokeWidth}
           strokeLinecap="round"
           strokeDasharray={circumference}
-          strokeDashoffset={offset}
+          initial={{ strokeDashoffset: circumference }}
+          animate={{ strokeDashoffset: offset }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className={`text-4xl font-black ${getScoreColor(score)}`}>{score}</span>
-        <span className="text-xs text-white/60 mt-1">{getScoreLabel(score)}</span>
+        <motion.span
+          className={`text-4xl font-bold ${scoreColor(score)}`}
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+        >
+          {score}
+        </motion.span>
+        <span className="text-xs text-gray-400 mt-1">/ 100</span>
       </div>
     </div>
   );
 }
 
-// ─── Category Card ───
+/* ─── main page ─── */
 
-function CategoryCard({ category }: { category: SeoCategory }) {
-  const [expanded, setExpanded] = useState(false);
-  const pct = category.maxScore > 0 ? Math.round((category.score / category.maxScore) * 100) : 0;
-
-  return (
-    <div className="border border-white/[0.10] bg-white/[0.05] rounded-xl overflow-hidden">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-4 hover:bg-white/[0.05] transition-colors text-left"
-      >
-        <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold border ${getScoreBg(pct)}`}>
-            <span className={getScoreColor(pct)}>{pct}</span>
-          </div>
-          <div>
-            <span className="font-semibold text-sm">{category.name}</span>
-            <div className="text-xs text-white/50 mt-0.5">
-              {category.checks.filter(c => c.passed).length}/{category.checks.length} checks passed
-            </div>
-          </div>
-        </div>
-        <ChevronRight className={`w-4 h-4 text-white/50 transition-transform ${expanded ? "rotate-90" : ""}`} />
-      </button>
-
-      {expanded && (
-        <div className="border-t border-white/[0.08] p-4 space-y-2">
-          {category.checks.map((check, i) => (
-            <div key={i} className="flex items-start gap-2.5">
-              {check.passed ? (
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
-              ) : (
-                <XCircle className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
-              )}
-              <div>
-                <div className="text-sm font-medium">{check.name}</div>
-                <div className="text-xs text-white/60 mt-0.5">{check.message}</div>
-                <span className={`inline-block text-[10px] mt-1 px-1.5 py-0.5 rounded ${
-                  check.impact === "high" ? "bg-red-500/10 text-red-400" :
-                  check.impact === "medium" ? "bg-yellow-500/10 text-yellow-400" :
-                  "bg-blue-500/10 text-blue-400"
-                }`}>
-                  {check.impact} impact
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Main Component ───
-
-export default function SEODashboard() {
-  const [user, setUser] = useState<{ email: string; name?: string } | null>(null);
-  const [activeView, setActiveView] = useState<NavView>("dashboard");
-  const [history, setHistory] = useState<AnalysisRecord[]>([]);
-
-  // Analysis state
-  const [urlInput, setUrlInput] = useState("");
+export default function SeoAgentPage() {
+  const [authed, setAuthed] = useState<boolean | null>(null);
+  const [inputMode, setInputMode] = useState<"url" | "html">("url");
+  const [url, setUrl] = useState("");
   const [htmlInput, setHtmlInput] = useState("");
-  const [keywordInput, setKeywordInput] = useState("");
+  const [keyword, setKeyword] = useState("");
   const [analyzing, setAnalyzing] = useState(false);
-  const [analysisError, setAnalysisError] = useState("");
-  const [currentResult, setCurrentResult] = useState<SeoResult | null>(null);
+  const [fixing, setFixing] = useState(false);
+  const [result, setResult] = useState<SeoResult | null>(null);
   const [currentHtml, setCurrentHtml] = useState("");
-  const [currentLabel, setCurrentLabel] = useState("");
+  const [error, setError] = useState("");
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [selectedHistory, setSelectedHistory] = useState<string | null>(null);
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+  const [showHistory, setShowHistory] = useState(false);
+  const [fixChanges, setFixChanges] = useState<string[] | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Keywords state
-  const [keywordBusiness, setKeywordBusiness] = useState("");
-  const [keywordLoading, setKeywordLoading] = useState(false);
-  const [keywordSuggestions, setKeywordSuggestions] = useState<KeywordSuggestion[]>([]);
-  const [keywordError, setKeywordError] = useState("");
-
-  // Load user + history
+  // Auth check
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem("zoobicon_user");
-      if (stored) setUser(JSON.parse(stored));
-    } catch { /* ignore */ }
-    setHistory(loadHistory());
+    const user = localStorage.getItem("zoobicon_user");
+    if (!user) {
+      window.location.href = "/auth/login";
+    } else {
+      setAuthed(true);
+    }
   }, []);
 
-  const handleLogout = () => {
-    try { localStorage.removeItem("zoobicon_user"); } catch { /* ignore */ }
-    setUser(null);
-  };
-
-  // ─── Fetch HTML from URL ───
-  const fetchHtmlFromUrl = async (url: string): Promise<string> => {
-    // Try fetching through a CORS proxy approach — use our own API
-    const res = await fetch(`/api/seo/analyze`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        code: `<!DOCTYPE html><html><head><title>Fetching ${url}</title></head><body><p>Placeholder</p></body></html>`,
-        targetKeyword: "",
-      }),
-    });
-    // For URL analysis, we'll fetch the URL content client-side
-    // This may be blocked by CORS for some sites
+  // Load history
+  useEffect(() => {
     try {
-      const proxyRes = await fetch(url, { mode: "no-cors" });
-      const text = await proxyRes.text();
-      if (text && text.includes("<")) return text;
-    } catch { /* CORS blocked */ }
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        setHistory(JSON.parse(stored));
+      }
+    } catch {
+      // ignore corrupt data
+    }
+  }, []);
 
-    // Fallback: use a simple approach — inform user to paste HTML
-    throw new Error("Could not fetch this URL due to CORS restrictions. Please paste the HTML source code instead (right-click the page, View Page Source, copy all).");
-  };
+  // Save history
+  const saveHistory = useCallback((entries: HistoryEntry[]) => {
+    const trimmed = entries.slice(0, 50);
+    setHistory(trimmed);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
+  }, []);
 
-  // ─── Run Analysis ───
-  const runAnalysis = useCallback(async (html: string, keyword: string, label: string, inputType: "url" | "html") => {
-    setAnalyzing(true);
-    setAnalysisError("");
-    setCurrentResult(null);
+  const handleAnalyze = useCallback(async () => {
+    setError("");
+    setResult(null);
+    setFixChanges(null);
+    setSelectedHistory(null);
+
+    let html = "";
+
+    if (inputMode === "url") {
+      if (!url.trim()) {
+        setError("Enter a URL to analyze.");
+        return;
+      }
+      setAnalyzing(true);
+      try {
+        let targetUrl = url.trim();
+        if (!targetUrl.startsWith("http://") && !targetUrl.startsWith("https://")) {
+          targetUrl = "https://" + targetUrl;
+        }
+
+        const fetchRes = await fetch(targetUrl);
+        if (!fetchRes.ok) {
+          setError(
+            `Failed to fetch URL (${fetchRes.status}). Try pasting the HTML directly instead.`
+          );
+          setAnalyzing(false);
+          return;
+        }
+        html = await fetchRes.text();
+      } catch {
+        setError(
+          "Could not fetch URL. The site may block cross-origin requests. Try pasting the HTML directly instead."
+        );
+        setAnalyzing(false);
+        return;
+      }
+    } else {
+      html = htmlInput.trim();
+      if (!html) {
+        setError("Paste your HTML to analyze.");
+        return;
+      }
+      setAnalyzing(true);
+    }
+
+    setCurrentHtml(html);
 
     try {
       const res = await fetch("/api/seo/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: html, targetKeyword: keyword }),
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: "Analysis failed" }));
-        throw new Error(err.error || "Analysis failed");
-      }
-
-      const result: SeoResult = await res.json();
-      setCurrentResult(result);
-      setCurrentHtml(html);
-      setCurrentLabel(label);
-
-      // Save to history
-      const record: AnalysisRecord = {
-        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-        timestamp: Date.now(),
-        label,
-        score: result.score,
-        targetKeyword: keyword,
-        inputType,
-        result,
-        html: html.length < 200000 ? html : undefined, // Don't store huge HTML
-      };
-
-      const updated = [record, ...history.filter(h => h.id !== record.id)].slice(0, 50);
-      setHistory(updated);
-      saveHistory(updated);
-
-      // Switch to analyze view to show results
-      setActiveView("analyze");
-    } catch (err) {
-      setAnalysisError(err instanceof Error ? err.message : "Analysis failed");
-    } finally {
-      setAnalyzing(false);
-    }
-  }, [history]);
-
-  // ─── URL Analysis ───
-  const handleUrlAnalysis = async () => {
-    if (!urlInput.trim()) return;
-    const url = urlInput.trim().startsWith("http") ? urlInput.trim() : `https://${urlInput.trim()}`;
-
-    try {
-      setAnalyzing(true);
-      setAnalysisError("");
-      const html = await fetchHtmlFromUrl(url);
-      await runAnalysis(html, keywordInput.trim(), url, "url");
-    } catch (err) {
-      setAnalysisError(err instanceof Error ? err.message : "Failed to fetch URL");
-      setAnalyzing(false);
-    }
-  };
-
-  // ─── HTML Analysis ───
-  const handleHtmlAnalysis = async () => {
-    if (!htmlInput.trim()) return;
-    await runAnalysis(htmlInput.trim(), keywordInput.trim(), "Pasted HTML", "html");
-  };
-
-  // ─── Keyword Suggestions ───
-  const handleKeywordSearch = async () => {
-    if (!keywordBusiness.trim()) return;
-    setKeywordLoading(true);
-    setKeywordError("");
-    setKeywordSuggestions([]);
-
-    try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          code: "<!-- keyword research -->",
-          instruction: `You are an SEO keyword research expert. The user needs keyword suggestions for this business/industry: "${keywordBusiness.trim()}"
-
-Generate exactly 12 keyword suggestions. For each keyword, provide:
-- keyword: the search term
-- difficulty: "Low", "Medium", or "High"
-- relevance: "High", "Medium", or "Low"
-- searchVolume: estimated monthly searches (e.g., "1.2K", "14K", "590")
-- intent: "Informational", "Commercial", "Transactional", or "Navigational"
-
-Output ONLY a valid JSON array of objects with these exact keys, no other text. Example:
-[{"keyword":"best crm software","difficulty":"High","relevance":"High","searchVolume":"12K","intent":"Commercial"}]`,
+          code: html,
+          targetKeyword: keyword.trim() || undefined,
         }),
       });
 
-      if (!res.ok) throw new Error("Failed to generate keywords");
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        setError(errData.error || "Analysis failed. Please try again.");
+        setAnalyzing(false);
+        return;
+      }
 
-      const text = await res.text();
-      // Extract JSON from response
-      const jsonMatch = text.match(/\[[\s\S]*\]/);
-      if (!jsonMatch) throw new Error("Invalid response format");
+      const data: SeoResult = await res.json();
+      setResult(data);
 
-      const suggestions = JSON.parse(jsonMatch[0]) as KeywordSuggestion[];
-      setKeywordSuggestions(suggestions);
-    } catch (err) {
-      setKeywordError(err instanceof Error ? err.message : "Failed to generate keywords");
+      const entry: HistoryEntry = {
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        label: inputMode === "url" ? url.trim() : `HTML snippet (${html.length} chars)`,
+        url: inputMode === "url" ? url.trim() : undefined,
+        score: data.score,
+        timestamp: Date.now(),
+        result: data,
+        html,
+        keyword: keyword.trim() || undefined,
+      };
+      saveHistory([entry, ...history]);
+    } catch {
+      setError("An unexpected error occurred during analysis.");
     } finally {
-      setKeywordLoading(false);
+      setAnalyzing(false);
     }
-  };
+  }, [inputMode, url, htmlInput, keyword, history, saveHistory]);
 
-  // ─── Delete history record ───
-  const deleteRecord = (id: string) => {
-    const updated = history.filter(h => h.id !== id);
-    setHistory(updated);
-    saveHistory(updated);
-  };
+  const handleAutoFix = useCallback(async () => {
+    if (!result || !currentHtml) return;
 
-  // ─── View a history record ───
-  const viewRecord = (record: AnalysisRecord) => {
-    setCurrentResult(record.result);
-    setCurrentLabel(record.label);
-    setCurrentHtml(record.html || "");
-    setActiveView("analyze");
-  };
+    setFixing(true);
+    setError("");
+    setFixChanges(null);
 
-  // ─── Render ───
+    const suggestions = result.suggestions.map((s) => s.message);
+
+    try {
+      const res = await fetch("/api/seo/fix", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          html: currentHtml,
+          suggestions,
+          keyword: keyword.trim() || undefined,
+        }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        setError(errData.error || "Auto-fix failed. Please try again.");
+        setFixing(false);
+        return;
+      }
+
+      const data = await res.json();
+      setCurrentHtml(data.html);
+      setFixChanges(data.changes);
+
+      // Re-analyze the fixed HTML
+      const analyzeRes = await fetch("/api/seo/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: data.html,
+          targetKeyword: keyword.trim() || undefined,
+        }),
+      });
+
+      if (analyzeRes.ok) {
+        const newResult: SeoResult = await analyzeRes.json();
+        setResult(newResult);
+
+        const entry: HistoryEntry = {
+          id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+          label: `[Fixed] ${inputMode === "url" ? url.trim() : "HTML snippet"}`,
+          url: inputMode === "url" ? url.trim() : undefined,
+          score: newResult.score,
+          timestamp: Date.now(),
+          result: newResult,
+          html: data.html,
+          keyword: keyword.trim() || undefined,
+        };
+        saveHistory([entry, ...history]);
+      }
+    } catch {
+      setError("Auto-fix encountered an error. Please try again.");
+    } finally {
+      setFixing(false);
+    }
+  }, [result, currentHtml, keyword, inputMode, url, history, saveHistory]);
+
+  const loadHistoryEntry = useCallback((entry: HistoryEntry) => {
+    setResult(entry.result);
+    setCurrentHtml(entry.html);
+    setSelectedHistory(entry.id);
+    setFixChanges(null);
+    setError("");
+    if (entry.url) {
+      setUrl(entry.url);
+      setInputMode("url");
+    } else {
+      setHtmlInput(entry.html);
+      setInputMode("html");
+    }
+    if (entry.keyword) setKeyword(entry.keyword);
+    setShowHistory(false);
+  }, []);
+
+  const deleteHistoryEntry = useCallback(
+    (id: string) => {
+      const filtered = history.filter((h) => h.id !== id);
+      saveHistory(filtered);
+      if (selectedHistory === id) {
+        setSelectedHistory(null);
+      }
+    },
+    [history, saveHistory, selectedHistory]
+  );
+
+  const exportReport = useCallback(() => {
+    if (!result) return;
+    const report = {
+      generatedAt: new Date().toISOString(),
+      url: inputMode === "url" ? url : null,
+      keyword: keyword || null,
+      overallScore: result.score,
+      categories: result.categories.map((c) => ({
+        name: c.name,
+        score: c.score,
+        maxScore: c.maxScore,
+        checks: c.checks,
+      })),
+      suggestions: result.suggestions,
+    };
+    const blob = new Blob([JSON.stringify(report, null, 2)], {
+      type: "application/json",
+    });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `seo-report-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }, [result, inputMode, url, keyword]);
+
+  const handleSignOut = useCallback(() => {
+    localStorage.removeItem("zoobicon_user");
+    window.location.href = "/";
+  }, []);
+
+  if (authed === null) {
+    return (
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-indigo-400 animate-spin" />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-[#111a2e] text-white">
-      {/* Top Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08] bg-[#0d1525]/90 backdrop-blur-2xl">
-        <div className="max-w-[1600px] mx-auto px-4 lg:px-6 flex items-center justify-between h-14">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-400 to-emerald-500 flex items-center justify-center">
-                <Search className="w-3.5 h-3.5 text-white" />
-              </div>
-              <span className="text-sm font-bold tracking-tight">Zoobicon</span>
-            </Link>
-            <span className="text-white/30">/</span>
-            <span className="text-sm text-white/60 font-medium">SEO Agent</span>
-          </div>
-          <div className="flex items-center gap-3">
-            {user ? (
-              <>
-                <Link href="/dashboard" className="text-xs text-white/60 hover:text-white/70 transition-colors px-3 py-1.5 flex items-center gap-1.5">
-                  <LayoutDashboard className="w-3 h-3" />
+    <div className="min-h-screen bg-gray-950 text-white">
+      {/* ─── navbar ─── */}
+      <nav className="sticky top-0 z-50 bg-gray-950/80 backdrop-blur-xl border-b border-white/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-8">
+              <Link href="/" className="flex items-center gap-2 group">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-white" />
+                </div>
+                <span className="font-bold text-lg">Zoobicon</span>
+              </Link>
+              <div className="hidden md:flex items-center gap-1">
+                <Link
+                  href="/dashboard"
+                  className="px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-2"
+                >
+                  <LayoutDashboard className="w-4 h-4" />
                   Dashboard
                 </Link>
-                <button onClick={handleLogout} className="text-xs text-white/60 hover:text-white/70 transition-colors px-3 py-1.5 flex items-center gap-1.5">
-                  <LogOut className="w-3 h-3" />
-                  Sign out
-                </button>
-                <div className="flex items-center gap-1.5 text-xs bg-white/[0.07] px-3 py-1.5 rounded-lg">
-                  <User className="w-3 h-3 text-cyan-400" />
-                  <span className="text-white/60">{user.name || user.email.split("@")[0]}</span>
+                <div className="px-3 py-2 rounded-lg text-sm text-white bg-white/10 flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4 text-indigo-400" />
+                  SEO Agent
                 </div>
-              </>
-            ) : (
-              <>
-                <Link href="/auth/login" className="text-xs text-white/60 hover:text-white/70 transition-colors px-3 py-1.5">
-                  Sign in
+                <Link
+                  href="/builder"
+                  className="px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-2"
+                >
+                  <Hammer className="w-4 h-4" />
+                  Builder
                 </Link>
-                <Link href="/auth/signup" className="text-xs bg-gradient-to-r from-cyan-500 to-emerald-500 px-4 py-1.5 rounded-lg font-semibold text-white">
-                  Get Started
-                </Link>
-              </>
-            )}
+              </div>
+            </div>
+            <button
+              onClick={handleSignOut}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="hidden sm:inline">Sign Out</span>
+            </button>
           </div>
         </div>
       </nav>
 
-      <div className="flex pt-14">
-        {/* Sidebar */}
-        <aside className="fixed left-0 top-14 bottom-0 w-56 border-r border-white/[0.08] bg-[#0d1525]/80 backdrop-blur-xl hidden lg:block">
-          <div className="p-4 space-y-1">
-            {NAV_ITEMS.map(item => (
-              <button
-                key={item.id}
-                onClick={() => setActiveView(item.id)}
-                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-all ${
-                  activeView === item.id
-                    ? "bg-cyan-500/10 text-cyan-400 font-medium"
-                    : "text-white/60 hover:text-white/70 hover:bg-white/[0.06]"
-                }`}
-              >
-                <item.icon className="w-4 h-4" />
-                {item.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/[0.08]">
-            <Link
-              href="/products/seo-agent"
-              className="flex items-center gap-2 text-xs text-white/40 hover:text-white/60 transition-colors"
-            >
-              <ExternalLink className="w-3 h-3" />
-              About SEO Agent
-            </Link>
-          </div>
-        </aside>
-
-        {/* Mobile nav */}
-        <div className="lg:hidden fixed top-14 left-0 right-0 z-40 border-b border-white/[0.08] bg-[#0d1525]/90 backdrop-blur-xl">
-          <div className="flex overflow-x-auto px-4 py-2 gap-1">
-            {NAV_ITEMS.map(item => (
-              <button
-                key={item.id}
-                onClick={() => setActiveView(item.id)}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs whitespace-nowrap transition-all ${
-                  activeView === item.id
-                    ? "bg-cyan-500/10 text-cyan-400 font-medium"
-                    : "text-white/60 hover:text-white/70"
-                }`}
-              >
-                <item.icon className="w-3.5 h-3.5" />
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <main className="flex-1 lg:ml-56 min-h-[calc(100vh-56px)]">
-          <div className="max-w-5xl mx-auto px-4 lg:px-8 py-8 lg:py-10 mt-12 lg:mt-0">
-
-            {/* ─── DASHBOARD VIEW ─── */}
-            {activeView === "dashboard" && (
-              <div className="space-y-8">
-                <div>
-                  <h1 className="text-2xl font-bold mb-1">SEO Agent Dashboard</h1>
-                  <p className="text-white/60 text-sm">Analyze, optimize, and track your website SEO performance.</p>
-                </div>
-
-                {/* Quick action cards */}
-                <div className="grid md:grid-cols-2 gap-4">
-                  {/* Analyze by URL */}
-                  <div className="border border-white/[0.10] bg-white/[0.05] rounded-xl p-6">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center">
-                        <Globe className="w-5 h-5 text-cyan-400" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-sm">Analyze a Website</h3>
-                        <p className="text-xs text-white/50">Enter a URL to scan</p>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={urlInput}
-                        onChange={e => setUrlInput(e.target.value)}
-                        onKeyDown={e => e.key === "Enter" && handleUrlAnalysis()}
-                        placeholder="https://example.com"
-                        className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-lg px-3 py-2 text-sm placeholder:text-white/40 focus:outline-none focus:border-cyan-500/30"
-                      />
-                      <button
-                        onClick={handleUrlAnalysis}
-                        disabled={analyzing || !urlInput.trim()}
-                        className="bg-gradient-to-r from-cyan-500 to-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-opacity flex items-center gap-1.5"
-                      >
-                        {analyzing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ArrowRight className="w-3.5 h-3.5" />}
-                        Scan
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Analyze by HTML */}
-                  <div className="border border-white/[0.10] bg-white/[0.05] rounded-xl p-6">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                        <Code2 className="w-5 h-5 text-purple-400" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-sm">Paste HTML Code</h3>
-                        <p className="text-xs text-white/50">Analyze raw HTML source</p>
-                      </div>
-                    </div>
-                    <textarea
-                      value={htmlInput}
-                      onChange={e => setHtmlInput(e.target.value)}
-                      placeholder="<!DOCTYPE html>&#10;<html>..."
-                      rows={3}
-                      className="w-full bg-white/[0.07] border border-white/[0.12] rounded-lg px-3 py-2 text-sm placeholder:text-white/40 focus:outline-none focus:border-purple-500/30 resize-none font-mono text-xs"
-                    />
-                    <div className="flex gap-2 mt-2">
-                      <input
-                        type="text"
-                        value={keywordInput}
-                        onChange={e => setKeywordInput(e.target.value)}
-                        placeholder="Target keyword (optional)"
-                        className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-lg px-3 py-2 text-sm placeholder:text-white/40 focus:outline-none focus:border-white/10"
-                      />
-                      <button
-                        onClick={handleHtmlAnalysis}
-                        disabled={analyzing || !htmlInput.trim()}
-                        className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-opacity flex items-center gap-1.5"
-                      >
-                        {analyzing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Search className="w-3.5 h-3.5" />}
-                        Analyze
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Error display */}
-                {analysisError && (
-                  <div className="flex items-start gap-3 bg-red-500/5 border border-red-500/20 rounded-xl p-4">
-                    <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <div className="text-sm font-medium text-red-400">Analysis Error</div>
-                      <div className="text-xs text-white/65 mt-1">{analysisError}</div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Recent analyses */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex gap-8">
+          {/* ─── history sidebar (desktop) ─── */}
+          <aside className="hidden lg:block w-72 shrink-0">
+            <div className="sticky top-24">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                  <Clock className="w-4 h-4" />
+                  History
+                </h2>
                 {history.length > 0 && (
-                  <div>
-                    <h2 className="text-lg font-semibold mb-3">Recent Analyses</h2>
-                    <div className="space-y-2">
-                      {history.slice(0, 5).map(record => (
+                  <button
+                    onClick={() => {
+                      saveHistory([]);
+                      setSelectedHistory(null);
+                    }}
+                    className="text-xs text-gray-500 hover:text-red-400 transition-colors"
+                  >
+                    Clear all
+                  </button>
+                )}
+              </div>
+              {history.length === 0 ? (
+                <p className="text-sm text-gray-600">No analyses yet.</p>
+              ) : (
+                <div className="space-y-2 max-h-[calc(100vh-12rem)] overflow-y-auto pr-2">
+                  {history.map((entry) => (
+                    <motion.button
+                      key={entry.id}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      onClick={() => loadHistoryEntry(entry)}
+                      className={`w-full text-left p-3 rounded-xl border transition-all group ${
+                        selectedHistory === entry.id
+                          ? "bg-indigo-500/10 border-indigo-500/30"
+                          : "bg-white/[0.02] border-white/5 hover:bg-white/5 hover:border-white/10"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium truncate text-gray-200">
+                            {entry.label}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {new Date(entry.timestamp).toLocaleDateString()} &middot;{" "}
+                            {new Date(entry.timestamp).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span
+                            className={`text-sm font-bold ${scoreColor(entry.score)}`}
+                          >
+                            {entry.score}
+                          </span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteHistoryEntry(entry.id);
+                            }}
+                            className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-red-400 transition-all"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </motion.button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </aside>
+
+          {/* ─── main content ─── */}
+          <main className="flex-1 min-w-0">
+            {/* header */}
+            <div className="mb-8">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                  <BarChart3 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold">SEO Agent</h1>
+                  <p className="text-sm text-gray-400">
+                    Analyze, score, and auto-fix SEO issues on any webpage
+                  </p>
+                </div>
+              </div>
+
+              {/* mobile history toggle */}
+              <button
+                onClick={() => setShowHistory(!showHistory)}
+                className="lg:hidden mt-4 flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+              >
+                <Clock className="w-4 h-4" />
+                History ({history.length})
+                <ChevronRight
+                  className={`w-4 h-4 transition-transform ${
+                    showHistory ? "rotate-90" : ""
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* mobile history panel */}
+            <AnimatePresence>
+              {showHistory && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="lg:hidden overflow-hidden mb-6"
+                >
+                  <div className="bg-white/[0.02] rounded-xl border border-white/5 p-4 space-y-2">
+                    {history.length === 0 ? (
+                      <p className="text-sm text-gray-600">No analyses yet.</p>
+                    ) : (
+                      history.slice(0, 10).map((entry) => (
                         <button
-                          key={record.id}
-                          onClick={() => viewRecord(record)}
-                          className="w-full flex items-center gap-4 border border-white/[0.10] bg-white/[0.05] rounded-xl p-4 hover:bg-white/[0.07] transition-colors text-left group"
+                          key={entry.id}
+                          onClick={() => loadHistoryEntry(entry)}
+                          className="w-full text-left p-3 rounded-lg bg-white/[0.02] hover:bg-white/5 flex items-center justify-between"
                         >
-                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold border ${getScoreBg(record.score)}`}>
-                            <span className={getScoreColor(record.score)}>{record.score}</span>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="text-sm font-medium truncate">{record.label}</div>
-                            <div className="text-xs text-white/50 mt-0.5">
-                              {new Date(record.timestamp).toLocaleDateString()} &middot;
-                              {record.targetKeyword ? ` Keyword: ${record.targetKeyword}` : " No keyword"}
-                            </div>
-                          </div>
-                          <ChevronRight className="w-4 h-4 text-white/40 group-hover:text-white/60 transition-colors" />
+                          <span className="text-sm truncate mr-4">
+                            {entry.label}
+                          </span>
+                          <span
+                            className={`text-sm font-bold shrink-0 ${scoreColor(
+                              entry.score
+                            )}`}
+                          >
+                            {entry.score}
+                          </span>
                         </button>
-                      ))}
-                    </div>
-                    {history.length > 5 && (
-                      <button
-                        onClick={() => setActiveView("history")}
-                        className="text-xs text-cyan-400 hover:text-cyan-300 mt-3 flex items-center gap-1"
-                      >
-                        View all {history.length} analyses <ArrowRight className="w-3 h-3" />
-                      </button>
+                      ))
                     )}
                   </div>
-                )}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-                {/* Quick Links */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {/* ─── input section ─── */}
+            <div className="bg-white/[0.02] rounded-2xl border border-white/5 p-6 mb-8">
+              {/* mode tabs */}
+              <div className="flex gap-2 mb-5">
+                <button
+                  onClick={() => setInputMode("url")}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    inputMode === "url"
+                      ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/30"
+                      : "text-gray-400 hover:text-white hover:bg-white/5 border border-transparent"
+                  }`}
+                >
+                  <Globe className="w-4 h-4" />
+                  Analyze URL
+                </button>
+                <button
+                  onClick={() => setInputMode("html")}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    inputMode === "html"
+                      ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/30"
+                      : "text-gray-400 hover:text-white hover:bg-white/5 border border-transparent"
+                  }`}
+                >
+                  <Code2 className="w-4 h-4" />
+                  Paste HTML
+                </button>
+              </div>
+
+              {/* input area */}
+              {inputMode === "url" ? (
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <input
+                    type="url"
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    placeholder="https://example.com"
+                    className="w-full pl-12 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !analyzing) handleAnalyze();
+                    }}
+                  />
+                </div>
+              ) : (
+                <textarea
+                  ref={textareaRef}
+                  value={htmlInput}
+                  onChange={(e) => setHtmlInput(e.target.value)}
+                  placeholder="Paste your HTML code here..."
+                  rows={6}
+                  className="w-full p-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all resize-y"
+                />
+              )}
+
+              {/* keyword + analyze button */}
+              <div className="flex flex-col sm:flex-row gap-3 mt-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                  <input
+                    type="text"
+                    value={keyword}
+                    onChange={(e) => setKeyword(e.target.value)}
+                    placeholder="Target keyword (optional)"
+                    className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                  />
+                </div>
+                <button
+                  onClick={handleAnalyze}
+                  disabled={analyzing}
+                  className="flex items-center justify-center gap-2 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+                >
+                  {analyzing ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Analyzing...
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="w-4 h-4" />
+                      Analyze SEO
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* error */}
+              <AnimatePresence>
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="mt-4 flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-xl"
+                  >
+                    <AlertTriangle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="text-sm text-red-300">{error}</p>
+                    </div>
+                    <button
+                      onClick={() => setError("")}
+                      className="text-red-400 hover:text-red-300"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* ─── results ─── */}
+            <AnimatePresence mode="wait">
+              {result && (
+                <motion.div
+                  key="results"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  {/* score + actions */}
+                  <div className="flex flex-col md:flex-row items-center gap-8 mb-8 bg-white/[0.02] rounded-2xl border border-white/5 p-8">
+                    <ScoreRing score={result.score} />
+                    <div className="flex-1 text-center md:text-left">
+                      <h2 className="text-2xl font-bold mb-2">
+                        {result.score >= 80
+                          ? "Great SEO Health"
+                          : result.score >= 50
+                          ? "Needs Improvement"
+                          : "Critical Issues Found"}
+                      </h2>
+                      <p className="text-gray-400 mb-4">
+                        {
+                          result.suggestions.filter(
+                            (s) => s.priority === "high"
+                          ).length
+                        }{" "}
+                        high-priority issue
+                        {result.suggestions.filter(
+                          (s) => s.priority === "high"
+                        ).length !== 1
+                          ? "s"
+                          : ""}
+                        ,{" "}
+                        {
+                          result.suggestions.filter(
+                            (s) => s.priority === "medium"
+                          ).length
+                        }{" "}
+                        medium,{" "}
+                        {
+                          result.suggestions.filter(
+                            (s) => s.priority === "low"
+                          ).length
+                        }{" "}
+                        low
+                      </p>
+                      <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+                        <button
+                          onClick={handleAutoFix}
+                          disabled={fixing || result.suggestions.length === 0}
+                          className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {fixing ? (
+                            <>
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              Fixing...
+                            </>
+                          ) : (
+                            <>
+                              <Sparkles className="w-4 h-4" />
+                              Auto-Fix Issues
+                            </>
+                          )}
+                        </button>
+                        <button
+                          onClick={exportReport}
+                          className="flex items-center gap-2 px-5 py-2.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-medium rounded-lg transition-all"
+                        >
+                          <Download className="w-4 h-4" />
+                          Export Report
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* fix changes banner */}
+                  <AnimatePresence>
+                    {fixChanges && fixChanges.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="mb-8 overflow-hidden"
+                      >
+                        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-6">
+                          <h3 className="text-lg font-semibold text-emerald-300 flex items-center gap-2 mb-3">
+                            <CheckCircle2 className="w-5 h-5" />
+                            Auto-Fix Applied
+                          </h3>
+                          <ul className="space-y-2">
+                            {fixChanges.map((change, i) => (
+                              <li
+                                key={i}
+                                className="flex items-start gap-2 text-sm text-emerald-200"
+                              >
+                                <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-400" />
+                                {change}
+                              </li>
+                            ))}
+                          </ul>
+                          <p className="text-xs text-emerald-400/60 mt-3">
+                            The scores above reflect the fixed HTML. You can
+                            download it via Export Report.
+                          </p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* category grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    {result.categories.map((cat) => {
+                      const pct =
+                        cat.maxScore > 0
+                          ? Math.round((cat.score / cat.maxScore) * 100)
+                          : 0;
+                      const isExpanded = expandedCategory === cat.name;
+                      return (
+                        <motion.button
+                          key={cat.name}
+                          onClick={() =>
+                            setExpandedCategory(isExpanded ? null : cat.name)
+                          }
+                          className={`text-left p-4 rounded-xl border transition-all ${
+                            isExpanded
+                              ? "bg-indigo-500/10 border-indigo-500/30 col-span-1 sm:col-span-2 lg:col-span-4"
+                              : `${scoreBg(pct)} hover:scale-[1.02]`
+                          }`}
+                          layout
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <span className={scoreColor(pct)}>
+                                {CATEGORY_ICONS[cat.name] || (
+                                  <BarChart3 className="w-5 h-5" />
+                                )}
+                              </span>
+                              <span className="font-medium text-sm">
+                                {cat.name}
+                              </span>
+                            </div>
+                            <span
+                              className={`text-lg font-bold ${scoreColor(pct)}`}
+                            >
+                              {pct}
+                            </span>
+                          </div>
+                          <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                            <motion.div
+                              className="h-full rounded-full"
+                              style={{
+                                backgroundColor: scoreRingColor(pct),
+                              }}
+                              initial={{ width: 0 }}
+                              animate={{ width: `${pct}%` }}
+                              transition={{ duration: 0.8, ease: "easeOut" }}
+                            />
+                          </div>
+
+                          {/* expanded checks */}
+                          <AnimatePresence>
+                            {isExpanded && (
+                              <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="mt-4 space-y-2 overflow-hidden"
+                              >
+                                {cat.checks.map((check, i) => (
+                                  <div
+                                    key={i}
+                                    className={`flex items-start gap-3 p-3 rounded-lg ${
+                                      check.passed
+                                        ? "bg-emerald-500/5"
+                                        : "bg-red-500/5"
+                                    }`}
+                                  >
+                                    {check.passed ? (
+                                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                                    ) : (
+                                      <XCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                                    )}
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-sm font-medium text-gray-200">
+                                        {check.name}
+                                      </p>
+                                      <p className="text-xs text-gray-400 mt-0.5">
+                                        {check.message}
+                                      </p>
+                                    </div>
+                                    {priorityBadge(check.impact)}
+                                  </div>
+                                ))}
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </motion.button>
+                      );
+                    })}
+                  </div>
+
+                  {/* suggestions list */}
+                  {result.suggestions.length > 0 && (
+                    <div className="bg-white/[0.02] rounded-2xl border border-white/5 p-6">
+                      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <AlertTriangle className="w-5 h-5 text-yellow-400" />
+                        Actionable Suggestions
+                        <span className="text-sm font-normal text-gray-500">
+                          ({result.suggestions.length})
+                        </span>
+                      </h3>
+                      <div className="space-y-3">
+                        {result.suggestions.map((suggestion, i) => (
+                          <motion.div
+                            key={i}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: i * 0.03 }}
+                            className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] transition-colors"
+                          >
+                            <div className="mt-0.5">
+                              {priorityBadge(suggestion.priority)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm text-gray-200">
+                                {suggestion.message}
+                              </p>
+                              <p className="text-xs text-gray-500 mt-1">
+                                {suggestion.category}
+                              </p>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {result.suggestions.length === 0 && (
+                    <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-8 text-center">
+                      <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
+                      <h3 className="text-lg font-semibold text-emerald-300">
+                        No Issues Found
+                      </h3>
+                      <p className="text-sm text-emerald-400/70 mt-1">
+                        This page passes all SEO checks. Great work!
+                      </p>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* empty state */}
+            {!result && !analyzing && (
+              <div className="text-center py-20">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/10 flex items-center justify-center mx-auto mb-6">
+                  <BarChart3 className="w-10 h-10 text-indigo-400" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">
+                  Analyze Your First Page
+                </h3>
+                <p className="text-gray-500 max-w-md mx-auto">
+                  Enter a URL or paste HTML above to get a comprehensive SEO
+                  audit with actionable fixes powered by AI.
+                </p>
+                <div className="flex flex-wrap justify-center gap-3 mt-8">
                   {[
-                    { label: "Keyword Research", icon: Tag, view: "keywords" as NavView },
-                    { label: "Full History", icon: History, view: "history" as NavView },
-                    { label: "Website Builder", icon: Sparkles, href: "/builder" },
-                    { label: "Learn More", icon: FileText, href: "/products/seo-agent" },
-                  ].map((item, i) => (
-                    "href" in item ? (
-                      <Link
-                        key={i}
-                        href={item.href!}
-                        className="flex flex-col items-center gap-2 border border-white/[0.10] bg-white/[0.05] rounded-xl p-4 hover:bg-white/[0.07] transition-colors"
-                      >
-                        <item.icon className="w-5 h-5 text-white/50" />
-                        <span className="text-xs text-white/60">{item.label}</span>
-                      </Link>
-                    ) : (
-                      <button
-                        key={i}
-                        onClick={() => setActiveView(item.view!)}
-                        className="flex flex-col items-center gap-2 border border-white/[0.10] bg-white/[0.05] rounded-xl p-4 hover:bg-white/[0.07] transition-colors"
-                      >
-                        <item.icon className="w-5 h-5 text-white/50" />
-                        <span className="text-xs text-white/60">{item.label}</span>
-                      </button>
-                    )
+                    "Meta tags & title optimization",
+                    "Heading hierarchy",
+                    "Content quality",
+                    "Image alt text",
+                    "Mobile responsiveness",
+                    "Social sharing tags",
+                    "Structured data",
+                    "Performance hints",
+                  ].map((feature) => (
+                    <span
+                      key={feature}
+                      className="text-xs px-3 py-1.5 rounded-full bg-white/5 border border-white/5 text-gray-400"
+                    >
+                      {feature}
+                    </span>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* ─── ANALYZE VIEW ─── */}
-            {activeView === "analyze" && (
-              <div className="space-y-6">
-                {/* Input area at top */}
-                <div className="border border-white/[0.10] bg-white/[0.05] rounded-xl p-5">
-                  <h2 className="text-sm font-semibold mb-3">Analyze HTML</h2>
-                  <textarea
-                    value={htmlInput}
-                    onChange={e => setHtmlInput(e.target.value)}
-                    placeholder="Paste your full HTML source code here..."
-                    rows={4}
-                    className="w-full bg-white/[0.07] border border-white/[0.12] rounded-lg px-3 py-2.5 text-xs font-mono placeholder:text-white/40 focus:outline-none focus:border-cyan-500/30 resize-none"
-                  />
-                  <div className="flex gap-2 mt-3">
-                    <input
-                      type="text"
-                      value={keywordInput}
-                      onChange={e => setKeywordInput(e.target.value)}
-                      placeholder="Target keyword (optional)"
-                      className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-lg px-3 py-2 text-sm placeholder:text-white/40 focus:outline-none focus:border-white/10"
-                    />
-                    <button
-                      onClick={handleHtmlAnalysis}
-                      disabled={analyzing || !htmlInput.trim()}
-                      className="bg-gradient-to-r from-cyan-500 to-emerald-500 text-white px-5 py-2 rounded-lg text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-opacity flex items-center gap-2"
-                    >
-                      {analyzing ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          Analyzing...
-                        </>
-                      ) : (
-                        <>
-                          <Search className="w-4 h-4" />
-                          Analyze
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Error */}
-                {analysisError && (
-                  <div className="flex items-start gap-3 bg-red-500/5 border border-red-500/20 rounded-xl p-4">
-                    <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-                    <div className="text-sm text-red-400">{analysisError}</div>
-                  </div>
-                )}
-
-                {/* Results */}
-                {currentResult && (
-                  <div className="space-y-6">
-                    {/* Score header */}
-                    <div className="border border-white/[0.10] bg-white/[0.05] rounded-xl p-6">
-                      <div className="flex flex-col md:flex-row items-center gap-6">
-                        <ScoreCircle score={currentResult.score} />
-                        <div className="flex-1 text-center md:text-left">
-                          <h2 className="text-xl font-bold mb-1">SEO Score: {currentResult.score}/100</h2>
-                          <p className="text-sm text-white/60 mb-1">{currentLabel}</p>
-                          <p className="text-sm text-white/50">
-                            {currentResult.categories.reduce((sum, c) => sum + c.checks.filter(ch => ch.passed).length, 0)}/
-                            {currentResult.categories.reduce((sum, c) => sum + c.checks.length, 0)} checks passed
-                            {" "}&middot;{" "}
-                            {currentResult.suggestions.length} recommendation{currentResult.suggestions.length !== 1 ? "s" : ""}
-                          </p>
-                          {keywordInput && (
-                            <div className="inline-flex items-center gap-1.5 mt-2 bg-cyan-500/10 text-cyan-400 text-xs px-2.5 py-1 rounded-full">
-                              <Tag className="w-3 h-3" />
-                              {keywordInput}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Category breakdown */}
-                    <div>
-                      <h3 className="text-sm font-semibold text-white/60 mb-3 uppercase tracking-wide">Category Breakdown</h3>
-                      <div className="grid md:grid-cols-2 gap-3">
-                        {currentResult.categories.map((cat, i) => (
-                          <CategoryCard key={i} category={cat} />
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Suggestions */}
-                    {currentResult.suggestions.length > 0 && (
-                      <div>
-                        <h3 className="text-sm font-semibold text-white/60 mb-3 uppercase tracking-wide">
-                          Recommendations ({currentResult.suggestions.length})
-                        </h3>
-                        <div className="space-y-2">
-                          {currentResult.suggestions.map((s, i) => (
-                            <div key={i} className="flex items-start gap-3 border border-white/[0.10] bg-white/[0.05] rounded-lg p-3">
-                              <span className={`flex-shrink-0 text-[10px] font-bold uppercase px-2 py-0.5 rounded mt-0.5 ${
-                                s.priority === "high" ? "bg-red-500/10 text-red-400" :
-                                s.priority === "medium" ? "bg-yellow-500/10 text-yellow-400" :
-                                "bg-blue-500/10 text-blue-400"
-                              }`}>
-                                {s.priority}
-                              </span>
-                              <div className="flex-1">
-                                <p className="text-sm">{s.message}</p>
-                                <span className="text-xs text-white/40 mt-0.5">{s.category}</span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Auto-fix button */}
-                    {currentHtml && currentResult.suggestions.length > 0 && (
-                      <div className="border border-cyan-500/20 bg-cyan-500/5 rounded-xl p-5">
-                        <div className="flex items-start gap-4">
-                          <Sparkles className="w-6 h-6 text-cyan-400 flex-shrink-0 mt-0.5" />
-                          <div className="flex-1">
-                            <h3 className="font-semibold mb-1">Auto-Fix with AI</h3>
-                            <p className="text-sm text-white/60 mb-3">
-                              Let the AI agent automatically fix the SEO issues found in your HTML.
-                              It will apply the high-priority recommendations and return improved code.
-                            </p>
-                            <AutoFixButton html={currentHtml} suggestions={currentResult.suggestions} onResult={(html) => {
-                              setHtmlInput(html);
-                              setCurrentHtml(html);
-                              // Re-analyze with the fixed HTML
-                              runAnalysis(html, keywordInput, currentLabel + " (fixed)", "html");
-                            }} />
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Empty state */}
-                {!currentResult && !analyzing && !analysisError && (
-                  <div className="text-center py-16 text-white/40">
-                    <Search className="w-12 h-12 mx-auto mb-4 opacity-30" />
-                    <p className="text-sm">Paste HTML code above and click Analyze to get your SEO score.</p>
-                  </div>
-                )}
+            {/* analyzing spinner */}
+            {analyzing && (
+              <div className="text-center py-20">
+                <Loader2 className="w-12 h-12 text-indigo-400 animate-spin mx-auto mb-4" />
+                <h3 className="text-lg font-semibold">Analyzing SEO...</h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  Checking 8 categories across 30+ signals
+                </p>
               </div>
             )}
-
-            {/* ─── KEYWORDS VIEW ─── */}
-            {activeView === "keywords" && (
-              <div className="space-y-6">
-                <div>
-                  <h1 className="text-2xl font-bold mb-1">Keyword Research</h1>
-                  <p className="text-white/60 text-sm">Get AI-powered keyword suggestions for your business.</p>
-                </div>
-
-                <div className="border border-white/[0.10] bg-white/[0.05] rounded-xl p-5">
-                  <h3 className="text-sm font-semibold mb-3">Describe your business or industry</h3>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={keywordBusiness}
-                      onChange={e => setKeywordBusiness(e.target.value)}
-                      onKeyDown={e => e.key === "Enter" && handleKeywordSearch()}
-                      placeholder="e.g., online pet food store, SaaS project management tool, local dentist..."
-                      className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-lg px-3 py-2.5 text-sm placeholder:text-white/40 focus:outline-none focus:border-cyan-500/30"
-                    />
-                    <button
-                      onClick={handleKeywordSearch}
-                      disabled={keywordLoading || !keywordBusiness.trim()}
-                      className="bg-gradient-to-r from-cyan-500 to-emerald-500 text-white px-5 py-2.5 rounded-lg text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-opacity flex items-center gap-2"
-                    >
-                      {keywordLoading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          Researching...
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="w-4 h-4" />
-                          Get Keywords
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                {keywordError && (
-                  <div className="flex items-start gap-3 bg-red-500/5 border border-red-500/20 rounded-xl p-4">
-                    <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-                    <div className="text-sm text-red-400">{keywordError}</div>
-                  </div>
-                )}
-
-                {keywordSuggestions.length > 0 && (
-                  <div className="border border-white/[0.10] bg-white/[0.05] rounded-xl overflow-hidden">
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
-                        <thead>
-                          <tr className="border-b border-white/[0.10]">
-                            <th className="text-left py-3 px-4 text-xs text-white/60 font-medium uppercase tracking-wide">Keyword</th>
-                            <th className="text-left py-3 px-4 text-xs text-white/60 font-medium uppercase tracking-wide">Volume</th>
-                            <th className="text-left py-3 px-4 text-xs text-white/60 font-medium uppercase tracking-wide">Difficulty</th>
-                            <th className="text-left py-3 px-4 text-xs text-white/60 font-medium uppercase tracking-wide">Relevance</th>
-                            <th className="text-left py-3 px-4 text-xs text-white/60 font-medium uppercase tracking-wide">Intent</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {keywordSuggestions.map((kw, i) => (
-                            <tr key={i} className="border-b border-white/[0.07] hover:bg-white/[0.05] transition-colors">
-                              <td className="py-3 px-4 font-medium">{kw.keyword}</td>
-                              <td className="py-3 px-4 text-white/65">{kw.searchVolume}</td>
-                              <td className="py-3 px-4">
-                                <span className={`inline-block text-xs px-2 py-0.5 rounded ${
-                                  kw.difficulty === "Low" ? "bg-emerald-500/10 text-emerald-400" :
-                                  kw.difficulty === "Medium" ? "bg-yellow-500/10 text-yellow-400" :
-                                  "bg-red-500/10 text-red-400"
-                                }`}>
-                                  {kw.difficulty}
-                                </span>
-                              </td>
-                              <td className="py-3 px-4">
-                                <span className={`inline-block text-xs px-2 py-0.5 rounded ${
-                                  kw.relevance === "High" ? "bg-cyan-500/10 text-cyan-400" :
-                                  kw.relevance === "Medium" ? "bg-white/10 text-white/65" :
-                                  "bg-white/5 text-white/50"
-                                }`}>
-                                  {kw.relevance}
-                                </span>
-                              </td>
-                              <td className="py-3 px-4 text-white/60 text-xs">{kw.intent}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
-
-                {!keywordLoading && keywordSuggestions.length === 0 && !keywordError && (
-                  <div className="text-center py-16 text-white/40">
-                    <Tag className="w-12 h-12 mx-auto mb-4 opacity-30" />
-                    <p className="text-sm">Enter your business type above to get keyword suggestions.</p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* ─── HISTORY VIEW ─── */}
-            {activeView === "history" && (
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h1 className="text-2xl font-bold mb-1">Analysis History</h1>
-                    <p className="text-white/60 text-sm">{history.length} analysis record{history.length !== 1 ? "s" : ""} stored locally.</p>
-                  </div>
-                  {history.length > 0 && (
-                    <button
-                      onClick={() => {
-                        if (confirm("Clear all analysis history?")) {
-                          setHistory([]);
-                          saveHistory([]);
-                        }
-                      }}
-                      className="text-xs text-red-400/60 hover:text-red-400 transition-colors flex items-center gap-1.5"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                      Clear All
-                    </button>
-                  )}
-                </div>
-
-                {history.length === 0 ? (
-                  <div className="text-center py-16 text-white/40">
-                    <History className="w-12 h-12 mx-auto mb-4 opacity-30" />
-                    <p className="text-sm">No analyses yet. Run your first analysis to see results here.</p>
-                    <button
-                      onClick={() => setActiveView("dashboard")}
-                      className="mt-4 text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1 mx-auto"
-                    >
-                      Go to Dashboard <ArrowRight className="w-3 h-3" />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {history.map(record => (
-                      <div
-                        key={record.id}
-                        className="flex items-center gap-4 border border-white/[0.10] bg-white/[0.05] rounded-xl p-4 group"
-                      >
-                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-sm font-bold border ${getScoreBg(record.score)}`}>
-                          <span className={getScoreColor(record.score)}>{record.score}</span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="text-sm font-medium truncate">{record.label}</div>
-                          <div className="text-xs text-white/50 mt-0.5">
-                            {new Date(record.timestamp).toLocaleString()} &middot;
-                            {record.inputType === "url" ? " URL" : " HTML"} analysis
-                            {record.targetKeyword ? ` &middot; Keyword: ${record.targetKeyword}` : ""}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => viewRecord(record)}
-                            className="text-xs text-cyan-400 hover:text-cyan-300 px-3 py-1.5 rounded-lg bg-cyan-500/5 hover:bg-cyan-500/10 transition-colors"
-                          >
-                            View
-                          </button>
-                          <button
-                            onClick={() => deleteRecord(record.id)}
-                            className="text-xs text-white/40 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-500/5 transition-colors opacity-0 group-hover:opacity-100"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </main>
+          </main>
+        </div>
       </div>
-    </div>
-  );
-}
-
-// ─── Auto-Fix Button Component ───
-
-function AutoFixButton({
-  html,
-  suggestions,
-  onResult,
-}: {
-  html: string;
-  suggestions: SeoResult["suggestions"];
-  onResult: (html: string) => void;
-}) {
-  const [fixing, setFixing] = useState(false);
-  const [error, setError] = useState("");
-
-  const handleAutoFix = async () => {
-    setFixing(true);
-    setError("");
-
-    // Build fix instructions from high and medium priority suggestions
-    const fixes = suggestions
-      .filter(s => s.priority === "high" || s.priority === "medium")
-      .map(s => `- [${s.category}] ${s.message}`)
-      .join("\n");
-
-    try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          code: html,
-          instruction: `Fix the following SEO issues in this HTML. Apply all changes and return the complete fixed HTML document:\n\n${fixes}`,
-        }),
-      });
-
-      if (!res.ok) throw new Error("Auto-fix failed");
-
-      const text = await res.text();
-      // The chat endpoint returns the full HTML
-      // Extract the HTML from the response (it may contain the full document)
-      const htmlMatch = text.match(/<!DOCTYPE[\s\S]*<\/html>/i);
-      if (htmlMatch) {
-        onResult(htmlMatch[0]);
-      } else if (text.includes("<html")) {
-        const start = text.indexOf("<html");
-        const htmlContent = text.slice(start);
-        onResult(htmlContent);
-      } else {
-        throw new Error("Could not extract fixed HTML from AI response");
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Auto-fix failed");
-    } finally {
-      setFixing(false);
-    }
-  };
-
-  return (
-    <div>
-      <button
-        onClick={handleAutoFix}
-        disabled={fixing}
-        className="bg-gradient-to-r from-cyan-500 to-emerald-500 text-white px-5 py-2.5 rounded-lg text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-opacity flex items-center gap-2"
-      >
-        {fixing ? (
-          <>
-            <Loader2 className="w-4 h-4 animate-spin" />
-            Fixing SEO Issues...
-          </>
-        ) : (
-          <>
-            <RefreshCw className="w-4 h-4" />
-            Auto-Fix Issues
-          </>
-        )}
-      </button>
-      {error && (
-        <p className="text-xs text-red-400 mt-2">{error}</p>
-      )}
     </div>
   );
 }

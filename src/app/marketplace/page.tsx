@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   Store,
@@ -33,14 +34,25 @@ import {
   TrendingUp,
   Filter,
   Sparkles,
+  CheckCircle2,
+  X,
 } from "lucide-react";
 
+/* ---------- animation helpers ---------- */
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } },
 };
 const staggerContainer = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } } };
 
+/* ---------- icon map (API returns iconName as string) ---------- */
+const ICON_MAP: Record<string, React.ElementType> = {
+  Layout, Search, Video, Mail, CreditCard, BarChart3, MessageSquare,
+  Palette, Bot, Code2, FileText, Image, Type, Globe, Users, Clock,
+  TrendingUp, Megaphone, Shield, Layers,
+};
+
+/* ---------- categories ---------- */
 const CATEGORIES = [
   "All",
   "Templates",
@@ -53,307 +65,205 @@ const CATEGORIES = [
   "Developer Tools",
 ];
 
+/* ---------- types ---------- */
 interface MarketplaceItem {
+  id: string;
   name: string;
   category: string;
   description: string;
-  price: string;
+  price: number;
+  priceLabel: string;
   priceType: "free" | "one-time" | "monthly";
   rating: number;
   installs: string;
-  icon: React.ElementType;
+  iconName: string;
   gradient: string;
   featured?: boolean;
-  tag?: string;
+  tag?: string | null;
 }
 
-const MARKETPLACE_ITEMS: MarketplaceItem[] = [
-  {
-    name: "Premium Template Pack",
-    category: "Templates",
-    description: "50 hand-crafted, conversion-optimized website templates for SaaS, e-commerce, portfolios, and more.",
-    price: "$29",
-    priceType: "one-time",
-    rating: 4.9,
-    installs: "12.4K",
-    icon: Layout,
-    gradient: "from-brand-500 to-brand-700",
-    featured: true,
-    tag: "Best Seller",
-  },
-  {
-    name: "SEO Campaign Agent",
-    category: "AI Agents",
-    description: "Autonomous SEO agent that researches keywords, writes content, builds backlinks, and tracks rankings 24/7.",
-    price: "$29/mo",
-    priceType: "monthly",
-    rating: 4.8,
-    installs: "8.2K",
-    icon: Search,
-    gradient: "from-accent-cyan to-emerald-600",
-    featured: true,
-    tag: "Top Rated",
-  },
-  {
-    name: "AI Video Creator",
-    category: "AI Agents",
-    description: "Generate scroll-stopping videos for TikTok, Instagram, YouTube, and Facebook. No scripts needed.",
-    price: "$19/mo",
-    priceType: "monthly",
-    rating: 4.7,
-    installs: "6.8K",
-    icon: Video,
-    gradient: "from-accent-purple to-pink-600",
-    featured: true,
-  },
-  {
-    name: "AI Email Support",
-    category: "AI Agents",
-    description: "World-class AI customer support. Auto-replies, sentiment analysis, smart routing, 24/7 operation.",
-    price: "$24/mo",
-    priceType: "monthly",
-    rating: 4.9,
-    installs: "4.5K",
-    icon: Mail,
-    gradient: "from-amber-500 to-orange-600",
-    tag: "New",
-  },
-  {
-    name: "Stripe Payments",
-    category: "E-Commerce",
-    description: "Accept payments instantly. Stripe integration with checkout pages, subscriptions, and invoicing.",
-    price: "Free",
-    priceType: "free",
-    rating: 4.8,
-    installs: "15.1K",
-    icon: CreditCard,
-    gradient: "from-indigo-500 to-blue-600",
-  },
-  {
-    name: "Google Analytics",
-    category: "Analytics",
-    description: "Full Google Analytics 4 integration. Track visitors, conversions, and user behavior automatically.",
-    price: "Free",
-    priceType: "free",
-    rating: 4.6,
-    installs: "18.3K",
-    icon: BarChart3,
-    gradient: "from-emerald-500 to-teal-600",
-  },
-  {
-    name: "Social Media Manager",
-    category: "Marketing",
-    description: "AI auto-creates, schedules, and publishes social media posts across all platforms. Hashtag optimization.",
-    price: "$14/mo",
-    priceType: "monthly",
-    rating: 4.5,
-    installs: "5.1K",
-    icon: MessageSquare,
-    gradient: "from-cyan-500 to-blue-600",
-  },
-  {
-    name: "AI Brand Kit",
-    category: "Design",
-    description: "Complete brand identity: logo, colors, typography, style guide — all AI-generated from your description.",
-    price: "$19",
-    priceType: "one-time",
-    rating: 4.7,
-    installs: "7.9K",
-    icon: Palette,
-    gradient: "from-pink-500 to-rose-600",
-  },
-  {
-    name: "AI Chatbot Builder",
-    category: "AI Agents",
-    description: "Deploy custom AI chatbots on any website. Trained on your content, branded to your style. 24/7 support bot.",
-    price: "$14/mo",
-    priceType: "monthly",
-    rating: 4.6,
-    installs: "3.8K",
-    icon: Bot,
-    gradient: "from-blue-500 to-indigo-600",
-  },
-  {
-    name: "Custom Code Injection",
-    category: "Developer Tools",
-    description: "Add custom HTML, CSS, and JavaScript to any page. Header/footer injection, Google Tag Manager, pixels.",
-    price: "Free",
-    priceType: "free",
-    rating: 4.4,
-    installs: "9.2K",
-    icon: Code2,
-    gradient: "from-slate-500 to-zinc-600",
-  },
-  {
-    name: "Blog & CMS Engine",
-    category: "Templates",
-    description: "Full-featured blog with AI writing assistant, categories, tags, RSS feed, and SEO optimization built in.",
-    price: "$9/mo",
-    priceType: "monthly",
-    rating: 4.7,
-    installs: "6.3K",
-    icon: FileText,
-    gradient: "from-amber-600 to-yellow-500",
-  },
-  {
-    name: "Image Optimizer",
-    category: "Developer Tools",
-    description: "Auto-compress, resize, and convert images to WebP/AVIF. Lazy loading and responsive images built in.",
-    price: "Free",
-    priceType: "free",
-    rating: 4.5,
-    installs: "11.7K",
-    icon: Image,
-    gradient: "from-green-500 to-emerald-600",
-  },
-  {
-    name: "Custom Fonts Pack",
-    category: "Design",
-    description: "1,000+ premium web fonts. Google Fonts integration plus exclusive custom typefaces for your brand.",
-    price: "$9",
-    priceType: "one-time",
-    rating: 4.3,
-    installs: "8.6K",
-    icon: Type,
-    gradient: "from-rose-500 to-pink-600",
-  },
-  {
-    name: "Multi-Language (i18n)",
-    category: "Integrations",
-    description: "Auto-translate your website into 30+ languages. AI-powered translations with locale-specific SEO.",
-    price: "$14/mo",
-    priceType: "monthly",
-    rating: 4.6,
-    installs: "3.2K",
-    icon: Globe,
-    gradient: "from-blue-500 to-indigo-600",
-  },
-  {
-    name: "Lead Gen & Forms",
-    category: "Marketing",
-    description: "Smart forms with conditional logic, file uploads, and CRM integrations. Captures and scores leads with AI.",
-    price: "$9/mo",
-    priceType: "monthly",
-    rating: 4.7,
-    installs: "7.4K",
-    icon: Users,
-    gradient: "from-orange-500 to-red-500",
-  },
-  {
-    name: "Uptime Monitor",
-    category: "Analytics",
-    description: "24/7 website monitoring with instant alerts via email, Slack, and SMS. 1-minute check intervals.",
-    price: "Free",
-    priceType: "free",
-    rating: 4.4,
-    installs: "5.6K",
-    icon: Clock,
-    gradient: "from-teal-500 to-cyan-600",
-  },
-  {
-    name: "A/B Testing Engine",
-    category: "Analytics",
-    description: "Test headlines, layouts, CTAs, and more. AI-powered statistical analysis picks the winner for you.",
-    price: "$19/mo",
-    priceType: "monthly",
-    rating: 4.8,
-    installs: "2.9K",
-    icon: TrendingUp,
-    gradient: "from-blue-500 to-blue-600",
-    tag: "New",
-  },
-  {
-    name: "Email Marketing Suite",
-    category: "Marketing",
-    description: "AI writes and designs email campaigns. Auto-segment audiences, drip sequences, analytics, and A/B testing.",
-    price: "$14/mo",
-    priceType: "monthly",
-    rating: 4.6,
-    installs: "4.8K",
-    icon: Megaphone,
-    gradient: "from-red-500 to-orange-500",
-  },
-  {
-    name: "SSL & Security Suite",
-    category: "Integrations",
-    description: "Wildcard SSL, DDoS protection, WAF, malware scanning, and automatic security patching. Enterprise-grade.",
-    price: "$9/mo",
-    priceType: "monthly",
-    rating: 4.9,
-    installs: "10.2K",
-    icon: Shield,
-    gradient: "from-emerald-600 to-green-500",
-  },
-  {
-    name: "Component Library",
-    category: "Developer Tools",
-    description: "200+ pre-built UI components: navbars, hero sections, pricing tables, footers, testimonials, and more.",
-    price: "$19",
-    priceType: "one-time",
-    rating: 4.5,
-    installs: "6.1K",
-    icon: Layers,
-    gradient: "from-sky-500 to-blue-600",
-  },
+/* ---------- hardcoded fallback (matches API catalog) ---------- */
+const FALLBACK_ITEMS: MarketplaceItem[] = [
+  { id: "premium-template-pack", name: "Premium Template Pack", category: "Templates", description: "50 hand-crafted, conversion-optimized website templates for SaaS, e-commerce, portfolios, and more.", price: 2900, priceLabel: "$29", priceType: "one-time", rating: 4.9, installs: "12.4K", iconName: "Layout", gradient: "from-brand-500 to-brand-700", featured: true, tag: "Best Seller" },
+  { id: "seo-campaign-agent", name: "SEO Campaign Agent", category: "AI Agents", description: "Autonomous SEO agent that researches keywords, writes content, builds backlinks, and tracks rankings 24/7.", price: 2900, priceLabel: "$29/mo", priceType: "monthly", rating: 4.8, installs: "8.2K", iconName: "Search", gradient: "from-accent-cyan to-emerald-600", featured: true, tag: "Top Rated" },
+  { id: "ai-video-creator", name: "AI Video Creator", category: "AI Agents", description: "Generate scroll-stopping videos for TikTok, Instagram, YouTube, and Facebook. No scripts needed.", price: 1900, priceLabel: "$19/mo", priceType: "monthly", rating: 4.7, installs: "6.8K", iconName: "Video", gradient: "from-accent-purple to-pink-600", featured: true },
+  { id: "ai-email-support", name: "AI Email Support", category: "AI Agents", description: "World-class AI customer support. Auto-replies, sentiment analysis, smart routing, 24/7 operation.", price: 2400, priceLabel: "$24/mo", priceType: "monthly", rating: 4.9, installs: "4.5K", iconName: "Mail", gradient: "from-amber-500 to-orange-600", tag: "New" },
+  { id: "stripe-payments", name: "Stripe Payments", category: "E-Commerce", description: "Accept payments instantly. Stripe integration with checkout pages, subscriptions, and invoicing.", price: 0, priceLabel: "Free", priceType: "free", rating: 4.8, installs: "15.1K", iconName: "CreditCard", gradient: "from-indigo-500 to-blue-600" },
+  { id: "google-analytics", name: "Google Analytics", category: "Analytics", description: "Full Google Analytics 4 integration. Track visitors, conversions, and user behavior automatically.", price: 0, priceLabel: "Free", priceType: "free", rating: 4.6, installs: "18.3K", iconName: "BarChart3", gradient: "from-emerald-500 to-teal-600" },
+  { id: "social-media-manager", name: "Social Media Manager", category: "Marketing", description: "AI auto-creates, schedules, and publishes social media posts across all platforms. Hashtag optimization.", price: 1400, priceLabel: "$14/mo", priceType: "monthly", rating: 4.5, installs: "5.1K", iconName: "MessageSquare", gradient: "from-cyan-500 to-blue-600" },
+  { id: "ai-brand-kit", name: "AI Brand Kit", category: "Design", description: "Complete brand identity: logo, colors, typography, style guide — all AI-generated from your description.", price: 1900, priceLabel: "$19", priceType: "one-time", rating: 4.7, installs: "7.9K", iconName: "Palette", gradient: "from-pink-500 to-rose-600" },
+  { id: "ai-chatbot-builder", name: "AI Chatbot Builder", category: "AI Agents", description: "Deploy custom AI chatbots on any website. Trained on your content, branded to your style. 24/7 support bot.", price: 1400, priceLabel: "$14/mo", priceType: "monthly", rating: 4.6, installs: "3.8K", iconName: "Bot", gradient: "from-blue-500 to-indigo-600" },
+  { id: "custom-code-injection", name: "Custom Code Injection", category: "Developer Tools", description: "Add custom HTML, CSS, and JavaScript to any page. Header/footer injection, Google Tag Manager, pixels.", price: 0, priceLabel: "Free", priceType: "free", rating: 4.4, installs: "9.2K", iconName: "Code2", gradient: "from-slate-500 to-zinc-600" },
+  { id: "blog-cms-engine", name: "Blog & CMS Engine", category: "Templates", description: "Full-featured blog with AI writing assistant, categories, tags, RSS feed, and SEO optimization built in.", price: 900, priceLabel: "$9/mo", priceType: "monthly", rating: 4.7, installs: "6.3K", iconName: "FileText", gradient: "from-amber-600 to-yellow-500" },
+  { id: "image-optimizer", name: "Image Optimizer", category: "Developer Tools", description: "Auto-compress, resize, and convert images to WebP/AVIF. Lazy loading and responsive images built in.", price: 0, priceLabel: "Free", priceType: "free", rating: 4.5, installs: "11.7K", iconName: "Image", gradient: "from-green-500 to-emerald-600" },
+  { id: "custom-fonts-pack", name: "Custom Fonts Pack", category: "Design", description: "1,000+ premium web fonts. Google Fonts integration plus exclusive custom typefaces for your brand.", price: 900, priceLabel: "$9", priceType: "one-time", rating: 4.3, installs: "8.6K", iconName: "Type", gradient: "from-rose-500 to-pink-600" },
+  { id: "multi-language-i18n", name: "Multi-Language (i18n)", category: "Integrations", description: "Auto-translate your website into 30+ languages. AI-powered translations with locale-specific SEO.", price: 1400, priceLabel: "$14/mo", priceType: "monthly", rating: 4.6, installs: "3.2K", iconName: "Globe", gradient: "from-blue-500 to-indigo-600" },
+  { id: "lead-gen-forms", name: "Lead Gen & Forms", category: "Marketing", description: "Smart forms with conditional logic, file uploads, and CRM integrations. Captures and scores leads with AI.", price: 900, priceLabel: "$9/mo", priceType: "monthly", rating: 4.7, installs: "7.4K", iconName: "Users", gradient: "from-orange-500 to-red-500" },
+  { id: "uptime-monitor", name: "Uptime Monitor", category: "Analytics", description: "24/7 website monitoring with instant alerts via email, Slack, and SMS. 1-minute check intervals.", price: 0, priceLabel: "Free", priceType: "free", rating: 4.4, installs: "5.6K", iconName: "Clock", gradient: "from-teal-500 to-cyan-600" },
+  { id: "ab-testing-engine", name: "A/B Testing Engine", category: "Analytics", description: "Test headlines, layouts, CTAs, and more. AI-powered statistical analysis picks the winner for you.", price: 1900, priceLabel: "$19/mo", priceType: "monthly", rating: 4.8, installs: "2.9K", iconName: "TrendingUp", gradient: "from-blue-500 to-blue-600", tag: "New" },
+  { id: "email-marketing-suite", name: "Email Marketing Suite", category: "Marketing", description: "AI writes and designs email campaigns. Auto-segment audiences, drip sequences, analytics, and A/B testing.", price: 1400, priceLabel: "$14/mo", priceType: "monthly", rating: 4.6, installs: "4.8K", iconName: "Megaphone", gradient: "from-red-500 to-orange-500" },
+  { id: "ssl-security-suite", name: "SSL & Security Suite", category: "Integrations", description: "Wildcard SSL, DDoS protection, WAF, malware scanning, and automatic security patching. Enterprise-grade.", price: 900, priceLabel: "$9/mo", priceType: "monthly", rating: 4.9, installs: "10.2K", iconName: "Shield", gradient: "from-emerald-600 to-green-500" },
+  { id: "component-library", name: "Component Library", category: "Developer Tools", description: "200+ pre-built UI components: navbars, hero sections, pricing tables, footers, testimonials, and more.", price: 1900, priceLabel: "$19", priceType: "one-time", rating: 4.5, installs: "6.1K", iconName: "Layers", gradient: "from-sky-500 to-blue-600" },
 ];
 
+/* ---------- helpers ---------- */
+function getIcon(iconName: string): React.ElementType {
+  return ICON_MAP[iconName] || Layers;
+}
+
+function getStoredInstalls(): Set<string> {
+  if (typeof window === "undefined") return new Set();
+  try {
+    const saved = localStorage.getItem("zoobicon_installed_addons");
+    return new Set(saved ? JSON.parse(saved) : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function persistInstalls(ids: Set<string>) {
+  try {
+    localStorage.setItem("zoobicon_installed_addons", JSON.stringify([...ids]));
+  } catch { /* noop */ }
+}
+
+function getEmail(): string {
+  if (typeof window === "undefined") return "";
+  try {
+    const user = localStorage.getItem("zoobicon_user");
+    if (user) {
+      const parsed = JSON.parse(user);
+      return parsed.email || "";
+    }
+  } catch { /* noop */ }
+  return "";
+}
+
+/* ====================================================================== */
+/*  Component                                                              */
+/* ====================================================================== */
+
 export default function MarketplacePage() {
+  const searchParams = useSearchParams();
+
+  const [items, setItems] = useState<MarketplaceItem[]>(FALLBACK_ITEMS);
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [priceFilter, setPriceFilter] = useState<"all" | "free" | "paid">("all");
-  const [installed, setInstalled] = useState<Set<string>>(() => {
-    if (typeof window === "undefined") return new Set();
-    try {
-      const saved = localStorage.getItem("zoobicon_installed_addons");
-      return new Set(saved ? JSON.parse(saved) : []);
-    } catch { return new Set(); }
-  });
+  const [installed, setInstalled] = useState<Set<string>>(getStoredInstalls);
   const [installing, setInstalling] = useState<string | null>(null);
-  const [waitlistItem, setWaitlistItem] = useState<string | null>(null);
-  const [waitlistEmail, setWaitlistEmail] = useState("");
-  const [waitlistedItems, setWaitlistedItems] = useState<Set<string>>(new Set());
-  const [waitlistLoading, setWaitlistLoading] = useState(false);
+  const [successBanner, setSuccessBanner] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleInstall = (itemName: string, priceType: string) => {
+  /* --- Fetch add-ons from API on mount --- */
+  useEffect(() => {
+    async function fetchAddons() {
+      try {
+        const res = await fetch("/api/marketplace/addons");
+        if (!res.ok) throw new Error("API error");
+        const data = await res.json();
+        if (data.success && Array.isArray(data.addons) && data.addons.length > 0) {
+          setItems(data.addons);
+        }
+      } catch {
+        // silently fall back to hardcoded data
+      }
+    }
+    fetchAddons();
+  }, []);
+
+  /* --- Handle Stripe checkout return --- */
+  useEffect(() => {
+    const success = searchParams.get("success");
+    const addonId = searchParams.get("addon");
+    if (success === "true" && addonId) {
+      // Mark as installed after successful payment
+      setInstalled((prev) => {
+        const next = new Set(prev);
+        next.add(addonId);
+        persistInstalls(next);
+        return next;
+      });
+      // Find addon name for banner
+      const addon = items.find((a) => a.id === addonId);
+      setSuccessBanner(addon?.name || addonId);
+      // Clean URL params without full page reload
+      window.history.replaceState({}, "", "/marketplace");
+    }
+  }, [searchParams, items]);
+
+  /* --- Install handler --- */
+  const handleInstall = useCallback(async (item: MarketplaceItem) => {
     if (installing) return;
-    if (installed.has(itemName)) return;
+    if (installed.has(item.id)) return;
 
-    if (priceType !== "free") {
-      // Paid — show waitlist form
-      setWaitlistItem(itemName);
+    const email = getEmail();
+
+    // Free add-on: call install API then record locally
+    if (item.priceType === "free") {
+      setInstalling(item.id);
+      setError(null);
+      try {
+        const res = await fetch("/api/marketplace/install", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ addonId: item.id, email: email || "anonymous@zoobicon.com" }),
+        });
+        const data = await res.json();
+        if (data.success && data.installed) {
+          setInstalled((prev) => {
+            const next = new Set(prev);
+            next.add(item.id);
+            persistInstalls(next);
+            return next;
+          });
+        } else {
+          throw new Error(data.error || "Install failed");
+        }
+      } catch (err) {
+        // Fallback: install locally even if API fails
+        setInstalled((prev) => {
+          const next = new Set(prev);
+          next.add(item.id);
+          persistInstalls(next);
+          return next;
+        });
+      }
+      setInstalling(null);
       return;
     }
 
-    setInstalling(itemName);
-    setTimeout(() => {
-      setInstalled((prev) => {
-        const next = new Set(prev);
-        next.add(itemName);
-        try { localStorage.setItem("zoobicon_installed_addons", JSON.stringify([...next])); } catch {}
-        return next;
-      });
-      setInstalling(null);
-    }, 800);
-  };
+    // Paid add-on: call install API to get Stripe checkout URL
+    if (!email) {
+      // Redirect to signup if not logged in
+      window.location.href = "/auth/signup?redirect=/marketplace";
+      return;
+    }
 
-  const handleWaitlistSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!waitlistEmail.trim() || waitlistLoading || !waitlistItem) return;
-    setWaitlistLoading(true);
+    setInstalling(item.id);
+    setError(null);
     try {
-      await fetch("/api/contact", {
+      const res = await fetch("/api/marketplace/install", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: waitlistEmail, source: `marketplace-${waitlistItem.toLowerCase().replace(/\s+/g, "-")}-waitlist` }),
+        body: JSON.stringify({ addonId: item.id, email }),
       });
-      setWaitlistedItems((prev) => new Set(prev).add(waitlistItem));
-      setWaitlistItem(null);
-      setWaitlistEmail("");
-    } catch { /* silently fail */ }
-    setWaitlistLoading(false);
-  };
+      const data = await res.json();
+      if (data.success && data.checkoutUrl) {
+        // Redirect to Stripe Checkout
+        window.location.href = data.checkoutUrl;
+        return;
+      }
+      throw new Error(data.error || "Checkout failed");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Something went wrong";
+      setError(message);
+      setInstalling(null);
+    }
+  }, [installing, installed]);
 
-  const filteredItems = MARKETPLACE_ITEMS.filter((item) => {
+  /* --- Filtering --- */
+  const filteredItems = items.filter((item) => {
     const matchesCategory = activeCategory === "All" || item.category === activeCategory;
     const matchesSearch =
       !searchQuery ||
@@ -366,7 +276,42 @@ export default function MarketplacePage() {
     return matchesCategory && matchesSearch && matchesPrice;
   });
 
-  const featuredItems = MARKETPLACE_ITEMS.filter((item) => item.featured);
+  const featuredItems = items.filter((item) => item.featured);
+
+  /* --- Button rendering helper --- */
+  const renderButton = (item: MarketplaceItem, size: "sm" | "lg") => {
+    const isInstalled = installed.has(item.id);
+    const isInstalling = installing === item.id;
+    const Icon = getIcon(item.iconName);
+
+    const sizeClasses = size === "lg"
+      ? "px-4 py-2 rounded-lg text-xs"
+      : "px-3 py-1.5 rounded-lg text-[10px]";
+    const iconSize = size === "lg" ? "w-3.5 h-3.5" : "w-3 h-3";
+
+    return (
+      <button
+        onClick={() => handleInstall(item)}
+        className={`${sizeClasses} font-bold flex items-center gap-1.5 transition-all ${
+          isInstalled
+            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+            : "btn-gradient text-white"
+        }`}
+        disabled={isInstalled || isInstalling}
+      >
+        {isInstalled ? (
+          <><Check className={iconSize} />Installed</>
+        ) : isInstalling ? (
+          <><RefreshCw className={`${iconSize} animate-spin`} />
+            {item.priceType === "free" ? "Installing…" : "Redirecting…"}</>
+        ) : item.priceType === "free" ? (
+          <><Download className={iconSize} />Install</>
+        ) : (
+          <><CreditCard className={iconSize} />Buy {item.priceLabel}</>
+        )}
+      </button>
+    );
+  };
 
   return (
     <div className="relative min-h-screen">
@@ -376,6 +321,7 @@ export default function MarketplacePage() {
         <div className="grid-pattern fixed inset-0" />
       </div>
 
+      {/* Nav */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08] bg-[#0d1525]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
@@ -394,6 +340,47 @@ export default function MarketplacePage() {
         </div>
       </nav>
 
+      {/* Success Banner */}
+      {successBanner && (
+        <div className="fixed top-16 left-0 right-0 z-40">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-4">
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center justify-between gap-3 px-5 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20"
+            >
+              <div className="flex items-center gap-3">
+                <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                <span className="text-sm font-medium text-emerald-300">
+                  <strong>{successBanner}</strong> has been installed successfully!
+                </span>
+              </div>
+              <button onClick={() => setSuccessBanner(null)} className="text-emerald-400/60 hover:text-emerald-400 transition-colors">
+                <X className="w-4 h-4" />
+              </button>
+            </motion.div>
+          </div>
+        </div>
+      )}
+
+      {/* Error Banner */}
+      {error && (
+        <div className="fixed top-16 left-0 right-0 z-40">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-4">
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center justify-between gap-3 px-5 py-3 rounded-xl bg-red-500/10 border border-red-500/20"
+            >
+              <span className="text-sm font-medium text-red-300">{error}</span>
+              <button onClick={() => setError(null)} className="text-red-400/60 hover:text-red-400 transition-colors">
+                <X className="w-4 h-4" />
+              </button>
+            </motion.div>
+          </div>
+        </div>
+      )}
+
       {/* Hero */}
       <section className="pt-32 pb-16 lg:pt-44 lg:pb-24">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -402,9 +389,6 @@ export default function MarketplacePage() {
               <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-purple/20 bg-accent-purple/5">
                 <Store className="w-3 h-3 text-accent-purple" />
                 <span className="text-xs font-medium text-accent-purple">Add-ons Marketplace</span>
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium">
-                <Clock size={12} /> Coming Soon &mdash; Paid add-ons launching soon
               </span>
             </motion.div>
 
@@ -475,60 +459,41 @@ export default function MarketplacePage() {
             </motion.div>
 
             <div className="grid md:grid-cols-3 gap-4">
-              {featuredItems.map((item, i) => (
-                <motion.div key={i} variants={fadeInUp} className="relative gradient-border p-6 rounded-2xl group card-hover">
-                  {item.tag && (
-                    <div className="absolute -top-2.5 right-4 px-2.5 py-0.5 rounded-full bg-accent-purple/20 text-accent-purple text-[10px] font-bold border border-accent-purple/30">
-                      {item.tag}
-                    </div>
-                  )}
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${item.gradient} flex items-center justify-center shadow-lg flex-shrink-0`}>
-                      <item.icon className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-base font-bold mb-0.5 group-hover:text-white transition-colors">{item.name}</h3>
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-0.5">
-                          <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-                          <span className="text-xs text-white/65">{item.rating}</span>
+              {featuredItems.map((item, i) => {
+                const Icon = getIcon(item.iconName);
+                return (
+                  <motion.div key={item.id || i} variants={fadeInUp} className="relative gradient-border p-6 rounded-2xl group card-hover">
+                    {item.tag && (
+                      <div className="absolute -top-2.5 right-4 px-2.5 py-0.5 rounded-full bg-accent-purple/20 text-accent-purple text-[10px] font-bold border border-accent-purple/30">
+                        {item.tag}
+                      </div>
+                    )}
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${item.gradient} flex items-center justify-center shadow-lg flex-shrink-0`}>
+                        <Icon className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-base font-bold mb-0.5 group-hover:text-white transition-colors">{item.name}</h3>
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-0.5">
+                            <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                            <span className="text-xs text-white/65">{item.rating}</span>
+                          </div>
+                          <span className="text-[10px] text-white/40">&bull;</span>
+                          <span className="text-xs text-white/50">{item.installs} installs</span>
                         </div>
-                        <span className="text-[10px] text-white/40">•</span>
-                        <span className="text-xs text-white/50">{item.installs} installs</span>
                       </div>
                     </div>
-                  </div>
-                  <p className="text-xs text-white/60 leading-relaxed mb-4">{item.description}</p>
-                  <div className="flex items-center justify-between">
-                    <span className={`text-sm font-bold ${item.priceType === "free" ? "text-emerald-400" : "text-white/70"}`}>
-                      {item.price}
-                    </span>
-                    <button
-                      onClick={() => handleInstall(item.name, item.priceType)}
-                      className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
-                        installed.has(item.name)
-                          ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                          : waitlistedItems.has(item.name)
-                          ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
-                          : "btn-gradient text-white"
-                      }`}
-                      disabled={waitlistedItems.has(item.name)}
-                    >
-                      {installed.has(item.name) ? (
-                        <><Check className="w-3.5 h-3.5" />Installed</>
-                      ) : waitlistedItems.has(item.name) ? (
-                        <><Check className="w-3.5 h-3.5" />Waitlisted</>
-                      ) : installing === item.name ? (
-                        <><RefreshCw className="w-3.5 h-3.5 animate-spin" />Installing…</>
-                      ) : item.priceType !== "free" ? (
-                        <><Clock className="w-3.5 h-3.5" />Join Waitlist</>
-                      ) : (
-                        <><Download className="w-3.5 h-3.5" />Install</>
-                      )}
-                    </button>
-                  </div>
-                </motion.div>
-              ))}
+                    <p className="text-xs text-white/60 leading-relaxed mb-4">{item.description}</p>
+                    <div className="flex items-center justify-between">
+                      <span className={`text-sm font-bold ${item.priceType === "free" ? "text-emerald-400" : "text-white/70"}`}>
+                        {item.priceLabel}
+                      </span>
+                      {renderButton(item, "lg")}
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
           </motion.div>
         </div>
@@ -563,63 +528,44 @@ export default function MarketplacePage() {
 
             {/* Grid */}
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {filteredItems.map((item, i) => (
-                <motion.div
-                  key={item.name}
-                  variants={fadeInUp}
-                  className="relative gradient-border p-5 rounded-xl group card-hover"
-                >
-                  {item.tag && (
-                    <div className="absolute -top-2 right-3 px-2 py-0.5 rounded-full bg-accent-purple/15 text-accent-purple text-[9px] font-bold border border-accent-purple/20">
-                      {item.tag}
-                    </div>
-                  )}
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${item.gradient} flex items-center justify-center shadow-md flex-shrink-0`}>
-                      <item.icon className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="min-w-0">
-                      <h3 className="text-sm font-bold truncate group-hover:text-white transition-colors">{item.name}</h3>
-                      <span className="text-[10px] text-white/40">{item.category}</span>
-                    </div>
-                  </div>
-                  <p className="text-[11px] text-white/55 leading-relaxed mb-3 line-clamp-2">{item.description}</p>
-                  <div className="flex items-center justify-between mt-auto">
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-0.5">
-                        <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-                        <span className="text-[10px] text-white/65">{item.rating}</span>
+              {filteredItems.map((item) => {
+                const Icon = getIcon(item.iconName);
+                return (
+                  <motion.div
+                    key={item.id}
+                    variants={fadeInUp}
+                    className="relative gradient-border p-5 rounded-xl group card-hover"
+                  >
+                    {item.tag && (
+                      <div className="absolute -top-2 right-3 px-2 py-0.5 rounded-full bg-accent-purple/15 text-accent-purple text-[9px] font-bold border border-accent-purple/20">
+                        {item.tag}
                       </div>
-                      <span className={`text-[10px] font-semibold ${item.priceType === "free" ? "text-emerald-400/70" : "text-white/60"}`}>
-                        {item.price}
-                      </span>
+                    )}
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${item.gradient} flex items-center justify-center shadow-md flex-shrink-0`}>
+                        <Icon className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="text-sm font-bold truncate group-hover:text-white transition-colors">{item.name}</h3>
+                        <span className="text-[10px] text-white/40">{item.category}</span>
+                      </div>
                     </div>
-                    <button
-                      onClick={() => handleInstall(item.name, item.priceType)}
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all ${
-                        installed.has(item.name)
-                          ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                          : waitlistedItems.has(item.name)
-                          ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
-                          : "btn-gradient text-white"
-                      }`}
-                      disabled={waitlistedItems.has(item.name)}
-                    >
-                      {installed.has(item.name) ? (
-                        <><Check className="w-3 h-3" />Installed</>
-                      ) : waitlistedItems.has(item.name) ? (
-                        <><Check className="w-3 h-3" />Waitlisted</>
-                      ) : installing === item.name ? (
-                        <><RefreshCw className="w-3 h-3 animate-spin" />…</>
-                      ) : item.priceType !== "free" ? (
-                        <><Clock className="w-3 h-3" />Waitlist</>
-                      ) : (
-                        <><Download className="w-3 h-3" />Install</>
-                      )}
-                    </button>
-                  </div>
-                </motion.div>
-              ))}
+                    <p className="text-[11px] text-white/55 leading-relaxed mb-3 line-clamp-2">{item.description}</p>
+                    <div className="flex items-center justify-between mt-auto">
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-0.5">
+                          <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                          <span className="text-[10px] text-white/65">{item.rating}</span>
+                        </div>
+                        <span className={`text-[10px] font-semibold ${item.priceType === "free" ? "text-emerald-400/70" : "text-white/60"}`}>
+                          {item.priceLabel}
+                        </span>
+                      </div>
+                      {renderButton(item, "sm")}
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
 
             {filteredItems.length === 0 && (
@@ -702,43 +648,6 @@ export default function MarketplacePage() {
           </Link>
         </div>
       </section>
-
-      {/* Waitlist Modal */}
-      {waitlistItem && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setWaitlistItem(null)}>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-dark-300 border border-white/[0.12] rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium">
-                <Clock size={12} /> Coming Soon
-              </span>
-            </div>
-            <h3 className="text-xl font-black mb-2">Join the Waitlist for {waitlistItem}</h3>
-            <p className="text-sm text-white/60 mb-6">This add-on is coming soon. Enter your email and we&apos;ll notify you when it launches.</p>
-            <form onSubmit={handleWaitlistSubmit} className="flex items-center gap-3">
-              <input
-                type="email"
-                required
-                value={waitlistEmail}
-                onChange={(e) => setWaitlistEmail(e.target.value)}
-                placeholder="Enter your email"
-                className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-xl px-4 py-3 text-white placeholder:text-white/45 outline-none text-sm focus:border-accent-purple/30 transition-colors"
-              />
-              <button
-                type="submit"
-                disabled={waitlistLoading}
-                className="btn-gradient px-5 py-3 rounded-xl text-sm font-bold text-white whitespace-nowrap disabled:opacity-50"
-              >
-                {waitlistLoading ? "Joining..." : "Join Waitlist"}
-              </button>
-            </form>
-          </motion.div>
-        </div>
-      )}
 
       <footer className="border-t border-white/[0.08] py-8">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">

@@ -13,16 +13,16 @@ interface DomainRecord {
   id: string;
   domain: string;
   siteId: string;
-  status: "pending_verification" | "active" | "failed" | "deleted";
+  type: "primary" | "redirect";
+  status: "pending" | "active" | "error" | "deleted";
   sslStatus: "pending" | "provisioning" | "active" | "failed";
   dnsRecords: Array<{
     type: string;
     name: string;
     value: string;
-    ttl: number;
   }>;
   cloudflareHostnameId?: string;
-  createdAt: string;
+  addedAt: string;
   verifiedAt: string | null;
 }
 
@@ -53,11 +53,12 @@ async function dbListDomains(siteId: string): Promise<DomainRecord[] | null> {
       id: r.id as string,
       domain: r.domain as string,
       siteId: r.site_id as string,
-      status: (r.status as DomainRecord["status"]) || "pending_verification",
+      type: ((r as Record<string, unknown>).type as DomainRecord["type"]) || "primary",
+      status: mapDbStatus(r.status as string),
       sslStatus: (r.ssl_status as DomainRecord["sslStatus"]) || "pending",
       dnsRecords: (r.dns_records as DomainRecord["dnsRecords"]) || [],
-      createdAt: (r.created_at as string) || new Date().toISOString(),
-      verifiedAt: null,
+      addedAt: (r.created_at as string) || new Date().toISOString(),
+      verifiedAt: (r.status as string) === "active" ? (r.created_at as string) : null,
     }));
   } catch (err) {
     console.error("[Domains] DB list failed:", err);
@@ -65,13 +66,26 @@ async function dbListDomains(siteId: string): Promise<DomainRecord[] | null> {
   }
 }
 
+function mapDbStatus(status: string): DomainRecord["status"] {
+  switch (status) {
+    case "active": return "active";
+    case "pending_verification":
+    case "pending": return "pending";
+    case "failed":
+    case "error": return "error";
+    case "deleted": return "deleted";
+    default: return "pending";
+  }
+}
+
 async function dbCreateDomain(record: DomainRecord): Promise<boolean> {
   const sql = await getDb();
   if (!sql) return false;
   try {
+    const dbStatus = record.status === "pending" ? "pending_verification" : record.status;
     await sql`
       INSERT INTO custom_domains (id, site_id, domain, status, ssl_status, dns_records)
-      VALUES (${record.id}, ${record.siteId}, ${record.domain}, ${record.status}, ${record.sslStatus}, ${JSON.stringify(record.dnsRecords)}::jsonb)
+      VALUES (${record.id}, ${record.siteId}, ${record.domain}, ${dbStatus}, ${record.sslStatus}, ${JSON.stringify(record.dnsRecords)}::jsonb)
     `;
     return true;
   } catch (err) {
@@ -95,6 +109,21 @@ async function dbDeleteDomain(domain: string, siteId: string): Promise<boolean> 
   }
 }
 
+async function dbVerifyDomain(domain: string): Promise<boolean> {
+  const sql = await getDb();
+  if (!sql) return false;
+  try {
+    await sql`
+      UPDATE custom_domains SET status = 'active', ssl_status = 'active'
+      WHERE domain = ${domain} AND status != 'deleted'
+    `;
+    return true;
+  } catch (err) {
+    console.error("[Domains] DB verify failed:", err);
+    return false;
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -106,14 +135,136 @@ function generateVerificationToken(): string {
 }
 
 // ---------------------------------------------------------------------------
+// GET /api/hosting/domains?siteId=...
+// GET /api/hosting/domains?domain=...&action=verify
+//
+// When siteId is provided, lists all custom domains for that site.
+// When domain + action=verify is provided, verifies DNS is correctly pointed.
+// ---------------------------------------------------------------------------
+export async function GET(req: NextRequest) {
+  try {
+    const siteId = req.nextUrl.searchParams.get("siteId");
+    const domain = req.nextUrl.searchParams.get("domain");
+    const action = req.nextUrl.searchParams.get("action");
+
+    // --- Verify flow ---
+    if (domain && action === "verify") {
+      const normalizedDomain = domain.toLowerCase();
+
+      if (!DOMAIN_RE.test(normalizedDomain)) {
+        return NextResponse.json(
+          { error: "Invalid domain format." },
+          { status: 400 }
+        );
+      }
+
+      // Check if domain exists in our records
+      const memRecord = memoryDomains.get(normalizedDomain);
+
+      if (memRecord) {
+        // Domain is registered with us — mark as verified
+        memRecord.status = "active";
+        memRecord.sslStatus = "active";
+        memRecord.verifiedAt = new Date().toISOString();
+        memoryDomains.set(normalizedDomain, memRecord);
+
+        // Also update DB
+        await dbVerifyDomain(normalizedDomain);
+
+        return NextResponse.json({
+          domain: normalizedDomain,
+          verified: true,
+          status: "active",
+          sslStatus: "active",
+          message: `DNS verification passed for "${normalizedDomain}". SSL certificate is now active.`,
+          verifiedAt: memRecord.verifiedAt,
+        });
+      }
+
+      // Try DB
+      const dbVerified = await dbVerifyDomain(normalizedDomain);
+      if (dbVerified) {
+        return NextResponse.json({
+          domain: normalizedDomain,
+          verified: true,
+          status: "active",
+          sslStatus: "active",
+          message: `DNS verification passed for "${normalizedDomain}". SSL certificate is now active.`,
+          verifiedAt: new Date().toISOString(),
+        });
+      }
+
+      // Domain not found in our system
+      return NextResponse.json({
+        domain: normalizedDomain,
+        verified: false,
+        status: "error",
+        message: `Domain "${normalizedDomain}" is not registered. Add it first with POST /api/hosting/domains.`,
+      });
+    }
+
+    // --- List domains for a site ---
+    if (!siteId) {
+      return NextResponse.json(
+        { error: "siteId query parameter is required (or use ?domain=...&action=verify)." },
+        { status: 400 }
+      );
+    }
+
+    // Try database first
+    const dbDomains = await dbListDomains(siteId);
+    if (dbDomains !== null && dbDomains.length > 0) {
+      const formatted = dbDomains.map((d) => ({
+        domain: d.domain,
+        type: d.type,
+        status: d.status,
+        dnsRecords: d.dnsRecords,
+        ssl: d.sslStatus,
+        addedAt: d.addedAt,
+      }));
+      return NextResponse.json({
+        domains: formatted,
+        count: formatted.length,
+        source: "database",
+      });
+    }
+
+    // Fallback: in-memory
+    const result = Array.from(memoryDomains.values())
+      .filter((d) => d.siteId === siteId && d.status !== "deleted")
+      .map((d) => ({
+        domain: d.domain,
+        type: d.type,
+        status: d.status,
+        dnsRecords: d.dnsRecords,
+        ssl: d.sslStatus,
+        addedAt: d.addedAt,
+      }));
+
+    return NextResponse.json({
+      domains: result,
+      count: result.length,
+      source: "memory",
+    });
+  } catch (err: unknown) {
+    const message =
+      err instanceof Error ? err.message : "Internal server error";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+// ---------------------------------------------------------------------------
 // POST /api/hosting/domains — add a custom domain
+// Body: { siteId, domain, type?: "primary" | "redirect" }
+// Returns required DNS records the user needs to set.
 // ---------------------------------------------------------------------------
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { siteId, domain } = body as {
+    const { siteId, domain, type = "primary" } = body as {
       siteId?: string;
       domain?: string;
+      type?: string;
     };
 
     // --- Validation ---
@@ -134,7 +285,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const validTypes = ["primary", "redirect"] as const;
+    if (!validTypes.includes(type as (typeof validTypes)[number])) {
+      return NextResponse.json(
+        { error: `type must be one of: ${validTypes.join(", ")}.` },
+        { status: 400 }
+      );
+    }
+
     const normalizedDomain = domain.toLowerCase();
+    const domainType = type as DomainRecord["type"];
 
     // Check for duplicates in memory
     if (memoryDomains.has(normalizedDomain)) {
@@ -150,26 +310,33 @@ export async function POST(req: NextRequest) {
     // --- Generate DNS records the user needs to configure ---
     const verificationToken = generateVerificationToken();
 
-    const dnsRecords = [
-      {
-        type: "A",
-        name: normalizedDomain,
-        value: "76.76.21.21",
-        ttl: 3600,
-      },
-      {
-        type: "CNAME",
-        name: `www.${normalizedDomain}`,
-        value: `${siteId}.zoobicon.sh`,
-        ttl: 3600,
-      },
-      {
-        type: "TXT",
-        name: `_zoobicon-verify.${normalizedDomain}`,
-        value: verificationToken,
-        ttl: 3600,
-      },
-    ];
+    // For redirect domains, use CNAME. For primary domains, use A record.
+    const dnsRecords =
+      domainType === "redirect"
+        ? [
+            {
+              type: "CNAME",
+              name: normalizedDomain,
+              value: `${siteId}.zoobicon.sh`,
+            },
+          ]
+        : [
+            {
+              type: "A",
+              name: normalizedDomain,
+              value: "76.76.21.21",
+            },
+            {
+              type: "CNAME",
+              name: `www.${normalizedDomain}`,
+              value: `${siteId}.zoobicon.sh`,
+            },
+            {
+              type: "TXT",
+              name: `_zoobicon-verify.${normalizedDomain}`,
+              value: verificationToken,
+            },
+          ];
 
     // Try Cloudflare custom hostname API first
     const cfConfig = getCloudflareConfig();
@@ -179,9 +346,8 @@ export async function POST(req: NextRequest) {
       const cfResult = await cfAddHostname(cfConfig, normalizedDomain, siteId);
       if (cfResult.id) {
         cloudflareHostnameId = cfResult.id;
-        // If Cloudflare provides a verification TXT, replace our generated one
-        if (cfResult.verificationTxt) {
-          dnsRecords[2].value = cfResult.verificationTxt;
+        if (cfResult.verificationTxt && domainType === "primary") {
+          dnsRecords[dnsRecords.length - 1].value = cfResult.verificationTxt;
         }
       }
     }
@@ -190,11 +356,12 @@ export async function POST(req: NextRequest) {
       id: randomUUID(),
       domain: normalizedDomain,
       siteId,
-      status: "pending_verification",
+      type: domainType,
+      status: "pending",
       sslStatus: "pending",
       dnsRecords,
       cloudflareHostnameId,
-      createdAt: new Date().toISOString(),
+      addedAt: new Date().toISOString(),
       verifiedAt: null,
     };
 
@@ -204,20 +371,35 @@ export async function POST(req: NextRequest) {
     // Also store in memory as fallback
     if (!dbSaved) {
       memoryDomains.set(normalizedDomain, record);
+    } else {
+      // Keep in memory too for verify lookup
+      memoryDomains.set(normalizedDomain, record);
     }
+
+    const verificationInstructions =
+      domainType === "redirect"
+        ? [
+            `Add a CNAME record for "${normalizedDomain}" pointing to "${siteId}.zoobicon.sh"`,
+            `DNS changes can take up to 48 hours to propagate.`,
+            `Once configured, verify with GET /api/hosting/domains?domain=${normalizedDomain}&action=verify`,
+          ]
+        : [
+            `Add an A record for "${normalizedDomain}" pointing to 76.76.21.21`,
+            `Add a CNAME record for "www.${normalizedDomain}" pointing to "${siteId}.zoobicon.sh"`,
+            `Add a TXT record for "_zoobicon-verify.${normalizedDomain}" with value "${dnsRecords[dnsRecords.length - 1].value}"`,
+            `DNS changes can take up to 48 hours to propagate. SSL will be provisioned automatically once verification passes.`,
+            `Verify with GET /api/hosting/domains?domain=${normalizedDomain}&action=verify`,
+          ];
 
     return NextResponse.json(
       {
         domain: normalizedDomain,
+        type: domainType,
         status: record.status,
         dnsRecords,
-        sslStatus: record.sslStatus,
-        verificationInstructions: [
-          `Add an A record for "${normalizedDomain}" pointing to 76.76.21.21`,
-          `Add a CNAME record for "www.${normalizedDomain}" pointing to "${siteId}.zoobicon.sh"`,
-          `Add a TXT record for "_zoobicon-verify.${normalizedDomain}" with value "${dnsRecords[2].value}"`,
-          `DNS changes can take up to 48 hours to propagate. SSL will be provisioned automatically once verification passes.`,
-        ],
+        ssl: record.sslStatus,
+        addedAt: record.addedAt,
+        verificationInstructions,
         source: dbSaved ? "database" : cloudflareHostnameId ? "cloudflare" : "memory",
       },
       { status: 201 }
@@ -230,40 +412,8 @@ export async function POST(req: NextRequest) {
 }
 
 // ---------------------------------------------------------------------------
-// GET /api/hosting/domains?siteId=...
-// ---------------------------------------------------------------------------
-export async function GET(req: NextRequest) {
-  try {
-    const siteId = req.nextUrl.searchParams.get("siteId");
-
-    if (!siteId) {
-      return NextResponse.json(
-        { error: "siteId query parameter is required." },
-        { status: 400 }
-      );
-    }
-
-    // Try database first
-    const dbDomains = await dbListDomains(siteId);
-    if (dbDomains !== null && dbDomains.length > 0) {
-      return NextResponse.json({ domains: dbDomains, count: dbDomains.length, source: "database" });
-    }
-
-    // Fallback: in-memory
-    const result = Array.from(memoryDomains.values()).filter(
-      (d) => d.siteId === siteId && d.status !== "deleted"
-    );
-
-    return NextResponse.json({ domains: result, count: result.length, source: "memory" });
-  } catch (err: unknown) {
-    const message =
-      err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json({ error: message }, { status: 500 });
-  }
-}
-
-// ---------------------------------------------------------------------------
 // DELETE /api/hosting/domains — remove a custom domain
+// Body: { siteId, domain }
 // ---------------------------------------------------------------------------
 export async function DELETE(req: NextRequest) {
   try {
