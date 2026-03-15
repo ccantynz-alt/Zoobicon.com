@@ -7,12 +7,12 @@
  *   <BackgroundEffects preset="default" />
  *
  * Presets control which combination of effects render:
- *   - "default"     : mesh gradient + particles + grid pulse
- *   - "energetic"   : mesh gradient + particles + spotlight + ambient lines
- *   - "calm"        : cool mesh gradient + radial pulses + vignette
- *   - "technical"   : grid pulse + constellation dots + ambient lines
- *   - "premium"     : purple mesh gradient + particles + radial pulses + spotlight
- *   - "minimal"     : mesh gradient + vignette (lightest weight)
+ *   - "default"     : mesh gradient + particles + grid pulse + gold fog
+ *   - "energetic"   : mesh gradient + particles + spotlight + ambient lines + B&W fog
+ *   - "calm"        : cool mesh gradient + radial pulses + gold fog + vignette
+ *   - "technical"   : grid pulse + constellation dots + ambient lines + B&W fog
+ *   - "premium"     : purple mesh gradient + particles + radial pulses + spotlight + gold fog
+ *   - "minimal"     : mesh gradient + gold fog + vignette (lightest weight)
  */
 
 type Preset = "default" | "energetic" | "calm" | "technical" | "premium" | "minimal";
@@ -60,6 +60,16 @@ function ConstellationDots() {
           style={{ top: pos.top, left: pos.left }}
         />
       ))}
+    </div>
+  );
+}
+
+function FogLayer({ variant = "gold" }: { variant?: "gold" | "mono" }) {
+  return (
+    <div className={`fog-layer fog-${variant}`}>
+      <div className="fog-bank" />
+      <div className="fog-bank" />
+      <div className="fog-bank" />
     </div>
   );
 }
@@ -125,6 +135,14 @@ export default function BackgroundEffects({
 
       {/* Ambient lines */}
       {(preset === "energetic" || preset === "technical") && <AmbientLines />}
+
+      {/* Fog — drifting mist layers (gold on premium pages, mono on technical) */}
+      {(preset === "default" || preset === "calm" || preset === "premium" || preset === "minimal") && (
+        <FogLayer variant="gold" />
+      )}
+      {(preset === "energetic" || preset === "technical") && (
+        <FogLayer variant="mono" />
+      )}
 
       {/* Vignette — darkened edges */}
       {(preset === "calm" || preset === "minimal") && <div className="vignette" />}
