@@ -151,11 +151,9 @@ function buildXmlRequest(
 
 function generateSignature(xml: string, apiKey: string): string {
   // OpenSRS uses MD5(MD5(xml + apiKey) + apiKey)
-  // Using Web Crypto API isn't ideal for MD5 since it doesn't support it.
-  // We'll use a simple hash approach for the signature.
-  // In production, use the crypto module for MD5.
-  // For now, return a placeholder that works with the test environment.
-  return `${Buffer.from(xml + apiKey).toString("base64").slice(0, 32)}`;
+  const { createHash } = require("crypto");
+  const inner = createHash("md5").update(xml + apiKey).digest("hex");
+  return createHash("md5").update(inner + apiKey).digest("hex");
 }
 
 async function callOpenSRS(
