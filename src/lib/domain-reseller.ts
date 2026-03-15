@@ -253,7 +253,13 @@ export async function searchDomains(
         currency: "USD",
         premium: false,
         period: 1,
-      } as DomainSearchResult;
+        // Debug info (remove after confirming API works)
+        _debug: {
+          apiSuccess: result.success,
+          responseText: result.responseText || null,
+          error: result.error || null,
+        },
+      } as DomainSearchResult & { _debug: unknown };
     });
 
     return Promise.all(lookupPromises);
