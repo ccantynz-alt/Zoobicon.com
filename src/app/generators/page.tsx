@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import BackgroundEffects from "@/components/BackgroundEffects";
 import {
   Sparkles, Globe, Layout, Calendar, BarChart3, Palette, Search, Moon,
   FileText, Link2, Briefcase, BookOpen, MapPin, Ticket, Store, Smartphone,
@@ -110,7 +111,8 @@ export default function GeneratorsPage() {
   const totalGenerators = allGenerators.length;
 
   return (
-    <div className="min-h-screen bg-[#111a2e] text-white">
+    <div className="min-h-screen bg-[#111a2e] text-white relative">
+      <BackgroundEffects preset="default" />
       {/* Nav */}
       <nav className="sticky top-0 z-50 border-b border-white/[0.10] bg-[#111a2e]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">

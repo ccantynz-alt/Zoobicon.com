@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import BackgroundEffects from "@/components/BackgroundEffects";
 import {
   Mail,
   Inbox,
@@ -517,7 +518,8 @@ export default function EmailSupportDashboard() {
   const visibleTickets = filteredTickets();
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col">
+    <div className="relative min-h-screen bg-gray-950 text-white flex flex-col">
+      <BackgroundEffects preset="calm" />
       {/* Top Nav */}
       <nav className="h-14 border-b border-white/[0.08] bg-gray-950/80 backdrop-blur-xl flex items-center justify-between px-4 shrink-0 z-50">
         <div className="flex items-center gap-3">

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Zap } from "lucide-react";
 import type { Metadata } from "next";
+import BackgroundEffects from "@/components/BackgroundEffects";
 
 export const revalidate = 86400; // Revalidate once per day
 
@@ -11,7 +12,8 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-[#0d1525] text-[#f0f0f2]">
+    <div className="relative min-h-screen bg-[#0d1525] text-[#f0f0f2]">
+      <BackgroundEffects preset="minimal" />
       {/* Nav */}
       <nav className="border-b border-white/[0.08] bg-[#0d1525]/80 backdrop-blur-2xl">
         <div className="max-w-4xl mx-auto px-6 py-4">

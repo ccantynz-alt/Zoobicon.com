@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import BackgroundEffects from "@/components/BackgroundEffects";
 import {
   Zap,
   BarChart3,
@@ -128,7 +129,8 @@ export default function AnalyticsPage() {
   const maxSeo = seoHistory.length > 0 ? Math.max(...seoHistory.map((s) => s.score), 100) : 100;
 
   return (
-    <div className="min-h-screen bg-[#111a2e]">
+    <div className="min-h-screen bg-[#111a2e] relative">
+      <BackgroundEffects preset="technical" />
       {/* Top Nav */}
       <nav className="border-b border-white/[0.08] bg-[#111a2e]/80 backdrop-blur-2xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">

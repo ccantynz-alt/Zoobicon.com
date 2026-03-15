@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import BackgroundEffects from "@/components/BackgroundEffects";
 import {
   Check, Zap, ArrowRight, HelpCircle, Sparkles, Globe, Video, BarChart3,
   Mail, Bot, Palette, Code2, Shield, Users, Building2, Loader2,
@@ -246,10 +247,7 @@ export default function PricingPage() {
 
   return (
     <div className="relative min-h-screen">
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="glow-orb glow-orb-blue w-[700px] h-[700px] -top-40 -left-40 opacity-20" />
-        <div className="glow-orb glow-orb-purple w-[500px] h-[500px] top-1/2 right-0 opacity-15" />
-      </div>
+      <BackgroundEffects preset="premium" />
 
       {/* Nav */}
       <nav className="sticky top-0 z-50 border-b border-white/[0.08] bg-dark-400/80 backdrop-blur-2xl">

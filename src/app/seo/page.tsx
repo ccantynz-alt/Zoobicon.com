@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import BackgroundEffects from "@/components/BackgroundEffects";
 import {
   Search,
   Code2,
@@ -430,7 +431,8 @@ export default function SeoAgentPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="relative min-h-screen bg-gray-950 text-white">
+      <BackgroundEffects preset="energetic" />
       {/* ─── navbar ─── */}
       <nav className="sticky top-0 z-50 bg-gray-950/80 backdrop-blur-xl border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
