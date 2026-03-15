@@ -21,11 +21,17 @@ export default function ClonePanel({ onClone }: ClonePanelProps) {
     setError("");
     setAnalysis("");
 
+    // Auto-prepend https:// if no protocol provided
+    let normalizedUrl = url.trim();
+    if (!/^https?:\/\//i.test(normalizedUrl)) {
+      normalizedUrl = `https://${normalizedUrl}`;
+    }
+
     try {
       const res = await fetch("/api/clone", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: url.trim(), upgradeTier: tier }),
+        body: JSON.stringify({ url: normalizedUrl, upgradeTier: tier }),
       });
 
       if (!res.ok) {
@@ -60,10 +66,10 @@ export default function ClonePanel({ onClone }: ClonePanelProps) {
       <div className="space-y-2">
         <div className="relative">
           <input
-            type="url"
+            type="text"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://example.com"
+            placeholder="example.com"
             className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white placeholder-white/20 focus:outline-none focus:border-brand-500/40 transition-colors"
             onKeyDown={(e) => e.key === "Enter" && handleClone()}
           />

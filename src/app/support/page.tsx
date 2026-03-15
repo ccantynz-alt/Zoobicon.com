@@ -168,7 +168,7 @@ export default function SupportPage() {
       </div>
 
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.04] bg-[#050507]/80 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08] bg-[#0d1525]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
@@ -177,14 +177,14 @@ export default function SupportPage() {
               </div>
               <span className="text-lg font-bold tracking-tight">Zoobicon</span>
             </Link>
-            <span className="text-xs text-white/20">/</span>
-            <span className="text-sm text-white/50">Support</span>
+            <span className="text-xs text-white/40">/</span>
+            <span className="text-sm text-white/65">Support</span>
           </div>
           <div className="flex items-center gap-3">
             {hasMessages && (
               <button
                 onClick={resetChat}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-white/40 hover:text-white/60 border border-white/[0.06] hover:border-white/10 transition-all"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-white/60 hover:text-white/60 border border-white/[0.10] hover:border-white/10 transition-all"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 New chat
@@ -216,13 +216,13 @@ export default function SupportPage() {
                 <h1 className="text-3xl md:text-4xl font-black tracking-tight mb-3 text-center">
                   Hi, I&apos;m Zoe!
                 </h1>
-                <p className="text-base text-white/40 max-w-lg mx-auto text-center">
+                <p className="text-base text-white/60 max-w-lg mx-auto text-center">
                   Your Zoobicon AI support assistant. Ask me anything about our products,
                   features, billing, DNS, or how to get the most out of the platform.
                 </p>
                 <div className="flex items-center justify-center gap-2 mt-3">
-                  <Shield className="w-3.5 h-3.5 text-white/20" />
-                  <span className="text-xs text-white/20">Scoped to Zoobicon support only</span>
+                  <Shield className="w-3.5 h-3.5 text-white/40" />
+                  <span className="text-xs text-white/40">Scoped to Zoobicon support only</span>
                 </div>
               </motion.div>
 
@@ -239,11 +239,11 @@ export default function SupportPage() {
                     onClick={() => sendMessage(topic.label)}
                     className="group gradient-border p-4 rounded-xl text-left card-hover"
                   >
-                    <topic.icon className="w-5 h-5 text-white/30 mb-2 group-hover:text-brand-400 transition-colors" />
+                    <topic.icon className="w-5 h-5 text-white/50 mb-2 group-hover:text-brand-400 transition-colors" />
                     <div className="text-sm font-medium text-white/70 group-hover:text-white transition-colors leading-tight">
                       {topic.label}
                     </div>
-                    <div className="text-[10px] text-white/20 mt-1">{topic.category}</div>
+                    <div className="text-[10px] text-white/40 mt-1">{topic.category}</div>
                   </button>
                 ))}
               </motion.div>
@@ -255,7 +255,7 @@ export default function SupportPage() {
                 transition={{ duration: 0.5, delay: 0.25 }}
               >
                 <div className="relative">
-                  <div className="flex items-end bg-white/[0.04] border border-white/[0.08] rounded-2xl overflow-hidden focus-within:border-brand-500/30 transition-colors">
+                  <div className="flex items-end bg-white/[0.07] border border-white/[0.12] rounded-2xl overflow-hidden focus-within:border-brand-500/30 transition-colors">
                     <textarea
                       ref={inputRef}
                       value={input}
@@ -263,13 +263,13 @@ export default function SupportPage() {
                       onKeyDown={handleKeyDown}
                       placeholder="Ask Zoe about Zoobicon..."
                       rows={1}
-                      className="flex-1 bg-transparent px-5 py-4 text-white placeholder:text-white/25 outline-none text-base resize-none max-h-32"
+                      className="flex-1 bg-transparent px-5 py-4 text-white placeholder:text-white/45 outline-none text-base resize-none max-h-32"
                       style={{ minHeight: "56px" }}
                     />
                     <button
                       onClick={() => sendMessage()}
                       disabled={!input.trim()}
-                      className="p-3 mr-2 mb-1.5 rounded-xl text-white/30 hover:text-white disabled:opacity-20 transition-all"
+                      className="p-3 mr-2 mb-1.5 rounded-xl text-white/50 hover:text-white disabled:opacity-20 transition-all"
                     >
                       <Send className="w-5 h-5" />
                     </button>
@@ -284,7 +284,7 @@ export default function SupportPage() {
                 transition={{ duration: 0.5, delay: 0.4 }}
                 className="mt-12"
               >
-                <div className="text-xs text-white/20 uppercase tracking-wider font-medium mb-4 text-center">
+                <div className="text-xs text-white/40 uppercase tracking-wider font-medium mb-4 text-center">
                   Or browse help topics
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -292,12 +292,12 @@ export default function SupportPage() {
                     <Link
                       key={i}
                       href={cat.href}
-                      className="group flex items-center gap-3 p-3 rounded-xl border border-white/[0.04] hover:border-white/[0.08] hover:bg-white/[0.02] transition-all"
+                      className="group flex items-center gap-3 p-3 rounded-xl border border-white/[0.08] hover:border-white/[0.12] hover:bg-white/[0.05] transition-all"
                     >
-                      <cat.icon className="w-4 h-4 text-white/20 group-hover:text-white/40 transition-colors flex-shrink-0" />
+                      <cat.icon className="w-4 h-4 text-white/40 group-hover:text-white/60 transition-colors flex-shrink-0" />
                       <div className="min-w-0">
-                        <div className="text-xs font-semibold text-white/50 group-hover:text-white/70 transition-colors truncate">{cat.title}</div>
-                        <div className="text-[10px] text-white/20 truncate">{cat.desc}</div>
+                        <div className="text-xs font-semibold text-white/65 group-hover:text-white/70 transition-colors truncate">{cat.title}</div>
+                        <div className="text-[10px] text-white/40 truncate">{cat.desc}</div>
                       </div>
                     </Link>
                   ))}
@@ -331,21 +331,21 @@ export default function SupportPage() {
                         className={`max-w-[80%] rounded-2xl px-4 py-3 ${
                           msg.role === "user"
                             ? "bg-brand-500/20 border border-brand-500/20 text-white"
-                            : "bg-white/[0.04] border border-white/[0.06] text-white/80"
+                            : "bg-white/[0.07] border border-white/[0.10] text-white/80"
                         }`}
                       >
                         {msg.content ? (
                           <div className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</div>
                         ) : (
-                          <div className="flex items-center gap-2 text-white/30">
+                          <div className="flex items-center gap-2 text-white/50">
                             <Loader2 className="w-4 h-4 animate-spin" />
                             <span className="text-xs">Zoe is typing...</span>
                           </div>
                         )}
                       </div>
                       {msg.role === "user" && (
-                        <div className="w-8 h-8 rounded-lg bg-white/[0.06] border border-white/[0.08] flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <User className="w-4 h-4 text-white/40" />
+                        <div className="w-8 h-8 rounded-lg bg-white/[0.09] border border-white/[0.12] flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <User className="w-4 h-4 text-white/60" />
                         </div>
                       )}
                     </motion.div>
@@ -356,9 +356,9 @@ export default function SupportPage() {
             </div>
 
             {/* Chat input */}
-            <div className="border-t border-white/[0.04] bg-[#050507]/80 backdrop-blur-xl">
+            <div className="border-t border-white/[0.08] bg-[#0d1525]/80 backdrop-blur-xl">
               <div className="max-w-3xl mx-auto px-6 py-4">
-                <div className="flex items-end bg-white/[0.04] border border-white/[0.08] rounded-2xl overflow-hidden focus-within:border-brand-500/30 transition-colors">
+                <div className="flex items-end bg-white/[0.07] border border-white/[0.12] rounded-2xl overflow-hidden focus-within:border-brand-500/30 transition-colors">
                   <textarea
                     ref={inputRef}
                     value={input}
@@ -367,13 +367,13 @@ export default function SupportPage() {
                     placeholder={isStreaming ? "Waiting for response..." : "Ask Zoe about Zoobicon..."}
                     disabled={isStreaming}
                     rows={1}
-                    className="flex-1 bg-transparent px-5 py-3.5 text-white placeholder:text-white/25 outline-none text-sm resize-none max-h-32 disabled:opacity-50"
+                    className="flex-1 bg-transparent px-5 py-3.5 text-white placeholder:text-white/45 outline-none text-sm resize-none max-h-32 disabled:opacity-50"
                     style={{ minHeight: "48px" }}
                   />
                   <button
                     onClick={() => sendMessage()}
                     disabled={!input.trim() || isStreaming}
-                    className="p-3 mr-1 mb-0.5 rounded-xl text-white/30 hover:text-white disabled:opacity-20 transition-all"
+                    className="p-3 mr-1 mb-0.5 rounded-xl text-white/50 hover:text-white disabled:opacity-20 transition-all"
                   >
                     {isStreaming ? (
                       <Loader2 className="w-5 h-5 animate-spin" />
@@ -383,11 +383,11 @@ export default function SupportPage() {
                   </button>
                 </div>
                 <div className="flex items-center justify-between mt-2">
-                  <div className="flex items-center gap-1.5 text-[10px] text-white/15">
+                  <div className="flex items-center gap-1.5 text-[10px] text-white/35">
                     <Shield className="w-3 h-3" />
                     Zoobicon support only — won&apos;t answer off-topic questions
                   </div>
-                  <div className="text-[10px] text-white/15">
+                  <div className="text-[10px] text-white/35">
                     Press Enter to send, Shift+Enter for new line
                   </div>
                 </div>

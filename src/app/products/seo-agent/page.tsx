@@ -68,12 +68,12 @@ export default function SEOAgentPage() {
   return (
     <div className="relative min-h-screen">
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="glow-orb glow-orb-cyan w-[500px] h-[500px] -top-[150px] right-[10%] opacity-10" />
-        <div className="glow-orb glow-orb-blue w-[400px] h-[400px] bottom-[30%] -left-[100px] opacity-10" />
+        <div className="glow-orb glow-orb-cyan w-[500px] h-[500px] -top-[150px] right-[10%] opacity-15" />
+        <div className="glow-orb glow-orb-blue w-[400px] h-[400px] bottom-[30%] -left-[100px] opacity-15" />
         <div className="grid-pattern fixed inset-0" />
       </div>
 
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.04] bg-[#050507]/80 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08] bg-[#0d1525]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
@@ -82,17 +82,17 @@ export default function SEOAgentPage() {
               </div>
               <span className="text-lg font-bold tracking-tight">Zoobicon</span>
             </Link>
-            <span className="text-xs text-white/20">/</span>
-            <span className="text-sm text-white/50">SEO Agent</span>
+            <span className="text-xs text-white/40">/</span>
+            <span className="text-sm text-white/65">SEO Agent</span>
           </div>
           <div className="flex items-center gap-4">
             {user ? (
               <>
-                <Link href="/dashboard" className="text-sm text-white/50 hover:text-white transition-colors px-4 py-2 flex items-center gap-1.5">
+                <Link href="/dashboard" className="text-sm text-white/65 hover:text-white transition-colors px-4 py-2 flex items-center gap-1.5">
                   <LayoutDashboard className="w-3.5 h-3.5" />
                   Dashboard
                 </Link>
-                <button onClick={handleLogout} className="text-sm text-white/50 hover:text-white transition-colors px-4 py-2 flex items-center gap-1.5">
+                <button onClick={handleLogout} className="text-sm text-white/65 hover:text-white transition-colors px-4 py-2 flex items-center gap-1.5">
                   <LogOut className="w-3.5 h-3.5" />
                   Sign out
                 </button>
@@ -103,7 +103,7 @@ export default function SEOAgentPage() {
               </>
             ) : (
               <>
-                <Link href="/auth/login" className="text-sm text-white/50 hover:text-white transition-colors px-4 py-2">
+                <Link href="/auth/login" className="text-sm text-white/65 hover:text-white transition-colors px-4 py-2">
                   Sign in
                 </Link>
                 <Link href="/auth/signup" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white">
@@ -129,7 +129,7 @@ export default function SEOAgentPage() {
               <span className="gradient-text-hero">Autopilot.</span>
             </motion.h1>
 
-            <motion.p variants={fadeInUp} className="max-w-2xl text-lg md:text-xl text-white/40 leading-relaxed mb-10">
+            <motion.p variants={fadeInUp} className="max-w-2xl text-lg md:text-xl text-white/60 leading-relaxed mb-10">
               An autonomous AI agent that researches, plans, and executes your entire SEO strategy
               24/7. Content creation, backlink outreach, technical audits — all handled while you sleep.
             </motion.p>
@@ -151,7 +151,7 @@ export default function SEOAgentPage() {
               ].map((stat) => (
                 <div key={stat.label} className="gradient-border p-4 rounded-xl text-center">
                   <div className="text-2xl font-black gradient-text-static">{stat.value}</div>
-                  <div className="text-xs text-white/30 mt-1">{stat.label}</div>
+                  <div className="text-xs text-white/50 mt-1">{stat.label}</div>
                 </div>
               ))}
             </motion.div>
@@ -160,14 +160,14 @@ export default function SEOAgentPage() {
       </section>
 
       {/* Workflow */}
-      <section className="py-20 border-t border-white/[0.04]">
+      <section className="py-20 border-t border-white/[0.08]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="text-center mb-12">
               <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
                 How the Agent <span className="gradient-text">Works</span>
               </h2>
-              <p className="text-lg text-white/40">Set it and forget it. The agent handles everything.</p>
+              <p className="text-lg text-white/60">Set it and forget it. The agent handles everything.</p>
             </motion.div>
 
             <div className="space-y-3">
@@ -178,7 +178,7 @@ export default function SEOAgentPage() {
                   </div>
                   <div>
                     <h3 className="text-lg font-bold mb-1">{step.phase}</h3>
-                    <p className="text-sm text-white/40 leading-relaxed">{step.desc}</p>
+                    <p className="text-sm text-white/60 leading-relaxed">{step.desc}</p>
                   </div>
                 </motion.div>
               ))}
@@ -188,7 +188,7 @@ export default function SEOAgentPage() {
       </section>
 
       {/* Capabilities */}
-      <section className="py-20 border-t border-white/[0.04]">
+      <section className="py-20 border-t border-white/[0.08]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="text-center mb-12">
@@ -202,7 +202,7 @@ export default function SEOAgentPage() {
                 <motion.div key={i} variants={fadeInUp} className="gradient-border card-hover p-6 rounded-xl group">
                   <c.icon className="w-8 h-8 text-accent-cyan/50 mb-4 group-hover:text-accent-cyan transition-colors" />
                   <h3 className="text-lg font-bold mb-2">{c.title}</h3>
-                  <p className="text-sm text-white/40 leading-relaxed">{c.desc}</p>
+                  <p className="text-sm text-white/60 leading-relaxed">{c.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -211,13 +211,13 @@ export default function SEOAgentPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 border-t border-white/[0.04]">
+      <section className="py-20 border-t border-white/[0.08]">
         <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
           <Cpu className="w-12 h-12 text-accent-cyan/30 mx-auto mb-6" />
           <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
             Stop Doing SEO.<br /><span className="gradient-text">Let AI Do It.</span>
           </h2>
-          <p className="text-lg text-white/40 mb-8">Launch your first autonomous SEO campaign in under 2 minutes.</p>
+          <p className="text-lg text-white/60 mb-8">Launch your first autonomous SEO campaign in under 2 minutes.</p>
           <Link href="/seo" className="inline-flex group btn-gradient px-10 py-4 rounded-2xl text-lg font-bold text-white items-center gap-3 shadow-glow-lg">
             <span>Launch SEO Dashboard</span>
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -225,13 +225,13 @@ export default function SEOAgentPage() {
         </div>
       </section>
 
-      <footer className="border-t border-white/[0.04] py-8">
+      <footer className="border-t border-white/[0.08] py-8">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <div className="text-xs text-white/20">&copy; 2026 Zoobicon</div>
+          <div className="text-xs text-white/40">&copy; 2026 Zoobicon</div>
           <div className="flex gap-4">
-            <Link href="/" className="text-xs text-white/20 hover:text-white/40">Home</Link>
-            <Link href="/products/website-builder" className="text-xs text-white/20 hover:text-white/40">Builder</Link>
-            <Link href="/products/video-creator" className="text-xs text-white/20 hover:text-white/40">Video Creator</Link>
+            <Link href="/" className="text-xs text-white/40 hover:text-white/60">Home</Link>
+            <Link href="/products/website-builder" className="text-xs text-white/40 hover:text-white/60">Builder</Link>
+            <Link href="/products/video-creator" className="text-xs text-white/40 hover:text-white/60">Video Creator</Link>
           </div>
         </div>
       </footer>

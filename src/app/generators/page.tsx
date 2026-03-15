@@ -110,9 +110,9 @@ export default function GeneratorsPage() {
   const totalGenerators = allGenerators.length;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white">
+    <div className="min-h-screen bg-[#111a2e] text-white">
       {/* Nav */}
-      <nav className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#0a0a0f]/80 backdrop-blur-xl">
+      <nav className="sticky top-0 z-50 border-b border-white/[0.10] bg-[#111a2e]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center">
@@ -122,10 +122,10 @@ export default function GeneratorsPage() {
           </Link>
 
           <div className="hidden md:flex items-center gap-6">
-            <Link href="/builder" className="text-sm text-white/50 hover:text-white transition-colors">Builder</Link>
-            <Link href="/pricing" className="text-sm text-white/50 hover:text-white transition-colors">Pricing</Link>
+            <Link href="/builder" className="text-sm text-white/65 hover:text-white transition-colors">Builder</Link>
+            <Link href="/pricing" className="text-sm text-white/65 hover:text-white transition-colors">Pricing</Link>
             <Link href="/generators" className="text-sm text-brand-400">Generators</Link>
-            <Link href="/developers" className="text-sm text-white/50 hover:text-white transition-colors">API</Link>
+            <Link href="/developers" className="text-sm text-white/65 hover:text-white transition-colors">API</Link>
           </div>
 
           <div className="flex items-center gap-3">
@@ -136,7 +136,7 @@ export default function GeneratorsPage() {
               Open Builder
               <ArrowRight size={14} />
             </Link>
-            <button className="md:hidden text-white/50" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            <button className="md:hidden text-white/65" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
               {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
@@ -160,14 +160,14 @@ export default function GeneratorsPage() {
               anything
             </span>
           </h1>
-          <p className="text-lg text-white/50 max-w-2xl mx-auto mb-10">
+          <p className="text-lg text-white/65 max-w-2xl mx-auto mb-10">
             {totalGenerators} specialized AI generators for websites, dashboards, apps, marketing campaigns,
             APIs, and design systems. Each one produces production-quality output in seconds.
           </p>
 
           {/* Search */}
           <div className="max-w-lg mx-auto relative mb-8">
-            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
+            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/65" />
             <input
               type="text"
               value={searchQuery}
@@ -176,7 +176,7 @@ export default function GeneratorsPage() {
                 setSelectedCategory(null);
               }}
               placeholder="Search generators..."
-              className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white placeholder:text-white/30 focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/20 text-sm"
+              className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white/[0.07] border border-white/[0.12] text-white placeholder:text-white/65 focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/20 text-sm"
             />
           </div>
 
@@ -187,7 +187,7 @@ export default function GeneratorsPage() {
               className={`px-4 py-2 rounded-lg text-xs font-medium transition-all ${
                 !selectedCategory && !searchQuery
                   ? "bg-brand-500/20 text-brand-400 border border-brand-500/30"
-                  : "bg-white/[0.04] text-white/50 border border-white/[0.06] hover:bg-white/[0.08] hover:text-white/80"
+                  : "bg-white/[0.07] text-white/65 border border-white/[0.10] hover:bg-white/[0.08] hover:text-white/80"
               }`}
             >
               All ({totalGenerators})
@@ -199,7 +199,7 @@ export default function GeneratorsPage() {
                 className={`px-4 py-2 rounded-lg text-xs font-medium transition-all ${
                   selectedCategory === cat.name
                     ? "bg-brand-500/20 text-brand-400 border border-brand-500/30"
-                    : "bg-white/[0.04] text-white/50 border border-white/[0.06] hover:bg-white/[0.08] hover:text-white/80"
+                    : "bg-white/[0.07] text-white/65 border border-white/[0.10] hover:bg-white/[0.08] hover:text-white/80"
                 }`}
               >
                 {cat.name} ({cat.generators.length})
@@ -211,14 +211,14 @@ export default function GeneratorsPage() {
 
       {/* Pipeline Section */}
       <section className="max-w-7xl mx-auto px-6 pb-16">
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-8 mb-16">
+        <div className="rounded-2xl border border-white/[0.10] bg-white/[0.08] p-8 mb-16">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-blue-500 flex items-center justify-center">
               <Workflow size={20} />
             </div>
             <div>
               <h2 className="text-xl font-bold">Multi-Agent Pipeline</h2>
-              <p className="text-sm text-white/40">Orchestrate specialized AI agents for superior output</p>
+              <p className="text-sm text-white/60">Orchestrate specialized AI agents for superior output</p>
             </div>
           </div>
           <div className="grid md:grid-cols-3 gap-4">
@@ -226,7 +226,7 @@ export default function GeneratorsPage() {
               <div
                 key={tier.name}
                 className={`relative rounded-xl border p-5 transition-all hover:border-brand-500/30 ${
-                  tier.tag ? "border-brand-500/20 bg-brand-500/[0.03]" : "border-white/[0.06] bg-white/[0.02]"
+                  tier.tag ? "border-brand-500/20 bg-brand-500/[0.03]" : "border-white/[0.10] bg-white/[0.08]"
                 }`}
               >
                 {tier.tag && (
@@ -236,12 +236,12 @@ export default function GeneratorsPage() {
                 )}
                 <div className="flex items-center gap-2 mb-3">
                   <h3 className="font-semibold">{tier.name}</h3>
-                  <span className="px-2 py-0.5 rounded-full bg-white/[0.06] text-[10px] font-medium text-white/50">
+                  <span className="px-2 py-0.5 rounded-full bg-white/[0.09] text-[10px] font-medium text-white/65">
                     {tier.agents} agents
                   </span>
                 </div>
-                <p className="text-xs text-white/40 mb-3">{tier.description}</p>
-                <div className="flex items-center gap-2 text-xs text-white/30">
+                <p className="text-xs text-white/60 mb-3">{tier.description}</p>
+                <div className="flex items-center gap-2 text-xs text-white/65">
                   <Zap size={12} />
                   <span>{tier.speed}</span>
                 </div>
@@ -260,8 +260,8 @@ export default function GeneratorsPage() {
             ))}
             {filteredGenerators.length === 0 && (
               <div className="col-span-full text-center py-20">
-                <Search size={40} className="mx-auto text-white/10 mb-4" />
-                <p className="text-white/30">No generators match your search.</p>
+                <Search size={40} className="mx-auto text-white/30 mb-4" />
+                <p className="text-white/65">No generators match your search.</p>
               </div>
             )}
           </div>
@@ -273,7 +273,7 @@ export default function GeneratorsPage() {
                   <Layers size={16} />
                 </div>
                 <h2 className="text-xl font-bold">{cat.name}</h2>
-                <span className="px-2.5 py-0.5 rounded-full bg-white/[0.06] text-[10px] font-medium text-white/40">
+                <span className="px-2.5 py-0.5 rounded-full bg-white/[0.09] text-[10px] font-medium text-white/60">
                   {cat.generators.length}
                 </span>
               </div>
@@ -288,10 +288,10 @@ export default function GeneratorsPage() {
       </section>
 
       {/* CTA */}
-      <section className="border-t border-white/[0.06] bg-white/[0.01]">
+      <section className="border-t border-white/[0.10] bg-white/[0.07]">
         <div className="max-w-4xl mx-auto px-6 py-20 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to build?</h2>
-          <p className="text-white/40 mb-8">
+          <p className="text-white/60 mb-8">
             All {totalGenerators} generators are available in the builder. Start with a prompt or pick a generator.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
@@ -304,7 +304,7 @@ export default function GeneratorsPage() {
             </Link>
             <Link
               href="/developers"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/[0.06] text-white/80 font-medium hover:bg-white/[0.1] transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/[0.09] text-white/80 font-medium hover:bg-white/[0.1] transition-colors"
             >
               API Docs
               <Code2 size={16} />
@@ -322,7 +322,7 @@ function GeneratorCard({ gen }: { gen: { name: string; description: string; endp
   return (
     <Link
       href={`/builder?generator=${generatorId}`}
-      className="group relative rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 hover:border-brand-500/30 hover:bg-brand-500/[0.03] transition-all duration-200"
+      className="group relative rounded-xl border border-white/[0.10] bg-white/[0.08] p-5 hover:border-brand-500/30 hover:bg-brand-500/[0.03] transition-all duration-200"
     >
       {gen.tag && (
         <span className={`absolute top-3 right-3 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
@@ -341,7 +341,7 @@ function GeneratorCard({ gen }: { gen: { name: string; description: string; endp
       <h3 className="font-semibold text-sm mb-2 text-white/90 group-hover:text-white transition-colors">
         {gen.name}
       </h3>
-      <p className="text-xs text-white/35 leading-relaxed line-clamp-3">
+      <p className="text-xs text-white/65 leading-relaxed line-clamp-3">
         {gen.description}
       </p>
       <div className="mt-3 flex items-center gap-1 text-[10px] text-brand-400/60 group-hover:text-brand-400 transition-colors">

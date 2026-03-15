@@ -159,9 +159,9 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050507]">
+    <div className="min-h-screen bg-[#0d1525]">
       {/* Top Nav */}
-      <nav className="border-b border-white/[0.04] bg-[#050507]/80 backdrop-blur-2xl sticky top-0 z-50">
+      <nav className="border-b border-white/[0.08] bg-[#0d1525]/80 backdrop-blur-2xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-6">
@@ -172,13 +172,13 @@ export default function DashboardPage() {
                 <span className="text-lg font-bold tracking-tight">Zoobicon</span>
               </Link>
               <div className="hidden md:flex items-center gap-1">
-                <Link href="/dashboard" className="px-3 py-1.5 text-sm font-medium text-white/80 bg-white/[0.04] rounded-lg">
+                <Link href="/dashboard" className="px-3 py-1.5 text-sm font-medium text-white/80 bg-white/[0.07] rounded-lg">
                   Dashboard
                 </Link>
-                <Link href="/builder" className="px-3 py-1.5 text-sm text-white/40 hover:text-white/60 rounded-lg transition-colors">
+                <Link href="/builder" className="px-3 py-1.5 text-sm text-white/60 hover:text-white/60 rounded-lg transition-colors">
                   Builder
                 </Link>
-                <Link href="/analytics" className="px-3 py-1.5 text-sm text-white/40 hover:text-white/60 rounded-lg transition-colors">
+                <Link href="/analytics" className="px-3 py-1.5 text-sm text-white/60 hover:text-white/60 rounded-lg transition-colors">
                   Analytics
                 </Link>
               </div>
@@ -197,22 +197,22 @@ export default function DashboardPage() {
               <div className="relative">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/[0.10] bg-white/[0.05] hover:bg-white/[0.07] transition-colors"
                 >
                   <div className="w-6 h-6 rounded-full bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center text-[10px] font-bold text-white">
                     {userName.charAt(0).toUpperCase()}
                   </div>
                   <span className="text-sm text-white/60 hidden sm:block">{userName}</span>
-                  <ChevronDown className="w-3 h-3 text-white/30" />
+                  <ChevronDown className="w-3 h-3 text-white/50" />
                 </button>
 
                 {showUserMenu && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setShowUserMenu(false)} />
-                    <div className="absolute right-0 mt-2 w-48 bg-dark-100 border border-white/[0.08] rounded-xl shadow-elevated overflow-hidden z-50">
-                      <div className="px-4 py-3 border-b border-white/[0.06]">
+                    <div className="absolute right-0 mt-2 w-48 bg-dark-100 border border-white/[0.12] rounded-xl shadow-elevated overflow-hidden z-50">
+                      <div className="px-4 py-3 border-b border-white/[0.10]">
                         <div className="text-sm font-medium">{userName}</div>
-                        <div className="text-xs text-white/30">
+                        <div className="text-xs text-white/50">
                           {userRole === "admin" ? (
                             <span className="text-brand-400 font-semibold">Admin · Unlimited</span>
                           ) : "Free Plan"}
@@ -222,7 +222,7 @@ export default function DashboardPage() {
                         {userRole === "admin" && (
                           <Link
                             href="/admin"
-                            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-brand-400/70 hover:text-brand-400 hover:bg-white/[0.04] transition-colors"
+                            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-brand-400/70 hover:text-brand-400 hover:bg-white/[0.07] transition-colors"
                           >
                             <Shield className="w-4 h-4" />
                             Admin Panel
@@ -230,14 +230,14 @@ export default function DashboardPage() {
                         )}
                         <Link
                           href="/auth/settings"
-                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-white/50 hover:text-white hover:bg-white/[0.04] transition-colors"
+                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-white/65 hover:text-white hover:bg-white/[0.07] transition-colors"
                         >
                           <Settings className="w-4 h-4" />
                           Settings
                         </Link>
                         <button
                           onClick={handleLogout}
-                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-400/60 hover:text-red-400 hover:bg-white/[0.04] transition-colors"
+                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-400/60 hover:text-red-400 hover:bg-white/[0.07] transition-colors"
                         >
                           <LogOut className="w-4 h-4" />
                           Sign out
@@ -265,7 +265,7 @@ export default function DashboardPage() {
               </span>
             )}
           </div>
-          <p className="text-white/40 text-sm">
+          <p className="text-white/60 text-sm">
             {userRole === "admin"
               ? "Full access to all tools, agents, and platform controls."
               : "Manage your projects and create new ones."}
@@ -286,7 +286,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <div className="text-sm font-semibold group-hover:text-white transition-colors">{action.label}</div>
-                  <div className="text-xs text-white/30">{action.desc}</div>
+                  <div className="text-xs text-white/50">{action.desc}</div>
                 </div>
               </Link>
             ))}
@@ -304,7 +304,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <div className="text-sm font-semibold group-hover:text-white transition-colors">{action.label}</div>
-                  <div className="text-xs text-white/30">Create new</div>
+                  <div className="text-xs text-white/50">Create new</div>
                 </div>
               </Link>
             ))}
@@ -314,19 +314,19 @@ export default function DashboardPage() {
         {/* Admin: AI Tools Arsenal */}
         {userRole === "admin" && (
           <div className="mb-10">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-white/30 mb-4">AI Tools Arsenal — All Unlocked</h2>
+            <h2 className="text-sm font-bold uppercase tracking-wider text-white/50 mb-4">AI Tools Arsenal — All Unlocked</h2>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
               {ADMIN_TOOLS.map((tool) => (
                 <Link
                   key={tool.label}
                   href="/builder"
-                  className="group p-3 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.05] hover:border-brand-500/20 transition-all"
+                  className="group p-3 rounded-xl border border-white/[0.10] bg-white/[0.05] hover:bg-white/[0.08] hover:border-brand-500/20 transition-all"
                 >
                   <div className="flex items-center gap-2 mb-1">
                     <tool.icon className="w-4 h-4 text-brand-400/60 group-hover:text-brand-400 transition-colors" />
                     <span className="text-xs font-semibold text-white/70 group-hover:text-white transition-colors">{tool.label}</span>
                   </div>
-                  <div className="text-[10px] text-white/25">{tool.desc}</div>
+                  <div className="text-[10px] text-white/45">{tool.desc}</div>
                 </Link>
               ))}
             </div>
@@ -337,19 +337,19 @@ export default function DashboardPage() {
         <div className="grid grid-cols-3 gap-4 mb-10">
           <div className="gradient-border p-5 rounded-xl">
             <div className="text-2xl font-black gradient-text-static">{projects.length}</div>
-            <div className="text-xs text-white/40 mt-1">Total Projects</div>
+            <div className="text-xs text-white/60 mt-1">Total Projects</div>
           </div>
           <div className="gradient-border p-5 rounded-xl">
             <div className="text-2xl font-black gradient-text-static">
               {projects.reduce((sum, p) => sum + p.code.length, 0).toLocaleString()}
             </div>
-            <div className="text-xs text-white/40 mt-1">Characters Generated</div>
+            <div className="text-xs text-white/60 mt-1">Characters Generated</div>
           </div>
           <div className="gradient-border p-5 rounded-xl">
             <div className="text-2xl font-black gradient-text-static">
               {userRole === "admin" ? "∞" : userPlan === "unlimited" ? "∞" : "Free"}
             </div>
-            <div className="text-xs text-white/40 mt-1">
+            <div className="text-xs text-white/60 mt-1">
               {userRole === "admin" ? "All Agents Active" : "Current Plan"}
             </div>
           </div>
@@ -361,27 +361,27 @@ export default function DashboardPage() {
           <div className="flex items-center gap-3">
             {/* Search */}
             <div className="relative">
-              <Search className="w-4 h-4 text-white/20 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-white/40 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search projects..."
-                className="bg-white/[0.03] border border-white/[0.06] rounded-lg pl-9 pr-4 py-2 text-sm
+                className="bg-white/[0.06] border border-white/[0.10] rounded-lg pl-9 pr-4 py-2 text-sm
                            placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 w-48 transition-all"
               />
             </div>
             {/* View toggle */}
-            <div className="flex bg-white/[0.03] border border-white/[0.06] rounded-lg p-0.5">
+            <div className="flex bg-white/[0.06] border border-white/[0.10] rounded-lg p-0.5">
               <button
                 onClick={() => setViewMode("grid")}
-                className={`p-1.5 rounded-md transition-colors ${viewMode === "grid" ? "bg-white/[0.08] text-white" : "text-white/30"}`}
+                className={`p-1.5 rounded-md transition-colors ${viewMode === "grid" ? "bg-white/[0.08] text-white" : "text-white/50"}`}
               >
                 <LayoutGrid className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`p-1.5 rounded-md transition-colors ${viewMode === "list" ? "bg-white/[0.08] text-white" : "text-white/30"}`}
+                className={`p-1.5 rounded-md transition-colors ${viewMode === "list" ? "bg-white/[0.08] text-white" : "text-white/50"}`}
               >
                 <List className="w-4 h-4" />
               </button>
@@ -398,7 +398,7 @@ export default function DashboardPage() {
             <h3 className="text-lg font-bold text-white/60 mb-2">
               {searchQuery ? "No matching projects" : "No projects yet"}
             </h3>
-            <p className="text-sm text-white/30 mb-6 max-w-md mx-auto">
+            <p className="text-sm text-white/50 mb-6 max-w-md mx-auto">
               {searchQuery
                 ? "Try a different search term."
                 : "Start building your first website with AI. It only takes seconds."}
@@ -418,7 +418,7 @@ export default function DashboardPage() {
             {filteredProjects.map((project) => (
               <div key={project.id} className="gradient-border card-hover rounded-xl overflow-hidden group">
                 {/* Thumbnail */}
-                <div className="h-40 bg-dark-200 border-b border-white/[0.04] relative overflow-hidden">
+                <div className="h-40 bg-dark-200 border-b border-white/[0.08] relative overflow-hidden">
                   <iframe
                     srcDoc={project.code}
                     title={project.name}
@@ -443,13 +443,13 @@ export default function DashboardPage() {
                     <h3 className="text-sm font-semibold truncate flex-1">{project.name}</h3>
                     <button
                       onClick={() => handleDelete(project.id)}
-                      className="text-white/10 hover:text-red-400 transition-colors ml-2 flex-shrink-0"
+                      className="text-white/30 hover:text-red-400 transition-colors ml-2 flex-shrink-0"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
-                  <p className="text-xs text-white/30 line-clamp-2 mb-3">{project.prompt}</p>
-                  <div className="flex items-center gap-3 text-[10px] text-white/20">
+                  <p className="text-xs text-white/50 line-clamp-2 mb-3">{project.prompt}</p>
+                  <div className="flex items-center gap-3 text-[10px] text-white/40">
                     <span className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       {formatDate(project.updatedAt)}
@@ -465,7 +465,7 @@ export default function DashboardPage() {
             {filteredProjects.map((project) => (
               <div key={project.id} className="gradient-border card-hover p-4 rounded-xl flex items-center gap-4 group">
                 {/* Mini thumbnail */}
-                <div className="w-20 h-14 bg-dark-200 rounded-lg overflow-hidden flex-shrink-0 border border-white/[0.04]">
+                <div className="w-20 h-14 bg-dark-200 rounded-lg overflow-hidden flex-shrink-0 border border-white/[0.08]">
                   <iframe
                     srcDoc={project.code}
                     title={project.name}
@@ -475,9 +475,9 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-sm font-semibold truncate">{project.name}</h3>
-                  <p className="text-xs text-white/30 truncate">{project.prompt}</p>
+                  <p className="text-xs text-white/50 truncate">{project.prompt}</p>
                 </div>
-                <div className="flex items-center gap-2 text-xs text-white/20 flex-shrink-0">
+                <div className="flex items-center gap-2 text-xs text-white/40 flex-shrink-0">
                   <Clock className="w-3 h-3" />
                   {formatDate(project.updatedAt)}
                 </div>
@@ -490,7 +490,7 @@ export default function DashboardPage() {
                   </Link>
                   <button
                     onClick={() => handleDelete(project.id)}
-                    className="p-1.5 text-white/20 hover:text-red-400 transition-colors"
+                    className="p-1.5 text-white/40 hover:text-red-400 transition-colors"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>

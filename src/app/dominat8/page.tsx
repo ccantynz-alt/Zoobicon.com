@@ -152,7 +152,7 @@ export default function Dominat8Page() {
   const [annualBilling, setAnnualBilling] = useState(true);
 
   return (
-    <div className="min-h-screen bg-[#060610] text-white">
+    <div className="min-h-screen bg-[#0d1525] text-white">
       {/* Announcement bar */}
       <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white text-center py-2.5 text-xs font-medium">
         <span className="hidden sm:inline">Join businesses already dominating their market with AI</span>
@@ -162,7 +162,7 @@ export default function Dominat8Page() {
       </div>
 
       {/* Nav */}
-      <nav className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#060610]/90 backdrop-blur-xl">
+      <nav className="sticky top-0 z-50 border-b border-white/[0.10] bg-[#0d1525]/90 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/dominat8" className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
@@ -174,14 +174,14 @@ export default function Dominat8Page() {
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
-            <a href="#weapons" className="text-sm text-white/50 hover:text-white transition-colors">Arsenal</a>
-            <a href="#compare" className="text-sm text-white/50 hover:text-white transition-colors">Compare</a>
-            <a href="#testimonials" className="text-sm text-white/50 hover:text-white transition-colors">Proof</a>
-            <a href="#pricing" className="text-sm text-white/50 hover:text-white transition-colors">Pricing</a>
+            <a href="#weapons" className="text-sm text-white/65 hover:text-white transition-colors">Arsenal</a>
+            <a href="#compare" className="text-sm text-white/65 hover:text-white transition-colors">Compare</a>
+            <a href="#testimonials" className="text-sm text-white/65 hover:text-white transition-colors">Proof</a>
+            <a href="#pricing" className="text-sm text-white/65 hover:text-white transition-colors">Pricing</a>
           </div>
 
           <div className="flex items-center gap-3">
-            <Link href="/auth/login" className="hidden sm:block text-sm text-white/50 hover:text-white transition-colors">
+            <Link href="/auth/login" className="hidden sm:block text-sm text-white/65 hover:text-white transition-colors">
               Log in
             </Link>
             <Link
@@ -190,7 +190,7 @@ export default function Dominat8Page() {
             >
               Start Dominating
             </Link>
-            <button className="md:hidden text-white/50" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            <button className="md:hidden text-white/65" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
               {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
@@ -205,7 +205,7 @@ export default function Dominat8Page() {
           <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] rounded-full bg-indigo-600/[0.06] blur-[130px]" />
           <div className="absolute top-1/3 right-0 w-[400px] h-[400px] rounded-full bg-cyan-500/[0.04] blur-[100px]" />
           {/* Grid overlay */}
-          <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "linear-gradient(rgba(59,130,246,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.3) 1px, transparent 1px)", backgroundSize: "60px 60px" }} />
+          <div className="absolute inset-0 opacity-[0.08]" style={{ backgroundImage: "linear-gradient(rgba(59,130,246,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.3) 1px, transparent 1px)", backgroundSize: "60px 60px" }} />
           {/* Spotlight */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[50%] bg-gradient-to-b from-blue-500/[0.08] to-transparent blur-[60px]" />
         </div>
@@ -241,7 +241,7 @@ export default function Dominat8Page() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-lg sm:text-xl lg:text-2xl text-white/50 max-w-3xl mx-auto mb-12 leading-relaxed"
+            className="text-lg sm:text-xl lg:text-2xl text-white/65 max-w-3xl mx-auto mb-12 leading-relaxed"
           >
             While they spend weeks and tens of thousands on websites, you generate
             agency-quality sites, apps, and marketing assets in{" "}
@@ -266,7 +266,7 @@ export default function Dominat8Page() {
             </Link>
             <a
               href="#weapons"
-              className="inline-flex items-center gap-2 px-8 py-5 bg-white/[0.06] text-white/80 rounded-2xl text-base font-medium hover:bg-white/[0.1] transition-all border border-white/[0.08] hover:border-white/[0.15]"
+              className="inline-flex items-center gap-2 px-8 py-5 bg-white/[0.09] text-white/80 rounded-2xl text-base font-medium hover:bg-white/[0.1] transition-all border border-white/[0.12] hover:border-white/[0.15]"
             >
               <Play size={16} />
               See the Arsenal
@@ -278,14 +278,14 @@ export default function Dominat8Page() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.7 }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto p-8 rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm"
+            className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto p-8 rounded-2xl border border-white/[0.10] bg-white/[0.05] backdrop-blur-sm"
           >
             {STATS.map((stat) => (
               <div key={stat.label} className="text-center">
                 <div className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-blue-300 via-cyan-300 to-blue-400 bg-clip-text text-transparent">
                   {stat.value}
                 </div>
-                <div className="text-xs text-white/40 mt-1.5 font-medium uppercase tracking-wider">{stat.label}</div>
+                <div className="text-xs text-white/60 mt-1.5 font-medium uppercase tracking-wider">{stat.label}</div>
               </div>
             ))}
           </motion.div>
@@ -296,7 +296,7 @@ export default function Dominat8Page() {
       <section id="weapons" className="max-w-7xl mx-auto px-6 py-24">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-black mb-4">Your AI Arsenal</h2>
-          <p className="text-white/40 max-w-2xl mx-auto">
+          <p className="text-white/60 max-w-2xl mx-auto">
             30+ specialized AI generators. Each one replaces thousands of dollars in agency work.
           </p>
         </div>
@@ -307,13 +307,13 @@ export default function Dominat8Page() {
             return (
               <div
                 key={weapon.name}
-                className="group rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 hover:border-blue-500/30 hover:bg-blue-500/[0.02] transition-all duration-300"
+                className="group rounded-xl border border-white/[0.10] bg-white/[0.05] p-6 hover:border-blue-500/30 hover:bg-blue-500/[0.02] transition-all duration-300"
               >
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 flex items-center justify-center mb-4 group-hover:from-blue-500/30 group-hover:to-indigo-500/30 transition-colors">
                   <Icon size={22} className="text-blue-400" />
                 </div>
                 <h3 className="text-lg font-bold mb-2">{weapon.name}</h3>
-                <p className="text-sm text-white/40 leading-relaxed mb-4">{weapon.description}</p>
+                <p className="text-sm text-white/60 leading-relaxed mb-4">{weapon.description}</p>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-semibold">
                   <Zap size={12} />
                   {weapon.stat}
@@ -330,23 +330,23 @@ export default function Dominat8Page() {
           <h2 className="text-3xl sm:text-4xl font-black mb-4">
             Dominat<span className="text-blue-400">8</span> vs Traditional Agencies
           </h2>
-          <p className="text-white/40">Same quality. Fraction of the cost. None of the waiting.</p>
+          <p className="text-white/60">Same quality. Fraction of the cost. None of the waiting.</p>
         </div>
 
-        <div className="rounded-xl border border-white/[0.06] overflow-hidden">
-          <div className="grid grid-cols-3 bg-white/[0.04] border-b border-white/[0.06]">
-            <div className="p-4 text-xs font-bold text-white/50 uppercase tracking-wider">Feature</div>
+        <div className="rounded-xl border border-white/[0.10] overflow-hidden">
+          <div className="grid grid-cols-3 bg-white/[0.07] border-b border-white/[0.10]">
+            <div className="p-4 text-xs font-bold text-white/65 uppercase tracking-wider">Feature</div>
             <div className="p-4 text-xs font-bold text-blue-400 uppercase tracking-wider text-center">Dominat8</div>
-            <div className="p-4 text-xs font-bold text-white/30 uppercase tracking-wider text-center">Agency</div>
+            <div className="p-4 text-xs font-bold text-white/50 uppercase tracking-wider text-center">Agency</div>
           </div>
           {COMPARISON.map((row, i) => (
             <div
               key={row.feature}
-              className={`grid grid-cols-3 ${i < COMPARISON.length - 1 ? "border-b border-white/[0.04]" : ""}`}
+              className={`grid grid-cols-3 ${i < COMPARISON.length - 1 ? "border-b border-white/[0.08]" : ""}`}
             >
               <div className="p-4 text-sm text-white/60">{row.feature}</div>
               <div className="p-4 text-sm text-center font-semibold text-emerald-400">{row.us}</div>
-              <div className="p-4 text-sm text-center text-white/30">{row.them}</div>
+              <div className="p-4 text-sm text-center text-white/50">{row.them}</div>
             </div>
           ))}
         </div>
@@ -356,14 +356,14 @@ export default function Dominat8Page() {
       <section id="testimonials" className="max-w-7xl mx-auto px-6 py-24">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-black mb-4">What Users Are Saying</h2>
-          <p className="text-white/40">Example use cases based on typical results.</p>
+          <p className="text-white/60">Example use cases based on typical results.</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
           {TESTIMONIALS.map((t) => (
             <div
               key={t.name}
-              className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-6"
+              className="rounded-xl border border-white/[0.10] bg-white/[0.05] p-6"
             >
               <div className="flex gap-1 mb-4">
                 {Array.from({ length: t.rating }).map((_, i) => (
@@ -375,7 +375,7 @@ export default function Dominat8Page() {
               </p>
               <div>
                 <div className="text-sm font-semibold">{t.name}</div>
-                <div className="text-xs text-white/40">{t.title}</div>
+                <div className="text-xs text-white/60">{t.title}</div>
               </div>
             </div>
           ))}
@@ -386,13 +386,13 @@ export default function Dominat8Page() {
       <section id="pricing" className="max-w-6xl mx-auto px-6 py-24">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-black mb-4">Choose Your Weapon</h2>
-          <p className="text-white/40 mb-8">Cancel anytime. No credit card required for free tier.</p>
+          <p className="text-white/60 mb-8">Cancel anytime. No credit card required for free tier.</p>
 
-          <div className="inline-flex items-center gap-3 p-1 rounded-lg bg-white/[0.04] border border-white/[0.06]">
+          <div className="inline-flex items-center gap-3 p-1 rounded-lg bg-white/[0.07] border border-white/[0.10]">
             <button
               onClick={() => setAnnualBilling(false)}
               className={`px-4 py-2 rounded-md text-xs font-medium transition-all ${
-                !annualBilling ? "bg-white/[0.1] text-white" : "text-white/40"
+                !annualBilling ? "bg-white/[0.1] text-white" : "text-white/60"
               }`}
             >
               Monthly
@@ -400,7 +400,7 @@ export default function Dominat8Page() {
             <button
               onClick={() => setAnnualBilling(true)}
               className={`px-4 py-2 rounded-md text-xs font-medium transition-all ${
-                annualBilling ? "bg-white/[0.1] text-white" : "text-white/40"
+                annualBilling ? "bg-white/[0.1] text-white" : "text-white/60"
               }`}
             >
               Annual <span className="text-emerald-400 font-bold">-20%</span>
@@ -415,7 +415,7 @@ export default function Dominat8Page() {
               className={`relative rounded-xl border p-8 ${
                 plan.highlighted
                   ? "border-blue-500/30 bg-blue-500/[0.03] shadow-xl shadow-blue-500/5"
-                  : "border-white/[0.06] bg-white/[0.02]"
+                  : "border-white/[0.10] bg-white/[0.05]"
               }`}
             >
               {plan.highlighted && (
@@ -424,7 +424,7 @@ export default function Dominat8Page() {
                 </span>
               )}
               <h3 className="text-lg font-bold mb-1">{plan.name}</h3>
-              <p className="text-xs text-white/40 mb-4">{plan.description}</p>
+              <p className="text-xs text-white/60 mb-4">{plan.description}</p>
               <div className="mb-6">
                 <span className="text-4xl font-black">
                   {plan.price === "Custom"
@@ -436,7 +436,7 @@ export default function Dominat8Page() {
                         : plan.price}
                 </span>
                 {plan.period && (
-                  <span className="text-white/40 text-sm">{plan.period}</span>
+                  <span className="text-white/60 text-sm">{plan.period}</span>
                 )}
                 {annualBilling && plan.price !== "Free" && plan.price !== "Custom" && (
                   <div className="text-xs text-emerald-400 mt-1">Save $120/year</div>
@@ -455,7 +455,7 @@ export default function Dominat8Page() {
                 className={`block w-full text-center py-3 rounded-lg text-sm font-bold transition-all ${
                   plan.highlighted
                     ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-lg shadow-blue-500/20"
-                    : "bg-white/[0.06] text-white/80 hover:bg-white/[0.1] border border-white/[0.08]"
+                    : "bg-white/[0.09] text-white/80 hover:bg-white/[0.1] border border-white/[0.12]"
                 }`}
               >
                 {plan.cta}
@@ -473,7 +473,7 @@ export default function Dominat8Page() {
           <h2 className="text-3xl sm:text-4xl font-black mb-4">
             Stop competing. Start dominating.
           </h2>
-          <p className="text-white/40 mb-8 max-w-2xl mx-auto">
+          <p className="text-white/60 mb-8 max-w-2xl mx-auto">
             Every minute you wait, a competitor with Dominat8 is launching another site.
             The question isn&apos;t whether you can afford to use AI — it&apos;s whether you can afford not to.
           </p>
@@ -484,12 +484,12 @@ export default function Dominat8Page() {
             Start Dominating — It&apos;s Free
             <ArrowRight size={20} />
           </Link>
-          <p className="text-xs text-white/30 mt-4">No credit card required. Cancel anytime.</p>
+          <p className="text-xs text-white/50 mt-4">No credit card required. Cancel anytime.</p>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/[0.06] bg-[#06060a]">
+      <footer className="border-t border-white/[0.10] bg-[#0d1525]">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-2.5">
@@ -500,13 +500,13 @@ export default function Dominat8Page() {
                 Dominat<span className="text-blue-400">8</span>
               </span>
             </div>
-            <div className="flex items-center gap-6 text-xs text-white/30">
+            <div className="flex items-center gap-6 text-xs text-white/50">
               <Link href="/privacy" className="hover:text-white/60 transition-colors">Privacy</Link>
               <Link href="/terms" className="hover:text-white/60 transition-colors">Terms</Link>
               <Link href="/support" className="hover:text-white/60 transition-colors">Support</Link>
               <Link href="/developers" className="hover:text-white/60 transition-colors">API</Link>
             </div>
-            <p className="text-xs text-white/20">
+            <p className="text-xs text-white/40">
               © {new Date().getFullYear()} Dominat8. All rights reserved.
             </p>
           </div>
