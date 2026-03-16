@@ -1276,6 +1276,8 @@ export default function LandingPage() {
                 <li><Link href="/products/email-support" className="text-sm text-white/65 hover:text-white/60 transition-colors">AI Email Support</Link></li>
                 <li><Link href="/domains" className="text-sm text-white/65 hover:text-white/60 transition-colors">Domains</Link></li>
                 <li><Link href="/marketplace" className="text-sm text-white/65 hover:text-white/60 transition-colors">Marketplace</Link></li>
+                <li><Link href="/generators" className="text-sm text-white/65 hover:text-white/60 transition-colors">32 Generators</Link></li>
+                <li><Link href="/crawl" className="text-sm text-white/65 hover:text-white/60 transition-colors">Competitor Crawler</Link></li>
               </ul>
             </div>
             <div>
@@ -1292,6 +1294,7 @@ export default function LandingPage() {
               <ul className="space-y-2.5">
                 <li><Link href="/agencies" className="text-sm text-white/65 hover:text-white/60 transition-colors">Agencies</Link></li>
                 <li><Link href="/agencies#white-label" className="text-sm text-white/65 hover:text-white/60 transition-colors">White Label</Link></li>
+                <li><Link href="/agencies/portal" className="text-sm text-white/65 hover:text-white/60 transition-colors">Client Portal</Link></li>
                 <li><Link href="/support" className="text-sm text-white/65 hover:text-white/60 transition-colors">AI Support</Link></li>
                 <li><Link href="/auth/signup" className="text-sm text-white/65 hover:text-white/60 transition-colors">Sign Up</Link></li>
               </ul>

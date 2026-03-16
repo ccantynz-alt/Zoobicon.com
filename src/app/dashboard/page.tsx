@@ -41,8 +41,8 @@ import { getProjects as getLocalProjects, deleteProject as deleteLocalProject, t
 const QUICK_ACTIONS = [
   { icon: Globe, label: "New Website", href: "/builder", color: "from-brand-500 to-brand-700" },
   { icon: Sparkles, label: "SEO Agent", href: "/seo", color: "from-accent-cyan to-emerald-600" },
+  { icon: Search, label: "Crawl Competitor", href: "/crawl", color: "from-violet-500 to-purple-600" },
   { icon: BarChart3, label: "Analytics", href: "/analytics", color: "from-blue-500 to-fuchsia-600" },
-  { icon: Bot, label: "Chatbot", href: "/builder?generator=chatbot-widget", color: "from-blue-500 to-indigo-600" },
 ];
 
 const ADMIN_QUICK_ACTIONS = [
