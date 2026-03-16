@@ -336,7 +336,7 @@ export default function WordPressExport({ code }: WordPressExportProps) {
         className="flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg border border-zinc-700 transition-colors text-sm font-medium"
       >
         <FileArchive className="w-4 h-4" />
-        Export to WordPress
+        Zoobicon Connect
       </button>
     );
   }
@@ -349,7 +349,7 @@ export default function WordPressExport({ code }: WordPressExportProps) {
           <div className="flex items-center gap-3">
             <FileArchive className="w-5 h-5 text-blue-400" />
             <h2 className="text-lg font-semibold text-zinc-100">
-              WordPress
+              Zoobicon Connect
             </h2>
           </div>
           <button

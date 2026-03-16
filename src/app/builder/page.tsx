@@ -158,7 +158,7 @@ const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }
   { id: "translate", label: "Translate", icon: <Languages size={18} /> },
   { id: "github", label: "GitHub Import", icon: <Github size={18} /> },
   { id: "figma", label: "Figma Import", icon: <Figma size={18} /> },
-  { id: "wordpress", label: "WordPress Export", icon: <FileArchive size={18} /> },
+  { id: "wordpress", label: "Zoobicon Connect", icon: <FileArchive size={18} /> },
   { id: "visual-editor", label: "Visual Editor", icon: <MousePointer2 size={18} /> },
   { id: "sections", label: "Add Section", icon: <Package size={18} /> },
   { id: "project", label: "Project Mode", icon: <FolderTree size={18} /> },
