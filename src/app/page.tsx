@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useInView } from "framer-motion";
 import BuilderDemo from "@/components/BuilderDemo";
 import VideoShowcase from "@/components/VideoShowcase";
 import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
@@ -342,6 +342,224 @@ const FEATURES = [
   },
 ];
 
+const TESTIMONIALS = [
+  {
+    name: "Sarah Chen",
+    role: "Founder & CEO",
+    company: "TechFlow",
+    quote: "We replaced our entire frontend team's prototyping workflow. What took days now takes 90 seconds. The quality is indistinguishable from hand-coded sites.",
+    stars: 5,
+    gradient: "from-blue-500 to-cyan-500",
+  },
+  {
+    name: "Marcus Rodriguez",
+    role: "Head of Growth",
+    company: "ScaleUp",
+    quote: "The multi-agent pipeline is genuinely different from anything else. It doesn't just generate HTML — it thinks about strategy, copy, SEO, and animations separately. The output quality shows.",
+    stars: 5,
+    gradient: "from-purple-500 to-pink-500",
+  },
+  {
+    name: "Emma Larsson",
+    role: "Creative Director",
+    company: "NovaStar",
+    quote: "I was skeptical about AI-generated design. Then I saw the Opus output. Dark mode, responsive, micro-interactions — all in one prompt. Now my agency uses Zoobicon for every client pitch.",
+    stars: 5,
+    gradient: "from-amber-500 to-orange-500",
+  },
+  {
+    name: "David Park",
+    role: "CTO",
+    company: "BuildPro",
+    quote: "The white-label agency platform let us launch our own branded AI builder in a week. Our clients think we built it from scratch. Revenue up 340% in Q1.",
+    stars: 5,
+    gradient: "from-emerald-500 to-teal-500",
+  },
+];
+
+const SOCIAL_PROOF_LOGOS = [
+  "Acme Corp", "TechFlow", "NovaStar", "BuildPro", "ScaleUp", "DataWave",
+  "Meridian", "Axiom", "Luminary", "Vertex", "Catalyst", "Orbit",
+];
+
+// Animated counter hook
+function useCountUp(end: number, duration: number = 2000, inView: boolean) {
+  const [count, setCount] = useState(0);
+  const hasAnimated = useRef(false);
+
+  useEffect(() => {
+    if (!inView || hasAnimated.current) return;
+    hasAnimated.current = true;
+    const startTime = Date.now();
+    const timer = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.floor(eased * end));
+      if (progress >= 1) clearInterval(timer);
+    }, 16);
+    return () => clearInterval(timer);
+  }, [inView, end, duration]);
+
+  return count;
+}
+
+// Hero code animation lines
+const CODE_LINES = [
+  { text: '<!-- AI Agent: Building your site -->', cls: 'syn-comment' },
+  { text: '<div class="hero-section">', cls: 'syn-tag' },
+  { text: '  <h1 class="gradient-text">', cls: 'syn-tag' },
+  { text: '    Welcome to the Future', cls: '' },
+  { text: '  </h1>', cls: 'syn-tag' },
+  { text: '  <p class="subtitle">', cls: 'syn-tag' },
+  { text: '    AI-powered everything.', cls: '' },
+  { text: '  </p>', cls: 'syn-tag' },
+  { text: '  <button class="cta-btn">', cls: 'syn-tag' },
+  { text: '    Get Started Free', cls: '' },
+  { text: '  </button>', cls: 'syn-tag' },
+  { text: '</div>', cls: 'syn-tag' },
+  { text: '<section class="features">', cls: 'syn-tag' },
+  { text: '  <div class="grid-3">', cls: 'syn-tag' },
+  { text: '    <!-- 7 agents working... -->', cls: 'syn-comment' },
+];
+
+function HeroCodeAnimation() {
+  const [phase, setPhase] = useState<'code' | 'preview'>('code');
+  const [visibleLines, setVisibleLines] = useState(0);
+
+  useEffect(() => {
+    // Type out code lines one by one
+    const lineTimer = setInterval(() => {
+      setVisibleLines(prev => {
+        if (prev >= CODE_LINES.length) {
+          clearInterval(lineTimer);
+          // After all lines shown, switch to preview
+          setTimeout(() => setPhase('preview'), 800);
+          return prev;
+        }
+        return prev + 1;
+      });
+    }, 200);
+
+    // Full cycle: reset after showing preview
+    const cycleTimer = setInterval(() => {
+      setPhase('code');
+      setVisibleLines(0);
+    }, 10000);
+
+    return () => {
+      clearInterval(lineTimer);
+      clearInterval(cycleTimer);
+    };
+  }, [phase]);
+
+  return (
+    <div className="relative w-full">
+      {/* Animated gradient border container */}
+      <div className="card-glow">
+        <div className="code-window">
+          <div className="code-window-header">
+            <div className="code-window-dot" style={{ background: '#ff5f57' }} />
+            <div className="code-window-dot" style={{ background: '#febc2e' }} />
+            <div className="code-window-dot" style={{ background: '#28c840' }} />
+            <span className="ml-3 text-[11px] text-white/30 font-mono">index.html — Zoobicon AI</span>
+            <div className="ml-auto flex items-center gap-2">
+              <span className="text-[9px] text-emerald-400/80 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 font-semibold">
+                LIVE
+              </span>
+            </div>
+          </div>
+
+          <AnimatePresence mode="wait">
+            {phase === 'code' ? (
+              <motion.div
+                key="code"
+                initial={{ opacity: 1 }}
+                exit={{ opacity: 0, scale: 0.95, filter: 'blur(4px)' }}
+                transition={{ duration: 0.4 }}
+                className="p-4 min-h-[320px] overflow-hidden"
+              >
+                {CODE_LINES.slice(0, visibleLines).map((line, i) => (
+                  <div
+                    key={i}
+                    className="code-line"
+                    style={{ animationDelay: `${i * 0.05}s` }}
+                  >
+                    <span className="text-white/20 mr-3 select-none text-[10px]">
+                      {String(i + 1).padStart(2, ' ')}
+                    </span>
+                    <span className={line.cls}>{line.text}</span>
+                  </div>
+                ))}
+                {visibleLines < CODE_LINES.length && (
+                  <div className="inline-block w-[7px] h-[16px] bg-brand-400/80 animate-pulse ml-6 mt-1" />
+                )}
+              </motion.div>
+            ) : (
+              <motion.div
+                key="preview"
+                className="preview-morph p-4 min-h-[320px]"
+              >
+                {/* Fake rendered website preview */}
+                <div className="rounded-lg overflow-hidden border border-white/[0.06] bg-gradient-to-br from-[#0a0a1a] to-[#0f0f2a]">
+                  {/* Mini nav */}
+                  <div className="flex items-center gap-2 px-3 py-2 border-b border-white/[0.06]">
+                    <div className="w-4 h-4 rounded bg-gradient-to-br from-brand-500 to-purple-500" />
+                    <div className="w-16 h-2 rounded bg-white/10" />
+                    <div className="ml-auto flex gap-2">
+                      <div className="w-10 h-2 rounded bg-white/8" />
+                      <div className="w-10 h-2 rounded bg-white/8" />
+                      <div className="w-12 h-2.5 rounded bg-brand-500/40" />
+                    </div>
+                  </div>
+                  {/* Mini hero */}
+                  <div className="p-4 text-center">
+                    <div className="w-32 h-3 rounded bg-gradient-to-r from-brand-500/60 to-purple-500/60 mx-auto mb-2" />
+                    <div className="w-48 h-2 rounded bg-white/10 mx-auto mb-1" />
+                    <div className="w-40 h-2 rounded bg-white/8 mx-auto mb-3" />
+                    <div className="w-20 h-5 rounded bg-brand-500/40 mx-auto mb-4" />
+                  </div>
+                  {/* Mini cards */}
+                  <div className="px-4 pb-4 grid grid-cols-3 gap-2">
+                    {[0,1,2].map(j => (
+                      <div key={j} className="p-2 rounded border border-white/[0.06] bg-white/[0.02]">
+                        <div className="w-5 h-5 rounded bg-gradient-to-br from-brand-500/30 to-purple-500/30 mb-1.5" />
+                        <div className="w-full h-1.5 rounded bg-white/8 mb-1" />
+                        <div className="w-3/4 h-1.5 rounded bg-white/5" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="text-center mt-3">
+                  <span className="text-[10px] text-emerald-400/80 font-semibold tracking-wider uppercase">
+                    Build complete — deployed to zoobicon.sh
+                  </span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Animated counter stat component
+function AnimatedStat({ value, label, suffix = '' }: { value: number; label: string; suffix?: string }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const count = useCountUp(value, 2000, isInView);
+  return (
+    <motion.div ref={ref} variants={fadeInUp} className="text-center">
+      <div className="text-4xl md:text-5xl font-bold font-sharp text-white text-glow mb-2">
+        {count}{suffix}
+      </div>
+      <div className="text-sm text-white/35 uppercase tracking-[0.15em] font-medium">{label}</div>
+    </motion.div>
+  );
+}
+
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<{ email: string; name?: string; role?: string } | null>(null);
@@ -506,16 +724,17 @@ export default function LandingPage() {
               </motion.div>
 
               <h1 className="font-sharp text-[3rem] sm:text-[4rem] lg:text-[5.5rem] font-bold tracking-[-0.05em] leading-[0.95] mb-6 text-white text-glow-strong">
-                Build{" "}
-                <span className="relative inline-block">
+                <span className="gradient-text-animated">Build</span>{" "}
+                <span className="relative inline-block" style={{ perspective: '800px' }}>
                   <AnimatePresence mode="wait">
                     <motion.span
                       key={wordIndex}
-                      initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
-                      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                      exit={{ opacity: 0, y: -20, filter: "blur(8px)" }}
-                      transition={{ duration: 0.4, ease: "easeOut" }}
+                      initial={{ opacity: 0, rotateX: 90, y: 20 }}
+                      animate={{ opacity: 1, rotateX: 0, y: 0 }}
+                      exit={{ opacity: 0, rotateX: -90, y: -20 }}
+                      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                       className="text-white inline-block"
+                      style={{ transformOrigin: 'bottom center' }}
                     >
                       {ROTATING_WORDS[wordIndex]}
                     </motion.span>
@@ -558,56 +777,14 @@ export default function LandingPage() {
               </div>
             </motion.div>
 
-            {/* Right — Service cards (SiteGround style) */}
+            {/* Right — Live AI code generation animation */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.2 }}
               className="hidden lg:block"
             >
-              <div className="space-y-3">
-                {[
-                  { icon: Globe, label: "Build a website", active: false },
-                  { icon: Search, label: "Optimize for SEO", active: false },
-                  { icon: Sparkles, label: "Generate with AI", active: true },
-                  { icon: Video, label: "Create videos", active: false },
-                  { icon: Mail, label: "Send email campaigns", active: false },
-                  { icon: Globe, label: "Register a domain", active: false },
-                ].map((item, i) => (
-                  <motion.div
-                    key={item.label}
-                    initial={{ opacity: 0, x: 30 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: 0.3 + i * 0.08 }}
-                  >
-                    <Link
-                      href={i === 0 ? "/products/website-builder" : i === 1 ? "/products/seo-agent" : i === 2 ? "/builder" : i === 3 ? "/products/video-creator" : i === 5 ? "/domains" : "#products"}
-                      className={`flex items-center gap-4 px-6 py-4 rounded-lg transition-all duration-200 group ${
-                        item.active
-                          ? "bg-white/[0.06] border border-white/[0.10] shadow-[0_0_30px_rgba(255,255,255,0.03)]"
-                          : "bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] hover:border-white/[0.10]"
-                      }`}
-                    >
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                        item.active ? "bg-white/[0.08]" : "bg-white/[0.04]"
-                      }`}>
-                        <item.icon className={`w-5 h-5 ${item.active ? "text-white/80" : "text-white/40 group-hover:text-white/60"} transition-colors`} />
-                      </div>
-                      <span className={`text-sm font-medium font-sharp tracking-wide ${item.active ? "text-white/90" : "text-white/50 group-hover:text-white/70"} transition-colors`}>
-                        {item.label}
-                      </span>
-                      {item.active && (
-                        <div className="ml-auto w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
-                          <Check className="w-3 h-3 text-white" />
-                        </div>
-                      )}
-                      {!item.active && (
-                        <ChevronRight className="ml-auto w-4 h-4 text-white/35 group-hover:text-white/65 transition-colors" />
-                      )}
-                    </Link>
-                  </motion.div>
-                ))}
-              </div>
+              <HeroCodeAnimation />
             </motion.div>
           </div>
 
