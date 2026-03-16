@@ -400,4 +400,40 @@ export async function initSchema() {
   `;
 
   await sql`CREATE INDEX IF NOT EXISTS knowledge_base_category_idx ON knowledge_base (category)`;
+
+  // ---- Live support usage tracking ----
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS support_usage (
+      id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_email      TEXT NOT NULL,
+      month           TEXT NOT NULL,
+      minutes_used    REAL NOT NULL DEFAULT 0,
+      tokens_used     INTEGER NOT NULL DEFAULT 0,
+      sessions_count  INTEGER NOT NULL DEFAULT 0,
+      plan_at_time    VARCHAR(50) NOT NULL DEFAULT 'free',
+      addon_premium   BOOLEAN NOT NULL DEFAULT false,
+      created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      UNIQUE(user_email, month)
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS support_usage_user_month_idx ON support_usage (user_email, month)`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS support_sessions (
+      id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_email      TEXT NOT NULL,
+      started_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      ended_at        TIMESTAMPTZ,
+      duration_secs   INTEGER NOT NULL DEFAULT 0,
+      messages_count  INTEGER NOT NULL DEFAULT 0,
+      tokens_used     INTEGER NOT NULL DEFAULT 0,
+      status          VARCHAR(20) NOT NULL DEFAULT 'active'
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS support_sessions_user_email_idx ON support_sessions (user_email)`;
+  await sql`CREATE INDEX IF NOT EXISTS support_sessions_status_idx ON support_sessions (status)`;
 }

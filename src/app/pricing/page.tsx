@@ -8,7 +8,7 @@ import {
   Check, Zap, ArrowRight, HelpCircle, Sparkles, Globe, Video, BarChart3,
   Mail, Bot, Palette, Code2, Shield, Users, Building2, Loader2,
   LayoutDashboard, LogOut, Plus, ShoppingCart, Server, AtSign, Lock,
-  Blocks, Languages, TestTube2, Megaphone,
+  Blocks, Languages, TestTube2, Megaphone, Headphones,
 } from "lucide-react";
 
 const fadeInUp = {
@@ -81,6 +81,7 @@ const PLANS = [
       "Chatbot Builder",
       "A/B Testing & Analytics",
       "Figma Import",
+      "Live Agent support (30 min/mo)",
       "Priority support",
       "API access (100K req/mo)",
     ],
@@ -103,6 +104,7 @@ const PLANS = [
       "Team seats (up to 10)",
       "Template marketplace access",
       "Bulk operations & automation",
+      "Live Agent support (120 min/mo)",
       "API access (500K req/mo)",
       "Priority Slack support",
     ],
@@ -142,6 +144,7 @@ const PRODUCTS = [
   { icon: Mail, name: "AI Email Support", starter: false, creator: false, pro: true, agency: true, enterprise: true },
   { icon: Bot, name: "Chatbot Builder", starter: false, creator: false, pro: true, agency: true, enterprise: true },
   { icon: Users, name: "White-Label & Teams", starter: false, creator: false, pro: false, agency: "10 seats", enterprise: "Unlimited" },
+  { icon: Headphones, name: "Live Agent Support", starter: false, creator: false, pro: "30 min/mo", agency: "120 min/mo", enterprise: "600 min/mo" },
   { icon: Shield, name: "SLA Guarantee", starter: false, creator: false, pro: false, agency: false, enterprise: "99.99%" },
   { icon: Code2, name: "API Access", starter: false, creator: "10K/mo", pro: "100K/mo", agency: "500K/mo", enterprise: "Unlimited" },
 ];
@@ -208,6 +211,10 @@ const FAQS = [
   {
     q: "What happens to my websites if I downgrade?",
     a: "Your sites are preserved forever. On Starter, you can still view, edit, and export everything. You just can't generate new ones beyond the 3/month limit. Hosted sites stay live as long as you have a paid plan — Starter sites get 7-day previews.",
+  },
+  {
+    q: "What's Live Agent support?",
+    a: "Free users get Zoe, our quick AI assistant (powered by Claude Haiku). Pro and Agency plans include Live Agent support — a full Claude Sonnet-powered AI that gives deeper, more thorough answers. Pro gets 30 minutes/month (10 min sessions), Agency gets 120 minutes/month (15 min sessions). Need more? Add Premium Support for $19/month — adds 60 extra minutes with 20-minute sessions. Sessions have a cooldown between messages to prevent abuse, and auto-close when time runs out.",
   },
   {
     q: "How does white-labeling work on Enterprise?",
@@ -448,6 +455,7 @@ export default function PricingPage() {
                   { icon: Languages, name: "Multi-Language (i18n)", price: "$14", period: "/mo", desc: "Auto-translate your site into 30+ languages", color: "text-pink-400", borderColor: "border-pink-500/15 hover:border-pink-500/30", soon: true },
                   { icon: TestTube2, name: "A/B Testing Engine", price: "$19", period: "/mo", desc: "Split test pages, CTAs, and layouts with AI recommendations", color: "text-orange-400", borderColor: "border-orange-500/15 hover:border-orange-500/30", soon: true },
                   { icon: Palette, name: "AI Brand Kit", price: "$19", period: "one-time", desc: "Logo, color palette, typography, brand guidelines — AI generated", color: "text-rose-400", borderColor: "border-rose-500/15 hover:border-rose-500/30", soon: true },
+                  { icon: Headphones, name: "Premium Support", price: "$19", period: "/mo", desc: "+60 min/mo live Claude agent support with 20 min sessions. Real answers, not canned responses", color: "text-emerald-400", borderColor: "border-emerald-500/15 hover:border-emerald-500/30", soon: false },
                   { icon: Blocks, name: "Component Library", price: "$19", period: "one-time", desc: "500+ premium components: heroes, CTAs, navs, footers, forms", color: "text-teal-400", borderColor: "border-teal-500/15 hover:border-teal-500/30", soon: false },
                 ].map((addon) => (
                   <motion.div key={addon.name} variants={fadeInUp}>

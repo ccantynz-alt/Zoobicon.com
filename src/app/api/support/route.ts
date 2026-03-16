@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+import { recordMessageUsage } from "@/lib/support-usage";
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -68,7 +69,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { messages } = await request.json();
+    const { messages, sessionId, userEmail, tier } = await request.json();
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return new Response(JSON.stringify({ error: "Messages are required" }), {
@@ -84,6 +85,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Determine model and max tokens based on tier
+    // Free/unauthenticated: Haiku (fast, cheap) with lower token limit
+    // Pro/Agency/Enterprise (live agent): Sonnet (better quality)
+    const isLiveAgent = tier === "live";
+    const model = isLiveAgent ? "claude-sonnet-4-6" : "claude-haiku-4-5-20251001";
+    const maxTokens = isLiveAgent ? 2048 : 1024;
+
+    const messageStart = Date.now();
+
     // Sanitize messages to only include role and content
     const sanitizedMessages = messages.map((m: { role: string; content: string }) => ({
       role: m.role as "user" | "assistant",
@@ -91,13 +101,14 @@ export async function POST(request: NextRequest) {
     }));
 
     const stream = await client.messages.stream({
-      model: "claude-sonnet-4-6",
-      max_tokens: 1024,
+      model,
+      max_tokens: maxTokens,
       system: SYSTEM_PROMPT,
       messages: sanitizedMessages,
     });
 
     const encoder = new TextEncoder();
+    let totalOutputTokens = 0;
 
     const readable = new ReadableStream({
       async start(controller) {
@@ -107,11 +118,42 @@ export async function POST(request: NextRequest) {
               event.type === "content_block_delta" &&
               event.delta.type === "text_delta"
             ) {
+              totalOutputTokens += Math.ceil(event.delta.text.length / 4); // rough estimate
               controller.enqueue(
                 encoder.encode(`data: ${JSON.stringify({ type: "chunk", content: event.delta.text })}\n\n`)
               );
             }
           }
+
+          // Track usage for live agent sessions
+          if (isLiveAgent && sessionId && userEmail) {
+            const durationSecs = Math.round((Date.now() - messageStart) / 1000);
+            // Estimate input tokens (rough: 4 chars per token)
+            const inputTokens = Math.ceil(
+              sanitizedMessages.reduce(
+                (acc: number, m: { content: string }) => acc + m.content.length,
+                0
+              ) / 4
+            );
+            const result = await recordMessageUsage(
+              sessionId,
+              userEmail,
+              inputTokens + totalOutputTokens,
+              durationSecs
+            );
+
+            // Send usage info to client
+            controller.enqueue(
+              encoder.encode(
+                `data: ${JSON.stringify({
+                  type: "usage",
+                  sessionExpired: result.sessionExpired,
+                  minutesRemaining: Math.round(result.minutesRemaining * 10) / 10,
+                })}\n\n`
+              )
+            );
+          }
+
           controller.enqueue(
             encoder.encode(`data: ${JSON.stringify({ type: "done" })}\n\n`)
           );

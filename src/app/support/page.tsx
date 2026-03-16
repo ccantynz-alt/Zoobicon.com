@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import BackgroundEffects from "@/components/BackgroundEffects";
@@ -23,12 +23,36 @@ import {
   Shield,
   BookOpen,
   MessageCircle,
+  Clock,
+  Crown,
+  AlertTriangle,
+  Timer,
+  X,
 } from "lucide-react";
 import SupportAvatar from "@/components/SupportAvatar";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
+}
+
+interface UsageData {
+  plan: string;
+  hasLiveAgent: boolean;
+  minutesUsed: number;
+  minutesRemaining: number;
+  monthlyLimit: number;
+  sessionsCount: number;
+  sessionMaxMinutes: number;
+  messageCooldownSecs: number;
+  canStartSession: boolean;
+  sessionBlockReason: string | null;
+  activeSession: {
+    sessionId: string;
+    elapsedMinutes: number;
+    messagesCount: number;
+    remainingMinutes: number;
+  } | null;
 }
 
 const QUICK_TOPICS = [
@@ -53,8 +77,92 @@ export default function SupportPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [userPlan, setUserPlan] = useState<string>("free");
+  const [usage, setUsage] = useState<UsageData | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [isLiveAgent, setIsLiveAgent] = useState(false);
+  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
+  const [sessionWarning, setSessionWarning] = useState<string | null>(null);
+  const [cooldownRemaining, setCooldownRemaining] = useState(0);
+  const [sessionElapsed, setSessionElapsed] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const sessionTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const cooldownTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Load user from localStorage
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("zoobicon_user");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        setUserEmail(parsed.email);
+        setUserPlan(parsed.plan || "free");
+      }
+    } catch {}
+  }, []);
+
+  // Fetch usage when user is loaded
+  const fetchUsage = useCallback(async () => {
+    if (!userEmail) return;
+    try {
+      const res = await fetch(`/api/support/usage?email=${encodeURIComponent(userEmail)}`);
+      if (res.ok) {
+        const data = await res.json();
+        setUsage(data);
+        if (data.activeSession) {
+          setSessionId(data.activeSession.sessionId);
+          setIsLiveAgent(true);
+          setSessionElapsed(data.activeSession.elapsedMinutes);
+        }
+      }
+    } catch {}
+  }, [userEmail]);
+
+  useEffect(() => {
+    fetchUsage();
+  }, [fetchUsage]);
+
+  // Session timer — tick every second when live agent is active
+  useEffect(() => {
+    if (isLiveAgent && sessionId && usage) {
+      sessionTimerRef.current = setInterval(() => {
+        setSessionElapsed((prev) => {
+          const next = prev + 1 / 60;
+          const remaining = usage.sessionMaxMinutes - next;
+          // Warning at 2 minutes remaining
+          if (remaining <= 2 && remaining > 0) {
+            setSessionWarning(
+              `${Math.ceil(remaining)} minute${Math.ceil(remaining) !== 1 ? "s" : ""} remaining in this session`
+            );
+          }
+          // Auto-end at 0
+          if (remaining <= 0) {
+            endLiveSession();
+            return next;
+          }
+          return next;
+        });
+      }, 1000);
+
+      return () => {
+        if (sessionTimerRef.current) clearInterval(sessionTimerRef.current);
+      };
+    }
+  }, [isLiveAgent, sessionId, usage]);
+
+  // Cooldown timer
+  useEffect(() => {
+    if (cooldownRemaining > 0) {
+      cooldownTimerRef.current = setTimeout(() => {
+        setCooldownRemaining((c) => Math.max(0, c - 1));
+      }, 1000);
+      return () => {
+        if (cooldownTimerRef.current) clearTimeout(cooldownTimerRef.current);
+      };
+    }
+  }, [cooldownRemaining]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -64,15 +172,70 @@ export default function SupportPage() {
     inputRef.current?.focus();
   }, []);
 
+  const startLiveSession = async () => {
+    if (!userEmail) {
+      // Not logged in
+      setShowUpgradePrompt(true);
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/support/usage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: userEmail, action: "start" }),
+      });
+
+      if (res.status === 403) {
+        const data = await res.json();
+        setSessionWarning(data.error);
+        setShowUpgradePrompt(true);
+        return;
+      }
+
+      const data = await res.json();
+      setSessionId(data.sessionId);
+      setIsLiveAgent(true);
+      setSessionElapsed(data.resumed ? (data.elapsedMinutes || 0) : 0);
+      setSessionWarning(null);
+      await fetchUsage();
+    } catch (err) {
+      console.error("Failed to start session:", err);
+    }
+  };
+
+  const endLiveSession = async () => {
+    if (sessionId && userEmail) {
+      try {
+        await fetch("/api/support/usage", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: userEmail, action: "end", sessionId }),
+        });
+      } catch {}
+    }
+    setSessionId(null);
+    setIsLiveAgent(false);
+    setSessionElapsed(0);
+    setSessionWarning(null);
+    if (sessionTimerRef.current) clearInterval(sessionTimerRef.current);
+    await fetchUsage();
+  };
+
   const sendMessage = async (text?: string) => {
     const messageText = text || input.trim();
-    if (!messageText || isStreaming) return;
+    if (!messageText || isStreaming || cooldownRemaining > 0) return;
 
     const userMessage: Message = { role: "user", content: messageText };
     const updatedMessages = [...messages, userMessage];
     setMessages(updatedMessages);
     setInput("");
     setIsStreaming(true);
+
+    // Start cooldown for live agent
+    if (isLiveAgent && usage) {
+      setCooldownRemaining(usage.messageCooldownSecs);
+    }
 
     // Add empty assistant message to stream into
     setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
@@ -81,7 +244,12 @@ export default function SupportPage() {
       const response = await fetch("/api/support", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: updatedMessages }),
+        body: JSON.stringify({
+          messages: updatedMessages,
+          sessionId: isLiveAgent ? sessionId : undefined,
+          userEmail: isLiveAgent ? userEmail : undefined,
+          tier: isLiveAgent ? "live" : "free",
+        }),
       });
 
       if (!response.ok) {
@@ -115,6 +283,18 @@ export default function SupportPage() {
                 }
                 return [...updated];
               });
+            } else if (data.type === "usage") {
+              // Update usage from server
+              if (data.sessionExpired) {
+                setSessionWarning("Session time limit reached. You can start a new session.");
+                setIsLiveAgent(false);
+                setSessionId(null);
+              }
+              if (data.minutesRemaining !== undefined) {
+                setUsage((prev) =>
+                  prev ? { ...prev, minutesRemaining: data.minutesRemaining } : prev
+                );
+              }
             } else if (data.type === "error") {
               setMessages((prev) => {
                 const updated = [...prev];
@@ -154,10 +334,12 @@ export default function SupportPage() {
   const resetChat = () => {
     setMessages([]);
     setInput("");
+    setSessionWarning(null);
     inputRef.current?.focus();
   };
 
   const hasMessages = messages.length > 0;
+  const sessionRemainingMin = usage ? usage.sessionMaxMinutes - sessionElapsed : 0;
 
   return (
     <div className="relative min-h-screen flex flex-col">
@@ -177,6 +359,42 @@ export default function SupportPage() {
             <span className="text-sm text-white/65">Support</span>
           </div>
           <div className="flex items-center gap-3">
+            {/* Live Agent Toggle */}
+            {userEmail && usage?.hasLiveAgent && (
+              <div className="flex items-center gap-2">
+                {isLiveAgent ? (
+                  <>
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                      <span className="text-xs text-emerald-300 font-medium">Live Agent</span>
+                      <span className="text-[10px] text-emerald-400/60 ml-1">
+                        {Math.max(0, Math.ceil(sessionRemainingMin))}m left
+                      </span>
+                    </div>
+                    <button
+                      onClick={endLiveSession}
+                      className="text-[10px] text-white/40 hover:text-white/60 transition-colors"
+                    >
+                      End session
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={startLiveSession}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-emerald-300 border border-emerald-500/20 hover:bg-emerald-500/10 transition-all"
+                  >
+                    <Sparkles className="w-3 h-3" />
+                    Start Live Agent
+                    {usage.minutesRemaining > 0 && (
+                      <span className="text-[10px] text-emerald-400/60">
+                        ({Math.round(usage.minutesRemaining)}m left)
+                      </span>
+                    )}
+                  </button>
+                )}
+              </div>
+            )}
+
             {hasMessages && (
               <button
                 onClick={resetChat}
@@ -192,6 +410,106 @@ export default function SupportPage() {
           </div>
         </div>
       </nav>
+
+      {/* Session Warning Banner */}
+      <AnimatePresence>
+        {sessionWarning && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-16 left-0 right-0 z-40 bg-amber-500/10 border-b border-amber-500/20"
+          >
+            <div className="max-w-7xl mx-auto px-6 py-2 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs text-amber-300">
+                <AlertTriangle className="w-3.5 h-3.5" />
+                {sessionWarning}
+              </div>
+              <button
+                onClick={() => setSessionWarning(null)}
+                className="text-amber-400/60 hover:text-amber-300 transition-colors"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Upgrade Prompt Modal */}
+      <AnimatePresence>
+        {showUpgradePrompt && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowUpgradePrompt(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-gray-900 border border-white/10 rounded-2xl p-8 max-w-md mx-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-brand-500 flex items-center justify-center">
+                  <Crown className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg">Live Agent Support</h3>
+                  <p className="text-xs text-white/50">Powered by Claude AI</p>
+                </div>
+              </div>
+
+              <p className="text-sm text-white/60 mb-6 leading-relaxed">
+                Get real answers from a Claude AI agent — not canned responses. Available on Pro, Agency, and Enterprise plans, or as a standalone add-on.
+              </p>
+
+              <div className="space-y-3 mb-6">
+                <div className="flex items-center gap-3 text-sm">
+                  <Timer className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                  <span className="text-white/70">
+                    <strong className="text-white">Pro:</strong> 30 min/mo (10 min sessions)
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 text-sm">
+                  <Timer className="w-4 h-4 text-purple-400 flex-shrink-0" />
+                  <span className="text-white/70">
+                    <strong className="text-white">Agency:</strong> 120 min/mo (15 min sessions)
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 text-sm">
+                  <Sparkles className="w-4 h-4 text-brand-400 flex-shrink-0" />
+                  <span className="text-white/70">
+                    <strong className="text-white">Premium Support:</strong> +60 min/mo add-on ($19/mo)
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <Link
+                  href="/pricing"
+                  className="flex-1 btn-gradient px-4 py-3 rounded-xl text-sm font-bold text-white text-center"
+                >
+                  View Plans
+                </Link>
+                <button
+                  onClick={() => setShowUpgradePrompt(false)}
+                  className="px-4 py-3 rounded-xl text-sm text-white/60 border border-white/10 hover:border-white/20 transition-all"
+                >
+                  Stay with Zoe
+                </button>
+              </div>
+
+              <p className="text-[10px] text-white/30 text-center mt-4">
+                Zoe (free tier) still answers questions — just with faster, shorter responses
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main content */}
       <div className="flex-1 pt-16 flex flex-col">
@@ -216,10 +534,49 @@ export default function SupportPage() {
                   Your Zoobicon AI support assistant. Ask me anything about our products,
                   features, billing, DNS, or how to get the most out of the platform.
                 </p>
-                <div className="flex items-center justify-center gap-2 mt-3">
-                  <Shield className="w-3.5 h-3.5 text-white/40" />
-                  <span className="text-xs text-white/40">Scoped to Zoobicon support only</span>
+
+                {/* Tier indicator */}
+                <div className="flex items-center gap-3 mt-4">
+                  <div className="flex items-center gap-1.5">
+                    <Shield className="w-3.5 h-3.5 text-white/40" />
+                    <span className="text-xs text-white/40">Scoped to Zoobicon support only</span>
+                  </div>
+                  {isLiveAgent ? (
+                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                      <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+                      <span className="text-[10px] text-emerald-300 font-medium">Live Agent (Sonnet)</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white/5 border border-white/10">
+                      <Bot className="w-3 h-3 text-white/40" />
+                      <span className="text-[10px] text-white/40">Quick AI (Haiku)</span>
+                    </div>
+                  )}
                 </div>
+
+                {/* Live Agent CTA for non-live users */}
+                {!isLiveAgent && userEmail && usage?.hasLiveAgent && (
+                  <button
+                    onClick={startLiveSession}
+                    className="mt-4 flex items-center gap-2 px-4 py-2 rounded-xl text-xs text-emerald-300 border border-emerald-500/20 hover:bg-emerald-500/10 transition-all"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    Switch to Live Agent for deeper support
+                    <span className="text-emerald-400/60">
+                      ({Math.round(usage.minutesRemaining)}m remaining)
+                    </span>
+                  </button>
+                )}
+
+                {!isLiveAgent && (!userEmail || !usage?.hasLiveAgent) && (
+                  <button
+                    onClick={() => setShowUpgradePrompt(true)}
+                    className="mt-4 flex items-center gap-2 px-4 py-2 rounded-xl text-xs text-white/50 border border-white/10 hover:border-white/20 transition-all"
+                  >
+                    <Crown className="w-3.5 h-3.5" />
+                    Upgrade for Live Agent support
+                  </button>
+                )}
               </motion.div>
 
               {/* Quick topics */}
@@ -257,14 +614,14 @@ export default function SupportPage() {
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={handleKeyDown}
-                      placeholder="Ask Zoe about Zoobicon..."
+                      placeholder={isLiveAgent ? "Ask the live agent..." : "Ask Zoe about Zoobicon..."}
                       rows={1}
                       className="flex-1 bg-transparent px-5 py-4 text-white placeholder:text-white/45 outline-none text-base resize-none max-h-32"
                       style={{ minHeight: "56px" }}
                     />
                     <button
                       onClick={() => sendMessage()}
-                      disabled={!input.trim()}
+                      disabled={!input.trim() || cooldownRemaining > 0}
                       className="p-3 mr-2 mb-1.5 rounded-xl text-white/50 hover:text-white disabled:opacity-20 transition-all"
                     >
                       <Send className="w-5 h-5" />
@@ -327,6 +684,8 @@ export default function SupportPage() {
                         className={`max-w-[80%] rounded-2xl px-4 py-3 ${
                           msg.role === "user"
                             ? "bg-brand-500/20 border border-brand-500/20 text-white"
+                            : isLiveAgent
+                            ? "bg-emerald-500/[0.07] border border-emerald-500/[0.15] text-white/80"
                             : "bg-white/[0.07] border border-white/[0.10] text-white/80"
                         }`}
                       >
@@ -335,7 +694,9 @@ export default function SupportPage() {
                         ) : (
                           <div className="flex items-center gap-2 text-white/50">
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            <span className="text-xs">Zoe is typing...</span>
+                            <span className="text-xs">
+                              {isLiveAgent ? "Agent is thinking..." : "Zoe is typing..."}
+                            </span>
                           </div>
                         )}
                       </div>
@@ -354,37 +715,64 @@ export default function SupportPage() {
             {/* Chat input */}
             <div className="border-t border-white/[0.08] bg-[#0d1525]/80 backdrop-blur-xl">
               <div className="max-w-3xl mx-auto px-6 py-4">
-                <div className="flex items-end bg-white/[0.07] border border-white/[0.12] rounded-2xl overflow-hidden focus-within:border-brand-500/30 transition-colors">
+                <div className={`flex items-end rounded-2xl overflow-hidden transition-colors ${
+                  isLiveAgent
+                    ? "bg-emerald-500/[0.05] border border-emerald-500/[0.15] focus-within:border-emerald-500/30"
+                    : "bg-white/[0.07] border border-white/[0.12] focus-within:border-brand-500/30"
+                }`}>
                   <textarea
                     ref={inputRef}
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder={isStreaming ? "Waiting for response..." : "Ask Zoe about Zoobicon..."}
-                    disabled={isStreaming}
+                    placeholder={
+                      cooldownRemaining > 0
+                        ? `Wait ${cooldownRemaining}s...`
+                        : isStreaming
+                        ? "Waiting for response..."
+                        : isLiveAgent
+                        ? "Ask the live agent..."
+                        : "Ask Zoe about Zoobicon..."
+                    }
+                    disabled={isStreaming || cooldownRemaining > 0}
                     rows={1}
                     className="flex-1 bg-transparent px-5 py-3.5 text-white placeholder:text-white/45 outline-none text-sm resize-none max-h-32 disabled:opacity-50"
                     style={{ minHeight: "48px" }}
                   />
                   <button
                     onClick={() => sendMessage()}
-                    disabled={!input.trim() || isStreaming}
+                    disabled={!input.trim() || isStreaming || cooldownRemaining > 0}
                     className="p-3 mr-1 mb-0.5 rounded-xl text-white/50 hover:text-white disabled:opacity-20 transition-all"
                   >
                     {isStreaming ? (
                       <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : cooldownRemaining > 0 ? (
+                      <Clock className="w-5 h-5" />
                     ) : (
                       <Send className="w-5 h-5" />
                     )}
                   </button>
                 </div>
                 <div className="flex items-center justify-between mt-2">
-                  <div className="flex items-center gap-1.5 text-[10px] text-white/35">
-                    <Shield className="w-3 h-3" />
-                    Zoobicon support only — won&apos;t answer off-topic questions
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1.5 text-[10px] text-white/35">
+                      <Shield className="w-3 h-3" />
+                      Zoobicon support only
+                    </div>
+                    {isLiveAgent && usage && (
+                      <div className="flex items-center gap-1.5 text-[10px] text-emerald-400/50">
+                        <Timer className="w-3 h-3" />
+                        Session: {Math.max(0, Math.ceil(sessionRemainingMin))}m remaining
+                        &bull; Month: {Math.round(usage.minutesRemaining)}m left
+                      </div>
+                    )}
                   </div>
                   <div className="text-[10px] text-white/35">
-                    Press Enter to send, Shift+Enter for new line
+                    {isLiveAgent ? (
+                      <span className="text-emerald-400/40">Live Agent &bull; Claude Sonnet</span>
+                    ) : (
+                      "Quick AI &bull; Claude Haiku"
+                    )}
                   </div>
                 </div>
               </div>
