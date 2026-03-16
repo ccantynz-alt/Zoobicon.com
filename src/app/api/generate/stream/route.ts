@@ -311,7 +311,14 @@ This site is being built for a white-label agency. Apply these branding rules:
                 .trim()
             : "";
 
-          if (!isEdit && bodyText.length < 100) {
+          if (isEdit && bodyText.length < 50) {
+            // Edit response lost the body — the AI spent all tokens on CSS/head and truncated
+            // Instead of replacing with broken HTML, send error so client preserves original code
+            console.error(`[Stream] Edit produced empty body (${bodyText.length} chars, ${accumulated.length} total HTML). Original code preserved.`);
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify({ type: "edit_failed", message: "Edit response was incomplete (no visible content). Your original site has been preserved. Try a simpler edit or try again." })}\n\n`)
+            );
+          } else if (!isEdit && bodyText.length < 100) {
             // Body is empty/near-empty — retry up to 2 times with increasingly aggressive body-first prompts
             console.warn(`[Stream] Empty body detected (${bodyText.length} chars). Retrying with body-first prompt...`);
             controller.enqueue(

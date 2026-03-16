@@ -785,9 +785,11 @@ function BuilderPage() {
         const decoder = new TextDecoder();
         let accumulated = "";
         let lineBuffer = ""; // Buffer for incomplete SSE lines split across chunks
+        let streamAborted = false; // Set when edit_failed or error terminates the stream early
 
         const processStreamLines = (lines: string[]) => {
           for (const line of lines) {
+            if (streamAborted) return;
             if (!line.startsWith("data: ")) continue;
             const jsonStr = line.slice(6).trim();
             if (!jsonStr) continue;
@@ -804,7 +806,16 @@ function BuilderPage() {
               } else if (event.type === "status") {
                 // Informational status update (e.g., "Retrying...")
               } else if (event.type === "done") {
-                setStatus("complete");
+                if (!streamAborted) setStatus("complete");
+              } else if (event.type === "edit_failed") {
+                // Edit produced empty body — preserve original code, show warning
+                streamAborted = true;
+                if (existingCode) {
+                  setGeneratedCode(existingCode);
+                }
+                setError(event.message || "Edit failed — original site preserved.");
+                setStatus("error");
+                return;
               } else if (event.type === "error") {
                 // Clear empty/partial HTML so PreviewPanel shows error state, not "empty page detected"
                 setGeneratedCode("");
@@ -837,6 +848,11 @@ function BuilderPage() {
           processStreamLines(lineBuffer.split("\n"));
         }
 
+        if (streamAborted) {
+          // edit_failed or error already handled — don't process accumulated HTML
+          return;
+        }
+
         if (accumulated) {
           // Clean accumulated HTML — strip code fences, JSON preamble
           let clean = accumulated.trim();
@@ -854,7 +870,14 @@ function BuilderPage() {
             ? bodyM[1].replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().length
             : 0;
 
-          if (!existingCode && bodyChars < 50) {
+          if (existingCode && bodyChars < 50) {
+            // Edit produced empty body — restore original code
+            console.warn(`[Builder] Edit produced empty body (${bodyChars} chars). Restoring original code.`);
+            setGeneratedCode(existingCode);
+            setError("Edit response was incomplete. Your original site has been preserved. Try a simpler edit or try again.");
+            setStatus("error");
+            return;
+          } else if (!existingCode && bodyChars < 50) {
             // Body is empty even after server retry — do one client-side retry via non-streaming endpoint
             console.warn(`[Builder] Empty body after stream (${bodyChars} chars). Client-side retry...`);
             try {
@@ -980,11 +1003,13 @@ function BuilderPage() {
               setPipelineAgents(prev => [...prev, event.message || "Processing..."]);
             } else if (event.type === "done") {
               // Stream complete
+            } else if (event.type === "edit_failed") {
+              throw new Error(event.message || "Edit failed — original site preserved.");
             } else if (event.type === "error") {
               throw new Error(event.message || "Generation error");
             }
           } catch (e) {
-            if (e instanceof Error && (e.message.includes("Generation") || e.message.includes("error") || e.message.includes("failed"))) {
+            if (e instanceof Error && (e.message.includes("Generation") || e.message.includes("error") || e.message.includes("failed") || e.message.includes("Edit"))) {
               throw e;
             }
             // Skip JSON parse errors

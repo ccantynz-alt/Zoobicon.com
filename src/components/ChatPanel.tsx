@@ -166,6 +166,25 @@ export default function ChatPanel({ currentCode, onCodeUpdate, isVisible }: Chat
       }
 
       if (finalHtml) {
+        // Validate that the edit didn't destroy the body content
+        const bodyM = finalHtml.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+        const bodyChars = bodyM
+          ? bodyM[1].replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().length
+          : 0;
+
+        if (mode === "full" && currentCode && bodyChars < 50) {
+          // Edit destroyed the body — don't apply it
+          const assistantMsg: ChatMessage = {
+            role: "assistant",
+            content: "The edit response was incomplete (no visible body content). Your original site has been preserved. Try a simpler edit or try again.",
+            timestamp: Date.now(),
+          };
+          setMessages((prev) => [...prev, assistantMsg]);
+          setIsLoading(false);
+          setEditMode(null);
+          return;
+        }
+
         onCodeUpdate(finalHtml);
       }
 
