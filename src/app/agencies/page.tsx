@@ -156,6 +156,12 @@ export default function AgenciesPage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <Link href="/agencies/dashboard" className="text-sm text-white/50 hover:text-white/70 transition-colors">
+              Dashboard
+            </Link>
+            <Link href="/agencies/portal" className="text-sm text-white/50 hover:text-white/70 transition-colors">
+              Client Portal
+            </Link>
             <Link href="/auth/signup" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white">
               <span>Start Free Trial</span>
             </Link>
