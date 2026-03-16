@@ -200,7 +200,7 @@ export default function DomainsPage() {
     <div className="relative min-h-screen">
       <BackgroundEffects preset="energetic" />
 
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08] bg-[#0d1525]/80 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#050508]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
@@ -600,9 +600,9 @@ export default function DomainsPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-[#0d1525] border border-white/[0.12] rounded-2xl shadow-2xl"
+            className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-[#050508] border border-white/[0.12] rounded-2xl shadow-2xl"
           >
-            <div className="sticky top-0 bg-[#0d1525] border-b border-white/[0.10] p-6 flex items-center justify-between z-10">
+            <div className="sticky top-0 bg-[#050508] border-b border-white/[0.10] p-6 flex items-center justify-between z-10">
               <h3 className="text-xl font-black">Register Domains</h3>
               <button onClick={() => setShowCheckout(false)} className="text-white/40 hover:text-white">
                 <X className="w-5 h-5" />

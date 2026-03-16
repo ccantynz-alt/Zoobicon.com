@@ -491,7 +491,7 @@ export default function Dominat8Page() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/[0.10] bg-[#0d1525]">
+      <footer className="border-t border-white/[0.06] bg-[#050508]">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-2.5">
