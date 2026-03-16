@@ -44,6 +44,8 @@ import { downloadZip } from "@/lib/zip-export";
 import CollaborationBar from "@/components/CollaborationBar";
 import CursorOverlay from "@/components/CursorOverlay";
 import { useCollaboration } from "@/hooks/useCollaboration";
+import OnboardingTooltips, { shouldShowTour } from "@/components/OnboardingTooltips";
+import BuildSuccessModal, { shouldShowBuildSuccess, dismissBuildSuccess } from "@/components/BuildSuccessModal";
 
 import {
   Bug,
@@ -421,6 +423,8 @@ function BuilderPage() {
   const [showWelcome, setShowWelcome] = useState(false);
   const [generatorBanner, setGeneratorBanner] = useState<{ id: string; name: string } | null>(null);
   const [showDiffPanel, setShowDiffPanel] = useState(false);
+  const [showTour, setShowTour] = useState(false);
+  const [showBuildSuccess, setShowBuildSuccess] = useState(false);
 
   // Agency white-label branding (loaded from user's agency membership)
   const [agencyBrand, setAgencyBrand] = useState<{ agencyName: string; primaryColor: string; secondaryColor: string; logoUrl?: string } | null>(null);
@@ -615,6 +619,13 @@ function BuilderPage() {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [generatedCode]);
+
+  // Show build success modal on first successful generation
+  useEffect(() => {
+    if (status === "complete" && generatedCode && shouldShowBuildSuccess()) {
+      setShowBuildSuccess(true);
+    }
+  }, [status, generatedCode]);
 
   const handleUndo = useCallback(() => {
     if (!canUndo) return;
@@ -1401,7 +1412,7 @@ function BuilderPage() {
     <div className="flex flex-col h-screen bg-[#111a2e] relative overflow-hidden">
       {/* Welcome modal for first-time users */}
       {showWelcome && (
-        <WelcomeModal onClose={() => { setShowWelcome(false); dismissWelcomeModal(); }} />
+        <WelcomeModal onClose={() => { setShowWelcome(false); dismissWelcomeModal(); setTimeout(() => { if (shouldShowTour()) setShowTour(true); }, 500); }} />
       )}
       {showDiffPanel && (
         <div className="fixed inset-0 z-50">
@@ -1713,6 +1724,19 @@ function BuilderPage() {
       </div>
 
       <StatusBar status={status} pipelineStep={pipelineAgents.length > 0 ? pipelineAgents[pipelineAgents.length - 1] : undefined} />
+
+      <OnboardingTooltips active={showTour} />
+      <BuildSuccessModal
+        isOpen={showBuildSuccess}
+        onClose={() => { setShowBuildSuccess(false); dismissBuildSuccess(); }}
+        onAction={(action) => {
+          setShowBuildSuccess(false);
+          dismissBuildSuccess();
+          if (action === "chat") setActiveTool("chat");
+          else if (action === "visual") setActiveTool("visual-editor");
+          else if (action === "deploy") handleDeploy();
+        }}
+      />
     </div>
   );
 }

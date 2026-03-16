@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState, useCallback } from "react";
-import { Mic, MicOff, Sparkles, Zap, Pencil, Send, Check, ChevronDown, Cpu, LayoutTemplate, SlidersHorizontal } from "lucide-react";
+import { Mic, MicOff, Sparkles, Zap, Pencil, Send, Check, ChevronDown, Cpu, LayoutTemplate, SlidersHorizontal, FileText, Files, Layers } from "lucide-react";
 import TemplateGallery from "./TemplateGallery";
 import CustomizationPanel, {
   DEFAULT_CUSTOMIZATION,
@@ -39,6 +39,8 @@ export interface AIModel {
   tier: string;
 }
 
+export type GenerationMode = "single" | "multi" | "fullstack";
+
 interface PromptInputProps {
   prompt: string;
   onPromptChange: (value: string) => void;
@@ -53,6 +55,8 @@ interface PromptInputProps {
   selectedModel?: string;
   onModelChange?: (modelId: string) => void;
   availableModels?: AIModel[];
+  generationMode?: GenerationMode;
+  onGenerationModeChange?: (mode: GenerationMode) => void;
 }
 
 const EXAMPLE_PROMPTS = [
@@ -65,6 +69,12 @@ const EXAMPLE_PROMPTS = [
 
 const STANDARD_FEATURES = ["Opus-powered", "Responsive", "Fast single-pass"];
 const PREMIUM_FEATURES = ["10-agent pipeline", "Animations", "SEO + Forms", "React export"];
+
+const GENERATION_MODES: { id: GenerationMode; label: string; icon: typeof FileText; description: string }[] = [
+  { id: "single", label: "Single Page", icon: FileText, description: "One complete HTML page" },
+  { id: "multi", label: "Multi-Page", icon: Files, description: "3-6 connected pages with shared design" },
+  { id: "fullstack", label: "Full-Stack", icon: Layers, description: "Database + API + frontend with CRUD" },
+];
 
 export default function PromptInput({
   prompt,
@@ -80,6 +90,8 @@ export default function PromptInput({
   selectedModel,
   onModelChange,
   availableModels,
+  generationMode,
+  onGenerationModeChange,
 }: PromptInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const editInputRef = useRef<HTMLTextAreaElement>(null);
@@ -90,7 +102,15 @@ export default function PromptInput({
   const [showTemplateGallery, setShowTemplateGallery] = useState(false);
   const [showCustomization, setShowCustomization] = useState(false);
   const [customization, setCustomization] = useState<CustomizationOptions>(DEFAULT_CUSTOMIZATION);
+  const [internalMode, setInternalMode] = useState<GenerationMode>(generationMode ?? "single");
+  const [hoveredMode, setHoveredMode] = useState<GenerationMode | null>(null);
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+
+  const activeMode = generationMode ?? internalMode;
+  const handleModeChange = useCallback((mode: GenerationMode) => {
+    setInternalMode(mode);
+    onGenerationModeChange?.(mode);
+  }, [onGenerationModeChange]);
 
   useEffect(() => {
     const nav = navigator as Navigator & { userAgentData?: { platform: string } };
@@ -367,6 +387,42 @@ export default function PromptInput({
             <CustomizationPanel options={customization} onChange={setCustomization} />
           )}
         </>
+      )}
+
+      {/* Generation mode selector */}
+      {!hasExistingCode && (
+        <div>
+          <div className="flex gap-1.5">
+            {GENERATION_MODES.map((mode) => {
+              const Icon = mode.icon;
+              const isActive = activeMode === mode.id;
+              return (
+                <button
+                  key={mode.id}
+                  onClick={() => handleModeChange(mode.id)}
+                  onMouseEnter={() => setHoveredMode(mode.id)}
+                  onMouseLeave={() => setHoveredMode(null)}
+                  disabled={isGenerating}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium transition-all disabled:opacity-40 ${
+                    isActive
+                      ? "bg-blue-600 text-white shadow-md shadow-blue-600/20"
+                      : "bg-white/[0.05] text-white/50 hover:bg-white/[0.10] hover:text-white/70"
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  {mode.label}
+                </button>
+              );
+            })}
+          </div>
+          {(() => {
+            const descMode = hoveredMode ?? activeMode;
+            const desc = GENERATION_MODES.find(m => m.id === descMode)?.description;
+            return desc ? (
+              <p className="text-[10px] text-white/30 mt-1 ml-0.5">{desc}</p>
+            ) : null;
+          })()}
+        </div>
       )}
 
       {/* Main textarea */}
