@@ -2061,7 +2061,7 @@ export default function GeneratorTypePage() {
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt, tier: "standard" }),
+        body: JSON.stringify({ prompt, tier: "standard", generator: type }),
       });
 
       if (!res.ok) {

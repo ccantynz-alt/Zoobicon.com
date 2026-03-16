@@ -897,6 +897,7 @@ function BuilderPage() {
           tier,
           ...(selectedModel ? { model: selectedModel } : {}),
           ...(isAdmin ? { isAdmin: true } : {}),
+          ...(generatorBanner ? { generatorType: generatorBanner.id } : {}),
         }),
         signal: controller.signal,
       });

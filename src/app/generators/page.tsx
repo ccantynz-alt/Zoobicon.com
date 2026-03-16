@@ -323,7 +323,7 @@ function GeneratorCard({ gen }: { gen: { name: string; description: string; endp
   const generatorId = endpointToGeneratorId(gen.endpoint);
   return (
     <Link
-      href={`/builder?generator=${generatorId}`}
+      href={`/generators/${generatorId}`}
       className="group relative rounded-xl border border-white/[0.10] bg-white/[0.08] p-5 hover:border-brand-500/30 hover:bg-brand-500/[0.03] transition-all duration-200"
     >
       {gen.tag && (
@@ -347,7 +347,7 @@ function GeneratorCard({ gen }: { gen: { name: string; description: string; endp
         {gen.description}
       </p>
       <div className="mt-3 flex items-center gap-1 text-[10px] text-brand-400/60 group-hover:text-brand-400 transition-colors">
-        <span>Open in Builder</span>
+        <span>Configure & Generate</span>
         <ArrowRight size={10} />
       </div>
     </Link>
