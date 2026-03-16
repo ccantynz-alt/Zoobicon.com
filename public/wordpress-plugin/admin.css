@@ -1,0 +1,170 @@
+.zoobicon-wrap {
+  max-width: 960px;
+}
+
+.zoobicon-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: #fff;
+  padding: 24px 32px;
+  border-radius: 12px;
+  margin: 20px 0 24px 0;
+}
+
+.zoobicon-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 4px 0;
+  padding: 0;
+}
+
+.zoobicon-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #06b6d4, #10b981);
+  font-weight: 800;
+  font-size: 18px;
+  color: #fff;
+}
+
+.zoobicon-subtitle {
+  color: rgba(255,255,255,0.6);
+  margin: 0;
+  font-size: 14px;
+}
+
+.zoobicon-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 782px) {
+  .zoobicon-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.zoobicon-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 16px;
+}
+
+.zoobicon-card h2 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+  padding: 0;
+  color: #1e293b;
+}
+
+.zoobicon-status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.zoobicon-status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.zoobicon-status-ready .zoobicon-status-dot {
+  background: #10b981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+}
+
+.zoobicon-status-ready {
+  color: #059669;
+}
+
+.zoobicon-stats {
+  display: flex;
+  gap: 24px;
+}
+
+.zoobicon-stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.zoobicon-stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.zoobicon-stat-label {
+  font-size: 12px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.zoobicon-steps {
+  padding-left: 20px;
+  margin: 0;
+}
+
+.zoobicon-steps li {
+  padding: 6px 0;
+  color: #475569;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.zoobicon-key-field {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.zoobicon-key-field input {
+  font-family: monospace;
+  font-size: 13px;
+  background: #f8fafc;
+}
+
+.zoobicon-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.zoobicon-badge-publish {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.zoobicon-badge-draft {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.zoobicon-badge-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.zoobicon-badge-private {
+  background: #ede9fe;
+  color: #5b21b6;
+}
