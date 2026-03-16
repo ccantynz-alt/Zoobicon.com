@@ -48,25 +48,25 @@ const PLAN_LIMITS: Record<string, PlanLimits> = {
     hasLiveAgent: true,
   },
   agency: {
-    monthlyMinutes: 120,
-    sessionMaxMinutes: 15,
-    sessionTokenBudget: 80_000,
-    messageCooldownSecs: 20,
-    hasLiveAgent: true,
+    monthlyMinutes: 0,
+    sessionMaxMinutes: 0,
+    sessionTokenBudget: 0,
+    messageCooldownSecs: 0,
+    hasLiveAgent: false, // Agencies have Priority Slack — they don't need hand-holding
   },
   enterprise: {
-    monthlyMinutes: 600,
-    sessionMaxMinutes: 30,
-    sessionTokenBudget: 200_000,
-    messageCooldownSecs: 10,
-    hasLiveAgent: true,
+    monthlyMinutes: 0,
+    sessionMaxMinutes: 0,
+    sessionTokenBudget: 0,
+    messageCooldownSecs: 0,
+    hasLiveAgent: false, // Dedicated account manager instead
   },
   unlimited: {
-    monthlyMinutes: 600,
-    sessionMaxMinutes: 30,
-    sessionTokenBudget: 200_000,
-    messageCooldownSecs: 10,
-    hasLiveAgent: true,
+    monthlyMinutes: 0,
+    sessionMaxMinutes: 0,
+    sessionTokenBudget: 0,
+    messageCooldownSecs: 0,
+    hasLiveAgent: false, // Admin — uses Zoe or direct access
   },
 };
 
@@ -178,7 +178,7 @@ export async function canStartSession(userEmail: string): Promise<SessionCheck> 
   if (!usage.limits.hasLiveAgent) {
     return {
       allowed: false,
-      reason: "Live agent support is available on Pro, Agency, and Enterprise plans, or as a Premium Support add-on.",
+      reason: "Live agent support is included with Pro, or available as a Premium Support add-on ($19/mo) on any plan.",
       minutesRemaining: 0,
       sessionMaxMinutes: 0,
       limits: usage.limits,

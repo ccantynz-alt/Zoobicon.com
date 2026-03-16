@@ -464,26 +464,20 @@ export default function SupportPage() {
               </div>
 
               <p className="text-sm text-white/60 mb-6 leading-relaxed">
-                Get real answers from a Claude AI agent — not canned responses. Available on Pro, Agency, and Enterprise plans, or as a standalone add-on.
+                Get real answers from a Claude Sonnet agent — not canned responses. Included with Pro, or available as a standalone add-on on any plan.
               </p>
 
               <div className="space-y-3 mb-6">
                 <div className="flex items-center gap-3 text-sm">
                   <Timer className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                   <span className="text-white/70">
-                    <strong className="text-white">Pro:</strong> 30 min/mo (10 min sessions)
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 text-sm">
-                  <Timer className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                  <span className="text-white/70">
-                    <strong className="text-white">Agency:</strong> 120 min/mo (15 min sessions)
+                    <strong className="text-white">Pro ($49/mo):</strong> 30 min/mo included (10 min sessions)
                   </span>
                 </div>
                 <div className="flex items-center gap-3 text-sm">
                   <Sparkles className="w-4 h-4 text-brand-400 flex-shrink-0" />
                   <span className="text-white/70">
-                    <strong className="text-white">Premium Support:</strong> +60 min/mo add-on ($19/mo)
+                    <strong className="text-white">Premium Support ($19/mo):</strong> 60 min/mo, 20 min sessions — any plan
                   </span>
                 </div>
               </div>

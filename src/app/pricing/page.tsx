@@ -104,7 +104,6 @@ const PLANS = [
       "Team seats (up to 10)",
       "Template marketplace access",
       "Bulk operations & automation",
-      "Live Agent support (120 min/mo)",
       "API access (500K req/mo)",
       "Priority Slack support",
     ],
@@ -144,7 +143,7 @@ const PRODUCTS = [
   { icon: Mail, name: "AI Email Support", starter: false, creator: false, pro: true, agency: true, enterprise: true },
   { icon: Bot, name: "Chatbot Builder", starter: false, creator: false, pro: true, agency: true, enterprise: true },
   { icon: Users, name: "White-Label & Teams", starter: false, creator: false, pro: false, agency: "10 seats", enterprise: "Unlimited" },
-  { icon: Headphones, name: "Live Agent Support", starter: false, creator: false, pro: "30 min/mo", agency: "120 min/mo", enterprise: "600 min/mo" },
+  { icon: Headphones, name: "Live Agent Support", starter: false, creator: false, pro: "30 min/mo", agency: false, enterprise: false },
   { icon: Shield, name: "SLA Guarantee", starter: false, creator: false, pro: false, agency: false, enterprise: "99.99%" },
   { icon: Code2, name: "API Access", starter: false, creator: "10K/mo", pro: "100K/mo", agency: "500K/mo", enterprise: "Unlimited" },
 ];
@@ -214,7 +213,7 @@ const FAQS = [
   },
   {
     q: "What's Live Agent support?",
-    a: "Free users get Zoe, our quick AI assistant (powered by Claude Haiku). Pro and Agency plans include Live Agent support — a full Claude Sonnet-powered AI that gives deeper, more thorough answers. Pro gets 30 minutes/month (10 min sessions), Agency gets 120 minutes/month (15 min sessions). Need more? Add Premium Support for $19/month — adds 60 extra minutes with 20-minute sessions. Sessions have a cooldown between messages to prevent abuse, and auto-close when time runs out.",
+    a: "Free users get Zoe, our quick AI assistant (powered by Claude Haiku). Pro includes Live Agent support — a full Claude Sonnet-powered AI that gives deeper, more thorough answers with 30 minutes/month (10 min sessions). Agency and Enterprise don't include it because those users already have Priority Slack and dedicated account managers. Anyone can add Premium Support for $19/month for 60 minutes of live agent time with 20-minute sessions.",
   },
   {
     q: "How does white-labeling work on Enterprise?",
