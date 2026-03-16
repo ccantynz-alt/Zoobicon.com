@@ -1,6 +1,9 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
 
+const ALLOWED_MODELS = ["claude-sonnet-4-6", "claude-opus-4-6"] as const;
+type AllowedModel = (typeof ALLOWED_MODELS)[number];
+
 const SYSTEM_PROMPT = `You are an expert code auditor and auto-debugger. You analyze HTML/CSS/JS code for errors and fix them.
 
 You MUST return ONLY valid JSON with this exact structure (no markdown, no code fences, no extra text):
@@ -73,7 +76,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { code } = body;
+    const { code, model: requestedModel } = body;
 
     if (!code || typeof code !== "string") {
       return NextResponse.json(
@@ -89,6 +92,20 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Validate model if provided
+    let model: AllowedModel = "claude-sonnet-4-6";
+    if (requestedModel) {
+      if (!ALLOWED_MODELS.includes(requestedModel as AllowedModel)) {
+        return NextResponse.json(
+          {
+            error: `Invalid model. Allowed values: ${ALLOWED_MODELS.join(", ")}`,
+          },
+          { status: 400 }
+        );
+      }
+      model = requestedModel as AllowedModel;
+    }
+
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
@@ -100,8 +117,8 @@ export async function POST(req: NextRequest) {
     const client = new Anthropic({ apiKey });
 
     const message = await client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 16000,
+      model,
+      max_tokens: model === "claude-opus-4-6" ? 32000 : 16000,
       system: SYSTEM_PROMPT,
       messages: [
         {
@@ -111,7 +128,7 @@ export async function POST(req: NextRequest) {
       ],
     });
 
-    const textBlock = message.content.find((block) => block.type === "text");
+    const textBlock = message.content.find((block: { type: string }) => block.type === "text");
     if (!textBlock || textBlock.type !== "text") {
       return NextResponse.json(
         { error: "No response generated from analysis" },
@@ -155,8 +172,9 @@ export async function POST(req: NextRequest) {
       fixed_code: result.fixed_code,
       issues: result.issues,
       score: result.score,
+      model,
     });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("Debug API error:", err);
 
     if (err instanceof Anthropic.APIError) {

@@ -312,7 +312,17 @@ Full audit completed. **0 broken routes, 0 broken links, 0 missing API endpoints
 
 ## Competitive Roadmap — Closing the Gap with v0/Lovable/Bolt
 
-### Competitive Position (as of March 2026)
+### Key Competitors (as of March 2026)
+
+| Competitor | Strength | Valuation/Scale |
+|------------|----------|-----------------|
+| **v0** (Vercel) | Frontend React generation, Vercel ecosystem | Vercel-backed |
+| **Bolt.new** (StackBlitz) | WebContainers in-browser runtime, framework flexibility | — |
+| **Lovable** | Full-stack MVPs, Supabase integration, SOC 2 | $6.6B valuation, $200M+ ARR |
+| **Emergent** | Multi-agent pipeline, React Native/Expo, MCP support, AI personalization | $100M+ ARR |
+| **OpenClaw** | Open-source AI agent framework (MIT), 163K GitHub stars, 5,700+ plugin marketplace, modular architecture (Gateway/Brain/Heartbeat), 24/7 autonomous agents. Not a direct competitor but a framework we should integrate with or build on. Could power our autonomous agents (SEO, optimizer, support). Watch for security concerns (ClawJacked vulnerability). |
+
+### Competitive Position
 
 **Where we match or beat competitors:**
 - Single-page generation quality (Opus-powered, best output in market)
@@ -358,6 +368,8 @@ Full audit completed. **0 broken routes, 0 broken links, 0 missing API endpoints
 - AI auto-reply drafting for email support tickets
 - Smart template recommendations based on user input analysis
 - Multi-site batch optimization (agency feature)
+- **OpenClaw integration** — Evaluate using OpenClaw's agent framework for autonomous agents (SEO, optimizer, support). MIT licensed, 163K stars, 5,700+ skills marketplace. Could power 24/7 background agents via its Heartbeat system. Key concerns: security (ClawJacked vulnerability), data privacy with local WebSocket service. See https://openclaw.ai/
+- **MCP support** — Model Context Protocol for pulling external context (GitHub, Notion, Figma, Slack) into the generation pipeline. Emergent already supports this.
 
 **Phase 8: Collaboration & Scale** (PARTIALLY COMPLETE)
 - ✅ Real-time collaboration with rooms, presence, cursor overlay, code sync (poll-based)
