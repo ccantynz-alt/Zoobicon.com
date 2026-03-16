@@ -25,6 +25,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { callLLM, type LLMProvider } from "./llm-provider";
 import { COMPONENT_LIBRARY_INSTRUCTION, injectComponentLibrary } from "./component-library";
+import { getGeneratorSystemSupplement } from "./generator-prompts";
 
 export interface PipelineInput {
   prompt: string;
@@ -33,6 +34,7 @@ export interface PipelineInput {
   pages?: string[];
   tier?: "standard" | "premium" | "ultra";
   model?: string; // User-selected model (e.g., "claude-sonnet-4-6", "gpt-4o", "gemini-2.5-pro")
+  generatorType?: string; // Generator type ID (e.g., "landing", "restaurant", "saas") for type-specific prompts
 }
 
 export interface AgentResult {
@@ -690,14 +692,23 @@ export async function runPipeline(
     return r.text;
   };
 
+  // ── Generator-specific system prompt supplement ──
+  const generatorSupplement = input.generatorType
+    ? getGeneratorSystemSupplement(input.generatorType)
+    : "";
+
   // ── Phase 1: Strategist ──
   onProgress?.("strategist", "analyzing market & audience");
   const strategyStart = Date.now();
 
+  const strategistSystem = generatorSupplement
+    ? STRATEGIST_SYSTEM + `\n\nGENERATOR CONTEXT: This is a ${input.generatorType} generator. Tailor your strategy to this specific type of website/application. The Developer agent will receive additional industry-specific instructions, but your strategy should already reflect the right approach for this type.`
+    : STRATEGIST_SYSTEM;
+
   const strategyText = await llmText({
     model: MODEL_PLANNER,
     maxTokens: 8192,
-    system: STRATEGIST_SYSTEM,
+    system: strategistSystem,
     userMessage: `Analyze and create a comprehensive strategy for this brief. If the user has provided specific design/content instructions, incorporate ALL of them into your strategy — do not ignore or simplify any user-specified details.\n\nBRIEF:\n${input.prompt}${input.style ? `\nPreferred style: ${input.style}` : ""}`,
   });
 
@@ -760,10 +771,15 @@ export async function runPipeline(
 
   const devUserMessage = `STRATEGY:\n${strategySpec}\n\nDESIGN SPEC:\n${brandSpec}\n\nCOPY:\n${copySpec}\n\nARCHITECTURE:\n${archSpec}\n\nORIGINAL BRIEF:\n${input.prompt}\n\nBuild the complete HTML website. Follow all specs exactly. If the original brief contains specific visual, copy, or structural instructions, those take priority.\n\nCRITICAL REMINDER: The <body> must contain ALL the copy content from the COPY section above. Write the full page content inside <body> — headers, sections, text, images, everything. Do NOT produce only CSS with an empty body.\n\nIMPORTANT: Start your response IMMEDIATELY with <!DOCTYPE html> — no preamble, no explanation, no code fences. Output raw HTML only.`;
 
+  // Inject generator-specific instructions into Developer system prompt
+  const devSystem = generatorSupplement
+    ? DEVELOPER_SYSTEM + "\n\n" + generatorSupplement
+    : DEVELOPER_SYSTEM;
+
   let devResult = await llmCall({
     model: MODEL_PREMIUM,
     maxTokens: 32000,
-    system: DEVELOPER_SYSTEM,
+    system: devSystem,
     userMessage: devUserMessage,
   });
 
@@ -779,7 +795,7 @@ export async function runPipeline(
     devResult = await llmCall({
       model: MODEL_BALANCED, // Sonnet — faster retry, still good quality
       maxTokens: 32000,
-      system: DEVELOPER_SYSTEM,
+      system: devSystem,
       userMessage: `CRITICAL: Your previous attempt produced CSS but the <body> was EMPTY. This time write MINIMAL CSS and focus ALL output on <body> content. Every section MUST appear: hero, features, about, testimonials, stats, FAQ, CTA, footer.\n\n${devUserMessage}`,
     });
 
