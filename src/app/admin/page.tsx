@@ -2,13 +2,17 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Zap, Shield, CheckCircle2, XCircle, AlertTriangle, LogOut,
   Settings, Users, Server, Globe, RefreshCw,
   Copy, Check, ExternalLink, BarChart3, Code2,
   Trash2, Edit3, Crown, ImagePlus, Workflow, Layout,
-  TrendingUp, UserPlus, FolderOpen, Rocket,
+  TrendingUp, UserPlus, FolderOpen, Rocket, Mail, Inbox, HeadphonesIcon,
+  Activity, Database, Cpu, Wifi, ArrowUpRight,
 } from "lucide-react";
+import BackgroundEffects from "@/components/BackgroundEffects";
+import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 
 type AdminTab = "overview" | "users" | "templates" | "analytics";
 
@@ -249,32 +253,35 @@ export default function AdminPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#050508]">
-      {/* Nav */}
-      <nav className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#050508]/80 backdrop-blur-2xl">
+    <div className="min-h-screen bg-[#030306] text-white overflow-hidden">
+      <BackgroundEffects preset="technical" />
+      <CursorGlowTracker />
+
+      {/* ── Vibrant Nav ── */}
+      <nav className="sticky top-0 z-50 border-b border-white/10 bg-gradient-to-r from-[#0a0a15]/90 via-[#0d0820]/90 to-[#0a0a15]/90 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
-                <Zap className="w-4 h-4 text-white" />
+            <Link href="/" className="flex items-center gap-2 group">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 via-brand-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-brand-500/30 group-hover:shadow-brand-500/50 transition-shadow">
+                <Zap className="w-4.5 h-4.5 text-white" />
               </div>
-              <span className="text-lg font-bold tracking-tight">Zoobicon</span>
+              <span className="text-lg font-bold tracking-tight bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">Zoobicon</span>
             </Link>
-            <div className="w-px h-4 bg-white/10" />
-            <div className="flex items-center gap-1.5">
-              <Shield className="w-3.5 h-3.5 text-brand-400" />
-              <span className="text-sm font-semibold text-white/70">Admin</span>
+            <div className="w-px h-5 bg-gradient-to-b from-transparent via-white/20 to-transparent" />
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-violet-500/15 to-brand-500/15 border border-violet-500/25">
+              <Shield className="w-3.5 h-3.5 text-violet-400" />
+              <span className="text-xs font-bold text-violet-300 tracking-wide uppercase">Admin</span>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-sm text-white/50 hidden sm:block">{userName}</span>
-            <Link href="/builder" className="text-xs text-white/60 hover:text-white/60 px-3 py-1.5 rounded-lg border border-white/[0.10] transition-colors">
+            <span className="text-sm text-white/60 hidden sm:block font-medium">{userName}</span>
+            <Link href="/builder" className="text-xs text-white/70 hover:text-white px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/10 transition-all">
               Builder
             </Link>
-            <Link href="/dashboard" className="text-xs text-white/60 hover:text-white/60 px-3 py-1.5 rounded-lg border border-white/[0.10] transition-colors">
+            <Link href="/dashboard" className="text-xs text-white/70 hover:text-white px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/10 transition-all">
               Dashboard
             </Link>
-            <button onClick={handleLogout} className="flex items-center gap-1.5 text-xs text-red-400/60 hover:text-red-400 transition-colors">
+            <button onClick={handleLogout} className="flex items-center gap-1.5 text-xs text-red-400/70 hover:text-red-400 transition-colors">
               <LogOut className="w-3.5 h-3.5" />
               Sign out
             </button>
@@ -282,17 +289,17 @@ export default function AdminPage() {
         </div>
       </nav>
 
-      {/* Tab Navigation */}
-      <div className="border-b border-white/[0.06]">
+      {/* ── Tab Navigation ── */}
+      <div className="border-b border-white/[0.08] bg-gradient-to-r from-transparent via-white/[0.02] to-transparent">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex gap-1">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-3 text-xs font-medium border-b-2 transition-colors ${
+              className={`flex items-center gap-2 px-5 py-3.5 text-xs font-semibold border-b-2 transition-all ${
                 activeTab === tab.id
-                  ? "border-brand-500 text-brand-400"
-                  : "border-transparent text-white/50 hover:text-white/65"
+                  ? "border-violet-500 text-violet-300 bg-violet-500/5"
+                  : "border-transparent text-white/40 hover:text-white/70 hover:bg-white/[0.03]"
               }`}
             >
               {tab.icon}
@@ -302,182 +309,262 @@ export default function AdminPage() {
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-6 lg:px-8 py-10 space-y-8">
+      <main className="max-w-7xl mx-auto px-6 lg:px-8 py-10 space-y-8 relative">
+        <HeroEffects variant="cyan" cursorGlow particles particleCount={25} interactiveGrid aurora beams />
 
         {/* ═══════ OVERVIEW TAB ═══════ */}
         {activeTab === "overview" && (
           <>
+            {/* Hero Header */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-600/20 via-brand-500/15 to-cyan-500/20 border border-white/10 p-8"
+            >
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(139,92,246,0.15),transparent_70%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(6,182,212,0.1),transparent_70%)]" />
+              <div className="relative">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-violet-500/30">
+                    <Shield className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="text-3xl font-black tracking-tight bg-gradient-to-r from-white via-violet-200 to-cyan-200 bg-clip-text text-transparent">
+                      Command Center
+                    </h1>
+                    <p className="text-sm text-white/60">System health, configuration, and platform management</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* ── Quick Actions: 2 rows ── */}
             <div>
-              <h1 className="text-2xl font-black tracking-tight mb-1">Admin Panel</h1>
-              <p className="text-white/60 text-sm">System health, configuration, and launch checklist.</p>
+              <h2 className="text-xs font-bold uppercase tracking-widest text-white/40 mb-3 flex items-center gap-2">
+                <Activity className="w-3.5 h-3.5 text-violet-400" />
+                Quick Actions
+              </h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                {[
+                  { icon: Mail, label: "Email Inbox", href: "/admin/email", desc: "Read & manage email", gradient: "from-rose-500 to-orange-500", glow: "shadow-rose-500/20" },
+                  { icon: Inbox, label: "Mailboxes", href: "/admin/mailboxes", desc: "Manage mailboxes & routing", gradient: "from-amber-500 to-yellow-500", glow: "shadow-amber-500/20" },
+                  { icon: HeadphonesIcon, label: "Support", href: "/admin/support", desc: "Support tickets & knowledge", gradient: "from-emerald-500 to-teal-500", glow: "shadow-emerald-500/20" },
+                  { icon: Code2, label: "Builder", href: "/builder", desc: "AI website builder", gradient: "from-violet-500 to-purple-500", glow: "shadow-violet-500/20" },
+                  { icon: Globe, label: "View Site", href: "/", desc: "Public homepage", gradient: "from-cyan-500 to-blue-500", glow: "shadow-cyan-500/20", external: true },
+                  { icon: Settings, label: "Settings", href: "/auth/settings", desc: "Account settings", gradient: "from-slate-400 to-zinc-500", glow: "shadow-slate-500/20" },
+                  { icon: BarChart3, label: "Dashboard", href: "/dashboard", desc: "Project dashboard", gradient: "from-brand-500 to-indigo-500", glow: "shadow-brand-500/20" },
+                ].map((a, i) => (
+                  <motion.div
+                    key={a.label}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                  >
+                    <Link
+                      href={a.href}
+                      target={(a as { external?: boolean }).external ? "_blank" : undefined}
+                      className={`group relative overflow-hidden rounded-2xl border border-white/10 hover:border-white/20 bg-white/[0.04] hover:bg-white/[0.08] p-5 flex items-start gap-4 transition-all shadow-lg ${a.glow} hover:scale-[1.02]`}
+                    >
+                      <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${a.gradient} flex items-center justify-center flex-shrink-0 shadow-lg ${a.glow} group-hover:scale-110 transition-transform`}>
+                        <a.icon className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-sm font-bold truncate text-white/90 group-hover:text-white transition-colors">{a.label}</div>
+                        <div className="text-[11px] text-white/45 truncate mt-0.5">{a.desc}</div>
+                      </div>
+                      <ArrowUpRight className="w-4 h-4 text-white/20 group-hover:text-white/50 absolute top-4 right-4 transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
             </div>
 
-            {/* Quick Actions */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {[
-                { icon: Code2, label: "Builder", href: "/builder", desc: "AI website builder" },
-                { icon: Globe, label: "View Site", href: "/", desc: "Public homepage", external: true },
-                { icon: Settings, label: "Settings", href: "/auth/settings", desc: "Change password" },
-                { icon: BarChart3, label: "Dashboard", href: "/dashboard", desc: "Project dashboard" },
-              ].map((a) => (
-                <Link
-                  key={a.label}
-                  href={a.href}
-                  target={a.external ? "_blank" : undefined}
-                  className="gradient-border p-4 rounded-xl card-hover flex items-center gap-3 group"
-                >
-                  <div className="w-9 h-9 rounded-lg bg-brand-500/10 border border-brand-500/20 flex items-center justify-center flex-shrink-0">
-                    <a.icon className="w-4 h-4 text-brand-400" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-sm font-semibold truncate">{a.label}</div>
-                    <div className="text-[10px] text-white/50 truncate">{a.desc}</div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-
-            {/* New Feature Highlights */}
+            {/* ── Feature Highlights ── */}
             <div className="grid md:grid-cols-3 gap-4">
               {[
-                { icon: Workflow, title: "10-Agent Pipeline", desc: "Strategist, Brand, Copywriter, Architect, Developer, Animator, SEO, Forms, Integrations, QA — 3 tiers: Standard, Premium, Ultra.", color: "brand" },
-                { icon: ImagePlus, title: "AI Image Generation", desc: "DALL-E 3, Stability AI, and Unsplash integration. Replace placeholders with contextual AI images.", color: "accent-cyan" },
-                { icon: Globe, title: "Website Cloner", desc: "Paste any URL to analyze, extract content, and rebuild as a premium modern website.", color: "accent-purple" },
-              ].map((f) => (
-                <div key={f.title} className="gradient-border rounded-2xl p-5">
-                  <div className={`w-10 h-10 rounded-xl bg-${f.color === "brand" ? "brand-500" : f.color === "accent-cyan" ? "cyan-500" : "purple-500"}/10 flex items-center justify-center mb-3`}>
-                    <f.icon className={`w-5 h-5 ${f.color === "brand" ? "text-brand-400" : f.color === "accent-cyan" ? "text-cyan-400" : "text-blue-400"}`} />
+                { icon: Workflow, title: "10-Agent Pipeline", desc: "Strategist, Brand, Copywriter, Architect, Developer, Animator, SEO, Forms, Integrations, QA — 3 tiers.", gradient: "from-violet-500/20 to-purple-500/10", iconGradient: "from-violet-500 to-purple-600", borderColor: "border-violet-500/20" },
+                { icon: ImagePlus, title: "AI Image Generation", desc: "DALL-E 3, Stability AI, and Unsplash integration. Contextual AI images.", gradient: "from-cyan-500/20 to-blue-500/10", iconGradient: "from-cyan-500 to-blue-500", borderColor: "border-cyan-500/20" },
+                { icon: Globe, title: "Website Cloner", desc: "Paste any URL to analyze, extract content, and rebuild as a premium site.", gradient: "from-emerald-500/20 to-teal-500/10", iconGradient: "from-emerald-500 to-teal-500", borderColor: "border-emerald-500/20" },
+              ].map((f, i) => (
+                <motion.div
+                  key={f.title}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 + i * 0.1 }}
+                  className={`rounded-2xl p-6 bg-gradient-to-br ${f.gradient} border ${f.borderColor} backdrop-blur-sm`}
+                >
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${f.iconGradient} flex items-center justify-center mb-4 shadow-lg`}>
+                    <f.icon className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-sm font-bold mb-1">{f.title}</h3>
-                  <p className="text-xs text-white/50 leading-relaxed">{f.desc}</p>
-                </div>
+                  <h3 className="text-sm font-bold mb-1.5 text-white/90">{f.title}</h3>
+                  <p className="text-xs text-white/55 leading-relaxed">{f.desc}</p>
+                </motion.div>
               ))}
             </div>
 
             <div className="grid lg:grid-cols-2 gap-6">
               {/* System Checks */}
-              <div className="gradient-border rounded-2xl p-6">
+              <motion.div
+                initial={{ opacity: 0, x: -15 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+                className="rounded-2xl border border-emerald-500/15 bg-gradient-to-br from-emerald-500/[0.07] to-transparent p-6"
+              >
                 <div className="flex items-center justify-between mb-5">
-                  <h2 className="text-base font-bold">System Status</h2>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-xs text-emerald-400/80">Operational</span>
+                  <h2 className="text-base font-bold flex items-center gap-2">
+                    <Cpu className="w-4 h-4 text-emerald-400" />
+                    System Status
+                  </h2>
+                  <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                    <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-lg shadow-emerald-400/50" />
+                    <span className="text-xs font-semibold text-emerald-400">All Systems Go</span>
                   </div>
                 </div>
                 <div className="space-y-3">
                   {[
-                    { label: "AI Generation Engine", detail: "Claude Sonnet + streaming SSE" },
-                    { label: "Multi-Agent Pipeline", detail: "10 agents · 3 tiers · Parallel execution" },
-                    { label: "AI Generators", detail: "32+ specialized generators across 6 categories" },
-                    { label: "Dominat8 Brand", detail: "dominat8.io + dominat8.com white-label active" },
-                    { label: "AI Image Engine", detail: "DALL-E 3 / Stability AI / Unsplash" },
-                    { label: "Website Cloner", detail: "Fetch, analyze, rebuild premium" },
-                    { label: "Rate Limiting", detail: "10 gen/min · 20 chat/min · 30 support/min" },
+                    { label: "AI Generation Engine", detail: "Claude Sonnet + streaming SSE", color: "text-emerald-400" },
+                    { label: "Multi-Agent Pipeline", detail: "10 agents · 3 tiers · Parallel execution", color: "text-emerald-400" },
+                    { label: "AI Generators", detail: "32+ specialized generators across 6 categories", color: "text-emerald-400" },
+                    { label: "Dominat8 Brand", detail: "dominat8.io + dominat8.com white-label active", color: "text-emerald-400" },
+                    { label: "AI Image Engine", detail: "DALL-E 3 / Stability AI / Unsplash", color: "text-emerald-400" },
+                    { label: "Website Cloner", detail: "Fetch, analyze, rebuild premium", color: "text-emerald-400" },
+                    { label: "Rate Limiting", detail: "10 gen/min · 20 chat/min · 30 support/min", color: "text-emerald-400" },
                   ].map((c) => (
-                    <div key={c.label} className="flex items-start gap-3">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                    <div key={c.label} className="flex items-start gap-3 py-1">
+                      <CheckCircle2 className={`w-4 h-4 ${c.color} flex-shrink-0 mt-0.5`} />
                       <div>
-                        <div className="text-sm font-medium">{c.label}</div>
-                        <div className="text-xs text-white/50">{c.detail}</div>
+                        <div className="text-sm font-medium text-white/85">{c.label}</div>
+                        <div className="text-xs text-white/45">{c.detail}</div>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="mt-5 pt-5 border-t border-white/[0.10]">
+                <div className="mt-5 pt-5 border-t border-white/[0.08]">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <Server className="w-4 h-4 text-white/60" />
+                      <Wifi className="w-4 h-4 text-cyan-400" />
                       <span className="text-sm font-medium">Anthropic API</span>
                     </div>
                     <button onClick={testApiConnection} disabled={apiTest === "loading"}
-                      className="flex items-center gap-1.5 text-xs text-white/60 hover:text-white/60 border border-white/[0.10] rounded-lg px-3 py-1.5 transition-colors disabled:opacity-50">
+                      className="flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 border border-cyan-500/20 hover:border-cyan-500/40 bg-cyan-500/5 hover:bg-cyan-500/10 rounded-lg px-3 py-1.5 transition-all disabled:opacity-50">
                       <RefreshCw className={`w-3 h-3 ${apiTest === "loading" ? "animate-spin" : ""}`} />
-                      Test
+                      Test Connection
                     </button>
                   </div>
-                  {apiTest === "ok" && <div className="flex items-center gap-2 text-xs text-emerald-400"><CheckCircle2 className="w-3.5 h-3.5" />Connection successful</div>}
-                  {apiTest === "error" && <div className="flex items-center gap-2 text-xs text-red-400"><XCircle className="w-3.5 h-3.5" />{apiError}</div>}
+                  {apiTest === "ok" && <div className="flex items-center gap-2 text-xs text-emerald-400 font-medium"><CheckCircle2 className="w-3.5 h-3.5" />Connection successful</div>}
+                  {apiTest === "error" && <div className="flex items-center gap-2 text-xs text-red-400 font-medium"><XCircle className="w-3.5 h-3.5" />{apiError}</div>}
                 </div>
-              </div>
+              </motion.div>
 
               {/* Env Vars */}
-              <div className="gradient-border rounded-2xl p-6">
-                <h2 className="text-base font-bold mb-1">Environment Variables</h2>
-                <p className="text-xs text-white/50 mb-5">Set in <span className="text-white/65">Vercel → Environment Variables</span></p>
+              <motion.div
+                initial={{ opacity: 0, x: 15 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+                className="rounded-2xl border border-violet-500/15 bg-gradient-to-br from-violet-500/[0.07] to-transparent p-6"
+              >
+                <h2 className="text-base font-bold mb-1 flex items-center gap-2">
+                  <Database className="w-4 h-4 text-violet-400" />
+                  Environment Variables
+                </h2>
+                <p className="text-xs text-white/45 mb-5">Set in <span className="text-violet-300/70 font-medium">Vercel → Environment Variables</span></p>
                 <div className="space-y-2.5">
                   {envKeys.map((e) => (
-                    <div key={e.key} className="flex items-center justify-between gap-3">
+                    <div key={e.key} className="flex items-center justify-between gap-3 py-1">
                       <div className="min-w-0">
-                        <div className="text-xs font-mono text-white/70 truncate">{e.key}</div>
-                        <div className="text-[10px] text-white/45">{e.label}</div>
+                        <div className="text-xs font-mono text-white/75 truncate">{e.key}</div>
+                        <div className="text-[10px] text-white/40">{e.label}</div>
                       </div>
-                      <div className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${
-                        e.required ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" : "bg-white/[0.07] text-white/50 border border-white/[0.10]"
+                      <div className={`text-[10px] font-bold px-2.5 py-1 rounded-full flex-shrink-0 ${
+                        e.required
+                          ? "bg-gradient-to-r from-amber-500/15 to-orange-500/15 text-amber-400 border border-amber-500/25"
+                          : "bg-white/[0.06] text-white/50 border border-white/[0.10]"
                       }`}>
                         {e.required ? "Required" : "Optional"}
                       </div>
                     </div>
                   ))}
                 </div>
-                <div className="mt-5 pt-5 border-t border-white/[0.10]">
+                <div className="mt-5 pt-5 border-t border-white/[0.08]">
                   <button
                     onClick={() => copyToClipboard(
                       "ANTHROPIC_API_KEY=\nOPENAI_API_KEY=\nSTABILITY_API_KEY=\nUNSPLASH_ACCESS_KEY=\nDATABASE_URL=\nADMIN_EMAIL=admin@zoobicon.com\nADMIN_PASSWORD=\nRESEND_API_KEY=\nNEXT_PUBLIC_APP_URL=https://zoobicon.com",
                       "envblock"
                     )}
-                    className="flex items-center gap-2 text-xs text-white/60 hover:text-white/60 border border-white/[0.10] rounded-lg px-3 py-1.5 transition-colors"
+                    className="flex items-center gap-2 text-xs text-violet-400 hover:text-violet-300 border border-violet-500/20 hover:border-violet-500/40 bg-violet-500/5 hover:bg-violet-500/10 rounded-lg px-4 py-2 transition-all"
                   >
-                    {copied === "envblock" ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                    {copied === "envblock" ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                     {copied === "envblock" ? "Copied!" : "Copy .env.local template"}
                   </button>
                 </div>
-              </div>
+              </motion.div>
             </div>
 
             {/* Launch Checklist */}
-            <div className="gradient-border rounded-2xl p-6">
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="rounded-2xl border border-brand-500/15 bg-gradient-to-br from-brand-500/[0.06] via-transparent to-cyan-500/[0.04] p-6"
+            >
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-base font-bold">Launch Checklist</h2>
-                  <p className="text-xs text-white/50 mt-0.5">
+                  <h2 className="text-base font-bold flex items-center gap-2">
+                    <Rocket className="w-4 h-4 text-brand-400" />
+                    Launch Checklist
+                  </h2>
+                  <p className="text-xs text-white/45 mt-0.5">
                     {launchChecklist.filter((i) => i.done).length} of {launchChecklist.length} complete
                   </p>
                 </div>
-                <div className="text-2xl font-black gradient-text-static">
+                <div className="text-3xl font-black bg-gradient-to-r from-brand-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent">
                   {Math.round((launchChecklist.filter((i) => i.done).length / launchChecklist.length) * 100)}%
                 </div>
               </div>
-              <div className="h-2 bg-white/[0.07] rounded-full mb-6 overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-brand-500 to-accent-cyan rounded-full transition-all duration-500"
+              <div className="h-3 bg-white/[0.06] rounded-full mb-6 overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-violet-500 via-brand-500 to-cyan-500 rounded-full transition-all duration-700 shadow-lg shadow-brand-500/30"
                   style={{ width: `${(launchChecklist.filter((i) => i.done).length / launchChecklist.length) * 100}%` }} />
               </div>
-              <div className="grid md:grid-cols-2 gap-2">
+              <div className="grid md:grid-cols-2 gap-2.5">
                 {launchChecklist.map((item, i) => (
-                  <div key={i} className="flex items-center gap-3 py-1.5">
-                    {item.done ? <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" /> : <div className="w-4 h-4 rounded-full border border-white/[0.12] flex-shrink-0" />}
-                    <span className={`text-sm ${item.done ? "text-white/60" : "text-white/60"}`}>{item.label}</span>
+                  <div key={i} className={`flex items-center gap-3 py-2 px-3 rounded-lg ${item.done ? "bg-emerald-500/[0.04]" : "bg-white/[0.02]"}`}>
+                    {item.done
+                      ? <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                      : <div className="w-4 h-4 rounded-full border-2 border-white/15 flex-shrink-0" />
+                    }
+                    <span className={`text-sm ${item.done ? "text-white/65" : "text-white/40"}`}>{item.label}</span>
                   </div>
                 ))}
               </div>
-            </div>
+            </motion.div>
 
             {/* API Reference */}
-            <div className="gradient-border rounded-2xl p-6">
-              <h2 className="text-base font-bold mb-5">API Reference</h2>
-              <div className="space-y-2">
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="rounded-2xl border border-white/10 bg-white/[0.03] p-6"
+            >
+              <h2 className="text-base font-bold mb-5 flex items-center gap-2">
+                <Server className="w-4 h-4 text-cyan-400" />
+                API Reference
+              </h2>
+              <div className="space-y-1.5">
                 {apiRoutes.map((r) => (
-                  <div key={r.path} className="flex items-center gap-4 py-2 border-b border-white/[0.06] last:border-0">
-                    <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded w-12 text-center flex-shrink-0 ${
-                      r.method === "GET" ? "text-emerald-400 bg-emerald-500/10" : "text-brand-400 bg-brand-500/10"
+                  <div key={r.path} className="flex items-center gap-4 py-2.5 px-3 rounded-lg border-b border-white/[0.04] last:border-0 hover:bg-white/[0.03] transition-colors">
+                    <span className={`text-[10px] font-mono font-bold px-2.5 py-1 rounded-md w-14 text-center flex-shrink-0 ${
+                      r.method === "GET"
+                        ? "text-emerald-400 bg-emerald-500/15 border border-emerald-500/20"
+                        : "text-violet-400 bg-violet-500/15 border border-violet-500/20"
                     }`}>{r.method}</span>
-                    <code className="text-xs font-mono text-white/60 w-56 flex-shrink-0">{r.path}</code>
+                    <code className="text-xs font-mono text-cyan-300/70 w-60 flex-shrink-0">{r.path}</code>
                     <span className="text-xs text-white/50 flex-1">{r.desc}</span>
-                    <span className="text-[10px] text-white/40 flex-shrink-0">{r.limit}</span>
+                    <span className="text-[10px] text-white/35 flex-shrink-0 font-medium">{r.limit}</span>
                   </div>
                 ))}
               </div>
-            </div>
+            </motion.div>
           </>
         )}
 
@@ -485,8 +572,8 @@ export default function AdminPage() {
         {activeTab === "analytics" && (
           <>
             <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-black tracking-tight">Analytics</h1>
-              <button onClick={fetchAnalytics} className="flex items-center gap-1.5 text-xs text-white/60 hover:text-white/60 border border-white/[0.10] rounded-lg px-3 py-1.5 transition-colors">
+              <h1 className="text-2xl font-black tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">Analytics</h1>
+              <button onClick={fetchAnalytics} className="flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 border border-cyan-500/20 bg-cyan-500/5 rounded-lg px-3 py-1.5 transition-all">
                 <RefreshCw className={`w-3 h-3 ${analyticsLoading ? "animate-spin" : ""}`} />
                 Refresh
               </button>
@@ -495,35 +582,45 @@ export default function AdminPage() {
             {/* Stat cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { label: "Total Users", value: analytics?.stats.totalUsers || 0, icon: Users, color: "brand" },
-                { label: "Projects", value: analytics?.stats.totalProjects || 0, icon: FolderOpen, color: "purple" },
-                { label: "Sites Deployed", value: analytics?.stats.totalSites || 0, icon: Rocket, color: "cyan" },
-                { label: "Deployments", value: analytics?.stats.totalDeployments || 0, icon: TrendingUp, color: "emerald" },
+                { label: "Total Users", value: analytics?.stats.totalUsers || 0, icon: Users, gradient: "from-violet-500/20 to-purple-500/10", iconGradient: "from-violet-500 to-purple-600", border: "border-violet-500/15" },
+                { label: "Projects", value: analytics?.stats.totalProjects || 0, icon: FolderOpen, gradient: "from-blue-500/20 to-indigo-500/10", iconGradient: "from-blue-500 to-indigo-500", border: "border-blue-500/15" },
+                { label: "Sites Deployed", value: analytics?.stats.totalSites || 0, icon: Rocket, gradient: "from-cyan-500/20 to-teal-500/10", iconGradient: "from-cyan-500 to-teal-500", border: "border-cyan-500/15" },
+                { label: "Deployments", value: analytics?.stats.totalDeployments || 0, icon: TrendingUp, gradient: "from-emerald-500/20 to-green-500/10", iconGradient: "from-emerald-500 to-green-500", border: "border-emerald-500/15" },
               ].map((s) => (
-                <div key={s.label} className="gradient-border rounded-2xl p-5">
+                <motion.div
+                  key={s.label}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className={`rounded-2xl p-5 bg-gradient-to-br ${s.gradient} border ${s.border}`}
+                >
                   <div className="flex items-center justify-between mb-3">
-                    <s.icon className={`w-5 h-5 ${s.color === "brand" ? "text-brand-400" : s.color === "purple" ? "text-blue-400" : s.color === "cyan" ? "text-cyan-400" : "text-emerald-400"}`} />
+                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.iconGradient} flex items-center justify-center shadow-lg`}>
+                      <s.icon className="w-5 h-5 text-white" />
+                    </div>
                   </div>
-                  <div className="text-3xl font-black">{s.value}</div>
-                  <div className="text-xs text-white/50 mt-1">{s.label}</div>
-                </div>
+                  <div className="text-3xl font-black text-white/90">{s.value}</div>
+                  <div className="text-xs text-white/50 mt-1 font-medium">{s.label}</div>
+                </motion.div>
               ))}
             </div>
 
             <div className="grid lg:grid-cols-2 gap-6">
               {/* Plan Distribution */}
-              <div className="gradient-border rounded-2xl p-6">
-                <h2 className="text-base font-bold mb-4">Plan Distribution</h2>
+              <div className="rounded-2xl p-6 border border-violet-500/15 bg-gradient-to-br from-violet-500/[0.06] to-transparent">
+                <h2 className="text-base font-bold mb-4 flex items-center gap-2">
+                  <Crown className="w-4 h-4 text-violet-400" />
+                  Plan Distribution
+                </h2>
                 {analytics?.planDistribution && analytics.planDistribution.length > 0 ? (
                   <div className="space-y-3">
                     {analytics.planDistribution.map((p) => (
-                      <div key={p.plan} className="space-y-1">
+                      <div key={p.plan} className="space-y-1.5">
                         <div className="flex justify-between text-xs">
-                          <span className="text-white/60 capitalize">{p.plan || "free"}</span>
+                          <span className="text-white/70 capitalize font-medium">{p.plan || "free"}</span>
                           <span className="text-white/50">{p.count} users</span>
                         </div>
-                        <div className="h-2 bg-white/[0.07] rounded-full overflow-hidden">
-                          <div className="h-full bg-gradient-to-r from-brand-500 to-accent-purple rounded-full"
+                        <div className="h-2.5 bg-white/[0.06] rounded-full overflow-hidden">
+                          <div className="h-full bg-gradient-to-r from-violet-500 to-brand-500 rounded-full shadow-sm"
                             style={{ width: `${Math.max(5, (p.count / (analytics.stats.totalUsers || 1)) * 100)}%` }} />
                         </div>
                       </div>
@@ -535,20 +632,20 @@ export default function AdminPage() {
               </div>
 
               {/* Recent signups */}
-              <div className="gradient-border rounded-2xl p-6">
+              <div className="rounded-2xl p-6 border border-cyan-500/15 bg-gradient-to-br from-cyan-500/[0.06] to-transparent">
                 <h2 className="text-base font-bold mb-4 flex items-center gap-2">
-                  <UserPlus className="w-4 h-4 text-brand-400" />
+                  <UserPlus className="w-4 h-4 text-cyan-400" />
                   Recent Signups
                 </h2>
                 {analytics?.recentUsers && analytics.recentUsers.length > 0 ? (
                   <div className="space-y-3">
                     {analytics.recentUsers.slice(0, 8).map((u, i) => (
-                      <div key={i} className="flex items-center justify-between py-1.5 border-b border-white/[0.06] last:border-0">
+                      <div key={i} className="flex items-center justify-between py-2 border-b border-white/[0.06] last:border-0">
                         <div>
-                          <div className="text-xs font-medium">{u.name || u.email}</div>
+                          <div className="text-xs font-semibold text-white/80">{u.name || u.email}</div>
                           <div className="text-[10px] text-white/40">{u.email}</div>
                         </div>
-                        <div className="text-[10px] text-white/40">
+                        <div className="text-[10px] text-white/40 font-medium">
                           {new Date(u.created_at).toLocaleDateString()}
                         </div>
                       </div>
@@ -561,20 +658,20 @@ export default function AdminPage() {
             </div>
 
             {/* Recent projects */}
-            <div className="gradient-border rounded-2xl p-6">
+            <div className="rounded-2xl p-6 border border-emerald-500/15 bg-gradient-to-br from-emerald-500/[0.06] to-transparent">
               <h2 className="text-base font-bold mb-4 flex items-center gap-2">
-                <FolderOpen className="w-4 h-4 text-blue-400" />
+                <FolderOpen className="w-4 h-4 text-emerald-400" />
                 Recent Projects
               </h2>
               {analytics?.recentProjects && analytics.recentProjects.length > 0 ? (
                 <div className="grid md:grid-cols-2 gap-3">
                   {analytics.recentProjects.map((p, i) => (
-                    <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-white/[0.05] border border-white/[0.08]">
+                    <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.07] transition-colors">
                       <div>
-                        <div className="text-xs font-medium">{p.name}</div>
+                        <div className="text-xs font-semibold text-white/80">{p.name}</div>
                         <div className="text-[10px] text-white/40">{p.user_email}</div>
                       </div>
-                      <div className="text-[10px] text-white/40">
+                      <div className="text-[10px] text-white/40 font-medium">
                         {new Date(p.created_at).toLocaleDateString()}
                       </div>
                     </div>
@@ -592,46 +689,48 @@ export default function AdminPage() {
           <>
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-black tracking-tight">User Management</h1>
-                <p className="text-white/60 text-sm mt-1">{users.length} registered users</p>
+                <h1 className="text-2xl font-black tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">User Management</h1>
+                <p className="text-white/50 text-sm mt-1 font-medium">{users.length} registered users</p>
               </div>
-              <button onClick={fetchUsers} className="flex items-center gap-1.5 text-xs text-white/60 hover:text-white/60 border border-white/[0.10] rounded-lg px-3 py-1.5 transition-colors">
+              <button onClick={fetchUsers} className="flex items-center gap-1.5 text-xs text-violet-400 hover:text-violet-300 border border-violet-500/20 bg-violet-500/5 rounded-lg px-3 py-1.5 transition-all">
                 <RefreshCw className={`w-3 h-3 ${usersLoading ? "animate-spin" : ""}`} />
                 Refresh
               </button>
             </div>
 
             {users.length > 0 ? (
-              <div className="gradient-border rounded-2xl overflow-hidden">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-white/[0.10]">
-                        <th className="text-left text-[10px] uppercase tracking-wider text-white/50 px-4 py-3">User</th>
-                        <th className="text-left text-[10px] uppercase tracking-wider text-white/50 px-4 py-3">Role</th>
-                        <th className="text-left text-[10px] uppercase tracking-wider text-white/50 px-4 py-3">Plan</th>
-                        <th className="text-left text-[10px] uppercase tracking-wider text-white/50 px-4 py-3">Projects</th>
-                        <th className="text-left text-[10px] uppercase tracking-wider text-white/50 px-4 py-3">Joined</th>
-                        <th className="text-right text-[10px] uppercase tracking-wider text-white/50 px-4 py-3">Actions</th>
+                      <tr className="border-b border-white/10 bg-gradient-to-r from-violet-500/[0.06] to-transparent">
+                        <th className="text-left text-[10px] uppercase tracking-wider text-violet-300/70 px-4 py-3 font-bold">User</th>
+                        <th className="text-left text-[10px] uppercase tracking-wider text-violet-300/70 px-4 py-3 font-bold">Role</th>
+                        <th className="text-left text-[10px] uppercase tracking-wider text-violet-300/70 px-4 py-3 font-bold">Plan</th>
+                        <th className="text-left text-[10px] uppercase tracking-wider text-violet-300/70 px-4 py-3 font-bold">Projects</th>
+                        <th className="text-left text-[10px] uppercase tracking-wider text-violet-300/70 px-4 py-3 font-bold">Joined</th>
+                        <th className="text-right text-[10px] uppercase tracking-wider text-violet-300/70 px-4 py-3 font-bold">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {users.map((user) => (
-                        <tr key={user.id} className="border-b border-white/[0.07] hover:bg-white/[0.05] transition-colors">
+                        <tr key={user.id} className="border-b border-white/[0.06] hover:bg-white/[0.04] transition-colors">
                           <td className="px-4 py-3">
-                            <div className="text-sm font-medium">{user.name || "—"}</div>
-                            <div className="text-[10px] text-white/50">{user.email}</div>
+                            <div className="text-sm font-semibold text-white/85">{user.name || "—"}</div>
+                            <div className="text-[10px] text-white/45">{user.email}</div>
                           </td>
                           <td className="px-4 py-3">
                             {editingUser === user.id ? (
                               <select value={editRole} onChange={(e) => setEditRole(e.target.value)}
-                                className="bg-white/[0.09] border border-white/[0.1] rounded px-2 py-1 text-xs">
+                                className="bg-white/[0.09] border border-white/[0.15] rounded-lg px-2 py-1 text-xs">
                                 <option value="user">User</option>
                                 <option value="admin">Admin</option>
                               </select>
                             ) : (
-                              <span className={`text-xs px-2 py-0.5 rounded-full ${
-                                user.role === "admin" ? "bg-brand-500/10 text-brand-400 border border-brand-500/20" : "bg-white/[0.07] text-white/60 border border-white/[0.10]"
+                              <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${
+                                user.role === "admin"
+                                  ? "bg-gradient-to-r from-violet-500/15 to-purple-500/15 text-violet-300 border border-violet-500/25"
+                                  : "bg-white/[0.06] text-white/60 border border-white/[0.10]"
                               }`}>
                                 {user.role === "admin" && <Crown className="w-3 h-3 inline mr-1" />}
                                 {user.role}
@@ -641,20 +740,20 @@ export default function AdminPage() {
                           <td className="px-4 py-3">
                             {editingUser === user.id ? (
                               <select value={editPlan} onChange={(e) => setEditPlan(e.target.value)}
-                                className="bg-white/[0.09] border border-white/[0.1] rounded px-2 py-1 text-xs">
+                                className="bg-white/[0.09] border border-white/[0.15] rounded-lg px-2 py-1 text-xs">
                                 <option value="free">Free</option>
                                 <option value="pro">Pro</option>
                                 <option value="unlimited">Unlimited</option>
                               </select>
                             ) : (
-                              <span className="text-xs text-white/65 capitalize">{user.plan || "free"}</span>
+                              <span className="text-xs text-white/65 capitalize font-medium">{user.plan || "free"}</span>
                             )}
                           </td>
                           <td className="px-4 py-3">
-                            <span className="text-xs text-white/60">{user.projectCount}</span>
+                            <span className="text-xs text-white/60 font-medium">{user.projectCount}</span>
                           </td>
                           <td className="px-4 py-3">
-                            <span className="text-xs text-white/50">
+                            <span className="text-xs text-white/45">
                               {new Date(user.created_at).toLocaleDateString()}
                             </span>
                           </td>
@@ -662,22 +761,22 @@ export default function AdminPage() {
                             {editingUser === user.id ? (
                               <div className="flex items-center justify-end gap-1.5">
                                 <button onClick={() => updateUser(user.id)}
-                                  className="text-xs text-emerald-400 hover:text-emerald-300 px-2 py-1 rounded border border-emerald-500/20 hover:bg-emerald-500/10 transition-colors">
+                                  className="text-xs text-emerald-400 hover:text-emerald-300 px-3 py-1.5 rounded-lg border border-emerald-500/25 hover:bg-emerald-500/10 transition-all font-semibold">
                                   Save
                                 </button>
                                 <button onClick={() => setEditingUser(null)}
-                                  className="text-xs text-white/50 hover:text-white/65 px-2 py-1 rounded border border-white/[0.10] transition-colors">
+                                  className="text-xs text-white/50 hover:text-white/70 px-3 py-1.5 rounded-lg border border-white/[0.10] transition-all">
                                   Cancel
                                 </button>
                               </div>
                             ) : (
                               <div className="flex items-center justify-end gap-1.5">
                                 <button onClick={() => { setEditingUser(user.id); setEditRole(user.role); setEditPlan(user.plan); }}
-                                  className="text-white/40 hover:text-white/65 p-1 transition-colors" title="Edit">
+                                  className="text-white/40 hover:text-violet-400 p-1.5 rounded-lg hover:bg-violet-500/10 transition-all" title="Edit">
                                   <Edit3 className="w-3.5 h-3.5" />
                                 </button>
                                 <button onClick={() => deleteUser(user.id, user.email)}
-                                  className="text-white/40 hover:text-red-400 p-1 transition-colors" title="Delete">
+                                  className="text-white/40 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-500/10 transition-all" title="Delete">
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                               </div>
@@ -690,10 +789,10 @@ export default function AdminPage() {
                 </div>
               </div>
             ) : (
-              <div className="gradient-border rounded-2xl p-12 text-center">
-                <Users className="w-12 h-12 text-white/30 mx-auto mb-4" />
-                <h3 className="text-sm font-semibold mb-1">No users yet</h3>
-                <p className="text-xs text-white/50">
+              <div className="rounded-2xl border border-violet-500/15 bg-gradient-to-br from-violet-500/[0.06] to-transparent p-12 text-center">
+                <Users className="w-14 h-14 text-violet-400/30 mx-auto mb-4" />
+                <h3 className="text-sm font-bold mb-1 text-white/70">No users yet</h3>
+                <p className="text-xs text-white/45">
                   {usersLoading ? "Loading..." : "Users will appear here once they sign up. Make sure DATABASE_URL is configured."}
                 </p>
               </div>
@@ -706,33 +805,39 @@ export default function AdminPage() {
           <>
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-black tracking-tight">Template Gallery</h1>
-                <p className="text-white/60 text-sm mt-1">{templates.length} curated templates</p>
+                <h1 className="text-2xl font-black tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">Template Gallery</h1>
+                <p className="text-white/50 text-sm mt-1 font-medium">{templates.length} curated templates</p>
               </div>
-              <button onClick={fetchTemplates} className="flex items-center gap-1.5 text-xs text-white/60 hover:text-white/60 border border-white/[0.10] rounded-lg px-3 py-1.5 transition-colors">
+              <button onClick={fetchTemplates} className="flex items-center gap-1.5 text-xs text-violet-400 hover:text-violet-300 border border-violet-500/20 bg-violet-500/5 rounded-lg px-3 py-1.5 transition-all">
                 <RefreshCw className={`w-3 h-3 ${templatesLoading ? "animate-spin" : ""}`} />
                 Refresh
               </button>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {templates.map((t) => (
-                <div key={t.id} className="gradient-border rounded-2xl p-5 hover:bg-white/[0.05] transition-colors">
+              {templates.map((t, i) => (
+                <motion.div
+                  key={t.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.03 }}
+                  className="rounded-2xl p-5 border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] hover:border-white/15 transition-all"
+                >
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <h3 className="text-sm font-bold">{t.name}</h3>
-                      <span className="text-[10px] text-white/50">{t.category}</span>
+                      <h3 className="text-sm font-bold text-white/85">{t.name}</h3>
+                      <span className="text-[10px] text-white/45 font-medium">{t.category}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       {t.featured && (
-                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                        <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500/15 to-orange-500/15 text-amber-400 border border-amber-500/20">
                           Featured
                         </span>
                       )}
-                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
+                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
                         t.tier === "premium"
-                          ? "bg-brand-500/10 text-brand-400 border border-brand-500/20"
-                          : "bg-white/[0.07] text-white/50 border border-white/[0.10]"
+                          ? "bg-gradient-to-r from-violet-500/15 to-brand-500/15 text-violet-300 border border-violet-500/20"
+                          : "bg-white/[0.06] text-white/50 border border-white/[0.10]"
                       }`}>
                         {t.tier}
                       </span>
@@ -741,28 +846,28 @@ export default function AdminPage() {
                   <p className="text-xs text-white/50 mb-3 line-clamp-2">{t.description}</p>
                   <div className="flex flex-wrap gap-1">
                     {t.tags.map((tag) => (
-                      <span key={tag} className="text-[9px] text-white/40 px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08]">
+                      <span key={tag} className="text-[9px] text-white/45 px-1.5 py-0.5 rounded-md bg-white/[0.05] border border-white/[0.08]">
                         {tag}
                       </span>
                     ))}
                   </div>
-                  <div className="mt-3 pt-3 border-t border-white/[0.08]">
+                  <div className="mt-3 pt-3 border-t border-white/[0.06]">
                     <button
                       onClick={() => copyToClipboard(t.prompt, t.id)}
-                      className="flex items-center gap-1.5 text-[10px] text-white/50 hover:text-white/60 transition-colors"
+                      className="flex items-center gap-1.5 text-[10px] text-cyan-400/70 hover:text-cyan-400 transition-colors font-medium"
                     >
                       {copied === t.id ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
                       {copied === t.id ? "Copied prompt!" : "Copy prompt"}
                     </button>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
 
             {templates.length === 0 && !templatesLoading && (
-              <div className="gradient-border rounded-2xl p-12 text-center">
-                <Layout className="w-12 h-12 text-white/30 mx-auto mb-4" />
-                <h3 className="text-sm font-semibold mb-1">Loading templates...</h3>
+              <div className="rounded-2xl border border-violet-500/15 bg-gradient-to-br from-violet-500/[0.06] to-transparent p-12 text-center">
+                <Layout className="w-14 h-14 text-violet-400/30 mx-auto mb-4" />
+                <h3 className="text-sm font-bold mb-1 text-white/70">Loading templates...</h3>
               </div>
             )}
           </>
