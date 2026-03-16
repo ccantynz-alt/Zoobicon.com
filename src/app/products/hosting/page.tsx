@@ -245,7 +245,7 @@ export default function HostingPage() {
       <BackgroundEffects preset="technical" />
 
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08] bg-[#0d1525]/80 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#050508]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
@@ -338,7 +338,7 @@ export default function HostingPage() {
       {/* ============================================ */}
       {/* 3. FEATURE COMPARISON VS COMPETITORS         */}
       {/* ============================================ */}
-      <section className="relative py-24 lg:py-32 border-b border-white/[0.08] overflow-hidden">
+      <section className="relative py-24 lg:py-32 border-b border-white/[0.06] overflow-hidden">
         <div className="absolute inset-0">
           <div className="glow-orb glow-orb-blue w-[700px] h-[700px] top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 opacity-5" />
           <div className="glow-orb glow-orb-purple w-[500px] h-[500px] top-1/3 right-0 opacity-5" />
@@ -424,7 +424,7 @@ export default function HostingPage() {
       {/* ============================================ */}
       {/* 4. HOSTING FEATURES GRID                     */}
       {/* ============================================ */}
-      <section className="py-24 lg:py-32 border-b border-white/[0.08]">
+      <section className="py-24 lg:py-32 border-b border-white/[0.06]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div
             initial="hidden"
@@ -457,7 +457,7 @@ export default function HostingPage() {
       {/* ============================================ */}
       {/* 5. DEPLOYMENT METHODS                        */}
       {/* ============================================ */}
-      <section className="py-24 lg:py-32 border-b border-white/[0.08]">
+      <section className="py-24 lg:py-32 border-b border-white/[0.06]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div
             initial="hidden"
@@ -497,7 +497,7 @@ export default function HostingPage() {
       {/* ============================================ */}
       {/* 6. PERFORMANCE SHOWCASE                      */}
       {/* ============================================ */}
-      <section className="py-24 lg:py-32 border-b border-white/[0.08] overflow-hidden">
+      <section className="py-24 lg:py-32 border-b border-white/[0.06] overflow-hidden">
         <div className="absolute inset-0">
           <div className="glow-orb glow-orb-cyan w-[600px] h-[600px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-5" />
         </div>
@@ -577,7 +577,7 @@ export default function HostingPage() {
       {/* ============================================ */}
       {/* 7. PRICING SECTION                           */}
       {/* ============================================ */}
-      <section id="pricing" className="py-24 lg:py-32 border-b border-white/[0.08]">
+      <section id="pricing" className="py-24 lg:py-32 border-b border-white/[0.06]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div
             initial="hidden"
@@ -644,7 +644,7 @@ export default function HostingPage() {
       {/* ============================================ */}
       {/* 8. MIGRATION SECTION                         */}
       {/* ============================================ */}
-      <section className="py-24 lg:py-32 border-b border-white/[0.08]">
+      <section className="py-24 lg:py-32 border-b border-white/[0.06]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div
             initial="hidden"

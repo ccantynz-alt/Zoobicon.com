@@ -112,7 +112,7 @@ export default function EmailSupportPage() {
     <div className="relative min-h-screen">
       <BackgroundEffects preset="calm" />
 
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08] bg-[#0d1525]/80 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#050508]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
@@ -257,7 +257,7 @@ export default function EmailSupportPage() {
                         <button
                           key={ticket.id}
                           onClick={() => setSelectedTicket(ticket)}
-                          className={`w-full text-left px-4 py-3 border-b border-white/[0.08] transition-colors ${
+                          className={`w-full text-left px-4 py-3 border-b border-white/[0.06] transition-colors ${
                             selectedTicket.id === ticket.id ? "bg-brand-500/5 border-l-2 border-l-brand-500" : "hover:bg-white/[0.05]"
                           }`}
                         >

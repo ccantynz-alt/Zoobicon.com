@@ -64,7 +64,11 @@ export function generateInviteCode(): string {
 
 // Presence is stale after this many seconds
 export const PRESENCE_STALE_SECONDS = 10;
-// Heartbeat interval (client-side)
+// Heartbeat interval (client-side, polling mode)
 export const HEARTBEAT_INTERVAL_MS = 3000;
-// Presence poll interval (client-side)
+// Presence poll interval (client-side, polling mode)
 export const PRESENCE_POLL_MS = 2000;
+// WebSocket heartbeat interval (less frequent — WS has built-in keep-alive)
+export const WS_HEARTBEAT_INTERVAL_MS = 15000;
+// WebSocket reconnect max attempts before falling back to polling
+export const WS_MAX_RECONNECT_ATTEMPTS = 5;

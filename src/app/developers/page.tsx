@@ -174,7 +174,7 @@ export default function DevelopersPage() {
       <BackgroundEffects preset="technical" />
 
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08] bg-[#0d1525]/80 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#050508]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2">
@@ -331,7 +331,7 @@ export default function DevelopersPage() {
             <motion.div variants={fadeInUp} className="gradient-border rounded-2xl overflow-hidden">
               <div className="bg-dark-300/60">
                 {API_ENDPOINTS.map((endpoint, i) => (
-                  <div key={i} className={`flex items-center gap-4 px-6 py-3.5 ${i !== API_ENDPOINTS.length - 1 ? "border-b border-white/[0.08]" : ""} hover:bg-white/[0.05] transition-colors`}>
+                  <div key={i} className={`flex items-center gap-4 px-6 py-3.5 ${i !== API_ENDPOINTS.length - 1 ? "border-b border-white/[0.06]" : ""} hover:bg-white/[0.05] transition-colors`}>
                     <span className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded ${
                       endpoint.method === "POST" ? "bg-brand-500/15 text-brand-400" : "bg-accent-cyan/15 text-accent-cyan"
                     }`}>

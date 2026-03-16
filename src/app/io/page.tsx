@@ -478,7 +478,7 @@ export default function ZoobiconIOPage() {
   const [activeLang, setActiveLang] = useState<"curl" | "javascript" | "python">("curl");
 
   return (
-    <div className="min-h-screen bg-[#0d1525] text-white overflow-hidden relative">
+    <div className="min-h-screen bg-[#050508] text-white overflow-hidden relative">
       <BackgroundEffects preset="energetic" />
       <CursorGlowTracker />
 

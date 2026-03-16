@@ -30,9 +30,11 @@ export default function BackgroundEffects({
       {preset === "technical" && <div className="mesh-gradient mesh-gradient-cool" style={{ opacity: 0.5 }} />}
       {preset === "premium" && <div className="mesh-gradient mesh-gradient-purple" />}
       {preset === "minimal" && <div className="mesh-gradient" />}
+      {preset === "contrast" && <div className="mesh-gradient" style={{ opacity: 0.7, filter: "hue-rotate(20deg) saturate(1.3)" }} />}
+      {preset === "blackfog" && <div className="mesh-gradient" style={{ opacity: 0.4, filter: "saturate(0.6) brightness(0.7)" }} />}
 
       {/* Grid pulse */}
-      {(preset === "default" || preset === "technical") && (
+      {(preset === "default" || preset === "technical" || preset === "contrast") && (
         <div className="grid-pulse" />
       )}
     </div>

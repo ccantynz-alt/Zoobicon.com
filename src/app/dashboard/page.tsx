@@ -178,10 +178,10 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#0d1525]">
+    <div className="relative min-h-screen bg-[#050508]">
       <BackgroundEffects preset="calm" />
       {/* Top Nav */}
-      <nav className="border-b border-white/[0.08] bg-[#0d1525]/80 backdrop-blur-2xl sticky top-0 z-50">
+      <nav className="border-b border-white/[0.06] bg-[#050508]/80 backdrop-blur-2xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-6">
@@ -424,7 +424,7 @@ export default function DashboardPage() {
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {liveSites.map((site) => (
                   <div key={site.id} className="gradient-border card-hover rounded-xl overflow-hidden group">
-                    <div className="h-40 bg-dark-200 border-b border-white/[0.08] relative overflow-hidden">
+                    <div className="h-40 bg-dark-200 border-b border-white/[0.06] relative overflow-hidden">
                       <iframe
                         src={`/api/hosting/serve/${site.slug}`}
                         title={site.name}
@@ -536,7 +536,7 @@ export default function DashboardPage() {
             {filteredProjects.map((project) => (
               <div key={project.id} className="gradient-border card-hover rounded-xl overflow-hidden group">
                 {/* Thumbnail */}
-                <div className="h-40 bg-dark-200 border-b border-white/[0.08] relative overflow-hidden">
+                <div className="h-40 bg-dark-200 border-b border-white/[0.06] relative overflow-hidden">
                   <iframe
                     srcDoc={project.code}
                     title={project.name}

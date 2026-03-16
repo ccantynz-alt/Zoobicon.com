@@ -249,9 +249,9 @@ export default function AdminPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0d1525]">
+    <div className="min-h-screen bg-[#050508]">
       {/* Nav */}
-      <nav className="sticky top-0 z-50 border-b border-white/[0.08] bg-[#0d1525]/80 backdrop-blur-2xl">
+      <nav className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#050508]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2">
@@ -283,7 +283,7 @@ export default function AdminPage() {
       </nav>
 
       {/* Tab Navigation */}
-      <div className="border-b border-white/[0.08]">
+      <div className="border-b border-white/[0.06]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex gap-1">
           {tabs.map((tab) => (
             <button
@@ -467,7 +467,7 @@ export default function AdminPage() {
               <h2 className="text-base font-bold mb-5">API Reference</h2>
               <div className="space-y-2">
                 {apiRoutes.map((r) => (
-                  <div key={r.path} className="flex items-center gap-4 py-2 border-b border-white/[0.08] last:border-0">
+                  <div key={r.path} className="flex items-center gap-4 py-2 border-b border-white/[0.06] last:border-0">
                     <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded w-12 text-center flex-shrink-0 ${
                       r.method === "GET" ? "text-emerald-400 bg-emerald-500/10" : "text-brand-400 bg-brand-500/10"
                     }`}>{r.method}</span>
@@ -543,7 +543,7 @@ export default function AdminPage() {
                 {analytics?.recentUsers && analytics.recentUsers.length > 0 ? (
                   <div className="space-y-3">
                     {analytics.recentUsers.slice(0, 8).map((u, i) => (
-                      <div key={i} className="flex items-center justify-between py-1.5 border-b border-white/[0.08] last:border-0">
+                      <div key={i} className="flex items-center justify-between py-1.5 border-b border-white/[0.06] last:border-0">
                         <div>
                           <div className="text-xs font-medium">{u.name || u.email}</div>
                           <div className="text-[10px] text-white/40">{u.email}</div>

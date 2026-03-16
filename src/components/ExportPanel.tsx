@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { Download, Github, Loader2, FileCode, FolderOpen } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Download, Loader2, FileCode, FolderOpen } from "lucide-react";
+import { transpileHtmlToReact, buildReactProjectFiles } from "@/lib/html-to-react";
 
 interface ExportResult {
   files: Record<string, string>;
@@ -24,6 +25,18 @@ export default function ExportPanel({ code, reactSource }: { code: string; react
   })();
 
   const hasReact = reactSource && Object.keys(reactSource).length >= 3;
+
+  // Auto-transpile HTML to React when no pre-decomposed source is available
+  const autoTranspiled = useMemo(() => {
+    if (hasReact || !code) return null;
+    try {
+      return transpileHtmlToReact(code, projectName);
+    } catch {
+      return null;
+    }
+  }, [code, projectName, hasReact]);
+
+  const canExportReact = hasReact || !!autoTranspiled;
 
   const downloadFiles = async (files: Record<string, string>) => {
     for (const [path, content] of Object.entries(files)) {
@@ -123,11 +136,18 @@ export default function ExportPanel({ code, reactSource }: { code: string; react
     if (!isPaidUser) return; // Guard rail: free tier cannot export
     setLoading(true);
     try {
-      // React export: build project from decomposed components
-      if (exportType === "react" && reactSource && Object.keys(reactSource).length > 0) {
-        const files = buildReactProject(projectName, reactSource);
-        await downloadFiles(files);
-        return;
+      // React export: use pre-decomposed components or auto-transpile
+      if (exportType === "react") {
+        if (reactSource && Object.keys(reactSource).length > 0) {
+          const files = buildReactProject(projectName, reactSource);
+          await downloadFiles(files);
+          return;
+        }
+        if (autoTranspiled) {
+          const files = buildReactProjectFiles(autoTranspiled, projectName);
+          await downloadFiles(files);
+          return;
+        }
       }
 
       const res = await fetch("/api/export/github", {
@@ -235,12 +255,12 @@ export default function ExportPanel({ code, reactSource }: { code: string; react
           </button>
           <button
             onClick={() => setExportType("react")}
-            disabled={!hasReact}
-            title={hasReact ? "React + shadcn/ui components" : "Generate a site first to get React components"}
+            disabled={!canExportReact}
+            title={canExportReact ? "Export as React + Next.js components" : "Generate a site first to export as React"}
             className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-medium transition-colors ${
               exportType === "react"
                 ? "bg-purple-500/20 text-purple-400 border border-purple-500/30"
-                : hasReact
+                : canExportReact
                   ? "bg-white/5 text-white/50 border border-white/10 hover:text-white/70"
                   : "bg-white/5 text-white/20 border border-white/10 cursor-not-allowed"
             }`}
@@ -294,9 +314,11 @@ export default function ExportPanel({ code, reactSource }: { code: string; react
             <div>src/app/page.tsx</div>
             <div>src/app/layout.tsx</div>
             <div>src/app/globals.css</div>
-            <div>src/lib/utils.ts</div>
             {hasReact && Object.keys(reactSource!).map((f) => (
               <div key={f}>{f.startsWith("src/") ? f : `src/components/${f}`}</div>
+            ))}
+            {!hasReact && autoTranspiled && autoTranspiled.components.map((c) => (
+              <div key={c.filename}>src/components/{c.filename}</div>
             ))}
             <div>package.json</div>
             <div>tailwind.config.ts</div>
