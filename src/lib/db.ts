@@ -326,4 +326,78 @@ export async function initSchema() {
   `;
 
   await sql`CREATE INDEX IF NOT EXISTS registered_domains_user_email_idx ON registered_domains (user_email)`;
+
+  // ---- Support tickets (replaces in-memory demo) ----
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS support_tickets (
+      id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      ticket_number   TEXT UNIQUE NOT NULL,
+      subject         TEXT NOT NULL,
+      from_email      TEXT NOT NULL,
+      from_name       TEXT NOT NULL DEFAULT '',
+      status          VARCHAR(20) NOT NULL DEFAULT 'open',
+      priority        VARCHAR(20) NOT NULL DEFAULT 'medium',
+      assignee        TEXT,
+      tags            JSONB DEFAULT '[]',
+      ai_confidence   REAL,
+      ai_auto_replied BOOLEAN NOT NULL DEFAULT false,
+      mailgun_message_id TEXT,
+      created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS support_tickets_status_idx ON support_tickets (status)`;
+  await sql`CREATE INDEX IF NOT EXISTS support_tickets_from_email_idx ON support_tickets (from_email)`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS support_messages (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      ticket_id   UUID NOT NULL REFERENCES support_tickets(id) ON DELETE CASCADE,
+      sender      VARCHAR(20) NOT NULL,
+      body_text   TEXT,
+      body_html   TEXT,
+      attachments JSONB DEFAULT '[]',
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS support_messages_ticket_id_idx ON support_messages (ticket_id)`;
+
+  // ---- Email outbox (sent emails) ----
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS email_outbound (
+      id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      from_address    TEXT NOT NULL,
+      to_address      TEXT NOT NULL,
+      subject         TEXT NOT NULL,
+      body_text       TEXT,
+      body_html       TEXT,
+      status          VARCHAR(20) NOT NULL DEFAULT 'sent',
+      mailgun_id      TEXT,
+      ticket_id       UUID REFERENCES support_tickets(id),
+      created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS email_outbound_ticket_id_idx ON email_outbound (ticket_id)`;
+
+  // ---- Knowledge base for AI support ----
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS knowledge_base (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      title       TEXT NOT NULL,
+      category    VARCHAR(50) NOT NULL DEFAULT 'general',
+      content     TEXT NOT NULL,
+      keywords    JSONB DEFAULT '[]',
+      is_active   BOOLEAN NOT NULL DEFAULT true,
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS knowledge_base_category_idx ON knowledge_base (category)`;
 }
