@@ -1194,15 +1194,76 @@ export default function LandingPage() {
                 <motion.div
                   key={i}
                   variants={fadeInUp}
-                  className="gradient-border card-hover p-8 rounded-2xl group"
+                  whileHover={{ y: -4, transition: { duration: 0.2, ease: "easeOut" as const } }}
+                  className="card-glow card-tilt p-8 rounded-2xl group"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-white/[0.07] border border-white/[0.10] flex items-center justify-center mb-5 group-hover:border-brand-500/30 transition-colors">
-                    <feature.icon className="w-6 h-6 text-white/60 group-hover:text-brand-400 transition-colors" />
+                  <div className="icon-glow w-12 h-12 rounded-xl bg-gradient-to-br from-brand-500/20 to-brand-400/10 border border-brand-500/20 flex items-center justify-center mb-5 group-hover:border-brand-500/40 transition-colors">
+                    <feature.icon className="w-6 h-6 text-brand-400/80 group-hover:text-brand-300 transition-colors" />
                   </div>
                   <h3 className="text-xl font-bold font-sharp mb-3">{feature.title}</h3>
                   <p className="text-sm text-white/35 leading-relaxed tracking-wide">
                     {feature.description}
                   </p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="relative py-24 lg:py-32 border-t border-white/[0.06] overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="glow-orb glow-orb-purple w-[600px] h-[600px] top-1/4 left-1/4 opacity-10" />
+          <div className="glow-orb glow-orb-cyan w-[400px] h-[400px] bottom-1/4 right-1/4 opacity-10" />
+        </div>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            <motion.div variants={fadeInUp} className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-amber-500/20 bg-amber-500/5 mb-6">
+                <Star className="w-3 h-3 text-amber-400" />
+                <span className="text-xs font-medium text-amber-400">What Builders Say</span>
+              </div>
+              <h2 className="font-sharp text-4xl md:text-5xl lg:text-6xl font-bold tracking-[-0.04em] mb-6 text-white text-glow">
+                Loved by Teams<br />
+                <span className="text-white/60">Who Ship Fast</span>
+              </h2>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+              {TESTIMONIALS.map((t, i) => (
+                <motion.div
+                  key={i}
+                  variants={fadeInUp}
+                  className="card-glow p-6 rounded-2xl relative testimonial-quote"
+                >
+                  {/* Stars */}
+                  <div className="flex items-center gap-0.5 mb-4">
+                    {[...Array(t.stars)].map((_, j) => (
+                      <Star key={j} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                    ))}
+                  </div>
+
+                  {/* Quote */}
+                  <p className="text-sm text-white/55 leading-relaxed mb-6">
+                    &ldquo;{t.quote}&rdquo;
+                  </p>
+
+                  {/* Author */}
+                  <div className="flex items-center gap-3 mt-auto">
+                    <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${t.gradient} flex items-center justify-center text-white font-bold text-sm`}>
+                      {t.name.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    <div>
+                      <div className="text-sm font-semibold text-white/80">{t.name}</div>
+                      <div className="text-xs text-white/40">{t.role}, {t.company}</div>
+                    </div>
+                  </div>
                 </motion.div>
               ))}
             </div>
