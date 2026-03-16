@@ -71,7 +71,7 @@ export default function BackgroundEffects({
         {preset === "technical" && <div className="mesh-gradient mesh-gradient-cool" style={{ opacity: 0.5 }} />}
         {preset === "premium" && <div className="mesh-gradient mesh-gradient-purple" />}
         {preset === "minimal" && <div className="mesh-gradient" />}
-        {preset === "contrast" && <div className="mesh-gradient" />}
+        {preset === "contrast" && <div className="mesh-gradient mesh-gradient-contrast" />}
 
         {/* Grid pulse */}
         {(preset === "default" || preset === "technical") && (
