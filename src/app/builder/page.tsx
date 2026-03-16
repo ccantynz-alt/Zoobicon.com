@@ -1732,9 +1732,9 @@ function BuilderPage() {
         onAction={(action) => {
           setShowBuildSuccess(false);
           dismissBuildSuccess();
-          if (action === "chat") setActiveTool("chat");
-          else if (action === "visual") setActiveTool("visual-editor");
+          if (action === "visual") setActiveTool("visual-editor");
           else if (action === "deploy") handleDeploy();
+          // "chat" — ChatPanel is always visible in the left sidebar, no action needed
         }}
       />
     </div>
