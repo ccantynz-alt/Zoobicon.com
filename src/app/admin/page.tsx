@@ -252,7 +252,7 @@ export default function AdminPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#030306] text-white overflow-hidden">
+    <div className="min-h-screen bg-[#04020a] text-white overflow-hidden">
       {/* Animated fog background */}
       <div className="fog-container">
         <div className="fog-layer fog-layer-1" />
@@ -266,7 +266,7 @@ export default function AdminPage() {
       <CursorGlowTracker />
 
       {/* ── Vibrant Nav ── */}
-      <nav className="sticky top-0 z-50 border-b border-violet-500/20 bg-gradient-to-r from-[#0a0a1a]/80 via-[#120828]/80 to-[#0a0a1a]/80 backdrop-blur-2xl shadow-lg shadow-violet-500/5">
+      <nav className="sticky top-0 z-50 border-b border-violet-500/30 bg-gradient-to-r from-[#0a0a1a]/85 via-[#150a30]/85 to-[#0a0a1a]/85 backdrop-blur-2xl shadow-xl shadow-violet-500/10">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2 group">
@@ -327,11 +327,13 @@ export default function AdminPage() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-600/30 via-brand-500/20 to-cyan-500/30 border border-violet-500/30 p-8 shadow-2xl shadow-violet-500/10 backdrop-blur-sm"
+              className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-600/40 via-brand-500/30 to-cyan-500/40 border border-violet-400/40 p-8 shadow-2xl shadow-violet-500/20 backdrop-blur-xl"
             >
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(139,92,246,0.25),transparent_60%)]" />
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(6,182,212,0.20),transparent_60%)]" />
-              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-400/50 to-transparent" />
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(139,92,246,0.35),transparent_50%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(6,182,212,0.30),transparent_50%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(99,102,241,0.15),transparent_70%)]" />
+              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-400/70 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent" />
               <div className="relative">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-violet-500/30">
@@ -372,7 +374,7 @@ export default function AdminPage() {
                     <Link
                       href={a.href}
                       target={(a as { external?: boolean }).external ? "_blank" : undefined}
-                      className={`group relative overflow-hidden rounded-2xl border border-white/[0.12] hover:border-violet-500/30 bg-white/[0.05] hover:bg-white/[0.10] backdrop-blur-md p-5 flex items-start gap-4 transition-all duration-300 shadow-lg ${a.glow} hover:shadow-xl hover:scale-[1.02]`}
+                      className={`group relative overflow-hidden rounded-2xl border border-white/[0.15] hover:border-violet-500/40 bg-white/[0.07] hover:bg-white/[0.14] backdrop-blur-xl p-5 flex items-start gap-4 transition-all duration-300 shadow-xl ${a.glow} hover:shadow-2xl hover:scale-[1.03]`}
                     >
                       <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${a.gradient} flex items-center justify-center flex-shrink-0 shadow-lg ${a.glow} group-hover:scale-110 transition-transform`}>
                         <a.icon className="w-5 h-5 text-white" />
@@ -391,9 +393,9 @@ export default function AdminPage() {
             {/* ── Feature Highlights ── */}
             <div className="grid md:grid-cols-3 gap-4">
               {[
-                { icon: Workflow, title: "10-Agent Pipeline", desc: "Strategist, Brand, Copywriter, Architect, Developer, Animator, SEO, Forms, Integrations, QA — 3 tiers.", gradient: "from-violet-500/20 to-purple-500/10", iconGradient: "from-violet-500 to-purple-600", borderColor: "border-violet-500/20" },
-                { icon: ImagePlus, title: "AI Image Generation", desc: "DALL-E 3, Stability AI, and Unsplash integration. Contextual AI images.", gradient: "from-cyan-500/20 to-blue-500/10", iconGradient: "from-cyan-500 to-blue-500", borderColor: "border-cyan-500/20" },
-                { icon: Globe, title: "Website Cloner", desc: "Paste any URL to analyze, extract content, and rebuild as a premium site.", gradient: "from-emerald-500/20 to-teal-500/10", iconGradient: "from-emerald-500 to-teal-500", borderColor: "border-emerald-500/20" },
+                { icon: Workflow, title: "10-Agent Pipeline", desc: "Strategist, Brand, Copywriter, Architect, Developer, Animator, SEO, Forms, Integrations, QA — 3 tiers.", gradient: "from-violet-500/30 to-purple-500/15", iconGradient: "from-violet-500 to-purple-600", borderColor: "border-violet-500/30" },
+                { icon: ImagePlus, title: "AI Image Generation", desc: "DALL-E 3, Stability AI, and Unsplash integration. Contextual AI images.", gradient: "from-cyan-500/30 to-blue-500/15", iconGradient: "from-cyan-500 to-blue-500", borderColor: "border-cyan-500/30" },
+                { icon: Globe, title: "Website Cloner", desc: "Paste any URL to analyze, extract content, and rebuild as a premium site.", gradient: "from-emerald-500/30 to-teal-500/15", iconGradient: "from-emerald-500 to-teal-500", borderColor: "border-emerald-500/30" },
               ].map((f, i) => (
                 <motion.div
                   key={f.title}
@@ -417,7 +419,7 @@ export default function AdminPage() {
                 initial={{ opacity: 0, x: -15 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 }}
-                className="rounded-2xl border border-emerald-500/25 bg-gradient-to-br from-emerald-500/[0.10] to-transparent p-6 backdrop-blur-md shadow-lg shadow-emerald-500/5"
+                className="rounded-2xl border border-emerald-500/35 bg-gradient-to-br from-emerald-500/[0.15] via-emerald-500/[0.05] to-transparent p-6 backdrop-blur-xl shadow-xl shadow-emerald-500/10"
               >
                 <div className="flex items-center justify-between mb-5">
                   <h2 className="text-base font-bold flex items-center gap-2">
@@ -471,7 +473,7 @@ export default function AdminPage() {
                 initial={{ opacity: 0, x: 15 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 }}
-                className="rounded-2xl border border-violet-500/25 bg-gradient-to-br from-violet-500/[0.10] to-transparent p-6 backdrop-blur-md shadow-lg shadow-violet-500/5"
+                className="rounded-2xl border border-violet-500/35 bg-gradient-to-br from-violet-500/[0.15] via-violet-500/[0.05] to-transparent p-6 backdrop-blur-xl shadow-xl shadow-violet-500/10"
               >
                 <h2 className="text-base font-bold mb-1 flex items-center gap-2">
                   <Database className="w-4 h-4 text-violet-400" />
@@ -515,7 +517,7 @@ export default function AdminPage() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="rounded-2xl border border-brand-500/25 bg-gradient-to-br from-brand-500/[0.10] via-transparent to-cyan-500/[0.08] p-6 backdrop-blur-md shadow-lg shadow-brand-500/5"
+              className="rounded-2xl border border-brand-500/35 bg-gradient-to-br from-brand-500/[0.15] via-transparent to-cyan-500/[0.12] p-6 backdrop-blur-xl shadow-xl shadow-brand-500/10"
             >
               <div className="flex items-center justify-between mb-6">
                 <div>
@@ -553,7 +555,7 @@ export default function AdminPage() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="rounded-2xl border border-cyan-500/20 bg-white/[0.05] p-6 backdrop-blur-md shadow-lg shadow-cyan-500/5"
+              className="rounded-2xl border border-cyan-500/30 bg-gradient-to-br from-cyan-500/[0.08] via-white/[0.05] to-violet-500/[0.06] p-6 backdrop-blur-xl shadow-xl shadow-cyan-500/10"
             >
               <h2 className="text-base font-bold mb-5 flex items-center gap-2">
                 <Server className="w-4 h-4 text-cyan-400" />
@@ -591,10 +593,10 @@ export default function AdminPage() {
             {/* Stat cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { label: "Total Users", value: analytics?.stats.totalUsers || 0, icon: Users, gradient: "from-violet-500/25 to-purple-500/15", iconGradient: "from-violet-500 to-purple-600", border: "border-violet-500/25" },
-                { label: "Projects", value: analytics?.stats.totalProjects || 0, icon: FolderOpen, gradient: "from-blue-500/25 to-indigo-500/15", iconGradient: "from-blue-500 to-indigo-500", border: "border-blue-500/25" },
-                { label: "Sites Deployed", value: analytics?.stats.totalSites || 0, icon: Rocket, gradient: "from-cyan-500/25 to-teal-500/15", iconGradient: "from-cyan-500 to-teal-500", border: "border-cyan-500/25" },
-                { label: "Deployments", value: analytics?.stats.totalDeployments || 0, icon: TrendingUp, gradient: "from-emerald-500/25 to-green-500/15", iconGradient: "from-emerald-500 to-green-500", border: "border-emerald-500/25" },
+                { label: "Total Users", value: analytics?.stats.totalUsers || 0, icon: Users, gradient: "from-violet-500/35 to-purple-500/20", iconGradient: "from-violet-500 to-purple-600", border: "border-violet-500/35" },
+                { label: "Projects", value: analytics?.stats.totalProjects || 0, icon: FolderOpen, gradient: "from-blue-500/35 to-indigo-500/20", iconGradient: "from-blue-500 to-indigo-500", border: "border-blue-500/35" },
+                { label: "Sites Deployed", value: analytics?.stats.totalSites || 0, icon: Rocket, gradient: "from-cyan-500/35 to-teal-500/20", iconGradient: "from-cyan-500 to-teal-500", border: "border-cyan-500/35" },
+                { label: "Deployments", value: analytics?.stats.totalDeployments || 0, icon: TrendingUp, gradient: "from-emerald-500/35 to-green-500/20", iconGradient: "from-emerald-500 to-green-500", border: "border-emerald-500/35" },
               ].map((s) => (
                 <motion.div
                   key={s.label}
@@ -615,7 +617,7 @@ export default function AdminPage() {
 
             <div className="grid lg:grid-cols-2 gap-6">
               {/* Plan Distribution */}
-              <div className="rounded-2xl p-6 border border-violet-500/25 bg-gradient-to-br from-violet-500/[0.10] to-transparent backdrop-blur-md shadow-lg shadow-violet-500/5">
+              <div className="rounded-2xl p-6 border border-violet-500/35 bg-gradient-to-br from-violet-500/[0.15] to-transparent backdrop-blur-xl shadow-xl shadow-violet-500/10">
                 <h2 className="text-base font-bold mb-4 flex items-center gap-2">
                   <Crown className="w-4 h-4 text-violet-400" />
                   Plan Distribution
@@ -641,7 +643,7 @@ export default function AdminPage() {
               </div>
 
               {/* Recent signups */}
-              <div className="rounded-2xl p-6 border border-cyan-500/25 bg-gradient-to-br from-cyan-500/[0.10] to-transparent backdrop-blur-md shadow-lg shadow-cyan-500/5">
+              <div className="rounded-2xl p-6 border border-cyan-500/35 bg-gradient-to-br from-cyan-500/[0.15] to-transparent backdrop-blur-xl shadow-xl shadow-cyan-500/10">
                 <h2 className="text-base font-bold mb-4 flex items-center gap-2">
                   <UserPlus className="w-4 h-4 text-cyan-400" />
                   Recent Signups
@@ -667,7 +669,7 @@ export default function AdminPage() {
             </div>
 
             {/* Recent projects */}
-            <div className="rounded-2xl p-6 border border-emerald-500/25 bg-gradient-to-br from-emerald-500/[0.10] to-transparent backdrop-blur-md shadow-lg shadow-emerald-500/5">
+            <div className="rounded-2xl p-6 border border-emerald-500/35 bg-gradient-to-br from-emerald-500/[0.15] to-transparent backdrop-blur-xl shadow-xl shadow-emerald-500/10">
               <h2 className="text-base font-bold mb-4 flex items-center gap-2">
                 <FolderOpen className="w-4 h-4 text-emerald-400" />
                 Recent Projects
@@ -708,7 +710,7 @@ export default function AdminPage() {
             </div>
 
             {users.length > 0 ? (
-              <div className="rounded-2xl border border-violet-500/20 bg-white/[0.05] overflow-hidden backdrop-blur-md shadow-lg shadow-violet-500/5">
+              <div className="rounded-2xl border border-violet-500/30 bg-gradient-to-br from-violet-500/[0.08] via-white/[0.05] to-transparent overflow-hidden backdrop-blur-xl shadow-xl shadow-violet-500/10">
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
