@@ -77,6 +77,7 @@ import {
   MousePointer2,
   FolderTree,
   Package,
+  Eye,
 } from "lucide-react";
 
 /** Sanitize raw API error messages for user display */
@@ -130,6 +131,7 @@ type ToolId =
   | "visual-editor"
   | "sections"
   | "project"
+  | "crawl"
   | null;
 
 const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }[] = [
@@ -157,6 +159,7 @@ const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }
   { id: "visual-editor", label: "Visual Editor", icon: <MousePointer2 size={18} /> },
   { id: "sections", label: "Add Section", icon: <Package size={18} /> },
   { id: "project", label: "Project Mode", icon: <FolderTree size={18} /> },
+  { id: "crawl", label: "Crawl Competitor", icon: <Eye size={18} /> },
 ];
 
 /* ─── Interactive particle constellation background ─── */
@@ -1256,6 +1259,24 @@ function BuilderPage() {
                 </button>
               </>
             )}
+          </div>
+        );
+      case "crawl":
+        return (
+          <div className="flex flex-col gap-4 p-4">
+            <p className="text-xs text-white/50 leading-relaxed">
+              Crawl a competitor&apos;s website to detect their tech stack, features, and design patterns.
+              Use insights to build something better.
+            </p>
+            <Link
+              href="/crawl"
+              target="_blank"
+              className="btn btn-primary text-sm flex items-center gap-2"
+            >
+              <Eye size={16} />
+              Open Intelligent Crawler
+              <ExternalLink size={12} />
+            </Link>
           </div>
         );
       default:
