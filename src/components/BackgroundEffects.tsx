@@ -14,16 +14,17 @@
  *   - "technical"   : grid pulse + white fog
  *   - "premium"     : purple mesh gradient + gold fog
  *   - "minimal"     : mesh gradient + light white fog + vignette
+ *   - "contrast"    : mesh gradient + black & white fog for dramatic depth
  */
 
-type Preset = "default" | "energetic" | "calm" | "technical" | "premium" | "minimal";
+type Preset = "default" | "energetic" | "calm" | "technical" | "premium" | "minimal" | "contrast";
 
 interface BackgroundEffectsProps {
   preset?: Preset;
   className?: string;
 }
 
-function FogOverlay({ variant = "white", intensity = "bold" }: { variant?: "white" | "gold"; intensity?: "bold" | "medium" | "light" }) {
+function FogOverlay({ variant = "white", intensity = "bold" }: { variant?: "white" | "gold" | "contrast"; intensity?: "bold" | "medium" | "light" }) {
   const intensityClass = `fog-${intensity}`;
   return (
     <div className={`fog-overlay fog-${variant} ${intensityClass}`}>
@@ -32,6 +33,12 @@ function FogOverlay({ variant = "white", intensity = "bold" }: { variant?: "whit
       <div className="fog-cloud fog-cloud-3" />
       <div className="fog-cloud fog-cloud-4" />
       <div className="fog-cloud fog-cloud-5" />
+      {variant === "contrast" && (
+        <>
+          <div className="fog-cloud-6" />
+          <div className="fog-cloud-7" />
+        </>
+      )}
     </div>
   );
 }
@@ -41,11 +48,12 @@ export default function BackgroundEffects({
   className = "",
 }: BackgroundEffectsProps) {
   // Determine fog settings per preset
-  const fogVariant = preset === "premium" ? "gold" : "white";
+  const fogVariant = preset === "premium" ? "gold" : preset === "contrast" ? "contrast" : "white";
   const fogIntensity =
     preset === "energetic" ? "bold" :
     preset === "minimal" ? "light" :
     preset === "calm" ? "medium" :
+    preset === "contrast" ? "bold" :
     "bold";
 
   return (
@@ -63,6 +71,7 @@ export default function BackgroundEffects({
         {preset === "technical" && <div className="mesh-gradient mesh-gradient-cool" style={{ opacity: 0.5 }} />}
         {preset === "premium" && <div className="mesh-gradient mesh-gradient-purple" />}
         {preset === "minimal" && <div className="mesh-gradient" />}
+        {preset === "contrast" && <div className="mesh-gradient" />}
 
         {/* Grid pulse */}
         {(preset === "default" || preset === "technical") && (
@@ -79,7 +88,7 @@ export default function BackgroundEffects({
       </div>
 
       {/* Vignette */}
-      {(preset === "calm" || preset === "minimal") && (
+      {(preset === "calm" || preset === "minimal" || preset === "contrast") && (
         <div className="fixed inset-0 pointer-events-none z-[11] vignette" aria-hidden="true" />
       )}
     </>
