@@ -10,6 +10,10 @@
     {
       "path": "/api/health?deep=true",
       "schedule": "0 */2 * * *"
+    },
+    {
+      "path": "/api/seo/agent/cron",
+      "schedule": "0 */6 * * *"
     }
   ],
 
@@ -57,6 +61,14 @@
     "src/app/api/auth/**": {
       "maxDuration": 30,
       "memory": 512
+    },
+    "src/app/api/seo/agent/cron/route.ts": {
+      "maxDuration": 300,
+      "memory": 1024
+    },
+    "src/app/api/video-creator/render/route.ts": {
+      "maxDuration": 120,
+      "memory": 1024
     }
   },
 

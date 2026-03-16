@@ -18,6 +18,7 @@ interface CollaborationBarProps {
   participants: RemoteParticipant[];
   myColor: string;
   isConnected: boolean;
+  transport?: "websocket" | "polling";
   onCreateRoom: () => void;
   onJoinRoom: (code: string) => Promise<unknown>;
   onLeaveRoom: () => void;
@@ -29,6 +30,7 @@ export default function CollaborationBar({
   participants,
   myColor,
   isConnected,
+  transport = "polling",
   onCreateRoom,
   onJoinRoom,
   onLeaveRoom,
@@ -131,6 +133,9 @@ export default function CollaborationBar({
       <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-green-500/10 border border-green-500/20">
         <Radio size={10} className="text-green-400 animate-pulse" />
         <span className="text-[10px] text-green-400 font-medium">LIVE</span>
+        {transport === "websocket" && (
+          <span className="text-[8px] text-green-400/50 ml-0.5">WS</span>
+        )}
       </div>
 
       {/* Avatar stack */}
