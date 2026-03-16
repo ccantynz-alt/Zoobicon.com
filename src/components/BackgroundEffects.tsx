@@ -3,10 +3,6 @@
 /**
  * BackgroundEffects — dramatic fog background layer for pages.
  *
- * Two layers:
- *   1. Background layer (z-0): mesh gradient, grid — behind content
- *   2. Fog overlay (z-10): bold drifting fog — in front of content, below nav (z-50)
- *
  * Presets:
  *   - "default"     : mesh gradient + bold white fog
  *   - "energetic"   : mesh gradient + bold white fog (thicker)
@@ -14,17 +10,18 @@
  *   - "technical"   : grid pulse + white fog
  *   - "premium"     : purple mesh gradient + gold fog
  *   - "minimal"     : mesh gradient + light white fog + vignette
- *   - "contrast"    : mesh gradient + black & white fog for dramatic depth
+ *   - "contrast"    : mesh gradient + black & white fog
+ *   - "blackfog"    : pure black background + thick dark smoke clouds
  */
 
-type Preset = "default" | "energetic" | "calm" | "technical" | "premium" | "minimal" | "contrast";
+type Preset = "default" | "energetic" | "calm" | "technical" | "premium" | "minimal" | "contrast" | "blackfog";
 
 interface BackgroundEffectsProps {
   preset?: Preset;
   className?: string;
 }
 
-function FogOverlay({ variant = "white", intensity = "bold" }: { variant?: "white" | "gold" | "contrast"; intensity?: "bold" | "medium" | "light" }) {
+function FogOverlay({ variant = "white", intensity = "bold" }: { variant?: "white" | "gold" | "contrast" | "black"; intensity?: "bold" | "medium" | "light" }) {
   const intensityClass = `fog-${intensity}`;
   return (
     <div className={`fog-overlay fog-${variant} ${intensityClass}`}>
@@ -33,7 +30,7 @@ function FogOverlay({ variant = "white", intensity = "bold" }: { variant?: "whit
       <div className="fog-cloud fog-cloud-3" />
       <div className="fog-cloud fog-cloud-4" />
       <div className="fog-cloud fog-cloud-5" />
-      {variant === "contrast" && (
+      {(variant === "contrast" || variant === "black") && (
         <>
           <div className="fog-cloud-6" />
           <div className="fog-cloud-7" />
@@ -47,13 +44,16 @@ export default function BackgroundEffects({
   preset = "default",
   className = "",
 }: BackgroundEffectsProps) {
-  // Determine fog settings per preset
-  const fogVariant = preset === "premium" ? "gold" : preset === "contrast" ? "contrast" : "white";
+  const fogVariant =
+    preset === "premium" ? "gold" :
+    preset === "contrast" ? "contrast" :
+    preset === "blackfog" ? "black" :
+    "white";
+
   const fogIntensity =
     preset === "energetic" ? "bold" :
     preset === "minimal" ? "light" :
     preset === "calm" ? "medium" :
-    preset === "contrast" ? "bold" :
     "bold";
 
   return (
@@ -63,7 +63,6 @@ export default function BackgroundEffects({
         className={`fixed inset-0 pointer-events-none z-0 overflow-hidden ${className}`}
         aria-hidden="true"
       >
-        {/* Mesh gradient */}
         {(preset === "default" || preset === "energetic") && (
           <div className="mesh-gradient" />
         )}
@@ -72,8 +71,8 @@ export default function BackgroundEffects({
         {preset === "premium" && <div className="mesh-gradient mesh-gradient-purple" />}
         {preset === "minimal" && <div className="mesh-gradient" />}
         {preset === "contrast" && <div className="mesh-gradient mesh-gradient-contrast" />}
+        {/* blackfog = no mesh gradient, pure black bg handled by bg-void class on body/container */}
 
-        {/* Grid pulse */}
         {(preset === "default" || preset === "technical") && (
           <div className="grid-pulse" />
         )}
@@ -88,7 +87,7 @@ export default function BackgroundEffects({
       </div>
 
       {/* Vignette */}
-      {(preset === "calm" || preset === "minimal" || preset === "contrast") && (
+      {(preset === "calm" || preset === "minimal" || preset === "contrast" || preset === "blackfog") && (
         <div className="fixed inset-0 pointer-events-none z-[11] vignette" aria-hidden="true" />
       )}
     </>
