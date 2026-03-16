@@ -479,12 +479,12 @@ export default function ZoobiconIOPage() {
 
   return (
     <div className="min-h-screen bg-[#050508] text-white overflow-hidden relative">
-      <BackgroundEffects preset="energetic" />
+      <BackgroundEffects preset="technical" />
       <CursorGlowTracker />
 
       {/* ─── Hero ─── */}
       <section className="relative pt-36 pb-24 px-4">
-        <HeroEffects variant="default" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
+        <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
 
         <motion.div
           className="relative max-w-5xl mx-auto text-center"

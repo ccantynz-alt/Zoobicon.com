@@ -197,7 +197,7 @@ export default function AiPage() {
 
   return (
     <div className="min-h-screen bg-[#050508] text-white overflow-x-hidden relative">
-      <BackgroundEffects preset="premium" />
+      <BackgroundEffects preset="technical" />
       {/* ───────── Navigation ───────── */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-[#050508]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -234,7 +234,7 @@ export default function AiPage() {
 
       {/* ───────── Hero ───────── */}
       <section className="relative pt-32 pb-24 px-6">
-        <HeroEffects variant="purple" cursorGlow particles particleCount={45} interactiveGrid aurora beams />
+        <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
 
         <div className="relative max-w-5xl mx-auto text-center">
           <motion.div variants={staggerContainer} initial="hidden" animate="visible">

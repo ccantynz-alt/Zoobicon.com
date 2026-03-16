@@ -587,7 +587,7 @@ export default function LandingPage() {
   return (
     <div className="relative bg-void">
       {/* Background Effects */}
-      <BackgroundEffects preset="blackfog" />
+      <BackgroundEffects preset="technical" />
 
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-black/60 backdrop-blur-2xl" aria-label="Main navigation">
@@ -696,10 +696,10 @@ export default function LandingPage() {
       <section className="relative overflow-hidden min-h-screen flex items-center pt-16">
         {/* Interactive background effects */}
         <HeroEffects
-          variant="default"
+          variant="cyan"
           cursorGlow
           particles
-          particleCount={50}
+          particleCount={35}
           interactiveGrid
           aurora
           beams

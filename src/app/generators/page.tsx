@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import BackgroundEffects from "@/components/BackgroundEffects";
+import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
   Sparkles, Globe, Layout, Calendar, BarChart3, Palette, Search, Moon,
   FileText, Link2, Briefcase, BookOpen, MapPin, Ticket, Store, Smartphone,
@@ -123,10 +124,10 @@ export default function GeneratorsPage() {
   const totalGenerators = allGenerators.length;
 
   return (
-    <div className="min-h-screen bg-[#111a2e] text-white relative">
-      <BackgroundEffects preset="default" />
+    <div className="min-h-screen text-white relative">
+      <BackgroundEffects preset="technical" />
       {/* Nav */}
-      <nav className="sticky top-0 z-50 border-b border-white/[0.10] bg-[#111a2e]/80 backdrop-blur-xl">
+      <nav className="sticky top-0 z-50 border-b border-white/[0.10] bg-[#050508]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center">
@@ -156,13 +157,11 @@ export default function GeneratorsPage() {
           </div>
         </div>
       </nav>
+      <CursorGlowTracker />
 
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-20 left-1/4 w-96 h-96 rounded-full bg-brand-500/5 blur-[100px]" />
-          <div className="absolute bottom-0 right-1/4 w-80 h-80 rounded-full bg-blue-500/5 blur-[80px]" />
-        </div>
+        <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
         <div className="max-w-7xl mx-auto px-6 pt-20 pb-16 text-center relative">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 text-xs font-medium mb-6">
             <Bot size={14} />

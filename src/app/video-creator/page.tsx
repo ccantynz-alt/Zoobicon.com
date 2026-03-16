@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import BackgroundEffects from "@/components/BackgroundEffects";
+import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
   Video,
   Sparkles,
@@ -343,7 +344,7 @@ export default function VideoCreatorDashboard() {
 
   return (
     <div className="relative min-h-screen bg-gray-950 text-white">
-      <BackgroundEffects preset="premium" />
+      <BackgroundEffects preset="technical" />
       {/* Nav */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08] bg-gray-950/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14">
@@ -380,6 +381,8 @@ export default function VideoCreatorDashboard() {
           </div>
         </div>
       </nav>
+
+      <CursorGlowTracker />
 
       {/* History Sidebar */}
       <AnimatePresence>
@@ -429,7 +432,8 @@ export default function VideoCreatorDashboard() {
         )}
       </AnimatePresence>
 
-      <main className="pt-14">
+      <main className="relative pt-14">
+        <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Left Column: Controls */}

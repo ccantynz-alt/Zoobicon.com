@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import BackgroundEffects from "@/components/BackgroundEffects";
+import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
   Zap,
   Send,
@@ -343,7 +344,7 @@ export default function SupportPage() {
 
   return (
     <div className="relative min-h-screen flex flex-col">
-      <BackgroundEffects preset="calm" />
+      <BackgroundEffects preset="technical" />
 
       {/* Nav */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#050508]/80 backdrop-blur-2xl">
@@ -410,6 +411,7 @@ export default function SupportPage() {
           </div>
         </div>
       </nav>
+      <CursorGlowTracker />
 
       {/* Session Warning Banner */}
       <AnimatePresence>

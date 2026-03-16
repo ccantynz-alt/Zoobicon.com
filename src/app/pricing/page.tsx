@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import BackgroundEffects from "@/components/BackgroundEffects";
+import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
   Check, Zap, ArrowRight, HelpCircle, Sparkles, Globe, Video, BarChart3,
   Mail, Bot, Palette, Code2, Shield, Users, Building2, Loader2,
@@ -253,7 +254,7 @@ export default function PricingPage() {
 
   return (
     <div className="relative min-h-screen">
-      <BackgroundEffects preset="premium" />
+      <BackgroundEffects preset="technical" />
 
       {/* Nav */}
       <nav className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#050508]/80 backdrop-blur-2xl">
@@ -288,10 +289,12 @@ export default function PricingPage() {
           </div>
         </div>
       </nav>
+      <CursorGlowTracker />
 
       <main>
         {/* Hero */}
-        <section className="py-20 lg:py-28 text-center">
+        <section className="relative py-20 lg:py-28 text-center">
+          <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
           <div className="max-w-3xl mx-auto px-6">
             <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
               <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-brand-500/20 bg-brand-500/5 text-brand-400 text-sm font-medium mb-6">

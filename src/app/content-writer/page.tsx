@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import BackgroundEffects from "@/components/BackgroundEffects";
+import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
   FileText,
   Copy,
@@ -205,7 +206,7 @@ export default function ContentWriterPage() {
 
   return (
     <div className="relative min-h-screen bg-gray-950 text-white">
-      <BackgroundEffects preset="default" />
+      <BackgroundEffects preset="technical" />
       {/* Top Bar */}
       <header className="sticky top-0 z-50 border-b border-gray-800 bg-gray-950/90 backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
@@ -246,6 +247,12 @@ export default function ContentWriterPage() {
           </div>
         </div>
       </header>
+
+      <CursorGlowTracker />
+
+      <section className="relative">
+        <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
+      </section>
 
       <div className="relative mx-auto flex max-w-7xl">
         {/* History Sidebar */}
