@@ -20,7 +20,6 @@ import {
   Globe,
   Cpu,
   GitBranch,
-  Braces,
   Package,
   ChevronRight,
 } from "lucide-react";
@@ -36,95 +35,110 @@ const staggerContainer = {
 };
 
 const CODE_EXAMPLES = {
-  generate: `const response = await fetch("https://api.zoobicon.io/v1/generate", {
+  generate: `// POST /api/v1/generate — Generate a complete website
+const response = await fetch("https://zoobicon.com/api/v1/generate", {
   method: "POST",
   headers: {
-    "Authorization": "Bearer zb_live_sk_...",
+    "Authorization": "Bearer zbk_live_...",
     "Content-Type": "application/json"
   },
   body: JSON.stringify({
-    prompt: "A modern SaaS landing page with pricing",
-    framework: "html",       // html | react | nextjs | vue
-    style: "modern-dark",    // 20+ style presets
-    responsive: true,
-    seo: true
+    prompt: "A modern SaaS landing page with pricing tables",
+    generator: "saas",          // 43 specialized generators
+    tier: "premium",            // standard | premium
+    style: "dark minimal",      // freeform style description
+    deploy: true,               // auto-deploy to zoobicon.sh
+    deploy_name: "my-saas",     // custom subdomain
+    webhook_url: "https://your-app.com/hooks/zoobicon"
   })
 });
 
-const { code, preview_url, metadata } = await response.json();
-// code: Full HTML/React source code
-// preview_url: Live preview at zoobicon.sh/preview/abc123
-// metadata: { tokens_used, generation_time_ms, framework }`,
-  seo: `const campaign = await zoobicon.seo.createCampaign({
-  domain: "yoursite.com",
-  competitors: ["competitor1.com", "competitor2.com"],
-  keywords: "auto-discover",  // AI finds best keywords
-  budget: "aggressive",
-  agent: {
-    contentGeneration: true,
-    backlinkOutreach: true,
-    technicalAudit: true,
-    weeklyReports: true
-  }
+const { data } = await response.json();
+// data.id:               "a1b2c3d4-..."
+// data.html:             "<!DOCTYPE html>..."  (complete site)
+// data.tokens_used:      18420
+// data.generation_time_ms: 12500
+// data.deployed.url:     "https://my-saas.zoobicon.sh"`,
+  deploy: `// POST /api/v1/deploy — Deploy any HTML to zoobicon.sh
+const response = await fetch("https://zoobicon.com/api/v1/deploy", {
+  method: "POST",
+  headers: {
+    "Authorization": "Bearer zbk_live_...",
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    html: myGeneratedHTML,
+    name: "Client Portfolio",
+    slug: "client-portfolio",        // → client-portfolio.zoobicon.sh
+    commit_message: "Initial launch"
+  })
 });
 
-// Agent runs autonomously — check status anytime
-const status = await zoobicon.seo.getCampaign(campaign.id);
-// { rank_improvements: 47, new_backlinks: 12, content_published: 8 }`,
-  video: `const video = await zoobicon.video.create({
-  prompt: "Product launch announcement for a fitness app",
-  platform: "tiktok",      // tiktok | instagram | youtube | facebook
-  duration: 30,            // seconds
-  style: "energetic",
-  music: "upbeat-electronic",
-  branding: {
-    logo_url: "https://yoursite.com/logo.png",
-    colors: ["#FF6B35", "#004E98"]
-  }
+const { data } = await response.json();
+// data.site_id:        "uuid-..."
+// data.url:            "https://client-portfolio.zoobicon.sh"
+// data.deployment_id:  "uuid-..."
+
+// Update later with PUT /api/v1/sites
+await fetch("https://zoobicon.com/api/v1/sites", {
+  method: "PUT",
+  headers: { "Authorization": "Bearer zbk_live_...", "Content-Type": "application/json" },
+  body: JSON.stringify({ slug: "client-portfolio", html: updatedHTML })
+});`,
+  sites: `// GET /api/v1/sites — List all your deployed sites
+const response = await fetch("https://zoobicon.com/api/v1/sites?page=1&limit=20", {
+  headers: { "Authorization": "Bearer zbk_live_..." }
 });
 
-// Returns video URL + platform-optimized versions
-// { video_url, thumbnail_url, platforms: { tiktok, instagram, youtube } }`,
-  sdk: `import { Zoobicon } from "@zoobicon/sdk";
+const { data } = await response.json();
+// data.sites: [
+//   { id, name, slug, url, plan, status, created_at },
+//   ...
+// ]
+// data.pagination: { page: 1, limit: 20, total: 47, totalPages: 3 }
 
-const zb = new Zoobicon({ apiKey: process.env.ZOOBICON_API_KEY });
-
-// Generate a website
-const site = await zb.sites.generate({
-  prompt: "Photography portfolio with dark theme",
-  framework: "nextjs"
+// DELETE /api/v1/sites — Deactivate a site
+await fetch("https://zoobicon.com/api/v1/sites", {
+  method: "DELETE",
+  headers: { "Authorization": "Bearer zbk_live_...", "Content-Type": "application/json" },
+  body: JSON.stringify({ slug: "old-site" })
+});`,
+  status: `// GET /api/v1/status — API health + account info
+const response = await fetch("https://zoobicon.com/api/v1/status", {
+  headers: { "Authorization": "Bearer zbk_live_..." }
 });
 
-// Deploy instantly
-const deployment = await zb.deploy.create({
-  siteId: site.id,
-  domain: "photos.yoursite.com"  // or use free *.zoobicon.sh subdomain
-});
+const { data } = await response.json();
+// data.status:     "operational"
+// data.plan:       "pro"
+// data.rate_limit: { limit: 60, window_ms: 60000 }
+// data.usage:      { sites_count: 47, deployments_count: 132, generations_count: 89 }
+// data.endpoints:  [{ method, path, description }, ...]
+// data.version:    "1.0.0"
 
-// Start an SEO campaign
-const seo = await zb.seo.launch({ siteId: site.id, mode: "aggressive" });
-
-// Create a promotional video
-const video = await zb.video.create({
-  siteId: site.id,
-  platform: "instagram",
-  style: "cinematic"
+// White-label branding (agency plans)
+const branded = await fetch("https://zoobicon.com/api/v1/generate", {
+  method: "POST",
+  headers: { "Authorization": "Bearer zbk_live_...", "Content-Type": "application/json" },
+  body: JSON.stringify({
+    prompt: "Restaurant website for Bella Italia",
+    agency_brand: {
+      agencyName: "WebCraft Agency",
+      primaryColor: "#1e40af",
+      logoUrl: "https://webcraft.agency/logo.png"
+    }
+  })
 });`,
 };
 
 const API_ENDPOINTS = [
-  { method: "POST", path: "/v1/generate", desc: "Generate a website from prompt" },
-  { method: "POST", path: "/v1/generate/stream", desc: "Stream generation in real-time" },
-  { method: "POST", path: "/v1/edit", desc: "Edit existing site with instructions" },
-  { method: "GET", path: "/v1/sites", desc: "List all generated sites" },
-  { method: "GET", path: "/v1/sites/:id", desc: "Get site details and code" },
-  { method: "POST", path: "/v1/deploy", desc: "Deploy site to custom domain" },
-  { method: "POST", path: "/v1/seo/campaigns", desc: "Create SEO campaign" },
-  { method: "GET", path: "/v1/seo/campaigns/:id", desc: "Get campaign status & metrics" },
-  { method: "POST", path: "/v1/video/create", desc: "Generate AI video" },
-  { method: "POST", path: "/v1/brand/generate", desc: "Generate brand kit" },
-  { method: "POST", path: "/v1/chatbot/create", desc: "Create AI chatbot" },
-  { method: "GET", path: "/v1/usage", desc: "Get API usage and billing" },
+  { method: "POST", path: "/api/v1/generate", desc: "Generate a website from prompt with 43 specialized generators" },
+  { method: "GET", path: "/api/v1/sites", desc: "List all your deployed sites with pagination" },
+  { method: "PUT", path: "/api/v1/sites", desc: "Update site HTML and create new deployment version" },
+  { method: "DELETE", path: "/api/v1/sites", desc: "Deactivate a site by ID or slug" },
+  { method: "POST", path: "/api/v1/deploy", desc: "Deploy HTML to zoobicon.sh with custom slug" },
+  { method: "GET", path: "/api/v1/deploy", desc: "Get deployment history for a site" },
+  { method: "GET", path: "/api/v1/status", desc: "API health check, usage stats, and account info" },
 ];
 
 const SDKS = [
@@ -139,14 +153,14 @@ const SDKS = [
 const FEATURES = [
   { icon: Webhook, title: "Webhooks", desc: "Real-time notifications for generation, deployment, and SEO events." },
   { icon: Shield, title: "OAuth 2.0", desc: "Secure authentication with scoped API keys and team permissions." },
-  { icon: BarChart3, title: "Rate Limiting", desc: "Generous limits: 100 req/min (Free), 1000 req/min (Pro), Unlimited (Enterprise)." },
+  { icon: BarChart3, title: "Rate Limiting", desc: "Tiered limits: 10 req/min (Free), 60 req/min (Pro), 600 req/min (Enterprise)." },
   { icon: Layers, title: "Batch Operations", desc: "Generate up to 50 sites in a single batch request with parallel processing." },
   { icon: Globe, title: "CDN Hosting", desc: "Auto-deploy to our global CDN. Custom domains with free SSL certificates." },
   { icon: GitBranch, title: "Version Control", desc: "Every generation is versioned. Roll back, diff, and branch your sites." },
 ];
 
 export default function DevelopersPage() {
-  const [activeTab, setActiveTab] = useState<keyof typeof CODE_EXAMPLES>("sdk");
+  const [activeTab, setActiveTab] = useState<keyof typeof CODE_EXAMPLES>("generate");
   const [copiedEndpoint, setCopiedEndpoint] = useState<string | null>(null);
 
   const copyCode = (code: string, id: string) => {
@@ -238,7 +252,7 @@ export default function DevelopersPage() {
                             : "text-white/50 hover:text-white/60"
                         }`}
                       >
-                        {tab === "sdk" ? "SDK Quick Start" : tab === "generate" ? "Generate Site" : tab === "seo" ? "SEO Agent" : "Video Creator"}
+                        {tab === "generate" ? "Generate" : tab === "deploy" ? "Deploy" : tab === "sites" ? "Manage Sites" : "Status & Branding"}
                       </button>
                     ))}
                   </div>
@@ -311,7 +325,7 @@ export default function DevelopersPage() {
               <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
                 API <span className="gradient-text">Reference</span>
               </h2>
-              <p className="text-lg text-white/60">RESTful API with streaming support. Base URL: <code className="text-accent-cyan font-mono text-sm">https://api.zoobicon.io/v1</code></p>
+              <p className="text-lg text-white/60">RESTful API with Bearer token auth. Base URL: <code className="text-accent-cyan font-mono text-sm">https://zoobicon.com/api/v1</code></p>
             </motion.div>
 
             <motion.div variants={fadeInUp} className="gradient-border rounded-2xl overflow-hidden">
@@ -372,10 +386,10 @@ export default function DevelopersPage() {
               <motion.div variants={fadeInUp} className="gradient-border p-6 rounded-xl">
                 <div className="text-sm font-semibold text-white/65 mb-2">Free</div>
                 <div className="text-3xl font-black mb-1">$0</div>
-                <div className="text-xs text-white/50 mb-4">100 requests/day</div>
+                <div className="text-xs text-white/50 mb-4">10 requests/min</div>
                 <ul className="space-y-2 mb-6 text-sm text-white/60">
-                  <li>50 site generations/month</li>
-                  <li>Basic SEO audit</li>
+                  <li>Standard tier generation</li>
+                  <li>Deploy to zoobicon.sh</li>
                   <li>Community support</li>
                   <li>1 API key</li>
                 </ul>
@@ -390,13 +404,13 @@ export default function DevelopersPage() {
                 </div>
                 <div className="text-sm font-semibold text-accent-cyan mb-2">Pro</div>
                 <div className="text-3xl font-black mb-1">$79<span className="text-lg font-normal text-white/50">/mo</span></div>
-                <div className="text-xs text-white/50 mb-4">1,000 requests/min</div>
+                <div className="text-xs text-white/50 mb-4">60 requests/min</div>
                 <ul className="space-y-2 mb-6 text-sm text-white/65">
-                  <li>Unlimited generations</li>
-                  <li>Full SEO agent</li>
-                  <li>Video creation API</li>
+                  <li>Premium tier generation</li>
+                  <li>43 specialized generators</li>
+                  <li>White-label branding</li>
+                  <li>Webhook callbacks</li>
                   <li>Priority support</li>
-                  <li>10 API keys</li>
                 </ul>
                 <button className="w-full py-2.5 rounded-xl bg-gradient-to-r from-accent-cyan to-emerald-500 text-sm font-bold text-white">
                   Start Pro
@@ -406,12 +420,12 @@ export default function DevelopersPage() {
               <motion.div variants={fadeInUp} className="gradient-border p-6 rounded-xl">
                 <div className="text-sm font-semibold text-white/65 mb-2">Enterprise</div>
                 <div className="text-3xl font-black mb-1">Custom</div>
-                <div className="text-xs text-white/50 mb-4">Unlimited everything</div>
+                <div className="text-xs text-white/50 mb-4">600 requests/min</div>
                 <ul className="space-y-2 mb-6 text-sm text-white/60">
-                  <li>Dedicated infrastructure</li>
-                  <li>Custom model training</li>
+                  <li>Dedicated rate limits</li>
+                  <li>Custom model routing</li>
                   <li>SLA guarantee</li>
-                  <li>Unlimited API keys</li>
+                  <li>Agency bulk generation</li>
                   <li>24/7 support</li>
                 </ul>
                 <a href="mailto:sales@zoobicon.com?subject=Enterprise API Inquiry" className="block w-full py-2.5 rounded-xl border border-white/[0.12] text-sm font-semibold text-white/60 hover:border-white/20 transition-all text-center">

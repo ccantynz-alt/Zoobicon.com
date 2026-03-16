@@ -131,10 +131,29 @@ Build has `ignoreBuildErrors: true` and `ignoreDuringBuilds: true` in next.confi
 - `/developers`, `/cli`, `/sh`, `/ai`, `/io` — Developer/branded routes
 - `/agencies` — Agency-focused page
 
+### Public API v1 (src/app/api/v1/)
+
+RESTful API for programmatic site generation and deployment. Bearer token auth via `zbk_live_*` API keys.
+
+| Route | Method | Description |
+|-------|--------|-------------|
+| `/api/v1/generate` | POST | Generate a website from prompt (supports 43 generators, tiers, model override, auto-deploy, webhooks, agency branding) |
+| `/api/v1/sites` | GET | List deployed sites with pagination and status filtering |
+| `/api/v1/sites` | PUT | Update site HTML, creates new deployment version |
+| `/api/v1/sites` | DELETE | Deactivate a site by ID or slug |
+| `/api/v1/deploy` | POST | Deploy HTML to zoobicon.sh with custom slug |
+| `/api/v1/deploy` | GET | Get deployment history for a site |
+| `/api/v1/status` | GET | API health, account info, usage stats, rate limits |
+
+**Authentication:** `Authorization: Bearer zbk_live_...` — HMAC-SHA256 stateless keys (no DB lookup). See `src/lib/apiKey.ts`.
+
+**Rate limits:** Free: 10 req/min, Pro: 60 req/min, Enterprise: 600 req/min. Sliding window per API key prefix. See `src/lib/api-middleware.ts`.
+
 ### Other API Routes (src/app/api/)
-89 route handlers across 26 directories. All verified working:
-- `/api/auth/*` — Authentication (signup, login, reset)
+90+ route handlers across 27 directories. All verified working:
+- `/api/auth/*` — Authentication (signup, login, reset, OAuth Google/GitHub)
 - `/api/projects/*` — Project CRUD
+- `/api/collab/*` — Real-time collaboration (rooms, presence, code sync)
 - `/api/contact` — Contact form handler
 - `/api/seo/analyze` — SEO analysis endpoint
 - `/api/clone` — Import existing website URL → convert to editable HTML
@@ -235,6 +254,8 @@ Post-deployment live editor:
 15. **Agency generation quota tracking** — `agency_generations` table tracks every AI generation per agency per month (period format: "YYYY-MM"). The stream generate route checks quota before generation and returns 429 when exceeded. Dashboard shows usage. Plan limits defined in `src/lib/agency-limits.ts`.
 16. **Visual editing is DOM-based** — The visual editor works by injecting a script into the preview iframe (`dom-bridge.ts`). Communication is via `postMessage`. Style/text changes are applied to the HTML string via `DOMParser` → manipulate → serialize. This means changes persist in the `generatedCode` state and survive undo/redo via the snapshot system.
 17. **Real-time collaboration uses poll-based presence (UPGRADE TO WEBSOCKETS)** — Current implementation uses database-backed rooms with poll-based presence (every 2-3s) because Vercel serverless doesn't support persistent WebSocket connections. This works but has ~2-3s latency on cursor positions and code sync. **FUTURE UPGRADE PATH:** When deploying to a persistent server (e.g., Railway, Fly.io, AWS ECS) or using a dedicated WebSocket service (PartyKit, Liveblocks, Ably), replace the polling in `useCollaboration.ts` with WebSocket connections. The API routes (`/api/collab/*`) can remain as REST for room management; only presence and code sync need the WebSocket upgrade. Key files: `src/lib/collaboration.ts` (config), `src/hooks/useCollaboration.ts` (client), `src/app/api/collab/` (server), `src/components/CollaborationBar.tsx` (UI), `src/components/CursorOverlay.tsx` (remote cursors). The collab_rooms, collab_participants, and collab_code_sync tables support the current system.
+
+18. **Public API v1** — The `/api/v1/*` routes provide a programmatic REST API for external developers. Authentication uses stateless HMAC-SHA256 API keys (`zbk_live_*`) validated in `src/lib/apiKey.ts` with rate limiting in `src/lib/api-middleware.ts`. The API supports generation with all 43 generators, auto-deploy to zoobicon.sh, webhook callbacks, and white-label agency branding. Do not change the auth scheme without updating all v1 routes. Key files: `src/lib/api-middleware.ts`, `src/app/api/v1/generate/route.ts`, `src/app/api/v1/sites/route.ts`, `src/app/api/v1/deploy/route.ts`, `src/app/api/v1/status/route.ts`.
 
 ## Route Audit Status
 
