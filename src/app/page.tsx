@@ -743,15 +743,15 @@ export default function LandingPage() {
                 <span className="block text-white/40 mt-2 text-[0.45em] tracking-[-0.02em]">with AI agents</span>
               </h1>
 
-              <p className="text-lg text-white/45 leading-relaxed mb-8 max-w-lg font-light tracking-wide">
+              <p className="text-lg text-white/45 leading-relaxed mb-8 max-w-lg font-light tracking-wide typing-cursor">
                 7 AI agents collaborate in real-time to create production-ready sites in seconds.
-                No templates. No limits. Just describe it.
+                No templates. No limits. Just describe it
               </p>
 
               <div className="flex flex-wrap items-center gap-4 mb-10">
                 <Link
                   href="/builder"
-                  className="group relative inline-flex items-center gap-3 px-8 py-4 bg-white text-black rounded-lg text-base font-bold font-sharp hover:bg-white/90 transition-all shadow-[0_0_40px_rgba(255,255,255,0.15),0_0_80px_rgba(255,255,255,0.05)] hover:shadow-[0_0_60px_rgba(255,255,255,0.25),0_0_120px_rgba(255,255,255,0.08)] hover:-translate-y-0.5 duration-300"
+                  className="btn-glow-pulse group relative inline-flex items-center gap-3 px-8 py-4 bg-white text-black rounded-lg text-base font-bold font-sharp hover:bg-white/90 transition-all shadow-[0_0_40px_rgba(255,255,255,0.15),0_0_80px_rgba(255,255,255,0.05)] hover:shadow-[0_0_60px_rgba(255,255,255,0.25),0_0_120px_rgba(255,255,255,0.08)] hover:-translate-y-0.5 duration-300"
                 >
                   Start Building Free
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -809,6 +809,27 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Social Proof Marquee */}
+      <section className="relative py-8 border-b border-white/[0.06] overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-4">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/25">Trusted by forward-thinking teams</span>
+          </div>
+          <div className="marquee-container">
+            <div className="marquee-track">
+              {[...SOCIAL_PROOF_LOGOS, ...SOCIAL_PROOF_LOGOS].map((name, i) => (
+                <span
+                  key={i}
+                  className="text-lg md:text-xl font-bold font-sharp text-white/[0.12] hover:text-white/25 transition-colors whitespace-nowrap select-none"
+                >
+                  {name}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Stats Bar */}
       <section className="relative py-16 border-y border-white/[0.06]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -819,14 +840,10 @@ export default function LandingPage() {
             variants={staggerContainer}
             className="grid grid-cols-2 md:grid-cols-4 gap-8"
           >
-            {STATS.map((stat, i) => (
-              <motion.div key={i} variants={fadeInUp} className="text-center">
-                <div className="text-4xl md:text-5xl font-bold font-sharp text-white text-glow mb-2">
-                  {stat.value}
-                </div>
-                <div className="text-sm text-white/35 uppercase tracking-[0.15em] font-medium">{stat.label}</div>
-              </motion.div>
-            ))}
+            <AnimatedStat value={12} suffix="+" label="AI-Powered Tools" />
+            <AnimatedStat value={30} suffix="+" label="Languages Supported" />
+            <AnimatedStat value={43} suffix="" label="Site Generators" />
+            <AnimatedStat value={4} suffix="" label="Domain Ecosystem" />
           </motion.div>
         </div>
       </section>
