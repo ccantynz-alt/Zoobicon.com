@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { sql } from "@/lib/db";
+import { checkClientLimit } from "@/lib/agency-limits";
 
 type RouteContext = { params: Promise<{ agencyId: string }> };
 
@@ -23,10 +24,20 @@ export async function POST(req: NextRequest, context: RouteContext) {
     }
 
     const [agency] = await sql`
-      SELECT id FROM agencies WHERE id = ${agencyId} AND status != 'deleted'
+      SELECT id, plan FROM agencies WHERE id = ${agencyId} AND status != 'deleted'
     `;
     if (!agency) {
       return Response.json({ error: "Agency not found" }, { status: 404 });
+    }
+
+    // Enforce client limit
+    const [clientCount] = await sql`
+      SELECT COUNT(*)::int as count FROM agency_clients
+      WHERE agency_id = ${agencyId} AND status = 'active'
+    `;
+    const limitCheck = checkClientLimit(agency.plan as string || "starter", clientCount?.count || 0);
+    if (!limitCheck.allowed) {
+      return Response.json({ error: limitCheck.reason }, { status: 403 });
     }
 
     const [client] = await sql`

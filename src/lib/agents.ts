@@ -35,6 +35,7 @@ export interface PipelineInput {
   tier?: "standard" | "premium" | "ultra";
   model?: string; // User-selected model (e.g., "claude-sonnet-4-6", "gpt-4o", "gemini-2.5-pro")
   generatorType?: string; // Generator type ID (e.g., "landing", "restaurant", "saas") for type-specific prompts
+  agencyBrand?: { agencyName: string; primaryColor?: string; secondaryColor?: string; logoUrl?: string }; // White-label agency branding
 }
 
 export interface AgentResult {
@@ -771,10 +772,14 @@ export async function runPipeline(
 
   const devUserMessage = `STRATEGY:\n${strategySpec}\n\nDESIGN SPEC:\n${brandSpec}\n\nCOPY:\n${copySpec}\n\nARCHITECTURE:\n${archSpec}\n\nORIGINAL BRIEF:\n${input.prompt}\n\nBuild the complete HTML website. Follow all specs exactly. If the original brief contains specific visual, copy, or structural instructions, those take priority.\n\nCRITICAL REMINDER: The <body> must contain ALL the copy content from the COPY section above. Write the full page content inside <body> — headers, sections, text, images, everything. Do NOT produce only CSS with an empty body.\n\nIMPORTANT: Start your response IMMEDIATELY with <!DOCTYPE html> — no preamble, no explanation, no code fences. Output raw HTML only.`;
 
-  // Inject generator-specific instructions into Developer system prompt
-  const devSystem = generatorSupplement
+  // Inject generator-specific instructions + agency branding into Developer system prompt
+  let devSystem = generatorSupplement
     ? DEVELOPER_SYSTEM + "\n\n" + generatorSupplement
     : DEVELOPER_SYSTEM;
+
+  if (input.agencyBrand?.agencyName) {
+    devSystem += `\n\n## WHITE-LABEL BRANDING — MANDATORY\nThis site is built for white-label agency "${input.agencyBrand.agencyName}". Do NOT mention "Zoobicon" anywhere. Use "${input.agencyBrand.agencyName}" in footer copyright. Primary color: ${input.agencyBrand.primaryColor || "#3b82f6"}. Secondary: ${input.agencyBrand.secondaryColor || "#8b5cf6"}.`;
+  }
 
   let devResult = await llmCall({
     model: MODEL_PREMIUM,

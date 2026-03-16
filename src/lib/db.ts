@@ -204,17 +204,27 @@ export async function initSchema() {
 
   await sql`
     CREATE TABLE IF NOT EXISTS agency_client_sites (
-      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      agency_id   UUID REFERENCES agencies(id) ON DELETE CASCADE,
-      client_id   UUID REFERENCES agency_clients(id) ON DELETE CASCADE,
-      site_id     UUID REFERENCES sites(id) ON DELETE CASCADE,
-      status      VARCHAR(50) DEFAULT 'active',
-      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      agency_id       UUID REFERENCES agencies(id) ON DELETE CASCADE,
+      client_id       UUID REFERENCES agency_clients(id) ON DELETE CASCADE,
+      site_id         UUID REFERENCES sites(id) ON DELETE CASCADE,
+      status          VARCHAR(50) DEFAULT 'active',
+      approval_status VARCHAR(50) DEFAULT 'draft',
+      approved_at     TIMESTAMPTZ,
+      approved_by     TEXT,
+      updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `;
 
   await sql`CREATE INDEX IF NOT EXISTS agency_client_sites_agency_id_idx ON agency_client_sites (agency_id)`;
   await sql`CREATE INDEX IF NOT EXISTS agency_client_sites_client_id_idx ON agency_client_sites (client_id)`;
+
+  // Add approval columns if table already exists (migration)
+  await sql`ALTER TABLE agency_client_sites ADD COLUMN IF NOT EXISTS approval_status VARCHAR(50) DEFAULT 'draft'`;
+  await sql`ALTER TABLE agency_client_sites ADD COLUMN IF NOT EXISTS approved_at TIMESTAMPTZ`;
+  await sql`ALTER TABLE agency_client_sites ADD COLUMN IF NOT EXISTS approved_by TEXT`;
+  await sql`ALTER TABLE agency_client_sites ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW()`;
 
   await sql`
     CREATE TABLE IF NOT EXISTS bulk_jobs (

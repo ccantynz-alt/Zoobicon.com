@@ -387,7 +387,7 @@ NEVER reuse a keyword. Every src must be different.
 
 export async function POST(req: NextRequest) {
   try {
-    const { prompt, tier, model: requestedModel, isAdmin, generatorType } = await req.json();
+    const { prompt, tier, model: requestedModel, isAdmin, generatorType, agencyBrand } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       return new Response(
@@ -412,7 +412,10 @@ export async function POST(req: NextRequest) {
 
     // Build system prompt: base + sections + generator-specific supplement
     const generatorSupplement = generatorType ? getGeneratorSystemSupplement(generatorType) : "";
-    const systemPrompt = BODY_ONLY_SYSTEM + (isPremium ? PREMIUM_SECTIONS : STANDARD_SECTIONS) + (generatorSupplement ? `\n\n${generatorSupplement}` : "");
+    const agencyBrandSupplement = agencyBrand?.agencyName
+      ? `\n\n## WHITE-LABEL BRANDING — MANDATORY\nThis site is built for white-label agency "${agencyBrand.agencyName}". Do NOT mention "Zoobicon" anywhere. Use "${agencyBrand.agencyName}" in footer copyright. Primary color: ${agencyBrand.primaryColor || "#3b82f6"}. Secondary: ${agencyBrand.secondaryColor || "#8b5cf6"}.`
+      : "";
+    const systemPrompt = BODY_ONLY_SYSTEM + (isPremium ? PREMIUM_SECTIONS : STANDARD_SECTIONS) + (generatorSupplement ? `\n\n${generatorSupplement}` : "") + agencyBrandSupplement;
 
     const client = new Anthropic({ apiKey, timeout });
     const encoder = new TextEncoder();

@@ -362,6 +362,20 @@ export default function AgencyDashboard() {
     }
   };
 
+  const updateSiteApproval = async (siteId: string, approvalStatus: string) => {
+    if (!activeAgency || !userEmail) return;
+    try {
+      await fetch(`/api/agencies/${activeAgency.id}/sites`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ siteId, approvalStatus, approvedBy: userEmail }),
+      });
+      loadAgencyDetails(activeAgency.id);
+    } catch (err) {
+      console.error("Failed to update site approval:", err);
+    }
+  };
+
   const saveBranding = async () => {
     if (!activeAgency) return;
     try {
@@ -370,6 +384,8 @@ export default function AgencyDashboard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ brand_config: brandConfig }),
       });
+      // Store in localStorage so TopBar and Builder pick up the branding
+      localStorage.setItem("zoobicon_agency_brand", JSON.stringify(brandConfig));
       loadAgencyDetails(activeAgency.id);
     } catch (err) {
       console.error("Failed to save branding:", err);
@@ -716,12 +732,18 @@ export default function AgencyDashboard() {
                 />
                 <span
                   className={`absolute top-2 right-2 text-xs px-2 py-0.5 rounded-full ${
-                    site.status === "active"
+                    (site as AgencySite & { approval_status?: string }).approval_status === "published"
                       ? "bg-green-500/20 text-green-400"
+                      : (site as AgencySite & { approval_status?: string }).approval_status === "approved"
+                      ? "bg-blue-500/20 text-blue-400"
+                      : (site as AgencySite & { approval_status?: string }).approval_status === "pending_review"
+                      ? "bg-yellow-500/20 text-yellow-400"
+                      : (site as AgencySite & { approval_status?: string }).approval_status === "rejected"
+                      ? "bg-red-500/20 text-red-400"
                       : "bg-gray-500/20 text-gray-400"
                   }`}
                 >
-                  {site.status}
+                  {((site as AgencySite & { approval_status?: string }).approval_status || "draft").replace("_", " ")}
                 </span>
               </div>
               <div className="p-4">
@@ -732,7 +754,45 @@ export default function AgencyDashboard() {
                 <p className="text-white/30 text-xs mt-1">
                   Updated {new Date(site.updated_at).toLocaleDateString()}
                 </p>
-                <div className="flex items-center gap-2 mt-3">
+
+                {/* Approval workflow controls */}
+                <div className="flex items-center gap-1.5 mt-3 flex-wrap">
+                  {((site as AgencySite & { approval_status?: string }).approval_status === "draft" ||
+                    (site as AgencySite & { approval_status?: string }).approval_status === "rejected") && (
+                    <button
+                      onClick={() => updateSiteApproval(site.id, "pending_review")}
+                      className="text-xs px-2.5 py-1 rounded-md bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 transition-colors"
+                    >
+                      Submit for Review
+                    </button>
+                  )}
+                  {(site as AgencySite & { approval_status?: string }).approval_status === "pending_review" && (
+                    <>
+                      <button
+                        onClick={() => updateSiteApproval(site.id, "approved")}
+                        className="text-xs px-2.5 py-1 rounded-md bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => updateSiteApproval(site.id, "rejected")}
+                        className="text-xs px-2.5 py-1 rounded-md bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
+                      >
+                        Reject
+                      </button>
+                    </>
+                  )}
+                  {(site as AgencySite & { approval_status?: string }).approval_status === "approved" && (
+                    <button
+                      onClick={() => updateSiteApproval(site.id, "published")}
+                      className="text-xs px-2.5 py-1 rounded-md bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors"
+                    >
+                      Publish
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2 mt-2">
                   <a
                     href={`https://${site.slug}.zoobicon.sh`}
                     target="_blank"

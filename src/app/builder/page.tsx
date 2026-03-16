@@ -419,6 +419,9 @@ function BuilderPage() {
   const [generatorBanner, setGeneratorBanner] = useState<{ id: string; name: string } | null>(null);
   const [showDiffPanel, setShowDiffPanel] = useState(false);
 
+  // Agency white-label branding (loaded from user's agency membership)
+  const [agencyBrand, setAgencyBrand] = useState<{ agencyName: string; primaryColor: string; secondaryColor: string; logoUrl?: string } | null>(null);
+
   // Show welcome modal on first visit
   useEffect(() => {
     if (shouldShowWelcomeModal()) {
@@ -458,7 +461,7 @@ function BuilderPage() {
   const canUndo = historyIndex > 0;
   const canRedo = historyIndex < history.length - 1;
 
-  // Admin always gets premium tier locked
+  // Admin always gets premium tier locked + load agency branding
   useEffect(() => {
     try {
       const user = localStorage.getItem("zoobicon_user");
@@ -467,6 +470,25 @@ function BuilderPage() {
         if (parsed.role === "admin" || parsed.plan === "unlimited") {
           setTier("premium");
           setIsAdmin(true);
+        }
+        // Load agency brand config if user belongs to an agency
+        if (parsed.agencyId && parsed.email) {
+          fetch(`/api/agencies?email=${encodeURIComponent(parsed.email)}`)
+            .then(r => r.json())
+            .then(data => {
+              const agency = data.agencies?.[0];
+              if (agency?.brand_config?.agencyName) {
+                setAgencyBrand({
+                  agencyName: agency.brand_config.agencyName,
+                  primaryColor: agency.brand_config.primaryColor || "#3b82f6",
+                  secondaryColor: agency.brand_config.secondaryColor || "#8b5cf6",
+                  logoUrl: agency.brand_config.logoUrl,
+                });
+                // Store for TopBar to pick up
+                localStorage.setItem("zoobicon_agency_brand", JSON.stringify(agency.brand_config));
+              }
+            })
+            .catch(() => { /* agency API not available */ });
         }
       }
     } catch { /* ignore */ }
@@ -598,6 +620,7 @@ function BuilderPage() {
             ...(existingCode ? { existingCode } : {}),
             ...(selectedModel ? { model: selectedModel } : {}),
             ...(generatorBanner ? { generator: generatorBanner.id } : {}),
+            ...(agencyBrand ? { agencyBrand } : {}),
           }),
           signal: controller.signal,
         });
@@ -623,6 +646,7 @@ function BuilderPage() {
               ...(existingCode ? { existingCode } : {}),
               ...(selectedModel ? { model: selectedModel } : {}),
               ...(generatorBanner ? { generator: generatorBanner.id } : {}),
+              ...(agencyBrand ? { agencyBrand } : {}),
             }),
           });
           if (!fallbackRes.ok) {
@@ -747,6 +771,7 @@ function BuilderPage() {
                   prompt: userPrompt,
                   tier,
                   ...(selectedModel ? { model: selectedModel } : {}),
+                  ...(agencyBrand ? { agencyBrand } : {}),
                 }),
                 signal: controller.signal,
               });
@@ -901,6 +926,7 @@ function BuilderPage() {
           ...(selectedModel ? { model: selectedModel } : {}),
           ...(isAdmin ? { isAdmin: true } : {}),
           ...(generatorBanner ? { generatorType: generatorBanner.id } : {}),
+          ...(agencyBrand ? { agencyBrand } : {}),
         }),
         signal: controller.signal,
       });

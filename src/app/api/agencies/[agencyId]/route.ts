@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { sql } from "@/lib/db";
+import { getAgencyPlanLimits } from "@/lib/agency-limits";
 
 type RouteContext = { params: Promise<{ agencyId: string }> };
 
@@ -31,12 +32,15 @@ export async function GET(req: NextRequest, context: RouteContext) {
       WHERE agency_id = ${agencyId} AND status = 'active'
     `;
 
+    const limits = getAgencyPlanLimits(agency.plan as string || "starter");
+
     return Response.json({
       agency: {
         ...agency,
         member_count: memberCount.count,
         client_count: clientCount.count,
         site_count: siteCount.count,
+        plan_limits: limits,
       },
     });
   } catch (err: unknown) {
