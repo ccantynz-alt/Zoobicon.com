@@ -1067,7 +1067,7 @@ export default function LandingPage() {
                 const content = (
                   <>
                     <div className="flex items-start justify-between mb-4">
-                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${product.color} flex items-center justify-center shadow-lg`}>
+                      <div className={`icon-glow w-12 h-12 rounded-xl bg-gradient-to-br ${product.color} flex items-center justify-center shadow-lg`}>
                         <product.icon className="w-6 h-6 text-white" />
                       </div>
                       <span className="text-[10px] font-semibold uppercase tracking-wider text-white/65 bg-white/[0.07] px-2.5 py-1 rounded-full">
@@ -1089,11 +1089,11 @@ export default function LandingPage() {
                 return (
                   <motion.div key={i} variants={fadeInUp}>
                     {product.href ? (
-                      <Link href={product.href} className="block gradient-border card-hover p-6 rounded-2xl group cursor-pointer">
+                      <Link href={product.href} className="block card-glow card-tilt p-6 rounded-2xl group cursor-pointer hover:-translate-y-1 transition-transform duration-300">
                         {content}
                       </Link>
                     ) : (
-                      <div className="gradient-border card-hover p-6 rounded-2xl group cursor-pointer">
+                      <div className="card-glow card-tilt p-6 rounded-2xl group cursor-pointer hover:-translate-y-1 transition-transform duration-300">
                         {content}
                       </div>
                     )}
