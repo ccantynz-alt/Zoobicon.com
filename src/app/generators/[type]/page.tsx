@@ -37,6 +37,7 @@ import {
   Brush,
   BookOpen,
   FileBarChart,
+  ShoppingCart,
   ArrowLeft,
   ChevronRight,
   Zap,
@@ -97,6 +98,7 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   Brush,
   BookOpen,
   FileBarChart,
+  ShoppingCart,
 };
 
 const GENERATOR_META: Record<string, GeneratorInfo> = {
@@ -1957,6 +1959,63 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Comparison tables with highlighting",
       "Recommendations section with action items",
       "Print-friendly layout with page breaks",
+    ],
+  },
+  ecommerce: {
+    name: "E-Commerce Store",
+    description:
+      "Generate complete e-commerce storefronts with product grids, shopping cart, checkout flow, customer reviews, wishlists, and discount codes.",
+    icon: "ShoppingCart",
+    category: "Website",
+    color: "from-emerald-600 to-green-600",
+    fields: [
+      {
+        id: "storeName",
+        label: "Store Name",
+        placeholder: "e.g. Urban Threads, GlowUp Skincare",
+        type: "text",
+      },
+      {
+        id: "products",
+        label: "Products / Categories",
+        placeholder: "Describe your products or categories (e.g. T-shirts, Hoodies, Accessories)",
+        type: "textarea",
+      },
+      {
+        id: "priceRange",
+        label: "Price Range",
+        placeholder: "e.g. $15 - $120",
+        type: "text",
+      },
+      {
+        id: "brandStyle",
+        label: "Brand Style",
+        placeholder: "Select style",
+        type: "select" as FieldType,
+        options: [
+          "Modern & Minimal",
+          "Bold & Vibrant",
+          "Luxury & Premium",
+          "Playful & Fun",
+          "Organic & Natural",
+        ],
+      },
+      {
+        id: "features",
+        label: "Special Features",
+        placeholder: "e.g. Discount codes, wishlist, size guide, reviews, loyalty points",
+        type: "textarea",
+      },
+    ],
+    outputFeatures: [
+      "Product grid with images, prices, and add-to-cart",
+      "Shopping cart with quantity controls",
+      "Checkout flow with shipping & payment forms",
+      "Customer reviews with star ratings",
+      "Wishlist functionality",
+      "Discount code input (SAVE10 built-in)",
+      "Category navigation and search/filters",
+      "Stock badges and sale indicators",
     ],
   },
 };

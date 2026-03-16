@@ -421,6 +421,7 @@ function BuilderPage() {
 
   // Agency white-label branding (loaded from user's agency membership)
   const [agencyBrand, setAgencyBrand] = useState<{ agencyName: string; primaryColor: string; secondaryColor: string; logoUrl?: string } | null>(null);
+  const [agencyId, setAgencyId] = useState<string | null>(null);
 
   // Show welcome modal on first visit
   useEffect(() => {
@@ -477,6 +478,7 @@ function BuilderPage() {
             .then(r => r.json())
             .then(data => {
               const agency = data.agencies?.[0];
+              if (agency?.id) setAgencyId(agency.id);
               if (agency?.brand_config?.agencyName) {
                 setAgencyBrand({
                   agencyName: agency.brand_config.agencyName,
@@ -621,6 +623,7 @@ function BuilderPage() {
             ...(selectedModel ? { model: selectedModel } : {}),
             ...(generatorBanner ? { generator: generatorBanner.id } : {}),
             ...(agencyBrand ? { agencyBrand } : {}),
+            ...(agencyId ? { agencyId } : {}),
           }),
           signal: controller.signal,
         });
@@ -647,6 +650,7 @@ function BuilderPage() {
               ...(selectedModel ? { model: selectedModel } : {}),
               ...(generatorBanner ? { generator: generatorBanner.id } : {}),
               ...(agencyBrand ? { agencyBrand } : {}),
+            ...(agencyId ? { agencyId } : {}),
             }),
           });
           if (!fallbackRes.ok) {
@@ -772,6 +776,7 @@ function BuilderPage() {
                   tier,
                   ...(selectedModel ? { model: selectedModel } : {}),
                   ...(agencyBrand ? { agencyBrand } : {}),
+            ...(agencyId ? { agencyId } : {}),
                 }),
                 signal: controller.signal,
               });
@@ -927,6 +932,7 @@ function BuilderPage() {
           ...(isAdmin ? { isAdmin: true } : {}),
           ...(generatorBanner ? { generatorType: generatorBanner.id } : {}),
           ...(agencyBrand ? { agencyBrand } : {}),
+            ...(agencyId ? { agencyId } : {}),
         }),
         signal: controller.signal,
       });

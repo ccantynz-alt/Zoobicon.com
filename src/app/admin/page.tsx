@@ -199,7 +199,7 @@ export default function AdminPage() {
     { done: true,  label: "Site hosting & deploy" },
     { done: false, label: "Stripe billing live" },
     { done: false, label: "OPENAI_API_KEY for DALL-E images" },
-    { done: false, label: "Google / GitHub OAuth" },
+    { done: true, label: "Google / GitHub OAuth" },
     { done: false, label: "Production database (DATABASE_URL)" },
   ];
 

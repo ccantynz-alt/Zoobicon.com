@@ -51,6 +51,8 @@ export async function initSchema() {
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_customer_id     TEXT UNIQUE`;
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_subscription_id TEXT UNIQUE`;
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_status    TEXT`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS auth_provider          TEXT`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS auth_provider_id       TEXT`;
 
   await sql`
     CREATE TABLE IF NOT EXISTS projects (
@@ -242,6 +244,19 @@ export async function initSchema() {
   `;
 
   await sql`CREATE INDEX IF NOT EXISTS bulk_jobs_agency_id_idx ON bulk_jobs (agency_id)`;
+
+  // Agency generation tracking (monthly quotas)
+  await sql`
+    CREATE TABLE IF NOT EXISTS agency_generations (
+      id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      agency_id       UUID REFERENCES agencies(id) ON DELETE CASCADE,
+      user_email      TEXT NOT NULL,
+      generator_type  TEXT,
+      period          TEXT NOT NULL,
+      created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS agency_generations_agency_period_idx ON agency_generations (agency_id, period)`;
 
   // ---- Email platform tables (zoobicon.io) ----
 

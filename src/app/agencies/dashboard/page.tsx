@@ -144,6 +144,7 @@ export default function AgencyDashboard() {
   const [clients, setClients] = useState<Client[]>([]);
   const [sites, setSites] = useState<AgencySite[]>([]);
   const [bulkJobs, setBulkJobs] = useState<BulkJob[]>([]);
+  const [generationQuota, setGenerationQuota] = useState<{ current: number; limit: number; remaining: number } | null>(null);
 
   // Form state
   const [showCreateAgency, setShowCreateAgency] = useState(false);
@@ -240,6 +241,16 @@ export default function AgencyDashboard() {
       setClients(clientsData.clients || []);
       setSites(sitesData.sites || []);
       setBulkJobs(bulkData.jobs || []);
+
+      // Load generation quota
+      fetch(`/api/agencies/${agencyId}/generations`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.current !== undefined) {
+            setGenerationQuota({ current: data.current, limit: data.limit, remaining: data.remaining });
+          }
+        })
+        .catch(() => {});
     } catch (err) {
       console.error("Failed to load agency details:", err);
     }
@@ -456,7 +467,7 @@ export default function AgencyDashboard() {
       <h2 className="text-xl font-bold text-white mb-6">Overview</h2>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         {[
           { label: "Total Clients", value: activeAgency?.client_count ?? clients.length, color: "text-blue-400" },
           { label: "Total Sites", value: activeAgency?.site_count ?? sites.length, color: "text-green-400" },
@@ -465,6 +476,11 @@ export default function AgencyDashboard() {
             label: "Active Deployments",
             value: sites.filter((s) => s.status === "active").length,
             color: "text-yellow-400",
+          },
+          {
+            label: "Generations This Month",
+            value: generationQuota ? `${generationQuota.current}/${generationQuota.limit === Infinity ? "∞" : generationQuota.limit}` : "—",
+            color: generationQuota && generationQuota.remaining <= 5 ? "text-red-400" : "text-cyan-400",
           },
         ].map((stat) => (
           <div
