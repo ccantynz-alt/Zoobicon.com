@@ -77,6 +77,8 @@ export default function DashboardPage() {
   const [userName, setUserName] = useState("User");
   const [userRole, setUserRole] = useState<"user" | "admin">("user");
   const [userPlan, setUserPlan] = useState<"free" | "unlimited">("free");
+  const [liveSites, setLiveSites] = useState<{ id: string; name: string; slug: string; status: string; updated_at: string }[]>([]);
+  const [activeSection, setActiveSection] = useState<"projects" | "deployed">("projects");
 
   useEffect(() => {
     let userEmail = "";
@@ -113,6 +115,22 @@ export default function DashboardPage() {
           }
         })
         .catch(() => setProjects(getLocalProjects()));
+
+      // Also fetch deployed sites from hosting API
+      fetch(`/api/hosting/sites?email=${encodeURIComponent(userEmail)}`)
+        .then((res) => (res.ok ? res.json() : Promise.reject()))
+        .then((data) => {
+          if (data.sites?.length) {
+            setLiveSites(data.sites.map((s: Record<string, unknown>) => ({
+              id: s.id as string,
+              name: s.name as string,
+              slug: s.slug as string,
+              status: (s.status as string) || "active",
+              updated_at: s.updated_at as string,
+            })));
+          }
+        })
+        .catch(() => { /* hosting API not available */ });
     } else {
       setProjects(getLocalProjects());
     }
@@ -336,10 +354,14 @@ export default function DashboardPage() {
         )}
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 mb-10">
+        <div className="grid grid-cols-4 gap-4 mb-10">
           <div className="gradient-border p-5 rounded-xl">
             <div className="text-2xl font-black gradient-text-static">{projects.length}</div>
             <div className="text-xs text-white/60 mt-1">Total Projects</div>
+          </div>
+          <div className="gradient-border p-5 rounded-xl">
+            <div className="text-2xl font-black gradient-text-static">{liveSites.length}</div>
+            <div className="text-xs text-white/60 mt-1">Deployed Sites</div>
           </div>
           <div className="gradient-border p-5 rounded-xl">
             <div className="text-2xl font-black gradient-text-static">
@@ -357,7 +379,101 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Projects Header */}
+        {/* Section tabs */}
+        <div className="flex items-center gap-1 mb-6 border-b border-white/[0.06] pb-1">
+          <button
+            onClick={() => setActiveSection("projects")}
+            className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
+              activeSection === "projects"
+                ? "text-white bg-white/[0.06] border-b-2 border-brand-500"
+                : "text-white/50 hover:text-white/70"
+            }`}
+          >
+            Projects ({projects.length})
+          </button>
+          <button
+            onClick={() => setActiveSection("deployed")}
+            className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
+              activeSection === "deployed"
+                ? "text-white bg-white/[0.06] border-b-2 border-emerald-500"
+                : "text-white/50 hover:text-white/70"
+            }`}
+          >
+            <span className="flex items-center gap-1.5">
+              <Globe className="w-3.5 h-3.5" />
+              Deployed ({liveSites.length})
+            </span>
+          </button>
+        </div>
+
+        {/* Deployed Sites Section */}
+        {activeSection === "deployed" && (
+          <div className="mb-10">
+            {liveSites.length === 0 ? (
+              <div className="gradient-border p-16 rounded-2xl text-center">
+                <Globe className="w-10 h-10 text-white/20 mx-auto mb-4" />
+                <h3 className="text-lg font-bold text-white/60 mb-2">No deployed sites yet</h3>
+                <p className="text-sm text-white/50 mb-6 max-w-md mx-auto">
+                  Build a website and deploy it to get a live URL on zoobicon.sh
+                </p>
+                <Link href="/builder" className="inline-flex items-center gap-2 btn-gradient px-6 py-3 rounded-xl text-sm font-bold text-white">
+                  <Plus className="w-4 h-4" /> Build & Deploy
+                </Link>
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {liveSites.map((site) => (
+                  <div key={site.id} className="gradient-border card-hover rounded-xl overflow-hidden group">
+                    <div className="h-40 bg-dark-200 border-b border-white/[0.08] relative overflow-hidden">
+                      <iframe
+                        src={`/api/hosting/serve/${site.slug}`}
+                        title={site.name}
+                        className="w-[200%] h-[200%] border-0 origin-top-left scale-50 pointer-events-none"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-dark-100/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-4 gap-2">
+                        <Link
+                          href={`/edit/${site.slug}`}
+                          className="px-3 py-1.5 bg-brand-500/90 rounded-lg text-xs font-semibold text-white"
+                        >
+                          Edit
+                        </Link>
+                        <a
+                          href={`https://${site.slug}.zoobicon.sh`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3 py-1.5 bg-white/10 rounded-lg text-xs font-semibold text-white flex items-center gap-1"
+                        >
+                          <ExternalLink className="w-3 h-3" /> Live
+                        </a>
+                      </div>
+                    </div>
+                    <div className="p-4">
+                      <div className="flex items-center justify-between mb-1">
+                        <h3 className="text-sm font-semibold truncate flex-1">{site.name}</h3>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full ${
+                          site.status === "active" ? "bg-emerald-500/20 text-emerald-400" : "bg-white/10 text-white/40"
+                        }`}>
+                          {site.status === "active" ? "Live" : site.status}
+                        </span>
+                      </div>
+                      <p className="text-xs text-white/40 truncate">{site.slug}.zoobicon.sh</p>
+                      {site.updated_at && (
+                        <div className="flex items-center gap-1 mt-2 text-[10px] text-white/30">
+                          <Clock className="w-3 h-3" />
+                          {formatDate(new Date(site.updated_at).getTime())}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Projects Section */}
+        {activeSection === "projects" && <>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold">Your Projects</h2>
           <div className="flex items-center gap-3">
@@ -501,6 +617,7 @@ export default function DashboardPage() {
             ))}
           </div>
         )}
+        </>}
       </main>
     </div>
   );
