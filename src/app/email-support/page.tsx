@@ -39,7 +39,6 @@ import {
   MessageSquare,
   GitMerge,
   ChevronRight,
-  Shield,
   Timer,
   Users,
   CreditCard,
