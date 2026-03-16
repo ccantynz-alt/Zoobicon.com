@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { sql } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
+import { notifyNewSignup } from "@/lib/admin-notify";
 
 export async function POST(request: NextRequest) {
   try {
@@ -35,6 +36,9 @@ export async function POST(request: NextRequest) {
       VALUES (${email.toLowerCase()}, ${name || ""}, ${passwordHash})
       RETURNING id, email, name, role, plan
     `;
+
+    // Notify admin of new signup (fire-and-forget, don't block response)
+    notifyNewSignup({ email: user.email, name: user.name }).catch(() => {});
 
     return Response.json({
       user: {
