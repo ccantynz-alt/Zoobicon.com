@@ -6,7 +6,7 @@
  * Presets control the mesh gradient and grid pulse behind content.
  */
 
-type Preset = "default" | "energetic" | "calm" | "technical" | "premium" | "minimal";
+type Preset = "default" | "energetic" | "calm" | "technical" | "premium" | "minimal" | "contrast" | "blackfog";
 
 interface BackgroundEffectsProps {
   preset?: Preset;
