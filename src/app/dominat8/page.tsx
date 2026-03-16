@@ -8,6 +8,7 @@ import {
   Star, Menu, X, Sparkles, Rocket, Shield, Clock, Users, Bot, Code2,
   TrendingUp, Trophy, Flame, ChevronRight, Play,
 } from "lucide-react";
+import BackgroundEffects from "@/components/BackgroundEffects";
 
 /**
  * Dominat8.io Landing Page
@@ -21,7 +22,7 @@ import {
  */
 
 const STATS = [
-  { value: "30+", label: "AI Generators" },
+  { value: "43", label: "AI Generators" },
   { value: "7", label: "Agent Pipeline" },
   { value: "<60s", label: "Generation Time" },
   { value: "24/7", label: "Availability" },
@@ -32,7 +33,7 @@ const WEAPONS = [
     icon: Globe,
     name: "Killer Websites",
     description: "Generate full production websites in seconds. While competitors spend weeks with agencies, you launch today.",
-    stat: "32 site types",
+    stat: "43 site types",
   },
   {
     icon: Layout,
@@ -152,9 +153,10 @@ export default function Dominat8Page() {
   const [annualBilling, setAnnualBilling] = useState(true);
 
   return (
-    <div className="min-h-screen bg-[#0d1525] text-white">
+    <div className="min-h-screen bg-[#050508] text-white relative">
+      <BackgroundEffects preset="contrast" />
       {/* Announcement bar */}
-      <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white text-center py-2.5 text-xs font-medium">
+      <div className="relative z-10 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white text-center py-2.5 text-xs font-medium">
         <span className="hidden sm:inline">Join businesses already dominating their market with AI</span>
         <span className="sm:hidden">Dominate your market with AI</span>
         <span className="mx-2 text-blue-200/40">|</span>
@@ -162,7 +164,7 @@ export default function Dominat8Page() {
       </div>
 
       {/* Nav */}
-      <nav className="sticky top-0 z-50 border-b border-white/[0.10] bg-[#0d1525]/90 backdrop-blur-xl">
+      <nav className="relative sticky top-0 z-50 border-b border-white/[0.10] bg-[#050508]/90 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/dominat8" className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
