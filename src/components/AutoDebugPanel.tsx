@@ -222,9 +222,9 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
     return "Sonnet";
   };
 
-  const errorCount = result?.issues.filter((i) => i.severity === "error").length || 0;
-  const warningCount = result?.issues.filter((i) => i.severity === "warning").length || 0;
-  const infoCount = result?.issues.filter((i) => i.severity === "info").length || 0;
+  const errorCount = result?.issues.filter((i: DebugIssue) => i.severity === "error").length || 0;
+  const warningCount = result?.issues.filter((i: DebugIssue) => i.severity === "warning").length || 0;
+  const infoCount = result?.issues.filter((i: DebugIssue) => i.severity === "info").length || 0;
 
   const lastIteration = iterations.length > 0 ? iterations[iterations.length - 1] : null;
   const targetReached = lastIteration?.reachedTarget ?? false;

@@ -128,7 +128,7 @@ export async function POST(req: NextRequest) {
       ],
     });
 
-    const textBlock = message.content.find((block) => block.type === "text");
+    const textBlock = message.content.find((block: { type: string }) => block.type === "text");
     if (!textBlock || textBlock.type !== "text") {
       return NextResponse.json(
         { error: "No response generated from analysis" },
@@ -174,7 +174,7 @@ export async function POST(req: NextRequest) {
       score: result.score,
       model,
     });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("Debug API error:", err);
 
     if (err instanceof Anthropic.APIError) {
