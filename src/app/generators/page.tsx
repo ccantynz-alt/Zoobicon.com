@@ -9,6 +9,7 @@ import {
   Settings, FormInput, Mail, Presentation, PenTool, Code2, Boxes, UtensilsCrossed,
   Home, FileBarChart, Chrome, PaintBucket, Users, FolderKanban, GraduationCap,
   Package, Workflow, ArrowRight, Zap, Bot, Layers, Star, Menu, X, ShoppingCart,
+  MessageCircle, Newspaper, Share2, FileSearch, Mic, Heart, Dumbbell, PartyPopper,
 } from "lucide-react";
 import { endpointToGeneratorId } from "@/lib/generator-prompts";
 
@@ -26,6 +27,10 @@ const GENERATOR_CATEGORIES = [
       { name: "Real Estate", description: "Property listing sites with search, mortgage calculator, agent profiles, and saved listings", endpoint: "/api/generate/realestate", icon: Home },
       { name: "Marketplace", description: "Two-sided marketplace platforms with listings, profiles, messaging, reviews, and search", endpoint: "/api/generate/marketplace", icon: Store },
       { name: "E-Commerce Store", description: "Complete storefronts with product grids, shopping cart, checkout, reviews, wishlists, and discount codes", endpoint: "/api/generate/ecommerce", icon: ShoppingCart, tag: "Popular" },
+      { name: "Podcast Website", description: "Audio-first sites with episode player, guest spotlights, subscription badges, and newsletter signup", endpoint: "/api/generate/podcast", icon: Mic },
+      { name: "Nonprofit & Charity", description: "Donation-focused sites with impact stats, beneficiary stories, volunteer signup, and fundraiser events", endpoint: "/api/generate/nonprofit", icon: Heart },
+      { name: "Fitness & Wellness", description: "Class schedules, trainer profiles, membership tiers, transformation galleries, and trial booking", endpoint: "/api/generate/fitness", icon: Dumbbell },
+      { name: "Wedding & Events", description: "Elegant sites with countdown, RSVP form, wedding party, registry links, travel info, and photo gallery", endpoint: "/api/generate/wedding", icon: PartyPopper },
     ],
   },
   {
@@ -40,6 +45,8 @@ const GENERATOR_CATEGORIES = [
       { name: "Learning Platform (LMS)", description: "Course catalog, lesson player, progress tracking, quizzes, certificates, and student dashboard", endpoint: "/api/generate/lms", icon: GraduationCap },
       { name: "Inventory Management", description: "Stock tracking, order management, supplier directory, low-stock alerts, and analytics reports", endpoint: "/api/generate/inventory", icon: Package },
       { name: "Data Dashboard", description: "Analytics dashboards with KPI cards, SVG charts, heatmaps, tables, and date range pickers", endpoint: "/api/generate/dashboard", icon: BarChart3 },
+      { name: "Mobile App UI", description: "Native-feeling app interfaces with bottom tabs, onboarding flow, profile page, and empty states", endpoint: "/api/generate/mobile-app", icon: Smartphone, tag: "New" },
+      { name: "Chatbot Interface", description: "AI chatbot UIs with message bubbles, quick replies, typing indicators, and conversation history", endpoint: "/api/generate/chatbot-ui", icon: MessageCircle, tag: "New" },
     ],
   },
   {
@@ -61,6 +68,10 @@ const GENERATOR_CATEGORIES = [
       { name: "Pitch Deck", description: "Interactive HTML slide decks with SVG charts, keyboard navigation, and print-to-PDF support", endpoint: "/api/generate/pitch-deck", icon: Presentation },
       { name: "Copywriter Agent", description: "Professional copy with A/B headline alternates, benefit-focused writing, and SEO meta content", endpoint: "/api/generate/copy", icon: PenTool, tag: "Agent" },
       { name: "Form Builder", description: "Multi-step forms with conditional logic, real-time validation, auto-save, and admin submissions view", endpoint: "/api/generate/form-builder", icon: FormInput },
+      { name: "Newsletter Template", description: "Email-client-compatible newsletter templates with hero article, content grid, and curated links", endpoint: "/api/generate/newsletter", icon: Newspaper },
+      { name: "Social Media Pack", description: "Multi-platform post templates: quote cards, product announcements, testimonials, and infographics", endpoint: "/api/generate/social-media", icon: Share2 },
+      { name: "Case Study / Whitepaper", description: "Long-form case studies with challenge/solution/results, metrics charts, and client testimonials", endpoint: "/api/generate/case-study", icon: FileSearch },
+      { name: "Product Documentation", description: "Technical docs with sidebar navigation, API reference, code examples, and changelog", endpoint: "/api/generate/documentation", icon: BookOpen, tag: "New" },
     ],
   },
   {

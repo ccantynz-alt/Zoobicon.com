@@ -172,6 +172,62 @@ const GENERATOR_PROMPTS: Record<string, GeneratorDef> = {
       "Create an installable Progressive Web App for [describe the application]. Include a service worker with offline caching, web app manifest, install prompt UI, responsive mobile-first design, push notification setup, and app-like navigation.",
   },
 
+  // ── Mobile & Apps ──
+  "mobile-app": {
+    name: "Mobile App UI",
+    prompt:
+      "Create a mobile app interface for [describe your app]. Include a native-feeling bottom tab navigation, home screen with cards, detail view, profile page with settings, and onboarding flow with 3-4 swipeable intro screens.",
+  },
+  "chatbot-ui": {
+    name: "Chatbot Interface",
+    prompt:
+      "Create a conversational AI chatbot interface for [describe the use case]. Include a chat window with message bubbles, typing indicator, quick-reply buttons, file attachment support, conversation history sidebar, and a settings panel for customizing bot behavior.",
+  },
+
+  // ── Content & Media ──
+  "newsletter": {
+    name: "Newsletter Template",
+    prompt:
+      "Create a professional newsletter email template for [describe your brand or topic]. Include a header with logo, featured article with hero image, 3-4 secondary story cards, curated links section, social proof quote, and footer with unsubscribe link. Table-based layout for email client compatibility.",
+  },
+  "social-media": {
+    name: "Social Media Pack",
+    prompt:
+      "Create a social media content pack for [describe your brand]. Include 6 post templates: quote card, product announcement, behind-the-scenes, testimonial highlight, statistics infographic, and event promotion. Each template should be designed for Instagram (1:1), with variations shown for Twitter and LinkedIn.",
+  },
+  "documentation": {
+    name: "Product Documentation",
+    prompt:
+      "Create a developer documentation site for [describe your product or API]. Include a sidebar navigation with nested sections, getting-started guide, API reference with method badges and code examples, configuration reference table, troubleshooting FAQ, and changelog page.",
+  },
+  "case-study": {
+    name: "Case Study / Whitepaper",
+    prompt:
+      "Create a long-form case study for [describe the project or client]. Include an executive summary, challenge description with pain points, solution walkthrough with screenshots, implementation timeline, results with specific metrics and charts, testimonial quotes, and a CTA to contact sales.",
+  },
+
+  // ── Specialized ──
+  "podcast": {
+    name: "Podcast Website",
+    prompt:
+      "Create a podcast website for [describe your show]. Include a hero with latest episode player (play/pause button, progress bar, timestamps), episode archive grid with thumbnails, guest profiles, show notes with timestamps, subscription buttons (Apple, Spotify, RSS), and a newsletter signup.",
+  },
+  "nonprofit": {
+    name: "Nonprofit & Charity",
+    prompt:
+      "Create a nonprofit website for [describe the organization]. Include an emotional hero with impact statistics, mission statement, programs overview with cards, impact metrics with animated counters, donation form with suggested amounts ($25/$50/$100/custom), volunteer signup, event calendar, and team/board member grid.",
+  },
+  "fitness": {
+    name: "Fitness & Wellness",
+    prompt:
+      "Create a fitness studio website for [describe the business]. Include a dynamic hero with class schedule preview, class types grid with difficulty levels, trainer profiles with certifications, membership pricing tiers, before/after transformation gallery, client testimonials, trial class booking form, and location with hours.",
+  },
+  "wedding": {
+    name: "Wedding & Events",
+    prompt:
+      "Create an elegant wedding website for [names]. Include a romantic hero with countdown to the date, our story timeline, wedding party profiles with photos, venue details with map, RSVP form with meal choice and dietary options, gift registry links, photo gallery, and travel/accommodation info for guests.",
+  },
+
   // ── Design Systems ──
   "brand-kit": {
     name: "Brand Kit",
@@ -1099,6 +1155,283 @@ STYLE:
 - Group related items together
 - Show do/don't comparisons where applicable
 - Code values next to every visual example`,
+
+  "mobile-app": `
+## GENERATOR: MOBILE APP UI
+You are building a mobile-first app interface. It must feel like a NATIVE app, not a website.
+
+LAYOUT:
+- Fixed status bar at top (battery, time, signal)
+- App header with title and action icons
+- Scrollable main content
+- Fixed bottom tab navigation: 4-5 tabs with icons + labels, active state indicator
+
+SCREENS (show as separate sections, each min-height: 100vh):
+1. Onboarding — 3 swipeable cards with illustration, headline, description, dot indicator, Skip/Next buttons
+2. Home — Greeting ("Good morning, [name]"), search bar, horizontal card carousel, vertical list
+3. Detail view — Full-width image, title, description, action buttons, related items
+4. Profile — Avatar, name, stats row, settings list with toggles, sign out
+5. Empty state — Friendly illustration placeholder, descriptive text, CTA button
+
+STYLE:
+- iOS/Android native feel — system font stack
+- Bottom nav: 56px height, icons 24px, active tab with color + label
+- Cards: 12px border-radius, subtle shadow, 16px padding
+- Touch targets: minimum 44px height
+- Safe area padding for notched devices
+- Haptic-feeling button states (scale on press)
+
+IMAGE SEEDS: seed/app-interface, seed/mobile-ui, seed/onboarding-illustration`,
+
+  "chatbot-ui": `
+## GENERATOR: CHATBOT INTERFACE
+You are building a conversational AI chatbot. NATURAL CONVERSATION FLOW is everything.
+
+LAYOUT:
+- Full-height chat container (100vh minus header)
+- Header: bot name, avatar, online status indicator, settings gear icon
+- Messages area: scrollable, auto-scroll to bottom
+- Input area: text input, send button, attachment icon, mic icon
+
+MESSAGE TYPES:
+1. Bot messages — Left-aligned, colored bubble, bot avatar, timestamp
+2. User messages — Right-aligned, darker bubble, no avatar
+3. Typing indicator — Three animated dots in bot bubble
+4. Quick replies — Horizontal scroll of pill-shaped option buttons below bot message
+5. Cards — Bot sends rich cards: image, title, description, action buttons
+6. System messages — Centered, small gray text ("Chat started", "Agent joined")
+
+FEATURES:
+1. Conversation sidebar — List of previous chats with preview text and timestamp
+2. Welcome screen — Before first message: greeting, suggested prompts as cards
+3. File sharing — Drag-drop area, file preview with progress bar
+4. Settings panel — Bot personality toggle, dark mode, notification preferences
+
+STYLE:
+- Clean, modern messaging app feel (iMessage/WhatsApp inspired)
+- Bot bubbles: soft accent color with slightly rounded corners
+- User bubbles: brand color, white text
+- Typing indicator: subtle bounce animation
+- Smooth send animation on messages
+
+IMAGE SEEDS: seed/chatbot-interface, seed/ai-assistant`,
+
+  newsletter: `
+## GENERATOR: NEWSLETTER EMAIL TEMPLATE
+You are building an HTML email template. TABLE-BASED LAYOUT required for email client compatibility.
+
+EMAIL RULES:
+- MAX width: 600px, centered with table layout
+- Use INLINE STYLES only (no <style> blocks for max compatibility)
+- Tables for layout, NOT flexbox or grid
+- Web-safe fonts: Arial, Helvetica, Georgia
+- All images must have alt text and width/height attributes
+
+SECTIONS:
+1. Header — Logo centered, navigation links (plain text)
+2. Hero — Featured article: large image, headline, 2-line excerpt, "Read More" button
+3. Content grid — 2-column table: 3-4 secondary stories with thumbnail, title, excerpt
+4. Curated links — "What We're Reading" section with 5 annotated links
+5. Quote/highlight — Pull quote from a customer or team member, styled box
+6. CTA — Primary action with large button (table-based, min 44px height)
+7. Footer — Company address (required for CAN-SPAM), unsubscribe link, social icons, copyright
+
+STYLE:
+- Professional and readable
+- 16px body text, 1.5 line height
+- CTA buttons: bold contrasting color, 40px+ height, 160px+ width
+- Consistent padding: 20px on all sides
+- Preheader text (hidden) for inbox preview
+
+IMAGE SEEDS: seed/newsletter-header, seed/article-thumbnail`,
+
+  "social-media": `
+## GENERATOR: SOCIAL MEDIA CONTENT PACK
+You are creating a set of social media post templates. Each is a self-contained visual card.
+
+OUTPUT: 6 distinct post templates, each shown as a card in a .grid-2 layout.
+
+TEMPLATES:
+1. Quote Card — Background gradient/pattern, large quote text (centered), attribution, brand logo
+2. Product Announcement — Product image, "NEW" badge, product name, key feature, price, "Shop Now"
+3. Behind-the-Scenes — Photo placeholder, casual caption overlay, brand watermark
+4. Testimonial — Customer photo circle, 5-star rating, quote, customer name + company
+5. Statistics Infographic — Large number, descriptive label, comparison/context, source citation
+6. Event Promotion — Event image, date badge, event name, location, "Register Now" CTA
+
+EACH TEMPLATE SHOWS:
+- Instagram version (1080x1080, 1:1 aspect ratio)
+- Suggested caption text below the visual
+- Suggested hashtags (5-8 relevant ones)
+
+STYLE:
+- Bold, scroll-stopping visuals
+- Large text (readable on mobile)
+- Brand colors throughout
+- Instagram aesthetic: clean, professional, consistent
+
+IMAGE SEEDS: seed/social-media-post, seed/product-flat-lay, seed/team-photo`,
+
+  documentation: `
+## GENERATOR: PRODUCT DOCUMENTATION SITE
+You are building technical documentation. FINDABILITY and CLARITY are critical.
+
+LAYOUT:
+- Left sidebar (260px, collapsible): nested navigation with expandable sections, search at top
+- Top bar: product name, version badge, "GitHub" link, dark mode toggle
+- Main content area (max 768px, centered): the documentation
+
+SECTIONS:
+1. Getting Started — Install command (code block with copy button), quick example, "Next Steps" links
+2. Configuration — Options table: option name, type, default, description. Code example
+3. API Reference — For each method/endpoint:
+   - Method badge (green GET, blue POST, yellow PUT, red DELETE)
+   - Path with parameters highlighted
+   - Description
+   - Parameters table
+   - Request/response JSON examples in dark code blocks
+   - Copy button on all code blocks
+4. Guides — Step-by-step tutorial with numbered steps, code snippets, expected output
+5. Troubleshooting — Collapsible FAQ items, common errors with solutions
+6. Changelog — Version entries with date, change type badges (Added, Changed, Fixed, Removed)
+
+STYLE:
+- Stripe Docs / Next.js Docs inspired
+- Sidebar: #f8fafc background, hover highlight, active item with left blue border
+- Code blocks: #1e293b background, syntax highlighting colors, copy button top-right
+- Tables: clean borders, monospace for code values
+- Heading anchors on hover (link icon)
+
+IMAGE SEEDS: seed/api-docs, seed/code-editor`,
+
+  "case-study": `
+## GENERATOR: CASE STUDY / WHITEPAPER
+You are building a long-form case study page. CREDIBILITY and STORYTELLING matter.
+
+SECTIONS:
+1. Hero — Client logo, case study title, industry badge, "Download PDF" button
+2. Key metrics — 3-4 large stat cards: "47% increase in revenue", "3x faster delivery"
+3. Challenge — Client background, pain points (bulleted), previous solution limitations
+4. Solution — How your product addressed each pain point, architecture/approach diagram placeholder
+5. Implementation — Timeline with phases: Discovery → Design → Build → Launch. Duration for each
+6. Results — Before/after comparison table, SVG charts showing improvement trends
+7. Testimonial — Large pull quote from client stakeholder with photo, name, title, company
+8. Tech stack — Used technologies as logo badges
+9. CTA — "Get Similar Results" form with name, email, company, "Request Demo" button
+
+STYLE:
+- Editorial, professional — magazine article feel
+- Max-width: 900px, centered
+- Large typography for metrics (48px+, bold)
+- Pull quotes: large italic text, left border accent
+- Stats: animated counter effect on scroll
+- Charts: blue/green palette, clear labels
+
+IMAGE SEEDS: seed/business-growth, seed/team-meeting, seed/data-chart`,
+
+  podcast: `
+## GENERATOR: PODCAST WEBSITE
+You are building a podcast website. LISTENING EXPERIENCE and DISCOVERABILITY are key.
+
+SECTIONS:
+1. Hero — Show artwork (large, 300px+), podcast name, tagline, listen-on badges (Apple, Spotify, Google), play latest episode button
+2. Latest episode — Full-width player: episode artwork, title, play/pause button, progress bar, time stamps, playback speed, volume, download
+3. Episode grid — .grid-2 cards: episode number, artwork thumbnail, title, date, duration badge, play button overlay, brief description
+4. Guest spotlight — Featured guest: photo, name, bio, social links, their episode card
+5. About — Host photo, host bio, show description, what listeners will learn
+6. Subscribe — All platform links with icons: Apple Podcasts, Spotify, YouTube, RSS feed
+7. Newsletter — "Get episode summaries in your inbox" email signup
+8. Reviews — Listener reviews from Apple Podcasts with star ratings
+
+PLAYER REQUIREMENTS:
+- Play/pause button (large, circular, brand-colored)
+- Seek bar: clickable progress bar with current time / total time
+- Playback speed: 0.5x, 1x, 1.5x, 2x toggle
+- Episode title and artwork visible during playback
+
+STYLE:
+- Dark theme (#0f172a) — podcast/audio vibe
+- Bold accent color for play buttons and active states
+- Rounded corners on all cards (16px)
+- Album artwork with subtle shadow
+- Waveform SVG decoration in hero
+
+IMAGE SEEDS: seed/podcast-microphone, seed/recording-studio, seed/headphones`,
+
+  nonprofit: `
+## GENERATOR: NONPROFIT & CHARITY WEBSITE
+You are building a nonprofit website. EMOTIONAL CONNECTION and TRUST are critical for donations.
+
+SECTIONS:
+1. Hero — Impactful full-width image, emotional headline, impact statistic ("15,000 lives changed"), "Donate Now" CTA (prominent, warm color)
+2. Mission — Mission statement, 3 core values with icons, brief org history
+3. Impact stats — 4 animated counters: lives impacted, funds raised, volunteers, projects completed
+4. Programs — .grid-3 cards: program image, name, description, people served, "Learn More"
+5. Stories — 2-3 beneficiary stories: photo, name, quote, their journey
+6. Donation section — Suggested amounts ($25, $50, $100, $250), custom amount input, monthly/one-time toggle, "Donate" button with trust badges (SSL, tax-deductible)
+7. Volunteer — Sign up form: name, email, interests checkboxes, availability
+8. Events — Upcoming fundraiser cards with date, location, "Register" button
+9. Partners/Sponsors — Logo grid of supporting organizations
+10. Footer — Charity registration number, address, social links
+
+STYLE:
+- Warm, hopeful — earthy tones (warm amber, forest green) OR clean blue/white
+- Authentic photography (not stock-looking)
+- Donation section must be prominent and trustworthy
+- Progress bars for fundraising goals
+- Impact numbers should be large and bold
+
+IMAGE SEEDS: seed/community-service, seed/helping-hands, seed/children-education, seed/volunteer-team`,
+
+  fitness: `
+## GENERATOR: FITNESS & WELLNESS WEBSITE
+You are building a fitness studio website. ENERGY and MOTIVATION drive sign-ups.
+
+SECTIONS:
+1. Hero — Dynamic action shot, bold headline ("Transform Your Body"), class schedule preview strip, "Start Free Trial" CTA
+2. Classes — .grid-3 cards: class type (Yoga, HIIT, Strength, Cycling, Boxing, Pilates), difficulty badge (Beginner/Intermediate/Advanced), duration, calories burned, schedule, instructor name
+3. Schedule — Weekly timetable: days as columns, time slots as rows, color-coded by class type
+4. Trainers — Cards: trainer photo, name, specialty, certifications, years experience, "Book Session" button
+5. Membership — 3 tiers: Basic ($29/mo), Premium ($59/mo), Elite ($99/mo) with features comparison, "Most Popular" badge on middle tier
+6. Transformations — Before/after image pairs with name, timeline, testimonial quote
+7. Amenities — Icons + labels: locker rooms, sauna, juice bar, parking, towel service
+8. Trial CTA — Large section: "Your First Class Is Free" with booking form (name, email, preferred class, date)
+9. Location — Map, hours, contact info
+
+STYLE:
+- High-energy, dark background with vibrant accent (electric blue, neon green, or hot orange)
+- Bold, uppercase headings
+- Dynamic diagonal lines or geometric shapes as design elements
+- Trainer photos: high contrast, dramatic lighting
+- CTAs: large, bold, impossible to miss
+
+IMAGE SEEDS: seed/gym-interior, seed/fitness-class, seed/yoga-studio, seed/personal-training`,
+
+  wedding: `
+## GENERATOR: WEDDING & EVENTS WEBSITE
+You are building a wedding website. ELEGANCE and PERSONAL TOUCH are everything.
+
+SECTIONS:
+1. Hero — Full-viewport romantic photo, couple's names in elegant script font, wedding date, "RSVP" button
+2. Countdown — Days, hours, minutes to wedding date (JS animated)
+3. Our Story — Timeline of relationship milestones: how we met, first date, engagement, with dates and sweet details
+4. Wedding Party — Bridesmaids and groomsmen cards: photo (circular), name, role, fun fact
+5. Details — Ceremony info (time, venue, address), Reception info (time, venue, address), dress code note
+6. RSVP Form — Name, email, attending (yes/no), number of guests, meal choice (chicken/fish/vegetarian), dietary restrictions, song request
+7. Registry — Links to registry sites with store logos (Amazon, Crate & Barrel, Zola)
+8. Gallery — Photo grid of engagement photos with lightbox
+9. Travel — Hotel blocks with rates and booking links, airport info, local transportation
+10. FAQ — Common questions: parking, kids, plus-ones, gifts
+
+STYLE:
+- Romantic and elegant — sage green, dusty rose, cream, gold accents
+- Script/serif font pairing (Playfair Display + Lora or similar)
+- Watercolor floral decorative elements (CSS gradients/patterns to simulate)
+- Lots of whitespace, airy feeling
+- Subtle animations (fade-in on scroll)
+- Mobile-first (guests will check on phones)
+
+IMAGE SEEDS: seed/wedding-couple, seed/flower-arrangement, seed/wedding-venue, seed/engagement-ring`,
 
   report: `
 ## GENERATOR: PROFESSIONAL BUSINESS REPORT

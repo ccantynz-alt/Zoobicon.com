@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import { sql } from "@/lib/db";
+import { recordPurchase } from "@/lib/addon-delivery";
 
 /**
  * POST /api/stripe/webhook
@@ -37,16 +38,32 @@ export async function POST(request: NextRequest) {
         const customerId = session.customer as string;
         const subscriptionId = session.subscription as string;
 
-        await sql`
-          INSERT INTO users (email, stripe_customer_id, stripe_subscription_id, plan, subscription_status)
-          VALUES (${email}, ${customerId}, ${subscriptionId}, 'pro', 'active')
-          ON CONFLICT (email) DO UPDATE SET
-            stripe_customer_id     = EXCLUDED.stripe_customer_id,
-            stripe_subscription_id = EXCLUDED.stripe_subscription_id,
-            plan                   = 'pro',
-            subscription_status    = 'active',
-            updated_at             = NOW()
-        `;
+        // Check if this is a marketplace add-on purchase
+        const addonId = session.metadata?.addonId;
+        const addonName = session.metadata?.addonName;
+
+        if (addonId && addonName) {
+          // Record the add-on purchase for delivery
+          await recordPurchase({
+            email,
+            addonId,
+            addonName,
+            stripeSessionId: session.id,
+            stripeSubscriptionId: subscriptionId || undefined,
+          });
+        } else {
+          // Regular plan upgrade
+          await sql`
+            INSERT INTO users (email, stripe_customer_id, stripe_subscription_id, plan, subscription_status)
+            VALUES (${email}, ${customerId}, ${subscriptionId}, 'pro', 'active')
+            ON CONFLICT (email) DO UPDATE SET
+              stripe_customer_id     = EXCLUDED.stripe_customer_id,
+              stripe_subscription_id = EXCLUDED.stripe_subscription_id,
+              plan                   = 'pro',
+              subscription_status    = 'active',
+              updated_at             = NOW()
+          `;
+        }
         break;
       }
 

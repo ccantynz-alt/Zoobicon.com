@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { ADDONS } from "../_addons";
+import { recordPurchase } from "@/lib/addon-delivery";
 
 /**
  * POST /api/marketplace/install
@@ -28,8 +29,13 @@ export async function POST(request: NextRequest) {
 
     // --- Free add-on: instant install ---
     if (addon.price === 0) {
-      // In a production system this would write to the database.
-      // The client persists the installation in localStorage as a fallback.
+      // Record in database for delivery system
+      try {
+        await recordPurchase({ email, addonId: addon.id, addonName: addon.name });
+      } catch {
+        // DB may not be available — localStorage fallback still works
+      }
+
       return Response.json({
         success: true,
         installed: true,
