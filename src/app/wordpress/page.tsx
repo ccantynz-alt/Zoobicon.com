@@ -93,7 +93,7 @@ export default function WordPressPage() {
 
       {/* Hero */}
       <section className="relative pt-32 pb-20 lg:pt-44 lg:pb-28">
-        <HeroEffects variant="cyan" cursorGlow particles particleCount={25} aurora />
+        <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="text-center">
             <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-blue-400/20 bg-blue-400/5 mb-6">

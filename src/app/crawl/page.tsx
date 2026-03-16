@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import BackgroundEffects from "@/components/BackgroundEffects";
+import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
   Zap,
   Search,
@@ -218,7 +219,7 @@ export default function CrawlPage() {
 
   return (
     <div className="relative min-h-screen">
-      <BackgroundEffects preset="default" />
+      <BackgroundEffects preset="technical" />
 
       {/* Nav */}
       <nav className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#050508]/80 backdrop-blur-2xl">
@@ -244,8 +245,12 @@ export default function CrawlPage() {
         </div>
       </nav>
 
+      <CursorGlowTracker />
+
       <main className="max-w-4xl mx-auto px-6 py-16">
         {/* Hero */}
+        <section className="relative">
+        <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -263,6 +268,7 @@ export default function CrawlPage() {
             and find vulnerabilities you can exploit.
           </p>
         </motion.div>
+        </section>
 
         {/* Input */}
         <motion.div

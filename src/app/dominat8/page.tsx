@@ -9,6 +9,7 @@ import {
   TrendingUp, Trophy, Flame, ChevronRight, Play,
 } from "lucide-react";
 import BackgroundEffects from "@/components/BackgroundEffects";
+import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 
 /**
  * Dominat8.io Landing Page
@@ -154,7 +155,7 @@ export default function Dominat8Page() {
 
   return (
     <div className="min-h-screen bg-[#050508] text-white relative">
-      <BackgroundEffects preset="contrast" />
+      <BackgroundEffects preset="technical" />
       {/* Announcement bar */}
       <div className="relative z-10 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white text-center py-2.5 text-xs font-medium">
         <span className="hidden sm:inline">Join businesses already dominating their market with AI</span>
@@ -199,8 +200,11 @@ export default function Dominat8Page() {
         </div>
       </nav>
 
+      <CursorGlowTracker />
+
       {/* Hero */}
       <section className="relative overflow-hidden min-h-[90vh] flex items-center">
+        <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
         {/* Dramatic background */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 left-1/4 w-[800px] h-[800px] rounded-full bg-blue-600/[0.07] blur-[150px]" />

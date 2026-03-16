@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import BackgroundEffects from "@/components/BackgroundEffects";
+import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
   Zap,
   BarChart3,
@@ -209,6 +210,8 @@ export default function AnalyticsPage() {
           </div>
         </div>
       </nav>
+
+      <CursorGlowTracker />
 
       <main className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
         {/* Page Header */}

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import BackgroundEffects from "@/components/BackgroundEffects";
+import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
   Mail,
   Inbox,
@@ -610,7 +611,7 @@ export default function EmailSupportDashboard() {
 
   return (
     <div className="relative min-h-screen bg-gray-950 text-white flex flex-col">
-      <BackgroundEffects preset="calm" />
+      <BackgroundEffects preset="technical" />
       {/* Top Nav */}
       <nav className="h-14 border-b border-white/[0.08] bg-gray-950/80 backdrop-blur-xl flex items-center justify-between px-4 shrink-0 z-50">
         <div className="flex items-center gap-3">
@@ -644,6 +645,8 @@ export default function EmailSupportDashboard() {
         </div>
       </nav>
 
+      <CursorGlowTracker />
+
       {/* Stats Bar */}
       <div className="h-12 border-b border-white/[0.06] bg-gray-950/50 flex items-center px-4 gap-6 shrink-0 overflow-x-auto">
         <div className="flex items-center gap-2 text-xs">
@@ -669,7 +672,8 @@ export default function EmailSupportDashboard() {
       </div>
 
       {/* Main Layout */}
-      <div className="flex flex-1 min-h-0">
+      <div className="relative flex flex-1 min-h-0">
+        <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
         {/* Sidebar - Folders */}
         <div className="w-52 border-r border-white/[0.06] bg-gray-950 shrink-0 flex flex-col">
           <div className="p-3">

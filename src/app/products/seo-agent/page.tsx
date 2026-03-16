@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import BackgroundEffects from "@/components/BackgroundEffects";
+import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
   Zap,
   Search,
@@ -68,7 +69,7 @@ export default function SEOAgentPage() {
 
   return (
     <div className="relative min-h-screen">
-      <BackgroundEffects preset="energetic" />
+      <BackgroundEffects preset="technical" />
 
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#050508]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
@@ -111,9 +112,11 @@ export default function SEOAgentPage() {
           </div>
         </div>
       </nav>
+      <CursorGlowTracker />
 
       {/* Hero */}
-      <section className="pt-32 pb-20 lg:pt-44 lg:pb-28">
+      <section className="relative pt-32 pb-20 lg:pt-44 lg:pb-28">
+        <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-cyan/20 bg-accent-cyan/5 mb-6">
