@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
 import { COMPONENT_LIBRARY_CSS } from "@/lib/component-library";
 import { callLLMWithFailover } from "@/lib/llm-provider";
+import { getGeneratorDef, getGeneratorSystemSupplement } from "@/lib/generator-prompts";
 
 /** Check if an error is a rate limit or overload that warrants model fallback */
 function isRetryableError(err: unknown): boolean {
@@ -386,7 +387,7 @@ NEVER reuse a keyword. Every src must be different.
 
 export async function POST(req: NextRequest) {
   try {
-    const { prompt, tier, model: requestedModel, isAdmin } = await req.json();
+    const { prompt, tier, model: requestedModel, isAdmin, generatorType, agencyBrand } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       return new Response(
@@ -409,7 +410,12 @@ export async function POST(req: NextRequest) {
     const maxTokens = isAdmin ? 64000 : isPremium ? 32000 : 16000;
     const timeout = isAdmin ? 300_000 : isPremium ? 180_000 : 90_000;
 
-    const systemPrompt = BODY_ONLY_SYSTEM + (isPremium ? PREMIUM_SECTIONS : STANDARD_SECTIONS);
+    // Build system prompt: base + sections + generator-specific supplement
+    const generatorSupplement = generatorType ? getGeneratorSystemSupplement(generatorType) : "";
+    const agencyBrandSupplement = agencyBrand?.agencyName
+      ? `\n\n## WHITE-LABEL BRANDING — MANDATORY\nThis site is built for white-label agency "${agencyBrand.agencyName}". Do NOT mention "Zoobicon" anywhere. Use "${agencyBrand.agencyName}" in footer copyright. Primary color: ${agencyBrand.primaryColor || "#3b82f6"}. Secondary: ${agencyBrand.secondaryColor || "#8b5cf6"}.`
+      : "";
+    const systemPrompt = BODY_ONLY_SYSTEM + (isPremium ? PREMIUM_SECTIONS : STANDARD_SECTIONS) + (generatorSupplement ? `\n\n${generatorSupplement}` : "") + agencyBrandSupplement;
 
     const client = new Anthropic({ apiKey, timeout });
     const encoder = new TextEncoder();

@@ -147,7 +147,7 @@ export const maxDuration = 300; // Match pipeline-stream timeout for Opus builds
 
 export async function POST(req: NextRequest) {
   try {
-    const { prompt, tier, existingCode, model: requestedModel, generator } = await req.json();
+    const { prompt, tier, existingCode, model: requestedModel, generator, agencyBrand } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       return new Response(
@@ -197,6 +197,17 @@ export async function POST(req: NextRequest) {
         if (supplement) {
           systemPrompt += "\n\n" + supplement;
         }
+      }
+
+      // Inject agency white-label branding into generated output
+      if (agencyBrand && agencyBrand.agencyName) {
+        systemPrompt += `\n\n## WHITE-LABEL BRANDING — MANDATORY
+This site is being built for a white-label agency. Apply these branding rules:
+- The builder/platform brand is "${agencyBrand.agencyName}" — do NOT mention "Zoobicon" anywhere in the output.
+- Use "${agencyBrand.agencyName}" as the company/brand name in the footer copyright and any "Powered by" text.
+- Primary brand color: ${agencyBrand.primaryColor || "#3b82f6"} — use this for --color-primary in :root.
+- Secondary brand color: ${agencyBrand.secondaryColor || "#8b5cf6"} — use this for gradients and accents.
+- The site content itself should still be about whatever the user requested — the white-label branding only affects platform attribution.`;
       }
       userMessage = `Build me a stunning, visually striking website for: ${prompt}\n\nThis must look like it was designed by a top-tier agency with BOLD visual impact. Use vibrant, saturated colors — NOT dull or washed-out palettes. The hero section must be dramatic (full-bleed image, dark gradient, or animated background — NEVER a plain white hero). Every section needs rich content with images, icons, and visual accents. Match the aesthetic to the industry but always prioritize visual impact and content density. Include: hero with dramatic visual treatment + clear value proposition, social proof, services/features with image-rich cards, testimonials, stats with bold colored numbers, CTA with colored background, and comprehensive dark footer.`;
       model = requestedModel || "claude-opus-4-6";

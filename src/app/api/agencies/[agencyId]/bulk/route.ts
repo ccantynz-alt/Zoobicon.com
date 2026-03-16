@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { sql } from "@/lib/db";
+import { checkFeatureAccess } from "@/lib/agency-limits";
 
 type RouteContext = { params: Promise<{ agencyId: string }> };
 
@@ -27,12 +28,18 @@ export async function POST(req: NextRequest, context: RouteContext) {
       );
     }
 
-    // Verify agency exists
+    // Verify agency exists and check plan
     const [agency] = await sql`
-      SELECT id FROM agencies WHERE id = ${agencyId} AND status != 'deleted'
+      SELECT id, plan FROM agencies WHERE id = ${agencyId} AND status != 'deleted'
     `;
     if (!agency) {
       return Response.json({ error: "Agency not found" }, { status: 404 });
+    }
+
+    // Enforce bulk generation feature gate
+    const featureCheck = checkFeatureAccess(agency.plan as string || "starter", "bulkGeneration");
+    if (!featureCheck.allowed) {
+      return Response.json({ error: featureCheck.reason }, { status: 403 });
     }
 
     // Cap bulk jobs at 50 businesses per request

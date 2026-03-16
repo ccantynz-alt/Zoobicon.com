@@ -77,6 +77,7 @@ import {
   MousePointer2,
   FolderTree,
   Package,
+  Eye,
 } from "lucide-react";
 
 /** Sanitize raw API error messages for user display */
@@ -130,6 +131,7 @@ type ToolId =
   | "visual-editor"
   | "sections"
   | "project"
+  | "crawl"
   | null;
 
 const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }[] = [
@@ -157,6 +159,7 @@ const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }
   { id: "visual-editor", label: "Visual Editor", icon: <MousePointer2 size={18} /> },
   { id: "sections", label: "Add Section", icon: <Package size={18} /> },
   { id: "project", label: "Project Mode", icon: <FolderTree size={18} /> },
+  { id: "crawl", label: "Crawl Competitor", icon: <Eye size={18} /> },
 ];
 
 /* ─── Interactive particle constellation background ─── */
@@ -416,6 +419,9 @@ function BuilderPage() {
   const [generatorBanner, setGeneratorBanner] = useState<{ id: string; name: string } | null>(null);
   const [showDiffPanel, setShowDiffPanel] = useState(false);
 
+  // Agency white-label branding (loaded from user's agency membership)
+  const [agencyBrand, setAgencyBrand] = useState<{ agencyName: string; primaryColor: string; secondaryColor: string; logoUrl?: string } | null>(null);
+
   // Show welcome modal on first visit
   useEffect(() => {
     if (shouldShowWelcomeModal()) {
@@ -455,7 +461,7 @@ function BuilderPage() {
   const canUndo = historyIndex > 0;
   const canRedo = historyIndex < history.length - 1;
 
-  // Admin always gets premium tier locked
+  // Admin always gets premium tier locked + load agency branding
   useEffect(() => {
     try {
       const user = localStorage.getItem("zoobicon_user");
@@ -464,6 +470,25 @@ function BuilderPage() {
         if (parsed.role === "admin" || parsed.plan === "unlimited") {
           setTier("premium");
           setIsAdmin(true);
+        }
+        // Load agency brand config if user belongs to an agency
+        if (parsed.agencyId && parsed.email) {
+          fetch(`/api/agencies?email=${encodeURIComponent(parsed.email)}`)
+            .then(r => r.json())
+            .then(data => {
+              const agency = data.agencies?.[0];
+              if (agency?.brand_config?.agencyName) {
+                setAgencyBrand({
+                  agencyName: agency.brand_config.agencyName,
+                  primaryColor: agency.brand_config.primaryColor || "#3b82f6",
+                  secondaryColor: agency.brand_config.secondaryColor || "#8b5cf6",
+                  logoUrl: agency.brand_config.logoUrl,
+                });
+                // Store for TopBar to pick up
+                localStorage.setItem("zoobicon_agency_brand", JSON.stringify(agency.brand_config));
+              }
+            })
+            .catch(() => { /* agency API not available */ });
         }
       }
     } catch { /* ignore */ }
@@ -595,6 +620,7 @@ function BuilderPage() {
             ...(existingCode ? { existingCode } : {}),
             ...(selectedModel ? { model: selectedModel } : {}),
             ...(generatorBanner ? { generator: generatorBanner.id } : {}),
+            ...(agencyBrand ? { agencyBrand } : {}),
           }),
           signal: controller.signal,
         });
@@ -620,6 +646,7 @@ function BuilderPage() {
               ...(existingCode ? { existingCode } : {}),
               ...(selectedModel ? { model: selectedModel } : {}),
               ...(generatorBanner ? { generator: generatorBanner.id } : {}),
+              ...(agencyBrand ? { agencyBrand } : {}),
             }),
           });
           if (!fallbackRes.ok) {
@@ -744,6 +771,7 @@ function BuilderPage() {
                   prompt: userPrompt,
                   tier,
                   ...(selectedModel ? { model: selectedModel } : {}),
+                  ...(agencyBrand ? { agencyBrand } : {}),
                 }),
                 signal: controller.signal,
               });
@@ -897,6 +925,8 @@ function BuilderPage() {
           tier,
           ...(selectedModel ? { model: selectedModel } : {}),
           ...(isAdmin ? { isAdmin: true } : {}),
+          ...(generatorBanner ? { generatorType: generatorBanner.id } : {}),
+          ...(agencyBrand ? { agencyBrand } : {}),
         }),
         signal: controller.signal,
       });
@@ -1255,6 +1285,24 @@ function BuilderPage() {
                 </button>
               </>
             )}
+          </div>
+        );
+      case "crawl":
+        return (
+          <div className="flex flex-col gap-4 p-4">
+            <p className="text-xs text-white/50 leading-relaxed">
+              Crawl a competitor&apos;s website to detect their tech stack, features, and design patterns.
+              Use insights to build something better.
+            </p>
+            <Link
+              href="/crawl"
+              target="_blank"
+              className="btn btn-primary text-sm flex items-center gap-2"
+            >
+              <Eye size={16} />
+              Open Intelligent Crawler
+              <ExternalLink size={12} />
+            </Link>
           </div>
         );
       default:

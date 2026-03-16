@@ -102,7 +102,7 @@ export const maxDuration = 120; // Allow up to 2 minutes for Opus generation
 
 export async function POST(req: NextRequest) {
   try {
-    const { prompt, tier, existingCode, generator } = await req.json();
+    const { prompt, tier, existingCode, generator, agencyBrand } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       return NextResponse.json(
@@ -160,6 +160,11 @@ export async function POST(req: NextRequest) {
       if (supplement) {
         systemPrompt += "\n\n" + supplement;
       }
+    }
+
+    // Inject agency white-label branding
+    if (!isEdit && agencyBrand?.agencyName) {
+      systemPrompt += `\n\n## WHITE-LABEL BRANDING — MANDATORY\nThis site is built for white-label agency "${agencyBrand.agencyName}". Do NOT mention "Zoobicon" anywhere. Use "${agencyBrand.agencyName}" in footer copyright. Primary color: ${agencyBrand.primaryColor || "#3b82f6"}. Secondary: ${agencyBrand.secondaryColor || "#8b5cf6"}.`;
     }
 
     const messages: { role: "user" | "assistant"; content: string }[] = [

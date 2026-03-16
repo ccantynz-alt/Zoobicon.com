@@ -90,7 +90,10 @@ export async function GET(req: NextRequest, context: RouteContext) {
         acs.client_id,
         ac.name as client_name,
         ac.company as client_company,
-        acs.created_at as assigned_at
+        acs.created_at as assigned_at,
+        COALESCE(acs.approval_status, 'draft') as approval_status,
+        acs.approved_at,
+        acs.approved_by
       FROM agency_client_sites acs
       JOIN sites s ON s.id = acs.site_id
       LEFT JOIN agency_clients ac ON ac.id = acs.client_id
@@ -103,6 +106,62 @@ export async function GET(req: NextRequest, context: RouteContext) {
     console.error("GET /api/agencies/[agencyId]/sites error:", err);
     return Response.json(
       { error: "Failed to list sites" },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * PUT /api/agencies/[agencyId]/sites
+ * Update site approval status: { siteId, approvalStatus, approvedBy? }
+ * approvalStatus: "draft" | "pending_review" | "approved" | "published" | "rejected"
+ */
+export async function PUT(req: NextRequest, context: RouteContext) {
+  try {
+    const { agencyId } = await context.params;
+    const body = await req.json();
+    const { siteId, approvalStatus, approvedBy } = body as {
+      siteId?: string;
+      approvalStatus?: string;
+      approvedBy?: string;
+    };
+
+    if (!siteId || !approvalStatus) {
+      return Response.json(
+        { error: "siteId and approvalStatus are required" },
+        { status: 400 }
+      );
+    }
+
+    const validStatuses = ["draft", "pending_review", "approved", "published", "rejected"];
+    if (!validStatuses.includes(approvalStatus)) {
+      return Response.json(
+        { error: `Invalid status. Must be one of: ${validStatuses.join(", ")}` },
+        { status: 400 }
+      );
+    }
+
+    const isApproval = approvalStatus === "approved" || approvalStatus === "published";
+
+    const [updated] = await sql`
+      UPDATE agency_client_sites SET
+        approval_status = ${approvalStatus},
+        approved_at = ${isApproval ? new Date().toISOString() : null},
+        approved_by = ${isApproval && approvedBy ? approvedBy : null},
+        updated_at = NOW()
+      WHERE agency_id = ${agencyId} AND site_id = ${siteId} AND status = 'active'
+      RETURNING *
+    `;
+
+    if (!updated) {
+      return Response.json({ error: "Site assignment not found" }, { status: 404 });
+    }
+
+    return Response.json({ assignment: updated });
+  } catch (err: unknown) {
+    console.error("PUT /api/agencies/[agencyId]/sites error:", err);
+    return Response.json(
+      { error: "Failed to update site status" },
       { status: 500 }
     );
   }
