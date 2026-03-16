@@ -234,6 +234,7 @@ Post-deployment live editor:
 14. **OAuth via redirect flow** — Google/GitHub OAuth uses server-side redirect (not popup). Routes: `/api/auth/oauth/{google,github}` → provider → `/api/auth/callback/{google,github}` → `/auth/callback` (stores in localStorage). DB stores `auth_provider` and `auth_provider_id` on users table. Env vars: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GITHUB_OAUTH_CLIENT_ID`, `GITHUB_OAUTH_CLIENT_SECRET`.
 15. **Agency generation quota tracking** — `agency_generations` table tracks every AI generation per agency per month (period format: "YYYY-MM"). The stream generate route checks quota before generation and returns 429 when exceeded. Dashboard shows usage. Plan limits defined in `src/lib/agency-limits.ts`.
 16. **Visual editing is DOM-based** — The visual editor works by injecting a script into the preview iframe (`dom-bridge.ts`). Communication is via `postMessage`. Style/text changes are applied to the HTML string via `DOMParser` → manipulate → serialize. This means changes persist in the `generatedCode` state and survive undo/redo via the snapshot system.
+17. **Real-time collaboration uses poll-based presence (UPGRADE TO WEBSOCKETS)** — Current implementation uses database-backed rooms with poll-based presence (every 2-3s) because Vercel serverless doesn't support persistent WebSocket connections. This works but has ~2-3s latency on cursor positions and code sync. **FUTURE UPGRADE PATH:** When deploying to a persistent server (e.g., Railway, Fly.io, AWS ECS) or using a dedicated WebSocket service (PartyKit, Liveblocks, Ably), replace the polling in `useCollaboration.ts` with WebSocket connections. The API routes (`/api/collab/*`) can remain as REST for room management; only presence and code sync need the WebSocket upgrade. Key files: `src/lib/collaboration.ts` (config), `src/hooks/useCollaboration.ts` (client), `src/app/api/collab/` (server), `src/components/CollaborationBar.tsx` (UI), `src/components/CursorOverlay.tsx` (remote cursors). The collab_rooms, collab_participants, and collab_code_sync tables support the current system.
 
 ## Route Audit Status
 
@@ -334,9 +335,10 @@ Full audit completed. **0 broken routes, 0 broken links, 0 missing API endpoints
 - Smart template recommendations based on user input analysis
 - Multi-site batch optimization (agency feature)
 
-**Phase 8: Collaboration & Scale**
-- Real-time collaboration (WebSocket-based, cursor presence)
-- Version branching (fork a site, merge changes)
-- Team workspaces with role-based access
-- API access for programmatic site generation (agency feature)
-- White-label deployment to agency-owned infrastructure
+**Phase 8: Collaboration & Scale** (PARTIALLY COMPLETE)
+- ✅ Real-time collaboration with rooms, presence, cursor overlay, code sync (poll-based)
+- ⬜ **UPGRADE: Replace polling with WebSocket** for <100ms latency (needs persistent server)
+- ⬜ Version branching (fork a site, merge changes)
+- ⬜ Team workspaces with role-based access
+- ⬜ API access for programmatic site generation (agency feature)
+- ⬜ White-label deployment to agency-owned infrastructure
