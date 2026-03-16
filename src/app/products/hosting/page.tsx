@@ -257,7 +257,7 @@ export default function HostingPage() {
             <span className="text-xs text-white/40">/</span>
             <span className="text-sm text-white/65">Hosting</span>
           </div>
-          <Link href="/hosting" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white">
+          <Link href="/builder" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white">
             <span>Deploy Now</span>
           </Link>
         </div>
@@ -298,7 +298,7 @@ export default function HostingPage() {
             </motion.div>
 
             <motion.div variants={fadeInUp} className="flex flex-wrap gap-4">
-              <Link href="/hosting" className="group btn-gradient px-8 py-4 rounded-2xl text-base font-bold text-white flex items-center gap-3 shadow-glow">
+              <Link href="/builder" className="group btn-gradient px-8 py-4 rounded-2xl text-base font-bold text-white flex items-center gap-3 shadow-glow">
                 <span>Deploy Your First Site Free</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
@@ -625,7 +625,7 @@ export default function HostingPage() {
                     ))}
                   </ul>
                   <Link
-                    href="/hosting"
+                    href={tier.price === "Free" ? "/builder" : "/auth/signup"}
                     className={`block text-center py-3 rounded-xl text-sm font-semibold transition-all ${
                       tier.highlighted
                         ? "btn-gradient text-white shadow-glow"

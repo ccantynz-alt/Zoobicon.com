@@ -2,6 +2,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
 import { callLLMWithFailover } from "@/lib/llm-provider";
 import { getGeneratorSystemSupplement } from "@/lib/generator-prompts";
+import { sql } from "@/lib/db";
+import { checkGenerationLimit, getCurrentPeriod, getAgencyPlanLimits } from "@/lib/agency-limits";
 
 const STANDARD_SYSTEM = `You are Zoobicon, an elite AI website generator producing $20K+ agency-quality sites. Output a single, complete HTML file.
 
@@ -147,7 +149,7 @@ export const maxDuration = 300; // Match pipeline-stream timeout for Opus builds
 
 export async function POST(req: NextRequest) {
   try {
-    const { prompt, tier, existingCode, model: requestedModel, generator, agencyBrand } = await req.json();
+    const { prompt, tier, existingCode, model: requestedModel, generator, agencyBrand, agencyId } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       return new Response(
@@ -161,6 +163,31 @@ export async function POST(req: NextRequest) {
         JSON.stringify({ error: "Prompt too long (max 5000 characters)" }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
+    }
+
+    // Agency generation quota check
+    if (agencyId && typeof agencyId === "string") {
+      try {
+        const [agency] = await sql`SELECT plan FROM agencies WHERE id = ${agencyId}`;
+        if (agency) {
+          const period = getCurrentPeriod();
+          const [countResult] = await sql`
+            SELECT COUNT(*)::int as count FROM agency_generations
+            WHERE agency_id = ${agencyId} AND period = ${period}
+          `;
+          const current = countResult?.count || 0;
+          const check = checkGenerationLimit(agency.plan, current);
+          if (!check.allowed) {
+            return new Response(
+              JSON.stringify({ error: check.reason, current: check.current, limit: check.limit }),
+              { status: 429, headers: { "Content-Type": "application/json" } }
+            );
+          }
+          // Record the generation (fire-and-forget)
+          sql`INSERT INTO agency_generations (agency_id, user_email, generator_type, period)
+              VALUES (${agencyId}, '', ${generator || "website"}, ${period})`.catch(() => {});
+        }
+      } catch { /* DB not available, allow generation */ }
     }
 
     const apiKey = process.env.ANTHROPIC_API_KEY;

@@ -8,7 +8,7 @@ import {
   FileText, Link2, Briefcase, BookOpen, MapPin, Ticket, Store, Smartphone,
   Settings, FormInput, Mail, Presentation, PenTool, Code2, Boxes, UtensilsCrossed,
   Home, FileBarChart, Chrome, PaintBucket, Users, FolderKanban, GraduationCap,
-  Package, Workflow, ArrowRight, Zap, Bot, Layers, Star, Menu, X,
+  Package, Workflow, ArrowRight, Zap, Bot, Layers, Star, Menu, X, ShoppingCart,
 } from "lucide-react";
 import { endpointToGeneratorId } from "@/lib/generator-prompts";
 
@@ -25,6 +25,7 @@ const GENERATOR_CATEGORIES = [
       { name: "Restaurant", description: "Premium restaurant sites with interactive menus, reservations, gallery, and online ordering", endpoint: "/api/generate/restaurant", icon: UtensilsCrossed },
       { name: "Real Estate", description: "Property listing sites with search, mortgage calculator, agent profiles, and saved listings", endpoint: "/api/generate/realestate", icon: Home },
       { name: "Marketplace", description: "Two-sided marketplace platforms with listings, profiles, messaging, reviews, and search", endpoint: "/api/generate/marketplace", icon: Store },
+      { name: "E-Commerce Store", description: "Complete storefronts with product grids, shopping cart, checkout, reviews, wishlists, and discount codes", endpoint: "/api/generate/ecommerce", icon: ShoppingCart, tag: "Popular" },
     ],
   },
   {

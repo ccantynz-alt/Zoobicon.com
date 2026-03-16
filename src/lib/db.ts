@@ -51,6 +51,8 @@ export async function initSchema() {
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_customer_id     TEXT UNIQUE`;
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_subscription_id TEXT UNIQUE`;
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_status    TEXT`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS auth_provider          TEXT`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS auth_provider_id       TEXT`;
 
   await sql`
     CREATE TABLE IF NOT EXISTS projects (
@@ -242,6 +244,60 @@ export async function initSchema() {
   `;
 
   await sql`CREATE INDEX IF NOT EXISTS bulk_jobs_agency_id_idx ON bulk_jobs (agency_id)`;
+
+  // Agency generation tracking (monthly quotas)
+  await sql`
+    CREATE TABLE IF NOT EXISTS agency_generations (
+      id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      agency_id       UUID REFERENCES agencies(id) ON DELETE CASCADE,
+      user_email      TEXT NOT NULL,
+      generator_type  TEXT,
+      period          TEXT NOT NULL,
+      created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS agency_generations_agency_period_idx ON agency_generations (agency_id, period)`;
+
+  // ---- Real-time collaboration tables ----
+  await sql`
+    CREATE TABLE IF NOT EXISTS collab_rooms (
+      id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      slug            TEXT NOT NULL,
+      owner_email     TEXT NOT NULL,
+      invite_code     VARCHAR(10) UNIQUE NOT NULL,
+      created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS collab_rooms_slug_idx ON collab_rooms (slug)`;
+  await sql`CREATE INDEX IF NOT EXISTS collab_rooms_invite_idx ON collab_rooms (invite_code)`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS collab_participants (
+      id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      room_id         UUID REFERENCES collab_rooms(id) ON DELETE CASCADE,
+      user_email      TEXT NOT NULL,
+      user_name       TEXT NOT NULL DEFAULT '',
+      color           VARCHAR(20) NOT NULL DEFAULT '#3b82f6',
+      cursor_x        REAL,
+      cursor_y        REAL,
+      cursor_element  TEXT,
+      last_heartbeat  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      is_active       BOOLEAN NOT NULL DEFAULT true,
+      joined_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS collab_participants_room_idx ON collab_participants (room_id)`;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS collab_code_sync (
+      id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      room_id         UUID REFERENCES collab_rooms(id) ON DELETE CASCADE UNIQUE,
+      html            TEXT NOT NULL DEFAULT '',
+      version         INTEGER NOT NULL DEFAULT 1,
+      updated_by      TEXT NOT NULL DEFAULT '',
+      updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
 
   // ---- Email platform tables (zoobicon.io) ----
 

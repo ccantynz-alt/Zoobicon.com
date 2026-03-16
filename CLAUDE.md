@@ -130,27 +130,50 @@ Build has `ignoreBuildErrors: true` and `ignoreDuringBuilds: true` in next.confi
 - `/pricing`, `/privacy`, `/terms`, `/support`, `/domains`, `/marketplace`, `/hosting`
 - `/developers`, `/cli`, `/sh`, `/ai`, `/io` — Developer/branded routes
 - `/agencies` — Agency-focused page
+- `/wordpress` — WordPress plugin landing page + download
+
+### Public API v1 (src/app/api/v1/)
+
+RESTful API for programmatic site generation and deployment. Bearer token auth via `zbk_live_*` API keys.
+
+| Route | Method | Description |
+|-------|--------|-------------|
+| `/api/v1/generate` | POST | Generate a website from prompt (supports 43 generators, tiers, model override, auto-deploy, webhooks, agency branding) |
+| `/api/v1/sites` | GET | List deployed sites with pagination and status filtering |
+| `/api/v1/sites` | PUT | Update site HTML, creates new deployment version |
+| `/api/v1/sites` | DELETE | Deactivate a site by ID or slug |
+| `/api/v1/deploy` | POST | Deploy HTML to zoobicon.sh with custom slug |
+| `/api/v1/deploy` | GET | Get deployment history for a site |
+| `/api/v1/status` | GET | API health, account info, usage stats, rate limits |
+
+**Authentication:** `Authorization: Bearer zbk_live_...` — HMAC-SHA256 stateless keys (no DB lookup). See `src/lib/apiKey.ts`.
+
+**Rate limits:** Free: 10 req/min, Pro: 60 req/min, Enterprise: 600 req/min. Sliding window per API key prefix. See `src/lib/api-middleware.ts`.
 
 ### Other API Routes (src/app/api/)
-89 route handlers across 26 directories. All verified working:
-- `/api/auth/*` — Authentication (signup, login, reset)
+90+ route handlers across 27 directories. All verified working:
+- `/api/auth/*` — Authentication (signup, login, reset, OAuth Google/GitHub)
 - `/api/projects/*` — Project CRUD
+- `/api/collab/*` — Real-time collaboration (rooms, presence, code sync)
 - `/api/contact` — Contact form handler
 - `/api/seo/analyze` — SEO analysis endpoint
 - `/api/clone` — Import existing website URL → convert to editable HTML
 - Plus: admin, animate, chat, crm, db, debug, export, figma, github, invoice, keys, performance, qa, stripe, support, translate
 
 ### Components (src/components/)
-32 components. All imports verified:
+35+ components. All imports verified:
 
 **Builder Core:**
 - `PromptInput.tsx` — AI prompt input with style/tier/model selectors + template quick-start
 - `PipelinePanel.tsx` — 7-agent pipeline progress visualization
-- `CodePanel.tsx` — Code editor/viewer with copy/download
-- `PreviewPanel.tsx` — Live preview with Desktop/Tablet/Mobile viewports + atmospheric effects
-- `TopBar.tsx` / `StatusBar.tsx` — Builder chrome with real-time agent status
+- `CodePanel.tsx` — Code editor/viewer with copy/download and multi-file tabs
+- `PreviewPanel.tsx` — Live preview with Desktop/Tablet/Mobile viewports + visual editing bridge
+- `TopBar.tsx` / `StatusBar.tsx` — Builder chrome with real-time agent status + agency white-label
+- `VisualEditor.tsx` — Click-to-select property editor (typography, spacing, background, border, layout)
+- `SectionLibrary.tsx` — Pre-built section templates for drag-and-drop addition
+- `ProjectTree.tsx` — File tree view for multi-file project editing
 
-**Builder Tools (21 sidebar panels):**
+**Builder Tools (21+ sidebar panels):**
 - `MultiPagePanel.tsx` — Generate 3-6 page sites with consistent design
 - `FullStackPanel.tsx` — Generate DB schema + API + frontend with tabbed view
 - `EcommercePanel.tsx` — E-commerce storefront generator
@@ -197,7 +220,12 @@ Auto-injected CSS design system (like shadcn/ui for generated output):
 - `password.ts` / `resetToken.ts` — Auth utilities
 - `apiKey.ts` / `rateLimit.ts` — API security
 - `image-gen.ts` — AI image generation
-- `templates.ts` — 12 site templates (saas-landing, portfolio-creative, ecommerce-store, restaurant-menu, agency-dark, blog-minimal, fitness-gym, tech-startup, event-conference, real-estate, music-artist, nonprofit-charity)
+- `templates.ts` — 100 site templates across 13 categories (Business, Technology, Health, Food & Drink, E-Commerce, Portfolio, Events, Blog, Professional, Nonprofit, Entertainment, Education, Real Estate)
+- `generator-prompts.ts` — 43 generator definitions with type-specific system prompt supplements
+- `dom-bridge.ts` — Visual editing script (hover/click/text-edit) + HTML manipulation utilities
+- `cloudflare.ts` — Cloudflare API integration for DNS/SSL/CDN
+- `agency-limits.ts` — Agency plan tier limits and quota enforcement
+- `intel-crawler.ts` — Competitor website analysis engine
 
 ### Edit Flow (src/app/edit/[slug]/)
 
@@ -223,6 +251,14 @@ Post-deployment live editor:
 11. **Multi-LLM support** — Three providers configured in `.env.local`: `ANTHROPIC_API_KEY`, `GOOGLE_AI_API_KEY`, `OPENAI_API_KEY`. Provider routing is in `src/lib/llm-provider.ts`. When a user selects a non-Claude model, all pipeline agents route through that provider. Default (no selection) uses the Claude Haiku/Opus/Sonnet split.
 12. **Component library injection** — `src/lib/component-library.ts` provides a CSS reset + design system (buttons, cards, inputs, badges, grids, animations) injected into every generated site. Like shadcn/ui for generated output. Do not remove.
 13. **Mediocre is failure** — Every product page must have a working backend. No fake CTAs, no mock data presented as real, no landing pages that funnel to unrelated products. If a feature isn't built yet, it must say "Coming Soon" with a waitlist — never "Launch Now." When encountering broken flows during any work, fix them immediately or flag as top priority. See the Quality Standard checklist above.
+14. **OAuth via redirect flow** — Google/GitHub OAuth uses server-side redirect (not popup). Routes: `/api/auth/oauth/{google,github}` → provider → `/api/auth/callback/{google,github}` → `/auth/callback` (stores in localStorage). DB stores `auth_provider` and `auth_provider_id` on users table. Env vars: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GITHUB_OAUTH_CLIENT_ID`, `GITHUB_OAUTH_CLIENT_SECRET`.
+15. **Agency generation quota tracking** — `agency_generations` table tracks every AI generation per agency per month (period format: "YYYY-MM"). The stream generate route checks quota before generation and returns 429 when exceeded. Dashboard shows usage. Plan limits defined in `src/lib/agency-limits.ts`.
+16. **Visual editing is DOM-based** — The visual editor works by injecting a script into the preview iframe (`dom-bridge.ts`). Communication is via `postMessage`. Style/text changes are applied to the HTML string via `DOMParser` → manipulate → serialize. This means changes persist in the `generatedCode` state and survive undo/redo via the snapshot system.
+17. **Real-time collaboration uses poll-based presence (UPGRADE TO WEBSOCKETS)** — Current implementation uses database-backed rooms with poll-based presence (every 2-3s) because Vercel serverless doesn't support persistent WebSocket connections. This works but has ~2-3s latency on cursor positions and code sync. **FUTURE UPGRADE PATH:** When deploying to a persistent server (e.g., Railway, Fly.io, AWS ECS) or using a dedicated WebSocket service (PartyKit, Liveblocks, Ably), replace the polling in `useCollaboration.ts` with WebSocket connections. The API routes (`/api/collab/*`) can remain as REST for room management; only presence and code sync need the WebSocket upgrade. Key files: `src/lib/collaboration.ts` (config), `src/hooks/useCollaboration.ts` (client), `src/app/api/collab/` (server), `src/components/CollaborationBar.tsx` (UI), `src/components/CursorOverlay.tsx` (remote cursors). The collab_rooms, collab_participants, and collab_code_sync tables support the current system.
+
+18. **Public API v1** — The `/api/v1/*` routes provide a programmatic REST API for external developers. Authentication uses stateless HMAC-SHA256 API keys (`zbk_live_*`) validated in `src/lib/apiKey.ts` with rate limiting in `src/lib/api-middleware.ts`. The API supports generation with all 43 generators, auto-deploy to zoobicon.sh, webhook callbacks, and white-label agency branding. Do not change the auth scheme without updating all v1 routes. Key files: `src/lib/api-middleware.ts`, `src/app/api/v1/generate/route.ts`, `src/app/api/v1/sites/route.ts`, `src/app/api/v1/deploy/route.ts`, `src/app/api/v1/status/route.ts`.
+
+19. **WordPress Connect Plugin** — The `public/wordpress-plugin/` directory contains the Zoobicon Connect WordPress plugin (PHP). This is a standalone WordPress plugin that customers install on their WP sites to receive deployments from Zoobicon. The plugin registers REST endpoints at `/wp-json/zoobicon/v1/` (deploy, status, pages, delete). Authentication uses a Connect Key (`zbc_*`) auto-generated on plugin activation. The Zoobicon side has a proxy at `/api/export/wordpress/deploy` that forwards deployments to the customer's WP site. The `WordPressExport.tsx` component has two modes: "Deploy to WordPress" (live push) and "Export Theme" (download ZIP). The `/wordpress` page is the plugin landing page. Key files: `public/wordpress-plugin/zoobicon-connect.php`, `src/app/api/export/wordpress/deploy/route.ts`, `src/components/WordPressExport.tsx`, `src/app/wordpress/page.tsx`.
 
 ## Route Audit Status
 
@@ -240,22 +276,30 @@ Full audit completed. **0 broken routes, 0 broken links, 0 missing API endpoints
 
 ### Current Product Readiness Checklist
 
-Products that need backends built to match their landing pages:
+| # | Product | Status | Notes |
+|---|---------|--------|-------|
+| 1 | **Website Builder** | DONE | Core product, fully functional with streaming + pipeline |
+| 2 | **Hosting** | DONE | Serving, CDN, SSL, DNS management via Cloudflare lib (`src/lib/cloudflare.ts`) |
+| 3 | **Generators (43)** | DONE | 43 generators with type-specific system prompts, custom form fields per type |
+| 4 | **SEO Agent** | DONE | Dashboard at `/seo` + analysis API at `/api/seo/analyze`. Autonomous mode not built. |
+| 5 | **Video Creator** | PARTIAL | Storyboard/script generation built (`/video-creator`). Video rendering not built. |
+| 6 | **Email Support** | DONE | Full ticketing system + Mailgun integration (`/email-support`, `/api/email/support`) |
+| 7 | **Marketplace** | DONE | 20 add-ons, category filtering, Stripe checkout (`/marketplace`, `/api/marketplace/`) |
+| 8 | **Domains** | DONE | Domain search, registration, Stripe checkout (`/domains`, `/api/domains/`) |
+| 9 | **Visual Editing** | DONE | Click-to-select, property editor, text editing, section reorder, section library |
+| 10 | **Project Mode** | DONE | File tree, multi-file editing, GitHub export, project generation |
+| 11 | **Agency Platform** | DONE | Dashboard, client portal, white-label, bulk gen, approval workflow, quota tracking |
+| 12 | **OAuth** | DONE | Google + GitHub OAuth with find-or-create user flow |
+| 13 | **Templates** | DONE | 100 templates across 13 categories |
+| 14 | **Competitor Crawler** | DONE | Tech stack analysis at `/admin/intel` via `src/lib/intel-crawler.ts` |
 
-| # | Product | Status | What's Needed |
-|---|---------|--------|---------------|
-| 1 | **Website Builder** | DONE | Core product, fully functional |
-| 2 | **Hosting** | PARTIAL | Serving layer, CDN, SSL, custom domains need completion |
-| 3 | **Generators (32)** | PARTIAL | Need type-specific system prompts routed through pipeline |
-| 4 | **SEO Agent** | NOT BUILT | Need dedicated dashboard + autonomous SEO workflow using existing `/api/seo/analyze` |
-| 5 | **Video Creator** | NOT BUILT | Need external video API integration (Runway/Pika/Sora) + dedicated UI |
-| 6 | **Email Support** | NOT BUILT | Need email provider integration + real ticketing system |
-| 7 | **Marketplace** | NOT BUILT | Need real product catalog, Stripe integration for add-on purchases, delivery system |
-| 8 | **Domains** | NOT BUILT | Need registrar API integration (Namecheap/Cloudflare reseller) + DNS management |
-
-**Priority order:** Generators (#3) → SEO Agent (#4) → Hosting completion (#2) → Marketplace (#7) → Domains (#8) → Email Support (#6) → Video Creator (#5)
-
-Generators are highest priority because they extend the core product with minimal new infrastructure. Video Creator is last because it requires the most external API integration.
+**Remaining gaps (genuine):**
+- Video rendering engine (needs Runway/Pika/Sora API)
+- Autonomous SEO agent (scheduled crawls, rank tracking, backlink outreach)
+- Real domain registrar API (currently simulated availability)
+- Marketplace add-on code delivery (payments work, delivery doesn't)
+- Real-time collaboration (not implemented)
+- In-browser runtime (competitors use WebContainers)
 
 ## Code Style
 
@@ -276,54 +320,49 @@ Generators are highest priority because they extend the core product with minima
 - Full-stack app generation (DB schema + API + CRUD frontend — REAL, working)
 - E-commerce generation (10+ features, cart, checkout — REAL, working)
 - Scaffolding (auth, admin, uploads, comments, notifications — REAL, working)
+- Visual editing with click-to-select, property editor, section reordering (matches v0/Bolt)
 - White-label / agency architecture (UNIQUE — no competitor offers this)
-- Tool density: 21 integrated tools vs competitors' 3-5
-- 32 specialized generators (UNIQUE — competitors are generic)
+- Tool density: 21+ integrated tools vs competitors' 3-5
+- 43 specialized generators with custom UIs (UNIQUE — competitors are generic)
+- 100 templates across 13 categories
 - Multi-LLM support (Claude, GPT-4o, Gemini 2.5 Pro)
+- Project mode with file tree, multi-file editing, GitHub export (matches Bolt)
+- Full marketplace with 20 add-ons and Stripe checkout
+- Google + GitHub OAuth
+- Agency platform with white-label, client portal, approval workflow, quota tracking
 
 **Where competitors lead:**
 - In-browser runtime (Bolt: WebContainers, v0: sandboxes) — we generate server-side
-- Visual editing (click-to-edit on preview) — we use chat-based edits only
-- One-click deploy to custom domains — we deploy to zoobicon.sh but DNS/SSL are stubs
 - Real-time collaboration — not implemented
 - Design system ecosystem — shadcn/ui vs our custom component library
 
-### Build Plan — 5 Phases
+### Build Plan — Next Phases
 
-**Phase 1: Deploy Pipeline (closes biggest user pain point)**
-- Cloudflare API integration for custom domains, automatic SSL, DNS management
-- Deploy dashboard showing all user sites with status/analytics
-- One-click redeploy from edit view
-- Staging preview URLs before going live
-- Files: `/api/hosting/dns/`, `/api/hosting/ssl/`, `/api/hosting/cdn/`, dashboard enhancements
+**Phases 1-5 are complete.** All five original roadmap phases have been implemented:
+- Phase 1 (Deploy Pipeline): Cloudflare integration, deploy dashboard, DNS/SSL/CDN
+- Phase 2 (Visual Editing): dom-bridge.ts, VisualEditor.tsx, SectionLibrary.tsx, PreviewPanel bridge
+- Phase 3 (Project Mode): ProjectTree.tsx, /api/generate/project, /api/export/github
+- Phase 4 (Generator Domination): 43 generators, 33 system supplements, 100 templates
+- Phase 5 (Agency Platform): Full agency dashboard, client portal, white-label, bulk gen, quotas, OAuth
 
-**Phase 2: Visual Editing (closes biggest competitive gap)**
-- Click-to-select overlay in preview iframe (highlight on hover, select on click)
-- Inline property editor sidebar (text, colors, spacing, fonts for selected element)
-- Direct DOM manipulation with sync back to source HTML
-- Drag-and-drop section reordering
-- "Add Section" with pre-built section templates
-- Files: `PreviewPanel.tsx` (postMessage bridge), new `VisualEditor.tsx`, `SectionLibrary.tsx`, `dom-bridge.ts`
+**Phase 6: Production Hardening**
+- Connect real domain registrar API (Namecheap/Cloudflare reseller) — currently simulated
+- Marketplace add-on delivery system (install code into user's sites)
+- Staging preview environment (deploy preview → approve → production)
+- Rate limiting and abuse prevention at scale
+- Monitoring and alerting (Sentry, Datadog)
 
-**Phase 3: Project Mode (compete with Bolt V2)**
-- File tree view for multi-file projects
-- File-by-file editing in CodePanel with tabs
-- Package.json generation with dependency management
-- GitHub export (push to user's repo via GitHub API)
-- Download as complete project zip (ready for `npm install && npm run dev`)
-- Files: new `ProjectTree.tsx`, new `/api/generate/project/`, `/api/export/github/`, `CodePanel.tsx` enhancements
+**Phase 7: AI Autonomy**
+- Autonomous SEO agent (scheduled crawls, rank tracking, automated fixes)
+- Video rendering via external API (Runway/Pika/Sora)
+- AI auto-reply drafting for email support tickets
+- Smart template recommendations based on user input analysis
+- Multi-site batch optimization (agency feature)
 
-**Phase 4: Generator Domination (amplify unique advantage)**
-- 32 type-specific system prompts for industry-perfect output
-- Generator-specific UI with custom input fields per type
-- 100+ templates (3-5 per generator type, up from 12 total)
-- One-click generate → preview → deploy flow
-- Files: new `generator-prompts.ts`, `/generators/[type]/page.tsx`, expand `templates.ts`
-
-**Phase 5: Agency Platform (blue ocean — no competitor here)**
-- Agency dashboard managing multiple client sites
-- Client handoff (transfer editing access)
-- White-label deploys (agency branding on builder, client branding on output)
-- Bulk generation with CSV import of business details
-- Revenue sharing (agency markup on hosting)
-- Files: `/agencies/dashboard/`, `/api/agencies/`, expand `brand-config.ts`, new `/api/generate/bulk/`
+**Phase 8: Collaboration & Scale** (PARTIALLY COMPLETE)
+- ✅ Real-time collaboration with rooms, presence, cursor overlay, code sync (poll-based)
+- ⬜ **UPGRADE: Replace polling with WebSocket** for <100ms latency (needs persistent server)
+- ⬜ Version branching (fork a site, merge changes)
+- ⬜ Team workspaces with role-based access
+- ⬜ API access for programmatic site generation (agency feature)
+- ⬜ White-label deployment to agency-owned infrastructure

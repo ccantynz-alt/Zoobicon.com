@@ -47,6 +47,9 @@ import {
   User,
   LogOut,
   LayoutDashboard,
+  Eye,
+  Film,
+  Building2,
 } from "lucide-react";
 
 const ROTATING_WORDS = ["websites", "landing pages", "portfolios", "SaaS apps", "e-commerce stores", "dashboards"];
@@ -284,25 +287,25 @@ const NEW_FEATURES = [
     glowColor: "shadow-cyan-500/20",
   },
   {
-    icon: Lock,
-    title: "Auth Scaffolding",
-    description: "Login, database, admin — generated",
-    color: "from-green-500 to-emerald-600",
-    glowColor: "shadow-green-500/20",
+    icon: Eye,
+    title: "Competitor Crawler",
+    description: "Analyze any site's tech stack, features, and strategy",
+    color: "from-violet-500 to-purple-600",
+    glowColor: "shadow-violet-500/20",
   },
   {
-    icon: Search,
-    title: "SEO Scoring",
-    description: "Real-time SEO analysis with auto-fix",
-    color: "from-brand-500 to-brand-700",
-    glowColor: "shadow-brand-500/20",
+    icon: Film,
+    title: "Video Storyboards",
+    description: "AI storyboard scripts for any platform",
+    color: "from-pink-500 to-rose-600",
+    glowColor: "shadow-pink-500/20",
   },
   {
-    icon: Wand2,
-    title: "Animation Editor",
-    description: "Professional animations, no code",
-    color: "from-blue-500 to-fuchsia-500",
-    glowColor: "shadow-blue-500/20",
+    icon: Building2,
+    title: "Agency White-Label",
+    description: "Your brand, your clients, your platform",
+    color: "from-amber-500 to-orange-600",
+    glowColor: "shadow-amber-500/20",
   },
 ];
 
@@ -1273,6 +1276,8 @@ export default function LandingPage() {
                 <li><Link href="/products/email-support" className="text-sm text-white/65 hover:text-white/60 transition-colors">AI Email Support</Link></li>
                 <li><Link href="/domains" className="text-sm text-white/65 hover:text-white/60 transition-colors">Domains</Link></li>
                 <li><Link href="/marketplace" className="text-sm text-white/65 hover:text-white/60 transition-colors">Marketplace</Link></li>
+                <li><Link href="/generators" className="text-sm text-white/65 hover:text-white/60 transition-colors">32 Generators</Link></li>
+                <li><Link href="/crawl" className="text-sm text-white/65 hover:text-white/60 transition-colors">Competitor Crawler</Link></li>
               </ul>
             </div>
             <div>
@@ -1289,6 +1294,7 @@ export default function LandingPage() {
               <ul className="space-y-2.5">
                 <li><Link href="/agencies" className="text-sm text-white/65 hover:text-white/60 transition-colors">Agencies</Link></li>
                 <li><Link href="/agencies#white-label" className="text-sm text-white/65 hover:text-white/60 transition-colors">White Label</Link></li>
+                <li><Link href="/agencies/portal" className="text-sm text-white/65 hover:text-white/60 transition-colors">Client Portal</Link></li>
                 <li><Link href="/support" className="text-sm text-white/65 hover:text-white/60 transition-colors">AI Support</Link></li>
                 <li><Link href="/auth/signup" className="text-sm text-white/65 hover:text-white/60 transition-colors">Sign Up</Link></li>
               </ul>

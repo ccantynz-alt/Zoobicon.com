@@ -11,6 +11,13 @@ import {
   FileCode,
   ChevronDown,
   ChevronRight,
+  Upload,
+  Globe,
+  Link2,
+  Key,
+  CheckCircle2,
+  AlertCircle,
+  ExternalLink,
 } from "lucide-react";
 
 interface ThemeResult {
@@ -19,12 +26,41 @@ interface ThemeResult {
   instructions: string[];
 }
 
+interface WPDeployResult {
+  success: boolean;
+  page_id: number;
+  title: string;
+  slug: string;
+  status: string;
+  url: string;
+  edit_url: string;
+  version: number;
+  deployed_at: string;
+  wordpress_site: string;
+}
+
+interface WPConnectionStatus {
+  connected: boolean;
+  site_name?: string;
+  site_url?: string;
+  wordpress_version?: string;
+  theme?: string;
+  plugin_version?: string;
+  deploy_count?: number;
+  error?: string;
+}
+
 interface WordPressExportProps {
   code: string;
 }
 
+type ExportMode = "theme" | "deploy";
+
 export default function WordPressExport({ code }: WordPressExportProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [mode, setMode] = useState<ExportMode>("deploy");
+
+  // Theme export state
   const [siteName, setSiteName] = useState("");
   const [siteDescription, setSiteDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -33,6 +69,95 @@ export default function WordPressExport({ code }: WordPressExportProps) {
   const [expandedFiles, setExpandedFiles] = useState<Set<string>>(new Set());
   const [copiedWxr, setCopiedWxr] = useState(false);
   const [copiedFile, setCopiedFile] = useState<string | null>(null);
+
+  // Deploy state
+  const [wpUrl, setWpUrl] = useState("");
+  const [connectKey, setConnectKey] = useState("");
+  const [deployTitle, setDeployTitle] = useState("");
+  const [deploySlug, setDeploySlug] = useState("");
+  const [deployStatus, setDeployStatus] = useState<"draft" | "publish">("draft");
+  const [isDeploying, setIsDeploying] = useState(false);
+  const [isTesting, setIsTesting] = useState(false);
+  const [deployError, setDeployError] = useState<string | null>(null);
+  const [deployResult, setDeployResult] = useState<WPDeployResult | null>(null);
+  const [connectionStatus, setConnectionStatus] = useState<WPConnectionStatus | null>(null);
+
+  // Load saved WP connection from localStorage
+  const loadSavedConnection = useCallback(() => {
+    try {
+      const saved = localStorage.getItem("zoobicon_wp_connection");
+      if (saved) {
+        const { url, key } = JSON.parse(saved);
+        if (url) setWpUrl(url);
+        if (key) setConnectKey(key);
+      }
+    } catch {}
+  }, []);
+
+  // Save WP connection to localStorage
+  const saveConnection = useCallback(() => {
+    try {
+      localStorage.setItem("zoobicon_wp_connection", JSON.stringify({ url: wpUrl, key: connectKey }));
+    } catch {}
+  }, [wpUrl, connectKey]);
+
+  // Test connection to WordPress site
+  const testConnection = useCallback(async () => {
+    if (!wpUrl || !connectKey) return;
+    setIsTesting(true);
+    setConnectionStatus(null);
+    setDeployError(null);
+
+    try {
+      const res = await fetch(`/api/export/wordpress/deploy?wp_url=${encodeURIComponent(wpUrl)}&connect_key=${encodeURIComponent(connectKey)}`);
+      const data: WPConnectionStatus = await res.json();
+      setConnectionStatus(data);
+      if (data.connected) {
+        saveConnection();
+      }
+    } catch {
+      setConnectionStatus({ connected: false, error: "Failed to test connection" });
+    } finally {
+      setIsTesting(false);
+    }
+  }, [wpUrl, connectKey, saveConnection]);
+
+  // Deploy to WordPress
+  const handleDeploy = useCallback(async () => {
+    if (!wpUrl || !connectKey || !deployTitle.trim()) return;
+
+    setIsDeploying(true);
+    setDeployError(null);
+    setDeployResult(null);
+
+    try {
+      const res = await fetch("/api/export/wordpress/deploy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          wp_url: wpUrl,
+          connect_key: connectKey,
+          html: code,
+          title: deployTitle.trim(),
+          slug: deploySlug.trim() || undefined,
+          status: deployStatus,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.details || data.error || "Deployment failed");
+      }
+
+      setDeployResult(data);
+      saveConnection();
+    } catch (err) {
+      setDeployError(err instanceof Error ? err.message : "Deployment failed");
+    } finally {
+      setIsDeploying(false);
+    }
+  }, [wpUrl, connectKey, code, deployTitle, deploySlug, deployStatus, saveConnection]);
 
   const themeName = siteName
     .toLowerCase()
@@ -207,11 +332,11 @@ export default function WordPressExport({ code }: WordPressExportProps) {
   if (!isOpen) {
     return (
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={() => { setIsOpen(true); loadSavedConnection(); }}
         className="flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded-lg border border-zinc-700 transition-colors text-sm font-medium"
       >
         <FileArchive className="w-4 h-4" />
-        Export to WordPress
+        Zoobicon Connect
       </button>
     );
   }
@@ -224,7 +349,7 @@ export default function WordPressExport({ code }: WordPressExportProps) {
           <div className="flex items-center gap-3">
             <FileArchive className="w-5 h-5 text-blue-400" />
             <h2 className="text-lg font-semibold text-zinc-100">
-              Export to WordPress
+              Zoobicon Connect
             </h2>
           </div>
           <button
@@ -235,10 +360,235 @@ export default function WordPressExport({ code }: WordPressExportProps) {
           </button>
         </div>
 
+        {/* Mode tabs */}
+        <div className="flex border-b border-zinc-700">
+          <button
+            onClick={() => setMode("deploy")}
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
+              mode === "deploy"
+                ? "text-blue-400 border-b-2 border-blue-400 bg-blue-400/5"
+                : "text-zinc-400 hover:text-zinc-300"
+            }`}
+          >
+            <Upload className="w-4 h-4" />
+            Deploy to WordPress
+          </button>
+          <button
+            onClick={() => setMode("theme")}
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
+              mode === "theme"
+                ? "text-blue-400 border-b-2 border-blue-400 bg-blue-400/5"
+                : "text-zinc-400 hover:text-zinc-300"
+            }`}
+          >
+            <FolderTree className="w-4 h-4" />
+            Export Theme
+          </button>
+        </div>
+
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
+
+          {/* ===================== DEPLOY MODE ===================== */}
+          {mode === "deploy" && !deployResult && (
+            <div className="space-y-4">
+              <div className="p-3 bg-blue-900/20 border border-blue-700/30 rounded-lg">
+                <p className="text-xs text-blue-300 leading-relaxed">
+                  Deploy directly to your WordPress site. Requires the{" "}
+                  <strong>Zoobicon Connect</strong> plugin installed on your WordPress site.{" "}
+                  <a href="/wordpress" target="_blank" className="underline hover:text-blue-200">
+                    Download plugin &rarr;
+                  </a>
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-zinc-300 mb-1.5">
+                  <Globe className="w-3.5 h-3.5 inline mr-1.5" />
+                  WordPress Site URL <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="url"
+                  value={wpUrl}
+                  onChange={(e) => { setWpUrl(e.target.value); setConnectionStatus(null); }}
+                  placeholder="https://yoursite.com"
+                  className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  disabled={isDeploying}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-zinc-300 mb-1.5">
+                  <Key className="w-3.5 h-3.5 inline mr-1.5" />
+                  Connect Key <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="password"
+                  value={connectKey}
+                  onChange={(e) => { setConnectKey(e.target.value); setConnectionStatus(null); }}
+                  placeholder="zbc_..."
+                  className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm font-mono"
+                  disabled={isDeploying}
+                />
+                <p className="text-xs text-zinc-500 mt-1">
+                  Found in WordPress admin &rarr; Zoobicon &rarr; Settings
+                </p>
+              </div>
+
+              {/* Test connection */}
+              <button
+                onClick={testConnection}
+                disabled={isTesting || !wpUrl || !connectKey}
+                className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-zinc-300 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 border border-zinc-600 rounded-lg transition-colors"
+              >
+                {isTesting ? (
+                  <><Loader2 className="w-3 h-3 animate-spin" /> Testing...</>
+                ) : (
+                  <><Link2 className="w-3 h-3" /> Test Connection</>
+                )}
+              </button>
+
+              {connectionStatus && (
+                <div className={`p-3 rounded-lg border text-sm ${
+                  connectionStatus.connected
+                    ? "bg-green-900/20 border-green-700/30 text-green-300"
+                    : "bg-red-900/20 border-red-700/30 text-red-300"
+                }`}>
+                  {connectionStatus.connected ? (
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 font-medium">
+                        <CheckCircle2 className="w-4 h-4" />
+                        Connected to {connectionStatus.site_name}
+                      </div>
+                      <div className="text-xs opacity-75">
+                        WordPress {connectionStatus.wordpress_version} &middot; Theme: {connectionStatus.theme} &middot; {connectionStatus.deploy_count} deploys
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 shrink-0" />
+                      {connectionStatus.error}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <hr className="border-zinc-700" />
+
+              <div>
+                <label className="block text-sm font-medium text-zinc-300 mb-1.5">
+                  Page Title <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={deployTitle}
+                  onChange={(e) => setDeployTitle(e.target.value)}
+                  placeholder="My Landing Page"
+                  className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  disabled={isDeploying}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-zinc-300 mb-1.5">
+                    URL Slug
+                  </label>
+                  <input
+                    type="text"
+                    value={deploySlug}
+                    onChange={(e) => setDeploySlug(e.target.value)}
+                    placeholder="my-landing-page"
+                    className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    disabled={isDeploying}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-zinc-300 mb-1.5">
+                    Publish Status
+                  </label>
+                  <select
+                    value={deployStatus}
+                    onChange={(e) => setDeployStatus(e.target.value as "draft" | "publish")}
+                    className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    disabled={isDeploying}
+                  >
+                    <option value="draft">Draft</option>
+                    <option value="publish">Published</option>
+                  </select>
+                </div>
+              </div>
+
+              {deployError && (
+                <div className="p-3 bg-red-900/30 border border-red-700 rounded-lg text-red-300 text-sm">
+                  {deployError}
+                </div>
+              )}
+
+              <button
+                onClick={handleDeploy}
+                disabled={isDeploying || !wpUrl || !connectKey || !deployTitle.trim()}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 disabled:bg-zinc-700 disabled:text-zinc-500 text-white rounded-lg font-medium text-sm transition-colors"
+              >
+                {isDeploying ? (
+                  <><Loader2 className="w-4 h-4 animate-spin" /> Deploying to WordPress...</>
+                ) : (
+                  <><Upload className="w-4 h-4" /> Deploy to WordPress</>
+                )}
+              </button>
+            </div>
+          )}
+
+          {/* Deploy success */}
+          {mode === "deploy" && deployResult && (
+            <div className="space-y-4">
+              <div className="p-4 bg-green-900/20 border border-green-700/30 rounded-lg">
+                <div className="flex items-center gap-2 text-green-300 font-semibold mb-2">
+                  <CheckCircle2 className="w-5 h-5" />
+                  Deployed Successfully!
+                </div>
+                <div className="space-y-2 text-sm text-green-200/80">
+                  <div><strong>Title:</strong> {deployResult.title}</div>
+                  <div><strong>Status:</strong> {deployResult.status}</div>
+                  <div><strong>Version:</strong> {deployResult.version}</div>
+                  <div><strong>Page ID:</strong> {deployResult.page_id}</div>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <a
+                  href={deployResult.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium text-sm transition-colors"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  View Page
+                </a>
+                {deployResult.edit_url && (
+                  <a
+                    href={deployResult.edit_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-zinc-700 hover:bg-zinc-600 text-zinc-200 rounded-lg font-medium text-sm transition-colors"
+                  >
+                    Edit in WordPress
+                  </a>
+                )}
+              </div>
+
+              <button
+                onClick={() => { setDeployResult(null); setDeployError(null); }}
+                className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
+              >
+                &larr; Deploy another page
+              </button>
+            </div>
+          )}
+
+          {/* ===================== THEME EXPORT MODE ===================== */}
           {/* Form */}
-          {!result && (
+          {mode === "theme" && !result && (
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-zinc-300 mb-1.5">
@@ -310,7 +660,7 @@ export default function WordPressExport({ code }: WordPressExportProps) {
           )}
 
           {/* Results */}
-          {result && (
+          {mode === "theme" && result && (
             <div className="space-y-5">
               {/* Action buttons */}
               <div className="flex gap-3">

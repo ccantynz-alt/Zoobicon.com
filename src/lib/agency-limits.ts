@@ -117,6 +117,14 @@ export function checkGenerationLimit(plan: string, currentGenerations: number): 
   };
 }
 
+/**
+ * Get current month period string (e.g., "2026-03")
+ */
+export function getCurrentPeriod(): string {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+}
+
 export function checkFeatureAccess(plan: string, feature: "bulkGeneration" | "whiteLabel" | "customDomain" | "apiAccess"): { allowed: boolean; reason?: string } {
   const limits = getAgencyPlanLimits(plan);
   const allowed = limits[feature];

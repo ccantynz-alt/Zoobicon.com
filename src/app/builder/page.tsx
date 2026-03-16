@@ -41,6 +41,9 @@ import type { SelectedElement } from "@/lib/dom-bridge";
 import { applyStyleToHtml, applyTextToHtml, reorderSections, addSectionToHtml } from "@/lib/dom-bridge";
 import SectionLibrary from "@/components/SectionLibrary";
 import { downloadZip } from "@/lib/zip-export";
+import CollaborationBar from "@/components/CollaborationBar";
+import CursorOverlay from "@/components/CursorOverlay";
+import { useCollaboration } from "@/hooks/useCollaboration";
 
 import {
   Bug,
@@ -155,7 +158,7 @@ const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }
   { id: "translate", label: "Translate", icon: <Languages size={18} /> },
   { id: "github", label: "GitHub Import", icon: <Github size={18} /> },
   { id: "figma", label: "Figma Import", icon: <Figma size={18} /> },
-  { id: "wordpress", label: "WordPress Export", icon: <FileArchive size={18} /> },
+  { id: "wordpress", label: "Zoobicon Connect", icon: <FileArchive size={18} /> },
   { id: "visual-editor", label: "Visual Editor", icon: <MousePointer2 size={18} /> },
   { id: "sections", label: "Add Section", icon: <Package size={18} /> },
   { id: "project", label: "Project Mode", icon: <FolderTree size={18} /> },
@@ -421,6 +424,11 @@ function BuilderPage() {
 
   // Agency white-label branding (loaded from user's agency membership)
   const [agencyBrand, setAgencyBrand] = useState<{ agencyName: string; primaryColor: string; secondaryColor: string; logoUrl?: string } | null>(null);
+  const [agencyId, setAgencyId] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState("");
+  const [userName, setUserName] = useState("");
+  const previewContainerRef = useRef<HTMLDivElement>(null);
+  const [previewRect, setPreviewRect] = useState<DOMRect | null>(null);
 
   // Show welcome modal on first visit
   useEffect(() => {
@@ -467,6 +475,8 @@ function BuilderPage() {
       const user = localStorage.getItem("zoobicon_user");
       if (user) {
         const parsed = JSON.parse(user);
+        if (parsed.email) setUserEmail(parsed.email);
+        if (parsed.name) setUserName(parsed.name);
         if (parsed.role === "admin" || parsed.plan === "unlimited") {
           setTier("premium");
           setIsAdmin(true);
@@ -477,6 +487,7 @@ function BuilderPage() {
             .then(r => r.json())
             .then(data => {
               const agency = data.agencies?.[0];
+              if (agency?.id) setAgencyId(agency.id);
               if (agency?.brand_config?.agencyName) {
                 setAgencyBrand({
                   agencyName: agency.brand_config.agencyName,
@@ -503,6 +514,76 @@ function BuilderPage() {
       })
       .catch(() => { /* models API not available, use defaults */ });
   }, []);
+
+  // --- Real-Time Collaboration ---
+  const collabSlug = useMemo(() => {
+    // Use site slug from URL or a generated session key
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("slug") || params.get("site") || "";
+    }
+    return "";
+  }, []);
+
+  const collab = useCollaboration({
+    slug: collabSlug,
+    email: userEmail,
+    name: userName,
+    enabled: !!collabSlug && !!userEmail,
+    onRemoteCodeUpdate: useCallback((html: string, _version: number, updatedBy: string) => {
+      // Apply remote code update
+      setGeneratedCode(html);
+      setStatus("complete");
+      console.log(`Code updated by ${updatedBy}`);
+    }, []),
+  });
+
+  // Auto-join collab room from invite code in URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const inviteCode = params.get("collab");
+    if (inviteCode && userEmail && !collab.isConnected) {
+      collab.joinRoom(inviteCode);
+    }
+  }, [userEmail, collab.isConnected]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Push code changes to collab room
+  const prevCodeRef = useRef("");
+  useEffect(() => {
+    if (collab.isConnected && generatedCode && generatedCode !== prevCodeRef.current) {
+      prevCodeRef.current = generatedCode;
+      collab.pushCode(generatedCode);
+    }
+  }, [generatedCode, collab.isConnected, collab.pushCode]);
+
+  // Track preview container rect for cursor overlay
+  useEffect(() => {
+    const el = previewContainerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(() => {
+      setPreviewRect(el.getBoundingClientRect());
+    });
+    observer.observe(el);
+
+    // Send cursor position on mousemove (throttled)
+    let lastSent = 0;
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!collab.isConnected) return;
+      const now = Date.now();
+      if (now - lastSent < 100) return; // Throttle to 10fps
+      lastSent = now;
+      const rect = el.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = (e.clientY - rect.top) / rect.height;
+      collab.sendCursorPosition(x, y, null);
+    };
+    el.addEventListener("mousemove", handleMouseMove);
+
+    return () => {
+      observer.disconnect();
+      el.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, [collab.isConnected, collab.sendCursorPosition]);
 
   // Track code changes in snapshot system
   const pendingLabelRef = useRef<string>("Manual change");
@@ -621,6 +702,7 @@ function BuilderPage() {
             ...(selectedModel ? { model: selectedModel } : {}),
             ...(generatorBanner ? { generator: generatorBanner.id } : {}),
             ...(agencyBrand ? { agencyBrand } : {}),
+            ...(agencyId ? { agencyId } : {}),
           }),
           signal: controller.signal,
         });
@@ -647,6 +729,7 @@ function BuilderPage() {
               ...(selectedModel ? { model: selectedModel } : {}),
               ...(generatorBanner ? { generator: generatorBanner.id } : {}),
               ...(agencyBrand ? { agencyBrand } : {}),
+            ...(agencyId ? { agencyId } : {}),
             }),
           });
           if (!fallbackRes.ok) {
@@ -772,6 +855,7 @@ function BuilderPage() {
                   tier,
                   ...(selectedModel ? { model: selectedModel } : {}),
                   ...(agencyBrand ? { agencyBrand } : {}),
+            ...(agencyId ? { agencyId } : {}),
                 }),
                 signal: controller.signal,
               });
@@ -927,6 +1011,7 @@ function BuilderPage() {
           ...(isAdmin ? { isAdmin: true } : {}),
           ...(generatorBanner ? { generatorType: generatorBanner.id } : {}),
           ...(agencyBrand ? { agencyBrand } : {}),
+            ...(agencyId ? { agencyId } : {}),
         }),
         signal: controller.signal,
       });
@@ -1334,7 +1419,21 @@ function BuilderPage() {
       {/* Interactive particle constellation background */}
       <BuilderBackground isGenerating={status === "generating"} />
 
-      <TopBar />
+      <div className="flex items-center border-b border-white/[0.06]">
+        <div className="flex-1"><TopBar /></div>
+        <div className="px-3">
+          <CollaborationBar
+            room={collab.room}
+            participants={collab.participants}
+            myColor={collab.myColor}
+            isConnected={collab.isConnected}
+            onCreateRoom={collab.createRoom}
+            onJoinRoom={collab.joinRoom}
+            onLeaveRoom={collab.leaveRoom}
+            userEmail={userEmail}
+          />
+        </div>
+      </div>
 
       <div className="flex flex-1 overflow-hidden">
         {/* Left panel — Prompt (before generation) or Chat editor (after) */}
@@ -1554,12 +1653,20 @@ function BuilderPage() {
                 </div>
               </div>
             ) : activeTab === "preview" ? (
-              <PreviewPanel
-                html={generatedCode}
-                isGenerating={status === "generating"}
-                visualEditMode={visualEditMode}
-                onElementSelected={setSelectedElement}
-              />
+              <div ref={previewContainerRef} className="relative h-full">
+                <PreviewPanel
+                  html={generatedCode}
+                  isGenerating={status === "generating"}
+                  visualEditMode={visualEditMode}
+                  onElementSelected={setSelectedElement}
+                />
+                {collab.isConnected && (
+                  <CursorOverlay
+                    participants={collab.participants}
+                    containerRect={previewRect}
+                  />
+                )}
+              </div>
             ) : activeTab === "seo" ? (
               <SeoPreview html={generatedCode} />
             ) : (
