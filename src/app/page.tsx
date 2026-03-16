@@ -366,7 +366,7 @@ export default function LandingPage() {
   return (
     <div className="relative">
       {/* Background Effects */}
-      <BackgroundEffects preset="energetic" />
+      <BackgroundEffects preset="contrast" />
 
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.12] bg-[#0d1525]/80 backdrop-blur-2xl" aria-label="Main navigation">
