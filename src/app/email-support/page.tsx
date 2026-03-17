@@ -601,7 +601,7 @@ export default function EmailSupportDashboard() {
 
   if (!authChecked) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
       </div>
     );
@@ -610,10 +610,10 @@ export default function EmailSupportDashboard() {
   const visibleTickets = filteredTickets();
 
   return (
-    <div className="relative min-h-screen bg-gray-950 text-white flex flex-col">
+    <div className="relative min-h-screen bg-gray-900 text-white flex flex-col">
       <BackgroundEffects preset="technical" />
       {/* Top Nav */}
-      <nav className="h-14 border-b border-white/[0.08] bg-gray-950/80 backdrop-blur-xl flex items-center justify-between px-4 shrink-0 z-50">
+      <nav className="h-14 border-b border-white/[0.08] bg-gray-900/80 backdrop-blur-xl flex items-center justify-between px-4 shrink-0 z-50">
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
@@ -648,7 +648,7 @@ export default function EmailSupportDashboard() {
       <CursorGlowTracker />
 
       {/* Stats Bar */}
-      <div className="h-12 border-b border-white/[0.06] bg-gray-950/50 flex items-center px-4 gap-6 shrink-0 overflow-x-auto">
+      <div className="h-12 border-b border-white/[0.06] bg-gray-900/50 flex items-center px-4 gap-6 shrink-0 overflow-x-auto">
         <div className="flex items-center gap-2 text-xs">
           <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
           <span className="text-white/40">Open</span>
@@ -675,7 +675,7 @@ export default function EmailSupportDashboard() {
       <div className="relative flex flex-1 min-h-0">
         <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
         {/* Sidebar - Folders */}
-        <div className="w-52 border-r border-white/[0.06] bg-gray-950 shrink-0 flex flex-col">
+        <div className="w-52 border-r border-white/[0.06] bg-gray-900 shrink-0 flex flex-col">
           <div className="p-3">
             <button
               onClick={() => setShowNewTicket(true)}
@@ -720,7 +720,7 @@ export default function EmailSupportDashboard() {
         </div>
 
         {/* Ticket List */}
-        <div className="w-80 border-r border-white/[0.06] bg-gray-950/50 flex flex-col shrink-0">
+        <div className="w-80 border-r border-white/[0.06] bg-gray-900/50 flex flex-col shrink-0">
           {/* Search & Filter Bar */}
           <div className="p-3 border-b border-white/[0.06] space-y-2">
             <div className="relative">
@@ -846,7 +846,7 @@ export default function EmailSupportDashboard() {
         </div>
 
         {/* Ticket Detail */}
-        <div className="flex-1 flex min-w-0 bg-gray-950/30">
+        <div className="flex-1 flex min-w-0 bg-gray-900/30">
           {selectedTicket ? (
             <>
             <div className="flex-1 flex flex-col min-w-0">
@@ -1041,7 +1041,7 @@ export default function EmailSupportDashboard() {
                     <div
                       className={`max-w-[70%] rounded-2xl px-4 py-3 ${
                         msg.from === "customer"
-                          ? "bg-white/[0.06] border border-white/[0.08]"
+                          ? "bg-white/[0.12] border border-white/[0.15]"
                           : msg.from === "ai"
                           ? "bg-purple-500/[0.08] border border-purple-500/20"
                           : msg.from === "internal"
@@ -1070,8 +1070,8 @@ export default function EmailSupportDashboard() {
                           )}
                         </div>
                       )}
-                      <p className="text-xs text-white/65 leading-relaxed whitespace-pre-wrap">{msg.body}</p>
-                      <div className="text-[9px] text-white/25 mt-2">{formatDate(msg.timestamp)}</div>
+                      <p className="text-sm text-white/90 leading-relaxed whitespace-pre-wrap">{msg.body}</p>
+                      <div className="text-[10px] text-white/45 mt-2">{formatDate(msg.timestamp)}</div>
                     </div>
                     {msg.from !== "customer" && (
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
@@ -1181,7 +1181,7 @@ export default function EmailSupportDashboard() {
             </div>
             {/* Customer Profile Sidebar */}
             {showCustomerSidebar && (
-              <div className="w-56 border-l border-white/[0.06] bg-gray-950/50 shrink-0 overflow-y-auto">
+              <div className="w-56 border-l border-white/[0.06] bg-gray-900/50 shrink-0 overflow-y-auto">
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-[10px] font-bold text-white/40 uppercase tracking-wider">Customer</span>
@@ -1248,7 +1248,7 @@ export default function EmailSupportDashboard() {
             {!showCustomerSidebar && (
               <button
                 onClick={() => setShowCustomerSidebar(true)}
-                className="w-8 border-l border-white/[0.06] bg-gray-950/50 shrink-0 flex items-center justify-center hover:bg-white/[0.04] transition-all"
+                className="w-8 border-l border-white/[0.06] bg-gray-900/50 shrink-0 flex items-center justify-center hover:bg-white/[0.04] transition-all"
                 title="Show customer profile"
               >
                 <UserCircle className="w-4 h-4 text-white/30" />
@@ -1256,9 +1256,9 @@ export default function EmailSupportDashboard() {
             )}
             </>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-white/25 gap-3">
+            <div className="flex-1 flex flex-col items-center justify-center text-white/50 gap-3">
               <Mail className="w-12 h-12" />
-              <span className="text-sm">Select a ticket to view details</span>
+              <span className="text-sm font-medium">Select a ticket to view details</span>
             </div>
           )}
         </div>

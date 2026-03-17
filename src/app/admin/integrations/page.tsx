@@ -440,7 +440,7 @@ export default function IntegrationsPage() {
   const available = integrations.filter((i) => i.status !== "connected");
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white">
+    <div className="min-h-screen bg-zinc-900 text-white">
       <BackgroundEffects />
 
       {/* Notification toast */}

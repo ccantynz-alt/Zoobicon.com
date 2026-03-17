@@ -140,11 +140,11 @@ export default function AdminEmailPage() {
   const toggleSelectAll = () => setSelected(selected.size === emails.length ? new Set() : new Set(emails.map((e) => e.id)));
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white relative">
+    <div className="min-h-screen bg-[#131520] text-white relative">
       <BackgroundEffects />
 
       {/* Navbar */}
-      <nav className="relative z-20 border-b border-white/10 bg-zinc-900/80 backdrop-blur-md">
+      <nav className="relative z-20 border-b border-white/10 bg-zinc-800/90 backdrop-blur-md">
         <div className="max-w-[1440px] mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/" className="text-lg font-bold tracking-tight">Zoobicon</Link>
