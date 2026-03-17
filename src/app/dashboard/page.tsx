@@ -54,6 +54,7 @@ const ADMIN_QUICK_ACTIONS = [
   { icon: Key, label: "API Keys", desc: "Developer access", href: "/auth/settings", color: "from-cyan-500 to-blue-600" },
   { icon: BarChart3, label: "Analytics", desc: "Site performance", href: "/analytics", color: "from-blue-500 to-fuchsia-600" },
   { icon: Settings, label: "Settings", desc: "Account config", href: "/auth/settings", color: "from-gray-500 to-slate-600" },
+  { icon: Mail, label: "Email Support", desc: "Tickets & inbox", href: "/email-support", color: "from-pink-500 to-rose-600" },
 ];
 
 const ADMIN_TOOLS = [
@@ -178,10 +179,10 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#050508]">
-      <BackgroundEffects preset="calm" />
+    <div className="relative min-h-screen bg-[#0b1121]">
+      <BackgroundEffects preset="dashboard" />
       {/* Top Nav */}
-      <nav className="border-b border-white/[0.06] bg-[#050508]/80 backdrop-blur-2xl sticky top-0 z-50">
+      <nav className="border-b border-white/[0.08] bg-[#0b1121]/80 backdrop-blur-2xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-6">
@@ -192,13 +193,13 @@ export default function DashboardPage() {
                 <span className="text-lg font-bold tracking-tight">Zoobicon</span>
               </Link>
               <div className="hidden md:flex items-center gap-1">
-                <Link href="/dashboard" className="px-3 py-1.5 text-sm font-medium text-white/80 bg-white/[0.07] rounded-lg">
+                <Link href="/dashboard" className="px-3 py-1.5 text-sm font-medium text-white/80 bg-white/[0.12] rounded-lg">
                   Dashboard
                 </Link>
-                <Link href="/builder" className="px-3 py-1.5 text-sm text-white/60 hover:text-white/60 rounded-lg transition-colors">
+                <Link href="/builder" className="px-3 py-1.5 text-sm text-white/70 hover:text-white rounded-lg transition-colors">
                   Builder
                 </Link>
-                <Link href="/analytics" className="px-3 py-1.5 text-sm text-white/60 hover:text-white/60 rounded-lg transition-colors">
+                <Link href="/analytics" className="px-3 py-1.5 text-sm text-white/70 hover:text-white rounded-lg transition-colors">
                   Analytics
                 </Link>
               </div>
@@ -217,22 +218,22 @@ export default function DashboardPage() {
               <div className="relative">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/[0.10] bg-white/[0.05] hover:bg-white/[0.07] transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/[0.12] bg-white/[0.08] hover:bg-white/[0.12] transition-colors"
                 >
                   <div className="w-6 h-6 rounded-full bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center text-[10px] font-bold text-white">
                     {userName.charAt(0).toUpperCase()}
                   </div>
-                  <span className="text-sm text-white/60 hidden sm:block">{userName}</span>
-                  <ChevronDown className="w-3 h-3 text-white/50" />
+                  <span className="text-sm text-white/80 hidden sm:block">{userName}</span>
+                  <ChevronDown className="w-3 h-3 text-white/70" />
                 </button>
 
                 {showUserMenu && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setShowUserMenu(false)} />
-                    <div className="absolute right-0 mt-2 w-48 bg-dark-100 border border-white/[0.12] rounded-xl shadow-elevated overflow-hidden z-50">
-                      <div className="px-4 py-3 border-b border-white/[0.10]">
+                    <div className="absolute right-0 mt-2 w-48 bg-[#111827] border border-white/[0.15] rounded-xl shadow-elevated overflow-hidden z-50">
+                      <div className="px-4 py-3 border-b border-white/[0.12]">
                         <div className="text-sm font-medium">{userName}</div>
-                        <div className="text-xs text-white/50">
+                        <div className="text-xs text-white/70">
                           {userRole === "admin" ? (
                             <span className="text-brand-400 font-semibold">Admin · Unlimited</span>
                           ) : "Free Plan"}
@@ -242,7 +243,7 @@ export default function DashboardPage() {
                         {userRole === "admin" && (
                           <Link
                             href="/admin"
-                            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-brand-400/70 hover:text-brand-400 hover:bg-white/[0.07] transition-colors"
+                            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-brand-400/70 hover:text-brand-400 hover:bg-white/[0.12] transition-colors"
                           >
                             <Shield className="w-4 h-4" />
                             Admin Panel
@@ -250,14 +251,14 @@ export default function DashboardPage() {
                         )}
                         <Link
                           href="/auth/settings"
-                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-white/65 hover:text-white hover:bg-white/[0.07] transition-colors"
+                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-white/65 hover:text-white hover:bg-white/[0.12] transition-colors"
                         >
                           <Settings className="w-4 h-4" />
                           Settings
                         </Link>
                         <button
                           onClick={handleLogout}
-                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-400/60 hover:text-red-400 hover:bg-white/[0.07] transition-colors"
+                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-400/60 hover:text-red-400 hover:bg-white/[0.12] transition-colors"
                         >
                           <LogOut className="w-4 h-4" />
                           Sign out
@@ -285,7 +286,7 @@ export default function DashboardPage() {
               </span>
             )}
           </div>
-          <p className="text-white/60 text-sm">
+          <p className="text-white/80 text-sm">
             {userRole === "admin"
               ? "Full access to all tools, agents, and platform controls."
               : "Manage your projects and create new ones."}
@@ -306,7 +307,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <div className="text-sm font-semibold group-hover:text-white transition-colors">{action.label}</div>
-                  <div className="text-xs text-white/50">{action.desc}</div>
+                  <div className="text-xs text-white/70">{action.desc}</div>
                 </div>
               </Link>
             ))}
@@ -324,7 +325,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <div className="text-sm font-semibold group-hover:text-white transition-colors">{action.label}</div>
-                  <div className="text-xs text-white/50">Create new</div>
+                  <div className="text-xs text-white/70">Create new</div>
                 </div>
               </Link>
             ))}
@@ -334,19 +335,19 @@ export default function DashboardPage() {
         {/* Admin: AI Tools Arsenal */}
         {userRole === "admin" && (
           <div className="mb-10">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-white/50 mb-4">AI Tools Arsenal — All Unlocked</h2>
+            <h2 className="text-sm font-bold uppercase tracking-wider text-white/80 mb-4">AI Tools Arsenal — All Unlocked</h2>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
               {ADMIN_TOOLS.map((tool) => (
                 <Link
                   key={tool.label}
                   href="/builder"
-                  className="group p-3 rounded-xl border border-white/[0.10] bg-white/[0.05] hover:bg-white/[0.08] hover:border-brand-500/20 transition-all"
+                  className="group p-3 rounded-xl border border-white/[0.12] bg-white/[0.08] hover:bg-white/[0.14] hover:border-brand-500/20 transition-all"
                 >
                   <div className="flex items-center gap-2 mb-1">
                     <tool.icon className="w-4 h-4 text-brand-400/60 group-hover:text-brand-400 transition-colors" />
                     <span className="text-xs font-semibold text-white/70 group-hover:text-white transition-colors">{tool.label}</span>
                   </div>
-                  <div className="text-[10px] text-white/45">{tool.desc}</div>
+                  <div className="text-[10px] text-white/65">{tool.desc}</div>
                 </Link>
               ))}
             </div>
@@ -357,36 +358,36 @@ export default function DashboardPage() {
         <div className="grid grid-cols-4 gap-4 mb-10">
           <div className="gradient-border p-5 rounded-xl">
             <div className="text-2xl font-black gradient-text-static">{projects.length}</div>
-            <div className="text-xs text-white/60 mt-1">Total Projects</div>
+            <div className="text-xs text-white/80 mt-1">Total Projects</div>
           </div>
           <div className="gradient-border p-5 rounded-xl">
             <div className="text-2xl font-black gradient-text-static">{liveSites.length}</div>
-            <div className="text-xs text-white/60 mt-1">Deployed Sites</div>
+            <div className="text-xs text-white/80 mt-1">Deployed Sites</div>
           </div>
           <div className="gradient-border p-5 rounded-xl">
             <div className="text-2xl font-black gradient-text-static">
               {projects.reduce((sum, p) => sum + p.code.length, 0).toLocaleString()}
             </div>
-            <div className="text-xs text-white/60 mt-1">Characters Generated</div>
+            <div className="text-xs text-white/80 mt-1">Characters Generated</div>
           </div>
           <div className="gradient-border p-5 rounded-xl">
             <div className="text-2xl font-black gradient-text-static">
               {userRole === "admin" ? "∞" : userPlan === "unlimited" ? "∞" : "Free"}
             </div>
-            <div className="text-xs text-white/60 mt-1">
+            <div className="text-xs text-white/80 mt-1">
               {userRole === "admin" ? "All Agents Active" : "Current Plan"}
             </div>
           </div>
         </div>
 
         {/* Section tabs */}
-        <div className="flex items-center gap-1 mb-6 border-b border-white/[0.06] pb-1">
+        <div className="flex items-center gap-1 mb-6 border-b border-white/[0.12] pb-1">
           <button
             onClick={() => setActiveSection("projects")}
             className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
               activeSection === "projects"
-                ? "text-white bg-white/[0.06] border-b-2 border-brand-500"
-                : "text-white/50 hover:text-white/70"
+                ? "text-white bg-white/[0.10] border-b-2 border-brand-500"
+                : "text-white/70 hover:text-white/70"
             }`}
           >
             Projects ({projects.length})
@@ -395,8 +396,8 @@ export default function DashboardPage() {
             onClick={() => setActiveSection("deployed")}
             className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
               activeSection === "deployed"
-                ? "text-white bg-white/[0.06] border-b-2 border-emerald-500"
-                : "text-white/50 hover:text-white/70"
+                ? "text-white bg-white/[0.10] border-b-2 border-emerald-500"
+                : "text-white/70 hover:text-white/70"
             }`}
           >
             <span className="flex items-center gap-1.5">
@@ -411,9 +412,9 @@ export default function DashboardPage() {
           <div className="mb-10">
             {liveSites.length === 0 ? (
               <div className="gradient-border p-16 rounded-2xl text-center">
-                <Globe className="w-10 h-10 text-white/20 mx-auto mb-4" />
-                <h3 className="text-lg font-bold text-white/60 mb-2">No deployed sites yet</h3>
-                <p className="text-sm text-white/50 mb-6 max-w-md mx-auto">
+                <Globe className="w-10 h-10 text-white/50 mx-auto mb-4" />
+                <h3 className="text-lg font-bold text-white/80 mb-2">No deployed sites yet</h3>
+                <p className="text-sm text-white/70 mb-6 max-w-md mx-auto">
                   Build a website and deploy it to get a live URL on zoobicon.sh
                 </p>
                 <Link href="/builder" className="inline-flex items-center gap-2 btn-gradient px-6 py-3 rounded-xl text-sm font-bold text-white">
@@ -424,7 +425,7 @@ export default function DashboardPage() {
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {liveSites.map((site) => (
                   <div key={site.id} className="gradient-border card-hover rounded-xl overflow-hidden group">
-                    <div className="h-40 bg-dark-200 border-b border-white/[0.06] relative overflow-hidden">
+                    <div className="h-40 bg-[#0f172a] border-b border-white/[0.12] relative overflow-hidden">
                       <iframe
                         src={`/api/hosting/serve/${site.slug}`}
                         title={site.name}
@@ -452,14 +453,14 @@ export default function DashboardPage() {
                       <div className="flex items-center justify-between mb-1">
                         <h3 className="text-sm font-semibold truncate flex-1">{site.name}</h3>
                         <span className={`text-[10px] px-2 py-0.5 rounded-full ${
-                          site.status === "active" ? "bg-emerald-500/20 text-emerald-400" : "bg-white/10 text-white/40"
+                          site.status === "active" ? "bg-emerald-500/20 text-emerald-400" : "bg-white/10 text-white/60"
                         }`}>
                           {site.status === "active" ? "Live" : site.status}
                         </span>
                       </div>
-                      <p className="text-xs text-white/40 truncate">{site.slug}.zoobicon.sh</p>
+                      <p className="text-xs text-white/60 truncate">{site.slug}.zoobicon.sh</p>
                       {site.updated_at && (
-                        <div className="flex items-center gap-1 mt-2 text-[10px] text-white/30">
+                        <div className="flex items-center gap-1 mt-2 text-[10px] text-white/50">
                           <Clock className="w-3 h-3" />
                           {formatDate(new Date(site.updated_at).getTime())}
                         </div>
@@ -479,27 +480,27 @@ export default function DashboardPage() {
           <div className="flex items-center gap-3">
             {/* Search */}
             <div className="relative">
-              <Search className="w-4 h-4 text-white/40 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-white/60 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search projects..."
-                className="bg-white/[0.06] border border-white/[0.10] rounded-lg pl-9 pr-4 py-2 text-sm
+                className="bg-white/[0.10] border border-white/[0.12] rounded-lg pl-9 pr-4 py-2 text-sm
                            placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 w-48 transition-all"
               />
             </div>
             {/* View toggle */}
-            <div className="flex bg-white/[0.06] border border-white/[0.10] rounded-lg p-0.5">
+            <div className="flex bg-white/[0.10] border border-white/[0.12] rounded-lg p-0.5">
               <button
                 onClick={() => setViewMode("grid")}
-                className={`p-1.5 rounded-md transition-colors ${viewMode === "grid" ? "bg-white/[0.08] text-white" : "text-white/50"}`}
+                className={`p-1.5 rounded-md transition-colors ${viewMode === "grid" ? "bg-white/[0.08] text-white" : "text-white/70"}`}
               >
                 <LayoutGrid className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`p-1.5 rounded-md transition-colors ${viewMode === "list" ? "bg-white/[0.08] text-white" : "text-white/50"}`}
+                className={`p-1.5 rounded-md transition-colors ${viewMode === "list" ? "bg-white/[0.08] text-white" : "text-white/70"}`}
               >
                 <List className="w-4 h-4" />
               </button>
@@ -513,10 +514,10 @@ export default function DashboardPage() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500/10 to-accent-purple/10 border border-brand-500/10 mb-4">
               <Code2 className="w-8 h-8 text-brand-400/40" />
             </div>
-            <h3 className="text-lg font-bold text-white/60 mb-2">
+            <h3 className="text-lg font-bold text-white/80 mb-2">
               {searchQuery ? "No matching projects" : "No projects yet"}
             </h3>
-            <p className="text-sm text-white/50 mb-6 max-w-md mx-auto">
+            <p className="text-sm text-white/70 mb-6 max-w-md mx-auto">
               {searchQuery
                 ? "Try a different search term."
                 : "Start building your first website with AI. It only takes seconds."}
@@ -536,7 +537,7 @@ export default function DashboardPage() {
             {filteredProjects.map((project) => (
               <div key={project.id} className="gradient-border card-hover rounded-xl overflow-hidden group">
                 {/* Thumbnail */}
-                <div className="h-40 bg-dark-200 border-b border-white/[0.06] relative overflow-hidden">
+                <div className="h-40 bg-[#0f172a] border-b border-white/[0.12] relative overflow-hidden">
                   <iframe
                     srcDoc={project.code}
                     title={project.name}
@@ -561,13 +562,13 @@ export default function DashboardPage() {
                     <h3 className="text-sm font-semibold truncate flex-1">{project.name}</h3>
                     <button
                       onClick={() => handleDelete(project.id)}
-                      className="text-white/30 hover:text-red-400 transition-colors ml-2 flex-shrink-0"
+                      className="text-white/50 hover:text-red-400 transition-colors ml-2 flex-shrink-0"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
-                  <p className="text-xs text-white/50 line-clamp-2 mb-3">{project.prompt}</p>
-                  <div className="flex items-center gap-3 text-[10px] text-white/40">
+                  <p className="text-xs text-white/70 line-clamp-2 mb-3">{project.prompt}</p>
+                  <div className="flex items-center gap-3 text-[10px] text-white/60">
                     <span className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       {formatDate(project.updatedAt)}
@@ -583,7 +584,7 @@ export default function DashboardPage() {
             {filteredProjects.map((project) => (
               <div key={project.id} className="gradient-border card-hover p-4 rounded-xl flex items-center gap-4 group">
                 {/* Mini thumbnail */}
-                <div className="w-20 h-14 bg-dark-200 rounded-lg overflow-hidden flex-shrink-0 border border-white/[0.08]">
+                <div className="w-20 h-14 bg-[#0f172a] rounded-lg overflow-hidden flex-shrink-0 border border-white/[0.08]">
                   <iframe
                     srcDoc={project.code}
                     title={project.name}
@@ -593,9 +594,9 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-sm font-semibold truncate">{project.name}</h3>
-                  <p className="text-xs text-white/50 truncate">{project.prompt}</p>
+                  <p className="text-xs text-white/70 truncate">{project.prompt}</p>
                 </div>
-                <div className="flex items-center gap-2 text-xs text-white/40 flex-shrink-0">
+                <div className="flex items-center gap-2 text-xs text-white/60 flex-shrink-0">
                   <Clock className="w-3 h-3" />
                   {formatDate(project.updatedAt)}
                 </div>
@@ -608,7 +609,7 @@ export default function DashboardPage() {
                   </Link>
                   <button
                     onClick={() => handleDelete(project.id)}
-                    className="p-1.5 text-white/40 hover:text-red-400 transition-colors"
+                    className="p-1.5 text-white/60 hover:text-red-400 transition-colors"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
