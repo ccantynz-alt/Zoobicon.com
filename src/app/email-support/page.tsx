@@ -647,6 +647,15 @@ export default function EmailSupportDashboard() {
 
       <CursorGlowTracker />
 
+      {/* Demo Data Banner */}
+      <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2.5 flex items-center justify-center gap-2 shrink-0 z-40">
+        <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+        <p className="text-xs text-amber-300 text-center">
+          <strong>DEMO DATA</strong> — These are placeholder tickets, not real customers. Connect Mailgun to receive real support emails.{" "}
+          <Link href="/admin/email-settings" className="underline hover:text-amber-200 transition-colors">Set up email →</Link>
+        </p>
+      </div>
+
       {/* Stats Bar */}
       <div className="h-12 border-b border-white/[0.06] bg-gray-900/50 flex items-center px-4 gap-6 shrink-0 overflow-x-auto">
         <div className="flex items-center gap-2 text-xs">
