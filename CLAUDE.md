@@ -123,6 +123,8 @@ Build has `ignoreBuildErrors: true` and `ignoreDuringBuilds: true` in next.confi
 - `/edit/[slug]` — Post-deploy live editor with version history
 - `/dashboard` — User dashboard
 - `/admin` — Admin dashboard (fallback credentials in auth route)
+- `/admin/email-settings` — Email configuration (Mailgun setup guide, API keys, notification prefs)
+- `/admin/pre-launch` — Pre-launch checklist (75+ items across 12 categories)
 - `/auth/*` — Login, signup, forgot-password, reset-password, settings
 - `/products/*` — Product pages (website-builder, seo-agent, video-creator, email-support, hosting)
 - `/generators` — Hub page linking to all 32+ generators
@@ -259,6 +261,12 @@ Post-deployment live editor:
 18. **Public API v1** — The `/api/v1/*` routes provide a programmatic REST API for external developers. Authentication uses stateless HMAC-SHA256 API keys (`zbk_live_*`) validated in `src/lib/apiKey.ts` with rate limiting in `src/lib/api-middleware.ts`. The API supports generation with all 43 generators, auto-deploy to zoobicon.sh, webhook callbacks, and white-label agency branding. Do not change the auth scheme without updating all v1 routes. Key files: `src/lib/api-middleware.ts`, `src/app/api/v1/generate/route.ts`, `src/app/api/v1/sites/route.ts`, `src/app/api/v1/deploy/route.ts`, `src/app/api/v1/status/route.ts`.
 
 19. **WordPress Connect Plugin** — The `public/wordpress-plugin/` directory contains the Zoobicon Connect WordPress plugin (PHP). This is a standalone WordPress plugin that customers install on their WP sites to receive deployments from Zoobicon. The plugin registers REST endpoints at `/wp-json/zoobicon/v1/` (deploy, status, pages, delete). Authentication uses a Connect Key (`zbc_*`) auto-generated on plugin activation. The Zoobicon side has a proxy at `/api/export/wordpress/deploy` that forwards deployments to the customer's WP site. The `WordPressExport.tsx` component has two modes: "Deploy to WordPress" (live push) and "Export Theme" (download ZIP). The `/wordpress` page is the plugin landing page. Key files: `public/wordpress-plugin/zoobicon-connect.php`, `src/app/api/export/wordpress/deploy/route.ts`, `src/components/WordPressExport.tsx`, `src/app/wordpress/page.tsx`.
+
+20. **Email is Mailgun-only — NO Google Workspace** — All email (inbound admin inbox, inbound support tickets, outbound notifications/replies) runs through Mailgun. No Google Workspace, no Resend dependency. One service, one API key. Architecture: Mailgun receives emails for `admin@zoobicon.com` and `support@zoobicon.com` via MX records, forwards to webhooks (`/api/email/inbox` and `/api/email/support/inbound`), which store in the database. Outbound goes via Mailgun API. `src/lib/admin-notify.ts` tries Mailgun first, falls back to Resend (legacy), then console logging. The `/admin/email` and `/email-support` pages show DEMO DATA banners when Mailgun is not connected (the hardcoded `DEMO_EMAILS` and `DEMO_TICKETS` arrays are fallback placeholders, NOT real data). Setup guide is at `/admin/email-settings`. Env vars: `MAILGUN_API_KEY`, `MAILGUN_DOMAIN`, `ADMIN_EMAIL`. Cost: $0 on Mailgun free tier (5,000 emails/month).
+
+21. **Pre-launch checklist at `/admin/pre-launch`** — 75+ checklist items across 12 categories (infrastructure, security, email, payments, SEO, performance, quality, UX, AI pipeline, competitive edge, legal, monitoring). Progress tracked via localStorage. Includes competitive position notes vs v0/Bolt/Lovable/Emergent. Admin dashboard has quick links to this page and `/admin/email-settings`.
+
+22. **Admin panel backgrounds brightened** — All admin pages use `bg-[#131520]` or `bg-gray-900` instead of the ultra-dark `#04020a`/`#09090b`/`gray-950` they had before. This improves text contrast and visibility across the admin panel. Email support page also brightened. Do not revert to ultra-dark backgrounds.
 
 ## Route Audit Status
 
