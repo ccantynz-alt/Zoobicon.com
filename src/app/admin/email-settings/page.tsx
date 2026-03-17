@@ -74,10 +74,14 @@ export default function AdminEmailSettingsPage() {
     setTestResult(null);
     try {
       const targetEmail = config.notificationEmail || config.adminEmail || "admin@zoobicon.com";
-      const res = await fetch("/api/email/inbox", {
+      const domain = config.mailgunDomain || "zoobicon.com";
+      const fromAddr = config.fromAddress || `noreply@${domain}`;
+      const fromName = config.fromName || "Zoobicon";
+      const res = await fetch("/api/email/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          from: `${fromName} <${fromAddr}>`,
           to: targetEmail,
           subject: "[Zoobicon] Test Email - Configuration Verified",
           text: "This is a test email from your Zoobicon admin panel. If you received this, your email configuration is working correctly.",
@@ -86,12 +90,14 @@ export default function AdminEmailSettingsPage() {
             <p style="color:rgba(255,255,255,0.7);line-height:1.6">This is a test email from your Zoobicon admin panel. If you received this, your email configuration is working correctly.</p>
             <p style="color:rgba(255,255,255,0.4);font-size:12px;margin-top:24px">Sent at ${new Date().toISOString()}</p>
           </div>`,
+          tags: ["test"],
         }),
       });
+      const data = await res.json();
       if (res.ok) {
         setTestResult({ ok: true, message: `Test email sent to ${targetEmail}` });
       } else {
-        setTestResult({ ok: false, message: "Failed to send test email. Check your API keys." });
+        setTestResult({ ok: false, message: data.error || "Failed to send test email. Check your MAILGUN_API_KEY and MAILGUN_DOMAIN environment variables." });
       }
     } catch {
       setTestResult({ ok: false, message: "Network error. Email service may not be configured." });
