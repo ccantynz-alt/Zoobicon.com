@@ -228,9 +228,10 @@ export default function AdminEmailSettingsPage() {
               <input
                 type="text" value={config.mailgunDomain}
                 onChange={(e) => setConfig((p) => ({ ...p, mailgunDomain: e.target.value }))}
-                placeholder="mail.zoobicon.com"
+                placeholder="zoobicon.com"
                 className="w-full bg-white/[0.06] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500/50 transition-colors"
               />
+              <p className="text-xs text-zinc-500 mt-1">Just the domain name (e.g. <code className="text-zinc-400">zoobicon.com</code>), not the full API URL. The API base URL is added automatically.</p>
             </div>
           </div>
         </motion.div>
@@ -282,7 +283,7 @@ export default function AdminEmailSettingsPage() {
             <div><span className="text-blue-400">ADMIN_NOTIFICATION_EMAIL</span><span className="text-zinc-500">=</span><span className="text-green-400">{config.notificationEmail || config.adminEmail || "admin@zoobicon.com"}</span></div>
             <div className="pt-2"><span className="text-zinc-500"># Mailgun (all email)</span></div>
             <div><span className="text-blue-400">MAILGUN_API_KEY</span><span className="text-zinc-500">=</span><span className="text-green-400">{config.mailgunApiKey ? maskKey(config.mailgunApiKey) : "key-xxxxx"}</span></div>
-            <div><span className="text-blue-400">MAILGUN_DOMAIN</span><span className="text-zinc-500">=</span><span className="text-green-400">{config.mailgunDomain || "mail.zoobicon.com"}</span></div>
+            <div><span className="text-blue-400">MAILGUN_DOMAIN</span><span className="text-zinc-500">=</span><span className="text-green-400">{config.mailgunDomain || "zoobicon.com"}</span></div>
           </div>
         </motion.div>
 
