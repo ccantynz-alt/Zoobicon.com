@@ -2,10 +2,10 @@
  * Admin Notification Service
  *
  * Sends email notifications to the admin (ADMIN_NOTIFICATION_EMAIL or ADMIN_EMAIL)
- * via Resend. Falls back to console logging if RESEND_API_KEY is not set.
+ * via Mailgun. Falls back to console logging if MAILGUN_API_KEY is not set.
  */
 
-const RESEND_API = "https://api.resend.com/emails";
+import { sendViaMailgun } from "@/lib/mailgun";
 
 function getAdminEmail(): string {
   return (
@@ -32,43 +32,17 @@ interface NotifyOptions {
  */
 export async function notifyAdmin(opts: NotifyOptions): Promise<boolean> {
   const adminEmail = getAdminEmail();
-  const apiKey = process.env.RESEND_API_KEY;
 
-  if (!apiKey) {
-    console.log(`[Admin Notify] No RESEND_API_KEY — logging instead:`);
-    console.log(`  To: ${adminEmail}`);
-    console.log(`  Subject: ${opts.subject}`);
-    console.log(`  Body: ${opts.text || "(HTML only)"}`);
-    return false;
-  }
+  const result = await sendViaMailgun({
+    from: getFromAddress(),
+    to: adminEmail,
+    subject: opts.subject,
+    html: opts.html,
+    text: opts.text,
+    tags: ["admin-notification"],
+  });
 
-  try {
-    const res = await fetch(RESEND_API, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: getFromAddress(),
-        to: [adminEmail],
-        subject: opts.subject,
-        html: opts.html,
-        ...(opts.text ? { text: opts.text } : {}),
-      }),
-    });
-
-    if (!res.ok) {
-      const err = await res.text();
-      console.error(`[Admin Notify] Resend error ${res.status}:`, err);
-      return false;
-    }
-
-    return true;
-  } catch (err) {
-    console.error("[Admin Notify] Failed to send:", err);
-    return false;
-  }
+  return result.success;
 }
 
 // ── Styled email wrapper ──────────────────────────────────────
