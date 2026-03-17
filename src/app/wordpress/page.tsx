@@ -113,7 +113,7 @@ export default function WordPressPage() {
 
             <motion.div variants={fadeInUp} className="flex flex-wrap justify-center gap-3">
               <a
-                href="/zoobicon-connect.zip"
+                href="/api/download/wordpress-plugin"
                 download="zoobicon-connect.zip"
                 className="group btn-gradient px-6 py-3 rounded-xl text-sm font-bold text-white flex items-center gap-2"
               >
@@ -242,7 +242,7 @@ export default function WordPressPage() {
           </p>
           <div className="flex justify-center gap-3">
             <a
-              href="/zoobicon-connect.zip"
+              href="/api/download/wordpress-plugin"
               download="zoobicon-connect.zip"
               className="btn-gradient px-8 py-3 rounded-xl text-sm font-bold text-white flex items-center gap-2"
             >
