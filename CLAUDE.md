@@ -378,3 +378,36 @@ Full audit completed. **0 broken routes, 0 broken links, 0 missing API endpoints
 - ⬜ Team workspaces with role-based access
 - ⬜ API access for programmatic site generation (agency feature)
 - ⬜ White-label deployment to agency-owned infrastructure
+
+## ONGOING PRIORITY: Full-Stack Build Speed — Outpace Every Competitor
+
+**This is a standing research and improvement mandate.** Every session, every task — always look for ways to make the full-stack build pipeline faster. Speed is the #1 competitive advantage we can own.
+
+### Current Landscape (March 2026)
+| Platform | Time to First Preview | Full-Stack Time | Architecture |
+|---|---|---|---|
+| **Bolt.new** | ~3-5s | Manual (add Supabase yourself) | WebContainers (in-browser Node.js via WASM) |
+| **v0 (Vercel)** | ~5-15s | No backend generation | Vercel Sandbox VM, component-level |
+| **Lovable** | ~30-90s | ~90s (React + Supabase) | Cloud build, locked to Supabase |
+| **Zoobicon** | ~95s | ~95s (HTML + DB + API + CRUD) | 7-agent pipeline, server-side |
+
+### Target Architecture: "Instant Scaffold + Progressive Enhancement"
+The goal is **3s to first preview, 10s to customized site, 30s to full-stack app**:
+1. **Phase 0 (0-3s)**: Instant template scaffold matching user intent (Haiku classifier → serve pre-built template)
+2. **Phase 1 (3-10s)**: Stream AI-customized copy, colors, branding into scaffold in real-time
+3. **Phase 2 (10-30s)**: Stream full-stack features (auth, DB schema, API routes) as progressive layers
+4. **Phase 3 (30-60s)**: Background enhancement agents (SEO, animations) — site already works
+
+### What to Continuously Research & Improve
+- **Template pre-matching speed**: Can we classify intent and serve a scaffold in <1s?
+- **Streaming injection**: Instead of building HTML from scratch, stream diffs/patches into templates
+- **Parallel full-stack generation**: DB schema, API routes, and frontend generated simultaneously (not sequentially)
+- **Background enhancement**: SEO + animations applied after user already has a working site
+- **Model speed breakthroughs**: Monitor for faster models (Haiku upgrades, Gemini Flash, GPT-4o-mini) that could replace Opus for builds without quality loss
+- **Edge/browser execution**: Evaluate WebContainers, Sandpack, or similar in-browser runtimes for instant preview
+- **Caching strategies**: Can we cache common scaffolds (SaaS dashboard, e-commerce, landing page) at the edge?
+- **Prompt compression**: Shorter, more efficient system prompts = faster time-to-first-token
+- **Speculative generation**: Start generating likely outputs before the user finishes typing
+
+### The Rule
+**Never accept the current pipeline speed as "good enough."** If a competitor ships a faster build, we must respond. If a new model or technique enables faster generation, adopt it immediately. Speed is the moat — the fastest full-stack builder wins the market.
