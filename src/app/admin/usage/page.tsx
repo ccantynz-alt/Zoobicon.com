@@ -232,7 +232,7 @@ export default function UsagePage() {
   ];
 
   return (
-    <div className="relative min-h-screen bg-[#09090b]">
+    <div className="relative min-h-screen bg-[#131520]">
       <BackgroundEffects preset="technical" />
 
       {/* Nav */}

@@ -121,7 +121,7 @@ export default function AdminHealthPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#0b0b11] text-slate-200">
+    <div className="min-h-screen bg-[#131520] text-slate-200">
       <div className="max-w-3xl mx-auto px-6 py-12">
         <Link href="/admin" className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors mb-8">
           <ArrowLeft className="w-4 h-4" />

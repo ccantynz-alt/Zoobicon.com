@@ -252,7 +252,7 @@ export default function AdminPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#04020a] text-white overflow-hidden">
+    <div className="min-h-screen bg-[#131520] text-white overflow-hidden">
       {/* Animated fog background */}
       <div className="fog-container">
         <div className="fog-layer fog-layer-1" />
@@ -359,7 +359,9 @@ export default function AdminPage() {
                 {[
                   { icon: Mail, label: "Email Inbox", href: "/admin/email", desc: "Read & manage email", gradient: "from-rose-500 to-orange-500", glow: "shadow-rose-500/20" },
                   { icon: Inbox, label: "Mailboxes", href: "/admin/mailboxes", desc: "Manage mailboxes & routing", gradient: "from-amber-500 to-yellow-500", glow: "shadow-amber-500/20" },
+                  { icon: Settings, label: "Email Settings", href: "/admin/email-settings", desc: "Configure admin email", gradient: "from-pink-500 to-rose-500", glow: "shadow-pink-500/20" },
                   { icon: HeadphonesIcon, label: "Support", href: "/admin/support", desc: "Support tickets & knowledge", gradient: "from-emerald-500 to-teal-500", glow: "shadow-emerald-500/20" },
+                  { icon: Rocket, label: "Pre-Launch", href: "/admin/pre-launch", desc: "Launch checklist & readiness", gradient: "from-blue-500 to-purple-600", glow: "shadow-blue-500/20" },
                   { icon: Code2, label: "Builder", href: "/builder", desc: "AI website builder", gradient: "from-violet-500 to-purple-500", glow: "shadow-violet-500/20" },
                   { icon: Globe, label: "View Site", href: "/", desc: "Public homepage", gradient: "from-cyan-500 to-blue-500", glow: "shadow-cyan-500/20", external: true },
                   { icon: Settings, label: "Settings", href: "/auth/settings", desc: "Account settings", gradient: "from-slate-400 to-zinc-500", glow: "shadow-slate-500/20" },
