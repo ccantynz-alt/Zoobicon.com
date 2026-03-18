@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { sql, getSQL } from "@/lib/db";
+import { sql } from "@/lib/db";
 
 // ---------------------------------------------------------------------------
 // GET /api/email/setup — Verify Mailgun config + ensure DB tables exist
@@ -187,23 +187,146 @@ export async function GET() {
 }
 
 export async function POST() {
+  const errors: string[] = [];
+
+  // Create each table individually using tagged template literals
+  // (sql.unsafe() and rawSql() don't work reliably with neon serverless)
+
   try {
-    // Run table creation statements individually via neon's direct call syntax
-    const rawSql = getSQL();
-    const statements = EMAIL_TABLES_SQL
-      .split(";")
-      .map((s) => s.trim())
-      .filter((s) => s.length > 0 && !s.startsWith("--"));
+    await sql`
+      CREATE TABLE IF NOT EXISTS email_inbound (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        mailbox_address TEXT NOT NULL DEFAULT 'admin@zoobicon.com',
+        from_address TEXT NOT NULL,
+        to_address TEXT NOT NULL,
+        subject TEXT NOT NULL DEFAULT '(No Subject)',
+        text_body TEXT DEFAULT '',
+        html_body TEXT DEFAULT '',
+        headers JSONB DEFAULT '{}',
+        received_at TIMESTAMPTZ DEFAULT NOW(),
+        size INT DEFAULT 0,
+        read BOOLEAN DEFAULT false,
+        folder TEXT DEFAULT 'inbox'
+      )
+    `;
+  } catch (err) {
+    errors.push(`email_inbound: ${err instanceof Error ? err.message : "failed"}`);
+  }
 
-    for (const stmt of statements) {
-      try {
-        await rawSql(stmt);
-      } catch (stmtErr) {
-        console.warn("[Email Setup] Statement failed:", stmt.substring(0, 80), stmtErr);
-      }
-    }
+  try {
+    await sql`CREATE INDEX IF NOT EXISTS idx_email_inbound_mailbox ON email_inbound(mailbox_address)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_email_inbound_received ON email_inbound(received_at)`;
+  } catch { /* indexes are optional */ }
 
-    // Verify tables were created
+  try {
+    await sql`
+      CREATE TABLE IF NOT EXISTS support_tickets (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        ticket_number TEXT UNIQUE NOT NULL,
+        subject TEXT NOT NULL,
+        from_email TEXT NOT NULL,
+        from_name TEXT DEFAULT '',
+        status TEXT DEFAULT 'open',
+        priority TEXT DEFAULT 'normal',
+        assignee TEXT DEFAULT '',
+        tags JSONB DEFAULT '[]',
+        ai_confidence DECIMAL DEFAULT 0,
+        ai_auto_replied BOOLEAN DEFAULT false,
+        mailgun_message_id TEXT DEFAULT '',
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `;
+  } catch (err) {
+    errors.push(`support_tickets: ${err instanceof Error ? err.message : "failed"}`);
+  }
+
+  try {
+    await sql`CREATE INDEX IF NOT EXISTS idx_support_tickets_status ON support_tickets(status)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_support_tickets_from ON support_tickets(from_email)`;
+  } catch { /* indexes are optional */ }
+
+  try {
+    await sql`
+      CREATE TABLE IF NOT EXISTS support_messages (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        ticket_id UUID NOT NULL REFERENCES support_tickets(id) ON DELETE CASCADE,
+        sender TEXT NOT NULL DEFAULT 'customer',
+        body_text TEXT DEFAULT '',
+        body_html TEXT DEFAULT '',
+        attachments JSONB DEFAULT '[]',
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `;
+  } catch (err) {
+    errors.push(`support_messages: ${err instanceof Error ? err.message : "failed"}`);
+  }
+
+  try {
+    await sql`CREATE INDEX IF NOT EXISTS idx_support_messages_ticket ON support_messages(ticket_id)`;
+  } catch { /* indexes are optional */ }
+
+  try {
+    await sql`
+      CREATE TABLE IF NOT EXISTS email_outbound (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        from_address TEXT NOT NULL,
+        to_address TEXT NOT NULL,
+        subject TEXT NOT NULL,
+        body_text TEXT DEFAULT '',
+        body_html TEXT DEFAULT '',
+        status TEXT DEFAULT 'sent',
+        mailgun_id TEXT DEFAULT '',
+        ticket_id UUID,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `;
+  } catch (err) {
+    errors.push(`email_outbound: ${err instanceof Error ? err.message : "failed"}`);
+  }
+
+  try {
+    await sql`CREATE INDEX IF NOT EXISTS idx_email_outbound_ticket ON email_outbound(ticket_id)`;
+  } catch { /* indexes are optional */ }
+
+  try {
+    await sql`
+      CREATE TABLE IF NOT EXISTS knowledge_base (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        title TEXT NOT NULL,
+        category TEXT DEFAULT 'general',
+        content TEXT NOT NULL,
+        is_active BOOLEAN DEFAULT true,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `;
+  } catch (err) {
+    errors.push(`knowledge_base: ${err instanceof Error ? err.message : "failed"}`);
+  }
+
+  try {
+    await sql`
+      CREATE TABLE IF NOT EXISTS email_events (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        message_id TEXT DEFAULT '',
+        type TEXT NOT NULL,
+        domain TEXT DEFAULT '',
+        recipient TEXT DEFAULT '',
+        timestamp TIMESTAMPTZ DEFAULT NOW(),
+        metadata JSONB DEFAULT '{}'
+      )
+    `;
+  } catch (err) {
+    errors.push(`email_events: ${err instanceof Error ? err.message : "failed"}`);
+  }
+
+  try {
+    await sql`CREATE INDEX IF NOT EXISTS idx_email_events_domain ON email_events(domain)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_email_events_ts ON email_events(timestamp)`;
+  } catch { /* indexes are optional */ }
+
+  // Verify what was created
+  try {
     const tables = await sql`
       SELECT table_name FROM information_schema.tables
       WHERE table_schema = 'public'
@@ -213,14 +336,14 @@ export async function POST() {
     const found = tables.map((t: Record<string, unknown>) => t.table_name as string);
 
     return NextResponse.json({
-      success: true,
+      success: errors.length === 0,
       tables_created: found,
-      message: `Created ${found.length} email tables. Run GET /api/email/setup to verify full configuration.`,
+      errors: errors.length > 0 ? errors : undefined,
+      message: `Created ${found.length} email tables.${errors.length > 0 ? ` ${errors.length} errors occurred.` : " Run GET /api/email/setup to verify full configuration."}`,
     });
   } catch (err) {
-    console.error("[Email Setup] Error:", err);
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Failed to create tables" },
+      { error: err instanceof Error ? err.message : "Failed to verify tables", table_errors: errors },
       { status: 500 }
     );
   }
