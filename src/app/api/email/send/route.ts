@@ -48,9 +48,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Email format validation
+    // Email format validation — supports both "user@domain" and "Name <user@domain>"
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(from)) {
+    const namedEmailRegex = /^.+<([^\s@]+@[^\s@]+\.[^\s@]+)>$/;
+
+    function extractEmail(addr: string): string | null {
+      const trimmed = addr.trim();
+      if (emailRegex.test(trimmed)) return trimmed;
+      const match = trimmed.match(namedEmailRegex);
+      if (match) return match[1];
+      return null;
+    }
+
+    if (!extractEmail(from)) {
       return NextResponse.json(
         { error: "Invalid from email address." },
         { status: 400 }
@@ -59,7 +69,7 @@ export async function POST(req: NextRequest) {
 
     const toAddresses = Array.isArray(to) ? to : [to];
     for (const addr of toAddresses) {
-      if (!emailRegex.test(addr)) {
+      if (!extractEmail(addr)) {
         return NextResponse.json(
           { error: `Invalid to email address: ${addr}` },
           { status: 400 }

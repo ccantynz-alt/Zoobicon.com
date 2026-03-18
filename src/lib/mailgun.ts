@@ -94,10 +94,14 @@ export function verifyWebhookSignature(
   token: string,
   signature: string
 ): boolean {
-  const apiKey = MAILGUN_API_KEY();
-  if (!apiKey) return true; // Skip verification in dev
+  // Mailgun uses a separate webhook signing key (not the API key).
+  // Find it in Mailgun dashboard → Settings → API Security → Webhook signing key.
+  // Falls back to API key for backwards compatibility.
+  const signingKey =
+    process.env.MAILGUN_WEBHOOK_SIGNING_KEY || MAILGUN_API_KEY();
+  if (!signingKey) return true; // Skip verification in dev
 
-  const hmac = crypto.createHmac("sha256", apiKey);
+  const hmac = crypto.createHmac("sha256", signingKey);
   hmac.update(timestamp + token);
   const expected = hmac.digest("hex");
   return signature === expected;

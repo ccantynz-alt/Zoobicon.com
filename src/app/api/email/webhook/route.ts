@@ -11,6 +11,70 @@ import {
 // We store it in the DB and optionally trigger AI auto-reply.
 // ---------------------------------------------------------------------------
 
+// Ensure required tables exist (runs once, CREATE IF NOT EXISTS is idempotent)
+let tablesEnsured = false;
+async function ensureTables() {
+  if (tablesEnsured) return;
+  try {
+    await sql.unsafe(`
+      CREATE TABLE IF NOT EXISTS email_inbound (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        mailbox_address TEXT NOT NULL DEFAULT 'admin@zoobicon.com',
+        from_address TEXT NOT NULL,
+        to_address TEXT NOT NULL,
+        subject TEXT NOT NULL DEFAULT '(No Subject)',
+        text_body TEXT DEFAULT '',
+        html_body TEXT DEFAULT '',
+        headers JSONB DEFAULT '{}',
+        received_at TIMESTAMPTZ DEFAULT NOW(),
+        size INT DEFAULT 0,
+        read BOOLEAN DEFAULT false,
+        folder TEXT DEFAULT 'inbox'
+      );
+      CREATE TABLE IF NOT EXISTS support_tickets (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        ticket_number TEXT UNIQUE NOT NULL,
+        subject TEXT NOT NULL,
+        from_email TEXT NOT NULL,
+        from_name TEXT DEFAULT '',
+        status TEXT DEFAULT 'open',
+        priority TEXT DEFAULT 'normal',
+        assignee TEXT DEFAULT '',
+        tags JSONB DEFAULT '[]',
+        ai_confidence DECIMAL DEFAULT 0,
+        ai_auto_replied BOOLEAN DEFAULT false,
+        mailgun_message_id TEXT DEFAULT '',
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      );
+      CREATE TABLE IF NOT EXISTS support_messages (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        ticket_id UUID NOT NULL REFERENCES support_tickets(id) ON DELETE CASCADE,
+        sender TEXT NOT NULL DEFAULT 'customer',
+        body_text TEXT DEFAULT '',
+        body_html TEXT DEFAULT '',
+        attachments JSONB DEFAULT '[]',
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+      CREATE TABLE IF NOT EXISTS email_outbound (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        from_address TEXT NOT NULL,
+        to_address TEXT NOT NULL,
+        subject TEXT NOT NULL,
+        body_text TEXT DEFAULT '',
+        body_html TEXT DEFAULT '',
+        status TEXT DEFAULT 'sent',
+        mailgun_id TEXT DEFAULT '',
+        ticket_id UUID,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+    tablesEnsured = true;
+  } catch (err) {
+    console.error("[Webhook] Table creation failed:", err);
+  }
+}
+
 // Helper: generate ticket number like TK-10001
 async function nextTicketNumber(): Promise<string> {
   const rows = await sql`SELECT COUNT(*)::int AS c FROM support_tickets`;
@@ -20,6 +84,8 @@ async function nextTicketNumber(): Promise<string> {
 
 export async function POST(req: NextRequest) {
   try {
+    await ensureTables();
+
     // Mailgun sends form-encoded data
     const contentType = req.headers.get("content-type") || "";
     let formFields: Record<string, string> = {};
