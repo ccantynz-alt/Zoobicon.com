@@ -5,7 +5,7 @@
  * via Mailgun. Falls back to console logging if MAILGUN_API_KEY is not set.
  */
 
-import { sendViaMailgun } from "./mailgun";
+import { sendViaMailgun } from "@/lib/mailgun";
 
 function getAdminEmail(): string {
   return (
@@ -32,43 +32,17 @@ interface NotifyOptions {
  */
 export async function notifyAdmin(opts: NotifyOptions): Promise<boolean> {
   const adminEmail = getAdminEmail();
-  const apiKey = process.env.MAILGUN_API_KEY;
 
-  if (!apiKey) {
-    console.log(`[Admin Notify] No MAILGUN_API_KEY — logging instead:`);
-    console.log(`  To: ${adminEmail}`);
-    console.log(`  Subject: ${opts.subject}`);
-    console.log(`  Body: ${opts.text || "(HTML only)"}`);
-    return false;
-  }
-}
+  const result = await sendViaMailgun({
+    from: getFromAddress(),
+    to: adminEmail,
+    subject: opts.subject,
+    html: opts.html,
+    text: opts.text,
+    tags: ["admin-notification"],
+  });
 
-/**
- * Send via Resend API (legacy fallback).
- */
-async function sendViaResend(to: string, opts: NotifyOptions): Promise<boolean> {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return false;
-
-  try {
-    const result = await sendViaMailgun({
-      from: getFromAddress(),
-      to: adminEmail,
-      subject: opts.subject,
-      html: opts.html,
-      ...(opts.text ? { text: opts.text } : {}),
-      tags: ["admin-notification"],
-    });
-
-    if (!result.success) {
-      console.error(`[Admin Notify] Mailgun error:`, result.error);
-      return false;
-    }
-    return true;
-  } catch (err) {
-    console.error("[Admin Notify] Resend send failed:", err);
-    return false;
-  }
+  return result.success;
 }
 
 /**

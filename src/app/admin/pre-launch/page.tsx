@@ -60,7 +60,8 @@ const CHECKLIST: ChecklistItem[] = [
 
   // Email & Notifications
   { id: "email-1", label: "Admin email address configured", description: "Set ADMIN_EMAIL and ADMIN_NOTIFICATION_EMAIL in production env vars.", priority: "critical", category: "email", link: "/admin/email-settings" },
-  { id: "email-2", label: "Mailgun API key set for all emails", description: "MAILGUN_API_KEY and MAILGUN_DOMAIN configured. Powers admin notifications, support tickets, and password resets. Inbound webhook URL registered at Mailgun dashboard.", priority: "critical", category: "email", link: "/admin/email-settings" },
+  { id: "email-2", label: "Mailgun API key and domain configured", description: "MAILGUN_API_KEY and MAILGUN_DOMAIN set. All emails (notifications, support, password resets) route through Mailgun.", priority: "critical", category: "email", link: "/admin/email-settings" },
+  { id: "email-3", label: "Mailgun inbound webhook registered", description: "Inbound webhook URL registered at Mailgun dashboard for receiving support ticket emails.", priority: "high", category: "email" },
   { id: "email-4", label: "Email templates tested", description: "Send test emails for all notification types: signup, deploy, contact, waitlist. Verify HTML rendering.", priority: "high", category: "email" },
   { id: "email-5", label: "SPF/DKIM/DMARC DNS records", description: "Email authentication records set for zoobicon.com to prevent emails landing in spam.", priority: "high", category: "email" },
   { id: "email-6", label: "Support email workflow tested end-to-end", description: "Customer sends email -> ticket created -> agent replies -> customer receives reply. Full round-trip.", priority: "high", category: "email", link: "/email-support" },

@@ -108,11 +108,16 @@ export default function AdminEmailSettingsPage() {
     setTestSending(true);
     setTestResult(null);
     try {
-      const res = await fetch("/api/email/inbox", {
+      const targetEmail = config.notificationEmail || config.adminEmail || "admin@zoobicon.com";
+      const domain = config.mailgunDomain || "zoobicon.com";
+      const fromAddr = config.fromAddress || `noreply@${domain}`;
+      const fromName = config.fromName || "Zoobicon";
+      const res = await fetch("/api/email/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          to: config.adminEmail,
+          from: `${fromName} <${fromAddr}>`,
+          to: targetEmail,
           subject: "[Zoobicon] Test Email - Configuration Verified",
           text: "This is a test email from your Zoobicon admin panel. If you received this, your Mailgun configuration is working correctly.",
           html: `<div style="font-family:system-ui,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;background:#131520;color:#fff;border-radius:16px">
@@ -120,12 +125,14 @@ export default function AdminEmailSettingsPage() {
             <p style="color:rgba(255,255,255,0.7);line-height:1.6">This is a test email from your Zoobicon admin panel. Your Mailgun configuration is working correctly.</p>
             <p style="color:rgba(255,255,255,0.4);font-size:12px;margin-top:24px">Sent at ${new Date().toISOString()}</p>
           </div>`,
+          tags: ["test"],
         }),
       });
+      const data = await res.json();
       if (res.ok) {
         setTestResult({ ok: true, message: `Test email sent to ${config.adminEmail}` });
       } else {
-        setTestResult({ ok: false, message: "Failed to send. Check your Mailgun API key and domain." });
+        setTestResult({ ok: false, message: data.error || "Failed to send test email. Check your MAILGUN_API_KEY and MAILGUN_DOMAIN environment variables." });
       }
     } catch {
       setTestResult({ ok: false, message: "Network error. Mailgun may not be configured yet." });
@@ -397,7 +404,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                   {showKeys.mailgun ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              <p className="text-xs text-zinc-500 mt-1">Found at Mailgun &rarr; Settings &rarr; API Keys. This one key handles all sending and receiving.</p>
+              <p className="text-xs text-zinc-500 mt-1">All emails (notifications, support tickets, password resets) are sent via Mailgun.</p>
             </div>
             <div>
               <label className="block text-sm text-zinc-300 mb-1.5 font-medium">Mailgun Domain</label>
@@ -405,9 +412,9 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                 type="text" value={config.mailgunDomain}
                 onChange={(e) => setConfig((p) => ({ ...p, mailgunDomain: e.target.value }))}
                 placeholder="zoobicon.com"
-                className={inputClass}
+                className="w-full bg-white/[0.06] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500/50 transition-colors"
               />
-              <p className="text-xs text-zinc-500 mt-1">The verified sending domain in your Mailgun account. Can be a subdomain like <code className="text-cyan-400/60">mail.zoobicon.com</code> or the root <code className="text-cyan-400/60">zoobicon.com</code>.</p>
+              <p className="text-xs text-zinc-500 mt-1">Just the domain name (e.g. <code className="text-zinc-400">zoobicon.com</code>), not the full API URL. The API base URL is added automatically.</p>
             </div>
           </div>
         </motion.div>
@@ -469,57 +476,9 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
             <div><span className="text-blue-400">MAILGUN_DOMAIN</span><span className="text-zinc-500">=</span><span className="text-green-400">{config.mailgunDomain || "zoobicon.com"}</span></div>
             <div><span className="text-blue-400">ADMIN_EMAIL</span><span className="text-zinc-500">=</span><span className="text-green-400">{config.adminEmail || "admin@zoobicon.com"}</span></div>
             <div><span className="text-blue-400">ADMIN_NOTIFICATION_EMAIL</span><span className="text-zinc-500">=</span><span className="text-green-400">{config.notificationEmail || config.adminEmail || "admin@zoobicon.com"}</span></div>
-          </div>
-        </motion.div>
-
-        {/* Mailgun Inbound Routes */}
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-          className="bg-white/[0.04] border border-white/10 rounded-xl p-6 mb-6">
-          <div className="flex items-center gap-3 mb-2">
-            <Shield className="w-5 h-5 text-orange-400" />
-            <h2 className="text-lg font-semibold">Mailgun Inbound Routes</h2>
-          </div>
-          <p className="text-sm text-zinc-400 mb-5">
-            Create these two routes in your Mailgun dashboard under <span className="text-zinc-300">Receiving &rarr; Routes</span>.
-          </p>
-          <div className="space-y-4">
-            {/* Route 1 */}
-            <div className="bg-black/20 border border-white/[0.06] rounded-lg p-4">
-              <h3 className="text-sm font-semibold text-blue-300 mb-3">Route 1: Admin Inbox</h3>
-              <div className="space-y-2">
-                <div>
-                  <span className="text-[10px] uppercase tracking-wider text-zinc-500 font-medium">Match</span>
-                  <div className="bg-black/30 rounded px-3 py-2 mt-1 font-mono text-xs text-amber-300/80">
-                    match_recipient(&quot;{config.adminEmail || "admin@zoobicon.com"}&quot;)
-                  </div>
-                </div>
-                <div>
-                  <span className="text-[10px] uppercase tracking-wider text-zinc-500 font-medium">Action</span>
-                  <div className="bg-black/30 rounded px-3 py-2 mt-1 font-mono text-xs text-green-300/80">
-                    forward(&quot;https://zoobicon.com/api/email/inbox&quot;)
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Route 2 */}
-            <div className="bg-black/20 border border-white/[0.06] rounded-lg p-4">
-              <h3 className="text-sm font-semibold text-purple-300 mb-3">Route 2: Support Tickets</h3>
-              <div className="space-y-2">
-                <div>
-                  <span className="text-[10px] uppercase tracking-wider text-zinc-500 font-medium">Match</span>
-                  <div className="bg-black/30 rounded px-3 py-2 mt-1 font-mono text-xs text-amber-300/80">
-                    match_recipient(&quot;{config.supportEmail || "support@zoobicon.com"}&quot;)
-                  </div>
-                </div>
-                <div>
-                  <span className="text-[10px] uppercase tracking-wider text-zinc-500 font-medium">Action</span>
-                  <div className="bg-black/30 rounded px-3 py-2 mt-1 font-mono text-xs text-green-300/80">
-                    forward(&quot;https://zoobicon.com/api/email/support/inbound&quot;)
-                  </div>
-                </div>
-              </div>
-            </div>
+            <div className="pt-2"><span className="text-zinc-500"># Mailgun (all email)</span></div>
+            <div><span className="text-blue-400">MAILGUN_API_KEY</span><span className="text-zinc-500">=</span><span className="text-green-400">{config.mailgunApiKey ? maskKey(config.mailgunApiKey) : "key-xxxxx"}</span></div>
+            <div><span className="text-blue-400">MAILGUN_DOMAIN</span><span className="text-zinc-500">=</span><span className="text-green-400">{config.mailgunDomain || "zoobicon.com"}</span></div>
           </div>
         </motion.div>
 

@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  sendEmail,
-  analyzeEmailContent,
-  type EmailMessage,
-} from "@/lib/email-service";
+import { sendViaMailgun } from "@/lib/mailgun";
+import { analyzeEmailContent } from "@/lib/email-service";
 
 // ---------------------------------------------------------------------------
 // POST /api/email/send — Send transactional or marketing email
@@ -18,7 +15,7 @@ export async function POST(req: NextRequest) {
       html?: string;
       text?: string;
       replyTo?: string;
-      tags?: Record<string, string>;
+      tags?: string[];
       analyze?: boolean;
     };
 
@@ -93,7 +90,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const message: EmailMessage = {
+    const result = await sendViaMailgun({
       from,
       to: toAddresses,
       subject,
@@ -101,9 +98,7 @@ export async function POST(req: NextRequest) {
       text,
       replyTo,
       tags,
-    };
-
-    const result = await sendEmail(message);
+    });
 
     if (!result.success) {
       return NextResponse.json(
