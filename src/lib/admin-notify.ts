@@ -2,13 +2,10 @@
  * Admin Notification Service
  *
  * Sends email notifications to the admin (ADMIN_NOTIFICATION_EMAIL or ADMIN_EMAIL)
- * via Mailgun (primary) or Resend (legacy fallback).
- * Falls back to console logging if neither API key is set.
- *
- * Architecture: Mailgun handles ALL email (inbound + outbound). No Google Workspace needed.
- * - Inbound: Mailgun webhook → /api/email/inbox (admin) or /api/email/support/inbound (tickets)
- * - Outbound: This service sends via Mailgun API
+ * via Mailgun. Falls back to console logging if MAILGUN_API_KEY is not set.
  */
+
+import { sendViaMailgun } from "./mailgun";
 
 function getAdminEmail(): string {
   return (
@@ -19,7 +16,8 @@ function getAdminEmail(): string {
 }
 
 function getFromAddress(): string {
-  return "Zoobicon <noreply@zoobicon.com>";
+  const domain = process.env.MAILGUN_DOMAIN || "zoobicon.com";
+  return `Zoobicon <noreply@${domain}>`;
 }
 
 interface NotifyOptions {
@@ -32,35 +30,15 @@ interface NotifyOptions {
 /**
  * Send via Mailgun API (primary).
  */
-async function sendViaMailgun(to: string, opts: NotifyOptions): Promise<boolean> {
+export async function notifyAdmin(opts: NotifyOptions): Promise<boolean> {
+  const adminEmail = getAdminEmail();
   const apiKey = process.env.MAILGUN_API_KEY;
-  const domain = process.env.MAILGUN_DOMAIN;
-  if (!apiKey || !domain) return false;
 
-  try {
-    const form = new URLSearchParams();
-    form.append("from", getFromAddress());
-    form.append("to", to);
-    form.append("subject", opts.subject);
-    form.append("html", opts.html);
-    if (opts.text) form.append("text", opts.text);
-
-    const res = await fetch(`https://api.mailgun.net/v3/${domain}/messages`, {
-      method: "POST",
-      headers: {
-        Authorization: `Basic ${Buffer.from(`api:${apiKey}`).toString("base64")}`,
-      },
-      body: form,
-    });
-
-    if (!res.ok) {
-      const err = await res.text();
-      console.error(`[Admin Notify] Mailgun error ${res.status}:`, err);
-      return false;
-    }
-    return true;
-  } catch (err) {
-    console.error("[Admin Notify] Mailgun send failed:", err);
+  if (!apiKey) {
+    console.log(`[Admin Notify] No MAILGUN_API_KEY — logging instead:`);
+    console.log(`  To: ${adminEmail}`);
+    console.log(`  Subject: ${opts.subject}`);
+    console.log(`  Body: ${opts.text || "(HTML only)"}`);
     return false;
   }
 }
@@ -73,24 +51,17 @@ async function sendViaResend(to: string, opts: NotifyOptions): Promise<boolean> 
   if (!apiKey) return false;
 
   try {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: getFromAddress(),
-        to: [to],
-        subject: opts.subject,
-        html: opts.html,
-        ...(opts.text ? { text: opts.text } : {}),
-      }),
+    const result = await sendViaMailgun({
+      from: getFromAddress(),
+      to: adminEmail,
+      subject: opts.subject,
+      html: opts.html,
+      ...(opts.text ? { text: opts.text } : {}),
+      tags: ["admin-notification"],
     });
 
-    if (!res.ok) {
-      const err = await res.text();
-      console.error(`[Admin Notify] Resend error ${res.status}:`, err);
+    if (!result.success) {
+      console.error(`[Admin Notify] Mailgun error:`, result.error);
       return false;
     }
     return true;

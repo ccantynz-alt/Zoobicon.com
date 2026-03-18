@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { createResetToken } from "@/lib/resetToken";
+import { sendViaMailgun } from "@/lib/mailgun";
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,20 +18,15 @@ export async function POST(request: NextRequest) {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://zoobicon.com";
     const resetUrl = `${appUrl}/auth/reset-password?token=${token}`;
 
-    // Send via Resend if API key is present
-    if (process.env.RESEND_API_KEY) {
+    // Send via Mailgun if API key is present
+    if (process.env.MAILGUN_API_KEY) {
       try {
-        await fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            from: "Zoobicon <noreply@zoobicon.com>",
-            to: [email],
-            subject: "Reset your Zoobicon password",
-            html: `
+        const domain = process.env.MAILGUN_DOMAIN || "zoobicon.com";
+        await sendViaMailgun({
+          from: `Zoobicon <noreply@${domain}>`,
+          to: email,
+          subject: "Reset your Zoobicon password",
+          html: `
               <div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:#09090f;color:#fff;border-radius:16px">
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:32px">
                   <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#2563eb,#1d4ed8);display:flex;align-items:center;justify-content:center">
@@ -53,14 +49,14 @@ export async function POST(request: NextRequest) {
                 </p>
               </div>
             `,
-          }),
+          tags: ["password-reset"],
         });
       } catch {
         // Log but don't surface email errors to client (security)
-        console.error("Resend email failed");
+        console.error("Mailgun email failed");
       }
     } else {
-      // Log the reset URL to server console when RESEND_API_KEY not set (development)
+      // Log the reset URL to server console when MAILGUN_API_KEY not set (development)
       console.log(`[DEV] Password reset link for ${email}:\n${resetUrl}`);
     }
 
