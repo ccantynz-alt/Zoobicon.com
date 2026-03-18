@@ -232,11 +232,11 @@ export default function UsagePage() {
   ];
 
   return (
-    <div className="relative min-h-screen bg-[#09090f]">
-      <BackgroundEffects preset="technical" />
+    <div className="relative min-h-screen bg-[#050508]">
+      <BackgroundEffects preset="admin" />
 
       {/* Nav */}
-      <nav className="border-b border-white/[0.08] bg-[#09090b]/80 backdrop-blur-2xl sticky top-0 z-50">
+      <nav className="border-b border-white/10 bg-[#050508]/90 backdrop-blur-2xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-6">
@@ -255,7 +255,7 @@ export default function UsagePage() {
             <div className="relative">
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/[0.10] bg-white/[0.05] hover:bg-white/[0.07] transition-colors"
+                className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/[0.05] hover:bg-white/[0.07] transition-colors"
               >
                 <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-600 to-violet-600 flex items-center justify-center text-[10px] font-bold text-white">
                   {userName.charAt(0).toUpperCase()}
@@ -266,7 +266,7 @@ export default function UsagePage() {
               {showUserMenu && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setShowUserMenu(false)} />
-                  <div className="absolute right-0 mt-2 w-48 bg-zinc-900 border border-white/[0.12] rounded-xl shadow-lg overflow-hidden z-50">
+                  <div className="absolute right-0 mt-2 w-48 bg-[#111318] border border-white/10 rounded-xl shadow-lg overflow-hidden z-50">
                     <div className="py-1">
                       <Link href="/admin" className="flex items-center gap-2 px-4 py-2 text-sm text-white/65 hover:text-white hover:bg-white/[0.07]">
                         <Shield className="w-4 h-4" /> Admin Panel
@@ -305,7 +305,7 @@ export default function UsagePage() {
               variants={cardVariants}
               initial="hidden"
               animate="visible"
-              className="rounded-xl border border-white/[0.08] bg-zinc-900/80 p-5"
+              className="rounded-xl border border-white/10 bg-[#111318]/80 p-5"
             >
               <div className="flex items-center justify-between mb-3">
                 <div className={`w-10 h-10 rounded-lg ${card.iconBg} flex items-center justify-center`}>
@@ -328,7 +328,7 @@ export default function UsagePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35, duration: 0.4 }}
-          className="rounded-xl border border-white/[0.08] bg-zinc-900/80 p-6 mb-10"
+          className="rounded-xl border border-white/10 bg-[#111318]/80 p-6 mb-10"
         >
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -353,7 +353,7 @@ export default function UsagePage() {
                     style={{ height: `${heightPct}%` }}
                   />
                   {/* Tooltip */}
-                  <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-zinc-800 border border-white/10 text-[10px] text-white px-2 py-1 rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                  <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-[#111318] border border-white/10 text-[10px] text-white px-2 py-1 rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
                     {d.day}: {d.count}
                   </div>
                 </div>
@@ -372,7 +372,7 @@ export default function UsagePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.45, duration: 0.4 }}
-          className="rounded-xl border border-white/[0.08] bg-zinc-900/80 p-6 mb-10"
+          className="rounded-xl border border-white/10 bg-[#111318]/80 p-6 mb-10"
         >
           <div className="flex items-center gap-2 mb-6">
             <CreditCard className="w-5 h-5 text-blue-400" />
@@ -381,13 +381,13 @@ export default function UsagePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Big number */}
-            <div className="flex flex-col items-center justify-center bg-zinc-800/50 rounded-xl p-6 border border-white/[0.06]">
+            <div className="flex flex-col items-center justify-center bg-[#111318]/50 rounded-xl p-6 border border-white/10">
               <div className="text-5xl font-black text-white mb-1">{stats.creditsRemaining.toLocaleString()}</div>
               <div className="text-sm text-white/40">credits remaining</div>
             </div>
 
             {/* Plan + limits */}
-            <div className="bg-zinc-800/50 rounded-xl p-6 border border-white/[0.06]">
+            <div className="bg-[#111318]/50 rounded-xl p-6 border border-white/10">
               <div className="flex items-center gap-2 mb-4">
                 <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
                   stats.plan === "enterprise"
@@ -416,13 +416,13 @@ export default function UsagePage() {
             </div>
 
             {/* Progress + upgrade */}
-            <div className="bg-zinc-800/50 rounded-xl p-6 border border-white/[0.06] flex flex-col justify-between">
+            <div className="bg-[#111318]/50 rounded-xl p-6 border border-white/10 flex flex-col justify-between">
               <div>
                 <div className="flex justify-between text-sm mb-2">
                   <span className="text-white/50">Used this period</span>
                   <span className="text-white font-medium">{stats.creditsUsed.toLocaleString()} / {stats.creditsTotal.toLocaleString()}</span>
                 </div>
-                <div className="w-full h-3 bg-zinc-700 rounded-full overflow-hidden">
+                <div className="w-full h-3 bg-[#111318] rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all duration-700 ${
                       creditPct > 90 ? "bg-red-500" : creditPct > 70 ? "bg-amber-500" : "bg-blue-600"
@@ -448,7 +448,7 @@ export default function UsagePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.55, duration: 0.4 }}
-          className="rounded-xl border border-white/[0.08] bg-zinc-900/80 p-6 mb-10"
+          className="rounded-xl border border-white/10 bg-[#111318]/80 p-6 mb-10"
         >
           <div className="flex items-center gap-2 mb-6">
             <Key className="w-5 h-5 text-blue-400" />
@@ -458,7 +458,7 @@ export default function UsagePage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/[0.08]">
+                <tr className="border-b border-white/10">
                   <th className="text-left py-3 px-4 text-xs font-semibold text-white/40 uppercase tracking-wider">Key</th>
                   <th className="text-left py-3 px-4 text-xs font-semibold text-white/40 uppercase tracking-wider">Label</th>
                   <th className="text-right py-3 px-4 text-xs font-semibold text-white/40 uppercase tracking-wider">Today</th>
@@ -496,7 +496,7 @@ export default function UsagePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.65, duration: 0.4 }}
-          className="rounded-xl border border-white/[0.08] bg-zinc-900/80 p-6"
+          className="rounded-xl border border-white/10 bg-[#111318]/80 p-6"
         >
           <div className="flex items-center gap-2 mb-6">
             <Activity className="w-5 h-5 text-blue-400" />

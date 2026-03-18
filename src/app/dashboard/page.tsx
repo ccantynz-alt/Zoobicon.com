@@ -179,10 +179,10 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#0b1121]">
-      <BackgroundEffects preset="dashboard" />
+    <div className="relative min-h-screen bg-[#050508]">
+      <BackgroundEffects preset="admin" />
       {/* Top Nav */}
-      <nav className="border-b border-white/20 bg-[#0f1322]/95 backdrop-blur-2xl sticky top-0 z-50">
+      <nav className="border-b border-white/10 bg-[#050508]/90 backdrop-blur-2xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-6">
@@ -218,7 +218,7 @@ export default function DashboardPage() {
               <div className="relative">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/20 bg-[#1e2235] hover:bg-[#252a3e] transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-[#111318] hover:bg-[#1a1d24] transition-colors"
                 >
                   <div className="w-6 h-6 rounded-full bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center text-[10px] font-bold text-white">
                     {userName.charAt(0).toUpperCase()}
@@ -230,8 +230,8 @@ export default function DashboardPage() {
                 {showUserMenu && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setShowUserMenu(false)} />
-                    <div className="absolute right-0 mt-2 w-48 bg-[#1e2235] border border-white/[0.15] rounded-xl shadow-elevated overflow-hidden z-50">
-                      <div className="px-4 py-3 border-b border-white/20">
+                    <div className="absolute right-0 mt-2 w-48 bg-[#111318] border border-white/[0.15] rounded-xl shadow-elevated overflow-hidden z-50">
+                      <div className="px-4 py-3 border-b border-white/10">
                         <div className="text-sm font-medium">{userName}</div>
                         <div className="text-xs text-white/85">
                           {userRole === "admin" ? (
@@ -243,7 +243,7 @@ export default function DashboardPage() {
                         {userRole === "admin" && (
                           <Link
                             href="/admin"
-                            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-brand-400/70 hover:text-brand-400 hover:bg-[#252a3e] transition-colors"
+                            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-brand-400/70 hover:text-brand-400 hover:bg-[#1a1d24] transition-colors"
                           >
                             <Shield className="w-4 h-4" />
                             Admin Panel
@@ -251,14 +251,14 @@ export default function DashboardPage() {
                         )}
                         <Link
                           href="/auth/settings"
-                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-white/80 hover:text-white hover:bg-[#252a3e] transition-colors"
+                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-white/80 hover:text-white hover:bg-[#1a1d24] transition-colors"
                         >
                           <Settings className="w-4 h-4" />
                           Settings
                         </Link>
                         <button
                           onClick={handleLogout}
-                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-400/60 hover:text-red-400 hover:bg-[#252a3e] transition-colors"
+                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-400/60 hover:text-red-400 hover:bg-[#1a1d24] transition-colors"
                         >
                           <LogOut className="w-4 h-4" />
                           Sign out
@@ -341,7 +341,7 @@ export default function DashboardPage() {
                 <Link
                   key={tool.label}
                   href="/builder"
-                  className="group p-3 rounded-xl border border-white/20 bg-[#1e2235] hover:bg-[#252a3e] hover:border-brand-500/20 transition-all"
+                  className="group p-3 rounded-xl border border-white/10 bg-[#111318] hover:bg-[#1a1d24] hover:border-brand-500/20 transition-all"
                 >
                   <div className="flex items-center gap-2 mb-1">
                     <tool.icon className="w-4 h-4 text-brand-400/60 group-hover:text-brand-400 transition-colors" />
@@ -381,12 +381,12 @@ export default function DashboardPage() {
         </div>
 
         {/* Section tabs */}
-        <div className="flex items-center gap-1 mb-6 border-b border-white/20 pb-1">
+        <div className="flex items-center gap-1 mb-6 border-b border-white/10 pb-1">
           <button
             onClick={() => setActiveSection("projects")}
             className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
               activeSection === "projects"
-                ? "text-white bg-[#1a1d2e] border-b-2 border-brand-500"
+                ? "text-white bg-[#111318] border-b-2 border-brand-500"
                 : "text-white/85 hover:text-white/85"
             }`}
           >
@@ -396,7 +396,7 @@ export default function DashboardPage() {
             onClick={() => setActiveSection("deployed")}
             className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
               activeSection === "deployed"
-                ? "text-white bg-[#1a1d2e] border-b-2 border-emerald-500"
+                ? "text-white bg-[#111318] border-b-2 border-emerald-500"
                 : "text-white/85 hover:text-white/85"
             }`}
           >
@@ -425,7 +425,7 @@ export default function DashboardPage() {
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {liveSites.map((site) => (
                   <div key={site.id} className="gradient-border card-hover rounded-xl overflow-hidden group">
-                    <div className="h-40 bg-[#0f172a] border-b border-white/20 relative overflow-hidden">
+                    <div className="h-40 bg-[#0a0c12] border-b border-white/10 relative overflow-hidden">
                       <iframe
                         src={`/api/hosting/serve/${site.slug}`}
                         title={site.name}
@@ -486,21 +486,21 @@ export default function DashboardPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search projects..."
-                className="bg-[#1a1d2e] border border-white/20 rounded-lg pl-9 pr-4 py-2 text-sm
+                className="bg-[#111318] border border-white/10 rounded-lg pl-9 pr-4 py-2 text-sm
                            placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 w-48 transition-all"
               />
             </div>
             {/* View toggle */}
-            <div className="flex bg-[#1a1d2e] border border-white/20 rounded-lg p-0.5">
+            <div className="flex bg-[#111318] border border-white/10 rounded-lg p-0.5">
               <button
                 onClick={() => setViewMode("grid")}
-                className={`p-1.5 rounded-md transition-colors ${viewMode === "grid" ? "bg-[#1e2235] text-white" : "text-white/85"}`}
+                className={`p-1.5 rounded-md transition-colors ${viewMode === "grid" ? "bg-[#111318] text-white" : "text-white/85"}`}
               >
                 <LayoutGrid className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`p-1.5 rounded-md transition-colors ${viewMode === "list" ? "bg-[#1e2235] text-white" : "text-white/85"}`}
+                className={`p-1.5 rounded-md transition-colors ${viewMode === "list" ? "bg-[#111318] text-white" : "text-white/85"}`}
               >
                 <List className="w-4 h-4" />
               </button>
@@ -537,7 +537,7 @@ export default function DashboardPage() {
             {filteredProjects.map((project) => (
               <div key={project.id} className="gradient-border card-hover rounded-xl overflow-hidden group">
                 {/* Thumbnail */}
-                <div className="h-40 bg-[#0f172a] border-b border-white/20 relative overflow-hidden">
+                <div className="h-40 bg-[#0a0c12] border-b border-white/10 relative overflow-hidden">
                   <iframe
                     srcDoc={project.code}
                     title={project.name}
@@ -584,7 +584,7 @@ export default function DashboardPage() {
             {filteredProjects.map((project) => (
               <div key={project.id} className="gradient-border card-hover p-4 rounded-xl flex items-center gap-4 group">
                 {/* Mini thumbnail */}
-                <div className="w-20 h-14 bg-[#0f172a] rounded-lg overflow-hidden flex-shrink-0 border border-white/[0.15]">
+                <div className="w-20 h-14 bg-[#0a0c12] rounded-lg overflow-hidden flex-shrink-0 border border-white/[0.15]">
                   <iframe
                     srcDoc={project.code}
                     title={project.name}

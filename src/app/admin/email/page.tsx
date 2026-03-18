@@ -254,29 +254,29 @@ export default function AdminEmailPage() {
   const toggleSelectAll = () => setSelected(selected.size === emails.length ? new Set() : new Set(emails.map((e) => e.id)));
 
   return (
-    <div className="min-h-screen bg-[#09090f] text-white relative">
-      <BackgroundEffects />
+    <div className="min-h-screen bg-[#050508] text-white relative">
+      <BackgroundEffects preset="admin" />
 
       {/* Navbar */}
-      <nav className="relative z-20 border-b border-white/10 bg-zinc-800/90 backdrop-blur-md">
+      <nav className="relative z-20 border-b border-white/10 bg-[#111318]/90 backdrop-blur-md">
         <div className="max-w-[1440px] mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/" className="text-lg font-bold tracking-tight">Zoobicon</Link>
-            <span className="text-zinc-500 hidden sm:inline">/</span>
-            <Link href="/admin" className="text-sm text-zinc-400 hover:text-white transition-colors hidden sm:inline">Admin</Link>
-            <span className="text-zinc-500 hidden sm:inline">/</span>
-            <span className="text-sm text-zinc-100 hidden sm:inline">Email</span>
+            <span className="text-white/50 hidden sm:inline">/</span>
+            <Link href="/admin" className="text-sm text-white/60 hover:text-white transition-colors hidden sm:inline">Admin</Link>
+            <span className="text-white/50 hidden sm:inline">/</span>
+            <span className="text-sm text-white/90 hidden sm:inline">Email</span>
           </div>
           <div className="flex items-center gap-3">
             {user ? (
               <>
-                <Link href="/dashboard" className="text-sm text-zinc-400 hover:text-white transition-colors">Dashboard</Link>
-                <button onClick={() => { localStorage.removeItem("zoobicon_user"); setUser(null); }} className="text-sm text-zinc-500 hover:text-white transition-colors">Sign out</button>
+                <Link href="/dashboard" className="text-sm text-white/60 hover:text-white transition-colors">Dashboard</Link>
+                <button onClick={() => { localStorage.removeItem("zoobicon_user"); setUser(null); }} className="text-sm text-white/50 hover:text-white transition-colors">Sign out</button>
                 <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold">{(user.name || user.email || "A").charAt(0).toUpperCase()}</div>
               </>
             ) : (
               <>
-                <Link href="/auth/login" className="text-sm text-zinc-400 hover:text-white transition-colors">Sign in</Link>
+                <Link href="/auth/login" className="text-sm text-white/60 hover:text-white transition-colors">Sign in</Link>
                 <Link href="/builder" className="text-sm bg-blue-600 hover:bg-blue-500 px-3 py-1.5 rounded-lg transition-colors">Start Building</Link>
               </>
             )}
@@ -298,21 +298,21 @@ export default function AdminEmailPage() {
       {/* Main layout */}
       <div className="relative z-10 max-w-[1440px] mx-auto flex" style={{ height: "calc(100vh - 96px)" }}>
         {/* Sidebar */}
-        <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 fixed md:static z-30 top-14 left-0 bottom-0 w-56 bg-zinc-900/95 md:bg-transparent border-r border-white/10 flex flex-col p-3 gap-1 transition-transform duration-200`}>
+        <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 fixed md:static z-30 top-14 left-0 bottom-0 w-56 bg-[#111318]/95 md:bg-transparent border-r border-white/10 flex flex-col p-3 gap-1 transition-transform duration-200`}>
           <button onClick={() => { setComposing(true); setSidebarOpen(false); }} className="flex items-center justify-center gap-2 w-full bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors mb-3">
             <Plus className="w-4 h-4" /> Compose
           </button>
           {FOLDERS.map(({ key, label, icon: Icon }) => (
-            <button key={key} onClick={() => { setFolder(key); setSelectedEmail(null); setSelected(new Set()); setSidebarOpen(false); }} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${folder === key ? "bg-blue-600/15 text-blue-400" : "text-zinc-400 hover:bg-white/5 hover:text-zinc-100"}`}>
+            <button key={key} onClick={() => { setFolder(key); setSelectedEmail(null); setSelected(new Set()); setSidebarOpen(false); }} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${folder === key ? "bg-blue-600/15 text-blue-400" : "text-white/60 hover:bg-white/5 hover:text-white/90"}`}>
               <Icon className="w-4 h-4" /><span className="flex-1 text-left">{label}</span>
               {key === "inbox" && unreadCount > 0 && <span className="text-xs bg-blue-600/25 text-blue-400 px-1.5 py-0.5 rounded-full font-medium">{unreadCount}</span>}
             </button>
           ))}
           <div className="mt-auto pt-4 border-t border-white/10">
-            <Link href="/admin/support" className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-zinc-500 hover:bg-white/5 hover:text-zinc-300 transition-colors">
+            <Link href="/admin/support" className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-white/50 hover:bg-white/5 hover:text-white/80 transition-colors">
               <Star className="w-4 h-4" /> Support Tickets
             </Link>
-            <div className="px-3 py-2 text-xs text-zinc-600">admin@zoobicon.com</div>
+            <div className="px-3 py-2 text-xs text-white/30">admin@zoobicon.com</div>
           </div>
         </aside>
         {sidebarOpen && <div className="fixed inset-0 z-20 bg-black/50 md:hidden" onClick={() => setSidebarOpen(false)} />}
@@ -321,29 +321,29 @@ export default function AdminEmailPage() {
         <div className={`flex flex-col border-r border-white/10 ${selectedEmail ? "hidden md:flex md:w-96" : "flex-1"}`}>
           <div className="border-b border-white/10 p-3 space-y-2">
             <div className="flex items-center gap-2">
-              <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg hover:bg-white/5 md:hidden"><Mail className="w-5 h-5 text-zinc-400" /></button>
+              <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg hover:bg-white/5 md:hidden"><Mail className="w-5 h-5 text-white/60" /></button>
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-                <input type="text" placeholder="Search emails..." value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => e.key === "Enter" && fetchEmails()} className="w-full bg-zinc-800/80 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500/50 transition-colors" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50" />
+                <input type="text" placeholder="Search emails..." value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => e.key === "Enter" && fetchEmails()} className="w-full bg-[#111318]/80 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-blue-500/50 transition-colors" />
               </div>
               <button onClick={fetchEmails} className="p-2 rounded-lg hover:bg-white/5 transition-colors" title="Refresh">
-                <RefreshCw className={`w-4 h-4 text-zinc-400 ${loading ? "animate-spin" : ""}`} />
+                <RefreshCw className={`w-4 h-4 text-white/60 ${loading ? "animate-spin" : ""}`} />
               </button>
             </div>
             <div className="flex items-center gap-2 text-xs">
               <button onClick={toggleSelectAll} className="p-1 rounded hover:bg-white/5 transition-colors">
-                {selected.size > 0 && selected.size === emails.length ? <CheckSquare className="w-4 h-4 text-blue-400" /> : <Square className="w-4 h-4 text-zinc-500" />}
+                {selected.size > 0 && selected.size === emails.length ? <CheckSquare className="w-4 h-4 text-blue-400" /> : <Square className="w-4 h-4 text-white/50" />}
               </button>
               {selected.size > 0 ? (
                 <motion.div initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-1">
-                  <span className="text-zinc-400 mr-1">{selected.size} selected</span>
-                  <button onClick={() => handleBulkAction("read")} className="px-2 py-1 rounded bg-white/5 text-zinc-300 hover:bg-white/10 transition-colors">Mark read</button>
-                  <button onClick={() => handleBulkAction("unread")} className="px-2 py-1 rounded bg-white/5 text-zinc-300 hover:bg-white/10 transition-colors">Mark unread</button>
+                  <span className="text-white/60 mr-1">{selected.size} selected</span>
+                  <button onClick={() => handleBulkAction("read")} className="px-2 py-1 rounded bg-white/5 text-white/80 hover:bg-white/10 transition-colors">Mark read</button>
+                  <button onClick={() => handleBulkAction("unread")} className="px-2 py-1 rounded bg-white/5 text-white/80 hover:bg-white/10 transition-colors">Mark unread</button>
                   {folder !== "trash" && <button onClick={() => handleBulkAction("trash")} className="px-2 py-1 rounded bg-white/5 text-red-400 hover:bg-red-500/10 transition-colors"><Trash2 className="w-3 h-3" /></button>}
                   {folder !== "spam" && <button onClick={() => handleBulkAction("spam")} className="px-2 py-1 rounded bg-white/5 text-yellow-400 hover:bg-yellow-500/10 transition-colors"><AlertTriangle className="w-3 h-3" /></button>}
                 </motion.div>
               ) : (
-                <span className="text-zinc-600">{total > 0 ? `${total} email${total !== 1 ? "s" : ""}` : ""}</span>
+                <span className="text-white/30">{total > 0 ? `${total} email${total !== 1 ? "s" : ""}` : ""}</span>
               )}
             </div>
           </div>
@@ -352,31 +352,31 @@ export default function AdminEmailPage() {
             {loading ? (
               <div className="flex items-center justify-center py-24"><Loader2 className="w-6 h-6 text-blue-400 animate-spin" /></div>
             ) : folder === "sent" ? (
-              <div className="flex flex-col items-center justify-center py-24 text-zinc-500 px-6">
+              <div className="flex flex-col items-center justify-center py-24 text-white/50 px-6">
                 <Send className="w-12 h-12 mb-3 opacity-20" /><p className="font-medium">No sent emails yet</p>
-                <p className="text-sm mt-1 text-zinc-600 text-center">Emails you send will appear here in a future update.</p>
+                <p className="text-sm mt-1 text-white/30 text-center">Emails you send will appear here in a future update.</p>
               </div>
             ) : emails.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-24 text-zinc-500 px-6">
+              <div className="flex flex-col items-center justify-center py-24 text-white/50 px-6">
                 <Mail className="w-12 h-12 mb-3 opacity-20" /><p className="font-medium">{search ? "No results found" : `No emails in ${folder}`}</p>
-                <p className="text-sm mt-1 text-zinc-600 text-center">{search ? "Try a different search term" : "Emails to admin@zoobicon.com will appear here"}</p>
+                <p className="text-sm mt-1 text-white/30 text-center">{search ? "Try a different search term" : "Emails to admin@zoobicon.com will appear here"}</p>
               </div>
             ) : (
               <AnimatePresence initial={false}>
                 {emails.map((email) => (
                   <motion.div key={email.id} layout initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.15 }}>
-                    <div className={`flex items-start gap-3 px-4 py-3 border-b border-white/5 cursor-pointer transition-colors ${selectedEmail?.id === email.id ? "bg-blue-600/10" : "hover:bg-white/[0.03]"} ${!email.read ? "bg-white/[0.02]" : ""}`} onClick={() => { setSelectedEmail(email); if (!email.read) markRead(email, true); }}>
+                    <div className={`flex items-start gap-3 px-4 py-3 border-b border-white/10 cursor-pointer transition-colors ${selectedEmail?.id === email.id ? "bg-blue-600/10" : "hover:bg-white/[0.03]"} ${!email.read ? "bg-white/[0.02]" : ""}`} onClick={() => { setSelectedEmail(email); if (!email.read) markRead(email, true); }}>
                       <button onClick={(ev) => { ev.stopPropagation(); toggleSelect(email.id); }} className="mt-0.5 p-0.5 rounded hover:bg-white/10 transition-colors flex-shrink-0">
-                        {selected.has(email.id) ? <CheckSquare className="w-4 h-4 text-blue-400" /> : <Square className="w-4 h-4 text-zinc-600" />}
+                        {selected.has(email.id) ? <CheckSquare className="w-4 h-4 text-blue-400" /> : <Square className="w-4 h-4 text-white/30" />}
                       </button>
                       <div className="w-2 mt-2 flex-shrink-0">{!email.read && <div className="w-2 h-2 bg-blue-500 rounded-full" />}</div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">
-                          <span className={`text-sm truncate ${email.read ? "text-zinc-400" : "text-white font-semibold"}`}>{email.from_address}</span>
-                          <span className="text-xs text-zinc-600 ml-auto flex-shrink-0">{relativeTime(email.received_at)}</span>
+                          <span className={`text-sm truncate ${email.read ? "text-white/60" : "text-white font-semibold"}`}>{email.from_address}</span>
+                          <span className="text-xs text-white/30 ml-auto flex-shrink-0">{relativeTime(email.received_at)}</span>
                         </div>
-                        <p className={`text-sm truncate ${email.read ? "text-zinc-500" : "text-zinc-200 font-medium"}`}>{email.subject || "(No Subject)"}</p>
-                        <p className="text-xs text-zinc-600 truncate mt-0.5">{email.text_body?.substring(0, 120)}</p>
+                        <p className={`text-sm truncate ${email.read ? "text-white/50" : "text-white/90 font-medium"}`}>{email.subject || "(No Subject)"}</p>
+                        <p className="text-xs text-white/30 truncate mt-0.5">{email.text_body?.substring(0, 120)}</p>
                       </div>
                     </div>
                   </motion.div>
@@ -392,44 +392,44 @@ export default function AdminEmailPage() {
             <motion.div key={selectedEmail.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col min-w-0">
               <div className="p-4 border-b border-white/10">
                 <div className="flex items-center justify-between mb-3">
-                  <button onClick={() => setSelectedEmail(null)} className="p-1.5 rounded-lg hover:bg-white/5 transition-colors md:hidden"><ChevronLeft className="w-5 h-5 text-zinc-400" /></button>
+                  <button onClick={() => setSelectedEmail(null)} className="p-1.5 rounded-lg hover:bg-white/5 transition-colors md:hidden"><ChevronLeft className="w-5 h-5 text-white/60" /></button>
                   <div className="flex items-center gap-1 ml-auto">
-                    <button onClick={() => openReply(selectedEmail)} className="p-2 rounded-lg hover:bg-white/5 transition-colors" title="Reply"><Reply className="w-4 h-4 text-zinc-400" /></button>
-                    <button onClick={() => openForward(selectedEmail)} className="p-2 rounded-lg hover:bg-white/5 transition-colors" title="Forward"><Forward className="w-4 h-4 text-zinc-400" /></button>
-                    <button onClick={() => markRead(selectedEmail, !selectedEmail.read)} className="p-2 rounded-lg hover:bg-white/5 transition-colors" title={selectedEmail.read ? "Mark unread" : "Mark read"}><Mail className="w-4 h-4 text-zinc-400" /></button>
-                    {folder !== "trash" && <button onClick={() => moveToFolder(selectedEmail.id, "trash")} className="p-2 rounded-lg hover:bg-white/5 transition-colors" title="Trash"><Trash2 className="w-4 h-4 text-zinc-400" /></button>}
-                    {folder !== "spam" && <button onClick={() => moveToFolder(selectedEmail.id, "spam")} className="p-2 rounded-lg hover:bg-white/5 transition-colors" title="Spam"><AlertTriangle className="w-4 h-4 text-zinc-400" /></button>}
-                    <button className="p-2 rounded-lg hover:bg-white/5 transition-colors"><MoreHorizontal className="w-4 h-4 text-zinc-400" /></button>
+                    <button onClick={() => openReply(selectedEmail)} className="p-2 rounded-lg hover:bg-white/5 transition-colors" title="Reply"><Reply className="w-4 h-4 text-white/60" /></button>
+                    <button onClick={() => openForward(selectedEmail)} className="p-2 rounded-lg hover:bg-white/5 transition-colors" title="Forward"><Forward className="w-4 h-4 text-white/60" /></button>
+                    <button onClick={() => markRead(selectedEmail, !selectedEmail.read)} className="p-2 rounded-lg hover:bg-white/5 transition-colors" title={selectedEmail.read ? "Mark unread" : "Mark read"}><Mail className="w-4 h-4 text-white/60" /></button>
+                    {folder !== "trash" && <button onClick={() => moveToFolder(selectedEmail.id, "trash")} className="p-2 rounded-lg hover:bg-white/5 transition-colors" title="Trash"><Trash2 className="w-4 h-4 text-white/60" /></button>}
+                    {folder !== "spam" && <button onClick={() => moveToFolder(selectedEmail.id, "spam")} className="p-2 rounded-lg hover:bg-white/5 transition-colors" title="Spam"><AlertTriangle className="w-4 h-4 text-white/60" /></button>}
+                    <button className="p-2 rounded-lg hover:bg-white/5 transition-colors"><MoreHorizontal className="w-4 h-4 text-white/60" /></button>
                   </div>
                 </div>
-                <h2 className="text-lg font-semibold text-zinc-100 mb-3">{selectedEmail.subject || "(No Subject)"}</h2>
+                <h2 className="text-lg font-semibold text-white/90 mb-3">{selectedEmail.subject || "(No Subject)"}</h2>
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center text-sm font-bold text-zinc-300 flex-shrink-0">{selectedEmail.from_address.charAt(0).toUpperCase()}</div>
+                  <div className="w-10 h-10 rounded-full bg-[#111318] border border-white/10 flex items-center justify-center text-sm font-bold text-white/85 flex-shrink-0">{selectedEmail.from_address.charAt(0).toUpperCase()}</div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm font-medium text-zinc-200">{selectedEmail.from_address}</span>
-                      <span className="text-xs text-zinc-600">{fullDate(selectedEmail.received_at)}</span>
+                      <span className="text-sm font-medium text-white/90">{selectedEmail.from_address}</span>
+                      <span className="text-xs text-white/30">{fullDate(selectedEmail.received_at)}</span>
                     </div>
-                    <p className="text-xs text-zinc-500 mt-0.5">To: {selectedEmail.to_address}</p>
+                    <p className="text-xs text-white/50 mt-0.5">To: {selectedEmail.to_address}</p>
                   </div>
                 </div>
               </div>
               <div className="flex-1 overflow-y-auto p-6">
                 {selectedEmail.html_body ? (
-                  <div className="prose prose-invert prose-sm max-w-none prose-p:text-zinc-300 prose-a:text-blue-400" dangerouslySetInnerHTML={{ __html: selectedEmail.html_body }} />
+                  <div className="prose prose-invert prose-sm max-w-none prose-p:text-white/80 prose-a:text-blue-400" dangerouslySetInnerHTML={{ __html: selectedEmail.html_body }} />
                 ) : (
-                  <pre className="whitespace-pre-wrap text-sm text-zinc-300 font-sans leading-relaxed">{selectedEmail.text_body}</pre>
+                  <pre className="whitespace-pre-wrap text-sm text-white/80 font-sans leading-relaxed">{selectedEmail.text_body}</pre>
                 )}
               </div>
               <div className="border-t border-white/10 p-4 flex items-center gap-3">
-                <button onClick={() => openReply(selectedEmail)} className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/10 text-sm text-zinc-300 hover:bg-white/5 transition-colors"><Reply className="w-4 h-4" /> Reply</button>
-                <button onClick={() => openForward(selectedEmail)} className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/10 text-sm text-zinc-300 hover:bg-white/5 transition-colors"><Forward className="w-4 h-4" /> Forward</button>
+                <button onClick={() => openReply(selectedEmail)} className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/10 text-sm text-white/80 hover:bg-white/5 transition-colors"><Reply className="w-4 h-4" /> Reply</button>
+                <button onClick={() => openForward(selectedEmail)} className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/10 text-sm text-white/80 hover:bg-white/5 transition-colors"><Forward className="w-4 h-4" /> Forward</button>
               </div>
             </motion.div>
           ) : (
             !loading && folder !== "sent" && emails.length > 0 && (
               <div className="flex-1 hidden md:flex items-center justify-center">
-                <div className="text-center text-zinc-600"><Mail className="w-16 h-16 mx-auto mb-4 opacity-20" /><p className="text-sm">Select an email to read</p></div>
+                <div className="text-center text-white/30"><Mail className="w-16 h-16 mx-auto mb-4 opacity-20" /><p className="text-sm">Select an email to read</p></div>
               </div>
             )
           )}
@@ -440,21 +440,21 @@ export default function AdminEmailPage() {
       <AnimatePresence>
         {composing && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={(e) => { if (e.target === e.currentTarget) setComposing(false); }}>
-            <motion.div initial={{ y: 40, opacity: 0, scale: 0.97 }} animate={{ y: 0, opacity: 1, scale: 1 }} exit={{ y: 40, opacity: 0, scale: 0.97 }} transition={{ duration: 0.2 }} className="w-full max-w-2xl bg-zinc-900 border border-white/10 rounded-xl shadow-2xl flex flex-col max-h-[80vh]">
+            <motion.div initial={{ y: 40, opacity: 0, scale: 0.97 }} animate={{ y: 0, opacity: 1, scale: 1 }} exit={{ y: 40, opacity: 0, scale: 0.97 }} transition={{ duration: 0.2 }} className="w-full max-w-2xl bg-[#111318] border border-white/10 rounded-xl shadow-2xl flex flex-col max-h-[80vh]">
               <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
-                <h3 className="text-sm font-semibold text-zinc-100">New Message</h3>
-                <button onClick={() => { setComposing(false); setComposeData({ to: "", subject: "", text: "" }); setSendSuccess(false); }} className="p-1 rounded hover:bg-white/5 transition-colors"><X className="w-4 h-4 text-zinc-400" /></button>
+                <h3 className="text-sm font-semibold text-white/90">New Message</h3>
+                <button onClick={() => { setComposing(false); setComposeData({ to: "", subject: "", text: "" }); setSendSuccess(false); }} className="p-1 rounded hover:bg-white/5 transition-colors"><X className="w-4 h-4 text-white/60" /></button>
               </div>
               <div className="flex flex-col gap-0 flex-1 overflow-hidden">
-                <div className="flex items-center border-b border-white/5 px-4">
-                  <label className="text-xs text-zinc-500 w-12">To</label>
-                  <input type="email" value={composeData.to} onChange={(e) => setComposeData((d) => ({ ...d, to: e.target.value }))} className="flex-1 bg-transparent py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none" placeholder="recipient@example.com" />
+                <div className="flex items-center border-b border-white/10 px-4">
+                  <label className="text-xs text-white/50 w-12">To</label>
+                  <input type="email" value={composeData.to} onChange={(e) => setComposeData((d) => ({ ...d, to: e.target.value }))} className="flex-1 bg-transparent py-2.5 text-sm text-white placeholder-white/30 focus:outline-none" placeholder="recipient@example.com" />
                 </div>
-                <div className="flex items-center border-b border-white/5 px-4">
-                  <label className="text-xs text-zinc-500 w-12">Subject</label>
-                  <input type="text" value={composeData.subject} onChange={(e) => setComposeData((d) => ({ ...d, subject: e.target.value }))} className="flex-1 bg-transparent py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none" placeholder="Subject" />
+                <div className="flex items-center border-b border-white/10 px-4">
+                  <label className="text-xs text-white/50 w-12">Subject</label>
+                  <input type="text" value={composeData.subject} onChange={(e) => setComposeData((d) => ({ ...d, subject: e.target.value }))} className="flex-1 bg-transparent py-2.5 text-sm text-white placeholder-white/30 focus:outline-none" placeholder="Subject" />
                 </div>
-                <textarea value={composeData.text} onChange={(e) => setComposeData((d) => ({ ...d, text: e.target.value }))} placeholder="Write your message..." className="flex-1 min-h-[200px] bg-transparent px-4 py-3 text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none resize-none" />
+                <textarea value={composeData.text} onChange={(e) => setComposeData((d) => ({ ...d, text: e.target.value }))} placeholder="Write your message..." className="flex-1 min-h-[200px] bg-transparent px-4 py-3 text-sm text-white/90 placeholder-white/30 focus:outline-none resize-none" />
               </div>
               {/* AI Polish Diff View */}
               <AnimatePresence>
@@ -468,13 +468,13 @@ export default function AdminEmailPage() {
                           <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${polishResult.score >= 90 ? "bg-green-500/20 text-green-400" : polishResult.score >= 70 ? "bg-yellow-500/20 text-yellow-400" : "bg-red-500/20 text-red-400"}`}>
                             Score: {polishResult.score}/100
                           </span>
-                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/5 text-zinc-400">{polishResult.tone}</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/5 text-white/60">{polishResult.tone}</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           <button onClick={acceptPolish} className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-green-600/20 hover:bg-green-600/30 text-green-400 text-xs font-medium transition-colors">
                             <Check className="w-3 h-3" /> Accept
                           </button>
-                          <button onClick={rejectPolish} className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-zinc-700/50 hover:bg-zinc-700 text-zinc-400 text-xs font-medium transition-colors">
+                          <button onClick={rejectPolish} className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/10 text-white/60 text-xs font-medium transition-colors">
                             <X className="w-3 h-3" /> Dismiss
                           </button>
                         </div>
@@ -484,12 +484,12 @@ export default function AdminEmailPage() {
                           {polishResult.changes.map((change, i) => (
                             <div key={i} className="flex items-start gap-2 text-[11px]">
                               <Wand2 className="w-3 h-3 text-blue-400 mt-0.5 shrink-0" />
-                              <span className="text-zinc-400">{change}</span>
+                              <span className="text-white/60">{change}</span>
                             </div>
                           ))}
                         </div>
                       )}
-                      <div className="bg-black/20 rounded-lg p-3 text-xs text-zinc-300 whitespace-pre-wrap max-h-32 overflow-y-auto">{polishResult.polished}</div>
+                      <div className="bg-black/20 rounded-lg p-3 text-xs text-white/80 whitespace-pre-wrap max-h-32 overflow-y-auto">{polishResult.polished}</div>
                     </div>
                   </motion.div>
                 )}
@@ -498,28 +498,28 @@ export default function AdminEmailPage() {
               {/* Enhanced Toolbar */}
               <div className="flex items-center justify-between px-4 py-3 border-t border-white/10">
                 <div className="flex items-center gap-1">
-                  <button className="p-2 rounded-lg hover:bg-white/5 transition-colors" title="Attach file"><Paperclip className="w-4 h-4 text-zinc-500" /></button>
+                  <button className="p-2 rounded-lg hover:bg-white/5 transition-colors" title="Attach file"><Paperclip className="w-4 h-4 text-white/50" /></button>
 
                   {/* AI Polish Button */}
                   <button onClick={handlePolish} disabled={polishing || !composeData.text.trim()} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-purple-500/10 border border-transparent hover:border-purple-500/20 transition-all disabled:opacity-30 group" title="AI Polish — fix grammar, tone & clarity">
-                    {polishing ? <Loader2 className="w-4 h-4 text-purple-400 animate-spin" /> : <Sparkles className="w-4 h-4 text-zinc-500 group-hover:text-purple-400" />}
-                    <span className="text-xs text-zinc-500 group-hover:text-purple-400 hidden sm:inline">Polish</span>
+                    {polishing ? <Loader2 className="w-4 h-4 text-purple-400 animate-spin" /> : <Sparkles className="w-4 h-4 text-white/50 group-hover:text-purple-400" />}
+                    <span className="text-xs text-white/50 group-hover:text-purple-400 hidden sm:inline">Polish</span>
                   </button>
 
                   {/* Templates */}
                   <div className="relative">
                     <button onClick={() => setShowTemplates(!showTemplates)} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-white/5 transition-colors group" title="Email Templates">
-                      <FileText className="w-4 h-4 text-zinc-500 group-hover:text-cyan-400" />
-                      <span className="text-xs text-zinc-500 group-hover:text-cyan-400 hidden sm:inline">Templates</span>
+                      <FileText className="w-4 h-4 text-white/50 group-hover:text-cyan-400" />
+                      <span className="text-xs text-white/50 group-hover:text-cyan-400 hidden sm:inline">Templates</span>
                     </button>
                     <AnimatePresence>
                       {showTemplates && (
-                        <motion.div initial={{ opacity: 0, y: 8, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 8, scale: 0.95 }} className="absolute bottom-full left-0 mb-2 w-64 bg-zinc-800 border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50">
-                          <div className="px-3 py-2 border-b border-white/10 text-xs font-semibold text-zinc-400">Quick Templates</div>
+                        <motion.div initial={{ opacity: 0, y: 8, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 8, scale: 0.95 }} className="absolute bottom-full left-0 mb-2 w-64 bg-[#111318] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50">
+                          <div className="px-3 py-2 border-b border-white/10 text-xs font-semibold text-white/60">Quick Templates</div>
                           {EMAIL_TEMPLATES.map((t, i) => (
-                            <button key={i} onClick={() => applyTemplate(t)} className="w-full text-left px-3 py-2.5 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0">
-                              <span className="text-xs font-medium text-zinc-200">{t.name}</span>
-                              <p className="text-[10px] text-zinc-500 mt-0.5 truncate">{t.body.substring(0, 60)}...</p>
+                            <button key={i} onClick={() => applyTemplate(t)} className="w-full text-left px-3 py-2.5 hover:bg-white/5 transition-colors border-b border-white/10 last:border-0">
+                              <span className="text-xs font-medium text-white/90">{t.name}</span>
+                              <p className="text-[10px] text-white/50 mt-0.5 truncate">{t.body.substring(0, 60)}...</p>
                             </button>
                           ))}
                         </motion.div>
@@ -529,20 +529,20 @@ export default function AdminEmailPage() {
 
                   {/* Signature */}
                   <button onClick={() => setShowSignatureEditor(!showSignatureEditor)} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-white/5 transition-colors group" title="Email Signature">
-                    <PenTool className="w-4 h-4 text-zinc-500 group-hover:text-green-400" />
-                    <span className="text-xs text-zinc-500 group-hover:text-green-400 hidden sm:inline">Signature</span>
+                    <PenTool className="w-4 h-4 text-white/50 group-hover:text-green-400" />
+                    <span className="text-xs text-white/50 group-hover:text-green-400 hidden sm:inline">Signature</span>
                   </button>
 
                   {/* AI Subject Line */}
                   <button onClick={generateSubject} disabled={generatingSubject || !composeData.text.trim()} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-white/5 transition-colors group disabled:opacity-30" title="AI generate subject line">
-                    {generatingSubject ? <Loader2 className="w-4 h-4 text-amber-400 animate-spin" /> : <Zap className="w-4 h-4 text-zinc-500 group-hover:text-amber-400" />}
-                    <span className="text-xs text-zinc-500 group-hover:text-amber-400 hidden sm:inline">Subject</span>
+                    {generatingSubject ? <Loader2 className="w-4 h-4 text-amber-400 animate-spin" /> : <Zap className="w-4 h-4 text-white/50 group-hover:text-amber-400" />}
+                    <span className="text-xs text-white/50 group-hover:text-amber-400 hidden sm:inline">Subject</span>
                   </button>
 
                   {/* Schedule */}
                   <button onClick={() => setScheduling(!scheduling)} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-white/5 transition-colors group" title="Schedule send">
-                    <Clock className="w-4 h-4 text-zinc-500 group-hover:text-orange-400" />
-                    <span className="text-xs text-zinc-500 group-hover:text-orange-400 hidden sm:inline">Schedule</span>
+                    <Clock className="w-4 h-4 text-white/50 group-hover:text-orange-400" />
+                    <span className="text-xs text-white/50 group-hover:text-orange-400 hidden sm:inline">Schedule</span>
                   </button>
                 </div>
 
@@ -563,7 +563,7 @@ export default function AdminEmailPage() {
                           <button onClick={saveSignature} className="text-[10px] px-2 py-1 rounded bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 transition-colors">Save</button>
                         </div>
                       </div>
-                      <textarea value={signature} onChange={(e) => setSignature(e.target.value)} className="w-full bg-black/20 rounded-lg px-3 py-2 text-xs text-zinc-300 placeholder-zinc-600 focus:outline-none resize-none h-20" placeholder="Your email signature..." />
+                      <textarea value={signature} onChange={(e) => setSignature(e.target.value)} className="w-full bg-black/20 rounded-lg px-3 py-2 text-xs text-white/80 placeholder-white/30 focus:outline-none resize-none h-20" placeholder="Your email signature..." />
                     </div>
                   </motion.div>
                 )}
@@ -577,7 +577,7 @@ export default function AdminEmailPage() {
                       <Clock className="w-4 h-4 text-orange-400" />
                       <span className="text-xs text-orange-300 font-medium">Send Later:</span>
                       <input type="datetime-local" value={scheduleTime} onChange={(e) => setScheduleTime(e.target.value)} className="bg-black/20 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-orange-500/40" />
-                      <span className="text-[10px] text-zinc-500">Email will be queued and sent at the scheduled time</span>
+                      <span className="text-[10px] text-white/50">Email will be queued and sent at the scheduled time</span>
                     </div>
                   </motion.div>
                 )}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import BackgroundEffects from "@/components/BackgroundEffects";
 import {
   ArrowLeft,
   Radar,
@@ -119,9 +120,10 @@ export default function IntelPage() {
   ) || [];
 
   return (
-    <div className="min-h-screen bg-[#09090f] text-white">
+    <div className="min-h-screen bg-[#050508] text-white">
+      <BackgroundEffects preset="admin" />
       {/* Header */}
-      <header className="border-b border-white/[0.06] px-6 py-4">
+      <header className="border-b border-white/10 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
@@ -204,7 +206,7 @@ export default function IntelPage() {
                 className={`p-4 rounded-xl border transition-all text-left ${
                   selectedCompetitor === c.name
                     ? "bg-brand-500/10 border-brand-500/30"
-                    : "bg-white/[0.02] border-white/[0.06] hover:border-white/10"
+                    : "bg-white/[0.02] border-white/10 hover:border-white/10"
                 }`}
               >
                 <div className="text-sm font-semibold mb-1">{c.name}</div>
@@ -274,7 +276,7 @@ export default function IntelPage() {
               {filteredResults.map((result, i) => (
                 <div
                   key={i}
-                  className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]"
+                  className="p-4 rounded-xl bg-white/[0.02] border border-white/10"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div>
