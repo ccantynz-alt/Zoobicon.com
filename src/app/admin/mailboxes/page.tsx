@@ -235,7 +235,7 @@ export default function AdminMailboxesPage() {
 
   // ---- Render ----
   return (
-    <div className="min-h-screen bg-[#131520] text-white">
+    <div className="min-h-screen bg-[#09090f] text-white">
       <BackgroundEffects />
 
       {/* Navbar */}

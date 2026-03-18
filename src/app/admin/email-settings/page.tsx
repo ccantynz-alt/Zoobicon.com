@@ -42,7 +42,7 @@ const SETUP_STEPS = [
   {
     step: 3,
     title: "Set up inbound routing",
-    description: "In Mailgun \u2192 Receiving \u2192 Create Route. Match recipient: admin@zoobicon.com \u2192 Forward to: https://zoobicon.com/api/email/inbox (webhook). Create a second route for support@zoobicon.com \u2192 Forward to: https://zoobicon.com/api/email/support/inbound.",
+    description: "In Mailgun \u2192 Receiving \u2192 Create Route. Create ONE catch-all route: Match recipient '.*@zoobicon.com' \u2192 Forward to: https://zoobicon.com/api/email/webhook. This single webhook handles both admin@zoobicon.com and support@zoobicon.com automatically. Action: 'Store and notify' with the webhook URL.",
     link: "https://app.mailgun.com/receiving/routes",
   },
   {
@@ -81,6 +81,9 @@ export default function AdminEmailSettingsPage() {
   const [showKeys, setShowKeys] = useState<Record<string, boolean>>({});
   const [copiedEnv, setCopiedEnv] = useState(false);
   const [expandedStep, setExpandedStep] = useState<number | null>(null);
+  const [setupStatus, setSetupStatus] = useState<Record<string, { ok: boolean; detail: string }> | null>(null);
+  const [checkingSetup, setCheckingSetup] = useState(false);
+  const [creatingTables, setCreatingTables] = useState(false);
 
   useEffect(() => {
     try {
@@ -145,6 +148,7 @@ export default function AdminEmailSettingsPage() {
   const envBlock = `# Email (Mailgun only — no Google Workspace needed)
 MAILGUN_API_KEY=${config.mailgunApiKey || "key-xxxxx"}
 MAILGUN_DOMAIN=${config.mailgunDomain || "zoobicon.com"}
+MAILGUN_WEBHOOK_SIGNING_KEY=your-webhook-signing-key
 ADMIN_EMAIL=${config.adminEmail || "admin@zoobicon.com"}
 ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "admin@zoobicon.com"}`;
 
@@ -157,7 +161,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
   const inputClass = "w-full bg-white/[0.06] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500/50 transition-colors";
 
   return (
-    <div className="min-h-screen bg-[#131520] text-white">
+    <div className="min-h-screen bg-[#09090f] text-white">
       <BackgroundEffects />
 
       {/* Navbar */}
@@ -209,7 +213,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
               <div className="space-y-2 text-xs text-zinc-400 leading-relaxed">
                 <p><span className="text-zinc-300">admin@zoobicon.com</span></p>
                 <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-zinc-600 shrink-0" /><span>Mailgun receives it</span></div>
-                <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-zinc-600 shrink-0" /><span>Webhook sends to <code className="text-cyan-400/80">/api/email/inbox</code></span></div>
+                <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-zinc-600 shrink-0" /><span>Webhook to <code className="text-cyan-400/80">/api/email/webhook</code></span></div>
                 <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-zinc-600 shrink-0" /><span>Appears in <code className="text-cyan-400/80">/admin/email</code></span></div>
               </div>
             </div>
@@ -225,7 +229,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
               <div className="space-y-2 text-xs text-zinc-400 leading-relaxed">
                 <p><span className="text-zinc-300">support@zoobicon.com</span></p>
                 <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-zinc-600 shrink-0" /><span>Mailgun receives it</span></div>
-                <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-zinc-600 shrink-0" /><span>Webhook to <code className="text-cyan-400/80">/api/email/support/inbound</code></span></div>
+                <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-zinc-600 shrink-0" /><span>Webhook to <code className="text-cyan-400/80">/api/email/webhook</code></span></div>
                 <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-zinc-600 shrink-0" /><span>Ticket in <code className="text-cyan-400/80">/email-support</code></span></div>
                 <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-zinc-600 shrink-0" /><span>AI drafts reply</span></div>
               </div>
@@ -245,7 +249,11 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
               </div>
             </div>
           </div>
-          <p className="text-xs text-zinc-500 mt-4">Total cost: <span className="text-green-400/80">$0/month</span> on Mailgun free tier (5,000 emails/month). No Google Workspace, no per-seat charges.</p>
+          <div className="mt-4 bg-white/[0.04] border border-white/[0.06] rounded-lg p-3">
+            <p className="text-xs text-zinc-400 mb-1.5 font-medium">Mailgun Webhook URL (use this for ALL inbound routing):</p>
+            <code className="text-xs text-cyan-400 bg-black/30 px-2 py-1 rounded select-all">https://zoobicon.com/api/email/webhook</code>
+          </div>
+          <p className="text-xs text-zinc-500 mt-3">Total cost: <span className="text-green-400/80">$0/month</span> on Mailgun free tier (5,000 emails/month). No Google Workspace, no per-seat charges.</p>
         </motion.div>
 
         {/* Setup Guide — Expandable accordion */}
@@ -284,6 +292,71 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
               </div>
             ))}
           </div>
+        </motion.div>
+
+        {/* Connection Verification */}
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}
+          className="bg-white/[0.06] border border-white/10 rounded-xl p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <Server className="w-5 h-5 text-green-400" />
+              <h2 className="text-lg font-semibold">Connection Status</h2>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={async () => {
+                  setCheckingSetup(true);
+                  try {
+                    const res = await fetch("/api/email/setup");
+                    const data = await res.json();
+                    setSetupStatus(data.checks);
+                  } catch {
+                    setSetupStatus({ error: { ok: false, detail: "Could not reach setup endpoint" } });
+                  }
+                  setCheckingSetup(false);
+                }}
+                disabled={checkingSetup}
+                className="flex items-center gap-1.5 text-xs bg-green-600/20 hover:bg-green-600/30 border border-green-500/30 text-green-400 px-3 py-1.5 rounded-lg transition-all disabled:opacity-50"
+              >
+                {checkingSetup ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle2 className="w-3 h-3" />}
+                Verify Setup
+              </button>
+              <button
+                onClick={async () => {
+                  setCreatingTables(true);
+                  try {
+                    await fetch("/api/email/setup", { method: "POST" });
+                    // Re-check after creating
+                    const res = await fetch("/api/email/setup");
+                    const data = await res.json();
+                    setSetupStatus(data.checks);
+                  } catch {
+                    setSetupStatus({ error: { ok: false, detail: "Failed to create tables" } });
+                  }
+                  setCreatingTables(false);
+                }}
+                disabled={creatingTables}
+                className="flex items-center gap-1.5 text-xs bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 text-blue-400 px-3 py-1.5 rounded-lg transition-all disabled:opacity-50"
+              >
+                {creatingTables ? <Loader2 className="w-3 h-3 animate-spin" /> : <Server className="w-3 h-3" />}
+                Create DB Tables
+              </button>
+            </div>
+          </div>
+          {setupStatus && (
+            <div className="space-y-2">
+              {Object.entries(setupStatus).map(([key, val]) => (
+                <div key={key} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-xs ${val.ok ? "bg-green-500/10 text-green-400" : "bg-red-500/10 text-red-400"}`}>
+                  {val.ok ? <CheckCircle2 className="w-3.5 h-3.5 shrink-0" /> : <AlertTriangle className="w-3.5 h-3.5 shrink-0" />}
+                  <span className="font-medium min-w-[160px]">{key.replace(/_/g, " ")}</span>
+                  <span className="text-zinc-400">{val.detail}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          {!setupStatus && (
+            <p className="text-xs text-zinc-500">Click &ldquo;Verify Setup&rdquo; to check your Mailgun API key, domain, database tables, and webhook configuration.</p>
+          )}
         </motion.div>
 
         {/* Email Addresses */}
@@ -438,6 +511,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
             <div><span className="text-zinc-500"># Email (Mailgun only — no Google Workspace needed)</span></div>
             <div><span className="text-blue-400">MAILGUN_API_KEY</span><span className="text-zinc-500">=</span><span className="text-green-400">{config.mailgunApiKey ? maskKey(config.mailgunApiKey) : "key-xxxxx"}</span></div>
             <div><span className="text-blue-400">MAILGUN_DOMAIN</span><span className="text-zinc-500">=</span><span className="text-green-400">{config.mailgunDomain || "zoobicon.com"}</span></div>
+            <div><span className="text-blue-400">MAILGUN_WEBHOOK_SIGNING_KEY</span><span className="text-zinc-500">=</span><span className="text-green-400">your-webhook-signing-key</span></div>
             <div><span className="text-blue-400">ADMIN_EMAIL</span><span className="text-zinc-500">=</span><span className="text-green-400">{config.adminEmail || "admin@zoobicon.com"}</span></div>
             <div><span className="text-blue-400">ADMIN_NOTIFICATION_EMAIL</span><span className="text-zinc-500">=</span><span className="text-green-400">{config.notificationEmail || config.adminEmail || "admin@zoobicon.com"}</span></div>
           </div>
