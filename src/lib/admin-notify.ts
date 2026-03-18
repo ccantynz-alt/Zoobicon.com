@@ -2,10 +2,10 @@
  * Admin Notification Service
  *
  * Sends email notifications to the admin (ADMIN_NOTIFICATION_EMAIL or ADMIN_EMAIL)
- * via Resend. Falls back to console logging if RESEND_API_KEY is not set.
+ * via Mailgun. Falls back to console logging if MAILGUN_API_KEY is not set.
  */
 
-const RESEND_API = "https://api.resend.com/emails";
+import { sendViaMailgun } from "./mailgun";
 
 function getAdminEmail(): string {
   return (
@@ -16,7 +16,8 @@ function getAdminEmail(): string {
 }
 
 function getFromAddress(): string {
-  return "Zoobicon <noreply@zoobicon.com>";
+  const domain = process.env.MAILGUN_DOMAIN || "zoobicon.com";
+  return `Zoobicon <noreply@${domain}>`;
 }
 
 interface NotifyOptions {
@@ -32,10 +33,10 @@ interface NotifyOptions {
  */
 export async function notifyAdmin(opts: NotifyOptions): Promise<boolean> {
   const adminEmail = getAdminEmail();
-  const apiKey = process.env.RESEND_API_KEY;
+  const apiKey = process.env.MAILGUN_API_KEY;
 
   if (!apiKey) {
-    console.log(`[Admin Notify] No RESEND_API_KEY — logging instead:`);
+    console.log(`[Admin Notify] No MAILGUN_API_KEY — logging instead:`);
     console.log(`  To: ${adminEmail}`);
     console.log(`  Subject: ${opts.subject}`);
     console.log(`  Body: ${opts.text || "(HTML only)"}`);
@@ -43,24 +44,17 @@ export async function notifyAdmin(opts: NotifyOptions): Promise<boolean> {
   }
 
   try {
-    const res = await fetch(RESEND_API, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: getFromAddress(),
-        to: [adminEmail],
-        subject: opts.subject,
-        html: opts.html,
-        ...(opts.text ? { text: opts.text } : {}),
-      }),
+    const result = await sendViaMailgun({
+      from: getFromAddress(),
+      to: adminEmail,
+      subject: opts.subject,
+      html: opts.html,
+      ...(opts.text ? { text: opts.text } : {}),
+      tags: ["admin-notification"],
     });
 
-    if (!res.ok) {
-      const err = await res.text();
-      console.error(`[Admin Notify] Resend error ${res.status}:`, err);
+    if (!result.success) {
+      console.error(`[Admin Notify] Mailgun error:`, result.error);
       return false;
     }
 

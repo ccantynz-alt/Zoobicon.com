@@ -13,7 +13,6 @@ import BackgroundEffects from "@/components/BackgroundEffects";
 interface EmailConfig {
   adminEmail: string;
   notificationEmail: string;
-  resendApiKey: string;
   mailgunApiKey: string;
   mailgunDomain: string;
   fromName: string;
@@ -29,7 +28,6 @@ export default function AdminEmailSettingsPage() {
   const [config, setConfig] = useState<EmailConfig>({
     adminEmail: "",
     notificationEmail: "",
-    resendApiKey: "",
     mailgunApiKey: "",
     mailgunDomain: "",
     fromName: "Zoobicon",
@@ -210,22 +208,6 @@ export default function AdminEmailSettingsPage() {
           </div>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm text-zinc-300 mb-1.5 font-medium">Resend API Key</label>
-              <div className="relative">
-                <input
-                  type={showKeys.resend ? "text" : "password"}
-                  value={config.resendApiKey}
-                  onChange={(e) => setConfig((p) => ({ ...p, resendApiKey: e.target.value }))}
-                  placeholder="re_..."
-                  className="w-full bg-white/[0.06] border border-white/10 rounded-lg px-4 py-2.5 pr-10 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500/50 transition-colors font-mono"
-                />
-                <button onClick={() => toggleKey("resend")} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors">
-                  {showKeys.resend ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-              <p className="text-xs text-zinc-500 mt-1">Primary email service for admin notifications (signups, deploys, contact forms).</p>
-            </div>
-            <div>
               <label className="block text-sm text-zinc-300 mb-1.5 font-medium">Mailgun API Key</label>
               <div className="relative">
                 <input
@@ -239,7 +221,7 @@ export default function AdminEmailSettingsPage() {
                   {showKeys.mailgun ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              <p className="text-xs text-zinc-500 mt-1">Used for support ticket email (inbound/outbound via webhook).</p>
+              <p className="text-xs text-zinc-500 mt-1">Primary email service for all emails — admin notifications, support tickets, password resets.</p>
             </div>
             <div>
               <label className="block text-sm text-zinc-300 mb-1.5 font-medium">Mailgun Domain</label>
@@ -298,8 +280,7 @@ export default function AdminEmailSettingsPage() {
             <div><span className="text-zinc-500"># Admin credentials</span></div>
             <div><span className="text-blue-400">ADMIN_EMAIL</span><span className="text-zinc-500">=</span><span className="text-green-400">{config.adminEmail || "admin@zoobicon.com"}</span></div>
             <div><span className="text-blue-400">ADMIN_NOTIFICATION_EMAIL</span><span className="text-zinc-500">=</span><span className="text-green-400">{config.notificationEmail || config.adminEmail || "admin@zoobicon.com"}</span></div>
-            <div className="pt-2"><span className="text-zinc-500"># Email services</span></div>
-            <div><span className="text-blue-400">RESEND_API_KEY</span><span className="text-zinc-500">=</span><span className="text-green-400">{config.resendApiKey ? maskKey(config.resendApiKey) : "re_xxxxx"}</span></div>
+            <div className="pt-2"><span className="text-zinc-500"># Email service (Mailgun — all emails)</span></div>
             <div><span className="text-blue-400">MAILGUN_API_KEY</span><span className="text-zinc-500">=</span><span className="text-green-400">{config.mailgunApiKey ? maskKey(config.mailgunApiKey) : "key-xxxxx"}</span></div>
             <div><span className="text-blue-400">MAILGUN_DOMAIN</span><span className="text-zinc-500">=</span><span className="text-green-400">{config.mailgunDomain || "mail.zoobicon.com"}</span></div>
           </div>
