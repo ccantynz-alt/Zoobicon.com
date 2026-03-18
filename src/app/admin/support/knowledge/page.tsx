@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import BackgroundEffects from "@/components/BackgroundEffects";
 import {
   ArrowLeft, BookOpen, Plus, Search, Edit3, Trash2,
   Save, X, Loader2, Tag, RefreshCw, CheckCircle2,
@@ -156,17 +157,18 @@ export default function KnowledgeBasePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-[#050508] text-white">
+      <BackgroundEffects preset="admin" />
       {/* Header */}
-      <div className="border-b border-gray-800 bg-gray-900/80 backdrop-blur-sm">
+      <div className="border-b border-white/10 bg-[#111318]/80 backdrop-blur-sm">
         <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/admin/support" className="p-2 rounded-lg hover:bg-gray-800 transition-colors">
-              <ArrowLeft className="w-5 h-5 text-gray-400" />
+            <Link href="/admin/support" className="p-2 rounded-lg hover:bg-[#111318] transition-colors">
+              <ArrowLeft className="w-5 h-5 text-white/70" />
             </Link>
             <BookOpen className="w-6 h-6 text-amber-400" />
             <h1 className="text-lg font-semibold">Knowledge Base</h1>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-white/60">
               {articles.length} articles
             </span>
           </div>
@@ -178,8 +180,8 @@ export default function KnowledgeBasePage() {
               <Plus className="w-4 h-4" />
               New Article
             </button>
-            <button onClick={fetchArticles} className="p-2 rounded-lg hover:bg-gray-800 transition-colors">
-              <RefreshCw className={`w-5 h-5 text-gray-400 ${loading ? "animate-spin" : ""}`} />
+            <button onClick={fetchArticles} className="p-2 rounded-lg hover:bg-[#111318] transition-colors">
+              <RefreshCw className={`w-5 h-5 text-white/70 ${loading ? "animate-spin" : ""}`} />
             </button>
           </div>
         </div>
@@ -187,7 +189,7 @@ export default function KnowledgeBasePage() {
 
       <div className="max-w-[1400px] mx-auto flex" style={{ height: "calc(100vh - 60px)" }}>
         {/* Sidebar — Categories */}
-        <div className="w-56 border-r border-gray-800 p-3 flex flex-col gap-1">
+        <div className="w-56 border-r border-white/10 p-3 flex flex-col gap-1">
           <button
             onClick={() => {
               setSelectedCategory(null);
@@ -196,7 +198,7 @@ export default function KnowledgeBasePage() {
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
               !selectedCategory
                 ? "bg-amber-600/20 text-amber-300"
-                : "text-gray-400 hover:bg-gray-800"
+                : "text-white/70 hover:bg-[#111318]"
             }`}
           >
             <FolderOpen className="w-4 h-4" />
@@ -214,20 +216,20 @@ export default function KnowledgeBasePage() {
                 className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
                   selectedCategory === cat
                     ? "bg-amber-600/20 text-amber-300"
-                    : "text-gray-400 hover:bg-gray-800"
+                    : "text-white/70 hover:bg-[#111318]"
                 }`}
               >
                 <span className="capitalize">{cat.replace("-", " ")}</span>
                 {count > 0 && (
-                  <span className="text-xs text-gray-600">{count}</span>
+                  <span className="text-xs text-white/40">{count}</span>
                 )}
               </button>
             );
           })}
 
-          <div className="mt-6 pt-4 border-t border-gray-800">
-            <p className="px-3 text-xs text-gray-600 mb-2">How it works</p>
-            <p className="px-3 text-xs text-gray-500 leading-relaxed">
+          <div className="mt-6 pt-4 border-t border-white/10">
+            <p className="px-3 text-xs text-white/40 mb-2">How it works</p>
+            <p className="px-3 text-xs text-white/60 leading-relaxed">
               Articles you add here are automatically included as context when the AI
               drafts support responses. More articles = smarter AI replies.
             </p>
@@ -237,16 +239,16 @@ export default function KnowledgeBasePage() {
         {/* Main Content */}
         <div className="flex-1 flex flex-col">
           {/* Search */}
-          <div className="p-3 border-b border-gray-800">
+          <div className="p-3 border-b border-white/10">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60" />
               <input
                 type="text"
                 placeholder="Search articles..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && fetchArticles()}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-500"
+                className="w-full bg-[#111318] border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-amber-500"
               />
             </div>
           </div>
@@ -262,15 +264,15 @@ export default function KnowledgeBasePage() {
                   </h2>
                   <button
                     onClick={cancelEdit}
-                    className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+                    className="p-2 hover:bg-[#111318] rounded-lg transition-colors"
                   >
-                    <X className="w-5 h-5 text-gray-400" />
+                    <X className="w-5 h-5 text-white/70" />
                   </button>
                 </div>
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-gray-400 mb-1">Title</label>
+                    <label className="block text-sm text-white/70 mb-1">Title</label>
                     <input
                       type="text"
                       value={formData.title}
@@ -278,18 +280,18 @@ export default function KnowledgeBasePage() {
                         setFormData((d) => ({ ...d, title: e.target.value }))
                       }
                       placeholder="e.g., How to deploy a website"
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-500"
+                      className="w-full bg-[#111318] border border-white/10 rounded-lg px-4 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-amber-500"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm text-gray-400 mb-1">Category</label>
+                    <label className="block text-sm text-white/70 mb-1">Category</label>
                     <select
                       value={formData.category}
                       onChange={(e) =>
                         setFormData((d) => ({ ...d, category: e.target.value }))
                       }
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-amber-500"
+                      className="w-full bg-[#111318] border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-amber-500"
                     >
                       {CATEGORIES.map((cat) => (
                         <option key={cat} value={cat}>
@@ -300,9 +302,9 @@ export default function KnowledgeBasePage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm text-gray-400 mb-1">
+                    <label className="block text-sm text-white/70 mb-1">
                       Content{" "}
-                      <span className="text-gray-600">
+                      <span className="text-white/40">
                         — this is what the AI reads when drafting replies
                       </span>
                     </label>
@@ -313,14 +315,14 @@ export default function KnowledgeBasePage() {
                       }
                       placeholder="Write the full answer here. Include step-by-step instructions, URLs, pricing details — anything the AI should know when answering questions about this topic."
                       rows={15}
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-500 resize-none font-mono"
+                      className="w-full bg-[#111318] border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-amber-500 resize-none font-mono"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm text-gray-400 mb-1">
+                    <label className="block text-sm text-white/70 mb-1">
                       Keywords{" "}
-                      <span className="text-gray-600">— comma-separated, helps matching</span>
+                      <span className="text-white/40">— comma-separated, helps matching</span>
                     </label>
                     <input
                       type="text"
@@ -329,14 +331,14 @@ export default function KnowledgeBasePage() {
                         setFormData((d) => ({ ...d, keywords: e.target.value }))
                       }
                       placeholder="deploy, hosting, custom domain, DNS"
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-500"
+                      className="w-full bg-[#111318] border border-white/10 rounded-lg px-4 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-amber-500"
                     />
                   </div>
 
                   <div className="flex justify-end gap-3 pt-4">
                     <button
                       onClick={cancelEdit}
-                      className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"
+                      className="px-4 py-2 text-sm text-white/70 hover:text-white transition-colors"
                     >
                       Cancel
                     </button>
@@ -360,10 +362,10 @@ export default function KnowledgeBasePage() {
                 <Loader2 className="w-6 h-6 text-amber-400 animate-spin" />
               </div>
             ) : articles.length === 0 ? (
-              <div className="text-center py-20 text-gray-500">
+              <div className="text-center py-20 text-white/60">
                 <BookOpen className="w-16 h-16 mx-auto mb-4 opacity-20" />
                 <p className="text-lg mb-2">No articles yet</p>
-                <p className="text-sm text-gray-600 mb-6 max-w-md mx-auto">
+                <p className="text-sm text-white/40 mb-6 max-w-md mx-auto">
                   Add articles to teach the AI how to respond to common support
                   questions. The more you add, the smarter the AI becomes.
                 </p>
@@ -381,8 +383,8 @@ export default function KnowledgeBasePage() {
                     key={article.id}
                     className={`rounded-lg border p-4 transition-colors ${
                       article.is_active
-                        ? "bg-gray-900/50 border-gray-800 hover:border-gray-700"
-                        : "bg-gray-900/20 border-gray-800/50 opacity-60"
+                        ? "bg-[#111318]/50 border-white/10 hover:border-white/10"
+                        : "bg-[#111318]/20 border-white/10/50 opacity-60"
                     }`}
                   >
                     <div className="flex items-start justify-between">
@@ -391,7 +393,7 @@ export default function KnowledgeBasePage() {
                           <h3 className="font-medium text-sm truncate">
                             {article.title}
                           </h3>
-                          <span className="text-xs px-2 py-0.5 rounded bg-gray-800 text-gray-400 capitalize flex-shrink-0">
+                          <span className="text-xs px-2 py-0.5 rounded bg-[#111318] text-white/70 capitalize flex-shrink-0">
                             {article.category.replace("-", " ")}
                           </span>
                           {!article.is_active && (
@@ -400,16 +402,16 @@ export default function KnowledgeBasePage() {
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-gray-500 line-clamp-2">
+                        <p className="text-xs text-white/60 line-clamp-2">
                           {article.content.substring(0, 200)}
                         </p>
                         {article.keywords && (article.keywords as string[]).length > 0 && (
                           <div className="flex items-center gap-1 mt-2">
-                            <Tag className="w-3 h-3 text-gray-600" />
+                            <Tag className="w-3 h-3 text-white/40" />
                             {(article.keywords as string[]).slice(0, 5).map((kw) => (
                               <span
                                 key={kw}
-                                className="text-xs text-gray-600 bg-gray-800/50 px-1.5 py-0.5 rounded"
+                                className="text-xs text-white/40 bg-[#111318]/50 px-1.5 py-0.5 rounded"
                               >
                                 {kw}
                               </span>
@@ -423,7 +425,7 @@ export default function KnowledgeBasePage() {
                           className={`p-1.5 rounded transition-colors ${
                             article.is_active
                               ? "text-green-400 hover:bg-green-500/10"
-                              : "text-gray-600 hover:bg-gray-800"
+                              : "text-white/40 hover:bg-[#111318]"
                           }`}
                           title={article.is_active ? "Disable" : "Enable"}
                         >
@@ -431,13 +433,13 @@ export default function KnowledgeBasePage() {
                         </button>
                         <button
                           onClick={() => startEdit(article)}
-                          className="p-1.5 rounded text-gray-500 hover:text-white hover:bg-gray-800 transition-colors"
+                          className="p-1.5 rounded text-white/60 hover:text-white hover:bg-[#111318] transition-colors"
                         >
                           <Edit3 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => deleteArticle(article.id)}
-                          className="p-1.5 rounded text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                          className="p-1.5 rounded text-white/60 hover:text-red-400 hover:bg-red-500/10 transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>

@@ -12,6 +12,7 @@ import {
   Activity, Database, Cpu, Wifi, ArrowUpRight,
 } from "lucide-react";
 import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
+import BackgroundEffects from "@/components/BackgroundEffects";
 
 type AdminTab = "overview" | "users" | "templates" | "analytics";
 
@@ -252,7 +253,8 @@ export default function AdminPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#09090f] text-white overflow-hidden">
+    <div className="min-h-screen bg-[#050508] text-white overflow-hidden">
+      <BackgroundEffects preset="admin" />
       {/* Animated fog background */}
       <div className="fog-container">
         <div className="fog-layer fog-layer-1" />
@@ -453,7 +455,7 @@ export default function AdminPage() {
                   ))}
                 </div>
 
-                <div className="mt-5 pt-5 border-t border-white/[0.08]">
+                <div className="mt-5 pt-5 border-t border-white/10">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <Wifi className="w-4 h-4 text-cyan-400" />
@@ -499,7 +501,7 @@ export default function AdminPage() {
                     </div>
                   ))}
                 </div>
-                <div className="mt-5 pt-5 border-t border-white/[0.08]">
+                <div className="mt-5 pt-5 border-t border-white/10">
                   <button
                     onClick={() => copyToClipboard(
                       "ANTHROPIC_API_KEY=\nOPENAI_API_KEY=\nSTABILITY_API_KEY=\nUNSPLASH_ACCESS_KEY=\nDATABASE_URL=\nADMIN_EMAIL=admin@zoobicon.com\nADMIN_PASSWORD=\nMAILGUN_API_KEY=\nMAILGUN_DOMAIN=\nNEXT_PUBLIC_APP_URL=https://zoobicon.com",
@@ -679,7 +681,7 @@ export default function AdminPage() {
               {analytics?.recentProjects && analytics.recentProjects.length > 0 ? (
                 <div className="grid md:grid-cols-2 gap-3">
                   {analytics.recentProjects.map((p, i) => (
-                    <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.07] transition-colors">
+                    <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.04] border border-white/10 hover:bg-white/[0.07] transition-colors">
                       <div>
                         <div className="text-xs font-semibold text-white/80">{p.name}</div>
                         <div className="text-[10px] text-white/40">{p.user_email}</div>
@@ -859,7 +861,7 @@ export default function AdminPage() {
                   <p className="text-xs text-white/50 mb-3 line-clamp-2">{t.description}</p>
                   <div className="flex flex-wrap gap-1">
                     {t.tags.map((tag) => (
-                      <span key={tag} className="text-[9px] text-white/45 px-1.5 py-0.5 rounded-md bg-white/[0.05] border border-white/[0.08]">
+                      <span key={tag} className="text-[9px] text-white/45 px-1.5 py-0.5 rounded-md bg-white/[0.05] border border-white/10">
                         {tag}
                       </span>
                     ))}

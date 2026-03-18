@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import BackgroundEffects from "@/components/BackgroundEffects";
 import {
   ArrowLeft, Search, RefreshCw, Loader2, Send, X,
   AlertCircle, CheckCircle2, Clock, Inbox, Bot,
@@ -205,13 +206,14 @@ export default function AdminSupportPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#09090f] text-white">
+    <div className="min-h-screen bg-[#050508] text-white">
+      <BackgroundEffects preset="admin" />
       {/* Header */}
-      <div className="border-b border-gray-800 bg-gray-900/80 backdrop-blur-sm">
+      <div className="border-b border-white/10 bg-[#111318]/80 backdrop-blur-sm">
         <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/admin" className="p-2 rounded-lg hover:bg-gray-800 transition-colors">
-              <ArrowLeft className="w-5 h-5 text-gray-400" />
+            <Link href="/admin" className="p-2 rounded-lg hover:bg-[#111318] transition-colors">
+              <ArrowLeft className="w-5 h-5 text-white/70" />
             </Link>
             <MessageSquare className="w-6 h-6 text-emerald-400" />
             <h1 className="text-lg font-semibold">Support Dashboard</h1>
@@ -224,23 +226,23 @@ export default function AdminSupportPage() {
           <div className="flex items-center gap-2">
             <Link
               href="/admin/support/knowledge"
-              className="flex items-center gap-2 text-sm text-gray-400 hover:text-white px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+              className="flex items-center gap-2 text-sm text-white/70 hover:text-white px-3 py-2 rounded-lg hover:bg-[#111318] transition-colors"
             >
               <BookOpen className="w-4 h-4" />
               Knowledge Base
             </Link>
             <Link
               href="/admin/email"
-              className="flex items-center gap-2 text-sm text-gray-400 hover:text-white px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+              className="flex items-center gap-2 text-sm text-white/70 hover:text-white px-3 py-2 rounded-lg hover:bg-[#111318] transition-colors"
             >
               <Inbox className="w-4 h-4" />
               Email Inbox
             </Link>
             <button
               onClick={fetchTickets}
-              className="p-2 rounded-lg hover:bg-gray-800 transition-colors"
+              className="p-2 rounded-lg hover:bg-[#111318] transition-colors"
             >
-              <RefreshCw className={`w-5 h-5 text-gray-400 ${loading ? "animate-spin" : ""}`} />
+              <RefreshCw className={`w-5 h-5 text-white/70 ${loading ? "animate-spin" : ""}`} />
             </button>
           </div>
         </div>
@@ -248,10 +250,10 @@ export default function AdminSupportPage() {
 
       <div className="max-w-[1400px] mx-auto flex" style={{ height: "calc(100vh - 60px)" }}>
         {/* Ticket List */}
-        <div className={`border-r border-gray-800 flex flex-col ${selectedTicket ? "w-96" : "flex-1 max-w-2xl"}`}>
+        <div className={`border-r border-white/10 flex flex-col ${selectedTicket ? "w-96" : "flex-1 max-w-2xl"}`}>
           {/* Stats Bar */}
-          <div className="p-3 border-b border-gray-800 flex items-center gap-4">
-            <div className="flex items-center gap-1 text-xs text-gray-500">
+          <div className="p-3 border-b border-white/10 flex items-center gap-4">
+            <div className="flex items-center gap-1 text-xs text-white/60">
               <Bot className="w-3.5 h-3.5 text-emerald-400" />
               <span>{stats.ai_handled} AI-handled</span>
             </div>
@@ -269,7 +271,7 @@ export default function AdminSupportPage() {
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                   statusFilter === f.key
                     ? "bg-indigo-600/20 text-indigo-300 border border-indigo-500/30"
-                    : "text-gray-500 hover:text-gray-300 hover:bg-gray-800 border border-transparent"
+                    : "text-white/60 hover:text-white/85 hover:bg-[#111318] border border-transparent"
                 }`}
               >
                 {f.label} ({f.count})
@@ -280,14 +282,14 @@ export default function AdminSupportPage() {
           {/* Search */}
           <div className="p-3">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60" />
               <input
                 type="text"
                 placeholder="Search tickets..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && fetchTickets()}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
+                className="w-full bg-[#111318] border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-indigo-500"
               />
             </div>
           </div>
@@ -299,7 +301,7 @@ export default function AdminSupportPage() {
                 <Loader2 className="w-6 h-6 text-indigo-400 animate-spin" />
               </div>
             ) : tickets.length === 0 ? (
-              <div className="text-center py-20 text-gray-500">
+              <div className="text-center py-20 text-white/60">
                 <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-30" />
                 <p>No tickets found</p>
                 <p className="text-sm mt-1">
@@ -313,8 +315,8 @@ export default function AdminSupportPage() {
                   <button
                     key={ticket.id}
                     onClick={() => selectTicket(ticket)}
-                    className={`w-full text-left px-4 py-3 border-b border-gray-800/50 hover:bg-gray-800/50 transition-colors ${
-                      selectedTicket?.id === ticket.id ? "bg-gray-800/70" : ""
+                    className={`w-full text-left px-4 py-3 border-b border-white/10/50 hover:bg-[#111318]/50 transition-colors ${
+                      selectedTicket?.id === ticket.id ? "bg-[#111318]/70" : ""
                     }`}
                   >
                     <div className="flex items-center gap-2 mb-1">
@@ -327,7 +329,7 @@ export default function AdminSupportPage() {
                             : "text-green-400"
                         }`}
                       />
-                      <span className="text-xs text-gray-500 font-mono">
+                      <span className="text-xs text-white/60 font-mono">
                         {ticket.ticket_number}
                       </span>
                       <span
@@ -340,7 +342,7 @@ export default function AdminSupportPage() {
                       {ticket.ai_auto_replied && (
                         <Bot className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
                       )}
-                      <span className="text-xs text-gray-600 ml-auto">
+                      <span className="text-xs text-white/40 ml-auto">
                         {formatDate(ticket.updated_at)}
                       </span>
                     </div>
@@ -348,14 +350,14 @@ export default function AdminSupportPage() {
                       {ticket.subject}
                     </p>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-xs text-gray-500 truncate">
+                      <span className="text-xs text-white/60 truncate">
                         {ticket.from_name || ticket.from_email}
                       </span>
-                      <span className="text-xs text-gray-600">
+                      <span className="text-xs text-white/40">
                         &bull; {ticket.message_count} msgs
                       </span>
                       {ticket.ai_confidence !== null && (
-                        <span className="text-xs text-gray-600 ml-auto">
+                        <span className="text-xs text-white/40 ml-auto">
                           AI: {Math.round(ticket.ai_confidence * 100)}%
                         </span>
                       )}
@@ -371,10 +373,10 @@ export default function AdminSupportPage() {
         {selectedTicket ? (
           <div className="flex-1 flex flex-col">
             {/* Ticket Header */}
-            <div className="p-4 border-b border-gray-800">
+            <div className="p-4 border-b border-white/10">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-500 font-mono">
+                  <span className="text-xs text-white/60 font-mono">
                     {selectedTicket.ticket_number}
                   </span>
                   <span
@@ -403,7 +405,7 @@ export default function AdminSupportPage() {
                             : s === "pending"
                             ? "bg-blue-500/20 text-blue-300"
                             : "bg-green-500/20 text-green-300"
-                          : "text-gray-500 hover:bg-gray-800"
+                          : "text-white/60 hover:bg-[#111318]"
                       }`}
                     >
                       {s}
@@ -412,14 +414,14 @@ export default function AdminSupportPage() {
                 </div>
               </div>
               <h2 className="text-lg font-medium mb-1">{selectedTicket.subject}</h2>
-              <div className="flex items-center gap-2 text-sm text-gray-400">
+              <div className="flex items-center gap-2 text-sm text-white/70">
                 <User className="w-3.5 h-3.5" />
                 <span>{selectedTicket.from_name}</span>
-                <span className="text-gray-600">&lt;{selectedTicket.from_email}&gt;</span>
+                <span className="text-white/40">&lt;{selectedTicket.from_email}&gt;</span>
               </div>
               {/* Priority selector */}
               <div className="flex items-center gap-2 mt-2">
-                <span className="text-xs text-gray-500">Priority:</span>
+                <span className="text-xs text-white/60">Priority:</span>
                 {(["low", "medium", "high", "urgent"] as const).map((p) => (
                   <button
                     key={p}
@@ -427,7 +429,7 @@ export default function AdminSupportPage() {
                     className={`text-xs px-2 py-0.5 rounded border transition-colors ${
                       selectedTicket.priority === p
                         ? priorityColor[p]
-                        : "text-gray-600 border-gray-700 hover:border-gray-600"
+                        : "text-white/40 border-white/10 hover:border-white/20"
                     }`}
                   >
                     {p}
@@ -448,7 +450,7 @@ export default function AdminSupportPage() {
                     key={msg.id}
                     className={`rounded-lg p-4 ${
                       msg.sender === "customer"
-                        ? "bg-gray-800/50 border border-gray-700/50"
+                        ? "bg-[#111318]/50 border border-white/10/50"
                         : msg.sender === "ai-draft"
                         ? "bg-purple-900/20 border border-purple-500/20 ml-8"
                         : msg.sender === "ai"
@@ -459,8 +461,8 @@ export default function AdminSupportPage() {
                     <div className="flex items-center gap-2 mb-2 text-xs">
                       {msg.sender === "customer" ? (
                         <>
-                          <User className="w-3.5 h-3.5 text-gray-400" />
-                          <span className="text-gray-400">
+                          <User className="w-3.5 h-3.5 text-white/70" />
+                          <span className="text-white/70">
                             {selectedTicket.from_name}
                           </span>
                         </>
@@ -468,7 +470,7 @@ export default function AdminSupportPage() {
                         <>
                           <Sparkles className="w-3.5 h-3.5 text-purple-400" />
                           <span className="text-purple-400">AI Draft</span>
-                          <span className="text-gray-600">(not sent)</span>
+                          <span className="text-white/40">(not sent)</span>
                         </>
                       ) : msg.sender === "ai" ? (
                         <>
@@ -483,11 +485,11 @@ export default function AdminSupportPage() {
                           <span className="text-indigo-400">Agent</span>
                         </>
                       )}
-                      <span className="text-gray-600 ml-auto">
+                      <span className="text-white/40 ml-auto">
                         {formatDate(msg.created_at)}
                       </span>
                     </div>
-                    <div className="text-sm text-gray-300 whitespace-pre-wrap">
+                    <div className="text-sm text-white/85 whitespace-pre-wrap">
                       {msg.body_text}
                     </div>
                     {msg.sender === "ai-draft" && (
@@ -504,7 +506,7 @@ export default function AdminSupportPage() {
             </div>
 
             {/* Reply Area */}
-            <div className="border-t border-gray-800 p-4">
+            <div className="border-t border-white/10 p-4">
               <div className="flex items-center gap-2 mb-2">
                 <button
                   onClick={generateAIDraft}
@@ -525,7 +527,7 @@ export default function AdminSupportPage() {
                   onChange={(e) => setReplyText(e.target.value)}
                   placeholder="Type your reply..."
                   rows={3}
-                  className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 resize-none"
+                  className="flex-1 bg-[#111318] border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-indigo-500 resize-none"
                 />
                 <button
                   onClick={sendReply}
@@ -542,11 +544,11 @@ export default function AdminSupportPage() {
             </div>
           </div>
         ) : (
-          <div className="flex-1 flex items-center justify-center text-gray-600">
+          <div className="flex-1 flex items-center justify-center text-white/40">
             <div className="text-center">
               <MessageSquare className="w-16 h-16 mx-auto mb-4 opacity-20" />
               <p>Select a ticket to view</p>
-              <p className="text-sm mt-2 text-gray-700">
+              <p className="text-sm mt-2 text-white/40">
                 Emails to support@zoobicon.com automatically create tickets
                 <br />
                 AI drafts responses and auto-replies when confident

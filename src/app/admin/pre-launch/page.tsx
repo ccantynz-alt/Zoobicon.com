@@ -191,22 +191,22 @@ export default function PreLaunchChecklistPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#09090f] text-white">
-      <BackgroundEffects />
+    <div className="min-h-screen bg-[#050508] text-white">
+      <BackgroundEffects preset="admin" />
 
       {/* Navbar */}
-      <nav className="relative z-20 border-b border-white/10 bg-zinc-800/90 backdrop-blur-md">
+      <nav className="relative z-20 border-b border-white/10 bg-[#050508]/90 backdrop-blur-md">
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/admin" className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors">
+            <Link href="/admin" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
               <ArrowLeft className="w-4 h-4" />
               <span className="text-sm">Admin</span>
             </Link>
-            <span className="text-zinc-600">/</span>
+            <span className="text-white/50">/</span>
             <span className="text-sm text-white font-medium">Pre-Launch Checklist</span>
           </div>
           <div className="flex items-center gap-3 text-sm">
-            <span className="text-zinc-400">{checkedItems}/{totalItems} complete</span>
+            <span className="text-white/70">{checkedItems}/{totalItems} complete</span>
             <span className={`font-bold ${progress === 100 ? "text-green-400" : progress > 70 ? "text-yellow-400" : "text-red-400"}`}>{progress}%</span>
           </div>
         </div>
@@ -220,7 +220,7 @@ export default function PreLaunchChecklistPage() {
           </div>
           <div>
             <h1 className="text-3xl font-bold">Pre-Launch Checklist</h1>
-            <p className="text-zinc-400 mt-1">
+            <p className="text-white/70 mt-1">
               Everything that needs to be done before Zoobicon goes live. Complete all critical items before launch.
             </p>
           </div>
@@ -268,26 +268,26 @@ export default function PreLaunchChecklistPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
             <div className="bg-white/[0.06] rounded-lg p-3">
               <div className="text-green-400 font-medium mb-1">We Beat</div>
-              <div className="text-zinc-300">White-label agency, 43 generators, multi-LLM, full-stack gen, e-commerce gen, 21+ tools</div>
+              <div className="text-white/85">White-label agency, 43 generators, multi-LLM, full-stack gen, e-commerce gen, 21+ tools</div>
             </div>
             <div className="bg-white/[0.06] rounded-lg p-3">
               <div className="text-blue-400 font-medium mb-1">We Match</div>
-              <div className="text-zinc-300">Visual editing, project mode, templates, multi-page sites, GitHub export</div>
+              <div className="text-white/85">Visual editing, project mode, templates, multi-page sites, GitHub export</div>
             </div>
             <div className="bg-white/[0.06] rounded-lg p-3">
               <div className="text-yellow-400 font-medium mb-1">Gap to Close</div>
-              <div className="text-zinc-300">Build speed (95s vs Bolt 3-5s), in-browser runtime, real-time collab</div>
+              <div className="text-white/85">Build speed (95s vs Bolt 3-5s), in-browser runtime, real-time collab</div>
             </div>
             <div className="bg-white/[0.06] rounded-lg p-3">
               <div className="text-purple-400 font-medium mb-1">Unique Moat</div>
-              <div className="text-zinc-300">Agency platform, 43 specialized generators, Opus quality, WordPress plugin</div>
+              <div className="text-white/85">Agency platform, 43 specialized generators, Opus quality, WordPress plugin</div>
             </div>
           </div>
         </div>
 
         {/* Filters */}
         <div className="flex items-center gap-2 mb-6 flex-wrap">
-          <span className="text-sm text-zinc-500 mr-1">Filter:</span>
+          <span className="text-sm text-white/60 mr-1">Filter:</span>
           {["all", "critical", "high", "medium", "low"].map((p) => (
             <button
               key={p}
@@ -295,7 +295,7 @@ export default function PreLaunchChecklistPage() {
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 filterPriority === p
                   ? "bg-blue-600 text-white"
-                  : "bg-white/5 text-zinc-400 hover:bg-white/10"
+                  : "bg-white/5 text-white/70 hover:bg-white/10"
               }`}
             >
               {p === "all" ? "All" : p.charAt(0).toUpperCase() + p.slice(1)}
@@ -309,7 +309,7 @@ export default function PreLaunchChecklistPage() {
           <button
             onClick={() => setShowCompetitorNotes(!showCompetitorNotes)}
             className={`ml-auto px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-              showCompetitorNotes ? "bg-purple-600/20 text-purple-300" : "bg-white/5 text-zinc-500"
+              showCompetitorNotes ? "bg-purple-600/20 text-purple-300" : "bg-white/5 text-white/60"
             }`}
           >
             <Trophy className="w-3 h-3 inline mr-1" />
@@ -334,22 +334,22 @@ export default function PreLaunchChecklistPage() {
                 >
                   <Icon className={`w-5 h-5 ${cat.color}`} />
                   <span className="font-semibold flex-1 text-left">{cat.label}</span>
-                  <span className="text-sm text-zinc-400">{catChecked}/{items.length}</span>
+                  <span className="text-sm text-white/70">{catChecked}/{items.length}</span>
                   <div className="w-24 h-1.5 bg-white/10 rounded-full overflow-hidden mx-2">
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${catChecked === items.length ? "bg-green-500" : "bg-blue-500"}`}
                       style={{ width: `${items.length > 0 ? (catChecked / items.length) * 100 : 0}%` }}
                     />
                   </div>
-                  {isExpanded ? <ChevronDown className="w-4 h-4 text-zinc-500" /> : <ChevronRight className="w-4 h-4 text-zinc-500" />}
+                  {isExpanded ? <ChevronDown className="w-4 h-4 text-white/60" /> : <ChevronRight className="w-4 h-4 text-white/60" />}
                 </button>
 
                 {isExpanded && (
-                  <div className="border-t border-white/5">
+                  <div className="border-t border-white/10">
                     {items.map((item) => (
                       <div
                         key={item.id}
-                        className={`flex items-start gap-3 px-5 py-3 border-b border-white/5 last:border-0 transition-colors ${
+                        className={`flex items-start gap-3 px-5 py-3 border-b border-white/10 last:border-0 transition-colors ${
                           checked.has(item.id) ? "bg-green-500/[0.03]" : "hover:bg-white/[0.02]"
                         }`}
                       >
@@ -360,12 +360,12 @@ export default function PreLaunchChecklistPage() {
                           {checked.has(item.id) ? (
                             <CheckCircle2 className="w-5 h-5 text-green-400" />
                           ) : (
-                            <Circle className="w-5 h-5 text-zinc-600 hover:text-zinc-400 transition-colors" />
+                            <Circle className="w-5 h-5 text-white/50 hover:text-white/70 transition-colors" />
                           )}
                         </button>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className={`text-sm font-medium ${checked.has(item.id) ? "text-zinc-500 line-through" : "text-zinc-200"}`}>
+                            <span className={`text-sm font-medium ${checked.has(item.id) ? "text-white/60 line-through" : "text-white/85"}`}>
                               {item.label}
                             </span>
                             <span className={`text-[10px] px-1.5 py-0.5 rounded border font-medium ${priorityColor[item.priority]}`}>
@@ -377,7 +377,7 @@ export default function PreLaunchChecklistPage() {
                               </Link>
                             )}
                           </div>
-                          <p className={`text-xs mt-1 leading-relaxed ${checked.has(item.id) ? "text-zinc-600" : "text-zinc-400"}`}>
+                          <p className={`text-xs mt-1 leading-relaxed ${checked.has(item.id) ? "text-white/50" : "text-white/70"}`}>
                             {item.description}
                           </p>
                           {showCompetitorNotes && item.competitorNote && (
@@ -408,13 +408,13 @@ export default function PreLaunchChecklistPage() {
                   <div className={`text-lg font-bold ${done === total ? "text-green-400" : priorityColor[p].split(" ")[0]}`}>
                     {done}/{total}
                   </div>
-                  <div className="text-xs text-zinc-500 capitalize mt-0.5">{p}</div>
+                  <div className="text-xs text-white/60 capitalize mt-0.5">{p}</div>
                 </div>
               );
             })}
           </div>
-          <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-between">
-            <p className="text-sm text-zinc-400">
+          <div className="mt-4 pt-4 border-t border-white/10 flex items-center justify-between">
+            <p className="text-sm text-white/70">
               {progress === 100
                 ? "All items complete! You are ready to launch."
                 : criticalRemaining > 0
@@ -431,14 +431,14 @@ export default function PreLaunchChecklistPage() {
 
         {/* Quick Links */}
         <div className="mt-6 border-t border-white/10 pt-6">
-          <h3 className="text-sm font-medium text-zinc-400 mb-3">Quick Links</h3>
+          <h3 className="text-sm font-medium text-white/70 mb-3">Quick Links</h3>
           <div className="flex flex-wrap gap-2">
-            <Link href="/admin" className="text-xs bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-lg text-zinc-300 transition-colors">Admin Dashboard</Link>
-            <Link href="/admin/health" className="text-xs bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-lg text-zinc-300 transition-colors">Health Check</Link>
-            <Link href="/admin/email-settings" className="text-xs bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-lg text-zinc-300 transition-colors">Email Settings</Link>
-            <Link href="/admin/integrations" className="text-xs bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-lg text-zinc-300 transition-colors">Integrations</Link>
-            <Link href="/admin/usage" className="text-xs bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-lg text-zinc-300 transition-colors">Usage & Credits</Link>
-            <Link href="/builder" className="text-xs bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-lg text-zinc-300 transition-colors">Builder</Link>
+            <Link href="/admin" className="text-xs bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-lg text-white/85 transition-colors">Admin Dashboard</Link>
+            <Link href="/admin/health" className="text-xs bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-lg text-white/85 transition-colors">Health Check</Link>
+            <Link href="/admin/email-settings" className="text-xs bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-lg text-white/85 transition-colors">Email Settings</Link>
+            <Link href="/admin/integrations" className="text-xs bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-lg text-white/85 transition-colors">Integrations</Link>
+            <Link href="/admin/usage" className="text-xs bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-lg text-white/85 transition-colors">Usage & Credits</Link>
+            <Link href="/builder" className="text-xs bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-lg text-white/85 transition-colors">Builder</Link>
           </div>
         </div>
       </div>

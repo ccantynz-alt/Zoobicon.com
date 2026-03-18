@@ -177,7 +177,7 @@ const INTEGRATIONS: IntegrationDef[] = [
 function StatusBadge({ status }: { status: IntegrationStatus }) {
   const map = {
     connected: { label: "Connected", bg: "bg-emerald-500/20", text: "text-emerald-400", dot: "bg-emerald-400" },
-    not_connected: { label: "Not Connected", bg: "bg-zinc-700/40", text: "text-zinc-400", dot: "bg-zinc-500" },
+    not_connected: { label: "Not Connected", bg: "bg-white/5", text: "text-white/70", dot: "bg-white/30" },
     coming_soon: { label: "Coming Soon", bg: "bg-amber-500/20", text: "text-amber-400", dot: "bg-amber-400" },
   };
   const s = map[status];
@@ -224,7 +224,7 @@ function ConnectModal({
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl max-w-md w-full p-6"
+        className="bg-[#111318] border border-white/10 rounded-2xl shadow-2xl max-w-md w-full p-6"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -238,10 +238,10 @@ function ConnectModal({
             </div>
             <div>
               <h3 className="text-white font-semibold">Connect {integration.name}</h3>
-              <p className="text-zinc-400 text-xs">{integration.description}</p>
+              <p className="text-white/70 text-xs">{integration.description}</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-zinc-500 hover:text-white transition-colors">
+          <button onClick={onClose} className="text-white/60 hover:text-white transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -249,7 +249,7 @@ function ConnectModal({
         {/* OAuth method */}
         {integration.method === "oauth" && (
           <div className="space-y-4">
-            <p className="text-zinc-300 text-sm">
+            <p className="text-white/85 text-sm">
               Click below to authorize Zoobicon to access your {integration.name} account. You will be
               redirected to {integration.name} to grant permissions.
             </p>
@@ -268,13 +268,13 @@ function ConnectModal({
           <div className="space-y-4">
             {(integration.fields || []).map((f) => (
               <div key={f.key}>
-                <label className="block text-sm font-medium text-zinc-300 mb-1.5">{f.label}</label>
+                <label className="block text-sm font-medium text-white/85 mb-1.5">{f.label}</label>
                 <input
                   type="text"
                   placeholder={f.placeholder}
                   value={fields[f.key] || ""}
                   onChange={(e) => setFields({ ...fields, [f.key]: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                  className="w-full px-4 py-2.5 bg-[#111318] border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
                 />
               </div>
             ))}
@@ -291,15 +291,15 @@ function ConnectModal({
         {/* Webhook method */}
         {integration.method === "webhook" && (
           <div className="space-y-4">
-            <p className="text-zinc-300 text-sm">
+            <p className="text-white/85 text-sm">
               Copy the webhook URL below and paste it into your {integration.name} setup. Zoobicon will
               send events to this endpoint.
             </p>
-            <div className="flex items-center gap-2 bg-zinc-800 border border-zinc-700 rounded-xl p-3">
+            <div className="flex items-center gap-2 bg-[#111318] border border-white/10 rounded-xl p-3">
               <code className="text-sm text-indigo-400 flex-1 truncate">{integration.webhookUrl}</code>
               <button
                 onClick={() => handleCopy(integration.webhookUrl || "")}
-                className="text-zinc-400 hover:text-white transition-colors shrink-0"
+                className="text-white/70 hover:text-white transition-colors shrink-0"
               >
                 {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
               </button>
@@ -440,8 +440,8 @@ export default function IntegrationsPage() {
   const available = integrations.filter((i) => i.status !== "connected");
 
   return (
-    <div className="min-h-screen bg-zinc-900 text-white">
-      <BackgroundEffects />
+    <div className="min-h-screen bg-[#050508] text-white">
+      <BackgroundEffects preset="admin" />
 
       {/* Notification toast */}
       <AnimatePresence>
@@ -462,14 +462,14 @@ export default function IntegrationsPage() {
       </AnimatePresence>
 
       {/* Navbar */}
-      <nav className="sticky top-0 z-40 bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-800">
+      <nav className="sticky top-0 z-40 bg-[#050508]/90 backdrop-blur-xl border-b border-white/10">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-6">
             <Link href="/" className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
               Zoobicon
             </Link>
-            <div className="hidden md:flex items-center gap-1 text-sm text-zinc-400">
-              <Link href="/admin" className="hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-zinc-800">
+            <div className="hidden md:flex items-center gap-1 text-sm text-white/70">
+              <Link href="/admin" className="hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-[#111318]">
                 Admin
               </Link>
               <ChevronRight className="w-3.5 h-3.5" />
@@ -478,12 +478,12 @@ export default function IntegrationsPage() {
           </div>
           <div className="flex items-center gap-3">
             {userName && (
-              <span className="text-sm text-zinc-400 hidden sm:block">
+              <span className="text-sm text-white/70 hidden sm:block">
                 <User className="w-3.5 h-3.5 inline mr-1" />
                 {userName}
               </span>
             )}
-            <Link href="/admin" className="text-sm text-zinc-400 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-zinc-800">
+            <Link href="/admin" className="text-sm text-white/70 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-[#111318]">
               <Settings className="w-4 h-4" />
             </Link>
           </div>
@@ -503,7 +503,7 @@ export default function IntegrationsPage() {
             </div>
             <h1 className="text-3xl font-bold">Integrations</h1>
           </div>
-          <p className="text-zinc-400 max-w-2xl">
+          <p className="text-white/70 max-w-2xl">
             Connect third-party services to enhance your AI website builder. Import data, receive
             notifications, track analytics, and automate workflows.
           </p>
@@ -519,15 +519,15 @@ export default function IntegrationsPage() {
           {[
             { label: "Total Available", value: integrations.length, color: "text-white" },
             { label: "Connected", value: connected.length, color: "text-emerald-400" },
-            { label: "Not Connected", value: available.filter((i) => i.status === "not_connected").length, color: "text-zinc-400" },
+            { label: "Not Connected", value: available.filter((i) => i.status === "not_connected").length, color: "text-white/70" },
             { label: "Coming Soon", value: available.filter((i) => i.status === "coming_soon").length, color: "text-amber-400" },
           ].map((s, i) => (
             <div
               key={i}
-              className="bg-zinc-900/60 border border-zinc-800 rounded-xl p-4 text-center"
+              className="bg-[#111318]/60 border border-white/10 rounded-xl p-4 text-center"
             >
               <div className={`text-2xl font-bold ${s.color}`}>{s.value}</div>
-              <div className="text-xs text-zinc-500 mt-1">{s.label}</div>
+              <div className="text-xs text-white/60 mt-1">{s.label}</div>
             </div>
           ))}
         </motion.div>
@@ -553,7 +553,7 @@ export default function IntegrationsPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 + idx * 0.04 }}
-                    className="relative bg-zinc-900/60 border border-zinc-800 rounded-2xl overflow-hidden hover:border-zinc-700 transition-all group"
+                    className="relative bg-[#111318]/60 border border-white/10 rounded-2xl overflow-hidden hover:border-white/10 transition-all group"
                     style={{ borderLeftWidth: 3, borderLeftColor: integration.color }}
                   >
                     <div className="p-5">
@@ -567,13 +567,13 @@ export default function IntegrationsPage() {
                           </div>
                           <div>
                             <h3 className="font-semibold text-white">{integration.name}</h3>
-                            <p className="text-xs text-zinc-500 mt-0.5 line-clamp-1">{integration.description}</p>
+                            <p className="text-xs text-white/60 mt-0.5 line-clamp-1">{integration.description}</p>
                           </div>
                         </div>
                         <StatusBadge status="connected" />
                       </div>
 
-                      <div className="flex items-center gap-4 text-xs text-zinc-500 mb-4">
+                      <div className="flex items-center gap-4 text-xs text-white/60 mb-4">
                         {integration.connectedAt && (
                           <span className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
@@ -592,7 +592,7 @@ export default function IntegrationsPage() {
                         {integration.link && (
                           <Link
                             href={integration.link}
-                            className="flex-1 text-center py-2 rounded-xl text-sm font-medium bg-zinc-800 hover:bg-zinc-700 text-white transition-all flex items-center justify-center gap-1.5"
+                            className="flex-1 text-center py-2 rounded-xl text-sm font-medium bg-[#111318] hover:bg-white/15 text-white transition-all flex items-center justify-center gap-1.5"
                           >
                             Configure <ExternalLink className="w-3 h-3" />
                           </Link>
@@ -621,7 +621,7 @@ export default function IntegrationsPage() {
               transition={{ delay: 0.15 }}
               className="text-lg font-semibold mb-4 flex items-center gap-2"
             >
-              <Plug className="w-4 h-4 text-zinc-400" />
+              <Plug className="w-4 h-4 text-white/70" />
               Available Integrations
             </motion.h2>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-10">
@@ -634,7 +634,7 @@ export default function IntegrationsPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.15 + idx * 0.04 }}
-                    className="relative bg-zinc-900/60 border border-zinc-800 rounded-2xl overflow-hidden hover:border-zinc-700 transition-all group"
+                    className="relative bg-[#111318]/60 border border-white/10 rounded-2xl overflow-hidden hover:border-white/10 transition-all group"
                     style={{ borderLeftWidth: 3, borderLeftColor: isSoon ? "#f59e0b" : integration.color }}
                   >
                     <div className="p-5">
@@ -648,7 +648,7 @@ export default function IntegrationsPage() {
                           </div>
                           <div>
                             <h3 className="font-semibold text-white">{integration.name}</h3>
-                            <p className="text-xs text-zinc-500 mt-0.5 line-clamp-2">{integration.description}</p>
+                            <p className="text-xs text-white/60 mt-0.5 line-clamp-2">{integration.description}</p>
                           </div>
                         </div>
                         <StatusBadge status={integration.status} />
