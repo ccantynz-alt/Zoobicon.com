@@ -16,7 +16,8 @@ function getAdminEmail(): string {
 }
 
 function getFromAddress(): string {
-  return "Zoobicon <noreply@zoobicon.com>";
+  const domain = process.env.MAILGUN_DOMAIN || "zoobicon.com";
+  return `Zoobicon <noreply@${domain}>`;
 }
 
 interface NotifyOptions {
@@ -27,8 +28,7 @@ interface NotifyOptions {
 }
 
 /**
- * Send a notification email to the admin.
- * Returns true if sent successfully, false otherwise.
+ * Send via Mailgun API (primary).
  */
 export async function notifyAdmin(opts: NotifyOptions): Promise<boolean> {
   const adminEmail = getAdminEmail();
@@ -43,6 +43,31 @@ export async function notifyAdmin(opts: NotifyOptions): Promise<boolean> {
   });
 
   return result.success;
+}
+
+/**
+ * Send a notification email to the admin.
+ * Tries Mailgun first, falls back to Resend, then console logging.
+ */
+export async function notifyAdmin(opts: NotifyOptions): Promise<boolean> {
+  const adminEmail = getAdminEmail();
+
+  // Try Mailgun first (primary)
+  if (process.env.MAILGUN_API_KEY && process.env.MAILGUN_DOMAIN) {
+    return sendViaMailgun(adminEmail, opts);
+  }
+
+  // Fall back to Resend (legacy)
+  if (process.env.RESEND_API_KEY) {
+    return sendViaResend(adminEmail, opts);
+  }
+
+  // No email service configured — log to console
+  console.log(`[Admin Notify] No MAILGUN_API_KEY or RESEND_API_KEY — logging instead:`);
+  console.log(`  To: ${adminEmail}`);
+  console.log(`  Subject: ${opts.subject}`);
+  console.log(`  Body: ${opts.text || "(HTML only)"}`);
+  return false;
 }
 
 // ── Styled email wrapper ──────────────────────────────────────
