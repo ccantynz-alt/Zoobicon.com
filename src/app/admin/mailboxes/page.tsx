@@ -7,7 +7,7 @@ import {
   Mail, Plus, Search, Edit, Trash2, Power, ArrowRight, Shield,
   HardDrive, User, X, Loader2, Check, AlertTriangle,
 } from "lucide-react";
-// BackgroundEffects removed — was causing foggy overlay that killed contrast
+import BackgroundEffects from "@/components/BackgroundEffects";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -235,10 +235,11 @@ export default function AdminMailboxesPage() {
 
   // ---- Render ----
   return (
-    <div className="min-h-screen bg-[#131520] text-white">
+    <div className="min-h-screen bg-[#0b1121] text-white">
+      <BackgroundEffects />
 
       {/* Navbar */}
-      <nav className="sticky top-0 z-50 border-b border-zinc-700 bg-[#1a1d2e]/90 backdrop-blur-xl">
+      <nav className="sticky top-0 z-50 border-b border-zinc-700 bg-[#0f1322]/95 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
           <div className="flex items-center gap-4">
             <Link href="/" className="text-lg font-bold tracking-tight">Zoobicon</Link>
