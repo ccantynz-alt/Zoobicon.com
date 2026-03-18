@@ -177,15 +177,44 @@ export default function AdminPage() {
     { id: "templates", label: "Templates", icon: <Layout className="w-4 h-4" /> },
   ];
 
-  const envKeys = [
-    { key: "ANTHROPIC_API_KEY", label: "Anthropic (Claude)", required: true },
-    { key: "OPENAI_API_KEY", label: "OpenAI (DALL-E images)", required: false },
-    { key: "STABILITY_API_KEY", label: "Stability AI (SDXL images)", required: false },
-    { key: "UNSPLASH_ACCESS_KEY", label: "Unsplash (stock photos)", required: false },
-    { key: "MAILGUN_API_KEY", label: "Mailgun (Email)", required: false },
-    { key: "DATABASE_URL", label: "Neon Database", required: false },
-    { key: "ADMIN_EMAIL", label: "Admin Email", required: true },
-    { key: "ADMIN_PASSWORD", label: "Admin Password", required: true },
+  const envKeys: { key: string; label: string; required: boolean; group: string }[] = [
+    // Core AI
+    { key: "ANTHROPIC_API_KEY", label: "Anthropic (Claude) — powers the AI pipeline", required: true, group: "Core AI" },
+    { key: "OPENAI_API_KEY", label: "OpenAI (GPT-4o, DALL-E images)", required: false, group: "Core AI" },
+    { key: "GOOGLE_AI_API_KEY", label: "Google (Gemini 2.5 Pro/Flash)", required: false, group: "Core AI" },
+    // Images
+    { key: "STABILITY_API_KEY", label: "Stability AI (SDXL images)", required: false, group: "Images" },
+    { key: "UNSPLASH_ACCESS_KEY", label: "Unsplash (stock photos)", required: false, group: "Images" },
+    // Database & Auth
+    { key: "DATABASE_URL", label: "Neon serverless Postgres", required: true, group: "Database & Auth" },
+    { key: "ADMIN_EMAIL", label: "Admin login email", required: true, group: "Database & Auth" },
+    { key: "ADMIN_PASSWORD", label: "Admin login password", required: true, group: "Database & Auth" },
+    { key: "RESET_TOKEN_SECRET", label: "JWT/reset token signing secret", required: false, group: "Database & Auth" },
+    // OAuth
+    { key: "GOOGLE_CLIENT_ID", label: "Google OAuth client ID", required: false, group: "OAuth" },
+    { key: "GOOGLE_CLIENT_SECRET", label: "Google OAuth client secret", required: false, group: "OAuth" },
+    { key: "GITHUB_OAUTH_CLIENT_ID", label: "GitHub OAuth client ID", required: false, group: "OAuth" },
+    { key: "GITHUB_OAUTH_CLIENT_SECRET", label: "GitHub OAuth client secret", required: false, group: "OAuth" },
+    // Payments
+    { key: "STRIPE_SECRET_KEY", label: "Stripe secret key", required: false, group: "Payments" },
+    { key: "STRIPE_CREATOR_PRICE_ID", label: "Stripe Creator plan price ID ($19)", required: false, group: "Payments" },
+    { key: "STRIPE_PRO_PRICE_ID", label: "Stripe Pro plan price ID ($49)", required: false, group: "Payments" },
+    { key: "STRIPE_AGENCY_PRICE_ID", label: "Stripe Agency plan price ID ($99)", required: false, group: "Payments" },
+    { key: "STRIPE_WEBHOOK_SECRET", label: "Stripe webhook signing secret", required: false, group: "Payments" },
+    // Email
+    { key: "MAILGUN_API_KEY", label: "Mailgun API key", required: false, group: "Email" },
+    { key: "MAILGUN_DOMAIN", label: "Mailgun sending domain", required: false, group: "Email" },
+    { key: "MAILGUN_WEBHOOK_SIGNING_KEY", label: "Mailgun webhook verification", required: false, group: "Email" },
+    { key: "ADMIN_NOTIFICATION_EMAIL", label: "Where to send admin notifications", required: false, group: "Email" },
+    // Infrastructure
+    { key: "NEXT_PUBLIC_APP_URL", label: "Public app URL (emails, Stripe redirects)", required: false, group: "Infrastructure" },
+    { key: "CLOUDFLARE_API_TOKEN", label: "Cloudflare API token (DNS/SSL/CDN)", required: false, group: "Infrastructure" },
+    { key: "CLOUDFLARE_ZONE_ID", label: "Cloudflare zone ID", required: false, group: "Infrastructure" },
+    { key: "CLOUDFLARE_ACCOUNT_ID", label: "Cloudflare account ID", required: false, group: "Infrastructure" },
+    // Integrations
+    { key: "GITHUB_TOKEN", label: "GitHub token (import feature)", required: false, group: "Integrations" },
+    { key: "SLACK_BOT_TOKEN", label: "Slack bot token", required: false, group: "Integrations" },
+    { key: "SLACK_SIGNING_SECRET", label: "Slack signing secret", required: false, group: "Integrations" },
   ];
 
   const launchChecklist = [
@@ -483,28 +512,40 @@ export default function AdminPage() {
                   <Database className="w-4 h-4 text-violet-400" />
                   Environment Variables
                 </h2>
-                <p className="text-xs text-white/45 mb-5">Set in <span className="text-violet-300/70 font-medium">Vercel → Environment Variables</span></p>
-                <div className="space-y-2.5">
-                  {envKeys.map((e) => (
-                    <div key={e.key} className="flex items-center justify-between gap-3 py-1">
-                      <div className="min-w-0">
-                        <div className="text-xs font-mono text-white/75 truncate">{e.key}</div>
-                        <div className="text-[10px] text-white/40">{e.label}</div>
-                      </div>
-                      <div className={`text-[10px] font-bold px-2.5 py-1 rounded-full flex-shrink-0 ${
-                        e.required
-                          ? "bg-gradient-to-r from-amber-500/15 to-orange-500/15 text-amber-400 border border-amber-500/25"
-                          : "bg-white/[0.06] text-white/50 border border-white/[0.10]"
-                      }`}>
-                        {e.required ? "Required" : "Optional"}
-                      </div>
-                    </div>
-                  ))}
+                <p className="text-xs text-white/45 mb-5">Set in <span className="text-violet-300/70 font-medium">Vercel → Environment Variables</span> · {envKeys.length} total</p>
+                <div className="space-y-1 max-h-[420px] overflow-y-auto pr-1 custom-scrollbar">
+                  {(() => {
+                    let lastGroup = "";
+                    return envKeys.map((e) => {
+                      const showGroup = e.group !== lastGroup;
+                      lastGroup = e.group;
+                      return (
+                        <div key={e.key}>
+                          {showGroup && (
+                            <div className="text-[10px] font-semibold uppercase tracking-wider text-violet-400/70 mt-3 mb-1.5 first:mt-0">{e.group}</div>
+                          )}
+                          <div className="flex items-center justify-between gap-3 py-1">
+                            <div className="min-w-0">
+                              <div className="text-xs font-mono text-white/75 truncate">{e.key}</div>
+                              <div className="text-[10px] text-white/40">{e.label}</div>
+                            </div>
+                            <div className={`text-[10px] font-bold px-2.5 py-1 rounded-full flex-shrink-0 ${
+                              e.required
+                                ? "bg-gradient-to-r from-amber-500/15 to-orange-500/15 text-amber-400 border border-amber-500/25"
+                                : "bg-white/[0.06] text-white/50 border border-white/[0.10]"
+                            }`}>
+                              {e.required ? "Required" : "Optional"}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    });
+                  })()}
                 </div>
                 <div className="mt-5 pt-5 border-t border-white/10">
                   <button
                     onClick={() => copyToClipboard(
-                      "ANTHROPIC_API_KEY=\nOPENAI_API_KEY=\nSTABILITY_API_KEY=\nUNSPLASH_ACCESS_KEY=\nDATABASE_URL=\nADMIN_EMAIL=admin@zoobicon.com\nADMIN_PASSWORD=\nMAILGUN_API_KEY=\nMAILGUN_DOMAIN=\nNEXT_PUBLIC_APP_URL=https://zoobicon.com",
+                      "# Core AI\nANTHROPIC_API_KEY=\nOPENAI_API_KEY=\nGOOGLE_AI_API_KEY=\n\n# Images\nSTABILITY_API_KEY=\nUNSPLASH_ACCESS_KEY=\n\n# Database & Auth\nDATABASE_URL=\nADMIN_EMAIL=admin@zoobicon.com\nADMIN_PASSWORD=\nRESET_TOKEN_SECRET=\n\n# OAuth\nGOOGLE_CLIENT_ID=\nGOOGLE_CLIENT_SECRET=\nGITHUB_OAUTH_CLIENT_ID=\nGITHUB_OAUTH_CLIENT_SECRET=\n\n# Payments (Stripe)\nSTRIPE_SECRET_KEY=\nSTRIPE_CREATOR_PRICE_ID=\nSTRIPE_PRO_PRICE_ID=\nSTRIPE_AGENCY_PRICE_ID=\nSTRIPE_WEBHOOK_SECRET=\n\n# Email (Mailgun)\nMAILGUN_API_KEY=\nMAILGUN_DOMAIN=zoobicon.com\nMAILGUN_WEBHOOK_SIGNING_KEY=\nADMIN_NOTIFICATION_EMAIL=\n\n# Infrastructure\nNEXT_PUBLIC_APP_URL=https://zoobicon.com\nCLOUDFLARE_API_TOKEN=\nCLOUDFLARE_ZONE_ID=\nCLOUDFLARE_ACCOUNT_ID=\n\n# Integrations\nGITHUB_TOKEN=\nSLACK_BOT_TOKEN=\nSLACK_SIGNING_SECRET=",
                       "envblock"
                     )}
                     className="flex items-center gap-2 text-xs text-violet-400 hover:text-violet-300 border border-violet-500/20 hover:border-violet-500/40 bg-violet-500/5 hover:bg-violet-500/10 rounded-lg px-4 py-2 transition-all"
