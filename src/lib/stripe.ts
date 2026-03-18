@@ -21,4 +21,20 @@ export const stripe = new Proxy({} as Stripe, {
   },
 });
 
+export const CREATOR_PRICE_ID = process.env.STRIPE_CREATOR_PRICE_ID ?? "";
 export const PRO_PRICE_ID = process.env.STRIPE_PRO_PRICE_ID ?? "";
+export const AGENCY_PRICE_ID = process.env.STRIPE_AGENCY_PRICE_ID ?? "";
+
+export type PlanSlug = "creator" | "pro" | "agency";
+
+export const PLAN_PRICE_IDS: Record<PlanSlug, string> = {
+  creator: CREATOR_PRICE_ID,
+  pro: PRO_PRICE_ID,
+  agency: AGENCY_PRICE_ID,
+};
+
+export const PLAN_NAMES: Record<PlanSlug, string> = {
+  creator: "Creator",
+  pro: "Pro",
+  agency: "Agency",
+};

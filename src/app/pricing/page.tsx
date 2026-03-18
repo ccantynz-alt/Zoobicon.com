@@ -46,6 +46,7 @@ const PLANS = [
     desc: "For freelancers and small businesses shipping real sites.",
     cta: "Start Creator Trial",
     ctaHref: "/auth/signup",
+    planSlug: "creator" as const,
     featured: false,
     color: "from-emerald-500/5 to-white/0",
     features: [
@@ -68,6 +69,7 @@ const PLANS = [
     desc: "The full arsenal. Every AI tool, high limits, zero compromise.",
     cta: "Start Pro Trial",
     ctaHref: "/auth/signup",
+    planSlug: "pro" as const,
     featured: true,
     color: "from-brand-500/10 to-accent-purple/5",
     features: [
@@ -94,6 +96,7 @@ const PLANS = [
     desc: "For agencies building sites at scale. White-label and client handoff.",
     cta: "Start Agency Trial",
     ctaHref: "/auth/signup",
+    planSlug: "agency" as const,
     featured: false,
     color: "from-purple-500/5 to-white/0",
     features: [
@@ -233,15 +236,16 @@ export default function PricingPage() {
     } catch {}
   }, []);
 
-  async function handleProCheckout() {
+  async function handleCheckout(plan: "creator" | "pro" | "agency") {
     setCheckoutLoading(true);
-    const email = window.prompt("Enter your email to start the Pro trial:");
+    const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1);
+    const email = window.prompt(`Enter your email to start the ${planLabel} trial:`);
     if (!email) { setCheckoutLoading(false); return; }
 
     const res = await fetch("/api/stripe/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email, plan }),
     });
     const data = await res.json();
     if (data.url) {
@@ -356,11 +360,15 @@ export default function PricingPage() {
                     >
                       {plan.cta}
                     </a>
-                  ) : plan.featured ? (
+                  ) : plan.planSlug ? (
                     <button
-                      onClick={handleProCheckout}
+                      onClick={() => handleCheckout(plan.planSlug!)}
                       disabled={checkoutLoading}
-                      className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold btn-gradient text-white shadow-glow disabled:opacity-60 disabled:cursor-not-allowed"
+                      className={`flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold disabled:opacity-60 disabled:cursor-not-allowed ${
+                        plan.featured
+                          ? "btn-gradient text-white shadow-glow"
+                          : "border border-white/[0.1] text-white/70 hover:text-white hover:border-white/20 transition-all"
+                      }`}
                     >
                       {checkoutLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                       {plan.cta}
