@@ -170,8 +170,17 @@ export default function AdminEmailPage() {
         </div>
       </nav>
 
+      {/* Demo Data Banner */}
+      <div className="relative z-20 bg-amber-500/10 border-b border-amber-500/20 px-4 py-2.5 flex items-center justify-center gap-2">
+        <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+        <p className="text-xs text-amber-300 text-center">
+          <strong>DEMO DATA</strong> — These are placeholder emails. Connect Mailgun to receive real email.{" "}
+          <Link href="/admin/email-settings" className="underline hover:text-amber-200 transition-colors">Set up email →</Link>
+        </p>
+      </div>
+
       {/* Main layout */}
-      <div className="relative z-10 max-w-[1440px] mx-auto flex" style={{ height: "calc(100vh - 56px)" }}>
+      <div className="relative z-10 max-w-[1440px] mx-auto flex" style={{ height: "calc(100vh - 96px)" }}>
         {/* Sidebar */}
         <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 fixed md:static z-30 top-14 left-0 bottom-0 w-56 bg-zinc-900/95 md:bg-transparent border-r border-white/10 flex flex-col p-3 gap-1 transition-transform duration-200`}>
           <button onClick={() => { setComposing(true); setSidebarOpen(false); }} className="flex items-center justify-center gap-2 w-full bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors mb-3">

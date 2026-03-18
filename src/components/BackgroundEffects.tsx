@@ -6,7 +6,7 @@
  * Presets control the mesh gradient and grid pulse behind content.
  */
 
-type Preset = "default" | "energetic" | "calm" | "technical" | "premium" | "minimal" | "contrast" | "blackfog";
+type Preset = "default" | "energetic" | "calm" | "technical" | "premium" | "minimal" | "contrast" | "blackfog" | "dashboard";
 
 interface BackgroundEffectsProps {
   preset?: Preset;
@@ -32,6 +32,7 @@ export default function BackgroundEffects({
       {preset === "minimal" && <div className="mesh-gradient" />}
       {preset === "contrast" && <div className="mesh-gradient" style={{ opacity: 0.7, filter: "hue-rotate(20deg) saturate(1.3)" }} />}
       {preset === "blackfog" && <div className="mesh-gradient" style={{ opacity: 0.4, filter: "saturate(0.6) brightness(0.7)" }} />}
+      {preset === "dashboard" && <div className="mesh-gradient mesh-gradient-cool" style={{ opacity: 0.9, filter: "brightness(1.3) saturate(1.2)" }} />}
 
       {/* Grid pulse */}
       {(preset === "default" || preset === "technical" || preset === "contrast") && (

@@ -24,7 +24,40 @@ interface EmailConfig {
   notifyOnDeploy: boolean;
   notifyOnContact: boolean;
   notifyOnWaitlist: boolean;
+  aiAutoReply: boolean;
 }
+
+const SETUP_STEPS = [
+  {
+    step: 1,
+    title: "Create a Mailgun account",
+    description: "Sign up at mailgun.com (free tier = 5,000 emails/month). No credit card required for sandbox.",
+    link: "https://signup.mailgun.com/new/signup",
+  },
+  {
+    step: 2,
+    title: "Add and verify your domain",
+    description: "Add mail.zoobicon.com (or zoobicon.com) as a sending domain. Mailgun will give you DNS records (SPF, DKIM, MX) to add to your domain registrar.",
+    link: "https://app.mailgun.com/sending/domains",
+  },
+  {
+    step: 3,
+    title: "Set up inbound routing",
+    description: "In Mailgun → Receiving → Create Route. Match recipient: admin@zoobicon.com → Forward to: https://zoobicon.com/api/email/inbox (webhook). Create a second route for support@zoobicon.com → Forward to: https://zoobicon.com/api/email/support/inbound.",
+    link: "https://app.mailgun.com/receiving/routes",
+  },
+  {
+    step: 4,
+    title: "Add MX records to your DNS",
+    description: "Point zoobicon.com MX records to Mailgun's servers (mxa.mailgun.org and mxb.mailgun.org, priority 10). This tells the internet to deliver emails for @zoobicon.com to Mailgun.",
+  },
+  {
+    step: 5,
+    title: "Copy your API key and set env vars",
+    description: "Get your API key from Mailgun → Settings → API Keys. Add MAILGUN_API_KEY and MAILGUN_DOMAIN to your Vercel environment variables.",
+    link: "https://app.mailgun.com/settings/api_security",
+  },
+];
 
 export default function AdminEmailSettingsPage() {
   const [user, setUser] = useState<{ name?: string; email?: string } | null>(null);
@@ -41,6 +74,7 @@ export default function AdminEmailSettingsPage() {
     notifyOnDeploy: true,
     notifyOnContact: true,
     notifyOnWaitlist: true,
+    aiAutoReply: true,
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -57,9 +91,7 @@ export default function AdminEmailSettingsPage() {
 
     try {
       const saved = localStorage.getItem("zoobicon_email_config");
-      if (saved) {
-        setConfig((prev) => ({ ...prev, ...JSON.parse(saved) }));
-      }
+      if (saved) setConfig((prev) => ({ ...prev, ...JSON.parse(saved) }));
     } catch { /* */ }
   }, []);
 
@@ -76,35 +108,38 @@ export default function AdminEmailSettingsPage() {
     setTestSending(true);
     setTestResult(null);
     try {
-      const targetEmail = config.notificationEmail || config.adminEmail || "admin@zoobicon.com";
       const res = await fetch("/api/email/inbox", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          to: targetEmail,
+          to: config.adminEmail,
           subject: "[Zoobicon] Test Email - Configuration Verified",
-          text: "This is a test email from your Zoobicon admin panel. If you received this, your email configuration is working correctly.",
+          text: "This is a test email from your Zoobicon admin panel. If you received this, your Mailgun configuration is working correctly.",
           html: `<div style="font-family:system-ui,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;background:#131520;color:#fff;border-radius:16px">
             <h1 style="font-size:22px;font-weight:800;margin:0 0 16px">Email Configuration Test</h1>
-            <p style="color:rgba(255,255,255,0.7);line-height:1.6">This is a test email from your Zoobicon admin panel. If you received this, your email configuration is working correctly.</p>
+            <p style="color:rgba(255,255,255,0.7);line-height:1.6">This is a test email from your Zoobicon admin panel. Your Mailgun configuration is working correctly.</p>
             <p style="color:rgba(255,255,255,0.4);font-size:12px;margin-top:24px">Sent at ${new Date().toISOString()}</p>
           </div>`,
         }),
       });
       if (res.ok) {
-        setTestResult({ ok: true, message: `Test email sent to ${targetEmail}` });
+        setTestResult({ ok: true, message: `Test email sent to ${config.adminEmail}` });
       } else {
-        setTestResult({ ok: false, message: "Failed to send test email. Check your API keys." });
+        setTestResult({ ok: false, message: "Failed to send. Check your Mailgun API key and domain." });
       }
     } catch {
-      setTestResult({ ok: false, message: "Network error. Email service may not be configured." });
+      setTestResult({ ok: false, message: "Network error. Mailgun may not be configured yet." });
     }
     setTestSending(false);
   };
 
   const toggleKey = (key: string) => setShowKeys((p) => ({ ...p, [key]: !p[key] }));
-
   const maskKey = (val: string) => val ? val.substring(0, 8) + "..." + val.substring(val.length - 4) : "";
+  const copyText = (text: string, key: string) => {
+    navigator.clipboard.writeText(text).catch(() => {});
+    setCopied(key);
+    setTimeout(() => setCopied(""), 2000);
+  };
 
   const envBlock = `# Email (Mailgun only — no Google Workspace needed)
 MAILGUN_API_KEY=${config.mailgunApiKey || "key-xxxxx"}
@@ -244,6 +279,44 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
 
         {/* Email Addresses */}
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+          className="bg-white/[0.06] border border-white/10 rounded-xl p-6 mb-6">
+          <div className="flex items-center gap-3 mb-5">
+            <Shield className="w-5 h-5 text-green-400" />
+            <h2 className="text-lg font-semibold">Setup Guide — 5 Steps</h2>
+          </div>
+          <div className="space-y-2">
+            {SETUP_STEPS.map((s) => (
+              <div key={s.step} className="border border-white/5 rounded-lg overflow-hidden">
+                <button
+                  onClick={() => setExpandedStep(expandedStep === s.step ? null : s.step)}
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/[0.03] transition-colors"
+                >
+                  <div className="w-7 h-7 rounded-full bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-xs font-bold text-blue-400 shrink-0">
+                    {s.step}
+                  </div>
+                  <span className="text-sm font-medium text-zinc-200 flex-1 text-left">{s.title}</span>
+                  <div className={`text-zinc-500 transition-transform ${expandedStep === s.step ? "rotate-180" : ""}`}>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                  </div>
+                </button>
+                {expandedStep === s.step && (
+                  <div className="px-4 pb-4 pl-14">
+                    <p className="text-xs text-zinc-400 leading-relaxed">{s.description}</p>
+                    {s.link && (
+                      <a href={s.link} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 mt-2 transition-colors">
+                        <ExternalLink className="w-3 h-3" /> Open in Mailgun
+                      </a>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Email Addresses */}
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
           className="bg-white/[0.06] border border-white/10 rounded-xl p-6 mb-6">
           <div className="flex items-center gap-3 mb-5">
             <Globe className="w-5 h-5 text-blue-400" />
