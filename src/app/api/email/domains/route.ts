@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
-import {
-  generateDomainVerification,
-  verifyDomainWithSES,
-} from "@/lib/email-service";
+import { generateDomainVerification } from "@/lib/email-service";
 
 // ---------------------------------------------------------------------------
 // In-memory store (replaced by DB in production)
@@ -186,16 +183,13 @@ export async function POST(req: NextRequest) {
     // Generate verification requirements
     const verification = generateDomainVerification(normalizedDomain);
 
-    // Also attempt SES domain verification
-    const sesResult = await verifyDomainWithSES(normalizedDomain);
-
     const emailDomain: EmailDomain = {
       id: randomUUID(),
       domain: normalizedDomain,
       userEmail: email,
       status: "pending",
-      verificationToken: sesResult.verificationToken || verification.verificationToken,
-      dkimTokens: sesResult.dkimTokens || verification.dkimTokens,
+      verificationToken: verification.verificationToken,
+      dkimTokens: verification.dkimTokens,
       spfRecord: verification.spfRecord,
       dmarcRecord: verification.dmarcRecord,
       requiredRecords: verification.requiredRecords,

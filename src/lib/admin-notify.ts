@@ -5,7 +5,7 @@
  * via Mailgun. Falls back to console logging if MAILGUN_API_KEY is not set.
  */
 
-import { sendViaMailgun } from "./mailgun";
+import { sendViaMailgun } from "@/lib/mailgun";
 
 function getAdminEmail(): string {
   return (
