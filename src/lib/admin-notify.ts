@@ -28,46 +28,41 @@ interface NotifyOptions {
 }
 
 /**
- * Send via Mailgun API (primary).
- */
-export async function notifyAdmin(opts: NotifyOptions): Promise<boolean> {
-  const adminEmail = getAdminEmail();
-
-  const result = await sendViaMailgun({
-    from: getFromAddress(),
-    to: adminEmail,
-    subject: opts.subject,
-    html: opts.html,
-    text: opts.text,
-    tags: ["admin-notification"],
-  });
-
-  return result.success;
-}
-
-/**
  * Send a notification email to the admin.
- * Tries Mailgun first, falls back to Resend, then console logging.
+ * Returns true if sent successfully, false otherwise.
  */
 export async function notifyAdmin(opts: NotifyOptions): Promise<boolean> {
   const adminEmail = getAdminEmail();
+  const apiKey = process.env.MAILGUN_API_KEY;
 
-  // Try Mailgun first (primary)
-  if (process.env.MAILGUN_API_KEY && process.env.MAILGUN_DOMAIN) {
-    return sendViaMailgun(adminEmail, opts);
+  if (!apiKey) {
+    console.log(`[Admin Notify] No MAILGUN_API_KEY — logging instead:`);
+    console.log(`  To: ${adminEmail}`);
+    console.log(`  Subject: ${opts.subject}`);
+    console.log(`  Body: ${opts.text || "(HTML only)"}`);
+    return false;
   }
 
-  // Fall back to Resend (legacy)
-  if (process.env.RESEND_API_KEY) {
-    return sendViaResend(adminEmail, opts);
-  }
+  try {
+    const result = await sendViaMailgun({
+      from: getFromAddress(),
+      to: adminEmail,
+      subject: opts.subject,
+      html: opts.html,
+      ...(opts.text ? { text: opts.text } : {}),
+      tags: ["admin-notification"],
+    });
 
-  // No email service configured — log to console
-  console.log(`[Admin Notify] No MAILGUN_API_KEY or RESEND_API_KEY — logging instead:`);
-  console.log(`  To: ${adminEmail}`);
-  console.log(`  Subject: ${opts.subject}`);
-  console.log(`  Body: ${opts.text || "(HTML only)"}`);
-  return false;
+    if (!result.success) {
+      console.error(`[Admin Notify] Mailgun error:`, result.error);
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.error("[Admin Notify] Failed to send:", err);
+    return false;
+  }
 }
 
 // ── Styled email wrapper ──────────────────────────────────────
