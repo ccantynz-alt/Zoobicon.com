@@ -63,6 +63,8 @@ export default function AdminEmailPage() {
   const [sending, setSending] = useState(false);
   const [sendSuccess, setSendSuccess] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [usingDemoData, setUsingDemoData] = useState(false);
 
   // AI Polish & Advanced Features
   const [polishing, setPolishing] = useState(false);
@@ -99,15 +101,22 @@ export default function AdminEmailPage() {
 
   const fetchEmails = useCallback(async () => {
     setLoading(true);
+    setApiError(null);
+    setUsingDemoData(false);
     if (folder === "sent") { setEmails([]); setTotal(0); setLoading(false); return; }
     try {
       const p = new URLSearchParams({ folder, limit: "50", page: "1" });
       if (search) p.set("search", search);
       const res = await fetch(`/api/email/inbox?${p}`);
-      if (!res.ok) throw new Error("API error");
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || `API returned ${res.status}`);
+      }
       const data = await res.json();
       setEmails(data.emails || []); setTotal(data.total || 0); setUnreadCount(data.unread || 0);
-    } catch {
+    } catch (err) {
+      setApiError(err instanceof Error ? err.message : "Failed to fetch emails");
+      setUsingDemoData(true);
       const filtered = DEMO_EMAILS.filter((e) => {
         if (e.folder !== folder) return false;
         if (!search) return true;
@@ -275,14 +284,16 @@ export default function AdminEmailPage() {
         </div>
       </nav>
 
-      {/* Demo Data Banner */}
-      <div className="relative z-20 bg-amber-500/10 border-b border-amber-500/20 px-4 py-2.5 flex items-center justify-center gap-2">
-        <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-        <p className="text-xs text-amber-300 text-center">
-          <strong>DEMO DATA</strong> — These are placeholder emails. Connect Mailgun to receive real email.{" "}
-          <Link href="/admin/email-settings" className="underline hover:text-amber-200 transition-colors">Set up email →</Link>
-        </p>
-      </div>
+      {/* Demo Data Banner — only show when using demo data */}
+      {usingDemoData && (
+        <div className="relative z-20 bg-amber-500/10 border-b border-amber-500/20 px-4 py-2.5 flex items-center justify-center gap-2">
+          <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+          <p className="text-xs text-amber-300 text-center">
+            <strong>DEMO DATA</strong> — {apiError || "Could not connect to email API."}{" "}
+            <Link href="/admin/email-settings" className="underline hover:text-amber-200 transition-colors">Set up email →</Link>
+          </p>
+        </div>
+      )}
 
       {/* Main layout */}
       <div className="relative z-10 max-w-[1440px] mx-auto flex" style={{ height: "calc(100vh - 96px)" }}>

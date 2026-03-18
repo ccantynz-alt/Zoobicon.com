@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { sql } from "@/lib/db";
-import { sendViaMailgun } from "@/lib/mailgun";
+import { sql, getSQL } from "@/lib/db";
 
 // ---------------------------------------------------------------------------
 // GET /api/email/setup — Verify Mailgun config + ensure DB tables exist
@@ -189,8 +188,20 @@ export async function GET() {
 
 export async function POST() {
   try {
-    // Run all table creation statements
-    await sql.unsafe(EMAIL_TABLES_SQL);
+    // Run table creation statements individually via neon's direct call syntax
+    const rawSql = getSQL();
+    const statements = EMAIL_TABLES_SQL
+      .split(";")
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0 && !s.startsWith("--"));
+
+    for (const stmt of statements) {
+      try {
+        await rawSql(stmt);
+      } catch (stmtErr) {
+        console.warn("[Email Setup] Statement failed:", stmt.substring(0, 80), stmtErr);
+      }
+    }
 
     // Verify tables were created
     const tables = await sql`
