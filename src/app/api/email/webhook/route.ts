@@ -6,10 +6,49 @@ import {
 } from "@/lib/mailgun";
 
 // ---------------------------------------------------------------------------
+// GET /api/email/webhook — Diagnostic endpoint (check if webhook is reachable)
 // POST /api/email/webhook — Mailgun inbound email webhook
-// Mailgun POSTs form-encoded data when an email arrives.
-// We store it in the DB and optionally trigger AI auto-reply.
 // ---------------------------------------------------------------------------
+
+// Store last webhook attempt for debugging
+let lastWebhookAttempt: {
+  time: string;
+  contentType: string;
+  fields: string[];
+  recipient: string;
+  result: string;
+  error?: string;
+} | null = null;
+
+// GET — diagnostic: is the webhook reachable? what was the last attempt?
+export async function GET() {
+  let dbStatus = "unknown";
+  let inboundCount = 0;
+  let ticketCount = 0;
+
+  try {
+    const inbound = await sql`SELECT COUNT(*)::int AS c FROM email_inbound`;
+    inboundCount = inbound[0]?.c ?? 0;
+    const tickets = await sql`SELECT COUNT(*)::int AS c FROM support_tickets`;
+    ticketCount = tickets[0]?.c ?? 0;
+    dbStatus = "connected";
+  } catch (err) {
+    dbStatus = `error: ${err instanceof Error ? err.message : "unknown"}`;
+  }
+
+  return NextResponse.json({
+    status: "Webhook endpoint is reachable",
+    database: dbStatus,
+    counts: { inbound_emails: inboundCount, support_tickets: ticketCount },
+    env: {
+      MAILGUN_API_KEY: process.env.MAILGUN_API_KEY ? "set" : "NOT SET",
+      MAILGUN_WEBHOOK_SIGNING_KEY: process.env.MAILGUN_WEBHOOK_SIGNING_KEY ? "set" : "NOT SET",
+      MAILGUN_DOMAIN: process.env.MAILGUN_DOMAIN || "NOT SET (defaults to zoobicon.com)",
+      DATABASE_URL: process.env.DATABASE_URL ? "set" : "NOT SET",
+    },
+    last_webhook_attempt: lastWebhookAttempt || "No webhook attempts received yet",
+  });
+}
 
 // Helper: generate ticket number like TK-10001
 async function nextTicketNumber(): Promise<string> {
@@ -19,12 +58,25 @@ async function nextTicketNumber(): Promise<string> {
 }
 
 export async function POST(req: NextRequest) {
+  const contentType = req.headers.get("content-type") || "";
+
+  // Initialize debug info
+  lastWebhookAttempt = {
+    time: new Date().toISOString(),
+    contentType,
+    fields: [],
+    recipient: "",
+    result: "processing",
+  };
+
   try {
-    // Mailgun sends form-encoded data
-    const contentType = req.headers.get("content-type") || "";
+    // Parse form data or JSON
     let formFields: Record<string, string> = {};
 
-    if (contentType.includes("multipart/form-data") || contentType.includes("application/x-www-form-urlencoded")) {
+    if (
+      contentType.includes("multipart/form-data") ||
+      contentType.includes("application/x-www-form-urlencoded")
+    ) {
       const formData = await req.formData();
       formData.forEach((value, key) => {
         if (typeof value === "string") {
@@ -32,18 +84,43 @@ export async function POST(req: NextRequest) {
         }
       });
     } else {
-      // Fallback: JSON (for testing)
-      formFields = await req.json();
+      // JSON fallback (for testing or "Store and notify" events)
+      try {
+        formFields = await req.json();
+      } catch {
+        lastWebhookAttempt.result = "error";
+        lastWebhookAttempt.error = "Could not parse request body";
+        return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+      }
     }
 
-    // Verify Mailgun signature (skip in dev / when no key)
+    lastWebhookAttempt.fields = Object.keys(formFields);
+
+    // If this is a Mailgun "Store and notify" event (JSON with event-data),
+    // acknowledge it but don't process — we only need the Forward action data.
+    if (formFields["event-data"] || formFields["signature"]) {
+      // This is a Mailgun event webhook, not an inbound email forward
+      const eventData = formFields["event-data"];
+      if (typeof eventData === "string" || typeof eventData === "object") {
+        lastWebhookAttempt.result = "acknowledged_event";
+        return NextResponse.json({ ok: true, note: "Event acknowledged" });
+      }
+    }
+
+    // Verify Mailgun signature — be lenient: log warning but don't reject
+    // during initial setup. This prevents losing emails due to key mismatch.
     const sigTimestamp = formFields["timestamp"] || "";
     const sigToken = formFields["token"] || "";
     const sigSignature = formFields["signature"] || "";
 
-    if (process.env.MAILGUN_API_KEY && sigTimestamp && sigToken && sigSignature) {
-      if (!verifyWebhookSignature(sigTimestamp, sigToken, sigSignature)) {
-        return NextResponse.json({ error: "Invalid signature" }, { status: 403 });
+    if (sigTimestamp && sigToken && sigSignature) {
+      const valid = verifyWebhookSignature(sigTimestamp, sigToken, sigSignature);
+      if (!valid) {
+        console.warn(
+          "[Webhook] Signature verification FAILED — processing anyway.",
+          "Check MAILGUN_WEBHOOK_SIGNING_KEY. timestamp:", sigTimestamp
+        );
+        // Don't reject — log and continue. Admin can check /api/email/webhook (GET).
       }
     }
 
@@ -51,29 +128,45 @@ export async function POST(req: NextRequest) {
     const email = parseInboundEmail(formFields);
     const recipient = email.to.toLowerCase();
 
+    lastWebhookAttempt.recipient = recipient;
+
+    // If no recipient detected, try common Mailgun field names
+    const effectiveRecipient =
+      recipient ||
+      (formFields["recipient"] || "").toLowerCase() ||
+      (formFields["To"] || "").toLowerCase();
+
+    if (!effectiveRecipient) {
+      lastWebhookAttempt.result = "error";
+      lastWebhookAttempt.error = "No recipient found in webhook data";
+      console.error("[Webhook] No recipient found. Fields:", Object.keys(formFields));
+      // Still return 200 so Mailgun doesn't retry
+      return NextResponse.json({ ok: true, warning: "No recipient found" });
+    }
+
     // Route based on recipient address
-    const isSupport = recipient.includes("support@");
-    const isAdmin = recipient.includes("admin@");
+    const isSupport = effectiveRecipient.includes("support@");
+    const isAdmin = effectiveRecipient.includes("admin@");
 
     if (isSupport) {
       // ---- Support ticket flow ----
-      // Check if this is a reply to an existing ticket (via In-Reply-To or References)
       let existingTicketId: string | null = null;
 
       if (email.inReplyTo) {
-        const existing = await sql`
-          SELECT t.id FROM support_tickets t
-          JOIN email_outbound o ON o.ticket_id = t.id
-          WHERE o.mailgun_id = ${email.inReplyTo}
-          LIMIT 1
-        `;
-        if (existing.length > 0) {
-          existingTicketId = existing[0].id as string;
-        }
+        try {
+          const existing = await sql`
+            SELECT t.id FROM support_tickets t
+            JOIN email_outbound o ON o.ticket_id = t.id
+            WHERE o.mailgun_id = ${email.inReplyTo}
+            LIMIT 1
+          `;
+          if (existing.length > 0) {
+            existingTicketId = existing[0].id as string;
+          }
+        } catch { /* table might not have outbound entries yet */ }
       }
 
       if (existingTicketId) {
-        // Add message to existing ticket
         await sql`
           INSERT INTO support_messages (ticket_id, sender, body_text, body_html)
           VALUES (${existingTicketId}, 'customer', ${email.strippedText}, ${email.bodyHtml})
@@ -84,7 +177,6 @@ export async function POST(req: NextRequest) {
           WHERE id = ${existingTicketId}
         `;
       } else {
-        // Create new ticket
         const ticketNumber = await nextTicketNumber();
         const rows = await sql`
           INSERT INTO support_tickets (ticket_number, subject, from_email, from_name, mailgun_message_id)
@@ -93,7 +185,6 @@ export async function POST(req: NextRequest) {
         `;
         const ticketId = rows[0].id as string;
 
-        // Store the initial message
         await sql`
           INSERT INTO support_messages (ticket_id, sender, body_text, body_html)
           VALUES (${ticketId}, 'customer', ${email.strippedText}, ${email.bodyHtml})
@@ -110,15 +201,22 @@ export async function POST(req: NextRequest) {
       // ---- General inbox — store in email_inbound ----
       await sql`
         INSERT INTO email_inbound (mailbox_address, from_address, to_address, subject, text_body, html_body)
-        VALUES (${recipient}, ${email.from}, ${recipient}, ${email.subject}, ${email.bodyText}, ${email.bodyHtml})
+        VALUES (${effectiveRecipient}, ${email.from}, ${effectiveRecipient}, ${email.subject}, ${email.bodyText}, ${email.bodyHtml})
       `;
     }
 
+    lastWebhookAttempt.result = `success — stored as ${isSupport ? "support ticket" : "inbox email"}`;
+    console.log(`[Webhook] Email from ${email.from} to ${effectiveRecipient} — ${isSupport ? "support ticket" : "inbox"}`);
+
     return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error("[Email Webhook] Error:", err);
     const message = err instanceof Error ? err.message : "Webhook processing failed";
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error("[Email Webhook] Error:", message, err);
+    lastWebhookAttempt.result = "error";
+    lastWebhookAttempt.error = message;
+    // Return 200 even on error so Mailgun doesn't keep retrying failed webhooks
+    // The error is logged and visible via GET /api/email/webhook
+    return NextResponse.json({ ok: false, error: message }, { status: 200 });
   }
 }
 

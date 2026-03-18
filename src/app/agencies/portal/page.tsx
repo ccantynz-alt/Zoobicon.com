@@ -10,6 +10,8 @@ import {
   Search,
   Loader2,
   Building2,
+  ChevronRight,
+  Home,
 } from "lucide-react";
 
 interface PortalSite {
@@ -108,15 +110,20 @@ export default function ClientPortal() {
       <div className="min-h-screen bg-[#0a0a12] flex flex-col">
         <header className="flex items-center justify-between px-5 py-3 border-b border-white/[0.06] bg-[#12121a]/80 backdrop-blur-sm">
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => setPreviewSite(null)}
-              className="flex items-center gap-2 text-sm text-white/60 hover:text-white transition-colors"
-            >
-              <ArrowLeft size={16} />
-              Back to sites
-            </button>
-            <span className="text-white/20">|</span>
-            <span className="text-sm text-white font-medium">{previewSite.name}</span>
+            <nav className="flex items-center gap-1.5 text-sm" aria-label="Breadcrumb">
+              <Link href="/" className="flex items-center gap-1 text-white/40 hover:text-white transition-colors">
+                <Home size={14} />
+              </Link>
+              <ChevronRight size={12} className="text-white/20" />
+              <button
+                onClick={() => setPreviewSite(null)}
+                className="text-white/40 hover:text-white transition-colors"
+              >
+                Client Portal
+              </button>
+              <ChevronRight size={12} className="text-white/20" />
+              <span className="text-white/70 font-medium">{previewSite.name}</span>
+            </nav>
           </div>
           <a
             href={`https://${previewSite.slug}.zoobicon.sh`}
@@ -230,6 +237,19 @@ export default function ClientPortal() {
       </header>
 
       <main className="max-w-5xl mx-auto px-6 py-8">
+        <nav className="flex items-center gap-1.5 text-sm mb-6" aria-label="Breadcrumb">
+          <Link href="/" className="flex items-center gap-1 text-white/40 hover:text-white transition-colors">
+            <Home size={14} />
+            <span>Home</span>
+          </Link>
+          <ChevronRight size={12} className="text-white/20" />
+          <Link href="/agencies" className="text-white/40 hover:text-white transition-colors">
+            Agencies
+          </Link>
+          <ChevronRight size={12} className="text-white/20" />
+          <span className="text-white/70">Client Portal</span>
+        </nav>
+
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold text-white">
             Your Websites

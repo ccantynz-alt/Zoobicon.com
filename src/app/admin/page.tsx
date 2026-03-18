@@ -181,7 +181,7 @@ export default function AdminPage() {
     { key: "OPENAI_API_KEY", label: "OpenAI (DALL-E images)", required: false },
     { key: "STABILITY_API_KEY", label: "Stability AI (SDXL images)", required: false },
     { key: "UNSPLASH_ACCESS_KEY", label: "Unsplash (stock photos)", required: false },
-    { key: "RESEND_API_KEY", label: "Resend (Email)", required: false },
+    { key: "MAILGUN_API_KEY", label: "Mailgun (Email)", required: false },
     { key: "DATABASE_URL", label: "Neon Database", required: false },
     { key: "ADMIN_EMAIL", label: "Admin Email", required: true },
     { key: "ADMIN_PASSWORD", label: "Admin Password", required: true },
@@ -252,7 +252,7 @@ export default function AdminPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#131520] text-white overflow-hidden">
+    <div className="min-h-screen bg-[#09090f] text-white overflow-hidden">
       {/* Animated fog background */}
       <div className="fog-container">
         <div className="fog-layer fog-layer-1" />
@@ -502,7 +502,7 @@ export default function AdminPage() {
                 <div className="mt-5 pt-5 border-t border-white/[0.08]">
                   <button
                     onClick={() => copyToClipboard(
-                      "ANTHROPIC_API_KEY=\nOPENAI_API_KEY=\nSTABILITY_API_KEY=\nUNSPLASH_ACCESS_KEY=\nDATABASE_URL=\nADMIN_EMAIL=admin@zoobicon.com\nADMIN_PASSWORD=\nRESEND_API_KEY=\nNEXT_PUBLIC_APP_URL=https://zoobicon.com",
+                      "ANTHROPIC_API_KEY=\nOPENAI_API_KEY=\nSTABILITY_API_KEY=\nUNSPLASH_ACCESS_KEY=\nDATABASE_URL=\nADMIN_EMAIL=admin@zoobicon.com\nADMIN_PASSWORD=\nMAILGUN_API_KEY=\nMAILGUN_DOMAIN=\nNEXT_PUBLIC_APP_URL=https://zoobicon.com",
                       "envblock"
                     )}
                     className="flex items-center gap-2 text-xs text-violet-400 hover:text-violet-300 border border-violet-500/20 hover:border-violet-500/40 bg-violet-500/5 hover:bg-violet-500/10 rounded-lg px-4 py-2 transition-all"

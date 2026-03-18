@@ -7,6 +7,8 @@ import {
   Mail, Inbox, Send, Trash2, Search, Star, RefreshCw,
   ChevronLeft, MoreHorizontal, Paperclip, Reply, Forward,
   AlertTriangle, X, Loader2, Plus, CheckSquare, Square,
+  Sparkles, Clock, FileText, PenTool, Check, ChevronDown,
+  Wand2, RotateCcw, Zap,
 } from "lucide-react";
 import BackgroundEffects from "@/components/BackgroundEffects";
 
@@ -61,6 +63,37 @@ export default function AdminEmailPage() {
   const [sending, setSending] = useState(false);
   const [sendSuccess, setSendSuccess] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [usingDemoData, setUsingDemoData] = useState(false);
+
+  // AI Polish & Advanced Features
+  const [polishing, setPolishing] = useState(false);
+  const [polishResult, setPolishResult] = useState<{ polished: string; changes: string[]; score: number; tone: string; original: string } | null>(null);
+  const [showPolishDiff, setShowPolishDiff] = useState(false);
+  const [scheduling, setScheduling] = useState(false);
+  const [scheduleTime, setScheduleTime] = useState("");
+  const [showTemplates, setShowTemplates] = useState(false);
+  const [signature, setSignature] = useState("");
+  const [showSignatureEditor, setShowSignatureEditor] = useState(false);
+  const [generatingSubject, setGeneratingSubject] = useState(false);
+
+  // Email templates
+  const EMAIL_TEMPLATES = [
+    { name: "Welcome Reply", subject: "Welcome to Zoobicon!", body: "Hi there,\n\nThank you for reaching out! We're thrilled to have you on board.\n\nIf you have any questions about getting started, don't hesitate to ask. Our team is here to help you build something amazing.\n\nBest regards" },
+    { name: "Partnership Response", subject: "Re: Partnership Inquiry", body: "Hi,\n\nThank you for your interest in partnering with Zoobicon. We'd love to explore this opportunity.\n\nCould we schedule a 30-minute call this week to discuss your needs in detail? I'm available Tuesday and Thursday between 10am-4pm EST.\n\nLooking forward to connecting." },
+    { name: "Bug Acknowledged", subject: "Re: Bug Report", body: "Hi,\n\nThank you for reporting this issue. Our engineering team has been notified and is looking into it.\n\nWe'll keep you updated on the fix. In the meantime, if you experience any other issues, please don't hesitate to reach out.\n\nAppreciate your patience." },
+    { name: "Feature Request", subject: "Re: Feature Request", body: "Hi,\n\nGreat suggestion! We've added this to our product backlog for consideration.\n\nWe prioritize features based on demand and strategic fit. I'll follow up when we have an update on the timeline.\n\nThank you for helping us improve Zoobicon." },
+    { name: "Invoice/Billing", subject: "Re: Billing Inquiry", body: "Hi,\n\nThank you for reaching out about your billing question.\n\nI've looked into your account and here's what I found:\n\n[details]\n\nPlease let me know if you need any further clarification." },
+  ];
+
+  // Load signature from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("zoobicon_email_signature");
+      if (saved) setSignature(saved);
+      else setSignature("Best regards,\nThe Zoobicon Team\nzoobicon.com");
+    } catch { /* */ }
+  }, []);
 
   useEffect(() => {
     try { const s = localStorage.getItem("zoobicon_user"); if (s) setUser(JSON.parse(s)); } catch { /* */ }
@@ -68,15 +101,22 @@ export default function AdminEmailPage() {
 
   const fetchEmails = useCallback(async () => {
     setLoading(true);
+    setApiError(null);
+    setUsingDemoData(false);
     if (folder === "sent") { setEmails([]); setTotal(0); setLoading(false); return; }
     try {
       const p = new URLSearchParams({ folder, limit: "50", page: "1" });
       if (search) p.set("search", search);
       const res = await fetch(`/api/email/inbox?${p}`);
-      if (!res.ok) throw new Error("API error");
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || `API returned ${res.status}`);
+      }
       const data = await res.json();
       setEmails(data.emails || []); setTotal(data.total || 0); setUnreadCount(data.unread || 0);
-    } catch {
+    } catch (err) {
+      setApiError(err instanceof Error ? err.message : "Failed to fetch emails");
+      setUsingDemoData(true);
       const filtered = DEMO_EMAILS.filter((e) => {
         if (e.folder !== folder) return false;
         if (!search) return true;
@@ -117,6 +157,80 @@ export default function AdminEmailPage() {
     setSelected(new Set());
   };
 
+  // AI Polish
+  const handlePolish = async () => {
+    if (!composeData.text.trim()) return;
+    setPolishing(true);
+    setPolishResult(null);
+    try {
+      const res = await fetch("/api/email/polish", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: composeData.text, context: "compose" }),
+      });
+      const data = await res.json();
+      if (res.ok && data.polished) {
+        setPolishResult(data);
+        setShowPolishDiff(true);
+      }
+    } catch { /* silent */ }
+    setPolishing(false);
+  };
+
+  const acceptPolish = () => {
+    if (polishResult) {
+      setComposeData((d) => ({ ...d, text: polishResult.polished }));
+      setShowPolishDiff(false);
+      setPolishResult(null);
+    }
+  };
+
+  const rejectPolish = () => {
+    setShowPolishDiff(false);
+    setPolishResult(null);
+  };
+
+  // AI Subject Line Generator
+  const generateSubject = async () => {
+    if (!composeData.text.trim()) return;
+    setGeneratingSubject(true);
+    try {
+      const res = await fetch("/api/email/polish", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: `Generate a professional email subject line for this email body. Return JSON with just {"polished": "the subject line", "changes": [], "score": 100, "tone": "professional", "issues": []}:\n\n${composeData.text}`, context: "compose" }),
+      });
+      const data = await res.json();
+      if (res.ok && data.polished) {
+        setComposeData((d) => ({ ...d, subject: data.polished }));
+      }
+    } catch { /* silent */ }
+    setGeneratingSubject(false);
+  };
+
+  // Save signature
+  const saveSignature = () => {
+    localStorage.setItem("zoobicon_email_signature", signature);
+    setShowSignatureEditor(false);
+  };
+
+  // Append signature to email
+  const appendSignature = () => {
+    if (signature && !composeData.text.endsWith(signature)) {
+      setComposeData((d) => ({ ...d, text: d.text + (d.text ? "\n\n" : "") + signature }));
+    }
+  };
+
+  // Apply template
+  const applyTemplate = (template: typeof EMAIL_TEMPLATES[0]) => {
+    setComposeData((d) => ({
+      ...d,
+      subject: d.subject || template.subject,
+      text: template.body + (signature ? `\n\n${signature}` : ""),
+    }));
+    setShowTemplates(false);
+  };
+
   const handleSend = async () => {
     if (!composeData.to || !composeData.subject || !composeData.text) return;
     setSending(true);
@@ -140,7 +254,7 @@ export default function AdminEmailPage() {
   const toggleSelectAll = () => setSelected(selected.size === emails.length ? new Set() : new Set(emails.map((e) => e.id)));
 
   return (
-    <div className="min-h-screen bg-[#131520] text-white relative">
+    <div className="min-h-screen bg-[#09090f] text-white relative">
       <BackgroundEffects />
 
       {/* Navbar */}
@@ -170,14 +284,16 @@ export default function AdminEmailPage() {
         </div>
       </nav>
 
-      {/* Demo Data Banner */}
-      <div className="relative z-20 bg-amber-500/10 border-b border-amber-500/20 px-4 py-2.5 flex items-center justify-center gap-2">
-        <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-        <p className="text-xs text-amber-300 text-center">
-          <strong>DEMO DATA</strong> — These are placeholder emails. Connect Mailgun to receive real email.{" "}
-          <Link href="/admin/email-settings" className="underline hover:text-amber-200 transition-colors">Set up email →</Link>
-        </p>
-      </div>
+      {/* Demo Data Banner — only show when using demo data */}
+      {usingDemoData && (
+        <div className="relative z-20 bg-amber-500/10 border-b border-amber-500/20 px-4 py-2.5 flex items-center justify-center gap-2">
+          <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+          <p className="text-xs text-amber-300 text-center">
+            <strong>DEMO DATA</strong> — {apiError || "Could not connect to email API."}{" "}
+            <Link href="/admin/email-settings" className="underline hover:text-amber-200 transition-colors">Set up email →</Link>
+          </p>
+        </div>
+      )}
 
       {/* Main layout */}
       <div className="relative z-10 max-w-[1440px] mx-auto flex" style={{ height: "calc(100vh - 96px)" }}>
@@ -340,12 +456,132 @@ export default function AdminEmailPage() {
                 </div>
                 <textarea value={composeData.text} onChange={(e) => setComposeData((d) => ({ ...d, text: e.target.value }))} placeholder="Write your message..." className="flex-1 min-h-[200px] bg-transparent px-4 py-3 text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none resize-none" />
               </div>
+              {/* AI Polish Diff View */}
+              <AnimatePresence>
+                {showPolishDiff && polishResult && (
+                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="border-t border-white/10 overflow-hidden">
+                    <div className="px-4 py-3 bg-blue-500/5">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <Sparkles className="w-4 h-4 text-blue-400" />
+                          <span className="text-xs font-semibold text-blue-300">AI Polish Suggestions</span>
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${polishResult.score >= 90 ? "bg-green-500/20 text-green-400" : polishResult.score >= 70 ? "bg-yellow-500/20 text-yellow-400" : "bg-red-500/20 text-red-400"}`}>
+                            Score: {polishResult.score}/100
+                          </span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/5 text-zinc-400">{polishResult.tone}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <button onClick={acceptPolish} className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-green-600/20 hover:bg-green-600/30 text-green-400 text-xs font-medium transition-colors">
+                            <Check className="w-3 h-3" /> Accept
+                          </button>
+                          <button onClick={rejectPolish} className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-zinc-700/50 hover:bg-zinc-700 text-zinc-400 text-xs font-medium transition-colors">
+                            <X className="w-3 h-3" /> Dismiss
+                          </button>
+                        </div>
+                      </div>
+                      {polishResult.changes.length > 0 && (
+                        <div className="space-y-1 mb-2">
+                          {polishResult.changes.map((change, i) => (
+                            <div key={i} className="flex items-start gap-2 text-[11px]">
+                              <Wand2 className="w-3 h-3 text-blue-400 mt-0.5 shrink-0" />
+                              <span className="text-zinc-400">{change}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      <div className="bg-black/20 rounded-lg p-3 text-xs text-zinc-300 whitespace-pre-wrap max-h-32 overflow-y-auto">{polishResult.polished}</div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Enhanced Toolbar */}
               <div className="flex items-center justify-between px-4 py-3 border-t border-white/10">
-                <button className="p-2 rounded-lg hover:bg-white/5 transition-colors" title="Attach file"><Paperclip className="w-4 h-4 text-zinc-500" /></button>
+                <div className="flex items-center gap-1">
+                  <button className="p-2 rounded-lg hover:bg-white/5 transition-colors" title="Attach file"><Paperclip className="w-4 h-4 text-zinc-500" /></button>
+
+                  {/* AI Polish Button */}
+                  <button onClick={handlePolish} disabled={polishing || !composeData.text.trim()} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-purple-500/10 border border-transparent hover:border-purple-500/20 transition-all disabled:opacity-30 group" title="AI Polish — fix grammar, tone & clarity">
+                    {polishing ? <Loader2 className="w-4 h-4 text-purple-400 animate-spin" /> : <Sparkles className="w-4 h-4 text-zinc-500 group-hover:text-purple-400" />}
+                    <span className="text-xs text-zinc-500 group-hover:text-purple-400 hidden sm:inline">Polish</span>
+                  </button>
+
+                  {/* Templates */}
+                  <div className="relative">
+                    <button onClick={() => setShowTemplates(!showTemplates)} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-white/5 transition-colors group" title="Email Templates">
+                      <FileText className="w-4 h-4 text-zinc-500 group-hover:text-cyan-400" />
+                      <span className="text-xs text-zinc-500 group-hover:text-cyan-400 hidden sm:inline">Templates</span>
+                    </button>
+                    <AnimatePresence>
+                      {showTemplates && (
+                        <motion.div initial={{ opacity: 0, y: 8, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 8, scale: 0.95 }} className="absolute bottom-full left-0 mb-2 w-64 bg-zinc-800 border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50">
+                          <div className="px-3 py-2 border-b border-white/10 text-xs font-semibold text-zinc-400">Quick Templates</div>
+                          {EMAIL_TEMPLATES.map((t, i) => (
+                            <button key={i} onClick={() => applyTemplate(t)} className="w-full text-left px-3 py-2.5 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0">
+                              <span className="text-xs font-medium text-zinc-200">{t.name}</span>
+                              <p className="text-[10px] text-zinc-500 mt-0.5 truncate">{t.body.substring(0, 60)}...</p>
+                            </button>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Signature */}
+                  <button onClick={() => setShowSignatureEditor(!showSignatureEditor)} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-white/5 transition-colors group" title="Email Signature">
+                    <PenTool className="w-4 h-4 text-zinc-500 group-hover:text-green-400" />
+                    <span className="text-xs text-zinc-500 group-hover:text-green-400 hidden sm:inline">Signature</span>
+                  </button>
+
+                  {/* AI Subject Line */}
+                  <button onClick={generateSubject} disabled={generatingSubject || !composeData.text.trim()} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-white/5 transition-colors group disabled:opacity-30" title="AI generate subject line">
+                    {generatingSubject ? <Loader2 className="w-4 h-4 text-amber-400 animate-spin" /> : <Zap className="w-4 h-4 text-zinc-500 group-hover:text-amber-400" />}
+                    <span className="text-xs text-zinc-500 group-hover:text-amber-400 hidden sm:inline">Subject</span>
+                  </button>
+
+                  {/* Schedule */}
+                  <button onClick={() => setScheduling(!scheduling)} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-white/5 transition-colors group" title="Schedule send">
+                    <Clock className="w-4 h-4 text-zinc-500 group-hover:text-orange-400" />
+                    <span className="text-xs text-zinc-500 group-hover:text-orange-400 hidden sm:inline">Schedule</span>
+                  </button>
+                </div>
+
                 <button onClick={handleSend} disabled={sending || sendSuccess || !composeData.to || !composeData.subject || !composeData.text} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors">
                   {sendSuccess ? (<><CheckSquare className="w-4 h-4" /> Sent!</>) : sending ? (<><Loader2 className="w-4 h-4 animate-spin" /> Sending...</>) : (<><Send className="w-4 h-4" /> Send</>)}
                 </button>
               </div>
+
+              {/* Signature Editor */}
+              <AnimatePresence>
+                {showSignatureEditor && (
+                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="border-t border-white/10 overflow-hidden">
+                    <div className="px-4 py-3 bg-green-500/5">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-semibold text-green-300 flex items-center gap-1.5"><PenTool className="w-3 h-3" /> Email Signature</span>
+                        <div className="flex items-center gap-1.5">
+                          <button onClick={appendSignature} className="text-[10px] px-2 py-1 rounded bg-green-600/20 text-green-400 hover:bg-green-600/30 transition-colors">Insert into email</button>
+                          <button onClick={saveSignature} className="text-[10px] px-2 py-1 rounded bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 transition-colors">Save</button>
+                        </div>
+                      </div>
+                      <textarea value={signature} onChange={(e) => setSignature(e.target.value)} className="w-full bg-black/20 rounded-lg px-3 py-2 text-xs text-zinc-300 placeholder-zinc-600 focus:outline-none resize-none h-20" placeholder="Your email signature..." />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Schedule Picker */}
+              <AnimatePresence>
+                {scheduling && (
+                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="border-t border-white/10 overflow-hidden">
+                    <div className="px-4 py-3 bg-orange-500/5 flex items-center gap-3">
+                      <Clock className="w-4 h-4 text-orange-400" />
+                      <span className="text-xs text-orange-300 font-medium">Send Later:</span>
+                      <input type="datetime-local" value={scheduleTime} onChange={(e) => setScheduleTime(e.target.value)} className="bg-black/20 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-orange-500/40" />
+                      <span className="text-[10px] text-zinc-500">Email will be queued and sent at the scheduled time</span>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
           </motion.div>
         )}

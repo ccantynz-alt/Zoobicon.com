@@ -95,7 +95,9 @@ services:
         sync: false
       - key: ADMIN_PASSWORD
         sync: false
-      - key: RESEND_API_KEY
+      - key: MAILGUN_API_KEY
+        sync: false
+      - key: MAILGUN_DOMAIN
         sync: false
 
     autoDeploy: true

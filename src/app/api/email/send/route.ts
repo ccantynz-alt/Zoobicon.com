@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  sendEmail,
-  analyzeEmailContent,
-  type EmailMessage,
-} from "@/lib/email-service";
+import { sendViaMailgun } from "@/lib/mailgun";
+import { analyzeEmailContent } from "@/lib/email-service";
 
 // ---------------------------------------------------------------------------
 // POST /api/email/send — Send transactional or marketing email
@@ -18,7 +15,7 @@ export async function POST(req: NextRequest) {
       html?: string;
       text?: string;
       replyTo?: string;
-      tags?: Record<string, string>;
+      tags?: string[];
       analyze?: boolean;
     };
 
@@ -51,9 +48,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Email format validation
+    // Email format validation — supports both "user@domain" and "Name <user@domain>"
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(from)) {
+    const namedEmailRegex = /^.+<([^\s@]+@[^\s@]+\.[^\s@]+)>$/;
+
+    function extractEmail(addr: string): string | null {
+      const trimmed = addr.trim();
+      if (emailRegex.test(trimmed)) return trimmed;
+      const match = trimmed.match(namedEmailRegex);
+      if (match) return match[1];
+      return null;
+    }
+
+    if (!extractEmail(from)) {
       return NextResponse.json(
         { error: "Invalid from email address." },
         { status: 400 }
@@ -62,7 +69,7 @@ export async function POST(req: NextRequest) {
 
     const toAddresses = Array.isArray(to) ? to : [to];
     for (const addr of toAddresses) {
-      if (!emailRegex.test(addr)) {
+      if (!extractEmail(addr)) {
         return NextResponse.json(
           { error: `Invalid to email address: ${addr}` },
           { status: 400 }
@@ -93,7 +100,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const message: EmailMessage = {
+    const result = await sendViaMailgun({
       from,
       to: toAddresses,
       subject,
@@ -101,9 +108,7 @@ export async function POST(req: NextRequest) {
       text,
       replyTo,
       tags,
-    };
-
-    const result = await sendEmail(message);
+    });
 
     if (!result.success) {
       return NextResponse.json(

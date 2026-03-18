@@ -4,8 +4,8 @@ import { randomUUID } from "crypto";
 // ---------------------------------------------------------------------------
 // Inbound Email Routing
 //
-// Handles incoming email via webhook (Cloudflare Email Routing or AWS SES
-// SNS notifications). Routes to mailboxes, forwards, or stores.
+// Handles incoming email via Mailgun inbound webhook.
+// Routes to mailboxes, forwards, or stores.
 // ---------------------------------------------------------------------------
 
 interface InboundEmail {
@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
       text?: string;
       html?: string;
       headers?: Record<string, string>;
-      source?: "cloudflare" | "ses" | "test";
+      source?: "mailgun" | "test";
     };
 
     if (!from || !to) {
@@ -168,7 +168,7 @@ export async function POST(req: NextRequest) {
         rule.domain === toDomain &&
         (rule.localPart === "*" || rule.localPart === toLocalPart)
       ) {
-        // In production: forward via SES
+        // In production: forward via Mailgun
         console.log(`[Inbound] Forwarding ${to} → ${rule.forwardTo}`);
       }
     }

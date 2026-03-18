@@ -44,6 +44,10 @@ import {
   Users,
   CreditCard,
   Crown,
+  Wand2,
+  PenTool,
+  Check,
+  RotateCcw,
 } from "lucide-react";
 
 // ---------- Types ----------
@@ -398,6 +402,10 @@ export default function EmailSupportDashboard() {
   // Quick actions dropdown
   const [showActions, setShowActions] = useState(false);
 
+  // AI Polish for replies
+  const [polishing, setPolishing] = useState(false);
+  const [polishResult, setPolishResult] = useState<{ polished: string; changes: string[]; score: number; tone: string } | null>(null);
+
   // New features state
   const [isInternalNote, setIsInternalNote] = useState(false);
   const [showCannedResponses, setShowCannedResponses] = useState(false);
@@ -575,6 +583,32 @@ export default function EmailSupportDashboard() {
     }
   };
 
+  // AI Polish for replies
+  const handlePolishReply = async () => {
+    if (!replyText.trim()) return;
+    setPolishing(true);
+    setPolishResult(null);
+    try {
+      const res = await fetch("/api/email/polish", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: replyText, context: isInternalNote ? "internal" : "support" }),
+      });
+      const data = await res.json();
+      if (res.ok && data.polished) {
+        setPolishResult(data);
+      }
+    } catch { /* silent */ }
+    setPolishing(false);
+  };
+
+  const acceptReplyPolish = () => {
+    if (polishResult) {
+      setReplyText(polishResult.polished);
+      setPolishResult(null);
+    }
+  };
+
   // Send manual reply or internal note
   const handleSendReply = () => {
     if (!replyText.trim() || !selectedTicket) return;
@@ -601,7 +635,7 @@ export default function EmailSupportDashboard() {
 
   if (!authChecked) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-[#09090f] flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
       </div>
     );
@@ -610,7 +644,7 @@ export default function EmailSupportDashboard() {
   const visibleTickets = filteredTickets();
 
   return (
-    <div className="relative min-h-screen bg-gray-900 text-white flex flex-col">
+    <div className="relative min-h-screen bg-[#09090f] text-white flex flex-col">
       <BackgroundEffects preset="technical" />
       {/* Top Nav */}
       <nav className="h-14 border-b border-white/[0.08] bg-gray-900/80 backdrop-blur-xl flex items-center justify-between px-4 shrink-0 z-50">
@@ -1162,6 +1196,37 @@ export default function EmailSupportDashboard() {
                     Internal Note
                   </button>
                 </div>
+                {/* AI Polish Result */}
+                <AnimatePresence>
+                  {polishResult && (
+                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                      <div className="bg-purple-500/5 border border-purple-500/10 rounded-xl p-3 mb-2">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <Sparkles className="w-3 h-3 text-purple-400" />
+                            <span className="text-[10px] font-semibold text-purple-300">AI Polish</span>
+                            <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${polishResult.score >= 90 ? "bg-green-500/20 text-green-400" : "bg-yellow-500/20 text-yellow-400"}`}>
+                              {polishResult.score}/100
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <button onClick={acceptReplyPolish} className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-green-600/20 text-green-400 text-[10px] hover:bg-green-600/30 transition-colors"><Check className="w-2.5 h-2.5" /> Accept</button>
+                            <button onClick={() => setPolishResult(null)} className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-zinc-700/50 text-zinc-400 text-[10px] hover:bg-zinc-700 transition-colors"><X className="w-2.5 h-2.5" /> Dismiss</button>
+                          </div>
+                        </div>
+                        {polishResult.changes.length > 0 && (
+                          <div className="space-y-0.5 mb-1.5">
+                            {polishResult.changes.slice(0, 3).map((c, i) => (
+                              <div key={i} className="flex items-start gap-1.5 text-[10px] text-zinc-400"><Wand2 className="w-2.5 h-2.5 text-purple-400 mt-0.5 shrink-0" />{c}</div>
+                            ))}
+                          </div>
+                        )}
+                        <div className="bg-black/20 rounded-lg p-2 text-[11px] text-zinc-300 max-h-20 overflow-y-auto">{polishResult.polished}</div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
                 <div className="flex items-center gap-2">
                   <input
                     value={replyText}
@@ -1174,6 +1239,15 @@ export default function EmailSupportDashboard() {
                         : "bg-white/[0.05] border border-white/[0.08] focus:border-blue-500/30"
                     }`}
                   />
+                  {/* AI Polish Button */}
+                  <button
+                    onClick={handlePolishReply}
+                    disabled={polishing || !replyText.trim()}
+                    className="p-2.5 rounded-xl text-purple-400 hover:bg-purple-500/10 border border-transparent hover:border-purple-500/20 transition-all disabled:opacity-30"
+                    title="AI Polish — fix grammar & tone"
+                  >
+                    {polishing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                  </button>
                   <button
                     onClick={handleSendReply}
                     disabled={!replyText.trim()}

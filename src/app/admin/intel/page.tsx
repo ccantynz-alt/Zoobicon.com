@@ -119,7 +119,7 @@ export default function IntelPage() {
   ) || [];
 
   return (
-    <div className="min-h-screen bg-[#131520] text-white">
+    <div className="min-h-screen bg-[#09090f] text-white">
       {/* Header */}
       <header className="border-b border-white/[0.06] px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
