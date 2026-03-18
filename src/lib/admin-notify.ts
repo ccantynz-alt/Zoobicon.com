@@ -28,7 +28,8 @@ interface NotifyOptions {
 }
 
 /**
- * Send via Mailgun API (primary).
+ * Send a notification email to the admin.
+ * Returns true if sent successfully, false otherwise.
  */
 export async function notifyAdmin(opts: NotifyOptions): Promise<boolean> {
   const adminEmail = getAdminEmail();
@@ -41,14 +42,6 @@ export async function notifyAdmin(opts: NotifyOptions): Promise<boolean> {
     console.log(`  Body: ${opts.text || "(HTML only)"}`);
     return false;
   }
-}
-
-/**
- * Send via Resend API (legacy fallback).
- */
-async function sendViaResend(to: string, opts: NotifyOptions): Promise<boolean> {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return false;
 
   try {
     const result = await sendViaMailgun({
@@ -64,36 +57,12 @@ async function sendViaResend(to: string, opts: NotifyOptions): Promise<boolean> 
       console.error(`[Admin Notify] Mailgun error:`, result.error);
       return false;
     }
+
     return true;
   } catch (err) {
-    console.error("[Admin Notify] Resend send failed:", err);
+    console.error("[Admin Notify] Failed to send:", err);
     return false;
   }
-}
-
-/**
- * Send a notification email to the admin.
- * Tries Mailgun first, falls back to Resend, then console logging.
- */
-export async function notifyAdmin(opts: NotifyOptions): Promise<boolean> {
-  const adminEmail = getAdminEmail();
-
-  // Try Mailgun first (primary)
-  if (process.env.MAILGUN_API_KEY && process.env.MAILGUN_DOMAIN) {
-    return sendViaMailgun(adminEmail, opts);
-  }
-
-  // Fall back to Resend (legacy)
-  if (process.env.RESEND_API_KEY) {
-    return sendViaResend(adminEmail, opts);
-  }
-
-  // No email service configured — log to console
-  console.log(`[Admin Notify] No MAILGUN_API_KEY or RESEND_API_KEY — logging instead:`);
-  console.log(`  To: ${adminEmail}`);
-  console.log(`  Subject: ${opts.subject}`);
-  console.log(`  Body: ${opts.text || "(HTML only)"}`);
-  return false;
 }
 
 // ── Styled email wrapper ──────────────────────────────────────

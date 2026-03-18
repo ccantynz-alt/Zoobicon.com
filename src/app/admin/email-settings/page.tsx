@@ -24,7 +24,6 @@ interface EmailConfig {
   notifyOnDeploy: boolean;
   notifyOnContact: boolean;
   notifyOnWaitlist: boolean;
-  aiAutoReply: boolean;
 }
 
 const SETUP_STEPS = [
@@ -43,7 +42,7 @@ const SETUP_STEPS = [
   {
     step: 3,
     title: "Set up inbound routing",
-    description: "In Mailgun → Receiving → Create Route. Match recipient: admin@zoobicon.com → Forward to: https://zoobicon.com/api/email/inbox (webhook). Create a second route for support@zoobicon.com → Forward to: https://zoobicon.com/api/email/support/inbound.",
+    description: "In Mailgun \u2192 Receiving \u2192 Create Route. Match recipient: admin@zoobicon.com \u2192 Forward to: https://zoobicon.com/api/email/inbox (webhook). Create a second route for support@zoobicon.com \u2192 Forward to: https://zoobicon.com/api/email/support/inbound.",
     link: "https://app.mailgun.com/receiving/routes",
   },
   {
@@ -54,7 +53,7 @@ const SETUP_STEPS = [
   {
     step: 5,
     title: "Copy your API key and set env vars",
-    description: "Get your API key from Mailgun → Settings → API Keys. Add MAILGUN_API_KEY and MAILGUN_DOMAIN to your Vercel environment variables.",
+    description: "Get your API key from Mailgun \u2192 Settings \u2192 API Keys. Add MAILGUN_API_KEY and MAILGUN_DOMAIN to your Vercel environment variables.",
     link: "https://app.mailgun.com/settings/api_security",
   },
 ];
@@ -74,7 +73,6 @@ export default function AdminEmailSettingsPage() {
     notifyOnDeploy: true,
     notifyOnContact: true,
     notifyOnWaitlist: true,
-    aiAutoReply: true,
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -82,6 +80,7 @@ export default function AdminEmailSettingsPage() {
   const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null);
   const [showKeys, setShowKeys] = useState<Record<string, boolean>>({});
   const [copiedEnv, setCopiedEnv] = useState(false);
+  const [expandedStep, setExpandedStep] = useState<number | null>(null);
 
   useEffect(() => {
     try {
@@ -135,11 +134,6 @@ export default function AdminEmailSettingsPage() {
 
   const toggleKey = (key: string) => setShowKeys((p) => ({ ...p, [key]: !p[key] }));
   const maskKey = (val: string) => val ? val.substring(0, 8) + "..." + val.substring(val.length - 4) : "";
-  const copyText = (text: string, key: string) => {
-    navigator.clipboard.writeText(text).catch(() => {});
-    setCopied(key);
-    setTimeout(() => setCopied(""), 2000);
-  };
 
   const envBlock = `# Email (Mailgun only — no Google Workspace needed)
 MAILGUN_API_KEY=${config.mailgunApiKey || "key-xxxxx"}
@@ -247,38 +241,8 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
           <p className="text-xs text-zinc-500 mt-4">Total cost: <span className="text-green-400/80">$0/month</span> on Mailgun free tier (5,000 emails/month). No Google Workspace, no per-seat charges.</p>
         </motion.div>
 
-        {/* Setup Guide */}
+        {/* Setup Guide — Expandable accordion */}
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-          className="bg-white/[0.04] border border-white/10 rounded-xl p-6 mb-6">
-          <h2 className="text-lg font-semibold mb-4">Setup Guide — 5 Steps</h2>
-          <div className="space-y-3">
-            {[
-              "Create a Mailgun account",
-              "Add and verify your domain",
-              "Set up inbound routing",
-              "Add MX records to your DNS",
-              "Copy your API key and set env vars",
-            ].map((step, i) => (
-              <div key={i} className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-blue-600/20 border border-blue-500/30 flex items-center justify-center shrink-0 mt-0.5">
-                  <span className="text-xs font-bold text-blue-400">{i + 1}</span>
-                </div>
-                <p className="text-sm text-zinc-300">{step}</p>
-              </div>
-            ))}
-          </div>
-          <p className="text-xs text-zinc-500 mt-4">
-            Get your API key from Mailgun &rarr; Settings &rarr; API Keys. Add <code className="text-cyan-400/80">MAILGUN_API_KEY</code> and <code className="text-cyan-400/80">MAILGUN_DOMAIN</code> to your Vercel environment variables.
-          </p>
-          <a href="https://app.mailgun.com/settings/api_security" target="_blank" rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 mt-3 text-sm text-blue-400 hover:text-blue-300 transition-colors">
-            <ExternalLink className="w-3.5 h-3.5" />
-            Open in Mailgun
-          </a>
-        </motion.div>
-
-        {/* Email Addresses */}
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
           className="bg-white/[0.06] border border-white/10 rounded-xl p-6 mb-6">
           <div className="flex items-center gap-3 mb-5">
             <Shield className="w-5 h-5 text-green-400" />
@@ -316,7 +280,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
         </motion.div>
 
         {/* Email Addresses */}
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
           className="bg-white/[0.06] border border-white/10 rounded-xl p-6 mb-6">
           <div className="flex items-center gap-3 mb-5">
             <Globe className="w-5 h-5 text-blue-400" />
