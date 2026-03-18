@@ -502,4 +502,5 @@ export async function initSchema() {
 
   await sql`CREATE INDEX IF NOT EXISTS support_sessions_user_email_idx ON support_sessions (user_email)`;
   await sql`CREATE INDEX IF NOT EXISTS support_sessions_status_idx ON support_sessions (status)`;
+
 }
