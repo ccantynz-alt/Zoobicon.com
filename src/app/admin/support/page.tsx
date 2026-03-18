@@ -205,7 +205,7 @@ export default function AdminSupportPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-[#09090f] text-white">
       {/* Header */}
       <div className="border-b border-gray-800 bg-gray-900/80 backdrop-blur-sm">
         <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center justify-between">
