@@ -1533,7 +1533,6 @@ export default function LandingPage() {
                 <li><Link href="/marketplace" className="text-sm text-white/65 hover:text-white/60 transition-colors">Marketplace</Link></li>
                 <li><Link href="/generators" className="text-sm text-white/65 hover:text-white/60 transition-colors">32 Generators</Link></li>
                 <li><Link href="/crawl" className="text-sm text-white/65 hover:text-white/60 transition-colors">Competitor Crawler</Link></li>
-                <li><Link href="/immigration" className="text-sm text-white/65 hover:text-white/60 transition-colors">Immigration Compliance</Link></li>
               </ul>
             </div>
             <div>
