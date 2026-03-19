@@ -471,13 +471,13 @@ export default function HostingDashboard() {
 
           <div className="flex items-center gap-3">
             <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/50" />
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/60" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search sites..."
-                className="pl-9 pr-4 py-1.5 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 w-48 placeholder:text-white/50"
+                className="pl-9 pr-4 py-1.5 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 w-48 placeholder:text-white/60"
               />
             </div>
             <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-brand-500 to-accent-purple rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">
@@ -634,9 +634,9 @@ export default function HostingDashboard() {
                   dragOver ? "border-brand-500 bg-brand-500/5" : "border-white/10 hover:border-white/20"
                 }`}
               >
-                <Upload className="w-10 h-10 mx-auto mb-3 text-white/40" />
+                <Upload className="w-10 h-10 mx-auto mb-3 text-white/60" />
                 <p className="text-white/60 mb-1">Drag & drop your HTML, CSS, JS files here</p>
-                <p className="text-xs text-white/50">or click to browse — Max 100MB per deploy</p>
+                <p className="text-xs text-white/60">or click to browse — Max 100MB per deploy</p>
               </div>
             </motion.div>
 
@@ -658,13 +658,13 @@ export default function HostingDashboard() {
                 value={deployName}
                 onChange={(e) => setDeployName(e.target.value)}
                 placeholder="Site name (e.g., my-portfolio)"
-                className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/50 mb-3"
+                className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/60 mb-3"
               />
               <textarea
                 value={deployCode}
                 onChange={(e) => setDeployCode(e.target.value)}
                 placeholder="Paste your HTML code here..."
-                className="w-full h-24 px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/50 resize-none font-mono mb-3"
+                className="w-full h-24 px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/60 resize-none font-mono mb-3"
               />
               <button
                 onClick={handleDeploy}
@@ -691,12 +691,12 @@ export default function HostingDashboard() {
               <p className="text-sm text-white/65 mb-4">Install the Zoobicon CLI and deploy from your terminal.</p>
               <div className="bg-[#111a2e] rounded-lg p-4 font-mono text-sm border border-white/5">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-white/50 text-xs">Install CLI</span>
+                  <span className="text-white/60 text-xs">Install CLI</span>
                   <CopyButton text="npm i -g @zoobicon/cli" />
                 </div>
                 <p className="text-emerald-400">$ npm i -g @zoobicon/cli</p>
                 <div className="flex items-center justify-between mt-3 mb-2">
-                  <span className="text-white/50 text-xs">Deploy</span>
+                  <span className="text-white/60 text-xs">Deploy</span>
                   <CopyButton text="zb deploy" />
                 </div>
                 <p className="text-emerald-400">$ zb deploy</p>
@@ -713,7 +713,7 @@ export default function HostingDashboard() {
                   value={repoUrl}
                   onChange={(e) => setRepoUrl(e.target.value)}
                   placeholder="https://github.com/user/repo"
-                  className="flex-1 px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/50"
+                  className="flex-1 px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/60"
                 />
                 <button className="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 rounded-lg text-sm font-medium transition-colors">
                   Connect
@@ -742,7 +742,7 @@ export default function HostingDashboard() {
                       value={newDomain}
                       onChange={(e) => setNewDomain(e.target.value)}
                       placeholder="example.com"
-                      className="flex-1 px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/50"
+                      className="flex-1 px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/60"
                     />
                     <button onClick={handleAddDomain} className="px-4 py-2 bg-brand-500 hover:bg-brand-600 rounded-lg text-sm font-medium transition-colors">Add</button>
                     <button onClick={() => setShowAddDomain(false)} className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-sm transition-colors">Cancel</button>
@@ -1009,8 +1009,8 @@ export default function HostingDashboard() {
                     <select value={newRecordType} onChange={(e) => setNewRecordType(e.target.value)} className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 text-white">
                       {["A", "AAAA", "CNAME", "MX", "TXT", "NS", "SRV"].map((t) => <option key={t} value={t} className="bg-[#161f35]">{t}</option>)}
                     </select>
-                    <input value={newRecordName} onChange={(e) => setNewRecordName(e.target.value)} placeholder="Name (e.g. @, www)" className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/50 w-40" />
-                    <input value={newRecordValue} onChange={(e) => setNewRecordValue(e.target.value)} placeholder="Value" className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/50 flex-1 min-w-[200px]" />
+                    <input value={newRecordName} onChange={(e) => setNewRecordName(e.target.value)} placeholder="Name (e.g. @, www)" className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/60 w-40" />
+                    <input value={newRecordValue} onChange={(e) => setNewRecordValue(e.target.value)} placeholder="Value" className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/60 flex-1 min-w-[200px]" />
                     <button onClick={handleAddDnsRecord} className="px-4 py-2 bg-brand-500 hover:bg-brand-600 rounded-lg text-sm font-medium transition-colors">Add</button>
                     <button onClick={() => setShowAddRecord(false)} className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-sm transition-colors">Cancel</button>
                   </div>
@@ -1047,7 +1047,7 @@ export default function HostingDashboard() {
                         {r.proxied ? (
                           <span className="inline-flex items-center gap-1 text-xs text-amber-400"><Cloud className="w-3 h-3" /> Proxied</span>
                         ) : (
-                          <span className="text-xs text-white/50">DNS only</span>
+                          <span className="text-xs text-white/60">DNS only</span>
                         )}
                       </td>
                       <td className="px-4 py-3 text-right">
@@ -1137,7 +1137,7 @@ export default function HostingDashboard() {
                   <div key={item.label} className="p-4 rounded-lg bg-white/[0.06] border border-white/5 text-center">
                     <p className={`text-2xl font-bold ${item.color}`}>{item.value}</p>
                     <p className="text-xs text-white/60 mt-1">{item.label}</p>
-                    <p className="text-xs text-white/45 mt-0.5">{item.sub}</p>
+                    <p className="text-xs text-white/60 mt-0.5">{item.sub}</p>
                   </div>
                 ))}
               </div>
@@ -1182,9 +1182,9 @@ export default function HostingDashboard() {
                 {liveDeployments.filter((d) => d.env === envTab).map((d) => (
                   <div key={d.id} className="flex items-center gap-4 p-3 rounded-lg bg-white/[0.05] border border-white/5 hover:bg-white/[0.07] transition-colors">
                     <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <GitBranch className="w-4 h-4 text-white/50 shrink-0" />
+                      <GitBranch className="w-4 h-4 text-white/60 shrink-0" />
                       <span className="text-sm text-white/80 truncate">{d.commit}</span>
-                      <span className="text-xs text-white/50 font-mono">{d.hash}</span>
+                      <span className="text-xs text-white/60 font-mono">{d.hash}</span>
                     </div>
                     <span className="text-xs text-white/60 shrink-0">{d.time}</span>
                     <StatusBadge status={d.status} />

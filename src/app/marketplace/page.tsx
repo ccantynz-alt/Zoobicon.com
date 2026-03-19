@@ -320,7 +320,7 @@ export default function MarketplacePage() {
       <BackgroundEffects preset="technical" />
 
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#050508]/80 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
@@ -329,7 +329,7 @@ export default function MarketplacePage() {
               </div>
               <span className="text-lg font-bold tracking-tight">Zoobicon</span>
             </Link>
-            <span className="text-xs text-white/40">/</span>
+            <span className="text-xs text-white/60">/</span>
             <span className="text-sm text-white/65">Marketplace</span>
           </div>
           <Link href="/auth/signup" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white">
@@ -405,13 +405,13 @@ export default function MarketplacePage() {
             {/* Search */}
             <motion.div variants={fadeInUp} className="max-w-2xl flex items-center gap-3 mb-8">
               <div className="flex-1 flex items-center bg-white/[0.07] border border-white/[0.12] rounded-xl overflow-hidden focus-within:border-accent-purple/30 transition-colors">
-                <Search className="w-4 h-4 text-white/50 ml-4 flex-shrink-0" />
+                <Search className="w-4 h-4 text-white/60 ml-4 flex-shrink-0" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search add-ons, templates, agents..."
-                  className="flex-1 bg-transparent px-3 py-3 text-white placeholder:text-white/45 outline-none text-sm"
+                  className="flex-1 bg-transparent px-3 py-3 text-white placeholder:text-white/60 outline-none text-sm"
                 />
               </div>
               <div className="flex items-center gap-1 bg-white/[0.07] border border-white/[0.12] rounded-xl p-1">
@@ -422,7 +422,7 @@ export default function MarketplacePage() {
                     className={`px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                       priceFilter === filter
                         ? "bg-accent-purple/20 text-accent-purple"
-                        : "text-white/50 hover:text-white/65"
+                        : "text-white/60 hover:text-white/65"
                     }`}
                   >
                     {filter.charAt(0).toUpperCase() + filter.slice(1)}
@@ -441,7 +441,7 @@ export default function MarketplacePage() {
               ].map((stat) => (
                 <div key={stat.label} className="gradient-border p-4 rounded-xl text-center">
                   <div className="text-2xl font-black gradient-text-static">{stat.value}</div>
-                  <div className="text-xs text-white/50 mt-1">{stat.label}</div>
+                  <div className="text-xs text-white/60 mt-1">{stat.label}</div>
                 </div>
               ))}
             </motion.div>
@@ -479,8 +479,8 @@ export default function MarketplacePage() {
                             <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
                             <span className="text-xs text-white/65">{item.rating}</span>
                           </div>
-                          <span className="text-[10px] text-white/40">&bull;</span>
-                          <span className="text-xs text-white/50">{item.installs} installs</span>
+                          <span className="text-[10px] text-white/60">&bull;</span>
+                          <span className="text-xs text-white/60">{item.installs} installs</span>
                         </div>
                       </div>
                     </div>
@@ -522,8 +522,8 @@ export default function MarketplacePage() {
 
             {/* Results count */}
             <motion.div variants={fadeInUp} className="flex items-center gap-2 mb-6">
-              <Filter className="w-4 h-4 text-white/40" />
-              <span className="text-sm text-white/50">{filteredItems.length} add-ons</span>
+              <Filter className="w-4 h-4 text-white/60" />
+              <span className="text-sm text-white/60">{filteredItems.length} add-ons</span>
             </motion.div>
 
             {/* Grid */}
@@ -547,10 +547,10 @@ export default function MarketplacePage() {
                       </div>
                       <div className="min-w-0">
                         <h3 className="text-sm font-bold truncate group-hover:text-white transition-colors">{item.name}</h3>
-                        <span className="text-[10px] text-white/40">{item.category}</span>
+                        <span className="text-[10px] text-white/60">{item.category}</span>
                       </div>
                     </div>
-                    <p className="text-[11px] text-white/55 leading-relaxed mb-3 line-clamp-2">{item.description}</p>
+                    <p className="text-[11px] text-white/60 leading-relaxed mb-3 line-clamp-2">{item.description}</p>
                     <div className="flex items-center justify-between mt-auto">
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-0.5">
@@ -571,8 +571,8 @@ export default function MarketplacePage() {
             {filteredItems.length === 0 && (
               <div className="text-center py-20">
                 <Search className="w-12 h-12 text-white/30 mx-auto mb-4" />
-                <div className="text-lg font-bold text-white/50 mb-2">No add-ons found</div>
-                <div className="text-sm text-white/40">Try a different search or category</div>
+                <div className="text-lg font-bold text-white/60 mb-2">No add-ons found</div>
+                <div className="text-sm text-white/60">Try a different search or category</div>
               </div>
             )}
           </motion.div>
@@ -624,7 +624,7 @@ export default function MarketplacePage() {
                     <div className="text-center">
                       <Code2 className="w-16 h-16 text-accent-purple/40 mx-auto mb-4" />
                       <div className="text-3xl font-black gradient-text-static">80%</div>
-                      <div className="text-xs text-white/50 mt-1">Revenue Share</div>
+                      <div className="text-xs text-white/60 mt-1">Revenue Share</div>
                     </div>
                   </div>
                 </div>
@@ -651,11 +651,11 @@ export default function MarketplacePage() {
 
       <footer className="border-t border-white/[0.08] py-8">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <div className="text-xs text-white/40">&copy; 2026 Zoobicon</div>
+          <div className="text-xs text-white/60">&copy; 2026 Zoobicon</div>
           <div className="flex gap-4">
-            <Link href="/" className="text-xs text-white/40 hover:text-white/60">Home</Link>
-            <Link href="/domains" className="text-xs text-white/40 hover:text-white/60">Domains</Link>
-            <Link href="/products/website-builder" className="text-xs text-white/40 hover:text-white/60">Builder</Link>
+            <Link href="/" className="text-xs text-white/60 hover:text-white/60">Home</Link>
+            <Link href="/domains" className="text-xs text-white/60 hover:text-white/60">Domains</Link>
+            <Link href="/products/website-builder" className="text-xs text-white/60 hover:text-white/60">Builder</Link>
           </div>
         </div>
       </footer>

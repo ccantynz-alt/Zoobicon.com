@@ -261,7 +261,7 @@ export default function PricingPage() {
       <BackgroundEffects preset="technical" />
 
       {/* Nav */}
-      <nav className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#050508]/80 backdrop-blur-2xl">
+      <nav className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
@@ -339,15 +339,15 @@ export default function PricingPage() {
                     <div className={`text-sm font-semibold mb-2 ${plan.featured ? "text-brand-400" : "text-white/65"}`}>{plan.name}</div>
                     <div className="flex items-baseline gap-1 mb-1">
                       <span className="text-4xl font-black">{plan.price}</span>
-                      {plan.period && <span className="text-white/50 text-sm">{plan.period}</span>}
+                      {plan.period && <span className="text-white/60 text-sm">{plan.period}</span>}
                     </div>
-                    <p className="text-xs text-white/50 leading-relaxed">{plan.desc}</p>
+                    <p className="text-xs text-white/60 leading-relaxed">{plan.desc}</p>
                   </div>
 
                   <ul className="space-y-3 mb-8 flex-1">
                     {plan.features.map((f) => (
                       <li key={f} className="flex items-start gap-2">
-                        <Check className={`w-3.5 h-3.5 flex-shrink-0 mt-0.5 ${plan.featured ? "text-brand-400" : "text-white/50"}`} />
+                        <Check className={`w-3.5 h-3.5 flex-shrink-0 mt-0.5 ${plan.featured ? "text-brand-400" : "text-white/60"}`} />
                         <span className="text-sm text-white/65">{f}{SOON_FEATURES.has(f) && <SoonBadge />}</span>
                       </li>
                     ))}
@@ -392,13 +392,13 @@ export default function PricingPage() {
           <div className="max-w-4xl mx-auto">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer}>
               <motion.h2 variants={fadeInUp} className="text-3xl font-black text-center mb-2">What&apos;s included</motion.h2>
-              <motion.p variants={fadeInUp} className="text-white/50 text-center mb-10">Every AI product, broken down by plan. No credits. No surprises.</motion.p>
+              <motion.p variants={fadeInUp} className="text-white/60 text-center mb-10">Every AI product, broken down by plan. No credits. No surprises.</motion.p>
 
               <motion.div variants={fadeInUp} className="gradient-border rounded-2xl overflow-hidden overflow-x-auto">
                 {/* Header */}
                 <div className="grid grid-cols-6 gap-0 border-b border-white/[0.10] min-w-[800px]">
-                  <div className="px-4 py-4 text-xs font-semibold text-white/50 uppercase tracking-wider">Product</div>
-                  <div className="px-3 py-4 text-xs font-semibold text-white/50 uppercase tracking-wider text-center">Starter</div>
+                  <div className="px-4 py-4 text-xs font-semibold text-white/60 uppercase tracking-wider">Product</div>
+                  <div className="px-3 py-4 text-xs font-semibold text-white/60 uppercase tracking-wider text-center">Starter</div>
                   <div className="px-3 py-4 text-xs font-semibold text-emerald-400 uppercase tracking-wider text-center bg-emerald-500/[0.03]">Creator</div>
                   <div className="px-3 py-4 text-xs font-semibold text-brand-400 uppercase tracking-wider text-center bg-brand-500/[0.03]">Pro</div>
                   <div className="px-3 py-4 text-xs font-semibold text-purple-400 uppercase tracking-wider text-center bg-purple-500/[0.03]">Agency</div>
@@ -408,7 +408,7 @@ export default function PricingPage() {
                 {PRODUCTS.map((p, i) => (
                   <div key={p.name} className={`grid grid-cols-6 gap-0 border-b border-white/[0.07] min-w-[800px] ${i % 2 === 0 ? "" : "bg-white/[0.04]"}`}>
                     <div className="px-4 py-3 flex items-center gap-2">
-                      <p.icon className="w-3.5 h-3.5 text-white/50 flex-shrink-0" />
+                      <p.icon className="w-3.5 h-3.5 text-white/60 flex-shrink-0" />
                       <span className="text-xs text-white/60">{p.name}{SOON_PRODUCTS.has(p.name) && <SoonBadge />}</span>
                     </div>
                     {(["starter", "creator", "pro", "agency", "enterprise"] as const).map((tier) => {
@@ -448,7 +448,7 @@ export default function PricingPage() {
                 <Plus className="w-5 h-5 text-brand-400" />
                 <h2 className="text-3xl font-black">Power up your plan</h2>
               </motion.div>
-              <motion.p variants={fadeInUp} className="text-white/50 text-center mb-4 max-w-xl mx-auto">
+              <motion.p variants={fadeInUp} className="text-white/60 text-center mb-4 max-w-xl mx-auto">
                 Add individual AI agents and tools to any plan. Pay only for what you need.
               </motion.p>
               <motion.p variants={fadeInUp} className="text-xs text-brand-400/60 text-center mb-10">
@@ -477,11 +477,11 @@ export default function PricingPage() {
                         </div>
                         <div className="text-right">
                           <span className="text-sm font-black text-white">{addon.price}</span>
-                          <span className="text-[10px] text-white/50 ml-0.5">{addon.period}</span>
+                          <span className="text-[10px] text-white/60 ml-0.5">{addon.period}</span>
                         </div>
                       </div>
-                      <p className="text-xs text-white/50 leading-relaxed">{addon.desc}</p>
-                      <div className="mt-3 text-[10px] font-semibold text-white/40 group-hover:text-white/60 transition-colors flex items-center gap-1">
+                      <p className="text-xs text-white/60 leading-relaxed">{addon.desc}</p>
+                      <div className="mt-3 text-[10px] font-semibold text-white/60 group-hover:text-white/60 transition-colors flex items-center gap-1">
                         Add to plan <ArrowRight className="w-2.5 h-2.5" />
                       </div>
                     </Link>
@@ -505,7 +505,7 @@ export default function PricingPage() {
           <div className="max-w-5xl mx-auto">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer}>
               <motion.h2 variants={fadeInUp} className="text-3xl font-black text-center mb-2">Launch the complete stack</motion.h2>
-              <motion.p variants={fadeInUp} className="text-white/50 text-center mb-10 max-w-lg mx-auto">Domain, hosting, SSL, email — everything to go live. Bundle and save.</motion.p>
+              <motion.p variants={fadeInUp} className="text-white/60 text-center mb-10 max-w-lg mx-auto">Domain, hosting, SSL, email — everything to go live. Bundle and save.</motion.p>
 
               <motion.div variants={staggerContainer} className="grid md:grid-cols-3 gap-5">
                 {/* Domain */}
@@ -515,7 +515,7 @@ export default function PricingPage() {
                     <h3 className="text-lg font-bold mb-1">Custom Domain<SoonBadge /></h3>
                     <div className="flex items-baseline gap-1 mb-3">
                       <span className="text-2xl font-black">$2.99</span>
-                      <span className="text-sm text-white/50">/year</span>
+                      <span className="text-sm text-white/60">/year</span>
                     </div>
                     <ul className="space-y-2 mb-4">
                       {[".com from $12.99/yr", ".ai from $69.99/yr", ".io, .dev, .app available", "Free WHOIS privacy included"].map((f) => (
@@ -524,7 +524,7 @@ export default function PricingPage() {
                         </li>
                       ))}
                     </ul>
-                    <span className="text-xs text-white/40 group-hover:text-brand-400 transition-colors flex items-center gap-1 font-medium">
+                    <span className="text-xs text-white/60 group-hover:text-brand-400 transition-colors flex items-center gap-1 font-medium">
                       Browse domains <ArrowRight className="w-3 h-3" />
                     </span>
                   </Link>
@@ -537,7 +537,7 @@ export default function PricingPage() {
                     <h3 className="text-lg font-bold mb-1">Premium Hosting</h3>
                     <div className="flex items-baseline gap-1 mb-3">
                       <span className="text-2xl font-black">$12.99</span>
-                      <span className="text-sm text-white/50">/month</span>
+                      <span className="text-sm text-white/60">/month</span>
                     </div>
                     <ul className="space-y-2 mb-4">
                       {["Global CDN (300+ edge nodes)", "99.99% uptime SLA", "Auto SSL & DDoS protection", "Instant rollbacks & staging"].map((f) => (
@@ -546,7 +546,7 @@ export default function PricingPage() {
                         </li>
                       ))}
                     </ul>
-                    <span className="text-xs text-white/40 group-hover:text-accent-cyan transition-colors flex items-center gap-1 font-medium">
+                    <span className="text-xs text-white/60 group-hover:text-accent-cyan transition-colors flex items-center gap-1 font-medium">
                       View hosting <ArrowRight className="w-3 h-3" />
                     </span>
                   </Link>
@@ -559,7 +559,7 @@ export default function PricingPage() {
                     <h3 className="text-lg font-bold mb-1">Email + Security<SoonBadge /></h3>
                     <div className="flex items-baseline gap-1 mb-3">
                       <span className="text-2xl font-black">$14.98</span>
-                      <span className="text-sm text-white/50">/month</span>
+                      <span className="text-sm text-white/60">/month</span>
                     </div>
                     <ul className="space-y-2 mb-4">
                       {["Professional email (you@domain)", "10GB storage per mailbox", "Wildcard SSL certificate", "Malware scanning & firewall"].map((f) => (
@@ -568,7 +568,7 @@ export default function PricingPage() {
                         </li>
                       ))}
                     </ul>
-                    <div className="flex items-center gap-1.5 text-[10px] text-white/40">
+                    <div className="flex items-center gap-1.5 text-[10px] text-white/60">
                       <Lock className="w-3 h-3" /> Email $4.99/mo + SSL & Security $9.99/mo
                     </div>
                   </div>
@@ -583,7 +583,7 @@ export default function PricingPage() {
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-right">
-                    <div className="text-xs text-white/40 line-through">$51.96/mo + domain</div>
+                    <div className="text-xs text-white/60 line-through">$51.96/mo + domain</div>
                     <div className="text-sm font-black text-brand-400">From $46.98/mo + $2.99/yr</div>
                   </div>
                   <Link href="/domains" className="btn-gradient px-5 py-2.5 rounded-lg text-xs font-bold text-white whitespace-nowrap flex items-center gap-1.5">
@@ -629,10 +629,10 @@ export default function PricingPage() {
           <div className="max-w-3xl mx-auto">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer}>
               <motion.div variants={fadeInUp} className="flex items-center gap-2 justify-center mb-2">
-                <HelpCircle className="w-5 h-5 text-white/50" />
+                <HelpCircle className="w-5 h-5 text-white/60" />
                 <h2 className="text-3xl font-black">FAQ</h2>
               </motion.div>
-              <motion.p variants={fadeInUp} className="text-white/50 text-center mb-12">Everything you need to know.</motion.p>
+              <motion.p variants={fadeInUp} className="text-white/60 text-center mb-12">Everything you need to know.</motion.p>
 
               <motion.div variants={staggerContainer} className="space-y-4">
                 {FAQS.map((faq) => (

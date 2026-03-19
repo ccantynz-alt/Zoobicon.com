@@ -201,7 +201,7 @@ export default function DomainsPage() {
     <div className="relative min-h-screen">
       <BackgroundEffects preset="technical" />
 
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#050508]/80 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
@@ -210,7 +210,7 @@ export default function DomainsPage() {
               </div>
               <span className="text-lg font-bold tracking-tight">Zoobicon</span>
             </Link>
-            <span className="text-xs text-white/40">/</span>
+            <span className="text-xs text-white/60">/</span>
             <span className="text-sm text-white/65">Domains</span>
           </div>
           <div className="flex items-center gap-4">
@@ -260,13 +260,13 @@ export default function DomainsPage() {
             <motion.div variants={fadeInUp} className="max-w-3xl">
               <form onSubmit={handleSearch} className="relative">
                 <div className="flex items-center bg-white/[0.07] border border-white/[0.12] rounded-2xl overflow-hidden focus-within:border-accent-cyan/30 transition-colors">
-                  <Search className="w-5 h-5 text-white/50 ml-5 flex-shrink-0" />
+                  <Search className="w-5 h-5 text-white/60 ml-5 flex-shrink-0" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search for your perfect domain name..."
-                    className="flex-1 bg-transparent px-4 py-5 text-white placeholder:text-white/45 outline-none text-lg"
+                    className="flex-1 bg-transparent px-4 py-5 text-white placeholder:text-white/60 outline-none text-lg"
                   />
                   <button
                     type="submit"
@@ -298,7 +298,7 @@ export default function DomainsPage() {
                   className="mt-4 border border-white/[0.10] rounded-2xl overflow-hidden bg-dark-300/80 backdrop-blur-xl"
                 >
                   <div className="p-4 border-b border-white/[0.10]">
-                    <div className="text-xs text-white/50 font-medium uppercase tracking-wider">
+                    <div className="text-xs text-white/60 font-medium uppercase tracking-wider">
                       {searchResults.filter((r) => r.available).length} of {searchResults.length} domains available
                     </div>
                   </div>
@@ -326,7 +326,7 @@ export default function DomainsPage() {
                         <div className="flex items-center gap-4">
                           <span className="text-lg font-black">
                             ${result.price?.toFixed(2) || "14.99"}
-                            <span className="text-xs text-white/50 font-normal">/yr</span>
+                            <span className="text-xs text-white/60 font-normal">/yr</span>
                           </span>
                           {result.available ? (
                             <button
@@ -357,7 +357,7 @@ export default function DomainsPage() {
                       <div className="flex items-center justify-between">
                         <div>
                           <span className="text-sm font-bold">{cart.length} domain{cart.length > 1 ? "s" : ""} selected</span>
-                          <span className="text-xs text-white/50 ml-2">Total: ${cartTotal.toFixed(2)}/yr</span>
+                          <span className="text-xs text-white/60 ml-2">Total: ${cartTotal.toFixed(2)}/yr</span>
                         </div>
                         <button
                           onClick={() => setShowCheckout(true)}
@@ -383,7 +383,7 @@ export default function DomainsPage() {
               ].map((stat) => (
                 <div key={stat.label} className="gradient-border p-4 rounded-xl text-center">
                   <div className="text-2xl font-black gradient-text-static">{stat.value}</div>
-                  <div className="text-xs text-white/50 mt-1">{stat.label}</div>
+                  <div className="text-xs text-white/60 mt-1">{stat.label}</div>
                 </div>
               ))}
             </motion.div>
@@ -421,15 +421,15 @@ export default function DomainsPage() {
                     <div className="text-right">
                       <div className="text-2xl font-black">
                         ${tld.price}
-                        <span className="text-xs text-white/50 font-normal">/yr</span>
+                        <span className="text-xs text-white/60 font-normal">/yr</span>
                       </div>
-                      <div className="text-[10px] text-white/40">
+                      <div className="text-[10px] text-white/60">
                         Renews at ${tld.renewal}/yr
                       </div>
                     </div>
                   </div>
                   <p className="text-sm text-white/60 mb-4">{tld.desc}</p>
-                  <div className="flex items-center gap-2 text-[10px] text-white/40">
+                  <div className="flex items-center gap-2 text-[10px] text-white/60">
                     <Shield className="w-3 h-3" />
                     <span>Free WHOIS Privacy</span>
                     <span className="mx-1">•</span>
@@ -556,7 +556,7 @@ export default function DomainsPage() {
                     <div className="text-center">
                       <Globe className="w-16 h-16 text-accent-cyan/40 mx-auto mb-4" />
                       <div className="text-3xl font-black gradient-text-static">$8.99</div>
-                      <div className="text-xs text-white/50 mt-1">Domain + AI Site</div>
+                      <div className="text-xs text-white/60 mt-1">Domain + AI Site</div>
                     </div>
                   </div>
                 </div>
@@ -587,11 +587,11 @@ export default function DomainsPage() {
 
       <footer className="border-t border-white/[0.08] py-8">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <div className="text-xs text-white/40">&copy; 2026 Zoobicon</div>
+          <div className="text-xs text-white/60">&copy; 2026 Zoobicon</div>
           <div className="flex gap-4">
-            <Link href="/" className="text-xs text-white/40 hover:text-white/60">Home</Link>
-            <Link href="/products/website-builder" className="text-xs text-white/40 hover:text-white/60">Builder</Link>
-            <Link href="/marketplace" className="text-xs text-white/40 hover:text-white/60">Marketplace</Link>
+            <Link href="/" className="text-xs text-white/60 hover:text-white/60">Home</Link>
+            <Link href="/products/website-builder" className="text-xs text-white/60 hover:text-white/60">Builder</Link>
+            <Link href="/marketplace" className="text-xs text-white/60 hover:text-white/60">Marketplace</Link>
           </div>
         </div>
       </footer>
@@ -603,11 +603,11 @@ export default function DomainsPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-[#050508] border border-white/[0.12] rounded-2xl shadow-2xl"
+            className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-[#0a0a12] border border-white/[0.12] rounded-2xl shadow-2xl"
           >
-            <div className="sticky top-0 bg-[#050508] border-b border-white/[0.10] p-6 flex items-center justify-between z-10">
+            <div className="sticky top-0 bg-[#0a0a12] border-b border-white/[0.10] p-6 flex items-center justify-between z-10">
               <h3 className="text-xl font-black">Register Domains</h3>
-              <button onClick={() => setShowCheckout(false)} className="text-white/40 hover:text-white">
+              <button onClick={() => setShowCheckout(false)} className="text-white/60 hover:text-white">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -624,7 +624,7 @@ export default function DomainsPage() {
                         <span className="font-semibold">{item.domain}</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="font-bold">${item.price.toFixed(2)}<span className="text-xs text-white/50 font-normal">/yr</span></span>
+                        <span className="font-bold">${item.price.toFixed(2)}<span className="text-xs text-white/60 font-normal">/yr</span></span>
                         <button onClick={() => removeFromCart(item.domain)} className="text-white/30 hover:text-red-400 transition-colors">
                           <X className="w-4 h-4" />
                         </button>
@@ -671,7 +671,7 @@ export default function DomainsPage() {
                       { key: "phone", label: "Phone", type: "tel", placeholder: "+1.5551234567" },
                     ].map((field) => (
                       <div key={field.key}>
-                        <label className="text-xs text-white/50 mb-1 block">{field.label}</label>
+                        <label className="text-xs text-white/60 mb-1 block">{field.label}</label>
                         <input
                           type={field.type}
                           required
@@ -683,7 +683,7 @@ export default function DomainsPage() {
                       </div>
                     ))}
                     <div className="col-span-2">
-                      <label className="text-xs text-white/50 mb-1 block">Street Address</label>
+                      <label className="text-xs text-white/60 mb-1 block">Street Address</label>
                       <input
                         type="text"
                         required
@@ -700,7 +700,7 @@ export default function DomainsPage() {
                       { key: "country", label: "Country Code", placeholder: "US" },
                     ].map((field) => (
                       <div key={field.key}>
-                        <label className="text-xs text-white/50 mb-1 block">{field.label}</label>
+                        <label className="text-xs text-white/60 mb-1 block">{field.label}</label>
                         <input
                           type="text"
                           required

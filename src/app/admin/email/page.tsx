@@ -254,11 +254,11 @@ export default function AdminEmailPage() {
   const toggleSelectAll = () => setSelected(selected.size === emails.length ? new Set() : new Set(emails.map((e) => e.id)));
 
   return (
-    <div className="min-h-screen bg-[#050508] text-white relative">
+    <div className="min-h-screen bg-[#131520] text-white relative">
       <BackgroundEffects preset="admin" />
 
       {/* Navbar */}
-      <nav className="relative z-20 border-b border-white/10 bg-[#111318]/90 backdrop-blur-md">
+      <nav className="relative z-20 border-b border-white/10 bg-[#131520]/90 backdrop-blur-2xl">
         <div className="max-w-[1440px] mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/" className="text-lg font-bold tracking-tight">Zoobicon</Link>
@@ -410,7 +410,7 @@ export default function AdminEmailPage() {
                       <span className="text-sm font-medium text-white/90">{selectedEmail.from_address}</span>
                       <span className="text-xs text-white/30">{fullDate(selectedEmail.received_at)}</span>
                     </div>
-                    <p className="text-xs text-white/50 mt-0.5">To: {selectedEmail.to_address}</p>
+                    <p className="text-xs text-white/60 mt-0.5">To: {selectedEmail.to_address}</p>
                   </div>
                 </div>
               </div>
@@ -519,7 +519,7 @@ export default function AdminEmailPage() {
                           {EMAIL_TEMPLATES.map((t, i) => (
                             <button key={i} onClick={() => applyTemplate(t)} className="w-full text-left px-3 py-2.5 hover:bg-white/5 transition-colors border-b border-white/10 last:border-0">
                               <span className="text-xs font-medium text-white/90">{t.name}</span>
-                              <p className="text-[10px] text-white/50 mt-0.5 truncate">{t.body.substring(0, 60)}...</p>
+                              <p className="text-[10px] text-white/60 mt-0.5 truncate">{t.body.substring(0, 60)}...</p>
                             </button>
                           ))}
                         </motion.div>
@@ -577,7 +577,7 @@ export default function AdminEmailPage() {
                       <Clock className="w-4 h-4 text-orange-400" />
                       <span className="text-xs text-orange-300 font-medium">Send Later:</span>
                       <input type="datetime-local" value={scheduleTime} onChange={(e) => setScheduleTime(e.target.value)} className="bg-black/20 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-orange-500/40" />
-                      <span className="text-[10px] text-white/50">Email will be queued and sent at the scheduled time</span>
+                      <span className="text-[10px] text-white/60">Email will be queued and sent at the scheduled time</span>
                     </div>
                   </motion.div>
                 )}

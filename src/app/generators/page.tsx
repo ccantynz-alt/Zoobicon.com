@@ -127,7 +127,7 @@ export default function GeneratorsPage() {
     <div className="min-h-screen text-white relative">
       <BackgroundEffects preset="technical" />
       {/* Nav */}
-      <nav className="sticky top-0 z-50 border-b border-white/[0.10] bg-[#050508]/80 backdrop-blur-xl">
+      <nav className="sticky top-0 z-50 border-b border-white/[0.10] bg-[#0a0a12]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center">

@@ -659,15 +659,15 @@ export default function EmailSupportDashboard() {
           <span className="text-sm font-medium text-white/60">Email Support</span>
         </div>
         <div className="flex items-center gap-2">
-          <Link href="/dashboard" className="text-xs text-white/50 hover:text-white/80 transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5 flex items-center gap-1.5">
+          <Link href="/dashboard" className="text-xs text-white/60 hover:text-white/80 transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5 flex items-center gap-1.5">
             <LayoutDashboard className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Dashboard</span>
           </Link>
-          <Link href="/builder" className="text-xs text-white/50 hover:text-white/80 transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5 flex items-center gap-1.5">
+          <Link href="/builder" className="text-xs text-white/60 hover:text-white/80 transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5 flex items-center gap-1.5">
             <Hammer className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Builder</span>
           </Link>
-          <button onClick={handleLogout} className="text-xs text-white/50 hover:text-white/80 transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5 flex items-center gap-1.5">
+          <button onClick={handleLogout} className="text-xs text-white/60 hover:text-white/80 transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5 flex items-center gap-1.5">
             <LogOut className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Sign out</span>
           </button>
@@ -694,22 +694,22 @@ export default function EmailSupportDashboard() {
       <div className="h-12 border-b border-white/[0.06] bg-gray-900/50 flex items-center px-4 gap-6 shrink-0 overflow-x-auto">
         <div className="flex items-center gap-2 text-xs">
           <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-          <span className="text-white/40">Open</span>
+          <span className="text-white/60">Open</span>
           <span className="font-bold text-white/80">{stats.open}</span>
         </div>
         <div className="flex items-center gap-2 text-xs">
           <Clock className="w-3 h-3 text-white/30" />
-          <span className="text-white/40">Avg Response</span>
+          <span className="text-white/60">Avg Response</span>
           <span className="font-bold text-white/80">{stats.avgResponse}</span>
         </div>
         <div className="flex items-center gap-2 text-xs">
           <BarChart3 className="w-3 h-3 text-white/30" />
-          <span className="text-white/40">Resolution Rate</span>
+          <span className="text-white/60">Resolution Rate</span>
           <span className="font-bold text-emerald-400">{stats.resolutionRate}%</span>
         </div>
         <div className="flex items-center gap-2 text-xs">
           <Bot className="w-3 h-3 text-white/30" />
-          <span className="text-white/40">AI Replies</span>
+          <span className="text-white/60">AI Replies</span>
           <span className="font-bold text-purple-400">{stats.aiReplies}</span>
         </div>
       </div>
@@ -736,7 +736,7 @@ export default function EmailSupportDashboard() {
                 className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-all ${
                   activeFolder === f.key
                     ? "bg-white/[0.08] text-white font-medium"
-                    : "text-white/50 hover:bg-white/[0.04] hover:text-white/70"
+                    : "text-white/60 hover:bg-white/[0.04] hover:text-white/70"
                 }`}
               >
                 <div className="flex items-center gap-2.5">
@@ -754,7 +754,7 @@ export default function EmailSupportDashboard() {
           <div className="p-3 border-t border-white/[0.06]">
             <Link
               href="/products/email-support"
-              className="flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] text-white/30 hover:text-white/50 hover:bg-white/[0.04] transition-all"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] text-white/30 hover:text-white/60 hover:bg-white/[0.04] transition-all"
             >
               <ArrowLeft className="w-3 h-3" />
               Back to Product Page
@@ -779,7 +779,7 @@ export default function EmailSupportDashboard() {
               <button
                 onClick={() => setShowFilters(!showFilters)}
                 className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] border transition-all ${
-                  showFilters ? "bg-white/[0.08] border-white/[0.12] text-white/70" : "border-white/[0.06] text-white/40 hover:text-white/60"
+                  showFilters ? "bg-white/[0.08] border-white/[0.12] text-white/70" : "border-white/[0.06] text-white/60 hover:text-white/60"
                 }`}
               >
                 <Filter className="w-3 h-3" />
@@ -787,7 +787,7 @@ export default function EmailSupportDashboard() {
               </button>
               <button
                 onClick={() => setSortBy(sortBy === "newest" ? "oldest" : sortBy === "oldest" ? "priority" : "newest")}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] border border-white/[0.06] text-white/40 hover:text-white/60 transition-all"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] border border-white/[0.06] text-white/60 hover:text-white/60 transition-all"
               >
                 <ArrowUpDown className="w-3 h-3" />
                 {sortBy === "newest" ? "Newest" : sortBy === "oldest" ? "Oldest" : "Priority"}
@@ -809,7 +809,7 @@ export default function EmailSupportDashboard() {
                         className={`px-2.5 py-1 rounded-full text-[10px] font-medium border transition-all ${
                           filterPriority === p
                             ? "bg-blue-500/15 border-blue-500/30 text-blue-400"
-                            : "border-white/[0.08] text-white/40 hover:text-white/60"
+                            : "border-white/[0.08] text-white/60 hover:text-white/60"
                         }`}
                       >
                         {p === "all" ? "All Priorities" : p.charAt(0).toUpperCase() + p.slice(1)}
@@ -854,7 +854,7 @@ export default function EmailSupportDashboard() {
                     {ticket.subject}
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-white/40 truncate max-w-[60%]">{ticket.customerName}</span>
+                    <span className="text-[10px] text-white/60 truncate max-w-[60%]">{ticket.customerName}</span>
                     <span className="text-[10px] text-white/25">{timeAgo(ticket.createdAt)}</span>
                   </div>
                   <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
@@ -868,7 +868,7 @@ export default function EmailSupportDashboard() {
                       );
                     })()}
                     {ticket.assignee && (
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/[0.06] text-[8px] text-white/40 font-medium">
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/[0.06] text-[8px] text-white/60 font-medium">
                         <UserCircle className="w-2.5 h-2.5" />
                         {ticket.assignee}
                       </span>
@@ -899,7 +899,7 @@ export default function EmailSupportDashboard() {
                   <div className="min-w-0">
                     <h2 className="text-base font-bold text-white/90 truncate">{selectedTicket.subject}</h2>
                     <div className="flex items-center gap-3 mt-1.5">
-                      <span className="text-[11px] text-white/45">
+                      <span className="text-[11px] text-white/60">
                         <span className="text-white/60 font-medium">{selectedTicket.customerName}</span>
                         {" "}&lt;{selectedTicket.from}&gt;
                       </span>
@@ -909,7 +909,7 @@ export default function EmailSupportDashboard() {
                       <div className="flex items-center gap-1.5 mt-2">
                         <Tag className="w-3 h-3 text-white/20" />
                         {selectedTicket.tags.map((tag) => (
-                          <span key={tag} className="px-2 py-0.5 rounded-full bg-white/[0.06] text-[9px] text-white/40 font-medium">
+                          <span key={tag} className="px-2 py-0.5 rounded-full bg-white/[0.06] text-[9px] text-white/60 font-medium">
                             {tag}
                           </span>
                         ))}
@@ -934,7 +934,7 @@ export default function EmailSupportDashboard() {
                     <div className="relative">
                       <button
                         onClick={() => setShowAssignDropdown(!showAssignDropdown)}
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-white/[0.08] text-[11px] text-white/50 hover:text-white/70 hover:bg-white/[0.04] transition-all"
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-white/[0.08] text-[11px] text-white/60 hover:text-white/70 hover:bg-white/[0.04] transition-all"
                       >
                         <UserPlus className="w-3.5 h-3.5" />
                         Assign
@@ -972,7 +972,7 @@ export default function EmailSupportDashboard() {
                     <div className="relative">
                       <button
                         onClick={() => setShowActions(!showActions)}
-                        className="p-2 rounded-lg border border-white/[0.08] text-white/40 hover:text-white/60 hover:bg-white/[0.04] transition-all"
+                        className="p-2 rounded-lg border border-white/[0.08] text-white/60 hover:text-white/60 hover:bg-white/[0.04] transition-all"
                       >
                         <MoreHorizontal className="w-4 h-4" />
                       </button>
@@ -1034,7 +1034,7 @@ export default function EmailSupportDashboard() {
                     {selectedTicket.priority}
                   </span>
                   {selectedTicket.assignee && (
-                    <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-white/[0.06] text-[10px] text-white/50">
+                    <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-white/[0.06] text-[10px] text-white/60">
                       <UserCircle className="w-3 h-3" />
                       {selectedTicket.assignee}
                     </span>
@@ -1077,7 +1077,7 @@ export default function EmailSupportDashboard() {
                     className={`flex gap-3 ${msg.from === "customer" ? "" : "justify-end"}`}
                   >
                     {msg.from === "customer" && (
-                      <div className="w-8 h-8 rounded-full bg-white/[0.08] flex items-center justify-center text-[11px] font-bold text-white/50 shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-white/[0.08] flex items-center justify-center text-[11px] font-bold text-white/60 shrink-0">
                         {selectedTicket.customerName.charAt(0)}
                       </div>
                     )}
@@ -1114,7 +1114,7 @@ export default function EmailSupportDashboard() {
                         </div>
                       )}
                       <p className="text-sm text-white/90 leading-relaxed whitespace-pre-wrap">{msg.body}</p>
-                      <div className="text-[10px] text-white/45 mt-2">{formatDate(msg.timestamp)}</div>
+                      <div className="text-[10px] text-white/60 mt-2">{formatDate(msg.timestamp)}</div>
                     </div>
                     {msg.from !== "customer" && (
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
@@ -1154,7 +1154,7 @@ export default function EmailSupportDashboard() {
                     <button
                       onClick={() => setShowCannedResponses(!showCannedResponses)}
                       className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] border transition-all ${
-                        showCannedResponses ? "bg-amber-500/10 border-amber-500/20 text-amber-400" : "border-white/[0.06] text-white/40 hover:text-white/60"
+                        showCannedResponses ? "bg-amber-500/10 border-amber-500/20 text-amber-400" : "border-white/[0.06] text-white/60 hover:text-white/60"
                       }`}
                     >
                       <Zap className="w-3 h-3" />
@@ -1170,7 +1170,7 @@ export default function EmailSupportDashboard() {
                           className="absolute left-0 bottom-full mb-1 w-72 bg-gray-900 border border-white/[0.10] rounded-xl shadow-2xl overflow-hidden z-50"
                         >
                           <div className="px-3 py-2 border-b border-white/[0.06]">
-                            <span className="text-[10px] font-bold text-white/40 uppercase tracking-wider">Quick Replies</span>
+                            <span className="text-[10px] font-bold text-white/60 uppercase tracking-wider">Quick Replies</span>
                           </div>
                           {CANNED_RESPONSES.map((resp, i) => (
                             <button
@@ -1179,7 +1179,7 @@ export default function EmailSupportDashboard() {
                               className="w-full text-left px-3 py-2.5 text-xs text-white/60 hover:bg-white/[0.06] hover:text-white/80 transition-all border-b border-white/[0.04] last:border-0"
                             >
                               <span className="font-semibold text-white/70 block mb-0.5">{resp.label}</span>
-                              <span className="text-[10px] text-white/40 line-clamp-1">{resp.text}</span>
+                              <span className="text-[10px] text-white/60 line-clamp-1">{resp.text}</span>
                             </button>
                           ))}
                         </motion.div>
@@ -1189,7 +1189,7 @@ export default function EmailSupportDashboard() {
                   <button
                     onClick={() => setIsInternalNote(!isInternalNote)}
                     className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] border transition-all ${
-                      isInternalNote ? "bg-amber-500/15 border-amber-500/25 text-amber-400" : "border-white/[0.06] text-white/40 hover:text-white/60"
+                      isInternalNote ? "bg-amber-500/15 border-amber-500/25 text-amber-400" : "border-white/[0.06] text-white/60 hover:text-white/60"
                     }`}
                   >
                     <Lock className="w-3 h-3" />
@@ -1267,8 +1267,8 @@ export default function EmailSupportDashboard() {
               <div className="w-56 border-l border-white/[0.06] bg-gray-900/50 shrink-0 overflow-y-auto">
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-[10px] font-bold text-white/40 uppercase tracking-wider">Customer</span>
-                    <button onClick={() => setShowCustomerSidebar(false)} className="p-0.5 rounded hover:bg-white/[0.06] text-white/30 hover:text-white/50 transition-all">
+                    <span className="text-[10px] font-bold text-white/60 uppercase tracking-wider">Customer</span>
+                    <button onClick={() => setShowCustomerSidebar(false)} className="p-0.5 rounded hover:bg-white/[0.06] text-white/30 hover:text-white/60 transition-all">
                       <ChevronRight className="w-3 h-3" />
                     </button>
                   </div>
@@ -1278,16 +1278,16 @@ export default function EmailSupportDashboard() {
                       {selectedTicket.customerName.charAt(0)}
                     </div>
                     <span className="text-xs font-semibold text-white/80">{selectedTicket.customerName}</span>
-                    <span className="text-[10px] text-white/40">{selectedTicket.from}</span>
+                    <span className="text-[10px] text-white/60">{selectedTicket.from}</span>
                   </div>
                   {/* Stats */}
                   <div className="space-y-2.5 mb-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] text-white/35 flex items-center gap-1.5"><MessageSquare className="w-3 h-3" /> Total Tickets</span>
+                      <span className="text-[10px] text-white/60 flex items-center gap-1.5"><MessageSquare className="w-3 h-3" /> Total Tickets</span>
                       <span className="text-[10px] font-bold text-white/70">{tickets.filter((t) => t.from === selectedTicket.from).length}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] text-white/35 flex items-center gap-1.5"><Clock className="w-3 h-3" /> Member Since</span>
+                      <span className="text-[10px] text-white/60 flex items-center gap-1.5"><Clock className="w-3 h-3" /> Member Since</span>
                       <span className="text-[10px] font-bold text-white/70">
                         {new Date(
                           Math.min(...tickets.filter((t) => t.from === selectedTicket.from).map((t) => new Date(t.createdAt).getTime()))
@@ -1295,18 +1295,18 @@ export default function EmailSupportDashboard() {
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] text-white/35 flex items-center gap-1.5"><Crown className="w-3 h-3" /> Plan</span>
+                      <span className="text-[10px] text-white/60 flex items-center gap-1.5"><Crown className="w-3 h-3" /> Plan</span>
                       <span className="text-[10px] font-bold text-purple-400 bg-purple-500/10 px-1.5 py-0.5 rounded">Pro</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] text-white/35 flex items-center gap-1.5"><CreditCard className="w-3 h-3" /> MRR</span>
+                      <span className="text-[10px] text-white/60 flex items-center gap-1.5"><CreditCard className="w-3 h-3" /> MRR</span>
                       <span className="text-[10px] font-bold text-emerald-400">$49/mo</span>
                     </div>
                   </div>
                   {/* Previous Tickets */}
                   {tickets.filter((t) => t.from === selectedTicket.from && t.id !== selectedTicket.id).length > 0 && (
                     <div>
-                      <span className="text-[10px] font-bold text-white/40 uppercase tracking-wider block mb-2">Previous Tickets</span>
+                      <span className="text-[10px] font-bold text-white/60 uppercase tracking-wider block mb-2">Previous Tickets</span>
                       <div className="space-y-1.5">
                         {tickets
                           .filter((t) => t.from === selectedTicket.from && t.id !== selectedTicket.id)
@@ -1317,8 +1317,8 @@ export default function EmailSupportDashboard() {
                               onClick={() => setSelectedId(t.id)}
                               className="w-full text-left p-2 rounded-lg hover:bg-white/[0.04] transition-all group"
                             >
-                              <div className="text-[10px] font-mono text-white/25 group-hover:text-white/40">{t.id}</div>
-                              <div className="text-[10px] text-white/50 truncate group-hover:text-white/70">{t.subject}</div>
+                              <div className="text-[10px] font-mono text-white/25 group-hover:text-white/60">{t.id}</div>
+                              <div className="text-[10px] text-white/60 truncate group-hover:text-white/70">{t.subject}</div>
                               <span className={`inline-block mt-0.5 px-1.5 py-0.5 rounded text-[8px] font-bold ${statusColors[t.status]}`}>{t.status}</span>
                             </button>
                           ))}
@@ -1339,7 +1339,7 @@ export default function EmailSupportDashboard() {
             )}
             </>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-white/50 gap-3">
+            <div className="flex-1 flex flex-col items-center justify-center text-white/60 gap-3">
               <Mail className="w-12 h-12" />
               <span className="text-sm font-medium">Select a ticket to view details</span>
             </div>
@@ -1366,13 +1366,13 @@ export default function EmailSupportDashboard() {
             >
               <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.08]">
                 <h3 className="text-sm font-bold">Create New Ticket</h3>
-                <button onClick={() => setShowNewTicket(false)} className="p-1 rounded-lg hover:bg-white/[0.06] text-white/40 hover:text-white/60 transition-all">
+                <button onClick={() => setShowNewTicket(false)} className="p-1 rounded-lg hover:bg-white/[0.06] text-white/60 hover:text-white/60 transition-all">
                   <X className="w-4 h-4" />
                 </button>
               </div>
               <div className="p-6 space-y-4">
                 <div>
-                  <label className="text-[10px] font-medium text-white/40 uppercase tracking-wider mb-1.5 block">From (Email)</label>
+                  <label className="text-[10px] font-medium text-white/60 uppercase tracking-wider mb-1.5 block">From (Email)</label>
                   <input
                     value={newFrom}
                     onChange={(e) => setNewFrom(e.target.value)}
@@ -1381,7 +1381,7 @@ export default function EmailSupportDashboard() {
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-medium text-white/40 uppercase tracking-wider mb-1.5 block">Subject</label>
+                  <label className="text-[10px] font-medium text-white/60 uppercase tracking-wider mb-1.5 block">Subject</label>
                   <input
                     value={newSubject}
                     onChange={(e) => setNewSubject(e.target.value)}
@@ -1390,7 +1390,7 @@ export default function EmailSupportDashboard() {
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-medium text-white/40 uppercase tracking-wider mb-1.5 block">Message</label>
+                  <label className="text-[10px] font-medium text-white/60 uppercase tracking-wider mb-1.5 block">Message</label>
                   <textarea
                     value={newBody}
                     onChange={(e) => setNewBody(e.target.value)}
@@ -1400,7 +1400,7 @@ export default function EmailSupportDashboard() {
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-medium text-white/40 uppercase tracking-wider mb-1.5 block">Priority</label>
+                  <label className="text-[10px] font-medium text-white/60 uppercase tracking-wider mb-1.5 block">Priority</label>
                   <div className="flex gap-2">
                     {(["low", "medium", "high", "urgent"] as const).map((p) => (
                       <button
@@ -1409,7 +1409,7 @@ export default function EmailSupportDashboard() {
                         className={`px-3 py-1.5 rounded-lg text-[10px] font-medium border transition-all ${
                           newPriority === p
                             ? priorityColors[p]
-                            : "border-white/[0.08] text-white/40 hover:text-white/60"
+                            : "border-white/[0.08] text-white/60 hover:text-white/60"
                         }`}
                       >
                         {p.charAt(0).toUpperCase() + p.slice(1)}
@@ -1421,7 +1421,7 @@ export default function EmailSupportDashboard() {
               <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-white/[0.08]">
                 <button
                   onClick={() => setShowNewTicket(false)}
-                  className="px-4 py-2 rounded-lg text-xs text-white/50 hover:text-white/70 transition-all"
+                  className="px-4 py-2 rounded-lg text-xs text-white/60 hover:text-white/70 transition-all"
                 >
                   Cancel
                 </button>
@@ -1461,12 +1461,12 @@ export default function EmailSupportDashboard() {
                   <GitMerge className="w-4 h-4 text-blue-400" />
                   <h3 className="text-sm font-bold">Merge Ticket</h3>
                 </div>
-                <button onClick={() => { setShowMergeModal(false); setMergeTargetId(null); }} className="p-1 rounded-lg hover:bg-white/[0.06] text-white/40 hover:text-white/60 transition-all">
+                <button onClick={() => { setShowMergeModal(false); setMergeTargetId(null); }} className="p-1 rounded-lg hover:bg-white/[0.06] text-white/60 hover:text-white/60 transition-all">
                   <X className="w-4 h-4" />
                 </button>
               </div>
               <div className="p-6">
-                <p className="text-xs text-white/50 mb-3">
+                <p className="text-xs text-white/60 mb-3">
                   Merge <span className="text-white/80 font-semibold">{selectedTicket.id}</span> into another ticket. All messages will be combined.
                 </p>
                 <div className="space-y-1.5 max-h-64 overflow-y-auto">
@@ -1495,7 +1495,7 @@ export default function EmailSupportDashboard() {
               <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-white/[0.08]">
                 <button
                   onClick={() => { setShowMergeModal(false); setMergeTargetId(null); }}
-                  className="px-4 py-2 rounded-lg text-xs text-white/50 hover:text-white/70 transition-all"
+                  className="px-4 py-2 rounded-lg text-xs text-white/60 hover:text-white/70 transition-all"
                 >
                   Cancel
                 </button>

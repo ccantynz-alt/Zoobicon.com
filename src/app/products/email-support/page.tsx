@@ -113,7 +113,7 @@ export default function EmailSupportPage() {
     <div className="relative min-h-screen">
       <BackgroundEffects preset="technical" />
 
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#050508]/80 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
@@ -122,7 +122,7 @@ export default function EmailSupportPage() {
               </div>
               <span className="text-lg font-bold tracking-tight">Zoobicon</span>
             </Link>
-            <span className="text-xs text-white/40">/</span>
+            <span className="text-xs text-white/60">/</span>
             <span className="text-sm text-white/65">AI Email Support</span>
           </div>
           <div className="flex items-center gap-4">
@@ -203,7 +203,7 @@ export default function EmailSupportPage() {
                     value={waitlistEmail}
                     onChange={(e) => setWaitlistEmail(e.target.value)}
                     placeholder="Or enter your email for early access"
-                    className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-xl px-5 py-4 text-white placeholder:text-white/45 outline-none text-sm focus:border-brand-500/30 transition-colors"
+                    className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-xl px-5 py-4 text-white placeholder:text-white/60 outline-none text-sm focus:border-brand-500/30 transition-colors"
                   />
                   <button
                     type="submit"
@@ -227,7 +227,7 @@ export default function EmailSupportPage() {
               ].map((stat) => (
                 <div key={stat.label} className="gradient-border p-4 rounded-xl text-center">
                   <div className="text-2xl font-black gradient-text-static">{stat.value}</div>
-                  <div className="text-xs text-white/50 mt-1">{stat.label}</div>
+                  <div className="text-xs text-white/60 mt-1">{stat.label}</div>
                 </div>
               ))}
             </motion.div>
@@ -247,7 +247,7 @@ export default function EmailSupportPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="relative">
-                        <Search className="w-3.5 h-3.5 text-white/40 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                        <Search className="w-3.5 h-3.5 text-white/60 absolute left-2.5 top-1/2 -translate-y-1/2" />
                         <input className="bg-white/[0.06] border border-white/[0.10] rounded-lg pl-8 pr-3 py-1.5 text-xs text-white/60 placeholder-white/20 w-48" placeholder="Search tickets..." />
                       </div>
                     </div>
@@ -265,7 +265,7 @@ export default function EmailSupportPage() {
                           }`}
                         >
                           <div className="flex items-center justify-between mb-1">
-                            <span className="text-[10px] font-mono text-white/40">{ticket.id}</span>
+                            <span className="text-[10px] font-mono text-white/60">{ticket.id}</span>
                             <div className="flex items-center gap-2">
                               {sentimentIcon(ticket.sentiment)}
                               {statusBadge(ticket.status)}
@@ -273,8 +273,8 @@ export default function EmailSupportPage() {
                           </div>
                           <div className="text-xs font-semibold text-white/70 truncate">{ticket.subject}</div>
                           <div className="flex items-center justify-between mt-1">
-                            <span className="text-[10px] text-white/45 truncate">{ticket.from}</span>
-                            <span className="text-[10px] text-white/35">{ticket.time}</span>
+                            <span className="text-[10px] text-white/60 truncate">{ticket.from}</span>
+                            <span className="text-[10px] text-white/60">{ticket.time}</span>
                           </div>
                         </button>
                       ))}
@@ -289,7 +289,7 @@ export default function EmailSupportPage() {
                             selectedTicket.priority === "high" ? "bg-red-500/15 text-red-400" : selectedTicket.priority === "medium" ? "bg-amber-500/15 text-amber-400" : "bg-white/10 text-white/60"
                           }`}>{selectedTicket.priority}</span>
                         </div>
-                        <div className="text-[10px] text-white/45 mt-0.5">From: {selectedTicket.from} • {selectedTicket.time}</div>
+                        <div className="text-[10px] text-white/60 mt-0.5">From: {selectedTicket.from} • {selectedTicket.time}</div>
                       </div>
 
                       <div className="flex-1 p-5 overflow-y-auto">
@@ -297,7 +297,7 @@ export default function EmailSupportPage() {
                           <div className="space-y-4">
                             {/* Customer message */}
                             <div className="flex gap-3">
-                              <div className="w-7 h-7 rounded-full bg-white/[0.09] flex items-center justify-center flex-shrink-0 text-[10px] font-bold text-white/50">
+                              <div className="w-7 h-7 rounded-full bg-white/[0.09] flex items-center justify-center flex-shrink-0 text-[10px] font-bold text-white/60">
                                 {selectedTicket.from.charAt(0).toUpperCase()}
                               </div>
                               <div className="bg-white/[0.06] border border-white/[0.10] rounded-xl px-4 py-3 text-xs text-white/65 max-w-[80%]">
@@ -320,7 +320,7 @@ export default function EmailSupportPage() {
                             </div>
                           </div>
                         ) : (
-                          <div className="flex items-center justify-center h-full text-xs text-white/40">
+                          <div className="flex items-center justify-center h-full text-xs text-white/60">
                             Escalated to human agent — awaiting response
                           </div>
                         )}
@@ -394,7 +394,7 @@ export default function EmailSupportPage() {
                   value={waitlistEmail}
                   onChange={(e) => setWaitlistEmail(e.target.value)}
                   placeholder="Enter your email for early access"
-                  className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-xl px-5 py-4 text-white placeholder:text-white/45 outline-none text-sm focus:border-brand-500/30 transition-colors"
+                  className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-xl px-5 py-4 text-white placeholder:text-white/60 outline-none text-sm focus:border-brand-500/30 transition-colors"
                 />
                 <button
                   type="submit"
@@ -412,10 +412,10 @@ export default function EmailSupportPage() {
 
       <footer className="border-t border-white/[0.08] py-8">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <div className="text-xs text-white/40">&copy; 2026 Zoobicon</div>
+          <div className="text-xs text-white/60">&copy; 2026 Zoobicon</div>
           <div className="flex gap-4">
-            <Link href="/" className="text-xs text-white/40 hover:text-white/60">Home</Link>
-            <Link href="/marketplace" className="text-xs text-white/40 hover:text-white/60">Marketplace</Link>
+            <Link href="/" className="text-xs text-white/60 hover:text-white/60">Home</Link>
+            <Link href="/marketplace" className="text-xs text-white/60 hover:text-white/60">Marketplace</Link>
           </div>
         </div>
       </footer>

@@ -191,11 +191,11 @@ export default function PreLaunchChecklistPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050508] text-white">
+    <div className="min-h-screen bg-[#131520] text-white">
       <BackgroundEffects preset="admin" />
 
       {/* Navbar */}
-      <nav className="relative z-20 border-b border-white/10 bg-[#050508]/90 backdrop-blur-md">
+      <nav className="relative z-20 border-b border-white/10 bg-[#131520]/90 backdrop-blur-2xl">
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/admin" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">

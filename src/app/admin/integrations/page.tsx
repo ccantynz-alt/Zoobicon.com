@@ -440,7 +440,7 @@ export default function IntegrationsPage() {
   const available = integrations.filter((i) => i.status !== "connected");
 
   return (
-    <div className="min-h-screen bg-[#050508] text-white">
+    <div className="min-h-screen bg-[#131520] text-white">
       <BackgroundEffects preset="admin" />
 
       {/* Notification toast */}
@@ -462,7 +462,7 @@ export default function IntegrationsPage() {
       </AnimatePresence>
 
       {/* Navbar */}
-      <nav className="sticky top-0 z-40 bg-[#050508]/90 backdrop-blur-xl border-b border-white/10">
+      <nav className="sticky top-0 z-40 bg-[#131520]/90 backdrop-blur-2xl border-b border-white/10">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-6">
             <Link href="/" className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">

@@ -157,10 +157,10 @@ export default function KnowledgeBasePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050508] text-white">
+    <div className="min-h-screen bg-[#131520] text-white">
       <BackgroundEffects preset="admin" />
       {/* Header */}
-      <div className="border-b border-white/10 bg-[#111318]/80 backdrop-blur-sm">
+      <div className="border-b border-white/10 bg-[#131520]/90 backdrop-blur-2xl">
         <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/admin/support" className="p-2 rounded-lg hover:bg-[#111318] transition-colors">
@@ -228,7 +228,7 @@ export default function KnowledgeBasePage() {
           })}
 
           <div className="mt-6 pt-4 border-t border-white/10">
-            <p className="px-3 text-xs text-white/40 mb-2">How it works</p>
+            <p className="px-3 text-xs text-white/60 mb-2">How it works</p>
             <p className="px-3 text-xs text-white/60 leading-relaxed">
               Articles you add here are automatically included as context when the AI
               drafts support responses. More articles = smarter AI replies.
@@ -304,7 +304,7 @@ export default function KnowledgeBasePage() {
                   <div>
                     <label className="block text-sm text-white/70 mb-1">
                       Content{" "}
-                      <span className="text-white/40">
+                      <span className="text-white/60">
                         — this is what the AI reads when drafting replies
                       </span>
                     </label>
@@ -322,7 +322,7 @@ export default function KnowledgeBasePage() {
                   <div>
                     <label className="block text-sm text-white/70 mb-1">
                       Keywords{" "}
-                      <span className="text-white/40">— comma-separated, helps matching</span>
+                      <span className="text-white/60">— comma-separated, helps matching</span>
                     </label>
                     <input
                       type="text"
@@ -365,7 +365,7 @@ export default function KnowledgeBasePage() {
               <div className="text-center py-20 text-white/60">
                 <BookOpen className="w-16 h-16 mx-auto mb-4 opacity-20" />
                 <p className="text-lg mb-2">No articles yet</p>
-                <p className="text-sm text-white/40 mb-6 max-w-md mx-auto">
+                <p className="text-sm text-white/60 mb-6 max-w-md mx-auto">
                   Add articles to teach the AI how to respond to common support
                   questions. The more you add, the smarter the AI becomes.
                 </p>

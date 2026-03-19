@@ -12,10 +12,10 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <div className="relative min-h-screen bg-[#050508] text-[#e8e8ec]">
+    <div className="relative min-h-screen bg-[#0a0a12] text-[#e8e8ec]">
       <BackgroundEffects preset="minimal" />
       {/* Nav */}
-      <nav className="border-b border-white/[0.06] bg-[#050508]/80 backdrop-blur-2xl">
+      <nav className="border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
         <div className="max-w-4xl mx-auto px-6 py-4">
           <Link href="/" className="flex items-center gap-2 w-fit">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
@@ -265,11 +265,11 @@ export default function TermsPage() {
 
         {/* Footer nav */}
         <div className="mt-16 pt-8 border-t border-white/[0.10] flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-white/40">&copy; 2026 Zoobicon. All rights reserved.</p>
+          <p className="text-xs text-white/60">&copy; 2026 Zoobicon. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            <Link href="/privacy" className="text-xs text-white/40 hover:text-white/60 transition-colors">Privacy Policy</Link>
+            <Link href="/privacy" className="text-xs text-white/60 hover:text-white/60 transition-colors">Privacy Policy</Link>
             <Link href="/terms" className="text-xs text-white/60 hover:text-white/60 transition-colors">Terms of Service</Link>
-            <Link href="/" className="text-xs text-white/40 hover:text-white/60 transition-colors">Home</Link>
+            <Link href="/" className="text-xs text-white/60 hover:text-white/60 transition-colors">Home</Link>
           </div>
         </div>
       </div>

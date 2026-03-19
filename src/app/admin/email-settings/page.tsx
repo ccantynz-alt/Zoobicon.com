@@ -167,11 +167,11 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
   const inputClass = "w-full bg-white/[0.06] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-blue-500/50 transition-colors";
 
   return (
-    <div className="min-h-screen bg-[#050508] text-white">
+    <div className="min-h-screen bg-[#131520] text-white">
       <BackgroundEffects preset="admin" />
 
       {/* Navbar */}
-      <nav className="relative z-20 border-b border-white/10 bg-[#111318]/90 backdrop-blur-md">
+      <nav className="relative z-20 border-b border-white/10 bg-[#131520]/90 backdrop-blur-2xl">
         <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/admin" className="flex items-center gap-2 text-white/60 hover:text-white transition-colors">
@@ -251,7 +251,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
               </div>
               <div className="space-y-2 text-xs text-white/60 leading-relaxed">
                 <p>All outbound emails (notifications, replies, password resets) sent via Mailgun API from <span className="text-white/80">noreply@zoobicon.com</span>.</p>
-                <p className="pt-1 text-white/50">Zoobicon controls everything.</p>
+                <p className="pt-1 text-white/60">Zoobicon controls everything.</p>
               </div>
             </div>
           </div>
@@ -259,7 +259,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
             <p className="text-xs text-white/60 mb-1.5 font-medium">Mailgun Webhook URL (use this for ALL inbound routing):</p>
             <code className="text-xs text-cyan-400 bg-black/30 px-2 py-1 rounded select-all">https://zoobicon.com/api/email/webhook</code>
           </div>
-          <p className="text-xs text-white/50 mt-3">Total cost: <span className="text-green-400/80">$0/month</span> on Mailgun free tier (5,000 emails/month). No Google Workspace, no per-seat charges.</p>
+          <p className="text-xs text-white/60 mt-3">Total cost: <span className="text-green-400/80">$0/month</span> on Mailgun free tier (5,000 emails/month). No Google Workspace, no per-seat charges.</p>
         </motion.div>
 
         {/* Setup Guide — Expandable accordion */}
@@ -361,7 +361,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
             </div>
           )}
           {!setupStatus && (
-            <p className="text-xs text-white/50">Click &ldquo;Verify Setup&rdquo; to check your Mailgun API key, domain, database tables, and webhook configuration.</p>
+            <p className="text-xs text-white/60">Click &ldquo;Verify Setup&rdquo; to check your Mailgun API key, domain, database tables, and webhook configuration.</p>
           )}
         </motion.div>
 
@@ -381,7 +381,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                 placeholder="admin@zoobicon.com"
                 className={inputClass}
               />
-              <p className="text-xs text-white/50 mt-1">Your main inbox. Mailgun routes emails here &rarr; <code className="text-cyan-400/60">/admin/email</code></p>
+              <p className="text-xs text-white/60 mt-1">Your main inbox. Mailgun routes emails here &rarr; <code className="text-cyan-400/60">/admin/email</code></p>
             </div>
             <div>
               <label className="block text-sm text-white/80 mb-1.5 font-medium">Support Email</label>
@@ -391,7 +391,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                 placeholder="support@zoobicon.com"
                 className={inputClass}
               />
-              <p className="text-xs text-white/50 mt-1">Customer-facing support. Creates tickets in <code className="text-cyan-400/60">/email-support</code> with AI auto-reply.</p>
+              <p className="text-xs text-white/60 mt-1">Customer-facing support. Creates tickets in <code className="text-cyan-400/60">/email-support</code> with AI auto-reply.</p>
             </div>
           </div>
         </motion.div>
@@ -447,7 +447,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                   {showKeys.mailgun ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              <p className="text-xs text-white/50 mt-1">All emails (notifications, support tickets, password resets) are sent via Mailgun.</p>
+              <p className="text-xs text-white/60 mt-1">All emails (notifications, support tickets, password resets) are sent via Mailgun.</p>
             </div>
             <div>
               <label className="block text-sm text-white/80 mb-1.5 font-medium">Mailgun Domain</label>
@@ -457,7 +457,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                 placeholder="zoobicon.com"
                 className="w-full bg-white/[0.06] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-blue-500/50 transition-colors"
               />
-              <p className="text-xs text-white/50 mt-1">Just the domain name (e.g. <code className="text-white/60">zoobicon.com</code>), not the full API URL. The API base URL is added automatically.</p>
+              <p className="text-xs text-white/60 mt-1">Just the domain name (e.g. <code className="text-white/60">zoobicon.com</code>), not the full API URL. The API base URL is added automatically.</p>
             </div>
           </div>
         </motion.div>
@@ -482,7 +482,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                   {icon && <div className="mt-0.5">{icon}</div>}
                   <div>
                     <p className="text-sm text-white/90 font-medium">{label}</p>
-                    <p className="text-xs text-white/50 mt-0.5">{desc}</p>
+                    <p className="text-xs text-white/60 mt-0.5">{desc}</p>
                   </div>
                 </div>
                 <button
@@ -514,7 +514,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
             Add these to your <code className="bg-white/10 px-1.5 py-0.5 rounded text-xs text-cyan-300">.env.local</code> file or Vercel dashboard.
           </p>
           <div className="bg-black/30 rounded-lg p-4 font-mono text-xs space-y-1.5 overflow-x-auto">
-            <div><span className="text-white/50"># Email (Mailgun only — no Google Workspace needed)</span></div>
+            <div><span className="text-white/60"># Email (Mailgun only — no Google Workspace needed)</span></div>
             <div><span className="text-blue-400">MAILGUN_API_KEY</span><span className="text-white/50">=</span><span className="text-green-400">{config.mailgunApiKey ? maskKey(config.mailgunApiKey) : "key-xxxxx"}</span></div>
             <div><span className="text-blue-400">MAILGUN_DOMAIN</span><span className="text-white/50">=</span><span className="text-green-400">{config.mailgunDomain || "zoobicon.com"}</span></div>
             <div><span className="text-blue-400">MAILGUN_WEBHOOK_SIGNING_KEY</span><span className="text-white/50">=</span><span className="text-green-400">your-webhook-signing-key</span></div>
