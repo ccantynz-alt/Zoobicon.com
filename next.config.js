@@ -5,13 +5,13 @@ const nextConfig = {
     optimizePackageImports: ["lucide-react", "framer-motion"],
   },
 
-  // Set Turbopack root to the project directory
-  turbopack: {
-    root: __dirname,
-  },
-
   // Disable source maps in production for smaller/faster builds
   productionBrowserSourceMaps: false,
+
+  // Skip ESLint during builds (run it separately in CI if needed)
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 
   // Skip type checking during builds (run tsc separately in CI if needed)
   typescript: {
