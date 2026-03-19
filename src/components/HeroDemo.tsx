@@ -32,109 +32,157 @@ const AGENTS = [
 
 const DEMOS = [
   {
-    prompt: "Build a modern SaaS landing page for an AI code review tool with dark theme",
-    slug: "codelens",
+    prompt: "Build a premium fintech dashboard with dark theme, glassmorphism cards, and real-time analytics",
+    slug: "vaultpay",
     html: `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Inter,system-ui,sans-serif;background:#0a0a1a;color:#e0e0e8}
-nav{padding:14px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.06)}
-.logo{display:flex;align-items:center;gap:8px}
-.logo-icon{width:26px;height:26px;background:linear-gradient(135deg,#7c5aff,#3b82f6);border-radius:7px}
-.logo span{font-weight:700;font-size:14px}
-.nav-links{display:flex;gap:20px;font-size:12px;color:rgba(255,255,255,0.45)}
-.nav-cta{background:linear-gradient(135deg,#7c5aff,#3b82f6);border:none;color:#fff;padding:7px 16px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer}
-.hero{text-align:center;padding:48px 24px 36px}
-.hero h1{font-size:32px;font-weight:800;line-height:1.1;margin-bottom:10px;background:linear-gradient(135deg,#c4b5fd,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hero p{color:rgba(255,255,255,0.45);font-size:13px;max-width:380px;margin:0 auto 20px;line-height:1.5}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+body{font-family:Inter,system-ui,sans-serif;background:#06060e;color:#e4e4ec;overflow:hidden}
+nav{padding:12px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.05);background:rgba(6,6,14,0.8);backdrop-filter:blur(20px)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:28px;height:28px;background:linear-gradient(135deg,#818cf8,#6366f1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;box-shadow:0 0 20px rgba(99,102,241,0.3)}
+.logo span{font-weight:700;font-size:15px;letter-spacing:-0.02em}
+.nav-r{display:flex;align-items:center;gap:16px}
+.nav-pill{font-size:11px;color:rgba(255,255,255,0.4);font-weight:500}
+.nav-cta{background:linear-gradient(135deg,#818cf8,#6366f1);border:none;color:#fff;padding:7px 18px;border-radius:10px;font-size:11px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(99,102,241,0.25)}
+.hero{text-align:center;padding:36px 28px 28px;position:relative}
+.hero::before{content:'';position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:500px;height:300px;background:radial-gradient(ellipse,rgba(99,102,241,0.12),transparent 70%);pointer-events:none}
+.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.15);color:#a5b4fc;font-size:10px;font-weight:600;padding:5px 14px;border-radius:100px;margin-bottom:14px;letter-spacing:0.04em}
+.badge::before{content:'';width:6px;height:6px;border-radius:50%;background:#818cf8;box-shadow:0 0 8px rgba(129,140,248,0.6)}
+.hero h1{font-size:36px;font-weight:800;line-height:1.1;margin-bottom:10px;letter-spacing:-0.03em;background:linear-gradient(180deg,#fff 40%,rgba(255,255,255,0.5));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:rgba(255,255,255,0.4);font-size:13px;max-width:380px;margin:0 auto 18px;line-height:1.6;font-weight:400}
 .hero-btns{display:flex;gap:10px;justify-content:center}
-.btn-primary{background:linear-gradient(135deg,#7c5aff,#3b82f6);border:none;color:#fff;padding:10px 22px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer}
-.btn-secondary{background:transparent;border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.65);padding:10px 22px;border-radius:10px;font-size:12px;cursor:pointer}
-.features{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:0 24px 36px;max-width:560px;margin:0 auto}
-.card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:16px}
-.card-icon{width:28px;height:28px;border-radius:7px;margin-bottom:10px}
-.card h3{font-size:12px;font-weight:600;margin-bottom:4px}
-.card p{font-size:10px;color:rgba(255,255,255,0.35);line-height:1.5}
-.stats{display:flex;justify-content:center;gap:32px;padding:20px 24px;border-top:1px solid rgba(255,255,255,0.06)}
+.btn-p{background:linear-gradient(135deg,#818cf8,#6366f1);border:none;color:#fff;padding:11px 26px;border-radius:12px;font-size:12px;font-weight:600;cursor:pointer;box-shadow:0 4px 20px rgba(99,102,241,0.3),inset 0 1px 0 rgba(255,255,255,0.15)}
+.btn-s{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);padding:11px 26px;border-radius:12px;font-size:12px;font-weight:500;cursor:pointer;backdrop-filter:blur(8px)}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:6px 28px 16px;max-width:560px;margin:0 auto}
+.metric{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:14px 12px;text-align:center;backdrop-filter:blur(8px);position:relative;overflow:hidden}
+.metric::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent)}
+.metric-val{font-size:22px;font-weight:800;letter-spacing:-0.02em;margin-bottom:2px}
+.metric-val.indigo{background:linear-gradient(135deg,#818cf8,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.metric-val.emerald{background:linear-gradient(135deg,#34d399,#6ee7b7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.metric-val.amber{background:linear-gradient(135deg,#fbbf24,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.metric-val.cyan{background:linear-gradient(135deg,#22d3ee,#67e8f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.metric-lbl{font-size:9px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;font-weight:500}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 28px 20px;max-width:560px;margin:0 auto}
+.card{background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:16px;position:relative;overflow:hidden;backdrop-filter:blur(8px)}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent)}
+.card-icon{width:32px;height:32px;border-radius:10px;margin-bottom:10px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.card h3{font-size:12px;font-weight:700;margin-bottom:3px;letter-spacing:-0.01em}
+.card p{font-size:10px;color:rgba(255,255,255,0.35);line-height:1.6}
+.trust{display:flex;justify-content:center;align-items:center;gap:24px;padding:14px 28px;border-top:1px solid rgba(255,255,255,0.04)}
+.trust-item{font-size:9px;color:rgba(255,255,255,0.25);letter-spacing:0.08em;text-transform:uppercase;font-weight:500;display:flex;align-items:center;gap:5px}
+.trust-dot{width:4px;height:4px;border-radius:50%;background:rgba(52,211,153,0.5)}
+</style></head><body>
+<nav><div class="logo"><div class="logo-mark">V</div><span>VaultPay</span></div><div class="nav-r"><span class="nav-pill">Features</span><span class="nav-pill">Pricing</span><span class="nav-pill">Enterprise</span><button class="nav-cta">Open Account</button></div></nav>
+<div class="hero"><div class="badge">Trusted by 2,400+ businesses</div><h1>The Future of<br>Business Finance</h1><p>Real-time analytics, intelligent forecasting, and seamless payments — all in one elegant dashboard.</p><div class="hero-btns"><button class="btn-p">Start Free Trial</button><button class="btn-s">Watch Demo</button></div></div>
+<div class="metrics"><div class="metric"><div class="metric-val indigo">$4.2M</div><div class="metric-lbl">Processed</div></div><div class="metric"><div class="metric-val emerald">99.9%</div><div class="metric-lbl">Uptime</div></div><div class="metric"><div class="metric-val amber">0.3s</div><div class="metric-lbl">Transfers</div></div><div class="metric"><div class="metric-val cyan">256-bit</div><div class="metric-lbl">Encryption</div></div></div>
+<div class="cards">
+<div class="card"><div class="card-icon" style="background:linear-gradient(135deg,rgba(129,140,248,0.15),rgba(99,102,241,0.1));color:#818cf8">&#9783;</div><h3>Smart Analytics</h3><p>Real-time dashboards with predictive insights and anomaly detection.</p></div>
+<div class="card"><div class="card-icon" style="background:linear-gradient(135deg,rgba(52,211,153,0.15),rgba(16,185,129,0.1));color:#34d399">&#10003;</div><h3>Instant Transfers</h3><p>Send and receive payments globally in under 300 milliseconds.</p></div>
+<div class="card"><div class="card-icon" style="background:linear-gradient(135deg,rgba(251,191,36,0.15),rgba(245,158,11,0.1));color:#fbbf24">&#9881;</div><h3>AI Forecasting</h3><p>Machine learning models that predict cash flow 90 days ahead.</p></div>
+</div>
+<div class="trust"><div class="trust-item"><span class="trust-dot"></span>SOC 2 Certified</div><div class="trust-item"><span class="trust-dot"></span>PCI DSS Level 1</div><div class="trust-item"><span class="trust-dot"></span>GDPR Compliant</div><div class="trust-item"><span class="trust-dot"></span>Bank-Grade Security</div></div>
+</body></html>`,
+  },
+  {
+    prompt: "Create a luxury real estate platform with property listings, hero video placeholder, and dark elegant theme",
+    slug: "meridian-estates",
+    html: `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Inter,system-ui,sans-serif;background:#08070c;color:#ede9e3;overflow:hidden}
+nav{padding:14px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.04);background:rgba(8,7,12,0.9);backdrop-filter:blur(20px)}
+.logo{font-size:16px;font-weight:300;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.85)}
+.logo b{font-weight:700;background:linear-gradient(135deg,#d4a574,#c49a6c);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;gap:28px;font-size:11px;color:rgba(255,255,255,0.35);letter-spacing:0.06em;font-weight:400}
+.nav-cta{background:transparent;border:1px solid rgba(212,165,116,0.3);color:#d4a574;padding:8px 20px;border-radius:2px;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer}
+.hero{position:relative;padding:48px 32px 36px;text-align:center}
+.hero::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 50% 30%,rgba(212,165,116,0.06),transparent 60%);pointer-events:none}
+.hero-tag{display:inline-block;font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:rgba(212,165,116,0.7);margin-bottom:16px;font-weight:500}
+.hero h1{font-size:42px;font-weight:200;line-height:1.1;margin-bottom:12px;letter-spacing:-0.02em}
+.hero h1 em{font-style:italic;font-weight:300;color:rgba(255,255,255,0.5)}
+.hero p{font-size:13px;color:rgba(255,255,255,0.35);max-width:360px;margin:0 auto 22px;line-height:1.65;font-weight:300}
+.hero-btns{display:flex;gap:12px;justify-content:center}
+.btn-gold{background:linear-gradient(135deg,#d4a574,#b8956a);border:none;color:#0a0908;padding:11px 28px;border-radius:2px;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer}
+.btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);padding:11px 28px;border-radius:2px;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;font-weight:400}
+.listings{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:10px 32px 20px}
+.listing{border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02)}
+.listing-img{height:100px;position:relative}
+.listing-img::after{content:'';position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(transparent,rgba(8,7,12,0.8))}
+.listing-body{padding:12px}
+.listing-price{font-size:16px;font-weight:700;color:#d4a574;margin-bottom:2px;letter-spacing:-0.01em}
+.listing-addr{font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:8px;font-weight:400}
+.listing-meta{display:flex;gap:12px;font-size:9px;color:rgba(255,255,255,0.25);letter-spacing:0.04em}
+.listing-meta span{display:flex;align-items:center;gap:3px}
+.stats-bar{display:flex;justify-content:center;gap:40px;padding:16px 32px;border-top:1px solid rgba(255,255,255,0.04)}
 .stat{text-align:center}
-.stat-value{font-size:20px;font-weight:800;background:linear-gradient(135deg,#7c5aff,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.stat-label{font-size:9px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.1em;margin-top:2px}
+.stat-val{font-size:20px;font-weight:700;color:rgba(255,255,255,0.85);letter-spacing:-0.02em}
+.stat-lbl{font-size:8px;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.12em;margin-top:2px;font-weight:500}
 </style></head><body>
-<nav><div class="logo"><div class="logo-icon"></div><span>CodeLens AI</span></div><div class="nav-links"><span>Features</span><span>Pricing</span><span>Docs</span></div><button class="nav-cta">Get Started</button></nav>
-<div class="hero"><h1>Code Review,<br>Supercharged by AI</h1><p>Catch bugs, enforce standards, and ship 10x faster with intelligent code analysis.</p><div class="hero-btns"><button class="btn-primary">Start Free Trial</button><button class="btn-secondary">View Demo</button></div></div>
-<div class="features">
-<div class="card"><div class="card-icon" style="background:linear-gradient(135deg,#7c5aff,#a78bfa)"></div><h3>Smart Analysis</h3><p>Deep understanding beyond syntax to find logic errors.</p></div>
-<div class="card"><div class="card-icon" style="background:linear-gradient(135deg,#3b82f6,#22d3ee)"></div><h3>Instant Reviews</h3><p>Comprehensive reviews in seconds, not hours.</p></div>
-<div class="card"><div class="card-icon" style="background:linear-gradient(135deg,#10b981,#34d399)"></div><h3>Security Scan</h3><p>Auto-detects OWASP vulnerabilities and injection risks.</p></div>
+<nav><div class="logo"><b>Meridian</b> Estates</div><div class="nav-links"><span>Properties</span><span>Services</span><span>About</span><span>Contact</span></div><button class="nav-cta">Schedule Tour</button></nav>
+<div class="hero"><div class="hero-tag">Exceptional Properties Worldwide</div><h1>Where Luxury<br>Meets <em>Legacy</em></h1><p>Discover curated properties in the world's most prestigious locations. White-glove service from first viewing to final key.</p><div class="hero-btns"><button class="btn-gold">View Collection</button><button class="btn-ghost">Private Consultation</button></div></div>
+<div class="listings">
+<div class="listing"><div class="listing-img" style="background:linear-gradient(135deg,#1a1520,#2a1f35)"></div><div class="listing-body"><div class="listing-price">$12.8M</div><div class="listing-addr">Bel Air, Los Angeles</div><div class="listing-meta"><span>6 Beds</span><span>8 Baths</span><span>12,400 sqft</span></div></div></div>
+<div class="listing"><div class="listing-img" style="background:linear-gradient(135deg,#15181f,#1a2a3a)"></div><div class="listing-body"><div class="listing-price">$8.2M</div><div class="listing-addr">Upper East Side, NYC</div><div class="listing-meta"><span>4 Beds</span><span>5 Baths</span><span>6,800 sqft</span></div></div></div>
+<div class="listing"><div class="listing-img" style="background:linear-gradient(135deg,#1a1815,#2a2418)"></div><div class="listing-body"><div class="listing-price">$15.5M</div><div class="listing-addr">Mayfair, London</div><div class="listing-meta"><span>7 Beds</span><span>9 Baths</span><span>14,200 sqft</span></div></div></div>
 </div>
-<div class="stats"><div class="stat"><div class="stat-value">50K+</div><div class="stat-label">Reviews</div></div><div class="stat"><div class="stat-value">99.2%</div><div class="stat-label">Accuracy</div></div><div class="stat"><div class="stat-value">2.1s</div><div class="stat-label">Avg Time</div></div></div>
+<div class="stats-bar"><div class="stat"><div class="stat-val">$4.8B+</div><div class="stat-lbl">Properties Sold</div></div><div class="stat"><div class="stat-val">12,000+</div><div class="stat-lbl">Listings</div></div><div class="stat"><div class="stat-val">48</div><div class="stat-lbl">Countries</div></div><div class="stat"><div class="stat-val">99%</div><div class="stat-lbl">Client Satisfaction</div></div></div>
 </body></html>`,
   },
   {
-    prompt: "Create a photography portfolio with minimal design, dark gallery grid, and contact form",
-    slug: "jcarter-photo",
+    prompt: "Design a fitness app landing page with neon gradients, workout tracking features, and social proof",
+    slug: "pulsefit",
     html: `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Inter,system-ui,sans-serif;background:#08080c;color:#e8e8ec}
-nav{padding:16px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.06)}
-nav .name{font-size:13px;font-weight:300;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.7)}
-nav .links{display:flex;gap:24px;font-size:11px;color:rgba(255,255,255,0.4);letter-spacing:0.05em}
-.hero{text-align:center;padding:56px 28px 40px}
-.hero h1{font-size:38px;font-weight:200;letter-spacing:-0.02em;line-height:1.15;margin-bottom:8px}
-.hero h1 em{font-style:italic;color:rgba(255,255,255,0.5)}
-.hero p{color:rgba(255,255,255,0.35);font-size:12px;letter-spacing:0.05em;margin-bottom:24px}
-.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:0 28px 28px}
-.gallery-item{aspect-ratio:1;border-radius:4px;position:relative;overflow:hidden}
-.gallery-item:nth-child(1){background:linear-gradient(135deg,#1a1a2e,#2d1b69)}
-.gallery-item:nth-child(2){background:linear-gradient(135deg,#1b2838,#0f4c75)}
-.gallery-item:nth-child(3){background:linear-gradient(135deg,#2d1b2e,#6b2737)}
-.gallery-item:nth-child(4){background:linear-gradient(135deg,#0d2137,#1a5276)}
-.gallery-item:nth-child(5){background:linear-gradient(135deg,#2e1a1a,#8b4513);grid-column:span 2;aspect-ratio:2}
-.gallery-item:nth-child(6){background:linear-gradient(135deg,#1a2e1a,#2d5a27)}
-.cta{text-align:center;padding:32px 28px}
-.cta h2{font-size:18px;font-weight:300;margin-bottom:6px;letter-spacing:-0.01em}
-.cta p{font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:16px}
-.cta-btn{background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.7);padding:10px 28px;border-radius:0;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer}
-</style></head><body>
-<nav><div class="name">J. Carter</div><div class="links"><span>Work</span><span>About</span><span>Contact</span></div></nav>
-<div class="hero"><h1>Capturing moments<br>in <em>light & shadow</em></h1><p>EDITORIAL · PORTRAIT · LANDSCAPE</p></div>
-<div class="gallery"><div class="gallery-item"></div><div class="gallery-item"></div><div class="gallery-item"></div><div class="gallery-item"></div><div class="gallery-item"></div><div class="gallery-item"></div></div>
-<div class="cta"><h2>Let's create something beautiful</h2><p>Available for commissions and collaborations worldwide</p><button class="cta-btn">Get in Touch</button></div>
-</body></html>`,
-  },
-  {
-    prompt: "Design an e-commerce store for artisan coffee with product grid, cart, and warm aesthetic",
-    slug: "brewhaus",
-    html: `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Inter,system-ui,sans-serif;background:#0f0d0a;color:#e8e2d8}
-nav{padding:14px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.06)}
+body{font-family:Inter,system-ui,sans-serif;background:#0a0a0f;color:#eeeef2;overflow:hidden}
+nav{padding:12px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.05);background:rgba(10,10,15,0.9);backdrop-filter:blur(16px)}
 .logo{display:flex;align-items:center;gap:8px}
-.logo-icon{width:26px;height:26px;background:linear-gradient(135deg,#d97706,#92400e);border-radius:50%}
-.logo span{font-weight:700;font-size:14px;color:#d4a574}
-.nav-links{display:flex;gap:20px;font-size:11px;color:rgba(255,255,255,0.4)}
-.cart-btn{background:rgba(217,119,6,0.15);border:1px solid rgba(217,119,6,0.3);color:#d97706;padding:6px 14px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer}
-.hero{text-align:center;padding:44px 24px 32px;background:linear-gradient(180deg,rgba(217,119,6,0.06),transparent)}
-.hero h1{font-size:30px;font-weight:800;line-height:1.15;margin-bottom:8px;color:#f5e6d3}
-.hero p{color:rgba(255,255,255,0.4);font-size:12px;margin-bottom:20px}
-.hero-btn{background:linear-gradient(135deg,#d97706,#b45309);border:none;color:#fff;padding:10px 24px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer}
-.badge{display:inline-block;background:rgba(217,119,6,0.1);border:1px solid rgba(217,119,6,0.2);color:#d97706;font-size:9px;font-weight:600;padding:4px 10px;border-radius:20px;margin-bottom:12px;letter-spacing:0.08em;text-transform:uppercase}
-.products{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:0 24px 32px}
-.product{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;overflow:hidden}
-.product-img{height:80px;position:relative}
-.product-img:nth-child(1){background:linear-gradient(135deg,#3d2b1f,#5c3d2e)}
-.product-body{padding:10px}
-.product h3{font-size:11px;font-weight:600;margin-bottom:2px}
-.product .price{font-size:12px;font-weight:700;color:#d97706}
-.product .tag{font-size:8px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.08em}
-.product .add{width:100%;margin-top:8px;background:rgba(217,119,6,0.1);border:1px solid rgba(217,119,6,0.2);color:#d97706;padding:6px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer}
+.logo-icon{width:28px;height:28px;border-radius:10px;background:linear-gradient(135deg,#f43f5e,#ec4899);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;color:#fff;box-shadow:0 0 20px rgba(244,63,94,0.3)}
+.logo span{font-weight:800;font-size:15px;letter-spacing:-0.02em}
+.nav-r{display:flex;align-items:center;gap:16px}
+.nav-link{font-size:11px;color:rgba(255,255,255,0.4);font-weight:500}
+.nav-cta{background:linear-gradient(135deg,#f43f5e,#ec4899);border:none;color:#fff;padding:8px 20px;border-radius:10px;font-size:11px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(244,63,94,0.25)}
+.hero{text-align:center;padding:40px 28px 28px;position:relative}
+.hero::before{content:'';position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(244,63,94,0.08),rgba(168,85,247,0.04),transparent 70%);pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.15);color:#fb7185;font-size:10px;font-weight:600;padding:5px 14px;border-radius:100px;margin-bottom:14px}
+.hero-badge .dot{width:6px;height:6px;border-radius:50%;background:#f43f5e;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(244,63,94,0.4)}50%{opacity:0.8;box-shadow:0 0 0 6px rgba(244,63,94,0)}}
+.hero h1{font-size:38px;font-weight:900;line-height:1.05;margin-bottom:10px;letter-spacing:-0.03em}
+.hero h1 .gradient{background:linear-gradient(135deg,#f43f5e,#a855f7,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:rgba(255,255,255,0.4);font-size:13px;max-width:380px;margin:0 auto 20px;line-height:1.6}
+.hero-btns{display:flex;gap:10px;justify-content:center}
+.btn-fire{background:linear-gradient(135deg,#f43f5e,#ec4899);border:none;color:#fff;padding:12px 28px;border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 4px 24px rgba(244,63,94,0.3),inset 0 1px 0 rgba(255,255,255,0.2)}
+.btn-outline{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);padding:12px 28px;border-radius:12px;font-size:12px;font-weight:500;cursor:pointer;backdrop-filter:blur(8px)}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:6px 28px 16px;max-width:560px;margin:0 auto}
+.feat{background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:18px 14px;text-align:center;position:relative;overflow:hidden}
+.feat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.feat:nth-child(1)::before{background:linear-gradient(90deg,transparent,#f43f5e,transparent)}
+.feat:nth-child(2)::before{background:linear-gradient(90deg,transparent,#a855f7,transparent)}
+.feat:nth-child(3)::before{background:linear-gradient(90deg,transparent,#6366f1,transparent)}
+.feat-icon{width:36px;height:36px;border-radius:10px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.feat h3{font-size:12px;font-weight:700;margin-bottom:4px;letter-spacing:-0.01em}
+.feat p{font-size:10px;color:rgba(255,255,255,0.35);line-height:1.5}
+.social{display:flex;justify-content:center;align-items:center;gap:20px;padding:16px 28px;border-top:1px solid rgba(255,255,255,0.04)}
+.avatars{display:flex}
+.avatar{width:24px;height:24px;border-radius:50%;border:2px solid #0a0a0f;margin-left:-6px}
+.avatar:first-child{margin-left:0}
+.social-text{font-size:11px;color:rgba(255,255,255,0.4)}
+.social-text b{color:rgba(255,255,255,0.7)}
+.stores{display:flex;gap:8px;padding:6px 28px 16px;justify-content:center}
+.store-btn{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:8px 16px;display:flex;align-items:center;gap:8px;cursor:pointer}
+.store-btn .icon{font-size:16px}
+.store-btn .text{text-align:left}
+.store-btn .text small{display:block;font-size:8px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.06em}
+.store-btn .text span{display:block;font-size:11px;font-weight:600;color:rgba(255,255,255,0.8)}
 </style></head><body>
-<nav><div class="logo"><div class="logo-icon"></div><span>BrewHaus</span></div><div class="nav-links"><span>Shop</span><span>About</span><span>Subscribe</span></div><button class="cart-btn">Cart (0)</button></nav>
-<div class="hero"><div class="badge">Fresh Roasted Weekly</div><h1>Artisan Coffee,<br>Delivered to Your Door</h1><p>Single-origin beans roasted in small batches for maximum flavor.</p><button class="hero-btn">Shop Collection</button></div>
-<div class="products">
-<div class="product"><div class="product-img" style="background:linear-gradient(135deg,#3d2b1f,#5c3d2e);height:80px"></div><div class="product-body"><div class="tag">Single Origin</div><h3>Ethiopian Yirgacheffe</h3><div class="price">$18.99</div><button class="add">Add to Cart</button></div></div>
-<div class="product"><div class="product-img" style="background:linear-gradient(135deg,#2d1f15,#4a3728);height:80px"></div><div class="product-body"><div class="tag">House Blend</div><h3>Morning Ritual</h3><div class="price">$14.99</div><button class="add">Add to Cart</button></div></div>
-<div class="product"><div class="product-img" style="background:linear-gradient(135deg,#1f2d15,#3d4a28);height:80px"></div><div class="product-body"><div class="tag">Limited Edition</div><h3>Gesha Reserve</h3><div class="price">$32.99</div><button class="add">Add to Cart</button></div></div>
+<nav><div class="logo"><div class="logo-icon">P</div><span>PulseFit</span></div><div class="nav-r"><span class="nav-link">Features</span><span class="nav-link">Pricing</span><span class="nav-link">Athletes</span><button class="nav-cta">Download App</button></div></nav>
+<div class="hero"><div class="hero-badge"><span class="dot"></span>500K+ Active Athletes</div><h1>Train Smarter.<br><span class="gradient">Perform Better.</span></h1><p>AI-powered workout plans, real-time form analysis, and community challenges that push your limits.</p><div class="hero-btns"><button class="btn-fire">Start Free Trial</button><button class="btn-outline">Watch Demo</button></div></div>
+<div class="features">
+<div class="feat"><div class="feat-icon" style="background:linear-gradient(135deg,rgba(244,63,94,0.15),rgba(236,72,153,0.1));color:#fb7185">&#9829;</div><h3>AI Coach</h3><p>Personalized workout plans that adapt to your progress and recovery.</p></div>
+<div class="feat"><div class="feat-icon" style="background:linear-gradient(135deg,rgba(168,85,247,0.15),rgba(139,92,246,0.1));color:#c084fc">&#9734;</div><h3>Form Analysis</h3><p>Real-time camera tracking ensures perfect technique on every rep.</p></div>
+<div class="feat"><div class="feat-icon" style="background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(79,70,229,0.1));color:#818cf8">&#9775;</div><h3>Social Challenges</h3><p>Compete with friends, join global events, earn achievement badges.</p></div>
 </div>
+<div class="social"><div class="avatars"><div class="avatar" style="background:linear-gradient(135deg,#f43f5e,#ec4899)"></div><div class="avatar" style="background:linear-gradient(135deg,#a855f7,#6366f1)"></div><div class="avatar" style="background:linear-gradient(135deg,#22d3ee,#3b82f6)"></div><div class="avatar" style="background:linear-gradient(135deg,#f59e0b,#ef4444)"></div><div class="avatar" style="background:linear-gradient(135deg,#10b981,#059669)"></div></div><div class="social-text"><b>500,000+</b> athletes training with PulseFit</div></div>
+<div class="stores"><div class="store-btn"><div class="icon">&#61514;</div><div class="text"><small>Download on the</small><span>App Store</span></div></div><div class="store-btn"><div class="icon">&#9654;</div><div class="text"><small>Get it on</small><span>Google Play</span></div></div></div>
 </body></html>`,
   },
 ];

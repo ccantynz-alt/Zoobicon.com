@@ -36,14 +36,12 @@ import {
   Bot,
   TrendingUp,
   Play,
-  Star,
   Menu,
   X,
   Store,
   Headphones,
   HelpCircle,
   Check,
-  Minus,
   Bug,
   GitBranch,
   FileCode,
@@ -229,21 +227,21 @@ const STATS = [
   { value: "4", label: "Domain Ecosystem" },
 ];
 
-const COMPETITOR_FEATURES = [
-  { name: "AI Website Generation", zoobicon: true, wix: true, framer: false, durable: true, emergent: true },
-  { name: "Multi-Agent Pipeline", zoobicon: true, wix: false, framer: false, durable: false, emergent: true },
-  { name: "Industry-Aware Design AI", zoobicon: true, wix: false, framer: false, durable: false, emergent: false },
-  { name: "No Credit System", zoobicon: true, wix: true, framer: true, durable: true, emergent: false },
-  { name: "SEO Agent & Auto-Fix", zoobicon: true, wix: true, framer: false, durable: true, emergent: false },
-  { name: "AI Video Creator", zoobicon: false, wix: false, framer: false, durable: false, emergent: false },
-  { name: "GitHub & WP Export", zoobicon: true, wix: false, framer: false, durable: false, emergent: true },
-  { name: "Figma Import", zoobicon: true, wix: false, framer: true, durable: false, emergent: false },
-  { name: "i18n Translation (30+)", zoobicon: true, wix: true, framer: false, durable: false, emergent: false },
-  { name: "E-commerce Builder", zoobicon: true, wix: true, framer: false, durable: false, emergent: true },
-  { name: "Animation Editor", zoobicon: true, wix: false, framer: true, durable: false, emergent: false },
-  { name: "White-Label Platform", zoobicon: true, wix: false, framer: false, durable: false, emergent: false },
-  { name: "Domain Registration", zoobicon: false, wix: true, framer: false, durable: false, emergent: false },
-  { name: "Flat Pricing from $19/mo", zoobicon: true, wix: true, framer: true, durable: true, emergent: false },
+const PLATFORM_CAPABILITIES = [
+  { name: "AI Website Generation", description: "Full production-ready sites from a single prompt", included: true },
+  { name: "7-Agent Build Pipeline", description: "Strategy, design, copy, architecture, code, SEO & animations", included: true },
+  { name: "Full-Stack App Generation", description: "Database schema, API routes, and CRUD frontend", included: true },
+  { name: "E-commerce Storefront Builder", description: "Cart, checkout, product grid, reviews, discount codes", included: true },
+  { name: "43 Specialized Generators", description: "Industry-specific templates with custom AI prompts", included: true },
+  { name: "Visual Click-to-Edit", description: "Click any element, change text, colors, spacing live", included: true },
+  { name: "SEO Agent & Auto-Fix", description: "Meta tags, JSON-LD, heading hierarchy, OG tags", included: true },
+  { name: "Multi-Page Sites (3-6 pages)", description: "Shared design system, navigation, footer across pages", included: true },
+  { name: "GitHub & WordPress Export", description: "One-click export to GitHub repo or WP theme", included: true },
+  { name: "Figma Import", description: "Paste a Figma URL, get a coded website", included: true },
+  { name: "i18n Translation (30+ Languages)", description: "Translate any generated site instantly", included: true },
+  { name: "White-Label Agency Platform", description: "Your brand, your clients, your AI builder", included: true },
+  { name: "No Credit System", description: "Flat monthly pricing. No tokens, no usage traps", included: true },
+  { name: "Free Hosting on zoobicon.sh", description: "Deploy instantly with custom subdomains", included: true },
 ];
 
 const NEW_FEATURES = [
@@ -352,44 +350,25 @@ const FEATURES = [
   },
 ];
 
-const TESTIMONIALS = [
+const HOW_IT_WORKS = [
   {
-    name: "Sarah Chen",
-    role: "Founder & CEO",
-    company: "TechFlow",
-    quote: "We replaced our entire frontend team's prototyping workflow. What took days now takes 90 seconds. The quality is indistinguishable from hand-coded sites.",
-    stars: 5,
-    gradient: "from-blue-500 to-cyan-500",
+    step: "01",
+    title: "Describe Your Vision",
+    description: "Type a prompt describing what you want. A SaaS landing page, a restaurant site, an e-commerce store — anything.",
+    gradient: "from-violet-500 to-indigo-500",
   },
   {
-    name: "Marcus Rodriguez",
-    role: "Head of Growth",
-    company: "ScaleUp",
-    quote: "The multi-agent pipeline is genuinely different from anything else. It doesn't just generate HTML — it thinks about strategy, copy, SEO, and animations separately. The output quality shows.",
-    stars: 5,
-    gradient: "from-purple-500 to-pink-500",
+    step: "02",
+    title: "7 Agents Build It",
+    description: "Strategy, design, copywriting, architecture, code, SEO, and animations — all generated in parallel by specialized AI agents.",
+    gradient: "from-zoo-500 to-zoo-400",
   },
   {
-    name: "Emma Larsson",
-    role: "Creative Director",
-    company: "NovaStar",
-    quote: "I was skeptical about AI-generated design. Then I saw the Opus output. Dark mode, responsive, micro-interactions — all in one prompt. Now my agency uses Zoobicon for every client pitch.",
-    stars: 5,
-    gradient: "from-amber-500 to-orange-500",
-  },
-  {
-    name: "David Park",
-    role: "CTO",
-    company: "BuildPro",
-    quote: "The white-label agency platform let us launch our own branded AI builder in a week. Our clients think we built it from scratch. Revenue up 340% in Q1.",
-    stars: 5,
+    step: "03",
+    title: "Deploy Instantly",
+    description: "Your site goes live on zoobicon.sh in under 2 minutes. Edit visually, export to WordPress or GitHub, or connect a custom domain.",
     gradient: "from-emerald-500 to-teal-500",
   },
-];
-
-const SOCIAL_PROOF_LOGOS = [
-  "Acme Corp", "TechFlow", "NovaStar", "BuildPro", "ScaleUp", "DataWave",
-  "Meridian", "Axiom", "Luminary", "Vertex", "Catalyst", "Orbit",
 ];
 
 // Animated counter hook
@@ -573,7 +552,6 @@ function AnimatedStat({ value, label, suffix = '' }: { value: number; label: str
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<{ email: string; name?: string; role?: string } | null>(null);
-  const [wordIndex, setWordIndex] = useState(0);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -590,13 +568,6 @@ export default function LandingPage() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Rotating words animation
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setWordIndex((prev) => (prev + 1) % ROTATING_WORDS.length);
-    }, 2800);
-    return () => clearInterval(interval);
-  }, []);
 
   const handleLogout = () => {
     try { localStorage.removeItem("zoobicon_user"); } catch {}
@@ -764,106 +735,136 @@ export default function LandingPage() {
       <CursorGlowTracker />
 
       {/* ================================================================
-          HERO SECTION — The "holy shit" moment
+          HERO SECTION — Full-screen cinematic image + overlay
           ================================================================ */}
-      <section className="relative overflow-hidden min-h-screen flex items-center pt-16">
-        <HeroEffects
-          variant="cyan"
-          cursorGlow
-          particles
-          particleCount={35}
-          interactiveGrid
-          aurora
-          beams
-        />
+      <section className="relative min-h-screen flex flex-col">
+        {/* Full-screen background image — futuristic tech aesthetic */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="https://images.unsplash.com/photo-1639322537228-f710d846310a?w=1920&q=80&auto=format&fit=crop"
+            alt=""
+            className="w-full h-full object-cover"
+            loading="eager"
+            fetchPriority="high"
+          />
+          {/* Dark gradient overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/90" />
+          {/* Accent color wash */}
+          <div className="absolute inset-0 bg-gradient-to-br from-zoo-500/10 via-transparent to-accent-purple/10" />
+          {/* Bottom fade to page background */}
+          <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#06060e] to-transparent" />
+        </div>
 
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 w-full relative z-10 py-16 lg:py-24">
-          {/* Hero headline — centered, massive */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="text-center mb-12 lg:mb-16"
-          >
+        {/* Hero content — centered on the image */}
+        <div className="relative z-10 flex-1 flex items-center justify-center pt-20 pb-32">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8 w-full">
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.08] text-white/70 text-xs font-bold uppercase tracking-[0.2em] mb-8"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="text-center"
             >
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-zoo-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-zoo-400" />
-              </span>
-              7 AI AGENTS. ONE PROMPT. INFINITE POSSIBILITIES.
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.08] border border-white/[0.12] backdrop-blur-sm text-white/80 text-xs font-bold uppercase tracking-[0.2em] mb-8"
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-zoo-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-zoo-400" />
+                </span>
+                7 AI AGENTS. ONE PROMPT. INFINITE POSSIBILITIES.
+              </motion.div>
+
+              <h1 className="font-display text-[3.5rem] sm:text-[5rem] lg:text-[7rem] xl:text-[9rem] font-extrabold tracking-[-0.04em] leading-[0.85] mb-8 text-white drop-shadow-[0_4px_60px_rgba(0,0,0,0.5)]">
+                <span className="gradient-text-zoo-animated">Build</span>
+                <span className="text-white"> the</span>
+                <br />
+                <span className="text-white">Future.</span>
+              </h1>
+
+              <p className="text-lg lg:text-2xl text-white/70 leading-relaxed max-w-2xl mx-auto mb-12 font-light drop-shadow-[0_2px_20px_rgba(0,0,0,0.5)]">
+                Describe any website. 7 AI agents build it in seconds.
+                <br className="hidden sm:block" />
+                Production-ready. No code. No limits.
+              </p>
+
+              <div className="flex flex-wrap items-center justify-center gap-4 mb-10">
+                <Link
+                  href="/builder"
+                  className="btn-zoo group inline-flex items-center gap-3 text-lg font-bold px-12 py-5 rounded-2xl shadow-[0_0_40px_rgba(124,90,255,0.3)]"
+                >
+                  Start Building Free
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Link>
+                <Link
+                  href="#showcase"
+                  className="inline-flex items-center gap-2 text-lg px-10 py-5 rounded-2xl font-semibold text-white/80 bg-white/[0.08] border border-white/[0.15] backdrop-blur-sm hover:bg-white/[0.12] transition-all"
+                >
+                  See Examples
+                  <Eye className="w-5 h-5" />
+                </Link>
+              </div>
+
+              <div className="flex items-center justify-center gap-6 text-sm text-white/50 font-medium">
+                <span className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-zoo-400" /> No credit card
+                </span>
+                <span className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-zoo-400" /> Unlimited builds
+                </span>
+                <span className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-zoo-400" /> Free hosting
+                </span>
+              </div>
             </motion.div>
+          </div>
+        </div>
 
-            <h1 className="font-display text-[3.5rem] sm:text-[5rem] lg:text-[7rem] xl:text-8xl font-extrabold tracking-[-0.04em] leading-[0.9] mb-6 text-white">
-              <span className="gradient-text-zoo-animated">Describe it.</span>
-              <br />
-              <span className="relative inline-block">
-                <AnimatePresence mode="wait">
-                  <motion.span
-                    key={wordIndex}
-                    initial={{ opacity: 0, y: 40, filter: "blur(8px)" }}
-                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                    exit={{ opacity: 0, y: -40, filter: "blur(8px)" }}
-                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                    className="text-white/90 inline-block"
-                  >
-                    {ROTATING_WORDS[wordIndex]}
-                  </motion.span>
-                </AnimatePresence>
-              </span>
-              <span className="text-white/30 block mt-2 text-[0.35em] tracking-normal font-semibold">
-                materialize in seconds.
-              </span>
-            </h1>
+        {/* Scroll indicator */}
+        <motion.div
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
+          animate={{ y: [0, 8, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <ChevronRight className="w-6 h-6 text-white/30 rotate-90" />
+        </motion.div>
+      </section>
 
-            <p className="text-lg lg:text-xl text-white/50 leading-relaxed max-w-2xl mx-auto mb-10 font-light">
-              7 AI agents collaborate to build production-ready websites, SaaS apps,
-              and e-commerce stores from a single prompt. No templates. No code. No limits.
+      {/* ================================================================
+          LIVE BUILDER DEMO — Below the hero fold
+          ================================================================ */}
+      <section className="relative py-20 lg:py-28 overflow-hidden">
+        <HeroEffects variant="cyan" aurora beams />
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12"
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-zoo-500/20 bg-zoo-500/5 mb-6">
+              <Sparkles className="w-3 h-3 text-zoo-400" />
+              <span className="text-xs font-medium text-zoo-400">Watch It Build</span>
+            </div>
+            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-[-0.04em] mb-4 text-white">
+              From Prompt to Production
+            </h2>
+            <p className="text-lg text-white/50 max-w-xl mx-auto">
+              Type a description. Watch 7 AI agents collaborate. Get a live website.
             </p>
-
-            <div className="flex flex-wrap items-center justify-center gap-4 mb-8">
-              <Link
-                href="/builder"
-                className="btn-zoo group inline-flex items-center gap-3 text-base font-bold px-10 py-4 rounded-2xl"
-              >
-                Start Building Free
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link
-                href="#showcase"
-                className="btn-zoo-outline inline-flex items-center gap-2 text-base px-8 py-4 rounded-2xl"
-              >
-                See Examples
-                <Eye className="w-4 h-4" />
-              </Link>
-            </div>
-
-            <div className="flex items-center justify-center gap-6 text-sm text-white/40 font-medium">
-              <span className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-zoo-400" /> No credit card
-              </span>
-              <span className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-zoo-400" /> Unlimited builds
-              </span>
-              <span className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-zoo-400" /> Free hosting
-              </span>
-            </div>
           </motion.div>
 
-          {/* Live builder demo — the product IS the hero */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="relative max-w-5xl mx-auto"
           >
             <HeroDemo />
-            {/* Activity feed — positioned absolutely on desktop */}
             <div className="hidden xl:block absolute -right-[340px] top-8">
               <ActivityFeed />
             </div>
@@ -880,7 +881,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Competitor Comparison Banner */}
+      {/* Platform Capabilities — What's Included */}
       <section className="relative py-24 lg:py-32 border-b border-white/[0.06] overflow-hidden">
         <div className="absolute inset-0">
           <ParallaxLayer speed={0.2} className="absolute inset-0">
@@ -899,112 +900,56 @@ export default function LandingPage() {
           >
             <motion.div variants={fadeInUp} className="text-center mb-16">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-zoo-500/20 bg-zoo-500/5 mb-6">
-                <Star className="w-3 h-3 text-zoo-400" />
-                <span className="text-xs font-medium text-zoo-400">Industry Comparison</span>
+                <Check className="w-3 h-3 text-zoo-400" />
+                <span className="text-xs font-medium text-zoo-400">Everything Included</span>
               </div>
               <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-6 text-white text-glow">
-                See Why Builders<br />
-                <span className="text-white/60">Switch to Zoobicon</span>
+                One Platform.<br />
+                <span className="text-white/60">Every Capability.</span>
               </h2>
               <p className="max-w-2xl mx-auto text-lg text-white/60 tracking-wide">
-                The only platform that does it all. No more juggling tools, plugins, or workarounds.
+                No more juggling tools, plugins, or workarounds. Everything you need to build, launch, and scale — in one place.
               </p>
             </motion.div>
 
-            {/* Comparison Table */}
-            <motion.div variants={fadeInUp} className="overflow-x-auto">
-              <div className="min-w-[700px]">
-                {/* Header Row */}
-                <div className="grid grid-cols-6 gap-0 mb-2">
-                  <div className="p-4" />
-                  <div className="p-4 text-center">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-zoo-500/20 to-zoo-400/10 border border-zoo-500/30">
-                      <Zap className="w-4 h-4 text-zoo-400" />
-                      <span className="text-sm font-bold text-white">Zoobicon</span>
-                    </div>
+            {/* Capabilities Grid */}
+            <motion.div variants={fadeInUp} className="grid md:grid-cols-2 gap-3 max-w-4xl mx-auto">
+              {PLATFORM_CAPABILITIES.map((cap, i) => (
+                <motion.div
+                  key={i}
+                  variants={fadeInUp}
+                  className={`flex items-start gap-4 p-5 rounded-xl ${
+                    i % 2 === 0 ? "bg-white/[0.03]" : "bg-white/[0.02]"
+                  } border border-white/[0.06] hover:border-zoo-500/20 hover:bg-white/[0.04] transition-all group`}
+                >
+                  <div className="w-7 h-7 rounded-full bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-emerald-500/25 transition-colors">
+                    <Check className="w-3.5 h-3.5 text-emerald-400" />
                   </div>
-                  <div className="p-4 text-center">
-                    <span className="text-sm font-medium text-white/60">Wix</span>
+                  <div>
+                    <div className="text-sm font-semibold text-white/90 mb-1">{cap.name}</div>
+                    <div className="text-xs text-white/45 leading-relaxed">{cap.description}</div>
                   </div>
-                  <div className="p-4 text-center">
-                    <span className="text-sm font-medium text-white/60">Framer</span>
-                  </div>
-                  <div className="p-4 text-center">
-                    <span className="text-sm font-medium text-white/60">Durable</span>
-                  </div>
-                  <div className="p-4 text-center">
-                    <span className="text-sm font-medium text-white/60">Emergent</span>
-                  </div>
-                </div>
-
-                {/* Feature Rows */}
-                {COMPETITOR_FEATURES.map((feature, i) => (
-                  <motion.div
-                    key={i}
-                    variants={fadeInUp}
-                    className={`grid grid-cols-6 gap-0 ${
-                      i % 2 === 0 ? "bg-white/[0.08]" : ""
-                    } rounded-lg`}
-                  >
-                    <div className="p-4 flex items-center">
-                      <span className="text-sm text-white/60 font-medium">{feature.name}</span>
-                    </div>
-                    <div className="p-4 flex items-center justify-center">
-                      <div className="w-7 h-7 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
-                        <Check className="w-4 h-4 text-emerald-400" />
-                      </div>
-                    </div>
-                    {[feature.wix, feature.framer, feature.durable, feature.emergent].map((has, j) => (
-                      <div key={j} className="p-4 flex items-center justify-center">
-                        {has ? (
-                          <div className="w-7 h-7 rounded-full bg-white/[0.08] border border-white/[0.06] flex items-center justify-center">
-                            <Check className="w-4 h-4 text-white/65" />
-                          </div>
-                        ) : (
-                          <div className="w-7 h-7 rounded-full bg-white/[0.08] border border-white/[0.06] flex items-center justify-center">
-                            <Minus className="w-4 h-4 text-white/30" />
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </motion.div>
-                ))}
-
-                {/* Score Row */}
-                <div className="grid grid-cols-6 gap-0 mt-4 pt-4 border-t border-white/[0.10]">
-                  <div className="p-4">
-                    <span className="text-sm font-bold text-white/60">Total Features</span>
-                  </div>
-                  <div className="p-4 text-center">
-                    <span className="text-2xl font-black gradient-text-zoo">12/14</span>
-                  </div>
-                  <div className="p-4 text-center">
-                    <span className="text-2xl font-black text-white/60">6/14</span>
-                  </div>
-                  <div className="p-4 text-center">
-                    <span className="text-2xl font-black text-white/60">3/14</span>
-                  </div>
-                  <div className="p-4 text-center">
-                    <span className="text-2xl font-black text-white/60">3/14</span>
-                  </div>
-                  <div className="p-4 text-center">
-                    <span className="text-2xl font-black text-white/60">4/14</span>
-                  </div>
-                </div>
-              </div>
+                </motion.div>
+              ))}
             </motion.div>
 
-            {/* CTA under comparison */}
-            <motion.div variants={fadeInUp} className="text-center mt-12">
-              <Link
-                href="/builder"
-                className="inline-flex items-center gap-3 btn-zoo px-8 py-4 rounded-2xl text-base font-bold text-white"
-              >
-                <span>Try the Most Complete Builder</span>
-                <ArrowRight className="w-5 h-5" />
-              </Link>
+            {/* CTA */}
+            <motion.div variants={fadeInUp} className="text-center mt-14">
+              <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full bg-emerald-500/[0.06] border border-emerald-500/15">
+                <span className="text-sm text-emerald-400 font-semibold">14 of 14 included</span>
+                <span className="text-xs text-white/40">on every plan</span>
+              </div>
+              <div className="block">
+                <Link
+                  href="/builder"
+                  className="inline-flex items-center gap-3 btn-zoo px-8 py-4 rounded-2xl text-base font-bold text-white"
+                >
+                  <span>Start Building Free</span>
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+              </div>
               <p className="mt-4 text-sm text-white/40">
-                Free to start. No credit card required.
+                No credit card. No limits on features.
               </p>
             </motion.div>
           </motion.div>
@@ -1252,14 +1197,11 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
+      {/* How It Works — 3 steps */}
       <section className="relative py-24 lg:py-32 border-t border-white/[0.06] overflow-hidden">
         <div className="absolute inset-0">
           <ParallaxLayer speed={0.3} className="absolute inset-0">
             <div className="glow-orb glow-orb-purple w-[600px] h-[600px] top-1/4 left-1/4 opacity-10" />
-          </ParallaxLayer>
-          <ParallaxLayer speed={-0.2} className="absolute inset-0">
-            <div className="glow-orb glow-orb-cyan w-[400px] h-[400px] bottom-1/4 right-1/4 opacity-10" />
           </ParallaxLayer>
         </div>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
@@ -1270,45 +1212,33 @@ export default function LandingPage() {
             variants={staggerContainer}
           >
             <motion.div variants={fadeInUp} className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-amber-500/20 bg-amber-500/5 mb-6">
-                <Star className="w-3 h-3 text-amber-400" />
-                <span className="text-xs font-medium text-amber-400">What Builders Say</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-zoo-500/20 bg-zoo-500/5 mb-6">
+                <Sparkles className="w-3 h-3 text-zoo-400" />
+                <span className="text-xs font-medium text-zoo-400">How It Works</span>
               </div>
               <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-6 text-white text-glow">
-                Loved by Teams<br />
-                <span className="text-white/60">Who Ship Fast</span>
+                Three Steps.<br />
+                <span className="text-white/60">Zero Code.</span>
               </h2>
             </motion.div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
-              {TESTIMONIALS.map((t, i) => (
+            <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              {HOW_IT_WORKS.map((step, i) => (
                 <motion.div
                   key={i}
                   variants={fadeInUp}
-                  className="card-glow p-6 rounded-2xl relative testimonial-quote"
+                  className="relative text-center group"
                 >
-                  {/* Stars */}
-                  <div className="flex items-center gap-0.5 mb-4">
-                    {[...Array(t.stars)].map((_, j) => (
-                      <Star key={j} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                    ))}
+                  {/* Step number */}
+                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${step.gradient} mb-6 shadow-lg group-hover:scale-110 transition-transform`}>
+                    <span className="text-2xl font-black text-white">{step.step}</span>
                   </div>
-
-                  {/* Quote */}
-                  <p className="text-sm text-white/60 leading-relaxed mb-6">
-                    &ldquo;{t.quote}&rdquo;
-                  </p>
-
-                  {/* Author */}
-                  <div className="flex items-center gap-3 mt-auto">
-                    <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${t.gradient} flex items-center justify-center text-white font-bold text-sm`}>
-                      {t.name.split(' ').map(n => n[0]).join('')}
-                    </div>
-                    <div>
-                      <div className="text-sm font-semibold text-white/80">{t.name}</div>
-                      <div className="text-xs text-white/40">{t.role}, {t.company}</div>
-                    </div>
-                  </div>
+                  {/* Connector line (not on last) */}
+                  {i < HOW_IT_WORKS.length - 1 && (
+                    <div className="hidden md:block absolute top-8 left-[calc(50%+40px)] w-[calc(100%-80px)] h-[1px] bg-gradient-to-r from-white/10 to-white/5" />
+                  )}
+                  <h3 className="text-xl font-bold font-display mb-3 text-white">{step.title}</h3>
+                  <p className="text-sm text-white/50 leading-relaxed max-w-xs mx-auto">{step.description}</p>
                 </motion.div>
               ))}
             </div>
