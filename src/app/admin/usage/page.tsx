@@ -232,11 +232,11 @@ export default function UsagePage() {
   ];
 
   return (
-    <div className="relative min-h-screen bg-[#050508]">
+    <div className="relative min-h-screen bg-[#131520]">
       <BackgroundEffects preset="admin" />
 
       {/* Nav */}
-      <nav className="border-b border-white/10 bg-[#050508]/90 backdrop-blur-2xl sticky top-0 z-50">
+      <nav className="border-b border-white/10 bg-[#131520]/90 backdrop-blur-2xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-6">
@@ -293,7 +293,7 @@ export default function UsagePage() {
             <CreditCard className="w-6 h-6 text-blue-400" />
             <h1 className="text-2xl font-bold tracking-tight text-white">Usage &amp; Credits</h1>
           </div>
-          <p className="text-white/50 text-sm">Monitor your platform usage, credit balance, and API activity.</p>
+          <p className="text-white/60 text-sm">Monitor your platform usage, credit balance, and API activity.</p>
         </div>
 
         {/* ===== 1. Overview Cards ===== */}
@@ -318,7 +318,7 @@ export default function UsagePage() {
                 )}
               </div>
               <div className="text-2xl font-black text-white">{card.value}</div>
-              <div className="text-xs text-white/40 mt-1">{card.sub}</div>
+              <div className="text-xs text-white/60 mt-1">{card.sub}</div>
             </motion.div>
           ))}
         </div>
@@ -333,7 +333,7 @@ export default function UsagePage() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-base font-bold text-white">Daily Generations</h2>
-              <p className="text-xs text-white/40">Last 30 days</p>
+              <p className="text-xs text-white/60">Last 30 days</p>
             </div>
             <div className="text-right">
               <div className="text-lg font-bold text-white">{totalMonth.toLocaleString()}</div>
@@ -383,7 +383,7 @@ export default function UsagePage() {
             {/* Big number */}
             <div className="flex flex-col items-center justify-center bg-[#111318]/50 rounded-xl p-6 border border-white/10">
               <div className="text-5xl font-black text-white mb-1">{stats.creditsRemaining.toLocaleString()}</div>
-              <div className="text-sm text-white/40">credits remaining</div>
+              <div className="text-sm text-white/60">credits remaining</div>
             </div>
 
             {/* Plan + limits */}
@@ -401,15 +401,15 @@ export default function UsagePage() {
               </div>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-white/50">Generations</span>
+                  <span className="text-white/60">Generations</span>
                   <span className="text-white font-medium">{currentLimits.generations}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-white/50">API Rate</span>
+                  <span className="text-white/60">API Rate</span>
                   <span className="text-white font-medium">{currentLimits.apiRate}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-white/50">Storage</span>
+                  <span className="text-white/60">Storage</span>
                   <span className="text-white font-medium">{currentLimits.storage}</span>
                 </div>
               </div>
@@ -419,7 +419,7 @@ export default function UsagePage() {
             <div className="bg-[#111318]/50 rounded-xl p-6 border border-white/10 flex flex-col justify-between">
               <div>
                 <div className="flex justify-between text-sm mb-2">
-                  <span className="text-white/50">Used this period</span>
+                  <span className="text-white/60">Used this period</span>
                   <span className="text-white font-medium">{stats.creditsUsed.toLocaleString()} / {stats.creditsTotal.toLocaleString()}</span>
                 </div>
                 <div className="w-full h-3 bg-[#111318] rounded-full overflow-hidden">

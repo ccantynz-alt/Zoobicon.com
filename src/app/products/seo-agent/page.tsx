@@ -71,7 +71,7 @@ export default function SEOAgentPage() {
     <div className="relative min-h-screen">
       <BackgroundEffects preset="technical" />
 
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#050508]/80 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
@@ -80,7 +80,7 @@ export default function SEOAgentPage() {
               </div>
               <span className="text-lg font-bold tracking-tight">Zoobicon</span>
             </Link>
-            <span className="text-xs text-white/40">/</span>
+            <span className="text-xs text-white/60">/</span>
             <span className="text-sm text-white/65">SEO Agent</span>
           </div>
           <div className="flex items-center gap-4">
@@ -151,7 +151,7 @@ export default function SEOAgentPage() {
               ].map((stat) => (
                 <div key={stat.label} className="gradient-border p-4 rounded-xl text-center">
                   <div className="text-2xl font-black gradient-text-static">{stat.value}</div>
-                  <div className="text-xs text-white/50 mt-1">{stat.label}</div>
+                  <div className="text-xs text-white/60 mt-1">{stat.label}</div>
                 </div>
               ))}
             </motion.div>
@@ -227,11 +227,11 @@ export default function SEOAgentPage() {
 
       <footer className="border-t border-white/[0.08] py-8">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <div className="text-xs text-white/40">&copy; 2026 Zoobicon</div>
+          <div className="text-xs text-white/60">&copy; 2026 Zoobicon</div>
           <div className="flex gap-4">
-            <Link href="/" className="text-xs text-white/40 hover:text-white/60">Home</Link>
-            <Link href="/products/website-builder" className="text-xs text-white/40 hover:text-white/60">Builder</Link>
-            <Link href="/products/video-creator" className="text-xs text-white/40 hover:text-white/60">Video Creator</Link>
+            <Link href="/" className="text-xs text-white/60 hover:text-white/60">Home</Link>
+            <Link href="/products/website-builder" className="text-xs text-white/60 hover:text-white/60">Builder</Link>
+            <Link href="/products/video-creator" className="text-xs text-white/60 hover:text-white/60">Video Creator</Link>
           </div>
         </div>
       </footer>

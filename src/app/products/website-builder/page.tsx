@@ -53,7 +53,7 @@ export default function WebsiteBuilderPage() {
       <BackgroundEffects preset="technical" />
 
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#050508]/80 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
@@ -62,7 +62,7 @@ export default function WebsiteBuilderPage() {
               </div>
               <span className="text-lg font-bold tracking-tight">Zoobicon</span>
             </Link>
-            <span className="text-xs text-white/40">/</span>
+            <span className="text-xs text-white/60">/</span>
             <span className="text-sm text-white/65">AI Website Builder</span>
           </div>
           <Link href="/builder" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white">
@@ -189,7 +189,7 @@ export default function WebsiteBuilderPage() {
                         {row[col] === true ? (
                           <Check className="w-4 h-4 text-accent-cyan mx-auto" />
                         ) : row[col] === false ? (
-                          <span className="text-white/35">—</span>
+                          <span className="text-white/60">—</span>
                         ) : (
                           <span className="text-white/60 text-xs">{row[col] as string}</span>
                         )}
@@ -220,11 +220,11 @@ export default function WebsiteBuilderPage() {
 
       <footer className="border-t border-white/[0.08] py-8">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <div className="text-xs text-white/40">&copy; 2026 Zoobicon</div>
+          <div className="text-xs text-white/60">&copy; 2026 Zoobicon</div>
           <div className="flex gap-4">
-            <Link href="/" className="text-xs text-white/40 hover:text-white/60">Home</Link>
-            <Link href="/products/seo-agent" className="text-xs text-white/40 hover:text-white/60">SEO Agent</Link>
-            <Link href="/products/video-creator" className="text-xs text-white/40 hover:text-white/60">Video Creator</Link>
+            <Link href="/" className="text-xs text-white/60 hover:text-white/60">Home</Link>
+            <Link href="/products/seo-agent" className="text-xs text-white/60 hover:text-white/60">SEO Agent</Link>
+            <Link href="/products/video-creator" className="text-xs text-white/60 hover:text-white/60">Video Creator</Link>
           </div>
         </div>
       </footer>

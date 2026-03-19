@@ -120,10 +120,10 @@ export default function IntelPage() {
   ) || [];
 
   return (
-    <div className="min-h-screen bg-[#050508] text-white">
+    <div className="min-h-screen bg-[#131520] text-white">
       <BackgroundEffects preset="admin" />
       {/* Header */}
-      <header className="border-b border-white/10 px-6 py-4">
+      <header className="border-b border-white/10 bg-[#131520]/90 backdrop-blur-2xl px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
@@ -190,7 +190,7 @@ export default function IntelPage() {
 
         {/* Competitor Grid */}
         <div>
-          <h2 className="text-sm font-semibold text-white/50 mb-4 flex items-center gap-2">
+          <h2 className="text-sm font-semibold text-white/60 mb-4 flex items-center gap-2">
             <Globe className="w-4 h-4" />
             Tracked Competitors ({competitors.length})
           </h2>
@@ -261,7 +261,7 @@ export default function IntelPage() {
         {filteredResults.length > 0 && (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-white/50 flex items-center gap-2">
+              <h2 className="text-sm font-semibold text-white/60 flex items-center gap-2">
                 <Clock className="w-4 h-4" />
                 Crawl Results ({filteredResults.length})
               </h2>

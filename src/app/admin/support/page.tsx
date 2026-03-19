@@ -206,13 +206,13 @@ export default function AdminSupportPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#050508] text-white">
+    <div className="min-h-screen bg-[#131520] text-white">
       <BackgroundEffects preset="admin" />
       {/* Header */}
-      <div className="border-b border-white/10 bg-[#111318]/80 backdrop-blur-sm">
+      <div className="border-b border-white/10 bg-[#131520]/90 backdrop-blur-2xl">
         <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/admin" className="p-2 rounded-lg hover:bg-[#111318] transition-colors">
+            <Link href="/admin" className="p-2 rounded-lg hover:bg-[#131520] transition-colors">
               <ArrowLeft className="w-5 h-5 text-white/70" />
             </Link>
             <MessageSquare className="w-6 h-6 text-emerald-400" />
@@ -548,7 +548,7 @@ export default function AdminSupportPage() {
             <div className="text-center">
               <MessageSquare className="w-16 h-16 mx-auto mb-4 opacity-20" />
               <p>Select a ticket to view</p>
-              <p className="text-sm mt-2 text-white/40">
+              <p className="text-sm mt-2 text-white/60">
                 Emails to support@zoobicon.com automatically create tickets
                 <br />
                 AI drafts responses and auto-replies when confident

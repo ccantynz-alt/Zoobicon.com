@@ -97,7 +97,7 @@ export default function VideoCreatorPage() {
     <div className="relative min-h-screen">
       <BackgroundEffects preset="technical" />
 
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#050508]/80 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
@@ -106,7 +106,7 @@ export default function VideoCreatorPage() {
               </div>
               <span className="text-lg font-bold tracking-tight">Zoobicon</span>
             </Link>
-            <span className="text-xs text-white/40">/</span>
+            <span className="text-xs text-white/60">/</span>
             <span className="text-sm text-white/65">AI Video Creator</span>
           </div>
           <div className="flex items-center gap-4">
@@ -174,7 +174,7 @@ export default function VideoCreatorPage() {
                 <span>Try Storyboard Creator</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <span className="text-xs text-white/40">AI-powered storyboards & scripts — free to try</span>
+              <span className="text-xs text-white/60">AI-powered storyboards & scripts — free to try</span>
             </motion.div>
 
             <motion.div variants={fadeInUp} className="max-w-lg mb-16">
@@ -191,7 +191,7 @@ export default function VideoCreatorPage() {
                     value={waitlistEmail}
                     onChange={(e) => setWaitlistEmail(e.target.value)}
                     placeholder="Enter your email for early access"
-                    className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-xl px-5 py-4 text-white placeholder:text-white/45 outline-none text-sm focus:border-accent-purple/30 transition-colors"
+                    className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-xl px-5 py-4 text-white placeholder:text-white/60 outline-none text-sm focus:border-accent-purple/30 transition-colors"
                   />
                   <button
                     type="submit"
@@ -210,7 +210,7 @@ export default function VideoCreatorPage() {
               {PLATFORMS.map((p) => (
                 <div key={p.name} className="gradient-border p-4 rounded-xl text-center group card-hover">
                   <div className="text-sm font-bold mb-1 group-hover:text-white transition-colors">{p.name}</div>
-                  <div className="text-[10px] text-white/45">{p.format}</div>
+                  <div className="text-[10px] text-white/60">{p.format}</div>
                   <div className="text-[10px] text-accent-purple/60">{p.duration}</div>
                 </div>
               ))}
@@ -310,7 +310,7 @@ export default function VideoCreatorPage() {
                     <span className="text-[10px] font-mono text-accent-purple bg-accent-purple/10 px-2 py-0.5 rounded">{p.format}</span>
                   </div>
                   <p className="text-sm text-white/60 leading-relaxed mb-2">{p.desc}</p>
-                  <div className="text-xs text-white/40">Duration: {p.duration}</div>
+                  <div className="text-xs text-white/60">Duration: {p.duration}</div>
                 </motion.div>
               ))}
             </div>
@@ -350,7 +350,7 @@ export default function VideoCreatorPage() {
                   value={waitlistEmail}
                   onChange={(e) => setWaitlistEmail(e.target.value)}
                   placeholder="Enter your email for early access"
-                  className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-xl px-5 py-4 text-white placeholder:text-white/45 outline-none text-sm focus:border-accent-purple/30 transition-colors"
+                  className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-xl px-5 py-4 text-white placeholder:text-white/60 outline-none text-sm focus:border-accent-purple/30 transition-colors"
                 />
                 <button
                   type="submit"
@@ -368,11 +368,11 @@ export default function VideoCreatorPage() {
 
       <footer className="border-t border-white/[0.08] py-8">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <div className="text-xs text-white/40">&copy; 2026 Zoobicon</div>
+          <div className="text-xs text-white/60">&copy; 2026 Zoobicon</div>
           <div className="flex gap-4">
-            <Link href="/" className="text-xs text-white/40 hover:text-white/60">Home</Link>
-            <Link href="/products/website-builder" className="text-xs text-white/40 hover:text-white/60">Builder</Link>
-            <Link href="/products/seo-agent" className="text-xs text-white/40 hover:text-white/60">SEO Agent</Link>
+            <Link href="/" className="text-xs text-white/60 hover:text-white/60">Home</Link>
+            <Link href="/products/website-builder" className="text-xs text-white/60 hover:text-white/60">Builder</Link>
+            <Link href="/products/seo-agent" className="text-xs text-white/60 hover:text-white/60">SEO Agent</Link>
           </div>
         </div>
       </footer>

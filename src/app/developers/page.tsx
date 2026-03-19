@@ -174,7 +174,7 @@ export default function DevelopersPage() {
       <BackgroundEffects preset="technical" />
 
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#050508]/80 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2">
@@ -211,7 +211,7 @@ export default function DevelopersPage() {
                 <Terminal className="w-3 h-3 text-accent-cyan" />
                 <span className="text-xs font-medium text-accent-cyan">Developer Platform</span>
               </div>
-              <span className="text-xs text-white/40 font-mono">zoobicon.io</span>
+              <span className="text-xs text-white/60 font-mono">zoobicon.io</span>
             </motion.div>
 
             <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[0.95] mb-6">
@@ -249,7 +249,7 @@ export default function DevelopersPage() {
                         className={`px-5 py-3 text-xs font-medium whitespace-nowrap transition-colors ${
                           activeTab === tab
                             ? "text-accent-cyan border-b-2 border-accent-cyan"
-                            : "text-white/50 hover:text-white/60"
+                            : "text-white/60 hover:text-white/60"
                         }`}
                       >
                         {tab === "generate" ? "Generate" : tab === "deploy" ? "Deploy" : tab === "sites" ? "Manage Sites" : "Status & Branding"}
@@ -265,7 +265,7 @@ export default function DevelopersPage() {
                       {copiedEndpoint === activeTab ? (
                         <Check className="w-4 h-4 text-accent-cyan" />
                       ) : (
-                        <Copy className="w-4 h-4 text-white/50" />
+                        <Copy className="w-4 h-4 text-white/60" />
                       )}
                     </button>
                     <pre className="p-6 overflow-x-auto text-sm font-mono leading-relaxed text-white/60">
@@ -299,13 +299,13 @@ export default function DevelopersPage() {
                 <motion.div key={sdk.lang} variants={fadeInUp} className="gradient-border card-hover p-5 rounded-xl group">
                   <div className="flex items-center justify-between mb-3">
                     <span className={`text-sm font-bold ${sdk.color}`}>{sdk.lang}</span>
-                    <span className="text-[10px] font-mono text-white/40">{sdk.pkg}</span>
+                    <span className="text-[10px] font-mono text-white/60">{sdk.pkg}</span>
                   </div>
                   <div className="bg-dark-400/80 rounded-lg px-3 py-2 font-mono text-xs text-white/60 flex items-center justify-between">
                     <code>{sdk.install}</code>
                     <button
                       onClick={() => copyCode(sdk.install, sdk.lang)}
-                      className="text-white/40 hover:text-white/65 transition-colors ml-2 flex-shrink-0"
+                      className="text-white/60 hover:text-white/65 transition-colors ml-2 flex-shrink-0"
                     >
                       {copiedEndpoint === sdk.lang ? <Check className="w-3 h-3 text-accent-cyan" /> : <Copy className="w-3 h-3" />}
                     </button>
@@ -338,7 +338,7 @@ export default function DevelopersPage() {
                       {endpoint.method}
                     </span>
                     <code className="text-sm font-mono text-white/70 flex-shrink-0">{endpoint.path}</code>
-                    <span className="text-sm text-white/50 hidden md:block">{endpoint.desc}</span>
+                    <span className="text-sm text-white/60 hidden md:block">{endpoint.desc}</span>
                     <ChevronRight className="w-4 h-4 text-white/30 ml-auto" />
                   </div>
                 ))}
@@ -386,7 +386,7 @@ export default function DevelopersPage() {
               <motion.div variants={fadeInUp} className="gradient-border p-6 rounded-xl">
                 <div className="text-sm font-semibold text-white/65 mb-2">Free</div>
                 <div className="text-3xl font-black mb-1">$0</div>
-                <div className="text-xs text-white/50 mb-4">10 requests/min</div>
+                <div className="text-xs text-white/60 mb-4">10 requests/min</div>
                 <ul className="space-y-2 mb-6 text-sm text-white/60">
                   <li>Standard tier generation</li>
                   <li>Deploy to zoobicon.sh</li>
@@ -403,8 +403,8 @@ export default function DevelopersPage() {
                   Popular
                 </div>
                 <div className="text-sm font-semibold text-accent-cyan mb-2">Pro</div>
-                <div className="text-3xl font-black mb-1">$79<span className="text-lg font-normal text-white/50">/mo</span></div>
-                <div className="text-xs text-white/50 mb-4">60 requests/min</div>
+                <div className="text-3xl font-black mb-1">$79<span className="text-lg font-normal text-white/60">/mo</span></div>
+                <div className="text-xs text-white/60 mb-4">60 requests/min</div>
                 <ul className="space-y-2 mb-6 text-sm text-white/65">
                   <li>Premium tier generation</li>
                   <li>43 specialized generators</li>
@@ -420,7 +420,7 @@ export default function DevelopersPage() {
               <motion.div variants={fadeInUp} className="gradient-border p-6 rounded-xl">
                 <div className="text-sm font-semibold text-white/65 mb-2">Enterprise</div>
                 <div className="text-3xl font-black mb-1">Custom</div>
-                <div className="text-xs text-white/50 mb-4">600 requests/min</div>
+                <div className="text-xs text-white/60 mb-4">600 requests/min</div>
                 <ul className="space-y-2 mb-6 text-sm text-white/60">
                   <li>Dedicated rate limits</li>
                   <li>Custom model routing</li>
@@ -447,7 +447,7 @@ export default function DevelopersPage() {
           <p className="text-lg text-white/60 mb-8">Free API key. No credit card. Ship your first integration in under 5 minutes.</p>
           <div className="inline-flex items-center gap-2 bg-dark-200 border border-white/[0.12] rounded-xl px-5 py-3 font-mono text-sm text-white/65 mb-6">
             <span className="text-accent-cyan">$</span> npm install @zoobicon/sdk
-            <button onClick={() => copyCode("npm install @zoobicon/sdk", "cta-install")} className="ml-2 text-white/40 hover:text-white/65">
+            <button onClick={() => copyCode("npm install @zoobicon/sdk", "cta-install")} className="ml-2 text-white/60 hover:text-white/65">
               {copiedEndpoint === "cta-install" ? <Check className="w-4 h-4 text-accent-cyan" /> : <Copy className="w-4 h-4" />}
             </button>
           </div>
@@ -463,11 +463,11 @@ export default function DevelopersPage() {
       {/* Footer */}
       <footer className="border-t border-white/[0.08] py-8">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <div className="text-xs text-white/40">&copy; 2026 Zoobicon. All rights reserved.</div>
+          <div className="text-xs text-white/60">&copy; 2026 Zoobicon. All rights reserved.</div>
           <div className="flex gap-4">
-            <Link href="/" className="text-xs text-white/40 hover:text-white/60">Home</Link>
-            <Link href="/agencies" className="text-xs text-white/40 hover:text-white/60">Agencies</Link>
-            <Link href="/cli" className="text-xs text-white/40 hover:text-white/60">CLI</Link>
+            <Link href="/" className="text-xs text-white/60 hover:text-white/60">Home</Link>
+            <Link href="/agencies" className="text-xs text-white/60 hover:text-white/60">Agencies</Link>
+            <Link href="/cli" className="text-xs text-white/60 hover:text-white/60">CLI</Link>
           </div>
         </div>
       </footer>

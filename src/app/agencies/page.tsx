@@ -140,7 +140,7 @@ export default function AgenciesPage() {
       <BackgroundEffects preset="technical" />
 
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#050508]/80 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2">
@@ -157,10 +157,10 @@ export default function AgenciesPage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/agencies/dashboard" className="text-sm text-white/50 hover:text-white/70 transition-colors">
+            <Link href="/agencies/dashboard" className="text-sm text-white/60 hover:text-white/70 transition-colors">
               Dashboard
             </Link>
-            <Link href="/agencies/portal" className="text-sm text-white/50 hover:text-white/70 transition-colors">
+            <Link href="/agencies/portal" className="text-sm text-white/60 hover:text-white/70 transition-colors">
               Client Portal
             </Link>
             <Link href="/auth/signup" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white">
@@ -213,7 +213,7 @@ export default function AgenciesPage() {
               ].map((stat) => (
                 <div key={stat.label} className="gradient-border p-4 rounded-xl text-center">
                   <div className="text-2xl font-black gradient-text-static">{stat.value}</div>
-                  <div className="text-xs text-white/50 mt-1">{stat.label}</div>
+                  <div className="text-xs text-white/60 mt-1">{stat.label}</div>
                 </div>
               ))}
             </motion.div>
@@ -299,7 +299,7 @@ export default function AgenciesPage() {
                   <p className="text-sm text-white/60 leading-relaxed mb-4">&ldquo;{t.text}&rdquo;</p>
                   <div>
                     <div className="text-sm font-semibold">{t.name}</div>
-                    <div className="text-xs text-white/50">{t.role}</div>
+                    <div className="text-xs text-white/60">{t.role}</div>
                   </div>
                 </motion.div>
               ))}
@@ -336,8 +336,8 @@ export default function AgenciesPage() {
                     </div>
                   )}
                   <div className="text-sm font-semibold text-white/65 mb-2">{tier.name}</div>
-                  <div className="text-3xl font-black mb-0.5">{tier.price}<span className="text-base font-normal text-white/50">{tier.period}</span></div>
-                  <div className="text-xs text-white/50 mb-4">{tier.desc}</div>
+                  <div className="text-3xl font-black mb-0.5">{tier.price}<span className="text-base font-normal text-white/60">{tier.period}</span></div>
+                  <div className="text-xs text-white/60 mb-4">{tier.desc}</div>
                   <ul className="space-y-2 mb-6">
                     {tier.features.map((f) => (
                       <li key={f} className="flex items-center gap-2 text-sm text-white/65">
@@ -389,11 +389,11 @@ export default function AgenciesPage() {
       {/* Footer */}
       <footer className="border-t border-white/[0.08] py-8">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <div className="text-xs text-white/40">&copy; 2026 Zoobicon. All rights reserved.</div>
+          <div className="text-xs text-white/60">&copy; 2026 Zoobicon. All rights reserved.</div>
           <div className="flex gap-4">
-            <Link href="/" className="text-xs text-white/40 hover:text-white/60">Home</Link>
-            <Link href="/developers" className="text-xs text-white/40 hover:text-white/60">Developers</Link>
-            <Link href="/cli" className="text-xs text-white/40 hover:text-white/60">CLI</Link>
+            <Link href="/" className="text-xs text-white/60 hover:text-white/60">Home</Link>
+            <Link href="/developers" className="text-xs text-white/60 hover:text-white/60">Developers</Link>
+            <Link href="/cli" className="text-xs text-white/60 hover:text-white/60">CLI</Link>
           </div>
         </div>
       </footer>
