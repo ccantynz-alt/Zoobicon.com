@@ -423,3 +423,118 @@ The goal is **3s to first preview, 10s to customized site, 30s to full-stack app
 
 ### The Rule
 **Never accept the current pipeline speed as "good enough."** If a competitor ships a faster build, we must respond. If a new model or technique enables faster generation, adopt it immediately. Speed is the moat — the fastest full-stack builder wins the market.
+
+## WEBSITE REDESIGN — "Million Dollar" Overhaul Checklist
+
+**Goal:** Transform Zoobicon from "generic dark-mode AI startup" into a jaw-dropping, viral-worthy, conversion-optimized platform that commands attention on first visit and across TikTok/social media. Every domain gets its own personality. Every section is screenshot-worthy.
+
+**Research-backed targets:**
+- Sub-1-second load → 2.5-5x conversion lift
+- Real-time activity feeds → 98% conversion boost
+- Video testimonials → 80% lift over text
+- Interactive demos → 50% conversion boost
+- Scroll animations → 28% CTR increase
+- 73% of users associate smooth animations with trust
+
+### Phase 1: Hero That Sells Itself (zoobicon.com)
+
+- [ ] **1.1** Replace rotating-word hero with embedded live builder demo (visitor types prompt, watches agents activate, sees site materialize)
+- [ ] **1.2** Typography revolution — switch to distinctive display font (Clash Display / Cal Sans / custom), 8rem+ headlines, variable weight animations
+- [ ] **1.3** Signature color system — define ownable brand color that isn't "another blue gradient", implement across all components
+- [ ] **1.4** Kill all placeholder company names ("Acme Corp", "TechFlow", "NovaStar") — replace with real metrics
+- [ ] **1.5** Add live counter component ("47,293 sites built") pulling from real deployment data
+- [ ] **1.6** Add real-time activity feed ("Emma just built a yoga studio site — 12s ago")
+- [ ] **1.7** CTA button redesign — animated gradient border, pulse effect, impossible to miss
+- [ ] **1.8** Trust bar redesign — real stats, not generic "Trusted by builders worldwide"
+- [ ] **1.9** WebGL/3D hero element (Spline embed or Three.js scene) — not just particles
+
+### Phase 2: Cinematic Scroll Experience
+
+- [ ] **2.1** Install and configure GSAP ScrollTrigger for scroll-driven storytelling
+- [ ] **2.2** Section 1: "The Problem" — show the pain of building websites manually (contrast/comparison)
+- [ ] **2.3** Section 2: "The Magic" — live demo moment, the "aha" (interactive prompt → result)
+- [ ] **2.4** Section 3: "How It Works" — 3-step animated walkthrough (Describe → Generate → Deploy)
+- [ ] **2.5** Section 4: "The Output" — gallery of actual generated sites from deployments DB
+- [ ] **2.6** Section 5: "Speed Proof" — side-by-side: Zoobicon 95s vs hiring a dev 2 weeks
+- [ ] **2.7** Section 6: "Social Proof" — real testimonials, video if available, quantified results
+- [ ] **2.8** Section 7: "Pricing" — simplified, no "Soon" badges, clear value per tier
+- [ ] **2.9** Section 8: "Final CTA" — urgency, large, cinematic close
+- [ ] **2.10** Scroll-triggered reveals on every section (fade-in-up with stagger)
+- [ ] **2.11** Parallax depth layers between sections
+- [ ] **2.12** Pin/snap scrolling for key moments
+
+### Phase 3: Domain-Specific Landing Pages
+
+- [ ] **3.1** **zoobicon.ai** — 3D neural network hero (Spline/Three.js), technical copy, "Build with intelligence", AI-forward aesthetic
+- [ ] **3.2** **zoobicon.io** — Terminal-style hero with API demo, developer docs prominent, clean/minimal, code aesthetic
+- [ ] **3.3** **zoobicon.sh** — Full-screen CLI demo, hacker aesthetic, "Deploy from your terminal", command-line first
+- [ ] **3.4** **dominat8.io** — Glitch effects, neon accents, aggressive typography, "Crush your competition", high-energy
+- [ ] **3.5** Shared design DNA across all domains (typography scale, spacing system, animation library) but unique personalities
+- [ ] **3.6** Domain detection auto-routing via brand-config.ts updates
+
+### Phase 4: Conversion Architecture
+
+- [ ] **4.1** Segmented CTAs — different buttons for developer vs agency vs entrepreneur
+- [ ] **4.2** Sticky nav that's part of the conversion funnel (not just navigation)
+- [ ] **4.3** Social proof layered throughout the page (not just one "testimonials" section)
+- [ ] **4.4** Mobile-first layout overhaul (83% of visits are mobile)
+- [ ] **4.5** Before/after slider component — "Your prompt" → "Your website" with draggable divider
+- [ ] **4.6** Micro-interactions on every hover — buttons breathe, cards tilt with parallax, icons animate
+- [ ] **4.7** Loading states that are delightful (branded animations, not spinners)
+- [ ] **4.8** Pricing page overhaul — remove all "Soon" badges, clarify roadmap honestly
+
+### Phase 5: Viral / Social Media Optimization
+
+- [ ] **5.1** Every section designed as standalone screenshot-worthy frame
+- [ ] **5.2** Bold typography that reads on phone screens in TikTok feeds
+- [ ] **5.3** Contrast ratios that pop on mobile (kill white/40 text — minimum white/70 for body)
+- [ ] **5.4** "Built with Zoobicon" shareable badges on generated sites
+- [ ] **5.5** Auto-generated Open Graph images for every deployed site
+- [ ] **5.6** Prompt Gallery page — users share best prompts + results (community/viral loop)
+- [ ] **5.7** Showcase/gallery page of best generated sites (filterable, click to see prompt)
+
+### Phase 6: Component & Design System
+
+- [ ] **6.1** 8px spacing scale (8, 16, 32, 64px) — Linear-inspired consistency
+- [ ] **6.2** Warm-shifted grays instead of cool blue-grays
+- [ ] **6.3** Rive or Lottie animations for key interactive moments
+- [ ] **6.4** Consistent gradient language across all pages
+- [ ] **6.5** Card redesign — glass morphism or solid with better depth
+- [ ] **6.6** Button system overhaul — primary (filled + glow), secondary (outline + hover fill), ghost
+- [ ] **6.7** Icon animation system — icons animate on hover/scroll-in
+- [ ] **6.8** Cursor-following effects (subtle glow, magnetic buttons)
+
+### Phase 7: Performance & Polish
+
+- [ ] **7.1** Lazy-load below-fold sections and 3D elements
+- [ ] **7.2** Optimize all animations to transform+opacity only (GPU accelerated)
+- [ ] **7.3** `prefers-reduced-motion` support for all animations (accessibility)
+- [ ] **7.4** Sub-1-second First Contentful Paint target
+- [ ] **7.5** WebP/AVIF images where applicable
+- [ ] **7.6** Font subsetting for display fonts (load only needed glyphs)
+- [ ] **7.7** Critical CSS inlining for above-fold content
+
+### Implementation Notes
+
+- **Animation stack**: GSAP ScrollTrigger for scroll-driven + Framer Motion for component-level + Rive for complex interactive
+- **3D**: Spline for hero scenes (no WebGL expertise needed), fallback to animated SVG on low-power devices
+- **Typography**: Load display font via `next/font` for zero layout shift
+- **Color system**: Define in CSS custom properties for easy domain-specific theming
+- **Testing**: Every change must look good as a screenshot, work on mobile, and not increase load time
+- **Social proof rule**: ZERO placeholder/fake data. If we don't have real data yet, show the live counter from our own DB. Never "Acme Corp" again.
+
+### Key Files to Modify
+- `src/app/page.tsx` — Homepage (hero, sections, CTAs)
+- `src/app/pricing/page.tsx` — Pricing overhaul
+- `src/app/ai/page.tsx` — zoobicon.ai domain page
+- `src/app/io/page.tsx` — zoobicon.io domain page
+- `src/app/sh/page.tsx` — zoobicon.sh domain page
+- `src/app/dominat8/page.tsx` — dominat8.io domain page
+- `src/lib/brand-config.ts` — Domain detection + theming
+- `src/components/BackgroundEffects.tsx` — Hero visuals
+- `src/components/HeroDemo.tsx` — NEW: Live builder demo component
+- `src/components/ActivityFeed.tsx` — NEW: Real-time build feed
+- `src/components/ShowcaseGallery.tsx` — NEW: Generated sites gallery
+- `src/components/BeforeAfter.tsx` — NEW: Prompt→site slider
+- `tailwind.config.ts` — Color system, typography, spacing
+- `src/app/globals.css` — Design tokens, animations, font imports

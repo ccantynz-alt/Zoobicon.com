@@ -22,6 +22,11 @@ export interface MailgunSendOptions {
   inReplyTo?: string; // Message-ID for threading
   references?: string; // References header for threading
   tags?: string[];
+  tracking?: boolean; // Enable open+click tracking (default: true)
+  trackingClicks?: boolean | "htmlonly"; // Click tracking mode
+  trackingOpens?: boolean; // Open tracking (pixel injection)
+  unsubscribeUrl?: string; // List-Unsubscribe URL for CAN-SPAM
+  requireTls?: boolean; // Require TLS for delivery
 }
 
 export interface MailgunSendResult {
@@ -42,11 +47,29 @@ export async function sendViaMailgun(
     return { success: true, messageId: `local-${Date.now()}` };
   }
 
+  // Check suppression list — don't send to bounced/complained addresses
+  const recipients = Array.isArray(opts.to) ? opts.to : [opts.to];
+  const validRecipients: string[] = [];
+  for (const r of recipients) {
+    const suppressed = await isEmailSuppressed(r);
+    if (suppressed) {
+      console.warn(`[Mailgun] Skipping suppressed address: ${r}`);
+    } else {
+      validRecipients.push(r);
+    }
+  }
+
+  if (validRecipients.length === 0) {
+    return {
+      success: false,
+      error: "All recipients are on the suppression list",
+    };
+  }
+
   const form = new URLSearchParams();
   form.append("from", opts.from);
 
-  const recipients = Array.isArray(opts.to) ? opts.to : [opts.to];
-  for (const r of recipients) {
+  for (const r of validRecipients) {
     form.append("to", r);
   }
 
@@ -60,6 +83,35 @@ export async function sendViaMailgun(
     for (const tag of opts.tags) {
       form.append("o:tag", tag);
     }
+  }
+
+  // Tracking options
+  if (opts.tracking !== undefined) {
+    form.append("o:tracking", opts.tracking ? "yes" : "no");
+  }
+  if (opts.trackingClicks !== undefined) {
+    form.append(
+      "o:tracking-clicks",
+      opts.trackingClicks === true
+        ? "yes"
+        : opts.trackingClicks === false
+          ? "no"
+          : opts.trackingClicks
+    );
+  }
+  if (opts.trackingOpens !== undefined) {
+    form.append("o:tracking-opens", opts.trackingOpens ? "yes" : "no");
+  }
+
+  // CAN-SPAM / GDPR compliance: List-Unsubscribe header
+  if (opts.unsubscribeUrl) {
+    form.append("h:List-Unsubscribe", `<${opts.unsubscribeUrl}>`);
+    form.append("h:List-Unsubscribe-Post", "List-Unsubscribe=One-Click");
+  }
+
+  // TLS enforcement
+  if (opts.requireTls) {
+    form.append("o:require-tls", "true");
   }
 
   try {
@@ -110,6 +162,13 @@ export function verifyWebhookSignature(
 // ---------------------------------------------------------------------------
 // Parse inbound email from Mailgun webhook POST
 // ---------------------------------------------------------------------------
+export interface EmailAttachment {
+  filename: string;
+  contentType: string;
+  size: number;
+  url?: string; // Mailgun stores attachments temporarily
+}
+
 export interface ParsedInboundEmail {
   from: string;
   fromName: string;
@@ -122,9 +181,64 @@ export interface ParsedInboundEmail {
   inReplyTo: string;
   references: string;
   attachmentCount: number;
+  attachments: EmailAttachment[];
   timestamp: number;
 }
 
+// ---------------------------------------------------------------------------
+// Suppression list helpers — check before sending to avoid bounces/complaints
+// ---------------------------------------------------------------------------
+export async function isEmailSuppressed(email: string): Promise<boolean> {
+  try {
+    const { sql } = await import("@/lib/db");
+    const rows = await sql`
+      SELECT type FROM email_suppressions WHERE email = ${email.toLowerCase()} LIMIT 1
+    `;
+    return rows.length > 0;
+  } catch {
+    return false; // Table may not exist — don't block sending
+  }
+}
+
+export async function getSuppressionList(
+  type?: "bounce" | "complaint" | "unsubscribe",
+  limit = 100
+): Promise<Array<{ email: string; reason: string; type: string; created_at: string }>> {
+  try {
+    const { sql } = await import("@/lib/db");
+    if (type) {
+      const rows = await sql`
+        SELECT * FROM email_suppressions
+        WHERE type = ${type}
+        ORDER BY created_at DESC
+        LIMIT ${limit}
+      `;
+      return rows as Array<{ email: string; reason: string; type: string; created_at: string }>;
+    }
+    const rows = await sql`
+      SELECT * FROM email_suppressions
+      ORDER BY created_at DESC
+      LIMIT ${limit}
+    `;
+    return rows as Array<{ email: string; reason: string; type: string; created_at: string }>;
+  } catch {
+    return [];
+  }
+}
+
+export async function removeFromSuppressionList(email: string): Promise<boolean> {
+  try {
+    const { sql } = await import("@/lib/db");
+    await sql`DELETE FROM email_suppressions WHERE email = ${email.toLowerCase()}`;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Parse inbound email from Mailgun webhook POST
+// ---------------------------------------------------------------------------
 export function parseInboundEmail(
   formData: Record<string, string>
 ): ParsedInboundEmail {
@@ -133,6 +247,47 @@ export function parseInboundEmail(
   const nameMatch = fromRaw.match(/^(.+?)\s*<(.+?)>$/);
   const fromName = nameMatch ? nameMatch[1].trim().replace(/^"|"$/g, "") : "";
   const fromEmail = nameMatch ? nameMatch[2] : fromRaw;
+
+  // Parse attachment metadata from Mailgun's JSON content-id-map or attachment fields
+  const attachmentCount = parseInt(formData["attachment-count"] || "0", 10);
+  const attachments: EmailAttachment[] = [];
+
+  // Mailgun sends attachment info as JSON in "content-id-map" or individual attachment-N fields
+  try {
+    const contentIdMap = formData["content-id-map"];
+    if (contentIdMap) {
+      const map = JSON.parse(contentIdMap);
+      for (const [, attachment] of Object.entries(map)) {
+        const att = attachment as { filename?: string; "content-type"?: string; size?: number; url?: string };
+        attachments.push({
+          filename: att.filename || "unknown",
+          contentType: att["content-type"] || "application/octet-stream",
+          size: att.size || 0,
+          url: att.url,
+        });
+      }
+    }
+  } catch {
+    // Attachment parsing failed — store count only
+  }
+
+  // Also try individual attachment-N metadata
+  for (let i = 1; i <= attachmentCount; i++) {
+    const attJson = formData[`attachment-${i}`];
+    if (attJson && !attachments.some((a) => a.filename === attJson)) {
+      try {
+        const att = JSON.parse(attJson);
+        attachments.push({
+          filename: att.filename || att.name || `attachment-${i}`,
+          contentType: att["content-type"] || att.type || "application/octet-stream",
+          size: att.size || 0,
+          url: att.url,
+        });
+      } catch {
+        // Individual attachment field wasn't JSON — it might be the file itself
+      }
+    }
+  }
 
   return {
     from: fromEmail,
@@ -145,7 +300,8 @@ export function parseInboundEmail(
     messageId: formData["Message-Id"] || "",
     inReplyTo: formData["In-Reply-To"] || "",
     references: formData["References"] || "",
-    attachmentCount: parseInt(formData["attachment-count"] || "0", 10),
+    attachmentCount,
+    attachments,
     timestamp: parseInt(formData["timestamp"] || String(Math.floor(Date.now() / 1000)), 10),
   };
 }

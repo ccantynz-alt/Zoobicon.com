@@ -51,6 +51,8 @@ export async function notifyAdmin(opts: NotifyOptions): Promise<boolean> {
       html: opts.html,
       ...(opts.text ? { text: opts.text } : {}),
       tags: ["admin-notification"],
+      tracking: true,
+      trackingOpens: true,
     });
 
     if (!result.success) {

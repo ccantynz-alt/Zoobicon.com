@@ -157,22 +157,22 @@ export default function Dominat8Page() {
     <div className="min-h-screen bg-[#050508] text-white relative">
       <BackgroundEffects preset="technical" />
       {/* Announcement bar */}
-      <div className="relative z-10 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white text-center py-2.5 text-xs font-medium">
+      <div className="relative z-10 bg-gradient-to-r from-red-600 via-red-500 to-orange-600 text-white text-center py-2.5 text-xs font-medium">
         <span className="hidden sm:inline">Join businesses already dominating their market with AI</span>
         <span className="sm:hidden">Dominate your market with AI</span>
-        <span className="mx-2 text-blue-200/40">|</span>
-        <Link href="/builder" className="underline font-bold hover:text-blue-100 transition-colors">Try free →</Link>
+        <span className="mx-2 text-red-200/60">|</span>
+        <Link href="/builder" className="underline font-bold hover:text-red-100 transition-colors">Try free →</Link>
       </div>
 
       {/* Nav */}
       <nav className="relative sticky top-0 z-50 border-b border-white/[0.10] bg-[#050508]/90 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/dominat8" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-600 to-red-400 flex items-center justify-center shadow-lg shadow-red-500/25">
               <Target size={18} className="text-white" />
             </div>
             <span className="text-xl font-black tracking-tight">
-              Dominat<span className="text-blue-400">8</span>
+              Dominat<span className="text-red-400">8</span>
             </span>
           </Link>
 
@@ -189,7 +189,7 @@ export default function Dominat8Page() {
             </Link>
             <Link
               href="/builder"
-              className="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg text-sm font-bold hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg shadow-blue-500/25"
+              className="px-5 py-2.5 bg-gradient-to-r from-red-600 to-red-400 text-white rounded-lg text-sm font-bold hover:from-red-500 hover:to-orange-500 transition-all shadow-lg shadow-red-500/25"
             >
               Start Dominating
             </Link>
@@ -207,13 +207,13 @@ export default function Dominat8Page() {
         <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
         {/* Dramatic background */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-[800px] h-[800px] rounded-full bg-blue-600/[0.07] blur-[150px]" />
-          <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] rounded-full bg-indigo-600/[0.06] blur-[130px]" />
-          <div className="absolute top-1/3 right-0 w-[400px] h-[400px] rounded-full bg-cyan-500/[0.04] blur-[100px]" />
+          <div className="absolute top-0 left-1/4 w-[800px] h-[800px] rounded-full bg-red-600/[0.10] blur-[150px]" />
+          <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] rounded-full bg-orange-600/[0.08] blur-[130px]" />
+          <div className="absolute top-1/3 right-0 w-[400px] h-[400px] rounded-full bg-red-500/[0.06] blur-[100px]" />
           {/* Grid overlay */}
-          <div className="absolute inset-0 opacity-[0.08]" style={{ backgroundImage: "linear-gradient(rgba(59,130,246,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.3) 1px, transparent 1px)", backgroundSize: "60px 60px" }} />
+          <div className="absolute inset-0 opacity-[0.08]" style={{ backgroundImage: "linear-gradient(rgba(239,68,68,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(239,68,68,0.3) 1px, transparent 1px)", backgroundSize: "60px 60px" }} />
           {/* Spotlight */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[50%] bg-gradient-to-b from-blue-500/[0.08] to-transparent blur-[60px]" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[50%] bg-gradient-to-b from-red-500/[0.12] to-transparent blur-[60px]" />
         </div>
 
         <div className="max-w-7xl mx-auto px-6 pt-24 pb-20 text-center relative w-full">
@@ -222,7 +222,7 @@ export default function Dominat8Page() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-bold uppercase tracking-wider mb-10">
+            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-300 text-xs font-bold uppercase tracking-wider mb-10">
               <div className="relative">
                 <Zap size={14} />
                 <div className="absolute inset-0 animate-ping opacity-40"><Zap size={14} /></div>
@@ -235,10 +235,10 @@ export default function Dominat8Page() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className="text-[3.5rem] sm:text-[5rem] lg:text-[6.5rem] font-black tracking-[-0.04em] mb-8 leading-[0.85]"
+            className="text-[3.5rem] sm:text-[5rem] lg:text-[6.5rem] font-display font-black tracking-[-0.04em] mb-8 leading-[0.85]"
           >
             <span className="block text-white">Your competitors</span>
-            <span className="block mt-3 bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-400 bg-clip-text text-transparent drop-shadow-[0_0_80px_rgba(59,130,246,0.3)]" style={{ backgroundSize: "200% auto", animation: "gradient-shift 4s ease-in-out infinite" }}>
+            <span className="block mt-3 bg-gradient-to-r from-red-500 via-orange-300 to-red-400 bg-clip-text text-transparent drop-shadow-[0_0_80px_rgba(239,68,68,0.4)]" style={{ backgroundSize: "200% auto", animation: "gradient-shift 4s ease-in-out infinite" }}>
               are not ready.
             </span>
           </motion.h1>
@@ -253,7 +253,7 @@ export default function Dominat8Page() {
             agency-quality sites, apps, and marketing assets in{" "}
             <span className="text-white font-semibold">under 60 seconds</span>.
             <br className="hidden sm:block" />
-            30+ AI generators. 7-agent pipeline. <span className="text-blue-300 font-semibold">Zero mercy.</span>
+            30+ AI generators. 7-agent pipeline. <span className="text-red-300 font-semibold">Zero mercy.</span>
           </motion.p>
 
           <motion.div
@@ -264,7 +264,7 @@ export default function Dominat8Page() {
           >
             <Link
               href="/builder"
-              className="group inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 text-white rounded-2xl text-lg font-bold hover:from-blue-600 hover:via-blue-700 hover:to-indigo-700 transition-all shadow-[0_0_40px_rgba(59,130,246,0.3),0_8px_30px_rgba(59,130,246,0.2)] hover:shadow-[0_0_60px_rgba(59,130,246,0.4),0_12px_40px_rgba(59,130,246,0.3)] hover:-translate-y-1 duration-300"
+              className="group inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-red-600 via-red-500 to-orange-500 text-white rounded-2xl text-lg font-black uppercase tracking-wide hover:from-red-500 hover:via-orange-500 hover:to-yellow-500 transition-all shadow-[0_0_50px_rgba(239,68,68,0.5),0_8px_30px_rgba(239,68,68,0.3)] hover:shadow-[0_0_70px_rgba(239,68,68,0.6),0_12px_40px_rgba(239,68,68,0.4)] hover:-translate-y-1.5 hover:scale-[1.02] duration-300"
             >
               <Sparkles size={20} />
               Start Dominating Free
@@ -288,7 +288,7 @@ export default function Dominat8Page() {
           >
             {STATS.map((stat) => (
               <div key={stat.label} className="text-center">
-                <div className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-blue-300 via-cyan-300 to-blue-400 bg-clip-text text-transparent">
+                <div className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-red-500 via-orange-300 to-red-400 bg-clip-text text-transparent">
                   {stat.value}
                 </div>
                 <div className="text-xs text-white/60 mt-1.5 font-medium uppercase tracking-wider">{stat.label}</div>
@@ -301,7 +301,7 @@ export default function Dominat8Page() {
       {/* Weapons (Features) */}
       <section id="weapons" className="max-w-7xl mx-auto px-6 py-24">
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-black mb-4">Your AI Arsenal</h2>
+          <h2 className="text-3xl sm:text-4xl font-display font-black mb-4">Your AI Arsenal</h2>
           <p className="text-white/60 max-w-2xl mx-auto">
             30+ specialized AI generators. Each one replaces thousands of dollars in agency work.
           </p>
@@ -313,14 +313,14 @@ export default function Dominat8Page() {
             return (
               <div
                 key={weapon.name}
-                className="group rounded-xl border border-white/[0.10] bg-white/[0.05] p-6 hover:border-blue-500/30 hover:bg-blue-500/[0.02] transition-all duration-300"
+                className="group rounded-xl border border-white/[0.10] bg-white/[0.05] p-6 hover:border-red-500/30 hover:bg-red-500/[0.02] transition-all duration-300"
               >
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 flex items-center justify-center mb-4 group-hover:from-blue-500/30 group-hover:to-indigo-500/30 transition-colors">
-                  <Icon size={22} className="text-blue-400" />
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500/20 to-orange-500/20 flex items-center justify-center mb-4 group-hover:from-red-500/30 group-hover:to-orange-500/30 transition-colors">
+                  <Icon size={22} className="text-red-400" />
                 </div>
                 <h3 className="text-lg font-bold mb-2">{weapon.name}</h3>
                 <p className="text-sm text-white/60 leading-relaxed mb-4">{weapon.description}</p>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-semibold">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 text-red-400 text-xs font-semibold">
                   <Zap size={12} />
                   {weapon.stat}
                 </div>
@@ -333,8 +333,8 @@ export default function Dominat8Page() {
       {/* Comparison Table */}
       <section id="compare" className="max-w-5xl mx-auto px-6 py-24">
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-black mb-4">
-            Dominat<span className="text-blue-400">8</span> vs Traditional Agencies
+          <h2 className="text-3xl sm:text-4xl font-display font-black mb-4">
+            Dominat<span className="text-red-400">8</span> vs Traditional Agencies
           </h2>
           <p className="text-white/60">Same quality. Fraction of the cost. None of the waiting.</p>
         </div>
@@ -342,8 +342,8 @@ export default function Dominat8Page() {
         <div className="rounded-xl border border-white/[0.10] overflow-hidden">
           <div className="grid grid-cols-3 bg-white/[0.07] border-b border-white/[0.10]">
             <div className="p-4 text-xs font-bold text-white/65 uppercase tracking-wider">Feature</div>
-            <div className="p-4 text-xs font-bold text-blue-400 uppercase tracking-wider text-center">Dominat8</div>
-            <div className="p-4 text-xs font-bold text-white/50 uppercase tracking-wider text-center">Agency</div>
+            <div className="p-4 text-xs font-bold text-red-400 uppercase tracking-wider text-center">Dominat8</div>
+            <div className="p-4 text-xs font-bold text-white/60 uppercase tracking-wider text-center">Agency</div>
           </div>
           {COMPARISON.map((row, i) => (
             <div
@@ -352,7 +352,7 @@ export default function Dominat8Page() {
             >
               <div className="p-4 text-sm text-white/60">{row.feature}</div>
               <div className="p-4 text-sm text-center font-semibold text-emerald-400">{row.us}</div>
-              <div className="p-4 text-sm text-center text-white/50">{row.them}</div>
+              <div className="p-4 text-sm text-center text-white/60">{row.them}</div>
             </div>
           ))}
         </div>
@@ -361,7 +361,7 @@ export default function Dominat8Page() {
       {/* Testimonials */}
       <section id="testimonials" className="max-w-7xl mx-auto px-6 py-24">
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-black mb-4">What Users Are Saying</h2>
+          <h2 className="text-3xl sm:text-4xl font-display font-black mb-4">What Users Are Saying</h2>
           <p className="text-white/60">Example use cases based on typical results.</p>
         </div>
 
@@ -391,7 +391,7 @@ export default function Dominat8Page() {
       {/* Pricing */}
       <section id="pricing" className="max-w-6xl mx-auto px-6 py-24">
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-black mb-4">Choose Your Weapon</h2>
+          <h2 className="text-3xl sm:text-4xl font-display font-black mb-4">Choose Your Weapon</h2>
           <p className="text-white/60 mb-8">Cancel anytime. No credit card required for free tier.</p>
 
           <div className="inline-flex items-center gap-3 p-1 rounded-lg bg-white/[0.07] border border-white/[0.10]">
@@ -420,12 +420,12 @@ export default function Dominat8Page() {
               key={plan.name}
               className={`relative rounded-xl border p-8 ${
                 plan.highlighted
-                  ? "border-blue-500/30 bg-blue-500/[0.03] shadow-xl shadow-blue-500/5"
+                  ? "border-red-500/30 bg-red-500/[0.03] shadow-xl shadow-red-500/5"
                   : "border-white/[0.10] bg-white/[0.05]"
               }`}
             >
               {plan.highlighted && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs font-bold rounded-full">
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-red-600 to-red-400 text-white text-xs font-bold rounded-full uppercase tracking-wider">
                   Most Popular
                 </span>
               )}
@@ -460,7 +460,7 @@ export default function Dominat8Page() {
                 href={plan.price === "Custom" ? "/support" : "/builder"}
                 className={`block w-full text-center py-3 rounded-lg text-sm font-bold transition-all ${
                   plan.highlighted
-                    ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-lg shadow-blue-500/20"
+                    ? "bg-gradient-to-r from-red-600 to-red-400 text-white font-black uppercase tracking-wide hover:from-red-500 hover:to-orange-500 shadow-lg shadow-red-500/20"
                     : "bg-white/[0.09] text-white/80 hover:bg-white/[0.1] border border-white/[0.12]"
                 }`}
               >
@@ -473,10 +473,10 @@ export default function Dominat8Page() {
 
       {/* Final CTA */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-indigo-500/5" />
+        <div className="absolute inset-0 bg-gradient-to-r from-red-600/8 to-orange-500/6" />
         <div className="max-w-4xl mx-auto px-6 py-24 text-center relative">
-          <Trophy size={48} className="mx-auto text-blue-400/60 mb-6" />
-          <h2 className="text-3xl sm:text-4xl font-black mb-4">
+          <Trophy size={48} className="mx-auto text-red-400/60 mb-6" />
+          <h2 className="text-3xl sm:text-4xl font-display font-black mb-4">
             Stop competing. Start dominating.
           </h2>
           <p className="text-white/60 mb-8 max-w-2xl mx-auto">
@@ -485,12 +485,12 @@ export default function Dominat8Page() {
           </p>
           <Link
             href="/builder"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl text-lg font-bold hover:from-blue-600 hover:to-indigo-700 transition-all shadow-xl shadow-blue-500/25"
+            className="inline-flex items-center gap-2 px-10 py-5 bg-gradient-to-r from-red-600 via-red-500 to-orange-500 text-white rounded-xl text-lg font-black uppercase tracking-wide hover:from-red-500 hover:to-orange-500 transition-all shadow-[0_0_40px_rgba(239,68,68,0.4)] hover:shadow-[0_0_60px_rgba(239,68,68,0.5)] hover:-translate-y-1 hover:scale-[1.02] duration-300"
           >
             Start Dominating — It&apos;s Free
             <ArrowRight size={20} />
           </Link>
-          <p className="text-xs text-white/50 mt-4">No credit card required. Cancel anytime.</p>
+          <p className="text-xs text-white/60 mt-4">No credit card required. Cancel anytime.</p>
         </div>
       </section>
 
@@ -499,20 +499,20 @@ export default function Dominat8Page() {
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-600 to-red-400 flex items-center justify-center">
                 <Target size={16} className="text-white" />
               </div>
               <span className="text-lg font-black">
-                Dominat<span className="text-blue-400">8</span>
+                Dominat<span className="text-red-400">8</span>
               </span>
             </div>
-            <div className="flex items-center gap-6 text-xs text-white/50">
+            <div className="flex items-center gap-6 text-xs text-white/60">
               <Link href="/privacy" className="hover:text-white/60 transition-colors">Privacy</Link>
               <Link href="/terms" className="hover:text-white/60 transition-colors">Terms</Link>
               <Link href="/support" className="hover:text-white/60 transition-colors">Support</Link>
               <Link href="/developers" className="hover:text-white/60 transition-colors">API</Link>
             </div>
-            <p className="text-xs text-white/40">
+            <p className="text-xs text-white/60">
               © {new Date().getFullYear()} Dominat8. All rights reserved.
             </p>
           </div>

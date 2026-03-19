@@ -168,8 +168,8 @@ export async function POST(req: NextRequest) {
 
       if (existingTicketId) {
         await sql`
-          INSERT INTO support_messages (ticket_id, sender, body_text, body_html)
-          VALUES (${existingTicketId}, 'customer', ${email.strippedText}, ${email.bodyHtml})
+          INSERT INTO support_messages (ticket_id, sender, body_text, body_html, attachments)
+          VALUES (${existingTicketId}, 'customer', ${email.strippedText}, ${email.bodyHtml}, ${JSON.stringify(email.attachments)})
         `;
         await sql`
           UPDATE support_tickets
@@ -186,8 +186,8 @@ export async function POST(req: NextRequest) {
         const ticketId = rows[0].id as string;
 
         await sql`
-          INSERT INTO support_messages (ticket_id, sender, body_text, body_html)
-          VALUES (${ticketId}, 'customer', ${email.strippedText}, ${email.bodyHtml})
+          INSERT INTO support_messages (ticket_id, sender, body_text, body_html, attachments)
+          VALUES (${ticketId}, 'customer', ${email.strippedText}, ${email.bodyHtml}, ${JSON.stringify(email.attachments)})
         `;
 
         // Trigger async AI draft (non-blocking)

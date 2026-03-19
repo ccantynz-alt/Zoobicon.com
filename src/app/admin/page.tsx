@@ -282,7 +282,7 @@ export default function AdminPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#050508] text-white overflow-hidden">
+    <div className="min-h-screen bg-[#131520] text-white overflow-hidden">
       <BackgroundEffects preset="admin" />
       {/* Animated fog background */}
       <div className="fog-container">

@@ -10,10 +10,19 @@
   --accent-cyan: #22d3ee;
   --accent-purple: #a78bfa;
   --accent-pink: #f472b6;
+  /* Signature Zoobicon violet */
+  --zoo-400: #7c5aff;
+  --zoo-500: #6d3bff;
+  --zoo-600: #5a1eff;
+  --zoo-glow: rgba(124, 90, 255, 0.25);
 }
 
 * {
   box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 html,
@@ -209,6 +218,92 @@ pre code {
 .font-sharp {
   font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
   letter-spacing: -0.04em;
+}
+
+/* Display heading font — Plus Jakarta Sans for hero headlines */
+.font-display {
+  font-family: "Plus Jakarta Sans", "Space Grotesk", "Inter", system-ui, sans-serif;
+  letter-spacing: -0.04em;
+  font-weight: 800;
+}
+
+/* Signature Zoobicon gradient text */
+.gradient-text-zoo {
+  background: linear-gradient(135deg, #7c5aff, #3b82f6, #22d3ee);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-zoo-animated {
+  background: linear-gradient(135deg, #7c5aff, #3b82f6, #22d3ee, #7c5aff);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shift 6s ease infinite;
+}
+
+/* Signature CTA button — impossible to miss */
+.btn-zoo {
+  position: relative;
+  background: linear-gradient(135deg, #7c5aff, #5a1eff);
+  color: #fff;
+  font-weight: 700;
+  padding: 16px 32px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 24px rgba(124, 90, 255, 0.3), 0 0 0 1px rgba(124, 90, 255, 0.2);
+  overflow: visible;
+}
+
+.btn-zoo::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #7c5aff, #3b82f6, #22d3ee, #7c5aff);
+  background-size: 300% 300%;
+  animation: gradient-rotate 4s ease infinite;
+  z-index: -1;
+  opacity: 0.5;
+  filter: blur(12px);
+  transition: opacity 0.3s;
+}
+
+.btn-zoo:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 40px rgba(124, 90, 255, 0.4), 0 0 0 1px rgba(124, 90, 255, 0.3);
+}
+
+.btn-zoo:hover::before {
+  opacity: 0.8;
+}
+
+.btn-zoo:active {
+  transform: translateY(0);
+}
+
+/* Secondary outline button */
+.btn-zoo-outline {
+  position: relative;
+  background: transparent;
+  color: #fff;
+  font-weight: 600;
+  padding: 16px 32px;
+  border-radius: 14px;
+  border: 1px solid rgba(124, 90, 255, 0.4);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-zoo-outline:hover {
+  background: rgba(124, 90, 255, 0.1);
+  border-color: rgba(124, 90, 255, 0.6);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(124, 90, 255, 0.15);
 }
 
 /* Black fog page — override background to pure black */
@@ -553,6 +648,65 @@ pre code {
     rgba(0, 0, 0, 0.05) 70%
   );
 }
+
+/* Page-wide cursor spotlight — subtle violet glow that follows the mouse */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(
+    800px circle at var(--mx, -1000px) var(--my, -1000px),
+    rgba(124, 90, 255, 0.04),
+    transparent 50%
+  );
+  transition: background 0.15s ease;
+}
+
+/* Icon hover micro-animation — subtle bounce + glow */
+.icon-hover-pop {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s ease;
+}
+.icon-hover-pop:hover {
+  transform: scale(1.15) rotate(-3deg);
+  filter: drop-shadow(0 0 8px rgba(124, 90, 255, 0.4));
+}
+
+/* Card hover lift — premium 3D lift effect */
+.card-lift {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+}
+.card-lift:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 40px rgba(124, 90, 255, 0.08);
+}
+
+/* Staggered reveal for list items — CSS-only */
+@keyframes stagger-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stagger-reveal > * {
+  animation: stagger-fade-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.stagger-reveal > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger-reveal > *:nth-child(2) { animation-delay: 0.1s; }
+.stagger-reveal > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger-reveal > *:nth-child(4) { animation-delay: 0.2s; }
+.stagger-reveal > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger-reveal > *:nth-child(6) { animation-delay: 0.3s; }
+.stagger-reveal > *:nth-child(7) { animation-delay: 0.35s; }
+.stagger-reveal > *:nth-child(8) { animation-delay: 0.4s; }
+.stagger-reveal > *:nth-child(9) { animation-delay: 0.45s; }
+.stagger-reveal > *:nth-child(10) { animation-delay: 0.5s; }
 
 /* Aurora blobs — morphing gradient backgrounds */
 .hero-aurora-blob {
