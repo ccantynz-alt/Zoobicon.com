@@ -113,16 +113,20 @@ export default function RootLayout({
         {/* Preconnect to Google Fonts CDN */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* Async font loading — never blocks rendering */}
-        <script dangerouslySetInnerHTML={{ __html: `(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap';document.head.appendChild(l)})()` }} />
+        {/* Async font loading — never blocks rendering. Subset to Latin to reduce download. */}
+        <script dangerouslySetInnerHTML={{ __html: `(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap&subset=latin';document.head.appendChild(l)})()` }} />
         {/* Fallback for users with JS disabled */}
         <noscript>
           <link
-            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap&subset=latin"
             rel="stylesheet"
           />
         </noscript>
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+        {/* DNS prefetch for external services used during checkout/auth */}
+        <link rel="dns-prefetch" href="https://js.stripe.com" />
+        <link rel="dns-prefetch" href="https://accounts.google.com" />
+        <link rel="dns-prefetch" href="https://github.com" />
         <meta name="msapplication-TileColor" content="#050508" />
         <meta name="msapplication-config" content="none" />
       </head>

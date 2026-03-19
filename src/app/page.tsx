@@ -1,19 +1,22 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { motion, AnimatePresence, useInView, useScroll, useTransform } from "framer-motion";
-import BuilderDemo from "@/components/BuilderDemo";
-import VideoShowcase from "@/components/VideoShowcase";
 import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import BackgroundEffects from "@/components/BackgroundEffects";
 import HeroDemo from "@/components/HeroDemo";
 import ActivityFeed from "@/components/ActivityFeed";
-import LiveCounter from "@/components/LiveCounter";
-import ShowcaseGallery from "@/components/ShowcaseGallery";
-import BeforeAfter from "@/components/BeforeAfter";
 import ScrollProgress from "@/components/ScrollProgress";
 import { ParallaxLayer, SectionReveal } from "@/components/ParallaxSection";
+
+// Lazy-load below-fold components — reduces initial bundle by ~40KB
+const LiveCounter = dynamic(() => import("@/components/LiveCounter"), { ssr: false });
+const ShowcaseGallery = dynamic(() => import("@/components/ShowcaseGallery"), { ssr: false });
+const BeforeAfter = dynamic(() => import("@/components/BeforeAfter"), { ssr: false });
+const VideoShowcase = dynamic(() => import("@/components/VideoShowcase"), { ssr: false });
+const BuilderDemo = dynamic(() => import("@/components/BuilderDemo"), { ssr: false });
 import {
   Zap,
   Globe,
