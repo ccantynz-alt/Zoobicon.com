@@ -2,16 +2,32 @@ import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import "./globals.css";
 
-const BRAND_META: Record<string, { title: string; description: string; appleTitle: string }> = {
+const BRAND_META: Record<string, {
+  title: string;
+  description: string;
+  appleTitle: string;
+  url: string;
+  siteName: string;
+  ogTitle: string;
+  ogDescription: string;
+}> = {
   zoobicon: {
-    title: "ZOOBICON — AI Website Builder",
-    description: "Build stunning websites with AI. Describe what you want, Zoobicon brings it to life.",
+    title: "ZOOBICON — AI Website Builder | Build Websites in 60 Seconds",
+    description: "7 AI agents collaborate to build production-ready websites, SaaS apps, and e-commerce stores from a single prompt. No templates. No code. No limits.",
     appleTitle: "Zoobicon",
+    url: "https://zoobicon.com",
+    siteName: "Zoobicon",
+    ogTitle: "Build Any Website in 60 Seconds with AI",
+    ogDescription: "7 AI agents. One prompt. Production-ready websites, apps, and stores. Try free — no credit card required.",
   },
   dominat8: {
-    title: "DOMINAT8 — AI Website Builder",
-    description: "Dominate your market with AI-powered websites. Build, deploy, conquer.",
+    title: "DOMINAT8 — AI Website Builder | Dominate Your Market",
+    description: "Dominate your market with AI-powered websites. Build, deploy, conquer — in seconds, not weeks.",
     appleTitle: "Dominat8",
+    url: "https://dominat8.io",
+    siteName: "Dominat8",
+    ogTitle: "Dominate Your Market with AI-Powered Websites",
+    ogDescription: "Your competitors are not ready. Build killer websites, landing pages, and apps in seconds with AI.",
   },
 };
 
@@ -24,6 +40,44 @@ export async function generateMetadata(): Promise<Metadata> {
     title: meta.title,
     description: meta.description,
     manifest: "/manifest.json",
+    metadataBase: new URL(meta.url),
+    alternates: {
+      canonical: "/",
+    },
+    openGraph: {
+      type: "website",
+      siteName: meta.siteName,
+      title: meta.ogTitle,
+      description: meta.ogDescription,
+      url: meta.url,
+      images: [
+        {
+          url: "/og-image.png",
+          width: 1200,
+          height: 630,
+          alt: `${meta.siteName} — AI Website Builder`,
+        },
+      ],
+      locale: "en_US",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: meta.ogTitle,
+      description: meta.ogDescription,
+      images: ["/og-image.png"],
+      creator: "@zoobicon",
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large" as const,
+        "max-snippet": -1,
+      },
+    },
     appleWebApp: {
       capable: true,
       statusBarStyle: "black-translucent",
