@@ -10,6 +10,11 @@
   --accent-cyan: #22d3ee;
   --accent-purple: #a78bfa;
   --accent-pink: #f472b6;
+  /* Signature Zoobicon violet */
+  --zoo-400: #7c5aff;
+  --zoo-500: #6d3bff;
+  --zoo-600: #5a1eff;
+  --zoo-glow: rgba(124, 90, 255, 0.25);
 }
 
 * {
@@ -209,6 +214,92 @@ pre code {
 .font-sharp {
   font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
   letter-spacing: -0.04em;
+}
+
+/* Display heading font — Plus Jakarta Sans for hero headlines */
+.font-display {
+  font-family: "Plus Jakarta Sans", "Space Grotesk", "Inter", system-ui, sans-serif;
+  letter-spacing: -0.04em;
+  font-weight: 800;
+}
+
+/* Signature Zoobicon gradient text */
+.gradient-text-zoo {
+  background: linear-gradient(135deg, #7c5aff, #3b82f6, #22d3ee);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-zoo-animated {
+  background: linear-gradient(135deg, #7c5aff, #3b82f6, #22d3ee, #7c5aff);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shift 6s ease infinite;
+}
+
+/* Signature CTA button — impossible to miss */
+.btn-zoo {
+  position: relative;
+  background: linear-gradient(135deg, #7c5aff, #5a1eff);
+  color: #fff;
+  font-weight: 700;
+  padding: 16px 32px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 24px rgba(124, 90, 255, 0.3), 0 0 0 1px rgba(124, 90, 255, 0.2);
+  overflow: visible;
+}
+
+.btn-zoo::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #7c5aff, #3b82f6, #22d3ee, #7c5aff);
+  background-size: 300% 300%;
+  animation: gradient-rotate 4s ease infinite;
+  z-index: -1;
+  opacity: 0.5;
+  filter: blur(12px);
+  transition: opacity 0.3s;
+}
+
+.btn-zoo:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 40px rgba(124, 90, 255, 0.4), 0 0 0 1px rgba(124, 90, 255, 0.3);
+}
+
+.btn-zoo:hover::before {
+  opacity: 0.8;
+}
+
+.btn-zoo:active {
+  transform: translateY(0);
+}
+
+/* Secondary outline button */
+.btn-zoo-outline {
+  position: relative;
+  background: transparent;
+  color: #fff;
+  font-weight: 600;
+  padding: 16px 32px;
+  border-radius: 14px;
+  border: 1px solid rgba(124, 90, 255, 0.4);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-zoo-outline:hover {
+  background: rgba(124, 90, 255, 0.1);
+  border-color: rgba(124, 90, 255, 0.6);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(124, 90, 255, 0.15);
 }
 
 /* Black fog page — override background to pure black */

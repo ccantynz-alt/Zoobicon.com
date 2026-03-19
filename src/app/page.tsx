@@ -7,6 +7,11 @@ import BuilderDemo from "@/components/BuilderDemo";
 import VideoShowcase from "@/components/VideoShowcase";
 import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import BackgroundEffects from "@/components/BackgroundEffects";
+import HeroDemo from "@/components/HeroDemo";
+import ActivityFeed from "@/components/ActivityFeed";
+import LiveCounter from "@/components/LiveCounter";
+import ShowcaseGallery from "@/components/ShowcaseGallery";
+import BeforeAfter from "@/components/BeforeAfter";
 import {
   Zap,
   Globe,
@@ -595,10 +600,10 @@ export default function LandingPage() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-8">
               <Link href="/" className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-400 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-zoo-500 to-zoo-400 flex items-center justify-center shadow-glow-zoo">
                   <Zap className="w-4 h-4 text-white" />
                 </div>
-                <span className="text-lg font-bold tracking-tight font-sharp">Zoobicon</span>
+                <span className="text-lg font-bold tracking-tight font-display">Zoobicon</span>
               </Link>
               <div className="hidden md:flex items-center gap-6">
                 <a href="#products" className="text-sm font-medium text-white/50 hover:text-white transition-colors tracking-wide">Products</a>
@@ -641,7 +646,7 @@ export default function LandingPage() {
                   </Link>
                   <Link
                     href="/builder"
-                    className="btn-gradient px-5 py-2.5 rounded-xl text-sm font-semibold text-white"
+                    className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-zoo-500 to-zoo-400 shadow-glow-zoo hover:shadow-glow-zoo-lg hover:-translate-y-0.5 transition-all duration-300"
                   >
                     <span>Start Building</span>
                   </Link>
@@ -692,9 +697,10 @@ export default function LandingPage() {
       {/* Cursor glow tracker — enables CSS-based cursor following */}
       <CursorGlowTracker />
 
-      {/* Hero Section */}
+      {/* ================================================================
+          HERO SECTION — The "holy shit" moment
+          ================================================================ */}
       <section className="relative overflow-hidden min-h-screen flex items-center pt-16">
-        {/* Interactive background effects */}
         <HeroEffects
           variant="cyan"
           cursorGlow
@@ -705,146 +711,106 @@ export default function LandingPage() {
           beams
         />
 
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 w-full relative z-10 py-20 lg:py-28">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            {/* Left — Text */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.08] text-white/70 text-xs font-bold uppercase tracking-[0.2em] mb-8 font-sharp"
-              >
-                <span className="w-2 h-2 rounded-full bg-white/80 animate-pulse" />
-                AI-POWERED PLATFORM
-              </motion.div>
-
-              <h1 className="font-sharp text-[3rem] sm:text-[4rem] lg:text-[5.5rem] font-bold tracking-[-0.05em] leading-[0.95] mb-6 text-white text-glow-strong">
-                <span className="gradient-text-animated">Build</span>{" "}
-                <span className="relative inline-block" style={{ perspective: '800px' }}>
-                  <AnimatePresence mode="wait">
-                    <motion.span
-                      key={wordIndex}
-                      initial={{ opacity: 0, rotateX: 90, y: 20 }}
-                      animate={{ opacity: 1, rotateX: 0, y: 0 }}
-                      exit={{ opacity: 0, rotateX: -90, y: -20 }}
-                      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                      className="text-white inline-block"
-                      style={{ transformOrigin: 'bottom center' }}
-                    >
-                      {ROTATING_WORDS[wordIndex]}
-                    </motion.span>
-                  </AnimatePresence>
-                </span>
-                <span className="block text-white/40 mt-2 text-[0.45em] tracking-[-0.02em]">with AI agents</span>
-              </h1>
-
-              <p className="text-lg text-white/45 leading-relaxed mb-8 max-w-lg font-light tracking-wide typing-cursor">
-                7 AI agents collaborate in real-time to create production-ready sites in seconds.
-                No templates. No limits. Just describe it
-              </p>
-
-              <div className="flex flex-wrap items-center gap-4 mb-10">
-                <Link
-                  href="/builder"
-                  className="btn-glow-pulse group relative inline-flex items-center gap-3 px-8 py-4 bg-white text-black rounded-lg text-base font-bold font-sharp hover:bg-white/90 transition-all shadow-[0_0_40px_rgba(255,255,255,0.15),0_0_80px_rgba(255,255,255,0.05)] hover:shadow-[0_0_60px_rgba(255,255,255,0.25),0_0_120px_rgba(255,255,255,0.08)] hover:-translate-y-0.5 duration-300"
-                >
-                  Start Building Free
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-                <Link
-                  href="#products"
-                  className="inline-flex items-center gap-2 px-6 py-4 text-white/40 text-sm font-semibold uppercase tracking-[0.15em] hover:text-white/70 transition-colors border border-white/[0.08] hover:border-white/[0.15] rounded-lg"
-                >
-                  Explore
-                </Link>
-              </div>
-
-              <div className="flex items-center gap-5 text-xs text-white/30 tracking-wide uppercase font-medium">
-                <span className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-white/40" /> No credit card
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-white/40" /> Unlimited builds
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-white/40" /> Free hosting
-                </span>
-              </div>
-            </motion.div>
-
-            {/* Right — Live AI code generation animation */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.2 }}
-              className="hidden lg:block"
-            >
-              <HeroCodeAnimation />
-            </motion.div>
-          </div>
-
-          {/* Trust bar at bottom of hero */}
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 w-full relative z-10 py-16 lg:py-24">
+          {/* Hero headline — centered, massive */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            className="mt-16 lg:mt-24 pt-8 border-t border-white/[0.06]"
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="text-center mb-12 lg:mb-16"
           >
-            <div className="flex flex-wrap items-center justify-center gap-6">
-              <div className="flex items-center gap-1.5">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-white/70 text-white/70" />
-                ))}
-              </div>
-              <span className="text-sm text-white/40 tracking-wide">
-                Top rated — <span className="text-white/60 font-semibold">4.9 out of 5 stars</span>. Trusted by builders worldwide.
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.08] text-white/70 text-xs font-bold uppercase tracking-[0.2em] mb-8"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-zoo-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-zoo-400" />
+              </span>
+              7 AI AGENTS. ONE PROMPT. INFINITE POSSIBILITIES.
+            </motion.div>
+
+            <h1 className="font-display text-[3.5rem] sm:text-[5rem] lg:text-[7rem] xl:text-8xl font-extrabold tracking-[-0.04em] leading-[0.9] mb-6 text-white">
+              <span className="gradient-text-zoo-animated">Describe it.</span>
+              <br />
+              <span className="relative inline-block">
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={wordIndex}
+                    initial={{ opacity: 0, y: 40, filter: "blur(8px)" }}
+                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, y: -40, filter: "blur(8px)" }}
+                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                    className="text-white/90 inline-block"
+                  >
+                    {ROTATING_WORDS[wordIndex]}
+                  </motion.span>
+                </AnimatePresence>
+              </span>
+              <span className="text-white/30 block mt-2 text-[0.35em] tracking-normal font-semibold">
+                materialize in seconds.
+              </span>
+            </h1>
+
+            <p className="text-lg lg:text-xl text-white/50 leading-relaxed max-w-2xl mx-auto mb-10 font-light">
+              7 AI agents collaborate to build production-ready websites, SaaS apps,
+              and e-commerce stores from a single prompt. No templates. No code. No limits.
+            </p>
+
+            <div className="flex flex-wrap items-center justify-center gap-4 mb-8">
+              <Link
+                href="/builder"
+                className="btn-zoo group inline-flex items-center gap-3 text-base font-bold px-10 py-4 rounded-2xl"
+              >
+                Start Building Free
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link
+                href="#showcase"
+                className="btn-zoo-outline inline-flex items-center gap-2 text-base px-8 py-4 rounded-2xl"
+              >
+                See Examples
+                <Eye className="w-4 h-4" />
+              </Link>
+            </div>
+
+            <div className="flex items-center justify-center gap-6 text-sm text-white/40 font-medium">
+              <span className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-zoo-400" /> No credit card
+              </span>
+              <span className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-zoo-400" /> Unlimited builds
+              </span>
+              <span className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-zoo-400" /> Free hosting
               </span>
             </div>
           </motion.div>
-        </div>
-      </section>
 
-      {/* Social Proof Marquee */}
-      <section className="relative py-8 border-b border-white/[0.06] overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-4">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/25">Trusted by forward-thinking teams</span>
-          </div>
-          <div className="marquee-container">
-            <div className="marquee-track">
-              {[...SOCIAL_PROOF_LOGOS, ...SOCIAL_PROOF_LOGOS].map((name, i) => (
-                <span
-                  key={i}
-                  className="text-lg md:text-xl font-bold font-sharp text-white/[0.12] hover:text-white/25 transition-colors whitespace-nowrap select-none"
-                >
-                  {name}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Bar */}
-      <section className="relative py-16 border-y border-white/[0.06]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          {/* Live builder demo — the product IS the hero */}
           <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="relative max-w-5xl mx-auto"
           >
-            <AnimatedStat value={12} suffix="+" label="AI-Powered Tools" />
-            <AnimatedStat value={30} suffix="+" label="Languages Supported" />
-            <AnimatedStat value={43} suffix="" label="Site Generators" />
-            <AnimatedStat value={4} suffix="" label="Domain Ecosystem" />
+            <HeroDemo />
+            {/* Activity feed — positioned absolutely on desktop */}
+            <div className="hidden xl:block absolute -right-[340px] top-8">
+              <ActivityFeed />
+            </div>
           </motion.div>
+        </div>
+      </section>
+
+      {/* ================================================================
+          LIVE STATS — Real numbers, not fake logos
+          ================================================================ */}
+      <section className="relative py-16 lg:py-20 border-y border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <LiveCounter />
         </div>
       </section>
 
@@ -866,11 +832,11 @@ export default function LandingPage() {
                 <Star className="w-3 h-3 text-brand-400" />
                 <span className="text-xs font-medium text-brand-400">Industry Comparison</span>
               </div>
-              <h2 className="font-sharp text-4xl md:text-5xl lg:text-6xl font-bold tracking-[-0.04em] mb-6 text-white text-glow">
+              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-6 text-white text-glow">
                 See Why Builders<br />
                 <span className="text-white/60">Switch to Zoobicon</span>
               </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/40 tracking-wide">
+              <p className="max-w-2xl mx-auto text-lg text-white/60 tracking-wide">
                 The only platform that does it all. No more juggling tools, plugins, or workarounds.
               </p>
             </motion.div>
@@ -989,11 +955,11 @@ export default function LandingPage() {
                 <Sparkles className="w-3 h-3 text-emerald-400" />
                 <span className="text-xs font-medium text-emerald-400">New in 2026</span>
               </div>
-              <h2 className="font-sharp text-4xl md:text-5xl lg:text-6xl font-bold tracking-[-0.04em] mb-6 text-white text-glow">
+              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-6 text-white text-glow">
                 10 Game-Changing<br />
                 <span className="text-white/60">Features Just Dropped</span>
               </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/40 tracking-wide">
+              <p className="max-w-2xl mx-auto text-lg text-white/60 tracking-wide">
                 Every feature our competitors wish they had. Built, tested, and shipping today.
               </p>
             </motion.div>
@@ -1052,11 +1018,11 @@ export default function LandingPage() {
                 <Sparkles className="w-3 h-3 text-brand-400" />
                 <span className="text-xs font-medium text-brand-400">Product Suite</span>
               </div>
-              <h2 className="font-sharp text-4xl md:text-5xl lg:text-6xl font-bold tracking-[-0.04em] mb-6 text-white text-glow">
+              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-6 text-white text-glow">
                 Everything You Need to<br />
                 <span className="text-white/60">Dominate Online</span>
               </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/40 tracking-wide">
+              <p className="max-w-2xl mx-auto text-lg text-white/60 tracking-wide">
                 AI-powered products working in harmony. Each one best-in-class.
                 Together, an unstoppable digital powerhouse.
               </p>
@@ -1119,11 +1085,11 @@ export default function LandingPage() {
                 <Globe className="w-3 h-3 text-accent-cyan" />
                 <span className="text-xs font-medium text-accent-cyan">Domain Ecosystem</span>
               </div>
-              <h2 className="font-sharp text-4xl md:text-5xl lg:text-6xl font-bold tracking-[-0.04em] mb-6 text-white text-glow">
+              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-6 text-white text-glow">
                 Four Domains.<br />
                 <span className="text-white/60">One Empire.</span>
               </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/40 tracking-wide">
+              <p className="max-w-2xl mx-auto text-lg text-white/60 tracking-wide">
                 We own every extension. Complete market presence across .com, .ai, .io, and .sh — an impenetrable brand fortress.
               </p>
             </motion.div>
@@ -1180,11 +1146,11 @@ export default function LandingPage() {
                 <Zap className="w-3 h-3 text-brand-400" />
                 <span className="text-xs font-medium text-brand-400">Why Zoobicon</span>
               </div>
-              <h2 className="font-sharp text-4xl md:text-5xl lg:text-6xl font-bold tracking-[-0.04em] mb-6 text-white text-glow">
+              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-6 text-white text-glow">
                 Built Different.<br />
                 <span className="text-white/60">Built to Win.</span>
               </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/40 tracking-wide">
+              <p className="max-w-2xl mx-auto text-lg text-white/60 tracking-wide">
                 We didn&apos;t build another tool. We built the platform that makes every other tool obsolete.
               </p>
             </motion.div>
@@ -1229,7 +1195,7 @@ export default function LandingPage() {
                 <Star className="w-3 h-3 text-amber-400" />
                 <span className="text-xs font-medium text-amber-400">What Builders Say</span>
               </div>
-              <h2 className="font-sharp text-4xl md:text-5xl lg:text-6xl font-bold tracking-[-0.04em] mb-6 text-white text-glow">
+              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-6 text-white text-glow">
                 Loved by Teams<br />
                 <span className="text-white/60">Who Ship Fast</span>
               </h2>
@@ -1288,11 +1254,11 @@ export default function LandingPage() {
                 <Video className="w-3 h-3 text-accent-pink" />
                 <span className="text-xs font-medium text-accent-pink">AI Video Creator</span>
               </div>
-              <h2 className="font-sharp text-4xl md:text-5xl lg:text-6xl font-bold tracking-[-0.04em] mb-6 text-white text-glow">
+              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-6 text-white text-glow">
                 High-End Videos.<br />
                 <span className="text-white/60">Zero Scripts.</span>
               </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/40 tracking-wide mb-4">
+              <p className="max-w-2xl mx-auto text-lg text-white/60 tracking-wide mb-4">
                 Describe what you want. AI creates scroll-stopping, production-quality videos
                 optimized for every platform. Click any video to preview.
               </p>
@@ -1318,11 +1284,11 @@ export default function LandingPage() {
             variants={staggerContainer}
           >
             <motion.div variants={fadeInUp} className="text-center mb-16">
-              <h2 className="font-sharp text-4xl md:text-5xl lg:text-6xl font-bold tracking-[-0.04em] mb-6 text-white text-glow">
+              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-6 text-white text-glow">
                 Ready to<br />
                 <span className="text-white/60">Dominate?</span>
               </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/40 tracking-wide">
+              <p className="max-w-2xl mx-auto text-lg text-white/60 tracking-wide">
                 Start free. Scale when you&apos;re ready. No credit card required.
               </p>
             </motion.div>
@@ -1458,10 +1424,52 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Final CTA */}
+      {/* ================================================================
+          SHOWCASE GALLERY — Prove the quality
+          ================================================================ */}
+      <section id="showcase" className="relative py-24 lg:py-32 border-t border-white/[0.06]">
+        <ShowcaseGallery />
+      </section>
+
+      {/* ================================================================
+          BEFORE / AFTER — The magic moment
+          ================================================================ */}
       <section className="relative py-24 lg:py-32 border-t border-white/[0.06] overflow-hidden">
         <div className="absolute inset-0">
-          <div className="glow-orb glow-orb-blue w-[800px] h-[800px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-15" />
+          <div className="glow-orb glow-orb-purple w-[600px] h-[600px] top-1/3 left-1/4 opacity-10" />
+        </div>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+            className="text-center mb-16"
+          >
+            <motion.div variants={fadeInUp}>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-zoo-400/20 bg-zoo-400/5 mb-6">
+                <Sparkles className="w-3 h-3 text-zoo-400" />
+                <span className="text-xs font-medium text-zoo-400">The Magic</span>
+              </div>
+            </motion.div>
+            <motion.h2 variants={fadeInUp} className="font-display text-4xl md:text-5xl lg:text-7xl font-extrabold tracking-[-0.04em] mb-6 text-white">
+              From Words to<br />
+              <span className="gradient-text-zoo">Websites</span>
+            </motion.h2>
+            <motion.p variants={fadeInUp} className="max-w-2xl mx-auto text-lg text-white/50">
+              Drag the slider to see the transformation. One prompt. One click. A complete website.
+            </motion.p>
+          </motion.div>
+          <BeforeAfter />
+        </div>
+      </section>
+
+      {/* ================================================================
+          FINAL CTA — Cinematic close
+          ================================================================ */}
+      <section className="relative py-24 lg:py-32 border-t border-white/[0.06] overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="glow-orb w-[800px] h-[800px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-20" style={{ background: "radial-gradient(circle, rgba(124, 90, 255, 0.4), transparent 60%)" }} />
         </div>
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center relative z-10">
           <motion.div
@@ -1472,24 +1480,24 @@ export default function LandingPage() {
           >
             <motion.h2
               variants={fadeInUp}
-              className="font-sharp text-4xl md:text-5xl lg:text-7xl font-bold tracking-[-0.04em] mb-6 text-white text-glow-strong"
+              className="font-display text-4xl md:text-6xl lg:text-8xl font-extrabold tracking-[-0.04em] mb-6 text-white"
             >
-              Stop Building Websites.<br />
-              <span className="text-white/50">Start Building Empires.</span>
+              Stop Dreaming.<br />
+              <span className="gradient-text-zoo">Start Building.</span>
             </motion.h2>
             <motion.p
               variants={fadeInUp}
-              className="max-w-2xl mx-auto text-lg text-white/40 mb-10 tracking-wide"
+              className="max-w-2xl mx-auto text-lg text-white/50 mb-10"
             >
-              Join the next generation of creators, marketers, and entrepreneurs
-              who refuse to settle for ordinary tools.
+              Join thousands of creators, agencies, and entrepreneurs
+              who build production-ready websites in seconds, not weeks.
             </motion.p>
             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 href="/builder"
-                className="group bg-white text-black px-10 py-5 rounded-lg text-lg font-bold font-sharp flex items-center gap-3 shadow-[0_0_50px_rgba(255,255,255,0.15)] hover:shadow-[0_0_80px_rgba(255,255,255,0.25)] hover:-translate-y-0.5 transition-all duration-300"
+                className="btn-zoo group inline-flex items-center gap-3 text-lg font-bold px-12 py-5 rounded-2xl"
               >
-                <span>Launch Your Empire</span>
+                <span>Start Building Free</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </motion.div>
