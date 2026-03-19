@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence, useInView } from "framer-motion";
+import { motion, AnimatePresence, useInView, useScroll, useTransform } from "framer-motion";
 import BuilderDemo from "@/components/BuilderDemo";
 import VideoShowcase from "@/components/VideoShowcase";
 import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
@@ -12,6 +12,8 @@ import ActivityFeed from "@/components/ActivityFeed";
 import LiveCounter from "@/components/LiveCounter";
 import ShowcaseGallery from "@/components/ShowcaseGallery";
 import BeforeAfter from "@/components/BeforeAfter";
+import ScrollProgress from "@/components/ScrollProgress";
+import { ParallaxLayer, SectionReveal } from "@/components/ParallaxSection";
 import {
   Zap,
   Globe,
@@ -84,7 +86,7 @@ const PRODUCTS = [
     icon: Globe,
     name: "AI Website Builder",
     description: "Describe any website and watch it materialize in seconds. Full-stack, responsive, production-ready.",
-    color: "from-brand-500 to-brand-700",
+    color: "from-zoo-500 to-zoo-700",
     glowColor: "shadow-glow",
     domain: "zoobicon.ai",
     tag: "Core Product",
@@ -184,8 +186,8 @@ const DOMAINS = [
     label: "Brand Hub",
     description: "Main platform & marketing engine",
     icon: Zap,
-    color: "text-brand-400",
-    borderColor: "border-brand-500/30",
+    color: "text-zoo-400",
+    borderColor: "border-zoo-500/30",
     href: "/",
   },
   {
@@ -498,7 +500,7 @@ function HeroCodeAnimation() {
                   </div>
                 ))}
                 {visibleLines < CODE_LINES.length && (
-                  <div className="inline-block w-[7px] h-[16px] bg-brand-400/80 animate-pulse ml-6 mt-1" />
+                  <div className="inline-block w-[7px] h-[16px] bg-zoo-400/80 animate-pulse ml-6 mt-1" />
                 )}
               </motion.div>
             ) : (
@@ -510,26 +512,26 @@ function HeroCodeAnimation() {
                 <div className="rounded-lg overflow-hidden border border-white/[0.06] bg-gradient-to-br from-[#0a0a1a] to-[#0f0f2a]">
                   {/* Mini nav */}
                   <div className="flex items-center gap-2 px-3 py-2 border-b border-white/[0.06]">
-                    <div className="w-4 h-4 rounded bg-gradient-to-br from-brand-500 to-purple-500" />
+                    <div className="w-4 h-4 rounded bg-gradient-to-br from-zoo-500 to-purple-500" />
                     <div className="w-16 h-2 rounded bg-white/10" />
                     <div className="ml-auto flex gap-2">
                       <div className="w-10 h-2 rounded bg-white/8" />
                       <div className="w-10 h-2 rounded bg-white/8" />
-                      <div className="w-12 h-2.5 rounded bg-brand-500/40" />
+                      <div className="w-12 h-2.5 rounded bg-zoo-500/40" />
                     </div>
                   </div>
                   {/* Mini hero */}
                   <div className="p-4 text-center">
-                    <div className="w-32 h-3 rounded bg-gradient-to-r from-brand-500/60 to-purple-500/60 mx-auto mb-2" />
+                    <div className="w-32 h-3 rounded bg-gradient-to-r from-zoo-500/60 to-purple-500/60 mx-auto mb-2" />
                     <div className="w-48 h-2 rounded bg-white/10 mx-auto mb-1" />
                     <div className="w-40 h-2 rounded bg-white/8 mx-auto mb-3" />
-                    <div className="w-20 h-5 rounded bg-brand-500/40 mx-auto mb-4" />
+                    <div className="w-20 h-5 rounded bg-zoo-500/40 mx-auto mb-4" />
                   </div>
                   {/* Mini cards */}
                   <div className="px-4 pb-4 grid grid-cols-3 gap-2">
                     {[0,1,2].map(j => (
                       <div key={j} className="p-2 rounded border border-white/[0.06] bg-white/[0.02]">
-                        <div className="w-5 h-5 rounded bg-gradient-to-br from-brand-500/30 to-purple-500/30 mb-1.5" />
+                        <div className="w-5 h-5 rounded bg-gradient-to-br from-zoo-500/30 to-purple-500/30 mb-1.5" />
                         <div className="w-full h-1.5 rounded bg-white/8 mb-1" />
                         <div className="w-3/4 h-1.5 rounded bg-white/5" />
                       </div>
@@ -557,10 +559,10 @@ function AnimatedStat({ value, label, suffix = '' }: { value: number; label: str
   const count = useCountUp(value, 2000, isInView);
   return (
     <motion.div ref={ref} variants={fadeInUp} className="text-center">
-      <div className="text-4xl md:text-5xl font-bold font-sharp text-white text-glow mb-2">
+      <div className="text-4xl md:text-5xl font-bold font-display text-white text-glow mb-2">
         {count}{suffix}
       </div>
-      <div className="text-sm text-white/35 uppercase tracking-[0.15em] font-medium">{label}</div>
+      <div className="text-sm text-white/50 uppercase tracking-[0.15em] font-medium">{label}</div>
     </motion.div>
   );
 }
@@ -591,6 +593,9 @@ export default function LandingPage() {
 
   return (
     <div className="relative bg-void">
+      {/* Scroll progress indicator */}
+      <ScrollProgress />
+
       {/* Background Effects */}
       <BackgroundEffects preset="technical" />
 
@@ -633,7 +638,7 @@ export default function LandingPage() {
                   </button>
                   <Link
                     href="/builder"
-                    className="btn-gradient px-5 py-2.5 rounded-xl text-sm font-semibold text-white flex items-center gap-2"
+                    className="btn-zoo px-5 py-2.5 rounded-xl text-sm font-semibold text-white flex items-center gap-2"
                   >
                     <User className="w-3.5 h-3.5" />
                     <span>{user.name || user.email.split("@")[0]}</span>
@@ -681,12 +686,12 @@ export default function LandingPage() {
                 <button onClick={handleLogout} className="block text-sm text-white/60 hover:text-white flex items-center gap-2 w-full text-left">
                   <LogOut className="w-4 h-4" /> Sign out
                 </button>
-                <Link href="/builder" className="block btn-gradient px-5 py-2.5 rounded-xl text-sm font-semibold text-white text-center mt-4">
+                <Link href="/builder" className="block btn-zoo px-5 py-2.5 rounded-xl text-sm font-semibold text-white text-center mt-4">
                   <span>{user.name || user.email.split("@")[0]}&apos;s Builder</span>
                 </Link>
               </>
             ) : (
-              <Link href="/builder" className="block btn-gradient px-5 py-2.5 rounded-xl text-sm font-semibold text-white text-center mt-4">
+              <Link href="/builder" className="block btn-zoo px-5 py-2.5 rounded-xl text-sm font-semibold text-white text-center mt-4">
                 <span>Start Building</span>
               </Link>
             )}
@@ -817,8 +822,12 @@ export default function LandingPage() {
       {/* Competitor Comparison Banner */}
       <section className="relative py-24 lg:py-32 border-b border-white/[0.06] overflow-hidden">
         <div className="absolute inset-0">
-          <div className="glow-orb glow-orb-blue w-[700px] h-[700px] top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 opacity-15" />
-          <div className="glow-orb glow-orb-purple w-[500px] h-[500px] top-1/3 right-0 opacity-15" />
+          <ParallaxLayer speed={0.2} className="absolute inset-0">
+            <div className="glow-orb glow-orb-blue w-[700px] h-[700px] top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 opacity-15" />
+          </ParallaxLayer>
+          <ParallaxLayer speed={-0.15} className="absolute inset-0">
+            <div className="glow-orb glow-orb-purple w-[500px] h-[500px] top-1/3 right-0 opacity-15" />
+          </ParallaxLayer>
         </div>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
           <motion.div
@@ -828,9 +837,9 @@ export default function LandingPage() {
             variants={staggerContainer}
           >
             <motion.div variants={fadeInUp} className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand-500/20 bg-brand-500/5 mb-6">
-                <Star className="w-3 h-3 text-brand-400" />
-                <span className="text-xs font-medium text-brand-400">Industry Comparison</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-zoo-500/20 bg-zoo-500/5 mb-6">
+                <Star className="w-3 h-3 text-zoo-400" />
+                <span className="text-xs font-medium text-zoo-400">Industry Comparison</span>
               </div>
               <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-6 text-white text-glow">
                 See Why Builders<br />
@@ -848,8 +857,8 @@ export default function LandingPage() {
                 <div className="grid grid-cols-6 gap-0 mb-2">
                   <div className="p-4" />
                   <div className="p-4 text-center">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-brand-500/20 to-brand-400/10 border border-brand-500/30">
-                      <Zap className="w-4 h-4 text-brand-400" />
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-zoo-500/20 to-zoo-400/10 border border-zoo-500/30">
+                      <Zap className="w-4 h-4 text-zoo-400" />
                       <span className="text-sm font-bold text-white">Zoobicon</span>
                     </div>
                   </div>
@@ -906,7 +915,7 @@ export default function LandingPage() {
                     <span className="text-sm font-bold text-white/60">Total Features</span>
                   </div>
                   <div className="p-4 text-center">
-                    <span className="text-2xl font-black gradient-text">12/14</span>
+                    <span className="text-2xl font-black gradient-text-zoo">12/14</span>
                   </div>
                   <div className="p-4 text-center">
                     <span className="text-2xl font-black text-white/60">6/14</span>
@@ -928,7 +937,7 @@ export default function LandingPage() {
             <motion.div variants={fadeInUp} className="text-center mt-12">
               <Link
                 href="/builder"
-                className="inline-flex items-center gap-2 btn-gradient px-6 py-3 rounded-xl text-sm font-bold text-white shadow-glow"
+                className="inline-flex items-center gap-2 btn-zoo px-6 py-3 rounded-xl text-sm font-bold text-white shadow-glow"
               >
                 <span>Try the Most Complete Builder</span>
                 <ArrowRight className="w-4 h-4" />
@@ -941,7 +950,9 @@ export default function LandingPage() {
       {/* New Features Showcase */}
       <section className="relative py-24 lg:py-32 overflow-hidden">
         <div className="absolute inset-0">
-          <div className="glow-orb glow-orb-cyan w-[500px] h-[500px] top-0 right-1/4 opacity-15" />
+          <ParallaxLayer speed={0.25} className="absolute inset-0">
+            <div className="glow-orb glow-orb-cyan w-[500px] h-[500px] top-0 right-1/4 opacity-15" />
+          </ParallaxLayer>
         </div>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
           <motion.div
@@ -1014,9 +1025,9 @@ export default function LandingPage() {
             variants={staggerContainer}
           >
             <motion.div variants={fadeInUp} className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand-500/20 bg-brand-500/5 mb-6">
-                <Sparkles className="w-3 h-3 text-brand-400" />
-                <span className="text-xs font-medium text-brand-400">Product Suite</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-zoo-500/20 bg-zoo-500/5 mb-6">
+                <Sparkles className="w-3 h-3 text-zoo-400" />
+                <span className="text-xs font-medium text-zoo-400">Product Suite</span>
               </div>
               <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-6 text-white text-glow">
                 Everything You Need to<br />
@@ -1120,7 +1131,7 @@ export default function LandingPage() {
             <motion.div variants={fadeInUp} className="mt-12 text-center">
               <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full border border-white/[0.10] bg-white/[0.08]">
                 <div className="flex -space-x-2">
-                  <div className="w-6 h-6 rounded-full bg-brand-500/30 border border-brand-500/40" />
+                  <div className="w-6 h-6 rounded-full bg-zoo-500/30 border border-zoo-500/40" />
                   <div className="w-6 h-6 rounded-full bg-accent-purple/30 border border-accent-purple/40" />
                   <div className="w-6 h-6 rounded-full bg-accent-cyan/30 border border-accent-cyan/40" />
                   <div className="w-6 h-6 rounded-full bg-amber-500/30 border border-amber-500/40" />
@@ -1142,9 +1153,9 @@ export default function LandingPage() {
             variants={staggerContainer}
           >
             <motion.div variants={fadeInUp} className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand-500/20 bg-brand-500/5 mb-6">
-                <Zap className="w-3 h-3 text-brand-400" />
-                <span className="text-xs font-medium text-brand-400">Why Zoobicon</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-zoo-500/20 bg-zoo-500/5 mb-6">
+                <Zap className="w-3 h-3 text-zoo-400" />
+                <span className="text-xs font-medium text-zoo-400">Why Zoobicon</span>
               </div>
               <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-6 text-white text-glow">
                 Built Different.<br />
@@ -1163,11 +1174,11 @@ export default function LandingPage() {
                   whileHover={{ y: -4, transition: { duration: 0.2, ease: "easeOut" as const } }}
                   className="card-glow card-tilt p-8 rounded-2xl group"
                 >
-                  <div className="icon-glow w-12 h-12 rounded-xl bg-gradient-to-br from-brand-500/20 to-brand-400/10 border border-brand-500/20 flex items-center justify-center mb-5 group-hover:border-brand-500/40 transition-colors">
-                    <feature.icon className="w-6 h-6 text-brand-400/80 group-hover:text-brand-300 transition-colors" />
+                  <div className="icon-glow w-12 h-12 rounded-xl bg-gradient-to-br from-zoo-500/20 to-zoo-400/10 border border-zoo-500/20 flex items-center justify-center mb-5 group-hover:border-zoo-500/40 transition-colors">
+                    <feature.icon className="w-6 h-6 text-zoo-400/80 group-hover:text-zoo-300 transition-colors" />
                   </div>
-                  <h3 className="text-xl font-bold font-sharp mb-3">{feature.title}</h3>
-                  <p className="text-sm text-white/35 leading-relaxed tracking-wide">
+                  <h3 className="text-xl font-bold font-display mb-3">{feature.title}</h3>
+                  <p className="text-sm text-white/50 leading-relaxed tracking-wide">
                     {feature.description}
                   </p>
                 </motion.div>
@@ -1180,8 +1191,12 @@ export default function LandingPage() {
       {/* Testimonials Section */}
       <section className="relative py-24 lg:py-32 border-t border-white/[0.06] overflow-hidden">
         <div className="absolute inset-0">
-          <div className="glow-orb glow-orb-purple w-[600px] h-[600px] top-1/4 left-1/4 opacity-10" />
-          <div className="glow-orb glow-orb-cyan w-[400px] h-[400px] bottom-1/4 right-1/4 opacity-10" />
+          <ParallaxLayer speed={0.3} className="absolute inset-0">
+            <div className="glow-orb glow-orb-purple w-[600px] h-[600px] top-1/4 left-1/4 opacity-10" />
+          </ParallaxLayer>
+          <ParallaxLayer speed={-0.2} className="absolute inset-0">
+            <div className="glow-orb glow-orb-cyan w-[400px] h-[400px] bottom-1/4 right-1/4 opacity-10" />
+          </ParallaxLayer>
         </div>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
           <motion.div
@@ -1216,7 +1231,7 @@ export default function LandingPage() {
                   </div>
 
                   {/* Quote */}
-                  <p className="text-sm text-white/55 leading-relaxed mb-6">
+                  <p className="text-sm text-white/60 leading-relaxed mb-6">
                     &ldquo;{t.quote}&rdquo;
                   </p>
 
@@ -1240,7 +1255,9 @@ export default function LandingPage() {
       {/* Video Creator Showcase Section */}
       <section className="relative py-24 lg:py-32 border-t border-white/[0.06] overflow-hidden">
         <div className="absolute inset-0">
-          <div className="glow-orb glow-orb-purple w-[600px] h-[600px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-15" />
+          <ParallaxLayer speed={-0.25} className="absolute inset-0">
+            <div className="glow-orb glow-orb-purple w-[600px] h-[600px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-15" />
+          </ParallaxLayer>
         </div>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
           <motion.div
@@ -1342,22 +1359,22 @@ export default function LandingPage() {
               </motion.div>
 
               {/* Pro - Featured */}
-              <motion.div variants={fadeInUp} className="relative p-7 rounded-2xl border border-brand-500/30 bg-brand-500/[0.03] shadow-glow">
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-brand-500 to-brand-400 text-xs font-bold text-white">
+              <motion.div variants={fadeInUp} className="relative p-7 rounded-2xl border border-zoo-500/30 bg-zoo-500/[0.03] shadow-glow">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-zoo-500 to-zoo-400 text-xs font-bold text-white">
                   Most Popular
                 </div>
-                <div className="text-sm font-semibold text-brand-400 mb-2">Pro</div>
+                <div className="text-sm font-semibold text-zoo-400 mb-2">Pro</div>
                 <div className="text-4xl font-black mb-1">$49<span className="text-lg font-normal text-white/65">/mo</span></div>
                 <div className="text-sm text-white/65 mb-5">Full arsenal</div>
                 <ul className="space-y-2.5 mb-7">
                   {["Everything in Creator", "AI Video Creator", "Full SEO Agent", "AI Brand Kit", "All 12+ AI tools"].map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm text-white/60">
-                      <div className="w-1.5 h-1.5 rounded-full bg-brand-400" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-zoo-400" />
                       {f}
                     </li>
                   ))}
                 </ul>
-                <Link href="/auth/signup" className="block w-full btn-gradient py-3 rounded-xl text-sm font-bold text-white shadow-glow text-center">
+                <Link href="/auth/signup" className="block w-full btn-zoo py-3 rounded-xl text-sm font-bold text-white shadow-glow text-center">
                   Start Pro Trial
                 </Link>
               </motion.div>
@@ -1395,17 +1412,17 @@ export default function LandingPage() {
           >
             <motion.div variants={fadeInUp} className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
               <div>
-                <h2 className="text-2xl font-bold font-sharp tracking-[-0.03em] mb-1">Clip the ticket on every service</h2>
+                <h2 className="text-2xl font-bold font-display tracking-[-0.03em] mb-1">Clip the ticket on every service</h2>
                 <p className="text-sm text-white/65">Domains, hosting, AI agents, templates — add what you need, skip what you don&apos;t.</p>
               </div>
-              <Link href="/marketplace" className="text-sm font-medium text-brand-400 hover:text-brand-300 transition-colors flex items-center gap-1.5 whitespace-nowrap">
+              <Link href="/marketplace" className="text-sm font-medium text-zoo-400 hover:text-zoo-300 transition-colors flex items-center gap-1.5 whitespace-nowrap">
                 Explore the Marketplace <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </motion.div>
 
             <motion.div variants={staggerContainer} className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
               {[
-                { label: "Domains", price: "from $2.99/yr", href: "/domains", color: "text-brand-400 border-brand-500/15" },
+                { label: "Domains", price: "from $2.99/yr", href: "/domains", color: "text-zoo-400 border-zoo-500/15" },
                 { label: "Hosting", price: "$12.99/mo", href: "/hosting", color: "text-accent-cyan border-accent-cyan/15" },
                 { label: "SEO Agent", price: "$29/mo", href: "/marketplace", color: "text-emerald-400 border-emerald-500/15" },
                 { label: "Video Creator", price: "$19/mo", href: "/marketplace", color: "text-purple-400 border-purple-500/15" },
@@ -1436,31 +1453,35 @@ export default function LandingPage() {
           ================================================================ */}
       <section className="relative py-24 lg:py-32 border-t border-white/[0.06] overflow-hidden">
         <div className="absolute inset-0">
-          <div className="glow-orb glow-orb-purple w-[600px] h-[600px] top-1/3 left-1/4 opacity-10" />
+          <ParallaxLayer speed={0.2} className="absolute inset-0">
+            <div className="glow-orb glow-orb-purple w-[600px] h-[600px] top-1/3 left-1/4 opacity-10" />
+          </ParallaxLayer>
         </div>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-            className="text-center mb-16"
-          >
-            <motion.div variants={fadeInUp}>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-zoo-400/20 bg-zoo-400/5 mb-6">
-                <Sparkles className="w-3 h-3 text-zoo-400" />
-                <span className="text-xs font-medium text-zoo-400">The Magic</span>
-              </div>
+          <SectionReveal blur>
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={staggerContainer}
+              className="text-center mb-16"
+            >
+              <motion.div variants={fadeInUp}>
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-zoo-400/20 bg-zoo-400/5 mb-6">
+                  <Sparkles className="w-3 h-3 text-zoo-400" />
+                  <span className="text-xs font-medium text-zoo-400">The Magic</span>
+                </div>
+              </motion.div>
+              <motion.h2 variants={fadeInUp} className="font-display text-4xl md:text-5xl lg:text-7xl font-extrabold tracking-[-0.04em] mb-6 text-white">
+                From Words to<br />
+                <span className="gradient-text-zoo">Websites</span>
+              </motion.h2>
+              <motion.p variants={fadeInUp} className="max-w-2xl mx-auto text-lg text-white/50">
+                Drag the slider to see the transformation. One prompt. One click. A complete website.
+              </motion.p>
             </motion.div>
-            <motion.h2 variants={fadeInUp} className="font-display text-4xl md:text-5xl lg:text-7xl font-extrabold tracking-[-0.04em] mb-6 text-white">
-              From Words to<br />
-              <span className="gradient-text-zoo">Websites</span>
-            </motion.h2>
-            <motion.p variants={fadeInUp} className="max-w-2xl mx-auto text-lg text-white/50">
-              Drag the slider to see the transformation. One prompt. One click. A complete website.
-            </motion.p>
-          </motion.div>
-          <BeforeAfter />
+            <BeforeAfter />
+          </SectionReveal>
         </div>
       </section>
 
@@ -1469,7 +1490,9 @@ export default function LandingPage() {
           ================================================================ */}
       <section className="relative py-24 lg:py-32 border-t border-white/[0.06] overflow-hidden">
         <div className="absolute inset-0">
-          <div className="glow-orb w-[800px] h-[800px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-20" style={{ background: "radial-gradient(circle, rgba(124, 90, 255, 0.4), transparent 60%)" }} />
+          <ParallaxLayer speed={0.35} className="absolute inset-0">
+            <div className="glow-orb w-[800px] h-[800px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-20" style={{ background: "radial-gradient(circle, rgba(124, 90, 255, 0.4), transparent 60%)" }} />
+          </ParallaxLayer>
         </div>
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center relative z-10">
           <motion.div
@@ -1515,9 +1538,9 @@ export default function LandingPage() {
                 <div className="w-8 h-8 rounded-lg bg-white/[0.08] border border-white/[0.10] flex items-center justify-center">
                   <Zap className="w-4 h-4 text-white/70" />
                 </div>
-                <span className="text-lg font-bold font-sharp">Zoobicon</span>
+                <span className="text-lg font-bold font-display">Zoobicon</span>
               </div>
-              <p className="text-sm text-white/35 max-w-xs leading-relaxed mb-6 tracking-wide">
+              <p className="text-sm text-white/50 max-w-xs leading-relaxed mb-6 tracking-wide">
                 The most advanced AI platform for building, marketing, and dominating the digital landscape.
               </p>
               <div className="flex gap-3">
