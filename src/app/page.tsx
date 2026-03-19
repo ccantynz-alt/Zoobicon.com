@@ -571,11 +571,20 @@ export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<{ email: string; name?: string; role?: string } | null>(null);
   const [wordIndex, setWordIndex] = useState(0);
+  const [scrolled, setScrolled] = useState(false);
+
   useEffect(() => {
     try {
       const stored = localStorage.getItem("zoobicon_user");
       if (stored) setUser(JSON.parse(stored));
     } catch { /* Safari private mode / storage unavailable */ }
+  }, []);
+
+  // Track scroll for nav shrink effect
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   // Rotating words animation
@@ -599,10 +608,17 @@ export default function LandingPage() {
       {/* Background Effects */}
       <BackgroundEffects preset="technical" />
 
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-black/60 backdrop-blur-2xl" aria-label="Main navigation">
+      {/* Navigation — shrinks on scroll */}
+      <nav
+        className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-300 ${
+          scrolled
+            ? "border-white/[0.08] bg-black/80 backdrop-blur-2xl shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
+            : "border-white/[0.06] bg-black/60 backdrop-blur-2xl"
+        }`}
+        aria-label="Main navigation"
+      >
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className={`flex items-center justify-between transition-all duration-300 ${scrolled ? "h-14" : "h-16"}`}>
             <div className="flex items-center gap-8">
               <Link href="/" className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-zoo-500 to-zoo-400 flex items-center justify-center shadow-glow-zoo">
@@ -668,35 +684,77 @@ export default function LandingPage() {
             </button>
           </div>
         </div>
-        {/* Mobile menu */}
-        {mobileMenuOpen && (
-          <nav className="md:hidden border-t border-white/[0.06] bg-black/95 backdrop-blur-2xl px-6 py-6 space-y-4" aria-label="Mobile navigation">
-            <a href="#products" className="block text-sm text-white/60 hover:text-white">Products</a>
-            <Link href="/marketplace" className="block text-sm text-white/60 hover:text-white">Marketplace</Link>
-            <Link href="/domains" className="block text-sm text-white/60 hover:text-white">Domains</Link>
-            <Link href="/developers" className="block text-sm text-white/60 hover:text-white">Developers</Link>
-            <Link href="/agencies" className="block text-sm text-white/60 hover:text-white">Agencies</Link>
-            <Link href="/support" className="block text-sm text-white/60 hover:text-white">Support</Link>
-            <Link href="/pricing" className="block text-sm text-white/60 hover:text-white">Pricing</Link>
-            {user ? (
-              <>
-                <Link href="/dashboard" className="block text-sm text-white/60 hover:text-white flex items-center gap-2">
-                  <LayoutDashboard className="w-4 h-4" /> Dashboard
+        {/* Mobile menu — full-screen overlay */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.nav
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="md:hidden fixed inset-0 top-14 bg-[#050508]/98 backdrop-blur-2xl z-40 px-6 py-8 flex flex-col"
+              aria-label="Mobile navigation"
+            >
+              <div className="space-y-1 flex-1">
+                {[
+                  { href: "#products", label: "Products", onClick: true },
+                  { href: "/marketplace", label: "Marketplace" },
+                  { href: "/domains", label: "Domains" },
+                  { href: "/developers", label: "Developers" },
+                  { href: "/agencies", label: "Agencies" },
+                  { href: "/pricing", label: "Pricing" },
+                  { href: "/support", label: "Support" },
+                ].map((item) => (
+                  item.onClick ? (
+                    <a
+                      key={item.label}
+                      href={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block text-lg font-medium text-white/70 hover:text-white py-3 border-b border-white/[0.06] transition-colors"
+                    >
+                      {item.label}
+                    </a>
+                  ) : (
+                    <Link
+                      key={item.label}
+                      href={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block text-lg font-medium text-white/70 hover:text-white py-3 border-b border-white/[0.06] transition-colors"
+                    >
+                      {item.label}
+                    </Link>
+                  )
+                ))}
+                {user && (
+                  <>
+                    <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="block text-lg font-medium text-white/70 hover:text-white py-3 border-b border-white/[0.06] flex items-center gap-3">
+                      <LayoutDashboard className="w-5 h-5" /> Dashboard
+                    </Link>
+                    <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="block text-lg font-medium text-white/70 hover:text-white py-3 border-b border-white/[0.06] flex items-center gap-3 w-full text-left">
+                      <LogOut className="w-5 h-5" /> Sign out
+                    </button>
+                  </>
+                )}
+              </div>
+
+              {/* Mobile CTA — prominent at bottom */}
+              <div className="pt-6 border-t border-white/[0.06]">
+                <Link
+                  href="/builder"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block btn-zoo px-6 py-4 rounded-2xl text-base font-bold text-white text-center"
+                >
+                  {user ? `${user.name || user.email.split("@")[0]}'s Builder` : "Start Building Free"}
                 </Link>
-                <button onClick={handleLogout} className="block text-sm text-white/60 hover:text-white flex items-center gap-2 w-full text-left">
-                  <LogOut className="w-4 h-4" /> Sign out
-                </button>
-                <Link href="/builder" className="block btn-zoo px-5 py-2.5 rounded-xl text-sm font-semibold text-white text-center mt-4">
-                  <span>{user.name || user.email.split("@")[0]}&apos;s Builder</span>
-                </Link>
-              </>
-            ) : (
-              <Link href="/builder" className="block btn-zoo px-5 py-2.5 rounded-xl text-sm font-semibold text-white text-center mt-4">
-                <span>Start Building</span>
-              </Link>
-            )}
-          </nav>
-        )}
+                <div className="flex items-center justify-center gap-4 mt-4 text-xs text-white/40">
+                  <span>No credit card</span>
+                  <span className="w-1 h-1 rounded-full bg-white/20" />
+                  <span>Free forever</span>
+                </div>
+              </div>
+            </motion.nav>
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* Cursor glow tracker — enables CSS-based cursor following */}
@@ -937,11 +995,14 @@ export default function LandingPage() {
             <motion.div variants={fadeInUp} className="text-center mt-12">
               <Link
                 href="/builder"
-                className="inline-flex items-center gap-2 btn-zoo px-6 py-3 rounded-xl text-sm font-bold text-white shadow-glow"
+                className="inline-flex items-center gap-3 btn-zoo px-8 py-4 rounded-2xl text-base font-bold text-white"
               >
                 <span>Try the Most Complete Builder</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-5 h-5" />
               </Link>
+              <p className="mt-4 text-sm text-white/40">
+                Free to start. No credit card required.
+              </p>
             </motion.div>
           </motion.div>
         </div>
