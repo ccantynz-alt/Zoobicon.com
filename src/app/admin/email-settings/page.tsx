@@ -56,6 +56,12 @@ const SETUP_STEPS = [
     description: "Get your API key from Mailgun \u2192 Settings \u2192 API Keys. Add MAILGUN_API_KEY and MAILGUN_DOMAIN to your Vercel environment variables.",
     link: "https://app.mailgun.com/settings/api_security",
   },
+  {
+    step: 6,
+    title: "Set up event webhooks (optional but recommended)",
+    description: "In Mailgun \u2192 Sending \u2192 Webhooks, add https://zoobicon.com/api/email/events for all event types (delivered, opened, clicked, bounced, complained, unsubscribed). This enables delivery tracking, open rates, and automatic bounce suppression.",
+    link: "https://app.mailgun.com/sending/webhooks",
+  },
 ];
 
 export default function AdminEmailSettingsPage() {

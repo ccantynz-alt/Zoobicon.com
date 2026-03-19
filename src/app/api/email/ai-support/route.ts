@@ -164,8 +164,9 @@ Draft a professional support reply using the knowledge base if relevant. Return 
 
       if (tickets.length > 0) {
         const ticket = tickets[0];
+        const domain = process.env.MAILGUN_DOMAIN || "zoobicon.com";
         const sendResult = await sendViaMailgun({
-          from: `Zoobicon Support <support@${process.env.MAILGUN_DOMAIN || "zoobicon.com"}>`,
+          from: `Zoobicon Support <support@${domain}>`,
           to: ticket.from_email as string,
           subject: `Re: ${ticket.subject}`,
           text: reply,
@@ -173,9 +174,14 @@ Draft a professional support reply using the knowledge base if relevant. Return 
   <p>${reply.replace(/\n\n/g, "</p><p>").replace(/\n/g, "<br>")}</p>
   <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;">
   <p style="color: #6b7280; font-size: 13px;">This reply was sent by Zoe, Zoobicon's AI support assistant. A human agent may follow up if needed.</p>
+  <p style="color: #9ca3af; font-size: 11px;"><a href="https://zoobicon.com/unsubscribe?email=${encodeURIComponent(ticket.from_email as string)}" style="color: #9ca3af;">Unsubscribe</a></p>
 </div>`,
           inReplyTo: ticket.mailgun_message_id as string,
           tags: ["support", "ai-auto-reply"],
+          tracking: true,
+          trackingOpens: true,
+          trackingClicks: "htmlonly",
+          unsubscribeUrl: `https://zoobicon.com/unsubscribe?email=${encodeURIComponent(ticket.from_email as string)}`,
         });
 
         if (sendResult.success) {

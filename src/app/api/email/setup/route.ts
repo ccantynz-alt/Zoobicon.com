@@ -99,6 +99,14 @@ CREATE TABLE IF NOT EXISTS email_events (
 
 CREATE INDEX IF NOT EXISTS idx_email_events_domain ON email_events(domain);
 CREATE INDEX IF NOT EXISTS idx_email_events_ts ON email_events(timestamp);
+
+-- Email suppressions (bounces, complaints, unsubscribes)
+CREATE TABLE IF NOT EXISTS email_suppressions (
+  email TEXT PRIMARY KEY,
+  reason TEXT DEFAULT '',
+  type TEXT NOT NULL DEFAULT 'bounce',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
 `;
 
 export async function GET() {
@@ -157,7 +165,7 @@ export async function GET() {
     const tables = await sql`
       SELECT table_name FROM information_schema.tables
       WHERE table_schema = 'public'
-        AND table_name IN ('email_inbound', 'email_outbound', 'support_tickets', 'support_messages', 'knowledge_base', 'email_events')
+        AND table_name IN ('email_inbound', 'email_outbound', 'support_tickets', 'support_messages', 'knowledge_base', 'email_events', 'email_suppressions')
       ORDER BY table_name
     `;
     const found = tables.map((t: Record<string, unknown>) => t.table_name as string);
@@ -325,12 +333,36 @@ export async function POST() {
     await sql`CREATE INDEX IF NOT EXISTS idx_email_events_ts ON email_events(timestamp)`;
   } catch { /* indexes are optional */ }
 
+  // Email suppressions (bounces, complaints, unsubscribes)
+  try {
+    await sql`
+      CREATE TABLE IF NOT EXISTS email_suppressions (
+        email TEXT PRIMARY KEY,
+        reason TEXT DEFAULT '',
+        type TEXT NOT NULL DEFAULT 'bounce',
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `;
+  } catch (err) {
+    errors.push(`email_suppressions: ${err instanceof Error ? err.message : "failed"}`);
+  }
+
+  // Add keywords column to knowledge_base if not present
+  try {
+    await sql`ALTER TABLE knowledge_base ADD COLUMN IF NOT EXISTS keywords JSONB DEFAULT '[]'`;
+  } catch { /* column may already exist */ }
+
+  // Add updated_at column to knowledge_base if not present
+  try {
+    await sql`ALTER TABLE knowledge_base ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW()`;
+  } catch { /* column may already exist */ }
+
   // Verify what was created
   try {
     const tables = await sql`
       SELECT table_name FROM information_schema.tables
       WHERE table_schema = 'public'
-        AND table_name IN ('email_inbound', 'email_outbound', 'support_tickets', 'support_messages', 'knowledge_base', 'email_events')
+        AND table_name IN ('email_inbound', 'email_outbound', 'support_tickets', 'support_messages', 'knowledge_base', 'email_events', 'email_suppressions')
       ORDER BY table_name
     `;
     const found = tables.map((t: Record<string, unknown>) => t.table_name as string);
