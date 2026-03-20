@@ -1266,15 +1266,15 @@ export default function LandingPage() {
                 <span className="text-xs font-medium text-accent-pink">AI Video Creator</span>
               </div>
               <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-6 text-white text-glow">
-                High-End Videos.<br />
-                <span className="text-white/60">Zero Scripts.</span>
+                AI Video Creator.<br />
+                <span className="text-white/60">Coming Soon.</span>
               </h2>
               <p className="max-w-2xl mx-auto text-lg text-white/60 tracking-wide mb-4">
-                Describe what you want. AI creates scroll-stopping, production-quality videos
-                optimized for every platform. Click any video to preview.
+                AI-powered storyboard and script generation is live today. Full video rendering
+                is coming soon — join the waitlist to get early access.
               </p>
               <Link href="/products/video-creator" className="inline-flex items-center gap-2 text-sm text-accent-pink hover:text-accent-pink/80 transition-colors">
-                Learn more about Video Creator <ArrowRight className="w-4 h-4" />
+                Join the waitlist <ArrowRight className="w-4 h-4" />
               </Link>
             </motion.div>
 
