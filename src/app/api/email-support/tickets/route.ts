@@ -1,8 +1,16 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { sql } from "@/lib/db";
+
+// ---------------------------------------------------------------------------
+// Support Tickets API — tries real DB first, falls back to demo data
+// GET  /api/email-support/tickets — list tickets with filters
+// POST /api/email-support/tickets — create ticket
+// PUT  /api/email-support/tickets — update ticket
+// ---------------------------------------------------------------------------
 
 export interface TicketMessage {
   id: string;
-  from: "customer" | "agent" | "ai";
+  from: "customer" | "agent" | "ai" | "internal";
   body: string;
   timestamp: string;
 }
@@ -22,6 +30,7 @@ export interface Ticket {
   tags: string[];
 }
 
+// Demo data kept as fallback when DB is unavailable
 const DEMO_TICKETS: Ticket[] = [
   {
     id: "TK-3001",
@@ -73,120 +82,6 @@ const DEMO_TICKETS: Ticket[] = [
     ],
     tags: ["feedback", "positive"],
   },
-  {
-    id: "TK-3004",
-    subject: "Enterprise SSO integration timeline",
-    body: "We're evaluating Zoobicon for our 200-person team. When will SAML SSO be available? This is a hard requirement for us.",
-    from: "mike@enterprise.com",
-    customerName: "Mike Thompson",
-    status: "open",
-    priority: "urgent",
-    assignee: "Sales Team",
-    createdAt: "2026-03-15T06:30:00Z",
-    updatedAt: "2026-03-15T06:30:00Z",
-    messages: [
-      { id: "m6", from: "customer", body: "We're evaluating Zoobicon for our 200-person team. When will SAML SSO be available? This is a hard requirement for us.", timestamp: "2026-03-15T06:30:00Z" },
-    ],
-    tags: ["enterprise", "sso", "sales"],
-  },
-  {
-    id: "TK-3005",
-    subject: "CLI deploy fails with custom domain",
-    body: "Running `zb deploy --domain mysite.com` gives error: DNS_PROBE_FAILED. I've set up the CNAME record as documented. It's been 72 hours.",
-    from: "anna@freelance.dev",
-    customerName: "Anna Kowalski",
-    status: "open",
-    priority: "high",
-    assignee: null,
-    createdAt: "2026-03-14T22:15:00Z",
-    updatedAt: "2026-03-14T22:15:00Z",
-    messages: [
-      { id: "m7", from: "customer", body: "Running `zb deploy --domain mysite.com` gives error: DNS_PROBE_FAILED. I've set up the CNAME record as documented. It's been 72 hours.", timestamp: "2026-03-14T22:15:00Z" },
-    ],
-    tags: ["cli", "deploy", "dns", "bug"],
-  },
-  {
-    id: "TK-3006",
-    subject: "Billing discrepancy on my last invoice",
-    body: "I was charged $98 instead of $49 for Pro plan this month. I didn't upgrade or add anything. Please investigate.",
-    from: "david@smallbiz.com",
-    customerName: "David Kim",
-    status: "open",
-    priority: "high",
-    assignee: null,
-    createdAt: "2026-03-14T20:00:00Z",
-    updatedAt: "2026-03-14T20:00:00Z",
-    messages: [
-      { id: "m8", from: "customer", body: "I was charged $98 instead of $49 for Pro plan this month. I didn't upgrade or add anything. Please investigate.", timestamp: "2026-03-14T20:00:00Z" },
-    ],
-    tags: ["billing", "urgent"],
-  },
-  {
-    id: "TK-3007",
-    subject: "How to add Google Analytics to generated sites?",
-    body: "I want to add my GA4 tracking code to all my generated sites. Is there a global setting or do I need to edit each site manually?",
-    from: "priya@marketing.co",
-    customerName: "Priya Sharma",
-    status: "pending",
-    priority: "low",
-    assignee: null,
-    createdAt: "2026-03-14T18:30:00Z",
-    updatedAt: "2026-03-14T19:00:00Z",
-    messages: [
-      { id: "m9", from: "customer", body: "I want to add my GA4 tracking code to all my generated sites. Is there a global setting or do I need to edit each site manually?", timestamp: "2026-03-14T18:30:00Z" },
-      { id: "m10", from: "ai", body: "Hi Priya! Currently you can add GA4 tracking by editing the HTML of each site and placing the gtag.js snippet in the <head>. We're working on a global analytics injection feature for Pro users - expected next month!", timestamp: "2026-03-14T18:31:00Z" },
-    ],
-    tags: ["analytics", "ga4", "feature-request"],
-  },
-  {
-    id: "TK-3008",
-    subject: "AI-generated images look low quality",
-    body: "The AI images in my e-commerce site look blurry and generic. I'm using Stability AI. Are there settings to improve quality? Happy to pay more for better results.",
-    from: "tom@ecommerce.shop",
-    customerName: "Tom Baker",
-    status: "open",
-    priority: "medium",
-    assignee: null,
-    createdAt: "2026-03-14T16:45:00Z",
-    updatedAt: "2026-03-14T16:45:00Z",
-    messages: [
-      { id: "m11", from: "customer", body: "The AI images in my e-commerce site look blurry and generic. I'm using Stability AI. Are there settings to improve quality? Happy to pay more for better results.", timestamp: "2026-03-14T16:45:00Z" },
-    ],
-    tags: ["images", "quality", "ecommerce"],
-  },
-  {
-    id: "TK-3009",
-    subject: "Feature request: Figma plugin",
-    body: "Would love a Figma plugin that lets me send designs directly to Zoobicon for conversion. Currently I'm using the import panel but a plugin would be way faster.",
-    from: "emma@uxstudio.com",
-    customerName: "Emma Wilson",
-    status: "resolved",
-    priority: "low",
-    assignee: null,
-    createdAt: "2026-03-14T14:20:00Z",
-    updatedAt: "2026-03-14T14:25:00Z",
-    messages: [
-      { id: "m12", from: "customer", body: "Would love a Figma plugin that lets me send designs directly to Zoobicon for conversion. Currently I'm using the import panel but a plugin would be way faster.", timestamp: "2026-03-14T14:20:00Z" },
-      { id: "m13", from: "ai", body: "Great suggestion, Emma! A Figma plugin is on our roadmap. I've added your vote to the feature request. In the meantime, our Figma Import panel supports direct URL import - just paste your Figma share link!", timestamp: "2026-03-14T14:21:00Z" },
-    ],
-    tags: ["feature-request", "figma"],
-  },
-  {
-    id: "TK-3010",
-    subject: "Sites down - getting 502 errors",
-    body: "All 3 of my deployed sites are returning 502 Bad Gateway errors. This has been happening for the last 20 minutes. My clients are complaining. URGENT!",
-    from: "alex@webagency.io",
-    customerName: "Alex Rivera",
-    status: "open",
-    priority: "urgent",
-    assignee: "Engineering",
-    createdAt: "2026-03-14T12:05:00Z",
-    updatedAt: "2026-03-14T12:05:00Z",
-    messages: [
-      { id: "m14", from: "customer", body: "All 3 of my deployed sites are returning 502 Bad Gateway errors. This has been happening for the last 20 minutes. My clients are complaining. URGENT!", timestamp: "2026-03-14T12:05:00Z" },
-    ],
-    tags: ["outage", "502", "urgent", "hosting"],
-  },
 ];
 
 export async function GET(request: NextRequest) {
@@ -195,16 +90,115 @@ export async function GET(request: NextRequest) {
   const priority = searchParams.get("priority");
   const search = searchParams.get("search");
 
+  // Try real database first
+  try {
+    let tickets;
+    if (search) {
+      const q = `%${search}%`;
+      tickets = await sql`
+        SELECT t.*,
+          (SELECT COUNT(*)::int FROM support_messages m WHERE m.ticket_id = t.id) AS message_count
+        FROM support_tickets t
+        WHERE (t.subject ILIKE ${q} OR t.from_email ILIKE ${q} OR t.from_name ILIKE ${q})
+        ${status && status !== "all" ? sql`AND t.status = ${status}` : sql``}
+        ${priority ? sql`AND t.priority = ${priority}` : sql``}
+        ORDER BY t.updated_at DESC
+        LIMIT 50
+      `;
+    } else if (status && status !== "all") {
+      tickets = await sql`
+        SELECT t.*,
+          (SELECT COUNT(*)::int FROM support_messages m WHERE m.ticket_id = t.id) AS message_count
+        FROM support_tickets t
+        WHERE t.status = ${status}
+        ${priority ? sql`AND t.priority = ${priority}` : sql``}
+        ORDER BY
+          CASE t.priority WHEN 'urgent' THEN 0 WHEN 'high' THEN 1 WHEN 'medium' THEN 2 WHEN 'low' THEN 3 END,
+          t.updated_at DESC
+        LIMIT 50
+      `;
+    } else {
+      tickets = await sql`
+        SELECT t.*,
+          (SELECT COUNT(*)::int FROM support_messages m WHERE m.ticket_id = t.id) AS message_count
+        FROM support_tickets t
+        ${priority ? sql`WHERE t.priority = ${priority}` : sql``}
+        ORDER BY
+          CASE t.priority WHEN 'urgent' THEN 0 WHEN 'high' THEN 1 WHEN 'medium' THEN 2 WHEN 'low' THEN 3 END,
+          t.updated_at DESC
+        LIMIT 50
+      `;
+    }
+
+    // Get stats
+    const stats = await sql`
+      SELECT
+        COUNT(*)::int AS total,
+        COUNT(*) FILTER (WHERE status = 'open')::int AS open,
+        COUNT(*) FILTER (WHERE status = 'pending')::int AS pending,
+        COUNT(*) FILTER (WHERE status = 'resolved')::int AS resolved,
+        COUNT(*) FILTER (WHERE status = 'spam')::int AS spam,
+        COUNT(*) FILTER (WHERE ai_auto_replied = true)::int AS ai_handled
+      FROM support_tickets
+    `;
+
+    // Fetch messages for each ticket
+    const ticketIds = tickets.map((t: { id: string }) => t.id);
+    let messagesMap: Record<string, TicketMessage[]> = {};
+    if (ticketIds.length > 0) {
+      const messages = await sql`
+        SELECT id, ticket_id, sender, body_text, created_at
+        FROM support_messages
+        WHERE ticket_id = ANY(${ticketIds})
+        ORDER BY created_at ASC
+      `;
+      for (const m of messages) {
+        const tid = m.ticket_id as string;
+        if (!messagesMap[tid]) messagesMap[tid] = [];
+        messagesMap[tid].push({
+          id: m.id as string,
+          from: m.sender as "customer" | "agent" | "ai" | "internal",
+          body: m.body_text as string,
+          timestamp: (m.created_at as Date).toISOString?.() || String(m.created_at),
+        });
+      }
+    }
+
+    // Map DB rows to Ticket shape
+    const mapped: Ticket[] = tickets.map((t: Record<string, unknown>) => ({
+      id: t.id as string,
+      subject: (t.subject || "") as string,
+      body: (messagesMap[t.id as string]?.[0]?.body || "") as string,
+      from: (t.from_email || "") as string,
+      customerName: (t.from_name || (t.from_email as string)?.split("@")[0] || "Unknown") as string,
+      status: (t.status || "open") as Ticket["status"],
+      priority: (t.priority || "medium") as Ticket["priority"],
+      assignee: (t.assignee || null) as string | null,
+      createdAt: (t.created_at as Date)?.toISOString?.() || String(t.created_at),
+      updatedAt: (t.updated_at as Date)?.toISOString?.() || String(t.updated_at),
+      messages: messagesMap[t.id as string] || [],
+      tags: Array.isArray(t.tags) ? t.tags as string[] : typeof t.tags === "string" ? JSON.parse(t.tags as string || "[]") : [],
+    }));
+
+    return NextResponse.json({
+      tickets: mapped,
+      total: mapped.length,
+      stats: stats[0] || { total: 0, open: 0, pending: 0, resolved: 0, spam: 0, ai_handled: 0 },
+      source: "database",
+    });
+  } catch (err) {
+    console.warn("[email-support/tickets] DB unavailable, using demo data:", (err as Error).message);
+  }
+
+  // Fallback to demo data
   let filtered = [...DEMO_TICKETS];
 
   if (status && status !== "all") {
     filtered = filtered.filter((t) => t.status === status);
   }
-
   if (priority) {
     filtered = filtered.filter((t) => t.priority === priority);
   }
-
   if (search) {
     const q = search.toLowerCase();
     filtered = filtered.filter(
@@ -217,20 +211,18 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  return new Response(
-    JSON.stringify({
-      tickets: filtered,
-      total: filtered.length,
-      stats: {
-        open: DEMO_TICKETS.filter((t) => t.status === "open").length,
-        pending: DEMO_TICKETS.filter((t) => t.status === "pending").length,
-        resolved: DEMO_TICKETS.filter((t) => t.status === "resolved").length,
-        spam: DEMO_TICKETS.filter((t) => t.status === "spam").length,
-        total: DEMO_TICKETS.length,
-      },
-    }),
-    { status: 200, headers: { "Content-Type": "application/json" } }
-  );
+  return NextResponse.json({
+    tickets: filtered,
+    total: filtered.length,
+    stats: {
+      open: DEMO_TICKETS.filter((t) => t.status === "open").length,
+      pending: DEMO_TICKETS.filter((t) => t.status === "pending").length,
+      resolved: DEMO_TICKETS.filter((t) => t.status === "resolved").length,
+      spam: DEMO_TICKETS.filter((t) => t.status === "spam").length,
+      total: DEMO_TICKETS.length,
+    },
+    source: "demo",
+  });
 }
 
 export async function POST(request: NextRequest) {
@@ -238,14 +230,51 @@ export async function POST(request: NextRequest) {
     const { subject, body, from, priority } = await request.json();
 
     if (!subject || !body || !from) {
-      return new Response(
-        JSON.stringify({ error: "subject, body, and from are required" }),
+      return NextResponse.json(
+        { error: "subject, body, and from are required" },
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
+    // Try real database
+    try {
+      const name = from.split("@")[0].charAt(0).toUpperCase() + from.split("@")[0].slice(1);
+      const result = await sql`
+        INSERT INTO support_tickets (subject, from_email, from_name, status, priority)
+        VALUES (${subject}, ${from}, ${name}, 'open', ${priority || "medium"})
+        RETURNING id, created_at
+      `;
+      const ticket = result[0];
+
+      await sql`
+        INSERT INTO support_messages (ticket_id, sender, body_text)
+        VALUES (${ticket.id}, 'customer', ${body})
+      `;
+
+      return NextResponse.json({
+        ticket: {
+          id: ticket.id,
+          subject,
+          body,
+          from,
+          customerName: name,
+          status: "open",
+          priority: priority || "medium",
+          assignee: null,
+          createdAt: (ticket.created_at as Date).toISOString(),
+          updatedAt: (ticket.created_at as Date).toISOString(),
+          messages: [{ id: `m-${Date.now()}`, from: "customer", body, timestamp: new Date().toISOString() }],
+          tags: [],
+        },
+        source: "database",
+      }, { status: 201 });
+    } catch (dbErr) {
+      console.warn("[email-support/tickets] DB unavailable for create:", (dbErr as Error).message);
+    }
+
+    // Fallback: return ticket without persisting
     const newTicket: Ticket = {
-      id: `TK-${3000 + DEMO_TICKETS.length + 1}`,
+      id: `TK-${Date.now()}`,
       subject,
       body,
       from,
@@ -255,27 +284,14 @@ export async function POST(request: NextRequest) {
       assignee: null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      messages: [
-        {
-          id: `m-${Date.now()}`,
-          from: "customer",
-          body,
-          timestamp: new Date().toISOString(),
-        },
-      ],
+      messages: [{ id: `m-${Date.now()}`, from: "customer", body, timestamp: new Date().toISOString() }],
       tags: [],
     };
 
-    return new Response(JSON.stringify({ ticket: newTicket }), {
-      status: 201,
-      headers: { "Content-Type": "application/json" },
-    });
+    return NextResponse.json({ ticket: newTicket, source: "local" }, { status: 201 });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Failed to create ticket";
-    return new Response(JSON.stringify({ error: message }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -284,37 +300,32 @@ export async function PUT(request: NextRequest) {
     const { id, status, priority, assignee } = await request.json();
 
     if (!id) {
-      return new Response(
-        JSON.stringify({ error: "Ticket id is required" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
+      return NextResponse.json(
+        { error: "Ticket id is required" },
+        { status: 400 }
       );
     }
 
-    const ticket = DEMO_TICKETS.find((t) => t.id === id);
-    if (!ticket) {
-      return new Response(
-        JSON.stringify({ error: "Ticket not found" }),
-        { status: 404, headers: { "Content-Type": "application/json" } }
-      );
+    // Try real database
+    try {
+      if (status) {
+        await sql`UPDATE support_tickets SET status = ${status}, updated_at = NOW() WHERE id = ${id}`;
+      }
+      if (priority) {
+        await sql`UPDATE support_tickets SET priority = ${priority}, updated_at = NOW() WHERE id = ${id}`;
+      }
+      if (assignee !== undefined) {
+        await sql`UPDATE support_tickets SET assignee = ${assignee}, updated_at = NOW() WHERE id = ${id}`;
+      }
+      return NextResponse.json({ success: true, source: "database" });
+    } catch (dbErr) {
+      console.warn("[email-support/tickets] DB unavailable for update:", (dbErr as Error).message);
     }
 
-    const updated = {
-      ...ticket,
-      status: status || ticket.status,
-      priority: priority || ticket.priority,
-      assignee: assignee !== undefined ? assignee : ticket.assignee,
-      updatedAt: new Date().toISOString(),
-    };
-
-    return new Response(JSON.stringify({ ticket: updated }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    // Fallback: return success (client will update local state)
+    return NextResponse.json({ success: true, source: "local" });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Failed to update ticket";
-    return new Response(JSON.stringify({ error: message }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

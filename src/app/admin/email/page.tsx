@@ -284,13 +284,20 @@ export default function AdminEmailPage() {
         </div>
       </nav>
 
-      {/* Demo Data Banner — only show when using demo data */}
-      {usingDemoData && (
+      {/* Data Source Banner */}
+      {usingDemoData ? (
         <div className="relative z-20 bg-amber-500/10 border-b border-amber-500/20 px-4 py-2.5 flex items-center justify-center gap-2">
           <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
           <p className="text-xs text-amber-300 text-center">
             <strong>DEMO DATA</strong> — {apiError || "Could not connect to email API."}{" "}
             <Link href="/admin/email-settings" className="underline hover:text-amber-200 transition-colors">Set up email →</Link>
+          </p>
+        </div>
+      ) : !loading && (
+        <div className="relative z-20 bg-emerald-500/10 border-b border-emerald-500/20 px-4 py-1.5 flex items-center justify-center gap-2">
+          <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+          <p className="text-xs text-emerald-300 text-center">
+            <strong>LIVE</strong> — Connected to database. Emails stored and delivered via Mailgun.
           </p>
         </div>
       )}

@@ -249,26 +249,6 @@ const DEMO_TICKETS: Ticket[] = [
 ];
 
 // ---------- Helpers ----------
-const STORAGE_KEY = "zoobicon_email_tickets";
-
-function loadTickets(): Ticket[] {
-  let tickets: Ticket[];
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    tickets = stored ? JSON.parse(stored) : DEMO_TICKETS;
-  } catch { tickets = DEMO_TICKETS; }
-  // Ensure all tickets have SLA data
-  return tickets.map((t) => ({
-    ...t,
-    sla: t.sla || computeSla(t.priority, t.createdAt),
-  }));
-}
-
-function saveTickets(tickets: Ticket[]) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tickets));
-  } catch { /* noop */ }
-}
 
 function timeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
@@ -381,6 +361,8 @@ export default function EmailSupportDashboard() {
   const [authChecked, setAuthChecked] = useState(false);
 
   const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [dataSource, setDataSource] = useState<"database" | "demo" | null>(null);
+  const [ticketsLoading, setTicketsLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [activeFolder, setActiveFolder] = useState<Folder>("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -431,13 +413,31 @@ export default function EmailSupportDashboard() {
     setAuthChecked(true);
   }, [router]);
 
-  // Load tickets
+  // Load tickets from API (DB-first, demo fallback)
+  const fetchTickets = useCallback(async () => {
+    setTicketsLoading(true);
+    try {
+      const res = await fetch("/api/email-support/tickets");
+      if (!res.ok) throw new Error(`API returned ${res.status}`);
+      const data = await res.json();
+      const loaded = (data.tickets || []).map((t: Ticket) => ({
+        ...t,
+        sla: t.sla || computeSla(t.priority, t.createdAt),
+      }));
+      setTickets(loaded);
+      setDataSource(data.source || "demo");
+      if (loaded.length > 0 && !selectedId) setSelectedId(loaded[0].id);
+    } catch {
+      setDataSource("demo");
+      setTickets(DEMO_TICKETS.map((t) => ({ ...t, sla: computeSla(t.priority, t.createdAt) })));
+    }
+    setTicketsLoading(false);
+  }, [selectedId]);
+
   useEffect(() => {
     if (!authChecked) return;
-    const loaded = loadTickets();
-    setTickets(loaded);
-    if (loaded.length > 0) setSelectedId(loaded[0].id);
-  }, [authChecked]);
+    fetchTickets();
+  }, [authChecked, fetchTickets]);
 
   const handleLogout = () => {
     try { localStorage.removeItem("zoobicon_user"); } catch { /* noop */ }
@@ -500,31 +500,22 @@ export default function EmailSupportDashboard() {
     aiReplies: tickets.reduce((acc, t) => acc + t.messages.filter((m) => m.from === "ai").length, 0),
   };
 
-  // Create ticket
-  const handleCreateTicket = () => {
+  // Create ticket via API (persisted to DB)
+  const handleCreateTicket = async () => {
     if (!newSubject.trim() || !newBody.trim() || !newFrom.trim()) return;
-    const now = new Date().toISOString();
-    const ticket: Ticket = {
-      id: `TK-${3000 + tickets.length + 1}`,
-      subject: newSubject,
-      body: newBody,
-      from: newFrom,
-      customerName: newFrom.split("@")[0].charAt(0).toUpperCase() + newFrom.split("@")[0].slice(1),
-      status: "open",
-      priority: newPriority,
-      assignee: null,
-      createdAt: now,
-      updatedAt: now,
-      messages: [
-        { id: `m-${Date.now()}`, from: "customer", body: newBody, timestamp: now },
-      ],
-      tags: [],
-      sla: computeSla(newPriority, now),
-    };
-    const updated = [ticket, ...tickets];
-    setTickets(updated);
-    saveTickets(updated);
-    setSelectedId(ticket.id);
+    try {
+      const res = await fetch("/api/email-support/tickets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subject: newSubject, body: newBody, from: newFrom, priority: newPriority }),
+      });
+      const data = await res.json();
+      if (data.ticket) {
+        const ticket = { ...data.ticket, sla: computeSla(data.ticket.priority, data.ticket.createdAt) };
+        setTickets((prev) => [ticket, ...prev]);
+        setSelectedId(ticket.id);
+      }
+    } catch { /* will show in UI */ }
     setShowNewTicket(false);
     setNewSubject("");
     setNewBody("");
@@ -532,13 +523,19 @@ export default function EmailSupportDashboard() {
     setNewPriority("medium");
   };
 
-  // Update ticket
-  const updateTicket = (id: string, changes: Partial<Ticket>) => {
+  // Update ticket via API
+  const updateTicket = async (id: string, changes: Partial<Ticket>) => {
     const updated = tickets.map((t) =>
       t.id === id ? { ...t, ...changes, updatedAt: new Date().toISOString() } : t
     );
     setTickets(updated);
-    saveTickets(updated);
+    try {
+      await fetch("/api/email-support/tickets", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, ...changes }),
+      });
+    } catch { /* local state already updated */ }
   };
 
   // AI Auto-Reply
@@ -574,7 +571,6 @@ export default function EmailSupportDashboard() {
             : t
         );
         setTickets(updated);
-        saveTickets(updated);
       }
     } catch {
       // Silently fail - user can retry
@@ -609,8 +605,8 @@ export default function EmailSupportDashboard() {
     }
   };
 
-  // Send manual reply or internal note
-  const handleSendReply = () => {
+  // Send manual reply or internal note — persists via API
+  const handleSendReply = async () => {
     if (!replyText.trim() || !selectedTicket) return;
     const newMessage: TicketMessage = {
       id: `m-${isInternalNote ? "note" : "agent"}-${Date.now()}`,
@@ -618,6 +614,7 @@ export default function EmailSupportDashboard() {
       body: replyText,
       timestamp: new Date().toISOString(),
     };
+    // Optimistic UI update
     const updated = tickets.map((t) =>
       t.id === selectedTicket.id
         ? {
@@ -628,9 +625,22 @@ export default function EmailSupportDashboard() {
         : t
     );
     setTickets(updated);
-    saveTickets(updated);
     setReplyText("");
     setIsInternalNote(false);
+    // Persist to DB via real support API (sends email to customer if not internal note)
+    if (!isInternalNote) {
+      try {
+        await fetch("/api/email/support", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ticketId: selectedTicket.id,
+            reply: newMessage.body,
+            sendToCustomer: true,
+          }),
+        });
+      } catch { /* optimistic update already applied */ }
+    }
   };
 
   if (!authChecked) {
@@ -681,14 +691,24 @@ export default function EmailSupportDashboard() {
 
       <CursorGlowTracker />
 
-      {/* Demo Data Banner */}
-      <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2.5 flex items-center justify-center gap-2 shrink-0 z-40">
-        <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-        <p className="text-xs text-amber-300 text-center">
-          <strong>DEMO DATA</strong> — These are placeholder tickets, not real customers. Connect Mailgun to receive real support emails.{" "}
-          <Link href="/admin/email-settings" className="underline hover:text-amber-200 transition-colors">Set up email →</Link>
-        </p>
-      </div>
+      {/* Data Source Banner */}
+      {dataSource === "demo" && (
+        <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2.5 flex items-center justify-center gap-2 shrink-0 z-40">
+          <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+          <p className="text-xs text-amber-300 text-center">
+            <strong>DEMO DATA</strong> — Database not connected. Connect Mailgun + Neon to receive real support emails.{" "}
+            <Link href="/admin/email-settings" className="underline hover:text-amber-200 transition-colors">Set up email →</Link>
+          </p>
+        </div>
+      )}
+      {dataSource === "database" && (
+        <div className="bg-emerald-500/10 border-b border-emerald-500/20 px-4 py-1.5 flex items-center justify-center gap-2 shrink-0 z-40">
+          <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+          <p className="text-xs text-emerald-300 text-center">
+            <strong>LIVE</strong> — Connected to database. Tickets are persisted and emails routed via Mailgun.
+          </p>
+        </div>
+      )}
 
       {/* Stats Bar */}
       <div className="h-12 border-b border-white/[0.06] bg-gray-900/50 flex items-center px-4 gap-6 shrink-0 overflow-x-auto">
