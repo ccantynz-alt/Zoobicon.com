@@ -18,7 +18,7 @@
 //   LUMA_API_KEY         — Luma Dream Machine API key
 // ---------------------------------------------------------------------------
 
-export type VideoProvider = "replicate" | "runway" | "luma";
+export type VideoProvider = "replicate" | "runway" | "luma" | "pika" | "kling";
 
 export interface RenderScene {
   sceneNumber: number;
@@ -27,6 +27,7 @@ export interface RenderScene {
   textOverlay: string;
   colorPalette: string[];
   cameraMovement: string;
+  imageUrl?: string;          // Optional input image for image-to-video
 }
 
 export interface RenderJob {
@@ -39,6 +40,7 @@ export interface RenderJob {
   error: string | null;
   createdAt: string;
   completedAt: string | null;
+  progress?: number;          // 0-100 render progress
 }
 
 export interface RenderRequest {
@@ -312,6 +314,182 @@ async function checkLumaJob(generationId: string): Promise<RenderJob> {
   };
 }
 
+// --- Pika Integration ---
+
+async function pikaHeaders(): Promise<Record<string, string>> {
+  const key = process.env.PIKA_API_KEY;
+  if (!key) throw new Error("PIKA_API_KEY not configured");
+  return {
+    Authorization: `Bearer ${key}`,
+    "Content-Type": "application/json",
+  };
+}
+
+async function startPikaJob(scene: RenderScene, style: string): Promise<{ generationId: string }> {
+  const prompt = buildVideoPrompt(scene, style);
+
+  const body: Record<string, unknown> = {
+    promptText: prompt,
+    style: "realistic",
+    options: {
+      frameRate: 24,
+      camera: { pan: scene.cameraMovement.includes("pan") ? "right" : "none" },
+      parameters: { guidanceScale: 12, motion: 2, negativePrompt: "blurry, low quality, distorted" },
+    },
+  };
+
+  // If scene has a reference image, use image-to-video
+  if (scene.imageUrl) {
+    body.image = scene.imageUrl;
+  }
+
+  const res = await fetch("https://api.pika.art/v1/generate", {
+    method: "POST",
+    headers: await pikaHeaders(),
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Pika API error: ${res.status} ${err}`);
+  }
+
+  const data = await res.json();
+  return { generationId: data.id || data.generation_id };
+}
+
+async function checkPikaJob(generationId: string): Promise<RenderJob> {
+  const res = await fetch(`https://api.pika.art/v1/generate/${generationId}`, {
+    headers: await pikaHeaders(),
+  });
+
+  if (!res.ok) {
+    return {
+      id: generationId,
+      provider: "pika",
+      sceneNumber: 0,
+      status: "failed",
+      videoUrl: null,
+      thumbnailUrl: null,
+      error: `API error: ${res.status}`,
+      createdAt: new Date().toISOString(),
+      completedAt: null,
+    };
+  }
+
+  const data = await res.json();
+  const statusMap: Record<string, RenderJob["status"]> = {
+    pending: "pending",
+    processing: "processing",
+    finished: "succeeded",
+    complete: "succeeded",
+    failed: "failed",
+    error: "failed",
+  };
+
+  return {
+    id: generationId,
+    provider: "pika",
+    sceneNumber: 0,
+    status: statusMap[data.status] || "processing",
+    videoUrl: data.status === "finished" || data.status === "complete" ? (data.video?.url || data.resultUrl || null) : null,
+    thumbnailUrl: data.thumbnail || null,
+    error: data.error || null,
+    createdAt: data.createdAt || new Date().toISOString(),
+    completedAt: data.status === "finished" || data.status === "failed" ? new Date().toISOString() : null,
+    progress: data.progress || undefined,
+  };
+}
+
+// --- Kling Integration ---
+
+async function klingHeaders(): Promise<Record<string, string>> {
+  const key = process.env.KLING_API_KEY;
+  if (!key) throw new Error("KLING_API_KEY not configured");
+  return {
+    Authorization: `Bearer ${key}`,
+    "Content-Type": "application/json",
+  };
+}
+
+async function startKlingJob(scene: RenderScene, style: string): Promise<{ taskId: string }> {
+  const prompt = buildVideoPrompt(scene, style);
+  const durationSec = Math.min(10, parseDurationSeconds(scene.duration));
+
+  const body: Record<string, unknown> = {
+    prompt,
+    negative_prompt: "blurry, low quality, distorted, watermark",
+    duration: durationSec <= 5 ? "5" : "10",
+    mode: "std", // "std" for standard, "pro" for higher quality
+    cfg_scale: 0.5,
+    aspect_ratio: "16:9",
+  };
+
+  if (scene.imageUrl) {
+    body.image = scene.imageUrl;
+  }
+
+  const res = await fetch("https://api.klingai.com/v1/videos/text2video", {
+    method: "POST",
+    headers: await klingHeaders(),
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Kling API error: ${res.status} ${err}`);
+  }
+
+  const data = await res.json();
+  return { taskId: data.data?.task_id || data.task_id };
+}
+
+async function checkKlingJob(taskId: string): Promise<RenderJob> {
+  const res = await fetch(`https://api.klingai.com/v1/videos/text2video/${taskId}`, {
+    headers: await klingHeaders(),
+  });
+
+  if (!res.ok) {
+    return {
+      id: taskId,
+      provider: "kling",
+      sceneNumber: 0,
+      status: "failed",
+      videoUrl: null,
+      thumbnailUrl: null,
+      error: `API error: ${res.status}`,
+      createdAt: new Date().toISOString(),
+      completedAt: null,
+    };
+  }
+
+  const data = await res.json();
+  const taskData = data.data || data;
+  const statusMap: Record<string, RenderJob["status"]> = {
+    submitted: "pending",
+    processing: "processing",
+    succeed: "succeeded",
+    completed: "succeeded",
+    failed: "failed",
+  };
+
+  const videos = taskData.task_result?.videos || [];
+  const videoUrl = videos.length > 0 ? videos[0].url : null;
+
+  return {
+    id: taskId,
+    provider: "kling",
+    sceneNumber: 0,
+    status: statusMap[taskData.task_status] || "processing",
+    videoUrl: videoUrl,
+    thumbnailUrl: videos.length > 0 ? (videos[0].thumbnail || null) : null,
+    error: taskData.task_status_msg || null,
+    createdAt: taskData.created_at || new Date().toISOString(),
+    completedAt: taskData.task_status === "succeed" || taskData.task_status === "failed" ? new Date().toISOString() : null,
+    progress: taskData.progress || undefined,
+  };
+}
+
 // --- Unified API ---
 
 /**
@@ -321,7 +499,22 @@ export function getAvailableProvider(): VideoProvider | null {
   if (process.env.REPLICATE_API_TOKEN) return "replicate";
   if (process.env.RUNWAY_API_KEY) return "runway";
   if (process.env.LUMA_API_KEY) return "luma";
+  if (process.env.PIKA_API_KEY) return "pika";
+  if (process.env.KLING_API_KEY) return "kling";
   return null;
+}
+
+/**
+ * Get all configured providers.
+ */
+export function getAllConfiguredProviders(): { provider: VideoProvider; configured: boolean; models: string[] }[] {
+  return [
+    { provider: "replicate", configured: !!process.env.REPLICATE_API_TOKEN, models: ["Stable Video Diffusion XT", "FLUX"] },
+    { provider: "runway", configured: !!process.env.RUNWAY_API_KEY, models: ["Gen-3 Alpha Turbo"] },
+    { provider: "luma", configured: !!process.env.LUMA_API_KEY, models: ["Dream Machine"] },
+    { provider: "pika", configured: !!process.env.PIKA_API_KEY, models: ["Pika 1.5"] },
+    { provider: "kling", configured: !!process.env.KLING_API_KEY, models: ["Kling 1.6"] },
+  ];
 }
 
 /**
@@ -357,6 +550,16 @@ export async function startRender(request: RenderRequest): Promise<RenderResult>
         case "luma": {
           const result = await startLumaJob(scene, request.style);
           jobId = result.generationId;
+          break;
+        }
+        case "pika": {
+          const result = await startPikaJob(scene, request.style);
+          jobId = result.generationId;
+          break;
+        }
+        case "kling": {
+          const result = await startKlingJob(scene, request.style);
+          jobId = result.taskId;
           break;
         }
       }
@@ -421,6 +624,12 @@ export async function checkRenderStatus(jobs: RenderJob[]): Promise<RenderJob[]>
           break;
         case "luma":
           result = await checkLumaJob(job.id);
+          break;
+        case "pika":
+          result = await checkPikaJob(job.id);
+          break;
+        case "kling":
+          result = await checkKlingJob(job.id);
           break;
       }
 

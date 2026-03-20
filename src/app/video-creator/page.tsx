@@ -42,6 +42,19 @@ import {
   X,
   Check,
   ArrowRight,
+  Mic,
+  ImagePlus,
+  Subtitles,
+  Wand2,
+  LayoutTemplate,
+  Volume2,
+  FileText,
+  Settings2,
+  ChevronDown,
+  AlertCircle,
+  CheckCircle2,
+  CircleDashed,
+  RefreshCw,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -73,6 +86,48 @@ interface Project {
   projectType: string;
   platform: string;
   storyboard: Storyboard | null;
+}
+
+interface RenderJob {
+  id: string;
+  provider: string;
+  sceneNumber: number;
+  status: "pending" | "processing" | "succeeded" | "failed";
+  videoUrl: string | null;
+  thumbnailUrl: string | null;
+  error: string | null;
+  progress?: number;
+}
+
+interface VoicePreset {
+  id: string;
+  name: string;
+  description: string;
+  category: "male" | "female" | "neutral";
+  tone: string;
+}
+
+interface PipelineCapabilities {
+  videoRender: { available: boolean };
+  voiceover: { available: boolean };
+  imageGen: { available: boolean };
+}
+
+type PipelineStage = "idle" | "images" | "video" | "voiceover" | "subtitles" | "complete";
+
+interface VideoTemplate {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  projectType: string;
+  platform: string;
+  duration: number;
+  style: string;
+  music: string;
+  thumbnail: string;
+  script: string;
+  tags: string[];
 }
 
 /* ------------------------------------------------------------------ */
@@ -154,6 +209,21 @@ export default function VideoCreatorDashboard() {
   const [storyboard, setStoryboard] = useState<Storyboard | null>(null);
   const [error, setError] = useState("");
 
+  // Pipeline state
+  const [pipelineStage, setPipelineStage] = useState<PipelineStage>("idle");
+  const [capabilities, setCapabilities] = useState<PipelineCapabilities | null>(null);
+  const [renderJobs, setRenderJobs] = useState<RenderJob[]>([]);
+  const [renderProgress, setRenderProgress] = useState(0);
+  const [sceneImages, setSceneImages] = useState<{ sceneNumber: number; imageUrl: string }[]>([]);
+  const [voiceoverUrl, setVoiceoverUrl] = useState<string | null>(null);
+  const [voicePresets, setVoicePresets] = useState<VoicePreset[]>([]);
+  const [selectedVoice, setSelectedVoice] = useState("rachel");
+  const [subtitleData, setSubtitleData] = useState<{ srt: string; vtt: string } | null>(null);
+  const [showPipeline, setShowPipeline] = useState(false);
+  const [templates, setTemplates] = useState<VideoTemplate[]>([]);
+  const [showTemplates, setShowTemplates] = useState(false);
+  const [selectedProvider, setSelectedProvider] = useState("");
+
   // Project history
   const [projects, setProjects] = useState<Project[]>([]);
   const [showHistory, setShowHistory] = useState(false);
@@ -182,6 +252,22 @@ export default function VideoCreatorDashboard() {
       const stored = localStorage.getItem("zoobicon_video_projects");
       if (stored) setProjects(JSON.parse(stored));
     } catch { /* ignore */ }
+  }, []);
+
+  // Load pipeline capabilities and templates
+  useEffect(() => {
+    fetch("/api/video-creator/assembly")
+      .then((r) => r.json())
+      .then((d) => { if (d.capabilities) setCapabilities(d.capabilities); })
+      .catch(() => {});
+    fetch("/api/video-creator/voiceover")
+      .then((r) => r.json())
+      .then((d) => { if (d.voices) setVoicePresets(d.voices); })
+      .catch(() => {});
+    fetch("/api/video-creator/templates")
+      .then((r) => r.json())
+      .then((d) => { if (d.templates) setTemplates(d.templates); })
+      .catch(() => {});
   }, []);
 
   const saveProject = useCallback((sb: Storyboard) => {
@@ -285,6 +371,218 @@ export default function VideoCreatorDashboard() {
     } finally {
       setGenerating(false);
     }
+  };
+
+  // --- Pipeline: Generate Scene Images ---
+  const handleGenerateImages = async () => {
+    if (!storyboard) return;
+    setPipelineStage("images");
+    setError("");
+    try {
+      const scenes = storyboard.storyboard.map((s) => ({
+        sceneNumber: s.sceneNumber,
+        visualDescription: s.visualDescription,
+        colorPalette: s.colorPalette,
+        style,
+        platform,
+        textOverlay: s.textOverlay,
+      }));
+      const res = await fetch("/api/video-creator/images", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scenes }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || "Image generation failed");
+      }
+      const data = await res.json();
+      setSceneImages(data.images || []);
+      setPipelineStage("idle");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Image generation failed");
+      setPipelineStage("idle");
+    }
+  };
+
+  // --- Pipeline: Start Video Render ---
+  const handleStartRender = async () => {
+    if (!storyboard) return;
+    setPipelineStage("video");
+    setError("");
+    setRenderJobs([]);
+    setRenderProgress(0);
+    try {
+      const imageMap = new Map(sceneImages.map((i) => [i.sceneNumber, i.imageUrl]));
+      const scenes = storyboard.storyboard.map((s) => ({
+        sceneNumber: s.sceneNumber,
+        duration: s.duration,
+        visualDescription: s.visualDescription,
+        textOverlay: s.textOverlay,
+        colorPalette: s.colorPalette,
+        cameraMovement: s.cameraMovement,
+        imageUrl: imageMap.get(s.sceneNumber),
+      }));
+      const res = await fetch("/api/video-creator/render", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          scenes,
+          style,
+          platform,
+          provider: selectedProvider || undefined,
+        }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || "Render failed");
+      }
+      const data = await res.json();
+      setRenderJobs(data.jobs || []);
+      // Start polling
+      pollRenderStatus(data.jobs || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Render failed");
+      setPipelineStage("idle");
+    }
+  };
+
+  const pollRenderStatus = async (jobs: RenderJob[]) => {
+    let attempts = 0;
+    const maxAttempts = 120; // 10 min max
+    const poll = async () => {
+      if (attempts++ > maxAttempts) {
+        setPipelineStage("idle");
+        return;
+      }
+      try {
+        const res = await fetch("/api/video-creator/render", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ jobs }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setRenderJobs(data.jobs);
+          setRenderProgress(data.progress || 0);
+          jobs = data.jobs;
+          if (data.status === "completed" || data.status === "failed") {
+            setPipelineStage("idle");
+            return;
+          }
+        }
+      } catch { /* retry */ }
+      setTimeout(poll, 5000);
+    };
+    setTimeout(poll, 5000);
+  };
+
+  // --- Pipeline: Generate Voiceover ---
+  const handleGenerateVoiceover = async () => {
+    if (!storyboard) return;
+    setPipelineStage("voiceover");
+    setError("");
+    try {
+      const res = await fetch("/api/video-creator/voiceover", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          script: storyboard.script,
+          voiceId: selectedVoice,
+          mode: "full",
+        }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || "Voiceover generation failed");
+      }
+      const data = await res.json();
+      setVoiceoverUrl(data.audioUrl || null);
+      setPipelineStage("idle");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Voiceover generation failed");
+      setPipelineStage("idle");
+    }
+  };
+
+  // --- Pipeline: Generate Subtitles ---
+  const handleGenerateSubtitles = async () => {
+    if (!storyboard) return;
+    setPipelineStage("subtitles");
+    setError("");
+    try {
+      const res = await fetch("/api/video-creator/subtitles", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          script: storyboard.script,
+          totalDuration: parseInt(storyboard.totalDuration) || duration,
+          format: "both",
+          captionPreset: platform.includes("tiktok") ? "tiktok-bold" : "youtube-standard",
+        }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || "Subtitle generation failed");
+      }
+      const data = await res.json();
+      setSubtitleData({ srt: data.srt, vtt: data.vtt });
+      setPipelineStage("idle");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Subtitle generation failed");
+      setPipelineStage("idle");
+    }
+  };
+
+  // --- Pipeline: Run Full Pipeline ---
+  const handleFullPipeline = async () => {
+    if (!storyboard) return;
+    setShowPipeline(true);
+    // Step 1: Images
+    await handleGenerateImages();
+    // Step 2: Voiceover (parallel with subtitles)
+    await Promise.all([
+      handleGenerateVoiceover(),
+      handleGenerateSubtitles(),
+    ]);
+    // Step 3: Video render (if provider available)
+    if (capabilities?.videoRender?.available) {
+      await handleStartRender();
+    }
+  };
+
+  // --- Template: Apply template ---
+  const handleApplyTemplate = (template: VideoTemplate) => {
+    setProjectType(template.projectType);
+    setPlatform(template.platform);
+    setDuration(template.duration);
+    setStyle(template.style);
+    setMusic(template.music);
+    setScript(template.script);
+    setShowTemplates(false);
+  };
+
+  // --- Export: Download subtitle files ---
+  const exportSubtitleSRT = () => {
+    if (!subtitleData?.srt) return;
+    const blob = new Blob([subtitleData.srt], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `subtitles-${Date.now()}.srt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportSubtitleVTT = () => {
+    if (!subtitleData?.vtt) return;
+    const blob = new Blob([subtitleData.vtt], { type: "text/vtt" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `subtitles-${Date.now()}.vtt`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   // Export functions
@@ -441,8 +739,50 @@ export default function VideoCreatorDashboard() {
               {/* Header */}
               <motion.div initial="hidden" animate="visible" variants={fadeIn}>
                 <h1 className="text-2xl font-black tracking-tight mb-1">AI Video Creator</h1>
-                <p className="text-sm text-white/50">Generate storyboards and scripts with AI. Video rendering coming soon.</p>
+                <p className="text-sm text-white/50">Full video pipeline: storyboard, images, rendering, voiceover & subtitles.</p>
+                <div className="flex gap-2 mt-2">
+                  <button
+                    onClick={() => setShowTemplates(!showTemplates)}
+                    className="px-3 py-1.5 rounded-lg border border-white/[0.10] bg-white/[0.05] text-xs text-white/60 hover:text-white hover:bg-white/[0.10] transition-all flex items-center gap-1.5"
+                  >
+                    <LayoutTemplate className="w-3 h-3" />
+                    Templates ({templates.length})
+                  </button>
+                </div>
               </motion.div>
+
+              {/* Template selector */}
+              <AnimatePresence>
+                {showTemplates && templates.length > 0 && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="rounded-xl border border-white/[0.10] bg-white/[0.03] p-3 space-y-2">
+                      <div className="text-xs font-semibold text-white/60">Quick Start Templates</div>
+                      <div className="grid grid-cols-2 gap-1.5 max-h-48 overflow-y-auto">
+                        {templates.slice(0, 12).map((t) => (
+                          <button
+                            key={t.id}
+                            onClick={() => handleApplyTemplate(t)}
+                            className="p-2 rounded-lg border border-white/[0.06] bg-white/[0.02] hover:border-purple-500/30 hover:bg-purple-500/5 transition-all text-left group"
+                          >
+                            <div className={`w-full h-6 rounded bg-gradient-to-r ${t.thumbnail} mb-1.5`} />
+                            <div className="text-[10px] font-semibold text-white/80 group-hover:text-white truncate">{t.name}</div>
+                            <div className="text-[9px] text-white/30 truncate">{t.description}</div>
+                            <div className="flex gap-1 mt-1">
+                              <span className="text-[8px] bg-white/[0.06] px-1 py-0.5 rounded text-white/30">{t.duration}s</span>
+                              <span className="text-[8px] bg-white/[0.06] px-1 py-0.5 rounded text-white/30">{t.platform}</span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* Project Type */}
               <motion.div initial="hidden" animate="visible" variants={fadeIn} className="space-y-2">
@@ -727,15 +1067,33 @@ export default function VideoCreatorDashboard() {
                       >
                         {/* Scene visual preview */}
                         <div
-                          className="h-56 relative flex items-center justify-center"
+                          className="h-56 relative flex items-center justify-center overflow-hidden"
                           style={{
                             background: storyboard.storyboard[activeScene]?.colorPalette?.length
                               ? `linear-gradient(135deg, ${storyboard.storyboard[activeScene].colorPalette[0]}40, ${(storyboard.storyboard[activeScene].colorPalette[1] || storyboard.storyboard[activeScene].colorPalette[0])}40)`
                               : `linear-gradient(135deg, ${brandColors[0]}40, ${brandColors[1]}40)`,
                           }}
                         >
-                          <div className="text-center px-8">
-                            <div className="text-3xl font-black mb-2 text-white/90">
+                          {/* Show AI-generated scene image if available */}
+                          {sceneImages.find((img) => img.sceneNumber === storyboard.storyboard[activeScene]?.sceneNumber) && (
+                            <img
+                              src={sceneImages.find((img) => img.sceneNumber === storyboard.storyboard[activeScene]?.sceneNumber)?.imageUrl}
+                              alt={`Scene ${storyboard.storyboard[activeScene]?.sceneNumber}`}
+                              className="absolute inset-0 w-full h-full object-cover"
+                            />
+                          )}
+                          {/* Show rendered video if available */}
+                          {renderJobs.find((j) => j.sceneNumber === storyboard.storyboard[activeScene]?.sceneNumber && j.status === "succeeded" && j.videoUrl) && (
+                            <video
+                              src={renderJobs.find((j) => j.sceneNumber === storyboard.storyboard[activeScene]?.sceneNumber && j.status === "succeeded")?.videoUrl || undefined}
+                              className="absolute inset-0 w-full h-full object-cover"
+                              controls
+                              muted
+                              loop
+                            />
+                          )}
+                          <div className="relative text-center px-8 z-10">
+                            <div className="text-3xl font-black mb-2 text-white/90 drop-shadow-lg">
                               Scene {storyboard.storyboard[activeScene]?.sceneNumber}
                             </div>
                             {storyboard.storyboard[activeScene]?.textOverlay && (
@@ -815,18 +1173,206 @@ export default function VideoCreatorDashboard() {
                       </div>
                     )}
 
-                    {/* Coming soon notice */}
-                    <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
-                        <Film className="w-4 h-4 text-amber-400" />
-                      </div>
-                      <div>
-                        <div className="text-sm font-semibold text-amber-300 mb-0.5">Video rendering coming soon</div>
-                        <div className="text-xs text-white/50">
-                          Storyboard and script generation is live. Actual video rendering via AI (Runway, Pika, Sora) is in development.
-                          Export your storyboard and use it with any video editing tool in the meantime.
+                    {/* ---- Video Production Pipeline ---- */}
+                    <div className="rounded-xl border border-purple-500/20 bg-purple-500/5 p-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                            <Wand2 className="w-4 h-4 text-purple-400" />
+                          </div>
+                          <div>
+                            <div className="text-sm font-semibold text-purple-300">Video Production Pipeline</div>
+                            <div className="text-[10px] text-white/40">Generate images, render video, add voiceover & subtitles</div>
+                          </div>
                         </div>
+                        <button
+                          onClick={() => setShowPipeline(!showPipeline)}
+                          className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+                        >
+                          <ChevronDown className={`w-4 h-4 text-white/40 transition-transform ${showPipeline ? "rotate-180" : ""}`} />
+                        </button>
                       </div>
+
+                      {/* Pipeline stages summary */}
+                      <div className="grid grid-cols-4 gap-2">
+                        {[
+                          { label: "Images", done: sceneImages.length > 0, active: pipelineStage === "images", icon: ImagePlus },
+                          { label: "Video", done: renderJobs.some((j) => j.status === "succeeded"), active: pipelineStage === "video", icon: Film },
+                          { label: "Voice", done: !!voiceoverUrl, active: pipelineStage === "voiceover", icon: Mic },
+                          { label: "Subs", done: !!subtitleData, active: pipelineStage === "subtitles", icon: Subtitles },
+                        ].map((s) => (
+                          <div key={s.label} className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-[10px] font-medium ${
+                            s.active ? "bg-purple-500/20 text-purple-300" : s.done ? "bg-green-500/10 text-green-400" : "bg-white/[0.03] text-white/40"
+                          }`}>
+                            {s.active ? <Loader2 className="w-3 h-3 animate-spin" /> : s.done ? <CheckCircle2 className="w-3 h-3" /> : <CircleDashed className="w-3 h-3" />}
+                            {s.label}
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Full pipeline button */}
+                      <button
+                        onClick={handleFullPipeline}
+                        disabled={pipelineStage !== "idle"}
+                        className="w-full py-2.5 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      >
+                        {pipelineStage !== "idle" ? (
+                          <>
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            Running pipeline...
+                          </>
+                        ) : (
+                          <>
+                            <Wand2 className="w-3.5 h-3.5" />
+                            Run Full Pipeline
+                          </>
+                        )}
+                      </button>
+
+                      {/* Expanded pipeline controls */}
+                      <AnimatePresence>
+                        {showPipeline && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="space-y-3 overflow-hidden"
+                          >
+                            {/* Voice selection */}
+                            <div className="space-y-1.5">
+                              <div className="text-[10px] text-white/50 uppercase tracking-wider flex items-center gap-1">
+                                <Volume2 className="w-3 h-3" /> Voice
+                              </div>
+                              <div className="flex flex-wrap gap-1.5">
+                                {(voicePresets.length > 0 ? voicePresets : [
+                                  { id: "rachel", name: "Rachel", category: "female", tone: "professional" },
+                                  { id: "drew", name: "Drew", category: "male", tone: "warm" },
+                                  { id: "domi", name: "Domi", category: "female", tone: "energetic" },
+                                  { id: "josh", name: "Josh", category: "male", tone: "dynamic" },
+                                ] as VoicePreset[]).slice(0, 6).map((v) => (
+                                  <button
+                                    key={v.id}
+                                    onClick={() => setSelectedVoice(v.id)}
+                                    className={`px-2.5 py-1 rounded-md border text-[10px] font-medium transition-all ${
+                                      selectedVoice === v.id
+                                        ? "border-purple-500/50 bg-purple-500/10 text-purple-300"
+                                        : "border-white/[0.08] text-white/50 hover:border-white/20"
+                                    }`}
+                                  >
+                                    {v.name} <span className="text-white/30">({v.tone})</span>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Individual stage buttons */}
+                            <div className="grid grid-cols-2 gap-2">
+                              <button
+                                onClick={handleGenerateImages}
+                                disabled={pipelineStage !== "idle"}
+                                className="py-2 rounded-lg border border-white/[0.10] bg-white/[0.05] text-xs text-white/70 hover:text-white hover:bg-white/[0.10] transition-all flex items-center justify-center gap-1.5 disabled:opacity-30"
+                              >
+                                {pipelineStage === "images" ? <Loader2 className="w-3 h-3 animate-spin" /> : <ImagePlus className="w-3 h-3" />}
+                                {sceneImages.length > 0 ? "Regenerate Images" : "Generate Images"}
+                              </button>
+                              <button
+                                onClick={handleStartRender}
+                                disabled={pipelineStage !== "idle"}
+                                className="py-2 rounded-lg border border-white/[0.10] bg-white/[0.05] text-xs text-white/70 hover:text-white hover:bg-white/[0.10] transition-all flex items-center justify-center gap-1.5 disabled:opacity-30"
+                              >
+                                {pipelineStage === "video" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Film className="w-3 h-3" />}
+                                Render Video
+                              </button>
+                              <button
+                                onClick={handleGenerateVoiceover}
+                                disabled={pipelineStage !== "idle"}
+                                className="py-2 rounded-lg border border-white/[0.10] bg-white/[0.05] text-xs text-white/70 hover:text-white hover:bg-white/[0.10] transition-all flex items-center justify-center gap-1.5 disabled:opacity-30"
+                              >
+                                {pipelineStage === "voiceover" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Mic className="w-3 h-3" />}
+                                {voiceoverUrl ? "Regenerate Voice" : "Generate Voice"}
+                              </button>
+                              <button
+                                onClick={handleGenerateSubtitles}
+                                disabled={pipelineStage !== "idle"}
+                                className="py-2 rounded-lg border border-white/[0.10] bg-white/[0.05] text-xs text-white/70 hover:text-white hover:bg-white/[0.10] transition-all flex items-center justify-center gap-1.5 disabled:opacity-30"
+                              >
+                                {pipelineStage === "subtitles" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Subtitles className="w-3 h-3" />}
+                                {subtitleData ? "Regenerate Subs" : "Generate Subtitles"}
+                              </button>
+                            </div>
+
+                            {/* Render progress */}
+                            {renderJobs.length > 0 && (
+                              <div className="space-y-2">
+                                <div className="flex items-center justify-between text-[10px] text-white/50">
+                                  <span>Render Progress</span>
+                                  <span>{renderProgress}%</span>
+                                </div>
+                                <div className="w-full h-1.5 bg-white/[0.08] rounded-full overflow-hidden">
+                                  <motion.div
+                                    className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${renderProgress}%` }}
+                                    transition={{ duration: 0.5 }}
+                                  />
+                                </div>
+                                <div className="grid grid-cols-5 gap-1">
+                                  {renderJobs.map((job) => (
+                                    <div key={job.id} className={`text-center py-1 rounded text-[9px] font-medium ${
+                                      job.status === "succeeded" ? "bg-green-500/10 text-green-400" :
+                                      job.status === "failed" ? "bg-red-500/10 text-red-400" :
+                                      job.status === "processing" ? "bg-blue-500/10 text-blue-400" :
+                                      "bg-white/[0.03] text-white/30"
+                                    }`}>
+                                      S{job.sceneNumber}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Voiceover player */}
+                            {voiceoverUrl && (
+                              <div className="space-y-1.5">
+                                <div className="text-[10px] text-white/50 uppercase tracking-wider flex items-center gap-1">
+                                  <Volume2 className="w-3 h-3" /> Voiceover Preview
+                                </div>
+                                <audio controls src={voiceoverUrl} className="w-full h-8 [&::-webkit-media-controls-panel]:bg-white/5 rounded" />
+                              </div>
+                            )}
+
+                            {/* Subtitle exports */}
+                            {subtitleData && (
+                              <div className="flex gap-2">
+                                <button onClick={exportSubtitleSRT} className="flex-1 py-1.5 rounded-lg border border-white/[0.10] bg-white/[0.05] text-[10px] text-white/60 hover:text-white hover:bg-white/[0.10] transition-all flex items-center justify-center gap-1">
+                                  <FileText className="w-3 h-3" /> Download .srt
+                                </button>
+                                <button onClick={exportSubtitleVTT} className="flex-1 py-1.5 rounded-lg border border-white/[0.10] bg-white/[0.05] text-[10px] text-white/60 hover:text-white hover:bg-white/[0.10] transition-all flex items-center justify-center gap-1">
+                                  <FileText className="w-3 h-3" /> Download .vtt
+                                </button>
+                              </div>
+                            )}
+
+                            {/* Provider status */}
+                            {capabilities && (
+                              <div className="text-[10px] text-white/30 space-y-0.5 pt-1 border-t border-white/[0.06]">
+                                <div className="flex items-center gap-1">
+                                  {capabilities.imageGen.available ? <CheckCircle2 className="w-3 h-3 text-green-500" /> : <AlertCircle className="w-3 h-3 text-amber-500" />}
+                                  Image Gen: {capabilities.imageGen.available ? "Ready" : "No provider configured"}
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  {capabilities.videoRender.available ? <CheckCircle2 className="w-3 h-3 text-green-500" /> : <AlertCircle className="w-3 h-3 text-amber-500" />}
+                                  Video Render: {capabilities.videoRender.available ? "Ready (Runway/Luma/Pika/Kling)" : "No provider configured"}
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  {capabilities.voiceover.available ? <CheckCircle2 className="w-3 h-3 text-green-500" /> : <AlertCircle className="w-3 h-3 text-amber-500" />}
+                                  Voiceover: {capabilities.voiceover.available ? "Ready" : "No provider configured"}
+                                </div>
+                              </div>
+                            )}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
                   </div>
                 ) : (

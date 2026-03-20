@@ -3,6 +3,7 @@ import {
   startRender,
   checkRenderStatus,
   getAvailableProvider,
+  getAllConfiguredProviders,
   type RenderJob,
   type VideoProvider,
 } from "@/lib/video-render";
@@ -16,7 +17,7 @@ export const maxDuration = 120;
  *   scenes: RenderScene[],
  *   style: string,
  *   platform: string,
- *   provider?: "replicate" | "runway" | "luma"
+ *   provider?: "replicate" | "runway" | "luma" | "pika" | "kling"
  * }
  *
  * Returns: { jobId, jobs, status, totalScenes, completedScenes }
@@ -40,15 +41,12 @@ export async function POST(req: NextRequest) {
     // Check provider availability
     const activeProvider = provider || getAvailableProvider();
     if (!activeProvider) {
+      const allProviders = getAllConfiguredProviders();
       return Response.json(
         {
           error: "No video rendering provider configured",
-          message: "Set REPLICATE_API_TOKEN, RUNWAY_API_KEY, or LUMA_API_KEY in your environment variables.",
-          availableProviders: {
-            replicate: !!process.env.REPLICATE_API_TOKEN,
-            runway: !!process.env.RUNWAY_API_KEY,
-            luma: !!process.env.LUMA_API_KEY,
-          },
+          message: "Set one of: REPLICATE_API_TOKEN, RUNWAY_API_KEY, LUMA_API_KEY, PIKA_API_KEY, or KLING_API_KEY in your environment variables.",
+          providers: allProviders,
         },
         { status: 503 }
       );
@@ -96,12 +94,16 @@ export async function PUT(req: NextRequest) {
       overallStatus = failed === total ? "failed" : "completed";
     }
 
+    // Calculate overall progress
+    const progress = total > 0 ? Math.round(((completed + failed) / total) * 100) : 0;
+
     return Response.json({
       jobs: updated,
       status: overallStatus,
       totalScenes: total,
       completedScenes: completed,
       failedScenes: failed,
+      progress,
     });
   } catch (err) {
     console.error("[video-creator/render] Status check error:", err);
@@ -114,23 +116,17 @@ export async function PUT(req: NextRequest) {
  */
 export async function GET() {
   const provider = getAvailableProvider();
+  const allProviders = getAllConfiguredProviders();
 
   return Response.json({
     available: !!provider,
     activeProvider: provider,
-    providers: {
-      replicate: {
-        configured: !!process.env.REPLICATE_API_TOKEN,
-        models: ["Stable Video Diffusion XT"],
+    providers: allProviders.reduce(
+      (acc, p) => {
+        acc[p.provider] = { configured: p.configured, models: p.models };
+        return acc;
       },
-      runway: {
-        configured: !!process.env.RUNWAY_API_KEY,
-        models: ["Gen-3 Alpha Turbo"],
-      },
-      luma: {
-        configured: !!process.env.LUMA_API_KEY,
-        models: ["Dream Machine"],
-      },
-    },
+      {} as Record<string, { configured: boolean; models: string[] }>
+    ),
   });
 }
