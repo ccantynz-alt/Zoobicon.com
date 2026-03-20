@@ -1,573 +1,235 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { motion, AnimatePresence, useInView, useScroll, useTransform } from "framer-motion";
-import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
-import BackgroundEffects from "@/components/BackgroundEffects";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import HeroDemo from "@/components/HeroDemo";
-import ActivityFeed from "@/components/ActivityFeed";
 import ScrollProgress from "@/components/ScrollProgress";
-import { ParallaxLayer, SectionReveal } from "@/components/ParallaxSection";
-
-// Lazy-load below-fold components — reduces initial bundle by ~40KB
-const LiveCounter = dynamic(() => import("@/components/LiveCounter"), { ssr: false });
-const ShowcaseGallery = dynamic(() => import("@/components/ShowcaseGallery"), { ssr: false });
-const BeforeAfter = dynamic(() => import("@/components/BeforeAfter"), { ssr: false });
-const VideoShowcase = dynamic(() => import("@/components/VideoShowcase"), { ssr: false });
-const BuilderDemo = dynamic(() => import("@/components/BuilderDemo"), { ssr: false });
 import {
-  Zap,
-  Globe,
-  Video,
-  Search,
-  BarChart3,
-  Sparkles,
-  Palette,
-  Mail,
-  MessageSquare,
-  Shield,
-  Cpu,
   ArrowRight,
-  ChevronRight,
-  Code2,
-  Layers,
-  Bot,
-  TrendingUp,
-  Play,
   Menu,
   X,
-  Store,
-  Headphones,
-  HelpCircle,
   Check,
-  Bug,
-  GitBranch,
-  FileCode,
-  Figma,
-  Languages,
-  ShoppingCart,
-  Receipt,
-  Lock,
-  Wand2,
-  Download,
+  Shield,
   User,
   LogOut,
   LayoutDashboard,
-  Eye,
-  Film,
-  Building2,
 } from "lucide-react";
 
-const ROTATING_WORDS = ["websites", "landing pages", "portfolios", "SaaS apps", "e-commerce stores", "dashboards"];
+const ShowcaseGallery = dynamic(() => import("@/components/ShowcaseGallery"), { ssr: false });
 
-const fadeInUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } },
+/* ─── animation presets ─── */
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
 };
+const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } } };
 
-const staggerContainer = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.1 } },
-};
+/* ─── rotating word in hero ─── */
+const WORDS = ["websites", "apps", "stores", "portfolios", "dashboards", "landing pages"];
 
-const staggerFast = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.05 } },
-};
-
-const scaleIn = {
-  hidden: { opacity: 0, scale: 0.9 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: "easeOut" as const } },
-};
-
-const PRODUCTS = [
-  {
-    icon: Globe,
-    name: "AI Website Builder",
-    description: "Describe any website and watch it materialize in seconds. Full-stack, responsive, production-ready.",
-    color: "from-zoo-500 to-zoo-700",
-    glowColor: "shadow-glow",
-    domain: "zoobicon.ai",
-    tag: "Core Product",
-    href: "/products/website-builder",
-  },
-  {
-    icon: Search,
-    name: "SEO Campaigns Agent",
-    description: "Autonomous AI agent that researches, plans, and executes SEO campaigns that dominate search rankings.",
-    color: "from-accent-cyan to-emerald-600",
-    glowColor: "shadow-glow-cyan",
-    domain: "zoobicon.com",
-    tag: "Agent",
-    href: "/products/seo-agent",
-  },
-  {
-    icon: Video,
-    name: "AI Video Creator",
-    description: "Generate high-end videos for TikTok, Facebook, Instagram & YouTube. No scripts needed - just pure AI magic.",
-    color: "from-accent-purple to-pink-600",
-    glowColor: "shadow-glow-purple",
-    domain: "zoobicon.com",
-    tag: "Creator",
-    href: "/products/video-creator",
-  },
-  {
-    icon: Palette,
-    name: "AI Brand Kit",
-    description: "Complete brand identity in minutes. Logos, color palettes, typography, style guides - all AI-generated.",
-    color: "from-pink-500 to-rose-600",
-    glowColor: "shadow-glow-purple",
-    domain: "zoobicon.ai",
-    tag: "Designer",
-  },
-  {
-    icon: Headphones,
-    name: "AI Email Support",
-    description: "World-class AI customer support. Auto-replies in <30s, sentiment analysis, smart routing — 24/7.",
-    color: "from-amber-500 to-orange-600",
-    glowColor: "shadow-glow",
-    domain: "zoobicon.com",
-    tag: "Agent",
-    href: "/products/email-support",
-  },
-  {
-    icon: Globe,
-    name: "Domain Registration",
-    description: "Register premium domains from $2.99/yr. Free WHOIS privacy, DNS management, and AI website builder included.",
-    color: "from-cyan-500 to-blue-600",
-    glowColor: "shadow-glow-cyan",
-    domain: "zoobicon.com",
-    tag: "Revenue",
-    href: "/domains",
-  },
-  {
-    icon: Store,
-    name: "Add-ons Marketplace",
-    description: "Discover premium templates, AI agents, integrations, and tools. Install with one click. Build & sell your own.",
-    color: "from-accent-purple to-pink-600",
-    glowColor: "shadow-glow-purple",
-    domain: "zoobicon.com",
-    tag: "Marketplace",
-    href: "/marketplace",
-  },
-  {
-    icon: Mail,
-    name: "AI Email Marketing",
-    description: "Craft and automate email campaigns that convert. AI writes, designs, segments, and optimizes delivery.",
-    color: "from-rose-500 to-red-600",
-    glowColor: "shadow-glow",
-    domain: "zoobicon.com",
-    tag: "Agent",
-  },
-  {
-    icon: BarChart3,
-    name: "AI Analytics & Insights",
-    description: "Real-time intelligence on your digital presence. Competitor tracking, trend analysis, actionable insights.",
-    color: "from-emerald-500 to-teal-600",
-    glowColor: "shadow-glow-cyan",
-    domain: "zoobicon.io",
-    tag: "Intelligence",
-  },
-  {
-    icon: Bot,
-    name: "AI Chatbot Builder",
-    description: "Deploy custom AI chatbots on any website. Trained on your content, branded to your style.",
-    color: "from-blue-500 to-indigo-600",
-    glowColor: "shadow-glow-purple",
-    domain: "zoobicon.ai",
-    tag: "Builder",
-  },
-];
-
-const DOMAINS = [
-  {
-    domain: "zoobicon.com",
-    label: "Brand Hub",
-    description: "Main platform & marketing engine",
-    icon: Zap,
-    color: "text-zoo-400",
-    borderColor: "border-zoo-500/30",
-    href: "/",
-  },
-  {
-    domain: "zoobicon.ai",
-    label: "AI Builder",
-    description: "Website builder & AI creation tools",
-    icon: Sparkles,
-    color: "text-accent-purple",
-    borderColor: "border-accent-purple/30",
-    href: "/products/website-builder",
-  },
-  {
-    domain: "zoobicon.io",
-    label: "Developer API",
-    description: "API platform & integrations",
-    icon: Code2,
-    color: "text-accent-cyan",
-    borderColor: "border-accent-cyan/30",
-    href: "/developers",
-  },
-  {
-    domain: "zoobicon.sh",
-    label: "CLI & DevOps",
-    description: "Command-line tools & automation",
-    icon: Layers,
-    color: "text-amber-400",
-    borderColor: "border-amber-500/30",
-    href: "/cli",
-  },
-];
-
-const STATS = [
-  { value: "12+", label: "AI-Powered Tools" },
-  { value: "30+", label: "Languages Supported" },
-  { value: "WP", label: "WordPress Ready" },
-  { value: "4", label: "Domain Ecosystem" },
-];
-
-const PLATFORM_CAPABILITIES = [
-  { name: "AI Website Generation", description: "Full production-ready sites from a single prompt", included: true },
-  { name: "7-Agent Build Pipeline", description: "Strategy, design, copy, architecture, code, SEO & animations", included: true },
-  { name: "Full-Stack App Generation", description: "Database schema, API routes, and CRUD frontend", included: true },
-  { name: "E-commerce Storefront Builder", description: "Cart, checkout, product grid, reviews, discount codes", included: true },
-  { name: "43 Specialized Generators", description: "Industry-specific templates with custom AI prompts", included: true },
-  { name: "Visual Click-to-Edit", description: "Click any element, change text, colors, spacing live", included: true },
-  { name: "SEO Agent & Auto-Fix", description: "Meta tags, JSON-LD, heading hierarchy, OG tags", included: true },
-  { name: "Multi-Page Sites (3-6 pages)", description: "Shared design system, navigation, footer across pages", included: true },
-  { name: "GitHub & WordPress Export", description: "One-click export to GitHub repo or WP theme", included: true },
-  { name: "Figma Import", description: "Paste a Figma URL, get a coded website", included: true },
-  { name: "i18n Translation (30+ Languages)", description: "Translate any generated site instantly", included: true },
-  { name: "White-Label Agency Platform", description: "Your brand, your clients, your AI builder", included: true },
-  { name: "No Credit System", description: "Flat monthly pricing. No tokens, no usage traps", included: true },
-  { name: "Free Hosting on zoobicon.sh", description: "Deploy instantly with custom subdomains", included: true },
-];
-
-const NEW_FEATURES = [
-  {
-    icon: Bug,
-    title: "Auto-Debugging",
-    description: "AI catches and fixes errors before you see them",
-    color: "from-red-500 to-orange-500",
-    glowColor: "shadow-red-500/20",
-  },
-  {
-    icon: GitBranch,
-    title: "GitHub Import",
-    description: "Paste any repo URL. Get a modernized website.",
-    color: "from-gray-400 to-gray-600",
-    glowColor: "shadow-gray-500/20",
-  },
-  {
-    icon: Download,
-    title: "WordPress Export",
-    description: "One click to a full WordPress theme",
-    color: "from-blue-500 to-indigo-600",
-    glowColor: "shadow-blue-500/20",
-  },
-  {
-    icon: Figma,
-    title: "Figma Import",
-    description: "Design in Figma, deploy with Zoobicon",
-    color: "from-blue-500 to-pink-500",
-    glowColor: "shadow-blue-500/20",
-  },
-  {
-    icon: Languages,
-    title: "i18n Translation",
-    description: "30+ languages, one click",
-    color: "from-emerald-500 to-teal-500",
-    glowColor: "shadow-emerald-500/20",
-  },
-  {
-    icon: ShoppingCart,
-    title: "E-commerce Generator",
-    description: "Complete stores with cart & checkout",
-    color: "from-amber-500 to-yellow-500",
-    glowColor: "shadow-amber-500/20",
-  },
-  {
-    icon: Receipt,
-    title: "CRM & Invoicing",
-    description: "Business tools built in",
-    color: "from-cyan-500 to-blue-500",
-    glowColor: "shadow-cyan-500/20",
-  },
-  {
-    icon: Eye,
-    title: "Competitor Crawler",
-    description: "Analyze any site's tech stack, features, and strategy",
-    color: "from-violet-500 to-purple-600",
-    glowColor: "shadow-violet-500/20",
-  },
-  {
-    icon: Film,
-    title: "Video Storyboards",
-    description: "AI storyboard scripts for any platform",
-    color: "from-pink-500 to-rose-600",
-    glowColor: "shadow-pink-500/20",
-  },
-  {
-    icon: Building2,
-    title: "Agency White-Label",
-    description: "Your brand, your clients, your platform",
-    color: "from-amber-500 to-orange-600",
-    glowColor: "shadow-amber-500/20",
-  },
-];
-
-const FEATURES = [
-  {
-    icon: Cpu,
-    title: "Most Advanced AI Agents",
-    description: "Our agents don't just assist - they execute. Autonomous AI that handles your entire digital workflow end-to-end.",
-  },
-  {
-    icon: Zap,
-    title: "Instant Generation",
-    description: "From idea to production-ready output in seconds. Websites, videos, campaigns - all generated at lightning speed.",
-  },
-  {
-    icon: Shield,
-    title: "Enterprise-Grade",
-    description: "Built for scale with security-first architecture. Reliable infrastructure designed for production workloads.",
-  },
-  {
-    icon: TrendingUp,
-    title: "Market Domination Tools",
-    description: "SEO agents, competitor intelligence, and trend analysis that give you an unfair advantage in any market.",
-  },
-  {
-    icon: Layers,
-    title: "Full Ecosystem",
-    description: "Four domains, one unified platform. Everything you need to build, grow, and dominate online.",
-  },
-  {
-    icon: Globe,
-    title: "Multi-Platform Publishing",
-    description: "One-click deploy to the web. Export to WordPress, GitHub, or host on zoobicon.sh with a custom domain.",
-  },
-];
-
-const HOW_IT_WORKS = [
-  {
-    step: "01",
-    title: "Describe Your Vision",
-    description: "Type a prompt describing what you want. A SaaS landing page, a restaurant site, an e-commerce store — anything.",
-    gradient: "from-violet-500 to-indigo-500",
-  },
-  {
-    step: "02",
-    title: "7 Agents Build It",
-    description: "Strategy, design, copywriting, architecture, code, SEO, and animations — all generated in parallel by specialized AI agents.",
-    gradient: "from-zoo-500 to-zoo-400",
-  },
-  {
-    step: "03",
-    title: "Deploy Instantly",
-    description: "Your site goes live on zoobicon.sh in under 2 minutes. Edit visually, export to WordPress or GitHub, or connect a custom domain.",
-    gradient: "from-emerald-500 to-teal-500",
-  },
-];
-
-// Animated counter hook
-function useCountUp(end: number, duration: number = 2000, inView: boolean) {
-  const [count, setCount] = useState(0);
-  const hasAnimated = useRef(false);
-
+function RotatingWord() {
+  const [index, setIndex] = useState(0);
   useEffect(() => {
-    if (!inView || hasAnimated.current) return;
-    hasAnimated.current = true;
-    const startTime = Date.now();
-    const timer = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      // Ease out cubic
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.floor(eased * end));
-      if (progress >= 1) clearInterval(timer);
-    }, 16);
-    return () => clearInterval(timer);
-  }, [inView, end, duration]);
-
-  return count;
-}
-
-// Hero code animation lines
-const CODE_LINES = [
-  { text: '<!-- AI Agent: Building your site -->', cls: 'syn-comment' },
-  { text: '<div class="hero-section">', cls: 'syn-tag' },
-  { text: '  <h1 class="gradient-text">', cls: 'syn-tag' },
-  { text: '    Welcome to the Future', cls: '' },
-  { text: '  </h1>', cls: 'syn-tag' },
-  { text: '  <p class="subtitle">', cls: 'syn-tag' },
-  { text: '    AI-powered everything.', cls: '' },
-  { text: '  </p>', cls: 'syn-tag' },
-  { text: '  <button class="cta-btn">', cls: 'syn-tag' },
-  { text: '    Get Started Free', cls: '' },
-  { text: '  </button>', cls: 'syn-tag' },
-  { text: '</div>', cls: 'syn-tag' },
-  { text: '<section class="features">', cls: 'syn-tag' },
-  { text: '  <div class="grid-3">', cls: 'syn-tag' },
-  { text: '    <!-- 7 agents working... -->', cls: 'syn-comment' },
-];
-
-function HeroCodeAnimation() {
-  const [phase, setPhase] = useState<'code' | 'preview'>('code');
-  const [visibleLines, setVisibleLines] = useState(0);
-
-  useEffect(() => {
-    // Type out code lines one by one
-    const lineTimer = setInterval(() => {
-      setVisibleLines(prev => {
-        if (prev >= CODE_LINES.length) {
-          clearInterval(lineTimer);
-          // After all lines shown, switch to preview
-          setTimeout(() => setPhase('preview'), 800);
-          return prev;
-        }
-        return prev + 1;
-      });
-    }, 200);
-
-    // Full cycle: reset after showing preview
-    const cycleTimer = setInterval(() => {
-      setPhase('code');
-      setVisibleLines(0);
-    }, 10000);
-
-    return () => {
-      clearInterval(lineTimer);
-      clearInterval(cycleTimer);
-    };
-  }, [phase]);
-
+    const id = setInterval(() => setIndex((i) => (i + 1) % WORDS.length), 2400);
+    return () => clearInterval(id);
+  }, []);
   return (
-    <div className="relative w-full">
-      {/* Animated gradient border container */}
-      <div className="card-glow">
-        <div className="code-window">
-          <div className="code-window-header">
-            <div className="code-window-dot" style={{ background: '#ff5f57' }} />
-            <div className="code-window-dot" style={{ background: '#febc2e' }} />
-            <div className="code-window-dot" style={{ background: '#28c840' }} />
-            <span className="ml-3 text-[11px] text-white/30 font-mono">index.html — Zoobicon AI</span>
-            <div className="ml-auto flex items-center gap-2">
-              <span className="text-[9px] text-emerald-400/80 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 font-semibold">
-                LIVE
-              </span>
-            </div>
-          </div>
-
-          <AnimatePresence mode="wait">
-            {phase === 'code' ? (
-              <motion.div
-                key="code"
-                initial={{ opacity: 1 }}
-                exit={{ opacity: 0, scale: 0.95, filter: 'blur(4px)' }}
-                transition={{ duration: 0.4 }}
-                className="p-4 min-h-[320px] overflow-hidden"
-              >
-                {CODE_LINES.slice(0, visibleLines).map((line, i) => (
-                  <div
-                    key={i}
-                    className="code-line"
-                    style={{ animationDelay: `${i * 0.05}s` }}
-                  >
-                    <span className="text-white/20 mr-3 select-none text-[10px]">
-                      {String(i + 1).padStart(2, ' ')}
-                    </span>
-                    <span className={line.cls}>{line.text}</span>
-                  </div>
-                ))}
-                {visibleLines < CODE_LINES.length && (
-                  <div className="inline-block w-[7px] h-[16px] bg-zoo-400/80 animate-pulse ml-6 mt-1" />
-                )}
-              </motion.div>
-            ) : (
-              <motion.div
-                key="preview"
-                className="preview-morph p-4 min-h-[320px]"
-              >
-                {/* Fake rendered website preview */}
-                <div className="rounded-lg overflow-hidden border border-white/[0.06] bg-gradient-to-br from-[#0a0a1a] to-[#0f0f2a]">
-                  {/* Mini nav */}
-                  <div className="flex items-center gap-2 px-3 py-2 border-b border-white/[0.06]">
-                    <div className="w-4 h-4 rounded bg-gradient-to-br from-zoo-500 to-purple-500" />
-                    <div className="w-16 h-2 rounded bg-white/10" />
-                    <div className="ml-auto flex gap-2">
-                      <div className="w-10 h-2 rounded bg-white/8" />
-                      <div className="w-10 h-2 rounded bg-white/8" />
-                      <div className="w-12 h-2.5 rounded bg-zoo-500/40" />
-                    </div>
-                  </div>
-                  {/* Mini hero */}
-                  <div className="p-4 text-center">
-                    <div className="w-32 h-3 rounded bg-gradient-to-r from-zoo-500/60 to-purple-500/60 mx-auto mb-2" />
-                    <div className="w-48 h-2 rounded bg-white/10 mx-auto mb-1" />
-                    <div className="w-40 h-2 rounded bg-white/8 mx-auto mb-3" />
-                    <div className="w-20 h-5 rounded bg-zoo-500/40 mx-auto mb-4" />
-                  </div>
-                  {/* Mini cards */}
-                  <div className="px-4 pb-4 grid grid-cols-3 gap-2">
-                    {[0,1,2].map(j => (
-                      <div key={j} className="p-2 rounded border border-white/[0.06] bg-white/[0.02]">
-                        <div className="w-5 h-5 rounded bg-gradient-to-br from-zoo-500/30 to-purple-500/30 mb-1.5" />
-                        <div className="w-full h-1.5 rounded bg-white/8 mb-1" />
-                        <div className="w-3/4 h-1.5 rounded bg-white/5" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="text-center mt-3">
-                  <span className="text-[10px] text-emerald-400/80 font-semibold tracking-wider uppercase">
-                    Build complete — deployed to zoobicon.sh
-                  </span>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
-    </div>
+    <span className="inline-block relative h-[1.1em] overflow-hidden align-bottom">
+      <AnimatePresence mode="wait">
+        <motion.span
+          key={WORDS[index]}
+          initial={{ y: "100%", opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: "-100%", opacity: 0 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[#7c5aff] to-[#b794ff]"
+        >
+          {WORDS[index]}
+        </motion.span>
+      </AnimatePresence>
+    </span>
   );
 }
 
-// Animated counter stat component
-function AnimatedStat({ value, label, suffix = '' }: { value: number; label: string; suffix?: string }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const count = useCountUp(value, 2000, isInView);
+/* ─── animated counter ─── */
+function Counter({ end, suffix = "" }: { end: number; suffix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [val, setVal] = useState(0);
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting && !started) { setStarted(true); } },
+      { threshold: 0.5 }
+    );
+    obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, [started]);
+
+  useEffect(() => {
+    if (!started) return;
+    const dur = 1800;
+    const t0 = Date.now();
+    const tick = () => {
+      const p = Math.min((Date.now() - t0) / dur, 1);
+      setVal(Math.floor((1 - Math.pow(1 - p, 3)) * end));
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [started, end]);
+
+  return <span ref={ref}>{val.toLocaleString()}{suffix}</span>;
+}
+
+/* ─── immersive hero background — interactive mesh with mouse-reactive glow ─── */
+function HeroBackground() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const mouse = useRef({ x: -9999, y: -9999 });
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let w = 0, h = 0, animId = 0;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    const resize = () => {
+      w = canvas.clientWidth;
+      h = canvas.clientHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    const onMove = (e: MouseEvent) => {
+      const r = canvas.getBoundingClientRect();
+      mouse.current = { x: e.clientX - r.left, y: e.clientY - r.top };
+    };
+    document.addEventListener("mousemove", onMove);
+
+    // Orbs — large floating gradients
+    const orbs = Array.from({ length: 5 }, (_, i) => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      r: 200 + Math.random() * 300,
+      hue: [265, 280, 230, 300, 250][i],
+      sat: 60 + Math.random() * 30,
+      phase: Math.random() * Math.PI * 2,
+    }));
+
+    // Grid dots
+    const GRID = 40;
+    const dots: { x: number; y: number }[] = [];
+    for (let gx = 0; gx < w + GRID; gx += GRID) {
+      for (let gy = 0; gy < h + GRID; gy += GRID) {
+        dots.push({ x: gx, y: gy });
+      }
+    }
+
+    let t = 0;
+    const draw = () => {
+      t += 0.005;
+      ctx.clearRect(0, 0, w, h);
+
+      // Animated orbs
+      for (const orb of orbs) {
+        orb.phase += 0.003;
+        orb.x += orb.vx + Math.sin(orb.phase) * 0.4;
+        orb.y += orb.vy + Math.cos(orb.phase * 0.7) * 0.3;
+        if (orb.x < -orb.r) orb.x = w + orb.r;
+        if (orb.x > w + orb.r) orb.x = -orb.r;
+        if (orb.y < -orb.r) orb.y = h + orb.r;
+        if (orb.y > h + orb.r) orb.y = -orb.r;
+
+        const g = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, orb.r);
+        const alpha = 0.06 + Math.sin(orb.phase) * 0.02;
+        g.addColorStop(0, `hsla(${orb.hue}, ${orb.sat}%, 55%, ${alpha})`);
+        g.addColorStop(0.5, `hsla(${orb.hue}, ${orb.sat}%, 45%, ${alpha * 0.4})`);
+        g.addColorStop(1, "transparent");
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(orb.x, orb.y, orb.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Mouse glow
+      const mx = mouse.current.x, my = mouse.current.y;
+      if (mx > 0 && my > 0) {
+        const mg = ctx.createRadialGradient(mx, my, 0, mx, my, 250);
+        mg.addColorStop(0, "rgba(124, 90, 255, 0.08)");
+        mg.addColorStop(0.5, "rgba(124, 90, 255, 0.03)");
+        mg.addColorStop(1, "transparent");
+        ctx.fillStyle = mg;
+        ctx.beginPath();
+        ctx.arc(mx, my, 250, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Grid dots — subtle, react to mouse
+      for (const dot of dots) {
+        const dx = dot.x - mx, dy = dot.y - my;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const proximity = Math.max(0, 1 - dist / 300);
+        const size = 0.5 + proximity * 1.5;
+        const alpha = 0.04 + proximity * 0.2;
+        ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+        ctx.beginPath();
+        ctx.arc(dot.x, dot.y, size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Horizontal scan line (subtle)
+      const scanY = (h * 0.3) + Math.sin(t * 2) * h * 0.3;
+      const scanG = ctx.createLinearGradient(0, scanY - 1, 0, scanY + 1);
+      scanG.addColorStop(0, "transparent");
+      scanG.addColorStop(0.5, "rgba(124, 90, 255, 0.03)");
+      scanG.addColorStop(1, "transparent");
+      ctx.fillStyle = scanG;
+      ctx.fillRect(0, scanY - 40, w, 80);
+
+      animId = requestAnimationFrame(draw);
+    };
+    draw();
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener("resize", resize);
+      document.removeEventListener("mousemove", onMove);
+    };
+  }, []);
+
   return (
-    <motion.div ref={ref} variants={fadeInUp} className="text-center">
-      <div className="text-4xl md:text-5xl font-bold font-display text-white text-glow mb-2">
-        {count}{suffix}
-      </div>
-      <div className="text-sm text-white/50 uppercase tracking-[0.15em] font-medium">{label}</div>
-    </motion.div>
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 w-full h-full pointer-events-none"
+      style={{ zIndex: 0 }}
+    />
   );
 }
 
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [user, setUser] = useState<{ email: string; name?: string; role?: string } | null>(null);
+  const [user, setUser] = useState<{ email: string; name?: string } | null>(null);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem("zoobicon_user");
-      if (stored) setUser(JSON.parse(stored));
-    } catch { /* Safari private mode / storage unavailable */ }
+    try { const s = localStorage.getItem("zoobicon_user"); if (s) setUser(JSON.parse(s)); } catch {}
   }, []);
 
-  // Track scroll for nav shrink effect
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const fn = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", fn, { passive: true });
+    return () => window.removeEventListener("scroll", fn);
   }, []);
-
 
   const handleLogout = () => {
     try { localStorage.removeItem("zoobicon_user"); } catch {}
@@ -575,946 +237,409 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="relative bg-void">
-      {/* Scroll progress indicator */}
+    <div className="relative bg-[#050505] text-white selection:bg-[#7c5aff]/30 selection:text-white">
       <ScrollProgress />
 
-      {/* Background Effects */}
-      <BackgroundEffects preset="technical" />
-
-      {/* Navigation — shrinks on scroll */}
+      {/* ── NAV ── */}
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled
-            ? "border-white/[0.08] bg-black/80 backdrop-blur-2xl shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
-            : "border-white/[0.06] bg-black/60 backdrop-blur-2xl"
+            ? "bg-[#050505]/90 backdrop-blur-2xl border-b border-white/[0.06]"
+            : "bg-transparent"
         }`}
-        aria-label="Main navigation"
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className={`flex items-center justify-between transition-all duration-300 ${scrolled ? "h-14" : "h-16"}`}>
-            <div className="flex items-center gap-8">
-              <Link href="/" className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-zoo-500 to-zoo-400 flex items-center justify-center shadow-glow-zoo">
-                  <Zap className="w-4 h-4 text-white" />
-                </div>
-                <span className="text-lg font-bold tracking-tight font-display">Zoobicon</span>
-              </Link>
-              <div className="hidden md:flex items-center gap-6">
-                <a href="#products" className="text-sm font-medium text-white/50 hover:text-white transition-colors tracking-wide">Products</a>
-                <Link href="/marketplace" className="text-sm font-medium text-white/50 hover:text-white transition-colors tracking-wide">Marketplace</Link>
-                <Link href="/domains" className="text-sm font-medium text-white/50 hover:text-white transition-colors tracking-wide">Domains</Link>
-                <Link href="/developers" className="text-sm font-medium text-white/50 hover:text-white transition-colors tracking-wide">Developers</Link>
-                <Link href="/pricing" className="text-sm font-medium text-white/50 hover:text-white transition-colors tracking-wide">Pricing</Link>
-              </div>
+          <div className={`flex items-center justify-between transition-all ${scrolled ? "h-14" : "h-16"}`}>
+            <Link href="/" className="text-lg font-bold tracking-tight">
+              Zoobicon
+            </Link>
+            <div className="hidden md:flex items-center gap-8 text-[13px] text-white/50">
+              <Link href="/generators" className="hover:text-white transition-colors">Generators</Link>
+              <Link href="/marketplace" className="hover:text-white transition-colors">Marketplace</Link>
+              <Link href="/developers" className="hover:text-white transition-colors">Developers</Link>
+              <Link href="/agencies" className="hover:text-white transition-colors">Agencies</Link>
+              <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
             </div>
-            <div className="hidden md:flex items-center gap-4">
-              <Link href="/support" className="text-sm text-white/65 hover:text-white transition-colors px-4 py-2 flex items-center gap-1.5">
-                <HelpCircle className="w-3.5 h-3.5" />
-                Support
-              </Link>
+            <div className="hidden md:flex items-center gap-3">
               {user ? (
                 <>
-                  <Link href="/dashboard" className="text-sm text-white/65 hover:text-white transition-colors px-4 py-2 flex items-center gap-1.5">
-                    <LayoutDashboard className="w-3.5 h-3.5" />
-                    Dashboard
+                  <Link href="/dashboard" className="text-[13px] text-white/50 hover:text-white transition-colors px-3 py-1.5 flex items-center gap-1.5">
+                    <LayoutDashboard className="w-3.5 h-3.5" /> Dashboard
                   </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="text-sm text-white/65 hover:text-white transition-colors px-4 py-2 flex items-center gap-1.5"
-                  >
-                    <LogOut className="w-3.5 h-3.5" />
-                    Sign out
+                  <button onClick={handleLogout} className="text-[13px] text-white/50 hover:text-white transition-colors px-3 py-1.5 flex items-center gap-1.5">
+                    <LogOut className="w-3.5 h-3.5" /> Sign out
                   </button>
-                  <Link
-                    href="/builder"
-                    className="btn-zoo px-5 py-2.5 rounded-xl text-sm font-semibold text-white flex items-center gap-2"
-                  >
-                    <User className="w-3.5 h-3.5" />
-                    <span>{user.name || user.email.split("@")[0]}</span>
-                  </Link>
                 </>
               ) : (
-                <>
-                  <Link href="/auth/login" className="text-sm text-white/65 hover:text-white transition-colors px-4 py-2">
-                    Sign in
-                  </Link>
-                  <Link
-                    href="/builder"
-                    className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-zoo-500 to-zoo-400 shadow-glow-zoo hover:shadow-glow-zoo-lg hover:-translate-y-0.5 transition-all duration-300"
-                  >
-                    <span>Start Building</span>
-                  </Link>
-                </>
+                <Link href="/auth/login" className="text-[13px] text-white/50 hover:text-white transition-colors">Sign in</Link>
               )}
+              <Link
+                href="/builder"
+                className="text-[13px] font-semibold px-5 py-2 rounded-full bg-white text-black hover:bg-white/90 transition-colors"
+              >
+                Start Building
+              </Link>
             </div>
-            <button
-              className="md:hidden text-white/60"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-expanded={mobileMenuOpen}
-              aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-            >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            <button className="md:hidden text-white/60" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Toggle menu">
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
-        {/* Mobile menu — full-screen overlay */}
+
+        {/* Mobile menu */}
         <AnimatePresence>
           {mobileMenuOpen && (
-            <motion.nav
-              initial={{ opacity: 0, y: -20 }}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
-              className="md:hidden fixed inset-0 top-14 bg-[#050508]/98 backdrop-blur-2xl z-40 px-6 py-8 flex flex-col"
-              aria-label="Mobile navigation"
+              exit={{ opacity: 0, y: -10 }}
+              className="md:hidden fixed inset-0 top-14 bg-[#050505]/98 backdrop-blur-2xl z-40 px-6 py-8 flex flex-col"
             >
               <div className="space-y-1 flex-1">
                 {[
-                  { href: "#products", label: "Products", onClick: true },
+                  { href: "/generators", label: "Generators" },
                   { href: "/marketplace", label: "Marketplace" },
-                  { href: "/domains", label: "Domains" },
                   { href: "/developers", label: "Developers" },
                   { href: "/agencies", label: "Agencies" },
                   { href: "/pricing", label: "Pricing" },
                   { href: "/support", label: "Support" },
                 ].map((item) => (
-                  item.onClick ? (
-                    <a
-                      key={item.label}
-                      href={item.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="block text-lg font-medium text-white/70 hover:text-white py-3 border-b border-white/[0.06] transition-colors"
-                    >
-                      {item.label}
-                    </a>
-                  ) : (
-                    <Link
-                      key={item.label}
-                      href={item.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="block text-lg font-medium text-white/70 hover:text-white py-3 border-b border-white/[0.06] transition-colors"
-                    >
-                      {item.label}
-                    </Link>
-                  )
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block text-lg font-medium text-white/60 hover:text-white py-3 border-b border-white/[0.06]"
+                  >
+                    {item.label}
+                  </Link>
                 ))}
-                {user && (
-                  <>
-                    <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="block text-lg font-medium text-white/70 hover:text-white py-3 border-b border-white/[0.06] flex items-center gap-3">
-                      <LayoutDashboard className="w-5 h-5" /> Dashboard
-                    </Link>
-                    <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="block text-lg font-medium text-white/70 hover:text-white py-3 border-b border-white/[0.06] flex items-center gap-3 w-full text-left">
-                      <LogOut className="w-5 h-5" /> Sign out
-                    </button>
-                  </>
-                )}
               </div>
-
-              {/* Mobile CTA — prominent at bottom */}
               <div className="pt-6 border-t border-white/[0.06]">
-                <Link
-                  href="/builder"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block btn-zoo px-6 py-4 rounded-2xl text-base font-bold text-white text-center"
-                >
-                  {user ? `${user.name || user.email.split("@")[0]}'s Builder` : "Start Building Free"}
+                <Link href="/builder" onClick={() => setMobileMenuOpen(false)} className="block py-4 rounded-xl text-center text-base font-bold bg-white text-black">
+                  Start Building Free
                 </Link>
-                <div className="flex items-center justify-center gap-4 mt-4 text-xs text-white/40">
-                  <span>No credit card</span>
-                  <span className="w-1 h-1 rounded-full bg-white/20" />
-                  <span>Free forever</span>
-                </div>
               </div>
-            </motion.nav>
+            </motion.div>
           )}
         </AnimatePresence>
       </nav>
 
-      {/* Cursor glow tracker — enables CSS-based cursor following */}
-      <CursorGlowTracker />
+      {/* ═══════════════════════════════════════════════
+          SECTION 1 — HERO
+          Immersive background + demo = the product sells itself
+          ═══════════════════════════════════════════════ */}
+      <section className="relative min-h-screen pt-28 pb-4 md:pt-36 md:pb-8 overflow-hidden">
+        {/* Immersive interactive background */}
+        <HeroBackground />
+        {/* Top gradient fade from nav */}
+        <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-[#050505] to-transparent z-[1] pointer-events-none" />
+        {/* Bottom gradient fade into next section */}
+        <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#050505] to-transparent z-[1] pointer-events-none" />
 
-      {/* ================================================================
-          HERO SECTION — Full-screen cinematic image + overlay
-          ================================================================ */}
-      <section className="relative min-h-screen flex flex-col">
-        {/* Full-screen background image — futuristic tech aesthetic */}
-        <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.unsplash.com/photo-1639322537228-f710d846310a?w=1920&q=80&auto=format&fit=crop"
-            alt=""
-            className="w-full h-full object-cover"
-            loading="eager"
-            fetchPriority="high"
-          />
-          {/* Dark gradient overlay for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/90" />
-          {/* Accent color wash */}
-          <div className="absolute inset-0 bg-gradient-to-br from-zoo-500/10 via-transparent to-accent-purple/10" />
-          {/* Bottom fade to page background */}
-          <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#06060e] to-transparent" />
-        </div>
-
-        {/* Hero content — centered on the image */}
-        <div className="relative z-10 flex-1 flex items-center justify-center pt-20 pb-32">
-          <div className="max-w-7xl mx-auto px-6 lg:px-8 w-full">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="text-center"
-            >
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.08] border border-white/[0.12] backdrop-blur-sm text-white/80 text-xs font-bold uppercase tracking-[0.2em] mb-8"
-              >
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-zoo-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-zoo-400" />
-                </span>
-                7 AI AGENTS. ONE PROMPT. INFINITE POSSIBILITIES.
-              </motion.div>
-
-              <h1 className="font-display text-[3.5rem] sm:text-[5rem] lg:text-[7rem] xl:text-[9rem] font-extrabold tracking-[-0.04em] leading-[0.85] mb-8 text-white drop-shadow-[0_4px_60px_rgba(0,0,0,0.5)]">
-                <span className="gradient-text-zoo-animated">Build</span>
-                <span className="text-white"> the</span>
-                <br />
-                <span className="text-white">Future.</span>
-              </h1>
-
-              <p className="text-lg lg:text-2xl text-white/70 leading-relaxed max-w-2xl mx-auto mb-12 font-light drop-shadow-[0_2px_20px_rgba(0,0,0,0.5)]">
-                Describe any website. 7 AI agents build it in seconds.
-                <br className="hidden sm:block" />
-                Production-ready. No code. No limits.
-              </p>
-
-              <div className="flex flex-wrap items-center justify-center gap-4 mb-10">
-                <Link
-                  href="/builder"
-                  className="btn-zoo group inline-flex items-center gap-3 text-lg font-bold px-12 py-5 rounded-2xl shadow-[0_0_40px_rgba(124,90,255,0.3)]"
-                >
-                  Start Building Free
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-                <Link
-                  href="#showcase"
-                  className="inline-flex items-center gap-2 text-lg px-10 py-5 rounded-2xl font-semibold text-white/80 bg-white/[0.08] border border-white/[0.15] backdrop-blur-sm hover:bg-white/[0.12] transition-all"
-                >
-                  See Examples
-                  <Eye className="w-5 h-5" />
-                </Link>
-              </div>
-
-              <div className="flex items-center justify-center gap-6 text-sm text-white/50 font-medium">
-                <span className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-zoo-400" /> No credit card
-                </span>
-                <span className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-zoo-400" /> Unlimited builds
-                </span>
-                <span className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-zoo-400" /> Free hosting
-                </span>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <motion.div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <ChevronRight className="w-6 h-6 text-white/30 rotate-90" />
-        </motion.div>
-      </section>
-
-      {/* ================================================================
-          LIVE BUILDER DEMO — Below the hero fold
-          ================================================================ */}
-      <section className="relative py-20 lg:py-28 overflow-hidden">
-        <HeroEffects variant="cyan" aurora beams />
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-[2]">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-12"
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            className="text-center mb-16 md:mb-20"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-zoo-500/20 bg-zoo-500/5 mb-6">
-              <Sparkles className="w-3 h-3 text-zoo-400" />
-              <span className="text-xs font-medium text-zoo-400">Watch It Build</span>
-            </div>
-            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-[-0.04em] mb-4 text-white">
-              From Prompt to Production
-            </h2>
-            <p className="text-lg text-white/50 max-w-xl mx-auto">
-              Type a description. Watch 7 AI agents collaborate. Get a live website.
+            <h1 className="text-[clamp(2.5rem,8vw,7rem)] font-extrabold tracking-[-0.05em] leading-[0.9] mb-6">
+              One prompt.<br />
+              Stunning <RotatingWord />.
+            </h1>
+            <p className="text-lg md:text-xl text-white/40 max-w-xl mx-auto mb-10 leading-relaxed font-light">
+              7 AI agents collaborate in real-time to build production-ready
+              websites. Watch it happen.
             </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link
+                href="/builder"
+                className="group inline-flex items-center gap-2.5 px-8 py-4 rounded-full bg-white text-black text-[15px] font-bold hover:bg-white/90 transition-all hover:shadow-[0_0_40px_rgba(255,255,255,0.15)]"
+              >
+                Start Building Free
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+              <a
+                href="#showcase"
+                className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-[15px] font-medium text-white/50 border border-white/[0.1] hover:border-white/[0.2] hover:text-white/70 transition-all"
+              >
+                See Examples
+              </a>
+            </div>
+            <div className="flex items-center justify-center gap-6 mt-6 text-xs text-white/30">
+              <span>No credit card</span>
+              <span className="w-1 h-1 rounded-full bg-white/15" />
+              <span>Free forever</span>
+              <span className="w-1 h-1 rounded-full bg-white/15" />
+              <span>No limits</span>
+            </div>
           </motion.div>
 
+          {/* The live demo — this IS the product proof */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             className="relative max-w-5xl mx-auto"
           >
+            {/* Subtle glow behind the demo */}
+            <div className="absolute -inset-20 bg-[#7c5aff]/[0.04] rounded-[40px] blur-3xl pointer-events-none" />
             <HeroDemo />
-            <div className="hidden xl:block absolute -right-[340px] top-8">
-              <ActivityFeed />
-            </div>
           </motion.div>
         </div>
       </section>
 
-      {/* ================================================================
-          LIVE STATS — Real numbers, not fake logos
-          ================================================================ */}
-      <section className="relative py-16 lg:py-20 border-y border-white/[0.06]">
+      {/* ═══════════════════════════════════════════════
+          SECTION 2 — PROOF (numbers + showcase)
+          "Don't tell me. Show me."
+          ═══════════════════════════════════════════════ */}
+      <section className="relative py-24 md:py-32">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <LiveCounter />
-        </div>
-      </section>
-
-      {/* Platform Capabilities — What's Included */}
-      <section className="relative py-24 lg:py-32 border-b border-white/[0.06] overflow-hidden">
-        <div className="absolute inset-0">
-          <ParallaxLayer speed={0.2} className="absolute inset-0">
-            <div className="glow-orb glow-orb-blue w-[700px] h-[700px] top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 opacity-15" />
-          </ParallaxLayer>
-          <ParallaxLayer speed={-0.15} className="absolute inset-0">
-            <div className="glow-orb glow-orb-purple w-[500px] h-[500px] top-1/3 right-0 opacity-15" />
-          </ParallaxLayer>
-        </div>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-zoo-500/20 bg-zoo-500/5 mb-6">
-                <Check className="w-3 h-3 text-zoo-400" />
-                <span className="text-xs font-medium text-zoo-400">Everything Included</span>
-              </div>
-              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-6 text-white text-glow">
-                One Platform.<br />
-                <span className="text-white/60">Every Capability.</span>
-              </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/60 tracking-wide">
-                No more juggling tools, plugins, or workarounds. Everything you need to build, launch, and scale — in one place.
-              </p>
-            </motion.div>
-
-            {/* Capabilities Grid */}
-            <motion.div variants={fadeInUp} className="grid md:grid-cols-2 gap-3 max-w-4xl mx-auto">
-              {PLATFORM_CAPABILITIES.map((cap, i) => (
-                <motion.div
-                  key={i}
-                  variants={fadeInUp}
-                  className={`flex items-start gap-4 p-5 rounded-xl ${
-                    i % 2 === 0 ? "bg-white/[0.03]" : "bg-white/[0.02]"
-                  } border border-white/[0.06] hover:border-zoo-500/20 hover:bg-white/[0.04] transition-all group`}
-                >
-                  <div className="w-7 h-7 rounded-full bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-emerald-500/25 transition-colors">
-                    <Check className="w-3.5 h-3.5 text-emerald-400" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-semibold text-white/90 mb-1">{cap.name}</div>
-                    <div className="text-xs text-white/45 leading-relaxed">{cap.description}</div>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-
-            {/* CTA */}
-            <motion.div variants={fadeInUp} className="text-center mt-14">
-              <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full bg-emerald-500/[0.06] border border-emerald-500/15">
-                <span className="text-sm text-emerald-400 font-semibold">14 of 14 included</span>
-                <span className="text-xs text-white/40">on every plan</span>
-              </div>
-              <div className="block">
-                <Link
-                  href="/builder"
-                  className="inline-flex items-center gap-3 btn-zoo px-8 py-4 rounded-2xl text-base font-bold text-white"
-                >
-                  <span>Start Building Free</span>
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-              </div>
-              <p className="mt-4 text-sm text-white/40">
-                No credit card. No limits on features.
-              </p>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* New Features Showcase */}
-      <section className="relative py-24 lg:py-32 overflow-hidden">
-        <div className="absolute inset-0">
-          <ParallaxLayer speed={0.25} className="absolute inset-0">
-            <div className="glow-orb glow-orb-cyan w-[500px] h-[500px] top-0 right-1/4 opacity-15" />
-          </ParallaxLayer>
-        </div>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/5 mb-6">
-                <Sparkles className="w-3 h-3 text-emerald-400" />
-                <span className="text-xs font-medium text-emerald-400">New in 2026</span>
-              </div>
-              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-6 text-white text-glow">
-                10 Game-Changing<br />
-                <span className="text-white/60">Features Just Dropped</span>
-              </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/60 tracking-wide">
-                Every feature our competitors wish they had. Built, tested, and shipping today.
-              </p>
-            </motion.div>
-
-            <motion.div
-              variants={staggerFast}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-50px" }}
-              className="grid md:grid-cols-2 lg:grid-cols-5 gap-4"
-            >
-              {NEW_FEATURES.map((feature, i) => (
-                <motion.div
-                  key={i}
-                  variants={scaleIn}
-                  whileHover={{ y: -6, transition: { duration: 0.2, ease: "easeOut" as const } }}
-                  className="group relative p-6 rounded-xl border border-white/[0.06] bg-white/[0.03] hover:bg-white/[0.05] hover:border-white/[0.10] transition-all cursor-pointer"
-                >
-                  {/* Glow effect on hover */}
-                  <div className={`absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-br ${feature.color} blur-xl -z-10`} style={{ opacity: 0 }} />
-
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform`}>
-                    <feature.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="text-base font-bold mb-2 group-hover:text-white transition-colors">
-                    {feature.title}
-                  </h3>
-                  <p className="text-xs text-white/60 leading-relaxed">
-                    {feature.description}
-                  </p>
-
-                  {/* NEW badge */}
-                  <div className="absolute top-4 right-4">
-                    <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
-                      New
-                    </span>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Products Section */}
-      <section id="products" className="relative py-24 lg:py-32 border-t border-white/[0.06]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-zoo-500/20 bg-zoo-500/5 mb-6">
-                <Sparkles className="w-3 h-3 text-zoo-400" />
-                <span className="text-xs font-medium text-zoo-400">Product Suite</span>
-              </div>
-              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-6 text-white text-glow">
-                Everything You Need to<br />
-                <span className="text-white/60">Dominate Online</span>
-              </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/60 tracking-wide">
-                AI-powered products working in harmony. Each one best-in-class.
-                Together, an unstoppable digital powerhouse.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {PRODUCTS.map((product, i) => {
-                const content = (
-                  <>
-                    <div className="flex items-start justify-between mb-4">
-                      <div className={`icon-glow w-12 h-12 rounded-xl bg-gradient-to-br ${product.color} flex items-center justify-center shadow-lg`}>
-                        <product.icon className="w-6 h-6 text-white" />
-                      </div>
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-white/65 bg-white/[0.07] px-2.5 py-1 rounded-full">
-                        {product.tag}
-                      </span>
-                    </div>
-                    <h3 className="text-lg font-bold mb-2 group-hover:text-white transition-colors">
-                      {product.name}
-                    </h3>
-                    <p className="text-sm text-white/60 leading-relaxed mb-4">
-                      {product.description}
-                    </p>
-                    <div className="flex items-center gap-2 text-xs text-white/60">
-                      <Globe className="w-3 h-3" />
-                      <span>{product.domain}</span>
-                    </div>
-                  </>
-                );
-                return (
-                  <motion.div key={i} variants={fadeInUp}>
-                    {product.href ? (
-                      <Link href={product.href} className="block card-glow card-tilt p-6 rounded-2xl group cursor-pointer hover:-translate-y-1 transition-transform duration-300">
-                        {content}
-                      </Link>
-                    ) : (
-                      <div className="card-glow card-tilt p-6 rounded-2xl group cursor-pointer hover:-translate-y-1 transition-transform duration-300">
-                        {content}
-                      </div>
-                    )}
-                  </motion.div>
-                );
-              })}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Domain Ecosystem */}
-      <section id="ecosystem" className="relative py-24 lg:py-32 border-t border-white/[0.06]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-cyan/20 bg-accent-cyan/5 mb-6">
-                <Globe className="w-3 h-3 text-accent-cyan" />
-                <span className="text-xs font-medium text-accent-cyan">Domain Ecosystem</span>
-              </div>
-              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-6 text-white text-glow">
-                Four Domains.<br />
-                <span className="text-white/60">One Empire.</span>
-              </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/60 tracking-wide">
-                We own every extension. Complete market presence across .com, .ai, .io, and .sh — an impenetrable brand fortress.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {DOMAINS.map((d, i) => (
-                <motion.div key={i} variants={fadeInUp}>
-                  <Link
-                    href={d.href}
-                    className={`block relative p-6 rounded-2xl border ${d.borderColor} bg-white/[0.08] hover:bg-white/[0.07] transition-all group`}
-                  >
-                    <d.icon className={`w-8 h-8 ${d.color} mb-4`} />
-                    <div className="text-xl font-bold mb-1 group-hover:text-white transition-colors">
-                      {d.domain}
-                    </div>
-                    <div className={`text-sm font-semibold ${d.color} mb-2`}>
-                      {d.label}
-                    </div>
-                    <p className="text-sm text-white/60">
-                      {d.description}
-                    </p>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Connection visualization */}
-            <motion.div variants={fadeInUp} className="mt-12 text-center">
-              <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full border border-white/[0.10] bg-white/[0.08]">
-                <div className="flex -space-x-2">
-                  <div className="w-6 h-6 rounded-full bg-zoo-500/30 border border-zoo-500/40" />
-                  <div className="w-6 h-6 rounded-full bg-accent-purple/30 border border-accent-purple/40" />
-                  <div className="w-6 h-6 rounded-full bg-accent-cyan/30 border border-accent-cyan/40" />
-                  <div className="w-6 h-6 rounded-full bg-amber-500/30 border border-amber-500/40" />
-                </div>
-                <span className="text-sm text-white/65">All domains. One unified platform. Total market coverage.</span>
-              </div>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section id="features" className="relative py-24 lg:py-32 border-t border-white/[0.06]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-zoo-500/20 bg-zoo-500/5 mb-6">
-                <Zap className="w-3 h-3 text-zoo-400" />
-                <span className="text-xs font-medium text-zoo-400">Why Zoobicon</span>
-              </div>
-              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-6 text-white text-glow">
-                Built Different.<br />
-                <span className="text-white/60">Built to Win.</span>
-              </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/60 tracking-wide">
-                We didn&apos;t build another tool. We built the platform that makes every other tool obsolete.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {FEATURES.map((feature, i) => (
-                <motion.div
-                  key={i}
-                  variants={fadeInUp}
-                  whileHover={{ y: -4, transition: { duration: 0.2, ease: "easeOut" as const } }}
-                  className="card-glow card-tilt p-8 rounded-2xl group"
-                >
-                  <div className="icon-glow w-12 h-12 rounded-xl bg-gradient-to-br from-zoo-500/20 to-zoo-400/10 border border-zoo-500/20 flex items-center justify-center mb-5 group-hover:border-zoo-500/40 transition-colors">
-                    <feature.icon className="w-6 h-6 text-zoo-400/80 group-hover:text-zoo-300 transition-colors" />
-                  </div>
-                  <h3 className="text-xl font-bold font-display mb-3">{feature.title}</h3>
-                  <p className="text-sm text-white/50 leading-relaxed tracking-wide">
-                    {feature.description}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* How It Works — 3 steps */}
-      <section className="relative py-24 lg:py-32 border-t border-white/[0.06] overflow-hidden">
-        <div className="absolute inset-0">
-          <ParallaxLayer speed={0.3} className="absolute inset-0">
-            <div className="glow-orb glow-orb-purple w-[600px] h-[600px] top-1/4 left-1/4 opacity-10" />
-          </ParallaxLayer>
-        </div>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-zoo-500/20 bg-zoo-500/5 mb-6">
-                <Sparkles className="w-3 h-3 text-zoo-400" />
-                <span className="text-xs font-medium text-zoo-400">How It Works</span>
-              </div>
-              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-6 text-white text-glow">
-                Three Steps.<br />
-                <span className="text-white/60">Zero Code.</span>
-              </h2>
-            </motion.div>
-
-            <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              {HOW_IT_WORKS.map((step, i) => (
-                <motion.div
-                  key={i}
-                  variants={fadeInUp}
-                  className="relative text-center group"
-                >
-                  {/* Step number */}
-                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${step.gradient} mb-6 shadow-lg group-hover:scale-110 transition-transform`}>
-                    <span className="text-2xl font-black text-white">{step.step}</span>
-                  </div>
-                  {/* Connector line (not on last) */}
-                  {i < HOW_IT_WORKS.length - 1 && (
-                    <div className="hidden md:block absolute top-8 left-[calc(50%+40px)] w-[calc(100%-80px)] h-[1px] bg-gradient-to-r from-white/10 to-white/5" />
-                  )}
-                  <h3 className="text-xl font-bold font-display mb-3 text-white">{step.title}</h3>
-                  <p className="text-sm text-white/50 leading-relaxed max-w-xs mx-auto">{step.description}</p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Video Creator Showcase Section */}
-      <section className="relative py-24 lg:py-32 border-t border-white/[0.06] overflow-hidden">
-        <div className="absolute inset-0">
-          <ParallaxLayer speed={-0.25} className="absolute inset-0">
-            <div className="glow-orb glow-orb-purple w-[600px] h-[600px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-15" />
-          </ParallaxLayer>
-        </div>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-pink/20 bg-accent-pink/5 mb-6">
-                <Video className="w-3 h-3 text-accent-pink" />
-                <span className="text-xs font-medium text-accent-pink">AI Video Creator</span>
-              </div>
-              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-6 text-white text-glow">
-                AI Video Creator.<br />
-                <span className="text-white/60">Coming Soon.</span>
-              </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/60 tracking-wide mb-4">
-                AI-powered storyboard and script generation is live today. Full video rendering
-                is coming soon — join the waitlist to get early access.
-              </p>
-              <Link href="/products/video-creator" className="inline-flex items-center gap-2 text-sm text-accent-pink hover:text-accent-pink/80 transition-colors">
-                Join the waitlist <ArrowRight className="w-4 h-4" />
-              </Link>
-            </motion.div>
-
-            <motion.div variants={fadeInUp}>
-              <VideoShowcase />
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section id="pricing" className="relative py-24 lg:py-32 border-t border-white/[0.06]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
-              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-6 text-white text-glow">
-                Ready to<br />
-                <span className="text-white/60">Dominate?</span>
-              </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/60 tracking-wide">
-                Start free. Scale when you&apos;re ready. No credit card required.
-              </p>
-            </motion.div>
-
-            {/* No credits banner */}
-            <motion.div variants={fadeInUp} className="text-center mb-10">
-              <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border border-emerald-500/20 bg-emerald-500/[0.04]">
-                <Shield className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="text-xs font-medium text-emerald-300/80">No credits. No tokens. No usage traps. Flat pricing you can actually understand.</span>
-              </div>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 max-w-6xl mx-auto">
-              {/* Free */}
-              <motion.div variants={fadeInUp} className="gradient-border p-7 rounded-2xl">
-                <div className="text-sm font-semibold text-white/65 mb-2">Starter</div>
-                <div className="text-4xl font-black mb-1">Free</div>
-                <div className="text-sm text-white/65 mb-5">Forever</div>
-                <ul className="space-y-2.5 mb-7">
-                  {["3 websites/month", "Full 7-agent AI pipeline", "Opus-powered builds", "7-day hosting preview"].map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm text-white/65">
-                      <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href="/builder"
-                  className="block w-full py-3 text-center rounded-xl border border-white/[0.1] text-sm font-semibold text-white/70 hover:text-white hover:border-white/20 transition-all"
-                >
-                  Get Started
-                </Link>
-              </motion.div>
-
-              {/* Creator */}
-              <motion.div variants={fadeInUp} className="relative p-7 rounded-2xl border border-emerald-500/25 bg-emerald-500/[0.03]">
-                <div className="text-sm font-semibold text-emerald-400 mb-2">Creator</div>
-                <div className="text-4xl font-black mb-1">$19<span className="text-lg font-normal text-white/65">/mo</span></div>
-                <div className="text-sm text-white/65 mb-5">Unlimited quality</div>
-                <ul className="space-y-2.5 mb-7">
-                  {["Unlimited websites", "7-agent AI pipeline", "Custom domains", "GitHub & WP export", "Basic SEO agent"].map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm text-white/60">
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/auth/signup" className="block w-full py-3 rounded-xl text-sm font-bold text-center bg-emerald-600 hover:bg-emerald-500 text-white transition-all">
-                  Start Creator Trial
-                </Link>
-              </motion.div>
-
-              {/* Pro - Featured */}
-              <motion.div variants={fadeInUp} className="relative p-7 rounded-2xl border border-zoo-500/30 bg-zoo-500/[0.03] shadow-glow">
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-zoo-500 to-zoo-400 text-xs font-bold text-white">
-                  Most Popular
-                </div>
-                <div className="text-sm font-semibold text-zoo-400 mb-2">Pro</div>
-                <div className="text-4xl font-black mb-1">$49<span className="text-lg font-normal text-white/65">/mo</span></div>
-                <div className="text-sm text-white/65 mb-5">Full arsenal</div>
-                <ul className="space-y-2.5 mb-7">
-                  {["Everything in Creator", "AI Video Creator", "Full SEO Agent", "AI Brand Kit", "All 12+ AI tools"].map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm text-white/60">
-                      <div className="w-1.5 h-1.5 rounded-full bg-zoo-400" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/auth/signup" className="block w-full btn-zoo py-3 rounded-xl text-sm font-bold text-white shadow-glow text-center">
-                  Start Pro Trial
-                </Link>
-              </motion.div>
-
-              {/* Enterprise */}
-              <motion.div variants={fadeInUp} className="gradient-border p-7 rounded-2xl">
-                <div className="text-sm font-semibold text-white/65 mb-2">Enterprise</div>
-                <div className="text-4xl font-black mb-1">Custom</div>
-                <div className="text-sm text-white/65 mb-5">Teams & agencies</div>
-                <ul className="space-y-2.5 mb-7">
-                  {["White-label platform", "Custom AI training", "Dedicated agents", "Unlimited API", "24/7 support"].map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm text-white/65">
-                      <div className="w-1.5 h-1.5 rounded-full bg-accent-cyan" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <a href="mailto:sales@zoobicon.com?subject=Enterprise Inquiry" className="block w-full py-3 rounded-xl border border-white/[0.1] text-sm font-semibold text-white/70 hover:text-white hover:border-white/20 transition-all text-center">
-                  Contact Sales
-                </a>
-              </motion.div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Add-on Upsell Strip */}
-      <section className="relative py-16 border-t border-white/[0.06]">
-        <div className="max-w-6xl mx-auto px-6 lg:px-8">
+          {/* Stats strip — real numbers */}
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-80px" }}
-            variants={staggerContainer}
+            variants={stagger}
+            className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/[0.04] rounded-2xl overflow-hidden mb-24 md:mb-32"
           >
-            <motion.div variants={fadeInUp} className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
-              <div>
-                <h2 className="text-2xl font-bold font-display tracking-[-0.03em] mb-1">Clip the ticket on every service</h2>
-                <p className="text-sm text-white/65">Domains, hosting, AI agents, templates — add what you need, skip what you don&apos;t.</p>
-              </div>
-              <Link href="/marketplace" className="text-sm font-medium text-zoo-400 hover:text-zoo-300 transition-colors flex items-center gap-1.5 whitespace-nowrap">
-                Explore the Marketplace <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </motion.div>
+            {[
+              { val: 44, suffix: "", label: "Specialized generators" },
+              { val: 100, suffix: "+", label: "Ready-made templates" },
+              { val: 95, suffix: "s", label: "Average build time" },
+              { val: 7, suffix: "", label: "AI agents per build" },
+            ].map((s, i) => (
+              <motion.div key={i} variants={fadeUp} className="bg-[#0a0a0a] p-8 md:p-10 text-center">
+                <div className="text-3xl md:text-4xl font-extrabold tracking-tight mb-1">
+                  <Counter end={s.val} suffix={s.suffix} />
+                </div>
+                <div className="text-xs text-white/30 uppercase tracking-[0.15em]">{s.label}</div>
+              </motion.div>
+            ))}
+          </motion.div>
 
-            <motion.div variants={staggerContainer} className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-              {[
-                { label: "Domains", price: "from $2.99/yr", href: "/domains", color: "text-zoo-400 border-zoo-500/15" },
-                { label: "Hosting", price: "$12.99/mo", href: "/hosting", color: "text-accent-cyan border-accent-cyan/15" },
-                { label: "SEO Agent", price: "$29/mo", href: "/marketplace", color: "text-emerald-400 border-emerald-500/15" },
-                { label: "Video Creator", price: "$19/mo", href: "/marketplace", color: "text-purple-400 border-purple-500/15" },
-                { label: "Email Marketing", price: "$14/mo", href: "/marketplace", color: "text-amber-400 border-amber-500/15" },
-                { label: "Chatbot", price: "$14/mo", href: "/marketplace", color: "text-pink-400 border-pink-500/15" },
-              ].map((item) => (
-                <motion.div key={item.label} variants={fadeInUp}>
-                  <Link href={item.href} className={`block text-center p-4 rounded-xl border ${item.color} bg-white/[0.06] hover:bg-white/[0.06] transition-all`}>
-                    <div className="text-xs font-bold text-white/70 mb-1">{item.label}</div>
-                    <div className="text-[10px] text-white/65">{item.price}</div>
-                  </Link>
-                </motion.div>
-              ))}
+          {/* Showcase gallery */}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            variants={stagger}
+          >
+            <motion.div variants={fadeUp} className="text-center mb-14">
+              <h2 className="text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-4">
+                Real output. Not mockups.
+              </h2>
+              <p className="text-base md:text-lg text-white/35 max-w-xl mx-auto">
+                Every site below was generated by Zoobicon from a single prompt.
+                Click to see the prompt that created it.
+              </p>
+            </motion.div>
+            <motion.div variants={fadeUp} id="showcase">
+              <ShowcaseGallery />
             </motion.div>
           </motion.div>
         </div>
       </section>
 
-      {/* ================================================================
-          SHOWCASE GALLERY — Prove the quality
-          ================================================================ */}
-      <section id="showcase" className="relative py-24 lg:py-32 border-t border-white/[0.06]">
-        <ShowcaseGallery />
-      </section>
-
-      {/* ================================================================
-          BEFORE / AFTER — The magic moment
-          ================================================================ */}
-      <section className="relative py-24 lg:py-32 border-t border-white/[0.06] overflow-hidden">
-        <div className="absolute inset-0">
-          <ParallaxLayer speed={0.2} className="absolute inset-0">
-            <div className="glow-orb glow-orb-purple w-[600px] h-[600px] top-1/3 left-1/4 opacity-10" />
-          </ParallaxLayer>
-        </div>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
-          <SectionReveal blur>
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              variants={staggerContainer}
-              className="text-center mb-16"
-            >
-              <motion.div variants={fadeInUp}>
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-zoo-400/20 bg-zoo-400/5 mb-6">
-                  <Sparkles className="w-3 h-3 text-zoo-400" />
-                  <span className="text-xs font-medium text-zoo-400">The Magic</span>
-                </div>
-              </motion.div>
-              <motion.h2 variants={fadeInUp} className="font-display text-4xl md:text-5xl lg:text-7xl font-extrabold tracking-[-0.04em] mb-6 text-white">
-                From Words to<br />
-                <span className="gradient-text-zoo">Websites</span>
-              </motion.h2>
-              <motion.p variants={fadeInUp} className="max-w-2xl mx-auto text-lg text-white/50">
-                Drag the slider to see the transformation. One prompt. One click. A complete website.
-              </motion.p>
+      {/* ═══════════════════════════════════════════════
+          SECTION 3 — HOW IT WORKS (3 steps, simple)
+          ═══════════════════════════════════════════════ */}
+      <section className="relative py-24 md:py-32 border-t border-white/[0.04]">
+        <div className="max-w-5xl mx-auto px-6 lg:px-8">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            variants={stagger}
+          >
+            <motion.div variants={fadeUp} className="text-center mb-20">
+              <h2 className="text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-4">
+                Describe it. We build it.
+              </h2>
+              <p className="text-base md:text-lg text-white/35 max-w-lg mx-auto">
+                Three steps. No code. No templates. No compromise.
+              </p>
             </motion.div>
-            <BeforeAfter />
-          </SectionReveal>
+
+            <div className="grid md:grid-cols-3 gap-6 md:gap-12">
+              {[
+                {
+                  num: "01",
+                  title: "Describe your vision",
+                  body: "Type what you want in plain English. A fintech dashboard, a bakery site, an e-commerce store — anything.",
+                },
+                {
+                  num: "02",
+                  title: "7 agents build it",
+                  body: "Strategist, designer, copywriter, architect, developer, SEO specialist, and animator work in parallel.",
+                },
+                {
+                  num: "03",
+                  title: "Deploy instantly",
+                  body: "Your site goes live with one click. Edit visually, export to React or WordPress, connect a custom domain.",
+                },
+              ].map((step, i) => (
+                <motion.div key={i} variants={fadeUp} className="relative">
+                  <div className="text-[80px] md:text-[100px] font-black text-white/[0.03] leading-none absolute -top-6 -left-2 select-none pointer-events-none">
+                    {step.num}
+                  </div>
+                  <div className="relative pt-8">
+                    <div className="text-xs font-bold text-[#7c5aff] mb-3 tracking-[0.2em] uppercase">
+                      Step {step.num}
+                    </div>
+                    <h3 className="text-xl md:text-2xl font-bold mb-3 tracking-tight">{step.title}</h3>
+                    <p className="text-sm text-white/35 leading-relaxed">{step.body}</p>
+                  </div>
+                  {i < 2 && (
+                    <div className="hidden md:block absolute top-16 -right-6 lg:-right-8 w-4 text-white/10">
+                      <ArrowRight className="w-4 h-4" />
+                    </div>
+                  )}
+                </motion.div>
+              ))}
+            </div>
+
+            {/* What it can build */}
+            <motion.div variants={fadeUp} className="mt-20 text-center">
+              <p className="text-xs text-white/25 uppercase tracking-[0.2em] mb-6">What you can build</p>
+              <div className="flex flex-wrap justify-center gap-2">
+                {[
+                  "SaaS Landing Pages", "E-Commerce Stores", "Portfolios", "Dashboards",
+                  "Restaurants", "Agency Sites", "Blogs", "Full-Stack Apps",
+                  "Multi-Page Sites", "Email Templates",
+                ].map((tag) => (
+                  <span key={tag} className="px-4 py-2 rounded-full border border-white/[0.06] text-xs text-white/30 hover:text-white/50 hover:border-white/[0.12] transition-all cursor-default">
+                    {tag}
+                  </span>
+                ))}
+                <Link
+                  href="/generators"
+                  className="px-4 py-2 rounded-full border border-[#7c5aff]/20 text-xs text-[#7c5aff]/60 hover:text-[#7c5aff] hover:border-[#7c5aff]/40 transition-all"
+                >
+                  +34 more generators →
+                </Link>
+              </div>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
-      {/* ================================================================
-          FINAL CTA — Cinematic close
-          ================================================================ */}
-      <section className="relative py-24 lg:py-32 border-t border-white/[0.06] overflow-hidden">
-        <div className="absolute inset-0">
-          <ParallaxLayer speed={0.35} className="absolute inset-0">
-            <div className="glow-orb w-[800px] h-[800px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-20" style={{ background: "radial-gradient(circle, rgba(124, 90, 255, 0.4), transparent 60%)" }} />
-          </ParallaxLayer>
+      {/* ═══════════════════════════════════════════════
+          SECTION 4 — PRICING (clean, minimal)
+          ═══════════════════════════════════════════════ */}
+      <section id="pricing" className="relative py-24 md:py-32 border-t border-white/[0.04]">
+        <div className="max-w-5xl mx-auto px-6 lg:px-8">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            variants={stagger}
+          >
+            <motion.div variants={fadeUp} className="text-center mb-14">
+              <h2 className="text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-4">
+                Simple pricing.
+              </h2>
+              <p className="text-base text-white/35">
+                No credits. No tokens. No usage traps. Start free, upgrade when ready.
+              </p>
+            </motion.div>
+
+            <motion.div variants={fadeUp} className="grid md:grid-cols-3 gap-4">
+              {/* Free */}
+              <div className="p-8 rounded-2xl border border-white/[0.06] bg-white/[0.02]">
+                <div className="text-sm text-white/40 mb-2">Free</div>
+                <div className="text-4xl font-extrabold mb-1">$0</div>
+                <div className="text-xs text-white/30 mb-6">Forever</div>
+                <ul className="space-y-3 mb-8">
+                  {["3 sites / month", "7-agent AI pipeline", "Opus-quality builds", "Free hosting"].map((f) => (
+                    <li key={f} className="flex items-start gap-2.5 text-sm text-white/45">
+                      <Check className="w-3.5 h-3.5 text-white/20 mt-0.5 shrink-0" /> {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/builder" className="block w-full py-3 text-center rounded-full border border-white/[0.1] text-sm font-semibold text-white/60 hover:text-white hover:border-white/[0.2] transition-all">
+                  Get Started
+                </Link>
+              </div>
+
+              {/* Pro — featured */}
+              <div className="relative p-8 rounded-2xl border border-[#7c5aff]/30 bg-[#7c5aff]/[0.04]">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-[#7c5aff] text-[11px] font-bold text-white">
+                  Most Popular
+                </div>
+                <div className="text-sm text-[#7c5aff]/70 mb-2">Pro</div>
+                <div className="text-4xl font-extrabold mb-1">$49<span className="text-lg font-normal text-white/30">/mo</span></div>
+                <div className="text-xs text-white/30 mb-6">Full arsenal</div>
+                <ul className="space-y-3 mb-8">
+                  {["Unlimited sites", "All 44 generators", "Custom domains", "GitHub & WP export", "Visual editor", "Multi-page sites"].map((f) => (
+                    <li key={f} className="flex items-start gap-2.5 text-sm text-white/50">
+                      <Check className="w-3.5 h-3.5 text-[#7c5aff]/60 mt-0.5 shrink-0" /> {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/auth/signup" className="block w-full py-3 text-center rounded-full bg-[#7c5aff] text-sm font-bold text-white hover:bg-[#6d3bff] transition-colors">
+                  Start Pro Trial
+                </Link>
+              </div>
+
+              {/* Agency */}
+              <div className="p-8 rounded-2xl border border-white/[0.06] bg-white/[0.02]">
+                <div className="text-sm text-white/40 mb-2">Agency</div>
+                <div className="text-4xl font-extrabold mb-1">$99<span className="text-lg font-normal text-white/30">/mo</span></div>
+                <div className="text-xs text-white/30 mb-6">White-label</div>
+                <ul className="space-y-3 mb-8">
+                  {["Everything in Pro", "White-label platform", "Client portal", "Bulk generation", "API access", "Priority support"].map((f) => (
+                    <li key={f} className="flex items-start gap-2.5 text-sm text-white/45">
+                      <Check className="w-3.5 h-3.5 text-white/20 mt-0.5 shrink-0" /> {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/auth/signup" className="block w-full py-3 text-center rounded-full border border-white/[0.1] text-sm font-semibold text-white/60 hover:text-white hover:border-white/[0.2] transition-all">
+                  Start Agency Trial
+                </Link>
+              </div>
+            </motion.div>
+
+            <motion.div variants={fadeUp} className="text-center mt-8">
+              <p className="text-xs text-white/25">
+                Need more? <a href="mailto:sales@zoobicon.com" className="text-white/40 underline underline-offset-4 hover:text-white/60 transition-colors">Contact sales</a> for Enterprise.
+              </p>
+            </motion.div>
+          </motion.div>
         </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════
+          SECTION 5 — FINAL CTA
+          ═══════════════════════════════════════════════ */}
+      <section className="relative py-32 md:py-40 border-t border-white/[0.04] overflow-hidden">
+        {/* Subtle gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#7c5aff]/[0.03] to-transparent pointer-events-none" />
+
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center relative z-10">
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
+            viewport={{ once: true, margin: "-80px" }}
+            variants={stagger}
           >
             <motion.h2
-              variants={fadeInUp}
-              className="font-display text-4xl md:text-6xl lg:text-8xl font-extrabold tracking-[-0.04em] mb-6 text-white"
+              variants={fadeUp}
+              className="text-4xl md:text-6xl lg:text-[5.5rem] font-extrabold tracking-[-0.05em] leading-[0.9] mb-6"
             >
-              Stop Dreaming.<br />
-              <span className="gradient-text-zoo">Start Building.</span>
+              Stop browsing.<br />
+              Start building.
             </motion.h2>
-            <motion.p
-              variants={fadeInUp}
-              className="max-w-2xl mx-auto text-lg text-white/50 mb-10"
-            >
-              Join thousands of creators, agencies, and entrepreneurs
-              who build production-ready websites in seconds, not weeks.
+            <motion.p variants={fadeUp} className="text-lg text-white/30 max-w-lg mx-auto mb-10">
+              Join creators, agencies, and entrepreneurs who ship
+              production-ready websites in minutes, not months.
             </motion.p>
-            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <motion.div variants={fadeUp}>
               <Link
                 href="/builder"
-                className="btn-zoo group inline-flex items-center gap-3 text-lg font-bold px-12 py-5 rounded-2xl"
+                className="group inline-flex items-center gap-3 px-10 py-5 rounded-full bg-white text-black text-lg font-bold hover:bg-white/90 transition-all hover:shadow-[0_0_60px_rgba(255,255,255,0.12)]"
               >
-                <span>Start Building Free</span>
+                Start Building Free
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </motion.div>
@@ -1522,75 +647,70 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-white/[0.06] py-16">
+      {/* ── FOOTER ── */}
+      <footer className="border-t border-white/[0.04] py-16">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid md:grid-cols-5 gap-8 mb-12">
-            {/* Brand */}
             <div className="md:col-span-2">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 rounded-lg bg-white/[0.08] border border-white/[0.10] flex items-center justify-center">
-                  <Zap className="w-4 h-4 text-white/70" />
-                </div>
-                <span className="text-lg font-bold font-display">Zoobicon</span>
-              </div>
-              <p className="text-sm text-white/50 max-w-xs leading-relaxed mb-6 tracking-wide">
-                The most advanced AI platform for building, marketing, and dominating the digital landscape.
+              <div className="text-lg font-bold mb-4">Zoobicon</div>
+              <p className="text-sm text-white/30 max-w-xs leading-relaxed mb-6">
+                The AI platform for building, launching, and scaling
+                websites and web applications.
               </p>
-              <div className="flex gap-3">
-                {DOMAINS.map((d) => (
-                  <span key={d.domain} className="text-xs text-white/60 bg-white/[0.06] px-2.5 py-1 rounded-full border border-white/[0.06]">
-                    {d.domain}
-                  </span>
+              <div className="flex gap-2">
+                {["zoobicon.com", "zoobicon.ai", "zoobicon.io", "zoobicon.sh"].map((d) => (
+                  <span key={d} className="text-[10px] text-white/20 bg-white/[0.04] px-2 py-1 rounded-full">{d}</span>
                 ))}
               </div>
             </div>
-
-            {/* Links */}
             <div>
-              <div className="text-xs font-semibold text-white/65 uppercase tracking-wider mb-4">Products</div>
-              <ul className="space-y-2.5">
-                <li><Link href="/products/website-builder" className="text-sm text-white/65 hover:text-white/60 transition-colors">Website Builder</Link></li>
-                <li><Link href="/products/seo-agent" className="text-sm text-white/65 hover:text-white/60 transition-colors">SEO Agent</Link></li>
-                <li><Link href="/products/video-creator" className="text-sm text-white/65 hover:text-white/60 transition-colors">Video Creator</Link></li>
-                <li><Link href="/products/email-support" className="text-sm text-white/65 hover:text-white/60 transition-colors">AI Email Support</Link></li>
-                <li><Link href="/domains" className="text-sm text-white/65 hover:text-white/60 transition-colors">Domains</Link></li>
-                <li><Link href="/marketplace" className="text-sm text-white/65 hover:text-white/60 transition-colors">Marketplace</Link></li>
-                <li><Link href="/generators" className="text-sm text-white/65 hover:text-white/60 transition-colors">32 Generators</Link></li>
-                <li><Link href="/crawl" className="text-sm text-white/65 hover:text-white/60 transition-colors">Competitor Crawler</Link></li>
+              <div className="text-[11px] font-semibold text-white/30 uppercase tracking-wider mb-4">Products</div>
+              <ul className="space-y-2">
+                {[
+                  ["/products/website-builder", "Website Builder"],
+                  ["/products/seo-agent", "SEO Agent"],
+                  ["/products/email-support", "Email Support"],
+                  ["/generators", "44 Generators"],
+                  ["/marketplace", "Marketplace"],
+                  ["/domains", "Domains"],
+                ].map(([href, label]) => (
+                  <li key={href}><Link href={href} className="text-sm text-white/25 hover:text-white/50 transition-colors">{label}</Link></li>
+                ))}
               </ul>
             </div>
             <div>
-              <div className="text-xs font-semibold text-white/65 uppercase tracking-wider mb-4">Platform</div>
-              <ul className="space-y-2.5">
-                <li><Link href="/developers" className="text-sm text-white/65 hover:text-white/60 transition-colors">API Docs</Link></li>
-                <li><Link href="/cli" className="text-sm text-white/65 hover:text-white/60 transition-colors">CLI Tools</Link></li>
-                <li><Link href="/developers#sdks" className="text-sm text-white/65 hover:text-white/60 transition-colors">SDKs</Link></li>
-                <li><Link href="/developers#endpoints" className="text-sm text-white/65 hover:text-white/60 transition-colors">API Reference</Link></li>
+              <div className="text-[11px] font-semibold text-white/30 uppercase tracking-wider mb-4">Platform</div>
+              <ul className="space-y-2">
+                {[
+                  ["/developers", "API Docs"],
+                  ["/cli", "CLI Tools"],
+                  ["/hosting", "Hosting"],
+                  ["/wordpress", "WordPress"],
+                ].map(([href, label]) => (
+                  <li key={href}><Link href={href} className="text-sm text-white/25 hover:text-white/50 transition-colors">{label}</Link></li>
+                ))}
               </ul>
             </div>
             <div>
-              <div className="text-xs font-semibold text-white/65 uppercase tracking-wider mb-4">For Teams</div>
-              <ul className="space-y-2.5">
-                <li><Link href="/agencies" className="text-sm text-white/65 hover:text-white/60 transition-colors">Agencies</Link></li>
-                <li><Link href="/agencies#white-label" className="text-sm text-white/65 hover:text-white/60 transition-colors">White Label</Link></li>
-                <li><Link href="/agencies/portal" className="text-sm text-white/65 hover:text-white/60 transition-colors">Client Portal</Link></li>
-                <li><Link href="/support" className="text-sm text-white/65 hover:text-white/60 transition-colors">AI Support</Link></li>
-                <li><Link href="/auth/signup" className="text-sm text-white/65 hover:text-white/60 transition-colors">Sign Up</Link></li>
+              <div className="text-[11px] font-semibold text-white/30 uppercase tracking-wider mb-4">Company</div>
+              <ul className="space-y-2">
+                {[
+                  ["/agencies", "For Agencies"],
+                  ["/support", "Support"],
+                  ["/pricing", "Pricing"],
+                  ["/privacy", "Privacy"],
+                  ["/terms", "Terms"],
+                ].map(([href, label]) => (
+                  <li key={href}><Link href={href} className="text-sm text-white/25 hover:text-white/50 transition-colors">{label}</Link></li>
+                ))}
               </ul>
             </div>
           </div>
-
-          <div className="section-divider mb-8" />
-
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="text-xs text-white/60">
-              &copy; 2026 Zoobicon. All rights reserved.
-            </div>
+          <div className="border-t border-white/[0.04] pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="text-xs text-white/20">&copy; 2026 Zoobicon. All rights reserved.</div>
             <div className="flex items-center gap-6">
-              <Link href="/privacy" className="text-xs text-white/60 hover:text-white/60 transition-colors">Privacy</Link>
-              <Link href="/terms" className="text-xs text-white/60 hover:text-white/60 transition-colors">Terms</Link>
-              <Link href="/privacy" className="text-xs text-white/60 hover:text-white/60 transition-colors">Cookies</Link>
+              <Link href="/privacy" className="text-xs text-white/20 hover:text-white/40 transition-colors">Privacy</Link>
+              <Link href="/terms" className="text-xs text-white/20 hover:text-white/40 transition-colors">Terms</Link>
             </div>
           </div>
         </div>
