@@ -58,27 +58,27 @@ function Counter({ end, suffix = "" }: { end: number; suffix?: string }) {
   return <span ref={ref}>{val.toLocaleString()}{suffix}</span>;
 }
 
-/* ─── hero showcase slides — real generated sites as cinematic backgrounds ─── */
+/* ─── hero showcase slides — cinematic backgrounds ─── */
 const HERO_SLIDES = [
   {
-    // Fintech dashboard — dark, data-rich
-    bg: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=2400&q=80",
+    // Liquid cooled gaming PC interior — neon pink/blue RGB pipes & components
+    bg: "https://images.pexels.com/photos/33644890/pexels-photo-33644890.jpeg?auto=compress&cs=tinysrgb&w=2400",
     badge: "AI Website Builder for the Modern Web",
     h1: ["Prompt.", "Preview.", "Publish."],
     accent: 2, // which word gets the brand color (0-indexed)
     sub: "7 AI agents collaborate in real-time to build production-ready websites, apps, and stores — from a single sentence.",
   },
   {
-    // Clean workspace with code
-    bg: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=2400&q=80",
+    // Laptop with code — developer workspace
+    bg: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=2400&q=80",
     badge: "From Idea to Live Site in 95 Seconds",
     h1: ["Describe.", "Generate.", "Launch."],
     accent: 2,
     sub: "Full-stack apps, e-commerce stores, multi-page sites — built by AI agents, deployed instantly to your custom domain.",
   },
   {
-    // Modern tech/product workspace
-    bg: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=2400&q=80",
+    // Colorful code syntax on dark screen — similar coding aesthetic
+    bg: "https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&w=2400&q=80",
     badge: "43 Specialized Generators. One Platform.",
     h1: ["Dream.", "Build.", "Ship."],
     accent: 2,
