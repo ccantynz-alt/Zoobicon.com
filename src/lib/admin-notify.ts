@@ -185,6 +185,103 @@ export async function notifyWaitlist(data: {
   });
 }
 
+/** Notify admin when a new support ticket arrives */
+export async function notifyNewTicket(data: {
+  ticketNumber: string;
+  subject: string;
+  from: string;
+  fromName?: string;
+  preview: string;
+}): Promise<boolean> {
+  const trimmedPreview =
+    data.preview.length > 300
+      ? data.preview.slice(0, 300) + "…"
+      : data.preview;
+
+  const rows = [
+    row("Ticket", `<strong>${data.ticketNumber}</strong>`),
+    row("From", data.fromName ? `${escapeHtml(data.fromName)} (${escapeHtml(data.from)})` : escapeHtml(data.from)),
+    row("Subject", escapeHtml(data.subject)),
+    row(
+      "Preview",
+      `<div style="background:rgba(255,255,255,0.05);padding:12px;border-radius:8px;margin-top:4px">${escapeHtml(trimmedPreview)}</div>`
+    ),
+  ];
+
+  return notifyAdmin({
+    subject: `[Support] ${data.ticketNumber}: ${data.subject}`,
+    html: wrap("New Support Ticket", table(rows.join(""))),
+    text: `New support ticket ${data.ticketNumber} from ${data.fromName || data.from}: ${data.subject}\n\n${trimmedPreview}`,
+  });
+}
+
+/** Notify admin when a ticket is escalated (AI can't resolve or urgent) */
+export async function notifyTicketEscalation(data: {
+  ticketNumber: string;
+  ticketId: string;
+  subject: string;
+  from: string;
+  fromName?: string;
+  reason: string;
+  priority: string;
+  category: string;
+  confidence: number;
+  aiDraft?: string;
+}): Promise<boolean> {
+  const priorityColors: Record<string, string> = {
+    urgent: "#ef4444",
+    high: "#f97316",
+    medium: "#eab308",
+    low: "#22c55e",
+  };
+  const color = priorityColors[data.priority] || "#eab308";
+
+  const rows = [
+    row("Ticket", `<strong>${data.ticketNumber}</strong>`),
+    row("From", data.fromName ? `${escapeHtml(data.fromName)} (${escapeHtml(data.from)})` : escapeHtml(data.from)),
+    row("Subject", escapeHtml(data.subject)),
+    row(
+      "Priority",
+      `<span style="background:${color};color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:700;text-transform:uppercase">${data.priority}</span>`
+    ),
+    row("Category", data.category),
+    row("AI Confidence", `${Math.round(data.confidence * 100)}%`),
+    row(
+      "Escalation Reason",
+      `<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);padding:10px;border-radius:8px;color:#fca5a5;margin-top:4px">${escapeHtml(data.reason)}</div>`
+    ),
+  ];
+
+  if (data.aiDraft) {
+    const trimmedDraft =
+      data.aiDraft.length > 400
+        ? data.aiDraft.slice(0, 400) + "…"
+        : data.aiDraft;
+    rows.push(
+      row(
+        "AI Draft",
+        `<div style="background:rgba(255,255,255,0.05);padding:12px;border-radius:8px;margin-top:4px;font-style:italic">${escapeHtml(trimmedDraft)}</div>`
+      )
+    );
+  }
+
+  const dashboardUrl =
+    process.env.NEXT_PUBLIC_APP_URL || "https://zoobicon.com";
+
+  rows.push(
+    row(
+      "Action",
+      `<a href="${dashboardUrl}/email-support" style="display:inline-block;background:#2563eb;color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:600;margin-top:4px">Review in Dashboard →</a>`
+    )
+  );
+
+  return notifyAdmin({
+    subject: `🚨 [ESCALATION] ${data.ticketNumber}: ${data.subject} (${data.priority})`,
+    html: wrap("⚠️ Ticket Escalated — Human Attention Required", table(rows.join(""))),
+    text: `ESCALATED: ${data.ticketNumber} — ${data.subject}\nFrom: ${data.fromName || data.from}\nPriority: ${data.priority}\nReason: ${data.reason}\nConfidence: ${Math.round(data.confidence * 100)}%\n\nReview at: ${dashboardUrl}/email-support`,
+  });
+}
+
 function escapeHtml(str: string): string {
   return str
     .replace(/&/g, "&amp;")
