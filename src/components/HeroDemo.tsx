@@ -85,104 +85,108 @@ nav{padding:12px 28px;display:flex;align-items:center;justify-content:space-betw
 </body></html>`,
   },
   {
-    prompt: "Create a luxury real estate platform with property listings, hero video placeholder, and dark elegant theme",
-    slug: "meridian-estates",
+    prompt: "Build a gourmet food delivery platform with product cards, cart, warm amber branding on white background",
+    slug: "savorly",
     html: `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Inter,system-ui,sans-serif;background:#08070c;color:#ede9e3;overflow:hidden}
-nav{padding:14px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.04);background:rgba(8,7,12,0.9);backdrop-filter:blur(20px)}
-.logo{font-size:16px;font-weight:300;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.85)}
-.logo b{font-weight:700;background:linear-gradient(135deg,#d4a574,#c49a6c);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.nav-links{display:flex;gap:28px;font-size:11px;color:rgba(255,255,255,0.35);letter-spacing:0.06em;font-weight:400}
-.nav-cta{background:transparent;border:1px solid rgba(212,165,116,0.3);color:#d4a574;padding:8px 20px;border-radius:2px;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer}
-.hero{position:relative;padding:48px 32px 36px;text-align:center}
-.hero::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 50% 30%,rgba(212,165,116,0.06),transparent 60%);pointer-events:none}
-.hero-tag{display:inline-block;font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:rgba(212,165,116,0.7);margin-bottom:16px;font-weight:500}
-.hero h1{font-size:42px;font-weight:200;line-height:1.1;margin-bottom:12px;letter-spacing:-0.02em}
-.hero h1 em{font-style:italic;font-weight:300;color:rgba(255,255,255,0.5)}
-.hero p{font-size:13px;color:rgba(255,255,255,0.35);max-width:360px;margin:0 auto 22px;line-height:1.65;font-weight:300}
-.hero-btns{display:flex;gap:12px;justify-content:center}
-.btn-gold{background:linear-gradient(135deg,#d4a574,#b8956a);border:none;color:#0a0908;padding:11px 28px;border-radius:2px;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer}
-.btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);padding:11px 28px;border-radius:2px;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;font-weight:400}
-.listings{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:10px 32px 20px}
-.listing{border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02)}
-.listing-img{height:100px;position:relative}
-.listing-img::after{content:'';position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(transparent,rgba(8,7,12,0.8))}
-.listing-body{padding:12px}
-.listing-price{font-size:16px;font-weight:700;color:#d4a574;margin-bottom:2px;letter-spacing:-0.01em}
-.listing-addr{font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:8px;font-weight:400}
-.listing-meta{display:flex;gap:12px;font-size:9px;color:rgba(255,255,255,0.25);letter-spacing:0.04em}
-.listing-meta span{display:flex;align-items:center;gap:3px}
-.stats-bar{display:flex;justify-content:center;gap:40px;padding:16px 32px;border-top:1px solid rgba(255,255,255,0.04)}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+body{font-family:Inter,system-ui,sans-serif;background:#FFFAF5;color:#1a1a1a;overflow:hidden}
+nav{padding:12px 28px;display:flex;align-items:center;justify-content:space-between;background:#fff;border-bottom:1px solid #f0e6d9;box-shadow:0 1px 8px rgba(180,120,60,0.06)}
+.logo{display:flex;align-items:center;gap:8px}
+.logo-mark{width:30px;height:30px;background:linear-gradient(135deg,#F59E0B,#D97706);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff;box-shadow:0 2px 12px rgba(245,158,11,0.3)}
+.logo span{font-weight:800;font-size:16px;letter-spacing:-0.02em;color:#92400E}
+.nav-r{display:flex;align-items:center;gap:14px}
+.nav-pill{font-size:11px;color:#78716C;font-weight:500}
+.nav-cart{background:#FEF3C7;border:1px solid #FDE68A;color:#92400E;padding:6px 14px;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px}
+.nav-cta{background:linear-gradient(135deg,#F59E0B,#D97706);border:none;color:#fff;padding:8px 18px;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(245,158,11,0.25)}
+.hero{text-align:center;padding:28px 28px 20px;position:relative;background:linear-gradient(180deg,#FFFAF5,#FFF7ED)}
+.hero-tag{display:inline-flex;align-items:center;gap:5px;background:#FEF3C7;border:1px solid #FDE68A;color:#92400E;font-size:10px;font-weight:700;padding:5px 14px;border-radius:100px;margin-bottom:12px;letter-spacing:0.03em}
+.hero h1{font-size:34px;font-weight:900;line-height:1.1;margin-bottom:8px;letter-spacing:-0.03em;color:#1C1917}
+.hero h1 .warm{background:linear-gradient(135deg,#F59E0B,#DC2626);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:#78716C;font-size:13px;max-width:380px;margin:0 auto 16px;line-height:1.6}
+.hero-btns{display:flex;gap:10px;justify-content:center}
+.btn-warm{background:linear-gradient(135deg,#F59E0B,#D97706);border:none;color:#fff;padding:11px 26px;border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(245,158,11,0.3)}
+.btn-outline{background:#fff;border:2px solid #F59E0B;color:#92400E;padding:10px 26px;border-radius:12px;font-size:12px;font-weight:600;cursor:pointer}
+.products{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:10px 28px 16px}
+.product{background:#fff;border-radius:14px;overflow:hidden;border:1px solid #F5F0EB;box-shadow:0 2px 12px rgba(0,0,0,0.04)}
+.product-img{height:90px;position:relative}
+.product-badge{position:absolute;top:8px;left:8px;background:#DC2626;color:#fff;font-size:8px;font-weight:800;padding:3px 8px;border-radius:6px;letter-spacing:0.04em}
+.product-body{padding:12px}
+.product-name{font-size:12px;font-weight:700;color:#1C1917;margin-bottom:2px}
+.product-desc{font-size:9px;color:#A8A29E;margin-bottom:8px;line-height:1.4}
+.product-row{display:flex;align-items:center;justify-content:space-between}
+.product-price{font-size:16px;font-weight:800;color:#D97706}
+.product-btn{background:#FEF3C7;border:1px solid #FDE68A;color:#92400E;font-size:9px;font-weight:700;padding:5px 12px;border-radius:8px;cursor:pointer}
+.stats{display:flex;justify-content:center;gap:32px;padding:14px 28px;background:#fff;border-top:1px solid #F5F0EB}
 .stat{text-align:center}
-.stat-val{font-size:20px;font-weight:700;color:rgba(255,255,255,0.85);letter-spacing:-0.02em}
-.stat-lbl{font-size:8px;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.12em;margin-top:2px;font-weight:500}
+.stat-val{font-size:18px;font-weight:800;color:#D97706;letter-spacing:-0.02em}
+.stat-lbl{font-size:8px;color:#A8A29E;text-transform:uppercase;letter-spacing:0.1em;margin-top:1px;font-weight:600}
 </style></head><body>
-<nav><div class="logo"><b>Meridian</b> Estates</div><div class="nav-links"><span>Properties</span><span>Services</span><span>About</span><span>Contact</span></div><button class="nav-cta">Schedule Tour</button></nav>
-<div class="hero"><div class="hero-tag">Exceptional Properties Worldwide</div><h1>Where Luxury<br>Meets <em>Legacy</em></h1><p>Discover curated properties in the world's most prestigious locations. White-glove service from first viewing to final key.</p><div class="hero-btns"><button class="btn-gold">View Collection</button><button class="btn-ghost">Private Consultation</button></div></div>
-<div class="listings">
-<div class="listing"><div class="listing-img" style="background:linear-gradient(135deg,#1a1520,#2a1f35)"></div><div class="listing-body"><div class="listing-price">$12.8M</div><div class="listing-addr">Bel Air, Los Angeles</div><div class="listing-meta"><span>6 Beds</span><span>8 Baths</span><span>12,400 sqft</span></div></div></div>
-<div class="listing"><div class="listing-img" style="background:linear-gradient(135deg,#15181f,#1a2a3a)"></div><div class="listing-body"><div class="listing-price">$8.2M</div><div class="listing-addr">Upper East Side, NYC</div><div class="listing-meta"><span>4 Beds</span><span>5 Baths</span><span>6,800 sqft</span></div></div></div>
-<div class="listing"><div class="listing-img" style="background:linear-gradient(135deg,#1a1815,#2a2418)"></div><div class="listing-body"><div class="listing-price">$15.5M</div><div class="listing-addr">Mayfair, London</div><div class="listing-meta"><span>7 Beds</span><span>9 Baths</span><span>14,200 sqft</span></div></div></div>
+<nav><div class="logo"><div class="logo-mark">S</div><span>Savorly</span></div><div class="nav-r"><span class="nav-pill">Menu</span><span class="nav-pill">About</span><span class="nav-pill">Catering</span><div class="nav-cart">&#128722; 3 items</div><button class="nav-cta">Order Now</button></div></nav>
+<div class="hero"><div class="hero-tag">&#127860; Free delivery on orders over $40</div><h1>Gourmet Meals<br><span class="warm">Delivered Fresh</span></h1><p>Chef-crafted dishes made with locally sourced ingredients. From our kitchen to your door in under 30 minutes.</p><div class="hero-btns"><button class="btn-warm">Browse Menu</button><button class="btn-outline">Gift Cards</button></div></div>
+<div class="products">
+<div class="product"><div class="product-img" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A)"><span class="product-badge">BESTSELLER</span></div><div class="product-body"><div class="product-name">Truffle Wagyu Burger</div><div class="product-desc">A5 wagyu patty, truffle aioli, aged gruyere, brioche bun</div><div class="product-row"><span class="product-price">$28</span><button class="product-btn">Add to Cart</button></div></div></div>
+<div class="product"><div class="product-img" style="background:linear-gradient(135deg,#DCFCE7,#BBF7D0)"><span class="product-badge" style="background:#16A34A">NEW</span></div><div class="product-body"><div class="product-name">Miso Glazed Salmon</div><div class="product-desc">Wild-caught salmon, white miso, pickled ginger, jasmine rice</div><div class="product-row"><span class="product-price">$34</span><button class="product-btn">Add to Cart</button></div></div></div>
+<div class="product"><div class="product-img" style="background:linear-gradient(135deg,#FEE2E2,#FECACA)"></div><div class="product-body"><div class="product-name">Berry Panna Cotta</div><div class="product-desc">Vanilla bean panna cotta, mixed berry compote, mint</div><div class="product-row"><span class="product-price">$16</span><button class="product-btn">Add to Cart</button></div></div></div>
 </div>
-<div class="stats-bar"><div class="stat"><div class="stat-val">$4.8B+</div><div class="stat-lbl">Properties Sold</div></div><div class="stat"><div class="stat-val">12,000+</div><div class="stat-lbl">Listings</div></div><div class="stat"><div class="stat-val">48</div><div class="stat-lbl">Countries</div></div><div class="stat"><div class="stat-val">99%</div><div class="stat-lbl">Client Satisfaction</div></div></div>
+<div class="stats"><div class="stat"><div class="stat-val">4.9 &#9733;</div><div class="stat-lbl">Rating</div></div><div class="stat"><div class="stat-val">12K+</div><div class="stat-lbl">Orders/mo</div></div><div class="stat"><div class="stat-val">28 min</div><div class="stat-lbl">Avg Delivery</div></div><div class="stat"><div class="stat-val">100%</div><div class="stat-lbl">Fresh Guarantee</div></div></div>
 </body></html>`,
   },
   {
-    prompt: "Design a fitness app landing page with neon gradients, workout tracking features, and social proof",
-    slug: "pulsefit",
+    prompt: "Create a project management SaaS dashboard with team analytics, red accent theme on clean white background",
+    slug: "launchpad-io",
     html: `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Inter,system-ui,sans-serif;background:#0a0a0f;color:#eeeef2;overflow:hidden}
-nav{padding:12px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.05);background:rgba(10,10,15,0.9);backdrop-filter:blur(16px)}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+body{font-family:Inter,system-ui,sans-serif;background:#FAFAFA;color:#18181B;overflow:hidden}
+nav{padding:12px 28px;display:flex;align-items:center;justify-content:space-between;background:#fff;border-bottom:1px solid #F1F1F4;box-shadow:0 1px 4px rgba(0,0,0,0.03)}
 .logo{display:flex;align-items:center;gap:8px}
-.logo-icon{width:28px;height:28px;border-radius:10px;background:linear-gradient(135deg,#f43f5e,#ec4899);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;color:#fff;box-shadow:0 0 20px rgba(244,63,94,0.3)}
-.logo span{font-weight:800;font-size:15px;letter-spacing:-0.02em}
-.nav-r{display:flex;align-items:center;gap:16px}
-.nav-link{font-size:11px;color:rgba(255,255,255,0.4);font-weight:500}
-.nav-cta{background:linear-gradient(135deg,#f43f5e,#ec4899);border:none;color:#fff;padding:8px 20px;border-radius:10px;font-size:11px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(244,63,94,0.25)}
-.hero{text-align:center;padding:40px 28px 28px;position:relative}
-.hero::before{content:'';position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(244,63,94,0.08),rgba(168,85,247,0.04),transparent 70%);pointer-events:none}
-.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.15);color:#fb7185;font-size:10px;font-weight:600;padding:5px 14px;border-radius:100px;margin-bottom:14px}
-.hero-badge .dot{width:6px;height:6px;border-radius:50%;background:#f43f5e;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(244,63,94,0.4)}50%{opacity:0.8;box-shadow:0 0 0 6px rgba(244,63,94,0)}}
-.hero h1{font-size:38px;font-weight:900;line-height:1.05;margin-bottom:10px;letter-spacing:-0.03em}
-.hero h1 .gradient{background:linear-gradient(135deg,#f43f5e,#a855f7,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hero p{color:rgba(255,255,255,0.4);font-size:13px;max-width:380px;margin:0 auto 20px;line-height:1.6}
-.hero-btns{display:flex;gap:10px;justify-content:center}
-.btn-fire{background:linear-gradient(135deg,#f43f5e,#ec4899);border:none;color:#fff;padding:12px 28px;border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 4px 24px rgba(244,63,94,0.3),inset 0 1px 0 rgba(255,255,255,0.2)}
-.btn-outline{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);padding:12px 28px;border-radius:12px;font-size:12px;font-weight:500;cursor:pointer;backdrop-filter:blur(8px)}
-.features{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:6px 28px 16px;max-width:560px;margin:0 auto}
-.feat{background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:18px 14px;text-align:center;position:relative;overflow:hidden}
-.feat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
-.feat:nth-child(1)::before{background:linear-gradient(90deg,transparent,#f43f5e,transparent)}
-.feat:nth-child(2)::before{background:linear-gradient(90deg,transparent,#a855f7,transparent)}
-.feat:nth-child(3)::before{background:linear-gradient(90deg,transparent,#6366f1,transparent)}
-.feat-icon{width:36px;height:36px;border-radius:10px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:16px}
-.feat h3{font-size:12px;font-weight:700;margin-bottom:4px;letter-spacing:-0.01em}
-.feat p{font-size:10px;color:rgba(255,255,255,0.35);line-height:1.5}
-.social{display:flex;justify-content:center;align-items:center;gap:20px;padding:16px 28px;border-top:1px solid rgba(255,255,255,0.04)}
-.avatars{display:flex}
-.avatar{width:24px;height:24px;border-radius:50%;border:2px solid #0a0a0f;margin-left:-6px}
-.avatar:first-child{margin-left:0}
-.social-text{font-size:11px;color:rgba(255,255,255,0.4)}
-.social-text b{color:rgba(255,255,255,0.7)}
-.stores{display:flex;gap:8px;padding:6px 28px 16px;justify-content:center}
-.store-btn{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:8px 16px;display:flex;align-items:center;gap:8px;cursor:pointer}
-.store-btn .icon{font-size:16px}
-.store-btn .text{text-align:left}
-.store-btn .text small{display:block;font-size:8px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.06em}
-.store-btn .text span{display:block;font-size:11px;font-weight:600;color:rgba(255,255,255,0.8)}
+.logo-mark{width:28px;height:28px;background:linear-gradient(135deg,#DC2626,#B91C1C);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:#fff;box-shadow:0 2px 10px rgba(220,38,38,0.25)}
+.logo span{font-weight:800;font-size:15px;letter-spacing:-0.02em;color:#18181B}
+.nav-r{display:flex;align-items:center;gap:14px}
+.nav-pill{font-size:11px;color:#71717A;font-weight:500}
+.nav-avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#DC2626,#F59E0B);border:2px solid #fff;box-shadow:0 0 0 1px #E4E4E7}
+.nav-cta{background:#DC2626;border:none;color:#fff;padding:7px 16px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(220,38,38,0.2)}
+.dash{padding:20px 28px 14px}
+.dash-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.dash-header h1{font-size:22px;font-weight:800;letter-spacing:-0.02em}
+.dash-header .date{font-size:11px;color:#A1A1AA;font-weight:500}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.m-card{background:#fff;border-radius:12px;padding:14px;border:1px solid #F1F1F4;box-shadow:0 1px 3px rgba(0,0,0,0.02)}
+.m-label{font-size:9px;color:#A1A1AA;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:4px}
+.m-val{font-size:22px;font-weight:800;letter-spacing:-0.02em}
+.m-val.red{color:#DC2626}
+.m-val.green{color:#16A34A}
+.m-val.blue{color:#2563EB}
+.m-val.amber{color:#D97706}
+.m-change{font-size:9px;font-weight:600;margin-top:2px}
+.m-change.up{color:#16A34A}
+.m-change.down{color:#DC2626}
+.panels{display:grid;grid-template-columns:1.6fr 1fr;gap:10px}
+.panel{background:#fff;border-radius:12px;padding:14px;border:1px solid #F1F1F4}
+.panel-title{font-size:11px;font-weight:700;color:#18181B;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.panel-title .badge{background:#FEE2E2;color:#DC2626;font-size:8px;font-weight:700;padding:3px 8px;border-radius:6px}
+.task{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #FAFAFA}
+.task:last-child{border-bottom:none}
+.task-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.task-name{font-size:10px;font-weight:600;color:#3F3F46;flex:1}
+.task-status{font-size:8px;font-weight:700;padding:2px 8px;border-radius:6px}
+.task-status.done{background:#DCFCE7;color:#16A34A}
+.task-status.prog{background:#FEF3C7;color:#D97706}
+.task-status.todo{background:#F1F1F4;color:#71717A}
+.member{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #FAFAFA}
+.member:last-child{border-bottom:none}
+.member-av{width:24px;height:24px;border-radius:50%;flex-shrink:0}
+.member-info{flex:1}
+.member-name{font-size:10px;font-weight:700;color:#18181B}
+.member-role{font-size:8px;color:#A1A1AA}
+.member-tasks{font-size:9px;font-weight:700;color:#DC2626}
 </style></head><body>
-<nav><div class="logo"><div class="logo-icon">P</div><span>PulseFit</span></div><div class="nav-r"><span class="nav-link">Features</span><span class="nav-link">Pricing</span><span class="nav-link">Athletes</span><button class="nav-cta">Download App</button></div></nav>
-<div class="hero"><div class="hero-badge"><span class="dot"></span>500K+ Active Athletes</div><h1>Train Smarter.<br><span class="gradient">Perform Better.</span></h1><p>AI-powered workout plans, real-time form analysis, and community challenges that push your limits.</p><div class="hero-btns"><button class="btn-fire">Start Free Trial</button><button class="btn-outline">Watch Demo</button></div></div>
-<div class="features">
-<div class="feat"><div class="feat-icon" style="background:linear-gradient(135deg,rgba(244,63,94,0.15),rgba(236,72,153,0.1));color:#fb7185">&#9829;</div><h3>AI Coach</h3><p>Personalized workout plans that adapt to your progress and recovery.</p></div>
-<div class="feat"><div class="feat-icon" style="background:linear-gradient(135deg,rgba(168,85,247,0.15),rgba(139,92,246,0.1));color:#c084fc">&#9734;</div><h3>Form Analysis</h3><p>Real-time camera tracking ensures perfect technique on every rep.</p></div>
-<div class="feat"><div class="feat-icon" style="background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(79,70,229,0.1));color:#818cf8">&#9775;</div><h3>Social Challenges</h3><p>Compete with friends, join global events, earn achievement badges.</p></div>
-</div>
-<div class="social"><div class="avatars"><div class="avatar" style="background:linear-gradient(135deg,#f43f5e,#ec4899)"></div><div class="avatar" style="background:linear-gradient(135deg,#a855f7,#6366f1)"></div><div class="avatar" style="background:linear-gradient(135deg,#22d3ee,#3b82f6)"></div><div class="avatar" style="background:linear-gradient(135deg,#f59e0b,#ef4444)"></div><div class="avatar" style="background:linear-gradient(135deg,#10b981,#059669)"></div></div><div class="social-text"><b>500,000+</b> athletes training with PulseFit</div></div>
-<div class="stores"><div class="store-btn"><div class="icon">&#61514;</div><div class="text"><small>Download on the</small><span>App Store</span></div></div><div class="store-btn"><div class="icon">&#9654;</div><div class="text"><small>Get it on</small><span>Google Play</span></div></div></div>
+<nav><div class="logo"><div class="logo-mark">L</div><span>Launchpad</span></div><div class="nav-r"><span class="nav-pill">Projects</span><span class="nav-pill">Timeline</span><span class="nav-pill">Reports</span><button class="nav-cta">+ New Project</button><div class="nav-avatar"></div></div></nav>
+<div class="dash"><div class="dash-header"><h1>Sprint Dashboard</h1><div class="date">March 2026 &bull; Sprint 14</div></div>
+<div class="metrics"><div class="m-card"><div class="m-label">Active Tasks</div><div class="m-val red">47</div><div class="m-change up">&#9650; 12% vs last sprint</div></div><div class="m-card"><div class="m-label">Completed</div><div class="m-val green">128</div><div class="m-change up">&#9650; 24% this week</div></div><div class="m-card"><div class="m-label">Team Velocity</div><div class="m-val blue">94</div><div class="m-change up">&#9650; 8 pts improvement</div></div><div class="m-card"><div class="m-label">On-time Rate</div><div class="m-val amber">96%</div><div class="m-change up">&#9650; Best quarter yet</div></div></div>
+<div class="panels"><div class="panel"><div class="panel-title">Current Sprint Tasks <span class="badge">5 due today</span></div><div class="task"><div class="task-dot" style="background:#DC2626"></div><div class="task-name">API authentication refactor</div><span class="task-status prog">In Progress</span></div><div class="task"><div class="task-dot" style="background:#16A34A"></div><div class="task-name">User dashboard redesign</div><span class="task-status done">Complete</span></div><div class="task"><div class="task-dot" style="background:#D97706"></div><div class="task-name">Payment webhook integration</div><span class="task-status prog">In Progress</span></div><div class="task"><div class="task-dot" style="background:#2563EB"></div><div class="task-name">Mobile responsive overhaul</div><span class="task-status todo">To Do</span></div><div class="task"><div class="task-dot" style="background:#16A34A"></div><div class="task-name">E2E test coverage expansion</div><span class="task-status done">Complete</span></div></div>
+<div class="panel"><div class="panel-title">Team</div><div class="member"><div class="member-av" style="background:linear-gradient(135deg,#DC2626,#F59E0B)"></div><div class="member-info"><div class="member-name">Sarah Chen</div><div class="member-role">Lead Engineer</div></div><div class="member-tasks">12 tasks</div></div><div class="member"><div class="member-av" style="background:linear-gradient(135deg,#2563EB,#7C3AED)"></div><div class="member-info"><div class="member-name">Marcus Reid</div><div class="member-role">Full Stack Dev</div></div><div class="member-tasks">9 tasks</div></div><div class="member"><div class="member-av" style="background:linear-gradient(135deg,#16A34A,#2DD4BF)"></div><div class="member-info"><div class="member-name">Aiko Tanaka</div><div class="member-role">UI Designer</div></div><div class="member-tasks">7 tasks</div></div><div class="member"><div class="member-av" style="background:linear-gradient(135deg,#F59E0B,#EF4444)"></div><div class="member-info"><div class="member-name">James Park</div><div class="member-role">Backend Dev</div></div><div class="member-tasks">11 tasks</div></div></div></div></div>
 </body></html>`,
   },
 ];
