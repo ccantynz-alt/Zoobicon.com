@@ -426,6 +426,9 @@ function BuilderPage() {
   const [showTour, setShowTour] = useState(false);
   const [showBuildSuccess, setShowBuildSuccess] = useState(false);
 
+  // Recording mode — ?record=1 hides all chrome for clean screen captures
+  const [recordingMode, setRecordingMode] = useState(false);
+
   // Agency white-label branding (loaded from user's agency membership)
   const [agencyBrand, setAgencyBrand] = useState<{ agencyName: string; primaryColor: string; secondaryColor: string; logoUrl?: string } | null>(null);
   const [agencyId, setAgencyId] = useState<string | null>(null);
@@ -449,6 +452,10 @@ function BuilderPage() {
       const def = getGeneratorDef(generatorId);
       setPrompt(def.prompt);
       setGeneratorBanner({ id: generatorId, name: def.name });
+    }
+    // Recording mode detection
+    if (searchParams.get("record") === "1") {
+      setRecordingMode(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
@@ -655,10 +662,14 @@ function BuilderPage() {
         e.preventDefault();
         handleRedo();
       }
+      // Escape exits recording mode
+      if (e.key === "Escape" && recordingMode) {
+        setRecordingMode(false);
+      }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [handleUndo, handleRedo]);
+  }, [handleUndo, handleRedo, recordingMode]);
 
   // Auto-replace picsum placeholder images with contextually relevant ones
   // Paid users get AI-generated images (DALL-E/Stability), free users get Unsplash
@@ -1432,6 +1443,73 @@ function BuilderPage() {
   };
 
   const activeToolLabel = TOOLS.find((t) => t.id === activeTool)?.label ?? "";
+
+  /* ─── Recording Mode: fullscreen preview only ─── */
+  if (recordingMode) {
+    return (
+      <div className="h-screen w-screen bg-[#050508] relative overflow-hidden">
+        {/* Minimal recording chrome — press Escape to exit */}
+        <div className="absolute top-3 right-3 z-50 flex items-center gap-2">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/20 border border-red-500/40 text-red-400 text-xs font-semibold animate-pulse">
+            <span className="w-2 h-2 rounded-full bg-red-500" />
+            REC
+          </div>
+          <button
+            onClick={() => setRecordingMode(false)}
+            className="px-3 py-1.5 rounded-full bg-white/10 text-white/60 text-xs hover:bg-white/20 transition-colors"
+          >
+            Exit (Esc)
+          </button>
+        </div>
+
+        {/* Pipeline status overlay — shows during generation */}
+        {status === "generating" && pipelineAgents.length > 0 && (
+          <div className="absolute bottom-6 left-6 right-6 z-40">
+            <div className="max-w-xl mx-auto px-5 py-3 rounded-2xl bg-black/60 backdrop-blur-xl border border-white/[0.08]">
+              <div className="flex items-center gap-3">
+                <div className="w-2.5 h-2.5 rounded-full bg-violet-500 animate-pulse" />
+                <span className="text-sm text-white/80 font-medium">
+                  {pipelineAgents[pipelineAgents.length - 1]}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Fullscreen preview */}
+        <PreviewPanel
+          html={generatedCode}
+          isGenerating={status === "generating"}
+          visualEditMode={false}
+          onElementSelected={() => {}}
+        />
+
+        {/* Prompt input overlay at bottom — for recording demo sequences */}
+        {!hasCode && (
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-40 w-full max-w-2xl px-6">
+            <div className="flex items-center gap-3 px-5 py-4 rounded-2xl bg-black/70 backdrop-blur-xl border border-white/[0.1] shadow-2xl">
+              <Sparkles className="w-5 h-5 text-violet-400 flex-shrink-0" />
+              <input
+                type="text"
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter" && prompt.trim()) handleGenerate(); }}
+                placeholder="Describe the website you want to build..."
+                className="flex-1 bg-transparent text-white text-base placeholder-white/30 outline-none"
+              />
+              <button
+                onClick={handleGenerate}
+                disabled={!prompt.trim() || status === "generating"}
+                className="px-5 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 text-white text-sm font-semibold hover:from-violet-500 hover:to-purple-500 disabled:opacity-40 transition-all"
+              >
+                {status === "generating" ? "Building..." : "Generate"}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-screen bg-[#050508] relative overflow-hidden">
