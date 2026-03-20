@@ -61,8 +61,8 @@ function Counter({ end, suffix = "" }: { end: number; suffix?: string }) {
 /* ─── hero showcase slides — cinematic backgrounds ─── */
 const HERO_SLIDES = [
   {
-    // Liquid cooled gaming PC interior — neon pink/blue RGB pipes & components
-    bg: "https://images.pexels.com/photos/33644890/pexels-photo-33644890.jpeg?auto=compress&cs=tinysrgb&w=2400",
+    // Illuminated PC tower interior — neon LED strips, RGB fans, glowing components
+    bg: "https://images.pexels.com/photos/10684919/pexels-photo-10684919.jpeg?auto=compress&cs=tinysrgb&w=2400",
     badge: "AI Website Builder for the Modern Web",
     h1: ["Prompt.", "Preview.", "Publish."],
     accent: 2, // which word gets the brand color (0-indexed)
@@ -77,8 +77,8 @@ const HERO_SLIDES = [
     sub: "Full-stack apps, e-commerce stores, multi-page sites — built by AI agents, deployed instantly to your custom domain.",
   },
   {
-    // Colorful code syntax on dark screen — similar coding aesthetic
-    bg: "https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&w=2400&q=80",
+    // Vibrant RGB gaming PC with illuminated fans — futuristic neon glow
+    bg: "https://images.pexels.com/photos/34301930/pexels-photo-34301930.jpeg?auto=compress&cs=tinysrgb&w=2400",
     badge: "43 Specialized Generators. One Platform.",
     h1: ["Dream.", "Build.", "Ship."],
     accent: 2,
@@ -375,10 +375,14 @@ export default function LandingPage() {
 
       {/* ═══════════════════════════════════════════════
           SECTION 1.5 — LIVE DEMO (the proof)
-          "Watch 7 agents build a site in real-time"
+          Bold light section that breaks from the dark theme
           ═══════════════════════════════════════════════ */}
-      <section id="demo" className="relative py-24 md:py-32">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <section id="demo" className="relative py-24 md:py-32 bg-gradient-to-b from-[#FFF8F0] via-white to-[#FFF5EB] overflow-hidden">
+        {/* Warm accent decorations */}
+        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-gradient-to-br from-amber-400/20 via-orange-300/10 to-transparent rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-gradient-to-tl from-rose-400/15 via-red-300/10 to-transparent rounded-full blur-3xl translate-x-1/3 translate-y-1/3 pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -386,20 +390,31 @@ export default function LandingPage() {
             variants={stagger}
           >
             <motion.div variants={fadeUp} className="text-center mb-14">
-              <h2 className="text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-4">
-                Watch the magic happen.
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[12px] font-semibold text-amber-700 bg-amber-100 border border-amber-200 mb-6">
+                Live Builder Preview
+              </span>
+              <h2 className="text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-4 text-gray-900">
+                Watch it build in{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500">
+                  real-time.
+                </span>
               </h2>
-              <p className="text-base md:text-lg text-white/35 max-w-xl mx-auto">
-                Type a prompt. Watch 7 AI agents build your site in real-time.
-                This is a live demo — try it yourself.
+              <p className="text-base md:text-lg text-gray-500 max-w-xl mx-auto">
+                Type a prompt. Watch 7 AI agents collaborate to build your site.
+                Full-stack apps, e-commerce stores, dashboards — in seconds.
               </p>
             </motion.div>
             <motion.div variants={fadeUp} className="relative max-w-5xl mx-auto">
-              <div className="absolute -inset-20 bg-[#7c5aff]/[0.04] rounded-[40px] blur-3xl pointer-events-none" />
-              <HeroDemo />
+              <div className="absolute -inset-8 bg-gradient-to-br from-amber-400/10 via-orange-300/5 to-rose-400/10 rounded-[32px] blur-2xl pointer-events-none" />
+              <div className="relative rounded-2xl shadow-2xl shadow-orange-900/10 ring-1 ring-black/5">
+                <HeroDemo />
+              </div>
             </motion.div>
           </motion.div>
         </div>
+
+        {/* Transition gradient back to dark */}
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-b from-transparent to-[#050505]" />
       </section>
 
       {/* ═══════════════════════════════════════════════
