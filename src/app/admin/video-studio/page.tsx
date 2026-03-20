@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, lazy, Suspense } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+
+const VideoPlayer = lazy(() => import("@/components/VideoPlayer"));
 import {
   ArrowLeft,
   Video,
@@ -160,6 +162,9 @@ export default function VideoStudioPage() {
   const [copied, setCopied] = useState<string | null>(null);
   const [activeShot, setActiveShot] = useState(0);
   const [editingShot, setEditingShot] = useState<number | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
+  const [isGeneratingClips, setIsGeneratingClips] = useState(false);
+  const [clipStatuses, setClipStatuses] = useState<Record<number, { status: string; videoUrl?: string; generationId?: string }>>({});
 
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -247,6 +252,75 @@ export default function VideoStudioPage() {
       const text = await res.text();
       const blob = new Blob([text], { type: "text/plain" });
       downloadBlob(blob, `${script.title || "video"}.${format}`);
+    }
+  };
+
+  /* ─── generate AI video clips ─── */
+  const handleGenerateClips = async () => {
+    if (!script?.shots?.length) return;
+    setIsGeneratingClips(true);
+    setError("");
+
+    try {
+      const res = await fetch("/api/video/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          shots: script.shots,
+          aspectRatio: script.aspectRatio || "9:16",
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.status === "not_configured") {
+        setError("Luma API not configured — add LUMA_API_KEY to .env.local for AI video clips");
+        setIsGeneratingClips(false);
+        return;
+      }
+
+      if (data.results) {
+        const statuses: Record<number, { status: string; generationId?: string }> = {};
+        for (const r of data.results) {
+          statuses[r.shotNumber] = { status: r.status, generationId: r.generationId };
+        }
+        setClipStatuses(statuses);
+
+        // Poll for completion
+        pollClipStatuses(data.results.filter((r: { generationId?: string }) => r.generationId));
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Clip generation failed");
+    } finally {
+      setIsGeneratingClips(false);
+    }
+  };
+
+  const pollClipStatuses = async (generations: { shotNumber: number; generationId: string }[]) => {
+    const pending = new Set(generations.map(g => g.generationId));
+    const shotMap = new Map(generations.map(g => [g.generationId, g.shotNumber]));
+
+    for (let attempt = 0; attempt < 60 && pending.size > 0; attempt++) {
+      await new Promise(r => setTimeout(r, 5000));
+
+      for (const genId of Array.from(pending)) {
+        try {
+          const res = await fetch(`/api/video/generate?id=${genId}`);
+          const data = await res.json();
+          const shotNum = shotMap.get(genId)!;
+
+          setClipStatuses(prev => ({
+            ...prev,
+            [shotNum]: { status: data.status, videoUrl: data.videoUrl, generationId: genId },
+          }));
+
+          if (data.status === "completed" || data.status === "failed") {
+            pending.delete(genId);
+          }
+        } catch {
+          // Continue polling on network errors
+        }
+      }
     }
   };
 
@@ -803,6 +877,84 @@ export default function VideoStudioPage() {
                         <span className="ml-auto text-[9px] text-white/20">Clipboard</span>
                       </button>
                     </div>
+                  </div>
+
+                  {/* Video preview */}
+                  <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="text-[10px] uppercase tracking-wider text-white/30 font-bold flex items-center gap-1.5">
+                        <Play className="w-3 h-3" />
+                        Video Preview
+                      </h4>
+                      <button
+                        onClick={() => setShowPreview(!showPreview)}
+                        className={`text-[10px] font-semibold transition-colors ${
+                          showPreview ? "text-violet-400" : "text-white/30 hover:text-white/50"
+                        }`}
+                      >
+                        {showPreview ? "Hide" : "Show"}
+                      </button>
+                    </div>
+                    {showPreview && (
+                      <Suspense fallback={<div className="flex items-center justify-center py-12"><Loader2 className="w-5 h-5 animate-spin text-white/20" /></div>}>
+                        <VideoPlayer
+                          shots={script.shots}
+                          aspectRatio={(script.aspectRatio as "9:16" | "16:9" | "1:1") || "9:16"}
+                          brandColor="#8b5cf6"
+                          accentColor="#06b6d4"
+                          businessName={businessName}
+                          ctaText={script.ctaText}
+                        />
+                      </Suspense>
+                    )}
+                    {!showPreview && (
+                      <p className="text-[11px] text-white/25">
+                        Preview your video with animated text overlays and transitions before exporting.
+                      </p>
+                    )}
+                  </div>
+
+                  {/* AI Video Clips */}
+                  <div className="p-4 rounded-xl bg-gradient-to-br from-purple-500/[0.04] to-cyan-500/[0.04] border border-purple-500/15">
+                    <h4 className="text-[10px] uppercase tracking-wider text-purple-400/60 font-bold mb-1.5 flex items-center gap-1.5">
+                      <Sparkles className="w-3 h-3" />
+                      AI Video Clips
+                    </h4>
+                    <p className="text-[11px] text-white/30 mb-3">
+                      Generate real video clips from your shot descriptions using Luma Dream Machine.
+                    </p>
+                    <button
+                      onClick={handleGenerateClips}
+                      disabled={isGeneratingClips}
+                      className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-purple-500/10 border border-purple-500/30 text-xs font-semibold text-purple-400 hover:bg-purple-500/15 transition-colors disabled:opacity-50"
+                    >
+                      {isGeneratingClips ? (
+                        <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Generating clips...</>
+                      ) : (
+                        <><Film className="w-3.5 h-3.5" /> Generate AI Clips (~$0.35/shot)</>
+                      )}
+                    </button>
+                    {Object.keys(clipStatuses).length > 0 && (
+                      <div className="mt-2 space-y-1">
+                        {Object.entries(clipStatuses).map(([shotNum, clip]) => (
+                          <div key={shotNum} className="flex items-center justify-between text-[10px]">
+                            <span className="text-white/30">Shot {shotNum}</span>
+                            <span className={
+                              clip.status === "completed" ? "text-emerald-400" :
+                              clip.status === "failed" ? "text-red-400" :
+                              "text-amber-400"
+                            }>
+                              {clip.status === "completed" ? "Done" : clip.status === "failed" ? "Failed" : clip.status === "dreaming" ? "Rendering..." : "Queued"}
+                            </span>
+                            {clip.videoUrl && (
+                              <a href={clip.videoUrl} target="_blank" rel="noopener noreferrer" className="text-violet-400 hover:text-violet-300">
+                                View
+                              </a>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   {/* Recording mode prompt */}
