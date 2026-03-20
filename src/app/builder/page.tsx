@@ -221,7 +221,7 @@ function BuilderBackground({ isGenerating }: { isGenerating: boolean }) {
         vx, vy,
         baseVx: vx, baseVy: vy,
         size: 1.2 + Math.random() * 2,
-        hue: 210 + Math.random() * 30, // blue range
+        hue: 260 + Math.random() * 30, // zoo purple/violet range
         pulse: Math.random() * Math.PI * 2,
         pulseSpeed: 0.01 + Math.random() * 0.02,
       });
@@ -301,7 +301,7 @@ function BuilderBackground({ isGenerating }: { isGenerating: boolean }) {
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < CONNECTION_DIST) {
             const alpha = (1 - dist / CONNECTION_DIST) * (gen ? 0.25 : 0.12);
-            const hue = gen ? 200 + Math.sin(time * 0.02) * 20 : 220;
+            const hue = gen ? 265 + Math.sin(time * 0.02) * 20 : 270;
             ctx.strokeStyle = `hsla(${hue}, 80%, 60%, ${alpha})`;
             ctx.lineWidth = (1 - dist / CONNECTION_DIST) * 1.5;
             ctx.beginPath();
@@ -319,7 +319,7 @@ function BuilderBackground({ isGenerating }: { isGenerating: boolean }) {
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < MOUSE_RADIUS * 1.2) {
             const alpha = (1 - dist / (MOUSE_RADIUS * 1.2)) * 0.15;
-            ctx.strokeStyle = `hsla(200, 90%, 70%, ${alpha})`;
+            ctx.strokeStyle = `hsla(270, 90%, 70%, ${alpha})`;
             ctx.lineWidth = 0.5;
             ctx.beginPath();
             ctx.moveTo(mx, my);
@@ -357,9 +357,9 @@ function BuilderBackground({ isGenerating }: { isGenerating: boolean }) {
         const cx = w / 2, cy = h / 2;
         const ringRadius = 100 + Math.sin(time * 0.03) * 30;
         const ringGlow = ctx.createRadialGradient(cx, cy, ringRadius - 20, cx, cy, ringRadius + 40);
-        ringGlow.addColorStop(0, "hsla(210, 90%, 60%, 0)");
-        ringGlow.addColorStop(0.5, `hsla(210, 90%, 60%, ${0.04 + Math.sin(time * 0.05) * 0.02})`);
-        ringGlow.addColorStop(1, "hsla(210, 90%, 60%, 0)");
+        ringGlow.addColorStop(0, "hsla(270, 90%, 60%, 0)");
+        ringGlow.addColorStop(0.5, `hsla(270, 90%, 60%, ${0.04 + Math.sin(time * 0.05) * 0.02})`);
+        ringGlow.addColorStop(1, "hsla(270, 90%, 60%, 0)");
         ctx.fillStyle = ringGlow;
         ctx.beginPath();
         ctx.arc(cx, cy, ringRadius + 40, 0, Math.PI * 2);
@@ -1434,7 +1434,7 @@ function BuilderPage() {
   const activeToolLabel = TOOLS.find((t) => t.id === activeTool)?.label ?? "";
 
   return (
-    <div className="flex flex-col h-screen bg-[#111a2e] relative overflow-hidden">
+    <div className="flex flex-col h-screen bg-[#050508] relative overflow-hidden">
       {/* Welcome modal for first-time users */}
       {showWelcome && (
         <WelcomeModal onClose={() => { setShowWelcome(false); dismissWelcomeModal(); setTimeout(() => { if (shouldShowTour()) setShowTour(true); }, 500); }} />
@@ -1455,7 +1455,7 @@ function BuilderPage() {
       {/* Interactive particle constellation background */}
       <BuilderBackground isGenerating={status === "generating"} />
 
-      <div className="flex items-center border-b border-white/[0.06]">
+      <div className="flex items-center border-b border-white/[0.08]">
         <div className="flex-1"><TopBar /></div>
         <div className="px-3">
           <CollaborationBar
@@ -1473,7 +1473,7 @@ function BuilderPage() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Left panel — Prompt (before generation) or Chat editor (after) */}
-        <div className="w-[400px] min-w-[340px] flex flex-col border-r border-white/[0.10] bg-[#141e33]">
+        <div className="w-[400px] min-w-[340px] flex flex-col border-r border-white/[0.08] bg-[#0a0a0f]">
           {!hasCode ? (
             <>
               <div className="px-4 py-3 border-b border-white/[0.10]">
@@ -1541,7 +1541,7 @@ function BuilderPage() {
         </div>
 
         {/* Center panel — Preview / Code */}
-        <div className="flex-1 flex flex-col bg-[#111a2e]/80 backdrop-blur-sm">
+        <div className="flex-1 flex flex-col bg-[#050508]/80 backdrop-blur-sm">
           {/* Tabs */}
           <div className="flex items-center border-b border-white/[0.10] px-2">
             <button
@@ -1713,7 +1713,7 @@ function BuilderPage() {
 
         {/* Tool panel (slides open when a tool is active) */}
         {activeTool && (
-          <div className="w-[380px] flex flex-col border-l border-white/[0.10] bg-[#111a2e]/90 backdrop-blur-sm animate-in slide-in-from-right duration-200">
+          <div className="w-[380px] flex flex-col border-l border-white/[0.08] bg-[#0a0a0f]/90 backdrop-blur-sm animate-in slide-in-from-right duration-200">
             <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.10]">
               <span className="text-[11px] uppercase tracking-[2px] text-brand-400/50">
                 {activeToolLabel}
@@ -1730,7 +1730,7 @@ function BuilderPage() {
         )}
 
         {/* Right toolbar — Tool icons */}
-        <div className="w-12 flex flex-col items-center py-2 gap-1 border-l border-white/[0.10] bg-[#111a2e]/90 backdrop-blur-sm">
+        <div className="w-12 flex flex-col items-center py-2 gap-1 border-l border-white/[0.08] bg-[#0a0a0f]/90 backdrop-blur-sm">
           {TOOLS.map((tool) => (
             <button
               key={tool.id}
