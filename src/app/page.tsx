@@ -16,6 +16,10 @@ import {
   LogOut,
   LayoutDashboard,
   ChevronDown,
+  Globe,
+  Brain,
+  Code2,
+  Terminal,
 } from "lucide-react";
 
 const ShowcaseGallery = dynamic(() => import("@/components/ShowcaseGallery"), { ssr: false });
@@ -77,16 +81,16 @@ const HERO_SLIDES = [
     sub: "Full-stack apps, e-commerce stores, multi-page sites — built by AI agents, deployed instantly to your custom domain.",
   },
   {
-    // Colorful code on dark screen — clean developer aesthetic
-    bg: "https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&w=2400&q=80",
+    // Earth from space with glowing data network — cinematic, conveys global scale
+    bg: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2400&q=80",
     badge: "43 Specialized Generators. One Platform.",
     h1: ["Dream.", "Build.", "Ship."],
     accent: 2,
     sub: "SaaS dashboards, restaurant sites, portfolios, email templates — each with a purpose-built AI pipeline tuned for quality.",
   },
   {
-    // Laptop coding in dark workspace — focused, cinematic
-    bg: "https://images.unsplash.com/photo-1504639725590-34d0984388bd?auto=format&fit=crop&w=2400&q=80",
+    // Clean modern workspace from above — bright, professional, airy
+    bg: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=2400&q=80",
     badge: "Full-Stack Apps in Under 2 Minutes",
     h1: ["Code.", "Create.", "Conquer."],
     accent: 2,
@@ -380,6 +384,104 @@ export default function LandingPage() {
           Full-bleed product photo + overlaid text — Astra-inspired
           ═══════════════════════════════════════════════ */}
       <HeroShowcase />
+
+      {/* ═══════════════════════════════════════════════
+          SECTION 1.25 — FOUR DOMAINS, ONE PLATFORM
+          Showcases zoobicon.com / .ai / .io / .sh
+          ═══════════════════════════════════════════════ */}
+      <section className="relative py-20 md:py-28 bg-[#0a0a12] overflow-hidden">
+        {/* subtle radial glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(168,85,247,0.08)_0%,transparent_70%)] pointer-events-none" />
+
+        <div className="max-w-6xl mx-auto px-6">
+          <motion.div
+            initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}
+            variants={stagger} className="text-center mb-14"
+          >
+            <motion.p variants={fadeUp} className="text-sm font-semibold tracking-[0.2em] uppercase text-purple-400 mb-3">
+              One Platform — Four Experiences
+            </motion.p>
+            <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-bold text-white">
+              Every domain, a different{" "}
+              <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">superpower</span>
+            </motion.h2>
+          </motion.div>
+
+          <motion.div
+            initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}
+            variants={stagger}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
+          >
+            {/* zoobicon.com */}
+            <motion.div variants={fadeUp} className="group relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm p-6 hover:border-purple-500/40 transition-all duration-300 hover:bg-white/[0.06]">
+              <div className="w-11 h-11 rounded-xl bg-purple-500/15 flex items-center justify-center mb-4 group-hover:bg-purple-500/25 transition-colors">
+                <Globe className="w-5 h-5 text-purple-400" />
+              </div>
+              <h3 className="text-lg font-bold text-white mb-1">zoobicon.com</h3>
+              <p className="text-sm text-white/50 mb-3">The Builder</p>
+              <p className="text-sm text-white/70 leading-relaxed">
+                Full AI website builder. Prompt-to-production sites, stores, and apps with 43 specialized generators.
+              </p>
+              <div className="mt-4 pt-3 border-t border-white/5">
+                <Link href="/builder" className="text-xs font-semibold text-purple-400 hover:text-purple-300 inline-flex items-center gap-1 transition-colors">
+                  Start building <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+            </motion.div>
+
+            {/* zoobicon.ai */}
+            <motion.div variants={fadeUp} className="group relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm p-6 hover:border-cyan-500/40 transition-all duration-300 hover:bg-white/[0.06]">
+              <div className="w-11 h-11 rounded-xl bg-cyan-500/15 flex items-center justify-center mb-4 group-hover:bg-cyan-500/25 transition-colors">
+                <Brain className="w-5 h-5 text-cyan-400" />
+              </div>
+              <h3 className="text-lg font-bold text-white mb-1">zoobicon.ai</h3>
+              <p className="text-sm text-white/50 mb-3">The Intelligence</p>
+              <p className="text-sm text-white/70 leading-relaxed">
+                AI-forward features — multi-LLM pipeline, autonomous SEO agent, smart templates, and intelligent optimization.
+              </p>
+              <div className="mt-4 pt-3 border-t border-white/5">
+                <Link href="/ai" className="text-xs font-semibold text-cyan-400 hover:text-cyan-300 inline-flex items-center gap-1 transition-colors">
+                  Explore AI <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+            </motion.div>
+
+            {/* zoobicon.io */}
+            <motion.div variants={fadeUp} className="group relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm p-6 hover:border-emerald-500/40 transition-all duration-300 hover:bg-white/[0.06]">
+              <div className="w-11 h-11 rounded-xl bg-emerald-500/15 flex items-center justify-center mb-4 group-hover:bg-emerald-500/25 transition-colors">
+                <Code2 className="w-5 h-5 text-emerald-400" />
+              </div>
+              <h3 className="text-lg font-bold text-white mb-1">zoobicon.io</h3>
+              <p className="text-sm text-white/50 mb-3">The Developer Hub</p>
+              <p className="text-sm text-white/70 leading-relaxed">
+                Public API, webhooks, GitHub integration, project mode — built for developers who ship programmatically.
+              </p>
+              <div className="mt-4 pt-3 border-t border-white/5">
+                <Link href="/io" className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 inline-flex items-center gap-1 transition-colors">
+                  View API docs <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+            </motion.div>
+
+            {/* zoobicon.sh */}
+            <motion.div variants={fadeUp} className="group relative rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm p-6 hover:border-amber-500/40 transition-all duration-300 hover:bg-white/[0.06]">
+              <div className="w-11 h-11 rounded-xl bg-amber-500/15 flex items-center justify-center mb-4 group-hover:bg-amber-500/25 transition-colors">
+                <Terminal className="w-5 h-5 text-amber-400" />
+              </div>
+              <h3 className="text-lg font-bold text-white mb-1">zoobicon.sh</h3>
+              <p className="text-sm text-white/50 mb-3">The Deploy Engine</p>
+              <p className="text-sm text-white/70 leading-relaxed">
+                Instant hosting and deployment. Every site gets a live URL at yoursite.zoobicon.sh — SSL, CDN, and analytics included.
+              </p>
+              <div className="mt-4 pt-3 border-t border-white/5">
+                <Link href="/sh" className="text-xs font-semibold text-amber-400 hover:text-amber-300 inline-flex items-center gap-1 transition-colors">
+                  Deploy now <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
 
       {/* ═══════════════════════════════════════════════
           SECTION 1.5 — LIVE DEMO (the proof)
