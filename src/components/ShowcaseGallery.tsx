@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ExternalLink, Sparkles, ArrowRight } from "lucide-react";
+import { Sparkles, ArrowRight, Clock, Wand2 } from "lucide-react";
 
 interface ShowcaseItem {
   id: number;
@@ -10,11 +11,22 @@ interface ShowcaseItem {
   category: string;
   buildTime: string;
   prompt: string;
-  gradientFrom: string;
-  gradientTo: string;
-  accentColor: string;
-  layout: "saas" | "ecommerce" | "portfolio" | "agency" | "restaurant";
+  html: string;
 }
+
+const SHOWCASE_HTML: Record<string, string> = {
+  saas_analytics: `<!DOCTYPE html><html><head><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#0f0b1a;font-family:system-ui,sans-serif;color:#fff;padding:24px}nav{display:flex;justify-content:space-between;align-items:center;padding:12px 0;margin-bottom:32px}nav .logo{font-size:18px;font-weight:800;background:linear-gradient(135deg,#a78bfa,#6d28d9);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.nav-links{display:flex;gap:20px;font-size:11px;color:rgba(255,255,255,.5)}.badge{display:inline-block;font-size:9px;padding:4px 10px;border-radius:99px;background:rgba(167,139,250,.15);color:#a78bfa;font-weight:600;margin-bottom:16px}h1{font-size:32px;font-weight:800;line-height:1.1;margin-bottom:10px;letter-spacing:-1px}p.sub{font-size:12px;color:rgba(255,255,255,.45);margin-bottom:24px;line-height:1.5}.btn{display:inline-block;padding:10px 24px;border-radius:10px;font-size:12px;font-weight:700;background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;text-decoration:none}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:28px 0}.metric{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:16px}.metric .val{font-size:22px;font-weight:800;background:linear-gradient(135deg,#a78bfa,#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.metric .label{font-size:9px;color:rgba(255,255,255,.4);margin-top:4px}.chart{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:16px;margin-top:4px}.chart-title{font-size:11px;font-weight:600;margin-bottom:12px}.bars{display:flex;align-items:end;gap:6px;height:60px}.bar{flex:1;border-radius:4px 4px 0 0;background:linear-gradient(to top,#7c3aed,#a78bfa)}</style></head><body><nav><div class="logo">NovaTech</div><div class="nav-links"><span>Dashboard</span><span>Analytics</span><span>Reports</span><span>Settings</span></div></nav><div class="badge">Live Analytics Dashboard</div><h1>Real-time insights<br>for modern teams</h1><p class="sub">Track every metric that matters. AI-powered anomaly detection alerts you before problems happen.</p><a class="btn" href="#">Start Free Trial</a><div class="metrics"><div class="metric"><div class="val">2.4M</div><div class="label">Active Users</div></div><div class="metric"><div class="val">99.9%</div><div class="label">Uptime SLA</div></div><div class="metric"><div class="val">$847K</div><div class="label">Revenue Today</div></div></div><div class="chart"><div class="chart-title">Weekly Performance</div><div class="bars"><div class="bar" style="height:45%"></div><div class="bar" style="height:62%"></div><div class="bar" style="height:38%"></div><div class="bar" style="height:80%"></div><div class="bar" style="height:55%"></div><div class="bar" style="height:90%"></div><div class="bar" style="height:72%"></div></div></div></body></html>`,
+
+  ecommerce_fashion: `<!DOCTYPE html><html><head><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#faf8f5;font-family:system-ui,sans-serif;color:#1a1a1a;padding:20px}nav{display:flex;justify-content:space-between;align-items:center;padding:10px 0;margin-bottom:24px;border-bottom:1px solid rgba(0,0,0,.08)}.logo{font-size:16px;font-weight:800;letter-spacing:2px;text-transform:uppercase}.nav-r{display:flex;gap:16px;font-size:10px;color:#666}.hero{position:relative;background:linear-gradient(135deg,#2d1b4e,#1a0a2e);border-radius:16px;padding:32px;margin-bottom:24px;color:#fff;overflow:hidden}.hero::after{content:'';position:absolute;top:-50%;right:-20%;width:200px;height:200px;background:radial-gradient(circle,rgba(251,191,36,.2),transparent);border-radius:50%}.hero h1{font-size:28px;font-weight:800;line-height:1.1;margin-bottom:8px;position:relative;z-index:1}.hero p{font-size:11px;color:rgba(255,255,255,.6);margin-bottom:16px;position:relative;z-index:1}.hero .btn{display:inline-block;padding:10px 24px;background:#fbbf24;color:#000;font-weight:700;font-size:11px;border-radius:99px;text-decoration:none;position:relative;z-index:1}.products{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.product{background:#fff;border-radius:12px;overflow:hidden;border:1px solid rgba(0,0,0,.06)}.product .img{height:100px;background:linear-gradient(135deg,#f0e6ff,#e8d5f5)}.product .info{padding:10px}.product .name{font-size:11px;font-weight:600}.product .price{font-size:13px;font-weight:800;color:#7c3aed;margin-top:2px}.product .tag{font-size:8px;background:#fef3c7;color:#92400e;padding:2px 6px;border-radius:4px;display:inline-block;margin-top:4px}</style></head><body><nav><div class="logo">Luxe & Thread</div><div class="nav-r"><span>New In</span><span>Women</span><span>Men</span><span>Sale</span></div></nav><div class="hero"><h1>Spring/Summer<br>Collection '26</h1><p>Curated luxury. Sustainable materials. Free express shipping.</p><a class="btn" href="#">Shop Now</a></div><div class="products"><div class="product"><div class="img"></div><div class="info"><div class="name">Silk Wrap Dress</div><div class="price">$289</div><div class="tag">New</div></div></div><div class="product"><div class="img" style="background:linear-gradient(135deg,#fde68a,#fbbf24)"></div><div class="info"><div class="name">Linen Blazer</div><div class="price">$345</div></div></div><div class="product"><div class="img" style="background:linear-gradient(135deg,#d1fae5,#6ee7b7)"></div><div class="info"><div class="name">Cashmere Knit</div><div class="price">$195</div><div class="tag">Bestseller</div></div></div></div></body></html>`,
+
+  portfolio_dev: `<!DOCTYPE html><html><head><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#0a0e17;font-family:'Courier New',monospace;color:#e2e8f0;padding:24px}.terminal-bar{display:flex;gap:6px;margin-bottom:20px}.dot{width:8px;height:8px;border-radius:50%}.greeting{font-size:10px;color:#22d3ee;margin-bottom:24px;font-family:monospace}h1{font-size:30px;font-weight:800;font-family:system-ui,sans-serif;line-height:1.1;margin-bottom:6px}h1 .accent{color:#22d3ee}.role{font-size:12px;color:rgba(255,255,255,.4);margin-bottom:20px;font-family:system-ui}.links{display:flex;gap:8px;margin-bottom:28px}.link{padding:8px 16px;border-radius:8px;font-size:10px;font-weight:600;text-decoration:none;font-family:system-ui}.link.primary{background:#22d3ee;color:#0a0e17}.link.secondary{border:1px solid rgba(34,211,238,.3);color:#22d3ee}.section-title{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.3);margin-bottom:12px;font-family:system-ui}.projects{display:grid;grid-template-columns:1fr 1fr;gap:10px}.project{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px}.project .name{font-size:12px;font-weight:700;font-family:system-ui;margin-bottom:4px}.project .desc{font-size:9px;color:rgba(255,255,255,.4);font-family:system-ui;line-height:1.4}.project .tech{display:flex;gap:4px;margin-top:8px}.project .tech span{font-size:8px;padding:2px 6px;border-radius:4px;background:rgba(34,211,238,.1);color:#22d3ee}</style></head><body><div class="terminal-bar"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div></div><div class="greeting">$ whoami</div><h1>Alex <span class="accent">Rivera</span></h1><div class="role">Full-Stack Engineer &bull; Open Source &bull; San Francisco</div><div class="links"><a class="link primary" href="#">View Projects</a><a class="link secondary" href="#">GitHub</a></div><div class="section-title">Featured Projects</div><div class="projects"><div class="project"><div class="name">StreamDB</div><div class="desc">Real-time database engine with sub-ms latency</div><div class="tech"><span>Rust</span><span>WASM</span><span>gRPC</span></div></div><div class="project"><div class="name">Nexus CLI</div><div class="desc">Full-stack scaffolding tool for modern apps</div><div class="tech"><span>Go</span><span>React</span><span>Docker</span></div></div></div></body></html>`,
+
+  agency_creative: `<!DOCTYPE html><html><head><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#0a0015;font-family:system-ui,sans-serif;color:#fff;padding:24px;overflow:hidden}nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:40px}.logo{font-size:15px;font-weight:800;letter-spacing:1px}.nav-links{display:flex;gap:16px;font-size:10px;color:rgba(255,255,255,.4)}.nav-btn{padding:6px 14px;border-radius:99px;font-size:10px;font-weight:600;background:linear-gradient(135deg,#db2777,#f472b6);color:#fff}h1{font-size:42px;font-weight:900;line-height:.95;letter-spacing:-2px;margin-bottom:12px}h1 .outline{-webkit-text-stroke:1.5px rgba(255,255,255,.6);-webkit-text-fill-color:transparent}.sub{font-size:12px;color:rgba(255,255,255,.4);margin-bottom:28px;max-width:280px;line-height:1.5}.stats{display:flex;gap:24px;margin-bottom:32px}.stat .num{font-size:24px;font-weight:800;background:linear-gradient(135deg,#f472b6,#db2777);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.stat .label{font-size:9px;color:rgba(255,255,255,.35);margin-top:2px}.cases-title{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.3);margin-bottom:12px}.cases{display:grid;grid-template-columns:1fr 1fr;gap:10px}.case{border-radius:12px;padding:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06)}.case .client{font-size:11px;font-weight:700;margin-bottom:2px}.case .type{font-size:9px;color:rgba(255,255,255,.35)}.case .result{font-size:14px;font-weight:800;color:#f472b6;margin-top:8px}</style></head><body><nav><div class="logo">CATALYST</div><div class="nav-links"><span>Work</span><span>About</span><span>Contact</span></div><div class="nav-btn">Let's Talk</div></nav><h1>We make<br><span class="outline">brands</span> that<br>break through</h1><p class="sub">Award-winning creative agency. Strategy, design, and digital experiences that drive real results.</p><div class="stats"><div class="stat"><div class="num">200+</div><div class="label">Projects</div></div><div class="stat"><div class="num">98%</div><div class="label">Client Retention</div></div><div class="stat"><div class="num">14</div><div class="label">Awards</div></div></div><div class="cases-title">Recent Work</div><div class="cases"><div class="case"><div class="client">Meridian Health</div><div class="type">Brand + Web</div><div class="result">+340% leads</div></div><div class="case"><div class="client">Volt Energy</div><div class="type">Campaign</div><div class="result">12M reach</div></div></div></body></html>`,
+
+  restaurant_bakery: `<!DOCTYPE html><html><head><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#fdf6ee;font-family:'Georgia',serif;color:#3d2c1e;padding:20px}nav{display:flex;justify-content:space-between;align-items:center;padding:8px 0;margin-bottom:20px}.logo{font-size:18px;font-weight:700;color:#92400e}.nav-links{display:flex;gap:14px;font-size:10px;color:#78716c}.hero{background:linear-gradient(135deg,#92400e,#78350f);border-radius:16px;padding:28px;color:#fff;margin-bottom:20px;position:relative;overflow:hidden}.hero::after{content:'🥐';position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:48px;opacity:.3}.hero h1{font-size:26px;font-weight:700;line-height:1.1;margin-bottom:6px}.hero p{font-size:11px;opacity:.75;margin-bottom:14px}.hero .btn{display:inline-block;padding:8px 20px;background:#fbbf24;color:#78350f;font-weight:700;font-size:11px;border-radius:99px;text-decoration:none}.section-title{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:#a8a29e;margin-bottom:12px}.menu{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}.item{background:#fff;border-radius:12px;padding:12px;border:1px solid rgba(0,0,0,.06)}.item .name{font-size:12px;font-weight:700;margin-bottom:2px}.item .desc{font-size:9px;color:#78716c;line-height:1.3}.item .price{font-size:13px;font-weight:800;color:#92400e;margin-top:6px}.hours{background:#fff;border-radius:12px;padding:14px;border:1px solid rgba(0,0,0,.06)}.hours-row{display:flex;justify-content:space-between;font-size:10px;padding:4px 0;border-bottom:1px solid rgba(0,0,0,.04)}.hours-row:last-child{border:none}</style></head><body><nav><div class="logo">Artisan Bakery</div><div class="nav-links"><span>Menu</span><span>About</span><span>Order</span><span>Visit</span></div></nav><div class="hero"><h1>Fresh-baked<br>every morning</h1><p>Handcrafted sourdough, pastries & seasonal specials since 2018</p><a class="btn" href="#">Order Online</a></div><div class="section-title">Popular Items</div><div class="menu"><div class="item"><div class="name">Sourdough Loaf</div><div class="desc">48hr fermented, stone-baked</div><div class="price">$8.50</div></div><div class="item"><div class="name">Almond Croissant</div><div class="desc">Butter pastry, frangipane fill</div><div class="price">$5.75</div></div><div class="item"><div class="name">Cinnamon Roll</div><div class="desc">Cream cheese glaze, pecans</div><div class="price">$6.25</div></div><div class="item"><div class="name">Avocado Toast</div><div class="desc">Sourdough, poached egg, chili</div><div class="price">$12.00</div></div></div><div class="section-title">Hours</div><div class="hours"><div class="hours-row"><span>Mon–Fri</span><span>6:30am – 5pm</span></div><div class="hours-row"><span>Saturday</span><span>7am – 4pm</span></div><div class="hours-row"><span>Sunday</span><span>8am – 2pm</span></div></div></body></html>`,
+
+  saas_cloud: `<!DOCTYPE html><html><head><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#070c1a;font-family:system-ui,sans-serif;color:#fff;padding:24px}nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:36px}.logo{font-size:16px;font-weight:800;background:linear-gradient(135deg,#818cf8,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.nav-links{display:flex;gap:16px;font-size:10px;color:rgba(255,255,255,.4)}h1{font-size:34px;font-weight:800;line-height:1.05;letter-spacing:-1px;margin-bottom:10px;text-align:center}h1 .grad{background:linear-gradient(135deg,#818cf8,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}.sub{text-align:center;font-size:12px;color:rgba(255,255,255,.4);margin-bottom:24px}.ctas{display:flex;justify-content:center;gap:8px;margin-bottom:28px}.cta{padding:10px 22px;border-radius:10px;font-size:11px;font-weight:700;text-decoration:none}.cta.primary{background:linear-gradient(135deg,#6366f1,#818cf8);color:#fff}.cta.secondary{border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7)}.pricing{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.plan{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:16px;text-align:center}.plan.pop{border-color:rgba(99,102,241,.4);background:rgba(99,102,241,.08)}.plan .name{font-size:11px;font-weight:600;color:rgba(255,255,255,.5);margin-bottom:4px}.plan .price{font-size:22px;font-weight:800;margin-bottom:4px}.plan .price span{font-size:11px;font-weight:400;color:rgba(255,255,255,.35)}.plan .feat{font-size:9px;color:rgba(255,255,255,.35);line-height:1.6}.plan .btn{display:block;margin-top:10px;padding:8px;border-radius:8px;font-size:10px;font-weight:700;background:rgba(99,102,241,.15);color:#818cf8;text-align:center}.plan.pop .btn{background:#6366f1;color:#fff}</style></head><body><nav><div class="logo">CloudSync Pro</div><div class="nav-links"><span>Features</span><span>Pricing</span><span>Docs</span><span>Login</span></div></nav><h1>Your files.<br><span class="grad">Everywhere. Instantly.</span></h1><p class="sub">End-to-end encrypted cloud storage with real-time sync across all devices.</p><div class="ctas"><a class="cta primary" href="#">Get Started Free</a><a class="cta secondary" href="#">View Demo</a></div><div class="pricing"><div class="plan"><div class="name">Starter</div><div class="price">$0<span>/mo</span></div><div class="feat">5GB storage<br>2 devices<br>Basic support</div><div class="btn">Start Free</div></div><div class="plan pop"><div class="name">Pro</div><div class="price">$12<span>/mo</span></div><div class="feat">1TB storage<br>Unlimited devices<br>Priority support</div><div class="btn">Upgrade</div></div><div class="plan"><div class="name">Enterprise</div><div class="price">$49<span>/mo</span></div><div class="feat">Unlimited storage<br>SSO + SAML<br>Dedicated CSM</div><div class="btn">Contact Sales</div></div></div></body></html>`,
+};
 
 const showcaseItems: ShowcaseItem[] = [
   {
@@ -23,10 +35,7 @@ const showcaseItems: ShowcaseItem[] = [
     category: "SaaS",
     buildTime: "47s",
     prompt: "A modern SaaS analytics dashboard landing page with dark theme, real-time metrics, and interactive charts",
-    gradientFrom: "#1e1b4b",
-    gradientTo: "#7c3aed",
-    accentColor: "#a78bfa",
-    layout: "saas",
+    html: SHOWCASE_HTML.saas_analytics,
   },
   {
     id: 2,
@@ -34,10 +43,7 @@ const showcaseItems: ShowcaseItem[] = [
     category: "E-commerce",
     buildTime: "52s",
     prompt: "Premium fashion e-commerce store with minimalist design, product filtering, and wishlist functionality",
-    gradientFrom: "#78350f",
-    gradientTo: "#e11d48",
-    accentColor: "#fbbf24",
-    layout: "ecommerce",
+    html: SHOWCASE_HTML.ecommerce_fashion,
   },
   {
     id: 3,
@@ -45,10 +51,7 @@ const showcaseItems: ShowcaseItem[] = [
     category: "Portfolio",
     buildTime: "38s",
     prompt: "Developer portfolio with dark mode, terminal-inspired hero, project showcase with GitHub stats",
-    gradientFrom: "#0f172a",
-    gradientTo: "#155e75",
-    accentColor: "#22d3ee",
-    layout: "portfolio",
+    html: SHOWCASE_HTML.portfolio_dev,
   },
   {
     id: 4,
@@ -56,10 +59,7 @@ const showcaseItems: ShowcaseItem[] = [
     category: "Agency",
     buildTime: "61s",
     prompt: "Bold creative agency site with large typography, case studies grid, and animated transitions",
-    gradientFrom: "#581c87",
-    gradientTo: "#db2777",
-    accentColor: "#f472b6",
-    layout: "agency",
+    html: SHOWCASE_HTML.agency_creative,
   },
   {
     id: 5,
@@ -67,10 +67,7 @@ const showcaseItems: ShowcaseItem[] = [
     category: "Restaurant",
     buildTime: "43s",
     prompt: "Warm artisan bakery website with menu sections, online ordering, and location map",
-    gradientFrom: "#451a03",
-    gradientTo: "#92400e",
-    accentColor: "#d97706",
-    layout: "restaurant",
+    html: SHOWCASE_HTML.restaurant_bakery,
   },
   {
     id: 6,
@@ -78,300 +75,32 @@ const showcaseItems: ShowcaseItem[] = [
     category: "SaaS",
     buildTime: "55s",
     prompt: "Cloud storage SaaS with pricing tiers, feature comparison table, and integration logos",
-    gradientFrom: "#0c4a6e",
-    gradientTo: "#6d28d9",
-    accentColor: "#818cf8",
-    layout: "saas",
-  },
-  {
-    id: 7,
-    name: "Verde Botanics",
-    category: "E-commerce",
-    buildTime: "49s",
-    prompt: "Organic plant shop with product cards, care guides, and subscription box feature",
-    gradientFrom: "#14532d",
-    gradientTo: "#065f46",
-    accentColor: "#34d399",
-    layout: "ecommerce",
-  },
-  {
-    id: 8,
-    name: "Sarah Chen Design",
-    category: "Portfolio",
-    buildTime: "35s",
-    prompt: "Minimal portfolio for a UX designer with case study layouts, process diagrams, and testimonials",
-    gradientFrom: "#1c1917",
-    gradientTo: "#292524",
-    accentColor: "#f97316",
-    layout: "portfolio",
-  },
-  {
-    id: 9,
-    name: "Momentum Digital",
-    category: "Agency",
-    buildTime: "58s",
-    prompt: "Performance marketing agency with results dashboard, client logos, and ROI calculator",
-    gradientFrom: "#312e81",
-    gradientTo: "#be185d",
-    accentColor: "#e879f9",
-    layout: "agency",
-  },
-  {
-    id: 10,
-    name: "Sakura Ramen House",
-    category: "Restaurant",
-    buildTime: "41s",
-    prompt: "Japanese ramen restaurant with photo menu, reservation system, and chef's story section",
-    gradientFrom: "#7f1d1d",
-    gradientTo: "#9a3412",
-    accentColor: "#fb923c",
-    layout: "restaurant",
-  },
-  {
-    id: 11,
-    name: "QuantumLeap AI",
-    category: "SaaS",
-    buildTime: "63s",
-    prompt: "AI-powered business intelligence platform with demo video, use cases, and enterprise pricing",
-    gradientFrom: "#020617",
-    gradientTo: "#4338ca",
-    accentColor: "#6366f1",
-    layout: "saas",
-  },
-  {
-    id: 12,
-    name: "Atlas & Co Studio",
-    category: "Agency",
-    buildTime: "56s",
-    prompt: "Branding studio with fullscreen portfolio, team section, and interactive brand process timeline",
-    gradientFrom: "#1e1b4b",
-    gradientTo: "#9f1239",
-    accentColor: "#fb7185",
-    layout: "agency",
+    html: SHOWCASE_HTML.saas_cloud,
   },
 ];
 
 const categories = ["All", "SaaS", "E-commerce", "Portfolio", "Agency", "Restaurant"];
 
-function MockupPreview({ item }: { item: ShowcaseItem }) {
-  const { layout, gradientFrom, gradientTo, accentColor } = item;
-
+function IframePreview({ html }: { html: string }) {
   return (
-    <div
-      className="relative w-full overflow-hidden"
-      style={{
-        background: `linear-gradient(135deg, ${gradientFrom}, ${gradientTo})`,
-        aspectRatio: layout === "portfolio" ? "4/3" : layout === "agency" ? "3/4" : "4/3.5",
-      }}
-    >
-      {/* Mock browser chrome */}
-      <div className="flex items-center gap-1.5 px-3 py-2" style={{ background: "rgba(0,0,0,0.3)" }}>
+    <div className="relative w-full overflow-hidden" style={{ aspectRatio: "4/3" }}>
+      {/* Browser chrome */}
+      <div className="flex items-center gap-1.5 px-3 py-2 bg-black/40">
         <div className="w-2 h-2 rounded-full bg-red-400/80" />
         <div className="w-2 h-2 rounded-full bg-yellow-400/80" />
         <div className="w-2 h-2 rounded-full bg-green-400/80" />
-        <div
-          className="ml-3 h-4 rounded-full flex-1 max-w-[140px]"
-          style={{ background: "rgba(255,255,255,0.1)" }}
-        />
+        <div className="ml-3 h-4 rounded-full flex-1 max-w-[140px] bg-white/10" />
       </div>
-
-      {/* Mock navigation */}
-      <div className="flex items-center justify-between px-4 py-2">
-        <div className="w-16 h-3 rounded" style={{ background: accentColor, opacity: 0.9 }} />
-        <div className="flex gap-3">
-          {[...Array(4)].map((_, i) => (
-            <div
-              key={i}
-              className="h-2 rounded"
-              style={{ width: `${20 + i * 5}px`, background: "rgba(255,255,255,0.3)" }}
-            />
-          ))}
-        </div>
-        <div
-          className="h-5 w-14 rounded-md"
-          style={{ background: accentColor, opacity: 0.8 }}
-        />
-      </div>
-
-      {/* Layout-specific content */}
-      <div className="px-4 pt-2 pb-4">
-        {layout === "saas" && <SaaSMockup accent={accentColor} />}
-        {layout === "ecommerce" && <EcommerceMockup accent={accentColor} />}
-        {layout === "portfolio" && <PortfolioMockup accent={accentColor} />}
-        {layout === "agency" && <AgencyMockup accent={accentColor} />}
-        {layout === "restaurant" && <RestaurantMockup accent={accentColor} />}
-      </div>
+      {/* Real HTML rendered in sandboxed iframe */}
+      <iframe
+        srcDoc={html}
+        sandbox="allow-same-origin"
+        className="w-full border-0 pointer-events-none"
+        style={{ height: "calc(100% - 28px)", transform: "scale(1)", transformOrigin: "top left" }}
+        title="Site preview"
+        loading="lazy"
+      />
     </div>
-  );
-}
-
-function SaaSMockup({ accent }: { accent: string }) {
-  return (
-    <>
-      {/* Hero */}
-      <div className="text-center mb-3">
-        <div className="h-4 w-3/4 mx-auto rounded mb-2" style={{ background: "rgba(255,255,255,0.85)" }} />
-        <div className="h-2.5 w-1/2 mx-auto rounded mb-3" style={{ background: "rgba(255,255,255,0.35)" }} />
-        <div className="flex gap-2 justify-center">
-          <div className="h-6 w-20 rounded-lg" style={{ background: accent }} />
-          <div className="h-6 w-20 rounded-lg border" style={{ borderColor: "rgba(255,255,255,0.3)" }} />
-        </div>
-      </div>
-      {/* Metrics row */}
-      <div className="grid grid-cols-3 gap-2 mb-3">
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className="rounded-lg p-2" style={{ background: "rgba(0,0,0,0.25)" }}>
-            <div className="h-4 w-8 rounded mb-1" style={{ background: accent, opacity: 0.8 }} />
-            <div className="h-1.5 w-full rounded" style={{ background: "rgba(255,255,255,0.2)" }} />
-          </div>
-        ))}
-      </div>
-      {/* Feature grid */}
-      <div className="grid grid-cols-2 gap-2">
-        {[...Array(4)].map((_, i) => (
-          <div key={i} className="rounded-lg p-2" style={{ background: "rgba(255,255,255,0.06)" }}>
-            <div className="w-4 h-4 rounded mb-1.5" style={{ background: accent, opacity: 0.6 }} />
-            <div className="h-1.5 w-full rounded mb-1" style={{ background: "rgba(255,255,255,0.25)" }} />
-            <div className="h-1 w-2/3 rounded" style={{ background: "rgba(255,255,255,0.12)" }} />
-          </div>
-        ))}
-      </div>
-    </>
-  );
-}
-
-function EcommerceMockup({ accent }: { accent: string }) {
-  return (
-    <>
-      {/* Hero banner */}
-      <div className="rounded-xl mb-3 p-3 relative overflow-hidden" style={{ background: "rgba(0,0,0,0.2)" }}>
-        <div className="h-3 w-2/3 rounded mb-1.5" style={{ background: "rgba(255,255,255,0.8)" }} />
-        <div className="h-2 w-1/3 rounded mb-2" style={{ background: "rgba(255,255,255,0.3)" }} />
-        <div className="h-5 w-16 rounded-md" style={{ background: accent }} />
-      </div>
-      {/* Product grid */}
-      <div className="grid grid-cols-3 gap-2">
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className="rounded-lg overflow-hidden" style={{ background: "rgba(0,0,0,0.2)" }}>
-            <div
-              className="w-full aspect-square"
-              style={{
-                background: `linear-gradient(${135 + i * 20}deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02))`,
-              }}
-            />
-            <div className="p-1.5">
-              <div className="h-1.5 w-full rounded mb-1" style={{ background: "rgba(255,255,255,0.3)" }} />
-              <div className="h-2 w-8 rounded" style={{ background: accent, opacity: 0.7 }} />
-            </div>
-          </div>
-        ))}
-      </div>
-    </>
-  );
-}
-
-function PortfolioMockup({ accent }: { accent: string }) {
-  return (
-    <>
-      {/* Minimal hero */}
-      <div className="mb-4 mt-2">
-        <div className="h-5 w-1/2 rounded mb-2" style={{ background: "rgba(255,255,255,0.9)" }} />
-        <div className="h-2 w-3/4 rounded mb-1" style={{ background: "rgba(255,255,255,0.25)" }} />
-        <div className="h-2 w-1/2 rounded mb-3" style={{ background: "rgba(255,255,255,0.15)" }} />
-        <div className="h-0.5 w-12 rounded" style={{ background: accent }} />
-      </div>
-      {/* Project grid */}
-      <div className="grid grid-cols-2 gap-2">
-        {[...Array(4)].map((_, i) => (
-          <div
-            key={i}
-            className="rounded-lg aspect-video"
-            style={{
-              background: `linear-gradient(${i * 45}deg, rgba(255,255,255,0.04), rgba(255,255,255,0.1))`,
-              border: `1px solid rgba(255,255,255,0.08)`,
-            }}
-          >
-            <div className="p-2 flex flex-col justify-end h-full">
-              <div className="h-1.5 w-3/4 rounded" style={{ background: "rgba(255,255,255,0.3)" }} />
-            </div>
-          </div>
-        ))}
-      </div>
-    </>
-  );
-}
-
-function AgencyMockup({ accent }: { accent: string }) {
-  return (
-    <>
-      {/* Bold hero */}
-      <div className="mb-3 mt-1">
-        <div className="h-7 w-full rounded mb-1" style={{ background: "rgba(255,255,255,0.9)" }} />
-        <div className="h-7 w-2/3 rounded mb-2" style={{ background: "rgba(255,255,255,0.9)" }} />
-        <div className="h-2.5 w-1/2 rounded mb-3" style={{ background: "rgba(255,255,255,0.3)" }} />
-        <div className="flex gap-2">
-          <div className="h-7 w-24 rounded-full" style={{ background: accent }} />
-          <div className="h-7 w-24 rounded-full" style={{ border: `1px solid ${accent}` }} />
-        </div>
-      </div>
-      {/* Case study cards */}
-      <div className="space-y-2">
-        {[...Array(3)].map((_, i) => (
-          <div
-            key={i}
-            className="rounded-xl p-2.5 flex items-center gap-3"
-            style={{ background: "rgba(255,255,255,0.06)" }}
-          >
-            <div
-              className="w-10 h-10 rounded-lg shrink-0"
-              style={{
-                background: `linear-gradient(${135 + i * 40}deg, ${accent}44, ${accent}22)`,
-              }}
-            />
-            <div className="flex-1">
-              <div className="h-2 w-3/4 rounded mb-1" style={{ background: "rgba(255,255,255,0.4)" }} />
-              <div className="h-1.5 w-1/2 rounded" style={{ background: "rgba(255,255,255,0.15)" }} />
-            </div>
-          </div>
-        ))}
-      </div>
-    </>
-  );
-}
-
-function RestaurantMockup({ accent }: { accent: string }) {
-  return (
-    <>
-      {/* Hero with overlay */}
-      <div className="rounded-xl mb-3 p-3 relative" style={{ background: "rgba(0,0,0,0.3)" }}>
-        <div className="h-3.5 w-2/3 rounded mb-1" style={{ background: "rgba(255,255,255,0.85)" }} />
-        <div className="h-2 w-1/3 rounded mb-2" style={{ background: accent, opacity: 0.7 }} />
-        <div className="flex gap-2">
-          <div className="h-5 w-20 rounded-full" style={{ background: accent }} />
-          <div className="h-5 w-16 rounded-full" style={{ background: "rgba(255,255,255,0.15)" }} />
-        </div>
-      </div>
-      {/* Menu grid */}
-      <div className="grid grid-cols-2 gap-2">
-        {[...Array(4)].map((_, i) => (
-          <div key={i} className="rounded-lg overflow-hidden" style={{ background: "rgba(0,0,0,0.25)" }}>
-            <div
-              className="w-full aspect-[4/3]"
-              style={{
-                background: `linear-gradient(${180 + i * 30}deg, rgba(255,255,255,0.06), rgba(255,255,255,0.01))`,
-              }}
-            />
-            <div className="p-1.5">
-              <div className="h-1.5 w-3/4 rounded mb-1" style={{ background: "rgba(255,255,255,0.35)" }} />
-              <div className="flex justify-between items-center">
-                <div className="h-1 w-1/2 rounded" style={{ background: "rgba(255,255,255,0.15)" }} />
-                <div className="h-2 w-6 rounded" style={{ background: accent, opacity: 0.6 }} />
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </>
   );
 }
 
@@ -438,8 +167,8 @@ export default function ShowcaseGallery() {
           ))}
         </motion.div>
 
-        {/* Masonry grid */}
-        <div className="columns-1 md:columns-2 lg:columns-3 gap-5 space-y-5">
+        {/* Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <AnimatePresence mode="popLayout">
             {filteredItems.map((item, index) => (
               <motion.div
@@ -453,59 +182,32 @@ export default function ShowcaseGallery() {
                   delay: index * 0.06,
                   layout: { duration: 0.3 },
                 }}
-                className="break-inside-avoid"
               >
                 <motion.div
-                  className="group relative rounded-2xl overflow-hidden cursor-pointer"
-                  style={{
-                    background: "rgba(255,255,255,0.03)",
-                    border: "1px solid rgba(255,255,255,0.06)",
-                  }}
+                  className="group relative rounded-2xl overflow-hidden cursor-pointer bg-white/[0.03] border border-white/[0.06]"
                   whileHover={{ scale: 1.02, y: -4 }}
                   transition={{ duration: 0.25 }}
                   onMouseEnter={() => setHoveredCard(item.id)}
                   onMouseLeave={() => setHoveredCard(null)}
                 >
-                  {/* Gradient border on hover */}
-                  <div
-                    className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                    style={{
-                      background: `linear-gradient(135deg, ${item.gradientFrom}, ${item.gradientTo})`,
-                      padding: "1px",
-                      mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-                      maskComposite: "exclude",
-                      WebkitMaskComposite: "xor",
-                    }}
-                  />
-
-                  {/* Mockup preview */}
-                  <MockupPreview item={item} />
+                  {/* Live HTML preview */}
+                  <IframePreview html={item.html} />
 
                   {/* Info overlay */}
-                  <div
-                    className="p-4 relative"
-                    style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)" }}
-                  >
+                  <div className="p-4 bg-black/60 backdrop-blur-sm">
                     <div className="flex items-start justify-between mb-2">
                       <h3 className="text-white font-semibold text-base">{item.name}</h3>
-                      <div className="flex gap-1.5">
-                        <span
-                          className="text-xs px-2 py-0.5 rounded-full font-medium"
-                          style={{
-                            background: `${item.accentColor}22`,
-                            color: item.accentColor,
-                          }}
-                        >
-                          {item.category}
-                        </span>
-                      </div>
+                      <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-purple-500/15 text-purple-400">
+                        {item.category}
+                      </span>
                     </div>
 
                     <div className="flex items-center gap-2 mb-2.5">
-                      <span className="text-xs text-gray-400 bg-white/5 px-2 py-0.5 rounded-full">
-                        Built in {item.buildTime}
+                      <span className="inline-flex items-center gap-1 text-xs text-gray-400 bg-white/5 px-2 py-0.5 rounded-full">
+                        <Clock className="w-3 h-3" />
+                        {item.buildTime}
                       </span>
-                      <Sparkles className="w-3 h-3 text-purple-400" />
+                      <Wand2 className="w-3 h-3 text-purple-400" />
                     </div>
 
                     <p className="text-xs text-gray-500 italic line-clamp-2 leading-relaxed">
@@ -520,21 +222,15 @@ export default function ShowcaseGallery() {
                         y: hoveredCard === item.id ? 0 : 8,
                       }}
                       transition={{ duration: 0.2 }}
-                      className="mt-3"
+                      className="mt-3 flex items-center justify-between"
                     >
-                      <div className="flex items-center justify-between">
-                        <button
-                          className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg transition-colors"
-                          style={{ background: item.accentColor, color: "#000" }}
-                        >
-                          View Live
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </button>
-                        <button className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-white transition-colors">
-                          Build similar
-                          <ArrowRight className="w-3 h-3" />
-                        </button>
-                      </div>
+                      <Link
+                        href="/builder"
+                        className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg bg-purple-600 text-white hover:bg-purple-500 transition-colors"
+                      >
+                        Build Similar
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
                     </motion.div>
                   </div>
                 </motion.div>
@@ -552,12 +248,15 @@ export default function ShowcaseGallery() {
           className="text-center mt-16"
         >
           <p className="text-gray-500 text-sm mb-4">
-            These sites were generated in under 60 seconds with a single prompt.
+            Every site above was generated in under 60 seconds from a single prompt.
           </p>
-          <button className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-xl transition-colors shadow-lg shadow-purple-500/20">
+          <Link
+            href="/builder"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-xl transition-colors shadow-lg shadow-purple-500/20"
+          >
             Start Building for Free
             <ArrowRight className="w-4 h-4" />
-          </button>
+          </Link>
         </motion.div>
       </div>
     </section>
