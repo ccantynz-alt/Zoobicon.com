@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { sql } from "@/lib/db";
 import { sendViaMailgun } from "@/lib/mailgun";
+import { notifyTicketEscalation } from "@/lib/admin-notify";
 
 // ---------------------------------------------------------------------------
 // POST /api/email/ai-support — AI-powered support response
@@ -75,7 +76,7 @@ RESPONSE FORMAT — Return valid JSON only:
 
 export async function POST(req: NextRequest) {
   try {
-    const { ticketId, subject, body, customerName, autoSend } = await req.json();
+    const { ticketId, ticketNumber, subject, body, customerName, customerEmail, autoSend } = await req.json();
 
     if (!ticketId || !subject || !body) {
       return NextResponse.json(
@@ -207,6 +208,67 @@ Draft a professional support reply using the knowledge base if relevant. Return 
       }
     }
 
+    // ── Escalation: notify owner when AI can't fully handle the ticket ──
+    const needsEscalation =
+      priority === "urgent" ||
+      priority === "high" ||
+      category === "billing" ||
+      confidence < 0.7;
+
+    if (needsEscalation) {
+      let reason = "";
+      if (priority === "urgent") {
+        reason = "Ticket marked as URGENT by AI — requires immediate human attention.";
+      } else if (priority === "high") {
+        reason = "High priority ticket — AI handled initial response but human review recommended.";
+      } else if (category === "billing") {
+        reason = "Billing issue detected — AI does not auto-reply to billing tickets. Human review required.";
+      } else if (confidence < 0.5) {
+        reason = `Low AI confidence (${Math.round(confidence * 100)}%) — AI could not determine a reliable answer. Human response needed.`;
+      } else {
+        reason = `Moderate AI confidence (${Math.round(confidence * 100)}%) — AI drafted a response but it may need human review before sending.`;
+      }
+
+      // Look up ticket number if not passed
+      let effectiveTicketNumber = ticketNumber || "";
+      let effectiveFrom = customerEmail || "";
+      if (!effectiveTicketNumber || !effectiveFrom) {
+        try {
+          const tkRows = await sql`
+            SELECT ticket_number, from_email, from_name FROM support_tickets WHERE id = ${ticketId} LIMIT 1
+          `;
+          if (tkRows.length > 0) {
+            effectiveTicketNumber = effectiveTicketNumber || (tkRows[0].ticket_number as string);
+            effectiveFrom = effectiveFrom || (tkRows[0].from_email as string);
+          }
+        } catch { /* use what we have */ }
+      }
+
+      notifyTicketEscalation({
+        ticketNumber: effectiveTicketNumber || ticketId,
+        ticketId,
+        subject,
+        from: effectiveFrom,
+        fromName: customerName,
+        reason,
+        priority,
+        category,
+        confidence,
+        aiDraft: reply,
+      }).catch((err) =>
+        console.error("[AI Support] Escalation notification failed:", err)
+      );
+
+      // Mark ticket as needing human attention
+      await sql`
+        UPDATE support_tickets
+        SET assignee = 'unassigned',
+            status = CASE WHEN ${priority} = 'urgent' THEN 'urgent' ELSE 'open' END,
+            updated_at = NOW()
+        WHERE id = ${ticketId}
+      `;
+    }
+
     return NextResponse.json({
       reply,
       confidence,
@@ -214,6 +276,7 @@ Draft a professional support reply using the knowledge base if relevant. Return 
       priority,
       suggestedActions,
       autoReplied: shouldAutoReply,
+      escalated: needsEscalation,
     });
   } catch (err) {
     console.error("[AI Support] Error:", err);

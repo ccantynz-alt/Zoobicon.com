@@ -4,6 +4,7 @@ import {
   verifyWebhookSignature,
   parseInboundEmail,
 } from "@/lib/mailgun";
+import { notifyNewTicket } from "@/lib/admin-notify";
 
 // ---------------------------------------------------------------------------
 // GET /api/email/webhook — Diagnostic endpoint (check if webhook is reachable)
@@ -190,8 +191,17 @@ export async function POST(req: NextRequest) {
           VALUES (${ticketId}, 'customer', ${email.strippedText}, ${email.bodyHtml}, ${JSON.stringify(email.attachments)})
         `;
 
+        // Notify owner about new ticket (non-blocking)
+        notifyNewTicket({
+          ticketNumber,
+          subject: email.subject,
+          from: email.from,
+          fromName: email.fromName,
+          preview: email.strippedText || email.bodyText || "",
+        }).catch((err) => console.error("[Webhook] Owner notification failed:", err));
+
         // Trigger async AI draft (non-blocking)
-        triggerAIDraft(ticketId, email.subject, email.strippedText, email.fromName).catch(
+        triggerAIDraft(ticketId, ticketNumber, email.subject, email.strippedText, email.fromName, email.from).catch(
           (err) => console.error("[Webhook] AI draft failed:", err)
         );
       }
@@ -225,16 +235,25 @@ export async function POST(req: NextRequest) {
 // ---------------------------------------------------------------------------
 async function triggerAIDraft(
   ticketId: string,
+  ticketNumber: string,
   subject: string,
   body: string,
-  customerName: string
+  customerName: string,
+  customerEmail: string
 ) {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const res = await fetch(`${baseUrl}/api/email/ai-support`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ticketId, subject, body, customerName }),
+      body: JSON.stringify({
+        ticketId,
+        ticketNumber,
+        subject,
+        body,
+        customerName,
+        customerEmail,
+      }),
     });
     if (!res.ok) {
       console.error("[AI Draft] Failed:", res.status, await res.text());
