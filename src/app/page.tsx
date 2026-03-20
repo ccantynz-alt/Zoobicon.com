@@ -61,34 +61,42 @@ function Counter({ end, suffix = "" }: { end: number; suffix?: string }) {
 /* ─── hero showcase slides — cinematic backgrounds ─── */
 const HERO_SLIDES = [
   {
-    // Illuminated PC tower interior — neon LED strips, RGB fans, glowing components
-    bg: "https://images.pexels.com/photos/10684919/pexels-photo-10684919.jpeg?auto=compress&cs=tinysrgb&w=2400",
+    // Laptop with code — developer workspace (clean, warm tones)
+    bg: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=2400&q=80",
     badge: "AI Website Builder for the Modern Web",
     h1: ["Prompt.", "Preview.", "Publish."],
     accent: 2, // which word gets the brand color (0-indexed)
     sub: "7 AI agents collaborate in real-time to build production-ready websites, apps, and stores — from a single sentence.",
   },
   {
-    // Laptop with code — developer workspace
-    bg: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=2400&q=80",
+    // Clean tech abstract — servers/technology, blue tones, minimal
+    bg: "https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&w=2400&q=80",
     badge: "From Idea to Live Site in 95 Seconds",
     h1: ["Describe.", "Generate.", "Launch."],
     accent: 2,
     sub: "Full-stack apps, e-commerce stores, multi-page sites — built by AI agents, deployed instantly to your custom domain.",
   },
   {
-    // Vibrant RGB gaming PC with illuminated fans — futuristic neon glow
-    bg: "https://images.pexels.com/photos/34301930/pexels-photo-34301930.jpeg?auto=compress&cs=tinysrgb&w=2400",
+    // Colorful code on dark screen — clean developer aesthetic
+    bg: "https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&w=2400&q=80",
     badge: "43 Specialized Generators. One Platform.",
     h1: ["Dream.", "Build.", "Ship."],
     accent: 2,
     sub: "SaaS dashboards, restaurant sites, portfolios, email templates — each with a purpose-built AI pipeline tuned for quality.",
   },
+  {
+    // Laptop coding in dark workspace — focused, cinematic
+    bg: "https://images.unsplash.com/photo-1504639725590-34d0984388bd?auto=format&fit=crop&w=2400&q=80",
+    badge: "Full-Stack Apps in Under 2 Minutes",
+    h1: ["Code.", "Create.", "Conquer."],
+    accent: 2,
+    sub: "Database schemas, API routes, and interactive frontends — generated together as a complete, working application.",
+  },
 ];
 
 function HeroShowcase() {
   const [current, setCurrent] = useState(0);
-  const [imagesLoaded, setImagesLoaded] = useState<boolean[]>([false, false, false]);
+  const [imagesLoaded, setImagesLoaded] = useState<boolean[]>(HERO_SLIDES.map(() => false));
 
   // Preload images
   useEffect(() => {
