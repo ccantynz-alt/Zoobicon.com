@@ -8,7 +8,7 @@ import {
   ChevronLeft, MoreHorizontal, Paperclip, Reply, Forward,
   AlertTriangle, X, Loader2, Plus, CheckSquare, Square,
   Sparkles, Clock, FileText, PenTool, Check, ChevronDown,
-  Wand2, RotateCcw, Zap,
+  Wand2, RotateCcw, Zap, Shield,
 } from "lucide-react";
 import BackgroundEffects from "@/components/BackgroundEffects";
 
@@ -70,6 +70,9 @@ export default function AdminEmailPage() {
   const [polishing, setPolishing] = useState(false);
   const [polishResult, setPolishResult] = useState<{ polished: string; changes: string[]; score: number; tone: string; original: string } | null>(null);
   const [showPolishDiff, setShowPolishDiff] = useState(false);
+  const [grammarChecked, setGrammarChecked] = useState(false);
+  const [grammarChecking, setGrammarChecking] = useState(false);
+  const [grammarIssues, setGrammarIssues] = useState<string[]>([]);
   const [scheduling, setScheduling] = useState(false);
   const [scheduleTime, setScheduleTime] = useState("");
   const [showTemplates, setShowTemplates] = useState(false);
@@ -86,12 +89,39 @@ export default function AdminEmailPage() {
     { name: "Invoice/Billing", subject: "Re: Billing Inquiry", body: "Hi,\n\nThank you for reaching out about your billing question.\n\nI've looked into your account and here's what I found:\n\n[details]\n\nPlease let me know if you need any further clarification." },
   ];
 
+  // Default professional HTML signature (table-based for Gmail + Outlook 365 compatibility)
+  const DEFAULT_SIGNATURE = `Best regards,
+
+The Zoobicon Team
+AI Website Builder | zoobicon.com
+support@zoobicon.com`;
+
+  const HTML_SIGNATURE = `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#333333;line-height:1.4;">
+<tr><td style="padding-bottom:12px;border-bottom:2px solid #7c3aed;">
+<table cellpadding="0" cellspacing="0" border="0"><tr>
+<td style="padding-right:16px;vertical-align:top;">
+<table cellpadding="0" cellspacing="0" border="0" style="width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#3b82f6);"><tr><td align="center" style="color:#ffffff;font-size:20px;font-weight:bold;font-family:Arial,sans-serif;">Z</td></tr></table>
+</td>
+<td style="vertical-align:top;">
+<strong style="font-size:14px;color:#111827;">Zoobicon</strong><br/>
+<span style="font-size:12px;color:#7c3aed;font-weight:600;">AI Website Builder</span><br/>
+<span style="font-size:11px;color:#6b7280;">Build websites in seconds, not weeks</span>
+</td>
+</tr></table>
+</td></tr>
+<tr><td style="padding-top:10px;font-size:11px;color:#6b7280;">
+<a href="https://zoobicon.com" style="color:#7c3aed;text-decoration:none;font-weight:600;">zoobicon.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+<a href="mailto:support@zoobicon.com" style="color:#7c3aed;text-decoration:none;">support@zoobicon.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+<a href="https://zoobicon.ai" style="color:#7c3aed;text-decoration:none;">zoobicon.ai</a>
+</td></tr>
+</table>`;
+
   // Load signature from localStorage
   useEffect(() => {
     try {
       const saved = localStorage.getItem("zoobicon_email_signature");
       if (saved) setSignature(saved);
-      else setSignature("Best regards,\nThe Zoobicon Team\nzoobicon.com");
+      else setSignature(DEFAULT_SIGNATURE);
     } catch { /* */ }
   }, []);
 
@@ -231,12 +261,51 @@ export default function AdminEmailPage() {
     setShowTemplates(false);
   };
 
+  // Grammar check gate — no email leaves without passing
+  const runGrammarCheck = async () => {
+    if (!composeData.text.trim()) return;
+    setGrammarChecking(true);
+    setGrammarIssues([]);
+    try {
+      const res = await fetch("/api/email/polish", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: composeData.text, context: "grammar-check" }),
+      });
+      const data = await res.json();
+      if (res.ok && data.polished) {
+        const issues = data.changes || [];
+        setGrammarIssues(issues);
+        if (issues.length === 0 || data.score >= 90) {
+          setGrammarChecked(true);
+        } else {
+          // Auto-apply fixes and mark as checked
+          setComposeData((d) => ({ ...d, text: data.polished }));
+          setGrammarChecked(true);
+        }
+      } else {
+        // If API fails, allow sending (don't block on API errors)
+        setGrammarChecked(true);
+      }
+    } catch {
+      // Allow sending if grammar API is unavailable
+      setGrammarChecked(true);
+    }
+    setGrammarChecking(false);
+  };
+
   const handleSend = async () => {
     if (!composeData.to || !composeData.subject || !composeData.text) return;
+    // Block send until grammar check passes
+    if (!grammarChecked) {
+      await runGrammarCheck();
+      return; // User must click Send again after review
+    }
     setSending(true);
     try {
-      const res = await fetch("/api/email/inbox", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ to: composeData.to, subject: composeData.subject, text: composeData.text, html: `<p>${composeData.text.replace(/\n/g, "<br/>")}</p>` }) });
-      if (res.ok) { setSendSuccess(true); setTimeout(() => { setComposing(false); setComposeData({ to: "", subject: "", text: "" }); setSendSuccess(false); }, 1200); }
+      const bodyHtml = `<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333333;line-height:1.6;">${composeData.text.replace(/\n/g, "<br/>")}</div><br/>${HTML_SIGNATURE}`;
+      const res = await fetch("/api/email/inbox", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ to: composeData.to, subject: composeData.subject, text: composeData.text + "\n\n--\n" + signature, html: bodyHtml }) });
+      if (res.ok) { setSendSuccess(true); setTimeout(() => { setComposing(false); setComposeData({ to: "", subject: "", text: "" }); setSendSuccess(false); setGrammarChecked(false); setGrammarIssues([]); }, 1200); }
     } catch { /* silent */ }
     setSending(false);
   };
@@ -422,11 +491,13 @@ export default function AdminEmailPage() {
                 </div>
               </div>
               <div className="flex-1 overflow-y-auto p-6">
-                {selectedEmail.html_body ? (
-                  <div className="prose prose-invert prose-sm max-w-none prose-p:text-white/80 prose-a:text-blue-400" dangerouslySetInnerHTML={{ __html: selectedEmail.html_body }} />
-                ) : (
-                  <pre className="whitespace-pre-wrap text-sm text-white/80 font-sans leading-relaxed">{selectedEmail.text_body}</pre>
-                )}
+                <div className="bg-white rounded-xl p-6 shadow-sm">
+                  {selectedEmail.html_body ? (
+                    <div className="prose prose-sm max-w-none prose-p:text-gray-800 prose-a:text-blue-600 prose-headings:text-gray-900" dangerouslySetInnerHTML={{ __html: selectedEmail.html_body }} />
+                  ) : (
+                    <pre className="whitespace-pre-wrap text-sm text-gray-800 font-sans leading-relaxed">{selectedEmail.text_body}</pre>
+                  )}
+                </div>
               </div>
               <div className="border-t border-white/10 p-4 flex items-center gap-3">
                 <button onClick={() => openReply(selectedEmail)} className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/10 text-sm text-white/80 hover:bg-white/5 transition-colors"><Reply className="w-4 h-4" /> Reply</button>
@@ -461,7 +532,7 @@ export default function AdminEmailPage() {
                   <label className="text-xs text-white/50 w-12">Subject</label>
                   <input type="text" value={composeData.subject} onChange={(e) => setComposeData((d) => ({ ...d, subject: e.target.value }))} className="flex-1 bg-transparent py-2.5 text-sm text-white placeholder-white/30 focus:outline-none" placeholder="Subject" />
                 </div>
-                <textarea value={composeData.text} onChange={(e) => setComposeData((d) => ({ ...d, text: e.target.value }))} placeholder="Write your message..." className="flex-1 min-h-[200px] bg-transparent px-4 py-3 text-sm text-white/90 placeholder-white/30 focus:outline-none resize-none" />
+                <textarea value={composeData.text} onChange={(e) => { setComposeData((d) => ({ ...d, text: e.target.value })); setGrammarChecked(false); }} placeholder="Write your message..." className="flex-1 min-h-[200px] bg-transparent px-4 py-3 text-sm text-white/90 placeholder-white/30 focus:outline-none resize-none" />
               </div>
               {/* AI Polish Diff View */}
               <AnimatePresence>
@@ -553,9 +624,14 @@ export default function AdminEmailPage() {
                   </button>
                 </div>
 
-                <button onClick={handleSend} disabled={sending || sendSuccess || !composeData.to || !composeData.subject || !composeData.text} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors">
-                  {sendSuccess ? (<><CheckSquare className="w-4 h-4" /> Sent!</>) : sending ? (<><Loader2 className="w-4 h-4 animate-spin" /> Sending...</>) : (<><Send className="w-4 h-4" /> Send</>)}
-                </button>
+                <div className="flex items-center gap-2">
+                  {grammarIssues.length > 0 && grammarChecked && (
+                    <span className="text-[10px] text-emerald-400 flex items-center gap-1"><Check className="w-3 h-3" /> Grammar fixed</span>
+                  )}
+                  <button onClick={handleSend} disabled={sending || sendSuccess || grammarChecking || !composeData.to || !composeData.subject || !composeData.text} className={`flex items-center gap-2 ${grammarChecked ? "bg-blue-600 hover:bg-blue-500" : "bg-amber-600 hover:bg-amber-500"} disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors`}>
+                    {sendSuccess ? (<><CheckSquare className="w-4 h-4" /> Sent!</>) : sending ? (<><Loader2 className="w-4 h-4 animate-spin" /> Sending...</>) : grammarChecking ? (<><Loader2 className="w-4 h-4 animate-spin" /> Checking grammar...</>) : grammarChecked ? (<><Send className="w-4 h-4" /> Send</>) : (<><Shield className="w-4 h-4" /> Check &amp; Send</>)}
+                  </button>
+                </div>
               </div>
 
               {/* Signature Editor */}

@@ -48,6 +48,7 @@ import {
   PenTool,
   Check,
   RotateCcw,
+  Shield,
 } from "lucide-react";
 
 // ---------- Types ----------
@@ -388,6 +389,10 @@ export default function EmailSupportDashboard() {
   const [polishing, setPolishing] = useState(false);
   const [polishResult, setPolishResult] = useState<{ polished: string; changes: string[]; score: number; tone: string } | null>(null);
 
+  // Grammar check gate
+  const [grammarChecked, setGrammarChecked] = useState(false);
+  const [grammarChecking, setGrammarChecking] = useState(false);
+
   // New features state
   const [isInternalNote, setIsInternalNote] = useState(false);
   const [showCannedResponses, setShowCannedResponses] = useState(false);
@@ -606,8 +611,38 @@ export default function EmailSupportDashboard() {
   };
 
   // Send manual reply or internal note — persists via API
+  // Grammar check gate for support replies
+  const runReplyGrammarCheck = async () => {
+    if (!replyText.trim()) return;
+    setGrammarChecking(true);
+    try {
+      const res = await fetch("/api/email/polish", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: replyText, context: "grammar-check" }),
+      });
+      const data = await res.json();
+      if (res.ok && data.polished) {
+        if ((data.changes || []).length > 0 && data.score < 90) {
+          setReplyText(data.polished);
+        }
+        setGrammarChecked(true);
+      } else {
+        setGrammarChecked(true);
+      }
+    } catch {
+      setGrammarChecked(true);
+    }
+    setGrammarChecking(false);
+  };
+
   const handleSendReply = async () => {
     if (!replyText.trim() || !selectedTicket) return;
+    // Block send until grammar check passes (skip for internal notes)
+    if (!isInternalNote && !grammarChecked) {
+      await runReplyGrammarCheck();
+      return;
+    }
     const newMessage: TicketMessage = {
       id: `m-${isInternalNote ? "note" : "agent"}-${Date.now()}`,
       from: isInternalNote ? "internal" : "agent",
@@ -627,6 +662,7 @@ export default function EmailSupportDashboard() {
     setTickets(updated);
     setReplyText("");
     setIsInternalNote(false);
+    setGrammarChecked(false);
     // Persist to DB via real support API (sends email to customer if not internal note)
     if (!isInternalNote) {
       try {
@@ -1104,7 +1140,7 @@ export default function EmailSupportDashboard() {
                     <div
                       className={`max-w-[70%] rounded-2xl px-4 py-3 ${
                         msg.from === "customer"
-                          ? "bg-white/[0.12] border border-white/[0.15]"
+                          ? "bg-white text-gray-800 border border-gray-200"
                           : msg.from === "ai"
                           ? "bg-purple-500/[0.08] border border-purple-500/20"
                           : msg.from === "internal"
@@ -1133,8 +1169,8 @@ export default function EmailSupportDashboard() {
                           )}
                         </div>
                       )}
-                      <p className="text-sm text-white/90 leading-relaxed whitespace-pre-wrap">{msg.body}</p>
-                      <div className="text-[10px] text-white/60 mt-2">{formatDate(msg.timestamp)}</div>
+                      <p className={`text-sm leading-relaxed whitespace-pre-wrap ${msg.from === "customer" ? "text-gray-800" : "text-white/90"}`}>{msg.body}</p>
+                      <div className={`text-[10px] mt-2 ${msg.from === "customer" ? "text-gray-400" : "text-white/60"}`}>{formatDate(msg.timestamp)}</div>
                     </div>
                     {msg.from !== "customer" && (
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
@@ -1250,7 +1286,7 @@ export default function EmailSupportDashboard() {
                 <div className="flex items-center gap-2">
                   <input
                     value={replyText}
-                    onChange={(e) => setReplyText(e.target.value)}
+                    onChange={(e) => { setReplyText(e.target.value); setGrammarChecked(false); }}
                     onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSendReply(); } }}
                     placeholder={isInternalNote ? "Add an internal note (not visible to customer)..." : "Type a reply..."}
                     className={`flex-1 rounded-xl px-4 py-2.5 text-xs text-white placeholder:text-white/25 outline-none transition-colors ${
@@ -1270,14 +1306,17 @@ export default function EmailSupportDashboard() {
                   </button>
                   <button
                     onClick={handleSendReply}
-                    disabled={!replyText.trim()}
+                    disabled={grammarChecking || !replyText.trim()}
                     className={`p-2.5 rounded-xl text-white transition-all disabled:opacity-30 ${
                       isInternalNote
                         ? "bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500"
+                        : !grammarChecked && !isInternalNote
+                        ? "bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500"
                         : "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500"
                     }`}
+                    title={!grammarChecked && !isInternalNote ? "Click to grammar-check before sending" : "Send reply"}
                   >
-                    {isInternalNote ? <Lock className="w-4 h-4" /> : <Send className="w-4 h-4" />}
+                    {grammarChecking ? <Loader2 className="w-4 h-4 animate-spin" /> : isInternalNote ? <Lock className="w-4 h-4" /> : !grammarChecked ? <Shield className="w-4 h-4" /> : <Send className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
