@@ -84,11 +84,19 @@ const HERO_SLIDES = [
     accent: 2,
     sub: "SaaS dashboards, restaurant sites, portfolios, email templates — each with a purpose-built AI pipeline tuned for quality.",
   },
+  {
+    // Colorful code on dark screen — clean developer aesthetic
+    bg: "https://images.unsplash.com/photo-1542831371-29b0f74f9713?auto=format&fit=crop&w=2400&q=80",
+    badge: "Full-Stack Apps in Under 2 Minutes",
+    h1: ["Code.", "Create.", "Conquer."],
+    accent: 2,
+    sub: "Database schemas, API routes, and interactive frontends — generated together as a complete, working application.",
+  },
 ];
 
 function HeroShowcase() {
   const [current, setCurrent] = useState(0);
-  const [imagesLoaded, setImagesLoaded] = useState<boolean[]>([false, false, false]);
+  const [imagesLoaded, setImagesLoaded] = useState<boolean[]>(HERO_SLIDES.map(() => false));
 
   // Preload images
   useEffect(() => {

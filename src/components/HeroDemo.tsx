@@ -477,7 +477,7 @@ export default function HeroDemo() {
         <div className="px-4 pb-2">
           <motion.div
             className="relative rounded-xl overflow-hidden border border-white/[0.06] bg-[#08081a]"
-            style={{ height: 380 }}
+            style={{ height: 520 }}
             animate={{
               borderColor: phase === "deployed" ? "rgba(52,211,153,0.15)" : "rgba(255,255,255,0.06)",
             }}
