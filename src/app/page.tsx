@@ -15,6 +15,7 @@ import {
   User,
   LogOut,
   LayoutDashboard,
+  ChevronDown,
 } from "lucide-react";
 
 const ShowcaseGallery = dynamic(() => import("@/components/ShowcaseGallery"), { ssr: false });
@@ -25,33 +26,6 @@ const fadeUp = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
 };
 const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } } };
-
-/* ─── rotating word in hero ─── */
-const WORDS = ["websites", "apps", "stores", "portfolios", "dashboards", "landing pages"];
-
-function RotatingWord() {
-  const [index, setIndex] = useState(0);
-  useEffect(() => {
-    const id = setInterval(() => setIndex((i) => (i + 1) % WORDS.length), 2400);
-    return () => clearInterval(id);
-  }, []);
-  return (
-    <span className="inline-block relative h-[1.1em] overflow-hidden align-bottom">
-      <AnimatePresence mode="wait">
-        <motion.span
-          key={WORDS[index]}
-          initial={{ y: "100%", opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: "-100%", opacity: 0 }}
-          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[#7c5aff] to-[#b794ff]"
-        >
-          {WORDS[index]}
-        </motion.span>
-      </AnimatePresence>
-    </span>
-  );
-}
 
 /* ─── animated counter ─── */
 function Counter({ end, suffix = "" }: { end: number; suffix?: string }) {
@@ -84,135 +58,204 @@ function Counter({ end, suffix = "" }: { end: number; suffix?: string }) {
   return <span ref={ref}>{val.toLocaleString()}{suffix}</span>;
 }
 
-/* ─── immersive hero background — interactive mesh with mouse-reactive glow ─── */
-function HeroBackground() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mouse = useRef({ x: -9999, y: -9999 });
+/* ─── hero showcase slides — real generated sites as cinematic backgrounds ─── */
+const HERO_SLIDES = [
+  {
+    // Fintech dashboard — dark, data-rich
+    bg: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=2400&q=80",
+    badge: "AI Website Builder for the Modern Web",
+    h1: ["Prompt.", "Preview.", "Publish."],
+    accent: 2, // which word gets the brand color (0-indexed)
+    sub: "7 AI agents collaborate in real-time to build production-ready websites, apps, and stores — from a single sentence.",
+  },
+  {
+    // Clean workspace with code
+    bg: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=2400&q=80",
+    badge: "From Idea to Live Site in 95 Seconds",
+    h1: ["Describe.", "Generate.", "Launch."],
+    accent: 2,
+    sub: "Full-stack apps, e-commerce stores, multi-page sites — built by AI agents, deployed instantly to your custom domain.",
+  },
+  {
+    // Modern tech/product workspace
+    bg: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=2400&q=80",
+    badge: "43 Specialized Generators. One Platform.",
+    h1: ["Dream.", "Build.", "Ship."],
+    accent: 2,
+    sub: "SaaS dashboards, restaurant sites, portfolios, email templates — each with a purpose-built AI pipeline tuned for quality.",
+  },
+];
 
+function HeroShowcase() {
+  const [current, setCurrent] = useState(0);
+  const [imagesLoaded, setImagesLoaded] = useState<boolean[]>([false, false, false]);
+
+  // Preload images
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    let w = 0, h = 0, animId = 0;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-    const resize = () => {
-      w = canvas.clientWidth;
-      h = canvas.clientHeight;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
-    resize();
-    window.addEventListener("resize", resize);
-
-    const onMove = (e: MouseEvent) => {
-      const r = canvas.getBoundingClientRect();
-      mouse.current = { x: e.clientX - r.left, y: e.clientY - r.top };
-    };
-    document.addEventListener("mousemove", onMove);
-
-    // Orbs — large floating gradients
-    const orbs = Array.from({ length: 5 }, (_, i) => ({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      vx: (Math.random() - 0.5) * 0.3,
-      vy: (Math.random() - 0.5) * 0.3,
-      r: 200 + Math.random() * 300,
-      hue: [265, 280, 230, 300, 250][i],
-      sat: 60 + Math.random() * 30,
-      phase: Math.random() * Math.PI * 2,
-    }));
-
-    // Grid dots
-    const GRID = 40;
-    const dots: { x: number; y: number }[] = [];
-    for (let gx = 0; gx < w + GRID; gx += GRID) {
-      for (let gy = 0; gy < h + GRID; gy += GRID) {
-        dots.push({ x: gx, y: gy });
-      }
-    }
-
-    let t = 0;
-    const draw = () => {
-      t += 0.005;
-      ctx.clearRect(0, 0, w, h);
-
-      // Animated orbs
-      for (const orb of orbs) {
-        orb.phase += 0.003;
-        orb.x += orb.vx + Math.sin(orb.phase) * 0.4;
-        orb.y += orb.vy + Math.cos(orb.phase * 0.7) * 0.3;
-        if (orb.x < -orb.r) orb.x = w + orb.r;
-        if (orb.x > w + orb.r) orb.x = -orb.r;
-        if (orb.y < -orb.r) orb.y = h + orb.r;
-        if (orb.y > h + orb.r) orb.y = -orb.r;
-
-        const g = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, orb.r);
-        const alpha = 0.06 + Math.sin(orb.phase) * 0.02;
-        g.addColorStop(0, `hsla(${orb.hue}, ${orb.sat}%, 55%, ${alpha})`);
-        g.addColorStop(0.5, `hsla(${orb.hue}, ${orb.sat}%, 45%, ${alpha * 0.4})`);
-        g.addColorStop(1, "transparent");
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.arc(orb.x, orb.y, orb.r, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // Mouse glow
-      const mx = mouse.current.x, my = mouse.current.y;
-      if (mx > 0 && my > 0) {
-        const mg = ctx.createRadialGradient(mx, my, 0, mx, my, 250);
-        mg.addColorStop(0, "rgba(124, 90, 255, 0.08)");
-        mg.addColorStop(0.5, "rgba(124, 90, 255, 0.03)");
-        mg.addColorStop(1, "transparent");
-        ctx.fillStyle = mg;
-        ctx.beginPath();
-        ctx.arc(mx, my, 250, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // Grid dots — subtle, react to mouse
-      for (const dot of dots) {
-        const dx = dot.x - mx, dy = dot.y - my;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const proximity = Math.max(0, 1 - dist / 300);
-        const size = 0.5 + proximity * 1.5;
-        const alpha = 0.04 + proximity * 0.2;
-        ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
-        ctx.beginPath();
-        ctx.arc(dot.x, dot.y, size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // Horizontal scan line (subtle)
-      const scanY = (h * 0.3) + Math.sin(t * 2) * h * 0.3;
-      const scanG = ctx.createLinearGradient(0, scanY - 1, 0, scanY + 1);
-      scanG.addColorStop(0, "transparent");
-      scanG.addColorStop(0.5, "rgba(124, 90, 255, 0.03)");
-      scanG.addColorStop(1, "transparent");
-      ctx.fillStyle = scanG;
-      ctx.fillRect(0, scanY - 40, w, 80);
-
-      animId = requestAnimationFrame(draw);
-    };
-    draw();
-
-    return () => {
-      cancelAnimationFrame(animId);
-      window.removeEventListener("resize", resize);
-      document.removeEventListener("mousemove", onMove);
-    };
+    HERO_SLIDES.forEach((slide, i) => {
+      const img = new Image();
+      img.onload = () => setImagesLoaded(prev => { const n = [...prev]; n[i] = true; return n; });
+      img.src = slide.bg;
+    });
   }, []);
 
+  // Auto-rotate every 6s
+  useEffect(() => {
+    const id = setInterval(() => setCurrent(i => (i + 1) % HERO_SLIDES.length), 6000);
+    return () => clearInterval(id);
+  }, []);
+
+  const slide = HERO_SLIDES[current];
+
   return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full pointer-events-none"
-      style={{ zIndex: 0 }}
-    />
+    <section className="relative h-screen min-h-[700px] max-h-[1100px] overflow-hidden">
+      {/* Background images — all rendered, opacity-switched for smooth crossfade */}
+      {HERO_SLIDES.map((s, i) => (
+        <div
+          key={i}
+          className="absolute inset-0 transition-opacity duration-[1200ms] ease-in-out"
+          style={{ opacity: i === current ? 1 : 0 }}
+        >
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105"
+            style={{
+              backgroundImage: imagesLoaded[i] ? `url(${s.bg})` : undefined,
+              backgroundColor: "#0a0a0f",
+            }}
+          />
+        </div>
+      ))}
+
+      {/* Dark overlays for text readability */}
+      <div className="absolute inset-0 bg-black/55 z-[1]" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-[#050505]/60 z-[2]" />
+      {/* Subtle brand-colored vignette */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#7c5aff]/[0.08] via-transparent to-transparent z-[2]" />
+
+      {/* Content */}
+      <div className="relative z-10 h-full flex flex-col items-center justify-center px-6 text-center">
+        {/* Glass pill badge */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={`badge-${current}`}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{ duration: 0.5 }}
+            className="mb-8"
+          >
+            <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] font-medium text-white/80 bg-white/[0.08] backdrop-blur-xl border border-white/[0.12] shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
+              {slide.badge}
+            </span>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Massive stacked headline */}
+        <AnimatePresence mode="wait">
+          <motion.h1
+            key={`h1-${current}`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="text-[clamp(3rem,10vw,8rem)] font-black tracking-[-0.04em] leading-[0.95] mb-6"
+          >
+            {slide.h1.map((word, wi) => (
+              <span key={wi}>
+                <span
+                  className={
+                    wi === slide.accent
+                      ? "text-transparent bg-clip-text bg-gradient-to-r from-[#7c5aff] to-[#b794ff]"
+                      : "text-white"
+                  }
+                >
+                  {word}
+                </span>
+                {wi < slide.h1.length - 1 && <br />}
+              </span>
+            ))}
+          </motion.h1>
+        </AnimatePresence>
+
+        {/* Subtitle */}
+        <AnimatePresence mode="wait">
+          <motion.p
+            key={`sub-${current}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="text-base md:text-xl text-white/60 max-w-2xl mx-auto mb-10 leading-relaxed font-light"
+          >
+            {slide.sub}
+          </motion.p>
+        </AnimatePresence>
+
+        {/* Dual CTAs */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="flex flex-col sm:flex-row items-center gap-4"
+        >
+          <Link
+            href="/builder"
+            className="group inline-flex items-center gap-2.5 px-8 py-4 rounded-full bg-[#7c5aff] text-white text-[15px] font-bold hover:bg-[#6d3bff] transition-all shadow-[0_0_40px_rgba(124,90,255,0.3)] hover:shadow-[0_0_60px_rgba(124,90,255,0.45)]"
+          >
+            Start Free Trial
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+          <a
+            href="#demo"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-[15px] font-semibold text-white/80 bg-white/[0.08] backdrop-blur-sm border border-white/[0.15] hover:bg-white/[0.14] hover:border-white/[0.25] transition-all"
+          >
+            Watch It Build
+          </a>
+        </motion.div>
+
+        {/* Trust line */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 0.6 }}
+          className="mt-8 text-sm text-white/30 font-light tracking-wide"
+        >
+          Trusted by developers, agencies &amp; entrepreneurs worldwide
+        </motion.p>
+
+        {/* Slide indicators */}
+        <div className="flex items-center gap-2 mt-8">
+          {HERO_SLIDES.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrent(i)}
+              aria-label={`Go to slide ${i + 1}`}
+              className={`transition-all duration-500 rounded-full ${
+                i === current
+                  ? "w-8 h-2 bg-white/80"
+                  : "w-2 h-2 bg-white/25 hover:bg-white/40"
+              }`}
+            />
+          ))}
+        </div>
+
+        {/* Scroll indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 1 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        >
+          <span className="text-[11px] text-white/30 uppercase tracking-[0.2em] font-medium">Scroll</span>
+          <motion.div
+            animate={{ y: [0, 6, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <ChevronDown className="w-4 h-4 text-white/30" />
+          </motion.div>
+        </motion.div>
+      </div>
+    </section>
   );
 }
 
@@ -325,66 +368,36 @@ export default function LandingPage() {
       </nav>
 
       {/* ═══════════════════════════════════════════════
-          SECTION 1 — HERO
-          Immersive background + demo = the product sells itself
+          SECTION 1 — CINEMATIC HERO
+          Full-bleed product photo + overlaid text — Astra-inspired
           ═══════════════════════════════════════════════ */}
-      <section className="relative min-h-screen pt-28 pb-4 md:pt-36 md:pb-8 overflow-hidden">
-        {/* Immersive interactive background */}
-        <HeroBackground />
-        {/* Top gradient fade from nav */}
-        <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-[#050505] to-transparent z-[1] pointer-events-none" />
-        {/* Bottom gradient fade into next section */}
-        <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#050505] to-transparent z-[1] pointer-events-none" />
+      <HeroShowcase />
 
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-[2]">
+      {/* ═══════════════════════════════════════════════
+          SECTION 1.5 — LIVE DEMO (the proof)
+          "Watch 7 agents build a site in real-time"
+          ═══════════════════════════════════════════════ */}
+      <section id="demo" className="relative py-24 md:py-32">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="text-center mb-16 md:mb-20"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            variants={stagger}
           >
-            <h1 className="text-[clamp(2.5rem,8vw,7rem)] font-extrabold tracking-[-0.05em] leading-[0.9] mb-6">
-              One prompt.<br />
-              Stunning <RotatingWord />.
-            </h1>
-            <p className="text-lg md:text-xl text-white/40 max-w-xl mx-auto mb-10 leading-relaxed font-light">
-              7 AI agents collaborate in real-time to build production-ready
-              websites. Watch it happen.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link
-                href="/builder"
-                className="group inline-flex items-center gap-2.5 px-8 py-4 rounded-full bg-white text-black text-[15px] font-bold hover:bg-white/90 transition-all hover:shadow-[0_0_40px_rgba(255,255,255,0.15)]"
-              >
-                Start Building Free
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
-              <a
-                href="#showcase"
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-[15px] font-medium text-white/50 border border-white/[0.1] hover:border-white/[0.2] hover:text-white/70 transition-all"
-              >
-                See Examples
-              </a>
-            </div>
-            <div className="flex items-center justify-center gap-6 mt-6 text-xs text-white/30">
-              <span>No credit card</span>
-              <span className="w-1 h-1 rounded-full bg-white/15" />
-              <span>Free forever</span>
-              <span className="w-1 h-1 rounded-full bg-white/15" />
-              <span>No limits</span>
-            </div>
-          </motion.div>
-
-          {/* The live demo — this IS the product proof */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className="relative max-w-5xl mx-auto"
-          >
-            {/* Subtle glow behind the demo */}
-            <div className="absolute -inset-20 bg-[#7c5aff]/[0.04] rounded-[40px] blur-3xl pointer-events-none" />
-            <HeroDemo />
+            <motion.div variants={fadeUp} className="text-center mb-14">
+              <h2 className="text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-4">
+                Watch the magic happen.
+              </h2>
+              <p className="text-base md:text-lg text-white/35 max-w-xl mx-auto">
+                Type a prompt. Watch 7 AI agents build your site in real-time.
+                This is a live demo — try it yourself.
+              </p>
+            </motion.div>
+            <motion.div variants={fadeUp} className="relative max-w-5xl mx-auto">
+              <div className="absolute -inset-20 bg-[#7c5aff]/[0.04] rounded-[40px] blur-3xl pointer-events-none" />
+              <HeroDemo />
+            </motion.div>
           </motion.div>
         </div>
       </section>
