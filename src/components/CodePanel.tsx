@@ -223,7 +223,7 @@ export default function CodePanel({
         </button>
         <button
           onClick={handleDownload}
-          className="text-[11px] text-accent-pink/60 hover:text-accent-pink transition-colors px-2 py-1 rounded hover:bg-white/[0.03] flex items-center gap-1"
+          className="text-[11px] text-cyan-400/60 hover:text-cyan-400 transition-colors px-2 py-1 rounded hover:bg-white/[0.03] flex items-center gap-1"
         >
           <Download size={10} />
           Download

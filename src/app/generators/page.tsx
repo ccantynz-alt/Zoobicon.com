@@ -87,7 +87,7 @@ const GENERATOR_CATEGORIES = [
   },
   {
     name: "Design Systems",
-    color: "from-pink-500 to-rose-500",
+    color: "from-cyan-500 to-rose-500",
     generators: [
       { name: "Brand Kit", description: "Complete design systems with colors, typography, spacing, components, voice, and style guide page", endpoint: "/api/generate/brand-kit", icon: Palette },
       { name: "Style Guide Extractor", description: "Analyze existing sites to extract and document every color, font, spacing value, and component", endpoint: "/api/generate/style-guide", icon: PaintBucket },

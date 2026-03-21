@@ -215,7 +215,7 @@ export default function PreLaunchChecklistPage() {
       <div className="relative z-10 max-w-5xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-start gap-4 mb-8">
-          <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center shrink-0">
+          <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 via-purple-500 to-blue-500 flex items-center justify-center shrink-0">
             <Rocket className="w-7 h-7 text-white" />
           </div>
           <div>

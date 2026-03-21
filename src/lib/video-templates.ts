@@ -107,7 +107,7 @@ export const VIDEO_TEMPLATES: VideoTemplate[] = [
     duration: 15,
     style: "fun-playful",
     music: "upbeat",
-    thumbnail: "from-pink-500 to-violet-600",
+    thumbnail: "from-cyan-500 to-violet-600",
     script: "3 things nobody tells you about {{topic}}. Number 1: {{fact_1}}. Number 2: {{fact_2}}. Number 3: {{fact_3}}. Follow for more {{topic}} tips.",
     sceneOutline: [
       { sceneNumber: 1, duration: "2s", description: "Hook text with animated count \"3\"", textOverlay: "3 things nobody tells you...", transition: "cut" },
@@ -252,7 +252,7 @@ export const VIDEO_TEMPLATES: VideoTemplate[] = [
     duration: 60,
     style: "cinematic",
     music: "chill",
-    thumbnail: "from-rose-500 to-pink-600",
+    thumbnail: "from-rose-500 to-blue-700",
     script: "A day in my life as a {{role}}. {{morning_routine}}. {{work_highlight_1}}. {{work_highlight_2}}. {{afternoon_activity}}. {{evening_routine}}. And that's a wrap. Follow for more behind the scenes.",
     sceneOutline: [
       { sceneNumber: 1, duration: "5s", description: "Alarm clock / morning light, time stamp \"6:00 AM\"", textOverlay: "A day in my life as a {{role}}", transition: "fade" },
@@ -305,7 +305,7 @@ export const VIDEO_TEMPLATES: VideoTemplate[] = [
     duration: 15,
     style: "bold-dynamic",
     music: "upbeat",
-    thumbnail: "from-red-500 to-pink-500",
+    thumbnail: "from-red-500 to-blue-600",
     script: "FLASH SALE! {{discount}}% OFF everything! {{product_1}}. {{product_2}}. {{product_3}}. Only {{time_limit}} hours left. Shop now before it's gone!",
     sceneOutline: [
       { sceneNumber: 1, duration: "2s", description: "\"FLASH SALE\" text explosion with alarm animation", textOverlay: "FLASH SALE", transition: "cut" },

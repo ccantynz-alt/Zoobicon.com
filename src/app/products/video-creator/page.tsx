@@ -101,7 +101,7 @@ export default function VideoCreatorPage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-purple to-pink-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
                 <Video className="w-4 h-4 text-white" />
               </div>
               <span className="text-lg font-bold tracking-tight">Zoobicon</span>
@@ -146,9 +146,9 @@ export default function VideoCreatorPage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="flex flex-wrap items-center gap-3 mb-6">
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-pink/20 bg-accent-pink/5">
-                <Video className="w-3 h-3 text-accent-pink" />
-                <span className="text-xs font-medium text-accent-pink">AI Video Creator</span>
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-cyan-400/20 bg-cyan-400/5">
+                <Video className="w-3 h-3 text-cyan-400" />
+                <span className="text-xs font-medium text-cyan-400">AI Video Creator</span>
               </span>
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium">
                 <Clock size={12} /> Video Rendering Coming Soon
@@ -169,7 +169,7 @@ export default function VideoCreatorPage() {
             </motion.p>
 
             <motion.div variants={fadeInUp} className="flex flex-wrap items-center gap-3 mb-10">
-              <Link href="/video-creator" className="group btn-gradient px-6 py-3.5 rounded-xl text-sm font-bold text-white flex items-center gap-2 shadow-glow-purple">
+              <Link href="/video-creator" className="group btn-gradient px-6 py-3.5 rounded-xl text-sm font-bold text-white flex items-center gap-2 shadow-lg shadow-cyan-500/20">
                 <Play className="w-4 h-4" />
                 <span>Try Storyboard Creator</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -191,12 +191,12 @@ export default function VideoCreatorPage() {
                     value={waitlistEmail}
                     onChange={(e) => setWaitlistEmail(e.target.value)}
                     placeholder="Enter your email for early access"
-                    className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-xl px-5 py-4 text-white placeholder:text-white/60 outline-none text-sm focus:border-accent-purple/30 transition-colors"
+                    className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-xl px-5 py-4 text-white placeholder:text-white/60 outline-none text-sm focus:border-cyan-500/30 transition-colors"
                   />
                   <button
                     type="submit"
                     disabled={waitlistStatus === "loading"}
-                    className="group btn-gradient px-6 py-4 rounded-xl text-sm font-bold text-white flex items-center gap-2 shadow-glow-purple whitespace-nowrap disabled:opacity-50"
+                    className="group btn-gradient px-6 py-4 rounded-xl text-sm font-bold text-white flex items-center gap-2 shadow-lg shadow-cyan-500/20 whitespace-nowrap disabled:opacity-50"
                   >
                     <span>{waitlistStatus === "loading" ? "Joining..." : "Join Early Access"}</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -211,7 +211,7 @@ export default function VideoCreatorPage() {
                 <div key={p.name} className="gradient-border p-4 rounded-xl text-center group card-hover">
                   <div className="text-sm font-bold mb-1 group-hover:text-white transition-colors">{p.name}</div>
                   <div className="text-[10px] text-white/60">{p.format}</div>
-                  <div className="text-[10px] text-accent-purple/60">{p.duration}</div>
+                  <div className="text-[10px] text-cyan-500/60">{p.duration}</div>
                 </div>
               ))}
             </motion.div>
@@ -237,7 +237,7 @@ export default function VideoCreatorPage() {
               ].map((step, i) => (
                 <motion.div key={i} variants={fadeInUp} className="gradient-border p-8 rounded-2xl relative">
                   <div className="text-6xl font-black text-white/[0.03] absolute top-4 right-6">{step.num}</div>
-                  <div className="text-sm font-bold text-accent-purple mb-1">{step.num}</div>
+                  <div className="text-sm font-bold text-cyan-500 mb-1">{step.num}</div>
                   <h3 className="text-2xl font-black mb-3">{step.title}</h3>
                   <p className="text-sm text-white/60 leading-relaxed">{step.desc}</p>
                 </motion.div>
@@ -260,7 +260,7 @@ export default function VideoCreatorPage() {
 
             <motion.div variants={fadeInUp} className="flex flex-wrap justify-center gap-2">
               {STYLES.map((style) => (
-                <div key={style} className="px-5 py-2.5 rounded-full border border-white/[0.10] bg-white/[0.05] text-sm text-white/65 hover:text-accent-purple hover:border-accent-purple/30 hover:bg-accent-purple/5 transition-all cursor-pointer">
+                <div key={style} className="px-5 py-2.5 rounded-full border border-white/[0.10] bg-white/[0.05] text-sm text-white/65 hover:text-cyan-500 hover:border-cyan-500/30 hover:bg-cyan-500/5 transition-all cursor-pointer">
                   {style}
                 </div>
               ))}
@@ -282,7 +282,7 @@ export default function VideoCreatorPage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
               {FEATURES.map((f, i) => (
                 <motion.div key={i} variants={fadeInUp} className="gradient-border card-hover p-6 rounded-xl group">
-                  <f.icon className="w-7 h-7 text-accent-purple/50 mb-3 group-hover:text-accent-purple transition-colors" />
+                  <f.icon className="w-7 h-7 text-cyan-500/50 mb-3 group-hover:text-cyan-500 transition-colors" />
                   <h3 className="text-base font-bold mb-1.5">{f.title}</h3>
                   <p className="text-xs text-white/60 leading-relaxed">{f.desc}</p>
                 </motion.div>
@@ -307,7 +307,7 @@ export default function VideoCreatorPage() {
                 <motion.div key={i} variants={fadeInUp} className="gradient-border p-6 rounded-xl card-hover">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-lg font-bold">{p.name}</h3>
-                    <span className="text-[10px] font-mono text-accent-purple bg-accent-purple/10 px-2 py-0.5 rounded">{p.format}</span>
+                    <span className="text-[10px] font-mono text-cyan-500 bg-cyan-500/10 px-2 py-0.5 rounded">{p.format}</span>
                   </div>
                   <p className="text-sm text-white/60 leading-relaxed mb-2">{p.desc}</p>
                   <div className="text-xs text-white/60">Duration: {p.duration}</div>
@@ -321,13 +321,13 @@ export default function VideoCreatorPage() {
       {/* CTA */}
       <section className="py-20 border-t border-white/[0.08]">
         <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
-          <MonitorPlay className="w-12 h-12 text-accent-purple/30 mx-auto mb-6" />
+          <MonitorPlay className="w-12 h-12 text-cyan-500/30 mx-auto mb-6" />
           <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
             Your First Video<br /><span className="gradient-text">In Under 2 Minutes</span>
           </h2>
           <p className="text-lg text-white/60 mb-4">No editing skills. No scripts. No templates. Just AI magic.</p>
           <div className="flex flex-wrap items-center justify-center gap-3 mb-4">
-            <Link href="/video-creator" className="group btn-gradient px-6 py-3.5 rounded-xl text-sm font-bold text-white flex items-center gap-2 shadow-glow-purple">
+            <Link href="/video-creator" className="group btn-gradient px-6 py-3.5 rounded-xl text-sm font-bold text-white flex items-center gap-2 shadow-lg shadow-cyan-500/20">
               <Play className="w-4 h-4" />
               <span>Try Storyboard Creator</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -350,12 +350,12 @@ export default function VideoCreatorPage() {
                   value={waitlistEmail}
                   onChange={(e) => setWaitlistEmail(e.target.value)}
                   placeholder="Enter your email for early access"
-                  className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-xl px-5 py-4 text-white placeholder:text-white/60 outline-none text-sm focus:border-accent-purple/30 transition-colors"
+                  className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-xl px-5 py-4 text-white placeholder:text-white/60 outline-none text-sm focus:border-cyan-500/30 transition-colors"
                 />
                 <button
                   type="submit"
                   disabled={waitlistStatus === "loading"}
-                  className="group btn-gradient px-6 py-4 rounded-xl text-sm font-bold text-white flex items-center gap-2 shadow-glow-purple whitespace-nowrap disabled:opacity-50"
+                  className="group btn-gradient px-6 py-4 rounded-xl text-sm font-bold text-white flex items-center gap-2 shadow-lg shadow-cyan-500/20 whitespace-nowrap disabled:opacity-50"
                 >
                   <span>{waitlistStatus === "loading" ? "Joining..." : "Join Waitlist"}</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

@@ -43,7 +43,7 @@ const QUICK_ACTIONS = [
   { icon: Sparkles, label: "SEO Agent", href: "/seo", color: "from-accent-cyan to-emerald-600" },
   { icon: Search, label: "Crawl Competitor", href: "/crawl", color: "from-violet-500 to-purple-600" },
   { icon: BarChart3, label: "Analytics", href: "/analytics", color: "from-blue-500 to-fuchsia-600" },
-  { icon: Video, label: "AI Video Creator", href: "/video-creator", color: "from-accent-purple to-pink-600" },
+  { icon: Video, label: "AI Video Creator", href: "/video-creator", color: "from-accent-purple to-blue-700" },
 ];
 
 const ADMIN_QUICK_ACTIONS = [
@@ -55,7 +55,7 @@ const ADMIN_QUICK_ACTIONS = [
   { icon: Key, label: "API Keys", desc: "Developer access", href: "/auth/settings", color: "from-cyan-500 to-blue-600" },
   { icon: BarChart3, label: "Analytics", desc: "Site performance", href: "/analytics", color: "from-blue-500 to-fuchsia-600" },
   { icon: Settings, label: "Settings", desc: "Account config", href: "/auth/settings", color: "from-gray-500 to-slate-600" },
-  { icon: Mail, label: "Email Support", desc: "Tickets & inbox", href: "/email-support", color: "from-pink-500 to-rose-600" },
+  { icon: Mail, label: "Email Support", desc: "Tickets & inbox", href: "/email-support", color: "from-cyan-500 to-rose-600" },
 ];
 
 const ADMIN_TOOLS = [

@@ -105,7 +105,7 @@ export const TEMPLATES: Template[] = [
     category: "Entertainment",
     description: "Artist page with album showcase, tour dates, and merch store.",
     prompt: "A music artist/band website with a full-screen hero with artist name, a latest album showcase section, a tour dates list with venue and ticket links, a music player UI element, a merch store section, and social media links. Dark and moody with neon accent colors.",
-    thumbnail: "from-blue-900 to-pink-600",
+    thumbnail: "from-blue-900 to-blue-700",
     tags: ["Music", "Artist", "Entertainment"],
   },
   {
@@ -141,7 +141,7 @@ export const TEMPLATES: Template[] = [
     category: "Events",
     description: "Elegant wedding planner site with gallery, packages, and inquiry form.",
     prompt: "An elegant wedding planner website with a romantic hero section featuring a full-bleed floral/venue photo (.hero-image) with delicate overlay text. Portfolio gallery (.image-gallery) of past weddings. Service packages (Intimate, Classic, Grand) with pricing. Vendor partners section. Client love stories (testimonials with wedding date and venue). Planning timeline/process steps. Inquiry form for consultations. Soft blush (#fce7f3), sage green (#86efac), and cream palette. Elegant serif headings (Cormorant Garamond). Romantic, aspirational, feminine sophistication.",
-    thumbnail: "from-pink-300 to-rose-400",
+    thumbnail: "from-cyan-300 to-rose-400",
     tags: ["Wedding", "Events", "Planner", "Elegant"],
   },
   {
@@ -285,7 +285,7 @@ export const TEMPLATES: Template[] = [
     category: "E-Commerce",
     description: "Monthly subscription box with unboxing gallery, plans, and gifting options.",
     prompt: "A subscription box service website. Hero: lifestyle unboxing photo (.hero-image seed/subscription-box), headline 'Curated Just for You', subtitle 'Monthly surprises delivered to your door'. How it works: 3 steps (Choose Your Plan → Get Matched → Unbox Joy). Subscription plans .grid-3: Monthly ($29), Quarterly ($79, save 10%), Annual ($279, save 20%), each with what's included. Past boxes gallery showing previous months' contents with themed names. Customer unboxing video/photo testimonials. Gift a subscription CTA with gift card mockup. FAQ about shipping, cancellation, customization. Playful, colorful design: coral (#f43f5e) accent, soft backgrounds, rounded elements. Fun, approachable, gifting-friendly.",
-    thumbnail: "from-rose-500 to-pink-400",
+    thumbnail: "from-rose-500 to-blue-500",
     tags: ["Subscription", "E-Commerce", "Gift", "Monthly Box"],
   },
 
@@ -457,7 +457,7 @@ export const TEMPLATES: Template[] = [
     category: "Events",
     description: "Festival site with lineup, schedule, tickets, and camping info.",
     prompt: "A music festival website. Explosive hero with festival crowd photo (.hero-image seed/music-festival/1600/900), festival logo overlay, dates prominently displayed, countdown timer. Lineup: headliners (3 large names with photos), supporting acts organized by day (Friday/Saturday/Sunday). Stage schedule: multi-stage timetable (Main Stage, Tent Stage, DJ Stage) with time blocks. Tickets: General Admission $149, VIP $299, Platinum $499 with comparison. Camping & accommodation: tent/glamping/hotel options with photos and pricing. Getting there: map, shuttle info, parking. Festival map illustration placeholder. FAQ: what to bring, prohibited items, age policy. Past festival gallery (.image-gallery). Vibrant, psychedelic: neon pink (#ec4899), electric blue (#3b82f6), black bg. Festival energy — bold, loud, exciting.",
-    thumbnail: "from-pink-600 to-blue-600",
+    thumbnail: "from-cyan-600 to-blue-600",
     tags: ["Festival", "Music", "Events", "Tickets"],
   },
   {
@@ -553,7 +553,7 @@ export const TEMPLATES: Template[] = [
     category: "Blog",
     description: "Personal brand site with content, collaborations, and media kit.",
     prompt: "A personal brand / influencer website. Bold hero with professional portrait (.hero-image seed/influencer-portrait), name large and bold, tagline 'Digital Creator | Speaker | Author', social follower counts (IG 150K, YouTube 500K, TikTok 1M). Content sections: Latest YouTube videos (3 thumbnails with titles), Recent blog posts, Podcast episodes. Collaborations: 'As Seen In' logos (Forbes, TechCrunch, etc.). Brand partnerships: 4 featured collab case studies with brand logos and campaign photos. Speaking section: past events, topics, booking inquiry. Media kit download CTA with stats summary. Shop: merchandise or digital products. About: longer bio, achievements, mission statement. Contact for business inquiries form. Bold, modern: dark bg (#0a0a0a), neon accent matching personal brand, white text. Instagram-aesthetic quality.",
-    thumbnail: "from-gray-900 to-pink-600",
+    thumbnail: "from-gray-900 to-blue-700",
     tags: ["Personal Brand", "Influencer", "Content Creator", "Blog"],
   },
   {
@@ -573,7 +573,7 @@ export const TEMPLATES: Template[] = [
     category: "Business",
     description: "Pet grooming with services, pricing, gallery, and online booking.",
     prompt: "A pet grooming salon website. Cute hero with groomed fluffy dog (.hero-image seed/groomed-dog), headline 'Pampered Pups & Pretty Kitties', 'Book Grooming' CTA. Services: Bath & Brush ($35+), Full Grooming ($55+), Puppy's First Groom ($40), Cat Grooming ($65), Nail Trim ($15), Teeth Cleaning ($20). Pricing by size: Small/Medium/Large/XL with prices for each service. Before/after gallery (.image-gallery) of groomed pets. Our groomers: 3 profiles with specialties and certifications. Pet of the month feature. Loyalty program: every 5th groom free. Booking form: pet name, breed, service, preferred date/time, special instructions. Reviews with pet photos. FAQ about preparation, duration, aggressive pet policy. Playful, clean: baby blue (#93c5fd), white, pink accents (#f9a8d4). Adorable but professional.",
-    thumbnail: "from-blue-300 to-pink-300",
+    thumbnail: "from-blue-300 to-blue-400",
     tags: ["Pet Grooming", "Salon", "Pets", "Business"],
   },
   {
@@ -582,7 +582,7 @@ export const TEMPLATES: Template[] = [
     category: "Business",
     description: "Studio with session types, booking, mini sessions, and print shop.",
     prompt: "A photography studio booking website. Elegant hero with studio portrait (.hero-image seed/studio-portrait/1400/800), studio name, 'Book Your Session'. Session types .grid-3: Family Portraits ($299), Headshots ($199), Newborn ($399), Maternity ($349), Senior Portraits ($249), Event Coverage (custom quote). Each with sample image and what's included (session time, edited photos, online gallery). Mini session calendar: upcoming themed mini sessions (Holiday, Spring Garden, Back to School) with limited spots and booking. Portfolio: filterable gallery by session type. Client experience: what to expect from booking to gallery delivery. Print shop: canvas, albums, gift prints with pricing. Testimonials from families. Studio location with interior photos. Booking form: session type, preferred date, # of people, special requests. Soft, warm palette: blush (#fce7f3), warm gray, gold (#c9a96e). Elegant, premium, personal.",
-    thumbnail: "from-pink-200 to-amber-300",
+    thumbnail: "from-cyan-200 to-amber-300",
     tags: ["Photography", "Studio", "Portraits", "Booking"],
   },
   {
@@ -629,7 +629,7 @@ export const TEMPLATES: Template[] = [
     category: "Technology",
     description: "Social analytics with cross-platform metrics, content calendar, and performance.",
     prompt: "A social media analytics dashboard. Sidebar: Dashboard, Content, Calendar, Analytics, Accounts, Settings. Connected accounts row with icons: Instagram, Twitter/X, LinkedIn, TikTok, YouTube — each with follower count. Overview cards: Total Followers (245K, +3.2%), Engagement Rate (4.7%), Impressions (1.2M), Link Clicks (8,400). Platform comparison chart: bar chart showing followers/engagement per platform. Top performing posts: 5 posts with thumbnail, platform icon, engagement metrics, post date. Content calendar: monthly view with colored dots per platform showing scheduled posts. Best posting times heatmap: days × hours grid with engagement intensity. Audience demographics: age, gender, location charts. Quick actions: Schedule Post, Create Campaign, Generate Report. Modern dark theme: #0f172a sidebar, #f8fafc content, platform brand colors for icons. Data-rich, actionable.",
-    thumbnail: "from-pink-600 to-violet-600",
+    thumbnail: "from-cyan-600 to-violet-600",
     tags: ["Social Media", "Analytics", "Dashboard", "Marketing"],
   },
   {
@@ -713,7 +713,7 @@ export const TEMPLATES: Template[] = [
     category: "Entertainment",
     description: "Podcast with episode listings, guest features, and subscription options.",
     prompt: "A podcast website with bold visual identity. HERO: Dark bg (#0f172a) with .hero-aurora effect, podcast name in bold gradient text (.hero-gradient-text), tagline, Apple/Spotify/YouTube badges. LATEST EPISODE: featured player card with episode title, guest photo, duration, description, play button. EPISODE GRID: .grid-2 with 6 episode cards — each with episode number, title, guest, duration, date. POPULAR GUESTS: .grid-3 cards with guest photos, names, episode titles. ABOUT: hosts section with photos, bios, social links. STATS: 500+ episodes, 2M+ downloads, Top 10 on Apple, 4.9 star rating. NEWSLETTER: subscribe for weekly episode recaps. MERCH: 3 merchandise items with images. SPONSORS: logo strip of brand partners. Electric purple (#7c3aed) primary, hot pink (#ec4899) accent, dark bg. Bold, energetic.",
-    thumbnail: "from-purple-700 to-pink-500",
+    thumbnail: "from-purple-700 to-blue-600",
     tags: ["Podcast", "Audio", "Entertainment", "Media"],
   },
   {
@@ -911,7 +911,7 @@ export const TEMPLATES: Template[] = [
     category: "Business",
     description: "Luxury spa with services menu, booking, staff, and gift cards.",
     prompt: "A luxury day spa and salon website. HERO: Full-bleed .hero-image of serene spa interior with candles and flowers, elegant overlay text 'Your Sanctuary Awaits', 'Book Now' CTA. SERVICES MENU: categorized list — Massage (Swedish $95, Deep Tissue $120, Hot Stone $140), Facials (Classic $85, Anti-Aging $150), Body Treatments (Body Wrap $130, Salt Scrub $110), Hair (Cut & Style $75, Color $150+), Nails (Manicure $45, Pedicure $65). PACKAGES: .grid-3 — 'The Escape' ($199), 'Ultimate Indulgence' ($349), 'Couples Retreat' ($450). TEAM: .grid-4 — 4 therapists with specialties and photos. GALLERY: .image-gallery of 6 spa/treatment room photos. TESTIMONIALS: 3 clients about relaxation and results. GIFT CARDS: section promoting gift cards with amounts ($50-$500). HOURS: weekly schedule. Soft palette: blush bg (#fdf2f8), deep mauve (#9f1239) primary, gold (#b8860b) accent. Cormorant Garamond headings. Serene, luxurious.",
-    thumbnail: "from-pink-200 to-rose-700",
+    thumbnail: "from-cyan-200 to-rose-700",
     tags: ["Spa", "Salon", "Beauty", "Wellness"],
   },
   // ── Health (adding variety) ──
@@ -939,7 +939,7 @@ export const TEMPLATES: Template[] = [
     category: "Technology",
     description: "Pre-launch startup with waitlist, problem/solution, and early traction.",
     prompt: "A pre-launch startup landing page designed to convert visitors to waitlist signups. HERO: Dark bg (#0f172a) with .hero-aurora, bold headline in gradient text (.hero-gradient-text) 'The Future of [Industry] Starts Here', waitlist email input + 'Join the Waitlist' CTA, '2,847 people already signed up' social proof. PROBLEM: section with 3 pain point cards in dark red accents. SOLUTION: split layout showing the product concept with mockup placeholder image, 3 key differentiators. EARLY TRACTION: .stat-item — $2.5M raised, 3 enterprise pilots, 50K waitlist, Y Combinator S26. FEATURES PREVIEW: .grid-3 with upcoming features — icons, titles, 'Coming Soon' badges. TEAM: .grid-3 — 3 founders with photos, previous companies (ex-Google, ex-Stripe), LinkedIn links. INVESTORS: VC logos. TIMELINE: launch roadmap — Beta (Q2), Public Launch (Q3), Series A (Q4). CTA: waitlist with referral incentive. Very dark (#0f172a), electric violet (#7c3aed) primary, hot pink (#ec4899) accent. Urgent, exclusive.",
-    thumbnail: "from-violet-700 to-pink-500",
+    thumbnail: "from-violet-700 to-blue-600",
     tags: ["Startup", "Launch", "Waitlist", "Technology"],
   },
   {

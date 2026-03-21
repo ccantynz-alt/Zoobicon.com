@@ -296,8 +296,8 @@ const EMAIL_FEATURES = [
     title: "Mailbox Hosting",
     description:
       "Create mailboxes on your domain. info@, support@, hello@ — with forwarding, auto-reply, and 1GB storage.",
-    color: "text-pink-400",
-    border: "border-pink-500/20",
+    color: "text-cyan-400",
+    border: "border-cyan-500/20",
   },
 ];
 

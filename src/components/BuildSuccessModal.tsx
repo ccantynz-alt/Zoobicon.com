@@ -77,7 +77,7 @@ function useConfetti(count: number) {
       "#10b981",
       "#f59e0b",
       "#ef4444",
-      "#ec4899",
+      "#06b6d4",
       "#06b6d4",
       "#f97316",
     ];

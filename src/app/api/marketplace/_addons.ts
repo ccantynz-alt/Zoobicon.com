@@ -61,7 +61,7 @@ export const ADDONS: Addon[] = [
     featured: true,
     rating: 4.7,
     installs: "6.8K",
-    gradient: "from-accent-purple to-pink-600",
+    gradient: "from-accent-purple to-blue-700",
     iconName: "Video",
   },
   {
@@ -132,7 +132,7 @@ export const ADDONS: Addon[] = [
     featured: false,
     rating: 4.7,
     installs: "7.9K",
-    gradient: "from-pink-500 to-rose-600",
+    gradient: "from-cyan-500 to-rose-600",
     iconName: "Palette",
   },
   {
@@ -202,7 +202,7 @@ export const ADDONS: Addon[] = [
     featured: false,
     rating: 4.3,
     installs: "8.6K",
-    gradient: "from-rose-500 to-pink-600",
+    gradient: "from-rose-500 to-blue-700",
     iconName: "Type",
   },
   {

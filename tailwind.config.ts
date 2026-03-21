@@ -22,9 +22,9 @@ const config: Config = {
           700: "#1e40af",
         },
         accent: {
-          cyan: "#7dd3fc",
-          purple: "#a5b4fc",
-          pink: "#f0abfc",
+          cyan: "#22d3ee",
+          purple: "#67e8f9",
+          pink: "#38bdf8",
         },
         // Signature color — electric violet/indigo that's uniquely Zoobicon
         // Not another blue gradient — this is ownable
