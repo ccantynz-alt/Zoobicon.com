@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import "./globals.css";
-import CookieConsent from "@/components/CookieConsent";
+
 
 const BRAND_META: Record<string, {
   title: string;
@@ -180,7 +180,6 @@ export default function RootLayout({
       </head>
       <body className="grain">
         {children}
-        <CookieConsent />
       </body>
     </html>
   );
