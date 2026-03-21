@@ -43,6 +43,7 @@ import {
   Check,
   ArrowRight,
   Mic,
+  MicOff,
   ImagePlus,
   Subtitles,
   Wand2,
@@ -203,6 +204,66 @@ export default function VideoCreatorDashboard() {
   const [music, setMusic] = useState("upbeat");
   const [brandColors, setBrandColors] = useState(["#7c3aed", "#ec4899"]);
   const [brandFont, setBrandFont] = useState("Inter");
+
+  // Voice recording state
+  const [isRecording, setIsRecording] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [recognition, setRecognition] = useState<any>(null);
+
+  const toggleVoiceInput = useCallback(() => {
+    if (isRecording && recognition) {
+      recognition.stop();
+      setIsRecording(false);
+      return;
+    }
+
+    const SpeechRecognitionCtor =
+      (window as unknown as Record<string, unknown>).SpeechRecognition ||
+      (window as unknown as Record<string, unknown>).webkitSpeechRecognition;
+    if (!SpeechRecognitionCtor) {
+      setError("Voice input is not supported in this browser. Try Chrome or Edge.");
+      return;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const recog = new (SpeechRecognitionCtor as any)();
+    recog.continuous = true;
+    recog.interimResults = true;
+    recog.lang = "en-US";
+
+    let finalTranscript = "";
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recog.onresult = (event: any) => {
+      let interim = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const t = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += t + " ";
+        } else {
+          interim = t;
+        }
+      }
+      setScript((prev: string) => {
+        const base = prev.replace(/\u200B.*$/, "").trimEnd();
+        const combined = base ? base + " " + finalTranscript : finalTranscript;
+        return interim ? combined + "\u200B" + interim : combined.trimEnd();
+      });
+    };
+
+    recog.onerror = () => {
+      setIsRecording(false);
+    };
+
+    recog.onend = () => {
+      setIsRecording(false);
+      setScript((prev: string) => prev.replace(/\u200B/g, "").trimEnd());
+    };
+
+    recog.start();
+    setRecognition(recog);
+    setIsRecording(true);
+  }, [isRecording, recognition]);
 
   // Generation state
   const [generating, setGenerating] = useState(false);
@@ -938,13 +999,33 @@ export default function VideoCreatorDashboard() {
                     )}
                   </button>
                 </div>
-                <textarea
-                  value={script}
-                  onChange={(e) => setScript(e.target.value)}
-                  placeholder="Describe your video or paste a script... Leave empty and we'll generate one for you."
-                  rows={4}
-                  className="w-full bg-white/[0.05] border border-white/[0.10] rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/50 outline-none focus:border-purple-500/30 transition-colors resize-none"
-                />
+                <div className="relative">
+                  <textarea
+                    value={script}
+                    onChange={(e) => setScript(e.target.value)}
+                    placeholder="Describe your video or paste a script... Or tap the mic to speak."
+                    rows={4}
+                    className="w-full bg-white/[0.05] border border-white/[0.10] rounded-xl px-4 py-3 pr-12 text-sm text-white placeholder:text-white/50 outline-none focus:border-purple-500/30 transition-colors resize-none"
+                  />
+                  <button
+                    onClick={toggleVoiceInput}
+                    type="button"
+                    className={`absolute right-3 bottom-3 p-2 rounded-lg transition-all ${
+                      isRecording
+                        ? "bg-red-500/20 text-red-400 animate-pulse border border-red-500/30"
+                        : "bg-white/[0.05] text-white/50 hover:text-white hover:bg-white/[0.10] border border-white/[0.10]"
+                    }`}
+                    title={isRecording ? "Stop recording" : "Describe your video with voice"}
+                  >
+                    {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                  </button>
+                </div>
+                {isRecording && (
+                  <p className="text-xs text-red-400 flex items-center gap-1.5 mt-1">
+                    <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                    Listening... speak your video description
+                  </p>
+                )}
               </motion.div>
 
               {/* Visual Style */}
