@@ -272,6 +272,8 @@ Post-deployment live editor:
 
 24. **Stripe multi-tier checkout** — Three paid plans use Stripe: Creator ($19/mo → `STRIPE_CREATOR_PRICE_ID`), Pro ($49/mo → `STRIPE_PRO_PRICE_ID`), Agency ($99/mo → `STRIPE_AGENCY_PRICE_ID`). Enterprise ($299/mo) is contact-sales only. The checkout route at `/api/stripe/checkout` accepts `{ email, plan: "creator" | "pro" | "agency" }`. Plan price IDs and names are defined in `src/lib/stripe.ts`. All three pricing page buttons route through Stripe checkout. If adding new plans, add the price ID env var, update `PLAN_PRICE_IDS` in stripe.ts, and update the admin page env vars list.
 
+25. **Video Creator pipeline — STRICT honesty standard** — The Video Creator at `/video-creator` has a multi-stage pipeline. What works: AI script generation, storyboard generation (Sonnet), scene image generation (Replicate/OpenAI/Stability), voiceover (ElevenLabs/PlayHT/browser TTS), subtitle generation (SRT/VTT, 5 caption styles), full pipeline orchestration, quota tracking with Stripe overage packs. What does NOT work yet: video rendering (API routes built for Runway/Luma/Pika/Kling/Replicate but no provider keys configured), final MP4 assembly (manifest only, no FFmpeg), music audio (direction cues only, no actual tracks). **RULES:** (1) Never show dev-facing messages to users (no "add API_KEY", no "No provider configured"). (2) Unbuilt features say "Coming Soon" — never fake "Launch Now". (3) Subtitles are free (pure text processing) — do NOT gate behind video addon. (4) The full pipeline must pass data directly between stages — never rely on React state for cross-stage data (race condition). (5) Pipeline status must show per-stage progress, failures, and skips honestly. (6) The product page at `/products/video-creator` must accurately describe what's built vs coming. Key files: `src/app/video-creator/page.tsx`, `src/app/api/video-creator/` (10 routes), `src/lib/video-render.ts`, `src/lib/video-assembly.ts`, `src/lib/voiceover.ts`, `src/lib/subtitle-gen.ts`, `src/lib/scene-image-gen.ts`, `src/lib/video-usage.ts`, `src/lib/video-templates.ts`.
+
 ## Route Audit Status
 
 Full audit completed. **0 broken routes, 0 broken links, 0 missing API endpoints.** However, several product pages have CTAs that link to `/builder` or `/auth/signup` instead of dedicated product experiences — see the Quality Standard checklist above for the full list. If you add new routes, make sure:
@@ -294,7 +296,7 @@ Full audit completed. **0 broken routes, 0 broken links, 0 missing API endpoints
 | 2 | **Hosting** | DONE | Serving, CDN, SSL, DNS management via Cloudflare lib (`src/lib/cloudflare.ts`) |
 | 3 | **Generators (43)** | DONE | 43 generators with type-specific system prompts, custom form fields per type |
 | 4 | **SEO Agent** | DONE | Dashboard at `/seo` + analysis API at `/api/seo/analyze`. Autonomous mode not built. |
-| 5 | **Video Creator** | PARTIAL | Storyboard/script generation built (`/video-creator`). Video rendering not built. |
+| 5 | **Video Creator** | MOSTLY DONE | Full pipeline at `/video-creator`: AI script, storyboard, scene images (3 providers), voiceover (ElevenLabs/PlayHT/browser TTS), subtitles (SRT/VTT, 5 styles), quota tracking, Stripe overage packs. Video rendering API wired (Runway/Luma/Pika/Kling/Replicate) but awaiting provider keys. Final MP4 assembly not built. |
 | 6 | **Email Support** | DONE | Full ticketing system + Mailgun integration (`/email-support`, `/api/email/support`) |
 | 7 | **Marketplace** | DONE | 20 add-ons, category filtering, Stripe checkout (`/marketplace`, `/api/marketplace/`) |
 | 8 | **Domains** | DONE | Domain search, registration, Stripe checkout (`/domains`, `/api/domains/`) |
@@ -306,7 +308,9 @@ Full audit completed. **0 broken routes, 0 broken links, 0 missing API endpoints
 | 14 | **Competitor Crawler** | DONE | Tech stack analysis at `/admin/intel` via `src/lib/intel-crawler.ts` |
 
 **Remaining gaps (genuine):**
-- Video rendering engine (needs Runway/Pika/Sora API)
+- Video rendering provider API keys (Runway/Luma/Pika/Kling endpoints built, need env vars + credits)
+- Final video MP4 assembly (FFmpeg.wasm or server-side — currently returns manifest only)
+- Music audio library integration (music cue directions generated, no actual audio tracks)
 - Autonomous SEO agent (scheduled crawls, rank tracking, backlink outreach)
 - Real domain registrar API (currently simulated availability)
 - Marketplace add-on code delivery (payments work, delivery doesn't)

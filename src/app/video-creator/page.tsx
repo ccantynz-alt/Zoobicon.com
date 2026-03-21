@@ -116,6 +116,19 @@ interface PipelineCapabilities {
 
 type PipelineStage = "idle" | "images" | "video" | "voiceover" | "subtitles" | "complete";
 
+interface PipelineStageStatus {
+  status: "pending" | "running" | "done" | "failed" | "skipped";
+  error?: string;
+}
+
+interface FullPipelineProgress {
+  running: boolean;
+  images: PipelineStageStatus;
+  video: PipelineStageStatus;
+  voiceover: PipelineStageStatus;
+  subtitles: PipelineStageStatus;
+}
+
 interface VideoTemplate {
   id: string;
   name: string;
@@ -285,6 +298,7 @@ export default function VideoCreatorDashboard() {
   const [templates, setTemplates] = useState<VideoTemplate[]>([]);
   const [showTemplates, setShowTemplates] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState("");
+  const [fullPipelineProgress, setFullPipelineProgress] = useState<FullPipelineProgress | null>(null);
 
   // Project history
   const [projects, setProjects] = useState<Project[]>([]);
@@ -602,7 +616,7 @@ export default function VideoCreatorDashboard() {
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
         if (res.status === 503) {
-          throw new Error("Video rendering requires a provider API key (REPLICATE_API_TOKEN, RUNWAY_API_KEY, or LUMA_API_KEY). Add one to your environment variables and redeploy.");
+          throw new Error("Video rendering is not available yet. Your storyboard, images, voiceover, and subtitles are ready — video rendering via Runway/Luma/Pika is coming soon.");
         }
         throw new Error(d.error || "Render failed");
       }
@@ -678,7 +692,7 @@ export default function VideoCreatorDashboard() {
           window.speechSynthesis.speak(utterance);
           setVoiceoverUrl("browser-tts");
         } else {
-          setError("Browser does not support text-to-speech. Add ELEVENLABS_API_KEY for premium voiceover.");
+          setError("Browser does not support text-to-speech. Upgrade to a paid plan for premium AI voiceover.");
         }
       } else {
         setVoiceoverUrl(data.audioUrl || null);
@@ -691,9 +705,8 @@ export default function VideoCreatorDashboard() {
     }
   };
 
-  // --- Pipeline: Generate Subtitles ---
+  // --- Pipeline: Generate Subtitles (no addon required — pure text processing) ---
   const handleGenerateSubtitles = async () => {
-    if (!requireVideoAddon()) return;
     if (!storyboard) return;
     setPipelineStage("subtitles");
     setError("");
@@ -722,22 +735,169 @@ export default function VideoCreatorDashboard() {
   };
 
   // --- Pipeline: Run Full Pipeline ---
+  // Self-contained orchestrator that passes data directly between stages
+  // instead of relying on React state (which is async and causes race conditions)
   const handleFullPipeline = async () => {
     if (!requireVideoAddon()) return;
     if (!storyboard) return;
     setShowPipeline(true);
     setError("");
-    // Step 1: Images
-    await handleGenerateImages();
-    // Step 2: Voiceover + Subtitles (parallel, don't let one failure block the other or step 3)
-    await Promise.allSettled([
-      handleGenerateVoiceover(),
-      handleGenerateSubtitles(),
-    ]);
-    // Step 3: Video render (if provider available)
-    if (capabilities?.videoRender?.available) {
-      await handleStartRender();
+
+    const initStage = (): PipelineStageStatus => ({ status: "pending" });
+    const progress: FullPipelineProgress = {
+      running: true,
+      images: initStage(),
+      video: initStage(),
+      voiceover: initStage(),
+      subtitles: initStage(),
+    };
+    setFullPipelineProgress({ ...progress });
+
+    // --- Step 1: Generate scene images ---
+    let generatedImages: { sceneNumber: number; imageUrl: string }[] = [];
+    progress.images = { status: "running" };
+    setFullPipelineProgress({ ...progress });
+    try {
+      const scenes = storyboard.storyboard.map((s) => ({
+        sceneNumber: s.sceneNumber,
+        visualDescription: s.visualDescription,
+        colorPalette: s.colorPalette,
+        style,
+        platform,
+        textOverlay: s.textOverlay,
+      }));
+      const res = await fetch("/api/video-creator/images", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scenes, ...getQuotaFields() }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || "Image generation failed");
+      }
+      const data = await res.json();
+      generatedImages = data.images || [];
+      setSceneImages(generatedImages);
+      progress.images = { status: "done" };
+    } catch (err) {
+      progress.images = { status: "failed", error: err instanceof Error ? err.message : "Image generation failed" };
     }
+    setFullPipelineProgress({ ...progress });
+
+    // --- Step 2: Voiceover + Subtitles in parallel ---
+    progress.voiceover = { status: "running" };
+    progress.subtitles = { status: "running" };
+    setFullPipelineProgress({ ...progress });
+
+    const [voiceResult, subsResult] = await Promise.allSettled([
+      // Voiceover
+      (async () => {
+        const res = await fetch("/api/video-creator/voiceover", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            script: storyboard.script,
+            voiceId: selectedVoice,
+            mode: "full",
+            ...getQuotaFields(),
+          }),
+        });
+        if (!res.ok) {
+          const d = await res.json().catch(() => ({}));
+          throw new Error(d.error || "Voiceover generation failed");
+        }
+        return res.json();
+      })(),
+      // Subtitles (no addon required — pure text processing)
+      (async () => {
+        const res = await fetch("/api/video-creator/subtitles", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            script: storyboard.script,
+            totalDuration: parseInt(storyboard.totalDuration) || duration,
+            format: "both",
+            captionPreset: platform.includes("tiktok") ? "tiktok-bold" : "youtube-standard",
+          }),
+        });
+        if (!res.ok) {
+          const d = await res.json().catch(() => ({}));
+          throw new Error(d.error || "Subtitle generation failed");
+        }
+        return res.json();
+      })(),
+    ]);
+
+    // Handle voiceover result
+    if (voiceResult.status === "fulfilled") {
+      const data = voiceResult.value;
+      if (data.provider === "browser" && !data.audioUrl) {
+        if ("speechSynthesis" in window) {
+          setVoiceoverUrl("browser-tts");
+        }
+        progress.voiceover = { status: "done" };
+      } else {
+        setVoiceoverUrl(data.audioUrl || null);
+        progress.voiceover = { status: "done" };
+      }
+    } else {
+      progress.voiceover = { status: "failed", error: voiceResult.reason?.message || "Voiceover failed" };
+    }
+
+    // Handle subtitles result
+    if (subsResult.status === "fulfilled") {
+      const data = subsResult.value;
+      setSubtitleData({ srt: data.srt, vtt: data.vtt });
+      progress.subtitles = { status: "done" };
+    } else {
+      progress.subtitles = { status: "failed", error: subsResult.reason?.message || "Subtitle generation failed" };
+    }
+    setFullPipelineProgress({ ...progress });
+
+    // --- Step 3: Video render (if provider available) ---
+    if (capabilities?.videoRender?.available) {
+      progress.video = { status: "running" };
+      setFullPipelineProgress({ ...progress });
+      try {
+        const imageMap = new Map(generatedImages.map((i) => [i.sceneNumber, i.imageUrl]));
+        const renderScenes = storyboard.storyboard.map((s) => ({
+          sceneNumber: s.sceneNumber,
+          duration: s.duration,
+          visualDescription: s.visualDescription,
+          textOverlay: s.textOverlay,
+          colorPalette: s.colorPalette,
+          cameraMovement: s.cameraMovement,
+          imageUrl: imageMap.get(s.sceneNumber),
+        }));
+        const res = await fetch("/api/video-creator/render", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            scenes: renderScenes,
+            style,
+            platform,
+            provider: selectedProvider || undefined,
+            ...getQuotaFields(),
+          }),
+        });
+        if (!res.ok) {
+          const d = await res.json().catch(() => ({}));
+          throw new Error(d.error || "Render failed");
+        }
+        const data = await res.json();
+        setRenderJobs(data.jobs || []);
+        pollRenderStatus(data.jobs || []);
+        progress.video = { status: "done" };
+      } catch (err) {
+        progress.video = { status: "failed", error: err instanceof Error ? err.message : "Render failed" };
+      }
+    } else {
+      progress.video = { status: "skipped", error: "No video rendering provider configured. Images, voiceover, and subtitles were generated successfully." };
+    }
+
+    progress.running = false;
+    setFullPipelineProgress({ ...progress });
+    fetchQuota();
   };
 
   // --- Template: Apply template ---
@@ -1114,7 +1274,7 @@ export default function VideoCreatorDashboard() {
               {/* Music */}
               <motion.div initial="hidden" animate="visible" variants={fadeIn} className="space-y-2">
                 <label className="text-xs font-semibold text-white/70 uppercase tracking-wider flex items-center gap-1.5">
-                  <Music className="w-3 h-3" /> Music
+                  <Music className="w-3 h-3" /> Music Direction
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {MUSIC_CATEGORIES.map((m) => (
@@ -1532,30 +1692,97 @@ export default function VideoCreatorDashboard() {
                       {/* Pipeline stages summary */}
                       <div className="grid grid-cols-4 gap-2">
                         {[
-                          { label: "Images", done: sceneImages.length > 0, active: pipelineStage === "images", icon: ImagePlus },
-                          { label: "Video", done: renderJobs.some((j) => j.status === "succeeded"), active: pipelineStage === "video", icon: Film },
-                          { label: "Voice", done: !!voiceoverUrl, active: pipelineStage === "voiceover", icon: Mic },
-                          { label: "Subs", done: !!subtitleData, active: pipelineStage === "subtitles", icon: Subtitles },
+                          {
+                            label: "Images",
+                            done: sceneImages.length > 0,
+                            active: pipelineStage === "images" || fullPipelineProgress?.images.status === "running",
+                            failed: fullPipelineProgress?.images.status === "failed",
+                            icon: ImagePlus,
+                          },
+                          {
+                            label: "Video",
+                            done: renderJobs.some((j) => j.status === "succeeded"),
+                            active: pipelineStage === "video" || fullPipelineProgress?.video.status === "running",
+                            failed: fullPipelineProgress?.video.status === "failed",
+                            skipped: fullPipelineProgress?.video.status === "skipped",
+                            icon: Film,
+                          },
+                          {
+                            label: "Voice",
+                            done: !!voiceoverUrl,
+                            active: pipelineStage === "voiceover" || fullPipelineProgress?.voiceover.status === "running",
+                            failed: fullPipelineProgress?.voiceover.status === "failed",
+                            icon: Mic,
+                          },
+                          {
+                            label: "Subs",
+                            done: !!subtitleData,
+                            active: pipelineStage === "subtitles" || fullPipelineProgress?.subtitles.status === "running",
+                            failed: fullPipelineProgress?.subtitles.status === "failed",
+                            icon: Subtitles,
+                          },
                         ].map((s) => (
                           <div key={s.label} className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-[10px] font-medium ${
-                            s.active ? "bg-purple-500/20 text-purple-300" : s.done ? "bg-green-500/10 text-green-400" : "bg-white/[0.03] text-white/50"
+                            s.active ? "bg-purple-500/20 text-purple-300" :
+                            s.failed ? "bg-red-500/10 text-red-400" :
+                            s.skipped ? "bg-amber-500/10 text-amber-400" :
+                            s.done ? "bg-green-500/10 text-green-400" :
+                            "bg-white/[0.03] text-white/50"
                           }`}>
-                            {s.active ? <Loader2 className="w-3 h-3 animate-spin" /> : s.done ? <CheckCircle2 className="w-3 h-3" /> : <CircleDashed className="w-3 h-3" />}
+                            {s.active ? <Loader2 className="w-3 h-3 animate-spin" /> :
+                             s.failed ? <AlertCircle className="w-3 h-3" /> :
+                             s.skipped ? <AlertCircle className="w-3 h-3" /> :
+                             s.done ? <CheckCircle2 className="w-3 h-3" /> :
+                             <CircleDashed className="w-3 h-3" />}
                             {s.label}
                           </div>
                         ))}
                       </div>
 
+                      {/* Full pipeline progress detail */}
+                      {fullPipelineProgress && (
+                        <div className="space-y-1.5">
+                          {fullPipelineProgress.running && (
+                            <div className="flex items-center gap-2 text-[10px] text-purple-300">
+                              <Loader2 className="w-3 h-3 animate-spin" />
+                              Pipeline running — generating your video assets...
+                            </div>
+                          )}
+                          {!fullPipelineProgress.running && (
+                            <div className="text-[10px] text-white/50">
+                              Pipeline complete.
+                              {fullPipelineProgress.images.status === "done" && " Images generated."}
+                              {fullPipelineProgress.voiceover.status === "done" && " Voiceover ready."}
+                              {fullPipelineProgress.subtitles.status === "done" && " Subtitles ready."}
+                              {fullPipelineProgress.video.status === "skipped" && " Video rendering skipped (coming soon)."}
+                            </div>
+                          )}
+                          {/* Show any stage errors */}
+                          {Object.entries(fullPipelineProgress).filter(([key, val]) =>
+                            key !== "running" && typeof val === "object" && val.status === "failed" && val.error
+                          ).map(([key, val]) => (
+                            <div key={key} className="text-[10px] text-red-400 bg-red-500/10 border border-red-500/20 rounded px-2 py-1">
+                              {key}: {(val as PipelineStageStatus).error}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
                       {/* Full pipeline button */}
                       <button
                         onClick={handleFullPipeline}
-                        disabled={pipelineStage !== "idle"}
+                        disabled={pipelineStage !== "idle" || (fullPipelineProgress?.running ?? false)}
                         className="w-full py-2.5 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                       >
-                        {pipelineStage !== "idle" ? (
+                        {fullPipelineProgress?.running ? (
                           <>
                             <Loader2 className="w-3.5 h-3.5 animate-spin" />
                             Running pipeline...
+                          </>
+                        ) : pipelineStage !== "idle" ? (
+                          <>
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            Processing...
                           </>
                         ) : (
                           <>
@@ -1605,7 +1832,7 @@ export default function VideoCreatorDashboard() {
                             <div className="grid grid-cols-2 gap-2">
                               <button
                                 onClick={handleGenerateImages}
-                                disabled={pipelineStage !== "idle"}
+                                disabled={pipelineStage !== "idle" || (fullPipelineProgress?.running ?? false)}
                                 className="py-2 rounded-lg border border-white/[0.10] bg-white/[0.05] text-xs text-white/70 hover:text-white hover:bg-white/[0.10] transition-all flex items-center justify-center gap-1.5 disabled:opacity-30"
                               >
                                 {pipelineStage === "images" ? <Loader2 className="w-3 h-3 animate-spin" /> : <ImagePlus className="w-3 h-3" />}
@@ -1613,7 +1840,7 @@ export default function VideoCreatorDashboard() {
                               </button>
                               <button
                                 onClick={handleStartRender}
-                                disabled={pipelineStage !== "idle"}
+                                disabled={pipelineStage !== "idle" || (fullPipelineProgress?.running ?? false)}
                                 className="py-2 rounded-lg border border-white/[0.10] bg-white/[0.05] text-xs text-white/70 hover:text-white hover:bg-white/[0.10] transition-all flex items-center justify-center gap-1.5 disabled:opacity-30"
                               >
                                 {pipelineStage === "video" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Film className="w-3 h-3" />}
@@ -1621,7 +1848,7 @@ export default function VideoCreatorDashboard() {
                               </button>
                               <button
                                 onClick={handleGenerateVoiceover}
-                                disabled={pipelineStage !== "idle"}
+                                disabled={pipelineStage !== "idle" || (fullPipelineProgress?.running ?? false)}
                                 className="py-2 rounded-lg border border-white/[0.10] bg-white/[0.05] text-xs text-white/70 hover:text-white hover:bg-white/[0.10] transition-all flex items-center justify-center gap-1.5 disabled:opacity-30"
                               >
                                 {pipelineStage === "voiceover" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Mic className="w-3 h-3" />}
@@ -1629,7 +1856,7 @@ export default function VideoCreatorDashboard() {
                               </button>
                               <button
                                 onClick={handleGenerateSubtitles}
-                                disabled={pipelineStage !== "idle"}
+                                disabled={pipelineStage !== "idle" || (fullPipelineProgress?.running ?? false)}
                                 className="py-2 rounded-lg border border-white/[0.10] bg-white/[0.05] text-xs text-white/70 hover:text-white hover:bg-white/[0.10] transition-all flex items-center justify-center gap-1.5 disabled:opacity-30"
                               >
                                 {pipelineStage === "subtitles" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Subtitles className="w-3 h-3" />}
@@ -1702,7 +1929,7 @@ export default function VideoCreatorDashboard() {
                                     >
                                       <Square className="w-3 h-3" /> Stop
                                     </button>
-                                    <span className="text-[9px] text-amber-400/60">Browser TTS — add ELEVENLABS_API_KEY for premium voices</span>
+                                    <span className="text-[9px] text-amber-400/60">Browser TTS preview — upgrade to a paid plan for premium AI voices</span>
                                   </div>
                                 ) : (
                                   <audio controls src={voiceoverUrl} className="w-full h-8 [&::-webkit-media-controls-panel]:bg-white/5 rounded" />
@@ -1722,20 +1949,28 @@ export default function VideoCreatorDashboard() {
                               </div>
                             )}
 
-                            {/* Provider status */}
+                            {/* Pipeline capability status */}
                             {capabilities && (
                               <div className="text-[10px] text-white/50 space-y-0.5 pt-1 border-t border-white/[0.06]">
                                 <div className="flex items-center gap-1">
+                                  <CheckCircle2 className="w-3 h-3 text-green-500" />
+                                  Storyboard & Script: Ready
+                                </div>
+                                <div className="flex items-center gap-1">
                                   {capabilities.imageGen.available ? <CheckCircle2 className="w-3 h-3 text-green-500" /> : <AlertCircle className="w-3 h-3 text-amber-500" />}
-                                  Image Gen: {capabilities.imageGen.available ? "Ready" : "No provider configured"}
+                                  AI Image Generation: {capabilities.imageGen.available ? "Ready" : "Coming Soon"}
                                 </div>
                                 <div className="flex items-center gap-1">
                                   {capabilities.videoRender.available ? <CheckCircle2 className="w-3 h-3 text-green-500" /> : <AlertCircle className="w-3 h-3 text-amber-500" />}
-                                  Video Render: {capabilities.videoRender.available ? "Ready (Runway/Luma/Pika/Kling)" : "No provider configured"}
+                                  Video Rendering: {capabilities.videoRender.available ? "Ready (Runway/Luma/Pika/Kling)" : "Coming Soon — Runway/Luma/Pika integration"}
                                 </div>
                                 <div className="flex items-center gap-1">
-                                  {capabilities.voiceover.available ? <CheckCircle2 className="w-3 h-3 text-green-500" /> : <AlertCircle className="w-3 h-3 text-amber-500" />}
-                                  Voiceover: {capabilities.voiceover.available ? "Ready" : "No provider configured"}
+                                  {capabilities.voiceover.available ? <CheckCircle2 className="w-3 h-3 text-green-500" /> : <CheckCircle2 className="w-3 h-3 text-green-500" />}
+                                  Voiceover: {capabilities.voiceover.available && (capabilities.voiceover as { premium?: boolean }).premium ? "Ready (ElevenLabs)" : "Ready (Browser TTS)"}
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <CheckCircle2 className="w-3 h-3 text-green-500" />
+                                  Subtitles & Captions: Ready (SRT/VTT)
                                 </div>
                               </div>
                             )}
