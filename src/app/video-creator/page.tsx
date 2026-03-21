@@ -726,10 +726,11 @@ export default function VideoCreatorDashboard() {
     if (!requireVideoAddon()) return;
     if (!storyboard) return;
     setShowPipeline(true);
+    setError("");
     // Step 1: Images
     await handleGenerateImages();
-    // Step 2: Voiceover (parallel with subtitles)
-    await Promise.all([
+    // Step 2: Voiceover + Subtitles (parallel, don't let one failure block the other or step 3)
+    await Promise.allSettled([
       handleGenerateVoiceover(),
       handleGenerateSubtitles(),
     ]);
