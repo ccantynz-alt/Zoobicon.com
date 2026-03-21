@@ -70,7 +70,7 @@ interface ReplicatePrediction {
 const REPLICATE_API = "https://api.replicate.com/v1";
 
 async function replicateHeaders(): Promise<Record<string, string>> {
-  const token = process.env.REPLICATE_API_TOKEN;
+  const token = process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY;
   if (!token) throw new Error("REPLICATE_API_TOKEN not configured");
   return {
     Authorization: `Bearer ${token}`,
@@ -79,33 +79,27 @@ async function replicateHeaders(): Promise<Record<string, string>> {
 }
 
 /**
- * Start a video generation job on Replicate using Stable Video Diffusion.
+ * Start a video generation job on Replicate using MiniMax Video-01-Live.
+ * Previously used SVD XT which was deprecated. Video-01-Live is fast (~30s)
+ * and produces high-quality 720p video from text prompts.
  */
 async function startReplicateJob(scene: RenderScene, style: string): Promise<{ predictionId: string }> {
   const prompt = buildVideoPrompt(scene, style);
 
-  const res = await fetch(`${REPLICATE_API}/predictions`, {
+  const res = await fetch(`${REPLICATE_API}/models/minimax/video-01-live/predictions`, {
     method: "POST",
     headers: await replicateHeaders(),
     body: JSON.stringify({
-      // Stable Video Diffusion XT model
-      version: "3f0457e4619daac51203dedb472816fd4af51f3149fa7a9e0b5ffcf1b8172438",
       input: {
         prompt,
-        negative_prompt: "blurry, low quality, distorted, watermark, text artifacts",
-        num_frames: parseDurationSeconds(scene.duration) * 8, // 8fps
-        fps: 8,
-        width: 1024,
-        height: 576,
-        guidance_scale: 7.5,
-        num_inference_steps: 25,
+        prompt_optimizer: true,
       },
     }),
   });
 
   if (!res.ok) {
     const err = await res.text();
-    throw new Error(`Replicate API error: ${res.status} ${err}`);
+    throw new Error(`Replicate API error: ${res.status} — ${err}`);
   }
 
   const prediction: ReplicatePrediction = await res.json();
@@ -175,24 +169,39 @@ async function runwayHeaders(): Promise<Record<string, string>> {
 
 async function startRunwayJob(scene: RenderScene, style: string): Promise<{ taskId: string }> {
   const prompt = buildVideoPrompt(scene, style);
+  const rawDuration = parseDurationSeconds(scene.duration);
+  // Runway only accepts duration of 5 or 10 seconds
+  const duration = rawDuration <= 7 ? 5 : 10;
+
+  // Runway image_to_video REQUIRES a promptImage (publicly accessible URL)
+  const hasImage = scene.imageUrl && scene.imageUrl.startsWith("http");
+
+  if (!hasImage) {
+    throw new Error(
+      "Runway Gen-3 requires a scene image. Generate images first, then render video."
+    );
+  }
 
   const res = await fetch("https://api.dev.runwayml.com/v1/image_to_video", {
     method: "POST",
     headers: await runwayHeaders(),
     body: JSON.stringify({
       model: "gen3a_turbo",
+      promptImage: scene.imageUrl,
       promptText: prompt,
-      duration: Math.min(10, parseDurationSeconds(scene.duration)),
+      duration,
       watermark: false,
     }),
   });
 
   if (!res.ok) {
     const err = await res.text();
-    throw new Error(`Runway API error: ${res.status} ${err}`);
+    console.error(`[Runway] Scene ${scene.sceneNumber} failed:`, res.status, err);
+    throw new Error(`Runway API error: ${res.status} — ${err}`);
   }
 
   const data = await res.json();
+  console.log(`[Runway] Scene ${scene.sceneNumber} started: task ${data.id}`);
   return { taskId: data.id };
 }
 
@@ -496,11 +505,14 @@ async function checkKlingJob(taskId: string): Promise<RenderJob> {
  * Detect which video provider is configured.
  */
 export function getAvailableProvider(): VideoProvider | null {
-  if (process.env.REPLICATE_API_TOKEN) return "replicate";
+  // Runway first — best quality for video generation (Gen-3 Alpha Turbo)
   if (process.env.RUNWAY_API_KEY) return "runway";
+  // Then dedicated video providers
   if (process.env.LUMA_API_KEY) return "luma";
   if (process.env.PIKA_API_KEY) return "pika";
   if (process.env.KLING_API_KEY) return "kling";
+  // Replicate last — primarily an image provider, video models rotate frequently
+  if (process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY) return "replicate";
   return null;
 }
 
@@ -509,7 +521,7 @@ export function getAvailableProvider(): VideoProvider | null {
  */
 export function getAllConfiguredProviders(): { provider: VideoProvider; configured: boolean; models: string[] }[] {
   return [
-    { provider: "replicate", configured: !!process.env.REPLICATE_API_TOKEN, models: ["Stable Video Diffusion XT", "FLUX"] },
+    { provider: "replicate", configured: !!(process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY), models: ["MiniMax Video-01-Live", "FLUX"] },
     { provider: "runway", configured: !!process.env.RUNWAY_API_KEY, models: ["Gen-3 Alpha Turbo"] },
     { provider: "luma", configured: !!process.env.LUMA_API_KEY, models: ["Dream Machine"] },
     { provider: "pika", configured: !!process.env.PIKA_API_KEY, models: ["Pika 1.5"] },

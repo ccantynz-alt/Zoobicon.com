@@ -601,6 +601,9 @@ export default function VideoCreatorDashboard() {
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
+        if (res.status === 503) {
+          throw new Error("Video rendering requires a provider API key (REPLICATE_API_TOKEN, RUNWAY_API_KEY, or LUMA_API_KEY). Add one to your environment variables and redeploy.");
+        }
         throw new Error(d.error || "Render failed");
       }
       const data = await res.json();
@@ -666,7 +669,20 @@ export default function VideoCreatorDashboard() {
         throw new Error(d.error || "Voiceover generation failed");
       }
       const data = await res.json();
-      setVoiceoverUrl(data.audioUrl || null);
+      if (data.provider === "browser" && !data.audioUrl) {
+        // Use browser Web Speech API as fallback
+        if ("speechSynthesis" in window) {
+          const utterance = new SpeechSynthesisUtterance(storyboard.script);
+          utterance.rate = 1.0;
+          utterance.pitch = 1.0;
+          window.speechSynthesis.speak(utterance);
+          setVoiceoverUrl("browser-tts");
+        } else {
+          setError("Browser does not support text-to-speech. Add ELEVENLABS_API_KEY for premium voiceover.");
+        }
+      } else {
+        setVoiceoverUrl(data.audioUrl || null);
+      }
       setPipelineStage("idle");
       fetchQuota(); // Refresh usage
     } catch (err) {
@@ -710,10 +726,11 @@ export default function VideoCreatorDashboard() {
     if (!requireVideoAddon()) return;
     if (!storyboard) return;
     setShowPipeline(true);
+    setError("");
     // Step 1: Images
     await handleGenerateImages();
-    // Step 2: Voiceover (parallel with subtitles)
-    await Promise.all([
+    // Step 2: Voiceover + Subtitles (parallel, don't let one failure block the other or step 3)
+    await Promise.allSettled([
       handleGenerateVoiceover(),
       handleGenerateSubtitles(),
     ]);
@@ -1642,11 +1659,19 @@ export default function VideoCreatorDashboard() {
                                       job.status === "failed" ? "bg-red-500/10 text-red-400" :
                                       job.status === "processing" ? "bg-blue-500/10 text-blue-400" :
                                       "bg-white/[0.03] text-white/50"
-                                    }`}>
+                                    }`} title={job.error || undefined}>
                                       S{job.sceneNumber}
                                     </div>
                                   ))}
                                 </div>
+                                {renderJobs.some((j) => j.status === "failed" && j.error) && (
+                                  <div className="mt-2 p-2 rounded-lg bg-red-500/10 border border-red-500/20 text-[10px] text-red-300 space-y-0.5">
+                                    <span className="font-medium">Render errors:</span>
+                                    {renderJobs.filter((j) => j.status === "failed" && j.error).slice(0, 3).map((j) => (
+                                      <div key={j.id} className="truncate">S{j.sceneNumber}: {j.error}</div>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
                             )}
 
@@ -1656,7 +1681,32 @@ export default function VideoCreatorDashboard() {
                                 <div className="text-[10px] text-white/50 uppercase tracking-wider flex items-center gap-1">
                                   <Volume2 className="w-3 h-3" /> Voiceover Preview
                                 </div>
-                                <audio controls src={voiceoverUrl} className="w-full h-8 [&::-webkit-media-controls-panel]:bg-white/5 rounded" />
+                                {voiceoverUrl === "browser-tts" ? (
+                                  <div className="flex items-center gap-2">
+                                    <button
+                                      onClick={() => {
+                                        if ("speechSynthesis" in window && storyboard) {
+                                          window.speechSynthesis.cancel();
+                                          const u = new SpeechSynthesisUtterance(storyboard.script);
+                                          u.rate = 1.0;
+                                          window.speechSynthesis.speak(u);
+                                        }
+                                      }}
+                                      className="py-1.5 px-3 rounded-lg bg-white/[0.05] border border-white/[0.10] text-[10px] text-white/60 hover:text-white hover:bg-white/[0.10] transition-all flex items-center gap-1"
+                                    >
+                                      <Play className="w-3 h-3" /> Play Browser TTS
+                                    </button>
+                                    <button
+                                      onClick={() => window.speechSynthesis?.cancel()}
+                                      className="py-1.5 px-3 rounded-lg bg-white/[0.05] border border-white/[0.10] text-[10px] text-white/60 hover:text-white hover:bg-white/[0.10] transition-all flex items-center gap-1"
+                                    >
+                                      <Square className="w-3 h-3" /> Stop
+                                    </button>
+                                    <span className="text-[9px] text-amber-400/60">Browser TTS — add ELEVENLABS_API_KEY for premium voices</span>
+                                  </div>
+                                ) : (
+                                  <audio controls src={voiceoverUrl} className="w-full h-8 [&::-webkit-media-controls-panel]:bg-white/5 rounded" />
+                                )}
                               </div>
                             )}
 

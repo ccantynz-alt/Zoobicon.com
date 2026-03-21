@@ -58,10 +58,10 @@ export const VOICE_PRESETS: VoicePreset[] = [
 
 // --- Provider detection ---
 
-export function getAvailableVoiceProvider(): VoiceProvider | null {
+export function getAvailableVoiceProvider(): VoiceProvider {
   if (process.env.ELEVENLABS_API_KEY) return "elevenlabs";
   if (process.env.PLAYHT_API_KEY && process.env.PLAYHT_USER_ID) return "playht";
-  return null;
+  return "browser"; // Always fall back to browser TTS
 }
 
 export function getConfiguredVoiceProviders(): { provider: VoiceProvider; configured: boolean }[] {

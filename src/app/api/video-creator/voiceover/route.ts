@@ -63,18 +63,6 @@ export async function POST(req: NextRequest) {
     }
 
     const activeProvider = provider || getAvailableVoiceProvider();
-    if (!activeProvider) {
-      return Response.json(
-        {
-          error: "No voice provider configured",
-          message: "Set ELEVENLABS_API_KEY or PLAYHT_API_KEY + PLAYHT_USER_ID in your environment.",
-          providers: getConfiguredVoiceProviders(),
-          // Return duration estimate even without provider
-          durationEstimate: script ? estimateVoiceoverDuration(script, speed || 1.0) : null,
-        },
-        { status: 503 }
-      );
-    }
 
     // Resolve voice preset
     let resolvedVoiceId = voiceId;

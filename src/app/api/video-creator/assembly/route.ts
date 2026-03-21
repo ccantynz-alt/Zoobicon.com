@@ -71,6 +71,8 @@ export async function POST(req: NextRequest) {
         },
         voiceover: {
           available: !!getAvailableVoiceProvider(),
+          provider: getAvailableVoiceProvider(),
+          premium: getAvailableVoiceProvider() !== "browser",
         },
         imageGen: {
           available: !!getAvailableImageProvider(),
@@ -132,6 +134,8 @@ export async function GET() {
       },
       voiceover: {
         available: !!getAvailableVoiceProvider(),
+        provider: getAvailableVoiceProvider(),
+        premium: getAvailableVoiceProvider() !== "browser",
       },
       imageGen: {
         available: !!getAvailableImageProvider(),
