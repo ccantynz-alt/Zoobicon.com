@@ -12,6 +12,8 @@ import {
   checkVideoQuota,
   incrementVideoUsage,
   ensureVideoUsageTable,
+  getOverageCredits,
+  consumeOverageIfNeeded,
 } from "@/lib/video-usage";
 
 export const maxDuration = 180;
@@ -45,16 +47,17 @@ export async function POST(req: NextRequest) {
       await ensureVideoUsageTable();
       const limits = getVideoPlanLimits(plan || "free", !!hasAddon);
       const usage = await getVideoUsage(email);
-      const check = checkVideoQuota(usage, limits, "image");
+      const overageCredits = await getOverageCredits(email);
+      const check = checkVideoQuota(usage, limits, "image", overageCredits);
       if (!check.allowed) {
         return Response.json(
-          { error: check.reason, quota: { current: check.current, limit: check.limit, remaining: check.remaining } },
+          { error: check.reason, quota: { current: check.current, limit: check.limit, remaining: check.remaining }, canBuyMore: true },
           { status: 429 }
         );
       }
       if (check.remaining < scenes.length) {
         return Response.json(
-          { error: `Not enough image credits. Need ${scenes.length}, have ${check.remaining} remaining this month.`, quota: { current: check.current, limit: check.limit, remaining: check.remaining } },
+          { error: `Not enough image credits. Need ${scenes.length}, have ${check.remaining} remaining this month. Purchase additional credits to continue.`, quota: { current: check.current, limit: check.limit, remaining: check.remaining }, canBuyMore: true },
           { status: 429 }
         );
       }
@@ -79,7 +82,10 @@ export async function POST(req: NextRequest) {
     if (mode === "single") {
       const scene = scenes[0] as SceneImageRequest;
       const result = await generateSceneImage(scene, activeProvider);
-      if (email) await incrementVideoUsage(email, "image", 1);
+      if (email) {
+        await incrementVideoUsage(email, "image", 1);
+        await consumeOverageIfNeeded(email, plan, hasAddon, "image", 1);
+      }
       return Response.json({
         mode: "single",
         provider: activeProvider,
@@ -90,7 +96,10 @@ export async function POST(req: NextRequest) {
         scenes as SceneImageRequest[],
         activeProvider
       );
-      if (email) await incrementVideoUsage(email, "image", results.length);
+      if (email) {
+        await incrementVideoUsage(email, "image", results.length);
+        await consumeOverageIfNeeded(email, plan, hasAddon, "image", results.length);
+      }
       return Response.json({
         mode: "all",
         provider: activeProvider,

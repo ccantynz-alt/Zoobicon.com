@@ -13,6 +13,8 @@ import {
   checkVideoQuota,
   incrementVideoUsage,
   ensureVideoUsageTable,
+  getOverageCredits,
+  consumeOverageIfNeeded,
 } from "@/lib/video-usage";
 
 export const maxDuration = 120;
@@ -49,10 +51,11 @@ export async function POST(req: NextRequest) {
       await ensureVideoUsageTable();
       const limits = getVideoPlanLimits(plan || "free", !!hasAddon);
       const usage = await getVideoUsage(email);
-      const check = checkVideoQuota(usage, limits, "render");
+      const overageCredits = await getOverageCredits(email);
+      const check = checkVideoQuota(usage, limits, "render", overageCredits);
       if (!check.allowed) {
         return Response.json(
-          { error: check.reason, quota: { current: check.current, limit: check.limit, remaining: check.remaining } },
+          { error: check.reason, quota: { current: check.current, limit: check.limit, remaining: check.remaining }, canBuyMore: true },
           { status: 429 }
         );
       }
@@ -90,9 +93,10 @@ export async function POST(req: NextRequest) {
       provider: activeProvider as VideoProvider,
     });
 
-    // Track usage after successful start
+    // Track usage — use plan credits first, then overage
     if (email) {
       await incrementVideoUsage(email, "render", scenes.length);
+      await consumeOverageIfNeeded(email, plan, hasAddon, "render", scenes.length);
     }
 
     return Response.json(result);

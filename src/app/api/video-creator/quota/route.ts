@@ -5,6 +5,8 @@ import {
   getUsageSummary,
   ensureVideoUsageTable,
   checkFullPipelineQuota,
+  getOverageCredits,
+  OVERAGE_PACKS,
 } from "@/lib/video-usage";
 
 /**
@@ -32,7 +34,8 @@ export async function GET(req: NextRequest) {
 
     const limits = getVideoPlanLimits(plan, hasAddon);
     const usage = await getVideoUsage(email);
-    const summary = getUsageSummary(usage, limits);
+    const overageCredits = await getOverageCredits(email);
+    const summary = getUsageSummary(usage, limits, overageCredits);
     const pipelineCheck = checkFullPipelineQuota(usage, limits, sceneCount);
 
     return Response.json({
@@ -50,8 +53,10 @@ export async function GET(req: NextRequest) {
         hasVideoAccess: limits.hasVideoAccess,
       },
       usage: summary,
+      overageCredits,
       pipelineAllowed: pipelineCheck.allowed,
       pipelineReason: pipelineCheck.reason,
+      overagePacks: OVERAGE_PACKS,
     });
   } catch (err) {
     console.error("[video-creator/quota] Error:", err);

@@ -232,11 +232,14 @@ export default function VideoCreatorDashboard() {
 
   // Quota / usage state
   const [quota, setQuota] = useState<{
-    videos: { used: number; limit: number; pct: number };
-    images: { used: number; limit: number; pct: number };
-    renders: { used: number; limit: number; pct: number };
-    voiceovers: { used: number; limit: number; pct: number };
+    videos: { used: number; limit: number; pct: number; overage: number };
+    images: { used: number; limit: number; pct: number; overage: number };
+    renders: { used: number; limit: number; pct: number; overage: number };
+    voiceovers: { used: number; limit: number; pct: number; overage: number };
   } | null>(null);
+  const [overagePacks, setOveragePacks] = useState<{ id: string; name: string; price: number; priceDisplay: string; videos: number; savings?: string }[]>([]);
+  const [showBuyCredits, setShowBuyCredits] = useState(false);
+  const [buyingCredits, setBuyingCredits] = useState(false);
 
   // Auth check + addon/plan check
   useEffect(() => {
@@ -293,6 +296,7 @@ export default function VideoCreatorDashboard() {
       if (res.ok) {
         const data = await res.json();
         if (data.usage) setQuota(data.usage);
+        if (data.overagePacks) setOveragePacks(data.overagePacks);
       }
     } catch { /* ignore */ }
   }, [user, storyboard]);
@@ -428,6 +432,40 @@ export default function VideoCreatorDashboard() {
       setGenerating(false);
     }
   };
+
+  // --- Buy more credits ---
+  const handleBuyCredits = async (packId: string) => {
+    if (!user?.email) return;
+    setBuyingCredits(true);
+    try {
+      const res = await fetch("/api/video-creator/overage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: user.email, packId }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || "Failed to start checkout");
+      }
+      const data = await res.json();
+      if (data.url) window.location.href = data.url;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to purchase credits");
+    } finally {
+      setBuyingCredits(false);
+    }
+  };
+
+  // Handle returning from Stripe checkout
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("credits") === "purchased") {
+      // Refresh quota to show new credits
+      fetchQuota();
+      // Clean URL
+      window.history.replaceState({}, "", "/video-creator");
+    }
+  }, [fetchQuota]);
 
   // --- Pipeline: Access check ---
   const requireVideoAddon = (): boolean => {
@@ -1301,7 +1339,15 @@ export default function VideoCreatorDashboard() {
                       {/* Usage meter */}
                       {hasVideoAddon && quota && (
                         <div className="rounded-lg border border-white/[0.08] bg-white/[0.03] p-3 space-y-2">
-                          <div className="text-[10px] font-semibold text-white/50 uppercase tracking-wider">Monthly Usage</div>
+                          <div className="flex items-center justify-between">
+                            <div className="text-[10px] font-semibold text-white/50 uppercase tracking-wider">Monthly Usage</div>
+                            <button
+                              onClick={() => setShowBuyCredits(!showBuyCredits)}
+                              className="text-[10px] font-medium text-purple-400 hover:text-purple-300 transition-colors"
+                            >
+                              Buy More Credits
+                            </button>
+                          </div>
                           <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
                             {[
                               { label: "Videos", data: quota.videos },
@@ -1312,7 +1358,12 @@ export default function VideoCreatorDashboard() {
                               <div key={item.label} className="space-y-0.5">
                                 <div className="flex items-center justify-between">
                                   <span className="text-[10px] text-white/40">{item.label}</span>
-                                  <span className="text-[10px] text-white/60">{item.data.used}/{item.data.limit}</span>
+                                  <span className="text-[10px] text-white/60">
+                                    {item.data.used}/{item.data.limit}
+                                    {item.data.overage > 0 && (
+                                      <span className="text-emerald-400"> +{item.data.overage}</span>
+                                    )}
+                                  </span>
                                 </div>
                                 <div className="h-1 rounded-full bg-white/[0.06] overflow-hidden">
                                   <div
@@ -1322,6 +1373,60 @@ export default function VideoCreatorDashboard() {
                                 </div>
                               </div>
                             ))}
+                          </div>
+
+                          {/* Buy credits panel */}
+                          <AnimatePresence>
+                            {showBuyCredits && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                className="overflow-hidden"
+                              >
+                                <div className="pt-2 space-y-1.5 border-t border-white/[0.06]">
+                                  <div className="text-[10px] text-white/40 mb-1">One-time credit packs (valid 90 days):</div>
+                                  {overagePacks.map((pack) => (
+                                    <button
+                                      key={pack.id}
+                                      onClick={() => handleBuyCredits(pack.id)}
+                                      disabled={buyingCredits}
+                                      className="w-full flex items-center justify-between p-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] transition-colors text-left disabled:opacity-50"
+                                    >
+                                      <div>
+                                        <div className="text-[11px] font-medium text-white/80">{pack.name}</div>
+                                        {pack.savings && (
+                                          <div className="text-[9px] text-emerald-400 font-medium">{pack.savings}</div>
+                                        )}
+                                      </div>
+                                      <div className="text-xs font-bold text-purple-400">{pack.priceDisplay}</div>
+                                    </button>
+                                  ))}
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      )}
+
+                      {/* Quota exceeded prompt */}
+                      {error && error.includes("limit reached") && (
+                        <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3 space-y-2">
+                          <div className="text-xs font-semibold text-red-300">Usage Limit Reached</div>
+                          <div className="text-[10px] text-white/50">{error}</div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => setShowBuyCredits(true)}
+                              className="px-3 py-1.5 rounded-md bg-purple-600 text-white text-[10px] font-semibold hover:bg-purple-500 transition-colors"
+                            >
+                              Buy More Credits
+                            </button>
+                            <Link
+                              href="/pricing"
+                              className="px-3 py-1.5 rounded-md bg-white/[0.06] text-white/50 text-[10px] font-medium hover:bg-white/[0.10] transition-colors"
+                            >
+                              Upgrade Plan
+                            </Link>
                           </div>
                         </div>
                       )}

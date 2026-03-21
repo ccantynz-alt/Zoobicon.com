@@ -14,6 +14,8 @@ import {
   checkVideoQuota,
   incrementVideoUsage,
   ensureVideoUsageTable,
+  getOverageCredits,
+  consumeOverageIfNeeded,
 } from "@/lib/video-usage";
 
 export const maxDuration = 120;
@@ -50,10 +52,11 @@ export async function POST(req: NextRequest) {
       await ensureVideoUsageTable();
       const limits = getVideoPlanLimits(plan || "free", !!hasAddon);
       const usage = await getVideoUsage(email);
-      const check = checkVideoQuota(usage, limits, "voiceover");
+      const overageCredits = await getOverageCredits(email);
+      const check = checkVideoQuota(usage, limits, "voiceover", overageCredits);
       if (!check.allowed) {
         return Response.json(
-          { error: check.reason, quota: { current: check.current, limit: check.limit, remaining: check.remaining } },
+          { error: check.reason, quota: { current: check.current, limit: check.limit, remaining: check.remaining }, canBuyMore: true },
           { status: 429 }
         );
       }
@@ -90,7 +93,10 @@ export async function POST(req: NextRequest) {
 
     if (mode === "per-scene" && scenes && scenes.length > 0) {
       const results = await generateSceneVoiceovers(scenes, config);
-      if (email) await incrementVideoUsage(email, "voiceover", results.length);
+      if (email) {
+        await incrementVideoUsage(email, "voiceover", results.length);
+        await consumeOverageIfNeeded(email, plan, hasAddon, "voiceover", results.length);
+      }
       return Response.json({
         mode: "per-scene",
         provider: activeProvider,
@@ -100,7 +106,10 @@ export async function POST(req: NextRequest) {
       });
     } else {
       const result = await generateVoiceover(script, config);
-      if (email) await incrementVideoUsage(email, "voiceover", 1);
+      if (email) {
+        await incrementVideoUsage(email, "voiceover", 1);
+        await consumeOverageIfNeeded(email, plan, hasAddon, "voiceover", 1);
+      }
       return Response.json({
         mode: "full",
         ...result,
