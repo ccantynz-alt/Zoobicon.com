@@ -993,28 +993,28 @@ export default function VideoCreatorDashboard() {
     <div className="relative min-h-screen bg-[#06080f] text-white antialiased">
       <BackgroundEffects preset="technical" />
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#06080f]/90 backdrop-blur-2xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08] bg-[#06080f]/80 backdrop-blur-2xl saturate-150">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 flex items-center justify-between h-14">
           <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+            <Link href="/" className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/25">
                 <Video className="w-3.5 h-3.5 text-white" />
               </div>
-              <span className="text-base font-bold tracking-tight text-white">Zoobicon</span>
+              <span className="text-[15px] font-semibold tracking-tight text-white">Zoobicon</span>
             </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-white/40" />
-            <span className="text-sm text-white/70 font-medium">Video Creator</span>
+            <ChevronRight className="w-3 h-3 text-white/30" />
+            <span className="text-sm text-white/80 font-medium tracking-tight">Video Creator</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Link href="/dashboard" className="text-sm text-white/60 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5 flex items-center gap-1.5">
+          <div className="flex items-center gap-1">
+            <Link href="/dashboard" className="text-[13px] text-white/60 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/[0.06] flex items-center gap-1.5">
               <LayoutDashboard className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Dashboard</span>
             </Link>
-            <Link href="/builder" className="text-sm text-white/60 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5 flex items-center gap-1.5">
+            <Link href="/builder" className="text-[13px] text-white/60 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/[0.06] flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Builder</span>
             </Link>
-            <button onClick={() => setShowHistory(!showHistory)} className="text-sm text-white/60 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5 flex items-center gap-1.5">
+            <button onClick={() => setShowHistory(!showHistory)} className="text-[13px] text-white/60 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/[0.06] flex items-center gap-1.5">
               <History className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">History</span>
               {projects.length > 0 && (
@@ -1087,8 +1087,8 @@ export default function VideoCreatorDashboard() {
             <div className="lg:col-span-5 space-y-5">
               {/* Header */}
               <motion.div initial="hidden" animate="visible" variants={fadeIn}>
-                <h1 className="text-2xl font-black tracking-tight mb-1 text-white">AI Video Creator</h1>
-                <p className="text-sm text-white/70">Full video pipeline: storyboard, images, rendering, voiceover & subtitles.</p>
+                <h1 className="text-2xl font-extrabold tracking-tighter mb-1 text-white">AI Video Creator</h1>
+                <p className="text-[13px] text-white/60 tracking-snug leading-relaxed">Full video pipeline — storyboard, images, rendering, voiceover & subtitles.</p>
                 <div className="flex gap-2 mt-2">
                   <button
                     onClick={() => setShowTemplates(!showTemplates)}
@@ -1182,7 +1182,7 @@ export default function VideoCreatorDashboard() {
                     onChange={(e) => setScript(e.target.value)}
                     placeholder="Describe your video or paste a script... Or tap the mic to speak."
                     rows={4}
-                    className="w-full bg-white/[0.05] border border-white/[0.10] rounded-xl px-4 py-3 pr-12 text-sm text-white placeholder:text-white/50 outline-none focus:border-cyan-500/30 transition-colors resize-none"
+                    className="w-full bg-white/[0.04] border border-white/[0.10] rounded-xl px-4 py-3 pr-12 text-sm text-white placeholder:text-white/35 outline-none focus:border-cyan-500/40 focus:bg-white/[0.06] transition-all duration-150 resize-none"
                   />
                   <button
                     onClick={toggleVoiceInput}
@@ -1346,7 +1346,7 @@ export default function VideoCreatorDashboard() {
                 <button
                   onClick={handleGenerate}
                   disabled={generating}
-                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-500 hover:to-blue-600 text-white font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20"
+                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-500 hover:to-blue-600 text-white font-semibold text-sm tracking-tight transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 active:scale-[0.98]"
                 >
                   {generating ? (
                     <>
