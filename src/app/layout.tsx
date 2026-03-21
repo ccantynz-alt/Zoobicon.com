@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import "./globals.css";
+import CookieConsent from "@/components/CookieConsent";
 
 const BRAND_META: Record<string, {
   title: string;
@@ -129,8 +130,58 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://github.com" />
         <meta name="msapplication-TileColor" content="#050508" />
         <meta name="msapplication-config" content="none" />
+        {/* Organization JSON-LD structured data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Zoobicon",
+            "url": "https://zoobicon.com",
+            "logo": "https://zoobicon.com/og-image.png",
+            "description": "AI Website Builder — 7 AI agents build production-ready websites, SaaS apps, and e-commerce stores from a single prompt.",
+            "sameAs": [
+              "https://zoobicon.ai",
+              "https://zoobicon.io",
+              "https://zoobicon.sh"
+            ],
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "email": "support@zoobicon.com",
+              "contactType": "customer support"
+            },
+            "offers": {
+              "@type": "AggregateOffer",
+              "lowPrice": "0",
+              "highPrice": "99",
+              "priceCurrency": "USD",
+              "offerCount": "4"
+            }
+          }) }}
+        />
+        {/* SoftwareApplication JSON-LD structured data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "Zoobicon AI Website Builder",
+            "applicationCategory": "DeveloperApplication",
+            "operatingSystem": "Web",
+            "url": "https://zoobicon.com/builder",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "description": "Build production-ready websites with AI. 7 agents collaborate to generate full-stack apps, e-commerce stores, and multi-page sites from a single prompt."
+          }) }}
+        />
       </head>
-      <body className="grain">{children}</body>
+      <body className="grain">
+        {children}
+        <CookieConsent />
+      </body>
     </html>
   );
 }

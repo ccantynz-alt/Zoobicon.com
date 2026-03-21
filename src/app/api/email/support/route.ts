@@ -138,13 +138,16 @@ export async function POST(req: NextRequest) {
     // Send via Mailgun if requested
     if (sendToCustomer !== false) {
       const fromAddress = `support@${process.env.MAILGUN_DOMAIN || "zoobicon.com"}`;
+      const escapeHtml = (s: string) =>
+        s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+      const safeReply = escapeHtml(reply);
       const result = await sendViaMailgun({
         from: `Zoobicon Support <${fromAddress}>`,
         to: ticket.from_email as string,
         subject: `Re: ${ticket.subject}`,
         text: reply,
         html: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <p>${reply.replace(/\n\n/g, "</p><p>").replace(/\n/g, "<br>")}</p>
+  <p>${safeReply.replace(/\n\n/g, "</p><p>").replace(/\n/g, "<br>")}</p>
   <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;">
   <p style="color: #6b7280; font-size: 13px;">Zoobicon Support &bull; <a href="https://zoobicon.com/support" style="color: #6366f1;">Help Center</a></p>
 </div>`,

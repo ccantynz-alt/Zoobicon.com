@@ -43,6 +43,7 @@ const QUICK_ACTIONS = [
   { icon: Sparkles, label: "SEO Agent", href: "/seo", color: "from-accent-cyan to-emerald-600" },
   { icon: Search, label: "Crawl Competitor", href: "/crawl", color: "from-violet-500 to-purple-600" },
   { icon: BarChart3, label: "Analytics", href: "/analytics", color: "from-blue-500 to-fuchsia-600" },
+  { icon: Video, label: "AI Video Creator", href: "/video-creator", color: "from-accent-purple to-pink-600" },
 ];
 
 const ADMIN_QUICK_ACTIONS = [
