@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dictation</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: #0a0a0f;
+    color: #fff;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  /* ── Title Bar ─────────────────────────────────────── */
+  .titlebar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 16px; height: 40px;
+    background: #07070c; border-bottom: 1px solid rgba(255,255,255,0.06);
+    -webkit-app-region: drag;
+  }
+  .titlebar-left { display: flex; align-items: center; gap: 10px; }
+  .app-icon {
+    width: 24px; height: 24px; border-radius: 6px;
+    background: linear-gradient(135deg, #8b5cf6, #d946ef);
+    display: flex; align-items: center; justify-content: center; font-size: 12px;
+  }
+  .app-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7); }
+  .titlebar-right { display: flex; gap: 4px; -webkit-app-region: no-drag; }
+
+  /* ── Toolbar ───────────────────────────────────────── */
+  .toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 16px; border-bottom: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.02);
+  }
+  .toolbar-left, .toolbar-right { display: flex; align-items: center; gap: 8px; }
+  .engine-badge {
+    font-size: 11px; padding: 3px 10px; border-radius: 20px;
+    background: rgba(59,130,246,0.12); color: #60a5fa;
+    border: 1px solid rgba(59,130,246,0.2);
+  }
+  .engine-badge.whisper { background: rgba(16,185,129,0.12); color: #34d399; border-color: rgba(16,185,129,0.2); }
+  .session-stats { display: flex; gap: 14px; font-size: 12px; color: rgba(255,255,255,0.3); }
+  .tb-btn {
+    background: none; border: none; color: rgba(255,255,255,0.35);
+    cursor: pointer; padding: 6px 8px; border-radius: 6px; font-size: 13px;
+    transition: all 0.15s; font-family: inherit;
+  }
+  .tb-btn:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); }
+
+  /* ── Settings Panel ────────────────────────────────── */
+  .panel {
+    background: rgba(255,255,255,0.025); border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 16px; display: none; overflow-y: auto; max-height: 280px;
+  }
+  .panel.open { display: block; }
+  .panel h3 { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.5); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .setting-label { display: block; font-size: 11px; color: rgba(255,255,255,0.35); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.3px; }
+  .btn-group { display: flex; gap: 4px; }
+  .opt-btn {
+    flex: 1; padding: 7px 10px; border-radius: 7px; font-size: 12px;
+    border: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.025);
+    color: rgba(255,255,255,0.35); cursor: pointer; transition: all 0.15s;
+    font-family: inherit; text-align: center;
+  }
+  .opt-btn:hover { color: rgba(255,255,255,0.6); border-color: rgba(255,255,255,0.12); }
+  .opt-btn.on { background: rgba(139,92,246,0.12); border-color: rgba(139,92,246,0.3); color: #a78bfa; }
+  .opt-btn.on-blue { background: rgba(59,130,246,0.12); border-color: rgba(59,130,246,0.3); color: #60a5fa; }
+  .opt-btn.on-green { background: rgba(16,185,129,0.12); border-color: rgba(16,185,129,0.3); color: #34d399; }
+  .text-input {
+    width: 100%; padding: 7px 10px; border-radius: 7px; font-size: 12px;
+    border: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.025);
+    color: #fff; font-family: inherit; outline: none;
+  }
+  .text-input:focus { border-color: rgba(139,92,246,0.35); }
+  .text-input::placeholder { color: rgba(255,255,255,0.15); }
+  select.text-input { cursor: pointer; }
+  select.text-input option { background: #1a1a2e; }
+  .hint { font-size: 10px; color: rgba(255,255,255,0.15); margin-top: 3px; }
+  .checkbox-row {
+    display: flex; align-items: center; gap: 7px; font-size: 12px;
+    color: rgba(255,255,255,0.5); cursor: pointer; margin-bottom: 3px;
+  }
+  .checkbox-row input { accent-color: #8b5cf6; }
+
+  /* ── Voice Commands Panel ──────────────────────────── */
+  .cmd-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+  .cmd-item { font-size: 11px; color: rgba(255,255,255,0.4); padding: 3px 0; }
+  .cmd-key {
+    font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace; font-size: 10px;
+    background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 3px;
+    color: rgba(255,255,255,0.5);
+  }
+  .cmd-arrow { color: rgba(255,255,255,0.15); margin: 0 2px; }
+
+  /* ── Editor ────────────────────────────────────────── */
+  .editor-wrap { flex: 1; display: flex; flex-direction: column; padding: 0; min-height: 0; }
+  .editor-container {
+    flex: 1; display: flex; flex-direction: column;
+    position: relative; overflow: hidden;
+  }
+  .audio-bar { height: 2px; background: rgba(255,255,255,0.03); flex-shrink: 0; }
+  .audio-bar-fill {
+    height: 100%; background: linear-gradient(90deg, #8b5cf6, #d946ef);
+    transition: width 0.08s; width: 0%;
+  }
+  #editor {
+    flex: 1; width: 100%; padding: 20px 24px; background: transparent;
+    color: rgba(255,255,255,0.9); border: none; resize: none; outline: none;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-size: 17px; line-height: 1.75; caret-color: #a78bfa;
+    user-select: text;
+  }
+  #editor::placeholder { color: rgba(255,255,255,0.15); }
+  .interim {
+    position: absolute; bottom: 6px; left: 24px; right: 24px;
+    font-size: 11px; color: rgba(139,92,246,0.4); font-style: italic;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    display: none; pointer-events: none;
+  }
+
+  /* ── Bottom Bar ────────────────────────────────────── */
+  .bottombar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px; border-top: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.02);
+  }
+  .bottom-stats { display: flex; gap: 14px; font-size: 11px; color: rgba(255,255,255,0.25); }
+  .bottom-center { display: flex; align-items: center; gap: 10px; }
+  .bottom-right { display: flex; gap: 4px; }
+
+  .mic-btn {
+    width: 48px; height: 48px; border-radius: 14px; border: none;
+    cursor: pointer; position: relative; transition: all 0.25s;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #8b5cf6, #d946ef);
+    box-shadow: 0 2px 16px rgba(139,92,246,0.2);
+    font-size: 20px; color: #fff;
+  }
+  .mic-btn:hover { transform: scale(1.05); box-shadow: 0 4px 24px rgba(139,92,246,0.3); }
+  .mic-btn.on {
+    background: linear-gradient(135deg, #ef4444, #f97316);
+    box-shadow: 0 2px 16px rgba(239,68,68,0.3);
+    animation: mic-pulse 2s ease-in-out infinite;
+  }
+  @keyframes mic-pulse {
+    0%, 100% { box-shadow: 0 2px 16px rgba(239,68,68,0.3); }
+    50% { box-shadow: 0 4px 28px rgba(239,68,68,0.45); }
+  }
+
+  .act-btn {
+    padding: 8px; border-radius: 8px; border: none;
+    background: transparent; color: rgba(255,255,255,0.3);
+    cursor: pointer; transition: all 0.15s; font-size: 14px;
+  }
+  .act-btn:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); }
+  .act-btn:disabled { opacity: 0.2; cursor: not-allowed; }
+  .act-btn.ok { color: #34d399; }
+
+  .mode-label { font-size: 11px; color: rgba(255,255,255,0.2); }
+
+  .shortcuts-hint {
+    text-align: center; font-size: 10px; color: rgba(255,255,255,0.12);
+    padding: 4px 16px 8px;
+  }
+  .key {
+    font-family: 'SF Mono', 'Cascadia Code', monospace; font-size: 9px;
+    background: rgba(255,255,255,0.04); padding: 1px 5px; border-radius: 3px;
+  }
+
+  @media (max-width: 700px) {
+    .cmd-grid { grid-template-columns: repeat(2, 1fr); }
+    .settings-grid { grid-template-columns: 1fr; }
+    .session-stats { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Title Bar -->
+<div class="titlebar">
+  <div class="titlebar-left">
+    <div class="app-icon">&#x1f399;</div>
+    <span class="app-title">Dictation</span>
+  </div>
+</div>
+
+<!-- Toolbar -->
+<div class="toolbar">
+  <div class="toolbar-left">
+    <span class="engine-badge" id="engineBadge">Browser Speech</span>
+    <div class="session-stats" id="sessionStats" style="display:none">
+      <span id="timerDisplay">0:00</span>
+    </div>
+  </div>
+  <div class="toolbar-right">
+    <button class="tb-btn" onclick="togglePanel('cmds')" title="Voice commands reference">Commands</button>
+    <button class="tb-btn" onclick="togglePanel('settings')" title="Settings">Settings</button>
+  </div>
+</div>
+
+<!-- Voice Commands Panel -->
+<div class="panel" id="cmdsPanel">
+  <h3>Voice Commands</h3>
+  <div class="cmd-grid" id="cmdGrid"></div>
+</div>
+
+<!-- Settings Panel -->
+<div class="panel" id="settingsPanel">
+  <h3>Settings</h3>
+  <div class="settings-grid">
+    <div>
+      <span class="setting-label">Engine</span>
+      <div class="btn-group">
+        <button class="opt-btn on-blue" id="btnBrowser" onclick="setEngine('browser')">Browser (Free)</button>
+        <button class="opt-btn" id="btnWhisper" onclick="setEngine('whisper')">Whisper API</button>
+      </div>
+    </div>
+    <div>
+      <span class="setting-label">Mic Mode</span>
+      <div class="btn-group">
+        <button class="opt-btn on" id="btnToggle" onclick="setMode('toggle')">Toggle</button>
+        <button class="opt-btn" id="btnPTT" onclick="setMode('ptt')">Push to Talk</button>
+        <button class="opt-btn" id="btnAlways" onclick="setMode('always')">Always On</button>
+      </div>
+    </div>
+    <div id="apiKeyRow" style="display:none">
+      <span class="setting-label">OpenAI API Key</span>
+      <input type="password" class="text-input" id="apiKeyInput" placeholder="sk-..." oninput="saveKey(this.value)">
+      <p class="hint">Stored locally only. Never sent anywhere except OpenAI.</p>
+    </div>
+    <div>
+      <span class="setting-label">Language</span>
+      <select class="text-input" id="langSelect" onchange="lang=this.value; savePrefs()">
+        <option value="en-US">English (US)</option>
+        <option value="en-GB">English (UK)</option>
+        <option value="en-AU">English (AU)</option>
+        <option value="es-ES">Spanish</option>
+        <option value="fr-FR">French</option>
+        <option value="de-DE">German</option>
+        <option value="it-IT">Italian</option>
+        <option value="pt-BR">Portuguese (BR)</option>
+        <option value="ja-JP">Japanese</option>
+        <option value="ko-KR">Korean</option>
+        <option value="zh-CN">Chinese (Simplified)</option>
+        <option value="ar-SA">Arabic</option>
+        <option value="hi-IN">Hindi</option>
+        <option value="ru-RU">Russian</option>
+        <option value="nl-NL">Dutch</option>
+        <option value="pl-PL">Polish</option>
+      </select>
+    </div>
+    <div>
+      <span class="setting-label" id="fontLabel">Font Size: 17px</span>
+      <input type="range" style="width:100%; accent-color:#8b5cf6" min="12" max="32" value="17" oninput="setFont(this.value)">
+    </div>
+    <div>
+      <label class="checkbox-row"><input type="checkbox" id="chkCaps" checked onchange="autoCaps=this.checked; savePrefs()"> Auto-capitalize sentences</label>
+      <label class="checkbox-row"><input type="checkbox" id="chkCmds" checked onchange="voiceCmds=this.checked; savePrefs()"> Voice commands (period, new line, etc.)</label>
+      <label class="checkbox-row"><input type="checkbox" id="chkRestart" checked onchange="autoRestart=this.checked; savePrefs()"> Auto-restart on silence</label>
+    </div>
+  </div>
+</div>
+
+<!-- Editor -->
+<div class="editor-wrap">
+  <div class="editor-container">
+    <div class="audio-bar"><div class="audio-bar-fill" id="audioFill"></div></div>
+    <textarea id="editor" placeholder="Press the mic button or F2 to start dictating..." spellcheck="true"></textarea>
+    <div class="interim" id="interim"></div>
+  </div>
+</div>
+
+<!-- Bottom Bar -->
+<div class="bottombar">
+  <div class="bottom-stats">
+    <span id="wordCount">0 words</span>
+    <span id="charCount">0 chars</span>
+  </div>
+  <div class="bottom-center">
+    <button class="act-btn" id="undoBtn" onclick="undoSeg()" title="Undo last segment" disabled>&#8630;</button>
+    <button class="mic-btn" id="micBtn" onclick="toggle()">&#x1f3a4;</button>
+    <span class="mode-label" id="modeLabel">Click or F2</span>
+  </div>
+  <div class="bottom-right">
+    <button class="act-btn" id="copyBtn" onclick="copyAll()" title="Copy to clipboard" disabled>&#128203;</button>
+    <button class="act-btn" id="dlBtn" onclick="download()" title="Download .txt" disabled>&#11015;</button>
+    <button class="act-btn" id="clearBtn" onclick="clearAll()" title="Clear" disabled>&#128465;</button>
+  </div>
+</div>
+
+<div class="shortcuts-hint">
+  <span class="key">F2</span> toggle mic &middot; <span class="key">F9</span> global toggle &middot; <span class="key">Mouse Wheel</span> click &middot; <span class="key">Ctrl+Shift+D</span> show/hide
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+// State
+// ═══════════════════════════════════════════════════════════════════════════
+let listening = false;
+let engineType = 'browser';
+let micMode = 'toggle';
+let lang = 'en-US';
+let autoCaps = true;
+let voiceCmds = true;
+let autoRestart = true;
+let apiKey = '';
+let segments = [];
+let secs = 0;
+let timer = null;
+let recognition = null;
+let recorder = null;
+let chunks = [];
+let stream = null;
+let analyser = null;
+let raf = 0;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Voice Commands
+// ═══════════════════════════════════════════════════════════════════════════
+const CMDS = {
+  'new line': '\n', 'new paragraph': '\n\n',
+  'period': '.', 'full stop': '.', 'comma': ',',
+  'question mark': '?', 'exclamation mark': '!', 'exclamation point': '!',
+  'colon': ':', 'semicolon': ';',
+  'open quote': '\u201c', 'close quote': '\u201d',
+  'open parenthesis': '(', 'close parenthesis': ')',
+  'dash': ' \u2014 ', 'hyphen': '-', 'ellipsis': '\u2026',
+  'open bracket': '[', 'close bracket': ']',
+  'tab': '\t', 'space': ' ',
+};
+
+function applyCmds(text) {
+  if (!voiceCmds) return text;
+  let r = text;
+  for (const [c, v] of Object.entries(CMDS)) {
+    r = r.replace(new RegExp('\\b' + c + '\\b', 'gi'), v);
+  }
+  return r;
+}
+
+// Populate commands grid
+const cmdGrid = document.getElementById('cmdGrid');
+for (const [c, v] of Object.entries(CMDS)) {
+  const d = document.createElement('div');
+  d.className = 'cmd-item';
+  const show = v === '\n' ? '\\n' : v === '\n\n' ? '\\n\\n' : v === '\t' ? '\\t' : v === ' ' ? '(space)' : v;
+  d.innerHTML = '<span class="cmd-key">' + c + '</span><span class="cmd-arrow">\u2192</span>' + show;
+  cmdGrid.appendChild(d);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DOM
+// ═══════════════════════════════════════════════════════════════════════════
+const ed = document.getElementById('editor');
+const micBtn = document.getElementById('micBtn');
+const interimEl = document.getElementById('interim');
+const audioFill = document.getElementById('audioFill');
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Persistence
+// ═══════════════════════════════════════════════════════════════════════════
+function savePrefs() {
+  try {
+    localStorage.setItem('dictation_prefs', JSON.stringify({
+      engine: engineType, mode: micMode, lang, autoCaps, voiceCmds, autoRestart
+    }));
+  } catch(e) {}
+}
+function saveKey(k) { apiKey = k; try { localStorage.setItem('dictation_key', k); } catch(e) {} }
+function loadPrefs() {
+  try {
+    const p = JSON.parse(localStorage.getItem('dictation_prefs') || '{}');
+    if (p.engine) setEngine(p.engine);
+    if (p.mode) setMode(p.mode);
+    if (p.lang) { lang = p.lang; document.getElementById('langSelect').value = lang; }
+    if (p.autoCaps !== undefined) { autoCaps = p.autoCaps; document.getElementById('chkCaps').checked = autoCaps; }
+    if (p.voiceCmds !== undefined) { voiceCmds = p.voiceCmds; document.getElementById('chkCmds').checked = voiceCmds; }
+    if (p.autoRestart !== undefined) { autoRestart = p.autoRestart; document.getElementById('chkRestart').checked = autoRestart; }
+    const k = localStorage.getItem('dictation_key');
+    if (k) { apiKey = k; document.getElementById('apiKeyInput').value = k; }
+    const saved = localStorage.getItem('dictation_text');
+    if (saved) { ed.value = saved; updateStats(); }
+  } catch(e) {}
+}
+// Auto-save text every 2s
+setInterval(function() { try { localStorage.setItem('dictation_text', ed.value); } catch(e) {} }, 2000);
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Settings UI
+// ═══════════════════════════════════════════════════════════════════════════
+function togglePanel(id) {
+  const panels = ['settings', 'cmds'];
+  panels.forEach(p => {
+    const el = document.getElementById(p + 'Panel');
+    if (p === id) el.classList.toggle('open');
+    else el.classList.remove('open');
+  });
+}
+
+function setEngine(e) {
+  if (listening) stop();
+  engineType = e;
+  document.getElementById('btnBrowser').className = 'opt-btn' + (e === 'browser' ? ' on-blue' : '');
+  document.getElementById('btnWhisper').className = 'opt-btn' + (e === 'whisper' ? ' on-green' : '');
+  document.getElementById('engineBadge').textContent = e === 'browser' ? 'Browser Speech' : 'Whisper API';
+  document.getElementById('engineBadge').className = 'engine-badge' + (e === 'whisper' ? ' whisper' : '');
+  document.getElementById('apiKeyRow').style.display = e === 'whisper' ? '' : 'none';
+  savePrefs();
+}
+
+function setMode(m) {
+  micMode = m;
+  document.getElementById('btnToggle').className = 'opt-btn' + (m === 'toggle' ? ' on' : '');
+  document.getElementById('btnPTT').className = 'opt-btn' + (m === 'ptt' ? ' on' : '');
+  document.getElementById('btnAlways').className = 'opt-btn' + (m === 'always' ? ' on' : '');
+  const labels = { toggle: 'Click or F2', ptt: 'Hold to talk', always: 'Always on' };
+  document.getElementById('modeLabel').textContent = labels[m];
+  savePrefs();
+}
+
+function setFont(v) {
+  ed.style.fontSize = v + 'px';
+  document.getElementById('fontLabel').textContent = 'Font Size: ' + v + 'px';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Audio Visualization
+// ═══════════════════════════════════════════════════════════════════════════
+async function startViz() {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const ctx = new AudioContext();
+    analyser = ctx.createAnalyser();
+    analyser.fftSize = 256;
+    ctx.createMediaStreamSource(stream).connect(analyser);
+    const buf = new Uint8Array(analyser.frequencyBinCount);
+    (function tick() {
+      analyser.getByteFrequencyData(buf);
+      const avg = buf.reduce((s, v) => s + v, 0) / buf.length;
+      audioFill.style.width = Math.min(avg / 128 * 100, 100) + '%';
+      raf = requestAnimationFrame(tick);
+    })();
+  } catch(e) {}
+}
+
+function stopViz() {
+  if (raf) cancelAnimationFrame(raf);
+  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+  audioFill.style.width = '0%';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Browser Speech Recognition
+// ═══════════════════════════════════════════════════════════════════════════
+function startBrowser() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { alert('Speech recognition not supported. Use Chrome or Edge.'); return; }
+
+  recognition = new SR();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = lang;
+
+  recognition.onresult = function(ev) {
+    let interim = '', final = '';
+    for (let i = ev.resultIndex; i < ev.results.length; i++) {
+      const t = ev.results[i][0].transcript;
+      if (ev.results[i].isFinal) {
+        let p = applyCmds(t);
+        if (autoCaps) p = p.charAt(0).toUpperCase() + p.slice(1);
+        final += p;
+      } else {
+        interim += t;
+      }
+    }
+    if (final) {
+      appendText(final);
+      interimEl.style.display = 'none';
+    } else if (interim) {
+      interimEl.textContent = '\u201c' + interim + '\u201d';
+      interimEl.style.display = '';
+    }
+  };
+
+  recognition.onend = function() {
+    if (listening && autoRestart) {
+      try { recognition.start(); } catch(e) {}
+    }
+  };
+
+  recognition.onerror = function(e) {
+    if (e.error === 'not-allowed') {
+      alert('Microphone access denied. Allow mic access and try again.');
+      stop();
+    }
+  };
+
+  recognition.start();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Whisper API
+// ═══════════════════════════════════════════════════════════════════════════
+async function startWhisper() {
+  try {
+    const s = await navigator.mediaDevices.getUserMedia({ audio: true });
+    recorder = new MediaRecorder(s, { mimeType: 'audio/webm;codecs=opus' });
+    chunks = [];
+    recorder.ondataavailable = function(e) { if (e.data.size > 0) chunks.push(e.data); };
+    recorder.start(5000);
+
+    recorder._iv = setInterval(async function() {
+      if (!chunks.length) return;
+      const blob = new Blob(chunks, { type: 'audio/webm' });
+      chunks = [];
+      if (blob.size < 1000) return;
+      try {
+        const fd = new FormData();
+        fd.append('file', blob, 'audio.webm');
+        fd.append('model', 'whisper-1');
+        fd.append('language', lang.split('-')[0]);
+        const res = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + apiKey },
+          body: fd
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.text && data.text.trim()) {
+          let p = applyCmds(data.text.trim());
+          appendText(p);
+        }
+      } catch(e) {}
+    }, 6000);
+  } catch(e) {
+    alert('Microphone access denied.');
+    stop();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Core Controls
+// ═══════════════════════════════════════════════════════════════════════════
+function appendText(text) {
+  const prev = ed.value;
+  const space = prev.length > 0 && !prev.endsWith('\n') && !prev.endsWith('\t') && !prev.endsWith(' ') ? ' ' : '';
+  ed.value += space + text;
+  segments.push(text);
+  ed.scrollTop = ed.scrollHeight;
+  updateStats();
+}
+
+function start() {
+  if (engineType === 'whisper' && !apiKey) {
+    togglePanel('settings');
+    alert('Enter your OpenAI API key in Settings.');
+    return;
+  }
+  listening = true;
+  micBtn.classList.add('on');
+  micBtn.innerHTML = '&#9899;';
+  ed.placeholder = 'Listening... speak now';
+  document.getElementById('sessionStats').style.display = '';
+  startViz();
+  if (!timer) {
+    timer = setInterval(function() {
+      secs++;
+      document.getElementById('timerDisplay').textContent =
+        Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0');
+    }, 1000);
+  }
+  if (engineType === 'browser') startBrowser();
+  else startWhisper();
+}
+
+function stop() {
+  listening = false;
+  micBtn.classList.remove('on');
+  micBtn.innerHTML = '&#x1f3a4;';
+  interimEl.style.display = 'none';
+  ed.placeholder = 'Press the mic button or F2 to start dictating...';
+  stopViz();
+  if (recognition) { recognition.onend = null; recognition.stop(); recognition = null; }
+  if (recorder) {
+    if (recorder._iv) clearInterval(recorder._iv);
+    recorder.stop();
+    recorder.stream.getTracks().forEach(t => t.stop());
+    recorder = null;
+  }
+}
+
+function toggle() { listening ? stop() : start(); }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Mouse Wheel + Keyboard
+// ═══════════════════════════════════════════════════════════════════════════
+window.addEventListener('mousedown', function(e) {
+  if (e.button === 1) { e.preventDefault(); micMode === 'ptt' ? (!listening && start()) : toggle(); }
+});
+window.addEventListener('mouseup', function(e) {
+  if (e.button === 1 && micMode === 'ptt') { e.preventDefault(); listening && stop(); }
+});
+window.addEventListener('auxclick', function(e) { if (e.button === 1) e.preventDefault(); });
+
+window.addEventListener('keydown', function(e) {
+  if (e.key === 'F2' || (e.ctrlKey && e.shiftKey && e.key === 'M')) {
+    e.preventDefault();
+    micMode === 'ptt' ? (!listening && start()) : toggle();
+  }
+});
+window.addEventListener('keyup', function(e) {
+  if (micMode === 'ptt' && (e.key === 'F2' || (e.ctrlKey && e.shiftKey && e.key === 'M'))) {
+    listening && stop();
+  }
+});
+
+// Electron global shortcut listener
+if (window.electronAPI) {
+  window.electronAPI.onToggleMic(() => toggle());
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Actions
+// ═══════════════════════════════════════════════════════════════════════════
+function updateStats() {
+  const t = ed.value;
+  const w = t.trim() ? t.trim().split(/\s+/).length : 0;
+  document.getElementById('wordCount').textContent = w + ' words';
+  document.getElementById('charCount').textContent = t.length + ' chars';
+  const has = t.length > 0;
+  document.getElementById('copyBtn').disabled = !has;
+  document.getElementById('dlBtn').disabled = !has;
+  document.getElementById('clearBtn').disabled = !has;
+  document.getElementById('undoBtn').disabled = segments.length === 0;
+}
+ed.addEventListener('input', updateStats);
+
+function copyAll() {
+  navigator.clipboard.writeText(ed.value);
+  const b = document.getElementById('copyBtn');
+  b.innerHTML = '&#10003;'; b.classList.add('ok');
+  setTimeout(() => { b.innerHTML = '&#128203;'; b.classList.remove('ok'); }, 1500);
+}
+
+function download() {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([ed.value], { type: 'text/plain' }));
+  a.download = 'dictation-' + new Date().toISOString().slice(0, 10) + '.txt';
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+function clearAll() {
+  if (ed.value && confirm('Clear all text?')) {
+    ed.value = ''; segments = []; secs = 0;
+    document.getElementById('timerDisplay').textContent = '0:00';
+    updateStats();
+    try { localStorage.removeItem('dictation_text'); } catch(e) {}
+  }
+}
+
+function undoSeg() {
+  if (!segments.length) return;
+  const last = segments.pop();
+  const i = ed.value.lastIndexOf(last);
+  if (i !== -1) {
+    const start = i > 0 && ed.value[i - 1] === ' ' ? i - 1 : i;
+    ed.value = ed.value.slice(0, start) + ed.value.slice(i + last.length);
+  }
+  updateStats();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Init
+// ═══════════════════════════════════════════════════════════════════════════
+loadPrefs();
+
+// Auto-start if always-on mode
+if (micMode === 'always') setTimeout(start, 500);
+</script>
+</body>
+</html>
