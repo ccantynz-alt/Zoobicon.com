@@ -241,7 +241,7 @@ export default function VideoCreatorDashboard() {
         // Check if user has video addon OR is on a paid plan
         const installedAddons = localStorage.getItem("zoobicon_installed_addons");
         const addons: string[] = installedAddons ? JSON.parse(installedAddons) : [];
-        const isPaidPlan = parsed.plan === "unlimited" || parsed.plan === "pro" || parsed.plan === "agency" || parsed.plan === "creator";
+        const isPaidPlan = parsed.plan === "unlimited" || parsed.plan === "pro" || parsed.plan === "agency" || parsed.plan === "enterprise";
         const isAdmin = parsed.role === "admin";
         const hasAddon = addons.includes("ai-video-creator");
         setHasVideoAddon(hasAddon || isPaidPlan || isAdmin);
