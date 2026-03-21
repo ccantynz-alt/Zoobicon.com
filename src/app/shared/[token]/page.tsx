@@ -103,7 +103,7 @@ export default function SharedProjectPage({ params }: { params: { token: string 
                 className={`p-1.5 rounded-md transition-all ${
                   isActive
                     ? "bg-blue-500/20 text-blue-400"
-                    : "text-white/30 hover:text-white/60 hover:bg-white/[0.04]"
+                    : "text-white/50 hover:text-white/60 hover:bg-white/[0.04]"
                 }`}
                 title={config.label}
               >
@@ -115,7 +115,7 @@ export default function SharedProjectPage({ params }: { params: { token: string 
 
         {/* Right: branding + CTA */}
         <div className="flex items-center gap-3 shrink-0">
-          <span className="text-[10px] text-white/30 tracking-wider uppercase hidden sm:inline">
+          <span className="text-[10px] text-white/50 tracking-wider uppercase hidden sm:inline">
             Built with Zoobicon
           </span>
           <Link

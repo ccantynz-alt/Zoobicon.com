@@ -391,7 +391,7 @@ export default function HeroDemo() {
           </div>
           <div className="ml-3 flex-1 h-5 rounded-md bg-white/[0.04] flex items-center px-2.5 gap-1.5">
             <Globe className="w-2.5 h-2.5 text-white/15" />
-            <span className="text-[10px] text-white/25 font-mono tracking-wide">
+            <span className="text-[10px] text-white/50 font-mono tracking-wide">
               zoobicon.com/builder
             </span>
           </div>
@@ -402,8 +402,8 @@ export default function HeroDemo() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <Clock className="w-3 h-3 text-white/30" />
-              <span className={phase === "deployed" ? "text-emerald-400 font-semibold" : "text-white/40"}>
+              <Clock className="w-3 h-3 text-white/50" />
+              <span className={phase === "deployed" ? "text-emerald-400 font-semibold" : "text-white/50"}>
                 {elapsedTime}s
               </span>
             </motion.div>
@@ -429,11 +429,11 @@ export default function HeroDemo() {
           <div className="flex items-center gap-2 overflow-x-auto">
             <div className="flex items-center gap-1 mr-1">
               <div className="w-1.5 h-1.5 rounded-full bg-violet-500/60" />
-              <span className="text-[9px] uppercase tracking-[0.12em] text-white/25 font-semibold whitespace-nowrap">
+              <span className="text-[9px] uppercase tracking-[0.12em] text-white/50 font-semibold whitespace-nowrap">
                 Pipeline
               </span>
               {doneCount > 0 && (
-                <span className="text-[9px] text-white/20 tabular-nums">{doneCount}/{AGENTS.length}</span>
+                <span className="text-[9px] text-white/50 tabular-nums">{doneCount}/{AGENTS.length}</span>
               )}
             </div>
             {AGENTS.map((agent, i) => {
@@ -449,7 +449,7 @@ export default function HeroDemo() {
                       ? "bg-violet-500/20 text-violet-300 border border-violet-500/40"
                       : isDone
                         ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
-                        : "bg-white/[0.03] text-white/20 border border-white/[0.05]"
+                        : "bg-white/[0.03] text-white/50 border border-white/[0.05]"
                   }`}
                   animate={isActive && !reducedMotion ? { scale: [1, 1.05, 1] } : { scale: 1 }}
                   transition={isActive ? { duration: 1, repeat: Infinity, ease: "easeInOut" } : { duration: 0.3 }}

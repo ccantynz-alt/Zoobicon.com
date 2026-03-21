@@ -68,7 +68,7 @@ export default function AccessibilityPanel({ code }: { code: string }) {
 
   return (
     <div className="p-4 space-y-4">
-      <p className="text-xs text-white/40">
+      <p className="text-xs text-white/50">
         Check WCAG 2.1 accessibility compliance. Ensures your site is usable by everyone.
       </p>
 
@@ -92,11 +92,11 @@ export default function AccessibilityPanel({ code }: { code: string }) {
         <>
           <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10">
             <div>
-              <div className="text-xs text-white/40">WCAG Level</div>
+              <div className="text-xs text-white/50">WCAG Level</div>
               <div className={`text-2xl font-bold ${levelColor(result.level)}`}>{result.level}</div>
             </div>
             <div className="text-right">
-              <div className="text-xs text-white/40">Score</div>
+              <div className="text-xs text-white/50">Score</div>
               <div className="text-2xl font-bold text-white">{result.score}</div>
             </div>
           </div>
@@ -114,7 +114,7 @@ export default function AccessibilityPanel({ code }: { code: string }) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="text-white/80 font-medium">{check.rule}</span>
-                    <span className="text-white/30 text-[10px]">WCAG {check.wcagLevel}</span>
+                    <span className="text-white/50 text-[10px]">WCAG {check.wcagLevel}</span>
                     {check.status !== "pass" && impactBadge(check.impact)}
                   </div>
                   <div className="text-white/50 mt-0.5">{check.message}</div>

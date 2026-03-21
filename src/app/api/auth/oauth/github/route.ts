@@ -17,5 +17,11 @@ export async function GET(req: NextRequest) {
     state,
   });
 
-  return Response.redirect(`https://github.com/login/oauth/authorize?${params}`);
+  const redirectUrl = `https://github.com/login/oauth/authorize?${params}`;
+  const response = Response.redirect(redirectUrl);
+  response.headers.append(
+    "Set-Cookie",
+    `zoobicon_oauth_state=${state}; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=600`
+  );
+  return response;
 }

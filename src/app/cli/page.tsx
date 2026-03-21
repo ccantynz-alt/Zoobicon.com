@@ -154,7 +154,7 @@ export default function CLIPage() {
           <div className="flex items-center gap-3">
             <div className="hidden md:flex items-center gap-2 bg-dark-200 border border-white/[0.10] rounded-lg px-3 py-1.5 font-mono text-xs text-white/60">
               <span className="text-amber-400">$</span> npm i -g @zoobicon/cli
-              <button onClick={() => copyText("npm i -g @zoobicon/cli", "nav")} className="text-white/40 hover:text-white/65 ml-1">
+              <button onClick={() => copyText("npm i -g @zoobicon/cli", "nav")} className="text-white/50 hover:text-white/65 ml-1">
                 {copied === "nav" ? <Check className="w-3 h-3 text-accent-cyan" /> : <Copy className="w-3 h-3" />}
               </button>
             </div>
@@ -172,7 +172,7 @@ export default function CLIPage() {
             <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-amber-500/20 bg-amber-500/5 mb-6">
               <Terminal className="w-3 h-3 text-amber-400" />
               <span className="text-xs font-medium text-amber-400">Command Line Interface</span>
-              <span className="text-xs text-white/40 font-mono">zoobicon.sh</span>
+              <span className="text-xs text-white/50 font-mono">zoobicon.sh</span>
             </motion.div>
 
             <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[0.95] mb-6">
@@ -191,7 +191,7 @@ export default function CLIPage() {
                 className="group flex items-center gap-3 bg-dark-200 border border-white/[0.12] hover:border-amber-500/30 rounded-xl px-6 py-3 font-mono text-sm text-white/60 transition-all"
               >
                 <span className="text-amber-400">$</span> npm install -g @zoobicon/cli
-                {copied === "hero" ? <Check className="w-4 h-4 text-accent-cyan" /> : <Copy className="w-4 h-4 text-white/40 group-hover:text-white/65" />}
+                {copied === "hero" ? <Check className="w-4 h-4 text-accent-cyan" /> : <Copy className="w-4 h-4 text-white/50 group-hover:text-white/65" />}
               </button>
               <a href="#commands" className="px-6 py-3 rounded-xl text-sm font-medium text-white/65 border border-white/[0.12] hover:border-white/20 transition-all flex items-center gap-2">
                 <Package className="w-4 h-4" />
@@ -209,7 +209,7 @@ export default function CLIPage() {
                       <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
                       <div className="w-3 h-3 rounded-full bg-green-500/60" />
                     </div>
-                    <div className="flex-1 text-center text-xs text-white/40 font-mono">zsh — zoobicon</div>
+                    <div className="flex-1 text-center text-xs text-white/50 font-mono">zsh — zoobicon</div>
                   </div>
                   <pre className="p-6 overflow-x-auto text-sm font-mono leading-relaxed text-white/65 max-h-[500px] overflow-y-auto">
                     <code>{TERMINAL_DEMO}</code>
@@ -239,12 +239,12 @@ export default function CLIPage() {
                       {cmd.category}
                     </span>
                     <code className="text-sm font-mono text-accent-cyan/80 flex-shrink-0">{cmd.cmd}</code>
-                    <span className="text-xs text-white/45 hidden md:block flex-1">{cmd.desc}</span>
+                    <span className="text-xs text-white/50 hidden md:block flex-1">{cmd.desc}</span>
                     <button
                       onClick={() => copyText(cmd.cmd, `cmd-${i}`)}
                       className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
                     >
-                      {copied === `cmd-${i}` ? <Check className="w-3 h-3 text-accent-cyan" /> : <Copy className="w-3 h-3 text-white/40" />}
+                      {copied === `cmd-${i}` ? <Check className="w-3 h-3 text-accent-cyan" /> : <Copy className="w-3 h-3 text-white/50" />}
                     </button>
                   </div>
                 ))}
@@ -360,7 +360,7 @@ export default function CLIPage() {
           >
             <span className="text-amber-400">$</span>
             npm install -g @zoobicon/cli && zb auth login
-            {copied === "cta" ? <Check className="w-4 h-4 text-accent-cyan" /> : <Copy className="w-4 h-4 text-white/40 group-hover:text-white/65" />}
+            {copied === "cta" ? <Check className="w-4 h-4 text-accent-cyan" /> : <Copy className="w-4 h-4 text-white/50 group-hover:text-white/65" />}
           </button>
           <div className="flex justify-center gap-4">
             <Link href="/auth/signup" className="btn-gradient px-8 py-3 rounded-xl text-sm font-bold text-white flex items-center gap-2">
@@ -377,11 +377,11 @@ export default function CLIPage() {
       {/* Footer */}
       <footer className="border-t border-white/[0.08] py-8">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <div className="text-xs text-white/40">&copy; 2026 Zoobicon. All rights reserved.</div>
+          <div className="text-xs text-white/50">&copy; 2026 Zoobicon. All rights reserved.</div>
           <div className="flex gap-4">
-            <Link href="/" className="text-xs text-white/40 hover:text-white/60">Home</Link>
-            <Link href="/developers" className="text-xs text-white/40 hover:text-white/60">Developers</Link>
-            <Link href="/agencies" className="text-xs text-white/40 hover:text-white/60">Agencies</Link>
+            <Link href="/" className="text-xs text-white/50 hover:text-white/60">Home</Link>
+            <Link href="/developers" className="text-xs text-white/50 hover:text-white/60">Developers</Link>
+            <Link href="/agencies" className="text-xs text-white/50 hover:text-white/60">Agencies</Link>
           </div>
         </div>
       </footer>

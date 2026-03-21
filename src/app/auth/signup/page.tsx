@@ -63,7 +63,7 @@ export default function SignupPage() {
           </Link>
 
           <h1 className="text-3xl font-black tracking-tight mb-2">Create your account</h1>
-          <p className="text-white/40 mb-8">
+          <p className="text-white/50 mb-8">
             Start building with the most advanced AI platform.
           </p>
 
@@ -90,14 +90,14 @@ export default function SignupPage() {
 
           <div className="flex items-center gap-4 mb-6">
             <div className="flex-1 h-px bg-white/[0.06]" />
-            <span className="text-xs text-white/20">or</span>
+            <span className="text-xs text-white/50">or</span>
             <div className="flex-1 h-px bg-white/[0.06]" />
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-white/40 mb-1.5">Full name</label>
+              <label className="block text-xs font-medium text-white/50 mb-1.5">Full name</label>
               <input
                 type="text"
                 value={name}
@@ -105,12 +105,12 @@ export default function SignupPage() {
                 placeholder="Jane Smith"
                 required
                 className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-sm
-                           placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 transition-all"
+                           placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 transition-all"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-white/40 mb-1.5">Email</label>
+              <label className="block text-xs font-medium text-white/50 mb-1.5">Email</label>
               <input
                 type="email"
                 value={email}
@@ -118,12 +118,12 @@ export default function SignupPage() {
                 placeholder="you@company.com"
                 required
                 className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-sm
-                           placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 transition-all"
+                           placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 transition-all"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-white/40 mb-1.5">Password</label>
+              <label className="block text-xs font-medium text-white/50 mb-1.5">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -132,12 +132,12 @@ export default function SignupPage() {
                   placeholder="Create a strong password"
                   required
                   className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 pr-10 text-sm
-                             placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 transition-all"
+                             placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 transition-all"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/40"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/50"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -147,7 +147,7 @@ export default function SignupPage() {
                   {passwordChecks.map((check) => (
                     <div key={check.label} className="flex items-center gap-1">
                       <Check className={`w-3 h-3 ${check.met ? "text-accent-cyan" : "text-white/15"}`} />
-                      <span className={`text-[10px] ${check.met ? "text-accent-cyan" : "text-white/20"}`}>
+                      <span className={`text-[10px] ${check.met ? "text-accent-cyan" : "text-white/50"}`}>
                         {check.label}
                       </span>
                     </div>
@@ -171,14 +171,14 @@ export default function SignupPage() {
             </button>
           </form>
 
-          <p className="mt-4 text-center text-xs text-white/20">
+          <p className="mt-4 text-center text-xs text-white/50">
             By signing up you agree to our{" "}
-            <Link href="/terms" className="text-white/40 hover:text-white/60">Terms of Service</Link>
+            <Link href="/terms" className="text-white/50 hover:text-white/60">Terms of Service</Link>
             {" "}and{" "}
-            <Link href="/privacy" className="text-white/40 hover:text-white/60">Privacy Policy</Link>.
+            <Link href="/privacy" className="text-white/50 hover:text-white/60">Privacy Policy</Link>.
           </p>
 
-          <p className="mt-4 text-center text-sm text-white/30">
+          <p className="mt-4 text-center text-sm text-white/50">
             Already have an account?{" "}
             <Link href="/auth/login" className="text-brand-400 hover:text-brand-300 font-medium">
               Sign in

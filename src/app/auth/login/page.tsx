@@ -76,7 +76,7 @@ export default function LoginPage() {
           </Link>
 
           <h1 className="text-3xl font-black tracking-tight mb-2">Welcome back</h1>
-          <p className="text-white/40 mb-8">
+          <p className="text-white/50 mb-8">
             Sign in to your account to continue building.
           </p>
 
@@ -103,14 +103,14 @@ export default function LoginPage() {
 
           <div className="flex items-center gap-4 mb-6">
             <div className="flex-1 h-px bg-white/[0.06]" />
-            <span className="text-xs text-white/20">or</span>
+            <span className="text-xs text-white/50">or</span>
             <div className="flex-1 h-px bg-white/[0.06]" />
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-white/40 mb-1.5">Email</label>
+              <label className="block text-xs font-medium text-white/50 mb-1.5">Email</label>
               <input
                 type="email"
                 value={email}
@@ -118,13 +118,13 @@ export default function LoginPage() {
                 placeholder="you@company.com"
                 required
                 className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-sm
-                           placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 transition-all"
+                           placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 transition-all"
               />
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-xs font-medium text-white/40">Password</label>
+                <label className="text-xs font-medium text-white/50">Password</label>
                 <Link href="/auth/forgot-password" className="text-xs text-brand-400 hover:text-brand-300">Forgot password?</Link>
               </div>
               <div className="relative">
@@ -135,12 +135,12 @@ export default function LoginPage() {
                   placeholder="••••••••"
                   required
                   className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 pr-10 text-sm
-                             placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 transition-all"
+                             placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 transition-all"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/40"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/50"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -162,7 +162,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-white/30">
+          <p className="mt-6 text-center text-sm text-white/50">
             Don&apos;t have an account?{" "}
             <Link href="/auth/signup" className="text-brand-400 hover:text-brand-300 font-medium">
               Sign up free
@@ -179,7 +179,7 @@ export default function LoginPage() {
           <div className="text-5xl font-black tracking-tight mb-4 gradient-text-hero">
             Build Empires
           </div>
-          <p className="text-white/40 text-lg">
+          <p className="text-white/50 text-lg">
             The most advanced AI platform for creating, marketing, and dominating the digital landscape.
           </p>
         </div>

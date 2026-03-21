@@ -489,7 +489,14 @@ export default function MarketplacePage() {
                       <span className={`text-sm font-bold ${item.priceType === "free" ? "text-emerald-400" : "text-white/70"}`}>
                         {item.priceLabel}
                       </span>
-                      {renderButton(item, "lg")}
+                      <div className="flex items-center gap-2">
+                        {item.id === "ai-video-creator" && (
+                          <Link href="/video-creator" className="px-3 py-1.5 rounded-lg text-xs font-bold text-accent-purple border border-accent-purple/20 hover:bg-accent-purple/10 transition-colors flex items-center gap-1">
+                            <ArrowRight className="w-3 h-3" />Try It
+                          </Link>
+                        )}
+                        {renderButton(item, "lg")}
+                      </div>
                     </div>
                   </motion.div>
                 );
@@ -561,7 +568,14 @@ export default function MarketplacePage() {
                           {item.priceLabel}
                         </span>
                       </div>
-                      {renderButton(item, "sm")}
+                      <div className="flex items-center gap-1.5">
+                        {item.id === "ai-video-creator" && (
+                          <Link href="/video-creator" className="px-2 py-1 rounded-lg text-[10px] font-bold text-accent-purple border border-accent-purple/20 hover:bg-accent-purple/10 transition-colors">
+                            Try It
+                          </Link>
+                        )}
+                        {renderButton(item, "sm")}
+                      </div>
                     </div>
                   </motion.div>
                 );
@@ -570,7 +584,7 @@ export default function MarketplacePage() {
 
             {filteredItems.length === 0 && (
               <div className="text-center py-20">
-                <Search className="w-12 h-12 text-white/30 mx-auto mb-4" />
+                <Search className="w-12 h-12 text-white/50 mx-auto mb-4" />
                 <div className="text-lg font-bold text-white/60 mb-2">No add-ons found</div>
                 <div className="text-sm text-white/60">Try a different search or category</div>
               </div>

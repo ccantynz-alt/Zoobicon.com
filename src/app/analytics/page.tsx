@@ -283,7 +283,7 @@ export default function AnalyticsPage() {
 
               {sortedProjects.length === 0 ? (
                 <div className="p-12 text-center">
-                  <FileText className="w-10 h-10 text-white/30 mx-auto mb-3" />
+                  <FileText className="w-10 h-10 text-white/50 mx-auto mb-3" />
                   <p className="text-sm text-white/50 mb-4">No generations yet. Create your first project to see history here.</p>
                   <Link href="/builder" className="inline-flex items-center gap-2 text-sm text-brand-400 hover:text-brand-300 transition-colors">
                     <Plus className="w-4 h-4" /> Go to Builder
@@ -311,7 +311,7 @@ export default function AnalyticsPage() {
                       </div>
 
                       {/* Character count */}
-                      <div className="text-xs text-white/40 flex-shrink-0 hidden sm:block">
+                      <div className="text-xs text-white/50 flex-shrink-0 hidden sm:block">
                         {(project.code?.length || 0).toLocaleString()} chars
                       </div>
 
@@ -323,11 +323,11 @@ export default function AnalyticsPage() {
                       </div>
 
                       {/* Timestamp */}
-                      <div className="text-xs text-white/40 flex-shrink-0 w-16 text-right">
+                      <div className="text-xs text-white/50 flex-shrink-0 w-16 text-right">
                         {formatDate(project.updatedAt)}
                       </div>
 
-                      <ArrowRight className="w-3 h-3 text-white/30 group-hover:text-white/50 transition-colors flex-shrink-0" />
+                      <ArrowRight className="w-3 h-3 text-white/50 group-hover:text-white/50 transition-colors flex-shrink-0" />
                     </Link>
                   ))}
                 </div>
@@ -356,7 +356,7 @@ export default function AnalyticsPage() {
 
               {seoHistory.length === 0 ? (
                 <div className="p-6 text-center">
-                  <BarChart3 className="w-8 h-8 text-white/30 mx-auto mb-2" />
+                  <BarChart3 className="w-8 h-8 text-white/50 mx-auto mb-2" />
                   <p className="text-xs text-white/50 mb-3">No SEO analyses yet.</p>
                   <Link href="/products/seo-agent" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">
                     Run an SEO audit
@@ -405,7 +405,7 @@ export default function AnalyticsPage() {
                     <div className="text-sm font-medium group-hover:text-white transition-colors">New Website</div>
                     <div className="text-[10px] text-white/50">AI-powered builder</div>
                   </div>
-                  <ArrowRight className="w-3 h-3 text-white/40" />
+                  <ArrowRight className="w-3 h-3 text-white/50" />
                 </Link>
 
                 <Link
@@ -419,7 +419,7 @@ export default function AnalyticsPage() {
                     <div className="text-sm font-medium group-hover:text-white transition-colors">SEO Audit</div>
                     <div className="text-[10px] text-white/50">Analyze site performance</div>
                   </div>
-                  <ArrowRight className="w-3 h-3 text-white/40" />
+                  <ArrowRight className="w-3 h-3 text-white/50" />
                 </Link>
 
                 <Link
@@ -433,7 +433,7 @@ export default function AnalyticsPage() {
                     <div className="text-sm font-medium group-hover:text-white transition-colors">View Dashboard</div>
                     <div className="text-[10px] text-white/50">Manage all projects</div>
                   </div>
-                  <ArrowRight className="w-3 h-3 text-white/40" />
+                  <ArrowRight className="w-3 h-3 text-white/50" />
                 </Link>
               </div>
             </div>

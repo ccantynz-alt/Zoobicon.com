@@ -298,7 +298,7 @@ export default function ZoobiconShPage() {
           <div className="flex items-center gap-3">
             <div className="hidden md:flex items-center gap-2 bg-dark-200 border border-white/[0.10] rounded-lg px-3 py-1.5 font-mono text-xs text-white/60">
               <span className="text-green-400">$</span> npm i -g zoobicon-cli
-              <button onClick={() => copyText("npm i -g zoobicon-cli", "nav")} className="text-white/40 hover:text-white/50 ml-1">
+              <button onClick={() => copyText("npm i -g zoobicon-cli", "nav")} className="text-white/50 hover:text-white/50 ml-1">
                 {copied === "nav" ? <Check className="w-3 h-3 text-accent-cyan" /> : <Copy className="w-3 h-3" />}
               </button>
             </div>
@@ -337,7 +337,7 @@ export default function ZoobiconShPage() {
                 className="group flex items-center gap-3 bg-dark-200 border border-white/[0.12] hover:border-zoo-500/30 rounded-xl px-6 py-3 font-mono text-sm text-white/60 transition-all"
               >
                 <span className="text-green-400">$</span> npm install -g zoobicon-cli
-                {copied === "hero" ? <Check className="w-4 h-4 text-accent-cyan" /> : <Copy className="w-4 h-4 text-white/40 group-hover:text-white/50" />}
+                {copied === "hero" ? <Check className="w-4 h-4 text-accent-cyan" /> : <Copy className="w-4 h-4 text-white/50 group-hover:text-white/50" />}
               </button>
               <a
                 href="#commands"
@@ -386,7 +386,7 @@ export default function ZoobiconShPage() {
                           onClick={() => copyText(cmd.cmd, `cmd-${i}`)}
                           className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
                         >
-                          {copied === `cmd-${i}` ? <Check className="w-3 h-3 text-accent-cyan" /> : <Copy className="w-3 h-3 text-white/40" />}
+                          {copied === `cmd-${i}` ? <Check className="w-3 h-3 text-accent-cyan" /> : <Copy className="w-3 h-3 text-white/50" />}
                         </button>
                       </div>
                       <p className="text-xs text-white/50">{cmd.desc}</p>
@@ -578,7 +578,7 @@ export default function ZoobiconShPage() {
                         onClick={() => copyText(activeTab === "github" ? GITHUB_ACTIONS_YAML : GITLAB_CI_YAML, "cicd")}
                         className="absolute top-3 right-3 p-2 rounded-lg bg-white/[0.06] hover:bg-white/[0.12] transition-colors"
                       >
-                        {copied === "cicd" ? <Check className="w-3.5 h-3.5 text-accent-cyan" /> : <Copy className="w-3.5 h-3.5 text-white/40" />}
+                        {copied === "cicd" ? <Check className="w-3.5 h-3.5 text-accent-cyan" /> : <Copy className="w-3.5 h-3.5 text-white/50" />}
                       </button>
                     </div>
                   </div>
@@ -608,7 +608,7 @@ export default function ZoobiconShPage() {
               >
                 <span className="text-green-400">$</span>
                 npm install -g zoobicon-cli
-                {copied === "cta" ? <Check className="w-4 h-4 text-accent-cyan" /> : <Copy className="w-4 h-4 text-white/40 group-hover:text-white/50" />}
+                {copied === "cta" ? <Check className="w-4 h-4 text-accent-cyan" /> : <Copy className="w-4 h-4 text-white/50 group-hover:text-white/50" />}
               </button>
             </motion.div>
 

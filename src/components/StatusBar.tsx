@@ -101,7 +101,7 @@ export default function StatusBar({ status, pipelineStep }: StatusBarProps) {
         />
         <span
           className={`truncate ${
-            isActive ? "text-blue-400/70" : isComplete ? "text-green-400/70" : isError ? "text-red-400/70" : "text-white/30"
+            isActive ? "text-blue-400/70" : isComplete ? "text-green-400/70" : isError ? "text-red-400/70" : "text-white/50"
           }`}
         >
           {statusLabel}
@@ -131,7 +131,7 @@ export default function StatusBar({ status, pipelineStep }: StatusBarProps) {
             ))}
             {/* Finish flag at the end */}
             <div className="absolute top-1/2 -translate-y-1/2 right-0 translate-x-1">
-              <svg width="10" height="14" viewBox="0 0 10 14" className={`transition-colors duration-500 ${isComplete ? "text-green-400" : "text-white/20"}`}>
+              <svg width="10" height="14" viewBox="0 0 10 14" className={`transition-colors duration-500 ${isComplete ? "text-green-400" : "text-white/50"}`}>
                 <line x1="1" y1="0" x2="1" y2="14" stroke="currentColor" strokeWidth="1" />
                 <rect x="1" y="0" width="8" height="5" fill="currentColor" opacity={isComplete ? "0.8" : "0.3"} />
                 <rect x="1" y="0" width="4" height="2.5" fill={isComplete ? "#0a0a0f" : "transparent"} opacity="0.5" />
@@ -180,7 +180,7 @@ export default function StatusBar({ status, pipelineStep }: StatusBarProps) {
       )}
 
       {/* Right: timer + branding */}
-      <div className="ml-auto flex items-center gap-4 text-white/20 z-10">
+      <div className="ml-auto flex items-center gap-4 text-white/50 z-10">
         {isActive && (
           <span className="text-blue-400/70 tabular-nums font-mono">
             {formatTime(elapsed)}

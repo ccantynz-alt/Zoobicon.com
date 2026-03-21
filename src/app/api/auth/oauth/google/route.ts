@@ -20,5 +20,11 @@ export async function GET(req: NextRequest) {
     prompt: "select_account",
   });
 
-  return Response.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params}`);
+  const redirectUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
+  const response = Response.redirect(redirectUrl);
+  response.headers.append(
+    "Set-Cookie",
+    `zoobicon_oauth_state=${state}; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=600`
+  );
+  return response;
 }

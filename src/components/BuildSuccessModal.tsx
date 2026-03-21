@@ -171,7 +171,7 @@ export default function BuildSuccessModal({
             {/* Close */}
             <button
               onClick={handleClose}
-              className="absolute top-4 right-4 z-10 p-1.5 rounded-lg text-white/30 hover:text-white/60 hover:bg-white/5 transition-colors"
+              className="absolute top-4 right-4 z-10 p-1.5 rounded-lg text-white/50 hover:text-white/60 hover:bg-white/5 transition-colors"
             >
               <X size={16} />
             </button>
@@ -204,7 +204,7 @@ export default function BuildSuccessModal({
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.35 }}
-                className="mt-1.5 text-sm text-white/40"
+                className="mt-1.5 text-sm text-white/50"
               >
                 Great work. Here is what you can do next.
               </motion.p>
@@ -232,7 +232,7 @@ export default function BuildSuccessModal({
                       <p className="text-sm font-medium text-white">
                         {step.title}
                       </p>
-                      <p className="text-xs text-white/40 leading-relaxed">
+                      <p className="text-xs text-white/50 leading-relaxed">
                         {step.description}
                       </p>
                     </div>
@@ -250,14 +250,14 @@ export default function BuildSuccessModal({
                   onChange={(e) => setDontShowAgain(e.target.checked)}
                   className="w-3.5 h-3.5 rounded border-white/20 bg-white/5 text-blue-500 focus:ring-blue-500/30 focus:ring-offset-0"
                 />
-                <span className="text-xs text-white/30">
+                <span className="text-xs text-white/50">
                   Don&apos;t show again
                 </span>
               </label>
 
               <button
                 onClick={handleClose}
-                className="text-xs text-white/30 hover:text-white/50 transition-colors"
+                className="text-xs text-white/50 hover:text-white/50 transition-colors"
               >
                 Maybe later
               </button>

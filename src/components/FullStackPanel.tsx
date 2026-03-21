@@ -49,7 +49,7 @@ export default function FullStackPanel({
 
   return (
     <div className="p-4 space-y-4">
-      <p className="text-xs text-white/40">
+      <p className="text-xs text-white/50">
         Vibe-to-Database — describe an app and get a real database schema, API routes, and interactive frontend.
       </p>
 
@@ -98,7 +98,7 @@ export default function FullStackPanel({
                 className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[11px] font-medium transition-colors ${
                   activeView === tab.id
                     ? "bg-brand-500/20 text-brand-400"
-                    : "text-white/40 hover:text-white/60"
+                    : "text-white/50 hover:text-white/60"
                 }`}
               >
                 {tab.icon} {tab.label}

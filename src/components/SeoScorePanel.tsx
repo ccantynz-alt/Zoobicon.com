@@ -231,14 +231,14 @@ function CategorySection({ category }: { category: SeoCategory }) {
         onClick={() => setExpanded((prev) => !prev)}
         className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-white/[0.03] transition-colors group"
       >
-        <span className="text-white/40 group-hover:text-white/60 transition-colors">
+        <span className="text-white/50 group-hover:text-white/60 transition-colors">
           {icon}
         </span>
         <span className="text-sm font-medium text-white/90 flex-1 text-left">
           {category.name}
         </span>
         <div className="flex items-center gap-2.5">
-          <span className="text-[11px] text-white/30 tabular-nums">
+          <span className="text-[11px] text-white/50 tabular-nums">
             {passedCount}/{totalCount}
           </span>
           <div className="w-20 h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
@@ -253,7 +253,7 @@ function CategorySection({ category }: { category: SeoCategory }) {
           >
             {percentage}
           </span>
-          <span className="text-white/30 transition-transform duration-200">
+          <span className="text-white/50 transition-transform duration-200">
             {expanded ? (
               <ChevronDown className="w-3.5 h-3.5" />
             ) : (
@@ -284,7 +284,7 @@ function CategorySection({ category }: { category: SeoCategory }) {
                 <span
                   className={
                     check.passed
-                      ? "text-white/40 leading-relaxed"
+                      ? "text-white/50 leading-relaxed"
                       : "text-white/70 leading-relaxed"
                   }
                 >
@@ -417,7 +417,7 @@ export default function SeoScorePanel({
         {loading && !result && (
           <div className="flex flex-col items-center justify-center py-12 gap-3">
             <Loader2 className="w-7 h-7 text-blue-400 animate-spin" />
-            <span className="text-sm text-white/40">Analyzing SEO...</span>
+            <span className="text-sm text-white/50">Analyzing SEO...</span>
           </div>
         )}
 
@@ -433,7 +433,7 @@ export default function SeoScorePanel({
 
         {/* Empty state */}
         {!code.trim() && !loading && (
-          <div className="flex flex-col items-center justify-center py-16 gap-3 text-white/20">
+          <div className="flex flex-col items-center justify-center py-16 gap-3 text-white/50">
             <Search className="w-10 h-10" />
             <span className="text-sm text-center leading-relaxed">
               Generate or paste code
@@ -449,7 +449,7 @@ export default function SeoScorePanel({
             {/* Overall circular score */}
             <div className="flex flex-col items-center pt-1 pb-2">
               <CircularScore score={result.score} />
-              <span className="text-[11px] text-white/30 mt-2.5 uppercase tracking-widest font-medium">
+              <span className="text-[11px] text-white/50 mt-2.5 uppercase tracking-widest font-medium">
                 Overall SEO Score
               </span>
             </div>
@@ -457,7 +457,7 @@ export default function SeoScorePanel({
             {/* Top suggestions */}
             {result.suggestions.length > 0 && (
               <div className="space-y-2.5">
-                <h3 className="text-[11px] font-semibold text-white/40 uppercase tracking-widest">
+                <h3 className="text-[11px] font-semibold text-white/50 uppercase tracking-widest">
                   Top Suggestions
                 </h3>
                 <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-white/10">
@@ -492,7 +492,7 @@ export default function SeoScorePanel({
 
             {/* Category breakdown */}
             <div className="space-y-2.5">
-              <h3 className="text-[11px] font-semibold text-white/40 uppercase tracking-widest">
+              <h3 className="text-[11px] font-semibold text-white/50 uppercase tracking-widest">
                 Category Breakdown
               </h3>
               <div className="space-y-1.5">

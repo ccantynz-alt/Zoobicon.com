@@ -636,7 +636,7 @@ export default function PreviewPanel({
               className={`flex items-center gap-1.5 px-2 py-1 rounded text-[11px] transition-colors duration-150 ${
                 isActive
                   ? "text-blue-400"
-                  : "text-white/40 hover:text-white/70"
+                  : "text-white/50 hover:text-white/70"
               }`}
               title={config.label}
             >

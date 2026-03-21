@@ -289,7 +289,7 @@ export default function AdminSupportPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && fetchTickets()}
-                className="w-full bg-[#111318] border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-indigo-500"
+                className="w-full bg-[#111318] border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-white/50 focus:outline-none focus:border-indigo-500"
               />
             </div>
           </div>
@@ -342,7 +342,7 @@ export default function AdminSupportPage() {
                       {ticket.ai_auto_replied && (
                         <Bot className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
                       )}
-                      <span className="text-xs text-white/40 ml-auto">
+                      <span className="text-xs text-white/50 ml-auto">
                         {formatDate(ticket.updated_at)}
                       </span>
                     </div>
@@ -353,11 +353,11 @@ export default function AdminSupportPage() {
                       <span className="text-xs text-white/60 truncate">
                         {ticket.from_name || ticket.from_email}
                       </span>
-                      <span className="text-xs text-white/40">
+                      <span className="text-xs text-white/50">
                         &bull; {ticket.message_count} msgs
                       </span>
                       {ticket.ai_confidence !== null && (
-                        <span className="text-xs text-white/40 ml-auto">
+                        <span className="text-xs text-white/50 ml-auto">
                           AI: {Math.round(ticket.ai_confidence * 100)}%
                         </span>
                       )}
@@ -417,7 +417,7 @@ export default function AdminSupportPage() {
               <div className="flex items-center gap-2 text-sm text-white/70">
                 <User className="w-3.5 h-3.5" />
                 <span>{selectedTicket.from_name}</span>
-                <span className="text-white/40">&lt;{selectedTicket.from_email}&gt;</span>
+                <span className="text-white/50">&lt;{selectedTicket.from_email}&gt;</span>
               </div>
               {/* Priority selector */}
               <div className="flex items-center gap-2 mt-2">
@@ -429,7 +429,7 @@ export default function AdminSupportPage() {
                     className={`text-xs px-2 py-0.5 rounded border transition-colors ${
                       selectedTicket.priority === p
                         ? priorityColor[p]
-                        : "text-white/40 border-white/10 hover:border-white/20"
+                        : "text-white/50 border-white/10 hover:border-white/20"
                     }`}
                   >
                     {p}
@@ -470,7 +470,7 @@ export default function AdminSupportPage() {
                         <>
                           <Sparkles className="w-3.5 h-3.5 text-purple-400" />
                           <span className="text-purple-400">AI Draft</span>
-                          <span className="text-white/40">(not sent)</span>
+                          <span className="text-white/50">(not sent)</span>
                         </>
                       ) : msg.sender === "ai" ? (
                         <>
@@ -485,7 +485,7 @@ export default function AdminSupportPage() {
                           <span className="text-indigo-400">Agent</span>
                         </>
                       )}
-                      <span className="text-white/40 ml-auto">
+                      <span className="text-white/50 ml-auto">
                         {formatDate(msg.created_at)}
                       </span>
                     </div>
@@ -527,7 +527,7 @@ export default function AdminSupportPage() {
                   onChange={(e) => setReplyText(e.target.value)}
                   placeholder="Type your reply..."
                   rows={3}
-                  className="flex-1 bg-[#111318] border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-indigo-500 resize-none"
+                  className="flex-1 bg-[#111318] border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-white/50 focus:outline-none focus:border-indigo-500 resize-none"
                 />
                 <button
                   onClick={sendReply}
@@ -544,7 +544,7 @@ export default function AdminSupportPage() {
             </div>
           </div>
         ) : (
-          <div className="flex-1 flex items-center justify-center text-white/40">
+          <div className="flex-1 flex items-center justify-center text-white/50">
             <div className="text-center">
               <MessageSquare className="w-16 h-16 mx-auto mb-4 opacity-20" />
               <p>Select a ticket to view</p>

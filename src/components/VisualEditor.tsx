@@ -82,12 +82,12 @@ function NumberInput({
   return (
     <div className="flex flex-col gap-0.5">
       {label && (
-        <span className="text-[9px] text-white/30 uppercase tracking-wide">{label}</span>
+        <span className="text-[9px] text-white/50 uppercase tracking-wide">{label}</span>
       )}
       <div className="flex items-center bg-white/5 rounded border border-white/10 overflow-hidden">
         <button
           onClick={() => onChange(Math.max(min, numVal - step) + unit)}
-          className="px-1.5 py-1 text-white/40 hover:text-white/70 hover:bg-white/5 transition-colors"
+          className="px-1.5 py-1 text-white/50 hover:text-white/70 hover:bg-white/5 transition-colors"
         >
           <Minus size={10} />
         </button>
@@ -99,7 +99,7 @@ function NumberInput({
         />
         <button
           onClick={() => onChange(Math.min(max, numVal + step) + unit)}
-          className="px-1.5 py-1 text-white/40 hover:text-white/70 hover:bg-white/5 transition-colors"
+          className="px-1.5 py-1 text-white/50 hover:text-white/70 hover:bg-white/5 transition-colors"
         >
           <Plus size={10} />
         </button>
@@ -135,7 +135,7 @@ function ColorInput({
   return (
     <div className="flex flex-col gap-0.5">
       {label && (
-        <span className="text-[9px] text-white/30 uppercase tracking-wide">{label}</span>
+        <span className="text-[9px] text-white/50 uppercase tracking-wide">{label}</span>
       )}
       <div className="flex items-center gap-2 bg-white/5 rounded border border-white/10 px-2 py-1">
         <input
@@ -170,7 +170,7 @@ function SelectInput({
   return (
     <div className="flex flex-col gap-0.5">
       {label && (
-        <span className="text-[9px] text-white/30 uppercase tracking-wide">{label}</span>
+        <span className="text-[9px] text-white/50 uppercase tracking-wide">{label}</span>
       )}
       <select
         value={value}
@@ -333,10 +333,10 @@ export default function VisualEditor({
             <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mx-auto">
               <MousePointerClick size={20} className="text-blue-400/50" />
             </div>
-            <p className="text-[12px] text-white/40 leading-relaxed max-w-[180px]">
+            <p className="text-[12px] text-white/50 leading-relaxed max-w-[180px]">
               Click any element in the preview to select it and edit its properties
             </p>
-            <p className="text-[10px] text-white/25">
+            <p className="text-[10px] text-white/50">
               Double-click text to edit inline
             </p>
           </div>
@@ -368,7 +368,7 @@ export default function VisualEditor({
             )}
           </div>
           {selectedElement.className && typeof selectedElement.className === "string" && (
-            <p className="text-[9px] text-white/30 font-mono truncate mt-0.5">
+            <p className="text-[9px] text-white/50 font-mono truncate mt-0.5">
               .{selectedElement.className.split(" ").filter(Boolean).slice(0, 3).join(" .")}
             </p>
           )}
@@ -436,7 +436,7 @@ export default function VisualEditor({
             </div>
             {/* Text Align */}
             <div className="flex flex-col gap-0.5">
-              <span className="text-[9px] text-white/30 uppercase tracking-wide">
+              <span className="text-[9px] text-white/50 uppercase tracking-wide">
                 Text Align
               </span>
               <div className="flex gap-1">
@@ -447,7 +447,7 @@ export default function VisualEditor({
                     className={`flex-1 flex items-center justify-center py-1.5 rounded border transition-colors ${
                       cs.textAlign === val
                         ? "bg-blue-500/20 border-blue-500/40 text-blue-400"
-                        : "bg-white/5 border-white/10 text-white/40 hover:text-white/60 hover:bg-white/10"
+                        : "bg-white/5 border-white/10 text-white/50 hover:text-white/60 hover:bg-white/10"
                     }`}
                   >
                     <AlignIcon size={12} />
@@ -463,7 +463,7 @@ export default function VisualEditor({
           <div className="space-y-3">
             {/* Margin */}
             <div>
-              <span className="text-[9px] text-white/30 uppercase tracking-wide block mb-1">
+              <span className="text-[9px] text-white/50 uppercase tracking-wide block mb-1">
                 Margin
               </span>
               <div className="grid grid-cols-2 gap-1.5">
@@ -491,7 +491,7 @@ export default function VisualEditor({
             </div>
             {/* Padding */}
             <div>
-              <span className="text-[9px] text-white/30 uppercase tracking-wide block mb-1">
+              <span className="text-[9px] text-white/50 uppercase tracking-wide block mb-1">
                 Padding
               </span>
               <div className="grid grid-cols-2 gap-1.5">
@@ -544,7 +544,7 @@ export default function VisualEditor({
               onChange={(v) => onStyleChange("backgroundColor", v)}
             />
             <div className="flex flex-col gap-0.5">
-              <span className="text-[9px] text-white/30 uppercase tracking-wide">
+              <span className="text-[9px] text-white/50 uppercase tracking-wide">
                 Background Image URL
               </span>
               <input
@@ -653,13 +653,13 @@ function SectionList({
           key={section.index}
           className="flex items-center gap-2 bg-white/5 rounded border border-white/10 px-2 py-1.5 group"
         >
-          <GripVertical size={12} className="text-white/20 shrink-0" />
+          <GripVertical size={12} className="text-white/50 shrink-0" />
           <span className="flex-1 text-[11px] text-white/60 truncate">{section.label}</span>
           <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={() => i > 0 && onReorder(i, i - 1)}
               disabled={i === 0}
-              className="p-0.5 text-white/30 hover:text-white/60 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+              className="p-0.5 text-white/50 hover:text-white/60 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
               title="Move up"
             >
               <ArrowUp size={11} />
@@ -667,7 +667,7 @@ function SectionList({
             <button
               onClick={() => i < sections.length - 1 && onReorder(i, i + 1)}
               disabled={i === sections.length - 1}
-              className="p-0.5 text-white/30 hover:text-white/60 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+              className="p-0.5 text-white/50 hover:text-white/60 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
               title="Move down"
             >
               <ArrowDown size={11} />

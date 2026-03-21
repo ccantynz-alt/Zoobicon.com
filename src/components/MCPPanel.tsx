@@ -272,7 +272,7 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
             </span>
           )}
         </div>
-        <p className="text-xs text-white/40 mt-1">
+        <p className="text-xs text-white/50 mt-1">
           Pull context from GitHub, Notion, Figma, or Google Sheets into your AI generation.
         </p>
       </div>
@@ -280,7 +280,7 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
       {/* Provider status bar */}
       <div className="px-4 py-2 border-b border-white/10 flex gap-3 flex-wrap">
         {loadingTools ? (
-          <div className="flex items-center gap-2 text-xs text-white/40">
+          <div className="flex items-center gap-2 text-xs text-white/50">
             <Loader2 className="w-3 h-3 animate-spin" />
             Loading tools...
           </div>
@@ -301,7 +301,7 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
                   {isConnected ? (
                     <Check className="w-3 h-3 text-green-400" />
                   ) : (
-                    <span className="text-[10px] text-white/30 bg-white/5 px-1 rounded">demo</span>
+                    <span className="text-[10px] text-white/50 bg-white/5 px-1 rounded">demo</span>
                   )}
                 </div>
               );
@@ -314,9 +314,9 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
       <div className="flex-1 overflow-y-auto">
         {sources.length === 0 ? (
           <div className="px-4 py-8 text-center">
-            <Database className="w-8 h-8 text-white/20 mx-auto mb-2" />
-            <p className="text-xs text-white/40">No context sources added yet.</p>
-            <p className="text-xs text-white/30 mt-1">
+            <Database className="w-8 h-8 text-white/50 mx-auto mb-2" />
+            <p className="text-xs text-white/50">No context sources added yet.</p>
+            <p className="text-xs text-white/50 mt-1">
               Add a source below to pull external data into your generation.
             </p>
           </div>
@@ -344,7 +344,7 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
                         {source.included ? (
                           <ToggleRight className="w-4 h-4 text-indigo-400" />
                         ) : (
-                          <ToggleLeft className="w-4 h-4 text-white/30" />
+                          <ToggleLeft className="w-4 h-4 text-white/50" />
                         )}
                       </button>
                       {/* Expand/collapse */}
@@ -353,7 +353,7 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
                         className="p-1 rounded hover:bg-white/10 transition-colors"
                       >
                         <ChevronDown
-                          className={`w-3.5 h-3.5 text-white/40 transition-transform ${
+                          className={`w-3.5 h-3.5 text-white/50 transition-transform ${
                             source.expanded ? "" : "-rotate-90"
                           }`}
                         />
@@ -363,7 +363,7 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
                         onClick={() => removeSource(source.id)}
                         className="p-1 rounded hover:bg-red-500/20 transition-colors"
                       >
-                        <X className="w-3.5 h-3.5 text-white/40 hover:text-red-400" />
+                        <X className="w-3.5 h-3.5 text-white/50 hover:text-red-400" />
                       </button>
                     </div>
                   </div>
@@ -374,7 +374,7 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
                       <div className="space-y-2 mb-2">
                         {preset?.fields.map((field) => (
                           <div key={field.key}>
-                            <label className="text-[10px] text-white/40 uppercase tracking-wider">
+                            <label className="text-[10px] text-white/50 uppercase tracking-wider">
                               {field.label}
                             </label>
                             <input
@@ -382,7 +382,7 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
                               value={source.params[field.key] || ""}
                               onChange={(e) => updateParam(source.id, field.key, e.target.value)}
                               placeholder={field.placeholder}
-                              className="w-full mt-0.5 px-2 py-1.5 text-xs bg-white/5 border border-white/10 rounded focus:border-indigo-500/50 focus:outline-none text-white placeholder-white/20"
+                              className="w-full mt-0.5 px-2 py-1.5 text-xs bg-white/5 border border-white/10 rounded focus:border-indigo-500/50 focus:outline-none text-white placeholder-white/50"
                             />
                           </div>
                         ))}
@@ -434,7 +434,7 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
                           {/* Preview data */}
                           {source.result.success && source.result.data && (
                             <details className="mt-2">
-                              <summary className="text-[10px] text-white/40 cursor-pointer hover:text-white/60 flex items-center gap-1">
+                              <summary className="text-[10px] text-white/50 cursor-pointer hover:text-white/60 flex items-center gap-1">
                                 <Eye className="w-3 h-3" />
                                 Preview data
                               </summary>
@@ -466,7 +466,7 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
                 onClick={() => setShowAddMenu(false)}
                 className="p-1 rounded hover:bg-white/10"
               >
-                <X className="w-3 h-3 text-white/40" />
+                <X className="w-3 h-3 text-white/50" />
               </button>
             </div>
             {PRESETS.map((preset) => {
@@ -482,9 +482,9 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
                   <span className={`mt-0.5 ${meta.color}`}>{meta.icon}</span>
                   <div>
                     <div className="text-xs font-medium text-white/80">{preset.label}</div>
-                    <div className="text-[10px] text-white/30 mt-0.5">{preset.description}</div>
+                    <div className="text-[10px] text-white/50 mt-0.5">{preset.description}</div>
                   </div>
-                  <ExternalLink className="w-3 h-3 text-white/20 mt-0.5 ml-auto flex-shrink-0" />
+                  <ExternalLink className="w-3 h-3 text-white/50 mt-0.5 ml-auto flex-shrink-0" />
                 </button>
               );
             })}

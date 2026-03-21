@@ -3,7 +3,14 @@ import { sql } from "@/lib/db";
 
 export async function GET(req: NextRequest) {
   const code = req.nextUrl.searchParams.get("code");
+  const state = req.nextUrl.searchParams.get("state");
   const origin = req.nextUrl.origin;
+
+  // Validate OAuth state parameter to prevent CSRF
+  const storedState = req.cookies.get("zoobicon_oauth_state")?.value;
+  if (!state || !storedState || state !== storedState) {
+    return Response.redirect(`${origin}/auth/login?error=invalid_state`);
+  }
 
   if (!code) {
     return Response.redirect(`${origin}/auth/login?error=no_code`);
@@ -115,7 +122,13 @@ export async function GET(req: NextRequest) {
       plan: user.plan || "free",
     }));
 
-    return Response.redirect(`${origin}/auth/callback?user=${userData}`);
+    const redirectResponse = Response.redirect(`${origin}/auth/callback?user=${userData}`);
+    // Clear the state cookie
+    redirectResponse.headers.append(
+      "Set-Cookie",
+      "zoobicon_oauth_state=; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=0"
+    );
+    return redirectResponse;
   } catch (err) {
     console.error("GitHub OAuth callback error:", err);
     return Response.redirect(`${origin}/auth/login?error=oauth_failed`);

@@ -135,7 +135,7 @@ export default function BeforeAfter() {
                 </div>
 
                 {/* Subtext */}
-                <p className="text-xs text-white/30 text-center pt-2 tracking-wide">
+                <p className="text-xs text-white/50 text-center pt-2 tracking-wide">
                   Just words. No code. No design skills.
                 </p>
               </div>

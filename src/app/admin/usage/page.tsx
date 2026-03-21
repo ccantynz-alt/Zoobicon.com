@@ -360,7 +360,7 @@ export default function UsagePage() {
               );
             })}
           </div>
-          <div className="flex justify-between mt-2 text-[10px] text-white/30">
+          <div className="flex justify-between mt-2 text-[10px] text-white/50">
             <span>{dailyData[0]?.day}</span>
             <span>{dailyData[14]?.day}</span>
             <span>{dailyData[29]?.day}</span>
@@ -430,7 +430,7 @@ export default function UsagePage() {
                     style={{ width: `${creditPct}%` }}
                   />
                 </div>
-                <div className="text-xs text-white/30 mt-1">{creditPct}% consumed</div>
+                <div className="text-xs text-white/50 mt-1">{creditPct}% consumed</div>
               </div>
               <Link
                 href="/pricing"
@@ -459,12 +459,12 @@ export default function UsagePage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-white/10">
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-white/40 uppercase tracking-wider">Key</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-white/40 uppercase tracking-wider">Label</th>
-                  <th className="text-right py-3 px-4 text-xs font-semibold text-white/40 uppercase tracking-wider">Today</th>
-                  <th className="text-right py-3 px-4 text-xs font-semibold text-white/40 uppercase tracking-wider">This Month</th>
-                  <th className="text-right py-3 px-4 text-xs font-semibold text-white/40 uppercase tracking-wider">Rate Limit</th>
-                  <th className="text-center py-3 px-4 text-xs font-semibold text-white/40 uppercase tracking-wider">Status</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-white/50 uppercase tracking-wider">Key</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-white/50 uppercase tracking-wider">Label</th>
+                  <th className="text-right py-3 px-4 text-xs font-semibold text-white/50 uppercase tracking-wider">Today</th>
+                  <th className="text-right py-3 px-4 text-xs font-semibold text-white/50 uppercase tracking-wider">This Month</th>
+                  <th className="text-right py-3 px-4 text-xs font-semibold text-white/50 uppercase tracking-wider">Rate Limit</th>
+                  <th className="text-center py-3 px-4 text-xs font-semibold text-white/50 uppercase tracking-wider">Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -479,7 +479,7 @@ export default function UsagePage() {
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                         key.status === "active"
                           ? "bg-emerald-500/15 text-emerald-400"
-                          : "bg-white/[0.06] text-white/40"
+                          : "bg-white/[0.06] text-white/50"
                       }`}>
                         {key.status}
                       </span>
@@ -524,7 +524,7 @@ export default function UsagePage() {
                 <span className="flex-1 text-sm text-white/80 truncate">{item.description}</span>
 
                 {/* Model */}
-                <span className="hidden md:block text-xs text-white/30 font-mono w-36 text-right truncate">
+                <span className="hidden md:block text-xs text-white/50 font-mono w-36 text-right truncate">
                   {item.model}
                 </span>
 
@@ -534,7 +534,7 @@ export default function UsagePage() {
                 }`} />
 
                 {/* Timestamp */}
-                <span className="flex-shrink-0 flex items-center gap-1 text-xs text-white/30 w-20 justify-end">
+                <span className="flex-shrink-0 flex items-center gap-1 text-xs text-white/50 w-20 justify-end">
                   <Clock className="w-3 h-3" />
                   {formatRelative(item.timestamp)}
                 </span>

@@ -764,7 +764,7 @@ export default function VideoCreatorDashboard() {
               </div>
               <span className="text-base font-bold tracking-tight">Zoobicon</span>
             </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-white/30" />
+            <ChevronRight className="w-3.5 h-3.5 text-white/50" />
             <span className="text-sm text-white/60 font-medium">Video Creator</span>
           </div>
           <div className="flex items-center gap-2">
@@ -818,18 +818,18 @@ export default function VideoCreatorDashboard() {
                 </button>
               </div>
               {projects.length === 0 ? (
-                <div className="p-8 text-center text-white/40 text-sm">No projects yet. Generate a storyboard to get started.</div>
+                <div className="p-8 text-center text-white/50 text-sm">No projects yet. Generate a storyboard to get started.</div>
               ) : (
                 <div className="p-2">
                   {projects.map((project) => (
                     <div key={project.id} className="p-3 rounded-lg hover:bg-white/5 group flex items-start justify-between gap-2">
                       <button onClick={() => loadProject(project)} className="flex-1 text-left">
                         <div className="text-sm font-medium mb-0.5">{project.name}</div>
-                        <div className="text-xs text-white/40">
+                        <div className="text-xs text-white/50">
                           {new Date(project.createdAt).toLocaleDateString()} {new Date(project.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                         </div>
                       </button>
-                      <button onClick={() => deleteProject(project.id)} className="p-1.5 text-white/20 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity rounded hover:bg-red-500/10">
+                      <button onClick={() => deleteProject(project.id)} className="p-1.5 text-white/50 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity rounded hover:bg-red-500/10">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -882,10 +882,10 @@ export default function VideoCreatorDashboard() {
                           >
                             <div className={`w-full h-6 rounded bg-gradient-to-r ${t.thumbnail} mb-1.5`} />
                             <div className="text-[10px] font-semibold text-white/80 group-hover:text-white truncate">{t.name}</div>
-                            <div className="text-[9px] text-white/30 truncate">{t.description}</div>
+                            <div className="text-[9px] text-white/50 truncate">{t.description}</div>
                             <div className="flex gap-1 mt-1">
-                              <span className="text-[8px] bg-white/[0.06] px-1 py-0.5 rounded text-white/30">{t.duration}s</span>
-                              <span className="text-[8px] bg-white/[0.06] px-1 py-0.5 rounded text-white/30">{t.platform}</span>
+                              <span className="text-[8px] bg-white/[0.06] px-1 py-0.5 rounded text-white/50">{t.duration}s</span>
+                              <span className="text-[8px] bg-white/[0.06] px-1 py-0.5 rounded text-white/50">{t.platform}</span>
                             </div>
                           </button>
                         ))}
@@ -909,7 +909,7 @@ export default function VideoCreatorDashboard() {
                           : "border-white/[0.08] bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.05]"
                       }`}
                     >
-                      <type.icon className={`w-4 h-4 mb-1.5 ${projectType === type.id ? "text-purple-400" : "text-white/40"}`} />
+                      <type.icon className={`w-4 h-4 mb-1.5 ${projectType === type.id ? "text-purple-400" : "text-white/50"}`} />
                       <div className="text-xs font-semibold">{type.label}</div>
                     </button>
                   ))}
@@ -943,7 +943,7 @@ export default function VideoCreatorDashboard() {
                   onChange={(e) => setScript(e.target.value)}
                   placeholder="Describe your video or paste a script... Leave empty and we'll generate one for you."
                   rows={4}
-                  className="w-full bg-white/[0.05] border border-white/[0.10] rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/30 outline-none focus:border-purple-500/30 transition-colors resize-none"
+                  className="w-full bg-white/[0.05] border border-white/[0.10] rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/50 outline-none focus:border-purple-500/30 transition-colors resize-none"
                 />
               </motion.div>
 
@@ -986,7 +986,7 @@ export default function VideoCreatorDashboard() {
                     >
                       <p.icon className="w-3 h-3" />
                       {p.label}
-                      <span className="text-[10px] text-white/40">({p.aspect})</span>
+                      <span className="text-[10px] text-white/50">({p.aspect})</span>
                     </button>
                   ))}
                 </div>
@@ -1007,7 +1007,7 @@ export default function VideoCreatorDashboard() {
                       }`}
                     >
                       <div className={`text-sm font-bold ${duration === d.value ? "text-purple-300" : "text-white/80"}`}>{d.label}</div>
-                      <div className="text-[10px] text-white/40">{d.desc}</div>
+                      <div className="text-[10px] text-white/50">{d.desc}</div>
                     </button>
                   ))}
                 </div>
@@ -1061,7 +1061,7 @@ export default function VideoCreatorDashboard() {
                       {brandColors.length < 4 && (
                         <button
                           onClick={() => setBrandColors([...brandColors, "#10b981"])}
-                          className="w-8 h-8 rounded-lg border border-dashed border-white/20 flex items-center justify-center text-white/30 hover:text-white/60 hover:border-white/40 transition-colors text-lg"
+                          className="w-8 h-8 rounded-lg border border-dashed border-white/20 flex items-center justify-center text-white/50 hover:text-white/60 hover:border-white/40 transition-colors text-lg"
                         >
                           +
                         </button>
@@ -1230,27 +1230,27 @@ export default function VideoCreatorDashboard() {
                         {/* Scene details */}
                         <div className="p-5 space-y-3">
                           <div>
-                            <div className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Visual Direction</div>
+                            <div className="text-[10px] text-white/50 uppercase tracking-wider mb-1">Visual Direction</div>
                             <div className="text-sm text-white/80">{storyboard.storyboard[activeScene]?.visualDescription}</div>
                           </div>
                           <div className="grid grid-cols-2 gap-3">
                             <div>
-                              <div className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Camera Movement</div>
+                              <div className="text-[10px] text-white/50 uppercase tracking-wider mb-1">Camera Movement</div>
                               <div className="text-xs text-white/70">{storyboard.storyboard[activeScene]?.cameraMovement}</div>
                             </div>
                             <div>
-                              <div className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Transition</div>
+                              <div className="text-[10px] text-white/50 uppercase tracking-wider mb-1">Transition</div>
                               <div className="text-xs text-white/70">{storyboard.storyboard[activeScene]?.transition}</div>
                             </div>
                           </div>
                           {storyboard.storyboard[activeScene]?.colorPalette?.length > 0 && (
                             <div>
-                              <div className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Scene Palette</div>
+                              <div className="text-[10px] text-white/50 uppercase tracking-wider mb-1">Scene Palette</div>
                               <div className="flex gap-1.5">
                                 {storyboard.storyboard[activeScene].colorPalette.map((color, i) => (
                                   <div key={i} className="flex items-center gap-1">
                                     <div className="w-4 h-4 rounded-sm border border-white/20" style={{ backgroundColor: color }} />
-                                    <span className="text-[10px] text-white/40 font-mono">{color}</span>
+                                    <span className="text-[10px] text-white/50 font-mono">{color}</span>
                                   </div>
                                 ))}
                               </div>
@@ -1298,14 +1298,14 @@ export default function VideoCreatorDashboard() {
                           </div>
                           <div>
                             <div className="text-sm font-semibold text-purple-300">Video Production Pipeline</div>
-                            <div className="text-[10px] text-white/40">Generate images, render video, add voiceover & subtitles</div>
+                            <div className="text-[10px] text-white/50">Generate images, render video, add voiceover & subtitles</div>
                           </div>
                         </div>
                         <button
                           onClick={() => setShowPipeline(!showPipeline)}
                           className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
                         >
-                          <ChevronDown className={`w-4 h-4 text-white/40 transition-transform ${showPipeline ? "rotate-180" : ""}`} />
+                          <ChevronDown className={`w-4 h-4 text-white/50 transition-transform ${showPipeline ? "rotate-180" : ""}`} />
                         </button>
                       </div>
 
@@ -1315,7 +1315,7 @@ export default function VideoCreatorDashboard() {
                           <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
                           <div className="flex-1">
                             <div className="text-xs font-semibold text-amber-300 mb-0.5">Add-on required for full pipeline</div>
-                            <div className="text-[10px] text-white/40 mb-2">
+                            <div className="text-[10px] text-white/50 mb-2">
                               Storyboard and script generation are free. Video rendering, voiceover, image generation, and subtitles require the AI Video Creator add-on ($19/mo) or a paid plan.
                             </div>
                             <div className="flex gap-2">
@@ -1357,7 +1357,7 @@ export default function VideoCreatorDashboard() {
                             ].map((item) => (
                               <div key={item.label} className="space-y-0.5">
                                 <div className="flex items-center justify-between">
-                                  <span className="text-[10px] text-white/40">{item.label}</span>
+                                  <span className="text-[10px] text-white/50">{item.label}</span>
                                   <span className="text-[10px] text-white/60">
                                     {item.data.used}/{item.data.limit}
                                     {item.data.overage > 0 && (
@@ -1385,7 +1385,7 @@ export default function VideoCreatorDashboard() {
                                 className="overflow-hidden"
                               >
                                 <div className="pt-2 space-y-1.5 border-t border-white/[0.06]">
-                                  <div className="text-[10px] text-white/40 mb-1">One-time credit packs (valid 90 days):</div>
+                                  <div className="text-[10px] text-white/50 mb-1">One-time credit packs (valid 90 days):</div>
                                   {overagePacks.map((pack) => (
                                     <button
                                       key={pack.id}
@@ -1440,7 +1440,7 @@ export default function VideoCreatorDashboard() {
                           { label: "Subs", done: !!subtitleData, active: pipelineStage === "subtitles", icon: Subtitles },
                         ].map((s) => (
                           <div key={s.label} className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-[10px] font-medium ${
-                            s.active ? "bg-purple-500/20 text-purple-300" : s.done ? "bg-green-500/10 text-green-400" : "bg-white/[0.03] text-white/40"
+                            s.active ? "bg-purple-500/20 text-purple-300" : s.done ? "bg-green-500/10 text-green-400" : "bg-white/[0.03] text-white/50"
                           }`}>
                             {s.active ? <Loader2 className="w-3 h-3 animate-spin" /> : s.done ? <CheckCircle2 className="w-3 h-3" /> : <CircleDashed className="w-3 h-3" />}
                             {s.label}
@@ -1497,7 +1497,7 @@ export default function VideoCreatorDashboard() {
                                         : "border-white/[0.08] text-white/50 hover:border-white/20"
                                     }`}
                                   >
-                                    {v.name} <span className="text-white/30">({v.tone})</span>
+                                    {v.name} <span className="text-white/50">({v.tone})</span>
                                   </button>
                                 ))}
                               </div>
@@ -1560,7 +1560,7 @@ export default function VideoCreatorDashboard() {
                                       job.status === "succeeded" ? "bg-green-500/10 text-green-400" :
                                       job.status === "failed" ? "bg-red-500/10 text-red-400" :
                                       job.status === "processing" ? "bg-blue-500/10 text-blue-400" :
-                                      "bg-white/[0.03] text-white/30"
+                                      "bg-white/[0.03] text-white/50"
                                     }`}>
                                       S{job.sceneNumber}
                                     </div>
@@ -1593,7 +1593,7 @@ export default function VideoCreatorDashboard() {
 
                             {/* Provider status */}
                             {capabilities && (
-                              <div className="text-[10px] text-white/30 space-y-0.5 pt-1 border-t border-white/[0.06]">
+                              <div className="text-[10px] text-white/50 space-y-0.5 pt-1 border-t border-white/[0.06]">
                                 <div className="flex items-center gap-1">
                                   {capabilities.imageGen.available ? <CheckCircle2 className="w-3 h-3 text-green-500" /> : <AlertCircle className="w-3 h-3 text-amber-500" />}
                                   Image Gen: {capabilities.imageGen.available ? "Ready" : "No provider configured"}
@@ -1621,10 +1621,10 @@ export default function VideoCreatorDashboard() {
                         <Film className="w-8 h-8 text-purple-400/60" />
                       </div>
                       <h3 className="text-lg font-bold mb-2 text-white/80">Your storyboard will appear here</h3>
-                      <p className="text-sm text-white/40 max-w-sm">
+                      <p className="text-sm text-white/50 max-w-sm">
                         Configure your project settings, write or generate a script, then hit &quot;Generate Video Storyboard&quot; to create a scene-by-scene breakdown.
                       </p>
-                      <div className="flex items-center justify-center gap-4 mt-6 text-xs text-white/30">
+                      <div className="flex items-center justify-center gap-4 mt-6 text-xs text-white/50">
                         <span className="flex items-center gap-1"><Eye className="w-3 h-3" /> Scene visuals</span>
                         <span className="flex items-center gap-1"><Type className="w-3 h-3" /> Text overlays</span>
                         <span className="flex items-center gap-1"><Music className="w-3 h-3" /> Music cues</span>

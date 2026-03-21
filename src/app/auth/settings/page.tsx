@@ -179,7 +179,7 @@ export default function SettingsPage() {
       <nav className="border-b border-white/[0.04] bg-[#050507]/80 backdrop-blur-2xl sticky top-0 z-50">
         <div className="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="text-white/30 hover:text-white/60 transition-colors">
+            <Link href="/dashboard" className="text-white/50 hover:text-white/60 transition-colors">
               <ArrowLeft className="w-4 h-4" />
             </Link>
             <Link href="/" className="flex items-center gap-2">
@@ -189,7 +189,7 @@ export default function SettingsPage() {
               <span className="text-base font-bold tracking-tight">Zoobicon</span>
             </Link>
           </div>
-          <span className="text-sm text-white/30">Settings</span>
+          <span className="text-sm text-white/50">Settings</span>
         </div>
       </nav>
 
@@ -204,21 +204,21 @@ export default function SettingsPage() {
           </div>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <div className="text-xs text-white/30 mb-1">Name</div>
+              <div className="text-xs text-white/50 mb-1">Name</div>
               <div className="font-medium">{user.name}</div>
             </div>
             <div>
-              <div className="text-xs text-white/30 mb-1">Email</div>
+              <div className="text-xs text-white/50 mb-1">Email</div>
               <div className="font-medium">{user.email}</div>
             </div>
             <div>
-              <div className="text-xs text-white/30 mb-1">Role</div>
+              <div className="text-xs text-white/50 mb-1">Role</div>
               <div className={`font-medium ${user.role === "admin" ? "text-brand-400" : ""}`}>
                 {user.role === "admin" ? "Admin" : "User"}
               </div>
             </div>
             <div>
-              <div className="text-xs text-white/30 mb-1">Plan</div>
+              <div className="text-xs text-white/50 mb-1">Plan</div>
               <div className={`font-medium ${user.plan === "unlimited" ? "text-brand-400" : ""}`}>
                 {user.plan === "unlimited" ? "Unlimited" : "Free"}
               </div>
@@ -235,7 +235,7 @@ export default function SettingsPage() {
               </div>
               <h2 className="text-base font-bold">Change Admin Password</h2>
             </div>
-            <p className="text-xs text-white/30 mb-5 ml-12">
+            <p className="text-xs text-white/50 mb-5 ml-12">
               After confirming your current password you&apos;ll get the exact value to set in your deployment.
             </p>
 
@@ -260,7 +260,7 @@ export default function SettingsPage() {
                     </pre>
                     <button
                       onClick={handleCopy}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/60 transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/60 transition-colors"
                       title="Copy"
                     >
                       {copied ? <Check className="w-4 h-4 text-brand-400" /> : <Copy className="w-4 h-4" />}
@@ -270,7 +270,7 @@ export default function SettingsPage() {
 
                 <div className="flex items-start gap-2 p-3 rounded-xl bg-amber-500/5 border border-amber-500/15">
                   <AlertTriangle className="w-3.5 h-3.5 text-amber-400/60 mt-0.5 flex-shrink-0" />
-                  <p className="text-xs text-white/30">
+                  <p className="text-xs text-white/50">
                     On <strong className="text-white/50">Vercel</strong>: Settings → Environment Variables → update <code className="text-amber-300/70">ADMIN_PASSWORD</code> then redeploy.
                     On <strong className="text-white/50">Render</strong>: Dashboard → Environment → update the variable (no redeploy needed).
                   </p>
@@ -286,7 +286,7 @@ export default function SettingsPage() {
             ) : (
               <form onSubmit={handleChangePassword} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-medium text-white/40 mb-1.5">Current password</label>
+                  <label className="block text-xs font-medium text-white/50 mb-1.5">Current password</label>
                   <div className="relative">
                     <input
                       type={showCurrent ? "text" : "password"}
@@ -295,12 +295,12 @@ export default function SettingsPage() {
                       placeholder="••••••••"
                       required
                       className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 pr-10 text-sm
-                                 placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 transition-all"
+                                 placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 transition-all"
                     />
                     <button
                       type="button"
                       onClick={() => setShowCurrent(!showCurrent)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/40"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/50"
                     >
                       {showCurrent ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -308,7 +308,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-white/40 mb-1.5">New password</label>
+                  <label className="block text-xs font-medium text-white/50 mb-1.5">New password</label>
                   <div className="relative">
                     <input
                       type={showNew ? "text" : "password"}
@@ -318,12 +318,12 @@ export default function SettingsPage() {
                       required
                       minLength={12}
                       className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 pr-10 text-sm
-                                 placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 transition-all"
+                                 placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 transition-all"
                     />
                     <button
                       type="button"
                       onClick={() => setShowNew(!showNew)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/40"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/50"
                     >
                       {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -331,7 +331,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-white/40 mb-1.5">Confirm new password</label>
+                  <label className="block text-xs font-medium text-white/50 mb-1.5">Confirm new password</label>
                   <input
                     type="password"
                     value={confirmPassword}
@@ -339,7 +339,7 @@ export default function SettingsPage() {
                     placeholder="••••••••"
                     required
                     className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-sm
-                               placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 transition-all"
+                               placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 transition-all"
                   />
                 </div>
 
@@ -370,7 +370,7 @@ export default function SettingsPage() {
               </div>
               <h2 className="text-base font-bold">Password</h2>
             </div>
-            <p className="text-sm text-white/40 mb-4">
+            <p className="text-sm text-white/50 mb-4">
               Need to reset your password? We&apos;ll email you a secure reset link.
             </p>
             <Link
@@ -391,9 +391,9 @@ export default function SettingsPage() {
               </div>
               <h2 className="text-base font-bold">API Keys</h2>
             </div>
-            <span className="text-[10px] text-white/20 font-mono">zoobicon.io</span>
+            <span className="text-[10px] text-white/50 font-mono">zoobicon.io</span>
           </div>
-          <p className="text-xs text-white/30 mb-5 ml-12">
+          <p className="text-xs text-white/50 mb-5 ml-12">
             Use your API key to call the Zoobicon API from your own apps and scripts.
             Keep it secret — treat it like a password.
           </p>
@@ -413,13 +413,13 @@ export default function SettingsPage() {
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <div className="flex-1 flex items-center gap-2 bg-white/[0.03] border border-white/[0.06] rounded-xl px-3 py-2.5">
-                  <Code2 className="w-3.5 h-3.5 text-white/20 flex-shrink-0" />
+                  <Code2 className="w-3.5 h-3.5 text-white/50 flex-shrink-0" />
                   <code className="text-xs font-mono text-white/50 flex-1 truncate">
                     {showApiKey ? apiKey : apiKey.slice(0, 12) + "••••••••••••••••••••••••••••"}
                   </code>
                   <button
                     onClick={() => setShowApiKey(!showApiKey)}
-                    className="text-white/20 hover:text-white/40 text-[10px] flex-shrink-0"
+                    className="text-white/50 hover:text-white/50 text-[10px] flex-shrink-0"
                   >
                     {showApiKey ? "hide" : "show"}
                   </button>
@@ -434,7 +434,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="flex items-center justify-between">
-                <p className="text-[10px] text-white/20">
+                <p className="text-[10px] text-white/50">
                   Version {apiKeyVersion} · {user?.plan === "unlimited" ? "Pro" : "Free"} tier ·
                   {user?.plan === "unlimited" ? " 60 gen/min" : " 10 gen/min"}
                 </p>
@@ -450,11 +450,11 @@ export default function SettingsPage() {
 
               {/* Quick usage example */}
               <div className="mt-4 pt-4 border-t border-white/[0.04]">
-                <p className="text-[10px] text-white/25 mb-2 font-mono">Quick start</p>
-                <div className="bg-dark-400/60 rounded-lg p-3 text-[10px] font-mono text-white/40 leading-relaxed overflow-x-auto">
-                  <span className="text-white/20">curl</span> https://zoobicon.com/api/generate \<br />
-                  &nbsp;&nbsp;<span className="text-white/20">-H</span> <span className="text-accent-cyan/60">&quot;Authorization: Bearer {showApiKey ? apiKey : apiKey.slice(0, 16) + "…"}&quot;</span> \<br />
-                  &nbsp;&nbsp;<span className="text-white/20">-d</span> <span className="text-brand-400/60">&apos;&#123;&quot;prompt&quot;:&quot;A landing page for my SaaS&quot;&#125;&apos;</span>
+                <p className="text-[10px] text-white/50 mb-2 font-mono">Quick start</p>
+                <div className="bg-dark-400/60 rounded-lg p-3 text-[10px] font-mono text-white/50 leading-relaxed overflow-x-auto">
+                  <span className="text-white/50">curl</span> https://zoobicon.com/api/generate \<br />
+                  &nbsp;&nbsp;<span className="text-white/50">-H</span> <span className="text-accent-cyan/60">&quot;Authorization: Bearer {showApiKey ? apiKey : apiKey.slice(0, 16) + "…"}&quot;</span> \<br />
+                  &nbsp;&nbsp;<span className="text-white/50">-d</span> <span className="text-brand-400/60">&apos;&#123;&quot;prompt&quot;:&quot;A landing page for my SaaS&quot;&#125;&apos;</span>
                 </div>
               </div>
             </div>
@@ -462,7 +462,7 @@ export default function SettingsPage() {
         </section>
 
         <div className="text-center">
-          <Link href="/dashboard" className="text-sm text-white/30 hover:text-white/60 transition-colors">
+          <Link href="/dashboard" className="text-sm text-white/50 hover:text-white/60 transition-colors">
             ← Back to Dashboard
           </Link>
         </div>

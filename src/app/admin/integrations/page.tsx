@@ -274,7 +274,7 @@ function ConnectModal({
                   placeholder={f.placeholder}
                   value={fields[f.key] || ""}
                   onChange={(e) => setFields({ ...fields, [f.key]: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-[#111318] border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                  className="w-full px-4 py-2.5 bg-[#111318] border border-white/10 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
                 />
               </div>
             ))}

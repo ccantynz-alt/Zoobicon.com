@@ -111,17 +111,17 @@ export default function ClientPortal() {
         <header className="flex items-center justify-between px-5 py-3 border-b border-white/[0.06] bg-[#12121a]/80 backdrop-blur-sm">
           <div className="flex items-center gap-3">
             <nav className="flex items-center gap-1.5 text-sm" aria-label="Breadcrumb">
-              <Link href="/" className="flex items-center gap-1 text-white/40 hover:text-white transition-colors">
+              <Link href="/" className="flex items-center gap-1 text-white/50 hover:text-white transition-colors">
                 <Home size={14} />
               </Link>
-              <ChevronRight size={12} className="text-white/20" />
+              <ChevronRight size={12} className="text-white/50" />
               <button
                 onClick={() => setPreviewSite(null)}
-                className="text-white/40 hover:text-white transition-colors"
+                className="text-white/50 hover:text-white transition-colors"
               >
                 Client Portal
               </button>
-              <ChevronRight size={12} className="text-white/20" />
+              <ChevronRight size={12} className="text-white/50" />
               <span className="text-white/70 font-medium">{previewSite.name}</span>
             </nav>
           </div>
@@ -174,7 +174,7 @@ export default function ClientPortal() {
               onChange={(e) => setEmail(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleLogin()}
               placeholder="you@company.com"
-              className="w-full bg-white/[0.06] border border-white/[0.08] rounded-lg px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-white/20 transition-colors"
+              className="w-full bg-white/[0.06] border border-white/[0.08] rounded-lg px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:border-white/20 transition-colors"
               autoFocus
             />
 
@@ -199,7 +199,7 @@ export default function ClientPortal() {
             </button>
           </div>
 
-          <p className="text-center mt-6 text-white/30 text-xs">
+          <p className="text-center mt-6 text-white/50 text-xs">
             Contact your agency if you don&apos;t have access.
           </p>
         </div>
@@ -223,13 +223,13 @@ export default function ClientPortal() {
             </div>
           )}
           <h1 className="text-lg font-bold text-white">{brandName}</h1>
-          <span className="text-xs text-white/30 ml-2">Client Portal</span>
+          <span className="text-xs text-white/50 ml-2">Client Portal</span>
         </div>
         <div className="flex items-center gap-4">
-          <span className="text-xs text-white/40">{email}</span>
+          <span className="text-xs text-white/50">{email}</span>
           <button
             onClick={handleLogout}
-            className="text-xs text-white/40 hover:text-white/70 transition-colors"
+            className="text-xs text-white/50 hover:text-white/70 transition-colors"
           >
             Sign out
           </button>
@@ -238,32 +238,32 @@ export default function ClientPortal() {
 
       <main className="max-w-5xl mx-auto px-6 py-8">
         <nav className="flex items-center gap-1.5 text-sm mb-6" aria-label="Breadcrumb">
-          <Link href="/" className="flex items-center gap-1 text-white/40 hover:text-white transition-colors">
+          <Link href="/" className="flex items-center gap-1 text-white/50 hover:text-white transition-colors">
             <Home size={14} />
             <span>Home</span>
           </Link>
-          <ChevronRight size={12} className="text-white/20" />
-          <Link href="/agencies" className="text-white/40 hover:text-white transition-colors">
+          <ChevronRight size={12} className="text-white/50" />
+          <Link href="/agencies" className="text-white/50 hover:text-white transition-colors">
             Agencies
           </Link>
-          <ChevronRight size={12} className="text-white/20" />
+          <ChevronRight size={12} className="text-white/50" />
           <span className="text-white/70">Client Portal</span>
         </nav>
 
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold text-white">
             Your Websites
-            <span className="text-white/40 text-sm font-normal ml-2">({sites.length})</span>
+            <span className="text-white/50 text-sm font-normal ml-2">({sites.length})</span>
           </h2>
           {sites.length > 3 && (
             <div className="relative">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/50" />
               <input
                 type="text"
                 placeholder="Search sites..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-white/[0.04] border border-white/[0.08] rounded-lg pl-9 pr-4 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-white/20 w-56"
+                className="bg-white/[0.04] border border-white/[0.08] rounded-lg pl-9 pr-4 py-2 text-sm text-white placeholder:text-white/50 focus:outline-none focus:border-white/20 w-56"
               />
             </div>
           )}
@@ -271,8 +271,8 @@ export default function ClientPortal() {
 
         {filteredSites.length === 0 ? (
           <div className="text-center py-16">
-            <Globe size={40} className="mx-auto mb-4 text-white/20" />
-            <p className="text-white/40">
+            <Globe size={40} className="mx-auto mb-4 text-white/50" />
+            <p className="text-white/50">
               {searchQuery ? "No sites match your search." : "No websites assigned to your account yet."}
             </p>
           </div>
@@ -304,19 +304,19 @@ export default function ClientPortal() {
 
                 <div className="p-4">
                   <h3 className="text-white font-medium text-sm truncate">{site.name}</h3>
-                  <p className="text-white/40 text-xs mt-1 truncate">{site.slug}.zoobicon.sh</p>
+                  <p className="text-white/50 text-xs mt-1 truncate">{site.slug}.zoobicon.sh</p>
                   <div className="flex items-center justify-between mt-3">
                     <span className={`text-xs px-2 py-0.5 rounded-full ${
                       site.status === "published" ? "bg-green-500/20 text-green-400" :
                       site.status === "draft" ? "bg-yellow-500/20 text-yellow-400" :
-                      "bg-white/10 text-white/40"
+                      "bg-white/10 text-white/50"
                     }`}>
                       {site.status}
                     </span>
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => setPreviewSite(site)}
-                        className="text-white/40 hover:text-white transition-colors"
+                        className="text-white/50 hover:text-white transition-colors"
                         title="Preview"
                       >
                         <Eye size={14} />
@@ -325,7 +325,7 @@ export default function ClientPortal() {
                         href={`https://${site.slug}.zoobicon.sh`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-white/40 hover:text-white transition-colors"
+                        className="text-white/50 hover:text-white transition-colors"
                         title="Open live site"
                       >
                         <ExternalLink size={14} />

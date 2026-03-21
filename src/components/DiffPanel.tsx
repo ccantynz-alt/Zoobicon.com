@@ -159,7 +159,7 @@ export default function DiffPanel({
               <History size={16} />
               <span className="text-sm font-medium">Version History</span>
             </div>
-            <p className="text-[11px] text-white/30 mt-1">
+            <p className="text-[11px] text-white/50 mt-1">
               {snapshots.length} snapshot{snapshots.length !== 1 ? "s" : ""}
             </p>
           </div>
@@ -182,13 +182,13 @@ export default function DiffPanel({
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    <GitBranch size={12} className="flex-shrink-0 text-white/30" />
+                    <GitBranch size={12} className="flex-shrink-0 text-white/50" />
                     <span className="truncate font-medium">
                       {snap.label}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 mt-1 ml-5">
-                    <span className="text-white/25">{formatTime(snap.timestamp)}</span>
+                    <span className="text-white/50">{formatTime(snap.timestamp)}</span>
                     {isCurrent && (
                       <span className="text-[10px] bg-brand-500/20 text-brand-400 px-1.5 py-0.5 rounded">
                         current
@@ -217,7 +217,7 @@ export default function DiffPanel({
                     <Minus size={12} />
                     {diffResult.stats.removed} removed
                   </span>
-                  <span className="text-white/30">
+                  <span className="text-white/50">
                     {diffResult.stats.unchanged} unchanged
                   </span>
                 </div>
@@ -232,7 +232,7 @@ export default function DiffPanel({
                   className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] transition-colors ${
                     viewMode === "unified"
                       ? "bg-white/[0.08] text-white/80"
-                      : "text-white/30 hover:text-white/50"
+                      : "text-white/50 hover:text-white/50"
                   }`}
                 >
                   <Eye size={12} />
@@ -243,7 +243,7 @@ export default function DiffPanel({
                   className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] transition-colors ${
                     viewMode === "side-by-side"
                       ? "bg-white/[0.08] text-white/80"
-                      : "text-white/30 hover:text-white/50"
+                      : "text-white/50 hover:text-white/50"
                   }`}
                 >
                   <Columns2 size={12} />
@@ -266,7 +266,7 @@ export default function DiffPanel({
 
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-lg text-white/30 hover:text-white/60 hover:bg-white/[0.04] transition-colors"
+                className="p-1.5 rounded-lg text-white/50 hover:text-white/60 hover:bg-white/[0.04] transition-colors"
               >
                 <X size={16} />
               </button>
@@ -276,11 +276,11 @@ export default function DiffPanel({
           {/* Diff content */}
           <div className="flex-1 overflow-auto">
             {selectedIndex === null ? (
-              <div className="flex items-center justify-center h-full text-white/20 text-sm">
+              <div className="flex items-center justify-center h-full text-white/50 text-sm">
                 Select a snapshot from the sidebar to compare with current version
               </div>
             ) : selectedIndex === currentIndex ? (
-              <div className="flex items-center justify-center h-full text-white/20 text-sm">
+              <div className="flex items-center justify-center h-full text-white/50 text-sm">
                 This is the current version
               </div>
             ) : diffResult ? (
@@ -339,7 +339,7 @@ function UnifiedView({ lines }: { lines: DiffLine[] }) {
                 ? "text-green-300"
                 : line.type === "removed"
                   ? "text-red-300"
-                  : "text-white/40"
+                  : "text-white/50"
             }`}
           >
             {line.content || " "}
@@ -395,7 +395,7 @@ function SideBySideView({ lines }: { lines: DiffLine[] }) {
     if (type === "removed") return "text-red-300";
     if (type === "added") return "text-green-300";
     if (type === "empty") return "";
-    return "text-white/40";
+    return "text-white/50";
   };
 
   return (

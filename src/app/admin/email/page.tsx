@@ -388,7 +388,7 @@ support@zoobicon.com`;
             <Link href="/admin/support" className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-white/50 hover:bg-white/5 hover:text-white/80 transition-colors">
               <Star className="w-4 h-4" /> Support Tickets
             </Link>
-            <div className="px-3 py-2 text-xs text-white/30">admin@zoobicon.com</div>
+            <div className="px-3 py-2 text-xs text-white/50">admin@zoobicon.com</div>
           </div>
         </aside>
         {sidebarOpen && <div className="fixed inset-0 z-20 bg-black/50 md:hidden" onClick={() => setSidebarOpen(false)} />}
@@ -400,7 +400,7 @@ support@zoobicon.com`;
               <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg hover:bg-white/5 md:hidden"><Mail className="w-5 h-5 text-white/60" /></button>
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50" />
-                <input type="text" placeholder="Search emails..." value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => e.key === "Enter" && fetchEmails()} className="w-full bg-[#111318]/80 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-blue-500/50 transition-colors" />
+                <input type="text" placeholder="Search emails..." value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => e.key === "Enter" && fetchEmails()} className="w-full bg-[#111318]/80 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-white/50 focus:outline-none focus:border-blue-500/50 transition-colors" />
               </div>
               <button onClick={fetchEmails} className="p-2 rounded-lg hover:bg-white/5 transition-colors" title="Refresh">
                 <RefreshCw className={`w-4 h-4 text-white/60 ${loading ? "animate-spin" : ""}`} />
@@ -419,7 +419,7 @@ support@zoobicon.com`;
                   {folder !== "spam" && <button onClick={() => handleBulkAction("spam")} className="px-2 py-1 rounded bg-white/5 text-yellow-400 hover:bg-yellow-500/10 transition-colors"><AlertTriangle className="w-3 h-3" /></button>}
                 </motion.div>
               ) : (
-                <span className="text-white/30">{total > 0 ? `${total} email${total !== 1 ? "s" : ""}` : ""}</span>
+                <span className="text-white/50">{total > 0 ? `${total} email${total !== 1 ? "s" : ""}` : ""}</span>
               )}
             </div>
           </div>
@@ -430,12 +430,12 @@ support@zoobicon.com`;
             ) : folder === "sent" ? (
               <div className="flex flex-col items-center justify-center py-24 text-white/50 px-6">
                 <Send className="w-12 h-12 mb-3 opacity-20" /><p className="font-medium">No sent emails yet</p>
-                <p className="text-sm mt-1 text-white/30 text-center">Emails you send will appear here in a future update.</p>
+                <p className="text-sm mt-1 text-white/50 text-center">Emails you send will appear here in a future update.</p>
               </div>
             ) : emails.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-24 text-white/50 px-6">
                 <Mail className="w-12 h-12 mb-3 opacity-20" /><p className="font-medium">{search ? "No results found" : `No emails in ${folder}`}</p>
-                <p className="text-sm mt-1 text-white/30 text-center">{search ? "Try a different search term" : "Emails to admin@zoobicon.com will appear here"}</p>
+                <p className="text-sm mt-1 text-white/50 text-center">{search ? "Try a different search term" : "Emails to admin@zoobicon.com will appear here"}</p>
               </div>
             ) : (
               <AnimatePresence initial={false}>
@@ -443,16 +443,16 @@ support@zoobicon.com`;
                   <motion.div key={email.id} layout initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.15 }}>
                     <div className={`flex items-start gap-3 px-4 py-3 border-b border-white/10 cursor-pointer transition-colors ${selectedEmail?.id === email.id ? "bg-blue-600/10" : "hover:bg-white/[0.03]"} ${!email.read ? "bg-white/[0.02]" : ""}`} onClick={() => { setSelectedEmail(email); if (!email.read) markRead(email, true); }}>
                       <button onClick={(ev) => { ev.stopPropagation(); toggleSelect(email.id); }} className="mt-0.5 p-0.5 rounded hover:bg-white/10 transition-colors flex-shrink-0">
-                        {selected.has(email.id) ? <CheckSquare className="w-4 h-4 text-blue-400" /> : <Square className="w-4 h-4 text-white/30" />}
+                        {selected.has(email.id) ? <CheckSquare className="w-4 h-4 text-blue-400" /> : <Square className="w-4 h-4 text-white/50" />}
                       </button>
                       <div className="w-2 mt-2 flex-shrink-0">{!email.read && <div className="w-2 h-2 bg-blue-500 rounded-full" />}</div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">
                           <span className={`text-sm truncate ${email.read ? "text-white/60" : "text-white font-semibold"}`}>{email.from_address}</span>
-                          <span className="text-xs text-white/30 ml-auto flex-shrink-0">{relativeTime(email.received_at)}</span>
+                          <span className="text-xs text-white/50 ml-auto flex-shrink-0">{relativeTime(email.received_at)}</span>
                         </div>
                         <p className={`text-sm truncate ${email.read ? "text-white/50" : "text-white/90 font-medium"}`}>{email.subject || "(No Subject)"}</p>
-                        <p className="text-xs text-white/30 truncate mt-0.5">{email.text_body?.substring(0, 120)}</p>
+                        <p className="text-xs text-white/50 truncate mt-0.5">{email.text_body?.substring(0, 120)}</p>
                       </div>
                     </div>
                   </motion.div>
@@ -484,7 +484,7 @@ support@zoobicon.com`;
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm font-medium text-white/90">{selectedEmail.from_address}</span>
-                      <span className="text-xs text-white/30">{fullDate(selectedEmail.received_at)}</span>
+                      <span className="text-xs text-white/50">{fullDate(selectedEmail.received_at)}</span>
                     </div>
                     <p className="text-xs text-white/60 mt-0.5">To: {selectedEmail.to_address}</p>
                   </div>
@@ -507,7 +507,7 @@ support@zoobicon.com`;
           ) : (
             !loading && folder !== "sent" && emails.length > 0 && (
               <div className="flex-1 hidden md:flex items-center justify-center">
-                <div className="text-center text-white/30"><Mail className="w-16 h-16 mx-auto mb-4 opacity-20" /><p className="text-sm">Select an email to read</p></div>
+                <div className="text-center text-white/50"><Mail className="w-16 h-16 mx-auto mb-4 opacity-20" /><p className="text-sm">Select an email to read</p></div>
               </div>
             )
           )}
@@ -526,13 +526,13 @@ support@zoobicon.com`;
               <div className="flex flex-col gap-0 flex-1 overflow-hidden">
                 <div className="flex items-center border-b border-white/10 px-4">
                   <label className="text-xs text-white/50 w-12">To</label>
-                  <input type="email" value={composeData.to} onChange={(e) => setComposeData((d) => ({ ...d, to: e.target.value }))} className="flex-1 bg-transparent py-2.5 text-sm text-white placeholder-white/30 focus:outline-none" placeholder="recipient@example.com" />
+                  <input type="email" value={composeData.to} onChange={(e) => setComposeData((d) => ({ ...d, to: e.target.value }))} className="flex-1 bg-transparent py-2.5 text-sm text-white placeholder-white/50 focus:outline-none" placeholder="recipient@example.com" />
                 </div>
                 <div className="flex items-center border-b border-white/10 px-4">
                   <label className="text-xs text-white/50 w-12">Subject</label>
-                  <input type="text" value={composeData.subject} onChange={(e) => setComposeData((d) => ({ ...d, subject: e.target.value }))} className="flex-1 bg-transparent py-2.5 text-sm text-white placeholder-white/30 focus:outline-none" placeholder="Subject" />
+                  <input type="text" value={composeData.subject} onChange={(e) => setComposeData((d) => ({ ...d, subject: e.target.value }))} className="flex-1 bg-transparent py-2.5 text-sm text-white placeholder-white/50 focus:outline-none" placeholder="Subject" />
                 </div>
-                <textarea value={composeData.text} onChange={(e) => { setComposeData((d) => ({ ...d, text: e.target.value })); setGrammarChecked(false); }} placeholder="Write your message..." className="flex-1 min-h-[200px] bg-transparent px-4 py-3 text-sm text-white/90 placeholder-white/30 focus:outline-none resize-none" />
+                <textarea value={composeData.text} onChange={(e) => { setComposeData((d) => ({ ...d, text: e.target.value })); setGrammarChecked(false); }} placeholder="Write your message..." className="flex-1 min-h-[200px] bg-transparent px-4 py-3 text-sm text-white/90 placeholder-white/50 focus:outline-none resize-none" />
               </div>
               {/* AI Polish Diff View */}
               <AnimatePresence>
@@ -646,7 +646,7 @@ support@zoobicon.com`;
                           <button onClick={saveSignature} className="text-[10px] px-2 py-1 rounded bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 transition-colors">Save</button>
                         </div>
                       </div>
-                      <textarea value={signature} onChange={(e) => setSignature(e.target.value)} className="w-full bg-black/20 rounded-lg px-3 py-2 text-xs text-white/80 placeholder-white/30 focus:outline-none resize-none h-20" placeholder="Your email signature..." />
+                      <textarea value={signature} onChange={(e) => setSignature(e.target.value)} className="w-full bg-black/20 rounded-lg px-3 py-2 text-xs text-white/80 placeholder-white/50 focus:outline-none resize-none h-20" placeholder="Your email signature..." />
                     </div>
                   </motion.div>
                 )}
