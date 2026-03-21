@@ -86,6 +86,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    console.log(`[video-creator/render] Starting ${scenes.length} scenes with provider: ${activeProvider}`);
+
     const result = await startRender({
       scenes,
       style,
@@ -93,10 +95,20 @@ export async function POST(req: NextRequest) {
       provider: activeProvider as VideoProvider,
     });
 
-    // Track usage — use plan credits first, then overage
-    if (email) {
-      await incrementVideoUsage(email, "render", scenes.length);
-      await consumeOverageIfNeeded(email, plan, hasAddon, "render", scenes.length);
+    // Only charge for jobs that actually started (not failed at creation)
+    const startedJobs = result.jobs.filter((j) => j.status !== "failed").length;
+    const failedJobs = result.jobs.filter((j) => j.status === "failed");
+
+    if (failedJobs.length > 0) {
+      console.warn(`[video-creator/render] ${failedJobs.length} scenes failed to start:`,
+        failedJobs.map((j) => ({ scene: j.sceneNumber, error: j.error }))
+      );
+    }
+
+    // Track usage — only count jobs that successfully started
+    if (email && startedJobs > 0) {
+      await incrementVideoUsage(email, "render", startedJobs);
+      await consumeOverageIfNeeded(email, plan, hasAddon, "render", startedJobs);
     }
 
     return Response.json(result);

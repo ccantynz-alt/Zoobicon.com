@@ -169,39 +169,39 @@ async function runwayHeaders(): Promise<Record<string, string>> {
 
 async function startRunwayJob(scene: RenderScene, style: string): Promise<{ taskId: string }> {
   const prompt = buildVideoPrompt(scene, style);
-  const durationSec = Math.min(10, parseDurationSeconds(scene.duration));
+  const rawDuration = parseDurationSeconds(scene.duration);
+  // Runway only accepts duration of 5 or 10 seconds
+  const duration = rawDuration <= 7 ? 5 : 10;
 
-  // Use image_to_video when we have a scene image, otherwise text_to_video
-  // Runway Gen-3 Alpha Turbo requires promptImage for image_to_video
+  // Runway image_to_video REQUIRES a promptImage (publicly accessible URL)
   const hasImage = scene.imageUrl && scene.imageUrl.startsWith("http");
 
-  const endpoint = hasImage
-    ? "https://api.dev.runwayml.com/v1/image_to_video"
-    : "https://api.dev.runwayml.com/v1/image_to_video";
-
-  const body: Record<string, unknown> = {
-    model: "gen3a_turbo",
-    promptText: prompt,
-    duration: durationSec,
-    watermark: false,
-  };
-
-  if (hasImage) {
-    body.promptImage = scene.imageUrl;
+  if (!hasImage) {
+    throw new Error(
+      "Runway Gen-3 requires a scene image. Generate images first, then render video."
+    );
   }
 
-  const res = await fetch(endpoint, {
+  const res = await fetch("https://api.dev.runwayml.com/v1/image_to_video", {
     method: "POST",
     headers: await runwayHeaders(),
-    body: JSON.stringify(body),
+    body: JSON.stringify({
+      model: "gen3a_turbo",
+      promptImage: scene.imageUrl,
+      promptText: prompt,
+      duration,
+      watermark: false,
+    }),
   });
 
   if (!res.ok) {
     const err = await res.text();
+    console.error(`[Runway] Scene ${scene.sceneNumber} failed:`, res.status, err);
     throw new Error(`Runway API error: ${res.status} — ${err}`);
   }
 
   const data = await res.json();
+  console.log(`[Runway] Scene ${scene.sceneNumber} started: task ${data.id}`);
   return { taskId: data.id };
 }
 

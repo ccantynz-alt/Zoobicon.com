@@ -1659,11 +1659,19 @@ export default function VideoCreatorDashboard() {
                                       job.status === "failed" ? "bg-red-500/10 text-red-400" :
                                       job.status === "processing" ? "bg-blue-500/10 text-blue-400" :
                                       "bg-white/[0.03] text-white/50"
-                                    }`}>
+                                    }`} title={job.error || undefined}>
                                       S{job.sceneNumber}
                                     </div>
                                   ))}
                                 </div>
+                                {renderJobs.some((j) => j.status === "failed" && j.error) && (
+                                  <div className="mt-2 p-2 rounded-lg bg-red-500/10 border border-red-500/20 text-[10px] text-red-300 space-y-0.5">
+                                    <span className="font-medium">Render errors:</span>
+                                    {renderJobs.filter((j) => j.status === "failed" && j.error).slice(0, 3).map((j) => (
+                                      <div key={j.id} className="truncate">S{j.sceneNumber}: {j.error}</div>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
                             )}
 
