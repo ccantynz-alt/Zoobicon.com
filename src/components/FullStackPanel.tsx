@@ -24,11 +24,13 @@ export default function FullStackPanel({
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<FullStackResult | null>(null);
+  const [error, setError] = useState("");
   const [activeView, setActiveView] = useState<"frontend" | "schema" | "api">("frontend");
 
   const generate = async () => {
     if (!prompt.trim()) return;
     setLoading(true);
+    setError("");
     try {
       const res = await fetch("/api/generate/fullstack", {
         method: "POST",
@@ -39,9 +41,17 @@ export default function FullStackPanel({
         const data = await res.json();
         setResult(data);
         if (data.html) onApplyCode(data.html);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        const msg = data.error || `Generation failed (${res.status})`;
+        if (msg.includes("credit balance")) {
+          setError("Your Anthropic API credits are empty. Add credits at console.anthropic.com → Plans & Billing.");
+        } else {
+          setError(msg);
+        }
       }
     } catch {
-      // silent
+      setError("Network error — check your connection and try again.");
     } finally {
       setLoading(false);
     }
@@ -79,6 +89,12 @@ export default function FullStackPanel({
           </span>
         )}
       </button>
+
+      {error && (
+        <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-sm text-red-400">
+          {error}
+        </div>
+      )}
 
       {result && (
         <>
