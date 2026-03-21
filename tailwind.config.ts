@@ -22,9 +22,9 @@ const config: Config = {
           700: "#1e40af",
         },
         accent: {
-          cyan: "#7dd3fc",
-          purple: "#a5b4fc",
-          pink: "#f0abfc",
+          cyan: "#22d3ee",
+          purple: "#67e8f9",
+          pink: "#38bdf8",
         },
         // Signature color — electric violet/indigo that's uniquely Zoobicon
         // Not another blue gradient — this is ownable
@@ -56,9 +56,28 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ['"Inter"', "system-ui", "-apple-system", "sans-serif"],
+        sans: ['"Inter"', "system-ui", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
         display: ['"Plus Jakarta Sans"', '"Space Grotesk"', '"Inter"', "system-ui", "sans-serif"],
-        mono: ['"JetBrains Mono"', '"Fira Code"', "monospace"],
+        mono: ['"JetBrains Mono"', '"Fira Code"', "ui-monospace", "monospace"],
+      },
+      letterSpacing: {
+        tightest: "-0.04em",
+        tighter: "-0.03em",
+        tight: "-0.02em",
+        snug: "-0.011em",
+        normal: "0",
+        wide: "0.025em",
+        wider: "0.05em",
+        widest: "0.1em",
+      },
+      borderRadius: {
+        sm: "6px",
+        DEFAULT: "8px",
+        md: "10px",
+        lg: "12px",
+        xl: "16px",
+        "2xl": "20px",
+        "3xl": "24px",
       },
       spacing: {
         // 8px grid scale
@@ -68,9 +87,19 @@ const config: Config = {
         "30": "7.5rem",
       },
       fontSize: {
+        // Body — tighter defaults
+        "xs": ["0.75rem", { lineHeight: "1.5", letterSpacing: "-0.006em" }],
+        "sm": ["0.875rem", { lineHeight: "1.5", letterSpacing: "-0.011em" }],
+        "base": ["1rem", { lineHeight: "1.5", letterSpacing: "-0.011em" }],
+        "lg": ["1.125rem", { lineHeight: "1.5", letterSpacing: "-0.014em" }],
+        "xl": ["1.25rem", { lineHeight: "1.4", letterSpacing: "-0.017em" }],
+        "2xl": ["1.5rem", { lineHeight: "1.3", letterSpacing: "-0.02em" }],
+        "3xl": ["1.875rem", { lineHeight: "1.2", letterSpacing: "-0.025em" }],
+        "4xl": ["2.25rem", { lineHeight: "1.15", letterSpacing: "-0.028em" }],
+        "5xl": ["3rem", { lineHeight: "1.1", letterSpacing: "-0.03em" }],
         // Display sizes for hero headlines
-        "6xl": ["3.75rem", { lineHeight: "1", letterSpacing: "-0.03em" }],
-        "7xl": ["4.5rem", { lineHeight: "1", letterSpacing: "-0.03em" }],
+        "6xl": ["3.75rem", { lineHeight: "1", letterSpacing: "-0.035em" }],
+        "7xl": ["4.5rem", { lineHeight: "1", letterSpacing: "-0.035em" }],
         "8xl": ["6rem", { lineHeight: "0.95", letterSpacing: "-0.04em" }],
         "9xl": ["8rem", { lineHeight: "0.9", letterSpacing: "-0.04em" }],
       },

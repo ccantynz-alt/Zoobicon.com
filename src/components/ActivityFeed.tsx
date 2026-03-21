@@ -20,7 +20,7 @@ const AVATAR_GRADIENTS = [
   "from-blue-500 to-blue-700",
   "from-purple-500 to-purple-700",
   "from-cyan-500 to-cyan-700",
-  "from-pink-500 to-pink-700",
+  "from-cyan-500 to-cyan-700",
 ];
 
 const ICONS = [Globe, Sparkles, Zap];

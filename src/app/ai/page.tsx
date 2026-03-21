@@ -77,8 +77,8 @@ const AI_TOOLS = [
     icon: Palette,
     name: "AI Brand Kit Generator",
     description: "Logo, colors, typography, brand guidelines — generated instantly.",
-    color: "from-pink-500 to-rose-600",
-    glowColor: "shadow-pink-500/25",
+    color: "from-cyan-500 to-rose-600",
+    glowColor: "shadow-cyan-500/25",
     tag: "Design",
   },
   {
@@ -93,7 +93,7 @@ const AI_TOOLS = [
     icon: Video,
     name: "AI Video Creator",
     description: "Transform text scripts into professional marketing videos. Coming soon.",
-    color: "from-accent-purple to-pink-600",
+    color: "from-accent-purple to-blue-700",
     glowColor: "shadow-blue-500/25",
     tag: "Coming Soon",
   },
@@ -154,7 +154,7 @@ const HOW_IT_WORKS = [
     title: "Generate",
     subtitle: "AI builds it in seconds with auto-debugging",
     description: "Our AI writes production-grade code, designs responsive layouts, and auto-debugs every error — all in under 60 seconds.",
-    color: "from-accent-purple to-pink-600",
+    color: "from-accent-purple to-blue-700",
     glowColor: "shadow-blue-500/30",
   },
   {
@@ -620,7 +620,7 @@ export default function AiPage() {
                   {/* Orbiting dots */}
                   {["top-0 left-1/2 -translate-x-1/2 -translate-y-2", "bottom-0 left-1/2 -translate-x-1/2 translate-y-2", "left-0 top-1/2 -translate-y-1/2 -translate-x-2", "right-0 top-1/2 -translate-y-1/2 translate-x-2"].map((pos, i) => (
                     <div key={i} className={`absolute ${pos}`}>
-                      <div className={`w-3 h-3 rounded-full ${["bg-zoo-500", "bg-accent-purple", "bg-accent-cyan", "bg-pink-500"][i]} shadow-lg`} />
+                      <div className={`w-3 h-3 rounded-full ${["bg-zoo-500", "bg-accent-purple", "bg-accent-cyan", "bg-cyan-500"][i]} shadow-lg`} />
                     </div>
                   ))}
                 </div>

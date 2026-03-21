@@ -105,7 +105,7 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
 const CATEGORY_COLORS: Record<string, string> = {
   Framework: "text-blue-400 bg-blue-500/10 border-blue-500/20",
   CMS: "text-purple-400 bg-purple-500/10 border-purple-500/20",
-  CSS: "text-pink-400 bg-pink-500/10 border-pink-500/20",
+  CSS: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20",
   Analytics: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
   Hosting: "text-amber-400 bg-amber-500/10 border-amber-500/20",
   CDN: "text-orange-400 bg-orange-500/10 border-orange-500/20",

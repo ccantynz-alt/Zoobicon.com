@@ -403,7 +403,7 @@ export default function LandingPage() {
             </motion.p>
             <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-bold text-white">
               Every domain, a different{" "}
-              <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">superpower</span>
+              <span className="bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text text-transparent">superpower</span>
             </motion.h2>
           </motion.div>
 

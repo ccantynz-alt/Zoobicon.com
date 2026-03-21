@@ -8,8 +8,8 @@
   --brand-500: #3b82f6;
   --brand-600: #2563eb;
   --accent-cyan: #22d3ee;
-  --accent-purple: #a78bfa;
-  --accent-pink: #f472b6;
+  --accent-purple: #67e8f9;
+  --accent-pink: #38bdf8;
   /* Signature Zoobicon violet */
   --zoo-400: #7c5aff;
   --zoo-500: #6d3bff;
@@ -31,7 +31,7 @@ body {
   padding: 0;
   background: #050508;
   color: #e8e8ec;
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   overflow-x: hidden;
   min-height: 100vh;
   min-height: 100dvh;
@@ -39,6 +39,65 @@ body {
   text-size-adjust: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "ss01" 1, "ss03" 1;
+  font-optical-sizing: auto;
+  letter-spacing: -0.011em;
+  line-height: 1.5;
+}
+
+/* --- Apple-grade typography refinements --- */
+
+h1, h2, h3, h4, h5, h6,
+.font-black, .font-bold, .font-extrabold {
+  letter-spacing: -0.025em;
+  text-rendering: geometricPrecision;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+}
+
+h1, .text-2xl, .text-3xl, .text-4xl, .text-5xl, .text-6xl, .text-7xl, .text-8xl, .text-9xl {
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+
+/* Body text — tighter than default, more readable */
+p, span, label, div {
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "tnum" 1;
+}
+
+/* Monospace — consistent width numbers and code */
+.font-mono, code, pre, .tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "kern" 1, "liga" 0, "tnum" 1;
+}
+
+/* Text selection — crisp cyan instead of browser default */
+::selection {
+  background: rgba(6, 182, 212, 0.30);
+  color: #fff;
+}
+
+::-moz-selection {
+  background: rgba(6, 182, 212, 0.30);
+  color: #fff;
+}
+
+/* Focus visible — sharp ring instead of fuzzy outline */
+:focus-visible {
+  outline: 2px solid rgba(6, 182, 212, 0.6);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Placeholder text — uniform across browsers */
+::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+  font-weight: 400;
+}
+
+/* Sharper image rendering */
+img, video {
+  image-rendering: -webkit-optimize-contrast;
 }
 
 /* Scrollbar — WebKit */
@@ -64,6 +123,50 @@ body {
 * {
   scrollbar-width: thin;
   scrollbar-color: #2a2a4a #111a2e;
+}
+
+/* ============================================
+   SHARP CARD & SURFACE SYSTEM
+   Apple-grade glass surfaces with crisp borders
+   ============================================ */
+
+.surface {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.surface-elevated {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 12px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.surface-interactive {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  transition: all 0.15s ease;
+}
+
+.surface-interactive:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Dividers — sharper than default border opacity */
+.divider {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.divider-strong {
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 /* ============================================
@@ -327,11 +430,13 @@ pre code {
 
 .btn-gradient {
   background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 0 0 1px rgba(37,99,235,0.2);
+  letter-spacing: -0.01em;
+  font-weight: 600;
 }
 
 .btn-gradient:hover {
@@ -341,7 +446,7 @@ pre code {
 }
 
 .btn-gradient:active {
-  transform: translateY(0);
+  transform: translateY(0) scale(0.98);
 }
 
 /* ============================================
@@ -939,10 +1044,10 @@ select {
 
 .mesh-gradient-purple::before {
   background:
-    radial-gradient(ellipse 50% 60% at 20% 30%, rgba(139, 92, 246, 0.38), transparent),
-    radial-gradient(ellipse 45% 55% at 75% 20%, rgba(167, 139, 250, 0.32), transparent),
-    radial-gradient(ellipse 55% 50% at 70% 70%, rgba(59, 130, 246, 0.25), transparent),
-    radial-gradient(ellipse 40% 65% at 25% 80%, rgba(244, 114, 182, 0.22), transparent);
+    radial-gradient(ellipse 50% 60% at 20% 30%, rgba(6, 182, 212, 0.30), transparent),
+    radial-gradient(ellipse 45% 55% at 75% 20%, rgba(34, 211, 238, 0.25), transparent),
+    radial-gradient(ellipse 55% 50% at 70% 70%, rgba(37, 99, 235, 0.25), transparent),
+    radial-gradient(ellipse 40% 65% at 25% 80%, rgba(14, 165, 233, 0.20), transparent);
 }
 
 /* Thin white smoke wisps on pure black — admin/dashboard pages */

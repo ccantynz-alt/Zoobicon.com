@@ -572,7 +572,7 @@ export default function EcommerceGenerator({ onGenerate }: EcommerceGeneratorPro
             disabled={!canProceed()}
             className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-medium transition-colors ${
               canProceed()
-                ? "bg-gradient-to-r from-blue-600 to-pink-600 hover:from-blue-500 hover:to-pink-500 text-white"
+                ? "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white"
                 : "bg-zinc-800 text-zinc-500 cursor-not-allowed"
             }`}
           >

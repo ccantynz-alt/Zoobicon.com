@@ -68,12 +68,12 @@ const SHOWCASE_VIDEOS: VideoCard[] = [
     platform: "Facebook",
     duration: "0:45",
     style: "Playful",
-    gradient: "from-pink-500 via-rose-500 to-red-500",
+    gradient: "from-cyan-500 via-teal-500 to-blue-500",
     aspectRatio: "aspect-video",
     mockContent: {
       headline: "50% OFF EVERYTHING",
       subtext: "Limited Time Only",
-      accent: "#EC4899",
+      accent: "#06b6d4",
     },
   },
   {
@@ -96,7 +96,7 @@ const SHOWCASE_VIDEOS: VideoCard[] = [
     platform: "TikTok",
     duration: "0:20",
     style: "Neon",
-    gradient: "from-blue-600 via-pink-500 to-cyan-400",
+    gradient: "from-blue-600 via-cyan-500 to-cyan-400",
     aspectRatio: "aspect-[9/16]",
     mockContent: {
       headline: "SOUNDWAVE 2026",
@@ -149,7 +149,7 @@ function VideoCard({ video, isLarge }: { video: VideoCard; isLarge?: boolean }) 
       <div className={`absolute inset-0 bg-black/30 transition-opacity duration-300 ${isHovered ? "opacity-100" : "opacity-60"}`}>
         {/* Coming Soon badge */}
         <div className="absolute top-3 right-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10">
-          <Sparkles className="w-3 h-3 text-accent-pink" />
+          <Sparkles className="w-3 h-3 text-cyan-400" />
           <span className="text-[9px] font-bold text-white/80 tracking-wider uppercase">Coming Soon</span>
         </div>
 
@@ -213,7 +213,7 @@ export default function VideoShowcase() {
         </p>
         <Link
           href="/video-creator"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent-pink/10 border border-accent-pink/20 text-sm font-medium text-accent-pink hover:bg-accent-pink/15 transition-colors"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-sm font-medium text-cyan-400 hover:bg-cyan-500/15 transition-colors"
         >
           Try Storyboard Generator <ArrowRight className="w-4 h-4" />
         </Link>

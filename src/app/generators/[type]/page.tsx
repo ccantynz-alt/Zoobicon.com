@@ -163,7 +163,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Create stunning portfolio websites to showcase your work, projects, and skills with beautiful galleries and case study layouts.",
     icon: "Palette",
     category: "Website",
-    color: "from-purple-600 to-pink-600",
+    color: "from-purple-600 to-blue-700",
     fields: [
       {
         id: "creatorName",
@@ -1008,7 +1008,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Enhance any website with scroll animations, parallax effects, micro-interactions, loading transitions, and dynamic visual effects.",
     icon: "Sparkles",
     category: "Enhancement",
-    color: "from-fuchsia-600 to-pink-600",
+    color: "from-fuchsia-600 to-blue-700",
     fields: [
       {
         id: "websiteType",
@@ -1304,7 +1304,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Generate email marketing templates with sequences, A/B variants, responsive layouts, and campaign preview functionality.",
     icon: "Mail",
     category: "Marketing",
-    color: "from-pink-600 to-rose-600",
+    color: "from-cyan-600 to-rose-600",
     fields: [
       {
         id: "businessName",
@@ -1417,7 +1417,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Generate persuasive marketing copy for websites, ads, social media, product descriptions, and brand messaging frameworks.",
     icon: "Type",
     category: "Marketing",
-    color: "from-red-600 to-pink-600",
+    color: "from-red-600 to-blue-700",
     fields: [
       {
         id: "businessName",
@@ -2024,7 +2024,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   Website: "bg-blue-100 text-blue-700",
   App: "bg-green-100 text-green-700",
   Enhancement: "bg-purple-100 text-purple-700",
-  Marketing: "bg-pink-100 text-pink-700",
+  Marketing: "bg-cyan-100 text-cyan-700",
   Tool: "bg-amber-100 text-amber-700",
 };
 

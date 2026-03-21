@@ -63,7 +63,7 @@ export function buildCustomizationSuffix(options: CustomizationOptions): string 
   } else if (paletteInfo) {
     const colorNames: Record<string, string> = {
       professional: "navy/white/gray",
-      vibrant: "purple/pink/orange",
+      vibrant: "purple/cyan/orange",
       nature: "green/brown/cream",
       tech: "dark/blue/cyan",
     };
