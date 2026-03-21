@@ -253,10 +253,10 @@ export async function POST(req: NextRequest) {
 
             sendEvent(controller, { type: "fallback", html: clean });
             sendEvent(controller, { type: "done", diffCount: 0, fallback: true });
-            trackUsage(auth.user.email, "edit").catch(() => {});
+            trackUsage(auth.user.email, "edit").catch((err) => console.error("[Usage] Failed to track:", err));
           } else {
             sendEvent(controller, { type: "done", diffCount: applied });
-            trackUsage(auth.user.email, "edit").catch(() => {});
+            trackUsage(auth.user.email, "edit").catch((err) => console.error("[Usage] Failed to track:", err));
           }
 
           controller.close();

@@ -29,14 +29,17 @@ interface AuthFailure {
 
 type AuthResult = AuthSuccess | AuthFailure;
 
+/** Sentinel value for unlimited quota (no monthly cap) */
+const UNLIMITED = 999_999;
+
 /** Plan limits — generations per month */
 export const PLAN_LIMITS: Record<string, { generations: number; edits: number }> = {
   free: { generations: 3, edits: 10 },
   creator: { generations: 15, edits: 100 },
   pro: { generations: 50, edits: 500 },
-  agency: { generations: 200, edits: 999999 },
-  enterprise: { generations: 999999, edits: 999999 },
-  unlimited: { generations: 999999, edits: 999999 },
+  agency: { generations: 200, edits: UNLIMITED },
+  enterprise: { generations: UNLIMITED, edits: UNLIMITED },
+  unlimited: { generations: UNLIMITED, edits: UNLIMITED },
 };
 
 /** Rate limits per plan — requests per minute */
@@ -165,7 +168,7 @@ export async function checkUsageQuota(
   const limit = type === "generation" ? limits.generations : limits.edits;
 
   // Unlimited plans skip the check
-  if (limit >= 999999) {
+  if (limit >= UNLIMITED) {
     return { allowed: true, used: 0, limit };
   }
 

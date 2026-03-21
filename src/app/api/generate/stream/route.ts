@@ -166,6 +166,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Auth + usage enforcement (runs early to fail fast before DB queries)
+    const auth = await authenticateRequest(req);
+    if (auth.error) return auth.error;
+
     // Agency generation quota check
     if (agencyId && typeof agencyId === "string") {
       try {
@@ -190,10 +194,6 @@ export async function POST(req: NextRequest) {
         }
       } catch { /* DB not available, allow generation */ }
     }
-
-    // Auth + usage enforcement
-    const auth = await authenticateRequest(req);
-    if (auth.error) return auth.error;
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
@@ -406,7 +406,7 @@ Output ONLY raw HTML.`
           }
 
           // Track successful usage
-          trackUsage(auth.user.email, usageType).catch(() => {});
+          trackUsage(auth.user.email, usageType).catch((err) => console.error("[Usage] Failed to track:", err));
 
           controller.enqueue(
             encoder.encode(`data: ${JSON.stringify({ type: "done" })}\n\n`)

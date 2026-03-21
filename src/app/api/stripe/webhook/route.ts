@@ -39,6 +39,9 @@ export async function POST(request: NextRequest) {
         const customerId = session.customer as string;
         const subscriptionId = session.subscription as string;
         const plan = session.metadata?.plan || "pro";
+        if (!session.metadata?.plan) {
+          console.warn(`[webhook] checkout.session.completed: missing plan metadata for session ${session.id}, defaulting to 'pro'`);
+        }
 
         // Check if this is a marketplace add-on purchase
         const addonId = session.metadata?.addonId;
