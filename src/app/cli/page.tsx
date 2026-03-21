@@ -239,7 +239,7 @@ export default function CLIPage() {
                       {cmd.category}
                     </span>
                     <code className="text-sm font-mono text-accent-cyan/80 flex-shrink-0">{cmd.cmd}</code>
-                    <span className="text-xs text-white/45 hidden md:block flex-1">{cmd.desc}</span>
+                    <span className="text-xs text-white/50 hidden md:block flex-1">{cmd.desc}</span>
                     <button
                       onClick={() => copyText(cmd.cmd, `cmd-${i}`)}
                       className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"

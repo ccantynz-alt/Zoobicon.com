@@ -122,7 +122,7 @@ export default function GitHubImport({ onImport }: GitHubImportProps) {
               onKeyDown={(e) => e.key === "Enter" && handleImport()}
               placeholder="https://github.com/user/repo"
               disabled={isLoading}
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-white/25 focus:ring-1 focus:ring-white/25 transition-colors disabled:opacity-50"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:border-white/25 focus:ring-1 focus:ring-white/25 transition-colors disabled:opacity-50"
             />
           </div>
         </div>
@@ -141,7 +141,7 @@ export default function GitHubImport({ onImport }: GitHubImportProps) {
               onChange={(e) => setBranch(e.target.value)}
               placeholder="main"
               disabled={isLoading}
-              className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-white/25 focus:ring-1 focus:ring-white/25 transition-colors disabled:opacity-50"
+              className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-3 text-white placeholder-white/50 focus:outline-none focus:border-white/25 focus:ring-1 focus:ring-white/25 transition-colors disabled:opacity-50"
             />
           </div>
         </div>

@@ -164,7 +164,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
     setTimeout(() => setCopiedEnv(false), 2000);
   };
 
-  const inputClass = "w-full bg-white/[0.06] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-blue-500/50 transition-colors";
+  const inputClass = "w-full bg-white/[0.06] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/50 focus:outline-none focus:border-blue-500/50 transition-colors";
 
   return (
     <div className="min-h-screen bg-[#131520] text-white">
@@ -455,7 +455,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                 type="text" value={config.mailgunDomain}
                 onChange={(e) => setConfig((p) => ({ ...p, mailgunDomain: e.target.value }))}
                 placeholder="zoobicon.com"
-                className="w-full bg-white/[0.06] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-blue-500/50 transition-colors"
+                className="w-full bg-white/[0.06] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/50 focus:outline-none focus:border-blue-500/50 transition-colors"
               />
               <p className="text-xs text-white/60 mt-1">Just the domain name (e.g. <code className="text-white/60">zoobicon.com</code>), not the full API URL. The API base URL is added automatically.</p>
             </div>

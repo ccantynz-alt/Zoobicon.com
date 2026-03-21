@@ -287,7 +287,7 @@ export default function CrawlPage() {
                 onChange={(e) => setUrl(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleCrawl()}
                 placeholder="competitor.com"
-                className="w-full pl-12 pr-4 py-4 bg-white/[0.07] border border-white/[0.12] rounded-xl text-white placeholder:text-white/35 focus:outline-none focus:border-brand-500/30 text-base"
+                className="w-full pl-12 pr-4 py-4 bg-white/[0.07] border border-white/[0.12] rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:border-brand-500/30 text-base"
               />
             </div>
             <div className="flex items-center gap-2 bg-white/[0.07] border border-white/[0.12] rounded-xl px-3">
@@ -363,7 +363,7 @@ export default function CrawlPage() {
                     <p className="text-sm text-white/50 mt-1">{result.meta.title}</p>
                   )}
                   {result.meta.description && (
-                    <p className="text-xs text-white/35 mt-1 max-w-xl">{result.meta.description}</p>
+                    <p className="text-xs text-white/50 mt-1 max-w-xl">{result.meta.description}</p>
                   )}
                 </div>
                 <div className="text-right text-xs text-white/50 space-y-1">

@@ -309,7 +309,7 @@ export default function AdminMailboxesPage() {
               placeholder="Search by address or name..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-[#111318] py-2 pl-9 pr-3 text-sm text-white placeholder-white/30 outline-none focus:border-violet-500 transition-colors"
+              className="w-full rounded-lg border border-white/10 bg-[#111318] py-2 pl-9 pr-3 text-sm text-white placeholder-white/50 outline-none focus:border-violet-500 transition-colors"
             />
           </div>
         </div>
@@ -466,7 +466,7 @@ export default function AdminMailboxesPage() {
                       placeholder="sarah"
                       value={createForm.localPart}
                       onChange={(e) => setCreateForm((f) => ({ ...f, localPart: e.target.value.replace(/[^a-z0-9._-]/gi, "").toLowerCase() }))}
-                      className="flex-1 rounded-lg border border-white/10 bg-[#0e1015] px-3 py-2 text-sm text-white placeholder-white/30 outline-none focus:border-violet-600"
+                      className="flex-1 rounded-lg border border-white/10 bg-[#0e1015] px-3 py-2 text-sm text-white placeholder-white/50 outline-none focus:border-violet-600"
                     />
                     <span className="flex items-center text-sm text-white/50">@</span>
                     <select
@@ -489,7 +489,7 @@ export default function AdminMailboxesPage() {
                     placeholder="Sarah Chen"
                     value={createForm.displayName}
                     onChange={(e) => setCreateForm((f) => ({ ...f, displayName: e.target.value }))}
-                    className="w-full rounded-lg border border-white/10 bg-[#0e1015] px-3 py-2 text-sm text-white placeholder-white/30 outline-none focus:border-violet-600"
+                    className="w-full rounded-lg border border-white/10 bg-[#0e1015] px-3 py-2 text-sm text-white placeholder-white/50 outline-none focus:border-violet-600"
                   />
                 </div>
 
@@ -501,7 +501,7 @@ export default function AdminMailboxesPage() {
                     placeholder="personal@gmail.com"
                     value={createForm.forwardTo}
                     onChange={(e) => setCreateForm((f) => ({ ...f, forwardTo: e.target.value }))}
-                    className="w-full rounded-lg border border-white/10 bg-[#0e1015] px-3 py-2 text-sm text-white placeholder-white/30 outline-none focus:border-violet-600"
+                    className="w-full rounded-lg border border-white/10 bg-[#0e1015] px-3 py-2 text-sm text-white placeholder-white/50 outline-none focus:border-violet-600"
                   />
                 </div>
               </div>
@@ -577,7 +577,7 @@ export default function AdminMailboxesPage() {
                     placeholder="team@company.com"
                     value={editForm.forwardTo}
                     onChange={(e) => setEditForm((f) => ({ ...f, forwardTo: e.target.value }))}
-                    className="w-full rounded-lg border border-white/10 bg-[#0e1015] px-3 py-2 text-sm text-white placeholder-white/30 outline-none focus:border-violet-600"
+                    className="w-full rounded-lg border border-white/10 bg-[#0e1015] px-3 py-2 text-sm text-white placeholder-white/50 outline-none focus:border-violet-600"
                   />
                 </div>
 
@@ -588,7 +588,7 @@ export default function AdminMailboxesPage() {
                     placeholder="Optional auto-reply to incoming emails..."
                     value={editForm.autoReply}
                     onChange={(e) => setEditForm((f) => ({ ...f, autoReply: e.target.value }))}
-                    className="w-full rounded-lg border border-white/10 bg-[#0e1015] px-3 py-2 text-sm text-white placeholder-white/30 outline-none focus:border-violet-600 resize-none"
+                    className="w-full rounded-lg border border-white/10 bg-[#0e1015] px-3 py-2 text-sm text-white placeholder-white/50 outline-none focus:border-violet-600 resize-none"
                   />
                 </div>
 

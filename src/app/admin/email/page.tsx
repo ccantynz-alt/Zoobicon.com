@@ -400,7 +400,7 @@ support@zoobicon.com`;
               <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg hover:bg-white/5 md:hidden"><Mail className="w-5 h-5 text-white/60" /></button>
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50" />
-                <input type="text" placeholder="Search emails..." value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => e.key === "Enter" && fetchEmails()} className="w-full bg-[#111318]/80 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-blue-500/50 transition-colors" />
+                <input type="text" placeholder="Search emails..." value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => e.key === "Enter" && fetchEmails()} className="w-full bg-[#111318]/80 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-white/50 focus:outline-none focus:border-blue-500/50 transition-colors" />
               </div>
               <button onClick={fetchEmails} className="p-2 rounded-lg hover:bg-white/5 transition-colors" title="Refresh">
                 <RefreshCw className={`w-4 h-4 text-white/60 ${loading ? "animate-spin" : ""}`} />
@@ -526,13 +526,13 @@ support@zoobicon.com`;
               <div className="flex flex-col gap-0 flex-1 overflow-hidden">
                 <div className="flex items-center border-b border-white/10 px-4">
                   <label className="text-xs text-white/50 w-12">To</label>
-                  <input type="email" value={composeData.to} onChange={(e) => setComposeData((d) => ({ ...d, to: e.target.value }))} className="flex-1 bg-transparent py-2.5 text-sm text-white placeholder-white/30 focus:outline-none" placeholder="recipient@example.com" />
+                  <input type="email" value={composeData.to} onChange={(e) => setComposeData((d) => ({ ...d, to: e.target.value }))} className="flex-1 bg-transparent py-2.5 text-sm text-white placeholder-white/50 focus:outline-none" placeholder="recipient@example.com" />
                 </div>
                 <div className="flex items-center border-b border-white/10 px-4">
                   <label className="text-xs text-white/50 w-12">Subject</label>
-                  <input type="text" value={composeData.subject} onChange={(e) => setComposeData((d) => ({ ...d, subject: e.target.value }))} className="flex-1 bg-transparent py-2.5 text-sm text-white placeholder-white/30 focus:outline-none" placeholder="Subject" />
+                  <input type="text" value={composeData.subject} onChange={(e) => setComposeData((d) => ({ ...d, subject: e.target.value }))} className="flex-1 bg-transparent py-2.5 text-sm text-white placeholder-white/50 focus:outline-none" placeholder="Subject" />
                 </div>
-                <textarea value={composeData.text} onChange={(e) => { setComposeData((d) => ({ ...d, text: e.target.value })); setGrammarChecked(false); }} placeholder="Write your message..." className="flex-1 min-h-[200px] bg-transparent px-4 py-3 text-sm text-white/90 placeholder-white/30 focus:outline-none resize-none" />
+                <textarea value={composeData.text} onChange={(e) => { setComposeData((d) => ({ ...d, text: e.target.value })); setGrammarChecked(false); }} placeholder="Write your message..." className="flex-1 min-h-[200px] bg-transparent px-4 py-3 text-sm text-white/90 placeholder-white/50 focus:outline-none resize-none" />
               </div>
               {/* AI Polish Diff View */}
               <AnimatePresence>
@@ -646,7 +646,7 @@ support@zoobicon.com`;
                           <button onClick={saveSignature} className="text-[10px] px-2 py-1 rounded bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 transition-colors">Save</button>
                         </div>
                       </div>
-                      <textarea value={signature} onChange={(e) => setSignature(e.target.value)} className="w-full bg-black/20 rounded-lg px-3 py-2 text-xs text-white/80 placeholder-white/30 focus:outline-none resize-none h-20" placeholder="Your email signature..." />
+                      <textarea value={signature} onChange={(e) => setSignature(e.target.value)} className="w-full bg-black/20 rounded-lg px-3 py-2 text-xs text-white/80 placeholder-white/50 focus:outline-none resize-none h-20" placeholder="Your email signature..." />
                     </div>
                   </motion.div>
                 )}

@@ -248,7 +248,7 @@ export default function KnowledgeBasePage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && fetchArticles()}
-                className="w-full bg-[#111318] border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-amber-500"
+                className="w-full bg-[#111318] border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-white/50 focus:outline-none focus:border-amber-500"
               />
             </div>
           </div>
@@ -280,7 +280,7 @@ export default function KnowledgeBasePage() {
                         setFormData((d) => ({ ...d, title: e.target.value }))
                       }
                       placeholder="e.g., How to deploy a website"
-                      className="w-full bg-[#111318] border border-white/10 rounded-lg px-4 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-amber-500"
+                      className="w-full bg-[#111318] border border-white/10 rounded-lg px-4 py-2 text-sm text-white placeholder-white/50 focus:outline-none focus:border-amber-500"
                     />
                   </div>
 
@@ -315,7 +315,7 @@ export default function KnowledgeBasePage() {
                       }
                       placeholder="Write the full answer here. Include step-by-step instructions, URLs, pricing details — anything the AI should know when answering questions about this topic."
                       rows={15}
-                      className="w-full bg-[#111318] border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-amber-500 resize-none font-mono"
+                      className="w-full bg-[#111318] border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-white/50 focus:outline-none focus:border-amber-500 resize-none font-mono"
                     />
                   </div>
 
@@ -331,7 +331,7 @@ export default function KnowledgeBasePage() {
                         setFormData((d) => ({ ...d, keywords: e.target.value }))
                       }
                       placeholder="deploy, hosting, custom domain, DNS"
-                      className="w-full bg-[#111318] border border-white/10 rounded-lg px-4 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-amber-500"
+                      className="w-full bg-[#111318] border border-white/10 rounded-lg px-4 py-2 text-sm text-white placeholder-white/50 focus:outline-none focus:border-amber-500"
                     />
                   </div>
 

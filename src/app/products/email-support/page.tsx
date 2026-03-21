@@ -248,7 +248,7 @@ export default function EmailSupportPage() {
                     <div className="flex items-center gap-2">
                       <div className="relative">
                         <Search className="w-3.5 h-3.5 text-white/60 absolute left-2.5 top-1/2 -translate-y-1/2" />
-                        <input className="bg-white/[0.06] border border-white/[0.10] rounded-lg pl-8 pr-3 py-1.5 text-xs text-white/60 placeholder-white/20 w-48" placeholder="Search tickets..." />
+                        <input className="bg-white/[0.06] border border-white/[0.10] rounded-lg pl-8 pr-3 py-1.5 text-xs text-white/60 placeholder-white/50 w-48" placeholder="Search tickets..." />
                       </div>
                     </div>
                   </div>

@@ -488,7 +488,7 @@ export default function DashboardPage() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search projects..."
                 className="bg-[#111318] border border-white/10 rounded-lg pl-9 pr-4 py-2 text-sm
-                           placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 w-48 transition-all"
+                           placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 w-48 transition-all"
               />
             </div>
             {/* View toggle */}

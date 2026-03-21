@@ -537,7 +537,7 @@ pre code {
   }
 
   .cyber-tab:hover {
-    color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.50);
   }
 }
 
@@ -1442,7 +1442,7 @@ select {
 .typing-cursor::after {
   content: '|';
   animation: blink-cursor 1s steps(2) infinite;
-  color: rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.50);
   font-weight: 300;
   margin-left: 2px;
 }
@@ -1521,7 +1521,7 @@ select {
 .syn-attr { color: #c4b5fd; }
 .syn-str { color: #86efac; }
 .syn-comment { color: rgba(255,255,255,0.50); font-style: italic; }
-.syn-punct { color: rgba(255,255,255,0.4); }
+.syn-punct { color: rgba(255,255,255,0.50); }
 .syn-prop { color: #fcd34d; }
 .syn-val { color: #86efac; }
 

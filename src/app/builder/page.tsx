@@ -1495,7 +1495,7 @@ function BuilderPage() {
                 onChange={(e) => setPrompt(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter" && prompt.trim()) handleGenerate(); }}
                 placeholder="Describe the website you want to build..."
-                className="flex-1 bg-transparent text-white text-base placeholder-white/30 outline-none"
+                className="flex-1 bg-transparent text-white text-base placeholder-white/50 outline-none"
               />
               <button
                 onClick={handleGenerate}
