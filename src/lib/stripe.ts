@@ -38,3 +38,13 @@ export const PLAN_NAMES: Record<PlanSlug, string> = {
   pro: "Pro",
   agency: "Agency",
 };
+
+/** Map plan name → Stripe Price ID */
+export function getPriceId(plan: string): string {
+  switch (plan) {
+    case "creator": return CREATOR_PRICE_ID;
+    case "pro": return PRO_PRICE_ID;
+    case "agency": return AGENCY_PRICE_ID;
+    default: return PRO_PRICE_ID;
+  }
+}

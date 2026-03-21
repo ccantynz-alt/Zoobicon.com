@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
 
         const customerId = session.customer as string;
         const subscriptionId = session.subscription as string;
+        const plan = session.metadata?.plan || "pro";
 
         // Check if this is a marketplace add-on purchase
         const addonId = session.metadata?.addonId;
@@ -64,14 +65,14 @@ export async function POST(request: NextRequest) {
             stripeSubscriptionId: subscriptionId || undefined,
           });
         } else {
-          // Regular plan upgrade
+          // Regular plan upgrade — use the plan from session metadata
           await sql`
             INSERT INTO users (email, stripe_customer_id, stripe_subscription_id, plan, subscription_status)
-            VALUES (${email}, ${customerId}, ${subscriptionId}, 'pro', 'active')
+            VALUES (${email}, ${customerId}, ${subscriptionId}, ${plan}, 'active')
             ON CONFLICT (email) DO UPDATE SET
               stripe_customer_id     = EXCLUDED.stripe_customer_id,
               stripe_subscription_id = EXCLUDED.stripe_subscription_id,
-              plan                   = 'pro',
+              plan                   = ${plan},
               subscription_status    = 'active',
               updated_at             = NOW()
           `;
@@ -82,13 +83,22 @@ export async function POST(request: NextRequest) {
       case "customer.subscription.updated": {
         const sub = event.data.object as Stripe.Subscription;
         const status = sub.status; // active | trialing | past_due | canceled | ...
-        const plan = status === "active" || status === "trialing" ? "pro" : "free";
 
-        await sql`
-          UPDATE users
-          SET plan = ${plan}, subscription_status = ${status}, updated_at = NOW()
-          WHERE stripe_subscription_id = ${sub.id}
-        `;
+        if (status === "active" || status === "trialing") {
+          // Keep existing plan — just update status
+          await sql`
+            UPDATE users
+            SET subscription_status = ${status}, updated_at = NOW()
+            WHERE stripe_subscription_id = ${sub.id}
+          `;
+        } else {
+          // Past due or other non-active status — downgrade to free
+          await sql`
+            UPDATE users
+            SET plan = 'free', subscription_status = ${status}, updated_at = NOW()
+            WHERE stripe_subscription_id = ${sub.id}
+          `;
+        }
         break;
       }
 

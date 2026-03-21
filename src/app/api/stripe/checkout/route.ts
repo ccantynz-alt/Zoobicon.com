@@ -30,11 +30,15 @@ export async function POST(request: NextRequest) {
 
     // Re-use existing Stripe customer if one exists for this email
     let customerId: string | undefined;
-    const [existing] = await sql`
-      SELECT stripe_customer_id FROM users WHERE email = ${email} LIMIT 1
-    `;
-    if (existing?.stripe_customer_id) {
-      customerId = existing.stripe_customer_id;
+    try {
+      const [existing] = await sql`
+        SELECT stripe_customer_id FROM users WHERE email = ${email} LIMIT 1
+      `;
+      if (existing?.stripe_customer_id) {
+        customerId = existing.stripe_customer_id;
+      }
+    } catch {
+      // DB unavailable — proceed without customer lookup
     }
 
     const session = await stripe.checkout.sessions.create({
