@@ -190,8 +190,9 @@ const fadeIn = {
 
 export default function VideoCreatorDashboard() {
   const router = useRouter();
-  const [user, setUser] = useState<{ email: string; name?: string } | null>(null);
+  const [user, setUser] = useState<{ email: string; name?: string; plan?: string; role?: string } | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
+  const [hasVideoAddon, setHasVideoAddon] = useState(false);
 
   // Form state
   const [projectType, setProjectType] = useState("social-ad");
@@ -229,12 +230,21 @@ export default function VideoCreatorDashboard() {
   const [showHistory, setShowHistory] = useState(false);
   const [activeScene, setActiveScene] = useState(0);
 
-  // Auth check
+  // Auth check + addon/plan check
   useEffect(() => {
     try {
       const stored = localStorage.getItem("zoobicon_user");
       if (stored) {
-        setUser(JSON.parse(stored));
+        const parsed = JSON.parse(stored);
+        setUser(parsed);
+
+        // Check if user has video addon OR is on a paid plan
+        const installedAddons = localStorage.getItem("zoobicon_installed_addons");
+        const addons: string[] = installedAddons ? JSON.parse(installedAddons) : [];
+        const isPaidPlan = parsed.plan === "unlimited" || parsed.plan === "pro" || parsed.plan === "agency" || parsed.plan === "creator";
+        const isAdmin = parsed.role === "admin";
+        const hasAddon = addons.includes("ai-video-creator");
+        setHasVideoAddon(hasAddon || isPaidPlan || isAdmin);
       } else {
         router.push("/auth/login");
         return;
@@ -373,8 +383,16 @@ export default function VideoCreatorDashboard() {
     }
   };
 
+  // --- Pipeline: Access check ---
+  const requireVideoAddon = (): boolean => {
+    if (hasVideoAddon) return true;
+    setError("Video pipeline requires the AI Video Creator add-on or a paid plan. Visit the Marketplace to purchase.");
+    return false;
+  };
+
   // --- Pipeline: Generate Scene Images ---
   const handleGenerateImages = async () => {
+    if (!requireVideoAddon()) return;
     if (!storyboard) return;
     setPipelineStage("images");
     setError("");
@@ -407,6 +425,7 @@ export default function VideoCreatorDashboard() {
 
   // --- Pipeline: Start Video Render ---
   const handleStartRender = async () => {
+    if (!requireVideoAddon()) return;
     if (!storyboard) return;
     setPipelineStage("video");
     setError("");
@@ -479,6 +498,7 @@ export default function VideoCreatorDashboard() {
 
   // --- Pipeline: Generate Voiceover ---
   const handleGenerateVoiceover = async () => {
+    if (!requireVideoAddon()) return;
     if (!storyboard) return;
     setPipelineStage("voiceover");
     setError("");
@@ -507,6 +527,7 @@ export default function VideoCreatorDashboard() {
 
   // --- Pipeline: Generate Subtitles ---
   const handleGenerateSubtitles = async () => {
+    if (!requireVideoAddon()) return;
     if (!storyboard) return;
     setPipelineStage("subtitles");
     setError("");
@@ -536,6 +557,7 @@ export default function VideoCreatorDashboard() {
 
   // --- Pipeline: Run Full Pipeline ---
   const handleFullPipeline = async () => {
+    if (!requireVideoAddon()) return;
     if (!storyboard) return;
     setShowPipeline(true);
     // Step 1: Images
@@ -994,6 +1016,11 @@ export default function VideoCreatorDashboard() {
                 {error && (
                   <div className="mt-2 text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
                     {error}
+                    {error.includes("add-on") && (
+                      <Link href="/marketplace?search=video" className="ml-2 text-amber-400 underline hover:text-amber-300">
+                        Get the add-on
+                      </Link>
+                    )}
                   </div>
                 )}
               </motion.div>
@@ -1192,6 +1219,33 @@ export default function VideoCreatorDashboard() {
                           <ChevronDown className={`w-4 h-4 text-white/40 transition-transform ${showPipeline ? "rotate-180" : ""}`} />
                         </button>
                       </div>
+
+                      {/* Upgrade prompt for free users */}
+                      {!hasVideoAddon && (
+                        <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-3 flex items-start gap-2.5">
+                          <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                          <div className="flex-1">
+                            <div className="text-xs font-semibold text-amber-300 mb-0.5">Add-on required for full pipeline</div>
+                            <div className="text-[10px] text-white/40 mb-2">
+                              Storyboard and script generation are free. Video rendering, voiceover, image generation, and subtitles require the AI Video Creator add-on ($19/mo) or a paid plan.
+                            </div>
+                            <div className="flex gap-2">
+                              <Link
+                                href="/marketplace?search=video"
+                                className="px-3 py-1.5 rounded-md bg-amber-500/20 text-amber-300 text-[10px] font-semibold hover:bg-amber-500/30 transition-colors"
+                              >
+                                Get Video Add-on — $19/mo
+                              </Link>
+                              <Link
+                                href="/pricing"
+                                className="px-3 py-1.5 rounded-md bg-white/[0.06] text-white/50 text-[10px] font-medium hover:bg-white/[0.10] transition-colors"
+                              >
+                                View Plans
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      )}
 
                       {/* Pipeline stages summary */}
                       <div className="grid grid-cols-4 gap-2">
