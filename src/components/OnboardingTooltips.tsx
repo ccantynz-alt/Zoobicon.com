@@ -234,7 +234,7 @@ export default function OnboardingTooltips({ active }: OnboardingTooltipsProps) 
             </div>
             <button
               onClick={handleSkip}
-              className="flex-shrink-0 p-1 rounded text-white/30 hover:text-white/60 transition-colors"
+              className="flex-shrink-0 p-1 rounded text-white/50 hover:text-white/60 transition-colors"
               aria-label="Close tour"
             >
               <X size={14} />
@@ -262,7 +262,7 @@ export default function OnboardingTooltips({ active }: OnboardingTooltipsProps) 
                   }`}
                 />
               ))}
-              <span className="ml-2 text-[10px] text-white/30">
+              <span className="ml-2 text-[10px] text-white/50">
                 {currentStep + 1}/{STEPS.length}
               </span>
             </div>
@@ -270,7 +270,7 @@ export default function OnboardingTooltips({ active }: OnboardingTooltipsProps) 
             <div className="flex items-center gap-3">
               <button
                 onClick={handleSkip}
-                className="text-[11px] text-white/30 hover:text-white/50 transition-colors"
+                className="text-[11px] text-white/50 hover:text-white/50 transition-colors"
               >
                 Skip Tour
               </button>

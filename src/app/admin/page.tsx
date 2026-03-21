@@ -338,7 +338,7 @@ export default function AdminPage() {
               className={`flex items-center gap-2 px-5 py-3.5 text-xs font-semibold border-b-2 transition-all ${
                 activeTab === tab.id
                   ? "border-violet-500 text-violet-300 bg-violet-500/5"
-                  : "border-transparent text-white/40 hover:text-white/70 hover:bg-white/[0.03]"
+                  : "border-transparent text-white/50 hover:text-white/70 hover:bg-white/[0.03]"
               }`}
             >
               {tab.icon}
@@ -382,7 +382,7 @@ export default function AdminPage() {
 
             {/* ── Quick Actions: 2 rows ── */}
             <div>
-              <h2 className="text-xs font-bold uppercase tracking-widest text-white/40 mb-3 flex items-center gap-2">
+              <h2 className="text-xs font-bold uppercase tracking-widest text-white/50 mb-3 flex items-center gap-2">
                 <Activity className="w-3.5 h-3.5 text-violet-400" />
                 Quick Actions
               </h2>
@@ -416,7 +416,7 @@ export default function AdminPage() {
                         <div className="text-sm font-bold truncate text-white/90 group-hover:text-white transition-colors">{a.label}</div>
                         <div className="text-[11px] text-white/45 truncate mt-0.5">{a.desc}</div>
                       </div>
-                      <ArrowUpRight className="w-4 h-4 text-white/20 group-hover:text-white/50 absolute top-4 right-4 transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                      <ArrowUpRight className="w-4 h-4 text-white/50 group-hover:text-white/50 absolute top-4 right-4 transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                     </Link>
                   </motion.div>
                 ))}
@@ -527,7 +527,7 @@ export default function AdminPage() {
                           <div className="flex items-center justify-between gap-3 py-1">
                             <div className="min-w-0">
                               <div className="text-xs font-mono text-white/75 truncate">{e.key}</div>
-                              <div className="text-[10px] text-white/40">{e.label}</div>
+                              <div className="text-[10px] text-white/50">{e.label}</div>
                             </div>
                             <div className={`text-[10px] font-bold px-2.5 py-1 rounded-full flex-shrink-0 ${
                               e.required
@@ -589,7 +589,7 @@ export default function AdminPage() {
                       ? <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                       : <div className="w-4 h-4 rounded-full border-2 border-white/15 flex-shrink-0" />
                     }
-                    <span className={`text-sm ${item.done ? "text-white/65" : "text-white/40"}`}>{item.label}</span>
+                    <span className={`text-sm ${item.done ? "text-white/65" : "text-white/50"}`}>{item.label}</span>
                   </div>
                 ))}
               </div>
@@ -683,7 +683,7 @@ export default function AdminPage() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-white/40">No user data available yet.</p>
+                  <p className="text-xs text-white/50">No user data available yet.</p>
                 )}
               </div>
 
@@ -699,16 +699,16 @@ export default function AdminPage() {
                       <div key={i} className="flex items-center justify-between py-2 border-b border-white/[0.06] last:border-0">
                         <div>
                           <div className="text-xs font-semibold text-white/80">{u.name || u.email}</div>
-                          <div className="text-[10px] text-white/40">{u.email}</div>
+                          <div className="text-[10px] text-white/50">{u.email}</div>
                         </div>
-                        <div className="text-[10px] text-white/40 font-medium">
+                        <div className="text-[10px] text-white/50 font-medium">
                           {new Date(u.created_at).toLocaleDateString()}
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-white/40">No users yet. They&apos;ll show up here once people sign up.</p>
+                  <p className="text-xs text-white/50">No users yet. They&apos;ll show up here once people sign up.</p>
                 )}
               </div>
             </div>
@@ -725,16 +725,16 @@ export default function AdminPage() {
                     <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.04] border border-white/10 hover:bg-white/[0.07] transition-colors">
                       <div>
                         <div className="text-xs font-semibold text-white/80">{p.name}</div>
-                        <div className="text-[10px] text-white/40">{p.user_email}</div>
+                        <div className="text-[10px] text-white/50">{p.user_email}</div>
                       </div>
-                      <div className="text-[10px] text-white/40 font-medium">
+                      <div className="text-[10px] text-white/50 font-medium">
                         {new Date(p.created_at).toLocaleDateString()}
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-white/40">No projects created yet.</p>
+                <p className="text-xs text-white/50">No projects created yet.</p>
               )}
             </div>
           </>
@@ -828,11 +828,11 @@ export default function AdminPage() {
                             ) : (
                               <div className="flex items-center justify-end gap-1.5">
                                 <button onClick={() => { setEditingUser(user.id); setEditRole(user.role); setEditPlan(user.plan); }}
-                                  className="text-white/40 hover:text-violet-400 p-1.5 rounded-lg hover:bg-violet-500/10 transition-all" title="Edit">
+                                  className="text-white/50 hover:text-violet-400 p-1.5 rounded-lg hover:bg-violet-500/10 transition-all" title="Edit">
                                   <Edit3 className="w-3.5 h-3.5" />
                                 </button>
                                 <button onClick={() => deleteUser(user.id, user.email)}
-                                  className="text-white/40 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-500/10 transition-all" title="Delete">
+                                  className="text-white/50 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-500/10 transition-all" title="Delete">
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                               </div>

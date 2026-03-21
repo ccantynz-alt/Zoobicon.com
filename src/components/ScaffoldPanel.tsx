@@ -225,7 +225,7 @@ export default function ScaffoldPanel({
               {feature.label}
             </span>
           </div>
-          <p className="text-xs text-white/40 mt-0.5">{feature.description}</p>
+          <p className="text-xs text-white/50 mt-0.5">{feature.description}</p>
         </div>
       </label>
     );
@@ -256,7 +256,7 @@ export default function ScaffoldPanel({
               <h2 className="text-white font-semibold text-lg">
                 Full-Stack Scaffolding
               </h2>
-              <p className="text-white/40 text-xs">
+              <p className="text-white/50 text-xs">
                 Add auth, database, and features to your site
               </p>
             </div>
@@ -267,7 +267,7 @@ export default function ScaffoldPanel({
               setResult(null);
               setError(null);
             }}
-            className="text-white/40 hover:text-white transition-colors text-xl leading-none px-2"
+            className="text-white/50 hover:text-white transition-colors text-xl leading-none px-2"
           >
             &times;
           </button>
@@ -355,13 +355,13 @@ export default function ScaffoldPanel({
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-white/5">
-                        <th className="px-4 py-2 text-left text-white/40 font-medium text-xs">
+                        <th className="px-4 py-2 text-left text-white/50 font-medium text-xs">
                           Method
                         </th>
-                        <th className="px-4 py-2 text-left text-white/40 font-medium text-xs">
+                        <th className="px-4 py-2 text-left text-white/50 font-medium text-xs">
                           Path
                         </th>
-                        <th className="px-4 py-2 text-left text-white/40 font-medium text-xs">
+                        <th className="px-4 py-2 text-left text-white/50 font-medium text-xs">
                           Description
                         </th>
                       </tr>
@@ -378,7 +378,7 @@ export default function ScaffoldPanel({
                           <td className="px-4 py-2 font-mono text-xs text-white/60">
                             {endpoint.path}
                           </td>
-                          <td className="px-4 py-2 text-xs text-white/40">
+                          <td className="px-4 py-2 text-xs text-white/50">
                             {endpoint.description}
                           </td>
                         </tr>
@@ -400,7 +400,7 @@ export default function ScaffoldPanel({
                   setIsOpen(false);
                   setError(null);
                 }}
-                className="px-4 py-2 text-sm text-white/40 hover:text-white transition-colors"
+                className="px-4 py-2 text-sm text-white/50 hover:text-white transition-colors"
               >
                 Cancel
               </button>
@@ -409,7 +409,7 @@ export default function ScaffoldPanel({
                 disabled={selectedFeatures.length === 0 || isLoading}
                 className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-all ${
                   selectedFeatures.length === 0 || isLoading
-                    ? "bg-white/5 text-white/20 cursor-not-allowed"
+                    ? "bg-white/5 text-white/50 cursor-not-allowed"
                     : "bg-blue-600 text-white hover:bg-blue-500"
                 }`}
               >
@@ -433,7 +433,7 @@ export default function ScaffoldPanel({
                   setResult(null);
                   setError(null);
                 }}
-                className="px-4 py-2 text-sm text-white/40 hover:text-white transition-colors"
+                className="px-4 py-2 text-sm text-white/50 hover:text-white transition-colors"
               >
                 Back
               </button>

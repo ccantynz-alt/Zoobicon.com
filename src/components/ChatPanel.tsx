@@ -226,7 +226,7 @@ export default function ChatPanel({ currentCode, onCodeUpdate, isVisible }: Chat
           AI Editor
         </span>
         {!currentCode && (
-          <span className="ml-auto text-[10px] text-white/20">Generate a site first</span>
+          <span className="ml-auto text-[10px] text-white/50">Generate a site first</span>
         )}
       </div>
 
@@ -235,7 +235,7 @@ export default function ChatPanel({ currentCode, onCodeUpdate, isVisible }: Chat
         {messages.length === 0 && (
           <div className="text-center py-8">
             <Bot className="w-8 h-8 text-white/10 mx-auto mb-3" />
-            <p className="text-xs text-white/20 mb-4">
+            <p className="text-xs text-white/50 mb-4">
               Tell me what to change in your website.
             </p>
             <div className="space-y-1.5">
@@ -249,7 +249,7 @@ export default function ChatPanel({ currentCode, onCodeUpdate, isVisible }: Chat
                   key={suggestion}
                   onClick={() => setInput(suggestion)}
                   disabled={!currentCode}
-                  className="block w-full text-left text-xs text-white/25 hover:text-brand-400
+                  className="block w-full text-left text-xs text-white/50 hover:text-brand-400
                              py-1.5 px-3 rounded-lg hover:bg-white/[0.02] transition-colors disabled:opacity-30"
                 >
                   &ldquo;{suggestion}&rdquo;
@@ -284,7 +284,7 @@ export default function ChatPanel({ currentCode, onCodeUpdate, isVisible }: Chat
             </div>
             {msg.role === "user" && (
               <div className="w-6 h-6 rounded-full bg-white/[0.06] flex items-center justify-center flex-shrink-0 mt-0.5">
-                <User className="w-3 h-3 text-white/40" />
+                <User className="w-3 h-3 text-white/50" />
               </div>
             )}
           </div>
@@ -295,7 +295,7 @@ export default function ChatPanel({ currentCode, onCodeUpdate, isVisible }: Chat
             <div className="w-6 h-6 rounded-full bg-brand-500/20 flex items-center justify-center flex-shrink-0">
               <Loader2 className="w-3 h-3 text-brand-400 animate-spin" />
             </div>
-            <div className="px-3 py-2 rounded-xl text-xs bg-white/[0.04] text-white/40">
+            <div className="px-3 py-2 rounded-xl text-xs bg-white/[0.04] text-white/50">
               {editMode === "css-only"
                 ? "Updating styles..."
                 : editMode === "targeted"

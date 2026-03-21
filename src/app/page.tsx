@@ -230,7 +230,7 @@ function HeroShowcase() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 0.6 }}
-          className="mt-8 text-sm text-white/30 font-light tracking-wide"
+          className="mt-8 text-sm text-white/50 font-light tracking-wide"
         >
           Trusted by developers, agencies &amp; entrepreneurs worldwide
         </motion.p>
@@ -258,12 +258,12 @@ function HeroShowcase() {
           transition={{ duration: 1, delay: 1 }}
           className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
         >
-          <span className="text-[11px] text-white/30 uppercase tracking-[0.2em] font-medium">Scroll</span>
+          <span className="text-[11px] text-white/50 uppercase tracking-[0.2em] font-medium">Scroll</span>
           <motion.div
             animate={{ y: [0, 6, 0] }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
           >
-            <ChevronDown className="w-4 h-4 text-white/30" />
+            <ChevronDown className="w-4 h-4 text-white/50" />
           </motion.div>
         </motion.div>
       </div>
@@ -551,7 +551,7 @@ export default function LandingPage() {
                 <div className="text-3xl md:text-4xl font-extrabold tracking-tight mb-1">
                   <Counter end={s.val} suffix={s.suffix} />
                 </div>
-                <div className="text-xs text-white/30 uppercase tracking-[0.15em]">{s.label}</div>
+                <div className="text-xs text-white/50 uppercase tracking-[0.15em]">{s.label}</div>
               </motion.div>
             ))}
           </motion.div>
@@ -639,14 +639,14 @@ export default function LandingPage() {
 
             {/* What it can build */}
             <motion.div variants={fadeUp} className="mt-20 text-center">
-              <p className="text-xs text-white/25 uppercase tracking-[0.2em] mb-6">What you can build</p>
+              <p className="text-xs text-white/50 uppercase tracking-[0.2em] mb-6">What you can build</p>
               <div className="flex flex-wrap justify-center gap-2">
                 {[
                   "SaaS Landing Pages", "E-Commerce Stores", "Portfolios", "Dashboards",
                   "Restaurants", "Agency Sites", "Blogs", "Full-Stack Apps",
                   "Multi-Page Sites", "Email Templates",
                 ].map((tag) => (
-                  <span key={tag} className="px-4 py-2 rounded-full border border-white/[0.06] text-xs text-white/30 hover:text-white/50 hover:border-white/[0.12] transition-all cursor-default">
+                  <span key={tag} className="px-4 py-2 rounded-full border border-white/[0.06] text-xs text-white/50 hover:text-white/50 hover:border-white/[0.12] transition-all cursor-default">
                     {tag}
                   </span>
                 ))}
@@ -685,13 +685,13 @@ export default function LandingPage() {
             <motion.div variants={fadeUp} className="grid md:grid-cols-3 gap-4">
               {/* Free */}
               <div className="p-8 rounded-2xl border border-white/[0.06] bg-white/[0.02]">
-                <div className="text-sm text-white/40 mb-2">Free</div>
+                <div className="text-sm text-white/50 mb-2">Free</div>
                 <div className="text-4xl font-extrabold mb-1">$0</div>
-                <div className="text-xs text-white/30 mb-6">Forever</div>
+                <div className="text-xs text-white/50 mb-6">Forever</div>
                 <ul className="space-y-3 mb-8">
                   {["3 sites / month", "7-agent AI pipeline", "Opus-quality builds", "Free hosting"].map((f) => (
                     <li key={f} className="flex items-start gap-2.5 text-sm text-white/45">
-                      <Check className="w-3.5 h-3.5 text-white/20 mt-0.5 shrink-0" /> {f}
+                      <Check className="w-3.5 h-3.5 text-white/50 mt-0.5 shrink-0" /> {f}
                     </li>
                   ))}
                 </ul>
@@ -706,8 +706,8 @@ export default function LandingPage() {
                   Most Popular
                 </div>
                 <div className="text-sm text-[#7c5aff]/70 mb-2">Pro</div>
-                <div className="text-4xl font-extrabold mb-1">$49<span className="text-lg font-normal text-white/30">/mo</span></div>
-                <div className="text-xs text-white/30 mb-6">Full arsenal</div>
+                <div className="text-4xl font-extrabold mb-1">$49<span className="text-lg font-normal text-white/50">/mo</span></div>
+                <div className="text-xs text-white/50 mb-6">Full arsenal</div>
                 <ul className="space-y-3 mb-8">
                   {["Unlimited sites", "All 44 generators", "Custom domains", "GitHub & WP export", "Visual editor", "Multi-page sites"].map((f) => (
                     <li key={f} className="flex items-start gap-2.5 text-sm text-white/50">
@@ -722,13 +722,13 @@ export default function LandingPage() {
 
               {/* Agency */}
               <div className="p-8 rounded-2xl border border-white/[0.06] bg-white/[0.02]">
-                <div className="text-sm text-white/40 mb-2">Agency</div>
-                <div className="text-4xl font-extrabold mb-1">$99<span className="text-lg font-normal text-white/30">/mo</span></div>
-                <div className="text-xs text-white/30 mb-6">White-label</div>
+                <div className="text-sm text-white/50 mb-2">Agency</div>
+                <div className="text-4xl font-extrabold mb-1">$99<span className="text-lg font-normal text-white/50">/mo</span></div>
+                <div className="text-xs text-white/50 mb-6">White-label</div>
                 <ul className="space-y-3 mb-8">
                   {["Everything in Pro", "White-label platform", "Client portal", "Bulk generation", "API access", "Priority support"].map((f) => (
                     <li key={f} className="flex items-start gap-2.5 text-sm text-white/45">
-                      <Check className="w-3.5 h-3.5 text-white/20 mt-0.5 shrink-0" /> {f}
+                      <Check className="w-3.5 h-3.5 text-white/50 mt-0.5 shrink-0" /> {f}
                     </li>
                   ))}
                 </ul>
@@ -739,8 +739,8 @@ export default function LandingPage() {
             </motion.div>
 
             <motion.div variants={fadeUp} className="text-center mt-8">
-              <p className="text-xs text-white/25">
-                Need more? <a href="mailto:sales@zoobicon.com" className="text-white/40 underline underline-offset-4 hover:text-white/60 transition-colors">Contact sales</a> for Enterprise.
+              <p className="text-xs text-white/50">
+                Need more? <a href="mailto:sales@zoobicon.com" className="text-white/50 underline underline-offset-4 hover:text-white/60 transition-colors">Contact sales</a> for Enterprise.
               </p>
             </motion.div>
           </motion.div>
@@ -768,7 +768,7 @@ export default function LandingPage() {
               Stop browsing.<br />
               Start building.
             </motion.h2>
-            <motion.p variants={fadeUp} className="text-lg text-white/30 max-w-lg mx-auto mb-10">
+            <motion.p variants={fadeUp} className="text-lg text-white/50 max-w-lg mx-auto mb-10">
               Join creators, agencies, and entrepreneurs who ship
               production-ready websites in minutes, not months.
             </motion.p>
@@ -791,18 +791,18 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-5 gap-8 mb-12">
             <div className="md:col-span-2">
               <div className="text-lg font-bold mb-4">Zoobicon</div>
-              <p className="text-sm text-white/30 max-w-xs leading-relaxed mb-6">
+              <p className="text-sm text-white/50 max-w-xs leading-relaxed mb-6">
                 The AI platform for building, launching, and scaling
                 websites and web applications.
               </p>
               <div className="flex gap-2">
                 {["zoobicon.com", "zoobicon.ai", "zoobicon.io", "zoobicon.sh"].map((d) => (
-                  <span key={d} className="text-[10px] text-white/20 bg-white/[0.04] px-2 py-1 rounded-full">{d}</span>
+                  <span key={d} className="text-[10px] text-white/50 bg-white/[0.04] px-2 py-1 rounded-full">{d}</span>
                 ))}
               </div>
             </div>
             <div>
-              <div className="text-[11px] font-semibold text-white/30 uppercase tracking-wider mb-4">Products</div>
+              <div className="text-[11px] font-semibold text-white/50 uppercase tracking-wider mb-4">Products</div>
               <ul className="space-y-2">
                 {[
                   ["/products/website-builder", "Website Builder"],
@@ -812,12 +812,12 @@ export default function LandingPage() {
                   ["/marketplace", "Marketplace"],
                   ["/domains", "Domains"],
                 ].map(([href, label]) => (
-                  <li key={href}><Link href={href} className="text-sm text-white/25 hover:text-white/50 transition-colors">{label}</Link></li>
+                  <li key={href}><Link href={href} className="text-sm text-white/50 hover:text-white/50 transition-colors">{label}</Link></li>
                 ))}
               </ul>
             </div>
             <div>
-              <div className="text-[11px] font-semibold text-white/30 uppercase tracking-wider mb-4">Platform</div>
+              <div className="text-[11px] font-semibold text-white/50 uppercase tracking-wider mb-4">Platform</div>
               <ul className="space-y-2">
                 {[
                   ["/developers", "API Docs"],
@@ -825,12 +825,12 @@ export default function LandingPage() {
                   ["/hosting", "Hosting"],
                   ["/wordpress", "WordPress"],
                 ].map(([href, label]) => (
-                  <li key={href}><Link href={href} className="text-sm text-white/25 hover:text-white/50 transition-colors">{label}</Link></li>
+                  <li key={href}><Link href={href} className="text-sm text-white/50 hover:text-white/50 transition-colors">{label}</Link></li>
                 ))}
               </ul>
             </div>
             <div>
-              <div className="text-[11px] font-semibold text-white/30 uppercase tracking-wider mb-4">Company</div>
+              <div className="text-[11px] font-semibold text-white/50 uppercase tracking-wider mb-4">Company</div>
               <ul className="space-y-2">
                 {[
                   ["/agencies", "For Agencies"],
@@ -839,16 +839,16 @@ export default function LandingPage() {
                   ["/privacy", "Privacy"],
                   ["/terms", "Terms"],
                 ].map(([href, label]) => (
-                  <li key={href}><Link href={href} className="text-sm text-white/25 hover:text-white/50 transition-colors">{label}</Link></li>
+                  <li key={href}><Link href={href} className="text-sm text-white/50 hover:text-white/50 transition-colors">{label}</Link></li>
                 ))}
               </ul>
             </div>
           </div>
           <div className="border-t border-white/[0.04] pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="text-xs text-white/20">&copy; 2026 Zoobicon. All rights reserved.</div>
+            <div className="text-xs text-white/50">&copy; 2026 Zoobicon. All rights reserved.</div>
             <div className="flex items-center gap-6">
-              <Link href="/privacy" className="text-xs text-white/20 hover:text-white/40 transition-colors">Privacy</Link>
-              <Link href="/terms" className="text-xs text-white/20 hover:text-white/40 transition-colors">Terms</Link>
+              <Link href="/privacy" className="text-xs text-white/50 hover:text-white/50 transition-colors">Privacy</Link>
+              <Link href="/terms" className="text-xs text-white/50 hover:text-white/50 transition-colors">Terms</Link>
             </div>
           </div>
         </div>

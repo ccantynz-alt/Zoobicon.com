@@ -173,13 +173,13 @@ export default function BuilderDemo() {
               <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
               <div className="w-3 h-3 rounded-full bg-green-500/60" />
             </div>
-            <div className="bg-white/[0.04] rounded-lg px-4 py-1 text-xs text-white/30">
+            <div className="bg-white/[0.04] rounded-lg px-4 py-1 text-xs text-white/50">
               zoobicon.ai/builder
             </div>
           </div>
           <button
             onClick={startDemo}
-            className="flex items-center gap-1.5 text-xs text-white/25 hover:text-white/50 transition-colors"
+            className="flex items-center gap-1.5 text-xs text-white/50 hover:text-white/50 transition-colors"
           >
             <RotateCcw className="w-3 h-3" />
             Replay
@@ -192,7 +192,7 @@ export default function BuilderDemo() {
           <div className="w-[35%] border-r border-white/[0.06] flex flex-col">
             {/* Prompt area */}
             <div className="p-4 border-b border-white/[0.06]">
-              <div className="text-[10px] font-medium text-white/20 uppercase tracking-wider mb-2">
+              <div className="text-[10px] font-medium text-white/50 uppercase tracking-wider mb-2">
                 Describe your website
               </div>
               <div className="bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2 min-h-[72px] text-xs text-white/70 leading-relaxed">
@@ -206,7 +206,7 @@ export default function BuilderDemo() {
                   ? "bg-gradient-to-r from-brand-600 to-brand-500 text-white"
                   : phase === "done"
                   ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20"
-                  : "bg-white/[0.04] text-white/30 border border-white/[0.06]"
+                  : "bg-white/[0.04] text-white/50 border border-white/[0.06]"
               }`}>
                 {phase === "generating" && <><Sparkles className="w-3 h-3 animate-pulse" /> Generating...</>}
                 {phase === "done" && <>✓ Complete</>}
@@ -221,7 +221,7 @@ export default function BuilderDemo() {
                 <div
                   key={i}
                   className={`py-0.5 animate-fade-in ${
-                    line.includes("complete") ? "text-emerald-400" : "text-white/30"
+                    line.includes("complete") ? "text-emerald-400" : "text-white/50"
                   }`}
                 >
                   <span className="text-white/10 mr-1.5">{String(i + 1).padStart(2, "0")}</span>
@@ -243,7 +243,7 @@ export default function BuilderDemo() {
             <div className="flex border-b border-white/[0.06] px-1">
               <button
                 className={`px-4 py-2 text-[10px] font-medium transition-colors ${
-                  showPreview ? "text-brand-400 border-b-2 border-brand-500" : "text-white/30"
+                  showPreview ? "text-brand-400 border-b-2 border-brand-500" : "text-white/50"
                 }`}
                 onClick={() => setShowPreview(true)}
               >
@@ -251,7 +251,7 @@ export default function BuilderDemo() {
               </button>
               <button
                 className={`px-4 py-2 text-[10px] font-medium transition-colors ${
-                  !showPreview ? "text-brand-400 border-b-2 border-brand-500" : "text-white/30"
+                  !showPreview ? "text-brand-400 border-b-2 border-brand-500" : "text-white/50"
                 }`}
                 onClick={() => setShowPreview(false)}
               >
@@ -291,12 +291,12 @@ export default function BuilderDemo() {
                       <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500/15 to-brand-400/10 border border-brand-500/20 flex items-center justify-center group-hover:scale-105 transition-transform">
                         <Play className="w-7 h-7 text-brand-400/80 ml-0.5" />
                       </div>
-                      <span className="text-xs text-white/30 group-hover:text-white/50 transition-colors">Watch the demo</span>
+                      <span className="text-xs text-white/50 group-hover:text-white/50 transition-colors">Watch the demo</span>
                     </button>
                   ) : (
                     <div className="text-center">
                       <Sparkles className="w-8 h-8 text-brand-400/20 mx-auto mb-2 animate-pulse" />
-                      <div className="text-xs text-white/20">Preparing...</div>
+                      <div className="text-xs text-white/50">Preparing...</div>
                     </div>
                   )}
                 </div>
@@ -306,7 +306,7 @@ export default function BuilderDemo() {
         </div>
 
         {/* Status bar */}
-        <div className="flex items-center justify-between px-4 py-1.5 border-t border-white/[0.06] text-[9px] text-white/20">
+        <div className="flex items-center justify-between px-4 py-1.5 border-t border-white/[0.06] text-[9px] text-white/50">
           <div className="flex items-center gap-2">
             <Sparkles className="w-2.5 h-2.5 text-brand-400" />
             <span>Zoobicon v2.0</span>

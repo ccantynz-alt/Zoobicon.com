@@ -130,7 +130,7 @@ export default function CodePanel({
   if (!html && !isProjectMode) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-sm text-white/30 uppercase tracking-[2px]">
+        <p className="text-sm text-white/50 uppercase tracking-[2px]">
           No code generated yet
         </p>
       </div>
@@ -156,7 +156,7 @@ export default function CodePanel({
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-t text-[11px] font-medium whitespace-nowrap transition-colors shrink-0 ${
                   isActive
                     ? "bg-white/[0.06] text-brand-400 border-b-2 border-brand-400"
-                    : "text-white/40 hover:text-white/60"
+                    : "text-white/50 hover:text-white/60"
                 }`}
                 title={file.path}
               >
@@ -179,7 +179,7 @@ export default function CodePanel({
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-t text-[11px] font-medium whitespace-nowrap transition-colors ${
               activeFile === null
                 ? "bg-white/[0.06] text-brand-400 border-b-2 border-brand-400"
-                : "text-white/40 hover:text-white/60"
+                : "text-white/50 hover:text-white/60"
             }`}
           >
             <FileText size={12} />
@@ -192,7 +192,7 @@ export default function CodePanel({
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-t text-[11px] font-medium whitespace-nowrap transition-colors ${
                 activeFile === filename
                   ? "bg-white/[0.06] text-purple-400 border-b-2 border-purple-400"
-                  : "text-white/40 hover:text-white/60"
+                  : "text-white/50 hover:text-white/60"
               }`}
             >
               <FileCode size={12} />
@@ -206,7 +206,7 @@ export default function CodePanel({
 
       {/* Toolbar */}
       <div className="flex items-center gap-2 px-4 py-2 border-b border-white/[0.06]">
-        <span className="text-[10px] uppercase tracking-[2px] text-white/20 flex-1 truncate">
+        <span className="text-[10px] uppercase tracking-[2px] text-white/50 flex-1 truncate">
           {displayLabel}
         </span>
         {isProjectMode && currentProjectFile?.isModified && (

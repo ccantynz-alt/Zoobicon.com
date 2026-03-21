@@ -339,7 +339,7 @@ export default function DevelopersPage() {
                     </span>
                     <code className="text-sm font-mono text-white/70 flex-shrink-0">{endpoint.path}</code>
                     <span className="text-sm text-white/60 hidden md:block">{endpoint.desc}</span>
-                    <ChevronRight className="w-4 h-4 text-white/30 ml-auto" />
+                    <ChevronRight className="w-4 h-4 text-white/50 ml-auto" />
                   </div>
                 ))}
               </div>

@@ -133,7 +133,7 @@ export default function GitHubImport({ onImport }: GitHubImportProps) {
             Branch
           </label>
           <div className="relative">
-            <GitBranch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+            <GitBranch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50" />
             <input
               id="branch"
               type="text"
@@ -190,7 +190,7 @@ export default function GitHubImport({ onImport }: GitHubImportProps) {
                       ? "text-white"
                       : status === "done"
                       ? "text-white/60"
-                      : "text-white/30"
+                      : "text-white/50"
                   }`}
                 >
                   {step.label}
@@ -249,7 +249,7 @@ export default function GitHubImport({ onImport }: GitHubImportProps) {
                     key={i}
                     className="flex items-start gap-2 text-sm text-white/70"
                   >
-                    <ArrowRight className="w-3.5 h-3.5 mt-0.5 shrink-0 text-white/40" />
+                    <ArrowRight className="w-3.5 h-3.5 mt-0.5 shrink-0 text-white/50" />
                     {suggestion}
                   </li>
                 ))}

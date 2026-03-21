@@ -1,6 +1,9 @@
 import { NextRequest } from "next/server";
 import { sql } from "@/lib/db";
 import { verifyPassword } from "@/lib/password";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+
+const loginLimiter = { limit: 5, windowMs: 60000 };
 
 /* Default admin credentials — override with ADMIN_EMAIL / ADMIN_PASSWORD env vars */
 const DEFAULT_ADMIN_EMAIL = "admin@zoobicon.com";
@@ -8,6 +11,16 @@ const DEFAULT_ADMIN_PASSWORD = "Zoobicon2024!Admin";
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIp(request);
+    const { allowed, resetAt } = checkRateLimit(`login:${ip}`, loginLimiter);
+    if (!allowed) {
+      const retryAfter = Math.ceil((resetAt - Date.now()) / 1000);
+      return Response.json(
+        { error: "Too many login attempts. Please try again in a minute." },
+        { status: 429, headers: { "Retry-After": String(retryAfter) } }
+      );
+    }
+
     const { email, password } = await request.json();
 
     if (!email || !password) {

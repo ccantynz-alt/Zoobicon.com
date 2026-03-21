@@ -59,20 +59,20 @@ export default function TopBar() {
         </Link>
 
         <nav className="hidden sm:flex items-center gap-1 ml-4">
-          <Link href="/builder" className="px-2.5 py-1 text-xs text-white/40 hover:text-white/70 transition-colors rounded-md hover:bg-white/[0.04]">
+          <Link href="/builder" className="px-2.5 py-1 text-xs text-white/50 hover:text-white/70 transition-colors rounded-md hover:bg-white/[0.04]">
             Builder
           </Link>
-          <Link href="/dashboard" className="px-2.5 py-1 text-xs text-white/40 hover:text-white/70 transition-colors rounded-md hover:bg-white/[0.04]">
+          <Link href="/dashboard" className="px-2.5 py-1 text-xs text-white/50 hover:text-white/70 transition-colors rounded-md hover:bg-white/[0.04]">
             Dashboard
           </Link>
-          <Link href="/hosting" className="px-2.5 py-1 text-xs text-white/40 hover:text-white/70 transition-colors rounded-md hover:bg-white/[0.04]">
+          <Link href="/hosting" className="px-2.5 py-1 text-xs text-white/50 hover:text-white/70 transition-colors rounded-md hover:bg-white/[0.04]">
             Hosting
           </Link>
-          <Link href="/video-creator" className="px-2.5 py-1 text-xs text-white/40 hover:text-white/70 transition-colors rounded-md hover:bg-white/[0.04]">
+          <Link href="/video-creator" className="px-2.5 py-1 text-xs text-white/50 hover:text-white/70 transition-colors rounded-md hover:bg-white/[0.04]">
             Video
           </Link>
           {isAgency && (
-            <Link href="/agencies/dashboard" className="px-2.5 py-1 text-xs text-white/40 hover:text-white/70 transition-colors rounded-md hover:bg-white/[0.04]">
+            <Link href="/agencies/dashboard" className="px-2.5 py-1 text-xs text-white/50 hover:text-white/70 transition-colors rounded-md hover:bg-white/[0.04]">
               Agency
             </Link>
           )}

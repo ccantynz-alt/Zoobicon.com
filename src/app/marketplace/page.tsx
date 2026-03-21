@@ -584,7 +584,7 @@ export default function MarketplacePage() {
 
             {filteredItems.length === 0 && (
               <div className="text-center py-20">
-                <Search className="w-12 h-12 text-white/30 mx-auto mb-4" />
+                <Search className="w-12 h-12 text-white/50 mx-auto mb-4" />
                 <div className="text-lg font-bold text-white/60 mb-2">No add-ons found</div>
                 <div className="text-sm text-white/60">Try a different search or category</div>
               </div>

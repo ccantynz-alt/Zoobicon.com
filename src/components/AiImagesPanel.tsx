@@ -88,7 +88,7 @@ export default function AiImagesPanel({ code, onApplyImages }: AiImagesPanelProp
           <ImagePlus className="w-4 h-4 text-brand-400" />
           AI Image Engine
         </h3>
-        <p className="text-xs text-white/30">
+        <p className="text-xs text-white/50">
           Replace placeholder images with AI-generated or premium stock photos.
         </p>
       </div>
@@ -101,14 +101,14 @@ export default function AiImagesPanel({ code, onApplyImages }: AiImagesPanelProp
           { name: "Unsplash", key: "UNSPLASH_ACCESS_KEY" },
         ].map((p) => (
           <div key={p.name} className="text-center p-2 rounded-lg bg-white/[0.02] border border-white/[0.04]">
-            <span className="text-[10px] text-white/40">{p.name}</span>
+            <span className="text-[10px] text-white/50">{p.name}</span>
           </div>
         ))}
       </div>
 
       {/* Replace all images in page */}
       <div className="space-y-2">
-        <p className="text-[10px] uppercase tracking-widest text-white/20 flex items-center gap-1.5">
+        <p className="text-[10px] uppercase tracking-widest text-white/50 flex items-center gap-1.5">
           <Sparkles className="w-3 h-3" />
           Replace Page Images
         </p>
@@ -163,7 +163,7 @@ export default function AiImagesPanel({ code, onApplyImages }: AiImagesPanelProp
 
       {/* Single image generation */}
       <div className="space-y-2 pt-3 border-t border-white/[0.06]">
-        <p className="text-[10px] uppercase tracking-widest text-white/20 flex items-center gap-1.5">
+        <p className="text-[10px] uppercase tracking-widest text-white/50 flex items-center gap-1.5">
           <Wand2 className="w-3 h-3" />
           Generate Single Image
         </p>

@@ -118,14 +118,14 @@ export default function ShareModal({ projectSlug, projectName, projectHtml }: Sh
                 </div>
                 <div>
                   <h2 className="text-sm font-semibold text-white">Share Project</h2>
-                  <p className="text-[11px] text-white/40 mt-0.5 truncate max-w-[250px]">
+                  <p className="text-[11px] text-white/50 mt-0.5 truncate max-w-[250px]">
                     {projectName}
                   </p>
                 </div>
               </div>
               <button
                 onClick={handleClose}
-                className="p-1.5 text-white/30 hover:text-white/70 hover:bg-white/[0.06] rounded-lg transition-colors"
+                className="p-1.5 text-white/50 hover:text-white/70 hover:bg-white/[0.06] rounded-lg transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -150,7 +150,7 @@ export default function ShareModal({ projectSlug, projectName, projectHtml }: Sh
               {loading && !error && (
                 <div className="flex items-center justify-center py-4">
                   <div className="w-5 h-5 border-2 border-blue-400/30 border-t-blue-400 rounded-full animate-spin" />
-                  <span className="ml-3 text-xs text-white/40">Generating share link...</span>
+                  <span className="ml-3 text-xs text-white/50">Generating share link...</span>
                 </div>
               )}
 
@@ -159,7 +159,7 @@ export default function ShareModal({ projectSlug, projectName, projectHtml }: Sh
                 <>
                   {/* URL input + copy */}
                   <div>
-                    <label className="text-[11px] text-white/40 uppercase tracking-wider mb-2 block">
+                    <label className="text-[11px] text-white/50 uppercase tracking-wider mb-2 block">
                       Share Link
                     </label>
                     <div className="flex items-center gap-2">
@@ -187,7 +187,7 @@ export default function ShareModal({ projectSlug, projectName, projectHtml }: Sh
 
                   {/* Social share buttons */}
                   <div>
-                    <label className="text-[11px] text-white/40 uppercase tracking-wider mb-2 block">
+                    <label className="text-[11px] text-white/50 uppercase tracking-wider mb-2 block">
                       Share on Social
                     </label>
                     <div className="flex items-center gap-2">

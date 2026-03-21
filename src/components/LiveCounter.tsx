@@ -131,7 +131,7 @@ export default function LiveCounter() {
                     value={stat.value + tick * (i === 0 ? 3 : i === 1 ? 7 : i === 2 ? 1 : 21)}
                     started={isInView}
                   />
-                  <span className="text-white/40">{stat.suffix}</span>
+                  <span className="text-white/50">{stat.suffix}</span>
                 </div>
 
                 <div className="text-sm text-white/50 font-medium">

@@ -499,7 +499,7 @@ export default function SupportPage() {
                 </button>
               </div>
 
-              <p className="text-[10px] text-white/30 text-center mt-4">
+              <p className="text-[10px] text-white/50 text-center mt-4">
                 Zoe (free tier) still answers questions — just with faster, shorter responses
               </p>
             </motion.div>

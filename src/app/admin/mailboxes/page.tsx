@@ -243,9 +243,9 @@ export default function AdminMailboxesPage() {
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
           <div className="flex items-center gap-4">
             <Link href="/" className="text-lg font-bold tracking-tight">Zoobicon</Link>
-            <span className="text-white/30">/</span>
+            <span className="text-white/50">/</span>
             <Link href="/admin" className="text-sm text-white/60 hover:text-white transition-colors">Admin</Link>
-            <span className="text-white/30">/</span>
+            <span className="text-white/50">/</span>
             <span className="text-sm text-white">Mailboxes</span>
           </div>
           <div className="flex items-center gap-3">
@@ -323,7 +323,7 @@ export default function AdminMailboxesPage() {
 
         {/* Empty state */}
         {!loading && filtered.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-20 text-white/40">
+          <div className="flex flex-col items-center justify-center py-20 text-white/50">
             <Mail className="h-10 w-10 mb-3" />
             <p className="text-sm">No mailboxes found</p>
           </div>
@@ -451,7 +451,7 @@ export default function AdminMailboxesPage() {
             >
               <div className="mb-5 flex items-center justify-between">
                 <h2 className="text-lg font-semibold">Create Mailbox</h2>
-                <button onClick={() => setCreateOpen(false)} className="text-white/40 hover:text-white transition-colors">
+                <button onClick={() => setCreateOpen(false)} className="text-white/50 hover:text-white transition-colors">
                   <X className="h-5 w-5" />
                 </button>
               </div>
@@ -468,7 +468,7 @@ export default function AdminMailboxesPage() {
                       onChange={(e) => setCreateForm((f) => ({ ...f, localPart: e.target.value.replace(/[^a-z0-9._-]/gi, "").toLowerCase() }))}
                       className="flex-1 rounded-lg border border-white/10 bg-[#0e1015] px-3 py-2 text-sm text-white placeholder-white/30 outline-none focus:border-violet-600"
                     />
-                    <span className="flex items-center text-sm text-white/40">@</span>
+                    <span className="flex items-center text-sm text-white/50">@</span>
                     <select
                       value={createForm.domain}
                       onChange={(e) => setCreateForm((f) => ({ ...f, domain: e.target.value }))}
@@ -552,9 +552,9 @@ export default function AdminMailboxesPage() {
               <div className="mb-5 flex items-center justify-between">
                 <div>
                   <h2 className="text-lg font-semibold">Edit Mailbox</h2>
-                  <p className="text-xs text-white/40 mt-0.5">{editTarget.address}</p>
+                  <p className="text-xs text-white/50 mt-0.5">{editTarget.address}</p>
                 </div>
-                <button onClick={() => setEditTarget(null)} className="text-white/40 hover:text-white transition-colors">
+                <button onClick={() => setEditTarget(null)} className="text-white/50 hover:text-white transition-colors">
                   <X className="h-5 w-5" />
                 </button>
               </div>
@@ -655,7 +655,7 @@ export default function AdminMailboxesPage() {
                 </div>
                 <div>
                   <h2 className="text-base font-semibold">Delete Mailbox</h2>
-                  <p className="text-xs text-white/40">This action cannot be undone</p>
+                  <p className="text-xs text-white/50">This action cannot be undone</p>
                 </div>
               </div>
 

@@ -219,7 +219,7 @@ export default function WordPressPage() {
                   <span className="text-xs font-medium text-zinc-400">Auth header</span>
                   <button
                     onClick={() => { navigator.clipboard.writeText('X-Zoobicon-Key: zbc_your_key_here'); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
-                    className="text-white/40 hover:text-white/60"
+                    className="text-white/50 hover:text-white/60"
                   >
                     {copied ? <Check className="w-3 h-3 text-accent-cyan" /> : <Copy className="w-3 h-3" />}
                   </button>
@@ -259,11 +259,11 @@ export default function WordPressPage() {
       {/* Footer */}
       <footer className="border-t border-white/[0.08] py-8">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <div className="text-xs text-white/40">&copy; 2026 Zoobicon. All rights reserved.</div>
+          <div className="text-xs text-white/50">&copy; 2026 Zoobicon. All rights reserved.</div>
           <div className="flex gap-4">
-            <Link href="/" className="text-xs text-white/40 hover:text-white/60">Home</Link>
-            <Link href="/developers" className="text-xs text-white/40 hover:text-white/60">API</Link>
-            <Link href="/support" className="text-xs text-white/40 hover:text-white/60">Support</Link>
+            <Link href="/" className="text-xs text-white/50 hover:text-white/60">Home</Link>
+            <Link href="/developers" className="text-xs text-white/50 hover:text-white/60">API</Link>
+            <Link href="/support" className="text-xs text-white/50 hover:text-white/60">Support</Link>
           </div>
         </div>
       </footer>

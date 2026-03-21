@@ -181,19 +181,19 @@ export default function ExportPanel({ code, reactSource }: { code: string; react
             Your site is live for 7 days on free hosting. Upgrade to export as a clean project and keep it hosted permanently — ready for GitHub, Vercel, Netlify, or any hosting platform.
           </p>
           <div className="space-y-2 mb-4">
-            <div className="flex items-center gap-2 text-xs text-white/40">
+            <div className="flex items-center gap-2 text-xs text-white/50">
               <span className="w-1 h-1 rounded-full bg-brand-400" /> Static HTML export
             </div>
-            <div className="flex items-center gap-2 text-xs text-white/40">
+            <div className="flex items-center gap-2 text-xs text-white/50">
               <span className="w-1 h-1 rounded-full bg-brand-400" /> Next.js project scaffold
             </div>
-            <div className="flex items-center gap-2 text-xs text-white/40">
+            <div className="flex items-center gap-2 text-xs text-white/50">
               <span className="w-1 h-1 rounded-full bg-purple-400" /> React + shadcn/ui components
             </div>
-            <div className="flex items-center gap-2 text-xs text-white/40">
+            <div className="flex items-center gap-2 text-xs text-white/50">
               <span className="w-1 h-1 rounded-full bg-brand-400" /> GitHub-ready with configs
             </div>
-            <div className="flex items-center gap-2 text-xs text-white/40">
+            <div className="flex items-center gap-2 text-xs text-white/50">
               <span className="w-1 h-1 rounded-full bg-brand-400" /> Unlimited exports
             </div>
           </div>
@@ -204,7 +204,7 @@ export default function ExportPanel({ code, reactSource }: { code: string; react
             Upgrade to Export
           </a>
         </div>
-        <p className="text-[10px] text-white/20 text-center">
+        <p className="text-[10px] text-white/50 text-center">
           Free sites are hosted for 7 days. Upgrade to keep them permanently.
         </p>
       </div>
@@ -213,7 +213,7 @@ export default function ExportPanel({ code, reactSource }: { code: string; react
 
   return (
     <div className="p-4 space-y-4">
-      <p className="text-xs text-white/40">
+      <p className="text-xs text-white/50">
         Export your site as a clean, professional project ready for GitHub or any hosting platform.
       </p>
 
@@ -262,7 +262,7 @@ export default function ExportPanel({ code, reactSource }: { code: string; react
                 ? "bg-purple-500/20 text-purple-400 border border-purple-500/30"
                 : canExportReact
                   ? "bg-white/5 text-white/50 border border-white/10 hover:text-white/70"
-                  : "bg-white/5 text-white/20 border border-white/10 cursor-not-allowed"
+                  : "bg-white/5 text-white/50 border border-white/10 cursor-not-allowed"
             }`}
           >
             <FileCode size={14} />
@@ -288,7 +288,7 @@ export default function ExportPanel({ code, reactSource }: { code: string; react
       </button>
 
       <div className="p-3 rounded-lg bg-white/5 border border-white/10">
-        <div className="text-xs text-white/40 mb-2">Included files:</div>
+        <div className="text-xs text-white/50 mb-2">Included files:</div>
         {exportType === "static" ? (
           <div className="text-xs text-white/60 space-y-0.5 font-mono">
             <div>index.html</div>

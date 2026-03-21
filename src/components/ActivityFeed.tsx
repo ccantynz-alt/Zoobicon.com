@@ -102,7 +102,7 @@ export default function ActivityFeed() {
               </div>
 
               {/* Time badge */}
-              <span className="flex-shrink-0 text-[11px] text-white/40 tabular-nums whitespace-nowrap">
+              <span className="flex-shrink-0 text-[11px] text-white/50 tabular-nums whitespace-nowrap">
                 {item.secondsAgo}s ago
               </span>
 

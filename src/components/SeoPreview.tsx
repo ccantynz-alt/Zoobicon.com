@@ -74,7 +74,7 @@ function ScoreBar({ score, max }: { score: number; max: number }) {
       <div className="flex-1 h-1.5 rounded-full bg-white/[0.06]">
         <div className={`h-full rounded-full ${color} transition-all`} style={{ width: `${pct}%` }} />
       </div>
-      <span className="text-[10px] text-white/30 w-8 text-right">{score}/{max}</span>
+      <span className="text-[10px] text-white/50 w-8 text-right">{score}/{max}</span>
     </div>
   );
 }
@@ -103,7 +103,7 @@ export default function SeoPreview({ html }: SeoPreviewProps) {
   if (!html) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-sm text-white/30 uppercase tracking-[2px]">No code generated yet</p>
+        <p className="text-sm text-white/50 uppercase tracking-[2px]">No code generated yet</p>
       </div>
     );
   }
@@ -121,7 +121,7 @@ export default function SeoPreview({ html }: SeoPreviewProps) {
           <span className={`text-2xl font-bold ${score >= 80 ? "text-emerald-400" : score >= 50 ? "text-amber-400" : "text-red-400"}`}>
             {score}
           </span>
-          <span className="text-xs text-white/20">/100</span>
+          <span className="text-xs text-white/50">/100</span>
         </div>
       </div>
       <ScoreBar score={score} max={100} />
@@ -129,7 +129,7 @@ export default function SeoPreview({ html }: SeoPreviewProps) {
       {/* Google Search Preview */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <Globe size={14} className="text-white/30" />
+          <Globe size={14} className="text-white/50" />
           <h3 className="text-xs font-semibold text-white/50 uppercase tracking-wider">Google Preview</h3>
         </div>
         <div className="bg-white rounded-lg p-4 shadow-lg">
@@ -149,7 +149,7 @@ export default function SeoPreview({ html }: SeoPreviewProps) {
       {/* Social Share Preview */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <Share2 size={14} className="text-white/30" />
+          <Share2 size={14} className="text-white/50" />
           <h3 className="text-xs font-semibold text-white/50 uppercase tracking-wider">Social Card Preview</h3>
         </div>
         <div className="rounded-lg overflow-hidden border border-[#e1e8ed] bg-white shadow">

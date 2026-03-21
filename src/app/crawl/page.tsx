@@ -153,7 +153,7 @@ function Collapsible({
             </span>
           )}
         </div>
-        {open ? <ChevronDown className="w-4 h-4 text-white/30" /> : <ChevronRight className="w-4 h-4 text-white/30" />}
+        {open ? <ChevronDown className="w-4 h-4 text-white/50" /> : <ChevronRight className="w-4 h-4 text-white/50" />}
       </button>
       <AnimatePresence>
         {open && (
@@ -231,7 +231,7 @@ export default function CrawlPage() {
               </div>
               <span className="text-lg font-bold tracking-tight">Zoobicon</span>
             </Link>
-            <span className="text-xs text-white/40">/</span>
+            <span className="text-xs text-white/50">/</span>
             <span className="text-sm text-white/65">Intelligent Crawler</span>
           </div>
           <div className="flex items-center gap-3">
@@ -279,7 +279,7 @@ export default function CrawlPage() {
         >
           <div className="flex gap-3">
             <div className="flex-1 relative">
-              <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
+              <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50" />
               <input
                 ref={inputRef}
                 type="text"
@@ -296,7 +296,7 @@ export default function CrawlPage() {
                 className={`text-xs px-3 py-1.5 rounded-lg transition-all ${
                   mode === "quick"
                     ? "bg-white/10 text-white font-medium"
-                    : "text-white/40 hover:text-white/60"
+                    : "text-white/50 hover:text-white/60"
                 }`}
               >
                 Quick
@@ -306,7 +306,7 @@ export default function CrawlPage() {
                 className={`text-xs px-3 py-1.5 rounded-lg transition-all ${
                   mode === "deep"
                     ? "bg-brand-500/20 text-brand-400 font-medium"
-                    : "text-white/40 hover:text-white/60"
+                    : "text-white/50 hover:text-white/60"
                 }`}
               >
                 Deep AI
@@ -325,7 +325,7 @@ export default function CrawlPage() {
               Crawl
             </button>
           </div>
-          <div className="flex items-center gap-4 mt-3 text-[10px] text-white/30">
+          <div className="flex items-center gap-4 mt-3 text-[10px] text-white/50">
             <span>Quick: tech stack + features only (~2s)</span>
             <span>Deep AI: full competitive analysis with Claude (~10s)</span>
           </div>
@@ -357,7 +357,7 @@ export default function CrawlPage() {
                     className="text-lg font-bold text-white hover:text-brand-400 transition-colors flex items-center gap-2"
                   >
                     {result.url.replace(/^https?:\/\//, "")}
-                    <ExternalLink className="w-4 h-4 text-white/30" />
+                    <ExternalLink className="w-4 h-4 text-white/50" />
                   </a>
                   {result.meta.title && (
                     <p className="text-sm text-white/50 mt-1">{result.meta.title}</p>
@@ -366,7 +366,7 @@ export default function CrawlPage() {
                     <p className="text-xs text-white/35 mt-1 max-w-xl">{result.meta.description}</p>
                   )}
                 </div>
-                <div className="text-right text-xs text-white/40 space-y-1">
+                <div className="text-right text-xs text-white/50 space-y-1">
                   <div>{(result.htmlSize / 1024).toFixed(0)} KB HTML</div>
                   <div>{result.fetchDuration}ms fetch</div>
                   <div>{result.techStack.length} technologies</div>
@@ -389,19 +389,19 @@ export default function CrawlPage() {
               <div className="grid grid-cols-4 gap-3 mt-4">
                 <div className="text-center p-3 rounded-lg bg-white/[0.04]">
                   <div className="text-lg font-bold">{result.meta.wordCount || "?"}</div>
-                  <div className="text-[10px] text-white/40">Words</div>
+                  <div className="text-[10px] text-white/50">Words</div>
                 </div>
                 <div className="text-center p-3 rounded-lg bg-white/[0.04]">
                   <div className="text-lg font-bold">{result.meta.imageCount || "0"}</div>
-                  <div className="text-[10px] text-white/40">Images</div>
+                  <div className="text-[10px] text-white/50">Images</div>
                 </div>
                 <div className="text-center p-3 rounded-lg bg-white/[0.04]">
                   <div className="text-lg font-bold">{result.meta.linkCount || "0"}</div>
-                  <div className="text-[10px] text-white/40">Links</div>
+                  <div className="text-[10px] text-white/50">Links</div>
                 </div>
                 <div className="text-center p-3 rounded-lg bg-white/[0.04]">
                   <div className="text-lg font-bold">{result.meta.formCount || "0"}</div>
-                  <div className="text-[10px] text-white/40">Forms</div>
+                  <div className="text-[10px] text-white/50">Forms</div>
                 </div>
               </div>
             </div>
@@ -417,7 +417,7 @@ export default function CrawlPage() {
                 <div className="space-y-3">
                   {Object.entries(groupedTech).map(([category, techs]) => (
                     <div key={category}>
-                      <div className="text-[10px] text-white/40 uppercase tracking-wider mb-2">{category}</div>
+                      <div className="text-[10px] text-white/50 uppercase tracking-wider mb-2">{category}</div>
                       <div className="flex flex-wrap gap-2">
                         {techs.map((t) => (
                           <span
@@ -438,7 +438,7 @@ export default function CrawlPage() {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-white/40">No technologies detected — site may use server-rendered HTML with no identifiable frameworks.</p>
+                <p className="text-sm text-white/50">No technologies detected — site may use server-rendered HTML with no identifiable frameworks.</p>
               )}
             </Collapsible>
 
@@ -458,7 +458,7 @@ export default function CrawlPage() {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-white/40">No standard features detected.</p>
+                <p className="text-sm text-white/50">No standard features detected.</p>
               )}
             </Collapsible>
 
@@ -467,7 +467,7 @@ export default function CrawlPage() {
               <div className="space-y-4">
                 {result.colors.length > 0 && (
                   <div>
-                    <div className="text-[10px] text-white/40 uppercase tracking-wider mb-2">Color Palette</div>
+                    <div className="text-[10px] text-white/50 uppercase tracking-wider mb-2">Color Palette</div>
                     <div className="flex flex-wrap gap-2">
                       {result.colors.map((c, i) => (
                         <button
@@ -481,7 +481,7 @@ export default function CrawlPage() {
                             style={{ backgroundColor: c }}
                           />
                           <span className="text-[10px] text-white/50 group-hover:text-white/70 font-mono">{c}</span>
-                          <Copy className="w-2.5 h-2.5 text-white/20 group-hover:text-white/40" />
+                          <Copy className="w-2.5 h-2.5 text-white/50 group-hover:text-white/50" />
                         </button>
                       ))}
                     </div>
@@ -489,7 +489,7 @@ export default function CrawlPage() {
                 )}
                 {result.fonts.length > 0 && (
                   <div>
-                    <div className="text-[10px] text-white/40 uppercase tracking-wider mb-2">Typography</div>
+                    <div className="text-[10px] text-white/50 uppercase tracking-wider mb-2">Typography</div>
                     <div className="flex flex-wrap gap-2">
                       {result.fonts.map((f) => (
                         <span key={f} className="px-3 py-1.5 rounded-lg bg-white/[0.06] border border-white/[0.08] text-xs text-white/60">
@@ -507,19 +507,19 @@ export default function CrawlPage() {
               <Collapsible title="Market Positioning" icon={<Target className="w-5 h-5" />} defaultOpen>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <div className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Target Audience</div>
+                    <div className="text-[10px] text-white/50 uppercase tracking-wider mb-1">Target Audience</div>
                     <p className="text-sm text-white/70">{result.aiAnalysis.positioning.targetAudience}</p>
                   </div>
                   <div>
-                    <div className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Value Proposition</div>
+                    <div className="text-[10px] text-white/50 uppercase tracking-wider mb-1">Value Proposition</div>
                     <p className="text-sm text-white/70">{result.aiAnalysis.positioning.valueProposition}</p>
                   </div>
                   <div>
-                    <div className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Price Position</div>
+                    <div className="text-[10px] text-white/50 uppercase tracking-wider mb-1">Price Position</div>
                     <p className="text-sm text-white/70 capitalize">{result.aiAnalysis.positioning.pricePosition}</p>
                   </div>
                   <div>
-                    <div className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Brand Tone</div>
+                    <div className="text-[10px] text-white/50 uppercase tracking-wider mb-1">Brand Tone</div>
                     <p className="text-sm text-white/70 capitalize">{result.aiAnalysis.positioning.tone}</p>
                   </div>
                 </div>
@@ -531,7 +531,7 @@ export default function CrawlPage() {
                 <div className="space-y-4">
                   {result.aiAnalysis.designAnalysis.layout && (
                     <div>
-                      <div className="text-[10px] text-white/40 uppercase tracking-wider mb-1">Layout</div>
+                      <div className="text-[10px] text-white/50 uppercase tracking-wider mb-1">Layout</div>
                       <p className="text-sm text-white/70">{result.aiAnalysis.designAnalysis.layout}</p>
                     </div>
                   )}
@@ -617,7 +617,7 @@ export default function CrawlPage() {
             <div className="gradient-border rounded-xl p-6 flex items-center justify-between">
               <div>
                 <h3 className="font-bold text-white/80 mb-1">Ready to build something better?</h3>
-                <p className="text-xs text-white/40">
+                <p className="text-xs text-white/50">
                   Use these insights to generate a site that outperforms this competitor.
                 </p>
               </div>

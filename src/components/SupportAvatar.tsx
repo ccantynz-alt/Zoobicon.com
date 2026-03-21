@@ -79,11 +79,11 @@ export default function SupportAvatar({ isSpeaking, size = "lg" }: SupportAvatar
               animate={{ opacity: isSpeaking ? [1, 0.5, 1] : 1 }}
               transition={{ duration: 0.8, repeat: Infinity }}
             />
-            <span className="text-[10px] text-white/40 font-semibold tracking-widest">LIVE</span>
+            <span className="text-[10px] text-white/50 font-semibold tracking-widest">LIVE</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <Wifi className="w-3 h-3 text-white/20" />
-            <span className="text-[10px] text-white/20 font-mono">HD</span>
+            <Wifi className="w-3 h-3 text-white/50" />
+            <span className="text-[10px] text-white/50 font-mono">HD</span>
           </div>
           <div className="flex gap-1">
             {["bg-red-500/40", "bg-amber-500/40", "bg-emerald-500/40"].map((c) => (
@@ -163,7 +163,7 @@ export default function SupportAvatar({ isSpeaking, size = "lg" }: SupportAvatar
               <div className="flex items-center gap-2">
                 <div className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${isSpeaking ? "bg-emerald-400" : "bg-emerald-500/50"}`} />
                 <span className="text-xs font-semibold text-white/70">Zoe</span>
-                <span className="text-[10px] text-white/25">AI Support</span>
+                <span className="text-[10px] text-white/50">AI Support</span>
               </div>
             </motion.div>
           </div>
@@ -177,7 +177,7 @@ export default function SupportAvatar({ isSpeaking, size = "lg" }: SupportAvatar
             </div>
             <div>
               <div className="text-xs font-bold text-white/80">Zoe</div>
-              <div className="text-[9px] text-white/30">Zoobicon AI Support</div>
+              <div className="text-[9px] text-white/50">Zoobicon AI Support</div>
             </div>
           </div>
 

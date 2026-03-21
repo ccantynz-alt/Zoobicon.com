@@ -193,7 +193,7 @@ export default function PageShell({
           <div className={`${maxWidthClass} mx-auto px-6 py-12`}>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
               <div>
-                <h4 className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-4">Product</h4>
+                <h4 className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">Product</h4>
                 <div className="space-y-2.5">
                   <Link href="/builder" className="block text-sm text-white/55 hover:text-white transition-colors">Builder</Link>
                   <Link href="/generators" className="block text-sm text-white/55 hover:text-white transition-colors">Generators</Link>
@@ -202,7 +202,7 @@ export default function PageShell({
                 </div>
               </div>
               <div>
-                <h4 className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-4">Solutions</h4>
+                <h4 className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">Solutions</h4>
                 <div className="space-y-2.5">
                   <Link href="/agencies" className="block text-sm text-white/55 hover:text-white transition-colors">Agencies</Link>
                   <Link href="/developers" className="block text-sm text-white/55 hover:text-white transition-colors">Developers</Link>
@@ -211,7 +211,7 @@ export default function PageShell({
                 </div>
               </div>
               <div>
-                <h4 className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-4">Resources</h4>
+                <h4 className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">Resources</h4>
                 <div className="space-y-2.5">
                   <Link href="/pricing" className="block text-sm text-white/55 hover:text-white transition-colors">Pricing</Link>
                   <Link href="/support" className="block text-sm text-white/55 hover:text-white transition-colors">Support</Link>
@@ -220,7 +220,7 @@ export default function PageShell({
                 </div>
               </div>
               <div>
-                <h4 className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-4">Legal</h4>
+                <h4 className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4">Legal</h4>
                 <div className="space-y-2.5">
                   <Link href="/privacy" className="block text-sm text-white/55 hover:text-white transition-colors">Privacy</Link>
                   <Link href="/terms" className="block text-sm text-white/55 hover:text-white transition-colors">Terms</Link>
@@ -233,9 +233,9 @@ export default function PageShell({
                 <div className="w-6 h-6 rounded-md bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center">
                   <Zap size={12} className="text-white" />
                 </div>
-                <span className="text-xs text-white/40">&copy; {new Date().getFullYear()} Zoobicon. All rights reserved.</span>
+                <span className="text-xs text-white/50">&copy; {new Date().getFullYear()} Zoobicon. All rights reserved.</span>
               </div>
-              <div className="flex items-center gap-4 text-xs text-white/30">
+              <div className="flex items-center gap-4 text-xs text-white/50">
                 <span>Built with AI</span>
                 <span className="w-1 h-1 rounded-full bg-white/20" />
                 <span>43 Generators</span>

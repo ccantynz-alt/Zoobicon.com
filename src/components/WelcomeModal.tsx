@@ -104,7 +104,7 @@ export default function WelcomeModal({ onClose, onBrowseTemplates }: WelcomeModa
         {/* Close button */}
         <button
           onClick={handleDismiss}
-          className="absolute top-4 right-4 p-1.5 rounded-lg text-white/30 hover:text-white/60 hover:bg-white/5 transition-colors"
+          className="absolute top-4 right-4 p-1.5 rounded-lg text-white/50 hover:text-white/60 hover:bg-white/5 transition-colors"
         >
           <X size={16} />
         </button>
@@ -114,7 +114,7 @@ export default function WelcomeModal({ onClose, onBrowseTemplates }: WelcomeModa
           <h2 className="text-xl font-semibold text-white">
             Welcome to Zoobicon
           </h2>
-          <p className="mt-1 text-sm text-white/40">
+          <p className="mt-1 text-sm text-white/50">
             Build a production-ready website in three steps.
           </p>
         </div>
@@ -135,7 +135,7 @@ export default function WelcomeModal({ onClose, onBrowseTemplates }: WelcomeModa
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[11px] font-medium text-white/30 uppercase tracking-wider">
+                    <span className="text-[11px] font-medium text-white/50 uppercase tracking-wider">
                       Step {i + 1}
                     </span>
                     <span className={`text-sm font-semibold ${step.color}`}>
@@ -177,7 +177,7 @@ export default function WelcomeModal({ onClose, onBrowseTemplates }: WelcomeModa
               onChange={(e) => setDontShowAgain(e.target.checked)}
               className="w-3.5 h-3.5 rounded border-white/20 bg-white/5 text-blue-500 focus:ring-blue-500/30 focus:ring-offset-0"
             />
-            <span className="text-xs text-white/30">
+            <span className="text-xs text-white/50">
               Don&apos;t show this again
             </span>
           </label>

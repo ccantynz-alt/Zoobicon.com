@@ -625,7 +625,7 @@ export default function DomainsPage() {
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="font-bold">${item.price.toFixed(2)}<span className="text-xs text-white/60 font-normal">/yr</span></span>
-                        <button onClick={() => removeFromCart(item.domain)} className="text-white/30 hover:text-red-400 transition-colors">
+                        <button onClick={() => removeFromCart(item.domain)} className="text-white/50 hover:text-red-400 transition-colors">
                           <X className="w-4 h-4" />
                         </button>
                       </div>
@@ -678,7 +678,7 @@ export default function DomainsPage() {
                           value={registrant[field.key as keyof RegistrantInfo]}
                           onChange={(e) => setRegistrant((p) => ({ ...p, [field.key]: e.target.value }))}
                           placeholder={field.placeholder}
-                          className="w-full bg-white/[0.07] border border-white/[0.1] rounded-lg px-3 py-2 text-white placeholder:text-white/30 outline-none text-sm focus:border-accent-cyan/30 transition-colors"
+                          className="w-full bg-white/[0.07] border border-white/[0.1] rounded-lg px-3 py-2 text-white placeholder:text-white/50 outline-none text-sm focus:border-accent-cyan/30 transition-colors"
                         />
                       </div>
                     ))}
@@ -690,7 +690,7 @@ export default function DomainsPage() {
                         value={registrant.address1}
                         onChange={(e) => setRegistrant((p) => ({ ...p, address1: e.target.value }))}
                         placeholder="123 Main St"
-                        className="w-full bg-white/[0.07] border border-white/[0.1] rounded-lg px-3 py-2 text-white placeholder:text-white/30 outline-none text-sm focus:border-accent-cyan/30 transition-colors"
+                        className="w-full bg-white/[0.07] border border-white/[0.1] rounded-lg px-3 py-2 text-white placeholder:text-white/50 outline-none text-sm focus:border-accent-cyan/30 transition-colors"
                       />
                     </div>
                     {[
@@ -707,7 +707,7 @@ export default function DomainsPage() {
                           value={registrant[field.key as keyof RegistrantInfo]}
                           onChange={(e) => setRegistrant((p) => ({ ...p, [field.key]: e.target.value }))}
                           placeholder={field.placeholder}
-                          className="w-full bg-white/[0.07] border border-white/[0.1] rounded-lg px-3 py-2 text-white placeholder:text-white/30 outline-none text-sm focus:border-accent-cyan/30 transition-colors"
+                          className="w-full bg-white/[0.07] border border-white/[0.1] rounded-lg px-3 py-2 text-white placeholder:text-white/50 outline-none text-sm focus:border-accent-cyan/30 transition-colors"
                         />
                       </div>
                     ))}
@@ -736,7 +736,7 @@ export default function DomainsPage() {
                       </>
                     )}
                   </button>
-                  <p className="text-center text-[10px] text-white/30 mt-3">
+                  <p className="text-center text-[10px] text-white/50 mt-3">
                     By registering, you agree to our Terms of Service and the Tucows/OpenSRS registration agreement.
                   </p>
                 </form>

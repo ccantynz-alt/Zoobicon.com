@@ -49,7 +49,7 @@ export default function VariantsPanel({
 
   return (
     <div className="p-4 space-y-4">
-      <p className="text-xs text-white/40">
+      <p className="text-xs text-white/50">
         Generate multiple design variants of your site. Pick the one you like best.
       </p>
 

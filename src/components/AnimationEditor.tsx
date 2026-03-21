@@ -372,7 +372,7 @@ export default function AnimationEditor({
       <div className="flex-1 overflow-y-auto p-4 space-y-5">
         {/* Presets */}
         <div>
-          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-white/40">
+          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-white/50">
             Animation Presets
           </h3>
           <div className="grid grid-cols-2 gap-2">
@@ -386,7 +386,7 @@ export default function AnimationEditor({
                   <Sparkles size={14} />
                   {preset.name}
                 </div>
-                <p className="mt-1 text-xs text-white/40">{preset.description}</p>
+                <p className="mt-1 text-xs text-white/50">{preset.description}</p>
               </button>
             ))}
           </div>
@@ -394,7 +394,7 @@ export default function AnimationEditor({
 
         {/* Animation Library */}
         <div>
-          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-white/40">
+          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-white/50">
             Animation Library
           </h3>
           {/* Category Tabs */}
@@ -428,14 +428,14 @@ export default function AnimationEditor({
                   <div className="text-sm font-medium text-white/90">
                     {anim.name}
                   </div>
-                  <p className="mt-0.5 text-xs text-white/40 leading-tight">
+                  <p className="mt-0.5 text-xs text-white/50 leading-tight">
                     {anim.description}
                   </p>
                 </div>
               </button>
             ))}
             {filteredAnimations.length === 0 && (
-              <p className="col-span-2 py-4 text-center text-xs text-white/30">
+              <p className="col-span-2 py-4 text-center text-xs text-white/50">
                 No animations in this category yet
               </p>
             )}
@@ -575,7 +575,7 @@ export default function AnimationEditor({
         {/* Queued Animations */}
         {queue.length > 0 && (
           <div>
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-white/40">
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-white/50">
               Queued Animations ({queue.length})
             </h3>
             <div className="space-y-1.5">
@@ -592,14 +592,14 @@ export default function AnimationEditor({
                       <div className="text-sm font-medium text-white/80">
                         {libItem?.name || anim.type}
                       </div>
-                      <div className="truncate text-xs text-white/40">
+                      <div className="truncate text-xs text-white/50">
                         {anim.selector} &middot; {anim.options.duration}s
                         {anim.options.delay ? ` +${anim.options.delay}s delay` : ""}
                       </div>
                     </div>
                     <button
                       onClick={() => removeFromQueue(index)}
-                      className="ml-2 shrink-0 text-white/30 transition-colors hover:text-red-400"
+                      className="ml-2 shrink-0 text-white/50 transition-colors hover:text-red-400"
                     >
                       <Trash2 size={14} />
                     </button>

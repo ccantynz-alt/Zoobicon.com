@@ -56,7 +56,7 @@ export default function QAPanel({ code }: { code: string }) {
 
   return (
     <div className="p-4 space-y-4">
-      <p className="text-xs text-white/40">
+      <p className="text-xs text-white/50">
         Validate your generated code for HTML structure, accessibility, SEO, performance, and security issues.
       </p>
 
@@ -80,7 +80,7 @@ export default function QAPanel({ code }: { code: string }) {
         <>
           <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10">
             <div>
-              <div className="text-xs text-white/40">Quality Score</div>
+              <div className="text-xs text-white/50">Quality Score</div>
               <div className="text-2xl font-bold text-white">{result.score}/100</div>
             </div>
             <div className={`text-4xl font-black ${gradeColor(result.grade)}`}>
@@ -90,14 +90,14 @@ export default function QAPanel({ code }: { code: string }) {
 
           {result.issues.length > 0 && (
             <div className="space-y-1.5">
-              <div className="text-xs text-white/40 uppercase tracking-wider">Issues ({result.issues.length})</div>
+              <div className="text-xs text-white/50 uppercase tracking-wider">Issues ({result.issues.length})</div>
               {result.issues.map((issue, i) => (
                 <div key={i} className="flex items-start gap-2 p-2 rounded bg-white/5 text-xs">
                   {severityIcon(issue.severity)}
                   <div>
                     <span className="text-white/60">[{issue.category}]</span>{" "}
                     <span className="text-white/80">{issue.message}</span>
-                    {issue.line && <span className="text-white/30 ml-1">L{issue.line}</span>}
+                    {issue.line && <span className="text-white/50 ml-1">L{issue.line}</span>}
                   </div>
                 </div>
               ))}
@@ -106,7 +106,7 @@ export default function QAPanel({ code }: { code: string }) {
 
           {result.passed.length > 0 && (
             <div className="space-y-1">
-              <div className="text-xs text-white/40 uppercase tracking-wider">Passed ({result.passed.length})</div>
+              <div className="text-xs text-white/50 uppercase tracking-wider">Passed ({result.passed.length})</div>
               {result.passed.map((p, i) => (
                 <div key={i} className="flex items-center gap-2 text-xs text-emerald-400/70">
                   <CheckCircle size={12} /> {p}

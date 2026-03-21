@@ -208,7 +208,7 @@ export default function VideoShowcase() {
 
       {/* CTA below */}
       <div className="text-center mt-8 pt-6 border-t border-white/[0.04]">
-        <p className="text-sm text-white/40 mb-4">
+        <p className="text-sm text-white/50 mb-4">
           AI storyboard & script generation is live today. Full video rendering launching soon.
         </p>
         <Link

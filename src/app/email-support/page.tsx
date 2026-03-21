@@ -701,7 +701,7 @@ export default function EmailSupportDashboard() {
             </div>
             <span className="text-sm font-bold tracking-tight hidden sm:block">Zoobicon</span>
           </Link>
-          <span className="text-white/20">/</span>
+          <span className="text-white/50">/</span>
           <span className="text-sm font-medium text-white/60">Email Support</span>
         </div>
         <div className="flex items-center gap-2">
@@ -754,17 +754,17 @@ export default function EmailSupportDashboard() {
           <span className="font-bold text-white/80">{stats.open}</span>
         </div>
         <div className="flex items-center gap-2 text-xs">
-          <Clock className="w-3 h-3 text-white/30" />
+          <Clock className="w-3 h-3 text-white/50" />
           <span className="text-white/60">Avg Response</span>
           <span className="font-bold text-white/80">{stats.avgResponse}</span>
         </div>
         <div className="flex items-center gap-2 text-xs">
-          <BarChart3 className="w-3 h-3 text-white/30" />
+          <BarChart3 className="w-3 h-3 text-white/50" />
           <span className="text-white/60">Resolution Rate</span>
           <span className="font-bold text-emerald-400">{stats.resolutionRate}%</span>
         </div>
         <div className="flex items-center gap-2 text-xs">
-          <Bot className="w-3 h-3 text-white/30" />
+          <Bot className="w-3 h-3 text-white/50" />
           <span className="text-white/60">AI Replies</span>
           <span className="font-bold text-purple-400">{stats.aiReplies}</span>
         </div>
@@ -800,7 +800,7 @@ export default function EmailSupportDashboard() {
                   <span>{f.label}</span>
                 </div>
                 <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                  activeFolder === f.key ? "bg-white/10 text-white/70" : "text-white/30"
+                  activeFolder === f.key ? "bg-white/10 text-white/70" : "text-white/50"
                 }`}>
                   {folderCounts[f.key]}
                 </span>
@@ -810,7 +810,7 @@ export default function EmailSupportDashboard() {
           <div className="p-3 border-t border-white/[0.06]">
             <Link
               href="/products/email-support"
-              className="flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] text-white/30 hover:text-white/60 hover:bg-white/[0.04] transition-all"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] text-white/50 hover:text-white/60 hover:bg-white/[0.04] transition-all"
             >
               <ArrowLeft className="w-3 h-3" />
               Back to Product Page
@@ -823,12 +823,12 @@ export default function EmailSupportDashboard() {
           {/* Search & Filter Bar */}
           <div className="p-3 border-b border-white/[0.06] space-y-2">
             <div className="relative">
-              <Search className="w-3.5 h-3.5 text-white/30 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-3.5 h-3.5 text-white/50 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search tickets..."
-                className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg pl-9 pr-3 py-2 text-xs text-white placeholder:text-white/25 outline-none focus:border-blue-500/30 transition-colors"
+                className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg pl-9 pr-3 py-2 text-xs text-white placeholder:text-white/50 outline-none focus:border-blue-500/30 transition-colors"
               />
             </div>
             <div className="flex items-center gap-2">
@@ -880,7 +880,7 @@ export default function EmailSupportDashboard() {
           {/* Ticket Items */}
           <div className="flex-1 overflow-y-auto">
             {visibleTickets.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-white/30 text-xs gap-2">
+              <div className="flex flex-col items-center justify-center h-full text-white/50 text-xs gap-2">
                 <Inbox className="w-8 h-8" />
                 <span>No tickets found</span>
               </div>
@@ -896,7 +896,7 @@ export default function EmailSupportDashboard() {
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-[10px] font-mono text-white/30">{ticket.id}</span>
+                    <span className="text-[10px] font-mono text-white/50">{ticket.id}</span>
                     <div className="flex items-center gap-1.5">
                       <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold border ${priorityColors[ticket.priority]}`}>
                         {ticket.priority}
@@ -911,7 +911,7 @@ export default function EmailSupportDashboard() {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] text-white/60 truncate max-w-[60%]">{ticket.customerName}</span>
-                    <span className="text-[10px] text-white/25">{timeAgo(ticket.createdAt)}</span>
+                    <span className="text-[10px] text-white/50">{timeAgo(ticket.createdAt)}</span>
                   </div>
                   <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
                     {ticket.sla && ticket.status !== "resolved" && (() => {
@@ -959,11 +959,11 @@ export default function EmailSupportDashboard() {
                         <span className="text-white/60 font-medium">{selectedTicket.customerName}</span>
                         {" "}&lt;{selectedTicket.from}&gt;
                       </span>
-                      <span className="text-[10px] text-white/25">{formatDate(selectedTicket.createdAt)}</span>
+                      <span className="text-[10px] text-white/50">{formatDate(selectedTicket.createdAt)}</span>
                     </div>
                     {selectedTicket.tags.length > 0 && (
                       <div className="flex items-center gap-1.5 mt-2">
-                        <Tag className="w-3 h-3 text-white/20" />
+                        <Tag className="w-3 h-3 text-white/50" />
                         {selectedTicket.tags.map((tag) => (
                           <span key={tag} className="px-2 py-0.5 rounded-full bg-white/[0.06] text-[9px] text-white/60 font-medium">
                             {tag}
@@ -1105,7 +1105,7 @@ export default function EmailSupportDashboard() {
                     );
                   })()}
                   {selectedTicket.sla && selectedTicket.status !== "resolved" && (
-                    <span className="text-[9px] text-white/30">
+                    <span className="text-[9px] text-white/50">
                       Resolve by: {formatDate(selectedTicket.sla.resolutionDeadline)}
                     </span>
                   )}
@@ -1289,7 +1289,7 @@ export default function EmailSupportDashboard() {
                     onChange={(e) => { setReplyText(e.target.value); setGrammarChecked(false); }}
                     onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSendReply(); } }}
                     placeholder={isInternalNote ? "Add an internal note (not visible to customer)..." : "Type a reply..."}
-                    className={`flex-1 rounded-xl px-4 py-2.5 text-xs text-white placeholder:text-white/25 outline-none transition-colors ${
+                    className={`flex-1 rounded-xl px-4 py-2.5 text-xs text-white placeholder:text-white/50 outline-none transition-colors ${
                       isInternalNote
                         ? "bg-amber-500/[0.06] border border-amber-500/20 focus:border-amber-500/40"
                         : "bg-white/[0.05] border border-white/[0.08] focus:border-blue-500/30"
@@ -1327,7 +1327,7 @@ export default function EmailSupportDashboard() {
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-[10px] font-bold text-white/60 uppercase tracking-wider">Customer</span>
-                    <button onClick={() => setShowCustomerSidebar(false)} className="p-0.5 rounded hover:bg-white/[0.06] text-white/30 hover:text-white/60 transition-all">
+                    <button onClick={() => setShowCustomerSidebar(false)} className="p-0.5 rounded hover:bg-white/[0.06] text-white/50 hover:text-white/60 transition-all">
                       <ChevronRight className="w-3 h-3" />
                     </button>
                   </div>
@@ -1376,7 +1376,7 @@ export default function EmailSupportDashboard() {
                               onClick={() => setSelectedId(t.id)}
                               className="w-full text-left p-2 rounded-lg hover:bg-white/[0.04] transition-all group"
                             >
-                              <div className="text-[10px] font-mono text-white/25 group-hover:text-white/60">{t.id}</div>
+                              <div className="text-[10px] font-mono text-white/50 group-hover:text-white/60">{t.id}</div>
                               <div className="text-[10px] text-white/60 truncate group-hover:text-white/70">{t.subject}</div>
                               <span className={`inline-block mt-0.5 px-1.5 py-0.5 rounded text-[8px] font-bold ${statusColors[t.status]}`}>{t.status}</span>
                             </button>
@@ -1393,7 +1393,7 @@ export default function EmailSupportDashboard() {
                 className="w-8 border-l border-white/[0.06] bg-gray-900/50 shrink-0 flex items-center justify-center hover:bg-white/[0.04] transition-all"
                 title="Show customer profile"
               >
-                <UserCircle className="w-4 h-4 text-white/30" />
+                <UserCircle className="w-4 h-4 text-white/50" />
               </button>
             )}
             </>
@@ -1436,7 +1436,7 @@ export default function EmailSupportDashboard() {
                     value={newFrom}
                     onChange={(e) => setNewFrom(e.target.value)}
                     placeholder="customer@example.com"
-                    className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-4 py-2.5 text-xs text-white placeholder:text-white/25 outline-none focus:border-blue-500/30 transition-colors"
+                    className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-4 py-2.5 text-xs text-white placeholder:text-white/50 outline-none focus:border-blue-500/30 transition-colors"
                   />
                 </div>
                 <div>
@@ -1445,7 +1445,7 @@ export default function EmailSupportDashboard() {
                     value={newSubject}
                     onChange={(e) => setNewSubject(e.target.value)}
                     placeholder="Brief description of the issue"
-                    className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-4 py-2.5 text-xs text-white placeholder:text-white/25 outline-none focus:border-blue-500/30 transition-colors"
+                    className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-4 py-2.5 text-xs text-white placeholder:text-white/50 outline-none focus:border-blue-500/30 transition-colors"
                   />
                 </div>
                 <div>
@@ -1455,7 +1455,7 @@ export default function EmailSupportDashboard() {
                     onChange={(e) => setNewBody(e.target.value)}
                     placeholder="Describe the issue in detail..."
                     rows={4}
-                    className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-4 py-2.5 text-xs text-white placeholder:text-white/25 outline-none focus:border-blue-500/30 transition-colors resize-none"
+                    className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-4 py-2.5 text-xs text-white placeholder:text-white/50 outline-none focus:border-blue-500/30 transition-colors resize-none"
                   />
                 </div>
                 <div>
@@ -1542,11 +1542,11 @@ export default function EmailSupportDashboard() {
                         }`}
                       >
                         <div className="flex items-center justify-between mb-0.5">
-                          <span className="text-[10px] font-mono text-white/30">{t.id}</span>
+                          <span className="text-[10px] font-mono text-white/50">{t.id}</span>
                           <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold ${statusColors[t.status]}`}>{t.status}</span>
                         </div>
                         <div className="text-xs text-white/60 truncate">{t.subject}</div>
-                        <div className="text-[10px] text-white/30 mt-0.5">{t.customerName} - {timeAgo(t.createdAt)}</div>
+                        <div className="text-[10px] text-white/50 mt-0.5">{t.customerName} - {timeAgo(t.createdAt)}</div>
                       </button>
                     ))}
                 </div>

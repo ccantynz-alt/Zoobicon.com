@@ -90,7 +90,7 @@ export default function CollaborationBar({
               </button>
               <div className="flex items-center gap-2">
                 <div className="flex-1 h-px bg-white/5" />
-                <span className="text-[10px] text-white/20">or join</span>
+                <span className="text-[10px] text-white/50">or join</span>
                 <div className="flex-1 h-px bg-white/5" />
               </div>
               <div className="flex gap-2">
@@ -99,7 +99,7 @@ export default function CollaborationBar({
                   value={joinCode}
                   onChange={(e) => setJoinCode(e.target.value)}
                   placeholder="Invite code..."
-                  className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white/80 placeholder:text-white/20 outline-none focus:border-blue-500/50"
+                  className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white/80 placeholder:text-white/50 outline-none focus:border-blue-500/50"
                   onKeyDown={(e) => e.key === "Enter" && handleJoin()}
                 />
                 <button
@@ -161,7 +161,7 @@ export default function CollaborationBar({
       </button>
 
       {otherCount > 0 && (
-        <span className="text-[10px] text-white/40">
+        <span className="text-[10px] text-white/50">
           {otherCount} collaborator{otherCount > 1 ? "s" : ""}
         </span>
       )}
@@ -177,14 +177,14 @@ export default function CollaborationBar({
                 Live Session
               </h3>
             </div>
-            <button onClick={() => setShowPanel(false)} className="text-white/30 hover:text-white/60">
+            <button onClick={() => setShowPanel(false)} className="text-white/50 hover:text-white/60">
               <X size={14} />
             </button>
           </div>
 
           {/* Invite section */}
           <div className="p-3 border-b border-white/5">
-            <p className="text-[10px] text-white/30 mb-2">Invite code</p>
+            <p className="text-[10px] text-white/50 mb-2">Invite code</p>
             <div className="flex items-center gap-2">
               <code className="flex-1 bg-white/5 border border-white/10 rounded px-2 py-1.5 text-xs text-white/80 font-mono tracking-wider">
                 {room?.inviteCode}
@@ -201,7 +201,7 @@ export default function CollaborationBar({
 
           {/* Participants list */}
           <div className="p-3 space-y-1.5">
-            <p className="text-[10px] text-white/30 uppercase tracking-wider mb-2">
+            <p className="text-[10px] text-white/50 uppercase tracking-wider mb-2">
               Participants ({allParticipants.length})
             </p>
             {allParticipants.map((p) => (

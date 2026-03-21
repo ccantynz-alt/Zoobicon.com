@@ -757,11 +757,11 @@ export default function SectionLibrary({ onAddSection }: SectionLibraryProps) {
           <span className="text-[11px] font-medium text-white/50 uppercase tracking-wider">
             Add Section
           </span>
-          <span className="ml-auto text-[10px] text-white/30">{filtered.length} sections</span>
+          <span className="ml-auto text-[10px] text-white/50">{filtered.length} sections</span>
         </div>
         {/* Search */}
         <div className="relative">
-          <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-white/30" />
+          <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-white/50" />
           <input
             type="text"
             value={search}
@@ -781,7 +781,7 @@ export default function SectionLibrary({ onAddSection }: SectionLibraryProps) {
             className={`flex items-center gap-1 px-2 py-1 rounded text-[10px] transition-colors ${
               activeCategory === cat.id
                 ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
-                : "bg-white/5 text-white/40 border border-transparent hover:text-white/60 hover:bg-white/10"
+                : "bg-white/5 text-white/50 border border-transparent hover:text-white/60 hover:bg-white/10"
             }`}
           >
             <cat.icon size={10} />
@@ -808,16 +808,16 @@ export default function SectionLibrary({ onAddSection }: SectionLibraryProps) {
                   <div className="text-[11px] font-medium text-white/70 truncate">
                     {template.name}
                   </div>
-                  <div className="text-[9px] text-white/30 truncate">
+                  <div className="text-[9px] text-white/50 truncate">
                     {template.description}
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">
-                  <span className="text-[9px] text-white/20 uppercase">{template.category}</span>
+                  <span className="text-[9px] text-white/50 uppercase">{template.category}</span>
                   {expandedId === template.id ? (
-                    <ChevronDown size={10} className="text-white/30" />
+                    <ChevronDown size={10} className="text-white/50" />
                   ) : (
-                    <ChevronRight size={10} className="text-white/30" />
+                    <ChevronRight size={10} className="text-white/50" />
                   )}
                 </div>
               </button>
@@ -842,7 +842,7 @@ export default function SectionLibrary({ onAddSection }: SectionLibraryProps) {
             </div>
           ))}
           {filtered.length === 0 && (
-            <div className="text-center py-8 text-white/30 text-[11px]">
+            <div className="text-center py-8 text-white/50 text-[11px]">
               No sections match your search
             </div>
           )}

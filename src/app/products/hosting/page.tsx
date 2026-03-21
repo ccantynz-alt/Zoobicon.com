@@ -412,7 +412,7 @@ export default function HostingPage() {
                         {has ? (
                           <Check className="w-4 h-4 text-white/60" />
                         ) : (
-                          <Minus className="w-4 h-4 text-white/30" />
+                          <Minus className="w-4 h-4 text-white/50" />
                         )}
                       </div>
                     ))}

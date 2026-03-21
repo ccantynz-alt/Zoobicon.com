@@ -57,7 +57,7 @@ export default function ClonePanel({ onClone }: ClonePanelProps) {
           <Globe className="w-4 h-4 text-brand-400" />
           Website Cloner
         </h3>
-        <p className="text-xs text-white/30">
+        <p className="text-xs text-white/50">
           Paste any URL and we&apos;ll rebuild it as a premium, modern website.
         </p>
       </div>
@@ -82,7 +82,7 @@ export default function ClonePanel({ onClone }: ClonePanelProps) {
             className={`flex-1 text-xs py-1.5 rounded-lg border transition-colors ${
               tier === "standard"
                 ? "bg-white/[0.06] border-white/[0.12] text-white"
-                : "border-white/[0.04] text-white/30 hover:text-white/50"
+                : "border-white/[0.04] text-white/50 hover:text-white/50"
             }`}
           >
             Standard
@@ -92,7 +92,7 @@ export default function ClonePanel({ onClone }: ClonePanelProps) {
             className={`flex-1 text-xs py-1.5 rounded-lg border transition-colors flex items-center justify-center gap-1 ${
               tier === "premium"
                 ? "bg-brand-500/10 border-brand-500/30 text-brand-400"
-                : "border-white/[0.04] text-white/30 hover:text-white/50"
+                : "border-white/[0.04] text-white/50 hover:text-white/50"
             }`}
           >
             <Sparkles className="w-3 h-3" />
@@ -145,7 +145,7 @@ export default function ClonePanel({ onClone }: ClonePanelProps) {
 
       {/* How it works */}
       <div className="space-y-2 pt-2 border-t border-white/[0.06]">
-        <p className="text-[10px] uppercase tracking-widest text-white/20">How it works</p>
+        <p className="text-[10px] uppercase tracking-widest text-white/50">How it works</p>
         <div className="space-y-1.5">
           {[
             "Fetches and analyzes the target website",
@@ -157,7 +157,7 @@ export default function ClonePanel({ onClone }: ClonePanelProps) {
               <div className="w-4 h-4 rounded-full bg-brand-500/10 border border-brand-500/20 flex items-center justify-center flex-shrink-0">
                 <span className="text-[8px] text-brand-400 font-bold">{i + 1}</span>
               </div>
-              <span className="text-[11px] text-white/30">{step}</span>
+              <span className="text-[11px] text-white/50">{step}</span>
             </div>
           ))}
         </div>

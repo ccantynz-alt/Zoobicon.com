@@ -472,7 +472,7 @@ export default function EditSitePage() {
             className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${
               isDirty
                 ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
-                : "bg-white/5 text-white/40 cursor-not-allowed"
+                : "bg-white/5 text-white/50 cursor-not-allowed"
             }`}
           >
             {isSaving ? (
@@ -495,7 +495,7 @@ export default function EditSitePage() {
             <span className="text-[11px] uppercase tracking-[2px] text-brand-400/50">
               AI Editor
             </span>
-            <span className="text-[10px] text-white/40">
+            <span className="text-[10px] text-white/50">
               Editing live site
             </span>
           </div>

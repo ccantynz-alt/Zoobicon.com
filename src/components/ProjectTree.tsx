@@ -57,7 +57,7 @@ function getFileIcon(filename: string) {
     case "html":
       return <FileCode size={14} className="text-orange-400 shrink-0" />;
     default:
-      return <File size={14} className="text-white/40 shrink-0" />;
+      return <File size={14} className="text-white/50 shrink-0" />;
   }
 }
 
@@ -176,7 +176,7 @@ function TreeNodeItem({
           <>
             <ChevronRight
               size={12}
-              className={`shrink-0 transition-transform duration-150 text-white/30 ${
+              className={`shrink-0 transition-transform duration-150 text-white/50 ${
                 isExpanded ? "rotate-90" : ""
               }`}
             />
@@ -341,13 +341,13 @@ export default function ProjectTree({
     <div className="flex flex-col h-full bg-[#1a1a2e] border-r border-white/10 select-none">
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 border-b border-white/[0.06]">
-        <span className="text-[11px] uppercase tracking-[1.5px] text-white/40 font-medium truncate">
+        <span className="text-[11px] uppercase tracking-[1.5px] text-white/50 font-medium truncate">
           {projectName}
         </span>
         {onFileCreate && (
           <button
             onClick={() => setIsCreating(true)}
-            className="p-1 rounded hover:bg-white/[0.06] text-white/30 hover:text-white/60 transition-colors"
+            className="p-1 rounded hover:bg-white/[0.06] text-white/50 hover:text-white/60 transition-colors"
             title="New File"
           >
             <Plus size={14} />
@@ -372,7 +372,7 @@ export default function ProjectTree({
             }}
             onBlur={handleNewFile}
             placeholder="path/to/file.tsx"
-            className="w-full bg-white/[0.06] border border-white/10 rounded px-2 py-1 text-[12px] text-white/80 placeholder:text-white/20 outline-none focus:border-brand-400/50"
+            className="w-full bg-white/[0.06] border border-white/10 rounded px-2 py-1 text-[12px] text-white/80 placeholder:text-white/50 outline-none focus:border-brand-400/50"
           />
         </div>
       )}
@@ -393,7 +393,7 @@ export default function ProjectTree({
         ))}
 
         {files.length === 0 && (
-          <p className="text-[11px] text-white/20 text-center py-6">
+          <p className="text-[11px] text-white/50 text-center py-6">
             No files yet
           </p>
         )}
@@ -401,7 +401,7 @@ export default function ProjectTree({
 
       {/* File count */}
       <div className="px-3 py-1.5 border-t border-white/[0.06]">
-        <span className="text-[10px] text-white/20">
+        <span className="text-[10px] text-white/50">
           {files.length} file{files.length !== 1 ? "s" : ""}
         </span>
       </div>
@@ -480,7 +480,7 @@ export default function ProjectTree({
                   setRenamingPath(null);
                   setRenameValue("");
                 }}
-                className="px-3 py-1 text-[11px] text-white/40 hover:text-white/60 transition-colors"
+                className="px-3 py-1 text-[11px] text-white/50 hover:text-white/60 transition-colors"
               >
                 Cancel
               </button>

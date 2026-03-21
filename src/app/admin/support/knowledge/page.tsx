@@ -221,7 +221,7 @@ export default function KnowledgeBasePage() {
               >
                 <span className="capitalize">{cat.replace("-", " ")}</span>
                 {count > 0 && (
-                  <span className="text-xs text-white/40">{count}</span>
+                  <span className="text-xs text-white/50">{count}</span>
                 )}
               </button>
             );
@@ -407,11 +407,11 @@ export default function KnowledgeBasePage() {
                         </p>
                         {article.keywords && (article.keywords as string[]).length > 0 && (
                           <div className="flex items-center gap-1 mt-2">
-                            <Tag className="w-3 h-3 text-white/40" />
+                            <Tag className="w-3 h-3 text-white/50" />
                             {(article.keywords as string[]).slice(0, 5).map((kw) => (
                               <span
                                 key={kw}
-                                className="text-xs text-white/40 bg-[#111318]/50 px-1.5 py-0.5 rounded"
+                                className="text-xs text-white/50 bg-[#111318]/50 px-1.5 py-0.5 rounded"
                               >
                                 {kw}
                               </span>
@@ -425,7 +425,7 @@ export default function KnowledgeBasePage() {
                           className={`p-1.5 rounded transition-colors ${
                             article.is_active
                               ? "text-green-400 hover:bg-green-500/10"
-                              : "text-white/40 hover:bg-[#111318]"
+                              : "text-white/50 hover:bg-[#111318]"
                           }`}
                           title={article.is_active ? "Disable" : "Enable"}
                         >

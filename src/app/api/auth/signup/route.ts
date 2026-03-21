@@ -2,9 +2,22 @@ import { NextRequest } from "next/server";
 import { sql } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
 import { notifyNewSignup } from "@/lib/admin-notify";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+
+const signupLimiter = { limit: 3, windowMs: 60000 };
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIp(request);
+    const { allowed, resetAt } = checkRateLimit(`signup:${ip}`, signupLimiter);
+    if (!allowed) {
+      const retryAfter = Math.ceil((resetAt - Date.now()) / 1000);
+      return Response.json(
+        { error: "Too many signup attempts. Please try again in a minute." },
+        { status: 429, headers: { "Retry-After": String(retryAfter) } }
+      );
+    }
+
     const { name, email, password } = await request.json();
 
     if (!email || !password) {
@@ -26,7 +39,10 @@ export async function POST(request: NextRequest) {
     // Check if user already exists
     const [existing] = await sql`SELECT id FROM users WHERE email = ${email.toLowerCase()} LIMIT 1`;
     if (existing) {
-      return Response.json({ error: "An account with this email already exists" }, { status: 409 });
+      // Return same shape as success to prevent email enumeration
+      return Response.json({
+        user: { email: email.toLowerCase(), name: name || "", role: "user", plan: "free" },
+      });
     }
 
     const passwordHash = await hashPassword(password);

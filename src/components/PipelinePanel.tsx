@@ -147,7 +147,7 @@ export default function PipelinePanel({ onApplyCode }: PipelinePanelProps) {
           <Workflow className="w-4 h-4 text-brand-400" />
           7-Agent Pipeline
         </h3>
-        <p className="text-xs text-white/30">
+        <p className="text-xs text-white/50">
           Multi-phase AI pipeline: Strategy → Planning → Build → Enhancement.
         </p>
       </div>
@@ -156,8 +156,8 @@ export default function PipelinePanel({ onApplyCode }: PipelinePanelProps) {
       {status === "running" && (
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-[9px]">
-            <span className="text-white/30 uppercase tracking-wider font-semibold">Phase {currentPhase}/4</span>
-            <span className="text-white/25 tabular-nums">{doneCount}/{agents.length} agents</span>
+            <span className="text-white/50 uppercase tracking-wider font-semibold">Phase {currentPhase}/4</span>
+            <span className="text-white/50 tabular-nums">{doneCount}/{agents.length} agents</span>
           </div>
           <div className="h-1 rounded-full bg-white/[0.06] overflow-hidden">
             <motion.div
@@ -182,7 +182,7 @@ export default function PipelinePanel({ onApplyCode }: PipelinePanelProps) {
               {/* Phase label */}
               <div className="flex items-center gap-2">
                 <span className={`text-[9px] uppercase tracking-wider font-bold ${
-                  phaseDone ? "text-emerald-400/70" : phaseActive ? phaseColors.text : "text-white/20"
+                  phaseDone ? "text-emerald-400/70" : phaseActive ? phaseColors.text : "text-white/50"
                 }`}>
                   Phase {phase.num}: {phase.name}
                 </span>
@@ -244,12 +244,12 @@ export default function PipelinePanel({ onApplyCode }: PipelinePanelProps) {
                               ? "bg-violet-500/15 text-violet-400/80"
                               : agent.model === "Sonnet"
                                 ? "bg-blue-500/15 text-blue-400/80"
-                                : "bg-white/[0.06] text-white/30"
+                                : "bg-white/[0.06] text-white/50"
                           }`}>
                             {agent.model}
                           </span>
                         </div>
-                        <div className="text-[9px] text-white/20">
+                        <div className="text-[9px] text-white/50">
                           {isRunning ? (
                             <span className={phaseColors.text}>Working...</span>
                           ) : isDone ? (
@@ -289,7 +289,7 @@ export default function PipelinePanel({ onApplyCode }: PipelinePanelProps) {
               className={`text-[10px] py-1.5 rounded-lg border capitalize transition-colors ${
                 style === s
                   ? "bg-brand-500/10 border-brand-500/30 text-brand-400"
-                  : "border-white/[0.04] text-white/30 hover:text-white/50"
+                  : "border-white/[0.04] text-white/50 hover:text-white/50"
               }`}
             >
               {s}

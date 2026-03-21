@@ -128,7 +128,7 @@ export default function IntelPage() {
           <div className="flex items-center gap-4">
             <Link
               href="/admin"
-              className="text-white/30 hover:text-white/60 transition-colors"
+              className="text-white/50 hover:text-white/60 transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
             </Link>
@@ -138,7 +138,7 @@ export default function IntelPage() {
               </div>
               <div>
                 <h1 className="text-lg font-bold">Competitive Intelligence</h1>
-                <p className="text-xs text-white/30">
+                <p className="text-xs text-white/50">
                   Monitor competitors. Stay ahead.
                 </p>
               </div>
@@ -210,7 +210,7 @@ export default function IntelPage() {
                 }`}
               >
                 <div className="text-sm font-semibold mb-1">{c.name}</div>
-                <div className="text-[10px] text-white/30">{c.domain}</div>
+                <div className="text-[10px] text-white/50">{c.domain}</div>
                 <div
                   className={`text-[9px] mt-2 px-2 py-0.5 rounded-full inline-block ${
                     c.category === "direct"
@@ -266,7 +266,7 @@ export default function IntelPage() {
                 Crawl Results ({filteredResults.length})
               </h2>
               {report?.generatedAt && (
-                <span className="text-[10px] text-white/20">
+                <span className="text-[10px] text-white/50">
                   {new Date(report.generatedAt).toLocaleString()}
                 </span>
               )}
@@ -296,7 +296,7 @@ export default function IntelPage() {
                       </a>
                     </div>
                     {result.rawTextLength && (
-                      <span className="text-[10px] text-white/20">
+                      <span className="text-[10px] text-white/50">
                         {result.rawTextLength.toLocaleString()} chars
                       </span>
                     )}
@@ -304,7 +304,7 @@ export default function IntelPage() {
 
                   {result.title && (
                     <div className="mb-2">
-                      <span className="text-[10px] uppercase tracking-wider text-white/20">
+                      <span className="text-[10px] uppercase tracking-wider text-white/50">
                         Title
                       </span>
                       <p className="text-sm text-white/70">{result.title}</p>
@@ -390,7 +390,7 @@ export default function IntelPage() {
         {!report && !isCrawling && (
           <div className="text-center py-16">
             <Radar className="w-12 h-12 text-white/10 mx-auto mb-4" />
-            <p className="text-white/30 mb-2">No crawl data yet</p>
+            <p className="text-white/50 mb-2">No crawl data yet</p>
             <p className="text-xs text-white/15 mb-6">
               Click &quot;Crawl All&quot; to run your first competitive intelligence sweep.
             </p>

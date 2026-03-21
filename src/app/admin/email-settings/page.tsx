@@ -178,7 +178,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
               <ArrowLeft className="w-4 h-4" />
               <span className="text-sm">Admin</span>
             </Link>
-            <span className="text-white/30">/</span>
+            <span className="text-white/50">/</span>
             <span className="text-sm text-white font-medium">Email Settings</span>
           </div>
           <div className="flex items-center gap-3">
@@ -218,9 +218,9 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
               </div>
               <div className="space-y-2 text-xs text-white/60 leading-relaxed">
                 <p><span className="text-white/80">admin@zoobicon.com</span></p>
-                <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/30 shrink-0" /><span>Mailgun receives it</span></div>
-                <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/30 shrink-0" /><span>Webhook to <code className="text-cyan-400/80">/api/email/webhook</code></span></div>
-                <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/30 shrink-0" /><span>Appears in <code className="text-cyan-400/80">/admin/email</code></span></div>
+                <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/50 shrink-0" /><span>Mailgun receives it</span></div>
+                <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/50 shrink-0" /><span>Webhook to <code className="text-cyan-400/80">/api/email/webhook</code></span></div>
+                <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/50 shrink-0" /><span>Appears in <code className="text-cyan-400/80">/admin/email</code></span></div>
               </div>
             </div>
 
@@ -234,10 +234,10 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
               </div>
               <div className="space-y-2 text-xs text-white/60 leading-relaxed">
                 <p><span className="text-white/80">support@zoobicon.com</span></p>
-                <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/30 shrink-0" /><span>Mailgun receives it</span></div>
-                <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/30 shrink-0" /><span>Webhook to <code className="text-cyan-400/80">/api/email/webhook</code></span></div>
-                <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/30 shrink-0" /><span>Ticket in <code className="text-cyan-400/80">/email-support</code></span></div>
-                <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/30 shrink-0" /><span>AI drafts reply</span></div>
+                <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/50 shrink-0" /><span>Mailgun receives it</span></div>
+                <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/50 shrink-0" /><span>Webhook to <code className="text-cyan-400/80">/api/email/webhook</code></span></div>
+                <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/50 shrink-0" /><span>Ticket in <code className="text-cyan-400/80">/email-support</code></span></div>
+                <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/50 shrink-0" /><span>AI drafts reply</span></div>
               </div>
             </div>
 

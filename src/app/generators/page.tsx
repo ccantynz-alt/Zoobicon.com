@@ -273,7 +273,7 @@ export default function GeneratorsPage() {
             ))}
             {filteredGenerators.length === 0 && (
               <div className="col-span-full text-center py-20">
-                <Search size={40} className="mx-auto text-white/30 mb-4" />
+                <Search size={40} className="mx-auto text-white/50 mb-4" />
                 <p className="text-white/65">No generators match your search.</p>
               </div>
             )}

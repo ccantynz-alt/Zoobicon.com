@@ -227,10 +227,10 @@ export default function PromptInput({
             <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${
               tier === "standard" ? "bg-white/15" : "bg-white/[0.06]"
             }`}>
-              <Zap className={`w-3.5 h-3.5 ${tier === "standard" ? "text-white" : "text-white/30"}`} />
+              <Zap className={`w-3.5 h-3.5 ${tier === "standard" ? "text-white" : "text-white/50"}`} />
             </div>
             <span className={`text-xs font-bold uppercase tracking-wider ${
-              tier === "standard" ? "text-white" : "text-white/30"
+              tier === "standard" ? "text-white" : "text-white/50"
             }`}>
               Standard
             </span>
@@ -279,11 +279,11 @@ export default function PromptInput({
                 : "bg-white/[0.06]"
             }`}>
               <Sparkles className={`w-3.5 h-3.5 ${
-                tier === "premium" ? "text-brand-300" : "text-white/30"
+                tier === "premium" ? "text-brand-300" : "text-white/50"
               }`} />
             </div>
             <span className={`text-xs font-bold uppercase tracking-wider ${
-              tier === "premium" ? "text-brand-300" : "text-white/30"
+              tier === "premium" ? "text-brand-300" : "text-white/50"
             }`}>
               Premium
             </span>
@@ -319,12 +319,12 @@ export default function PromptInput({
           >
             <div className="flex items-center gap-2 min-w-0">
               <Cpu className="w-3.5 h-3.5 text-brand-400/60 flex-shrink-0" />
-              <span className="text-[10px] uppercase tracking-wider text-white/40 flex-shrink-0">Model</span>
+              <span className="text-[10px] uppercase tracking-wider text-white/50 flex-shrink-0">Model</span>
               <span className="text-xs text-white/70 truncate">
                 {availableModels.find(m => m.id === selectedModel)?.label || "Auto (Opus Build)"}
               </span>
             </div>
-            <ChevronDown className={`w-3.5 h-3.5 text-white/30 transition-transform ${showModelPicker ? "rotate-180" : ""}`} />
+            <ChevronDown className={`w-3.5 h-3.5 text-white/50 transition-transform ${showModelPicker ? "rotate-180" : ""}`} />
           </button>
           {showModelPicker && (
             <div className="absolute top-full left-0 right-0 mt-1 bg-[#12121a] border border-white/[0.08] rounded-lg shadow-2xl z-50 max-h-[240px] overflow-y-auto">
@@ -333,7 +333,7 @@ export default function PromptInput({
                 if (providerModels.length === 0) return null;
                 return (
                   <div key={provider}>
-                    <div className="px-3 py-1.5 text-[9px] uppercase tracking-widest text-white/20 border-b border-white/[0.04]">
+                    <div className="px-3 py-1.5 text-[9px] uppercase tracking-widest text-white/50 border-b border-white/[0.04]">
                       {provider === "claude" ? "Anthropic" : provider === "openai" ? "OpenAI" : "Google"}
                     </div>
                     {providerModels.map(model => (
@@ -376,12 +376,12 @@ export default function PromptInput({
             }`}
           >
             <div className="flex items-center gap-2">
-              <SlidersHorizontal className={`w-3.5 h-3.5 ${showCustomization ? "text-brand-400" : "text-white/30"}`} />
-              <span className={`text-[10px] uppercase tracking-wider ${showCustomization ? "text-brand-300" : "text-white/40"}`}>
+              <SlidersHorizontal className={`w-3.5 h-3.5 ${showCustomization ? "text-brand-400" : "text-white/50"}`} />
+              <span className={`text-[10px] uppercase tracking-wider ${showCustomization ? "text-brand-300" : "text-white/50"}`}>
                 Customize Style
               </span>
             </div>
-            <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showCustomization ? "rotate-180 text-brand-400" : "text-white/30"}`} />
+            <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showCustomization ? "rotate-180 text-brand-400" : "text-white/50"}`} />
           </button>
           {showCustomization && (
             <CustomizationPanel options={customization} onChange={setCustomization} />
@@ -419,7 +419,7 @@ export default function PromptInput({
             const descMode = hoveredMode ?? activeMode;
             const desc = GENERATION_MODES.find(m => m.id === descMode)?.description;
             return desc ? (
-              <p className="text-[10px] text-white/30 mt-1 ml-0.5">{desc}</p>
+              <p className="text-[10px] text-white/50 mt-1 ml-0.5">{desc}</p>
             ) : null;
           })()}
         </div>
@@ -429,7 +429,7 @@ export default function PromptInput({
       <div className="relative flex-1 min-h-0">
         <textarea
           ref={textareaRef}
-          className="w-full h-full min-h-[120px] bg-[#0a0a0f] border border-white/[0.06] text-white/90 text-sm font-mono rounded-xl p-4 pr-12 outline-none transition-colors focus:border-brand-500/50 focus:shadow-glow resize-none placeholder:text-white/20"
+          className="w-full h-full min-h-[120px] bg-[#0a0a0f] border border-white/[0.06] text-white/90 text-sm font-mono rounded-xl p-4 pr-12 outline-none transition-colors focus:border-brand-500/50 focus:shadow-glow resize-none placeholder:text-white/50"
           placeholder="Describe the website you want to build..."
           value={prompt}
           onChange={(e) => onPromptChange(e.target.value)}
@@ -445,7 +445,7 @@ export default function PromptInput({
             className={`absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-lg transition-all ${
               isListening
                 ? "bg-red-500/20 text-red-400 animate-pulse"
-                : "bg-white/[0.04] text-white/20 hover:text-white/50 hover:bg-white/[0.08]"
+                : "bg-white/[0.04] text-white/50 hover:text-white/50 hover:bg-white/[0.08]"
             }`}
             title={isListening ? "Stop listening" : "Voice input"}
           >
@@ -455,7 +455,7 @@ export default function PromptInput({
       </div>
 
       {/* Character count + shortcut */}
-      <div className="flex justify-between items-center text-[10px] text-white/40">
+      <div className="flex justify-between items-center text-[10px] text-white/50">
         <span>{prompt.length.toLocaleString()} / 20,000</span>
         <span className="text-brand-400/70">
           {isMac ? "Cmd" : "Ctrl"}+Enter to build
@@ -496,7 +496,7 @@ export default function PromptInput({
           <div className="relative">
             <textarea
               ref={editInputRef}
-              className="w-full min-h-[70px] bg-[#0a0a0f] border border-white/[0.06] text-white/90 text-sm font-mono rounded-xl p-3 pr-20 outline-none transition-colors focus:border-brand-500/50 resize-none placeholder:text-white/20"
+              className="w-full min-h-[70px] bg-[#0a0a0f] border border-white/[0.06] text-white/90 text-sm font-mono rounded-xl p-3 pr-20 outline-none transition-colors focus:border-brand-500/50 resize-none placeholder:text-white/50"
               placeholder="e.g. Change the hero background to blue, add a pricing section..."
               value={editPrompt}
               onChange={(e) => onEditPromptChange(e.target.value)}
@@ -511,7 +511,7 @@ export default function PromptInput({
                   className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all ${
                     isListening
                       ? "bg-red-500/20 text-red-400 animate-pulse"
-                      : "bg-white/[0.04] text-white/20 hover:text-white/50"
+                      : "bg-white/[0.04] text-white/50 hover:text-white/50"
                   }`}
                   title={isListening ? "Stop listening" : "Voice input"}
                 >
@@ -535,7 +535,7 @@ export default function PromptInput({
       {!hasExistingCode && (
         <div className="mt-1">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] uppercase tracking-[2px] text-white/40">
+            <span className="text-[10px] uppercase tracking-[2px] text-white/50">
               Try an example
             </span>
             <button

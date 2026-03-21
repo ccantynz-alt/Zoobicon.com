@@ -1,9 +1,22 @@
 import { NextRequest } from "next/server";
 import { createResetToken } from "@/lib/resetToken";
 import { sendViaMailgun } from "@/lib/mailgun";
+import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+
+const resetLimiter = { limit: 2, windowMs: 60000 };
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIp(request);
+    const { allowed, resetAt } = checkRateLimit(`reset:${ip}`, resetLimiter);
+    if (!allowed) {
+      const retryAfter = Math.ceil((resetAt - Date.now()) / 1000);
+      return new Response(
+        JSON.stringify({ error: "Too many password reset requests. Please try again in a minute." }),
+        { status: 429, headers: { "Content-Type": "application/json", "Retry-After": String(retryAfter) } }
+      );
+    }
+
     const { email } = await request.json();
 
     if (!email || typeof email !== "string") {
