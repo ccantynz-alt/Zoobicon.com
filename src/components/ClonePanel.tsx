@@ -70,7 +70,7 @@ export default function ClonePanel({ onClone }: ClonePanelProps) {
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             placeholder="example.com"
-            className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white placeholder-white/20 focus:outline-none focus:border-brand-500/40 transition-colors"
+            className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white placeholder-white/50 focus:outline-none focus:border-brand-500/40 transition-colors"
             onKeyDown={(e) => e.key === "Enter" && handleClone()}
           />
         </div>

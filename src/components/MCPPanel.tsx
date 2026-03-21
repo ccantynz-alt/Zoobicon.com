@@ -382,7 +382,7 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
                               value={source.params[field.key] || ""}
                               onChange={(e) => updateParam(source.id, field.key, e.target.value)}
                               placeholder={field.placeholder}
-                              className="w-full mt-0.5 px-2 py-1.5 text-xs bg-white/5 border border-white/10 rounded focus:border-indigo-500/50 focus:outline-none text-white placeholder-white/20"
+                              className="w-full mt-0.5 px-2 py-1.5 text-xs bg-white/5 border border-white/10 rounded focus:border-indigo-500/50 focus:outline-none text-white placeholder-white/50"
                             />
                           </div>
                         ))}

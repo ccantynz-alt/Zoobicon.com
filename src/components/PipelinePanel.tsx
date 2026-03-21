@@ -277,7 +277,7 @@ export default function PipelinePanel({ onApplyCode }: PipelinePanelProps) {
           onChange={(e) => setPrompt(e.target.value)}
           placeholder="Describe the website you want built by our 7-agent team..."
           rows={3}
-          className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2.5 text-xs text-white placeholder-white/20 focus:outline-none focus:border-brand-500/40 transition-colors resize-none"
+          className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2.5 text-xs text-white placeholder-white/50 focus:outline-none focus:border-brand-500/40 transition-colors resize-none"
         />
 
         {/* Style selection */}

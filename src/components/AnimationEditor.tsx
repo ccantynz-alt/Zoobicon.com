@@ -493,7 +493,7 @@ export default function AnimationEditor({
                     }}
                     disabled={applyToAll}
                     placeholder="e.g., .hero, #about, section"
-                    className="flex-1 rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white placeholder-white/30 outline-none focus:border-blue-500 disabled:opacity-50"
+                    className="flex-1 rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white placeholder-white/50 outline-none focus:border-blue-500 disabled:opacity-50"
                   />
                   <button
                     onClick={() => setApplyToAll(!applyToAll)}
