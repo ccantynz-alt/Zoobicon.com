@@ -70,7 +70,7 @@ interface ReplicatePrediction {
 const REPLICATE_API = "https://api.replicate.com/v1";
 
 async function replicateHeaders(): Promise<Record<string, string>> {
-  const token = process.env.REPLICATE_API_TOKEN;
+  const token = process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY;
   if (!token) throw new Error("REPLICATE_API_TOKEN not configured");
   return {
     Authorization: `Bearer ${token}`,
@@ -496,7 +496,8 @@ async function checkKlingJob(taskId: string): Promise<RenderJob> {
  * Detect which video provider is configured.
  */
 export function getAvailableProvider(): VideoProvider | null {
-  if (process.env.REPLICATE_API_TOKEN) return "replicate";
+  // Accept common env var name variants
+  if (process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY) return "replicate";
   if (process.env.RUNWAY_API_KEY) return "runway";
   if (process.env.LUMA_API_KEY) return "luma";
   if (process.env.PIKA_API_KEY) return "pika";
@@ -509,7 +510,7 @@ export function getAvailableProvider(): VideoProvider | null {
  */
 export function getAllConfiguredProviders(): { provider: VideoProvider; configured: boolean; models: string[] }[] {
   return [
-    { provider: "replicate", configured: !!process.env.REPLICATE_API_TOKEN, models: ["Stable Video Diffusion XT", "FLUX"] },
+    { provider: "replicate", configured: !!(process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY), models: ["Stable Video Diffusion XT", "FLUX"] },
     { provider: "runway", configured: !!process.env.RUNWAY_API_KEY, models: ["Gen-3 Alpha Turbo"] },
     { provider: "luma", configured: !!process.env.LUMA_API_KEY, models: ["Dream Machine"] },
     { provider: "pika", configured: !!process.env.PIKA_API_KEY, models: ["Pika 1.5"] },

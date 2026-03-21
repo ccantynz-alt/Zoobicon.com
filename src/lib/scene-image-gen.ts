@@ -57,7 +57,7 @@ const STYLE_MODIFIERS: Record<string, string> = {
 // --- Provider detection ---
 
 export function getAvailableImageProvider(): ImageProvider | null {
-  if (process.env.REPLICATE_API_TOKEN) return "replicate";
+  if (process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY) return "replicate";
   if (process.env.OPENAI_API_KEY) return "openai";
   if (process.env.STABILITY_API_KEY) return "stability";
   return null;
@@ -68,7 +68,7 @@ export function getAvailableImageProvider(): ImageProvider | null {
 async function generateWithReplicate(
   request: SceneImageRequest
 ): Promise<SceneImageResult> {
-  const token = process.env.REPLICATE_API_TOKEN;
+  const token = process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY;
   if (!token) throw new Error("REPLICATE_API_TOKEN not configured");
 
   const dims = PLATFORM_DIMENSIONS[request.platform] || PLATFORM_DIMENSIONS.youtube;
