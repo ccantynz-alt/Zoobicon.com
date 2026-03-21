@@ -7,6 +7,13 @@ import {
   type RenderJob,
   type VideoProvider,
 } from "@/lib/video-render";
+import {
+  getVideoUsage,
+  getVideoPlanLimits,
+  checkVideoQuota,
+  incrementVideoUsage,
+  ensureVideoUsageTable,
+} from "@/lib/video-usage";
 
 export const maxDuration = 120;
 
@@ -17,7 +24,10 @@ export const maxDuration = 120;
  *   scenes: RenderScene[],
  *   style: string,
  *   platform: string,
- *   provider?: "replicate" | "runway" | "luma" | "pika" | "kling"
+ *   provider?: "replicate" | "runway" | "luma" | "pika" | "kling",
+ *   email?: string,
+ *   plan?: string,
+ *   hasAddon?: boolean,
  * }
  *
  * Returns: { jobId, jobs, status, totalScenes, completedScenes }
@@ -25,13 +35,34 @@ export const maxDuration = 120;
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { scenes, style, platform, provider } = body;
+    const { scenes, style, platform, provider, email, plan, hasAddon } = body;
 
     if (!scenes || !Array.isArray(scenes) || scenes.length === 0) {
       return Response.json(
         { error: "scenes array is required with at least one scene" },
         { status: 400 }
       );
+    }
+
+    // Quota enforcement
+    if (email) {
+      await ensureVideoUsageTable();
+      const limits = getVideoPlanLimits(plan || "free", !!hasAddon);
+      const usage = await getVideoUsage(email);
+      const check = checkVideoQuota(usage, limits, "render");
+      if (!check.allowed) {
+        return Response.json(
+          { error: check.reason, quota: { current: check.current, limit: check.limit, remaining: check.remaining } },
+          { status: 429 }
+        );
+      }
+      // Check if enough credits for all scenes
+      if (check.remaining < scenes.length) {
+        return Response.json(
+          { error: `Not enough render credits. Need ${scenes.length}, have ${check.remaining} remaining this month.`, quota: { current: check.current, limit: check.limit, remaining: check.remaining } },
+          { status: 429 }
+        );
+      }
     }
 
     if (!style) {
@@ -58,6 +89,11 @@ export async function POST(req: NextRequest) {
       platform: platform || "youtube",
       provider: activeProvider as VideoProvider,
     });
+
+    // Track usage after successful start
+    if (email) {
+      await incrementVideoUsage(email, "render", scenes.length);
+    }
 
     return Response.json(result);
   } catch (err) {

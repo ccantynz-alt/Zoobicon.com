@@ -6,6 +6,13 @@ import {
   type SceneImageRequest,
   type ImageProvider,
 } from "@/lib/scene-image-gen";
+import {
+  getVideoUsage,
+  getVideoPlanLimits,
+  checkVideoQuota,
+  incrementVideoUsage,
+  ensureVideoUsageTable,
+} from "@/lib/video-usage";
 
 export const maxDuration = 180;
 
@@ -15,19 +22,42 @@ export const maxDuration = 180;
  * Body: {
  *   scenes: SceneImageRequest[],
  *   provider?: "replicate" | "openai" | "stability",
- *   mode?: "single" | "all"   // Generate one scene or all
+ *   mode?: "single" | "all",
+ *   email?: string,
+ *   plan?: string,
+ *   hasAddon?: boolean,
  * }
  */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { scenes, provider, mode = "all" } = body;
+    const { scenes, provider, mode = "all", email, plan, hasAddon } = body;
 
     if (!scenes || !Array.isArray(scenes) || scenes.length === 0) {
       return Response.json(
         { error: "scenes array is required with at least one scene" },
         { status: 400 }
       );
+    }
+
+    // Quota enforcement
+    if (email) {
+      await ensureVideoUsageTable();
+      const limits = getVideoPlanLimits(plan || "free", !!hasAddon);
+      const usage = await getVideoUsage(email);
+      const check = checkVideoQuota(usage, limits, "image");
+      if (!check.allowed) {
+        return Response.json(
+          { error: check.reason, quota: { current: check.current, limit: check.limit, remaining: check.remaining } },
+          { status: 429 }
+        );
+      }
+      if (check.remaining < scenes.length) {
+        return Response.json(
+          { error: `Not enough image credits. Need ${scenes.length}, have ${check.remaining} remaining this month.`, quota: { current: check.current, limit: check.limit, remaining: check.remaining } },
+          { status: 429 }
+        );
+      }
     }
 
     const activeProvider = (provider || getAvailableImageProvider()) as ImageProvider | null;
@@ -49,6 +79,7 @@ export async function POST(req: NextRequest) {
     if (mode === "single") {
       const scene = scenes[0] as SceneImageRequest;
       const result = await generateSceneImage(scene, activeProvider);
+      if (email) await incrementVideoUsage(email, "image", 1);
       return Response.json({
         mode: "single",
         provider: activeProvider,
@@ -59,6 +90,7 @@ export async function POST(req: NextRequest) {
         scenes as SceneImageRequest[],
         activeProvider
       );
+      if (email) await incrementVideoUsage(email, "image", results.length);
       return Response.json({
         mode: "all",
         provider: activeProvider,

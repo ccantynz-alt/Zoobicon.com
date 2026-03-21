@@ -8,6 +8,13 @@ import {
   estimateVoiceoverDuration,
   type VoiceConfig,
 } from "@/lib/voiceover";
+import {
+  getVideoUsage,
+  getVideoPlanLimits,
+  checkVideoQuota,
+  incrementVideoUsage,
+  ensureVideoUsageTable,
+} from "@/lib/video-usage";
 
 export const maxDuration = 120;
 
@@ -15,24 +22,41 @@ export const maxDuration = 120;
  * POST /api/video-creator/voiceover — Generate voiceover from script
  *
  * Body: {
- *   script: string,              // Full script text
- *   scenes?: { sceneNumber: number, narration: string }[],  // Per-scene narration
- *   voiceId?: string,            // Voice preset ID or provider voice ID
+ *   script: string,
+ *   scenes?: { sceneNumber: number, narration: string }[],
+ *   voiceId?: string,
  *   provider?: "elevenlabs" | "playht",
- *   speed?: number,              // 0.5-2.0
- *   mode?: "full" | "per-scene"  // Generate one audio or per-scene clips
+ *   speed?: number,
+ *   mode?: "full" | "per-scene",
+ *   email?: string,
+ *   plan?: string,
+ *   hasAddon?: boolean,
  * }
  */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { script, scenes, voiceId, provider, speed, mode = "full" } = body;
+    const { script, scenes, voiceId, provider, speed, mode = "full", email, plan, hasAddon } = body;
 
     if (!script && (!scenes || scenes.length === 0)) {
       return Response.json(
         { error: "Either script or scenes array is required" },
         { status: 400 }
       );
+    }
+
+    // Quota enforcement
+    if (email) {
+      await ensureVideoUsageTable();
+      const limits = getVideoPlanLimits(plan || "free", !!hasAddon);
+      const usage = await getVideoUsage(email);
+      const check = checkVideoQuota(usage, limits, "voiceover");
+      if (!check.allowed) {
+        return Response.json(
+          { error: check.reason, quota: { current: check.current, limit: check.limit, remaining: check.remaining } },
+          { status: 429 }
+        );
+      }
     }
 
     const activeProvider = provider || getAvailableVoiceProvider();
@@ -66,6 +90,7 @@ export async function POST(req: NextRequest) {
 
     if (mode === "per-scene" && scenes && scenes.length > 0) {
       const results = await generateSceneVoiceovers(scenes, config);
+      if (email) await incrementVideoUsage(email, "voiceover", results.length);
       return Response.json({
         mode: "per-scene",
         provider: activeProvider,
@@ -75,6 +100,7 @@ export async function POST(req: NextRequest) {
       });
     } else {
       const result = await generateVoiceover(script, config);
+      if (email) await incrementVideoUsage(email, "voiceover", 1);
       return Response.json({
         mode: "full",
         ...result,

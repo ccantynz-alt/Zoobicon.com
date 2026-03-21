@@ -230,6 +230,14 @@ export default function VideoCreatorDashboard() {
   const [showHistory, setShowHistory] = useState(false);
   const [activeScene, setActiveScene] = useState(0);
 
+  // Quota / usage state
+  const [quota, setQuota] = useState<{
+    videos: { used: number; limit: number; pct: number };
+    images: { used: number; limit: number; pct: number };
+    renders: { used: number; limit: number; pct: number };
+    voiceovers: { used: number; limit: number; pct: number };
+  } | null>(null);
+
   // Auth check + addon/plan check
   useEffect(() => {
     try {
@@ -255,6 +263,44 @@ export default function VideoCreatorDashboard() {
     }
     setAuthChecked(true);
   }, [router]);
+
+  // Helper: get quota fields to include in API request bodies
+  const getQuotaFields = () => {
+    if (!user) return {};
+    const installedAddons = localStorage.getItem("zoobicon_installed_addons");
+    const addons: string[] = installedAddons ? JSON.parse(installedAddons) : [];
+    return {
+      email: user.email,
+      plan: user.plan || "free",
+      hasAddon: addons.includes("ai-video-creator"),
+    };
+  };
+
+  // Fetch usage quota from server
+  const fetchQuota = useCallback(async () => {
+    if (!user?.email) return;
+    try {
+      const installedAddons = localStorage.getItem("zoobicon_installed_addons");
+      const addons: string[] = installedAddons ? JSON.parse(installedAddons) : [];
+      const hasAddon = addons.includes("ai-video-creator");
+      const params = new URLSearchParams({
+        email: user.email,
+        plan: user.plan || "free",
+        addon: hasAddon ? "true" : "false",
+        scenes: storyboard ? String(storyboard.storyboard.length) : "6",
+      });
+      const res = await fetch(`/api/video-creator/quota?${params}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.usage) setQuota(data.usage);
+      }
+    } catch { /* ignore */ }
+  }, [user, storyboard]);
+
+  // Fetch quota on auth and after pipeline actions
+  useEffect(() => {
+    if (user?.email && hasVideoAddon) fetchQuota();
+  }, [user, hasVideoAddon, fetchQuota]);
 
   // Load project history
   useEffect(() => {
@@ -408,7 +454,7 @@ export default function VideoCreatorDashboard() {
       const res = await fetch("/api/video-creator/images", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ scenes }),
+        body: JSON.stringify({ scenes, ...getQuotaFields() }),
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
@@ -417,6 +463,7 @@ export default function VideoCreatorDashboard() {
       const data = await res.json();
       setSceneImages(data.images || []);
       setPipelineStage("idle");
+      fetchQuota(); // Refresh usage
     } catch (err) {
       setError(err instanceof Error ? err.message : "Image generation failed");
       setPipelineStage("idle");
@@ -450,6 +497,7 @@ export default function VideoCreatorDashboard() {
           style,
           platform,
           provider: selectedProvider || undefined,
+          ...getQuotaFields(),
         }),
       });
       if (!res.ok) {
@@ -487,6 +535,7 @@ export default function VideoCreatorDashboard() {
           jobs = data.jobs;
           if (data.status === "completed" || data.status === "failed") {
             setPipelineStage("idle");
+            fetchQuota(); // Refresh usage
             return;
           }
         }
@@ -510,6 +559,7 @@ export default function VideoCreatorDashboard() {
           script: storyboard.script,
           voiceId: selectedVoice,
           mode: "full",
+          ...getQuotaFields(),
         }),
       });
       if (!res.ok) {
@@ -519,6 +569,7 @@ export default function VideoCreatorDashboard() {
       const data = await res.json();
       setVoiceoverUrl(data.audioUrl || null);
       setPipelineStage("idle");
+      fetchQuota(); // Refresh usage
     } catch (err) {
       setError(err instanceof Error ? err.message : "Voiceover generation failed");
       setPipelineStage("idle");
@@ -1243,6 +1294,34 @@ export default function VideoCreatorDashboard() {
                                 View Plans
                               </Link>
                             </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Usage meter */}
+                      {hasVideoAddon && quota && (
+                        <div className="rounded-lg border border-white/[0.08] bg-white/[0.03] p-3 space-y-2">
+                          <div className="text-[10px] font-semibold text-white/50 uppercase tracking-wider">Monthly Usage</div>
+                          <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
+                            {[
+                              { label: "Videos", data: quota.videos },
+                              { label: "Images", data: quota.images },
+                              { label: "Renders", data: quota.renders },
+                              { label: "Voiceovers", data: quota.voiceovers },
+                            ].map((item) => (
+                              <div key={item.label} className="space-y-0.5">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-[10px] text-white/40">{item.label}</span>
+                                  <span className="text-[10px] text-white/60">{item.data.used}/{item.data.limit}</span>
+                                </div>
+                                <div className="h-1 rounded-full bg-white/[0.06] overflow-hidden">
+                                  <div
+                                    className={`h-full rounded-full transition-all ${item.data.pct >= 90 ? "bg-red-500" : item.data.pct >= 70 ? "bg-amber-500" : "bg-purple-500"}`}
+                                    style={{ width: `${Math.min(100, item.data.pct)}%` }}
+                                  />
+                                </div>
+                              </div>
+                            ))}
                           </div>
                         </div>
                       )}
