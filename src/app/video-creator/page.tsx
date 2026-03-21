@@ -42,6 +42,19 @@ import {
   X,
   Check,
   ArrowRight,
+  Mic,
+  ImagePlus,
+  Subtitles,
+  Wand2,
+  LayoutTemplate,
+  Volume2,
+  FileText,
+  Settings2,
+  ChevronDown,
+  AlertCircle,
+  CheckCircle2,
+  CircleDashed,
+  RefreshCw,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -73,6 +86,48 @@ interface Project {
   projectType: string;
   platform: string;
   storyboard: Storyboard | null;
+}
+
+interface RenderJob {
+  id: string;
+  provider: string;
+  sceneNumber: number;
+  status: "pending" | "processing" | "succeeded" | "failed";
+  videoUrl: string | null;
+  thumbnailUrl: string | null;
+  error: string | null;
+  progress?: number;
+}
+
+interface VoicePreset {
+  id: string;
+  name: string;
+  description: string;
+  category: "male" | "female" | "neutral";
+  tone: string;
+}
+
+interface PipelineCapabilities {
+  videoRender: { available: boolean };
+  voiceover: { available: boolean };
+  imageGen: { available: boolean };
+}
+
+type PipelineStage = "idle" | "images" | "video" | "voiceover" | "subtitles" | "complete";
+
+interface VideoTemplate {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  projectType: string;
+  platform: string;
+  duration: number;
+  style: string;
+  music: string;
+  thumbnail: string;
+  script: string;
+  tags: string[];
 }
 
 /* ------------------------------------------------------------------ */
@@ -135,8 +190,9 @@ const fadeIn = {
 
 export default function VideoCreatorDashboard() {
   const router = useRouter();
-  const [user, setUser] = useState<{ email: string; name?: string } | null>(null);
+  const [user, setUser] = useState<{ email: string; name?: string; plan?: string; role?: string } | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
+  const [hasVideoAddon, setHasVideoAddon] = useState(false);
 
   // Form state
   const [projectType, setProjectType] = useState("social-ad");
@@ -154,17 +210,52 @@ export default function VideoCreatorDashboard() {
   const [storyboard, setStoryboard] = useState<Storyboard | null>(null);
   const [error, setError] = useState("");
 
+  // Pipeline state
+  const [pipelineStage, setPipelineStage] = useState<PipelineStage>("idle");
+  const [capabilities, setCapabilities] = useState<PipelineCapabilities | null>(null);
+  const [renderJobs, setRenderJobs] = useState<RenderJob[]>([]);
+  const [renderProgress, setRenderProgress] = useState(0);
+  const [sceneImages, setSceneImages] = useState<{ sceneNumber: number; imageUrl: string }[]>([]);
+  const [voiceoverUrl, setVoiceoverUrl] = useState<string | null>(null);
+  const [voicePresets, setVoicePresets] = useState<VoicePreset[]>([]);
+  const [selectedVoice, setSelectedVoice] = useState("rachel");
+  const [subtitleData, setSubtitleData] = useState<{ srt: string; vtt: string } | null>(null);
+  const [showPipeline, setShowPipeline] = useState(false);
+  const [templates, setTemplates] = useState<VideoTemplate[]>([]);
+  const [showTemplates, setShowTemplates] = useState(false);
+  const [selectedProvider, setSelectedProvider] = useState("");
+
   // Project history
   const [projects, setProjects] = useState<Project[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   const [activeScene, setActiveScene] = useState(0);
 
-  // Auth check
+  // Quota / usage state
+  const [quota, setQuota] = useState<{
+    videos: { used: number; limit: number; pct: number; overage: number };
+    images: { used: number; limit: number; pct: number; overage: number };
+    renders: { used: number; limit: number; pct: number; overage: number };
+    voiceovers: { used: number; limit: number; pct: number; overage: number };
+  } | null>(null);
+  const [overagePacks, setOveragePacks] = useState<{ id: string; name: string; price: number; priceDisplay: string; videos: number; savings?: string }[]>([]);
+  const [showBuyCredits, setShowBuyCredits] = useState(false);
+  const [buyingCredits, setBuyingCredits] = useState(false);
+
+  // Auth check + addon/plan check
   useEffect(() => {
     try {
       const stored = localStorage.getItem("zoobicon_user");
       if (stored) {
-        setUser(JSON.parse(stored));
+        const parsed = JSON.parse(stored);
+        setUser(parsed);
+
+        // Check if user has video addon OR is on a paid plan
+        const installedAddons = localStorage.getItem("zoobicon_installed_addons");
+        const addons: string[] = installedAddons ? JSON.parse(installedAddons) : [];
+        const isPaidPlan = parsed.plan === "unlimited" || parsed.plan === "pro" || parsed.plan === "agency" || parsed.plan === "enterprise";
+        const isAdmin = parsed.role === "admin";
+        const hasAddon = addons.includes("ai-video-creator");
+        setHasVideoAddon(hasAddon || isPaidPlan || isAdmin);
       } else {
         router.push("/auth/login");
         return;
@@ -176,12 +267,67 @@ export default function VideoCreatorDashboard() {
     setAuthChecked(true);
   }, [router]);
 
+  // Helper: get quota fields to include in API request bodies
+  const getQuotaFields = () => {
+    if (!user) return {};
+    const installedAddons = localStorage.getItem("zoobicon_installed_addons");
+    const addons: string[] = installedAddons ? JSON.parse(installedAddons) : [];
+    return {
+      email: user.email,
+      plan: user.plan || "free",
+      hasAddon: addons.includes("ai-video-creator"),
+    };
+  };
+
+  // Fetch usage quota from server
+  const fetchQuota = useCallback(async () => {
+    if (!user?.email) return;
+    try {
+      const installedAddons = localStorage.getItem("zoobicon_installed_addons");
+      const addons: string[] = installedAddons ? JSON.parse(installedAddons) : [];
+      const hasAddon = addons.includes("ai-video-creator");
+      const params = new URLSearchParams({
+        email: user.email,
+        plan: user.plan || "free",
+        addon: hasAddon ? "true" : "false",
+        scenes: storyboard ? String(storyboard.storyboard.length) : "6",
+      });
+      const res = await fetch(`/api/video-creator/quota?${params}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.usage) setQuota(data.usage);
+        if (data.overagePacks) setOveragePacks(data.overagePacks);
+      }
+    } catch { /* ignore */ }
+  }, [user, storyboard]);
+
+  // Fetch quota on auth and after pipeline actions
+  useEffect(() => {
+    if (user?.email && hasVideoAddon) fetchQuota();
+  }, [user, hasVideoAddon, fetchQuota]);
+
   // Load project history
   useEffect(() => {
     try {
       const stored = localStorage.getItem("zoobicon_video_projects");
       if (stored) setProjects(JSON.parse(stored));
     } catch { /* ignore */ }
+  }, []);
+
+  // Load pipeline capabilities and templates
+  useEffect(() => {
+    fetch("/api/video-creator/assembly")
+      .then((r) => r.json())
+      .then((d) => { if (d.capabilities) setCapabilities(d.capabilities); })
+      .catch(() => {});
+    fetch("/api/video-creator/voiceover")
+      .then((r) => r.json())
+      .then((d) => { if (d.voices) setVoicePresets(d.voices); })
+      .catch(() => {});
+    fetch("/api/video-creator/templates")
+      .then((r) => r.json())
+      .then((d) => { if (d.templates) setTemplates(d.templates); })
+      .catch(() => {});
   }, []);
 
   const saveProject = useCallback((sb: Storyboard) => {
@@ -285,6 +431,269 @@ export default function VideoCreatorDashboard() {
     } finally {
       setGenerating(false);
     }
+  };
+
+  // --- Buy more credits ---
+  const handleBuyCredits = async (packId: string) => {
+    if (!user?.email) return;
+    setBuyingCredits(true);
+    try {
+      const res = await fetch("/api/video-creator/overage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: user.email, packId }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || "Failed to start checkout");
+      }
+      const data = await res.json();
+      if (data.url) window.location.href = data.url;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to purchase credits");
+    } finally {
+      setBuyingCredits(false);
+    }
+  };
+
+  // Handle returning from Stripe checkout
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("credits") === "purchased") {
+      // Refresh quota to show new credits
+      fetchQuota();
+      // Clean URL
+      window.history.replaceState({}, "", "/video-creator");
+    }
+  }, [fetchQuota]);
+
+  // --- Pipeline: Access check ---
+  const requireVideoAddon = (): boolean => {
+    if (hasVideoAddon) return true;
+    setError("Video pipeline requires the AI Video Creator add-on or a paid plan. Visit the Marketplace to purchase.");
+    return false;
+  };
+
+  // --- Pipeline: Generate Scene Images ---
+  const handleGenerateImages = async () => {
+    if (!requireVideoAddon()) return;
+    if (!storyboard) return;
+    setPipelineStage("images");
+    setError("");
+    try {
+      const scenes = storyboard.storyboard.map((s) => ({
+        sceneNumber: s.sceneNumber,
+        visualDescription: s.visualDescription,
+        colorPalette: s.colorPalette,
+        style,
+        platform,
+        textOverlay: s.textOverlay,
+      }));
+      const res = await fetch("/api/video-creator/images", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scenes, ...getQuotaFields() }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || "Image generation failed");
+      }
+      const data = await res.json();
+      setSceneImages(data.images || []);
+      setPipelineStage("idle");
+      fetchQuota(); // Refresh usage
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Image generation failed");
+      setPipelineStage("idle");
+    }
+  };
+
+  // --- Pipeline: Start Video Render ---
+  const handleStartRender = async () => {
+    if (!requireVideoAddon()) return;
+    if (!storyboard) return;
+    setPipelineStage("video");
+    setError("");
+    setRenderJobs([]);
+    setRenderProgress(0);
+    try {
+      const imageMap = new Map(sceneImages.map((i) => [i.sceneNumber, i.imageUrl]));
+      const scenes = storyboard.storyboard.map((s) => ({
+        sceneNumber: s.sceneNumber,
+        duration: s.duration,
+        visualDescription: s.visualDescription,
+        textOverlay: s.textOverlay,
+        colorPalette: s.colorPalette,
+        cameraMovement: s.cameraMovement,
+        imageUrl: imageMap.get(s.sceneNumber),
+      }));
+      const res = await fetch("/api/video-creator/render", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          scenes,
+          style,
+          platform,
+          provider: selectedProvider || undefined,
+          ...getQuotaFields(),
+        }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || "Render failed");
+      }
+      const data = await res.json();
+      setRenderJobs(data.jobs || []);
+      // Start polling
+      pollRenderStatus(data.jobs || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Render failed");
+      setPipelineStage("idle");
+    }
+  };
+
+  const pollRenderStatus = async (jobs: RenderJob[]) => {
+    let attempts = 0;
+    const maxAttempts = 120; // 10 min max
+    const poll = async () => {
+      if (attempts++ > maxAttempts) {
+        setPipelineStage("idle");
+        return;
+      }
+      try {
+        const res = await fetch("/api/video-creator/render", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ jobs }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setRenderJobs(data.jobs);
+          setRenderProgress(data.progress || 0);
+          jobs = data.jobs;
+          if (data.status === "completed" || data.status === "failed") {
+            setPipelineStage("idle");
+            fetchQuota(); // Refresh usage
+            return;
+          }
+        }
+      } catch { /* retry */ }
+      setTimeout(poll, 5000);
+    };
+    setTimeout(poll, 5000);
+  };
+
+  // --- Pipeline: Generate Voiceover ---
+  const handleGenerateVoiceover = async () => {
+    if (!requireVideoAddon()) return;
+    if (!storyboard) return;
+    setPipelineStage("voiceover");
+    setError("");
+    try {
+      const res = await fetch("/api/video-creator/voiceover", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          script: storyboard.script,
+          voiceId: selectedVoice,
+          mode: "full",
+          ...getQuotaFields(),
+        }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || "Voiceover generation failed");
+      }
+      const data = await res.json();
+      setVoiceoverUrl(data.audioUrl || null);
+      setPipelineStage("idle");
+      fetchQuota(); // Refresh usage
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Voiceover generation failed");
+      setPipelineStage("idle");
+    }
+  };
+
+  // --- Pipeline: Generate Subtitles ---
+  const handleGenerateSubtitles = async () => {
+    if (!requireVideoAddon()) return;
+    if (!storyboard) return;
+    setPipelineStage("subtitles");
+    setError("");
+    try {
+      const res = await fetch("/api/video-creator/subtitles", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          script: storyboard.script,
+          totalDuration: parseInt(storyboard.totalDuration) || duration,
+          format: "both",
+          captionPreset: platform.includes("tiktok") ? "tiktok-bold" : "youtube-standard",
+        }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || "Subtitle generation failed");
+      }
+      const data = await res.json();
+      setSubtitleData({ srt: data.srt, vtt: data.vtt });
+      setPipelineStage("idle");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Subtitle generation failed");
+      setPipelineStage("idle");
+    }
+  };
+
+  // --- Pipeline: Run Full Pipeline ---
+  const handleFullPipeline = async () => {
+    if (!requireVideoAddon()) return;
+    if (!storyboard) return;
+    setShowPipeline(true);
+    // Step 1: Images
+    await handleGenerateImages();
+    // Step 2: Voiceover (parallel with subtitles)
+    await Promise.all([
+      handleGenerateVoiceover(),
+      handleGenerateSubtitles(),
+    ]);
+    // Step 3: Video render (if provider available)
+    if (capabilities?.videoRender?.available) {
+      await handleStartRender();
+    }
+  };
+
+  // --- Template: Apply template ---
+  const handleApplyTemplate = (template: VideoTemplate) => {
+    setProjectType(template.projectType);
+    setPlatform(template.platform);
+    setDuration(template.duration);
+    setStyle(template.style);
+    setMusic(template.music);
+    setScript(template.script);
+    setShowTemplates(false);
+  };
+
+  // --- Export: Download subtitle files ---
+  const exportSubtitleSRT = () => {
+    if (!subtitleData?.srt) return;
+    const blob = new Blob([subtitleData.srt], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `subtitles-${Date.now()}.srt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportSubtitleVTT = () => {
+    if (!subtitleData?.vtt) return;
+    const blob = new Blob([subtitleData.vtt], { type: "text/vtt" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `subtitles-${Date.now()}.vtt`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   // Export functions
@@ -441,8 +850,50 @@ export default function VideoCreatorDashboard() {
               {/* Header */}
               <motion.div initial="hidden" animate="visible" variants={fadeIn}>
                 <h1 className="text-2xl font-black tracking-tight mb-1">AI Video Creator</h1>
-                <p className="text-sm text-white/50">Generate storyboards and scripts with AI. Video rendering coming soon.</p>
+                <p className="text-sm text-white/50">Full video pipeline: storyboard, images, rendering, voiceover & subtitles.</p>
+                <div className="flex gap-2 mt-2">
+                  <button
+                    onClick={() => setShowTemplates(!showTemplates)}
+                    className="px-3 py-1.5 rounded-lg border border-white/[0.10] bg-white/[0.05] text-xs text-white/60 hover:text-white hover:bg-white/[0.10] transition-all flex items-center gap-1.5"
+                  >
+                    <LayoutTemplate className="w-3 h-3" />
+                    Templates ({templates.length})
+                  </button>
+                </div>
               </motion.div>
+
+              {/* Template selector */}
+              <AnimatePresence>
+                {showTemplates && templates.length > 0 && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="rounded-xl border border-white/[0.10] bg-white/[0.03] p-3 space-y-2">
+                      <div className="text-xs font-semibold text-white/60">Quick Start Templates</div>
+                      <div className="grid grid-cols-2 gap-1.5 max-h-48 overflow-y-auto">
+                        {templates.slice(0, 12).map((t) => (
+                          <button
+                            key={t.id}
+                            onClick={() => handleApplyTemplate(t)}
+                            className="p-2 rounded-lg border border-white/[0.06] bg-white/[0.02] hover:border-purple-500/30 hover:bg-purple-500/5 transition-all text-left group"
+                          >
+                            <div className={`w-full h-6 rounded bg-gradient-to-r ${t.thumbnail} mb-1.5`} />
+                            <div className="text-[10px] font-semibold text-white/80 group-hover:text-white truncate">{t.name}</div>
+                            <div className="text-[9px] text-white/30 truncate">{t.description}</div>
+                            <div className="flex gap-1 mt-1">
+                              <span className="text-[8px] bg-white/[0.06] px-1 py-0.5 rounded text-white/30">{t.duration}s</span>
+                              <span className="text-[8px] bg-white/[0.06] px-1 py-0.5 rounded text-white/30">{t.platform}</span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* Project Type */}
               <motion.div initial="hidden" animate="visible" variants={fadeIn} className="space-y-2">
@@ -654,6 +1105,11 @@ export default function VideoCreatorDashboard() {
                 {error && (
                   <div className="mt-2 text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
                     {error}
+                    {error.includes("add-on") && (
+                      <Link href="/marketplace?search=video" className="ml-2 text-amber-400 underline hover:text-amber-300">
+                        Get the add-on
+                      </Link>
+                    )}
                   </div>
                 )}
               </motion.div>
@@ -727,15 +1183,33 @@ export default function VideoCreatorDashboard() {
                       >
                         {/* Scene visual preview */}
                         <div
-                          className="h-56 relative flex items-center justify-center"
+                          className="h-56 relative flex items-center justify-center overflow-hidden"
                           style={{
                             background: storyboard.storyboard[activeScene]?.colorPalette?.length
                               ? `linear-gradient(135deg, ${storyboard.storyboard[activeScene].colorPalette[0]}40, ${(storyboard.storyboard[activeScene].colorPalette[1] || storyboard.storyboard[activeScene].colorPalette[0])}40)`
                               : `linear-gradient(135deg, ${brandColors[0]}40, ${brandColors[1]}40)`,
                           }}
                         >
-                          <div className="text-center px-8">
-                            <div className="text-3xl font-black mb-2 text-white/90">
+                          {/* Show AI-generated scene image if available */}
+                          {sceneImages.find((img) => img.sceneNumber === storyboard.storyboard[activeScene]?.sceneNumber) && (
+                            <img
+                              src={sceneImages.find((img) => img.sceneNumber === storyboard.storyboard[activeScene]?.sceneNumber)?.imageUrl}
+                              alt={`Scene ${storyboard.storyboard[activeScene]?.sceneNumber}`}
+                              className="absolute inset-0 w-full h-full object-cover"
+                            />
+                          )}
+                          {/* Show rendered video if available */}
+                          {renderJobs.find((j) => j.sceneNumber === storyboard.storyboard[activeScene]?.sceneNumber && j.status === "succeeded" && j.videoUrl) && (
+                            <video
+                              src={renderJobs.find((j) => j.sceneNumber === storyboard.storyboard[activeScene]?.sceneNumber && j.status === "succeeded")?.videoUrl || undefined}
+                              className="absolute inset-0 w-full h-full object-cover"
+                              controls
+                              muted
+                              loop
+                            />
+                          )}
+                          <div className="relative text-center px-8 z-10">
+                            <div className="text-3xl font-black mb-2 text-white/90 drop-shadow-lg">
                               Scene {storyboard.storyboard[activeScene]?.sceneNumber}
                             </div>
                             {storyboard.storyboard[activeScene]?.textOverlay && (
@@ -815,18 +1289,328 @@ export default function VideoCreatorDashboard() {
                       </div>
                     )}
 
-                    {/* Coming soon notice */}
-                    <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
-                        <Film className="w-4 h-4 text-amber-400" />
-                      </div>
-                      <div>
-                        <div className="text-sm font-semibold text-amber-300 mb-0.5">Video rendering coming soon</div>
-                        <div className="text-xs text-white/50">
-                          Storyboard and script generation is live. Actual video rendering via AI (Runway, Pika, Sora) is in development.
-                          Export your storyboard and use it with any video editing tool in the meantime.
+                    {/* ---- Video Production Pipeline ---- */}
+                    <div className="rounded-xl border border-purple-500/20 bg-purple-500/5 p-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                            <Wand2 className="w-4 h-4 text-purple-400" />
+                          </div>
+                          <div>
+                            <div className="text-sm font-semibold text-purple-300">Video Production Pipeline</div>
+                            <div className="text-[10px] text-white/40">Generate images, render video, add voiceover & subtitles</div>
+                          </div>
                         </div>
+                        <button
+                          onClick={() => setShowPipeline(!showPipeline)}
+                          className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+                        >
+                          <ChevronDown className={`w-4 h-4 text-white/40 transition-transform ${showPipeline ? "rotate-180" : ""}`} />
+                        </button>
                       </div>
+
+                      {/* Upgrade prompt for free users */}
+                      {!hasVideoAddon && (
+                        <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-3 flex items-start gap-2.5">
+                          <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                          <div className="flex-1">
+                            <div className="text-xs font-semibold text-amber-300 mb-0.5">Add-on required for full pipeline</div>
+                            <div className="text-[10px] text-white/40 mb-2">
+                              Storyboard and script generation are free. Video rendering, voiceover, image generation, and subtitles require the AI Video Creator add-on ($19/mo) or a paid plan.
+                            </div>
+                            <div className="flex gap-2">
+                              <Link
+                                href="/marketplace?search=video"
+                                className="px-3 py-1.5 rounded-md bg-amber-500/20 text-amber-300 text-[10px] font-semibold hover:bg-amber-500/30 transition-colors"
+                              >
+                                Get Video Add-on — $19/mo
+                              </Link>
+                              <Link
+                                href="/pricing"
+                                className="px-3 py-1.5 rounded-md bg-white/[0.06] text-white/50 text-[10px] font-medium hover:bg-white/[0.10] transition-colors"
+                              >
+                                View Plans
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Usage meter */}
+                      {hasVideoAddon && quota && (
+                        <div className="rounded-lg border border-white/[0.08] bg-white/[0.03] p-3 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <div className="text-[10px] font-semibold text-white/50 uppercase tracking-wider">Monthly Usage</div>
+                            <button
+                              onClick={() => setShowBuyCredits(!showBuyCredits)}
+                              className="text-[10px] font-medium text-purple-400 hover:text-purple-300 transition-colors"
+                            >
+                              Buy More Credits
+                            </button>
+                          </div>
+                          <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
+                            {[
+                              { label: "Videos", data: quota.videos },
+                              { label: "Images", data: quota.images },
+                              { label: "Renders", data: quota.renders },
+                              { label: "Voiceovers", data: quota.voiceovers },
+                            ].map((item) => (
+                              <div key={item.label} className="space-y-0.5">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-[10px] text-white/40">{item.label}</span>
+                                  <span className="text-[10px] text-white/60">
+                                    {item.data.used}/{item.data.limit}
+                                    {item.data.overage > 0 && (
+                                      <span className="text-emerald-400"> +{item.data.overage}</span>
+                                    )}
+                                  </span>
+                                </div>
+                                <div className="h-1 rounded-full bg-white/[0.06] overflow-hidden">
+                                  <div
+                                    className={`h-full rounded-full transition-all ${item.data.pct >= 90 ? "bg-red-500" : item.data.pct >= 70 ? "bg-amber-500" : "bg-purple-500"}`}
+                                    style={{ width: `${Math.min(100, item.data.pct)}%` }}
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Buy credits panel */}
+                          <AnimatePresence>
+                            {showBuyCredits && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                className="overflow-hidden"
+                              >
+                                <div className="pt-2 space-y-1.5 border-t border-white/[0.06]">
+                                  <div className="text-[10px] text-white/40 mb-1">One-time credit packs (valid 90 days):</div>
+                                  {overagePacks.map((pack) => (
+                                    <button
+                                      key={pack.id}
+                                      onClick={() => handleBuyCredits(pack.id)}
+                                      disabled={buyingCredits}
+                                      className="w-full flex items-center justify-between p-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.06] transition-colors text-left disabled:opacity-50"
+                                    >
+                                      <div>
+                                        <div className="text-[11px] font-medium text-white/80">{pack.name}</div>
+                                        {pack.savings && (
+                                          <div className="text-[9px] text-emerald-400 font-medium">{pack.savings}</div>
+                                        )}
+                                      </div>
+                                      <div className="text-xs font-bold text-purple-400">{pack.priceDisplay}</div>
+                                    </button>
+                                  ))}
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      )}
+
+                      {/* Quota exceeded prompt */}
+                      {error && error.includes("limit reached") && (
+                        <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3 space-y-2">
+                          <div className="text-xs font-semibold text-red-300">Usage Limit Reached</div>
+                          <div className="text-[10px] text-white/50">{error}</div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => setShowBuyCredits(true)}
+                              className="px-3 py-1.5 rounded-md bg-purple-600 text-white text-[10px] font-semibold hover:bg-purple-500 transition-colors"
+                            >
+                              Buy More Credits
+                            </button>
+                            <Link
+                              href="/pricing"
+                              className="px-3 py-1.5 rounded-md bg-white/[0.06] text-white/50 text-[10px] font-medium hover:bg-white/[0.10] transition-colors"
+                            >
+                              Upgrade Plan
+                            </Link>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Pipeline stages summary */}
+                      <div className="grid grid-cols-4 gap-2">
+                        {[
+                          { label: "Images", done: sceneImages.length > 0, active: pipelineStage === "images", icon: ImagePlus },
+                          { label: "Video", done: renderJobs.some((j) => j.status === "succeeded"), active: pipelineStage === "video", icon: Film },
+                          { label: "Voice", done: !!voiceoverUrl, active: pipelineStage === "voiceover", icon: Mic },
+                          { label: "Subs", done: !!subtitleData, active: pipelineStage === "subtitles", icon: Subtitles },
+                        ].map((s) => (
+                          <div key={s.label} className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-[10px] font-medium ${
+                            s.active ? "bg-purple-500/20 text-purple-300" : s.done ? "bg-green-500/10 text-green-400" : "bg-white/[0.03] text-white/40"
+                          }`}>
+                            {s.active ? <Loader2 className="w-3 h-3 animate-spin" /> : s.done ? <CheckCircle2 className="w-3 h-3" /> : <CircleDashed className="w-3 h-3" />}
+                            {s.label}
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Full pipeline button */}
+                      <button
+                        onClick={handleFullPipeline}
+                        disabled={pipelineStage !== "idle"}
+                        className="w-full py-2.5 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      >
+                        {pipelineStage !== "idle" ? (
+                          <>
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            Running pipeline...
+                          </>
+                        ) : (
+                          <>
+                            <Wand2 className="w-3.5 h-3.5" />
+                            Run Full Pipeline
+                          </>
+                        )}
+                      </button>
+
+                      {/* Expanded pipeline controls */}
+                      <AnimatePresence>
+                        {showPipeline && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="space-y-3 overflow-hidden"
+                          >
+                            {/* Voice selection */}
+                            <div className="space-y-1.5">
+                              <div className="text-[10px] text-white/50 uppercase tracking-wider flex items-center gap-1">
+                                <Volume2 className="w-3 h-3" /> Voice
+                              </div>
+                              <div className="flex flex-wrap gap-1.5">
+                                {(voicePresets.length > 0 ? voicePresets : [
+                                  { id: "rachel", name: "Rachel", category: "female", tone: "professional" },
+                                  { id: "drew", name: "Drew", category: "male", tone: "warm" },
+                                  { id: "domi", name: "Domi", category: "female", tone: "energetic" },
+                                  { id: "josh", name: "Josh", category: "male", tone: "dynamic" },
+                                ] as VoicePreset[]).slice(0, 6).map((v) => (
+                                  <button
+                                    key={v.id}
+                                    onClick={() => setSelectedVoice(v.id)}
+                                    className={`px-2.5 py-1 rounded-md border text-[10px] font-medium transition-all ${
+                                      selectedVoice === v.id
+                                        ? "border-purple-500/50 bg-purple-500/10 text-purple-300"
+                                        : "border-white/[0.08] text-white/50 hover:border-white/20"
+                                    }`}
+                                  >
+                                    {v.name} <span className="text-white/30">({v.tone})</span>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Individual stage buttons */}
+                            <div className="grid grid-cols-2 gap-2">
+                              <button
+                                onClick={handleGenerateImages}
+                                disabled={pipelineStage !== "idle"}
+                                className="py-2 rounded-lg border border-white/[0.10] bg-white/[0.05] text-xs text-white/70 hover:text-white hover:bg-white/[0.10] transition-all flex items-center justify-center gap-1.5 disabled:opacity-30"
+                              >
+                                {pipelineStage === "images" ? <Loader2 className="w-3 h-3 animate-spin" /> : <ImagePlus className="w-3 h-3" />}
+                                {sceneImages.length > 0 ? "Regenerate Images" : "Generate Images"}
+                              </button>
+                              <button
+                                onClick={handleStartRender}
+                                disabled={pipelineStage !== "idle"}
+                                className="py-2 rounded-lg border border-white/[0.10] bg-white/[0.05] text-xs text-white/70 hover:text-white hover:bg-white/[0.10] transition-all flex items-center justify-center gap-1.5 disabled:opacity-30"
+                              >
+                                {pipelineStage === "video" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Film className="w-3 h-3" />}
+                                Render Video
+                              </button>
+                              <button
+                                onClick={handleGenerateVoiceover}
+                                disabled={pipelineStage !== "idle"}
+                                className="py-2 rounded-lg border border-white/[0.10] bg-white/[0.05] text-xs text-white/70 hover:text-white hover:bg-white/[0.10] transition-all flex items-center justify-center gap-1.5 disabled:opacity-30"
+                              >
+                                {pipelineStage === "voiceover" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Mic className="w-3 h-3" />}
+                                {voiceoverUrl ? "Regenerate Voice" : "Generate Voice"}
+                              </button>
+                              <button
+                                onClick={handleGenerateSubtitles}
+                                disabled={pipelineStage !== "idle"}
+                                className="py-2 rounded-lg border border-white/[0.10] bg-white/[0.05] text-xs text-white/70 hover:text-white hover:bg-white/[0.10] transition-all flex items-center justify-center gap-1.5 disabled:opacity-30"
+                              >
+                                {pipelineStage === "subtitles" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Subtitles className="w-3 h-3" />}
+                                {subtitleData ? "Regenerate Subs" : "Generate Subtitles"}
+                              </button>
+                            </div>
+
+                            {/* Render progress */}
+                            {renderJobs.length > 0 && (
+                              <div className="space-y-2">
+                                <div className="flex items-center justify-between text-[10px] text-white/50">
+                                  <span>Render Progress</span>
+                                  <span>{renderProgress}%</span>
+                                </div>
+                                <div className="w-full h-1.5 bg-white/[0.08] rounded-full overflow-hidden">
+                                  <motion.div
+                                    className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${renderProgress}%` }}
+                                    transition={{ duration: 0.5 }}
+                                  />
+                                </div>
+                                <div className="grid grid-cols-5 gap-1">
+                                  {renderJobs.map((job) => (
+                                    <div key={job.id} className={`text-center py-1 rounded text-[9px] font-medium ${
+                                      job.status === "succeeded" ? "bg-green-500/10 text-green-400" :
+                                      job.status === "failed" ? "bg-red-500/10 text-red-400" :
+                                      job.status === "processing" ? "bg-blue-500/10 text-blue-400" :
+                                      "bg-white/[0.03] text-white/30"
+                                    }`}>
+                                      S{job.sceneNumber}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Voiceover player */}
+                            {voiceoverUrl && (
+                              <div className="space-y-1.5">
+                                <div className="text-[10px] text-white/50 uppercase tracking-wider flex items-center gap-1">
+                                  <Volume2 className="w-3 h-3" /> Voiceover Preview
+                                </div>
+                                <audio controls src={voiceoverUrl} className="w-full h-8 [&::-webkit-media-controls-panel]:bg-white/5 rounded" />
+                              </div>
+                            )}
+
+                            {/* Subtitle exports */}
+                            {subtitleData && (
+                              <div className="flex gap-2">
+                                <button onClick={exportSubtitleSRT} className="flex-1 py-1.5 rounded-lg border border-white/[0.10] bg-white/[0.05] text-[10px] text-white/60 hover:text-white hover:bg-white/[0.10] transition-all flex items-center justify-center gap-1">
+                                  <FileText className="w-3 h-3" /> Download .srt
+                                </button>
+                                <button onClick={exportSubtitleVTT} className="flex-1 py-1.5 rounded-lg border border-white/[0.10] bg-white/[0.05] text-[10px] text-white/60 hover:text-white hover:bg-white/[0.10] transition-all flex items-center justify-center gap-1">
+                                  <FileText className="w-3 h-3" /> Download .vtt
+                                </button>
+                              </div>
+                            )}
+
+                            {/* Provider status */}
+                            {capabilities && (
+                              <div className="text-[10px] text-white/30 space-y-0.5 pt-1 border-t border-white/[0.06]">
+                                <div className="flex items-center gap-1">
+                                  {capabilities.imageGen.available ? <CheckCircle2 className="w-3 h-3 text-green-500" /> : <AlertCircle className="w-3 h-3 text-amber-500" />}
+                                  Image Gen: {capabilities.imageGen.available ? "Ready" : "No provider configured"}
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  {capabilities.videoRender.available ? <CheckCircle2 className="w-3 h-3 text-green-500" /> : <AlertCircle className="w-3 h-3 text-amber-500" />}
+                                  Video Render: {capabilities.videoRender.available ? "Ready (Runway/Luma/Pika/Kling)" : "No provider configured"}
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  {capabilities.voiceover.available ? <CheckCircle2 className="w-3 h-3 text-green-500" /> : <AlertCircle className="w-3 h-3 text-amber-500" />}
+                                  Voiceover: {capabilities.voiceover.available ? "Ready" : "No provider configured"}
+                                </div>
+                              </div>
+                            )}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
                   </div>
                 ) : (

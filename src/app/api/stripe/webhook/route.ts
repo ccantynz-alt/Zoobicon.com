@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import { sql } from "@/lib/db";
 import { recordPurchase } from "@/lib/addon-delivery";
+import { OVERAGE_PACKS, addOverageCredits } from "@/lib/video-usage";
 
 /**
  * POST /api/stripe/webhook
@@ -41,6 +42,17 @@ export async function POST(request: NextRequest) {
         // Check if this is a marketplace add-on purchase
         const addonId = session.metadata?.addonId;
         const addonName = session.metadata?.addonName;
+
+        // Video overage credit pack purchase
+        if (session.metadata?.type === "video_overage") {
+          const packId = session.metadata?.packId;
+          const pack = OVERAGE_PACKS.find((p) => p.id === packId);
+          if (pack) {
+            await addOverageCredits(email, pack, session.id);
+            console.log(`[webhook] Video credits fulfilled: ${pack.name} for ${email}`);
+          }
+          break;
+        }
 
         if (addonId && addonName) {
           // Record the add-on purchase for delivery
