@@ -44,14 +44,14 @@ const PLATFORMS = [
 ];
 
 const FEATURES = [
-  { icon: Wand2, title: "No Scripts Needed", desc: "Just describe what you want. AI handles scripting, visual direction, transitions, and timing." },
-  { icon: Music, title: "AI Music & Sound", desc: "Auto-matched royalty-free music and sound effects. Trending audio for social platforms." },
-  { icon: Type, title: "Dynamic Captions", desc: "Auto-generated captions with animated text overlays. Accessibility and engagement in one." },
-  { icon: Palette, title: "Brand Consistency", desc: "Upload your brand kit. Every video uses your colors, fonts, and logo placement automatically." },
-  { icon: Layers, title: "Scene Composition", desc: "AI composes multi-scene videos with smooth transitions, B-roll, and visual storytelling." },
-  { icon: Scissors, title: "Auto-Edit", desc: "AI cuts, trims, paces, and optimizes for maximum watch time on each platform." },
-  { icon: Share2, title: "Multi-Platform Export", desc: "One video, all platforms. Auto-resized and re-formatted for every social network." },
-  { icon: BarChart3, title: "Performance Prediction", desc: "AI scores your video before publishing. Predicts engagement, reach, and virality potential." },
+  { icon: Wand2, title: "AI Script & Storyboard", desc: "Describe your video and AI writes the script, plans scenes, camera movements, transitions, and timing." },
+  { icon: Music, title: "Music Direction", desc: "AI generates music mood cues and timing for each scene. Pairs with your preferred royalty-free library." },
+  { icon: Type, title: "Auto Captions", desc: "Auto-generated SRT/VTT subtitles with 5 caption styles: TikTok Bold, Instagram Clean, YouTube Standard, Cinematic, Energetic." },
+  { icon: Palette, title: "Brand Consistency", desc: "Set your brand colors and fonts. Every storyboard, scene image, and caption uses your brand kit." },
+  { icon: Layers, title: "Scene-by-Scene Images", desc: "AI generates images for each scene using your storyboard. Supports Replicate (FLUX), DALL-E 3, and Stability AI." },
+  { icon: Scissors, title: "AI Voiceover", desc: "10 premium voices via ElevenLabs with adjustable speed and clarity. Browser TTS fallback for free plans." },
+  { icon: Share2, title: "Multi-Platform Formats", desc: "TikTok, Instagram Reels, YouTube, LinkedIn, Twitter — correct aspect ratios and format specs for each." },
+  { icon: BarChart3, title: "Video Rendering (Coming Soon)", desc: "Scene-by-scene video generation via Runway Gen-3, Luma Dream Machine, Pika, and Kling. Currently in development." },
 ];
 
 const STYLES = [
@@ -164,8 +164,8 @@ export default function VideoCreatorPage() {
             </motion.h1>
 
             <motion.p variants={fadeInUp} className="max-w-2xl text-lg md:text-xl text-white/60 leading-relaxed mb-6">
-              Create scroll-stopping videos for every platform. No scripts. No storyboards. No editing.
-              Just describe what you want and get broadcast-quality video in minutes.
+              Create scroll-stopping videos for every platform. AI writes your script, builds your storyboard,
+              generates scene images, voiceover, and subtitles — just describe what you want.
             </motion.p>
 
             <motion.div variants={fadeInUp} className="flex flex-wrap items-center gap-3 mb-10">
