@@ -411,6 +411,7 @@ function BuilderPage() {
   const [deployStatus, setDeployStatus] = useState<"idle" | "deploying" | "deployed" | "error">("idle");
   const [pipelineAgents, setPipelineAgents] = useState<string[]>([]);
   const [selectedModel, setSelectedModel] = useState("");  // Empty = use pipeline's smart routing (Haiku/Opus/Sonnet)
+  const [instantMode, setInstantMode] = useState(true); // Instant scaffold mode — 3s first preview
   const [availableModels, setAvailableModels] = useState<AIModel[]>([]);
   const [reactSource, setReactSource] = useState<Record<string, string> | null>(null);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
@@ -1024,6 +1025,11 @@ function BuilderPage() {
             if (event.type === "chunk" && event.content) {
               accumulated += event.content;
               onChunk?.(accumulated);
+            } else if (event.type === "scaffold" && event.content) {
+              // Instant mode: scaffold arrived — show immediately
+              accumulated = event.content;
+              onChunk?.(accumulated);
+              setPipelineAgents(prev => [...prev, "Scaffold loaded — customizing..."]);
             } else if (event.type === "replace" && event.content) {
               accumulated = event.content;
               onChunk?.(accumulated);
@@ -1062,10 +1068,17 @@ function BuilderPage() {
     };
 
     try {
-      // Both tiers use /api/generate/quick — Standard gets Sonnet, Premium gets Opus
-      setPipelineAgents([tier === "premium" ? "Building premium website..." : "Generating website..."]);
+      // Instant mode uses /api/generate/instant (3s scaffold), Classic uses /api/generate/quick
+      const endpoint = instantMode ? "/api/generate/instant" : "/api/generate/quick";
+      setPipelineAgents([
+        instantMode
+          ? "Instant scaffold loading..."
+          : tier === "premium"
+          ? "Building premium website..."
+          : "Generating website...",
+      ]);
 
-      const res = await fetch("/api/generate/quick", {
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1117,7 +1130,7 @@ function BuilderPage() {
       setError(cleanErrorMessage(errMsg));
       setStatus("error");
     }
-  }, [prompt, tier, autoReplaceImages, selectedModel]);
+  }, [prompt, tier, autoReplaceImages, selectedModel, instantMode]);
 
   const handleEdit = useCallback(async () => {
     if (!editPrompt.trim() || !generatedCode) return;
@@ -1514,6 +1527,17 @@ function BuilderPage() {
                 placeholder="Describe the website you want to build..."
                 className="flex-1 bg-transparent text-white text-base placeholder-white/50 outline-none"
               />
+              <button
+                onClick={() => setInstantMode(!instantMode)}
+                className={`px-3 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-wider transition-all border ${
+                  instantMode
+                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                    : "bg-white/5 border-white/10 text-white/40"
+                }`}
+                title={instantMode ? "Instant: 3s preview" : "Classic: full pipeline"}
+              >
+                {instantMode ? "⚡ Instant" : "Classic"}
+              </button>
               <button
                 onClick={handleGenerate}
                 disabled={!prompt.trim() || status === "generating"}

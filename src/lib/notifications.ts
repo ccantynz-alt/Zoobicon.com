@@ -15,7 +15,13 @@ export type NotificationType =
   | "weekly_report"
   | "referral"
   | "challenge"
-  | "system";
+  | "system"
+  | "auto_pilot"
+  | "competitor_alert"
+  | "traffic_spike"
+  | "booking_reminder"
+  | "invoice_paid"
+  | "subscriber_milestone";
 
 export interface Notification {
   id: string;
@@ -214,5 +220,85 @@ export function notifySystem(title: string, description: string, link?: string):
     title,
     description,
     link,
+  });
+}
+
+// ── Smart Notification Helpers (Auto-Pilot, Intel, Business OS) ──
+
+export function notifyAutoPilot(
+  siteName: string,
+  scoreBefore: number,
+  scoreAfter: number,
+  findingsCount: number
+): void {
+  const improved = scoreAfter > scoreBefore;
+  addNotification({
+    type: "auto_pilot",
+    title: improved ? "Auto-Pilot improved your site" : "Auto-Pilot audit complete",
+    description: improved
+      ? `SEO score for "${siteName}" improved from ${scoreBefore} to ${scoreAfter}. ${findingsCount} issues found.`
+      : `"${siteName}" scored ${scoreAfter}/100. ${findingsCount} recommendations available.`,
+    link: "/dashboard",
+    metadata: { siteName, scoreBefore, scoreAfter, findingsCount },
+  });
+}
+
+export function notifyCompetitorAlert(
+  competitorName: string,
+  alertType: string,
+  summary: string
+): void {
+  const typeLabels: Record<string, string> = {
+    price_change: "changed pricing",
+    new_feature: "launched a new feature",
+    tech_change: "updated their tech stack",
+    new_launch: "made a major announcement",
+  };
+  addNotification({
+    type: "competitor_alert",
+    title: `${competitorName} ${typeLabels[alertType] || "update detected"}`,
+    description: summary,
+    link: "/admin/intel",
+    metadata: { competitorName, alertType },
+  });
+}
+
+export function notifyTrafficSpike(siteName: string, views: number, percentIncrease: number): void {
+  addNotification({
+    type: "traffic_spike",
+    title: "Traffic spike detected!",
+    description: `"${siteName}" received ${views.toLocaleString()} views — up ${percentIncrease}% from average.`,
+    link: "/analytics",
+    metadata: { siteName, views, percentIncrease },
+  });
+}
+
+export function notifyBookingReminder(clientName: string, time: string): void {
+  addNotification({
+    type: "booking_reminder",
+    title: "Upcoming booking",
+    description: `Appointment with ${clientName} at ${time}.`,
+    link: "/booking",
+    metadata: { clientName, time },
+  });
+}
+
+export function notifyInvoicePaid(clientName: string, amount: string): void {
+  addNotification({
+    type: "invoice_paid",
+    title: "Invoice paid!",
+    description: `${clientName} paid ${amount}.`,
+    link: "/invoicing",
+    metadata: { clientName, amount },
+  });
+}
+
+export function notifySubscriberMilestone(listName: string, count: number): void {
+  addNotification({
+    type: "subscriber_milestone",
+    title: "Subscriber milestone!",
+    description: `Your "${listName}" list reached ${count.toLocaleString()} subscribers.`,
+    link: "/email-marketing",
+    metadata: { listName, count },
   });
 }
