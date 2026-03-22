@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { getGeneratorDef } from "@/lib/generator-prompts";
 import TopBar from "@/components/TopBar";
 import PromptInput from "@/components/PromptInput";
@@ -477,6 +478,22 @@ function BuilderPage() {
   const abortRef = useRef<AbortController | null>(null);
   const generationIdRef = useRef(0); // Tracks current generation to prevent stale image replacements
   const hasCode = generatedCode.length > 0;
+
+  // Get user email for auth headers
+  const getUserEmail = useCallback(() => {
+    try {
+      const u = localStorage.getItem("zoobicon_user");
+      if (u) return JSON.parse(u).email || "";
+    } catch {}
+    return "";
+  }, []);
+
+  const authHeaders = useCallback(() => {
+    const email = getUserEmail();
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (email) headers["x-user-email"] = email;
+    return headers;
+  }, [getUserEmail]);
   const canUndo = historyIndex > 0;
   const canRedo = historyIndex < history.length - 1;
 
@@ -716,7 +733,7 @@ function BuilderPage() {
       try {
         const res = await fetch("/api/generate/stream", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: authHeaders(),
           body: JSON.stringify({
             prompt: userPrompt,
             tier,
@@ -1117,7 +1134,7 @@ function BuilderPage() {
       // Try diff-based edit first (5-10x faster than full rewrite)
       const res = await fetch("/api/generate/edit-diff", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders(),
         body: JSON.stringify({
           prompt: instruction,
           existingCode: generatedCode,

@@ -239,7 +239,7 @@ export default function PricingPage() {
   async function handleCheckout(plan: "creator" | "pro" | "agency") {
     setCheckoutLoading(true);
     const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1);
-    const email = window.prompt(`Enter your email to start the ${planLabel} trial:`);
+    const email = user?.email || window.prompt(`Enter your email to start the ${planLabel} trial:`);
     if (!email) { setCheckoutLoading(false); return; }
 
     const res = await fetch("/api/stripe/checkout", {
