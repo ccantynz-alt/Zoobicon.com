@@ -199,6 +199,33 @@ const fadeIn = {
 };
 
 /* ------------------------------------------------------------------ */
+/*  User-friendly error messages (never show raw API responses)        */
+/* ------------------------------------------------------------------ */
+function sanitizeError(raw: string): string {
+  const lower = raw.toLowerCase();
+  if (lower.includes("payment_required") || lower.includes("paid_plan") || lower.includes("upgrade your subscription"))
+    return "Voice provider requires a paid plan. Try browser TTS instead.";
+  if (lower.includes("requires a scene image") || lower.includes("generate images first"))
+    return "Generate scene images before rendering video.";
+  if (lower.includes("validation of body failed") || lower.includes("too_big"))
+    return "Video render request was too large. Try shorter scenes.";
+  if (lower.includes("api error") || lower.includes("api_error"))
+    return "Service temporarily unavailable. Please try again.";
+  if (lower.includes("rate limit") || lower.includes("429"))
+    return "Rate limited. Please wait a moment and try again.";
+  if (lower.includes("no provider configured") || lower.includes("add api"))
+    return "This feature is coming soon.";
+  if (lower.includes("timeout") || lower.includes("timed out"))
+    return "Request timed out. Please try again.";
+  // Strip any JSON from the message
+  const cleaned = raw.replace(/\{[\s\S]*\}/, "").replace(/\[[\s\S]*\]/, "").trim();
+  // If what's left is too long or still looks technical, genericize
+  if (cleaned.length > 80 || cleaned.includes("error:") || cleaned.includes("Error:"))
+    return "Something went wrong. Please try again.";
+  return cleaned || "Something went wrong. Please try again.";
+}
+
+/* ------------------------------------------------------------------ */
 /*  Component                                                         */
 /* ------------------------------------------------------------------ */
 
@@ -1362,7 +1389,7 @@ export default function VideoCreatorDashboard() {
                 </button>
                 {error && (
                   <div className="mt-2 text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
-                    {error}
+                    {sanitizeError(error)}
                     {error.includes("add-on") && (
                       <Link href="/marketplace?search=video" className="ml-2 text-amber-400 underline hover:text-amber-300">
                         Get the add-on
@@ -1757,12 +1784,12 @@ export default function VideoCreatorDashboard() {
                               {fullPipelineProgress.video.status === "skipped" && " Video rendering skipped (coming soon)."}
                             </div>
                           )}
-                          {/* Show any stage errors */}
+                          {/* Show any stage errors (user-friendly, never raw API) */}
                           {Object.entries(fullPipelineProgress).filter(([key, val]) =>
                             key !== "running" && typeof val === "object" && val.status === "failed" && val.error
                           ).map(([key, val]) => (
                             <div key={key} className="text-[10px] text-red-400 bg-red-500/10 border border-red-500/20 rounded px-2 py-1">
-                              {key}: {(val as PipelineStageStatus).error}
+                              {key}: {sanitizeError((val as PipelineStageStatus).error || "")}
                             </div>
                           ))}
                         </div>
@@ -1886,16 +1913,16 @@ export default function VideoCreatorDashboard() {
                                       job.status === "failed" ? "bg-red-500/10 text-red-400" :
                                       job.status === "processing" ? "bg-blue-500/10 text-blue-400" :
                                       "bg-white/[0.03] text-white/50"
-                                    }`} title={job.error || undefined}>
+                                    }`} title={job.error ? sanitizeError(job.error) : undefined}>
                                       S{job.sceneNumber}
                                     </div>
                                   ))}
                                 </div>
                                 {renderJobs.some((j) => j.status === "failed" && j.error) && (
                                   <div className="mt-2 p-2 rounded-lg bg-red-500/10 border border-red-500/20 text-[10px] text-red-300 space-y-0.5">
-                                    <span className="font-medium">Render errors:</span>
+                                    <span className="font-medium">Render issues:</span>
                                     {renderJobs.filter((j) => j.status === "failed" && j.error).slice(0, 3).map((j) => (
-                                      <div key={j.id} className="truncate">S{j.sceneNumber}: {j.error}</div>
+                                      <div key={j.id} className="truncate">Scene {j.sceneNumber}: {sanitizeError(j.error || "")}</div>
                                     ))}
                                   </div>
                                 )}
@@ -1962,11 +1989,13 @@ export default function VideoCreatorDashboard() {
                                 </div>
                                 <div className="flex items-center gap-1">
                                   {capabilities.videoRender.available ? <CheckCircle2 className="w-3 h-3 text-green-500" /> : <AlertCircle className="w-3 h-3 text-amber-500" />}
-                                  Video Rendering: {capabilities.videoRender.available ? "Ready (Runway/Luma/Pika/Kling)" : "Coming Soon — Runway/Luma/Pika integration"}
+                                  Video Rendering: {capabilities.videoRender.available ? "Ready (Runway/Luma/Pika/Kling)" : "Coming Soon"}
                                 </div>
                                 <div className="flex items-center gap-1">
-                                  {capabilities.voiceover.available ? <CheckCircle2 className="w-3 h-3 text-green-500" /> : <CheckCircle2 className="w-3 h-3 text-green-500" />}
-                                  Voiceover: {capabilities.voiceover.available && (capabilities.voiceover as { premium?: boolean }).premium ? "Ready (ElevenLabs)" : "Ready (Browser TTS)"}
+                                  {capabilities.voiceover.available && (capabilities.voiceover as { premium?: boolean }).premium
+                                    ? <CheckCircle2 className="w-3 h-3 text-green-500" />
+                                    : <AlertCircle className="w-3 h-3 text-amber-500" />}
+                                  Voiceover: {capabilities.voiceover.available && (capabilities.voiceover as { premium?: boolean }).premium ? "Ready (ElevenLabs)" : "Browser TTS (upgrade for premium voices)"}
                                 </div>
                                 <div className="flex items-center gap-1">
                                   <CheckCircle2 className="w-3 h-3 text-green-500" />
