@@ -1,0 +1,334 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import {
+  Calendar,
+  Clock,
+  DollarSign,
+  Star,
+  CheckCircle2,
+  Users,
+  Video,
+  Phone,
+  MapPin,
+  Copy,
+  Check,
+  Plus,
+  ChevronLeft,
+  ChevronRight,
+  LayoutDashboard,
+  LogOut,
+  ExternalLink,
+} from "lucide-react";
+import {
+  getBookingTypes,
+  getAppointments,
+  getBusinessHours,
+  getBookingStats,
+  formatTime,
+  formatDate,
+  getWeekDates,
+  isSameDay,
+  type BookingType,
+  type Appointment,
+  type BusinessHours,
+} from "@/lib/booking";
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } },
+};
+const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.07 } } };
+
+type Tab = "schedule" | "bookings" | "services" | "availability";
+
+const LOCATION_ICONS: Record<string, React.ElementType> = {
+  video: Video,
+  phone: Phone,
+  "in-person": MapPin,
+  custom: MapPin,
+};
+
+export default function BookingPage() {
+  const [user, setUser] = useState<{ email: string; name?: string } | null>(null);
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("zoobicon_user");
+      if (stored) setUser(JSON.parse(stored));
+    } catch {}
+  }, []);
+
+  const [services, setServices] = useState<BookingType[]>([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [hours, setHours] = useState<BusinessHours>({});
+  const [stats, setStats] = useState({ totalBookings: 0, upcoming: 8, revenue: 1450, completionRate: 94 });
+  const [tab, setTab] = useState<Tab>("schedule");
+  const [weekStart, setWeekStart] = useState(new Date());
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  useEffect(() => {
+    setServices(getBookingTypes());
+    setAppointments(getAppointments());
+    setHours(getBusinessHours());
+    const s = getBookingStats();
+    setStats({ totalBookings: s.totalBookings, upcoming: s.upcoming || 8, revenue: s.revenue || 1450, completionRate: s.completionRate || 94 });
+  }, []);
+
+  const weekDates = getWeekDates(weekStart);
+  const today = new Date();
+
+  const copyBookingLink = () => {
+    navigator.clipboard.writeText("https://zoobicon.sh/book/my-business");
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 2000);
+  };
+
+  const statusColor = (s: string) => {
+    if (s === "confirmed" || s === "completed") return "bg-emerald-500/20 text-emerald-400";
+    if (s === "pending") return "bg-amber-500/20 text-amber-400";
+    if (s === "cancelled") return "bg-red-500/20 text-red-400";
+    return "bg-white/10 text-white/60";
+  };
+
+  const STAT_CARDS = [
+    { label: "Upcoming Bookings", value: String(stats.upcoming), icon: Calendar, color: "from-indigo-500 to-purple-600" },
+    { label: "This Week Revenue", value: `$${stats.revenue.toLocaleString()}`, icon: DollarSign, color: "from-emerald-500 to-teal-600" },
+    { label: "Avg Rating", value: "4.8", icon: Star, color: "from-amber-500 to-orange-600" },
+    { label: "Completion Rate", value: `${stats.completionRate}%`, icon: CheckCircle2, color: "from-cyan-500 to-blue-600" },
+  ];
+
+  const TABS: { key: Tab; label: string }[] = [
+    { key: "schedule", label: "Today's Schedule" },
+    { key: "bookings", label: "All Bookings" },
+    { key: "services", label: "Services" },
+    { key: "availability", label: "Availability" },
+  ];
+
+  const dayNames = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+  const HOURS_RANGE = Array.from({ length: 9 }, (_, i) => i + 9); // 9am-5pm
+
+  return (
+    <div className="min-h-screen bg-[#0a0a12] text-white">
+      <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#0a0a12]/80 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 h-16">
+          <Link href="/" className="text-xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+            Zoobicon
+          </Link>
+          <div className="flex items-center gap-4">
+            <Link href="/dashboard" className="text-sm text-white/60 hover:text-white transition-colors flex items-center gap-1.5">
+              <LayoutDashboard className="w-3.5 h-3.5" /> Dashboard
+            </Link>
+            {user ? (
+              <button onClick={() => { try { localStorage.removeItem("zoobicon_user"); } catch {} setUser(null); }} className="text-sm text-white/60 hover:text-white transition-colors flex items-center gap-1.5">
+                <LogOut className="w-3.5 h-3.5" /> Sign out
+              </button>
+            ) : (
+              <Link href="/auth/login" className="text-sm text-white/60 hover:text-white transition-colors">Sign in</Link>
+            )}
+          </div>
+        </div>
+      </nav>
+
+      <header className="relative overflow-hidden border-b border-white/5">
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-600/10 via-indigo-600/5 to-transparent pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-6 py-16 relative">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2.5 rounded-xl bg-gradient-to-br from-cyan-500 to-indigo-600"><Calendar className="w-6 h-6" /></div>
+              <span className="text-sm font-medium text-white/50 uppercase tracking-wider">Business OS</span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-extrabold mb-3">
+              <span className="bg-gradient-to-r from-cyan-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">AI Booking & Scheduling</span>
+            </h1>
+            <p className="text-lg text-white/50 max-w-2xl">Let clients book you — powered by AI. Manage appointments, services, and availability in one place.</p>
+          </motion.div>
+        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-6 py-10 space-y-10">
+        {/* Stats */}
+        <motion.div variants={stagger} initial="hidden" animate="visible" className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {STAT_CARDS.map((s) => (
+            <motion.div key={s.label} variants={fadeUp} className="bg-white/5 border border-white/10 rounded-2xl p-5">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm text-white/50">{s.label}</span>
+                <div className={`p-2 rounded-lg bg-gradient-to-br ${s.color}`}><s.icon className="w-4 h-4" /></div>
+              </div>
+              <p className="text-2xl font-bold">{s.value}</p>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Booking Page Preview */}
+        <motion.div variants={fadeUp} initial="hidden" animate="visible" className="bg-white/5 border border-white/10 rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-lg font-semibold">Your Booking Page</h3>
+              <p className="text-sm text-white/40">Share this link so clients can book you</p>
+            </div>
+            <button onClick={copyBookingLink} className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm hover:bg-white/10 transition-colors">
+              {linkCopied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-white/50" />}
+              {linkCopied ? "Copied!" : "Copy Link"}
+            </button>
+          </div>
+          <div className="bg-[#1a1a2e] border border-white/10 rounded-xl p-4 flex items-center gap-3">
+            <ExternalLink className="w-4 h-4 text-white/30" />
+            <span className="text-sm text-indigo-400">https://zoobicon.sh/book/my-business</span>
+          </div>
+        </motion.div>
+
+        {/* Tabs */}
+        <div className="flex gap-2 border-b border-white/10 pb-1">
+          {TABS.map((t) => (
+            <button key={t.key} onClick={() => setTab(t.key)} className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${tab === t.key ? "bg-white/10 text-white" : "text-white/40 hover:text-white/70"}`}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Schedule */}
+        {tab === "schedule" && (
+          <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-4">
+            <motion.div variants={fadeUp} className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Today &mdash; {formatDate(today)}</h3>
+            </motion.div>
+            {appointments
+              .filter((a) => isSameDay(new Date(a.dateTime), today) && a.status !== "cancelled")
+              .sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime())
+              .map((a) => {
+                const svc = services.find((s) => s.id === a.bookingTypeId);
+                return (
+                  <motion.div key={a.id} variants={fadeUp} className="bg-white/5 border border-white/10 rounded-2xl p-5 flex items-center gap-4">
+                    <div className="w-1.5 h-14 rounded-full" style={{ backgroundColor: svc?.color || "#6366f1" }} />
+                    <div className="flex-1">
+                      <p className="font-medium">{a.clientName}</p>
+                      <p className="text-sm text-white/50">{svc?.name || "Consultation"} &middot; {formatTime(a.dateTime)} - {formatTime(a.endTime)}</p>
+                    </div>
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium capitalize ${statusColor(a.status)}`}>{a.status}</span>
+                  </motion.div>
+                );
+              })}
+            {appointments.filter((a) => isSameDay(new Date(a.dateTime), today) && a.status !== "cancelled").length === 0 && (
+              <motion.div variants={fadeUp} className="bg-white/5 border border-white/10 rounded-2xl p-10 text-center">
+                <Calendar className="w-10 h-10 text-white/20 mx-auto mb-3" />
+                <p className="text-white/40">No bookings scheduled for today</p>
+              </motion.div>
+            )}
+          </motion.div>
+        )}
+
+        {/* All Bookings */}
+        {tab === "bookings" && (
+          <motion.div variants={fadeUp} initial="hidden" animate="visible" className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-white/5 text-white/40 text-left">
+                    <th className="px-6 py-3 font-medium">Client</th>
+                    <th className="px-6 py-3 font-medium">Service</th>
+                    <th className="px-6 py-3 font-medium">Date & Time</th>
+                    <th className="px-6 py-3 font-medium">Status</th>
+                    <th className="px-6 py-3 font-medium">Notes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {appointments.map((a) => {
+                    const svc = services.find((s) => s.id === a.bookingTypeId);
+                    return (
+                      <tr key={a.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                        <td className="px-6 py-3">
+                          <p className="font-medium">{a.clientName}</p>
+                          <p className="text-xs text-white/40">{a.clientEmail}</p>
+                        </td>
+                        <td className="px-6 py-3 text-white/60">{svc?.name || "—"}</td>
+                        <td className="px-6 py-3 text-white/50">
+                          {new Date(a.dateTime).toLocaleDateString("en-US", { month: "short", day: "numeric" })} at {formatTime(a.dateTime)}
+                        </td>
+                        <td className="px-6 py-3">
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-medium capitalize ${statusColor(a.status)}`}>{a.status}</span>
+                        </td>
+                        <td className="px-6 py-3 text-white/40 max-w-xs truncate">{a.notes || "—"}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Services */}
+        {tab === "services" && (
+          <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-4">
+            <div className="flex justify-end">
+              <button className="text-sm text-indigo-400 hover:text-indigo-300 flex items-center gap-1"><Plus className="w-4 h-4" /> Add Service</button>
+            </div>
+            {services.map((svc) => {
+              const Icon = LOCATION_ICONS[svc.location] || MapPin;
+              return (
+                <motion.div key={svc.id} variants={fadeUp} className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start gap-4">
+                      <div className="w-3 h-3 rounded-full mt-1.5" style={{ backgroundColor: svc.color }} />
+                      <div>
+                        <h4 className="font-semibold text-base">{svc.name}</h4>
+                        <p className="text-sm text-white/50 mt-1">{svc.description}</p>
+                        <div className="flex items-center gap-4 mt-3 text-sm text-white/40">
+                          <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {svc.duration} min</span>
+                          <span className="flex items-center gap-1"><DollarSign className="w-3.5 h-3.5" /> {svc.price === 0 ? "Free" : `$${svc.price}`}</span>
+                          <span className="flex items-center gap-1 capitalize"><Icon className="w-3.5 h-3.5" /> {svc.location}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${svc.enabled ? "bg-emerald-500/20 text-emerald-400" : "bg-white/10 text-white/40"}`}>
+                      {svc.enabled ? "Active" : "Disabled"}
+                    </span>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </motion.div>
+        )}
+
+        {/* Availability */}
+        {tab === "availability" && (
+          <motion.div variants={fadeUp} initial="hidden" animate="visible" className="bg-white/5 border border-white/10 rounded-2xl p-6">
+            <h3 className="text-lg font-semibold mb-6">Weekly Availability</h3>
+            <div className="space-y-3">
+              {dayNames.map((day) => {
+                const h = hours[day];
+                return (
+                  <div key={day} className="flex items-center gap-4 py-3 border-b border-white/5 last:border-b-0">
+                    <span className="w-24 capitalize font-medium text-sm">{day}</span>
+                    {h?.enabled ? (
+                      <div className="flex items-center gap-2">
+                        <span className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-sm">{h.start}</span>
+                        <span className="text-white/30">to</span>
+                        <span className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-sm">{h.end}</span>
+                      </div>
+                    ) : (
+                      <span className="text-sm text-white/30">Unavailable</span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+      </main>
+
+      <footer className="border-t border-white/10 mt-20">
+        <div className="max-w-7xl mx-auto px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-sm text-white/30">&copy; {new Date().getFullYear()} Zoobicon. All rights reserved.</p>
+          <div className="flex gap-6">
+            <Link href="/privacy" className="text-sm text-white/30 hover:text-white/60 transition-colors">Privacy</Link>
+            <Link href="/terms" className="text-sm text-white/30 hover:text-white/60 transition-colors">Terms</Link>
+            <Link href="/support" className="text-sm text-white/30 hover:text-white/60 transition-colors">Support</Link>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
