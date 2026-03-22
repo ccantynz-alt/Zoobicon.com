@@ -1713,3 +1713,18 @@ select {
     animation: none !important;
   }
 }
+
+/* ── Notification bell pulse ── */
+@keyframes bellPulse {
+  0%, 100% { transform: rotate(0deg); }
+  10% { transform: rotate(8deg); }
+  20% { transform: rotate(-6deg); }
+  30% { transform: rotate(4deg); }
+  40% { transform: rotate(0deg); }
+}
+
+/* ── Thin scrollbar for notification dropdown ── */
+.notif-scrollbar::-webkit-scrollbar { width: 4px; }
+.notif-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.notif-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+.notif-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
