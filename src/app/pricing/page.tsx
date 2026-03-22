@@ -500,6 +500,78 @@ export default function PricingPage() {
           </div>
         </section>
 
+        {/* Replace Your Stack */}
+        <section className="py-20 border-t border-white/[0.08] px-6">
+          <div className="max-w-4xl mx-auto">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer}>
+              <motion.div variants={fadeInUp} className="text-center mb-12">
+                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[12px] font-semibold text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 mb-5">
+                  <ShoppingCart className="w-3.5 h-3.5" />
+                  Cancel 6 subscriptions
+                </span>
+                <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-3">
+                  You&apos;re paying <span className="text-red-400 line-through decoration-red-400/50">$200+/mo</span> for tools Zoobicon replaces
+                </h2>
+                <p className="text-white/50 max-w-lg mx-auto">
+                  Most businesses juggle 6-8 separate subscriptions just to run their online presence. Zoobicon bundles everything into one platform.
+                </p>
+              </motion.div>
+
+              <motion.div variants={fadeInUp} className="gradient-border rounded-2xl overflow-hidden">
+                <div className="divide-y divide-white/[0.06]">
+                  {[
+                    { tool: "Website Builder", competitor: "Squarespace / Wix", theirPrice: "$16-33/mo", us: "Included", icon: Globe },
+                    { tool: "Hosting + SSL + CDN", competitor: "Vercel / Netlify", theirPrice: "$20/mo", us: "Included", icon: Server },
+                    { tool: "Email Marketing", competitor: "Mailchimp / ConvertKit", theirPrice: "$20-29/mo", us: "Included in Pro", icon: Mail },
+                    { tool: "Forms + CRM", competitor: "Typeform / Jotform", theirPrice: "$25-34/mo", us: "Included in Pro", icon: Blocks },
+                    { tool: "Chat Widget", competitor: "Intercom / Tidio", theirPrice: "$29-74/mo", us: "Included in Pro", icon: Bot },
+                    { tool: "SEO Tools", competitor: "Ahrefs / Surfer", theirPrice: "$89-99/mo", us: "Included in Pro", icon: BarChart3 },
+                    { tool: "Booking / Scheduling", competitor: "Calendly / Acuity", theirPrice: "$16-25/mo", us: "Included in Pro", icon: Users },
+                    { tool: "Link-in-Bio", competitor: "Linktree Pro", theirPrice: "$9-24/mo", us: "Included", icon: AtSign },
+                  ].map((row, i) => (
+                    <div key={i} className={`grid grid-cols-12 items-center px-5 py-3.5 ${i % 2 === 0 ? "" : "bg-white/[0.02]"}`}>
+                      <div className="col-span-5 flex items-center gap-2.5">
+                        <row.icon className="w-3.5 h-3.5 text-white/40 flex-shrink-0" />
+                        <div>
+                          <div className="text-sm font-medium text-white/80">{row.tool}</div>
+                          <div className="text-[10px] text-white/35">{row.competitor}</div>
+                        </div>
+                      </div>
+                      <div className="col-span-3 text-center">
+                        <span className="text-sm text-red-400/80 font-mono">{row.theirPrice}</span>
+                      </div>
+                      <div className="col-span-4 text-right">
+                        <span className="text-sm text-emerald-400 font-semibold">{row.us}</span>
+                      </div>
+                    </div>
+                  ))}
+                  {/* Total row */}
+                  <div className="grid grid-cols-12 items-center px-5 py-4 bg-gradient-to-r from-emerald-500/[0.06] to-brand-500/[0.06]">
+                    <div className="col-span-5">
+                      <span className="text-sm font-black text-white/90">TOTAL</span>
+                    </div>
+                    <div className="col-span-3 text-center">
+                      <span className="text-lg font-black text-red-400 line-through decoration-red-400/50">$224+/mo</span>
+                    </div>
+                    <div className="col-span-4 text-right">
+                      <span className="text-lg font-black text-emerald-400">$49/mo</span>
+                      <span className="text-xs text-emerald-400/60 ml-1">with Pro</span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div variants={fadeInUp} className="mt-6 text-center">
+                <p className="text-xs text-white/35 mb-4">Competitor prices verified March 2026. Zoobicon pricing based on Pro plan ($49/mo).</p>
+                <Link href="/auth/signup" className="inline-flex items-center gap-2 btn-gradient px-7 py-3 rounded-xl text-sm font-bold text-white shadow-glow">
+                  Start Your Pro Trial — Free for 14 Days
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </motion.div>
+            </motion.div>
+          </div>
+        </section>
+
         {/* Domain + Hosting Bundle */}
         <section className="py-20 border-t border-white/[0.08] px-6">
           <div className="max-w-5xl mx-auto">
