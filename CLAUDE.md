@@ -542,3 +542,213 @@ The goal is **3s to first preview, 10s to customized site, 30s to full-stack app
 - `src/components/BeforeAfter.tsx` — NEW: Prompt→site slider
 - `tailwind.config.ts` — Color system, typography, spacing
 - `src/app/globals.css` — Design tokens, animations, font imports
+
+## PLATFORM HOOKS & STICKINESS STRATEGY — From Builder to Business OS
+
+**Core Insight:** The best website builders stop being website builders. Squarespace added email marketing. Shopify added payments, POS, and shipping. Wix added booking. The goal is for users to say "I run everything through Zoobicon" — not "I use Zoobicon to make websites." Every feature below creates switching costs, daily usage habits, or viral loops.
+
+### The Four Laws of Platform Stickiness
+1. **Data gravity** — The more data that accumulates (subscriber lists, client history, invoices, rankings), the more painful migration becomes.
+2. **Workflow centrality** — If Zoobicon is where users write, publish, invoice, schedule, and analyze, it's their business OS.
+3. **Money flow** — When Zoobicon is in the payment chain (invoicing, product sales, subscriptions, bookings), switching means re-routing money.
+4. **Network position** — When clients, customers, and collaborators connect through Zoobicon, leaving disrupts relationships.
+
+---
+
+### Hook Category 1: Identity Hooks (Make Users Feel Like Somebody)
+
+| # | Feature | Description | Status |
+|---|---------|-------------|--------|
+| H1.1 | **Creator Profiles** | `/profile/[username]` — public portfolio of everything they've built. Follower counts, "Creator since [date]", creation stats. This is their digital resume. | NOT BUILT |
+| H1.2 | **Creator Tiers** | "Rising Creator" → "Pro Creator" → "Master Creator" based on sites built + views received. Badge visible on profile and gallery posts. | NOT BUILT |
+| H1.3 | **"Built with Zoobicon" Badges** | Every deployed site gets a subtle powered-by badge (removable on Pro+). Free advertising on every site built. | NOT BUILT |
+| H1.4 | **AI Brand Kit** | Persistent per-user brand kit: colors, logo, fonts, brand voice, tone, target audience. Every generation auto-pulls from this kit. Like Canva Brand Kit but also writes in the user's voice. Leave Zoobicon = lose your institutionalized brand identity. | NOT BUILT |
+| H1.5 | **Universal Bio Link Hub ("Zoobicon Link")** | `zoobicon.sh/username` replaces Linktree. AI auto-updates with latest blog post, product, video. AI rewrites bio weekly based on what's performing. Linktree charges $24/month. | NOT BUILT |
+
+**Key files:** `src/app/profile/[username]/page.tsx` (NEW), `src/lib/brand-kit.ts` (NEW), `src/components/CreatorBadge.tsx` (NEW)
+
+---
+
+### Hook Category 2: Dopamine Hooks (Make Building Feel Rewarding)
+
+| # | Feature | Description | Status |
+|---|---------|-------------|--------|
+| H2.1 | **Achievement System** | Milestones: "First Deploy!", "10 Sites Built", "1K Total Views", "7-Day Deploy Streak". Toast notifications + profile badges. | NOT BUILT |
+| H2.2 | **Live Stats Counter on Dashboard** | "Your sites have been viewed 4,293 times." Users check this like checking Instagram likes. Pull from real analytics data. | NOT BUILT |
+| H2.3 | **Quota Progress Bar** | "7 of 15 builds used this month" with animated fill bar on dashboard + builder. Creates urgency + natural upgrade pressure. | NOT BUILT |
+| H2.4 | **Celebration Moments** | Confetti animation on first deploy, level-up animations on milestones, custom sounds. Make every build feel like an accomplishment. | NOT BUILT |
+| H2.5 | **Weekly Business Health Score** | Monday email: site traffic, top pages, form submissions, SEO movement, one AI recommendation. Creates a weekly habit — users open it like a bank statement. | NOT BUILT |
+
+**Key files:** `src/components/AchievementToast.tsx` (NEW), `src/components/QuotaBar.tsx` (NEW), `src/lib/achievements.ts` (NEW), `src/app/api/reports/weekly/route.ts` (NEW)
+
+---
+
+### Hook Category 3: Social & Sharing Hooks (Make Every Build Go Viral)
+
+| # | Feature | Description | Status |
+|---|---------|-------------|--------|
+| H3.1 | **Share-to-Social After Deploy** | Post-deploy modal with one-click share to: TikTok, Instagram, Twitter/X, LinkedIn, Facebook, Reddit. Auto-generates platform-specific caption + OG image of the site. | NOT BUILT |
+| H3.2 | **TikTok Integration** | "Share to TikTok" generates a short video-style preview of the site being built (screen recording of generation process). Viral format: "I built this website in 90 seconds." Hashtags auto-suggested. | NOT BUILT |
+| H3.3 | **Instagram Story/Post Generator** | Auto-creates Instagram-ready images: before/after of prompt→site, stats overlay, branded template. Direct share via Instagram API or download for manual post. | NOT BUILT |
+| H3.4 | **Twitter/X Thread Generator** | One click to create a thread: "I just built [site] with AI in 90 seconds. Here's what happened: 🧵" with screenshots of each pipeline stage. | NOT BUILT |
+| H3.5 | **LinkedIn Article Auto-Publish** | For agencies/freelancers: "I built my client's site in 90 seconds with AI" professional post. Positions users as innovators in their network. | NOT BUILT |
+| H3.6 | **Cross-Platform Publisher ("Publish Everywhere")** | One post in Zoobicon → simultaneously publishes to: website blog, LinkedIn, Twitter/X thread, Instagram caption, TikTok caption, Facebook, Reddit. AI reformats for each platform's style and limits. Competing with Buffer ($18/month). | NOT BUILT |
+| H3.7 | **Auto-Generated OG Images** | Every deployed site gets a beautiful Open Graph image auto-generated (site screenshot + branding). Shared links look professional on every platform. | NOT BUILT |
+| H3.8 | **AI Social Media Content Calendar** | AI plans 30 days of social content based on user's industry, promotions, and past performance. Generates captions, hashtag sets, and image prompts. Schedule from Zoobicon's calendar. | NOT BUILT |
+| H3.9 | **Short-Form Video Script Generator + Teleprompter** | Describe a topic → get a TikTok/Reels script (hook, body, CTA). Built-in browser teleprompter mode. AI suggests trending audio + optimal posting times. | NOT BUILT |
+
+**Key files:** `src/components/ShareModal.tsx` (NEW), `src/app/api/social/share/route.ts` (NEW), `src/app/api/social/og-image/route.ts` (NEW), `src/lib/social-publish.ts` (NEW), `src/app/content-calendar/page.tsx` (NEW)
+
+---
+
+### Hook Category 4: Community Hooks (Network Effects)
+
+| # | Feature | Description | Status |
+|---|---------|-------------|--------|
+| H4.1 | **Prompt Gallery** | `/gallery` — users share best prompts + results. Upvotes, comments, trending. "This week's top 10 sites." Viral loop + SEO + community. | NOT BUILT |
+| H4.2 | **Site Remix** | "Love this site? Remix it" — one click to fork someone's site and customize. Drops friction to zero. Every remix credits the original creator. | NOT BUILT |
+| H4.3 | **Weekly Design Challenges** | "This week: Build the best restaurant site." Winners get featured + free Pro month. Creates FOMO + content + community engagement. | NOT BUILT |
+| H4.4 | **Template Marketplace (Creator Economy)** | Users list generated sites as purchasable templates ($5-50). Creator gets 70%, Zoobicon keeps 30%. Top creators earn $500-5,000/month. Once you're making money selling, you never leave. | NOT BUILT |
+| H4.5 | **"Site of the Day" Feature** | One site featured on homepage daily. Users check daily to see if they're featured. Creates daily visit habit + aspiration. | NOT BUILT |
+| H4.6 | **Showcase/Best-Of Page** | `/showcase` — curated gallery of best generated sites, filterable by industry/style. Click to see the prompt that made it. Inspiration + proof of quality. | PARTIAL |
+
+**Key files:** `src/app/gallery/page.tsx` (NEW), `src/app/api/gallery/route.ts` (NEW), `src/components/RemixButton.tsx` (NEW), `src/app/challenges/page.tsx` (NEW)
+
+---
+
+### Hook Category 5: Retention Hooks (Make Leaving Painful)
+
+| # | Feature | Description | Status |
+|---|---------|-------------|--------|
+| H5.1 | **Site Analytics Dashboard** | Show users their traffic, popular pages, visitor locations, conversion rates. Once they're checking stats daily, they're hooked. | NOT BUILT |
+| H5.2 | **Custom Domain Binding** | Once someone connects `mybusiness.com` to their Zoobicon site, migration means full DNS migration — massive deterrent. Bundle free `.sh` domain for year one. | PARTIAL |
+| H5.3 | **Version History Timeline** | Visual rewind to any point. Users invest more when they know nothing is ever lost. Git-style branching for sites. | PARTIAL |
+| H5.4 | **"Site Expires" Urgency Emails** | "Your site expires in 3 days — upgrade to keep it live." For free tier. Creates urgency to upgrade or lose their work + SEO juice. | NOT BUILT |
+| H5.5 | **Notification Inbox** | Bell icon: "Your site got 50 views today", "New comment on your gallery post", "Weekly challenge starts tomorrow." Re-engagement channel you own. | NOT BUILT |
+| H5.6 | **Smart Recommendations** | "You built 3 restaurant sites. Try our Menu Generator." Cross-sell 43 generators based on behavior. "People who built Y also built Z." | NOT BUILT |
+
+**Key files:** `src/app/analytics/page.tsx` (NEW), `src/components/NotificationInbox.tsx` (NEW), `src/lib/notifications.ts` (NEW), `src/app/api/notifications/route.ts` (NEW)
+
+---
+
+### Hook Category 6: Viral/Referral Hooks (Users Recruit Users)
+
+| # | Feature | Description | Status |
+|---|---------|-------------|--------|
+| H6.1 | **Referral Program** | "Give a friend 5 free builds, get 5 free builds." Track via `?ref=username`. Simple, proven. Compounding growth. | NOT BUILT |
+| H6.2 | **Agency Client Invite System** | When a Pro user invites a client to view/approve, client gets a Zoobicon account automatically. Each agency becomes a distribution channel. | NOT BUILT |
+| H6.3 | **"Powered by Zoobicon" on Free Sites** | Subtle badge on all free-tier sites. Removable on paid plans. Every free site is an ad. | NOT BUILT |
+| H6.4 | **Share-to-Earn** | Users earn credits when their shared sites/gallery posts drive signups. Tracked via UTM params. Turns every user into an affiliate. | NOT BUILT |
+
+**Key files:** `src/app/api/referral/route.ts` (NEW), `src/lib/referral.ts` (NEW), `src/app/referral/page.tsx` (NEW)
+
+---
+
+### Hook Category 7: Business OS Services (Make Zoobicon Indispensable)
+
+These services transform Zoobicon from a builder into the user's entire business operating system. Each one is a standalone SaaS product bundled into the platform.
+
+| # | Service | Description | Competing With | Status |
+|---|---------|-------------|----------------|--------|
+| H7.1 | **AI Email Marketing (Native)** | Built-in list builder. Forms auto-appear on every site. Subscribers accumulate in Zoobicon DB. AI writes weekly newsletters. One-click send. Lock-in: the subscriber list. | ConvertKit ($29/mo) | NOT BUILT |
+| H7.2 | **AI Invoicing & Proposals** | Describe a job → get professional PDF proposal with auto-calculated tax. Sends via email, tracks opens, converts to invoice on acceptance. Stripe payments. | FreshBooks ($17/mo), Bonsai ($25/mo) | NOT BUILT |
+| H7.3 | **AI Booking & Scheduling** | Embedded calendar for service businesses. Intake forms, reminder emails, cancellation policies, follow-ups. Google Calendar sync. Booking page = Zoobicon site. | Calendly ($16/mo), Acuity | NOT BUILT |
+| H7.4 | **Digital Product Store** | Sell PDFs, templates, courses, presets directly on any Zoobicon site. Stripe checkout, file delivery, license keys. 0% fee on Pro, 5% on free tier. | Gumroad, Lemon Squeezy | NOT BUILT |
+| H7.5 | **AI Client Portal Generator** | Password-protected client portal: project status, deliverable approvals, file downloads, invoice payments, feedback. All branded. | Dubsado ($40/mo) | NOT BUILT |
+| H7.6 | **Subscription/Membership Gating** | Password-protect pages for paid members. AI generates membership landing page + welcome email sequence. Stripe Billing handles recurring charges. | Memberful ($25/mo) | NOT BUILT |
+| H7.7 | **AI Blog Engine with Auto-SEO** | Publish once → AI generates 5 related posts, internal links them, submits sitemap to Google, tracks rankings. Every post generates social captions for 4 platforms. Blog lives on the site's subdirectory so Google authority flows to main domain. | WordPress, Ghost | NOT BUILT |
+| H7.8 | **AI Review Response Manager** | Connect Google Business Profile. AI drafts responses to every review (1-star and 5-star). Monthly reputation report. | Birdeye ($299/mo) | NOT BUILT |
+| H7.9 | **AI Local SEO Dashboard** | Local keyword rankings, Google Maps position, competitor analysis, one-click to implement AI suggestions directly on the site. | Local SEO agencies ($300-1,500/mo) | NOT BUILT |
+| H7.10 | **AI Contract & NDA Generator** | Generate service agreements, NDAs, scope-of-work docs from project description. Built-in e-signature. Every signed contract stored in Zoobicon. | Bonsai ($25/mo), DocuSign | NOT BUILT |
+| H7.11 | **Competitor Intelligence Feed** | Set 3-5 competitor URLs. Weekly crawl detects changes (new pages, price changes, new products). AI summarizes with suggested responses. Built on existing `intel-crawler.ts`. | Crayon ($99/mo), Kompyte | NOT BUILT |
+| H7.12 | **White-Label Client Reporting** | Agencies send branded monthly AI-written performance reports: traffic, conversions, SEO movement, recommendations. Client associates value with the agency. | AgencyAnalytics ($79/mo) | NOT BUILT |
+
+**Key files:** `src/app/email-marketing/page.tsx` (NEW), `src/app/invoicing/page.tsx` (NEW), `src/app/booking/page.tsx` (NEW), `src/app/store/page.tsx` (NEW), `src/app/blog-engine/page.tsx` (NEW), `src/lib/email-marketing.ts` (NEW), `src/lib/invoicing.ts` (NEW), `src/lib/booking.ts` (NEW)
+
+---
+
+### Hook Category 8: Onboarding & Activation Hooks
+
+| # | Feature | Description | Status |
+|---|---------|-------------|--------|
+| H8.1 | **First-Time Onboarding Checklist** | "Complete 5 tasks to unlock Pro trial: Build a site, Deploy it, Share it, Invite a friend, Try a generator." Guided activation with progress tracking. | NOT BUILT |
+| H8.2 | **Interactive Builder Demo on Homepage** | Visitor types a prompt on the homepage, watches agents activate, sees a site materialize. Zero-friction "aha moment" before signup. | NOT BUILT |
+| H8.3 | **Template Quick-Start** | New users see "Pick a template to start" before the blank prompt. Reduces intimidation. One click to customize a template. | PARTIAL |
+| H8.4 | **"What Do You Want to Build?" Segmentation** | First question after signup: "I'm a freelancer / agency / small business / creator." Personalizes entire dashboard, recommended generators, and onboarding flow. | NOT BUILT |
+
+**Key files:** `src/components/OnboardingChecklist.tsx` (NEW), `src/components/HeroDemo.tsx` (EXISTS), `src/lib/onboarding.ts` (NEW)
+
+---
+
+### Hook Category 9: Monetization Hooks (Make Upgrading Obvious)
+
+| # | Feature | Description | Status |
+|---|---------|-------------|--------|
+| H9.1 | **Freemium Watermark** | Free sites show "Powered by Zoobicon" watermark. Removing it = upgrade to Creator ($19/mo). | NOT BUILT |
+| H9.2 | **Gated Generators** | Some of the 43 generators are Pro-only. Free users can SEE what they'd get but can't generate. | NOT BUILT |
+| H9.3 | **Monthly Template Drops** | "5 new Pro-exclusive templates this month." Creates ongoing subscription value beyond build limits. | NOT BUILT |
+| H9.4 | **Overage Packs** | "Out of builds? Buy 5 more for $9" without full plan upgrade. Lower friction monetization for occasional heavy use. | NOT BUILT |
+| H9.5 | **Annual Plan Discount** | 20% off annual billing. Standard retention play — users commit for 12 months. | NOT BUILT |
+
+---
+
+### Implementation Priority — Build Order
+
+**Tier 1: Quick Wins (1-2 days each, massive impact)**
+1. Quota Progress Bar + Upgrade CTA — 1 component, drives revenue immediately
+2. Share-to-Social Modal (after deploy) — 1 modal, every deploy becomes free marketing
+3. "Built with Zoobicon" Badge on free sites — 1 component, passive viral loop
+4. Achievement Toasts — 1 component, makes building feel like a game
+5. Auto-generated OG Images — 1 API route, makes every shared link look professional
+
+**Tier 2: High Value (3-5 days each)**
+6. Prompt Gallery (`/gallery`) — community + viral loop + SEO content
+7. Referral Program — users recruit users, compounding growth
+8. Creator Profiles (`/profile/[username]`) — gives users identity
+9. Notification Inbox — re-engagement channel you own
+10. Site Analytics Dashboard — makes users check back daily
+
+**Tier 3: Business OS Services (1-2 weeks each)**
+11. AI Email Marketing (native list builder) — $29/mo competitor replacement
+12. AI Booking & Scheduling — $16/mo competitor replacement
+13. Digital Product Store — turns users into sellers who can't leave
+14. Cross-Platform Publisher — makes Zoobicon the daily writing tool
+15. AI Blog Engine with Auto-SEO — creates content flywheel
+
+**Tier 4: Advanced Stickiness (2-4 weeks each)**
+16. AI Invoicing & Proposals — deepens business dependency
+17. Template Marketplace (creator economy) — users earn money, never leave
+18. Client Portal Generator — agencies depend on Zoobicon for client delivery
+19. Membership/Subscription Gating — puts Zoobicon in the money flow
+20. Competitor Intelligence Feed — built on existing intel-crawler.ts
+
+### The North Star Metric
+**Daily Active Users who check their dashboard.** Not "sites generated" — that's a vanity metric. The hooks above are designed to give users a reason to log in EVERY DAY: check stats, read notifications, see gallery activity, review AI recommendations, manage subscribers, track invoices. When Zoobicon is the first tab they open in the morning, we've won.
+
+### Social Media Integration Architecture
+
+All social sharing flows through a unified `src/lib/social-publish.ts` module:
+- **TikTok**: TikTok Content Posting API (OAuth 2.0, requires app review). Generates short video preview of site generation OR static slideshow of site screenshots. Hashtag suggestion via AI.
+- **Instagram**: Instagram Graph API via Facebook Business. Auto-creates carousel posts (before/after, multi-page sites) or story-format vertical images.
+- **Twitter/X**: Twitter API v2. Thread generation with screenshot attachments. Auto-generates viral hooks.
+- **LinkedIn**: LinkedIn Marketing API. Professional-tone posts for agencies/freelancers. Article publishing for long-form case studies.
+- **Facebook**: Facebook Graph API. Page posts with link previews using custom OG images.
+- **Reddit**: Reddit API. Formats for subreddit-specific rules (r/webdev, r/SideProject, r/smallbusiness).
+
+Each platform requires OAuth app registration. Users connect accounts once in Settings. Share modal shows connected platforms with one-click publish.
+
+### Revenue Potential of Bundled Services
+
+| Service | What It Replaces | Competitor Price | Our Price (Bundled) |
+|---------|-----------------|-----------------|-------------------|
+| Email Marketing | ConvertKit, Mailchimp | $29-59/mo | Included in Pro ($49/mo) |
+| Booking/Scheduling | Calendly, Acuity | $16-25/mo | Included in Pro |
+| Invoicing | FreshBooks, Bonsai | $17-25/mo | Included in Pro |
+| Digital Product Store | Gumroad, Lemon Squeezy | 5-10% per sale | 0% on Pro, 5% on Free |
+| Link in Bio | Linktree Pro | $24/mo | Included in Creator ($19/mo) |
+| Social Publishing | Buffer, Later | $18-30/mo | Included in Pro |
+| Local SEO | SEO agencies | $300-1,500/mo | Included in Agency ($99/mo) |
+| Client Reporting | AgencyAnalytics | $79/mo | Included in Agency |
+| Review Management | Birdeye | $299/mo | Included in Agency |
+
+**Total replaced value on Pro plan: ~$165/month of tools for $49/month.** This is the pitch: "Cancel 6 subscriptions. Replace them all with Zoobicon."
