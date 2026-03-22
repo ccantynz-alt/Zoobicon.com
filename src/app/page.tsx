@@ -485,12 +485,13 @@ export default function LandingPage() {
 
       {/* ═══════════════════════════════════════════════
           SECTION 1.5 — LIVE DEMO (the proof)
-          Bold light section that breaks from the dark theme
+          Dark premium section with depth
           ═══════════════════════════════════════════════ */}
-      <section id="demo" className="relative py-24 md:py-32 bg-gradient-to-b from-[#FFF8F0] via-white to-[#FFF5EB] overflow-hidden">
-        {/* Warm accent decorations */}
-        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-gradient-to-br from-amber-400/20 via-orange-300/10 to-transparent rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-gradient-to-tl from-rose-400/15 via-red-300/10 to-transparent rounded-full blur-3xl translate-x-1/3 translate-y-1/3 pointer-events-none" />
+      <section id="demo" className="relative py-24 md:py-36 overflow-hidden">
+        {/* Ambient orbs */}
+        <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-violet-600/[0.07] rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-cyan-500/[0.05] rounded-full blur-[100px] translate-x-1/3 translate-y-1/3 pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-indigo-500/[0.04] rounded-full blur-[80px] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
           <motion.div
@@ -499,32 +500,33 @@ export default function LandingPage() {
             viewport={{ once: true, margin: "-80px" }}
             variants={stagger}
           >
-            <motion.div variants={fadeUp} className="text-center mb-14">
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[12px] font-semibold text-amber-700 bg-amber-100 border border-amber-200 mb-6">
+            <motion.div variants={fadeUp} className="text-center mb-16">
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[12px] font-semibold text-violet-300 bg-violet-500/10 border border-violet-500/20 mb-6">
+                <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
                 Live Builder Preview
               </span>
-              <h2 className="text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-4 text-gray-900">
+              <h2 className="text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-[-0.04em] mb-5">
                 Watch it build in{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-purple-400 to-cyan-400">
                   real-time.
                 </span>
               </h2>
-              <p className="text-base md:text-lg text-gray-500 max-w-xl mx-auto">
+              <p className="text-base md:text-lg text-white/45 max-w-xl mx-auto leading-relaxed">
                 Type a prompt. Watch 7 AI agents collaborate to build your site.
                 Full-stack apps, e-commerce stores, dashboards — in seconds.
               </p>
             </motion.div>
             <motion.div variants={fadeUp} className="relative max-w-5xl mx-auto">
-              <div className="absolute -inset-8 bg-gradient-to-br from-amber-400/10 via-orange-300/5 to-rose-400/10 rounded-[32px] blur-2xl pointer-events-none" />
-              <div className="relative rounded-2xl shadow-2xl shadow-orange-900/10 ring-1 ring-black/5">
+              {/* Outer glow */}
+              <div className="absolute -inset-10 bg-gradient-to-br from-violet-600/10 via-indigo-500/5 to-cyan-500/10 rounded-[40px] blur-3xl pointer-events-none" />
+              {/* Reflection line */}
+              <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-b from-white/[0.08] via-transparent to-transparent pointer-events-none z-10" />
+              <div className="relative">
                 <HeroDemo />
               </div>
             </motion.div>
           </motion.div>
         </div>
-
-        {/* Transition gradient back to dark */}
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-b from-transparent to-[#050505]" />
       </section>
 
       {/* ═══════════════════════════════════════════════
