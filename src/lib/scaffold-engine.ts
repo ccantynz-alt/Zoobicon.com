@@ -73,28 +73,28 @@ const CONFIGS: Record<string, SiteConfig> = {
     description: "Modern software platform that helps teams work smarter.",
     font1: "Inter",
     font2: "Inter",
-    colors: { primary: "#6366f1", primaryDark: "#4f46e5", bg: "#0f172a", bgAlt: "#1e293b", surface: "#1e293b", text: "#f1f5f9", textMuted: "#94a3b8", border: "#334155", accent: "#818cf8" },
+    colors: { primary: "#4f46e5", primaryDark: "#4338ca", bg: "#f8fafc", bgAlt: "#eef2ff", surface: "#ffffff", text: "#1e293b", textMuted: "#64748b", border: "#e2e8f0", accent: "#818cf8" },
   },
   restaurant: {
     title: "Restaurant",
     description: "An unforgettable dining experience with seasonal flavors.",
     font1: "Playfair Display",
     font2: "Lato",
-    colors: { primary: "#d97706", primaryDark: "#b45309", bg: "#1c1917", bgAlt: "#292524", surface: "#292524", text: "#fafaf9", textMuted: "#a8a29e", border: "#44403c", accent: "#f59e0b" },
+    colors: { primary: "#b45309", primaryDark: "#92400e", bg: "#fffbeb", bgAlt: "#fef3c7", surface: "#ffffff", text: "#451a03", textMuted: "#92400e", border: "#fde68a", accent: "#d97706" },
   },
   portfolio: {
     title: "Portfolio",
     description: "Creative portfolio showcasing design and development work.",
     font1: "Sora",
     font2: "Inter",
-    colors: { primary: "#ec4899", primaryDark: "#db2777", bg: "#0c0a09", bgAlt: "#1c1917", surface: "#1c1917", text: "#fafaf9", textMuted: "#a8a29e", border: "#44403c", accent: "#f472b6" },
+    colors: { primary: "#7c3aed", primaryDark: "#6d28d9", bg: "#faf5ff", bgAlt: "#f3e8ff", surface: "#ffffff", text: "#1e1b4b", textMuted: "#6b7280", border: "#e9d5ff", accent: "#a78bfa" },
   },
   agency: {
     title: "Digital Agency",
     description: "We build digital experiences that drive business growth.",
     font1: "Space Grotesk",
     font2: "Inter",
-    colors: { primary: "#10b981", primaryDark: "#059669", bg: "#030712", bgAlt: "#111827", surface: "#111827", text: "#f9fafb", textMuted: "#9ca3af", border: "#1f2937", accent: "#34d399" },
+    colors: { primary: "#059669", primaryDark: "#047857", bg: "#ffffff", bgAlt: "#ecfdf5", surface: "#ffffff", text: "#064e3b", textMuted: "#6b7280", border: "#d1fae5", accent: "#34d399" },
   },
   ecommerce: {
     title: "Online Store",
@@ -115,28 +115,28 @@ const CONFIGS: Record<string, SiteConfig> = {
     description: "Transform your body and mind with expert-led training.",
     font1: "Oswald",
     font2: "Inter",
-    colors: { primary: "#ef4444", primaryDark: "#dc2626", bg: "#0a0a0a", bgAlt: "#171717", surface: "#171717", text: "#fafafa", textMuted: "#a3a3a3", border: "#262626", accent: "#f87171" },
+    colors: { primary: "#dc2626", primaryDark: "#b91c1c", bg: "#fff1f2", bgAlt: "#ffe4e6", surface: "#ffffff", text: "#1c1917", textMuted: "#78716c", border: "#fecdd3", accent: "#f87171" },
   },
   startup: {
     title: "Startup",
     description: "The future starts here. Join us on our mission.",
     font1: "Plus Jakarta Sans",
     font2: "Inter",
-    colors: { primary: "#06b6d4", primaryDark: "#0891b2", bg: "#020617", bgAlt: "#0f172a", surface: "#0f172a", text: "#f8fafc", textMuted: "#94a3b8", border: "#1e293b", accent: "#22d3ee" },
+    colors: { primary: "#0891b2", primaryDark: "#0e7490", bg: "#ecfeff", bgAlt: "#cffafe", surface: "#ffffff", text: "#164e63", textMuted: "#6b7280", border: "#a5f3fc", accent: "#22d3ee" },
   },
   realestate: {
     title: "Real Estate",
     description: "Find your dream home with our expert guidance.",
     font1: "Poppins",
     font2: "Inter",
-    colors: { primary: "#0d9488", primaryDark: "#0f766e", bg: "#ffffff", bgAlt: "#f0fdfa", surface: "#ffffff", text: "#134e4a", textMuted: "#5eead4", border: "#ccfbf1", accent: "#14b8a6" },
+    colors: { primary: "#0d9488", primaryDark: "#0f766e", bg: "#ffffff", bgAlt: "#f0fdfa", surface: "#ffffff", text: "#134e4a", textMuted: "#6b7280", border: "#ccfbf1", accent: "#14b8a6" },
   },
   healthcare: {
     title: "Healthcare",
     description: "Compassionate care for you and your family.",
     font1: "Nunito",
     font2: "Inter",
-    colors: { primary: "#0ea5e9", primaryDark: "#0284c7", bg: "#ffffff", bgAlt: "#f0f9ff", surface: "#ffffff", text: "#0c4a6e", textMuted: "#7dd3fc", border: "#e0f2fe", accent: "#38bdf8" },
+    colors: { primary: "#0ea5e9", primaryDark: "#0284c7", bg: "#ffffff", bgAlt: "#f0f9ff", surface: "#ffffff", text: "#0c4a6e", textMuted: "#6b7280", border: "#e0f2fe", accent: "#38bdf8" },
   },
   education: {
     title: "Academy",
@@ -150,7 +150,7 @@ const CONFIGS: Record<string, SiteConfig> = {
     description: "Making a difference, one step at a time.",
     font1: "Nunito",
     font2: "Inter",
-    colors: { primary: "#16a34a", primaryDark: "#15803d", bg: "#ffffff", bgAlt: "#f0fdf4", surface: "#ffffff", text: "#14532d", textMuted: "#4ade80", border: "#bbf7d0", accent: "#22c55e" },
+    colors: { primary: "#16a34a", primaryDark: "#15803d", bg: "#ffffff", bgAlt: "#f0fdf4", surface: "#ffffff", text: "#14532d", textMuted: "#6b7280", border: "#bbf7d0", accent: "#22c55e" },
   },
   event: {
     title: "Event",
@@ -182,7 +182,7 @@ export function getScaffoldConfig(intent: string): SiteConfig {
 // ── Scaffold HTML bodies ──
 
 function navHtml(brand: string): string {
-  return `<nav style="position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);background:rgba(0,0,0,0.5);border-bottom:1px solid var(--color-border);">
+  return `<nav style="position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);background:color-mix(in srgb, var(--color-bg) 85%, transparent);border-bottom:1px solid var(--color-border);">
   <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding:16px var(--container-padding);max-width:var(--max-width);margin:0 auto;">
     <a href="#" style="font-family:var(--font-heading);font-size:1.5rem;font-weight:800;color:var(--color-primary);text-decoration:none;" data-section="nav" data-field="brand">${brand}</a>
     <div class="nav-links" style="display:flex;gap:24px;align-items:center;">
@@ -199,9 +199,9 @@ function navHtml(brand: string): string {
 function heroHtml(headline: string, sub: string): string {
   return `<section class="section hero-gradient-text" id="hero" style="padding:120px 0 80px;text-align:center;">
   <div class="container" style="max-width:var(--max-width);margin:0 auto;padding:0 var(--container-padding);">
-    <h1 class="fade-in" style="font-size:clamp(2.5rem,6vw,4.5rem);font-weight:800;margin-bottom:24px;line-height:1.1;" data-section="hero" data-field="headline">${headline}</h1>
-    <p class="fade-in" style="font-size:1.25rem;color:var(--color-text-muted);max-width:640px;margin:0 auto 40px;" data-section="hero" data-field="subheadline">${sub}</p>
-    <div class="fade-in" style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+    <h1 style="font-size:clamp(2.5rem,6vw,4.5rem);font-weight:800;margin-bottom:24px;line-height:1.1;" data-section="hero" data-field="headline">${headline}</h1>
+    <p style="font-size:1.25rem;color:var(--color-text-muted);max-width:640px;margin:0 auto 40px;" data-section="hero" data-field="subheadline">${sub}</p>
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
       <a href="#contact" class="btn btn-primary" data-section="hero" data-field="cta1">Get Started</a>
       <a href="#features" class="btn btn-ghost" data-section="hero" data-field="cta2">Learn More</a>
     </div>
@@ -211,7 +211,7 @@ function heroHtml(headline: string, sub: string): string {
 
 function featuresHtml(items: { icon: string; title: string; desc: string }[]): string {
   const cards = items.map((f, i) => `
-    <div class="card fade-in" style="padding:32px;border-radius:var(--card-radius);background:var(--color-surface);border:1px solid var(--color-border);" data-section="features" data-field="card${i}">
+    <div class="card" style="padding:32px;border-radius:var(--card-radius);background:var(--color-surface);border:1px solid var(--color-border);" data-section="features" data-field="card${i}">
       <div style="font-size:2rem;margin-bottom:16px;">${f.icon}</div>
       <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:8px;" data-section="features" data-field="title${i}">${f.title}</h3>
       <p style="color:var(--color-text-muted);font-size:0.95rem;" data-section="features" data-field="desc${i}">${f.desc}</p>
@@ -219,8 +219,8 @@ function featuresHtml(items: { icon: string; title: string; desc: string }[]): s
 
   return `<section class="section" id="features" style="padding:var(--section-padding) 0;">
   <div class="container" style="max-width:var(--max-width);margin:0 auto;padding:0 var(--container-padding);">
-    <h2 class="fade-in" style="text-align:center;font-size:2.25rem;font-weight:800;margin-bottom:16px;" data-section="features" data-field="heading">What We Offer</h2>
-    <p class="fade-in" style="text-align:center;color:var(--color-text-muted);max-width:600px;margin:0 auto 48px;" data-section="features" data-field="subheading">Everything you need to succeed.</p>
+    <h2 style="text-align:center;font-size:2.25rem;font-weight:800;margin-bottom:16px;" data-section="features" data-field="heading">What We Offer</h2>
+    <p style="text-align:center;color:var(--color-text-muted);max-width:600px;margin:0 auto 48px;" data-section="features" data-field="subheading">Everything you need to succeed.</p>
     <div class="grid-3" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;">
       ${cards}
     </div>
@@ -230,7 +230,7 @@ function featuresHtml(items: { icon: string; title: string; desc: string }[]): s
 
 function statsHtml(stats: { value: string; label: string }[]): string {
   const items = stats.map((s, i) => `
-    <div class="stat-item fade-in" style="text-align:center;">
+    <div class="stat-item" style="text-align:center;">
       <div class="stat-number" style="font-size:2.5rem;font-weight:800;color:var(--color-primary);" data-section="stats" data-field="value${i}">${s.value}</div>
       <div style="color:var(--color-text-muted);font-size:0.9rem;margin-top:4px;" data-section="stats" data-field="label${i}">${s.label}</div>
     </div>`).join("\n");
@@ -245,14 +245,14 @@ function statsHtml(stats: { value: string; label: string }[]): string {
 function testimonialsHtml(): string {
   return `<section class="section" id="about" style="padding:var(--section-padding) 0;">
   <div class="container" style="max-width:var(--max-width);margin:0 auto;padding:0 var(--container-padding);">
-    <h2 class="fade-in" style="text-align:center;font-size:2rem;font-weight:800;margin-bottom:48px;" data-section="testimonials" data-field="heading">What People Say</h2>
+    <h2 style="text-align:center;font-size:2rem;font-weight:800;margin-bottom:48px;" data-section="testimonials" data-field="heading">What People Say</h2>
     <div class="grid-2" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;">
-      <div class="testimonial-card card fade-in" style="padding:32px;border-radius:var(--card-radius);background:var(--color-surface);border:1px solid var(--color-border);">
+      <div class="testimonial-card card" style="padding:32px;border-radius:var(--card-radius);background:var(--color-surface);border:1px solid var(--color-border);">
         <p style="font-style:italic;margin-bottom:16px;color:var(--color-text-muted);" data-section="testimonials" data-field="quote0">"Absolutely transformed how we work. Highly recommended."</p>
         <div style="font-weight:600;" data-section="testimonials" data-field="name0">Alex Johnson</div>
         <div style="color:var(--color-text-muted);font-size:0.85rem;" data-section="testimonials" data-field="role0">CEO, TechCorp</div>
       </div>
-      <div class="testimonial-card card fade-in" style="padding:32px;border-radius:var(--card-radius);background:var(--color-surface);border:1px solid var(--color-border);">
+      <div class="testimonial-card card" style="padding:32px;border-radius:var(--card-radius);background:var(--color-surface);border:1px solid var(--color-border);">
         <p style="font-style:italic;margin-bottom:16px;color:var(--color-text-muted);" data-section="testimonials" data-field="quote1">"The results speak for themselves. Our growth has been incredible."</p>
         <div style="font-weight:600;" data-section="testimonials" data-field="name1">Sarah Chen</div>
         <div style="color:var(--color-text-muted);font-size:0.85rem;" data-section="testimonials" data-field="role1">Marketing Director</div>
@@ -265,9 +265,9 @@ function testimonialsHtml(): string {
 function ctaHtml(): string {
   return `<section class="section" id="contact" style="padding:var(--section-padding) 0;text-align:center;">
   <div class="container" style="max-width:640px;margin:0 auto;padding:0 var(--container-padding);">
-    <h2 class="fade-in" style="font-size:2.5rem;font-weight:800;margin-bottom:16px;" data-section="cta" data-field="heading">Ready to Get Started?</h2>
-    <p class="fade-in" style="color:var(--color-text-muted);margin-bottom:32px;" data-section="cta" data-field="subheading">Join thousands who already trust us.</p>
-    <a href="#" class="btn btn-primary btn-lg fade-in" data-section="cta" data-field="button">Start Free Trial</a>
+    <h2 style="font-size:2.5rem;font-weight:800;margin-bottom:16px;" data-section="cta" data-field="heading">Ready to Get Started?</h2>
+    <p style="color:var(--color-text-muted);margin-bottom:32px;" data-section="cta" data-field="subheading">Join thousands who already trust us.</p>
+    <a href="#" class="btn btn-primary btn-lg" data-section="cta" data-field="button">Start Free Trial</a>
   </div>
 </section>`;
 }
