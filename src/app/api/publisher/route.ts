@@ -13,53 +13,10 @@ interface PublishRecord {
 
 /* ---------- demo history ---------- */
 const PUBLISH_HISTORY: PublishRecord[] = [
-  {
-    id: "pub_1",
-    content: "Just launched my new portfolio site in 90 seconds with AI. The future of web design is here.",
-    platforms: ["twitter", "linkedin"],
-    status: "published",
-    scheduledAt: null,
-    publishedAt: "2026-03-21T14:30:00Z",
-    results: [
-      { platform: "twitter", status: "success", url: "https://x.com/user/status/123456" },
-      { platform: "linkedin", status: "success", url: "https://linkedin.com/feed/update/789" },
-    ],
-  },
-  {
-    id: "pub_2",
-    content: "5 tips for making your restaurant website stand out. Thread coming soon!",
-    platforms: ["twitter", "instagram", "facebook"],
-    status: "published",
-    scheduledAt: null,
-    publishedAt: "2026-03-19T10:00:00Z",
-    results: [
-      { platform: "twitter", status: "success", url: "https://x.com/user/status/654321" },
-      { platform: "instagram", status: "success", url: "https://instagram.com/p/abc123" },
-      { platform: "facebook", status: "failed", error: "Auth token expired. Reconnect your account." },
-    ],
-  },
-  {
-    id: "pub_3",
-    content: "Our client's e-commerce site went live today. 200% faster than traditional development.",
-    platforms: ["linkedin"],
-    status: "scheduled",
-    scheduledAt: "2026-03-25T09:00:00Z",
-    publishedAt: "2026-03-20T16:00:00Z",
-    results: [],
-  },
-  {
-    id: "pub_4",
-    content: "New blog post: How AI is changing the web design industry in 2026.",
-    platforms: ["twitter", "linkedin", "reddit"],
-    status: "published",
-    scheduledAt: null,
-    publishedAt: "2026-03-15T12:00:00Z",
-    results: [
-      { platform: "twitter", status: "success", url: "https://x.com/user/status/111222" },
-      { platform: "linkedin", status: "success", url: "https://linkedin.com/feed/update/333" },
-      { platform: "reddit", status: "success", url: "https://reddit.com/r/webdev/comments/abc" },
-    ],
-  },
+  { id: "pub_1", content: "Just launched my new portfolio site in 90 seconds with AI.", platforms: ["twitter", "linkedin"], status: "published", scheduledAt: null, publishedAt: "2026-03-21T14:30:00Z", results: [{ platform: "twitter", status: "success", url: "https://x.com/user/status/123456" }, { platform: "linkedin", status: "success", url: "https://linkedin.com/feed/update/789" }] },
+  { id: "pub_2", content: "5 tips for making your restaurant website stand out.", platforms: ["twitter", "instagram", "facebook"], status: "published", scheduledAt: null, publishedAt: "2026-03-19T10:00:00Z", results: [{ platform: "twitter", status: "success", url: "https://x.com/user/status/654321" }, { platform: "instagram", status: "success", url: "https://instagram.com/p/abc123" }, { platform: "facebook", status: "failed", error: "Auth token expired." }] },
+  { id: "pub_3", content: "Our client's e-commerce site went live today.", platforms: ["linkedin"], status: "scheduled", scheduledAt: "2026-03-25T09:00:00Z", publishedAt: "2026-03-20T16:00:00Z", results: [] },
+  { id: "pub_4", content: "How AI is changing the web design industry in 2026.", platforms: ["twitter", "linkedin", "reddit"], status: "published", scheduledAt: null, publishedAt: "2026-03-15T12:00:00Z", results: [{ platform: "twitter", status: "success", url: "https://x.com/user/status/111222" }, { platform: "linkedin", status: "success", url: "https://linkedin.com/feed/update/333" }, { platform: "reddit", status: "success", url: "https://reddit.com/r/webdev/comments/abc" }] },
 ];
 
 const SUPPORTED_PLATFORMS = ["twitter", "linkedin", "instagram", "facebook", "tiktok", "reddit"];
