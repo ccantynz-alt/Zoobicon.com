@@ -12,11 +12,8 @@ import {
   Zap,
   RefreshCw,
   Globe,
-  Check,
   FileCode,
-  Copy,
 } from "lucide-react";
-import { useState } from "react";
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -30,42 +27,40 @@ const staggerContainer = {
 const STEPS = [
   {
     step: "1",
-    title: "Install the Plugin",
-    description: "Download the Zoobicon Connect plugin and install it on your WordPress site via Plugins → Add New → Upload Plugin.",
-    icon: Download,
+    title: "Build with AI",
+    description: "Use the Zoobicon Builder to generate your website. Pick from 43 generators or describe what you want in plain English.",
+    icon: Zap,
   },
   {
     step: "2",
-    title: "Copy Your Connect Key",
-    description: "After activation, go to Zoobicon in the WordPress sidebar. Your Connect Key is auto-generated and ready to copy.",
-    icon: Shield,
+    title: "Export as WordPress Theme",
+    description: "Click Export → WordPress in the builder. Zoobicon generates a complete WordPress theme with style.css, functions.php, and templates.",
+    icon: FileCode,
   },
   {
     step: "3",
-    title: "Deploy from Zoobicon",
-    description: "In the Zoobicon Builder, click Export → WordPress → Deploy. Enter your site URL and Connect Key, then hit Deploy.",
-    icon: Upload,
+    title: "Download Your Theme",
+    description: "Download the theme as a ZIP file. Includes all HTML, CSS, and a WXR import file for your content. No plugin required.",
+    icon: Download,
   },
   {
     step: "4",
-    title: "Page Goes Live",
-    description: "Your AI-generated page appears in WordPress as a draft or published page. Edit it in WordPress or re-deploy from Zoobicon anytime.",
-    icon: Zap,
+    title: "Upload to WordPress",
+    description: "In WordPress, go to Appearance → Themes → Add New → Upload. Install your theme and activate it. Done.",
+    icon: Upload,
   },
 ];
 
 const FEATURES = [
-  { icon: Upload, title: "One-Click Deploy", desc: "Push directly from the Zoobicon builder to WordPress. No downloads, no FTP, no copy-paste." },
-  { icon: RefreshCw, title: "Update in Place", desc: "Re-deploy to update existing pages. Version history preserved. Roll back anytime." },
-  { icon: Shield, title: "Secure Authentication", desc: "Connect Key auth over HTTPS. Keys never leave your server. Regenerate anytime." },
-  { icon: Globe, title: "SEO Preserved", desc: "Meta titles, descriptions, and OG images deploy with the page. Yoast SEO compatible." },
-  { icon: FileCode, title: "Full HTML + CSS", desc: "Styles embedded inline. No theme conflicts. Works with any WordPress theme." },
-  { icon: Zap, title: "Agency Ready", desc: "Deploy to multiple client WordPress sites. Save connections for repeat deployments." },
+  { icon: Download, title: "Complete Theme Export", desc: "Full WordPress theme with style.css, functions.php, index.php, and template files. Ready to install." },
+  { icon: FileCode, title: "Clean HTML + CSS", desc: "Styles embedded inline. No theme conflicts. Works alongside any existing WordPress setup." },
+  { icon: Globe, title: "SEO Included", desc: "Meta titles, descriptions, and OG tags baked into the theme. Yoast SEO compatible out of the box." },
+  { icon: Shield, title: "No Plugin Required", desc: "Pure theme export — works on any WordPress installation. Self-hosted, WordPress.com Business, any host." },
+  { icon: RefreshCw, title: "WXR Content Import", desc: "WordPress XML import file included. Import your pages and content in one step via Tools → Import." },
+  { icon: Zap, title: "Or Just Host on Zoobicon", desc: "Skip WordPress entirely. Deploy instantly to zoobicon.sh with free hosting, SSL, and CDN included." },
 ];
 
 export default function WordPressPage() {
-  const [copied, setCopied] = useState(false);
-
   return (
     <div className="relative min-h-screen">
       <BackgroundEffects preset="technical" />
@@ -98,7 +93,7 @@ export default function WordPressPage() {
           <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="text-center">
             <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-blue-400/20 bg-blue-400/5 mb-6">
               <svg className="w-4 h-4 text-blue-400" viewBox="0 0 24 24" fill="currentColor"><path d="M21.469 6.825c.84 4.471-2.015 9.235-6.38 10.638-4.366 1.403-9.1-.587-10.58-4.445C3.03 9.16 5.885 4.395 10.25 2.992c.227-.073.454-.134.681-.182l-.184 2.072 2.36-2.072 2.36 2.072-.184-2.072c3.528.958 6.04 3.9 6.186 7.015z"/></svg>
-              <span className="text-xs font-medium text-blue-400">WordPress Plugin</span>
+              <span className="text-xs font-medium text-blue-400">WordPress Export</span>
             </motion.div>
 
             <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[0.95] mb-6">
@@ -107,22 +102,21 @@ export default function WordPressPage() {
             </motion.h1>
 
             <motion.p variants={fadeInUp} className="max-w-2xl mx-auto text-lg text-white/60 leading-relaxed mb-10">
-              Generate with AI. Deploy to WordPress. One click. The Zoobicon Connect plugin
-              turns your WordPress site into a deployment target for AI-generated pages.
+              Generate with AI. Export as a WordPress theme. Upload and go. Build your site in
+              Zoobicon, then take it to WordPress — or host it free on zoobicon.sh.
             </motion.p>
 
             <motion.div variants={fadeInUp} className="flex flex-wrap justify-center gap-3">
-              <a
-                href="/api/download/wordpress-plugin"
-                download="zoobicon-connect.zip"
+              <Link
+                href="/builder"
                 className="group btn-gradient px-6 py-3 rounded-xl text-sm font-bold text-white flex items-center gap-2"
               >
-                <Download className="w-4 h-4" />
-                Download Plugin v1.0
+                <Zap className="w-4 h-4" />
+                Start Building
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </a>
-              <Link href="/builder" className="px-6 py-3 rounded-xl text-sm font-medium text-white/65 border border-white/[0.12] hover:border-white/20 hover:text-white/70 transition-all flex items-center gap-2">
-                Open Builder
+              </Link>
+              <Link href="/hosting" className="px-6 py-3 rounded-xl text-sm font-medium text-white/65 border border-white/[0.12] hover:border-white/20 hover:text-white/70 transition-all flex items-center gap-2">
+                Free Hosting on zoobicon.sh
               </Link>
             </motion.div>
           </motion.div>
@@ -162,10 +156,10 @@ export default function WordPressPage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <motion.h2 variants={fadeInUp} className="text-4xl md:text-5xl font-black tracking-tight text-center mb-4">
-              Why <span className="gradient-text">Zoobicon Connect</span>
+              What You <span className="gradient-text">Get</span>
             </motion.h2>
             <motion.p variants={fadeInUp} className="text-lg text-white/60 text-center mb-12 max-w-2xl mx-auto">
-              The fastest way to get AI-generated content onto WordPress
+              A complete WordPress theme generated by AI, ready to upload
             </motion.p>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -181,51 +175,40 @@ export default function WordPressPage() {
         </div>
       </section>
 
-      {/* REST API */}
+      {/* Compatibility */}
       <section className="py-20 border-t border-white/[0.08]">
         <div className="max-w-3xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <motion.h2 variants={fadeInUp} className="text-4xl font-black tracking-tight text-center mb-4">
-              Plugin <span className="gradient-text">REST API</span>
+              WordPress <span className="gradient-text">Compatibility</span>
             </motion.h2>
             <motion.p variants={fadeInUp} className="text-sm text-white/60 text-center mb-8">
-              The plugin registers these endpoints on your WordPress site:
+              Theme export works everywhere. Here&apos;s what each WordPress setup supports:
             </motion.p>
 
             <motion.div variants={fadeInUp} className="gradient-border rounded-2xl overflow-hidden">
               <div className="bg-dark-300/60 divide-y divide-white/[0.08]">
                 {[
-                  { method: "POST", path: "/wp-json/zoobicon/v1/deploy", desc: "Deploy a page from Zoobicon" },
-                  { method: "GET", path: "/wp-json/zoobicon/v1/status", desc: "Plugin health check" },
-                  { method: "GET", path: "/wp-json/zoobicon/v1/pages", desc: "List deployed pages" },
-                  { method: "DELETE", path: "/wp-json/zoobicon/v1/pages/:id", desc: "Delete a deployed page" },
-                ].map((ep, i) => (
-                  <div key={i} className="flex items-center gap-3 px-5 py-3 hover:bg-white/[0.03]">
+                  { platform: "Self-hosted (WordPress.org)", theme: true, plugin: true, note: "Full support — themes, plugins, custom code" },
+                  { platform: "WordPress.com Business+", theme: true, plugin: true, note: "Full support — upload themes and plugins" },
+                  { platform: "WordPress.com Personal/Premium", theme: false, plugin: false, note: "Limited — no custom themes or plugins" },
+                  { platform: "WordPress.com Free", theme: false, plugin: false, note: "Very limited — use zoobicon.sh hosting instead" },
+                ].map((row, i) => (
+                  <div key={i} className="flex items-center gap-3 px-5 py-3.5 hover:bg-white/[0.03]">
+                    <span className="text-sm text-white/80 font-medium min-w-[200px]">{row.platform}</span>
                     <span className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded ${
-                      ep.method === "POST" ? "bg-brand-500/15 text-brand-400"
-                        : ep.method === "DELETE" ? "bg-red-500/15 text-red-400"
-                        : "bg-accent-cyan/15 text-accent-cyan"
-                    }`}>{ep.method}</span>
-                    <code className="text-xs font-mono text-white/70">{ep.path}</code>
-                    <span className="text-xs text-white/50 hidden md:block ml-auto">{ep.desc}</span>
+                      row.theme ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"
+                    }`}>{row.theme ? "✓ Theme" : "✗ Theme"}</span>
+                    <span className="text-xs text-white/50 hidden md:block ml-auto">{row.note}</span>
                   </div>
                 ))}
               </div>
             </motion.div>
 
-            <motion.div variants={fadeInUp} className="mt-6">
-              <div className="bg-dark-300/60 border border-white/[0.08] rounded-xl p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-medium text-zinc-400">Auth header</span>
-                  <button
-                    onClick={() => { navigator.clipboard.writeText('X-Zoobicon-Key: zbc_your_key_here'); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
-                    className="text-white/50 hover:text-white/60"
-                  >
-                    {copied ? <Check className="w-3 h-3 text-accent-cyan" /> : <Copy className="w-3 h-3" />}
-                  </button>
-                </div>
-                <code className="text-sm font-mono text-accent-cyan">X-Zoobicon-Key: zbc_your_key_here</code>
-              </div>
+            <motion.div variants={fadeInUp} className="mt-6 bg-accent-cyan/5 border border-accent-cyan/10 rounded-xl p-4">
+              <p className="text-sm text-white/60 leading-relaxed">
+                <span className="text-accent-cyan font-semibold">Recommendation:</span> For the fastest, easiest experience, host directly on <Link href="/hosting" className="text-accent-cyan hover:underline">zoobicon.sh</Link> — free hosting with SSL, CDN, and instant deploys. No WordPress needed.
+              </p>
             </motion.div>
           </motion.div>
         </div>
@@ -235,22 +218,21 @@ export default function WordPressPage() {
       <section className="py-20 border-t border-white/[0.08]">
         <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-black tracking-tight mb-4">
-            Ready to <span className="gradient-text">Connect</span>?
+            Ready to <span className="gradient-text">Build</span>?
           </h2>
           <p className="text-lg text-white/60 mb-8">
-            Download the plugin, activate it, and deploy your first AI page in under 2 minutes.
+            Build your site with AI, then export to WordPress or host free on zoobicon.sh.
           </p>
           <div className="flex justify-center gap-3">
-            <a
-              href="/api/download/wordpress-plugin"
-              download="zoobicon-connect.zip"
+            <Link
+              href="/builder"
               className="btn-gradient px-8 py-3 rounded-xl text-sm font-bold text-white flex items-center gap-2"
             >
-              <Download className="w-4 h-4" />
-              Download Plugin
-            </a>
-            <Link href="/builder" className="px-8 py-3 rounded-xl text-sm font-medium text-white/65 border border-white/[0.12] hover:border-white/20 transition-all">
-              Open Builder
+              <Zap className="w-4 h-4" />
+              Start Building
+            </Link>
+            <Link href="/hosting" className="px-8 py-3 rounded-xl text-sm font-medium text-white/65 border border-white/[0.12] hover:border-white/20 transition-all">
+              Free Hosting
             </Link>
           </div>
         </div>
