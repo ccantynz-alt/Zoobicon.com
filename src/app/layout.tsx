@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import "./globals.css";
+import GlobalChat from "@/components/GlobalChat";
 
 
 const BRAND_META: Record<string, {
@@ -180,6 +181,7 @@ export default function RootLayout({
       </head>
       <body className="grain">
         {children}
+        <GlobalChat />
       </body>
     </html>
   );

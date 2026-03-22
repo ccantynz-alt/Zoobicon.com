@@ -14,6 +14,14 @@
     {
       "path": "/api/seo/agent/cron",
       "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/intel/cron",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/auto-pilot/cron",
+      "schedule": "0 3 * * 1"
     }
   ],
 
@@ -43,6 +51,18 @@
       "memory": 1024
     },
     "src/app/api/generate/quick/route.ts": {
+      "maxDuration": 300,
+      "memory": 1024
+    },
+    "src/app/api/generate/instant/route.ts": {
+      "maxDuration": 300,
+      "memory": 1024
+    },
+    "src/app/api/intel/cron/route.ts": {
+      "maxDuration": 300,
+      "memory": 1024
+    },
+    "src/app/api/auto-pilot/cron/route.ts": {
       "maxDuration": 300,
       "memory": 1024
     },
