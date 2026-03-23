@@ -277,7 +277,7 @@ const STANDARD_SECTIONS = `
 2. Hero <section> — class="hero hero-mesh fade-in" with full-viewport feel. Wrap text in <div class="container hero-reveal">. Big headline in <h1> with <span class="hero-gradient-text"> on key words, subheading in <p class="text-lg text-muted">, two CTAs (.btn-primary.btn-lg.hero-btn-glow + .btn-ghost.btn-lg), and a social proof line. Add 1-2 <div class="hero-orb"> for ambient glow.
 3. Social proof — <section class="section-alt fade-in"> with <div class="logo-strip"> containing 4-5 company name spans.
 4. Features — <section class="section fade-in"> with .section-header (h2 + p) then .grid.grid-3 > .card > .card-body. Each card: inline SVG icon (24x24), <h3>, <p class="text-muted">. Write 6 cards.
-5. About — <section class="section section-alt fade-in"> with .grid.grid-2: one side = <img> (picsum, 800x500), other side = story text + stats in .flex.gap-3 using .stat-item.
+5. About — <section class="section section-alt fade-in"> with .grid.grid-2: one side = CSS gradient div (linear-gradient, 300px tall) with a large centered SVG icon, other side = story text + stats in .flex.gap-3 using .stat-item. If IMAGE GUIDANCE provides an about image URL, use that instead of the gradient.
 6. Testimonials — <section class="section fade-in"> with .section-header then .grid.grid-3 > .testimonial-card. Each: .testimonial-stars ("★★★★★"), <p> with specific quote mentioning metrics, <div> with name+title. 3 testimonials.
 7. Stats — <section class="section section-alt fade-in" with dark or accent background via inline style> with .grid.grid-4 > .stat-item. Use <div class="stat-number" data-target="NUMBER" data-suffix="+" data-prefix="">0</div> for animated counters + .stat-label. 4 stats.
 8. FAQ — <section class="section fade-in"> with .section-header then .faq-item > .faq-question (text + <span class="faq-icon">+</span>) + .faq-answer > p. Write 5 Q&As.
@@ -285,30 +285,16 @@ const STANDARD_SECTIONS = `
 10. Footer — <footer class="section fade-in" style="background:var(--color-text);color:#fff;padding:60px var(--container-padding)"> with .container > .grid.grid-4: about blurb, quick links, services, contact info.
 
 ## IMAGE RULES — MANDATORY
-Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for ALL images. These are PLACEHOLDER URLs — the server automatically replaces them with real, contextually matched stock photos based on the KEYWORD you provide.
+Do NOT use picsum.photos for hero, features, or testimonial avatars. Picsum returns random unrelated images.
 
-THE KEYWORD IS CRITICAL — it determines which real photo is shown. Make keywords descriptive and include the business industry.
+IMAGE SOURCES BY SECTION:
+- Hero: Use .hero-aurora or .hero-mesh CSS class for animated gradient background. Add 1-2 .hero-orb divs for glow. Do NOT use an <img> tag in the hero. If the user message includes CURATED IMAGES with a hero URL, use that instead.
+- Feature cards: Use inline SVG icons (24-48px) drawn with <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">. Do NOT use <img> tags for feature cards.
+- About section: Use a CSS gradient background div OR an image URL from CURATED IMAGES if provided.
+- Testimonial avatars: Use https://randomuser.me/api/portraits/men/N.jpg or women/N.jpg (N=1-99, unique per person). Style: width:60px; height:60px; border-radius:50%; object-fit:cover.
+- Gallery/portfolio: ONLY here use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT.
 
-Each image MUST use a UNIQUE seed from this list (assign in order):
-- img1: hero image (1200/600)
-- img2: about photo (800/500)
-- img3: feature card 1 (400/300)
-- img4: feature card 2 (400/300)
-- img5: feature card 3 (400/300)
-- img6: testimonial avatar 1 (80/80)
-- img7: testimonial avatar 2 (80/80)
-- img8: testimonial avatar 3 (80/80)
-
-For KEYWORD: use the business INDUSTRY plus image purpose, separated by hyphens. Include the core industry word so our photo matcher can find the right category.
-Examples for a bakery (note "restaurant" and "food" keywords for matching):
-img1=restaurant-bakery-interior, img2=food-baker-kneading-dough, img3=restaurant-fresh-pastries, img4=food-cafe-interior, img5=restaurant-wedding-cake, img6=professional-woman-portrait, img7=professional-man-portrait, img8=professional-young-portrait
-
-Examples for a cybersecurity startup:
-img1=cybersecurity-dark-operations-center, img2=technology-security-team, img3=cybersecurity-shield-protection, img4=technology-code-screen, img5=cybersecurity-network-monitoring, img6=technology-professional-man, img7=technology-professional-woman, img8=business-young-professional
-
-ALWAYS include a descriptive alt="" attribute on every <img> tag describing what the image should show.
-
-NEVER reuse a keyword. Every src must be different.
+ALWAYS include a descriptive alt="" attribute on every <img> tag.
 
 ## RULES
 - Output ONLY the <config> block and <body-html> block. Nothing else.
@@ -338,7 +324,7 @@ const PREMIUM_SECTIONS = `
 5. Solution/Features — <section class="section fade-in"> with .section-header then .grid.grid-3 > .card > .card-body. Each: colorful inline SVG icon in a tinted circle (via inline style), benefit headline, 3-line description connecting feature→benefit→outcome. 6 cards.
 6. About/Story — <section class="section section-alt fade-in-left"> with .grid.grid-2. One side: large image. Other: founder story, mission, 3-4 stats inline using .stat-item.
 7. Process/How it works — <section class="section fade-in"> with .section-header then numbered steps (1→2→3→4) with icons in accent circles, connected by a subtle line. Each step: number badge, heading, description.
-8. Testimonials — <section class="section section-alt fade-in"> with .grid.grid-3 > .testimonial-card. Each: stars, DETAILED quote with specific metrics ("Increased conversion by 47% in 3 months"), avatar image (picsum 80x80), name, title, company. 3 testimonials.
+8. Testimonials — <section class="section section-alt fade-in"> with .grid.grid-3 > .testimonial-card. Each: stars, DETAILED quote with specific metrics ("Increased conversion by 47% in 3 months"), avatar image from https://randomuser.me/api/portraits/men/N.jpg or women/N.jpg (60x60, border-radius:50%), name, title, company. 3 testimonials.
 9. Stats — <section class="section fade-in" with subtle accent background (e.g. deep navy #1e3a5f or brand primary, NOT neon) via inline style, white text> with .grid.grid-4 > .stat-item. Use animated counters: <div class="stat-number" data-target="NUMBER" data-suffix="%" data-prefix="">0</div>. 4 impressive stats.
 10. Pricing — <section class="section section-alt fade-in"> with .section-header then .grid.grid-3 for 3 pricing tiers. Middle card gets scale(1.05), accent border, "Most Popular" .badge-primary. Each: price, feature list with checkmarks (✓), CTA button.
 11. FAQ — <section class="section fade-in"> with .section-header then .faq-item > .faq-question (text + <span class="faq-icon">+</span>) + .faq-answer > p. 6 Q&As handling real objections.
@@ -346,30 +332,17 @@ const PREMIUM_SECTIONS = `
 13. Footer — <footer class="section" style="background:var(--color-text);color:rgba(255,255,255,0.9);padding:80px var(--container-padding) 40px"> with .container > .grid.grid-4: about + newsletter .input, nav links, services, contact + social icons. Bottom: copyright bar.
 
 ## IMAGE RULES — MANDATORY
-Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for ALL images. These are PLACEHOLDER URLs — the server automatically replaces them with real, contextually matched stock photos based on the KEYWORD.
+Do NOT use picsum.photos for hero, features, or testimonial avatars. Picsum returns random unrelated images.
 
-THE KEYWORD IS CRITICAL — it determines which real photo is shown. Make keywords descriptive and include the business industry.
+IMAGE SOURCES BY SECTION:
+- Hero: Already uses .hero-aurora/.hero-mesh CSS class — NO external image needed.
+- Feature cards: Use inline SVG icons in tinted accent circles. Do NOT use <img> tags.
+- About/story image: Use CSS gradient background div (matching brand colors) with large SVG icon. If CURATED IMAGES provides an about URL, use that.
+- Process step: Use numbered divs with accent circle backgrounds. No <img> needed.
+- Testimonial avatars: https://randomuser.me/api/portraits/men/N.jpg or women/N.jpg (N=1-99, unique per person). 60x60px, border-radius:50%, object-fit:cover.
+- Gallery/portfolio: ONLY here use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT.
 
-Each image MUST use a UNIQUE seed. Assign in order:
-- img1: hero (1200/600)
-- img2: about/story (800/500)
-- img3: feature 1 (400/300)
-- img4: feature 2 (400/300)
-- img5: feature 3 (400/300)
-- img6: feature 4 (400/300)
-- img7: process step (600/400)
-- img8: testimonial avatar 1 (80/80)
-- img9: testimonial avatar 2 (80/80)
-- img10: testimonial avatar 3 (80/80)
-- img11: additional section (800/500)
-
-For KEYWORD: use the business INDUSTRY plus image purpose, separated by hyphens. Include the core industry word so our photo matcher can find the right category.
-Example for a law firm (note "legal" and "law" keywords):
-img1=legal-modern-law-office-lobby, img2=legal-team-conference-room, img3=legal-courthouse-architecture, img4=legal-contract-signing, img5=legal-client-consultation, img6=legal-library-books, img7=legal-justice-scales-closeup, img8=business-professional-woman, img9=business-senior-businessman, img10=business-young-entrepreneur, img11=legal-city-skyline-downtown
-
-ALWAYS include a descriptive alt="" attribute on every <img> tag describing what the image should show.
-
-NEVER reuse a keyword. Every src must be different.
+ALWAYS include a descriptive alt="" attribute on every <img> tag.
 
 ## PREMIUM QUALITY MARKERS
 - Inline SVG icons should be colorful and detailed (not generic), using the primary/accent color
