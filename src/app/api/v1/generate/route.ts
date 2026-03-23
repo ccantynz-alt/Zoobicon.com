@@ -154,7 +154,7 @@ ${agency_brand.logoUrl ? `- Logo URL: ${agency_brand.logoUrl}` : ""}`;
 
         const [site] = await sql`
           INSERT INTO sites (name, slug, email, plan, status)
-          VALUES (${deploy_name || "API Generated Site"}, ${slug}, ${"api@zoobicon.com"}, ${"api"}, ${"active"})
+          VALUES (${deploy_name || "API Generated Site"}, ${slug}, ${`api_${auth.sub}@zoobicon.com`}, ${"api"}, ${"active"})
           ON CONFLICT (slug) DO UPDATE SET updated_at = NOW()
           RETURNING id, slug
         `;
@@ -192,7 +192,7 @@ ${agency_brand.logoUrl ? `- Logo URL: ${agency_brand.logoUrl}` : ""}`;
     try {
       await sql`
         INSERT INTO projects (user_email, name, prompt, code)
-        VALUES (${"api@zoobicon.com"}, ${`API: ${prompt.slice(0, 50)}`}, ${prompt}, ${html})
+        VALUES (${`api_${auth.sub}@zoobicon.com`}, ${`API: ${prompt.slice(0, 50)}`}, ${prompt}, ${html})
       `;
     } catch { /* best effort */ }
 

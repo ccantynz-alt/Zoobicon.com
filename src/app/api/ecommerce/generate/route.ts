@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
+import { injectComponentLibrary } from "@/lib/component-library";
 
 interface Product {
   name: string;
@@ -169,7 +170,7 @@ export async function POST(req: NextRequest) {
 
     const message = await client.messages.create({
       model: "claude-sonnet-4-6",
-      max_tokens: 16000,
+      max_tokens: 32000,
       system: buildSystemPrompt(theme),
       messages: [
         {
@@ -192,6 +193,11 @@ export async function POST(req: NextRequest) {
     // Strip markdown code fences if present
     if (html.startsWith("```")) {
       html = html.replace(/^```(?:html)?\n?/, "").replace(/\n?```$/, "");
+    }
+
+    // Inject component library CSS for consistent styling
+    if (!html.includes("ZOOBICON COMPONENT LIBRARY")) {
+      html = injectComponentLibrary(html);
     }
 
     return NextResponse.json({
