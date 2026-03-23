@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 import { COMPONENT_LIBRARY_CSS } from "@/lib/component-library";
 import { callLLMWithFailover } from "@/lib/llm-provider";
 import { getGeneratorDef, getGeneratorSystemSupplement } from "@/lib/generator-prompts";
-import { getImagePromptBlock } from "@/lib/stock-images";
+import { getImagePromptBlockSync } from "@/lib/stock-images";
 
 /** Check if an error is a rate limit or overload that warrants model fallback */
 function isRetryableError(err: unknown): boolean {
@@ -421,8 +421,8 @@ export async function POST(req: NextRequest) {
     const client = new Anthropic({ apiKey, timeout });
     const encoder = new TextEncoder();
 
-    // Inject curated Unsplash images when industry is detected
-    const imageBlock = getImagePromptBlock(prompt);
+    // Inject industry-specific image guidance (sync — no API call in quick route)
+    const imageBlock = getImagePromptBlockSync(prompt);
 
     const userMessage = isPremium
       ? `Build a world-class PREMIUM website for: ${prompt}
