@@ -6,6 +6,7 @@ import { sql } from "@/lib/db";
 import { checkGenerationLimit, getCurrentPeriod, getAgencyPlanLimits } from "@/lib/agency-limits";
 import { authenticateRequest, checkUsageQuota, trackUsage } from "@/lib/auth-guard";
 import { injectComponentLibrary } from "@/lib/component-library";
+import { getImagePromptBlock } from "@/lib/stock-images";
 
 const STANDARD_SYSTEM = `You are Zoobicon, an elite AI website generator producing $20K+ agency-quality sites. Output a single, complete HTML file.
 
@@ -256,11 +257,14 @@ This site is being built for a white-label agency. Apply these branding rules:
 - Secondary brand color: ${agencyBrand.secondaryColor || "#8b5cf6"} — use this for gradients and accents.
 - The site content itself should still be about whatever the user requested — the white-label branding only affects platform attribution.`;
       }
+      // Detect industry and inject curated Unsplash images when available
+      const imageBlock = getImagePromptBlock(prompt);
+
       userMessage = `Build a premium, agency-quality website for: ${prompt}
 
 Requirements:
-- Split hero with text left + large image right (https://picsum.photos/seed/KEYWORD/640/480). Include trust badge, headline, subheadline, 2 CTAs, trust checkmarks.
-- 6 feature cards each with their own image (https://picsum.photos/seed/KEYWORD/400/250)
+- Split hero with text left + large image right. Include trust badge, headline, subheadline, 2 CTAs, trust checkmarks.
+- 6 feature cards each with their own image
 - About section with side-by-side image and text, floating stat overlay
 - 3 testimonials with avatar photos and star ratings
 - Stats section with 4 bold numbers
@@ -268,8 +272,8 @@ Requirements:
 - CTA section with colored background and 2 buttons
 - Dark footer with 4 columns
 - Use industry-appropriate colors and typography. Match the aesthetic to the business type.
-- Every image uses https://picsum.photos/seed/DESCRIPTIVE-KEYWORD/WIDTH/HEIGHT with unique seeds.
-- MINIMUM 8 images total across the page. No section should be text-only.`;
+- MINIMUM 8 images total across the page. No section should be text-only.
+${imageBlock || "- Every image uses https://picsum.photos/seed/DESCRIPTIVE-KEYWORD/WIDTH/HEIGHT with unique, industry-specific seeds."}`;
       model = requestedModel || "claude-opus-4-6";
       maxTokens = 32000;
     }
