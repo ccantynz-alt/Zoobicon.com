@@ -257,8 +257,8 @@ This site is being built for a white-label agency. Apply these branding rules:
 - Secondary brand color: ${agencyBrand.secondaryColor || "#8b5cf6"} — use this for gradients and accents.
 - The site content itself should still be about whatever the user requested — the white-label branding only affects platform attribution.`;
       }
-      // Detect industry and inject curated Unsplash images when available
-      const imageBlock = getImagePromptBlock(prompt);
+      // Detect industry and inject curated images when available (Pexels API or fallback)
+      const imageBlock = await getImagePromptBlock(prompt);
 
       userMessage = `Build a premium, agency-quality website for: ${prompt}
 
