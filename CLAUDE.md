@@ -622,6 +622,42 @@ Competitors (v0, Bolt, Lovable) are ONLY website builders. Zoobicon is a **compl
 - ⬜ API access for programmatic site generation (agency feature)
 - ⬜ White-label deployment to agency-owned infrastructure
 
+## MARKET INTELLIGENCE — March 2026 Trends (Research-Backed)
+
+### Key Market Stats
+- **AI coding tools:** 84% of developers use or plan to use AI tools. 51% use daily. 41% of all global code is now AI-generated.
+- **Vibe coding:** 63% of vibe coding users are NON-developers. "Vibe Coding" was Collins Dictionary Word of the Year 2025.
+- **MCP (Model Context Protocol):** 97M monthly SDK downloads, 10,000+ active servers. Donated to Linux Foundation. First-class support in Claude, ChatGPT, Cursor, Gemini, VS Code.
+- **No-code/low-code market:** Exceeds $30B in 2026, on track for $65B by 2030. 70% of new apps use no-code/low-code.
+- **AI agents:** 80% of enterprise apps will embed AI agents by end of 2026. Gartner says 40% will include task-specific agents (up from <5% in early 2025).
+- **SMB SaaS spend:** Solopreneurs average $150-400/mo across 8-15 tools. Small businesses $500-2,000/mo across 34-40 tools.
+- **Highest churn categories:** Website builders (22-30%), social schedulers (25-30%), email marketing (20-25%), SEO tools (18-22%), CRM (20-25%).
+
+### Competitive Landscape Update (March 2026)
+| Competitor | Latest | Valuation/Scale |
+|---|---|---|
+| **Cursor** | $1B ARR in 24 months, Mission Control for 8 parallel agents | $29B valuation |
+| **Lovable** | Full-stack React + Supabase from conversation | $6.6B valuation, $200M+ ARR, $330M Series B |
+| **Bolt.new** | Supports React/Vue/Svelte/Angular/Expo, generous free tier | Growing fast |
+| **Emergent** | Multi-agent pipeline + MCP support + React Native | $100M+ ARR |
+| **Base44** | Acquired by Wix for $80M after 6 months | Wix-owned |
+| **GitHub Copilot** | 20M users, 42% market share, 90% Fortune 100 | Microsoft-backed |
+
+### Immediate Opportunities (From Research)
+1. **MCP Integration** — Become "MCP-native." Let users connect GitHub, Notion, Figma, Slack context into generation. Emergent already has this.
+2. **Pipeline as Viral Content** — "Watch 7 AI agents build your site" is TikTok-viral. Our pipeline visualization IS the marketing.
+3. **Share-to-Social After Deploy** — "I built this in 90 seconds" established viral format. One-click sharing with auto-generated OG images.
+4. **Code Export & Ownership** — "You own your code, forever" differentiates against lock-in anxiety.
+5. **AI Security Scanning** — All competitors produce code with 40-45% vulnerability rates. Adding security scanning = unique differentiator.
+6. **Vertical SaaS Starter Kits** — Industry-specific compound platforms growing 2x. Our 13 template categories → vertical starter kits (restaurant: menu + booking + reviews).
+
+### Trending Formats (Viral Potential)
+- "I built this website in 90 seconds" videos (TikTok, Instagram Reels)
+- Behind-the-scenes AI tool usage videos
+- Before/after transformations
+- Speed comparison videos (Zoobicon vs hiring a developer)
+- Pipeline visualization walkthroughs (7 agents working)
+
 ## ONGOING PRIORITY: Full-Stack Build Speed — Outpace Every Competitor
 
 **This is a standing research and improvement mandate.** Every session, every task — always look for ways to make the full-stack build pipeline faster. Speed is the #1 competitive advantage we can own.
