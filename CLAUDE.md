@@ -557,6 +557,33 @@ Competitors (v0, Bolt, Lovable) are ONLY website builders. Zoobicon is a **compl
 | Unbounce | $74 | /landing-pages |
 | **TOTAL** | **$923/mo** | **$49/mo (Pro plan)** |
 
+### 4-Domain Ecosystem Strategy — Each Domain Owns a Verb
+
+**The core principle:** Each domain is a standalone product that is excellent on its own but becomes dramatically more powerful when connected to the others. Shared layer: one identity, one data model, one billing relationship, cross-domain deep links.
+
+| Domain | Verb | Personality | Audience | Products |
+|--------|------|-------------|----------|----------|
+| **zoobicon.com** | BUILD | Creative, visual, approachable | Entrepreneurs, SMBs, freelancers, agencies | AI Builder, Brand Kit, Template Forge, Visual Editor, Client Portals, Proposals, Booking, Email Marketing, Digital Store, Gallery |
+| **zoobicon.sh** | SHIP | Hacker aesthetic, terminal-first | Developers, deployers, anyone with a live site | Hosting, Custom Domains, CLI Tool, Edge Functions, Managed DB, Preview Deploys, Analytics, Uptime Monitoring, Cron Jobs, Log Stream |
+| **zoobicon.ai** | GROW | Technical but accessible, futuristic | Power users, marketers, SEO pros, agencies | Autonomous SEO Agent, Content Engine, Cross-Platform Publisher, AI Image Studio, Reputation Manager, Competitor Intel, Smart Forms, Video Pipeline, AI Chat Agent, Weekly Business Reports |
+| **zoobicon.io** | CONNECT | Clean, minimal, API-first | Developers, SaaS builders, integration partners | REST API, SDKs, Webhook Platform, Developer Dashboard, MCP Server, Integration Marketplace, White-Label API, CI/CD Plugins, GraphQL API, Open Source Component Kit |
+
+**The cross-domain flywheel:**
+```
+.com (BUILD) ──generates──> .sh (HOST) ──produces──> .io (ANALYZE/INTEGRATE)
+     ^                          |                           |
+     |                          v                           v
+     └────────────── .ai (OPTIMIZE) <──────────────────────┘
+```
+
+**Lock-in layers (users love, not hate):**
+1. DNS-locked (custom domain on .sh)
+2. Data-locked (database, analytics history, subscriber list)
+3. Workflow-locked (CI/CD, cron jobs, weekly reports)
+4. Revenue-locked (invoices, store, client billing flowing through platform)
+5. Identity-locked (creator profile, gallery reputation, template sales)
+6. Network-locked (clients, collaborators, subscribers all on platform)
+
 ### Build Plan — Next Phases
 
 **Phases 1-5 are complete.** All five original roadmap phases have been implemented:
@@ -565,6 +592,11 @@ Competitors (v0, Bolt, Lovable) are ONLY website builders. Zoobicon is a **compl
 - Phase 3 (Project Mode): ProjectTree.tsx, /api/generate/project, /api/export/github
 - Phase 4 (Generator Domination): 43 generators, 33 system supplements, 100 templates
 - Phase 5 (Agency Platform): Full agency dashboard, client portal, white-label, bulk gen, quotas, OAuth
+
+**Phase 5.5: Business OS Expansion (COMPLETE)**
+- 34 new product pages built: Forms, CRM, AI Chat, Link-Bio, QR Codes, Proposals, Knowledge Base, Status Page, Feedback, Automation, Portfolio, Resume, Business Card, Pitch Deck, Documentation, Testimonials Wall, Surveys, Waitlist, Landing Pages, API Docs, Webhooks, Integrations Hub, White Paper, Case Study, Reports, Heatmaps, Changelog, Uptime, Reviews, Feature Requests, Popups, Messaging, Roadmap, A/B Testing
+- 24 new API routes with demo data
+- Platform now offers 75+ products replacing $923/mo in SaaS tools for $49/mo
 
 **Phase 6: Production Hardening**
 - Connect real domain registrar API (Namecheap/Cloudflare reseller) — currently simulated
