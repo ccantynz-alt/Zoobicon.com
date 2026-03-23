@@ -49,6 +49,13 @@ import {
   Check,
   RotateCcw,
   Shield,
+  Star,
+  Eye,
+  AlertCircle,
+  TrendingUp,
+  Activity,
+  ThumbsUp,
+  Hash,
 } from "lucide-react";
 
 // ---------- Types ----------
@@ -77,6 +84,21 @@ interface Ticket {
     resolutionDeadline: string;
     breached: boolean;
   };
+}
+
+interface CSATRating {
+  ticketId: string;
+  rating: number;
+  comment: string;
+  submittedAt: string;
+}
+
+interface TicketLock {
+  ticketId: string;
+  agentName: string;
+  agentEmail: string;
+  lockedAt: number;
+  action: "viewing" | "replying";
 }
 
 type Folder = "all" | "open" | "pending" | "resolved" | "spam";
@@ -320,30 +342,95 @@ function slaTimeLeft(deadline: string): { label: string; color: string } {
   return { label: `SLA: ${hrs}h left`, color: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" };
 }
 
-// ---------- Canned Responses ----------
-const CANNED_RESPONSES = [
-  { label: "Greeting", text: "Hi there! Thank you for reaching out to Zoobicon Support. I'd be happy to help you with this. Let me look into it right away." },
-  { label: "Escalation", text: "Thank you for your patience. I'm escalating this to our engineering team for a closer look. You'll receive an update within the next 2 hours." },
-  { label: "Feature Request", text: "Thank you for this great suggestion! I've added your feedback to our product roadmap. Our team reviews feature requests weekly, and we'll notify you when this is planned." },
-  { label: "Billing Inquiry", text: "I understand your concern about the billing. Let me pull up your account details and investigate this right away. If there's been an error, we'll issue a refund within 24 hours." },
-  { label: "Bug Report", text: "Thank you for reporting this bug. I've created an internal ticket for our engineering team. We take these reports seriously and will have a fix deployed as soon as possible." },
-  { label: "Closure", text: "I'm glad we could resolve this for you! If you have any other questions in the future, don't hesitate to reach out. Have a great day!" },
+// ---------- Canned Responses (15+ organized by category) ----------
+const CANNED_RESPONSE_CATEGORIES: { category: string; icon: React.ElementType; responses: { label: string; text: string }[] }[] = [
+  {
+    category: "General",
+    icon: MessageSquare,
+    responses: [
+      { label: "Greeting", text: "Hi there! Thank you for reaching out to Zoobicon Support. I'd be happy to help you with this. Let me look into it right away." },
+      { label: "Closure - Resolved", text: "I'm glad we could resolve this for you! If you have any other questions in the future, don't hesitate to reach out. Have a great day!" },
+      { label: "Follow-Up", text: "Hi! Just checking in to see if the solution I provided resolved your issue. Please let me know if you need any further assistance." },
+      { label: "Need More Info", text: "Thank you for reaching out. To help resolve this faster, could you provide a few more details? Specifically, I'd need: 1) Your account email, 2) Steps to reproduce the issue, 3) Any error messages you're seeing." },
+    ],
+  },
+  {
+    category: "Billing",
+    icon: CreditCard,
+    responses: [
+      { label: "Billing Inquiry", text: "I understand your concern about the billing. Let me pull up your account details and investigate this right away. If there's been an error, we'll issue a refund within 24 hours." },
+      { label: "Refund Processed", text: "Great news! I've processed a full refund to your original payment method. Please allow 5-10 business days for it to appear on your statement. Your account has been adjusted accordingly." },
+      { label: "Plan Upgrade", text: "I'd be happy to help you upgrade your plan! You can upgrade directly from your dashboard at zoobicon.com/dashboard, or I can process the change right here. The new features will be available immediately after upgrading." },
+    ],
+  },
+  {
+    category: "Technical",
+    icon: Hammer,
+    responses: [
+      { label: "Bug Report Ack", text: "Thank you for reporting this bug. I've created an internal ticket for our engineering team (priority: high). We take these reports seriously and will have a fix deployed as soon as possible. I'll follow up with a timeline within 24 hours." },
+      { label: "Known Issue", text: "This is a known issue that our engineering team is actively working on. We expect a fix to be deployed within the next 48 hours. I'll notify you as soon as the fix is live. Apologies for the inconvenience." },
+      { label: "Workaround", text: "While our team works on a permanent fix, here's a workaround that should help: [describe workaround]. Let me know if this resolves your issue in the meantime." },
+      { label: "DNS / Hosting", text: "For DNS changes, please ensure your CNAME record points to `sites.zoobicon.sh`. DNS propagation can take up to 48 hours, though it's usually much faster. You can check propagation status at whatsmydns.net. Let me know if you need help with the setup." },
+    ],
+  },
+  {
+    category: "Feature Request",
+    icon: Sparkles,
+    responses: [
+      { label: "Feature Logged", text: "Thank you for this great suggestion! I've added your feedback to our product roadmap. Our team reviews feature requests weekly, and we'll notify you when this is planned." },
+      { label: "Already Planned", text: "Great news! This feature is already on our roadmap and is currently in development. We expect to ship it within the next 2-4 weeks. I'll make sure you're notified as soon as it's available." },
+    ],
+  },
+  {
+    category: "Onboarding",
+    icon: Users,
+    responses: [
+      { label: "Welcome", text: "Welcome to Zoobicon! I'm excited to help you get started. The quickest way to build your first site is to head to zoobicon.com/builder, describe what you want, and our AI will generate a professional site in under 2 minutes. Here are some tips to get the best results..." },
+      { label: "Getting Started Guide", text: "Here's a quick start guide: 1) Go to /builder and describe your ideal website, 2) Choose a style and tier, 3) Click Generate, 4) Use the visual editor to fine-tune, 5) Deploy to a free .sh domain. For detailed docs, visit zoobicon.com/docs." },
+    ],
+  },
+  {
+    category: "Escalation",
+    icon: AlertCircle,
+    responses: [
+      { label: "Escalate to Engineering", text: "Thank you for your patience. I'm escalating this to our engineering team for a closer look. You'll receive an update within the next 2 hours." },
+      { label: "Escalate to Manager", text: "I understand your frustration and I want to make sure this is handled properly. I'm escalating this to our support manager who will personally follow up with you within the next hour." },
+    ],
+  },
 ];
 
-// ---------- Team Members ----------
-const TEAM_MEMBERS = ["Unassigned", "Support Team", "Engineering", "Sales Team", "Billing"];
+// Flatten for backward compatibility
+const CANNED_RESPONSES = CANNED_RESPONSE_CATEGORIES.flatMap((cat) => cat.responses);
 
-// ---------- Automation Rules ----------
+// ---------- Team Members ----------
+const TEAM_MEMBERS = ["Unassigned", "Support Team", "Engineering", "Sales Team", "Finance Team", "Product", "Agency Success", "Infrastructure"];
+
+// ---------- Auto-Assignment Rules ----------
+const AUTO_ASSIGN_RULES: { tags: string[]; team: string; label: string }[] = [
+  { tags: ["billing", "payment", "invoice", "refund"], team: "Finance Team", label: "billing/payment" },
+  { tags: ["bug", "outage", "502", "error", "crash"], team: "Engineering", label: "bug/outage" },
+  { tags: ["feature-request", "suggestion", "enhancement"], team: "Product", label: "feature-request" },
+  { tags: ["enterprise", "sales", "sso", "demo"], team: "Sales Team", label: "enterprise/sales" },
+  { tags: ["agency", "bulk", "white-label"], team: "Agency Success", label: "agency" },
+  { tags: ["dns", "hosting", "deploy", "domain", "ssl"], team: "Infrastructure", label: "hosting/dns" },
+];
+
+function autoAssignTeam(ticket: Ticket): string | null {
+  for (const rule of AUTO_ASSIGN_RULES) {
+    if (rule.tags.some((tag) => ticket.tags.includes(tag))) {
+      return rule.team;
+    }
+  }
+  return null;
+}
+
 function getAutomationRules(ticket: Ticket): string[] {
   const rules: string[] = [];
-  if (ticket.tags.includes("bug") || ticket.tags.includes("outage")) {
-    rules.push("Auto-assigned to Engineering (tag: bug/outage)");
-  }
-  if (ticket.tags.includes("billing")) {
-    rules.push("Auto-assigned to Billing (tag: billing)");
-  }
-  if (ticket.tags.includes("sales") || ticket.tags.includes("enterprise")) {
-    rules.push("Auto-assigned to Sales Team (tag: enterprise)");
+  for (const rule of AUTO_ASSIGN_RULES) {
+    if (rule.tags.some((tag) => ticket.tags.includes(tag))) {
+      rules.push(`Auto-assigned to ${rule.team} (tag: ${rule.label})`);
+      break;
+    }
   }
   const slaDefaults = SLA_DEFAULTS[ticket.priority];
   if (slaDefaults) {
@@ -352,7 +439,111 @@ function getAutomationRules(ticket: Ticket): string[] {
   if (ticket.messages.some((m) => m.from === "ai")) {
     rules.push("AI auto-reply sent (confidence: 92%)");
   }
+  if (ticket.priority === "urgent") {
+    rules.push("Priority escalation: Urgent tickets notify on-call");
+  }
   return rules;
+}
+
+// ---------- Collision Detection Helpers ----------
+const LOCK_EXPIRY_MS = 120000; // 2 minutes
+
+function getTicketLocks(): TicketLock[] {
+  try {
+    const raw = localStorage.getItem("zoobicon_ticket_locks");
+    if (!raw) return [];
+    const locks: TicketLock[] = JSON.parse(raw);
+    // Purge expired locks
+    const now = Date.now();
+    return locks.filter((l) => now - l.lockedAt < LOCK_EXPIRY_MS);
+  } catch { return []; }
+}
+
+function setTicketLock(lock: TicketLock): void {
+  try {
+    const existing = getTicketLocks().filter((l) => !(l.ticketId === lock.ticketId && l.agentEmail === lock.agentEmail));
+    localStorage.setItem("zoobicon_ticket_locks", JSON.stringify([...existing, lock]));
+  } catch { /* noop */ }
+}
+
+function removeTicketLock(ticketId: string, agentEmail: string): void {
+  try {
+    const existing = getTicketLocks().filter((l) => !(l.ticketId === ticketId && l.agentEmail === agentEmail));
+    localStorage.setItem("zoobicon_ticket_locks", JSON.stringify(existing));
+  } catch { /* noop */ }
+}
+
+function getOtherAgentLock(ticketId: string, myEmail: string): TicketLock | null {
+  const locks = getTicketLocks();
+  return locks.find((l) => l.ticketId === ticketId && l.agentEmail !== myEmail) || null;
+}
+
+// ---------- CSAT Helpers ----------
+function getCSATRatings(): CSATRating[] {
+  try {
+    const raw = localStorage.getItem("zoobicon_csat_ratings");
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+
+function saveCSATRating(rating: CSATRating): void {
+  try {
+    const existing = getCSATRatings().filter((r) => r.ticketId !== rating.ticketId);
+    localStorage.setItem("zoobicon_csat_ratings", JSON.stringify([...existing, rating]));
+  } catch { /* noop */ }
+}
+
+function getCSATForTicket(ticketId: string): CSATRating | null {
+  return getCSATRatings().find((r) => r.ticketId === ticketId) || null;
+}
+
+// ---------- Metrics Helpers ----------
+function computeTicketMetrics(tickets: Ticket[]) {
+  const resolved = tickets.filter((t) => t.status === "resolved");
+  const total = tickets.length;
+
+  // Avg response time (time between creation and first non-customer message)
+  let totalResponseMs = 0;
+  let responseCount = 0;
+  tickets.forEach((t) => {
+    const firstReply = t.messages.find((m) => m.from !== "customer");
+    if (firstReply) {
+      totalResponseMs += new Date(firstReply.timestamp).getTime() - new Date(t.createdAt).getTime();
+      responseCount++;
+    }
+  });
+  const avgResponseMs = responseCount > 0 ? totalResponseMs / responseCount : 0;
+  const avgResponseLabel = avgResponseMs > 0
+    ? avgResponseMs < 60000 ? `${Math.round(avgResponseMs / 1000)}s` : avgResponseMs < 3600000 ? `${Math.round(avgResponseMs / 60000)}m` : `${(avgResponseMs / 3600000).toFixed(1)}h`
+    : "N/A";
+
+  // Avg resolution time
+  let totalResolutionMs = 0;
+  resolved.forEach((t) => {
+    totalResolutionMs += new Date(t.updatedAt).getTime() - new Date(t.createdAt).getTime();
+  });
+  const avgResolutionMs = resolved.length > 0 ? totalResolutionMs / resolved.length : 0;
+  const avgResolutionLabel = avgResolutionMs > 0
+    ? avgResolutionMs < 3600000 ? `${Math.round(avgResolutionMs / 60000)}m` : `${(avgResolutionMs / 3600000).toFixed(1)}h`
+    : "N/A";
+
+  // CSAT
+  const csatRatings = getCSATRatings();
+  const csatAvg = csatRatings.length > 0 ? csatRatings.reduce((acc, r) => acc + r.rating, 0) / csatRatings.length : 0;
+
+  // First contact resolution (resolved with <= 2 agent/AI messages)
+  const fcrCount = resolved.filter((t) => {
+    const agentMsgs = t.messages.filter((m) => m.from === "agent" || m.from === "ai");
+    return agentMsgs.length <= 2;
+  }).length;
+  const fcrRate = resolved.length > 0 ? Math.round((fcrCount / resolved.length) * 100) : 0;
+
+  // Tickets per day (based on date range of all tickets)
+  const dates = tickets.map((t) => new Date(t.createdAt).toDateString());
+  const uniqueDays = new Set(dates).size;
+  const ticketsPerDay = uniqueDays > 0 ? (total / uniqueDays).toFixed(1) : "0";
+
+  return { avgResponseLabel, avgResolutionLabel, csatAvg, fcrRate, ticketsPerDay, csatCount: csatRatings.length };
 }
 
 // ---------- Component ----------
@@ -401,6 +592,19 @@ export default function EmailSupportDashboard() {
   const [showMergeModal, setShowMergeModal] = useState(false);
   const [mergeTargetId, setMergeTargetId] = useState<string | null>(null);
 
+  // Agent collision detection
+  const [collisionWarning, setCollisionWarning] = useState<TicketLock | null>(null);
+
+  // CSAT Survey
+  const [showCSAT, setShowCSAT] = useState(false);
+  const [csatRating, setCsatRating] = useState(0);
+  const [csatHover, setCsatHover] = useState(0);
+  const [csatComment, setCsatComment] = useState("");
+  const [csatSubmitted, setCsatSubmitted] = useState(false);
+
+  // Canned response category filter
+  const [cannedCategory, setCannedCategory] = useState<string>("all");
+
   // Auth check
   useEffect(() => {
     try {
@@ -443,6 +647,75 @@ export default function EmailSupportDashboard() {
     if (!authChecked) return;
     fetchTickets();
   }, [authChecked, fetchTickets]);
+
+  // Agent collision detection — lock ticket when viewing/replying
+  useEffect(() => {
+    if (!selectedId || !user) return;
+    const agentEmail = user.email || "unknown";
+    const agentName = user.name || user.email || "Agent";
+
+    // Set lock for current ticket
+    setTicketLock({
+      ticketId: selectedId,
+      agentName,
+      agentEmail,
+      lockedAt: Date.now(),
+      action: "viewing",
+    });
+
+    // Check for other agents
+    const otherLock = getOtherAgentLock(selectedId, agentEmail);
+    setCollisionWarning(otherLock);
+
+    // Refresh lock and check collisions every 10 seconds
+    const interval = setInterval(() => {
+      setTicketLock({
+        ticketId: selectedId,
+        agentName,
+        agentEmail,
+        lockedAt: Date.now(),
+        action: replyText.trim() ? "replying" : "viewing",
+      });
+      const lock = getOtherAgentLock(selectedId, agentEmail);
+      setCollisionWarning(lock);
+    }, 10000);
+
+    return () => {
+      clearInterval(interval);
+      removeTicketLock(selectedId, agentEmail);
+    };
+  }, [selectedId, user, replyText]);
+
+  // CSAT — check if already rated when selecting resolved ticket
+  useEffect(() => {
+    if (selectedId) {
+      const ticket = tickets.find((t) => t.id === selectedId);
+      if (ticket?.status === "resolved") {
+        const existing = getCSATForTicket(selectedId);
+        if (existing) {
+          setCsatSubmitted(true);
+          setCsatRating(existing.rating);
+        } else {
+          setCsatSubmitted(false);
+          setCsatRating(0);
+          setCsatComment("");
+        }
+      }
+    }
+  }, [selectedId, tickets]);
+
+  // Auto-assign on ticket creation
+  const applyAutoAssignment = useCallback((ticket: Ticket): Ticket => {
+    if (ticket.assignee) return ticket;
+    const team = autoAssignTeam(ticket);
+    if (team) return { ...ticket, assignee: team };
+    return ticket;
+  }, []);
+
+  // Save tickets helper (for merge and other local-only operations)
+  const saveTickets = useCallback((updated: Ticket[]) => {
+    setTickets(updated);
+  }, []);
 
   const handleLogout = () => {
     try { localStorage.removeItem("zoobicon_user"); } catch { /* noop */ }
@@ -516,7 +789,7 @@ export default function EmailSupportDashboard() {
       });
       const data = await res.json();
       if (data.ticket) {
-        const ticket = { ...data.ticket, sla: computeSla(data.ticket.priority, data.ticket.createdAt) };
+        const ticket = applyAutoAssignment({ ...data.ticket, sla: computeSla(data.ticket.priority, data.ticket.createdAt) });
         setTickets((prev) => [ticket, ...prev]);
         setSelectedId(ticket.id);
       }
@@ -679,6 +952,30 @@ export default function EmailSupportDashboard() {
     }
   };
 
+  // CSAT Submit
+  const handleCSATSubmit = async () => {
+    if (!selectedTicket || csatRating === 0) return;
+    const rating: CSATRating = {
+      ticketId: selectedTicket.id,
+      rating: csatRating,
+      comment: csatComment,
+      submittedAt: new Date().toISOString(),
+    };
+    saveCSATRating(rating);
+    setCsatSubmitted(true);
+    // Also send to API
+    try {
+      await fetch("/api/email-support/csat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(rating),
+      });
+    } catch { /* localStorage already saved */ }
+  };
+
+  // Compute metrics
+  const metrics = computeTicketMetrics(tickets);
+
   if (!authChecked) {
     return (
       <div className="min-h-screen bg-[#09090f] flex items-center justify-center">
@@ -746,27 +1043,62 @@ export default function EmailSupportDashboard() {
         </div>
       )}
 
-      {/* Stats Bar */}
-      <div className="h-12 border-b border-white/[0.06] bg-gray-900/50 flex items-center px-4 gap-6 shrink-0 overflow-x-auto">
-        <div className="flex items-center gap-2 text-xs">
-          <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-          <span className="text-white/60">Open</span>
-          <span className="font-bold text-white/80">{stats.open}</span>
-        </div>
-        <div className="flex items-center gap-2 text-xs">
-          <Clock className="w-3 h-3 text-white/50" />
-          <span className="text-white/60">Avg Response</span>
-          <span className="font-bold text-white/80">{stats.avgResponse}</span>
-        </div>
-        <div className="flex items-center gap-2 text-xs">
-          <BarChart3 className="w-3 h-3 text-white/50" />
-          <span className="text-white/60">Resolution Rate</span>
-          <span className="font-bold text-emerald-400">{stats.resolutionRate}%</span>
-        </div>
-        <div className="flex items-center gap-2 text-xs">
-          <Bot className="w-3 h-3 text-white/50" />
-          <span className="text-white/60">AI Replies</span>
-          <span className="font-bold text-purple-400">{stats.aiReplies}</span>
+      {/* Ticket Metrics Dashboard */}
+      <div className="border-b border-white/[0.06] bg-gray-900/50 shrink-0 overflow-x-auto">
+        <div className="flex items-center px-4 py-2.5 gap-1">
+          {/* Open Tickets */}
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500/[0.06] border border-blue-500/10">
+            <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+            <span className="text-[10px] text-white/60">Open</span>
+            <span className="text-xs font-bold text-blue-400">{stats.open}</span>
+          </div>
+          {/* Avg Response Time */}
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+            <Clock className="w-3 h-3 text-cyan-400" />
+            <span className="text-[10px] text-white/60">Avg Response</span>
+            <span className="text-xs font-bold text-cyan-400">{metrics.avgResponseLabel}</span>
+          </div>
+          {/* Avg Resolution Time */}
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+            <Timer className="w-3 h-3 text-amber-400" />
+            <span className="text-[10px] text-white/60">Avg Resolution</span>
+            <span className="text-xs font-bold text-amber-400">{metrics.avgResolutionLabel}</span>
+          </div>
+          {/* CSAT Score */}
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+            <Star className="w-3 h-3 text-yellow-400" />
+            <span className="text-[10px] text-white/60">CSAT</span>
+            <span className="text-xs font-bold text-yellow-400">
+              {metrics.csatAvg > 0 ? `${metrics.csatAvg.toFixed(1)}/5` : "N/A"}
+            </span>
+            {metrics.csatCount > 0 && (
+              <span className="text-[9px] text-white/40">({metrics.csatCount})</span>
+            )}
+          </div>
+          {/* First Contact Resolution */}
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+            <ThumbsUp className="w-3 h-3 text-emerald-400" />
+            <span className="text-[10px] text-white/60">FCR</span>
+            <span className="text-xs font-bold text-emerald-400">{metrics.fcrRate}%</span>
+          </div>
+          {/* Tickets per Day */}
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+            <Activity className="w-3 h-3 text-purple-400" />
+            <span className="text-[10px] text-white/60">Tickets/Day</span>
+            <span className="text-xs font-bold text-purple-400">{metrics.ticketsPerDay}</span>
+          </div>
+          {/* Resolution Rate */}
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+            <TrendingUp className="w-3 h-3 text-emerald-400" />
+            <span className="text-[10px] text-white/60">Resolved</span>
+            <span className="text-xs font-bold text-emerald-400">{stats.resolutionRate}%</span>
+          </div>
+          {/* AI Replies */}
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-500/[0.06] border border-purple-500/10">
+            <Bot className="w-3 h-3 text-purple-400" />
+            <span className="text-[10px] text-white/60">AI Replies</span>
+            <span className="text-xs font-bold text-purple-400">{stats.aiReplies}</span>
+          </div>
         </div>
       </div>
 
@@ -1123,6 +1455,90 @@ export default function EmailSupportDashboard() {
                 )}
               </div>
 
+              {/* Agent Collision Warning */}
+              {collisionWarning && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  className="px-6 py-0 shrink-0"
+                >
+                  <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-orange-500/10 border border-orange-500/20 mt-3">
+                    <Eye className="w-4 h-4 text-orange-400 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <span className="text-xs text-orange-300 font-medium">
+                        <span className="font-bold">{collisionWarning.agentName}</span>
+                        {" "}is currently {collisionWarning.action === "replying" ? "drafting a reply to" : "viewing"} this ticket
+                      </span>
+                      <span className="text-[10px] text-orange-400/60 ml-2">
+                        ({Math.round((Date.now() - collisionWarning.lockedAt) / 1000)}s ago)
+                      </span>
+                    </div>
+                    <AlertCircle className="w-3.5 h-3.5 text-orange-400/60 shrink-0" />
+                  </div>
+                </motion.div>
+              )}
+
+              {/* CSAT Survey for Resolved Tickets */}
+              {selectedTicket.status === "resolved" && (
+                <div className="px-6 pt-3 shrink-0">
+                  <div className={`rounded-xl border p-4 ${csatSubmitted ? "bg-emerald-500/[0.06] border-emerald-500/15" : "bg-yellow-500/[0.06] border-yellow-500/15"}`}>
+                    {csatSubmitted ? (
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-0.5">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star key={star} className={`w-4 h-4 ${star <= csatRating ? "text-yellow-400 fill-yellow-400" : "text-white/20"}`} />
+                          ))}
+                        </div>
+                        <span className="text-xs text-emerald-400 font-medium">CSAT rating submitted - Thank you!</span>
+                      </div>
+                    ) : (
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Star className="w-3.5 h-3.5 text-yellow-400" />
+                          <span className="text-xs font-semibold text-white/80">Customer Satisfaction Survey</span>
+                        </div>
+                        <p className="text-[10px] text-white/60 mb-3">Rate the resolution quality for this ticket:</p>
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-1">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <button
+                                key={star}
+                                onMouseEnter={() => setCsatHover(star)}
+                                onMouseLeave={() => setCsatHover(0)}
+                                onClick={() => setCsatRating(star)}
+                                className="p-0.5 transition-transform hover:scale-125"
+                              >
+                                <Star
+                                  className={`w-5 h-5 transition-colors ${
+                                    star <= (csatHover || csatRating)
+                                      ? "text-yellow-400 fill-yellow-400"
+                                      : "text-white/20"
+                                  }`}
+                                />
+                              </button>
+                            ))}
+                          </div>
+                          <input
+                            value={csatComment}
+                            onChange={(e) => setCsatComment(e.target.value)}
+                            placeholder="Optional comment..."
+                            className="flex-1 bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-1.5 text-[10px] text-white placeholder:text-white/40 outline-none focus:border-yellow-500/30 transition-colors"
+                          />
+                          <button
+                            onClick={handleCSATSubmit}
+                            disabled={csatRating === 0}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-yellow-600 to-amber-600 text-[10px] font-semibold text-white transition-all disabled:opacity-30 hover:from-yellow-500 hover:to-amber-500"
+                          >
+                            <Send className="w-3 h-3" />
+                            Submit
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Conversation Thread */}
               <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
                 {selectedTicket.messages.map((msg) => (
@@ -1223,21 +1639,62 @@ export default function EmailSupportDashboard() {
                           initial={{ opacity: 0, scale: 0.95, y: 4 }}
                           animate={{ opacity: 1, scale: 1, y: 0 }}
                           exit={{ opacity: 0, scale: 0.95, y: 4 }}
-                          className="absolute left-0 bottom-full mb-1 w-72 bg-gray-900 border border-white/[0.10] rounded-xl shadow-2xl overflow-hidden z-50"
+                          className="absolute left-0 bottom-full mb-1 w-96 bg-gray-900 border border-white/[0.10] rounded-xl shadow-2xl overflow-hidden z-50"
                         >
-                          <div className="px-3 py-2 border-b border-white/[0.06]">
-                            <span className="text-[10px] font-bold text-white/60 uppercase tracking-wider">Quick Replies</span>
+                          <div className="px-3 py-2 border-b border-white/[0.06] flex items-center justify-between">
+                            <span className="text-[10px] font-bold text-white/60 uppercase tracking-wider">Canned Responses</span>
+                            <span className="text-[9px] text-white/40">{CANNED_RESPONSES.length} templates</span>
                           </div>
-                          {CANNED_RESPONSES.map((resp, i) => (
+                          {/* Category Tabs */}
+                          <div className="flex items-center gap-1 px-2 py-1.5 border-b border-white/[0.04] overflow-x-auto">
                             <button
-                              key={i}
-                              onClick={() => { setReplyText(resp.text); setShowCannedResponses(false); }}
-                              className="w-full text-left px-3 py-2.5 text-xs text-white/60 hover:bg-white/[0.06] hover:text-white/80 transition-all border-b border-white/[0.04] last:border-0"
+                              onClick={() => setCannedCategory("all")}
+                              className={`px-2 py-1 rounded text-[9px] font-medium whitespace-nowrap transition-all ${
+                                cannedCategory === "all" ? "bg-blue-500/15 text-blue-400" : "text-white/50 hover:text-white/60"
+                              }`}
                             >
-                              <span className="font-semibold text-white/70 block mb-0.5">{resp.label}</span>
-                              <span className="text-[10px] text-white/60 line-clamp-1">{resp.text}</span>
+                              All
                             </button>
-                          ))}
+                            {CANNED_RESPONSE_CATEGORIES.map((cat) => (
+                              <button
+                                key={cat.category}
+                                onClick={() => setCannedCategory(cat.category)}
+                                className={`flex items-center gap-1 px-2 py-1 rounded text-[9px] font-medium whitespace-nowrap transition-all ${
+                                  cannedCategory === cat.category ? "bg-blue-500/15 text-blue-400" : "text-white/50 hover:text-white/60"
+                                }`}
+                              >
+                                <cat.icon className="w-2.5 h-2.5" />
+                                {cat.category}
+                              </button>
+                            ))}
+                          </div>
+                          {/* Response List */}
+                          <div className="max-h-64 overflow-y-auto">
+                            {CANNED_RESPONSE_CATEGORIES
+                              .filter((cat) => cannedCategory === "all" || cat.category === cannedCategory)
+                              .map((cat) => (
+                                <div key={cat.category}>
+                                  {cannedCategory === "all" && (
+                                    <div className="px-3 py-1.5 bg-white/[0.02] border-b border-white/[0.04]">
+                                      <span className="text-[9px] font-bold text-white/40 uppercase tracking-wider flex items-center gap-1.5">
+                                        <cat.icon className="w-2.5 h-2.5" />
+                                        {cat.category}
+                                      </span>
+                                    </div>
+                                  )}
+                                  {cat.responses.map((resp, i) => (
+                                    <button
+                                      key={`${cat.category}-${i}`}
+                                      onClick={() => { setReplyText(resp.text); setShowCannedResponses(false); setGrammarChecked(false); }}
+                                      className="w-full text-left px-3 py-2.5 text-xs text-white/60 hover:bg-white/[0.06] hover:text-white/80 transition-all border-b border-white/[0.04] last:border-0"
+                                    >
+                                      <span className="font-semibold text-white/70 block mb-0.5">{resp.label}</span>
+                                      <span className="text-[10px] text-white/50 line-clamp-2">{resp.text}</span>
+                                    </button>
+                                  ))}
+                                </div>
+                              ))}
+                          </div>
                         </motion.div>
                       )}
                     </AnimatePresence>

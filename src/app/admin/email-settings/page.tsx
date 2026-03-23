@@ -8,6 +8,7 @@ import {
   Server, Send, Eye, EyeOff, Loader2, TestTube,
   Globe, Key, Bell, ExternalLink, Copy, Check,
   Inbox, MessageSquare, ArrowRight, Bot, Shield,
+  Smartphone, Laptop2, Wifi, Monitor, RefreshCw,
 } from "lucide-react";
 import BackgroundEffects from "@/components/BackgroundEffects";
 
@@ -24,6 +25,9 @@ interface EmailConfig {
   notifyOnDeploy: boolean;
   notifyOnContact: boolean;
   notifyOnWaitlist: boolean;
+  personalForwardEmail: string;
+  smtpUsername: string;
+  smtpPassword: string;
 }
 
 const SETUP_STEPS = [
@@ -79,6 +83,9 @@ export default function AdminEmailSettingsPage() {
     notifyOnDeploy: true,
     notifyOnContact: true,
     notifyOnWaitlist: true,
+    personalForwardEmail: "",
+    smtpUsername: "",
+    smtpPassword: "",
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -87,6 +94,7 @@ export default function AdminEmailSettingsPage() {
   const [showKeys, setShowKeys] = useState<Record<string, boolean>>({});
   const [copiedEnv, setCopiedEnv] = useState(false);
   const [expandedStep, setExpandedStep] = useState<number | null>(null);
+  const [expandedDevice, setExpandedDevice] = useState<string | null>(null);
   const [setupStatus, setSetupStatus] = useState<Record<string, { ok: boolean; detail: string }> | null>(null);
   const [checkingSetup, setCheckingSetup] = useState(false);
   const [creatingTables, setCreatingTables] = useState(false);

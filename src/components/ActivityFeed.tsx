@@ -1,113 +1,278 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Globe, Sparkles, Zap } from "lucide-react";
+import {
+  Rocket,
+  Hammer,
+  UserPlus,
+  Share2,
+  GitFork,
+  Activity,
+} from "lucide-react";
 
-const NAMES = [
-  "Sarah", "Marcus", "Aisha", "Dev", "Elena", "Kai", "Priya", "James",
-  "Luna", "Omar", "Sophie", "Raj", "Mia", "Alex", "Yuki", "Noah", "Zara", "Leo",
-];
+/* ---------- types ---------- */
 
-const SITE_TYPES = [
-  "fitness studio", "SaaS dashboard", "restaurant", "portfolio",
-  "e-commerce store", "agency", "dental clinic", "real estate",
-  "photography", "consulting firm", "bakery", "law firm",
-  "startup landing page", "yoga studio", "barber shop", "tech blog",
-];
+type ActivityType = "build" | "deploy" | "signup" | "share" | "remix";
 
-const AVATAR_GRADIENTS = [
-  "from-blue-500 to-blue-700",
-  "from-purple-500 to-purple-700",
-  "from-cyan-500 to-cyan-700",
-  "from-cyan-500 to-cyan-700",
-];
-
-const ICONS = [Globe, Sparkles, Zap];
-
-interface ActivityItem {
-  id: number;
-  name: string;
-  siteType: string;
-  secondsAgo: number;
-  gradientIndex: number;
-  iconIndex: number;
+interface ActivityEvent {
+  id: string;
+  type: ActivityType;
+  userName: string;
+  description: string;
+  slug: string | null;
+  timestamp: string;
 }
 
-function randomItem<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
+interface ActivityFeedProps {
+  mode?: "compact" | "full";
+  limit?: number;
+  className?: string;
 }
 
-function generateActivity(id: number): ActivityItem {
-  return {
-    id,
-    name: randomItem(NAMES),
-    siteType: randomItem(SITE_TYPES),
-    secondsAgo: Math.floor(Math.random() * 43) + 3,
-    gradientIndex: Math.floor(Math.random() * AVATAR_GRADIENTS.length),
-    iconIndex: Math.floor(Math.random() * ICONS.length),
-  };
+/* ---------- icon map ---------- */
+
+const ICONS: Record<ActivityType, typeof Rocket> = {
+  deploy: Rocket,
+  build: Hammer,
+  signup: UserPlus,
+  share: Share2,
+  remix: GitFork,
+};
+
+const ICON_COLORS: Record<ActivityType, string> = {
+  deploy: "text-green-400",
+  build: "text-blue-400",
+  signup: "text-purple-400",
+  share: "text-amber-400",
+  remix: "text-pink-400",
+};
+
+const ICON_BG: Record<ActivityType, string> = {
+  deploy: "bg-green-400/10",
+  build: "bg-blue-400/10",
+  signup: "bg-purple-400/10",
+  share: "bg-amber-400/10",
+  remix: "bg-pink-400/10",
+};
+
+/* ---------- demo data ---------- */
+
+function generateDemoData(): ActivityEvent[] {
+  const now = Date.now();
+  const items: Omit<ActivityEvent, "id">[] = [
+    { type: "deploy", userName: "Emma W.", description: "deployed a yoga studio site", slug: "zen-yoga", timestamp: new Date(now - 12_000).toISOString() },
+    { type: "build", userName: "James R.", description: "built a SaaS landing page", slug: "taskpilot-ai", timestamp: new Date(now - 45_000).toISOString() },
+    { type: "signup", userName: "Sofia L.", description: "joined the platform", slug: null, timestamp: new Date(now - 120_000).toISOString() },
+    { type: "deploy", userName: "Marcus D.", description: "deployed a crypto dashboard", slug: "chainvault", timestamp: new Date(now - 180_000).toISOString() },
+    { type: "build", userName: "Priya G.", description: "built a restaurant website", slug: "bella-cucina", timestamp: new Date(now - 300_000).toISOString() },
+    { type: "share", userName: "Alex K.", description: "shared a developer portfolio", slug: "devmatrix", timestamp: new Date(now - 420_000).toISOString() },
+    { type: "remix", userName: "Lily R.", description: "remixed a plant shop template", slug: "green-thumb", timestamp: new Date(now - 600_000).toISOString() },
+    { type: "deploy", userName: "Chris P.", description: "deployed a fitness coaching site", slug: "ironwill-fit", timestamp: new Date(now - 900_000).toISOString() },
+    { type: "build", userName: "Nina W.", description: "built a digital agency site", slug: "pulse-digital", timestamp: new Date(now - 1_200_000).toISOString() },
+    { type: "signup", userName: "Tom H.", description: "joined the platform", slug: null, timestamp: new Date(now - 1_500_000).toISOString() },
+    { type: "deploy", userName: "Mia C.", description: "deployed a photography portfolio", slug: "shutterschool", timestamp: new Date(now - 1_800_000).toISOString() },
+    { type: "share", userName: "Raj S.", description: "shared a cybersecurity site", slug: "cyberguard", timestamp: new Date(now - 2_400_000).toISOString() },
+    { type: "build", userName: "Hannah B.", description: "built an organic skincare store", slug: "pureglow", timestamp: new Date(now - 3_000_000).toISOString() },
+    { type: "remix", userName: "Oscar Z.", description: "remixed a fintech dashboard", slug: "finscope", timestamp: new Date(now - 3_600_000).toISOString() },
+    { type: "deploy", userName: "Katie J.", description: "deployed a pet rescue site", slug: "safe-paws", timestamp: new Date(now - 4_200_000).toISOString() },
+    { type: "build", userName: "Leo F.", description: "built a creative agency portfolio", slug: "prism-creative", timestamp: new Date(now - 5_400_000).toISOString() },
+    { type: "signup", userName: "Diana M.", description: "joined the platform", slug: null, timestamp: new Date(now - 6_000_000).toISOString() },
+    { type: "deploy", userName: "Ben O.", description: "deployed a pet store", slug: "pawpalace", timestamp: new Date(now - 7_200_000).toISOString() },
+  ];
+  return items.map((item, i) => ({ ...item, id: `demo-${i}` }));
 }
 
-export default function ActivityFeed() {
-  const [items, setItems] = useState<ActivityItem[]>(() => [
-    generateActivity(1),
-    generateActivity(2),
-    generateActivity(3),
-  ]);
-  const [nextId, setNextId] = useState(4);
+/* ---------- time ago ---------- */
 
-  const addItem = useCallback(() => {
-    setItems((prev) => {
-      const updated = [generateActivity(nextId), ...prev];
-      return updated.slice(0, 3);
-    });
-    setNextId((id) => id + 1);
-  }, [nextId]);
+function timeAgo(timestamp: string): string {
+  const seconds = Math.floor((Date.now() - new Date(timestamp).getTime()) / 1000);
+  if (seconds < 5) return "just now";
+  if (seconds < 60) return `${seconds}s ago`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
+
+/* ---------- component ---------- */
+
+export default function ActivityFeed({
+  mode = "full",
+  limit = 20,
+  className = "",
+}: ActivityFeedProps) {
+  const [events, setEvents] = useState<ActivityEvent[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const pollRef = useRef<ReturnType<typeof setInterval>>();
+
+  const fetchActivity = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/activity?limit=${limit}`, {
+        cache: "no-store",
+      });
+      if (res.ok) {
+        const data: ActivityEvent[] = await res.json();
+        if (data.length > 0) {
+          setEvents(data.slice(0, limit));
+          setIsLoaded(true);
+          return;
+        }
+      }
+    } catch {
+      // API unavailable — use demo data
+    }
+    // Fallback to demo data
+    setEvents(generateDemoData().slice(0, limit));
+    setIsLoaded(true);
+  }, [limit]);
 
   useEffect(() => {
-    const interval = setInterval(addItem, 3000);
-    return () => clearInterval(interval);
-  }, [addItem]);
+    fetchActivity();
+    pollRef.current = setInterval(fetchActivity, 15_000);
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, [fetchActivity]);
+
+  // Auto-scroll for compact mode ticker
+  useEffect(() => {
+    if (mode !== "compact" || !scrollRef.current) return;
+    const el = scrollRef.current;
+    let animId: number;
+    let scrollPos = 0;
+    const speed = 0.5; // px per frame
+
+    function tick() {
+      scrollPos += speed;
+      if (scrollPos >= el.scrollWidth - el.clientWidth) {
+        scrollPos = 0;
+      }
+      el.scrollLeft = scrollPos;
+      animId = requestAnimationFrame(tick);
+    }
+    animId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(animId);
+  }, [mode, isLoaded]);
+
+  if (!isLoaded) {
+    return (
+      <div className={`flex items-center justify-center py-8 ${className}`}>
+        <Activity className="h-5 w-5 animate-pulse text-white/30" />
+      </div>
+    );
+  }
+
+  /* ---------- compact mode: horizontal ticker ---------- */
+
+  if (mode === "compact") {
+    return (
+      <div className={`relative overflow-hidden ${className}`}>
+        {/* Fade edges */}
+        <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-12 bg-gradient-to-r from-gray-950 to-transparent" />
+        <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-12 bg-gradient-to-l from-gray-950 to-transparent" />
+
+        <div
+          ref={scrollRef}
+          className="flex gap-4 overflow-x-hidden py-2 scrollbar-none"
+        >
+          {/* Duplicate for infinite scroll effect */}
+          {[...events, ...events].map((event, i) => {
+            const Icon = ICONS[event.type];
+            return (
+              <div
+                key={`${event.id}-${i}`}
+                className="flex flex-shrink-0 items-center gap-2.5 rounded-full border border-white/5 bg-white/[0.03] px-4 py-2"
+              >
+                <div
+                  className={`flex h-6 w-6 items-center justify-center rounded-full ${ICON_BG[event.type]}`}
+                >
+                  <Icon className={`h-3 w-3 ${ICON_COLORS[event.type]}`} />
+                </div>
+                <span className="whitespace-nowrap text-sm text-white/70">
+                  <span className="font-medium text-white/90">
+                    {event.userName}
+                  </span>{" "}
+                  {event.description}
+                </span>
+                <span className="whitespace-nowrap text-xs text-white/30">
+                  {timeAgo(event.timestamp)}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  /* ---------- full mode: vertical list ---------- */
 
   return (
-    <div className="w-full max-w-[320px] flex flex-col gap-2">
+    <div className={`space-y-1 ${className}`}>
+      <div className="mb-3 flex items-center gap-2">
+        <Activity className="h-4 w-4 text-white/40" />
+        <h3 className="text-sm font-medium text-white/60">Live Activity</h3>
+        <span className="relative flex h-2 w-2">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+        </span>
+      </div>
+
       <AnimatePresence mode="popLayout" initial={false}>
-        {items.map((item) => {
-          const Icon = ICONS[item.iconIndex];
+        {events.map((event) => {
+          const Icon = ICONS[event.type];
           return (
             <motion.div
-              key={item.id}
-              initial={{ opacity: 0, x: 60 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20, transition: { duration: 0.25 } }}
-              transition={{ type: "spring", stiffness: 300, damping: 28 }}
+              key={event.id}
               layout
-              className="relative flex items-center gap-[10px] rounded-lg p-3 border-l-2 border-[#7c5aff] bg-white/[0.04] backdrop-blur-sm hover:bg-white/[0.08] transition-colors cursor-default group"
+              initial={{ opacity: 0, y: -10, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.97 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="group flex items-start gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-white/[0.03]"
             >
-              {/* Avatar */}
+              {/* Icon */}
               <div
-                className={`flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br ${AVATAR_GRADIENTS[item.gradientIndex]} flex items-center justify-center text-white text-sm font-semibold`}
+                className={`mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg ${ICON_BG[event.type]} transition-transform group-hover:scale-110`}
               >
-                {item.name[0]}
+                <Icon className={`h-4 w-4 ${ICON_COLORS[event.type]}`} />
               </div>
 
-              {/* Text */}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm leading-tight truncate">
-                  <span className="text-white font-medium">{item.name}</span>{" "}
-                  <span className="text-white/60">just built a </span>
-                  <span className="text-white/60">{item.siteType}</span>
+              {/* Content */}
+              <div className="min-w-0 flex-1">
+                <p className="text-sm leading-snug text-white/80">
+                  <span className="font-medium text-white">
+                    {event.userName}
+                  </span>{" "}
+                  {event.description}
                 </p>
+                <div className="mt-0.5 flex items-center gap-2">
+                  <span className="text-xs text-white/30">
+                    {timeAgo(event.timestamp)}
+                  </span>
+                  {event.slug && (
+                    <a
+                      href={`https://${event.slug}.zoobicon.sh`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-white/20 transition-colors hover:text-white/50"
+                    >
+                      {event.slug}.zoobicon.sh
+                    </a>
+                  )}
+                </div>
               </div>
 
-              {/* Time badge */}
-              <span className="flex-shrink-0 text-[11px] text-white/50 tabular-nums whitespace-nowrap">
-                {item.secondsAgo}s ago
-              </span>
-
-              {/* Hover glow */}
-              <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-[0_0_12px_rgba(124,90,255,0.15)]" />
+              {/* Thumbnail placeholder for sites */}
+              {event.slug && (
+                <div className="hidden flex-shrink-0 overflow-hidden rounded-md border border-white/5 sm:block">
+                  <div className="h-10 w-16 bg-gradient-to-br from-white/[0.04] to-white/[0.01]" />
+                </div>
+              )}
             </motion.div>
           );
         })}

@@ -21,6 +21,7 @@ import {
   copyToClipboard,
   trackShare,
 } from "@/lib/social-publish";
+import { trackEvent } from "@/lib/achievements";
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -284,6 +285,7 @@ export default function ShareModal({
       const shareUrl = generateShareUrl(platformId, siteUrl, text);
 
       trackShare(platformId, siteUrl);
+      trackEvent("share");
 
       if (shareUrl) {
         // Platforms with web share URLs — open in popup

@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import NotificationInbox from "@/components/NotificationInbox";
+import QuotaBar from "@/components/QuotaBar";
 
 interface AgencyBrand {
   agencyName: string;
@@ -82,9 +84,16 @@ export default function TopBar() {
             </Link>
           )}
         </nav>
+
+        {/* Quota bar — compact mode after nav links */}
+        <div className="hidden sm:block ml-2">
+          <QuotaBar mode="compact" />
+        </div>
       </div>
 
       <div className="flex items-center gap-4">
+        {/* Notification bell */}
+        <NotificationInbox />
         {isAdmin && (
           <span className="text-[10px] text-brand-400/40 font-medium tracking-wider hidden sm:inline">
             ADMIN · UNLIMITED

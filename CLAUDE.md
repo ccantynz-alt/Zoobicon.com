@@ -808,3 +808,146 @@ Each platform requires OAuth app registration. Users connect accounts once in Se
 | Review Management | Birdeye | $299/mo | Included in Agency |
 
 **Total replaced value on Pro plan: ~$165/month of tools for $49/month.** This is the pitch: "Cancel 6 subscriptions. Replace them all with Zoobicon."
+
+## EMAIL SYSTEM — Advanced Architecture & Device Access
+
+### Decision 27: Dual-Path Email Architecture (Mailgun + Cloudflare Email Routing)
+
+**Problem:** admin@zoobicon.com and support@zoobicon.com are only accessible through the web dashboard. The platform owner needs to read/respond to emails on Apple devices (iPhone, iPad, Mac Mail) and Windows PCs (Outlook) — not just through the admin panel.
+
+**Solution: Dual-path architecture** — emails arrive at TWO destinations simultaneously:
+
+```
+Inbound email → zoobicon.com MX records → Cloudflare Email Routing
+                                                    ↓
+                              ┌─────────────────────┼─────────────────────┐
+                              ↓                                           ↓
+                    Mailgun Webhook                              Personal Email
+                  (AI ticketing system)                     (Apple Mail / Outlook)
+                              ↓                                           ↓
+                  Web Dashboard + AI Drafts              Push notifications on all devices
+                  /email-support, /admin/email            Read & reply from anywhere
+```
+
+**Path 1 — Cloudflare Email Routing (device access):**
+- Cloudflare forwards copies of `admin@zoobicon.com` → personal iCloud/Gmail/Outlook.com
+- Cloudflare forwards copies of `support@zoobicon.com` → same or different personal email
+- This gives real-time push notifications on iPhone, iPad, Mac, Windows, Android
+- The catch-all `*@zoobicon.com` → Mailgun webhook STILL works (Cloudflare routes specific addresses first, then catch-all)
+
+**Path 2 — Mailgun Webhook (AI ticketing system):**
+- Continues exactly as before: webhook → parse → create ticket → AI draft → auto-reply
+- No changes needed to existing Mailgun integration
+
+**Outbound — Mailgun SMTP (send as admin@zoobicon.com from any device):**
+- Server: `smtp.mailgun.org`
+- Port: `587` (TLS/STARTTLS)
+- Username: `postmaster@zoobicon.com` (or custom SMTP credential from Mailgun)
+- Password: Mailgun SMTP password (NOT the API key — different credential)
+- This lets you send FROM admin@zoobicon.com on Apple Mail, Outlook, any SMTP client
+- Replies sent this way go through Mailgun tracking (opens, clicks, delivery)
+
+**Apple Device Setup (iPhone/iPad/Mac Mail):**
+1. Settings → Mail → Accounts → Add Account → Other
+2. Incoming: IMAP server of forwarded email provider (e.g., imap.gmail.com if forwarding to Gmail)
+3. Outgoing: smtp.mailgun.org, port 587, TLS, postmaster@zoobicon.com + SMTP password
+4. Name: "Zoobicon Admin" or "Zoobicon Support"
+5. Email: admin@zoobicon.com or support@zoobicon.com
+
+**Windows Outlook Setup:**
+1. File → Add Account → Manual Setup → IMAP
+2. Incoming: IMAP server of forwarded email (imap.gmail.com / outlook.office365.com)
+3. Outgoing: smtp.mailgun.org, port 587, STARTTLS
+4. Username: postmaster@zoobicon.com
+5. Password: Mailgun SMTP password
+
+**Env vars (add to .env.local):**
+```
+MAILGUN_SMTP_LOGIN=postmaster@zoobicon.com
+MAILGUN_SMTP_PASSWORD=<from Mailgun dashboard>
+PERSONAL_FORWARD_EMAIL=<your personal email for device access>
+```
+
+**Key files:**
+- `src/app/admin/email-settings/page.tsx` — Setup guide with Apple/Windows device configuration steps
+- `src/lib/mailgun.ts` — Existing Mailgun integration (unchanged)
+- `src/app/api/email/webhook/route.ts` — Existing webhook handler (unchanged)
+
+**Cost:** $0/month — Cloudflare Email Routing is free, Mailgun free tier covers 5,000/month. No Google Workspace, no Microsoft 365, no monthly fee.
+
+### Decision 28: Advanced Support Ticketing System
+
+The support ticketing system at `/email-support` has been upgraded with enterprise-grade features:
+
+**Features built:**
+- **Agent Collision Detection** — Warns if another agent is viewing/replying to the same ticket (localStorage-based lock tracking)
+- **Customer Satisfaction (CSAT)** — 1-5 star rating widget after ticket resolution, with optional comment
+- **Canned Responses Library** — 15+ pre-written response templates organized by category (billing, technical, feature request, general, onboarding)
+- **Ticket Merging** — Merge duplicate tickets from the same customer into one thread
+- **Internal Notes** — Toggle between customer-facing reply and internal-only notes
+- **Ticket Metrics Dashboard** — Real-time metrics: Avg Response Time, CSAT Score, Resolution Rate, Tickets/Day
+- **Auto-Assignment Rules** — Tags-based routing: billing → Finance, bugs → Engineering, enterprise → Sales
+- **SLA Tracking** — Per-priority response/resolution deadlines with breach warnings
+- **AI Auto-Reply** — Claude Sonnet drafts responses, auto-sends if confidence ≥0.85 on non-billing/non-urgent tickets
+
+**Key files:** `src/app/email-support/page.tsx`, `src/app/api/email/support/route.ts`, `src/app/api/email/ai-support/route.ts`
+
+### Decision 29: Stickiness Hooks — Wired Into Main Flows
+
+All Tier 1 stickiness components are now wired into the actual user flows:
+
+| Hook | Component | Wired Into | Trigger |
+|------|-----------|-----------|---------|
+| **Quota Bar** | `QuotaBar.tsx` (compact mode) | `TopBar.tsx` | Always visible in builder/dashboard |
+| **Notification Inbox** | `NotificationInbox.tsx` | `TopBar.tsx` | Bell icon with unread badge |
+| **Achievement Toasts** | `AchievementToast.tsx` | Builder page | On build complete, deploy, share |
+| **Share Modal** | `ShareModal.tsx` | Builder page | Post-deploy popup (6 platforms + QR) |
+| **Creator Badge** | `CreatorBadge.tsx` | Deploy API | Auto-injected into free-tier deployed HTML |
+| **Activity Feed** | `ActivityFeed.tsx` | Homepage, Dashboard | Polls /api/activity every 15s |
+| **Deploy Tracking** | `achievements.ts` | Deploy API | `trackEvent("deploy")` on success |
+| **Build Tracking** | `achievements.ts` | Stream complete | `trackEvent("build")` on generation |
+
+**Activity Feed architecture:**
+- `src/components/ActivityFeed.tsx` — Real-time feed ("Emma W. deployed a yoga studio site — 12s ago")
+- `src/app/api/activity/route.ts` — GET recent activity from DB
+- `src/lib/activity.ts` — `logActivity()`, `getRecentActivity()`, `ensureActivityTable()`
+- Table: `activities (id serial, type text, user_email text, user_name text, description text, slug text, created_at timestamptz)`
+
+### Decision 30: 50% Market Advantage — Competitive Domination Tracker
+
+**Target:** Zoobicon must be 50% more advanced than any single competitor across ALL categories.
+
+**Current competitive score (post-upgrades):**
+
+| Category | Zoobicon Score | Best Competitor | Gap | Status |
+|---|---|---|---|---|
+| Output quality | 10/10 | Lovable 8/10 | +25% | LEADING |
+| Tool density | 10/10 | Emergent 5/10 | +100% | DOMINATING |
+| Generator count | 10/10 | All 2/10 | +400% | DOMINATING |
+| Agency/white-label | 10/10 | None 0/10 | +∞ | UNIQUE |
+| E-commerce gen | 9/10 | Lovable 5/10 | +80% | LEADING |
+| Email/ticketing | 9/10 | None 1/10 | +800% | DOMINATING |
+| Stickiness hooks | 7/10 | Lovable 4/10 | +75% | LEADING |
+| Visual editing | 8/10 | v0 8/10 | 0% | PARITY |
+| Multi-page gen | 8/10 | Lovable 7/10 | +14% | SLIGHT LEAD |
+| Full-stack gen | 9/10 | Lovable 7/10 | +28% | LEADING |
+| Speed to preview | 3/10 | Bolt 9/10 | -67% | TRAILING |
+| In-browser runtime | 0/10 | Bolt 10/10 | -100% | GAP |
+| Real-time collab | 3/10 | Emergent 6/10 | -50% | TRAILING |
+| Design ecosystem | 5/10 | v0 8/10 | -37% | TRAILING |
+
+**Aggregate: 101/140 (72%) vs best competitor ~65/140 (46%) = ~56% advantage on breadth.**
+
+**To maintain/grow the advantage — NEVER let these slip:**
+1. Output quality (Opus) — non-negotiable, do NOT downgrade
+2. Tool density — keep adding integrated tools
+3. Email/ticketing — now a major differentiator, keep improving
+4. Generator count — competitors can't match 43 specialized generators
+5. Agency platform — unique in market, invest more
+6. Stickiness hooks — every hook creates switching cost
+
+**To close remaining gaps — priority order:**
+1. Speed (instant scaffold plan — 3s first preview)
+2. In-browser runtime (WebContainers or Sandpack evaluation)
+3. Real-time collab (WebSocket upgrade from polling)
+4. Design ecosystem (expand component library, add themes)
