@@ -347,6 +347,12 @@ export default function VideoCreatorDashboard() {
   const [showBuyCredits, setShowBuyCredits] = useState(false);
   const [buyingCredits, setBuyingCredits] = useState(false);
 
+  // TikTok connection state
+  const [tiktokConnected, setTiktokConnected] = useState(false);
+  const [tiktokUser, setTiktokUser] = useState<{ display_name: string; avatar_url: string } | null>(null);
+  const [tiktokUploading, setTiktokUploading] = useState(false);
+  const [tiktokStatus, setTiktokStatus] = useState("");
+
   // Auth check + addon/plan check
   useEffect(() => {
     try {
@@ -371,6 +377,40 @@ export default function VideoCreatorDashboard() {
       return;
     }
     setAuthChecked(true);
+
+    // Check for existing TikTok connection in localStorage
+    try {
+      const storedTiktok = localStorage.getItem("zoobicon_tiktok");
+      if (storedTiktok) {
+        const parsed = JSON.parse(storedTiktok);
+        if (parsed.access_token && new Date(parsed.connected_at).getTime() + (parsed.expires_in || 86400) * 1000 > Date.now()) {
+          setTiktokConnected(true);
+          setTiktokUser({ display_name: parsed.display_name, avatar_url: parsed.avatar_url });
+        } else {
+          localStorage.removeItem("zoobicon_tiktok");
+        }
+      }
+    } catch { /* ignore */ }
+
+    // Handle TikTok OAuth callback (token in URL fragment)
+    if (window.location.hash.includes("tiktok_token=")) {
+      try {
+        const encoded = window.location.hash.split("tiktok_token=")[1];
+        const decoded = JSON.parse(atob(encoded));
+        localStorage.setItem("zoobicon_tiktok", JSON.stringify(decoded));
+        setTiktokConnected(true);
+        setTiktokUser({ display_name: decoded.display_name, avatar_url: decoded.avatar_url });
+        // Clean up URL
+        window.history.replaceState(null, "", window.location.pathname);
+      } catch { /* ignore */ }
+    }
+
+    // Handle TikTok OAuth error
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("tiktok_error")) {
+      setError(`TikTok connection failed: ${urlParams.get("tiktok_error")}`);
+      window.history.replaceState(null, "", window.location.pathname);
+    }
   }, [router]);
 
   // Helper: get quota fields to include in API request bodies
@@ -624,15 +664,28 @@ export default function VideoCreatorDashboard() {
     setRenderProgress(0);
     try {
       const imageMap = new Map(sceneImages.map((i) => [i.sceneNumber, i.imageUrl]));
-      const scenes = storyboard.storyboard.map((s) => ({
-        sceneNumber: s.sceneNumber,
-        duration: s.duration,
-        visualDescription: s.visualDescription,
-        textOverlay: s.textOverlay,
-        colorPalette: s.colorPalette,
-        cameraMovement: s.cameraMovement,
-        imageUrl: imageMap.get(s.sceneNumber),
-      }));
+      const scenes = storyboard.storyboard
+        .map((s) => ({
+          sceneNumber: s.sceneNumber,
+          duration: s.duration,
+          visualDescription: s.visualDescription,
+          textOverlay: s.textOverlay,
+          colorPalette: s.colorPalette,
+          cameraMovement: s.cameraMovement,
+          imageUrl: imageMap.get(s.sceneNumber),
+        }))
+        .filter((s) => s.imageUrl && s.imageUrl.startsWith("http"));
+
+      if (scenes.length === 0) {
+        throw new Error("Generate scene images first — video rendering requires images for each scene.");
+        return;
+      }
+
+      const missingCount = storyboard.storyboard.length - scenes.length;
+      if (missingCount > 0) {
+        setError(`${missingCount} scene(s) skipped — no images. Rendering ${scenes.length} scene(s) that have images.`);
+      }
+
       const res = await fetch("/api/video-creator/render", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1020,6 +1073,71 @@ export default function VideoCreatorDashboard() {
     a.download = `storyboard-${Date.now()}.txt`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  // --- TikTok Integration ---
+  const handleConnectTikTok = () => {
+    window.location.href = "/api/social/tiktok";
+  };
+
+  const handleDisconnectTikTok = () => {
+    localStorage.removeItem("zoobicon_tiktok");
+    setTiktokConnected(false);
+    setTiktokUser(null);
+    setTiktokStatus("");
+  };
+
+  const handleUploadToTikTok = async () => {
+    // Find first successful render job with video URL
+    const successJob = renderJobs.find((j) => j.status === "succeeded" && j.videoUrl);
+    if (!successJob?.videoUrl) {
+      setError("No rendered video available. Render a video first, then upload to TikTok.");
+      return;
+    }
+
+    const stored = localStorage.getItem("zoobicon_tiktok");
+    if (!stored) {
+      setError("Not connected to TikTok. Please connect your account first.");
+      return;
+    }
+
+    const { access_token } = JSON.parse(stored);
+    setTiktokUploading(true);
+    setTiktokStatus("Uploading to TikTok...");
+    setError("");
+
+    try {
+      const caption = storyboard
+        ? `${script.substring(0, 100)}${script.length > 100 ? "..." : ""} #AI #video #zoobicon`
+        : "Created with Zoobicon AI #AI #video #zoobicon";
+
+      const res = await fetch("/api/social/tiktok", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          accessToken: access_token,
+          videoUrl: successJob.videoUrl,
+          title: caption,
+          privacyLevel: "SELF_ONLY", // Start as private, user can change on TikTok
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        if (res.status === 401) {
+          handleDisconnectTikTok();
+          throw new Error("TikTok session expired. Please reconnect your account.");
+        }
+        throw new Error(data.error || "Upload failed");
+      }
+
+      setTiktokStatus("Uploaded to TikTok! Check your drafts to publish.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "TikTok upload failed");
+      setTiktokStatus("");
+    } finally {
+      setTiktokUploading(false);
+    }
   };
 
   const handleLogout = () => {
@@ -1995,6 +2113,47 @@ export default function VideoCreatorDashboard() {
                                 </button>
                               </div>
                             )}
+
+                            {/* TikTok Upload */}
+                            <div className="space-y-1.5 pt-1 border-t border-white/[0.06]">
+                              <div className="text-[10px] text-white/50 uppercase tracking-wider flex items-center gap-1">
+                                <Smartphone className="w-3 h-3" /> TikTok
+                              </div>
+                              {tiktokConnected ? (
+                                <div className="space-y-1.5">
+                                  <div className="flex items-center gap-2 text-[10px]">
+                                    {tiktokUser?.avatar_url && (
+                                      <img src={tiktokUser.avatar_url} alt="" className="w-5 h-5 rounded-full" />
+                                    )}
+                                    <span className="text-green-400">{tiktokUser?.display_name || "Connected"}</span>
+                                    <button onClick={handleDisconnectTikTok} className="ml-auto text-white/30 hover:text-red-400 transition-colors text-[9px]">
+                                      Disconnect
+                                    </button>
+                                  </div>
+                                  <button
+                                    onClick={handleUploadToTikTok}
+                                    disabled={tiktokUploading || !renderJobs.some((j) => j.status === "succeeded" && j.videoUrl)}
+                                    className="w-full py-1.5 rounded-lg bg-gradient-to-r from-[#ff0050] to-[#00f2ea] text-white text-[10px] font-medium hover:opacity-90 transition-all flex items-center justify-center gap-1.5 disabled:opacity-30 disabled:cursor-not-allowed"
+                                  >
+                                    {tiktokUploading ? <Loader2 className="w-3 h-3 animate-spin" /> : <ArrowRight className="w-3 h-3" />}
+                                    {tiktokUploading ? "Uploading..." : "Upload to TikTok"}
+                                  </button>
+                                  {!renderJobs.some((j) => j.status === "succeeded" && j.videoUrl) && (
+                                    <p className="text-[9px] text-white/30">Render a video first to enable TikTok upload</p>
+                                  )}
+                                  {tiktokStatus && (
+                                    <p className="text-[9px] text-green-400">{tiktokStatus}</p>
+                                  )}
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={handleConnectTikTok}
+                                  className="w-full py-1.5 rounded-lg border border-white/[0.10] bg-white/[0.05] text-[10px] text-white/60 hover:text-white hover:bg-white/[0.10] transition-all flex items-center justify-center gap-1.5"
+                                >
+                                  <Smartphone className="w-3 h-3" /> Connect TikTok Account
+                                </button>
+                              )}
+                            </div>
 
                             {/* Pipeline capability status */}
                             {capabilities && (

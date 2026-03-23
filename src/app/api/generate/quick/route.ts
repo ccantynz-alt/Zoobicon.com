@@ -401,13 +401,13 @@ export async function POST(req: NextRequest) {
       ? `Build a world-class PREMIUM website for: ${prompt}
 
 This must look like a $30,000 agency built it. Think Apple.com or Stripe.com — clean white background, generous whitespace, sophisticated typography. Include ALL 13 sections with rich, specific content. Every testimonial mentions real metrics. Every headline drives action. Use a LIGHT color scheme with white/cream backgrounds.
-${imageBlock || "Every image must use a unique picsum seed with industry-specific keywords."}
+${imageBlock || "Use CSS gradients and SVG icons instead of external images. For avatars use https://randomuser.me/api/portraits/men/N.jpg or women/N.jpg (N=1-99)."}
 
 Output the <config> block first, then the <body-html> block. Nothing else.`
       : `Build a stunning website for: ${prompt}
 
 Include all 10 sections with real, detailed content. Match the aesthetic to the industry. Make it impressive.
-${imageBlock || "Every image uses https://picsum.photos/seed/DESCRIPTIVE-KEYWORD/WIDTH/HEIGHT with industry-specific seeds."}
+${imageBlock || "Use CSS gradients and SVG icons instead of external images. For avatars use https://randomuser.me/api/portraits/men/N.jpg or women/N.jpg (N=1-99)."}
 
 Output the <config> block first, then the <body-html> block. Nothing else.`;
 
