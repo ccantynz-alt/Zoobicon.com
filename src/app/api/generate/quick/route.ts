@@ -3,7 +3,8 @@ import { NextRequest } from "next/server";
 import { COMPONENT_LIBRARY_CSS } from "@/lib/component-library";
 import { callLLMWithFailover } from "@/lib/llm-provider";
 import { getGeneratorDef, getGeneratorSystemSupplement } from "@/lib/generator-prompts";
-import { getImagePromptBlockSync } from "@/lib/stock-images";
+import { getImagePromptBlockSync, replacePicsumUrls } from "@/lib/stock-images";
+
 
 /** Check if an error is a rate limit or overload that warrants model fallback */
 function isRetryableError(err: unknown): boolean {
@@ -567,6 +568,9 @@ Output the <config> block first, then the <body-html> block. Nothing else.`;
               }
             }
           }
+
+          // Post-process: replace any picsum URLs the AI used despite instructions
+          bodyHtml = replacePicsumUrls(bodyHtml, prompt);
 
           // Build the complete page
           const fullPage = buildFullPage(config, bodyHtml);
