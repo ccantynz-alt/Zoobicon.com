@@ -492,7 +492,7 @@ export default function PreviewPanel({
     }
   `;
 
-  if (isGenerating) {
+  if (isGenerating && !html) {
     return (
       <div className="relative h-full overflow-hidden">
         <GeneratingAtmosphere />

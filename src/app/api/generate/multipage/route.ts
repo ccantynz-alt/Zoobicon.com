@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
+import { injectComponentLibrary } from "@/lib/component-library";
 
 const MULTIPAGE_SYSTEM = `You are Zoobicon, a world-class AI website generator that produces multi-page websites indistinguishable from those built by top design agencies charging $15,000+. When given a description, you produce a complete multi-page website as a JSON object.
 
@@ -265,6 +266,13 @@ export async function POST(req: NextRequest) {
 
     if (!parsed.siteName) {
       parsed.siteName = "My Website";
+    }
+
+    // Inject component library CSS into every page for consistent styling
+    for (const page of parsed.pages) {
+      if (page.html && !page.html.includes("ZOOBICON COMPONENT LIBRARY")) {
+        page.html = injectComponentLibrary(page.html);
+      }
     }
 
     return NextResponse.json(parsed);
