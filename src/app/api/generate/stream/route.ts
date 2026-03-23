@@ -20,12 +20,16 @@ COLOR RULES:
 - Background should create CONTRAST — dark bg (#0f172a, #1a1a2e) with light text, OR tinted light bg (#fdf8f4, #f0fdf4, #fef3c7) — NOT plain white
 - Every section must visually differ from adjacent ones (alternate bg colors, accent borders)
 
-IMAGES — USE THE RIGHT SOURCE FOR EACH SECTION:
-- Hero: For TECH/SAAS/CYBER: use .hero-aurora or .hero-mesh CSS class (component library) — NO external image needed, just a gradient/mesh background. For RESTAURANT/REAL ESTATE/PHOTOGRAPHY: use a relevant image (see IMAGE GUIDANCE in user message if provided).
-- Features: Use inline SVG icons (24-48px) for each card — NOT external photo URLs. Draw simple, relevant icons using <svg> elements with viewBox="0 0 24 24" and stroke="currentColor". Examples: shield icon for security, chart icon for analytics, lock icon for encryption.
-- About section: Two-column layout. For the image side, use a CSS gradient background (matching --color-primary) with a large centered SVG icon, OR use an image URL from IMAGE GUIDANCE if provided.
-- Testimonials: Use https://randomuser.me/api/portraits/men/N.jpg and https://randomuser.me/api/portraits/women/N.jpg for avatar photos (N = 1-99, each person gets a unique number). These are real human face photos. Use object-fit:cover; border-radius:50%; width:60px; height:60px.
-- Gallery/portfolio: ONLY here use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT if no better images are provided.
+IMAGES — PRIORITY ORDER FOR EACH SECTION:
+The user message may include an "IMAGE GUIDANCE" or "CURATED IMAGES" section with real stock photo URLs. If it does, USE THOSE EXACT URLs — they are high-quality, industry-relevant photos.
+
+If NO curated image URLs are provided, use these fallbacks:
+- Hero: For TECH/SAAS/CYBER: use .hero-aurora or .hero-mesh CSS class (component library) for an animated gradient background. For other industries: use a CSS gradient with brand colors.
+- Features: Use inline SVG icons (24-48px) per card — draw simple icons with <svg viewBox="0 0 24 24" stroke="currentColor">. Examples: shield, chart, lock, users, zap, globe.
+- About section: CSS gradient background with a large centered SVG icon.
+- Testimonials: Use https://randomuser.me/api/portraits/men/N.jpg or women/N.jpg (N=1-99, unique per person). Real face photos, border-radius:50%, 60x60px.
+- Gallery/portfolio: Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT. ONLY picsum-acceptable section.
+- NEVER use picsum.photos for hero, feature cards, or testimonial avatars.
 - All images use: object-fit:cover; border-radius:var(--card-radius)
 
 ## OUTPUT ORDER — FOLLOW EXACTLY
@@ -36,9 +40,9 @@ IMAGES — USE THE RIGHT SOURCE FOR EACH SECTION:
 
 ## BODY SECTIONS — WRITE ALL 11 OF THESE
 1. <nav> — sticky, backdrop-filter:blur, logo left + links + .btn-primary.btn-sm CTA right. Background: color-mix(in srgb, var(--color-bg) 85%, transparent)
-2. Hero — split layout: text left (badge pill, h1, p, two buttons, trust checkmarks) + visual right side. For the right side: TECH/SAAS/CYBER → use a div with .hero-aurora or .hero-mesh class + centered SVG icon (80-120px). RESTAURANT/REALESTATE → use image from IMAGE GUIDANCE if provided, otherwise a CSS gradient. NEVER use picsum for hero images. NEVER a plain white/empty hero.
+2. Hero — split layout: text left (badge pill, h1, p, two buttons, trust checkmarks) + visual right side. If CURATED IMAGES provides a hero URL, use it as a large image. Otherwise: TECH/SAAS/CYBER → .hero-aurora or .hero-mesh with centered SVG icon. Other → CSS gradient with brand colors. NEVER use picsum for hero. NEVER plain white/empty.
 3. Social proof / Logo strip — company names or trust metrics in a horizontal strip
-4. Features — section heading + .grid-3 with 6 cards. Each card has an inline SVG icon (32-48px), title, and description. Use .card class. Do NOT use external image URLs for feature cards — use SVG icons drawn inline.
+4. Features — section heading + .grid-3 with 6 cards. If CURATED IMAGES provides feature URLs, use them as card images. Otherwise: each card gets an inline SVG icon (32-48px) + title + description. Use .card class.
 5. About — two-column: image left (with floating stat overlay), text right with heading + paragraph + 4 checkmark benefits
 6. Process/How it works — 3-4 numbered steps with icons and connecting lines/arrows
 7. Testimonials — 3x .testimonial-card with star ratings (★★★★★), quote text, avatar image, name, role
@@ -76,12 +80,15 @@ COLOR RULES:
 - Strong, saturated primary color. High contrast everywhere.
 - Alternating section backgrounds (--color-bg / --color-bg-alt / --color-surface)
 
-IMAGES — USE THE RIGHT SOURCE FOR EACH SECTION:
-- Hero: For TECH/SAAS/CYBER: use .hero-aurora or .hero-mesh CSS class — NO external image. For RESTAURANT/REALESTATE/PHOTOGRAPHY: use image from IMAGE GUIDANCE if provided, otherwise CSS gradient.
-- Features: Use inline SVG icons (32-48px, stroke="currentColor") — NOT external photo URLs. Draw relevant icons inline.
-- About: CSS gradient background with SVG icon, OR image from IMAGE GUIDANCE if provided.
-- Testimonials: https://randomuser.me/api/portraits/men/N.jpg or women/N.jpg (N=1-99, unique per person). Real face photos, border-radius:50%, 60x60px.
-- Portfolio/Gallery: 4-6 images. Use picsum.photos/seed/KEYWORD/WIDTH/HEIGHT ONLY here.
+IMAGES — PRIORITY ORDER:
+The user message may include "CURATED IMAGES" with real stock photo URLs. If present, USE THOSE EXACT URLs — they are high-quality, industry-matched photos from Pexels.
+
+If NO curated URLs are provided, use these fallbacks:
+- Hero: TECH/SAAS/CYBER → .hero-aurora or .hero-mesh animated gradient. Other → CSS gradient.
+- Features: Inline SVG icons (32-48px, stroke="currentColor").
+- About: CSS gradient + large SVG icon.
+- Testimonials: https://randomuser.me/api/portraits/men/N.jpg or women/N.jpg (N=1-99).
+- Portfolio/Gallery: picsum.photos/seed/KEYWORD/WIDTH/HEIGHT (ONLY acceptable here).
 - NEVER use picsum for hero, features, or testimonials.
 
 ## OUTPUT: 90% BODY CONTENT
@@ -92,14 +99,10 @@ IMAGES — USE THE RIGHT SOURCE FOR EACH SECTION:
 
 ## BODY SECTIONS — WRITE ALL 13 (PREMIUM TIER)
 1. <nav> — sticky, backdrop-blur, logo + links + .btn-primary.btn-sm CTA
-2. Hero — 90-100vh, DRAMATIC visual impact, split layout (text left + visual right). Trust badge pill, punchy headline, subheading, TWO CTAs (.btn-primary.btn-lg + .btn-ghost), trust checkmarks. Right side:
-   * REAL ESTATE: property photo from IMAGE GUIDANCE, or .hero-image + .overlay-text
-   * RESTAURANT: food/ambiance photo from IMAGE GUIDANCE, or .hero-image + .overlay-text
-   * TECH/SAAS/CYBER: .hero-aurora or .hero-mesh CSS class with centered SVG icon (80-120px) — NO external image
-   * Floating social proof card overlaying the visual element
+2. Hero — 90-100vh, DRAMATIC visual impact, split layout (text left + visual right). Trust badge pill, punchy headline, subheading, TWO CTAs (.btn-primary.btn-lg + .btn-ghost), trust checkmarks. Right side: if CURATED IMAGES provides a hero URL, use it. Otherwise: TECH/SAAS/CYBER → .hero-aurora or .hero-mesh. Other → CSS gradient. Floating social proof card overlaying the visual.
 3. Logo strip / social proof — trusted-by company names or "10,000+ businesses" metrics in subtle strip
-4. Features — .grid-3 with 6 cards, each with inline SVG icon (32-48px), title, description. Use .card class. Do NOT use picsum or external images for feature cards.
-   * REAL ESTATE: Use .property-grid > .property-card with property photos from IMAGE GUIDANCE if provided
+4. Features — .grid-3 with 6 cards. If CURATED IMAGES provides feature URLs, use them as card images. Otherwise: inline SVG icon (32-48px) + title + description. Use .card class.
+   * REAL ESTATE: Use .property-grid > .property-card with property photos from CURATED IMAGES if provided
 5. About — two-column: image left (with floating highlight stat), text right with heading + paragraph + 4 checkmark benefits
 6. Process — 3-4 numbered steps with icons, connecting lines/arrows
 7. Portfolio/Gallery — .image-gallery with 4-6 project images + captions
