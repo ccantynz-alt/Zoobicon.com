@@ -203,8 +203,12 @@ const fadeIn = {
 /* ------------------------------------------------------------------ */
 function sanitizeError(raw: string): string {
   const lower = raw.toLowerCase();
+  if (lower.includes("authentication failed") || lower.includes("invalid api key") || lower.includes("unauthorized"))
+    return "Voice API key is invalid or expired. Check your ElevenLabs/PlayHT API key in environment variables.";
+  if (lower.includes("all models failed"))
+    return "Voice generation failed across all models. Your ElevenLabs plan may not include TTS — check your account at elevenlabs.io.";
   if (lower.includes("payment_required") || lower.includes("paid_plan") || lower.includes("upgrade your subscription"))
-    return "Voice provider requires a paid plan. Try browser TTS instead.";
+    return "Voice model requires a higher plan tier. The system tried multiple models — check your ElevenLabs subscription.";
   if (lower.includes("requires a scene image") || lower.includes("generate images first"))
     return "Generate scene images before rendering video.";
   if (lower.includes("validation of body failed") || lower.includes("too_big"))
@@ -883,11 +887,10 @@ export default function VideoCreatorDashboard() {
 
     // --- Step 3: Video render (if provider available) ---
     if (capabilities?.videoRender?.available) {
-      progress.video = { status: "running" };
-      setFullPipelineProgress({ ...progress });
-      try {
-        const imageMap = new Map(generatedImages.map((i) => [i.sceneNumber, i.imageUrl]));
-        const renderScenes = storyboard.storyboard.map((s) => ({
+      // Only render scenes that have images (image generation may have failed for some)
+      const imageMap = new Map(generatedImages.map((i) => [i.sceneNumber, i.imageUrl]));
+      const renderScenes = storyboard.storyboard
+        .map((s) => ({
           sceneNumber: s.sceneNumber,
           duration: s.duration,
           visualDescription: s.visualDescription,
@@ -895,28 +898,37 @@ export default function VideoCreatorDashboard() {
           colorPalette: s.colorPalette,
           cameraMovement: s.cameraMovement,
           imageUrl: imageMap.get(s.sceneNumber),
-        }));
-        const res = await fetch("/api/video-creator/render", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            scenes: renderScenes,
-            style,
-            platform,
-            provider: selectedProvider || undefined,
-            ...getQuotaFields(),
-          }),
-        });
-        if (!res.ok) {
-          const d = await res.json().catch(() => ({}));
-          throw new Error(d.error || "Render failed");
+        }))
+        .filter((s) => s.imageUrl && s.imageUrl.startsWith("http"));
+
+      if (renderScenes.length === 0) {
+        progress.video = { status: "failed", error: "No scene images available for rendering. Image generation may have failed — try running the pipeline again." };
+      } else {
+        progress.video = { status: "running" };
+        setFullPipelineProgress({ ...progress });
+        try {
+          const res = await fetch("/api/video-creator/render", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              scenes: renderScenes,
+              style,
+              platform,
+              provider: selectedProvider || undefined,
+              ...getQuotaFields(),
+            }),
+          });
+          if (!res.ok) {
+            const d = await res.json().catch(() => ({}));
+            throw new Error(d.error || "Render failed");
+          }
+          const data = await res.json();
+          setRenderJobs(data.jobs || []);
+          pollRenderStatus(data.jobs || []);
+          progress.video = { status: "done" };
+        } catch (err) {
+          progress.video = { status: "failed", error: err instanceof Error ? err.message : "Render failed" };
         }
-        const data = await res.json();
-        setRenderJobs(data.jobs || []);
-        pollRenderStatus(data.jobs || []);
-        progress.video = { status: "done" };
-      } catch (err) {
-        progress.video = { status: "failed", error: err instanceof Error ? err.message : "Render failed" };
       }
     } else {
       progress.video = { status: "skipped", error: "No video rendering provider configured. Images, voiceover, and subtitles were generated successfully." };

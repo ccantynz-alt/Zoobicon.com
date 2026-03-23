@@ -85,47 +85,77 @@ async function generateElevenLabs(
   const stability = config.stability ?? 0.5;
   const clarity = config.clarity ?? 0.75;
 
-  const res = await fetch(
-    `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
-    {
-      method: "POST",
-      headers: {
-        "xi-api-key": apiKey,
-        "Content-Type": "application/json",
-        Accept: "audio/mpeg",
-      },
-      body: JSON.stringify({
-        text: cleanScriptForTTS(text),
-        model_id: "eleven_multilingual_v2",
-        voice_settings: {
-          stability,
-          similarity_boost: clarity,
-          style: 0.0,
-          use_speaker_boost: true,
-        },
-      }),
-    }
-  );
+  // Try models in order: multilingual v2 → turbo v2.5 → monolingual v1
+  const modelsToTry = [
+    "eleven_multilingual_v2",
+    "eleven_turbo_v2_5",
+    "eleven_turbo_v2",
+    "eleven_monolingual_v1",
+  ];
 
-  if (!res.ok) {
+  let lastError = "";
+
+  for (const modelId of modelsToTry) {
+    const res = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
+      {
+        method: "POST",
+        headers: {
+          "xi-api-key": apiKey,
+          "Content-Type": "application/json",
+          Accept: "audio/mpeg",
+        },
+        body: JSON.stringify({
+          text: cleanScriptForTTS(text),
+          model_id: modelId,
+          voice_settings: {
+            stability,
+            similarity_boost: clarity,
+            style: 0.0,
+            use_speaker_boost: true,
+          },
+        }),
+      }
+    );
+
+    if (res.ok) {
+      // Success — convert audio to base64 data URL
+      const arrayBuffer = await res.arrayBuffer();
+      const base64 = Buffer.from(arrayBuffer).toString("base64");
+      const audioUrl = `data:audio/mpeg;base64,${base64}`;
+
+      const wordCount = text.split(/\s+/).length;
+      const durationEstimate = (wordCount / 150) * 60; // ~150 wpm
+
+      return {
+        audioUrl,
+        provider: "elevenlabs",
+        durationEstimate: Math.round(durationEstimate),
+        format: "mp3",
+      };
+    }
+
+    // Check if this is a model/plan issue — try next model
     const errText = await res.text();
-    throw new Error(`ElevenLabs API error: ${res.status} ${errText}`);
+    lastError = `ElevenLabs ${modelId}: ${res.status} ${errText}`;
+    console.error(`[voiceover] ${lastError}`);
+
+    // If it's a 401 (bad key) or 429 (rate limit), don't try other models
+    if (res.status === 401) {
+      throw new Error(`ElevenLabs authentication failed. Check your API key.`);
+    }
+    if (res.status === 429) {
+      throw new Error(`ElevenLabs rate limit reached. Please wait and try again.`);
+    }
+
+    // For 403/payment errors, try the next (simpler) model
+    if (res.status === 403 || res.status === 422) continue;
+
+    // For other errors, also try next model
+    continue;
   }
 
-  // Convert audio to base64 data URL
-  const arrayBuffer = await res.arrayBuffer();
-  const base64 = Buffer.from(arrayBuffer).toString("base64");
-  const audioUrl = `data:audio/mpeg;base64,${base64}`;
-
-  const wordCount = text.split(/\s+/).length;
-  const durationEstimate = (wordCount / 150) * 60; // ~150 wpm
-
-  return {
-    audioUrl,
-    provider: "elevenlabs",
-    durationEstimate: Math.round(durationEstimate),
-    format: "mp3",
-  };
+  throw new Error(`ElevenLabs: all models failed. Last error: ${lastError}`);
 }
 
 // --- PlayHT ---
@@ -193,22 +223,45 @@ export async function generateVoiceover(
     );
   }
 
-  switch (provider) {
-    case "elevenlabs":
-      return generateElevenLabs(text, config);
-    case "playht":
-      return generatePlayHT(text, config);
-    case "browser":
-      // Browser TTS is client-side only — return a marker
-      return {
-        audioUrl: "",
-        provider: "browser",
-        durationEstimate: Math.round((text.split(/\s+/).length / 150) * 60),
-        format: "browser-tts",
-      };
-    default:
-      throw new Error(`Unknown voice provider: ${provider}`);
+  // Try the requested provider, then fall back to alternatives
+  const fallbackOrder: VoiceProvider[] = [];
+  if (provider === "elevenlabs") {
+    fallbackOrder.push("elevenlabs");
+    if (process.env.PLAYHT_API_KEY && process.env.PLAYHT_USER_ID) fallbackOrder.push("playht");
+    fallbackOrder.push("browser");
+  } else if (provider === "playht") {
+    fallbackOrder.push("playht");
+    if (process.env.ELEVENLABS_API_KEY) fallbackOrder.push("elevenlabs");
+    fallbackOrder.push("browser");
+  } else {
+    fallbackOrder.push("browser");
   }
+
+  let lastError: Error | null = null;
+
+  for (const p of fallbackOrder) {
+    try {
+      switch (p) {
+        case "elevenlabs":
+          return await generateElevenLabs(text, config);
+        case "playht":
+          return await generatePlayHT(text, config);
+        case "browser":
+          return {
+            audioUrl: "",
+            provider: "browser",
+            durationEstimate: Math.round((text.split(/\s+/).length / 150) * 60),
+            format: "browser-tts",
+          };
+      }
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+      console.error(`[voiceover] ${p} failed, trying next:`, lastError.message);
+      continue;
+    }
+  }
+
+  throw lastError || new Error("All voice providers failed");
 }
 
 /**

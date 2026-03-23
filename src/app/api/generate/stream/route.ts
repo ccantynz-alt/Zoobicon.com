@@ -20,14 +20,17 @@ COLOR RULES:
 - Background should create CONTRAST — dark bg (#0f172a, #1a1a2e) with light text, OR tinted light bg (#fdf8f4, #f0fdf4, #fef3c7) — NOT plain white
 - Every section must visually differ from adjacent ones (alternate bg colors, accent borders)
 
-IMAGES — MANDATORY (minimum 8):
-- Hero: full-width background image or side-by-side layout with large image
-- Features: each card gets an image (https://picsum.photos/seed/KEYWORD/400/250)
-- About section: large image beside text
-- Testimonials: avatar images for each person (https://picsum.photos/seed/person-NAME/80/80)
-- Gallery/portfolio: 3-4 project images
+IMAGES — PRIORITY ORDER FOR EACH SECTION:
+The user message may include an "IMAGE GUIDANCE" or "CURATED IMAGES" section with real stock photo URLs. If it does, USE THOSE EXACT URLs — they are high-quality, industry-relevant photos.
+
+If NO curated image URLs are provided, use these fallbacks:
+- Hero: For TECH/SAAS/CYBER: use .hero-aurora or .hero-mesh CSS class (component library) for an animated gradient background. For other industries: use a CSS gradient with brand colors.
+- Features: Use inline SVG icons (24-48px) per card — draw simple icons with <svg viewBox="0 0 24 24" stroke="currentColor">. Examples: shield, chart, lock, users, zap, globe.
+- About section: CSS gradient background with a large centered SVG icon.
+- Testimonials: Use https://randomuser.me/api/portraits/men/N.jpg or women/N.jpg (N=1-99, unique per person). Real face photos, border-radius:50%, 60x60px.
+- Gallery/portfolio: Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT. ONLY picsum-acceptable section.
+- NEVER use picsum.photos for hero, feature cards, or testimonial avatars.
 - All images use: object-fit:cover; border-radius:var(--card-radius)
-- Use descriptive seed keywords: seed/modern-office, seed/team-meeting, seed/product-demo, seed/happy-customer
 
 ## OUTPUT ORDER — FOLLOW EXACTLY
 1. <head>: title, meta viewport, Google Fonts link (2 fonts: display + body)
@@ -37,9 +40,9 @@ IMAGES — MANDATORY (minimum 8):
 
 ## BODY SECTIONS — WRITE ALL 11 OF THESE
 1. <nav> — sticky, backdrop-filter:blur, logo left + links + .btn-primary.btn-sm CTA right. Background: color-mix(in srgb, var(--color-bg) 85%, transparent)
-2. Hero — split layout: text left (badge pill, h1, p, two buttons, trust checkmarks), large image right. OR full-bleed hero-image with overlay-text. NEVER a plain white/empty hero.
+2. Hero — split layout: text left (badge pill, h1, p, two buttons, trust checkmarks) + visual right side. If CURATED IMAGES provides a hero URL, use it as a large image. Otherwise: TECH/SAAS/CYBER → .hero-aurora or .hero-mesh with centered SVG icon. Other → CSS gradient with brand colors. NEVER use picsum for hero. NEVER plain white/empty.
 3. Social proof / Logo strip — company names or trust metrics in a horizontal strip
-4. Features — section heading + .grid-3 with 6 cards. Each card has an IMAGE (picsum 400x250), icon, title, description. Use .card class.
+4. Features — section heading + .grid-3 with 6 cards. If CURATED IMAGES provides feature URLs, use them as card images. Otherwise: each card gets an inline SVG icon (32-48px) + title + description. Use .card class.
 5. About — two-column: image left (with floating stat overlay), text right with heading + paragraph + 4 checkmark benefits
 6. Process/How it works — 3-4 numbered steps with icons and connecting lines/arrows
 7. Testimonials — 3x .testimonial-card with star ratings (★★★★★), quote text, avatar image, name, role
@@ -62,7 +65,7 @@ All .btn-primary elements MUST be visible. The component library sets color:#fff
 ## RULES
 - Output ONLY raw HTML. No markdown, no code fences, no explanation.
 - Start IMMEDIATELY with <!DOCTYPE html>
-- Images: https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT — MINIMUM 8 images across the page
+- Use inline SVG icons for features, randomuser.me for avatars, CSS gradients for hero backgrounds. Only use picsum.photos for gallery/portfolio sections.
 - .fade-in on sections for scroll animation. NEVER set opacity:0 yourself.
 - An empty or sparse <body> is a TOTAL FAILURE.
 - A DULL, WASHED-OUT site is a FAILURE. Bold colors, rich imagery, visual contrast.`;
@@ -77,13 +80,16 @@ COLOR RULES:
 - Strong, saturated primary color. High contrast everywhere.
 - Alternating section backgrounds (--color-bg / --color-bg-alt / --color-surface)
 
-IMAGES — MANDATORY (minimum 10 for premium):
-- Hero: dramatic full-width or split with large image
-- Features: every card gets an image
-- About: large image with floating stat overlay
-- Testimonials: avatar images
-- Portfolio/Gallery: 4-6 project images
-- All use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT with descriptive keywords
+IMAGES — PRIORITY ORDER:
+The user message may include "CURATED IMAGES" with real stock photo URLs. If present, USE THOSE EXACT URLs — they are high-quality, industry-matched photos from Pexels.
+
+If NO curated URLs are provided, use these fallbacks:
+- Hero: TECH/SAAS/CYBER → .hero-aurora or .hero-mesh animated gradient. Other → CSS gradient.
+- Features: Inline SVG icons (32-48px, stroke="currentColor").
+- About: CSS gradient + large SVG icon.
+- Testimonials: https://randomuser.me/api/portraits/men/N.jpg or women/N.jpg (N=1-99).
+- Portfolio/Gallery: picsum.photos/seed/KEYWORD/WIDTH/HEIGHT (ONLY acceptable here).
+- NEVER use picsum for hero, features, or testimonials.
 
 ## OUTPUT: 90% BODY CONTENT
 1. <head>: title, meta, 2 Google Fonts
@@ -93,15 +99,10 @@ IMAGES — MANDATORY (minimum 10 for premium):
 
 ## BODY SECTIONS — WRITE ALL 13 (PREMIUM TIER)
 1. <nav> — sticky, backdrop-blur, logo + links + .btn-primary.btn-sm CTA
-2. Hero — 90-100vh, DRAMATIC visual impact, punchy headline, subheading, TWO CTAs, social proof
-   * REAL ESTATE: Use .hero-carousel or .hero-image with full-viewport property photos + .overlay-text
-   * RESTAURANT: Use .hero-image with food/ambiance photo + .overlay-text
-   * TECH/SAAS: Use .hero-aurora or .hero-mesh for animated gradient backgrounds with vivid accent colors
-3. Social proof bar — company names/badges in subtle strip
-2. Hero — split layout (text left + large image right) with trust badge pill, headline, subheadline, two CTAs (.btn-primary.btn-lg + .btn-ghost), trust checkmarks (✓ No credit card, ✓ Free trial), floating social proof card on image
-3. Logo strip / social proof — trusted-by logos or "10,000+ businesses" metrics
-4. Features — .grid-3 with 6 cards, each with IMAGE (picsum 400x250), icon, title, description
-   * REAL ESTATE: Use .property-grid > .property-card with property photos
+2. Hero — 90-100vh, DRAMATIC visual impact, split layout (text left + visual right). Trust badge pill, punchy headline, subheading, TWO CTAs (.btn-primary.btn-lg + .btn-ghost), trust checkmarks. Right side: if CURATED IMAGES provides a hero URL, use it. Otherwise: TECH/SAAS/CYBER → .hero-aurora or .hero-mesh. Other → CSS gradient. Floating social proof card overlaying the visual.
+3. Logo strip / social proof — trusted-by company names or "10,000+ businesses" metrics in subtle strip
+4. Features — .grid-3 with 6 cards. If CURATED IMAGES provides feature URLs, use them as card images. Otherwise: inline SVG icon (32-48px) + title + description. Use .card class.
+   * REAL ESTATE: Use .property-grid > .property-card with property photos from CURATED IMAGES if provided
 5. About — two-column: image left (with floating highlight stat), text right with heading + paragraph + 4 checkmark benefits
 6. Process — 3-4 numbered steps with icons, connecting lines/arrows
 7. Portfolio/Gallery — .image-gallery with 4-6 project images + captions
@@ -125,7 +126,7 @@ IMAGES — MANDATORY (minimum 10 for premium):
 
 ## RULES
 - Output ONLY raw HTML. Start with <!DOCTYPE html>. No markdown, no code fences.
-- Images: https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT — MINIMUM 10 images for premium tier
+- Use inline SVG icons for features, randomuser.me for testimonial avatars, CSS gradient backgrounds for tech/cyber heroes. Only use picsum.photos for gallery/portfolio sections. NEVER use picsum for hero, features, or testimonials.
 - .fade-in on sections for scroll animation. NEVER set opacity:0.
 - An empty or sparse <body> is a TOTAL FAILURE. Content is the product.
 - DULL or WASHED-OUT output is a FAILURE. Bold colors, rich imagery, visual depth.`;
@@ -141,7 +142,7 @@ const EDIT_SYSTEM = `You are Zoobicon, an AI website editor. You are given an ex
 - If adding new sections, match the existing visual style perfectly.
 - The output must be a complete, valid HTML document — not a diff or partial.
 - A component library CSS is automatically injected (marked by a comment). Do NOT reproduce it — just keep any site-specific CSS.
-- For image changes: use https://picsum.photos/seed/DESCRIPTIVE-KEYWORD/WIDTH/HEIGHT with keywords that match the site's industry. Choose different seed keywords for different images.
+- For image changes: use randomuser.me for avatars, inline SVG icons for feature cards, CSS gradients for hero backgrounds. Only use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for gallery/portfolio images.
 - Keep your CSS minimal — the component library provides .btn-primary, .card, .grid-3, .section, etc.`;
 
 export const maxDuration = 300; // Match pipeline-stream timeout for Opus builds
@@ -263,17 +264,17 @@ This site is being built for a white-label agency. Apply these branding rules:
       userMessage = `Build a premium, agency-quality website for: ${prompt}
 
 Requirements:
-- Split hero with text left + large image right. Include trust badge, headline, subheadline, 2 CTAs, trust checkmarks.
-- 6 feature cards each with their own image
-- About section with side-by-side image and text, floating stat overlay
-- 3 testimonials with avatar photos and star ratings
+- Split hero with text left + visual element right. For TECH/SAAS/CYBER: use .hero-aurora or .hero-mesh with a large SVG icon. For other industries: use image from IMAGE GUIDANCE below if provided.
+- 6 feature cards each with an inline SVG icon (NOT external image URLs)
+- About section with side-by-side layout, floating stat overlay
+- 3 testimonials with avatar photos from https://randomuser.me/api/portraits/ and star ratings
 - Stats section with 4 bold numbers
 - FAQ accordion with 4-5 real questions
 - CTA section with colored background and 2 buttons
 - Dark footer with 4 columns
 - Use industry-appropriate colors and typography. Match the aesthetic to the business type.
-- MINIMUM 8 images total across the page. No section should be text-only.
-${imageBlock || "- Every image uses https://picsum.photos/seed/DESCRIPTIVE-KEYWORD/WIDTH/HEIGHT with unique, industry-specific seeds."}`;
+- NEVER use picsum.photos for hero, feature cards, or testimonial avatars. Only use picsum for gallery/portfolio sections.
+${imageBlock}`;
       model = requestedModel || "claude-opus-4-6";
       maxTokens = 32000;
     }
