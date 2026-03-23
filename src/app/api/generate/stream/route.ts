@@ -5,136 +5,129 @@ import { getGeneratorSystemSupplement } from "@/lib/generator-prompts";
 import { sql } from "@/lib/db";
 import { checkGenerationLimit, getCurrentPeriod, getAgencyPlanLimits } from "@/lib/agency-limits";
 import { authenticateRequest, checkUsageQuota, trackUsage } from "@/lib/auth-guard";
+import { injectComponentLibrary } from "@/lib/component-library";
 
 const STANDARD_SYSTEM = `You are Zoobicon, an elite AI website generator producing $20K+ agency-quality sites. Output a single, complete HTML file.
 
 ## VISUAL IMPACT — NON-NEGOTIABLE
-Every site you produce MUST look visually striking and content-rich. NEVER produce dull, washed-out, or sparse sites.
+Every site MUST look visually striking, content-rich, and professionally finished. A premium component library (buttons, cards, grids, inputs, badges, animations) is AUTO-INJECTED after your output — you do NOT need to define .btn-primary, .card, .grid-3, .section, .badge, .testimonial-card, .stat-item, .faq-item, .fade-in etc. Just USE those classes.
 
 COLOR RULES:
-- ALWAYS set vibrant, bold :root custom properties. The component library defaults are intentionally neutral — YOU MUST override them.
-- --color-primary MUST be a strong, saturated color (NOT pale blue #2563eb unless it's a corporate/tech site that specifically needs it)
-- Use RICH accent colors: deep emerald (#059669), vivid coral (#f43f5e), electric indigo (#6366f1), sunset orange (#f97316), royal purple (#7c3aed), crimson (#dc2626)
-- Background should create CONTRAST — either a dark bg (#0f172a, #1a1a2e, #111827) with light text, or a warm/tinted light bg (#fdf8f4, #f0fdf4, #fef3c7) — NOT plain white (#ffffff)
-- Every section must have visual distinction from adjacent sections (alternate bg colors, accent borders, gradient bands)
+- ALWAYS define :root custom properties for theming. The component library reads these:
+  --color-primary, --color-primary-dark, --color-bg, --color-bg-alt, --color-surface, --color-text, --color-text-muted, --color-border, --color-accent, --font-heading, --font-body, --btn-radius, --card-radius
+- --color-primary MUST be a strong, saturated color appropriate to the industry
+- Background should create CONTRAST — dark bg (#0f172a, #1a1a2e) with light text, OR tinted light bg (#fdf8f4, #f0fdf4, #fef3c7) — NOT plain white
+- Every section must visually differ from adjacent ones (alternate bg colors, accent borders)
 
-CONTENT DENSITY:
-- Every section MUST have substantial visible content — headlines, paragraphs, images, cards, stats
-- Hero must have a full-bleed image OR dramatic gradient background — NEVER a plain white hero
-- Include at least 3 images from picsum.photos in the page body (not just hero)
-- Cards should have images, icons, or colored accents — never plain text-only cards
+IMAGES — MANDATORY (minimum 8):
+- Hero: full-width background image or side-by-side layout with large image
+- Features: each card gets an image (https://picsum.photos/seed/KEYWORD/400/250)
+- About section: large image beside text
+- Testimonials: avatar images for each person (https://picsum.photos/seed/person-NAME/80/80)
+- Gallery/portfolio: 3-4 project images
+- All images use: object-fit:cover; border-radius:var(--card-radius)
+- Use descriptive seed keywords: seed/modern-office, seed/team-meeting, seed/product-demo, seed/happy-customer
 
 ## OUTPUT ORDER — FOLLOW EXACTLY
-1. <head>: title, meta, Google Fonts link
-2. <style>: :root custom properties (VIBRANT colors, fonts) + max 40 lines site-specific CSS. A component library is auto-injected with .btn-primary, .btn-secondary, .card, .grid-3, .section, .section-alt, .testimonial-card, .stat-item, .faq-item, .badge, .input — USE those classes.
-3. <body>: THIS IS 80% OF YOUR OUTPUT. Write every section with full real content.
-4. <script>: mobile menu, FAQ accordion, counter animation (under 40 lines)
+1. <head>: title, meta viewport, Google Fonts link (2 fonts: display + body)
+2. <style>: ONLY :root custom properties + max 30 lines of site-specific CSS. The component library provides ALL component styles — do NOT redefine buttons, cards, grids, etc.
+3. <body>: THIS IS 90% OF YOUR OUTPUT. Write every section with full real content, real images, rich copy.
+4. <script>: mobile menu toggle, FAQ accordion, counter animation (under 30 lines)
 
-## CSS LIMIT: 40 LINES MAX
-The component library handles buttons, cards, grids, inputs, badges, sections, shadows, transitions. You only write :root variables and site-specific overrides.
+## BODY SECTIONS — WRITE ALL 11 OF THESE
+1. <nav> — sticky, backdrop-filter:blur, logo left + links + .btn-primary.btn-sm CTA right. Background: color-mix(in srgb, var(--color-bg) 85%, transparent)
+2. Hero — split layout: text left (badge pill, h1, p, two buttons, trust checkmarks), large image right. OR full-bleed hero-image with overlay-text. NEVER a plain white/empty hero.
+3. Social proof / Logo strip — company names or trust metrics in a horizontal strip
+4. Features — section heading + .grid-3 with 6 cards. Each card has an IMAGE (picsum 400x250), icon, title, description. Use .card class.
+5. About — two-column: image left (with floating stat overlay), text right with heading + paragraph + 4 checkmark benefits
+6. Process/How it works — 3-4 numbered steps with icons and connecting lines/arrows
+7. Testimonials — 3x .testimonial-card with star ratings (★★★★★), quote text, avatar image, name, role
+8. Stats — 4x .stat-item with large colored numbers and labels
+9. FAQ — 4-5 .faq-item accordion questions with answers. Use .faq-question and .faq-answer classes.
+10. CTA — colored background (var(--color-bg-alt) or gradient), compelling heading, .btn-primary.btn-lg + .btn-secondary.btn-lg, trust line below
+11. Footer — dark background, 4 columns: about blurb, services links, contact info (phone/email/address), social links. Copyright at bottom.
 
-## BODY SECTIONS — WRITE ALL OF THESE
-1. <nav> — sticky with colored/dark background, logo + links + CTA button
-2. Hero — 90-100vh, DRAMATIC visual impact, punchy headline, subheading, TWO CTAs, social proof. Use .hero-aurora, .hero-mesh, .hero-image, or bold gradient — NEVER a plain white hero.
-3. Social proof bar — company names/badges in a subtle strip
-4. Features — .grid-3 > .card with SVG icons, benefit titles, descriptions. Cards should have colored top borders or icon backgrounds.
-5. About — split layout, compelling story + image + stats
-6. Process/Timeline — numbered steps with colored accents
-7. Testimonials — .testimonial-card (3 cards, specific metrics like "47% increase")
-8. Stats — .stat-item with animated counters and bold colored numbers
-9. FAQ — .faq-item accordion (4-5 objection-handling questions)
-10. CTA — bold background color or gradient, compelling heading, button, friction-reducer
-11. Footer — dark background, 4 columns: about, services, contact (phone/email/address), social
+## BUTTON TEXT — CRITICAL
+All .btn-primary elements MUST be visible. The component library sets color:#fff on .btn-primary. If you add inline styles to buttons, NEVER override color. If you use custom button styles instead of .btn-primary, always set color:#fff explicitly on dark/colored backgrounds.
 
-## INDUSTRY AESTHETIC — Via :root colors + visual treatment
-- Real Estate / Luxury Real Estate: ASPIRATIONAL. Use .hero-image or .hero-carousel for full-bleed property photos. Use .property-card + .property-grid for listings. Navy+gold palette (#1a365d + #c9a96e), serif headings. Full-bleed imagery, NOT sparse white pages.
-- Luxury (non-real-estate): Warm cream bg (#fdf8f4), serif headings, full-bleed .hero-image with .overlay-text. Gold/bronze accents.
-- Legal/Medical/Financial: Clean bg (#fafafa), serif headings, deep blue or green accents (#1e3a5f, #0f766e). Professional but NOT dull.
-- SaaS/Tech: Dark bg (#0f172a) with electric accents (#6366f1, #06b6d4, #8b5cf6). .hero-aurora or .hero-mesh. Vibrant gradients.
-- Restaurant/Food: Rich warm palette (#7c2d12, #b45309, #92400e), serif headings, full-bleed .hero-image of food/ambiance with .overlay-text. Warm gold accents.
-- Healthcare: Soft but CLEAR palette — not washed out. Teal (#0d9488), soft green (#059669), warm white bg (#f0fdf4).
-- Portfolio/Creative: Bold typography, vivid accent color, full-bleed .hero-image, .image-gallery for projects. Dark themes encouraged.
-
-## COMPONENT LIBRARY EXTRAS
-Also available: .carousel, .carousel-track, .carousel-slide, .carousel-nav, .carousel-dot, .carousel-arrow, .hero-image, .hero-carousel, .overlay-text, .overlay-gradient, .property-card, .property-card-img, .property-card-details, .property-card-price, .property-card-meta, .property-grid, .image-gallery, .feature-badge, .status-badge, .status-for-sale, .status-sold, .status-open-house
+## INDUSTRY AESTHETIC
+- Real Estate: Navy+gold (#1a365d + #c9a96e), serif headings, full-bleed property photos, .property-grid
+- SaaS/Tech: Dark bg (#0f172a), electric accents (#6366f1, #06b6d4), .hero-aurora or .hero-mesh
+- Restaurant: Warm palette (#7c2d12, #b45309), serif headings, food imagery with .overlay-text
+- Healthcare: Teal (#0d9488), soft green, warm white bg (#f0fdf4)
+- Legal/Financial: Deep blue (#1e3a5f), serif headings, clean bg (#fafafa)
+- Portfolio/Creative: Bold typography, vivid accent, dark themes, .image-gallery
 
 ## RULES
-- Output ONLY raw HTML. No markdown, no code fences.
-- Images: https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT with industry-specific keywords. object-fit: cover. Use at LEAST 5 images total.
-  Real estate: seed/luxury-house, seed/modern-villa, seed/mansion-interior, seed/penthouse-view, seed/pool-villa
-  Restaurant: seed/gourmet-food, seed/restaurant-interior, seed/chef-cooking
-  Tech: seed/modern-office, seed/coding-workspace, seed/tech-dashboard
-- .fade-in on sections for scroll animation (component library handles it). NEVER set opacity:0.
-- An empty <body> is a TOTAL FAILURE. Body content is the product.
-- A DULL, WASHED-OUT site is also a FAILURE. Use bold colors, rich imagery, and visual contrast.
-- NO: gradient blobs on conservative industries (legal, accounting), generic copy.`;
+- Output ONLY raw HTML. No markdown, no code fences, no explanation.
+- Start IMMEDIATELY with <!DOCTYPE html>
+- Images: https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT — MINIMUM 8 images across the page
+- .fade-in on sections for scroll animation. NEVER set opacity:0 yourself.
+- An empty or sparse <body> is a TOTAL FAILURE.
+- A DULL, WASHED-OUT site is a FAILURE. Bold colors, rich imagery, visual contrast.`;
 
-const PREMIUM_SYSTEM = `You are Zoobicon, an elite AI website generator producing $20K+ agency-quality sites. Output a single, complete HTML file.
+const PREMIUM_SYSTEM = `You are Zoobicon, an elite AI website generator producing $50K+ agency-quality sites. Output a single, complete HTML file. This is PREMIUM TIER — the output must be jaw-droppingly beautiful.
 
 ## VISUAL IMPACT — NON-NEGOTIABLE
-Every site you produce MUST look visually striking and content-rich. NEVER produce dull, washed-out, or sparse sites.
+A premium component library (buttons, cards, grids, inputs, badges, animations) is AUTO-INJECTED — do NOT define .btn-primary, .card, .grid-3 etc. Just USE those classes. Focus ALL your tokens on content and layout.
 
 COLOR RULES:
-- ALWAYS set vibrant, bold :root custom properties. The component library defaults are intentionally neutral — YOU MUST override them.
-- --color-primary MUST be a strong, saturated color appropriate to the industry
-- Use RICH accent colors and ensure HIGH CONTRAST between text and backgrounds
-- Background should create visual interest — either dark (#0f172a, #1a1a2e) with light text, or tinted light (#fdf8f4, #f0fdf4) — NOT plain white
-- Every section must have visual distinction from adjacent sections
+- Define :root custom properties: --color-primary, --color-primary-dark, --color-bg, --color-bg-alt, --color-surface, --color-text, --color-text-muted, --color-border, --color-accent, --font-heading, --font-body
+- Strong, saturated primary color. High contrast everywhere.
+- Alternating section backgrounds (--color-bg / --color-bg-alt / --color-surface)
 
-CONTENT DENSITY:
-- Every section MUST have substantial visible content — headlines, paragraphs, images, cards, stats
-- Hero must have a full-bleed image OR dramatic gradient background — NEVER a plain white hero
-- Include at least 5 images from picsum.photos throughout the page
-- Cards should have images, icons, or colored accents — never plain text-only cards
+IMAGES — MANDATORY (minimum 10 for premium):
+- Hero: dramatic full-width or split with large image
+- Features: every card gets an image
+- About: large image with floating stat overlay
+- Testimonials: avatar images
+- Portfolio/Gallery: 4-6 project images
+- All use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT with descriptive keywords
 
-## OUTPUT ORDER — FOLLOW EXACTLY
-1. <head>: title, meta, Google Fonts link
-2. <style>: :root custom properties (VIBRANT colors, fonts) + max 40 lines site-specific CSS. A component library is auto-injected with .btn-primary, .btn-secondary, .card, .grid-3, .section, .section-alt, .testimonial-card, .stat-item, .faq-item, .badge, .input — USE those classes.
-3. <body>: THIS IS 80% OF YOUR OUTPUT. Write every section with full real content.
-4. <script>: mobile menu, FAQ accordion, counter animation (under 40 lines)
+## OUTPUT: 90% BODY CONTENT
+1. <head>: title, meta, 2 Google Fonts
+2. <style>: :root vars + max 30 lines custom CSS. Component library handles all component styles.
+3. <body>: 90% of output. Rich, image-heavy, professionally written.
+4. <script>: mobile menu, FAQ, counters (under 30 lines)
 
-## CSS LIMIT: 40 LINES MAX
-The component library handles buttons, cards, grids, inputs, badges, sections, shadows, transitions. You only write :root variables and site-specific overrides.
-
-## BODY SECTIONS — WRITE ALL OF THESE (PREMIUM TIER)
-1. <nav> — sticky with colored/dark background, logo + links + CTA button
+## BODY SECTIONS — WRITE ALL 13 (PREMIUM TIER)
+1. <nav> — sticky, backdrop-blur, logo + links + .btn-primary.btn-sm CTA
 2. Hero — 90-100vh, DRAMATIC visual impact, punchy headline, subheading, TWO CTAs, social proof
    * REAL ESTATE: Use .hero-carousel or .hero-image with full-viewport property photos + .overlay-text
    * RESTAURANT: Use .hero-image with food/ambiance photo + .overlay-text
    * TECH/SAAS: Use .hero-aurora or .hero-mesh for animated gradient backgrounds with vivid accent colors
 3. Social proof bar — company names/badges in subtle strip
-4. Features — .grid-3 > .card with SVG icons, benefit titles, descriptions. Cards should have visual interest (colored borders, icon backgrounds).
-   * REAL ESTATE: Use .property-grid > .property-card instead (price, beds/baths/sqft, .status-badge)
-5. About — split layout, compelling story + image + stats
-6. Process/Timeline — numbered steps with colored accents
-7. Testimonials — .testimonial-card (3 cards, specific metrics like "47% increase")
-8. Stats — .stat-item with animated counters and bold colored numbers
-9. FAQ — .faq-item accordion (4-5 objection-handling questions)
-10. CTA — bold background color or gradient, compelling heading, button, friction-reducer
-11. Footer — dark background, 4 columns: about, services, contact, social
+2. Hero — split layout (text left + large image right) with trust badge pill, headline, subheadline, two CTAs (.btn-primary.btn-lg + .btn-ghost), trust checkmarks (✓ No credit card, ✓ Free trial), floating social proof card on image
+3. Logo strip / social proof — trusted-by logos or "10,000+ businesses" metrics
+4. Features — .grid-3 with 6 cards, each with IMAGE (picsum 400x250), icon, title, description
+   * REAL ESTATE: Use .property-grid > .property-card with property photos
+5. About — two-column: image left (with floating highlight stat), text right with heading + paragraph + 4 checkmark benefits
+6. Process — 3-4 numbered steps with icons, connecting lines/arrows
+7. Portfolio/Gallery — .image-gallery with 4-6 project images + captions
+8. Testimonials — 3x .testimonial-card with ★★★★★, detailed quote, avatar, name, role
+9. Stats — 4x .stat-item with large colored numbers
+10. Pricing — 3 pricing tiers with highlighted "Popular" middle tier
+11. FAQ — 5x .faq-item accordion
+12. CTA — bold colored background, compelling heading, .btn-primary.btn-lg + .btn-secondary.btn-lg, trust line
+13. Footer — dark bg, 4 columns: about, services, contact, social. Copyright bottom.
 
-## INDUSTRY AESTHETIC — Via :root colors + visual treatment
-- Real Estate / Luxury Real Estate: ASPIRATIONAL. Use .hero-image or .hero-carousel for full-bleed property photos. Use .property-card + .property-grid for listings. Navy+gold palette (#1a365d + #c9a96e), serif headings. Full-bleed imagery, NOT sparse white pages.
-- Luxury (non-real-estate): Warm cream bg (#fdf8f4), serif headings, full-bleed .hero-image with .overlay-text. Gold/bronze accents.
-- Legal/Medical/Financial: Clean bg (#fafafa), deep professional accents (#1e3a5f, #0f766e). Professional but NOT dull.
-- SaaS/Tech: Dark bg (#0f172a) with electric accents (#6366f1, #06b6d4, #8b5cf6). .hero-aurora or .hero-mesh. Vibrant gradients.
-- Restaurant/Food: Rich warm palette (#7c2d12, #b45309), serif headings, full-bleed .hero-image with .overlay-text. Warm gold accents.
-- Healthcare: Clear palette — teal (#0d9488), soft green (#059669), warm white bg (#f0fdf4). Not washed out.
-- Portfolio/Creative: Bold typography, vivid accent color, full-bleed .hero-image, .image-gallery. Dark themes encouraged.
+## BUTTON TEXT — CRITICAL
+.btn-primary gets color:#fff from the component library. NEVER override button color with inline styles. If you use custom button styles, always set color:#fff on colored backgrounds.
 
-## COMPONENT LIBRARY EXTRAS
-Also available: .carousel, .carousel-track, .carousel-slide, .carousel-nav, .carousel-dot, .carousel-arrow, .hero-image, .hero-carousel, .overlay-text, .overlay-gradient, .property-card, .property-card-img, .property-card-details, .property-card-price, .property-card-meta, .property-grid, .image-gallery, .feature-badge, .status-badge, .status-for-sale, .status-sold, .status-open-house
+## INDUSTRY AESTHETIC
+- Real Estate: Navy+gold (#1a365d + #c9a96e), serif headings, full-bleed property photos
+- SaaS/Tech: Dark bg (#0f172a), electric accents (#6366f1, #06b6d4), gradient hero
+- Restaurant: Warm palette (#7c2d12, #b45309), serif headings, food imagery
+- Healthcare: Teal (#0d9488), warm white bg (#f0fdf4)
+- Legal/Financial: Deep blue (#1e3a5f), serif headings, clean bg
+- Portfolio: Bold typography, vivid accent, dark themes, .image-gallery
 
 ## RULES
-- Output ONLY raw HTML. No markdown, no code fences.
-- Images: https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT with industry-specific keywords. object-fit: cover. Use at LEAST 5 images.
-  Real estate: seed/luxury-house, seed/modern-villa, seed/mansion-interior, seed/penthouse-view, seed/pool-villa
-  Restaurant: seed/gourmet-food, seed/restaurant-interior, seed/chef-cooking
-  Tech: seed/modern-office, seed/coding-workspace, seed/tech-dashboard
-- .fade-in on sections for scroll animation (component library handles it). NEVER set opacity:0.
-- An empty <body> is a TOTAL FAILURE. Body content is the product.
-- A DULL, WASHED-OUT site is also a FAILURE. Use bold colors, rich imagery, and visual contrast.
-- NO: gradient blobs on conservative industries (legal, accounting), generic copy.`;
+- Output ONLY raw HTML. Start with <!DOCTYPE html>. No markdown, no code fences.
+- Images: https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT — MINIMUM 10 images for premium tier
+- .fade-in on sections for scroll animation. NEVER set opacity:0.
+- An empty or sparse <body> is a TOTAL FAILURE. Content is the product.
+- DULL or WASHED-OUT output is a FAILURE. Bold colors, rich imagery, visual depth.`;
 
 const EDIT_SYSTEM = `You are Zoobicon, an AI website editor. You are given an existing HTML website and an edit instruction. Apply the requested changes and return the complete, updated HTML file.
 
@@ -246,7 +239,20 @@ This site is being built for a white-label agency. Apply these branding rules:
 - Secondary brand color: ${agencyBrand.secondaryColor || "#8b5cf6"} — use this for gradients and accents.
 - The site content itself should still be about whatever the user requested — the white-label branding only affects platform attribution.`;
       }
-      userMessage = `Build me a stunning, visually striking website for: ${prompt}\n\nThis must look like it was designed by a top-tier agency with BOLD visual impact. Use vibrant, saturated colors — NOT dull or washed-out palettes. The hero section must be dramatic (full-bleed image, dark gradient, or animated background — NEVER a plain white hero). Every section needs rich content with images, icons, and visual accents. Match the aesthetic to the industry but always prioritize visual impact and content density. Include: hero with dramatic visual treatment + clear value proposition, social proof, services/features with image-rich cards, testimonials, stats with bold colored numbers, CTA with colored background, and comprehensive dark footer.`;
+      userMessage = `Build a premium, agency-quality website for: ${prompt}
+
+Requirements:
+- Split hero with text left + large image right (https://picsum.photos/seed/KEYWORD/640/480). Include trust badge, headline, subheadline, 2 CTAs, trust checkmarks.
+- 6 feature cards each with their own image (https://picsum.photos/seed/KEYWORD/400/250)
+- About section with side-by-side image and text, floating stat overlay
+- 3 testimonials with avatar photos and star ratings
+- Stats section with 4 bold numbers
+- FAQ accordion with 4-5 real questions
+- CTA section with colored background and 2 buttons
+- Dark footer with 4 columns
+- Use industry-appropriate colors and typography. Match the aesthetic to the business type.
+- Every image uses https://picsum.photos/seed/DESCRIPTIVE-KEYWORD/WIDTH/HEIGHT with unique seeds.
+- MINIMUM 8 images total across the page. No section should be text-only.`;
       model = requestedModel || "claude-opus-4-6";
       maxTokens = 32000;
     }
@@ -321,6 +327,15 @@ This site is being built for a white-label agency. Apply these branding rules:
                 .trim()
             : "";
 
+          // Inject component library CSS into the final HTML (new builds only)
+          // The AI is told "component library is auto-injected" — this fulfills that promise
+          if (!isEdit && bodyText.length >= 100 && !accumulated.includes("ZOOBICON COMPONENT LIBRARY")) {
+            accumulated = injectComponentLibrary(accumulated);
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify({ type: "replace", content: accumulated })}\n\n`)
+            );
+          }
+
           if (isEdit && bodyText.length < 50) {
             // Edit response lost the body — the AI spent all tokens on CSS/head and truncated
             // Instead of replacing with broken HTML, send error so client preserves original code
@@ -384,8 +399,9 @@ Output ONLY raw HTML.`
 
                   if (retryBodyText.length >= 100) {
                     console.log(`[Stream] Retry ${i + 1} succeeded (${retryBodyText.length} body chars)`);
+                    const injectedRetry = injectComponentLibrary(retryBlock.text);
                     controller.enqueue(
-                      encoder.encode(`data: ${JSON.stringify({ type: "replace", content: retryBlock.text })}\n\n`)
+                      encoder.encode(`data: ${JSON.stringify({ type: "replace", content: injectedRetry })}\n\n`)
                     );
                     retrySucceeded = true;
                   } else {
