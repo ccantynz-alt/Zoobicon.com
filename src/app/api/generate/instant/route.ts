@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
 import { classifyIntent, getScaffold, getScaffoldConfig, generatePatchPrompt } from "@/lib/scaffold-engine";
 import { COMPONENT_LIBRARY_CSS } from "@/lib/component-library";
+import { replacePicsumUrls } from "@/lib/stock-images";
 
 export const maxDuration = 300;
 
@@ -373,12 +374,17 @@ export async function POST(request: NextRequest) {
               message: "Content customized successfully.",
             })));
 
+            // Replace generic picsum URLs with industry-relevant images
+            finalHtml = replacePicsumUrls(finalHtml, prompt);
+
             controller.enqueue(encoder.encode(sseEvent({
               type: "replace",
               content: finalHtml,
             })));
           } else {
             // AI response wasn't parseable — send scaffold as-is with a note
+            const fallbackHtml = replacePicsumUrls(scaffoldHtml, prompt);
+
             controller.enqueue(encoder.encode(sseEvent({
               type: "status",
               message: "Using scaffold template with default content.",
@@ -386,7 +392,7 @@ export async function POST(request: NextRequest) {
 
             controller.enqueue(encoder.encode(sseEvent({
               type: "replace",
-              content: scaffoldHtml,
+              content: fallbackHtml,
             })));
           }
 

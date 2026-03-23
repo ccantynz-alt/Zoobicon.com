@@ -3,6 +3,7 @@ import { sql } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
 import { notifyNewSignup } from "@/lib/admin-notify";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+import { logAudit } from "@/lib/audit";
 
 const signupLimiter = { limit: 3, windowMs: 60000 };
 
@@ -55,6 +56,7 @@ export async function POST(request: NextRequest) {
 
     // Notify admin of new signup (fire-and-forget, don't block response)
     notifyNewSignup({ email: user.email, name: user.name }).catch(() => {});
+    logAudit({ action: "signup", email: user.email, ip, metadata: { name: user.name } }).catch(() => {});
 
     return Response.json({
       user: {

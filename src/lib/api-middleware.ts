@@ -4,7 +4,8 @@ import { checkRateLimit } from "@/lib/rateLimit";
 
 export interface AuthenticatedRequest {
   plan: ApiKeyPlan;
-  keyPrefix: string; // First 12 chars for rate limit tracking
+  keyPrefix: string; // First 20 chars for rate limit tracking
+  sub: string;       // sha256(email)[0:16] — unique owner identifier for data isolation
 }
 
 // Rate limits per plan tier
@@ -58,6 +59,7 @@ export async function authenticateApiKey(
   return {
     plan,
     keyPrefix,
+    sub: validation.sub || keyPrefix, // Fallback to keyPrefix for legacy keys without sub
   };
 }
 

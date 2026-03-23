@@ -95,31 +95,48 @@ ${agency_brand.logoUrl ? `- Logo URL: ${agency_brand.logoUrl}` : ""}`;
 
     const userPrompt = style ? `Style: ${style}\n\n${prompt}` : prompt;
 
-    // Use Anthropic API directly for non-streaming generation
-    const apiKey = process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) {
-      return apiError(503, "api_not_configured", "Generation API is not configured");
-    }
-
-    const Anthropic = (await import("@anthropic-ai/sdk")).default;
-    const client = new Anthropic({ apiKey, timeout: 120_000 });
-
     const modelId = model || "claude-opus-4-6";
     const maxTokens = selectedTier === "premium" ? 32000 : 16000;
+    const isClaudeModel = !modelId || modelId.startsWith("claude");
 
-    const response = await client.messages.create({
-      model: modelId.startsWith("claude") ? modelId : "claude-opus-4-6",
-      max_tokens: maxTokens,
-      system: systemPrompt,
-      messages: [{ role: "user", content: userPrompt }],
-    });
+    let html: string;
+    let tokensUsedRaw = 0;
 
-    const html = response.content
-      .filter((block): block is { type: "text"; text: string } => block.type === "text")
-      .map((block) => block.text)
-      .join("");
+    if (isClaudeModel) {
+      // Use Anthropic API directly for Claude models
+      const apiKey = process.env.ANTHROPIC_API_KEY;
+      if (!apiKey) {
+        return apiError(503, "api_not_configured", "Generation API is not configured");
+      }
+      const Anthropic = (await import("@anthropic-ai/sdk")).default;
+      const client = new Anthropic({ apiKey, timeout: 120_000 });
 
-    const tokensUsed = (response.usage?.input_tokens || 0) + (response.usage?.output_tokens || 0);
+      const response = await client.messages.create({
+        model: modelId,
+        max_tokens: maxTokens,
+        system: systemPrompt,
+        messages: [{ role: "user", content: userPrompt }],
+      });
+
+      html = response.content
+        .filter((block): block is { type: "text"; text: string } => block.type === "text")
+        .map((block) => block.text)
+        .join("");
+      tokensUsedRaw = (response.usage?.input_tokens || 0) + (response.usage?.output_tokens || 0);
+    } else {
+      // Route non-Claude models through the multi-LLM provider
+      const { callLLM } = await import("@/lib/llm-provider");
+      const result = await callLLM({
+        model: modelId,
+        system: systemPrompt,
+        userMessage: userPrompt,
+        maxTokens,
+      });
+      html = result.text;
+      tokensUsedRaw = (result.inputTokens || 0) + (result.outputTokens || 0);
+    }
+
+    const tokensUsed = tokensUsedRaw;
     const generationTimeMs = Date.now() - startTime;
 
     // Generate a unique ID for this generation
@@ -137,7 +154,7 @@ ${agency_brand.logoUrl ? `- Logo URL: ${agency_brand.logoUrl}` : ""}`;
 
         const [site] = await sql`
           INSERT INTO sites (name, slug, email, plan, status)
-          VALUES (${deploy_name || "API Generated Site"}, ${slug}, ${"api@zoobicon.com"}, ${"api"}, ${"active"})
+          VALUES (${deploy_name || "API Generated Site"}, ${slug}, ${`api_${auth.sub}@zoobicon.com`}, ${"api"}, ${"active"})
           ON CONFLICT (slug) DO UPDATE SET updated_at = NOW()
           RETURNING id, slug
         `;
@@ -175,7 +192,7 @@ ${agency_brand.logoUrl ? `- Logo URL: ${agency_brand.logoUrl}` : ""}`;
     try {
       await sql`
         INSERT INTO projects (user_email, name, prompt, code)
-        VALUES (${"api@zoobicon.com"}, ${`API: ${prompt.slice(0, 50)}`}, ${prompt}, ${html})
+        VALUES (${`api_${auth.sub}@zoobicon.com`}, ${`API: ${prompt.slice(0, 50)}`}, ${prompt}, ${html})
       `;
     } catch { /* best effort */ }
 

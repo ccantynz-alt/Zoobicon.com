@@ -36,6 +36,7 @@ export interface PipelineInput {
   model?: string; // User-selected model (e.g., "claude-sonnet-4-6", "gpt-4o", "gemini-2.5-pro")
   generatorType?: string; // Generator type ID (e.g., "landing", "restaurant", "saas") for type-specific prompts
   agencyBrand?: { agencyName: string; primaryColor?: string; secondaryColor?: string; logoUrl?: string }; // White-label agency branding
+  externalContext?: string; // MCP context from GitHub/Notion/Figma
 }
 
 export interface AgentResult {
@@ -710,7 +711,7 @@ export async function runPipeline(
     model: MODEL_PLANNER,
     maxTokens: 8192,
     system: strategistSystem,
-    userMessage: `Analyze and create a comprehensive strategy for this brief. If the user has provided specific design/content instructions, incorporate ALL of them into your strategy — do not ignore or simplify any user-specified details.\n\nBRIEF:\n${input.prompt}${input.style ? `\nPreferred style: ${input.style}` : ""}`,
+    userMessage: `Analyze and create a comprehensive strategy for this brief. If the user has provided specific design/content instructions, incorporate ALL of them into your strategy — do not ignore or simplify any user-specified details.\n\nBRIEF:\n${input.prompt}${input.style ? `\nPreferred style: ${input.style}` : ""}${input.externalContext ? `\n\nEXTERNAL CONTEXT (from connected tools — GitHub, Notion, Figma):\n${input.externalContext.slice(0, 4000)}` : ""}`,
   });
 
   const strategySpec = extractJSON(strategyText);

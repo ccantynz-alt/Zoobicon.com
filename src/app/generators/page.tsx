@@ -47,6 +47,7 @@ const GENERATOR_CATEGORIES = [
       { name: "Inventory Management", description: "Stock tracking, order management, supplier directory, low-stock alerts, and analytics reports", endpoint: "/api/generate/inventory", icon: Package },
       { name: "Data Dashboard", description: "Analytics dashboards with KPI cards, SVG charts, heatmaps, tables, and date range pickers", endpoint: "/api/generate/dashboard", icon: BarChart3 },
       { name: "Mobile App UI", description: "Native-feeling app interfaces with bottom tabs, onboarding flow, profile page, and empty states", endpoint: "/api/generate/mobile-app", icon: Smartphone, tag: "New" },
+      { name: "React Native/Expo App", description: "Multi-file React Native/Expo apps with tab navigation, typed screens, Context state, and native UI", endpoint: "/api/generate/mobile", icon: Smartphone, tag: "New" },
       { name: "Chatbot Interface", description: "AI chatbot UIs with message bubbles, quick replies, typing indicators, and conversation history", endpoint: "/api/generate/chatbot-ui", icon: MessageCircle, tag: "New" },
     ],
   },

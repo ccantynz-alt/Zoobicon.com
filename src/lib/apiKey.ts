@@ -65,6 +65,7 @@ export async function generateApiKey(email: string, plan: ApiKeyPlan, version = 
 export interface ApiKeyValidation {
   valid: boolean;
   plan?: ApiKeyPlan;
+  sub?: string;      // sha256(email)[0:16] — unique user identifier
   reason?: string;
 }
 
@@ -80,7 +81,7 @@ export async function validateApiKey(key: string): Promise<ApiKeyValidation> {
   if (!ok) return { valid: false, reason: "invalid_signature" };
   try {
     const parsed: ApiKeyPayload = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
-    return { valid: true, plan: parsed.plan };
+    return { valid: true, plan: parsed.plan, sub: parsed.sub };
   } catch {
     return { valid: false, reason: "parse_error" };
   }

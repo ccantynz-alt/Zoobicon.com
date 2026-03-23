@@ -479,3 +479,160 @@ Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT with industry-specific keywo
 
   return block;
 }
+
+// ── Post-processing: replace picsum URLs in generated HTML ────────────────
+
+// Curated Unsplash photo IDs by industry
+const INDUSTRY_PHOTOS: Record<string, string[]> = {
+  cybersecurity: [
+    "photo-1550751827-4bd374c3f58b",
+    "photo-1558494949-ef010cbdcc31",
+    "photo-1526374965328-7f61d4dc18c5",
+    "photo-1563986768609-322da13575f2",
+    "photo-1555949963-ff9fe0c870eb",
+    "photo-1551808525-51a94da548ce",
+    "photo-1544197150-b99a580bb7a8",
+    "photo-1504639725590-34d0984388bd",
+  ],
+  restaurant: [
+    "photo-1414235077428-338989a2e8c0",
+    "photo-1504674900247-0877df9cc836",
+    "photo-1555396273-367ea4eb4db5",
+    "photo-1517248135467-4c7edcad34c4",
+    "photo-1551218808-94e220e084d2",
+    "photo-1466978913421-dad2ebd01d17",
+    "photo-1559339352-11d035aa65de",
+    "photo-1560512823-829485b8bf24",
+  ],
+  realestate: [
+    "photo-1600596542815-ffad4c1539a9",
+    "photo-1600607687939-ce8a6c25118c",
+    "photo-1600566753376-12c8ab7fb75b",
+    "photo-1600585154340-be6161a56a0c",
+    "photo-1613490493576-7fde63acd811",
+    "photo-1560448204-e02f11c3d0e2",
+    "photo-1600047509807-ba8f99d2cdde",
+    "photo-1560185893-a55cbc8c57e8",
+  ],
+  saas: [
+    "photo-1531482615713-2afd69097998",
+    "photo-1522071820081-009f0129c71c",
+    "photo-1460925895917-afdab827c52f",
+    "photo-1553877522-43269d4ea984",
+    "photo-1552664730-d307ca884978",
+    "photo-1519389950473-47ba0277781c",
+    "photo-1551434678-e076c223a692",
+    "photo-1498050108023-c5249f4df085",
+  ],
+  healthcare: [
+    "photo-1519494026892-80bbd2d6fd0d",
+    "photo-1576091160550-2173dba999ef",
+    "photo-1579684385127-1ef15d508118",
+    "photo-1631217868264-e5b90bb7e133",
+    "photo-1538108149393-fbbd81895907",
+    "photo-1559839734-2b71ea197ec2",
+    "photo-1551076805-e1869033e561",
+    "photo-1582750433449-648ed127bb54",
+  ],
+  fitness: [
+    "photo-1534438327276-14e5300c3a48",
+    "photo-1571019613454-1cb2f99b2d8b",
+    "photo-1517836357463-d25dfeac3438",
+    "photo-1540497077202-7c8a3999166f",
+    "photo-1571019614242-c5c5dee9f50b",
+    "photo-1576678927484-cc907957088c",
+    "photo-1549060279-7e168fcee0c2",
+    "photo-1518611012118-696072aa579a",
+  ],
+  legal: [
+    "photo-1589829545856-d10d557cf95f",
+    "photo-1521587760476-6c12a4b040da",
+    "photo-1507679799987-c73779587ccf",
+    "photo-1450101499163-c8848c66ca85",
+    "photo-1575505586569-646b2ca898fc",
+    "photo-1453945619913-79ec89a82c51",
+    "photo-1497366216548-37526070297c",
+    "photo-1606857521015-7f9fcf423740",
+  ],
+  ecommerce: [
+    "photo-1556742049-0cfed4f6a45d",
+    "photo-1441986300917-64674bd600d8",
+    "photo-1472851294608-062f824d29cc",
+    "photo-1607082348824-0a96f2a4b9da",
+    "photo-1556742111-a301076d9d18",
+    "photo-1460925895917-afdab827c52f",
+    "photo-1563013544-824ae1b704d3",
+    "photo-1531303435785-3853ba035cda",
+  ],
+  education: [
+    "photo-1523580494863-6f3031224c94",
+    "photo-1524178232363-1fb2b075b655",
+    "photo-1427504494785-3a9ca7044f45",
+    "photo-1503676260728-1c00da094a0b",
+    "photo-1509062522246-3755977927d7",
+    "photo-1546410531-bb4caa6b424d",
+    "photo-1488190211105-8b0e65b80b4e",
+    "photo-1580582932707-520aed937b7b",
+  ],
+  finance: [
+    "photo-1460925895917-afdab827c52f",
+    "photo-1579532537598-459ecdaf39cc",
+    "photo-1554224155-6726b3ff858f",
+    "photo-1553729459-afe8f2e2ed65",
+    "photo-1444653614773-995cb1ef9efa",
+    "photo-1551836022-d5d88e9218df",
+    "photo-1560472354-b33ff0c44a43",
+    "photo-1611974789855-9c2a0a7236a3",
+  ],
+};
+
+const DEFAULT_PHOTOS = [
+  "photo-1497366216548-37526070297c",
+  "photo-1522071820081-009f0129c71c",
+  "photo-1531482615713-2afd69097998",
+  "photo-1460925895917-afdab827c52f",
+  "photo-1552664730-d307ca884978",
+  "photo-1519389950473-47ba0277781c",
+  "photo-1553877522-43269d4ea984",
+  "photo-1498050108023-c5249f4df085",
+];
+
+/**
+ * Replace all picsum.photos URLs in generated HTML with curated Unsplash photos.
+ * This is the safety net — no matter what the AI outputs, images will be relevant.
+ */
+export function replacePicsumUrls(html: string, prompt: string): string {
+  const picsumPattern = /https?:\/\/picsum\.photos\/(?:seed\/[^\/\s"']+\/)?(\d+)\/(\d+)/g;
+  const matches = [...html.matchAll(picsumPattern)];
+  if (matches.length === 0) return html;
+
+  const industry = detectIndustry(prompt);
+  const photos = (industry && INDUSTRY_PHOTOS[industry]) || DEFAULT_PHOTOS;
+
+  let imgIndex = 0;
+  let result = html;
+
+  for (const match of matches) {
+    const fullUrl = match[0];
+    const width = parseInt(match[1]) || 800;
+    const height = parseInt(match[2]) || 600;
+
+    let replacement: string;
+
+    if (width <= 100 && height <= 100) {
+      // Small images → avatar portraits
+      const gender = imgIndex % 2 === 0 ? "men" : "women";
+      const num = 20 + imgIndex * 7;
+      replacement = `https://randomuser.me/api/portraits/${gender}/${num}.jpg`;
+    } else {
+      // Larger images → curated Unsplash photos
+      const photoId = photos[imgIndex % photos.length];
+      replacement = `https://images.unsplash.com/${photoId}?w=${width}&h=${height}&fit=crop&q=80`;
+    }
+
+    result = result.replace(fullUrl, replacement);
+    imgIndex++;
+  }
+
+  return result;
+}

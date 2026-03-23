@@ -6,7 +6,7 @@ import { sql } from "@/lib/db";
 import { checkGenerationLimit, getCurrentPeriod, getAgencyPlanLimits } from "@/lib/agency-limits";
 import { authenticateRequest, checkUsageQuota, trackUsage } from "@/lib/auth-guard";
 import { injectComponentLibrary } from "@/lib/component-library";
-import { getImagePromptBlock } from "@/lib/stock-images";
+import { getImagePromptBlock, replacePicsumUrls } from "@/lib/stock-images";
 
 const STANDARD_SYSTEM = `You are Zoobicon, an elite AI website generator producing $20K+ agency-quality sites. Output a single, complete HTML file.
 
@@ -149,7 +149,7 @@ export const maxDuration = 300; // Match pipeline-stream timeout for Opus builds
 
 export async function POST(req: NextRequest) {
   try {
-    const { prompt, tier, existingCode, model: requestedModel, generator, agencyBrand, agencyId } = await req.json();
+    const { prompt, tier, existingCode, model: requestedModel, generator, agencyBrand, agencyId, externalContext } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       return new Response(
@@ -279,6 +279,11 @@ ${imageBlock}`;
       maxTokens = 32000;
     }
 
+    // Inject MCP external context (GitHub repos, Notion pages, Figma designs) when provided
+    if (externalContext && typeof externalContext === "string" && externalContext.trim().length > 0) {
+      userMessage += `\n\n## EXTERNAL CONTEXT (from connected tools — GitHub, Notion, Figma, etc.)\nUse this context to inform the design, content, and structure of the site:\n${externalContext.slice(0, 8000)}`;
+    }
+
     const messages: { role: "user" | "assistant"; content: string }[] = [
       { role: "user", content: userMessage + (!isEdit ? "\n\nIMPORTANT: Start your response IMMEDIATELY with <!DOCTYPE html> — no preamble, no explanation, no code fences. Output raw HTML only." : "") },
     ];
@@ -352,6 +357,9 @@ ${imageBlock}`;
           // Inject component library CSS into the final HTML (both new builds and edits)
           // For edits: we stripped the library before sending to the AI, now re-inject it
           // For new builds: the AI was told "component library is auto-injected"
+          // Replace any picsum.photos URLs with industry-relevant Unsplash photos
+          accumulated = replacePicsumUrls(accumulated, prompt);
+
           if (!accumulated.includes("ZOOBICON COMPONENT LIBRARY")) {
             // Remove the placeholder comment if present
             accumulated = accumulated.replace(/\/\* \[component library auto-injected\] \*\/\n?/g, '');

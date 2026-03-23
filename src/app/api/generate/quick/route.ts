@@ -3,7 +3,8 @@ import { NextRequest } from "next/server";
 import { COMPONENT_LIBRARY_CSS } from "@/lib/component-library";
 import { callLLMWithFailover } from "@/lib/llm-provider";
 import { getGeneratorDef, getGeneratorSystemSupplement } from "@/lib/generator-prompts";
-import { getImagePromptBlockSync } from "@/lib/stock-images";
+import { getImagePromptBlockSync, replacePicsumUrls, detectIndustry } from "@/lib/stock-images";
+
 
 /** Check if an error is a rate limit or overload that warrants model fallback */
 function isRetryableError(err: unknown): boolean {
@@ -404,9 +405,17 @@ This must look like a $30,000 agency built it. Think Apple.com or Stripe.com —
 ${imageBlock || "Use CSS gradients and SVG icons instead of external images. For avatars use https://randomuser.me/api/portraits/men/N.jpg or women/N.jpg (N=1-99)."}
 
 Output the <config> block first, then the <body-html> block. Nothing else.`
-      : `Build a stunning website for: ${prompt}
+      : `Build a stunning, professional website for: ${prompt}
 
-Include all 10 sections with real, detailed content. Match the aesthetic to the industry. Make it impressive.
+REQUIREMENTS:
+- Include ALL 10 sections (nav, hero, social proof, features, about, testimonials, stats, FAQ, CTA, footer)
+- Every section must have REAL, detailed content — multiple sentences per section
+- Headlines must be SPECIFIC to this business (not generic like "Welcome" or "Get Started")
+- Feature cards: 6 cards with inline SVG icons, each with a benefit-focused headline + 2-3 line description
+- Testimonials: 3 quotes with SPECIFIC metrics ("Reduced costs by 42%"), name, title, company
+- Stats: 4 big numbers with data-target attributes for counter animation
+- FAQ: 5 real questions someone would ask about this business
+- Match the color scheme and aesthetic to the industry
 ${imageBlock || "Use CSS gradients and SVG icons instead of external images. For avatars use https://randomuser.me/api/portraits/men/N.jpg or women/N.jpg (N=1-99)."}
 
 Output the <config> block first, then the <body-html> block. Nothing else.`;
@@ -549,24 +558,38 @@ Output the <config> block first, then the <body-html> block. Nothing else.`;
             .replace(/\s+/g, " ")
             .trim();
 
-          console.log(`[Quick] ${isPremium ? "Premium" : "Standard"} (${model}): body=${textContent.length} chars`);
+          const sectionCount = (bodyHtml.match(/<section/gi) || []).length;
+          const hasNav = /<nav/i.test(bodyHtml);
+          const hasFooter = /<footer/i.test(bodyHtml);
 
-          // If body is empty after primary attempt, retry with Sonnet
-          if (textContent.length < 50 && isPremium) {
-            console.warn(`[Quick] Empty body (${textContent.length} chars), retrying with Sonnet`);
-            sendEvent({ type: "status", message: "Optimizing..." });
+          console.log(`[Quick] ${isPremium ? "Premium" : "Standard"} (${model}): body=${textContent.length} chars, sections=${sectionCount}, nav=${hasNav}, footer=${hasFooter}`);
+
+          // Quality gate: retry if body is thin, missing sections, or has no nav/footer
+          // Apply to BOTH tiers — a broken standard site is still a broken product
+          const needsRetry = textContent.length < 500 || sectionCount < 5 || !hasNav;
+          if (needsRetry && !sonnetAlreadyTried) {
+            console.warn(`[Quick] Quality gate failed (text=${textContent.length}, sections=${sectionCount}, nav=${hasNav}), retrying with Sonnet`);
+            sendEvent({ type: "status", message: "Enhancing quality..." });
+            sonnetAlreadyTried = true;
 
             const retryRaw = await generate("claude-sonnet-4-6", 16000, 90_000);
             const retryConfig = retryRaw.match(/<config>\s*([\s\S]*?)\s*<\/config>/);
             const retryBody = retryRaw.match(/<body-html>\s*([\s\S]*?)\s*<\/body-html>/);
 
             if (retryBody) {
-              bodyHtml = retryBody[1].trim();
-              if (retryConfig) {
-                try { config = JSON.parse(retryConfig[1]); } catch { /* keep existing */ }
+              const retryText = retryBody[1].replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+              // Only use retry if it's actually better
+              if (retryText.length > textContent.length) {
+                bodyHtml = retryBody[1].trim();
+                if (retryConfig) {
+                  try { config = JSON.parse(retryConfig[1]); } catch { /* keep existing */ }
+                }
               }
             }
           }
+
+          // Post-process: replace any picsum URLs the AI used despite instructions
+          bodyHtml = replacePicsumUrls(bodyHtml, prompt);
 
           // Build the complete page
           const fullPage = buildFullPage(config, bodyHtml);
@@ -683,23 +706,41 @@ Output the <config> block first, then the <body-html> block. Nothing else.`;
 }
 
 // Default config when AI doesn't provide one or JSON parsing fails
+// Industry-specific defaults for when AI config parsing fails
+const INDUSTRY_DEFAULTS: Record<string, { suffix: string; font1: string; primary: string; primaryDark: string; bg: string; bgAlt: string; accent: string }> = {
+  cybersecurity: { suffix: "Security Solutions", font1: "Inter", primary: "#0ea5e9", primaryDark: "#0284c7", bg: "#0f172a", bgAlt: "#1e293b", accent: "#06b6d4" },
+  restaurant: { suffix: "Fine Dining", font1: "Playfair Display", primary: "#c4611a", primaryDark: "#a3510f", bg: "#fffaf5", bgAlt: "#fdf2e9", accent: "#b45309" },
+  realestate: { suffix: "Real Estate", font1: "Playfair Display", primary: "#1e3a5f", primaryDark: "#162d4a", bg: "#ffffff", bgAlt: "#f8f6f3", accent: "#7c3aed" },
+  saas: { suffix: "Platform", font1: "Inter", primary: "#6366f1", primaryDark: "#4f46e5", bg: "#ffffff", bgAlt: "#f8fafc", accent: "#8b5cf6" },
+  healthcare: { suffix: "Healthcare", font1: "Inter", primary: "#0d9488", primaryDark: "#0f766e", bg: "#f8fffe", bgAlt: "#f0faf7", accent: "#14b8a6" },
+  fitness: { suffix: "Fitness", font1: "Inter", primary: "#dc2626", primaryDark: "#b91c1c", bg: "#ffffff", bgAlt: "#fef2f2", accent: "#f97316" },
+  legal: { suffix: "Law Firm", font1: "Playfair Display", primary: "#1e3a5f", primaryDark: "#162d4a", bg: "#ffffff", bgAlt: "#f8f6f3", accent: "#b45309" },
+  finance: { suffix: "Financial Services", font1: "Inter", primary: "#1e3a5f", primaryDark: "#162d4a", bg: "#ffffff", bgAlt: "#f8f9fa", accent: "#b45309" },
+  ecommerce: { suffix: "Store", font1: "Inter", primary: "#7c3aed", primaryDark: "#6d28d9", bg: "#ffffff", bgAlt: "#faf5ff", accent: "#ec4899" },
+  education: { suffix: "Academy", font1: "Inter", primary: "#2563eb", primaryDark: "#1d4ed8", bg: "#ffffff", bgAlt: "#eff6ff", accent: "#7c3aed" },
+  agency: { suffix: "Creative Agency", font1: "Space Grotesk", primary: "#7c3aed", primaryDark: "#6d28d9", bg: "#ffffff", bgAlt: "#faf5ff", accent: "#ec4899" },
+};
+
 function getDefaultConfig(prompt: string): SiteConfig {
-  const name = prompt.trim().split(/\s+/).slice(0, 3).join(" ");
+  const name = prompt.trim().split(/\s+/).slice(0, 4).join(" ");
+  const industry = detectIndustry(prompt);
+  const defaults = industry ? INDUSTRY_DEFAULTS[industry] : null;
+
   return {
-    title: `${name} — Professional Services`,
-    description: `${name} provides professional services tailored to your needs.`,
-    font1: "Inter",
+    title: `${name}${defaults ? ` — ${defaults.suffix}` : ""}`,
+    description: `${name} delivers exceptional results for every client.`,
+    font1: defaults?.font1 || "Inter",
     font2: "Inter",
     colors: {
-      primary: "#2563eb",
-      primaryDark: "#1d4ed8",
-      bg: "#ffffff",
-      bgAlt: "#f8fafc",
+      primary: defaults?.primary || "#2563eb",
+      primaryDark: defaults?.primaryDark || "#1d4ed8",
+      bg: defaults?.bg || "#ffffff",
+      bgAlt: defaults?.bgAlt || "#f8fafc",
       surface: "#ffffff",
-      text: "#1a1a2e",
-      textMuted: "#64748b",
-      border: "#e2e8f0",
-      accent: "#7c3aed",
+      text: defaults?.bg?.startsWith("#0") ? "#e2e8f0" : "#1a1a2e",
+      textMuted: defaults?.bg?.startsWith("#0") ? "#94a3b8" : "#64748b",
+      border: defaults?.bg?.startsWith("#0") ? "#334155" : "#e2e8f0",
+      accent: defaults?.accent || "#7c3aed",
     },
   };
 }

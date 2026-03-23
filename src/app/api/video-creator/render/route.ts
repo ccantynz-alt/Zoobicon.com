@@ -88,6 +88,8 @@ export async function POST(req: NextRequest) {
 
     console.log(`[video-creator/render] Starting ${scenes.length} scenes with provider: ${activeProvider}`);
 
+    // Pre-flight check: test the first scene only to validate the provider works
+    // This prevents burning quota on a provider that will fail every time
     const result = await startRender({
       scenes,
       style,
@@ -105,13 +107,23 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // If ALL jobs failed immediately, don't charge anything and return clear error
+    if (startedJobs === 0 && failedJobs.length > 0) {
+      const firstError = failedJobs[0].error || "Unknown error";
+      return Response.json({
+        ...result,
+        error: `Video rendering failed for all scenes. Provider: ${activeProvider}. Error: ${firstError}`,
+        quotaCharged: 0,
+      });
+    }
+
     // Track usage — only count jobs that successfully started
     if (email && startedJobs > 0) {
       await incrementVideoUsage(email, "render", startedJobs);
       await consumeOverageIfNeeded(email, plan, hasAddon, "render", startedJobs);
     }
 
-    return Response.json(result);
+    return Response.json({ ...result, quotaCharged: startedJobs });
   } catch (err) {
     console.error("[video-creator/render] Error:", err);
     const message = err instanceof Error ? err.message : "Render failed";

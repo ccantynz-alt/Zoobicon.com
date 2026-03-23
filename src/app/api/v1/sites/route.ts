@@ -2,6 +2,11 @@ import { NextRequest } from "next/server";
 import { authenticateApiKey, apiResponse, apiError } from "@/lib/api-middleware";
 import { sql } from "@/lib/db";
 
+// Derive a unique email per API key owner for data isolation
+function ownerEmail(sub: string): string {
+  return `api_${sub}@zoobicon.com`;
+}
+
 /**
  * GET /api/v1/sites — List sites for the authenticated API user
  *
@@ -25,6 +30,8 @@ export async function GET(req: NextRequest) {
   const auth = await authenticateApiKey(req);
   if (auth instanceof Response) return auth;
 
+  const email = ownerEmail(auth.sub);
+
   try {
     const url = req.nextUrl;
     const page = Math.max(1, parseInt(url.searchParams.get("page") || "1"));
@@ -39,25 +46,25 @@ export async function GET(req: NextRequest) {
       sites = await sql`
         SELECT id, name, slug, plan, status, created_at, updated_at
         FROM sites
-        WHERE email = 'api@zoobicon.com' AND status = ${status}
+        WHERE email = ${email} AND status = ${status}
         ORDER BY created_at DESC
         LIMIT ${limit} OFFSET ${offset}
       `;
       [countResult] = await sql`
         SELECT COUNT(*)::int as total FROM sites
-        WHERE email = 'api@zoobicon.com' AND status = ${status}
+        WHERE email = ${email} AND status = ${status}
       `;
     } else {
       sites = await sql`
         SELECT id, name, slug, plan, status, created_at, updated_at
         FROM sites
-        WHERE email = 'api@zoobicon.com'
+        WHERE email = ${email}
         ORDER BY created_at DESC
         LIMIT ${limit} OFFSET ${offset}
       `;
       [countResult] = await sql`
         SELECT COUNT(*)::int as total FROM sites
-        WHERE email = 'api@zoobicon.com'
+        WHERE email = ${email}
       `;
     }
 
@@ -96,6 +103,8 @@ export async function DELETE(req: NextRequest) {
   const auth = await authenticateApiKey(req);
   if (auth instanceof Response) return auth;
 
+  const email = ownerEmail(auth.sub);
+
   try {
     const body = await req.json();
     const { site_id, slug } = body;
@@ -108,13 +117,13 @@ export async function DELETE(req: NextRequest) {
     if (site_id) {
       result = await sql`
         UPDATE sites SET status = 'inactive', updated_at = NOW()
-        WHERE id = ${site_id} AND email = 'api@zoobicon.com'
+        WHERE id = ${site_id} AND email = ${email}
         RETURNING id, slug
       `;
     } else {
       result = await sql`
         UPDATE sites SET status = 'inactive', updated_at = NOW()
-        WHERE slug = ${slug} AND email = 'api@zoobicon.com'
+        WHERE slug = ${slug} AND email = ${email}
         RETURNING id, slug
       `;
     }
@@ -139,6 +148,8 @@ export async function PUT(req: NextRequest) {
   const auth = await authenticateApiKey(req);
   if (auth instanceof Response) return auth;
 
+  const email = ownerEmail(auth.sub);
+
   try {
     const body = await req.json();
     const { site_id, slug, html, commit_message } = body;
@@ -151,10 +162,10 @@ export async function PUT(req: NextRequest) {
       return apiError(400, "missing_html", "HTML content is required");
     }
 
-    // Find the site
+    // Find the site — scoped to this API key's owner
     const [site] = site_id
-      ? await sql`SELECT id, slug FROM sites WHERE id = ${site_id} AND email = 'api@zoobicon.com' LIMIT 1`
-      : await sql`SELECT id, slug FROM sites WHERE slug = ${slug} AND email = 'api@zoobicon.com' LIMIT 1`;
+      ? await sql`SELECT id, slug FROM sites WHERE id = ${site_id} AND email = ${email} LIMIT 1`
+      : await sql`SELECT id, slug FROM sites WHERE slug = ${slug} AND email = ${email} LIMIT 1`;
 
     if (!site) {
       return apiError(404, "site_not_found", "Site not found or not owned by this API key");

@@ -1,14 +1,19 @@
 "use client";
 
-import { useMemo, useState, useEffect, useRef, useCallback } from "react";
-import { Monitor, Tablet, Smartphone } from "lucide-react";
+import { useMemo, useState, useEffect, useRef, useCallback, lazy, Suspense } from "react";
+import { Monitor, Tablet, Smartphone, Play } from "lucide-react";
 import { injectVisualEditingScript } from "@/lib/dom-bridge";
 import type { SelectedElement, BridgeMessage } from "@/lib/dom-bridge";
+
+const SandpackPreview = lazy(() => import("@/components/SandpackPreview"));
+
+type PreviewMode = "iframe" | "sandpack";
 
 interface PreviewPanelProps {
   html: string;
   isGenerating: boolean;
   visualEditMode?: boolean;
+  previewMode?: PreviewMode;
   onElementSelected?: (element: SelectedElement | null) => void;
   onElementHover?: (element: SelectedElement | null) => void;
 }
@@ -327,10 +332,12 @@ export default function PreviewPanel({
   html,
   isGenerating,
   visualEditMode = false,
+  previewMode: previewModeProp = "iframe",
   onElementSelected,
   onElementHover,
 }: PreviewPanelProps) {
   const [viewport, setViewport] = useState<ViewportMode>("desktop");
+  const [activePreviewMode, setActivePreviewMode] = useState<PreviewMode>(previewModeProp);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   // Listen for postMessage from the iframe when visual editing is active
@@ -492,7 +499,7 @@ export default function PreviewPanel({
     }
   `;
 
-  if (isGenerating) {
+  if (isGenerating && !html) {
     return (
       <div className="relative h-full overflow-hidden">
         <GeneratingAtmosphere />
@@ -645,6 +652,23 @@ export default function PreviewPanel({
             </button>
           );
         })}
+        {/* Separator */}
+        <div className="w-px h-4 bg-white/10 mx-1" />
+
+        {/* Sandpack hot-reload toggle */}
+        <button
+          onClick={() => setActivePreviewMode(activePreviewMode === "iframe" ? "sandpack" : "iframe")}
+          className={`flex items-center gap-1.5 px-2 py-1 rounded text-[11px] transition-colors duration-150 ${
+            activePreviewMode === "sandpack"
+              ? "text-green-400"
+              : "text-white/50 hover:text-white/70"
+          }`}
+          title={activePreviewMode === "sandpack" ? "Switch to iframe preview" : "Switch to Sandpack hot-reload preview"}
+        >
+          <Play size={12} />
+          <span className="hidden sm:inline">Hot Reload</span>
+        </button>
+
         {visualEditMode && (
           <div className="ml-auto flex items-center gap-1.5">
             <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
@@ -657,25 +681,39 @@ export default function PreviewPanel({
 
       {/* Preview area */}
       <div className="flex-1 overflow-hidden bg-gray-950 flex items-start justify-center">
-        <div
-          className={`h-full transition-all duration-300 ease-in-out ${
-            viewport !== "desktop"
-              ? "my-0 border-x border-white/10 rounded-md shadow-lg shadow-black/30"
-              : ""
-          }`}
-          style={{
-            width: viewportConfig[viewport].width,
-            maxWidth: "100%",
-          }}
-        >
-          <iframe
-            ref={iframeRef}
-            srcDoc={previewHtml}
-            className="w-full h-full border-0 bg-white"
-            title="Website preview"
-            sandbox="allow-scripts allow-same-origin"
-          />
-        </div>
+        {activePreviewMode === "sandpack" ? (
+          <div className="w-full h-full">
+            <Suspense
+              fallback={
+                <div className="h-full flex items-center justify-center bg-[#131520] text-white/40 text-sm">
+                  Loading Sandpack...
+                </div>
+              }
+            >
+              <SandpackPreview html={previewHtml} />
+            </Suspense>
+          </div>
+        ) : (
+          <div
+            className={`h-full transition-all duration-300 ease-in-out ${
+              viewport !== "desktop"
+                ? "my-0 border-x border-white/10 rounded-md shadow-lg shadow-black/30"
+                : ""
+            }`}
+            style={{
+              width: viewportConfig[viewport].width,
+              maxWidth: "100%",
+            }}
+          >
+            <iframe
+              ref={iframeRef}
+              srcDoc={previewHtml}
+              className="w-full h-full border-0 bg-white"
+              title="Website preview"
+              sandbox="allow-scripts allow-same-origin"
+            />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -2,6 +2,11 @@ import { NextRequest } from "next/server";
 import { authenticateApiKey, apiResponse, apiError } from "@/lib/api-middleware";
 import { sql } from "@/lib/db";
 
+// Derive a unique email per API key owner for data isolation
+function ownerEmail(sub: string): string {
+  return `api_${sub}@zoobicon.com`;
+}
+
 /**
  * POST /api/v1/deploy — Deploy HTML to zoobicon.sh
  *
@@ -31,6 +36,8 @@ import { sql } from "@/lib/db";
 export async function POST(req: NextRequest) {
   const auth = await authenticateApiKey(req);
   if (auth instanceof Response) return auth;
+
+  const email = ownerEmail(auth.sub);
 
   try {
     const body = await req.json();
@@ -64,7 +71,7 @@ export async function POST(req: NextRequest) {
     if (existingSite) {
       // Site exists — check ownership
       const [owned] = await sql`
-        SELECT id FROM sites WHERE slug = ${baseSlug} AND email = 'api@zoobicon.com' LIMIT 1
+        SELECT id FROM sites WHERE slug = ${baseSlug} AND email = ${email} LIMIT 1
       `;
 
       if (!owned) {
@@ -72,7 +79,7 @@ export async function POST(req: NextRequest) {
         finalSlug = `${baseSlug}-${crypto.randomUUID().slice(0, 4)}`;
         const [newSite] = await sql`
           INSERT INTO sites (name, slug, email, plan, status)
-          VALUES (${name || "API Site"}, ${finalSlug}, 'api@zoobicon.com', 'api', 'active')
+          VALUES (${name || "API Site"}, ${finalSlug}, ${email}, 'api', 'active')
           RETURNING id
         `;
         siteId = newSite.id;
@@ -87,7 +94,7 @@ export async function POST(req: NextRequest) {
       finalSlug = baseSlug;
       const [newSite] = await sql`
         INSERT INTO sites (name, slug, email, plan, status)
-        VALUES (${name || "API Site"}, ${finalSlug}, 'api@zoobicon.com', 'api', 'active')
+        VALUES (${name || "API Site"}, ${finalSlug}, ${email}, 'api', 'active')
         RETURNING id
       `;
       siteId = newSite.id;
@@ -127,6 +134,8 @@ export async function GET(req: NextRequest) {
   const auth = await authenticateApiKey(req);
   if (auth instanceof Response) return auth;
 
+  const email = ownerEmail(auth.sub);
+
   try {
     const siteId = req.nextUrl.searchParams.get("site_id");
     const slug = req.nextUrl.searchParams.get("slug");
@@ -137,8 +146,8 @@ export async function GET(req: NextRequest) {
 
     // Find the site
     const [site] = siteId
-      ? await sql`SELECT id, slug, name, status FROM sites WHERE id = ${siteId} AND email = 'api@zoobicon.com' LIMIT 1`
-      : await sql`SELECT id, slug, name, status FROM sites WHERE slug = ${slug} AND email = 'api@zoobicon.com' LIMIT 1`;
+      ? await sql`SELECT id, slug, name, status FROM sites WHERE id = ${siteId} AND email = ${email} LIMIT 1`
+      : await sql`SELECT id, slug, name, status FROM sites WHERE slug = ${slug} AND email = ${email} LIMIT 1`;
 
     if (!site) {
       return apiError(404, "site_not_found", "Site not found or not owned by this API key");

@@ -18,7 +18,7 @@ interface CollaborationBarProps {
   participants: RemoteParticipant[];
   myColor: string;
   isConnected: boolean;
-  transport?: "websocket" | "polling";
+  transport?: "websocket" | "sse" | "polling";
   onCreateRoom: () => void;
   onJoinRoom: (code: string) => Promise<unknown>;
   onLeaveRoom: () => void;
@@ -135,6 +135,9 @@ export default function CollaborationBar({
         <span className="text-[10px] text-green-400 font-medium">LIVE</span>
         {transport === "websocket" && (
           <span className="text-[8px] text-green-400/50 ml-0.5">WS</span>
+        )}
+        {transport === "sse" && (
+          <span className="text-[8px] text-green-400/50 ml-0.5">SSE</span>
         )}
       </div>
 

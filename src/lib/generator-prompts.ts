@@ -178,6 +178,16 @@ const GENERATOR_PROMPTS: Record<string, GeneratorDef> = {
     prompt:
       "Create a mobile app interface for [describe your app]. Include a native-feeling bottom tab navigation, home screen with cards, detail view, profile page with settings, and onboarding flow with 3-4 swipeable intro screens.",
   },
+  "react-native": {
+    name: "React Native/Expo App",
+    prompt:
+      "Create a React Native mobile app with Expo for [describe your app]. Include tab navigation, multiple screens with real content, state management with React Context, and a polished native UI design.",
+  },
+  mobile: {
+    name: "React Native/Expo App",
+    prompt:
+      "Create a React Native mobile app with Expo for [describe your app]. Include tab navigation, multiple screens with real content, state management with React Context, and a polished native UI design.",
+  },
   "chatbot-ui": {
     name: "Chatbot Interface",
     prompt:
@@ -1182,6 +1192,108 @@ STYLE:
 - Haptic-feeling button states (scale on press)
 
 IMAGE SEEDS: seed/app-interface, seed/mobile-ui, seed/onboarding-illustration`,
+
+  "react-native": `
+## GENERATOR: REACT NATIVE / EXPO APP
+You are building a MULTI-FILE React Native/Expo mobile application. Output ONLY valid JSON — no markdown, no code fences.
+
+OUTPUT FORMAT:
+{
+  "projectName": "my-app",
+  "description": "Brief description",
+  "files": [
+    { "path": "App.tsx", "content": "..." },
+    { "path": "screens/HomeScreen.tsx", "content": "..." }
+  ]
+}
+
+REQUIRED FILES (MINIMUM):
+1. App.tsx — Root with NavigationContainer
+2. app.json — Expo config (name, slug, version, icon, splash, platforms)
+3. package.json — All dependencies (expo, react-native, @react-navigation/*, @expo/vector-icons, etc.)
+4. navigation/index.tsx — Tab + stack navigator configuration with typed params
+5. constants/Colors.ts — Full color palette (primary, secondary, background, text, border, success, error, warning)
+6. screens/HomeScreen.tsx — Main screen with real content
+7. screens/ — At least 2 more screens (Detail, Profile, Settings, Search, etc.)
+
+CODE STANDARDS:
+- TypeScript (.tsx) with proper type annotations throughout
+- Functional components ONLY — no class components
+- StyleSheet.create() for ALL styles — never inline objects
+- React Navigation v6+ with typed navigation props (NativeStackScreenProps, BottomTabScreenProps)
+- @expo/vector-icons (Ionicons preferred) for all icons
+- SafeAreaView wrapper on every screen
+- Platform.select() for iOS/Android style differences
+- Real content specific to the app purpose — no placeholder text
+- Images via https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT
+
+NAVIGATION:
+- BottomTabNavigator as root with 3-5 tabs
+- NativeStackNavigator nested inside tabs for drill-down
+- Typed RootTabParamList and per-tab stack param lists
+- Custom tab bar styling (colors, icons, labels)
+- Consistent header styles across stacks
+
+DESIGN:
+- 4px spacing grid (4, 8, 12, 16, 24, 32, 48)
+- Card radius: 12px, button radius: 8px, pill radius: 9999
+- Shadows via Platform.select (iOS shadow* vs Android elevation)
+- Touch targets minimum 44x44
+- FlatList for scrollable lists with keyExtractor
+- Pull-to-refresh (RefreshControl) on list screens
+- Loading states (ActivityIndicator), empty states, error states
+- Consistent typography scale in constants file`,
+
+  mobile: `
+## GENERATOR: REACT NATIVE / EXPO APP
+You are building a MULTI-FILE React Native/Expo mobile application. Output ONLY valid JSON — no markdown, no code fences.
+
+OUTPUT FORMAT:
+{
+  "projectName": "my-app",
+  "description": "Brief description",
+  "files": [
+    { "path": "App.tsx", "content": "..." },
+    { "path": "screens/HomeScreen.tsx", "content": "..." }
+  ]
+}
+
+REQUIRED FILES (MINIMUM):
+1. App.tsx — Root with NavigationContainer
+2. app.json — Expo config (name, slug, version, icon, splash, platforms)
+3. package.json — All dependencies (expo, react-native, @react-navigation/*, @expo/vector-icons, etc.)
+4. navigation/index.tsx — Tab + stack navigator configuration with typed params
+5. constants/Colors.ts — Full color palette (primary, secondary, background, text, border, success, error, warning)
+6. screens/HomeScreen.tsx — Main screen with real content
+7. screens/ — At least 2 more screens (Detail, Profile, Settings, Search, etc.)
+
+CODE STANDARDS:
+- TypeScript (.tsx) with proper type annotations throughout
+- Functional components ONLY — no class components
+- StyleSheet.create() for ALL styles — never inline objects
+- React Navigation v6+ with typed navigation props (NativeStackScreenProps, BottomTabScreenProps)
+- @expo/vector-icons (Ionicons preferred) for all icons
+- SafeAreaView wrapper on every screen
+- Platform.select() for iOS/Android style differences
+- Real content specific to the app purpose — no placeholder text
+- Images via https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT
+
+NAVIGATION:
+- BottomTabNavigator as root with 3-5 tabs
+- NativeStackNavigator nested inside tabs for drill-down
+- Typed RootTabParamList and per-tab stack param lists
+- Custom tab bar styling (colors, icons, labels)
+- Consistent header styles across stacks
+
+DESIGN:
+- 4px spacing grid (4, 8, 12, 16, 24, 32, 48)
+- Card radius: 12px, button radius: 8px, pill radius: 9999
+- Shadows via Platform.select (iOS shadow* vs Android elevation)
+- Touch targets minimum 44x44
+- FlatList for scrollable lists with keyExtractor
+- Pull-to-refresh (RefreshControl) on list screens
+- Loading states (ActivityIndicator), empty states, error states
+- Consistent typography scale in constants file`,
 
   "chatbot-ui": `
 ## GENERATOR: CHATBOT INTERFACE
