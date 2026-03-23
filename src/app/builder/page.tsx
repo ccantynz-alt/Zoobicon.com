@@ -47,6 +47,7 @@ import CursorOverlay from "@/components/CursorOverlay";
 import { useCollaboration } from "@/hooks/useCollaboration";
 import OnboardingTooltips, { shouldShowTour } from "@/components/OnboardingTooltips";
 import BuildSuccessModal, { shouldShowBuildSuccess, dismissBuildSuccess } from "@/components/BuildSuccessModal";
+import MCPPanel from "@/components/MCPPanel";
 
 import {
   Bug,
@@ -138,6 +139,7 @@ type ToolId =
   | "sections"
   | "project"
   | "crawl"
+  | "mcp"
   | null;
 
 const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }[] = [
@@ -166,6 +168,7 @@ const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }
   { id: "sections", label: "Add Section", icon: <Package size={18} /> },
   { id: "project", label: "Project Mode", icon: <FolderTree size={18} /> },
   { id: "crawl", label: "Crawl Competitor", icon: <Eye size={18} /> },
+  { id: "mcp", label: "MCP Context", icon: <ExternalLink size={18} /> },
 ];
 
 /* ─── Interactive particle constellation background ─── */
@@ -414,6 +417,7 @@ function BuilderPage() {
   const [instantMode, setInstantMode] = useState(true); // Instant scaffold mode — 3s first preview
   const [availableModels, setAvailableModels] = useState<AIModel[]>([]);
   const [reactSource, setReactSource] = useState<Record<string, string> | null>(null);
+  const [mcpContext, setMcpContext] = useState("");
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   // Phase 2: Visual editing
   const [visualEditMode, setVisualEditMode] = useState(false);
@@ -743,6 +747,7 @@ function BuilderPage() {
             ...(generatorBanner ? { generator: generatorBanner.id } : {}),
             ...(agencyBrand ? { agencyBrand } : {}),
             ...(agencyId ? { agencyId } : {}),
+            ...(mcpContext ? { externalContext: mcpContext } : {}),
           }),
           signal: controller.signal,
         });
@@ -1467,6 +1472,8 @@ function BuilderPage() {
             </Link>
           </div>
         );
+      case "mcp":
+        return <MCPPanel onContextChange={setMcpContext} />;
       default:
         return null;
     }

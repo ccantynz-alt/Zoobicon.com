@@ -149,7 +149,7 @@ export const maxDuration = 300; // Match pipeline-stream timeout for Opus builds
 
 export async function POST(req: NextRequest) {
   try {
-    const { prompt, tier, existingCode, model: requestedModel, generator, agencyBrand, agencyId } = await req.json();
+    const { prompt, tier, existingCode, model: requestedModel, generator, agencyBrand, agencyId, externalContext } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       return new Response(
@@ -277,6 +277,11 @@ Requirements:
 ${imageBlock}`;
       model = requestedModel || "claude-opus-4-6";
       maxTokens = 32000;
+    }
+
+    // Inject MCP external context (GitHub repos, Notion pages, Figma designs) when provided
+    if (externalContext && typeof externalContext === "string" && externalContext.trim().length > 0) {
+      userMessage += `\n\n## EXTERNAL CONTEXT (from connected tools — GitHub, Notion, Figma, etc.)\nUse this context to inform the design, content, and structure of the site:\n${externalContext.slice(0, 8000)}`;
     }
 
     const messages: { role: "user" | "assistant"; content: string }[] = [

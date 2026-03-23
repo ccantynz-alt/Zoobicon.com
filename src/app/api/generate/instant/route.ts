@@ -383,7 +383,7 @@ export async function POST(request: NextRequest) {
             })));
           } else {
             // AI response wasn't parseable — send scaffold as-is with a note
-            scaffoldHtml = replacePicsumUrls(scaffoldHtml, prompt);
+            const fallbackHtml = replacePicsumUrls(scaffoldHtml, prompt);
 
             controller.enqueue(encoder.encode(sseEvent({
               type: "status",
@@ -392,7 +392,7 @@ export async function POST(request: NextRequest) {
 
             controller.enqueue(encoder.encode(sseEvent({
               type: "replace",
-              content: scaffoldHtml,
+              content: fallbackHtml,
             })));
           }
 
