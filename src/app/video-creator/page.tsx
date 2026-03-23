@@ -705,9 +705,22 @@ export default function VideoCreatorDashboard() {
         throw new Error(d.error || "Render failed");
       }
       const data = await res.json();
+
+      // Check if all jobs failed immediately (provider misconfigured)
+      const allFailed = data.jobs?.length > 0 && data.jobs.every((j: RenderJob) => j.status === "failed");
+      if (allFailed || data.error) {
+        setRenderJobs(data.jobs || []);
+        throw new Error(data.error || "Video rendering failed — the provider may not be configured correctly. Your images, voiceover, and subtitles are still ready.");
+      }
+
       setRenderJobs(data.jobs || []);
-      // Start polling
-      pollRenderStatus(data.jobs || []);
+      // Start polling only if some jobs are pending/processing
+      const pendingJobs = (data.jobs || []).filter((j: RenderJob) => j.status !== "failed");
+      if (pendingJobs.length > 0) {
+        pollRenderStatus(data.jobs || []);
+      } else {
+        setPipelineStage("idle");
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Render failed");
       setPipelineStage("idle");
@@ -984,6 +997,12 @@ export default function VideoCreatorDashboard() {
             throw new Error(d.error || "Render failed");
           }
           const data = await res.json();
+          // Check if all jobs failed immediately (provider broken)
+          const allFailed = data.jobs?.length > 0 && data.jobs.every((j: RenderJob) => j.status === "failed");
+          if (allFailed || data.error) {
+            setRenderJobs(data.jobs || []);
+            throw new Error(data.error || "Video rendering provider failed. Images, voiceover, and subtitles are ready.");
+          }
           setRenderJobs(data.jobs || []);
           pollRenderStatus(data.jobs || []);
           progress.video = { status: "done" };
@@ -2168,7 +2187,7 @@ export default function VideoCreatorDashboard() {
                                 </div>
                                 <div className="flex items-center gap-1">
                                   {capabilities.videoRender.available ? <CheckCircle2 className="w-3 h-3 text-green-500" /> : <AlertCircle className="w-3 h-3 text-amber-500" />}
-                                  Video Rendering: {capabilities.videoRender.available ? "Ready (Runway/Luma/Pika/Kling)" : "Coming Soon"}
+                                  Video Rendering: {capabilities.videoRender.available ? "Provider Detected (may require valid API credits)" : "Coming Soon — Add RUNWAY_API_KEY or REPLICATE_API_TOKEN"}
                                 </div>
                                 <div className="flex items-center gap-1">
                                   {capabilities.voiceover.available && (capabilities.voiceover as { premium?: boolean }).premium
