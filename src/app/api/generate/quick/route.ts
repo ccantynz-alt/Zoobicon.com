@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 import { COMPONENT_LIBRARY_CSS } from "@/lib/component-library";
 import { callLLMWithFailover } from "@/lib/llm-provider";
 import { getGeneratorDef, getGeneratorSystemSupplement } from "@/lib/generator-prompts";
+import { getImagePromptBlock } from "@/lib/stock-images";
 
 /** Check if an error is a rate limit or overload that warrants model fallback */
 function isRetryableError(err: unknown): boolean {
@@ -420,15 +421,20 @@ export async function POST(req: NextRequest) {
     const client = new Anthropic({ apiKey, timeout });
     const encoder = new TextEncoder();
 
+    // Inject curated Unsplash images when industry is detected
+    const imageBlock = getImagePromptBlock(prompt);
+
     const userMessage = isPremium
       ? `Build a world-class PREMIUM website for: ${prompt}
 
-This must look like a $30,000 agency built it. Think Apple.com or Stripe.com — clean white background, generous whitespace, sophisticated typography. Include ALL 13 sections with rich, specific content. Every testimonial mentions real metrics. Every headline drives action. Use a LIGHT color scheme with white/cream backgrounds. Every image must use a unique picsum seed.
+This must look like a $30,000 agency built it. Think Apple.com or Stripe.com — clean white background, generous whitespace, sophisticated typography. Include ALL 13 sections with rich, specific content. Every testimonial mentions real metrics. Every headline drives action. Use a LIGHT color scheme with white/cream backgrounds.
+${imageBlock || "Every image must use a unique picsum seed with industry-specific keywords."}
 
 Output the <config> block first, then the <body-html> block. Nothing else.`
       : `Build a stunning website for: ${prompt}
 
 Include all 10 sections with real, detailed content. Match the aesthetic to the industry. Make it impressive.
+${imageBlock || "Every image uses https://picsum.photos/seed/DESCRIPTIVE-KEYWORD/WIDTH/HEIGHT with industry-specific seeds."}
 
 Output the <config> block first, then the <body-html> block. Nothing else.`;
 

@@ -6,6 +6,7 @@ import { sql } from "@/lib/db";
 import { checkGenerationLimit, getCurrentPeriod, getAgencyPlanLimits } from "@/lib/agency-limits";
 import { authenticateRequest, checkUsageQuota, trackUsage } from "@/lib/auth-guard";
 import { injectComponentLibrary } from "@/lib/component-library";
+import { getImagePromptBlock } from "@/lib/stock-images";
 
 const STANDARD_SYSTEM = `You are Zoobicon, an elite AI website generator producing $20K+ agency-quality sites. Output a single, complete HTML file.
 
@@ -133,11 +134,15 @@ const EDIT_SYSTEM = `You are Zoobicon, an AI website editor. You are given an ex
 
 ## Rules
 - Output ONLY the complete updated HTML. No markdown, no explanation, no code fences.
+- Start your response IMMEDIATELY with <!DOCTYPE html> — no preamble.
 - Preserve the existing design language, color palette, and typography unless asked to change them.
 - Make the requested changes precisely and thoroughly.
 - Maintain all existing responsive behavior and hover states.
 - If adding new sections, match the existing visual style perfectly.
-- The output must be a complete, valid HTML document — not a diff or partial.`;
+- The output must be a complete, valid HTML document — not a diff or partial.
+- A component library CSS is automatically injected (marked by a comment). Do NOT reproduce it — just keep any site-specific CSS.
+- For image changes: use https://picsum.photos/seed/DESCRIPTIVE-KEYWORD/WIDTH/HEIGHT with keywords that match the site's industry. Choose different seed keywords for different images.
+- Keep your CSS minimal — the component library provides .btn-primary, .card, .grid-3, .section, etc.`;
 
 export const maxDuration = 300; // Match pipeline-stream timeout for Opus builds
 
@@ -213,7 +218,20 @@ export async function POST(req: NextRequest) {
 
     if (isEdit) {
       systemPrompt = EDIT_SYSTEM;
-      userMessage = `Here is the current website HTML:\n\n${existingCode}\n\n---\n\nIMPORTANT: Output the COMPLETE updated HTML from <!DOCTYPE html> to </html>. Do NOT skip or truncate any sections.\n\nApply this edit: ${prompt}`;
+
+      // Strip the injected component library CSS from existingCode before sending to the AI.
+      // This saves ~10K tokens of input AND means the AI doesn't have to reproduce it in output.
+      // We'll re-inject it after the edit completes.
+      let cleanedCode = existingCode;
+      const libStartMarker = '/* ══════════════════════════════════════════════════════════';
+      const libEndMarker = '/* ── Custom Styles ── */';
+      const libStart = cleanedCode.indexOf(libStartMarker);
+      const libEnd = cleanedCode.indexOf(libEndMarker);
+      if (libStart !== -1 && libEnd !== -1) {
+        cleanedCode = cleanedCode.slice(0, libStart) + '/* [component library auto-injected] */\n' + cleanedCode.slice(libEnd + libEndMarker.length);
+      }
+
+      userMessage = `Here is the current website HTML:\n\n${cleanedCode}\n\n---\n\nIMPORTANT: Output the COMPLETE updated HTML from <!DOCTYPE html> to </html>. Do NOT skip or truncate any sections. The comment /* [component library auto-injected] */ marks where a CSS library is automatically injected — do NOT reproduce it, just keep the comment in place.\n\nApply this edit: ${prompt}`;
       model = requestedModel || "claude-sonnet-4-6";
       maxTokens = 32000;
     } else {
@@ -239,11 +257,14 @@ This site is being built for a white-label agency. Apply these branding rules:
 - Secondary brand color: ${agencyBrand.secondaryColor || "#8b5cf6"} — use this for gradients and accents.
 - The site content itself should still be about whatever the user requested — the white-label branding only affects platform attribution.`;
       }
+      // Detect industry and inject curated Unsplash images when available
+      const imageBlock = getImagePromptBlock(prompt);
+
       userMessage = `Build a premium, agency-quality website for: ${prompt}
 
 Requirements:
-- Split hero with text left + large image right (https://picsum.photos/seed/KEYWORD/640/480). Include trust badge, headline, subheadline, 2 CTAs, trust checkmarks.
-- 6 feature cards each with their own image (https://picsum.photos/seed/KEYWORD/400/250)
+- Split hero with text left + large image right. Include trust badge, headline, subheadline, 2 CTAs, trust checkmarks.
+- 6 feature cards each with their own image
 - About section with side-by-side image and text, floating stat overlay
 - 3 testimonials with avatar photos and star ratings
 - Stats section with 4 bold numbers
@@ -251,8 +272,8 @@ Requirements:
 - CTA section with colored background and 2 buttons
 - Dark footer with 4 columns
 - Use industry-appropriate colors and typography. Match the aesthetic to the business type.
-- Every image uses https://picsum.photos/seed/DESCRIPTIVE-KEYWORD/WIDTH/HEIGHT with unique seeds.
-- MINIMUM 8 images total across the page. No section should be text-only.`;
+- MINIMUM 8 images total across the page. No section should be text-only.
+${imageBlock || "- Every image uses https://picsum.photos/seed/DESCRIPTIVE-KEYWORD/WIDTH/HEIGHT with unique, industry-specific seeds."}`;
       model = requestedModel || "claude-opus-4-6";
       maxTokens = 32000;
     }
@@ -327,9 +348,12 @@ Requirements:
                 .trim()
             : "";
 
-          // Inject component library CSS into the final HTML (new builds only)
-          // The AI is told "component library is auto-injected" — this fulfills that promise
-          if (!isEdit && bodyText.length >= 100 && !accumulated.includes("ZOOBICON COMPONENT LIBRARY")) {
+          // Inject component library CSS into the final HTML (both new builds and edits)
+          // For edits: we stripped the library before sending to the AI, now re-inject it
+          // For new builds: the AI was told "component library is auto-injected"
+          if (!accumulated.includes("ZOOBICON COMPONENT LIBRARY")) {
+            // Remove the placeholder comment if present
+            accumulated = accumulated.replace(/\/\* \[component library auto-injected\] \*\/\n?/g, '');
             accumulated = injectComponentLibrary(accumulated);
             controller.enqueue(
               encoder.encode(`data: ${JSON.stringify({ type: "replace", content: accumulated })}\n\n`)
