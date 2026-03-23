@@ -149,6 +149,7 @@ export function useCollaboration({
               if (msg.updatedBy !== email) {
                 codeVersionRef.current = msg.version;
                 onRemoteCodeUpdateRef.current?.(msg.html, msg.version, msg.updatedBy);
+                setLastSyncedAt(Date.now());
               }
               break;
 
@@ -268,11 +269,20 @@ export function useCollaboration({
       });
     } catch { /* best effort */ }
 
+    // Clear pending debounced code sync
+    if (codeSyncTimerRef.current) {
+      clearTimeout(codeSyncTimerRef.current);
+      codeSyncTimerRef.current = null;
+    }
+    pendingCodeRef.current = null;
+
     setRoom(null);
     setParticipantId(null);
     setParticipants([]);
     setIsConnected(false);
     setTransport("polling");
+    setSyncStatus("synced");
+    setLastSyncedAt(null);
     reconnectAttemptsRef.current = 0;
   }, [room, email]);
 
@@ -412,8 +422,10 @@ export function useCollaboration({
         if (data.hasUpdate && data.updated_by !== email) {
           codeVersionRef.current = data.version;
           onRemoteCodeUpdateRef.current?.(data.html, data.version, data.updated_by);
+          setLastSyncedAt(Date.now());
         } else if (data.version) {
           codeVersionRef.current = data.version;
+          setLastSyncedAt(Date.now());
         }
       } catch { /* ignore */ }
     }, PRESENCE_POLL_MS + 500);
@@ -499,6 +511,11 @@ export function useCollaboration({
         clearTimeout(wsReconnectRef.current);
       }
 
+      // Cancel pending debounced code sync
+      if (codeSyncTimerRef.current) {
+        clearTimeout(codeSyncTimerRef.current);
+      }
+
       // Fire-and-forget leave
       if (room && email) {
         navigator.sendBeacon?.(
@@ -516,6 +533,8 @@ export function useCollaboration({
     participants,
     isConnected,
     transport,
+    syncStatus,
+    lastSyncedAt,
     createRoom,
     joinRoom,
     leaveRoom,
