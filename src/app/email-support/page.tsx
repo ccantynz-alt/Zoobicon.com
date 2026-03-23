@@ -55,7 +55,6 @@ import {
   TrendingUp,
   Activity,
   ThumbsUp,
-  Hash,
 } from "lucide-react";
 
 // ---------- Types ----------
