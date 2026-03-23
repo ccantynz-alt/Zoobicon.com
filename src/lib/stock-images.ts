@@ -444,38 +444,38 @@ HERO IMAGE:`;
     });
   }
 
-  block += `\n\nFor any additional images, use https://picsum.photos/seed/DESCRIPTIVE-KEYWORD/WIDTH/HEIGHT with industry-specific keywords like "server-room", "data-center" (NOT generic words like "office" or "building").`;
+  block += `\n\nFor testimonial avatars, use https://randomuser.me/api/portraits/men/N.jpg or women/N.jpg (N=1-99). For any gallery images not listed above, use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT.`;
 
   return block;
 }
 
 function buildDescriptiveImageBlock(industry: string, queries: IndustryQueries): string {
-  // No API key — give the AI detailed guidance on what each image should depict
-  let block = `\n## IMAGE GUIDANCE (industry: ${industry})
-Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for ALL images.
-The seed keyword MUST be specific to the industry. Examples of GOOD vs BAD seeds:
+  // No Pexels API key — tell the AI to use CSS effects, SVG icons, and randomuser.me
+  // Do NOT provide picsum URLs here — picsum returns random unrelated photos
+  const block = `\n## IMAGE GUIDANCE (industry: ${industry})
+⚠️ No stock photo API is configured. Do NOT use picsum.photos — it returns random unrelated images.
 
-GOOD seeds for ${industry}: "${queries.hero.replace(/ /g, "-")}", "${queries.features[0].replace(/ /g, "-")}", "${queries.features[1].replace(/ /g, "-")}"
-BAD seeds (too generic): "office", "building", "photo", "image", "hero"
+HERO SECTION — use CSS background effects:
+- For TECH/SAAS/CYBER: Use the .hero-aurora or .hero-mesh CSS class for an animated gradient background. Add a large centered SVG icon (80-120px, stroke="currentColor") representing the industry.
+- For RESTAURANT/REALESTATE/PHOTOGRAPHY: Use a CSS gradient background with brand colors (e.g. linear-gradient(135deg, var(--color-primary), var(--color-primary-dark))).
+- Do NOT use any external image URL for the hero.
 
-HERO IMAGE (use seed related to: ${queries.hero}):
-https://picsum.photos/seed/${queries.hero.replace(/ /g, "-")}/1400/800
+FEATURE CARDS — use inline SVG icons:
+${queries.features.map((q, i) => `${i + 1}. Draw an SVG icon representing: ${q}`).join("\n")}
+Each card: <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5">...</svg>
 
-FEATURE CARD IMAGES — use these seeds:`;
+ABOUT SECTION — use CSS gradient or pattern:
+- Use a gradient background div (200-300px) with a large SVG icon. Should represent: ${queries.about}
+- Do NOT use picsum or any random image URL.
 
-  queries.features.forEach((q, i) => {
-    block += `\n${i + 1}. https://picsum.photos/seed/${q.replace(/ /g, "-")}/${400}/${250} — Should depict: ${q}`;
-  });
+TESTIMONIAL AVATARS — use randomuser.me (real face photos):
+1. https://randomuser.me/api/portraits/men/32.jpg
+2. https://randomuser.me/api/portraits/women/44.jpg
+3. https://randomuser.me/api/portraits/men/67.jpg
+Style: width:60px; height:60px; border-radius:50%; object-fit:cover;
 
-  block += `\n\nABOUT SECTION IMAGE:
-https://picsum.photos/seed/${queries.about.replace(/ /g, "-")}/640/480 — Should depict: ${queries.about}
-
-TESTIMONIAL AVATARS (use unique seeds for each):
-1. https://picsum.photos/seed/${industry}-person-1/80/80
-2. https://picsum.photos/seed/${industry}-person-2/80/80
-3. https://picsum.photos/seed/${industry}-person-3/80/80
-
-IMPORTANT: Every image MUST have descriptive alt text matching what it should depict. Even though picsum returns random photos, the alt text must be industry-accurate for SEO and accessibility.`;
+GALLERY/PORTFOLIO — only section where external images are acceptable:
+Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT with industry-specific keywords here ONLY.`;
 
   return block;
 }

@@ -390,7 +390,7 @@ CRITICAL: Your previous attempt produced CSS but ZERO visible content. This time
 
 The <body> MUST contain: navigation, hero section, features/services, about section, testimonials, stats, FAQ, call-to-action, footer. Every section must have real, specific, benefit-focused copy.
 
-Use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT for images (specific keywords like seed/luxury-shuttle/800/500).
+Use inline SVG icons for features. Use https://randomuser.me/api/portraits/men/N.jpg or women/N.jpg for testimonial avatars. For hero background, use .hero-aurora or .hero-mesh CSS class (component library provides these). Do NOT use picsum.photos for hero or feature images.
 Import 2 Google Fonts. Use CSS custom properties for colors. Match the industry aesthetic.
 Output ONLY raw HTML — no markdown, no code fences, no explanation.`,
 
@@ -400,7 +400,7 @@ WRITE BARELY ANY CSS — use inline styles if needed. The BODY is everything.
 
 Output: <!DOCTYPE html><html><head><title>Site</title><style>/* minimal */</style></head><body>
 THEN write ALL page content: nav, hero, features, about, testimonials, stats, FAQ, CTA, footer.
-Use real text, real images (https://picsum.photos/seed/KEYWORD/W/H), real content.
+Use real text, inline SVG icons for features, randomuser.me for avatars. Do NOT use picsum.photos for hero images.
 Output ONLY raw HTML.`
             ];
 
