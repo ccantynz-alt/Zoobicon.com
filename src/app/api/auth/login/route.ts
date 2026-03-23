@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { sql } from "@/lib/db";
 import { verifyPassword } from "@/lib/password";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+import { logAudit } from "@/lib/audit";
 
 const loginLimiter = { limit: 5, windowMs: 60000 };
 
@@ -35,6 +36,7 @@ export async function POST(request: NextRequest) {
       email.toLowerCase() === adminEmail.toLowerCase() &&
       password === adminPassword
     ) {
+      logAudit({ action: "login", email: adminEmail, ip, metadata: { role: "admin" } }).catch(() => {});
       return Response.json({
         user: {
           email: adminEmail,
@@ -53,14 +55,17 @@ export async function POST(request: NextRequest) {
       `;
 
       if (!user || !user.password_hash) {
+        logAudit({ action: "login_failed", email: email.toLowerCase(), ip, metadata: { reason: "user_not_found" } }).catch(() => {});
         return Response.json({ error: "Invalid credentials" }, { status: 401 });
       }
 
       const valid = await verifyPassword(password, user.password_hash);
       if (!valid) {
+        logAudit({ action: "login_failed", email: email.toLowerCase(), ip, metadata: { reason: "wrong_password" } }).catch(() => {});
         return Response.json({ error: "Invalid credentials" }, { status: 401 });
       }
 
+      logAudit({ action: "login", email: user.email, ip, metadata: { role: user.role } }).catch(() => {});
       return Response.json({
         user: {
           email: user.email,

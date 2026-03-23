@@ -28,7 +28,7 @@ interface UseCollaborationOptions {
   onRemoteCodeUpdate?: (html: string, version: number, updatedBy: string) => void;
 }
 
-type TransportMode = "websocket" | "polling";
+type TransportMode = "websocket" | "sse" | "polling";
 
 export function useCollaboration({
   slug,
@@ -46,6 +46,7 @@ export function useCollaboration({
 
   const codeVersionRef = useRef(0);
   const wsRef = useRef<WebSocket | null>(null);
+  const sseRef = useRef<EventSource | null>(null);
   const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const presencePollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const codePollRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -168,19 +169,19 @@ export function useCollaboration({
             connectWebSocket(roomId, participantIdVal);
           }, delay);
         } else {
-          // Fall back to polling after max reconnect attempts
-          setTransport("polling");
+          // Fall back to SSE after max reconnect attempts
+          setTransport("sse");
         }
       };
 
       ws.onerror = () => {
-        // WebSocket failed (likely Vercel serverless) — fall back to polling
+        // WebSocket failed (likely Vercel serverless) — try SSE before polling
         ws.close();
-        setTransport("polling");
+        setTransport("sse");
       };
     } catch {
-      // WebSocket not available — use polling
-      setTransport("polling");
+      // WebSocket not available — try SSE
+      setTransport("sse");
     }
   }, [email, name, room]);
 
@@ -243,6 +244,12 @@ export function useCollaboration({
         wsRef.current.close(1000, "Left room");
       } catch { /* best effort */ }
       wsRef.current = null;
+    }
+
+    // Close SSE if active
+    if (sseRef.current) {
+      sseRef.current.close();
+      sseRef.current = null;
     }
 
     try {
@@ -375,6 +382,51 @@ export function useCollaboration({
       if (codePollRef.current) clearInterval(codePollRef.current);
     };
   }, [enabled, room, participantId, email, sendCursorPosition, transport]);
+
+  // --- SSE connection (replaces polling with ~500ms latency) ---
+  useEffect(() => {
+    if (!enabled || !room || !participantId || transport !== "sse") return;
+
+    const url = `/api/collab/events?roomId=${room.id}&participantId=${participantId}`;
+    const es = new EventSource(url);
+    sseRef.current = es;
+
+    es.addEventListener("presence", (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        if (data.participants) {
+          setParticipants(data.participants);
+        }
+      } catch { /* malformed event */ }
+    });
+
+    es.addEventListener("code", (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        if (data.version > codeVersionRef.current) {
+          codeVersionRef.current = data.version;
+          onRemoteCodeUpdateRef.current?.(data.html, data.version, data.updated_by);
+        }
+      } catch { /* malformed event */ }
+    });
+
+    es.addEventListener("connected", () => {
+      // SSE connected successfully
+    });
+
+    es.onerror = () => {
+      // SSE connection lost — EventSource auto-reconnects,
+      // but if it keeps failing, fall back to polling
+      if (es.readyState === EventSource.CLOSED) {
+        setTransport("polling");
+      }
+    };
+
+    return () => {
+      es.close();
+      sseRef.current = null;
+    };
+  }, [enabled, room, participantId, transport]);
 
   // --- WebSocket heartbeat (keep connection alive) ---
   useEffect(() => {
