@@ -27,6 +27,7 @@ export interface VoiceResult {
   provider: VoiceProvider;
   durationEstimate: number; // seconds
   format: string;
+  fallbackReason?: string; // Why a preferred provider was skipped
 }
 
 // --- Voice presets ---
@@ -238,6 +239,7 @@ export async function generateVoiceover(
   }
 
   let lastError: Error | null = null;
+  const errors: string[] = [];
 
   for (const p of fallbackOrder) {
     try {
@@ -252,10 +254,12 @@ export async function generateVoiceover(
             provider: "browser",
             durationEstimate: Math.round((text.split(/\s+/).length / 150) * 60),
             format: "browser-tts",
+            fallbackReason: errors.length > 0 ? errors.join("; ") : undefined,
           };
       }
     } catch (err) {
       lastError = err instanceof Error ? err : new Error(String(err));
+      errors.push(`${p}: ${lastError.message}`);
       console.error(`[voiceover] ${p} failed, trying next:`, lastError.message);
       continue;
     }

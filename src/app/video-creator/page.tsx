@@ -715,7 +715,10 @@ export default function VideoCreatorDashboard() {
       }
       const data = await res.json();
       if (data.provider === "browser" && !data.audioUrl) {
-        // Use browser Web Speech API as fallback
+        // ElevenLabs/PlayHT failed, fell back to browser — show why
+        if (data.fallbackReason) {
+          setError(`AI voice failed (using browser TTS instead): ${data.fallbackReason}`);
+        }
         if ("speechSynthesis" in window) {
           const utterance = new SpeechSynthesisUtterance(storyboard.script);
           utterance.rate = 1.0;
@@ -723,7 +726,7 @@ export default function VideoCreatorDashboard() {
           window.speechSynthesis.speak(utterance);
           setVoiceoverUrl("browser-tts");
         } else {
-          setError("Browser does not support text-to-speech. Upgrade to a paid plan for premium AI voiceover.");
+          setError("Browser does not support text-to-speech.");
         }
       } else {
         setVoiceoverUrl(data.audioUrl || null);
@@ -866,7 +869,12 @@ export default function VideoCreatorDashboard() {
         if ("speechSynthesis" in window) {
           setVoiceoverUrl("browser-tts");
         }
-        progress.voiceover = { status: "done" };
+        // Show fallback reason so user knows why AI voice didn't work
+        if (data.fallbackReason) {
+          progress.voiceover = { status: "done", error: `Browser TTS fallback: ${data.fallbackReason}` };
+        } else {
+          progress.voiceover = { status: "done" };
+        }
       } else {
         setVoiceoverUrl(data.audioUrl || null);
         progress.voiceover = { status: "done" };
@@ -1968,7 +1976,7 @@ export default function VideoCreatorDashboard() {
                                     >
                                       <Square className="w-3 h-3" /> Stop
                                     </button>
-                                    <span className="text-[9px] text-amber-400/60">Browser TTS preview — upgrade to a paid plan for premium AI voices</span>
+                                    <span className="text-[9px] text-amber-400/60">Browser TTS preview — check ElevenLabs API key if AI voices aren&apos;t working</span>
                                   </div>
                                 ) : (
                                   <audio controls src={voiceoverUrl} className="w-full h-8 [&::-webkit-media-controls-panel]:bg-white/5 rounded" />
