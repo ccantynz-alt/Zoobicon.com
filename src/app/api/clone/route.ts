@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
-      return NextResponse.json({ error: "ANTHROPIC_API_KEY not configured" }, { status: 500 });
+      return NextResponse.json({ error: "AI service is temporarily unavailable." }, { status: 500 });
     }
 
     // ── Step 1: Fetch the target website ──

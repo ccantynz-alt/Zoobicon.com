@@ -186,7 +186,7 @@ export async function POST(req: NextRequest) {
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        { error: "ANTHROPIC_API_KEY is not configured" },
+        { error: "AI service is temporarily unavailable. Please try again later." },
         { status: 500 }
       );
     }
@@ -280,14 +280,15 @@ export async function POST(req: NextRequest) {
     console.error("Multipage generation error:", err);
 
     if (err instanceof Anthropic.APIError) {
-      return NextResponse.json(
-        { error: `API error: ${err.message}` },
-        { status: err.status || 500 }
-      );
+      const status = err.status || 500;
+      const safeMsg = status === 429
+        ? "AI service is busy. Please wait a moment and try again."
+        : "AI service encountered an error. Please try again.";
+      return NextResponse.json({ error: safeMsg }, { status });
     }
 
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Something went wrong. Please try again." },
       { status: 500 }
     );
   }

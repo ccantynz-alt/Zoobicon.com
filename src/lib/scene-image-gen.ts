@@ -69,7 +69,7 @@ async function generateWithReplicate(
   request: SceneImageRequest
 ): Promise<SceneImageResult> {
   const token = process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY;
-  if (!token) throw new Error("REPLICATE_API_TOKEN not configured");
+  if (!token) throw new Error("Image generation service unavailable.");
 
   const dims = PLATFORM_DIMENSIONS[request.platform] || PLATFORM_DIMENSIONS.youtube;
   const prompt = buildImagePrompt(request);
@@ -137,7 +137,7 @@ async function generateWithOpenAI(
   request: SceneImageRequest
 ): Promise<SceneImageResult> {
   const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) throw new Error("OPENAI_API_KEY not configured");
+  if (!apiKey) throw new Error("AI service is temporarily unavailable.");
 
   const dims = PLATFORM_DIMENSIONS[request.platform] || PLATFORM_DIMENSIONS.youtube;
   const prompt = buildImagePrompt(request);
@@ -192,7 +192,7 @@ async function generateWithStability(
   request: SceneImageRequest
 ): Promise<SceneImageResult> {
   const apiKey = process.env.STABILITY_API_KEY;
-  if (!apiKey) throw new Error("STABILITY_API_KEY not configured");
+  if (!apiKey) throw new Error("Image generation service unavailable.");
 
   const dims = PLATFORM_DIMENSIONS[request.platform] || PLATFORM_DIMENSIONS.youtube;
   const prompt = buildImagePrompt(request);

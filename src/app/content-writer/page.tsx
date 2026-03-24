@@ -205,10 +205,10 @@ export default function ContentWriterPage() {
   }, []);
 
   return (
-    <div className="relative min-h-screen bg-gray-950 text-white">
+    <div className="relative min-h-screen bg-gray-900 text-white">
       <BackgroundEffects preset="technical" />
       {/* Top Bar */}
-      <header className="sticky top-0 z-50 border-b border-gray-800 bg-gray-950/90 backdrop-blur-md">
+      <header className="sticky top-0 z-50 border-b border-gray-800 bg-gray-900/90 backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
           <div className="flex items-center gap-3">
             <Link
@@ -523,7 +523,7 @@ export default function ContentWriterPage() {
                 </div>
 
                 {/* Content Display */}
-                <div className="rounded-lg border border-gray-800 bg-gray-950 p-5">
+                <div className="rounded-lg border border-gray-800 bg-gray-900 p-5">
                   <div className="prose prose-invert max-w-none whitespace-pre-wrap text-sm leading-relaxed text-gray-200">
                     {generatedContent}
                   </div>

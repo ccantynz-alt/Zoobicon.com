@@ -159,7 +159,7 @@ async function checkReplicateJob(predictionId: string): Promise<RenderJob> {
 
 async function runwayHeaders(): Promise<Record<string, string>> {
   const key = process.env.RUNWAY_API_KEY;
-  if (!key) throw new Error("RUNWAY_API_KEY not configured");
+  if (!key) throw new Error("Video rendering service unavailable.");
   return {
     Authorization: `Bearer ${key}`,
     "Content-Type": "application/json",
@@ -252,7 +252,7 @@ async function checkRunwayJob(taskId: string): Promise<RenderJob> {
 
 async function lumaHeaders(): Promise<Record<string, string>> {
   const key = process.env.LUMA_API_KEY;
-  if (!key) throw new Error("LUMA_API_KEY not configured");
+  if (!key) throw new Error("Video rendering service unavailable.");
   return {
     Authorization: `Bearer ${key}`,
     "Content-Type": "application/json",
@@ -327,7 +327,7 @@ async function checkLumaJob(generationId: string): Promise<RenderJob> {
 
 async function pikaHeaders(): Promise<Record<string, string>> {
   const key = process.env.PIKA_API_KEY;
-  if (!key) throw new Error("PIKA_API_KEY not configured");
+  if (!key) throw new Error("Video rendering service unavailable.");
   return {
     Authorization: `Bearer ${key}`,
     "Content-Type": "application/json",
@@ -414,7 +414,7 @@ async function checkPikaJob(generationId: string): Promise<RenderJob> {
 
 async function klingHeaders(): Promise<Record<string, string>> {
   const key = process.env.KLING_API_KEY;
-  if (!key) throw new Error("KLING_API_KEY not configured");
+  if (!key) throw new Error("Video rendering service unavailable.");
   return {
     Authorization: `Bearer ${key}`,
     "Content-Type": "application/json",

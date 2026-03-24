@@ -2062,7 +2062,7 @@ export default function GeneratorTypePage() {
 
   if (!generator) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
+      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -2170,9 +2170,9 @@ export default function GeneratorTypePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-gray-900 text-white">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-950/80 backdrop-blur-xl border-b border-white/10">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-900/80 backdrop-blur-xl border-b border-white/10">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="text-xl font-bold">
             Zoobicon
@@ -2216,7 +2216,7 @@ export default function GeneratorTypePage() {
         transition={{ duration: 0.6 }}
         className={`pt-32 pb-16 bg-gradient-to-br ${generator.color} relative overflow-hidden`}
       >
-        <div className="absolute inset-0 bg-gray-950/40" />
+        <div className="absolute inset-0 bg-gray-900/40" />
         <div className="relative max-w-5xl mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

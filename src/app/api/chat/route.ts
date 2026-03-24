@@ -198,7 +198,7 @@ export async function POST(request: NextRequest) {
 
     if (!process.env.ANTHROPIC_API_KEY) {
       return new Response(
-        JSON.stringify({ error: "ANTHROPIC_API_KEY is not configured." }),
+        JSON.stringify({ error: "AI service is temporarily unavailable." }),
         { status: 500, headers: { "Content-Type": "application/json" } }
       );
     }

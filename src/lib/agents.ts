@@ -607,7 +607,7 @@ export async function runPipeline(
   onProgress?: (agent: string, status: string) => void
 ): Promise<PipelineResult> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) throw new Error("ANTHROPIC_API_KEY not configured");
+  if (!apiKey) throw new Error("AI service is temporarily unavailable.");
 
   const agents: AgentResult[] = [];
   const startTime = Date.now();

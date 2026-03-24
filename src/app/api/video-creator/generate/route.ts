@@ -165,7 +165,6 @@ Generate the complete storyboard as JSON.`;
     return Response.json(result);
   } catch (err) {
     console.error("[video-creator/generate] Error:", err);
-    const message = err instanceof Error ? err.message : "Internal server error";
-    return Response.json({ error: message }, { status: 500 });
+    return Response.json({ error: "Storyboard generation failed. Please try again." }, { status: 500 });
   }
 }

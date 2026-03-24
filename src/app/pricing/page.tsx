@@ -153,21 +153,16 @@ const PRODUCTS = [
 ];
 
 // Features that are not yet fully built — show a subtle "Soon" badge
+// NOTE: Only mark features here that genuinely DON'T work yet.
+// Built features: SEO Agent (/seo), Video Creator (/video-creator), Email Support (/email-support),
+// Custom domains (/domains), Agency platform (/agencies)
 const SOON_FEATURES = new Set([
-  // Creator tier
-  "Custom domain support",
-  "Email support",
   // Pro tier
-  "Full SEO Campaign Agent",
-  "AI Video Creator",
-  "AI Email Support & Marketing",
   "AI Brand Kit",
   "Chatbot Builder",
   "A/B Testing & Analytics",
   // Agency tier
-  "Client handoff & management",
   "Template marketplace access",
-  "Bulk operations & automation",
   // Enterprise tier
   "Custom AI model training",
   "Dedicated AI agents",
@@ -179,11 +174,7 @@ const SOON_FEATURES = new Set([
 
 // Products in the comparison table that are not yet built
 const SOON_PRODUCTS = new Set([
-  "SEO Campaign Agent",
-  "AI Video Creator",
-  "AI Email Support",
   "Chatbot Builder",
-  "White-Label & Teams",
 ]);
 
 const SoonBadge = () => (
