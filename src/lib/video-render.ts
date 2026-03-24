@@ -657,15 +657,29 @@ export async function checkRenderStatus(jobs: RenderJob[]): Promise<RenderJob[]>
 
 // --- Helpers ---
 
-function buildVideoPrompt(scene: RenderScene, style: string): string {
-  const parts = [
-    scene.visualDescription,
-    `Camera: ${scene.cameraMovement}`,
-    `Style: ${style.replace(/-/g, " ")}`,
-    scene.colorPalette.length > 0 ? `Color palette: ${scene.colorPalette.join(", ")}` : "",
-  ].filter(Boolean);
+// Style → video-specific motion and cinematography directives
+const VIDEO_STYLE_DIRECTIONS: Record<string, string> = {
+  "modern-minimalist": "Slow, deliberate camera movements. Smooth dolly or tracking shots. Minimal motion in frame. Clean, controlled pace.",
+  "bold-dynamic": "Fast, energetic camera work. Quick cuts, dynamic zooms, kinetic motion. Objects move with purpose and speed. High energy throughout.",
+  "elegant-luxury": "Ultra-slow motion at 120fps. Silky smooth dolly moves. Gentle floating particles. Premium textures catching light. Serene, aspirational.",
+  "fun-playful": "Bouncy, lively camera. Playful tilts and pans. Confetti or particle bursts. Upbeat timing with quick, cheerful movements.",
+  "corporate-professional": "Steady, confident camera. Smooth slider or gimbal shots. Professional pacing — not rushed, not slow. Clean reveals.",
+  "cinematic": "Dramatic slow dolly push-in. Atmospheric volumetric light rays. Subtle lens flares. Film-like motion cadence. Shallow DOF shifts.",
+};
 
-  return parts.join(". ") + ".";
+function buildVideoPrompt(scene: RenderScene, style: string): string {
+  const motionDir = VIDEO_STYLE_DIRECTIONS[style] || VIDEO_STYLE_DIRECTIONS["cinematic"];
+  const colorDir = scene.colorPalette.length > 0
+    ? `The color grading must emphasize these colors: ${scene.colorPalette.join(", ")}.`
+    : "";
+
+  return [
+    scene.visualDescription,
+    `Camera movement: ${scene.cameraMovement}. The camera motion should feel motivated and intentional.`,
+    motionDir,
+    colorDir,
+    "Cinematic quality. Natural, fluid motion. No artificial-looking elements. Photorealistic. High production value.",
+  ].filter(Boolean).join(" ");
 }
 
 function parseDurationSeconds(duration: string): number {

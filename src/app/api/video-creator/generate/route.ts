@@ -61,7 +61,7 @@ export async function POST(request: Request) {
 
     const sceneCount = Math.max(4, Math.min(10, Math.ceil(duration / 10)));
 
-    const systemPrompt = `You are a professional video director and storyboard artist. You create detailed, production-ready storyboards for video content.
+    const systemPrompt = `You are a world-class video director who creates visually stunning, emotionally compelling storyboards. Think David Fincher meets TikTok — cinematic quality optimized for short attention spans.
 
 You MUST respond with ONLY valid JSON — no markdown, no code fences, no explanation text.
 
@@ -71,28 +71,36 @@ JSON schema:
     {
       "sceneNumber": number,
       "duration": "Xs" (string with seconds),
-      "visualDescription": "Detailed description of what's shown on screen",
+      "visualDescription": "Hyper-detailed cinematography description — lighting, composition, depth, color grading, subject positioning, mood, texture",
       "textOverlay": "Exact text shown on screen (empty string if none)",
       "transition": "Transition effect to next scene",
-      "cameraMovement": "Camera movement description",
+      "cameraMovement": "Precise camera movement with timing",
       "colorPalette": ["#hex1", "#hex2", "#hex3"]
     }
   ],
   "totalDuration": "${duration}s",
-  "estimatedRenderTime": "X-Y minutes",
+  "estimatedRenderTime": "2-5 minutes",
   "script": "The full narration/voiceover script",
   "musicCues": ["Description of music mood/changes at key moments"]
 }
 
-Rules:
+VISUAL DIRECTION RULES:
 - Scene durations MUST add up to exactly ${duration} seconds
 - Generate exactly ${sceneCount} scenes
-- Each scene's colorPalette should have 2-3 hex colors that fit the visual direction
-- textOverlay should be the actual on-screen text (titles, stats, CTAs) — not stage directions
-- Transitions: use specific effects (cut, dissolve, slide left, zoom in, fade to black, whip pan, etc.)
-- Camera movements: be specific (slow push in, tracking shot left, aerial pullback, static, handheld, etc.)
-- The script field should contain the complete voiceover/narration text${!script ? " — you must write it from scratch based on the project type" : ""}
-- musicCues should describe 3-5 music mood changes tied to specific scenes`;
+- EVERY scene description must specify: (1) subject/action, (2) lighting direction and quality, (3) depth of field, (4) color grading/mood, (5) composition framing
+- BAD: "A person using a laptop" — GOOD: "Close-up of hands on a glowing laptop keyboard, shallow depth of field, cool blue backlighting washing across the subject's face, soft bokeh from city lights in background, anamorphic lens flare from the screen"
+- textOverlay = actual on-screen text (titles, stats, CTAs) — bold, impactful, and SHORT (max 8 words)
+- Transitions should create RHYTHM: mix hard cuts for energy with dissolves for emotional beats
+- Camera movements should have MOTIVATION: push in for intimacy, pull back for reveals, handheld for urgency, locked off for authority
+- Each scene's colorPalette MUST use the brand colors (${brandColorStr}) as the foundation, with 1 scene-specific accent
+- The script field should contain the complete voiceover/narration text${!script ? " — write a compelling, human-sounding script (not corporate)" : ""}
+- musicCues should describe 3-5 specific mood shifts tied to scenes (e.g., "Scene 3: drop to silence before the reveal, then build with rising synths")
+
+PACING RULES:
+- Scene 1 is the HOOK — must be visually arresting in the first frame. No slow builds.
+- Alternate between tight close-ups and wider establishing shots for visual variety
+- The second-to-last scene should be the emotional peak (the "money shot")
+- Final scene should feel like a resolution — calm, confident, clear CTA`;
 
     const userMessage = `Create a ${duration}-second ${projectType.replace(/-/g, " ")} video storyboard.
 

@@ -44,14 +44,14 @@ const PLATFORM_DIMENSIONS: Record<string, { width: number; height: number }> = {
   twitter: { width: 1024, height: 1024 },
 };
 
-// Style → prompt modifiers for better image gen
+// Style → prompt modifiers for better image gen — these are cinematography-grade directions
 const STYLE_MODIFIERS: Record<string, string> = {
-  "modern-minimalist": "clean minimal design, flat design, lots of whitespace, subtle gradients, geometric shapes, modern aesthetic",
-  "bold-dynamic": "bold vibrant colors, high contrast, dynamic composition, dramatic lighting, energetic visual style",
-  "elegant-luxury": "luxury aesthetic, gold accents, dark background, soft lighting, serif typography, premium quality, sophisticated",
-  "fun-playful": "bright colorful, playful design, rounded shapes, cartoon-like, cheerful, vibrant, fun aesthetic",
-  "corporate-professional": "professional corporate style, clean lines, blue tones, structured layout, business aesthetic",
-  "cinematic": "cinematic composition, wide angle, dramatic lighting, film grain, letterbox, movie-like, atmospheric, depth of field",
+  "modern-minimalist": "ultra-clean minimal composition, large negative space, single focal point, muted desaturated palette with one vibrant accent, soft even lighting, shallow depth of field, editorial photography style, shot on Hasselblad",
+  "bold-dynamic": "hyper-saturated vibrant colors, extreme contrast, dramatic low-angle composition, volumetric rim lighting, dynamic diagonal lines, motion blur on edges, neon accents, cinematic color grading, shot on RED camera",
+  "elegant-luxury": "luxury brand photography, dark moody background, warm golden key light, soft bokeh highlights, rich textures (marble, velvet, glass), elegant serif overlays, shallow DOF, Rembrandt lighting, shot on medium format",
+  "fun-playful": "bright saturated candy colors, soft rounded forms, cheerful warm lighting, playful composition with visual rhythm, confetti/sparkle elements, slight tilt-shift effect, lifestyle photography feel, natural daylight",
+  "corporate-professional": "clean corporate environment, natural window light, neutral cool palette with teal accents, structured geometric composition, sharp focus throughout, modern glass/steel textures, architectural lighting, editorial business photography",
+  "cinematic": "anamorphic lens, 2.39:1 widescreen composition, atmospheric haze, dramatic chiaroscuro lighting, teal-and-orange color grade, deep blacks, film grain, practical light sources visible in frame, shallow DOF with oval bokeh, shot on ARRI Alexa",
 };
 
 // --- Provider detection ---
@@ -251,9 +251,7 @@ export async function generateSceneImage(
 ): Promise<SceneImageResult> {
   const activeProvider = provider || getAvailableImageProvider();
   if (!activeProvider) {
-    throw new Error(
-      "No image provider configured. Set REPLICATE_API_TOKEN, OPENAI_API_KEY, or STABILITY_API_KEY."
-    );
+    throw new Error("Image generation is temporarily unavailable. Please try again later.");
   }
 
   switch (activeProvider) {
@@ -299,13 +297,15 @@ export async function generateAllSceneImages(
 function buildImagePrompt(request: SceneImageRequest): string {
   const styleMod = STYLE_MODIFIERS[request.style] || STYLE_MODIFIERS["modern-minimalist"];
   const colorNote = request.colorPalette.length > 0
-    ? `Color palette: ${request.colorPalette.join(", ")}.`
+    ? `Dominant color palette must use: ${request.colorPalette.join(", ")}. These colors should be prominent in the lighting, environment, or subject.`
     : "";
 
+  // Build a cinematography-grade prompt
   return [
     request.visualDescription,
     styleMod,
     colorNote,
-    "Professional quality, 8k resolution, no text or watermarks, photorealistic where appropriate.",
+    "Ultra high quality, 8K resolution, photorealistic, professional photography, no text, no watermarks, no logos, no UI elements.",
+    "The image must look like a frame from a high-budget commercial or film — not a stock photo.",
   ].filter(Boolean).join(". ");
 }
