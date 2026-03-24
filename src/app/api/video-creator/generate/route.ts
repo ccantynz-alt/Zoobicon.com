@@ -1,4 +1,4 @@
-import { callLLM } from "@/lib/llm-provider";
+import { callLLMWithFailover } from "@/lib/llm-provider";
 
 export const maxDuration = 60;
 
@@ -121,7 +121,7 @@ ${script ? `USER'S SCRIPT/BRIEF:\n${script}` : `No script provided. Generate a c
 
 Generate the complete storyboard as JSON.`;
 
-    const response = await callLLM({
+    const response = await callLLMWithFailover({
       model: "claude-sonnet-4-6",
       system: systemPrompt,
       userMessage,

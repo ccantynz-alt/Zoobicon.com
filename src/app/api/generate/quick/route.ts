@@ -456,12 +456,37 @@ Output the <config> block first, then the <body-html> block. Nothing else.`;
 
           // Prepend prefill for non-Opus models so parsing regexes still match
           let accumulated = isOpus ? "" : "<config>\n{";
+          let bodyStarted = false;
+          let bodyContent = "";
+          // Throttle preview updates to avoid overwhelming the client
+          let lastSendTime = 0;
+          const SEND_INTERVAL = 300; // ms between preview updates
+
           for await (const ev of stream) {
             if (ev.type === "content_block_delta" && ev.delta.type === "text_delta") {
               accumulated += ev.delta.text;
               // Stream body-html chunks to client for live preview
+              // Wrap in a minimal HTML shell so the preview can render them properly
               if (accumulated.includes("<body-html>")) {
-                sendEvent({ type: "chunk", content: ev.delta.text });
+                if (!bodyStarted) {
+                  bodyStarted = true;
+                  bodyContent = accumulated.split("<body-html>")[1] || "";
+                } else {
+                  bodyContent += ev.delta.text;
+                }
+                const now = Date.now();
+                if (now - lastSendTime >= SEND_INTERVAL) {
+                  lastSendTime = now;
+                  const previewHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><style>${COMPONENT_LIBRARY_CSS}\n:root{--color-primary:#6366f1;--color-bg:#0f172a;--color-bg-alt:#1e293b;--color-surface:#1e293b;--color-text:#e2e8f0;--color-text-muted:#94a3b8;--color-border:#334155;--color-accent:#8b5cf6;--font-heading:system-ui;--font-body:system-ui}body{background:var(--color-bg);color:var(--color-text);font-family:var(--font-body)}</style></head><body>${bodyContent}</body></html>`;
+                  sendEvent({ type: "replace", content: previewHtml });
+                }
+              } else {
+                // Config phase — send status updates
+                const now = Date.now();
+                if (!bodyStarted && now - lastSendTime >= 2000) {
+                  lastSendTime = now;
+                  sendEvent({ type: "status", message: "Planning design system..." });
+                }
               }
             }
           }
