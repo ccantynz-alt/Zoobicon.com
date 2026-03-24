@@ -578,6 +578,174 @@ const FAILSAFE_OBSERVER_SCRIPT = `
 })();
 </script>`;
 
+// ══════════════════════════════════════════════════════════
+//  THEME PRESETS — Named color schemes for generated sites
+// ══════════════════════════════════════════════════════════
+
+export interface ThemePreset {
+  name: string;
+  description: string;
+  preview: { primary: string; bg: string; text: string };
+  variables: {
+    '--color-primary': string;
+    '--color-primary-dark': string;
+    '--color-bg': string;
+    '--color-bg-alt': string;
+    '--color-surface': string;
+    '--color-text': string;
+    '--color-text-light': string;
+    '--color-border': string;
+    '--color-accent': string;
+  };
+}
+
+export const THEME_PRESETS: Record<string, ThemePreset> = {
+  corporate: {
+    name: 'Corporate',
+    description: 'Navy and slate tones with a professional, trustworthy feel',
+    preview: { primary: '#1e3a5f', bg: '#f8f9fb', text: '#1a202c' },
+    variables: {
+      '--color-primary': '#1e3a5f',
+      '--color-primary-dark': '#152a45',
+      '--color-bg': '#f8f9fb',
+      '--color-bg-alt': '#eef1f6',
+      '--color-surface': '#ffffff',
+      '--color-text': '#1a202c',
+      '--color-text-light': '#4a5568',
+      '--color-border': '#d2d8e3',
+      '--color-accent': '#2b6cb0',
+    },
+  },
+  startup: {
+    name: 'Startup',
+    description: 'Vibrant purple-to-blue gradient energy, modern and bold',
+    preview: { primary: '#7c3aed', bg: '#faf5ff', text: '#1e1b4b' },
+    variables: {
+      '--color-primary': '#7c3aed',
+      '--color-primary-dark': '#5b21b6',
+      '--color-bg': '#faf5ff',
+      '--color-bg-alt': '#f0e7fe',
+      '--color-surface': '#ffffff',
+      '--color-text': '#1e1b4b',
+      '--color-text-light': '#6b63a0',
+      '--color-border': '#ddd6fe',
+      '--color-accent': '#3b82f6',
+    },
+  },
+  warm: {
+    name: 'Warm',
+    description: 'Amber, terracotta, and cream for an inviting, earthy aesthetic',
+    preview: { primary: '#c2590a', bg: '#fdf8f4', text: '#3b2314' },
+    variables: {
+      '--color-primary': '#c2590a',
+      '--color-primary-dark': '#9a4408',
+      '--color-bg': '#fdf8f4',
+      '--color-bg-alt': '#f5ebe0',
+      '--color-surface': '#fffcf8',
+      '--color-text': '#3b2314',
+      '--color-text-light': '#7c6353',
+      '--color-border': '#e6d5c3',
+      '--color-accent': '#d97706',
+    },
+  },
+  dark: {
+    name: 'Dark',
+    description: 'Deep charcoal with neon accents for a sleek, modern look',
+    preview: { primary: '#6ee7b7', bg: '#111827', text: '#f3f4f6' },
+    variables: {
+      '--color-primary': '#6ee7b7',
+      '--color-primary-dark': '#34d399',
+      '--color-bg': '#111827',
+      '--color-bg-alt': '#1f2937',
+      '--color-surface': '#1f2937',
+      '--color-text': '#f3f4f6',
+      '--color-text-light': '#9ca3af',
+      '--color-border': '#374151',
+      '--color-accent': '#38bdf8',
+    },
+  },
+  neon: {
+    name: 'Neon',
+    description: 'Cyberpunk black with electric neon highlights',
+    preview: { primary: '#e11dfa', bg: '#09090b', text: '#fafafa' },
+    variables: {
+      '--color-primary': '#e11dfa',
+      '--color-primary-dark': '#b818c9',
+      '--color-bg': '#09090b',
+      '--color-bg-alt': '#18181b',
+      '--color-surface': '#18181b',
+      '--color-text': '#fafafa',
+      '--color-text-light': '#a1a1aa',
+      '--color-border': '#27272a',
+      '--color-accent': '#22d3ee',
+    },
+  },
+  minimal: {
+    name: 'Minimal',
+    description: 'Near-white palette with subtle grays for a clean, focused design',
+    preview: { primary: '#18181b', bg: '#fafafa', text: '#18181b' },
+    variables: {
+      '--color-primary': '#18181b',
+      '--color-primary-dark': '#09090b',
+      '--color-bg': '#fafafa',
+      '--color-bg-alt': '#f4f4f5',
+      '--color-surface': '#ffffff',
+      '--color-text': '#18181b',
+      '--color-text-light': '#71717a',
+      '--color-border': '#e4e4e7',
+      '--color-accent': '#3f3f46',
+    },
+  },
+};
+
+/**
+ * Returns a `:root { ... }` CSS block for the given theme name.
+ * Falls back to an empty string if the theme is not found.
+ */
+export function getThemeCSS(themeName: string): string {
+  const key = themeName.toLowerCase().replace(/\s+/g, '');
+  const theme = THEME_PRESETS[key];
+  if (!theme) return '';
+
+  const lines = Object.entries(theme.variables)
+    .map(([prop, value]) => `  ${prop}: ${value};`)
+    .join('\n');
+
+  return `:root {\n${lines}\n}`;
+}
+
+/**
+ * Injects a theme's `:root` custom properties into HTML.
+ * - If the HTML already has a `:root { ... }` block, it is replaced.
+ * - Otherwise the block is inserted at the beginning of the first `<style>` tag,
+ *   or before `</head>` if no `<style>` exists.
+ * Returns the original HTML unchanged if the theme name is not recognised.
+ */
+export function injectTheme(html: string, themeName: string): string {
+  const css = getThemeCSS(themeName);
+  if (!css) return html;
+
+  // Replace existing :root block (greedy match the closest closing brace after :root)
+  const rootBlockRe = /:root\s*\{[^}]*\}/;
+  if (rootBlockRe.test(html)) {
+    return html.replace(rootBlockRe, css);
+  }
+
+  // No existing :root — inject into first <style> tag
+  const styleTagRe = /<style[^>]*>/i;
+  if (styleTagRe.test(html)) {
+    return html.replace(styleTagRe, (match) => `${match}\n${css}\n`);
+  }
+
+  // No <style> tag at all — inject before </head>
+  if (/<\/head>/i.test(html)) {
+    return html.replace(/<\/head>/i, `<style>\n${css}\n</style>\n</head>`);
+  }
+
+  // Last resort — prepend
+  return `<style>\n${css}\n</style>\n${html}`;
+}
+
 /**
  * Inject the component library CSS + failsafe observer into generated HTML
  */

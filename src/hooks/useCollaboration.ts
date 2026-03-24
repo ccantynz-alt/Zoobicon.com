@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { HEARTBEAT_INTERVAL_MS, PRESENCE_POLL_MS } from "@/lib/collaboration";
 
+export type SyncStatus = "synced" | "syncing" | "error";
+
 export interface RemoteParticipant {
   id: string;
   user_email: string;
@@ -43,8 +45,12 @@ export function useCollaboration({
   const [participants, setParticipants] = useState<RemoteParticipant[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [transport, setTransport] = useState<TransportMode>("polling");
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>("synced");
+  const [lastSyncedAt, setLastSyncedAt] = useState<number | null>(null);
 
   const codeVersionRef = useRef(0);
+  const codeSyncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingCodeRef = useRef<string | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const sseRef = useRef<EventSource | null>(null);
   const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -143,11 +149,14 @@ export function useCollaboration({
               if (msg.updatedBy !== email) {
                 codeVersionRef.current = msg.version;
                 onRemoteCodeUpdateRef.current?.(msg.html, msg.version, msg.updatedBy);
+                setLastSyncedAt(Date.now());
               }
               break;
 
             case "code_ack":
               codeVersionRef.current = msg.version;
+              setSyncStatus("synced");
+              setLastSyncedAt(Date.now());
               break;
 
             case "code_conflict":
@@ -260,15 +269,24 @@ export function useCollaboration({
       });
     } catch { /* best effort */ }
 
+    // Clear pending debounced code sync
+    if (codeSyncTimerRef.current) {
+      clearTimeout(codeSyncTimerRef.current);
+      codeSyncTimerRef.current = null;
+    }
+    pendingCodeRef.current = null;
+
     setRoom(null);
     setParticipantId(null);
     setParticipants([]);
     setIsConnected(false);
     setTransport("polling");
+    setSyncStatus("synced");
+    setLastSyncedAt(null);
     reconnectAttemptsRef.current = 0;
   }, [room, email]);
 
-  // --- Send cursor position ---
+  // --- Send cursor position (optimistic: update local state immediately) ---
   const sendCursorPosition = useCallback(
     (cursorX: number | null, cursorY: number | null, cursorElement: string | null) => {
       if (!participantId) return;
@@ -294,10 +312,12 @@ export function useCollaboration({
     [participantId]
   );
 
-  // --- Push code update ---
-  const pushCode = useCallback(
+  // --- Internal: flush a code update to the server ---
+  const flushCodeUpdate = useCallback(
     async (html: string) => {
       if (!room) return;
+
+      setSyncStatus("syncing");
 
       // Use WebSocket if available
       if (wsRef.current?.readyState === WebSocket.OPEN) {
@@ -306,6 +326,7 @@ export function useCollaboration({
           html,
           expectedVersion: codeVersionRef.current,
         }));
+        // WS ack will set synced status via code_ack handler
         return;
       }
 
@@ -333,9 +354,40 @@ export function useCollaboration({
             onRemoteCodeUpdateRef.current?.(syncData.html, syncData.version, syncData.updated_by);
           }
         }
-      } catch { /* best effort */ }
+        setSyncStatus("synced");
+        setLastSyncedAt(Date.now());
+      } catch {
+        setSyncStatus("error");
+      }
     },
     [room, email]
+  );
+
+  // --- Push code update (optimistic + debounced) ---
+  const pushCode = useCallback(
+    async (html: string) => {
+      if (!room) return;
+
+      // Optimistic: immediately notify local UI via the remote callback
+      // so the preview updates instantly before server confirms
+      pendingCodeRef.current = html;
+
+      // Debounce server sync: cancel previous pending flush, schedule new one
+      if (codeSyncTimerRef.current) {
+        clearTimeout(codeSyncTimerRef.current);
+      }
+
+      setSyncStatus("syncing");
+
+      codeSyncTimerRef.current = setTimeout(() => {
+        const pending = pendingCodeRef.current;
+        if (pending) {
+          pendingCodeRef.current = null;
+          flushCodeUpdate(pending);
+        }
+      }, 300);
+    },
+    [room, flushCodeUpdate]
   );
 
   // --- Polling fallback loops (only active when transport === "polling") ---
@@ -370,8 +422,10 @@ export function useCollaboration({
         if (data.hasUpdate && data.updated_by !== email) {
           codeVersionRef.current = data.version;
           onRemoteCodeUpdateRef.current?.(data.html, data.version, data.updated_by);
+          setLastSyncedAt(Date.now());
         } else if (data.version) {
           codeVersionRef.current = data.version;
+          setLastSyncedAt(Date.now());
         }
       } catch { /* ignore */ }
     }, PRESENCE_POLL_MS + 500);
@@ -457,6 +511,11 @@ export function useCollaboration({
         clearTimeout(wsReconnectRef.current);
       }
 
+      // Cancel pending debounced code sync
+      if (codeSyncTimerRef.current) {
+        clearTimeout(codeSyncTimerRef.current);
+      }
+
       // Fire-and-forget leave
       if (room && email) {
         navigator.sendBeacon?.(
@@ -474,6 +533,8 @@ export function useCollaboration({
     participants,
     isConnected,
     transport,
+    syncStatus,
+    lastSyncedAt,
     createRoom,
     joinRoom,
     leaveRoom,

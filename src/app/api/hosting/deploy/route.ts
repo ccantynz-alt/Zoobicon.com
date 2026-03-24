@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { sql } from "@/lib/db";
 import { notifySiteDeployed } from "@/lib/admin-notify";
+import { getCreatorBadgeHTML } from "@/components/CreatorBadge";
 
 function slugify(name: string): string {
   return name
@@ -47,7 +48,7 @@ export async function POST(req: NextRequest) {
     // If an existing site slug was provided, look it up
     if (existingSiteSlug) {
       const [found] = await sql`
-        SELECT id, slug FROM sites
+        SELECT id, slug, name, plan FROM sites
         WHERE slug = ${existingSiteSlug} AND email = ${email} AND status != 'deleted'
         LIMIT 1
       `;
@@ -76,17 +77,24 @@ export async function POST(req: NextRequest) {
 
     const siteId = siteRow!.id as string;
     const slug = siteRow!.slug as string;
-    const size = new TextEncoder().encode(code).length;
+
+    // Inject "Built with Zoobicon" badge for free-tier sites
+    const siteName = (siteRow as Record<string, unknown>).name as string || name || slug;
+    const userPlan = ((siteRow as Record<string, unknown>).plan as string) || "free";
+    const badgeHtml = getCreatorBadgeHTML(slug, userPlan);
+    const finalCode = badgeHtml ? code.replace("</body>", badgeHtml + "</body>") : code;
+
+    const size = new TextEncoder().encode(finalCode).length;
 
     const url =
       environment === "staging"
         ? `https://${slug}-staging.zoobicon.sh`
         : `https://${slug}.zoobicon.sh`;
 
-    // Create deployment record with the HTML code
+    // Create deployment record with the HTML code (badge-injected for free tier)
     const [deployment] = await sql`
       INSERT INTO deployments (site_id, environment, status, url, size, code, commit_message)
-      VALUES (${siteId}, ${environment}, 'live', ${url}, ${size}, ${code}, ${"Deployed from builder"})
+      VALUES (${siteId}, ${environment}, 'live', ${url}, ${size}, ${finalCode}, ${"Deployed from builder"})
       RETURNING id, environment, status, url, size, created_at
     `;
 
@@ -95,7 +103,7 @@ export async function POST(req: NextRequest) {
 
     // Notify admin of new deployment (fire-and-forget)
     notifySiteDeployed({
-      siteName: (siteRow as Record<string, unknown>).name as string || name || slug,
+      siteName,
       slug,
       email,
     }).catch(() => {});
@@ -108,6 +116,7 @@ export async function POST(req: NextRequest) {
       status: "live",
       size,
       deployedAt: deployment.created_at,
+      trackingHints: { event: "deploy", siteName, slug },
     }, { status: 201 });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Internal server error";

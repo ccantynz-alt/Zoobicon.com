@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   Users,
   Link2,
@@ -11,7 +11,7 @@ import {
   Radio,
   X,
 } from "lucide-react";
-import type { RemoteParticipant, CollabRoom } from "@/hooks/useCollaboration";
+import type { RemoteParticipant, CollabRoom, SyncStatus } from "@/hooks/useCollaboration";
 
 interface CollaborationBarProps {
   room: CollabRoom | null;
@@ -19,10 +19,22 @@ interface CollaborationBarProps {
   myColor: string;
   isConnected: boolean;
   transport?: "websocket" | "sse" | "polling";
+  syncStatus?: SyncStatus;
+  lastSyncedAt?: number | null;
   onCreateRoom: () => void;
   onJoinRoom: (code: string) => Promise<unknown>;
   onLeaveRoom: () => void;
   userEmail: string;
+}
+
+function formatTimeAgo(ts: number | null | undefined): string {
+  if (!ts) return "";
+  const seconds = Math.floor((Date.now() - ts) / 1000);
+  if (seconds < 5) return "just now";
+  if (seconds < 60) return `${seconds}s ago`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  return "a while ago";
 }
 
 export default function CollaborationBar({
@@ -31,6 +43,8 @@ export default function CollaborationBar({
   myColor,
   isConnected,
   transport = "polling",
+  syncStatus = "synced",
+  lastSyncedAt,
   onCreateRoom,
   onJoinRoom,
   onLeaveRoom,
@@ -40,6 +54,13 @@ export default function CollaborationBar({
   const [joinCode, setJoinCode] = useState("");
   const [copied, setCopied] = useState(false);
   const [joinError, setJoinError] = useState("");
+  // Re-render periodically to update "Xs ago" text
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    if (!isConnected || !lastSyncedAt) return;
+    const interval = setInterval(() => setTick((t) => t + 1), 5000);
+    return () => clearInterval(interval);
+  }, [isConnected, lastSyncedAt]);
 
   const copyInviteLink = useCallback(() => {
     if (!room) return;
@@ -139,6 +160,32 @@ export default function CollaborationBar({
         {transport === "sse" && (
           <span className="text-[8px] text-green-400/50 ml-0.5">SSE</span>
         )}
+      </div>
+
+      {/* Sync status indicator */}
+      <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/[0.03] border border-white/5" title={
+        syncStatus === "synced" ? "All changes synced" :
+        syncStatus === "syncing" ? "Syncing changes..." :
+        "Sync error — retrying"
+      }>
+        <div className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${
+          syncStatus === "synced" ? "bg-green-400" :
+          syncStatus === "syncing" ? "bg-yellow-400 animate-pulse" :
+          "bg-red-400"
+        }`} />
+        <span className={`text-[10px] transition-colors duration-300 ${
+          syncStatus === "synced" ? "text-white/40" :
+          syncStatus === "syncing" ? "text-yellow-400/70" :
+          "text-red-400/70"
+        }`}>
+          {syncStatus === "synced" && lastSyncedAt
+            ? `Synced ${formatTimeAgo(lastSyncedAt)}`
+            : syncStatus === "synced"
+            ? "Synced"
+            : syncStatus === "syncing"
+            ? "Syncing..."
+            : "Sync error"}
+        </span>
       </div>
 
       {/* Avatar stack */}

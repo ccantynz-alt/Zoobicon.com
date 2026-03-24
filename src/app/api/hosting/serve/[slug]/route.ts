@@ -27,6 +27,12 @@ export async function GET(
       LIMIT 1
     `;
 
+    // Fetch site name for OG tags
+    const [siteRow] = await sql`
+      SELECT name FROM sites WHERE slug = ${slug} AND status = 'active' LIMIT 1
+    `;
+    const siteName = siteRow?.name || slug;
+
     if (!deployment || !deployment.code) {
       return new Response(
         `<!DOCTYPE html><html><head><title>Site Not Found</title>
@@ -40,7 +46,24 @@ export async function GET(
       );
     }
 
-    return new Response(deployment.code, {
+    // Inject OG meta tags if not already present
+    let html = deployment.code as string;
+    const ogImageUrl = `https://zoobicon.sh/api/og/${encodeURIComponent(slug)}`;
+    const headCloseIdx = html.indexOf("</head>");
+    if (headCloseIdx !== -1) {
+      let ogTags = "";
+      if (!html.includes('property="og:image"') && !html.includes("property='og:image'")) {
+        ogTags += `<meta property="og:image" content="${ogImageUrl}" />\n`;
+      }
+      if (!html.includes('property="og:title"') && !html.includes("property='og:title'")) {
+        ogTags += `<meta property="og:title" content="${siteName}" />\n`;
+      }
+      if (ogTags) {
+        html = html.slice(0, headCloseIdx) + ogTags + html.slice(headCloseIdx);
+      }
+    }
+
+    return new Response(html, {
       status: 200,
       headers: {
         "Content-Type": "text/html; charset=utf-8",

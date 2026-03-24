@@ -48,6 +48,9 @@ import { useCollaboration } from "@/hooks/useCollaboration";
 import OnboardingTooltips, { shouldShowTour } from "@/components/OnboardingTooltips";
 import BuildSuccessModal, { shouldShowBuildSuccess, dismissBuildSuccess } from "@/components/BuildSuccessModal";
 import MCPPanel from "@/components/MCPPanel";
+import ShareModal from "@/components/ShareModal";
+import { trackEvent } from "@/lib/achievements";
+import { notifyDeploy } from "@/lib/notifications";
 
 import {
   Bug,
@@ -412,6 +415,7 @@ function BuilderPage() {
   const [isDeploying, setIsDeploying] = useState(false);
   const [deployUrl, setDeployUrl] = useState("");
   const [deployStatus, setDeployStatus] = useState<"idle" | "deploying" | "deployed" | "error">("idle");
+  const [showShareModal, setShowShareModal] = useState(false);
   const [pipelineAgents, setPipelineAgents] = useState<string[]>([]);
   const [selectedModel, setSelectedModel] = useState("");  // Empty = use pipeline's smart routing (Haiku/Opus/Sonnet)
   const [instantMode, setInstantMode] = useState(true); // Instant scaffold mode — 3s first preview
@@ -840,7 +844,10 @@ function BuilderPage() {
               } else if (event.type === "status") {
                 // Informational status update (e.g., "Retrying...")
               } else if (event.type === "done") {
-                if (!streamAborted) setStatus("complete");
+                if (!streamAborted) {
+                  setStatus("complete");
+                  trackEvent("build");
+                }
               } else if (event.type === "edit_failed") {
                 // Edit produced empty body — preserve original code, show warning
                 streamAborted = true;
@@ -973,6 +980,7 @@ function BuilderPage() {
 
           setGeneratedCode(clean);
           setStatus("complete");
+          trackEvent("build");
           // Auto-replace placeholder images
           autoReplaceImages(clean).then((improved) => {
             if (improved !== clean) setGeneratedCode(improved);
@@ -1287,6 +1295,13 @@ function BuilderPage() {
       const data = await res.json();
       setDeployUrl(data.url);
       setDeployStatus("deployed");
+
+      // Track deploy achievement + send notification
+      trackEvent("deploy");
+      notifyDeploy(siteName, data.url);
+
+      // Show share modal after successful deploy
+      setShowShareModal(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Deploy failed");
       setDeployStatus("error");
@@ -1887,6 +1902,12 @@ function BuilderPage() {
           else if (action === "deploy") handleDeploy();
           // "chat" — ChatPanel is always visible in the left sidebar, no action needed
         }}
+      />
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        siteUrl={deployUrl}
+        siteName={prompt.trim().slice(0, 50) || "My Site"}
       />
     </div>
   );
