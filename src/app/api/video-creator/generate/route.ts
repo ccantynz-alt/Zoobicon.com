@@ -147,13 +147,19 @@ Generate the complete storyboard as JSON.`;
       response = { text, model: "claude-haiku-4-5-20251001", provider: "claude" as const };
     }
 
-    // Parse the JSON response
+    // Parse the JSON response — handle code fences, markdown wrapping, etc.
     let parsed;
     try {
-      // Try to extract JSON from the response in case there's any wrapper text
-      const jsonMatch = response.text.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) throw new Error("No JSON object found in response");
-      parsed = JSON.parse(jsonMatch[0]);
+      let text = response.text.trim();
+      // Strip markdown code fences (```json ... ``` or ``` ... ```)
+      text = text.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?\s*```\s*$/, "");
+      // Try to extract the outermost JSON object
+      const firstBrace = text.indexOf("{");
+      const lastBrace = text.lastIndexOf("}");
+      if (firstBrace === -1 || lastBrace === -1 || lastBrace <= firstBrace) {
+        throw new Error("No JSON object found in response");
+      }
+      parsed = JSON.parse(text.slice(firstBrace, lastBrace + 1));
     } catch (parseErr) {
       console.error("[video-creator/generate] Failed to parse LLM response:", response.text.slice(0, 500));
       return Response.json({ error: "Failed to parse storyboard. Please try again." }, { status: 500 });

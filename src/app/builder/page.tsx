@@ -1132,16 +1132,34 @@ function BuilderPage() {
       if (he !== -1) finalHtml = finalHtml.slice(0, he + "</html>".length);
 
       if (finalHtml && generationIdRef.current === currentGenId) {
-        setGeneratedCode(finalHtml);
-        setStatus("complete");
-        setPipelineAgents(prev => [...prev, "Complete"]);
+        // Safety check: verify the body actually has content
+        const bodyMatch = finalHtml.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+        const bodyText = bodyMatch
+          ? bodyMatch[1]
+              .replace(/<script[\s\S]*?<\/script>/gi, "")
+              .replace(/<style[\s\S]*?<\/style>/gi, "")
+              .replace(/<[^>]+>/g, "")
+              .replace(/\s+/g, " ")
+              .trim()
+          : "";
 
-        // Auto-replace placeholder images
-        autoReplaceImages(finalHtml).then((improved) => {
-          if (improved !== finalHtml && generationIdRef.current === currentGenId) {
-            setGeneratedCode(improved);
-          }
-        });
+        if (bodyText.length < 50) {
+          console.warn(`[Generate] Empty body detected (${bodyText.length} chars), treating as error`);
+          setGeneratedCode("");
+          setError("Generation produced an empty page. Please try again — this is usually a temporary issue.");
+          setStatus("error");
+        } else {
+          setGeneratedCode(finalHtml);
+          setStatus("complete");
+          setPipelineAgents(prev => [...prev, "Complete"]);
+
+          // Auto-replace placeholder images
+          autoReplaceImages(finalHtml).then((improved) => {
+            if (improved !== finalHtml && generationIdRef.current === currentGenId) {
+              setGeneratedCode(improved);
+            }
+          });
+        }
       }
     } catch (err) {
       if ((err as Error).name === "AbortError") return;
