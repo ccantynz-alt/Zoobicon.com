@@ -67,13 +67,7 @@ export async function POST(req: NextRequest) {
     if (!activeProvider) {
       return Response.json(
         {
-          error: "No image provider configured",
-          message: "Set REPLICATE_API_TOKEN, OPENAI_API_KEY, or STABILITY_API_KEY in your environment.",
-          providers: {
-            replicate: !!process.env.REPLICATE_API_TOKEN,
-            openai: !!process.env.OPENAI_API_KEY,
-            stability: !!process.env.STABILITY_API_KEY,
-          },
+          error: "Image generation is temporarily unavailable. Please try again later.",
         },
         { status: 503 }
       );

@@ -78,8 +78,7 @@ export async function POST(req: NextRequest) {
       const allProviders = getAllConfiguredProviders();
       return Response.json(
         {
-          error: "No video rendering provider configured",
-          message: "Set one of: REPLICATE_API_TOKEN, RUNWAY_API_KEY, LUMA_API_KEY, PIKA_API_KEY, or KLING_API_KEY in your environment variables.",
+          error: "Video rendering is coming soon. Stay tuned for updates!",
           providers: allProviders,
         },
         { status: 503 }

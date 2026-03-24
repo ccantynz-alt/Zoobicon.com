@@ -203,12 +203,12 @@ const fadeIn = {
 /* ------------------------------------------------------------------ */
 function sanitizeError(raw: string): string {
   const lower = raw.toLowerCase();
-  if (lower.includes("authentication failed") || lower.includes("invalid api key") || lower.includes("unauthorized"))
-    return "Voice API key is invalid or expired. Check your ElevenLabs/PlayHT API key in environment variables.";
-  if (lower.includes("all models failed"))
-    return "Voice generation failed across all models. Your ElevenLabs plan may not include TTS — check your account at elevenlabs.io.";
+  if (lower.includes("authentication failed") || lower.includes("invalid api key") || lower.includes("unauthorized") || lower.includes("auth error"))
+    return "Voice generation encountered an issue. Please try again — if this persists, contact support.";
+  if (lower.includes("all models failed") || lower.includes("voice generation failed"))
+    return "Voice generation is temporarily unavailable. Please try again in a moment.";
   if (lower.includes("payment_required") || lower.includes("paid_plan") || lower.includes("upgrade your subscription"))
-    return "Voice model requires a higher plan tier. The system tried multiple models — check your ElevenLabs subscription.";
+    return "This voice model is not available on your current plan. The system will try alternative models automatically.";
   if (lower.includes("requires a scene image") || lower.includes("generate images first"))
     return "Generate scene images before rendering video.";
   if (lower.includes("validation of body failed") || lower.includes("too_big"))
@@ -217,14 +217,15 @@ function sanitizeError(raw: string): string {
     return "Service temporarily unavailable. Please try again.";
   if (lower.includes("rate limit") || lower.includes("429"))
     return "Rate limited. Please wait a moment and try again.";
-  if (lower.includes("no provider configured") || lower.includes("add api"))
+  if (lower.includes("no provider configured") || lower.includes("add api") || lower.includes("not configured") || lower.includes("environment"))
     return "This feature is coming soon.";
   if (lower.includes("timeout") || lower.includes("timed out"))
     return "Request timed out. Please try again.";
-  // Strip any JSON from the message
-  const cleaned = raw.replace(/\{[\s\S]*\}/, "").replace(/\[[\s\S]*\]/, "").trim();
+  // Strip any JSON, env var references, and technical details from the message
+  let cleaned = raw.replace(/\{[\s\S]*\}/, "").replace(/\[[\s\S]*\]/, "").trim();
+  cleaned = cleaned.replace(/[A-Z_]{3,}_[A-Z_]+/g, "").trim(); // Strip env var names like ELEVENLABS_API_KEY
   // If what's left is too long or still looks technical, genericize
-  if (cleaned.length > 80 || cleaned.includes("error:") || cleaned.includes("Error:"))
+  if (cleaned.length > 80 || cleaned.includes("error:") || cleaned.includes("Error:") || cleaned.includes("env") || cleaned.includes("key"))
     return "Something went wrong. Please try again.";
   return cleaned || "Something went wrong. Please try again.";
 }
@@ -781,9 +782,9 @@ export default function VideoCreatorDashboard() {
       }
       const data = await res.json();
       if (data.provider === "browser" && !data.audioUrl) {
-        // ElevenLabs/PlayHT failed, fell back to browser — show why
+        // AI voice fell back to browser TTS
         if (data.fallbackReason) {
-          setError(`AI voice failed (using browser TTS instead): ${data.fallbackReason}`);
+          setError("Using browser preview voice. Premium AI voices will be available shortly.");
         }
         if ("speechSynthesis" in window) {
           const utterance = new SpeechSynthesisUtterance(storyboard.script);
@@ -937,7 +938,7 @@ export default function VideoCreatorDashboard() {
         }
         // Show fallback reason so user knows why AI voice didn't work
         if (data.fallbackReason) {
-          progress.voiceover = { status: "done", error: `Browser TTS fallback: ${data.fallbackReason}` };
+          progress.voiceover = { status: "done", error: "Using browser preview voice" };
         } else {
           progress.voiceover = { status: "done" };
         }
@@ -2113,7 +2114,7 @@ export default function VideoCreatorDashboard() {
                                     >
                                       <Square className="w-3 h-3" /> Stop
                                     </button>
-                                    <span className="text-[9px] text-amber-400/60">Browser TTS preview — check ElevenLabs API key if AI voices aren&apos;t working</span>
+                                    <span className="text-[9px] text-amber-400/60">Browser TTS — free preview mode</span>
                                   </div>
                                 ) : (
                                   <audio controls src={voiceoverUrl} className="w-full h-8 [&::-webkit-media-controls-panel]:bg-white/5 rounded" />
@@ -2187,7 +2188,7 @@ export default function VideoCreatorDashboard() {
                                 </div>
                                 <div className="flex items-center gap-1">
                                   {capabilities.videoRender.available ? <CheckCircle2 className="w-3 h-3 text-green-500" /> : <AlertCircle className="w-3 h-3 text-amber-500" />}
-                                  Video Rendering: {capabilities.videoRender.available ? "Provider Detected (may require valid API credits)" : "Coming Soon — Add RUNWAY_API_KEY or REPLICATE_API_TOKEN"}
+                                  Video Rendering: {capabilities.videoRender.available ? "Ready" : "Coming Soon"}
                                 </div>
                                 <div className="flex items-center gap-1">
                                   {capabilities.voiceover.available && (capabilities.voiceover as { premium?: boolean }).premium

@@ -80,7 +80,7 @@ async function generateElevenLabs(
   config: VoiceConfig
 ): Promise<VoiceResult> {
   const apiKey = process.env.ELEVENLABS_API_KEY;
-  if (!apiKey) throw new Error("ELEVENLABS_API_KEY not configured");
+  if (!apiKey) throw new Error("Voice service is not available. Please try again later.");
 
   const voiceId = config.voiceId || "21m00Tcm4TlvDq8ikWAM"; // Rachel default
   const stability = config.stability ?? 0.5;
@@ -141,22 +141,30 @@ async function generateElevenLabs(
     lastError = `ElevenLabs ${modelId}: ${res.status} ${errText}`;
     console.error(`[voiceover] ${lastError}`);
 
-    // If it's a 401 (bad key) or 429 (rate limit), don't try other models
-    if (res.status === 401) {
-      throw new Error(`ElevenLabs authentication failed. Check your API key.`);
-    }
+    // 429 = rate limit — stop immediately
     if (res.status === 429) {
-      throw new Error(`ElevenLabs rate limit reached. Please wait and try again.`);
+      throw new Error(`Voice generation is temporarily rate limited. Please wait a moment and try again.`);
     }
 
-    // For 403/payment errors, try the next (simpler) model
+    // 401 on first model could be a model-level auth issue — try simpler models first
+    // Only throw hard auth error if ALL models fail with 401
+    if (res.status === 401) {
+      lastError = `ElevenLabs auth error (${modelId}): ${res.status}`;
+      continue;
+    }
+
+    // For 403/payment/validation errors, try the next (simpler) model
     if (res.status === 403 || res.status === 422) continue;
 
     // For other errors, also try next model
     continue;
   }
 
-  throw new Error(`ElevenLabs: all models failed. Last error: ${lastError}`);
+  // If all models returned 401, the key itself is likely the problem
+  if (lastError.includes("auth error")) {
+    throw new Error("Voice generation unavailable. Please try again or contact support.");
+  }
+  throw new Error(`Voice generation failed. Please try again.`);
 }
 
 // --- PlayHT ---
@@ -167,7 +175,7 @@ async function generatePlayHT(
 ): Promise<VoiceResult> {
   const apiKey = process.env.PLAYHT_API_KEY;
   const userId = process.env.PLAYHT_USER_ID;
-  if (!apiKey || !userId) throw new Error("PLAYHT_API_KEY or PLAYHT_USER_ID not configured");
+  if (!apiKey || !userId) throw new Error("Voice service is not available. Please try again later.");
 
   const voiceId = config.voiceId || "s3://voice-cloning-zero-shot/775ae416-49bb-4fb6-bd45-740f205d3e11/original/manifest.json";
   const speed = config.speed ?? 1.0;
@@ -219,9 +227,7 @@ export async function generateVoiceover(
   const provider = config.provider || getAvailableVoiceProvider();
 
   if (!provider) {
-    throw new Error(
-      "No voice provider configured. Set ELEVENLABS_API_KEY or PLAYHT_API_KEY + PLAYHT_USER_ID."
-    );
+    throw new Error("Voice generation is temporarily unavailable. Please try again later.");
   }
 
   // Try the requested provider, then fall back to alternatives
