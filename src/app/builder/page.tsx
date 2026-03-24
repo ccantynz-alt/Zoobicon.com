@@ -418,7 +418,7 @@ function BuilderPage() {
   const [showShareModal, setShowShareModal] = useState(false);
   const [pipelineAgents, setPipelineAgents] = useState<string[]>([]);
   const [selectedModel, setSelectedModel] = useState("");  // Empty = use pipeline's smart routing (Haiku/Opus/Sonnet)
-  const [instantMode, setInstantMode] = useState(true); // Instant scaffold mode — 3s first preview
+  const [instantMode, setInstantMode] = useState(false); // Default to full AI generation for premium quality
   const [availableModels, setAvailableModels] = useState<AIModel[]>([]);
   const [reactSource, setReactSource] = useState<Record<string, string> | null>(null);
   const [mcpContext, setMcpContext] = useState("");
@@ -1553,12 +1553,12 @@ function BuilderPage() {
                 onClick={() => setInstantMode(!instantMode)}
                 className={`px-3 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-wider transition-all border ${
                   instantMode
-                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-                    : "bg-white/5 border-white/10 text-white/40"
+                    ? "bg-amber-500/10 border-amber-500/30 text-amber-400"
+                    : "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
                 }`}
-                title={instantMode ? "Instant: 3s preview" : "Classic: full pipeline"}
+                title={instantMode ? "Quick: 3s scaffold preview (lower quality)" : "Premium: full AI generation (best quality)"}
               >
-                {instantMode ? "⚡ Instant" : "Classic"}
+                {instantMode ? "⚡ Quick" : "✨ Premium"}
               </button>
               <button
                 onClick={handleGenerate}

@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
   if (!apiKey) {
     return NextResponse.json({
       status: "fail",
-      error: "ANTHROPIC_API_KEY not configured",
+      error: "AI service is temporarily unavailable.",
       steps: [],
     }, { status: 500 });
   }

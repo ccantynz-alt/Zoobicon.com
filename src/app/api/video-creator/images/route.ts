@@ -104,8 +104,7 @@ export async function POST(req: NextRequest) {
     }
   } catch (err) {
     console.error("[video-creator/images] Error:", err);
-    const message = err instanceof Error ? err.message : "Image generation failed";
-    return Response.json({ error: message }, { status: 500 });
+    return Response.json({ error: "Image generation failed. Please try again." }, { status: 500 });
   }
 }
 
@@ -117,18 +116,18 @@ export async function GET() {
 
   return Response.json({
     available: !!provider,
-    activeProvider: provider,
+    activeProvider: provider || null,
     providers: {
       replicate: {
-        configured: !!process.env.REPLICATE_API_TOKEN,
+        available: !!(process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY),
         models: ["FLUX Schnell", "Stable Diffusion XL"],
       },
       openai: {
-        configured: !!process.env.OPENAI_API_KEY,
+        available: !!process.env.OPENAI_API_KEY,
         models: ["DALL-E 3"],
       },
       stability: {
-        configured: !!process.env.STABILITY_API_KEY,
+        available: !!process.env.STABILITY_API_KEY,
         models: ["Stable Diffusion 3"],
       },
     },

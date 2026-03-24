@@ -30,6 +30,8 @@ export interface SiteConfig {
 // ── Intent Classification ──
 
 const INTENT_KEYWORDS: Record<string, string[]> = {
+  cybersecurity: ["cybersecurity", "cyber", "security", "infosec", "hacking", "penetration", "firewall", "threat", "vulnerability", "soc", "siem", "endpoint", "ransomware", "phishing", "zero trust", "breach", "encryption", "neon cyber", "dark security"],
+  tech: ["technology", "tech", "ai", "artificial intelligence", "machine learning", "ml", "data", "cloud", "devops", "blockchain", "web3", "crypto", "nft", "automation", "iot", "robotics", "computing", "neon tech", "dark tech"],
   saas: ["saas", "software", "app", "platform", "dashboard", "subscription", "api", "tool", "productivity", "crm", "erp"],
   restaurant: ["restaurant", "cafe", "coffee", "bakery", "food", "menu", "dining", "bistro", "pizza", "sushi", "bar", "pub", "catering", "chef", "kitchen"],
   portfolio: ["portfolio", "photographer", "designer", "artist", "creative", "freelance", "personal", "resume", "cv"],
@@ -44,6 +46,9 @@ const INTENT_KEYWORDS: Record<string, string[]> = {
   nonprofit: ["nonprofit", "charity", "donate", "foundation", "cause", "volunteer", "ngo", "community", "mission"],
   event: ["event", "conference", "wedding", "party", "concert", "festival", "meetup", "summit", "gala", "ticket"],
   lawyer: ["lawyer", "attorney", "law firm", "legal", "litigation", "counsel", "paralegal", "justice"],
+  gaming: ["gaming", "game", "esports", "streamer", "twitch", "gamer", "play", "console", "xbox", "playstation"],
+  fintech: ["fintech", "finance", "banking", "payment", "investment", "trading", "stocks", "crypto exchange", "wallet", "defi"],
+  music: ["music", "band", "artist", "album", "record", "studio recording", "producer", "dj", "rapper", "singer"],
 };
 
 export function classifyIntent(prompt: string): string {
@@ -68,6 +73,59 @@ export function classifyIntent(prompt: string): string {
 // ── Config per intent ──
 
 const CONFIGS: Record<string, SiteConfig> = {
+  cybersecurity: {
+    title: "Cybersecurity",
+    description: "Enterprise-grade security that stops threats before they start.",
+    font1: "Space Grotesk",
+    font2: "Inter",
+    colors: { primary: "#00ff88", primaryDark: "#00cc6a", bg: "#0a0e1a", bgAlt: "#111827", surface: "#1a1f2e", text: "#e2e8f0", textMuted: "#94a3b8", border: "#1e293b", accent: "#06b6d4" },
+    customCss: `
+.btn-primary { color: #0a0e1a !important; font-weight: 700; }
+.hero-aurora, .hero-mesh { opacity: 0.6; }
+nav { border-bottom-color: rgba(0, 255, 136, 0.1) !important; }
+.stat-number { text-shadow: 0 0 20px rgba(0, 255, 136, 0.3); }
+`,
+  },
+  tech: {
+    title: "Tech Company",
+    description: "Building the future with intelligent technology.",
+    font1: "Space Grotesk",
+    font2: "Inter",
+    colors: { primary: "#6366f1", primaryDark: "#4f46e5", bg: "#0f172a", bgAlt: "#1e293b", surface: "#1e293b", text: "#e2e8f0", textMuted: "#94a3b8", border: "#334155", accent: "#818cf8" },
+    customCss: `
+.btn-primary { color: #fff !important; }
+`,
+  },
+  gaming: {
+    title: "Gaming",
+    description: "Level up your experience.",
+    font1: "Orbitron",
+    font2: "Inter",
+    colors: { primary: "#ef4444", primaryDark: "#dc2626", bg: "#09090b", bgAlt: "#18181b", surface: "#1c1c22", text: "#fafafa", textMuted: "#a1a1aa", border: "#27272a", accent: "#f97316" },
+    customCss: `
+.btn-primary { color: #fff !important; }
+`,
+  },
+  fintech: {
+    title: "FinTech",
+    description: "Modern financial services powered by technology.",
+    font1: "DM Sans",
+    font2: "Inter",
+    colors: { primary: "#10b981", primaryDark: "#059669", bg: "#020617", bgAlt: "#0f172a", surface: "#1e293b", text: "#f1f5f9", textMuted: "#94a3b8", border: "#1e293b", accent: "#34d399" },
+    customCss: `
+.btn-primary { color: #020617 !important; font-weight: 700; }
+`,
+  },
+  music: {
+    title: "Music",
+    description: "Feel the rhythm, experience the sound.",
+    font1: "Bebas Neue",
+    font2: "Inter",
+    colors: { primary: "#ec4899", primaryDark: "#db2777", bg: "#0c0a1a", bgAlt: "#1a1330", surface: "#1a1330", text: "#fce7f3", textMuted: "#f9a8d4", border: "#2d1b4e", accent: "#a855f7" },
+    customCss: `
+.btn-primary { color: #fff !important; }
+`,
+  },
   saas: {
     title: "SaaS Platform",
     description: "Modern software platform that helps teams work smarter.",
