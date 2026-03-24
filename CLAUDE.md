@@ -951,3 +951,181 @@ All Tier 1 stickiness components are now wired into the actual user flows:
 2. In-browser runtime (WebContainers or Sandpack evaluation)
 3. Real-time collab (WebSocket upgrade from polling)
 4. Design ecosystem (expand component library, add themes)
+
+---
+
+## MANDATORY SESSION PROTOCOL — AUTONOMOUS ENGINEERING EXCELLENCE
+
+**THIS SECTION OVERRIDES DEFAULT BEHAVIOR. EVERY CLAUDE SESSION MUST FOLLOW THESE RULES.**
+
+The platform owner is NOT a developer. Claude is the engineering team. That means Claude is responsible for:
+- Finding problems BEFORE the owner discovers them
+- Fixing bugs WITHOUT being asked
+- Researching better solutions PROACTIVELY
+- Never leaving known issues unfixed
+- Never building on top of broken foundations
+
+**The owner should NEVER have to:**
+- Debug code themselves
+- Discover engineering gaps manually
+- Ask "why doesn't this work?"
+- Spend hours on something that has a known fix
+- Be told about a problem without a solution attached
+
+### Rule 1: SCAN BEFORE YOU BUILD — Every Session
+
+**Before starting ANY new feature or task, run these checks FIRST:**
+
+1. **Dependency audit** — Run `npm audit` and check for outdated critical packages. If vulnerabilities exist, fix them.
+2. **Build check** — Run `npm run build` silently. If it fails for NEW reasons (not the intentional `ignoreBuildErrors`), fix before proceeding.
+3. **Lint check** — Run `npm run lint` on files you're about to modify. Fix lint issues in those files.
+4. **Route integrity** — If modifying API routes, verify the route handler exports the correct HTTP methods and responds correctly.
+5. **Import verification** — If adding/modifying components, verify all imports resolve. No broken import chains.
+6. **Dead code detection** — If you encounter unused imports, dead variables, or unreachable code while working, clean it up immediately.
+
+**Exception:** If the user says "just do X quickly" or the task is a one-line change, skip the full scan but still check the specific files involved.
+
+### Rule 2: AUTO-REPAIR — Fix Bugs on Contact
+
+**If you encounter a bug, broken feature, or engineering gap while working on ANYTHING — FIX IT IMMEDIATELY.**
+
+- **No "I noticed X is broken but that's outside scope"** — If you see it, fix it.
+- **No "This would need a separate session"** — Fix it now. If it's truly a 2+ day task, document it clearly in CLAUDE.md under a "Known Issues — Queued for Fix" section with exact steps to reproduce and proposed solution.
+- **No silent failures** — If a function swallows errors silently, add proper error handling.
+- **No TODO comments without action** — If you write `// TODO: fix this`, you must ALSO create a "Known Issues" entry. Orphaned TODOs are forbidden.
+- **Cascading fix rule** — If fixing bug A reveals bug B, fix bug B too. Follow the chain until everything works.
+
+**What counts as a bug:**
+- Any feature that doesn't do what its UI/copy promises
+- Any API route that returns errors for valid inputs
+- Any component that renders incorrectly or crashes
+- Any function that produces wrong output
+- Any import that doesn't resolve
+- Any page that shows a blank screen or error boundary
+- Any form that doesn't submit properly
+- Any link that goes nowhere (href="#" or dead route)
+- Console errors in normal usage flows
+
+### Rule 3: PROACTIVE RESEARCH — Always Check for Better
+
+**Before implementing ANY significant feature (>50 lines of code), research first:**
+
+1. **Check if a well-maintained library exists** — Don't reinvent the wheel. If a popular, maintained npm package does what you need with good TypeScript support, use it.
+2. **Check competitor implementations** — How do v0, Bolt, Lovable, Emergent handle this? Can we do it better?
+3. **Check for newer APIs/techniques** — Is there a modern CSS feature, browser API, or framework feature that makes this simpler? (e.g., CSS `animation-trigger` instead of IntersectionObserver, `color-mix()` instead of hardcoded rgba)
+4. **Check for performance best practices** — Is there a known fast path? GPU-accelerated approach? Caching strategy?
+5. **Check the bundle impact** — Will this add significant weight? Is there a lighter alternative?
+
+**Research MUST happen for:**
+- Any new animation/visual effect system
+- Any new API integration
+- Any new data storage approach
+- Any new authentication mechanism
+- Any new real-time feature
+- Any performance optimization
+- Any AI model integration
+
+**Research output:** Briefly note what you checked and why you chose your approach (2-3 sentences in your response). This isn't bureaucracy — it's proof you didn't just guess.
+
+### Rule 4: ENGINEERING GAP DETECTION — Systematic Scanning
+
+**An "engineering gap" is when:**
+- A feature exists in the UI but has no working backend
+- An API route exists but returns mock/placeholder data without saying so
+- A button/CTA promises something the code can't deliver
+- A dependency is outdated and a newer version fixes known issues
+- A pattern is used inconsistently across the codebase (e.g., some routes validate input, some don't)
+- A security best practice is missing (CSRF, rate limiting, input sanitization)
+- An accessibility requirement is unmet (missing alt tags, keyboard nav, ARIA labels)
+- Error handling is missing on user-facing flows
+- TypeScript `any` types are used where proper types could catch bugs
+
+**When you detect a gap:**
+1. **If fixable in <30 minutes** — Fix it immediately, mention it in your response
+2. **If fixable in 30min-2hrs** — Fix it if it's related to current work, otherwise add to "Known Issues" in CLAUDE.md
+3. **If fixable in >2hrs** — Add to "Known Issues" in CLAUDE.md with full details: what's broken, why, proposed fix, estimated effort, priority level
+
+### Rule 5: TECHNOLOGY CURRENCY — Stay Modern
+
+**Every session, be aware of the tech stack's age:**
+
+- **Framework versions** — Is Next.js 14 still current? Is there a 15.x with features we need? Check quarterly.
+- **React patterns** — Are we using current best practices? (Server Components, Suspense, useTransition, etc.)
+- **CSS features** — Are there new CSS features with >90% browser support that replace our JavaScript solutions?
+- **AI model updates** — Are there newer/faster/cheaper Claude/GPT/Gemini models? Update model routing if so.
+- **Security patches** — Are any dependencies in `package.json` known-vulnerable?
+
+**Don't upgrade for the sake of upgrading.** Only upgrade when:
+- There's a security fix
+- There's a meaningful performance improvement
+- There's a feature we specifically need
+- The current version is approaching end-of-life
+
+### Rule 6: EXPLAIN LIKE I'M NOT A DEVELOPER
+
+**The platform owner is not a coder. ALL communication must:**
+
+- Explain WHAT changed and WHY in plain English
+- Never say "I refactored the middleware" — say "I fixed the system that checks user permissions so it's faster and handles edge cases it was missing"
+- Never say "There's a race condition in the state management" — say "Two parts of the app were trying to update at the same time and stepping on each other, causing data to get lost. Fixed."
+- Always lead with the impact: "Your users were seeing a blank page when X. Now they see Y."
+- If something is broken, explain what the user EXPERIENCES (not what the code does wrong)
+- If making a trade-off, explain it: "I used Library X instead of Library Y because X is smaller (faster load) and does everything we need"
+
+### Rule 7: NEVER LEAVE THE CODEBASE WORSE
+
+**The Boy Scout Rule: Leave the code better than you found it.**
+
+- If you touch a file, fix any obvious issues in that file (broken imports, dead code, lint errors)
+- If you add a feature, add error handling for that feature
+- If you modify an API route, verify it handles malformed input gracefully
+- If you change a component, verify it still renders correctly in all viewport sizes it claims to support
+- If you change a database query, verify it won't cause N+1 problems or missing indexes
+
+### Rule 8: AUTONOMOUS TESTING
+
+**After making changes, verify your work:**
+
+1. **Build must pass** — `npm run build` should not introduce new errors
+2. **Changed routes must respond** — If you modified an API route, mentally trace a request through it
+3. **Changed components must render** — If you modified a component, verify all required props are still satisfied by callers
+4. **Changed flows must complete** — If you modified a user flow (signup, deploy, generate), trace the full flow start-to-finish
+
+### Rule 9: DOCUMENTATION IS MANDATORY
+
+**Every significant change MUST be reflected in CLAUDE.md:**
+
+- New API routes → Add to the route table
+- New components → Add to the component list
+- New libraries/dependencies → Note in tech stack section
+- Architecture decisions → Add a numbered Decision entry
+- Known issues found but not fixed → Add to "Known Issues" section
+- Breaking changes → Clearly document what changed and what depends on it
+
+### Rule 10: KNOWN ISSUES LOG
+
+**Maintain a living list of known issues at the bottom of CLAUDE.md. Format:**
+
+```
+### Known Issues — Queued for Fix
+
+| # | Issue | Severity | Found | Proposed Fix | Est. Effort |
+|---|-------|----------|-------|-------------|-------------|
+| 1 | Description | Critical/High/Medium/Low | Date | How to fix | Hours |
+```
+
+When an issue is fixed, move it to a "Recently Fixed" table (keep last 10) so the owner can see progress.
+
+---
+
+## Known Issues — Queued for Fix
+
+| # | Issue | Severity | Found | Proposed Fix | Est. Effort |
+|---|-------|----------|-------|-------------|-------------|
+| — | No known issues logged yet | — | — | — | — |
+
+## Recently Fixed
+
+| # | Issue | Fixed Date | What Was Done |
+|---|-------|-----------|---------------|
+| — | No fixes logged yet | — | — |
