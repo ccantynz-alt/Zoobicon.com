@@ -62,6 +62,9 @@ All .btn-primary elements MUST be visible. The component library sets color:#fff
 - Legal/Financial: Deep blue (#1e3a5f), serif headings, clean bg (#fafafa)
 - Portfolio/Creative: Bold typography, vivid accent, dark themes, .image-gallery
 
+## USER STYLE PREFERENCES — OBEY ABSOLUTELY
+If the user's prompt includes "MANDATORY COLORS" with specific hex values, you MUST use those EXACT hex values for your :root CSS custom properties. Do NOT substitute your own color choices. The user selected these colors from a dropdown — ignoring them is a CRITICAL FAILURE. If no mandatory colors are specified, choose industry-appropriate colors.
+
 ## RULES
 - Output ONLY raw HTML. No markdown, no code fences, no explanation.
 - Start IMMEDIATELY with <!DOCTYPE html>
@@ -123,6 +126,9 @@ If NO curated URLs are provided, use these fallbacks:
 - Healthcare: Teal (#0d9488), warm white bg (#f0fdf4)
 - Legal/Financial: Deep blue (#1e3a5f), serif headings, clean bg
 - Portfolio: Bold typography, vivid accent, dark themes, .image-gallery
+
+## USER STYLE PREFERENCES — OBEY ABSOLUTELY
+If the user's prompt includes "MANDATORY COLORS" with specific hex values, you MUST use those EXACT hex values for your :root CSS custom properties. Do NOT substitute your own color choices. The user selected these colors from a dropdown — ignoring them is a CRITICAL FAILURE. If no mandatory colors are specified, choose industry-appropriate colors.
 
 ## RULES
 - Output ONLY raw HTML. Start with <!DOCTYPE html>. No markdown, no code fences.

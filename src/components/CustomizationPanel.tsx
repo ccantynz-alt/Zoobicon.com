@@ -57,34 +57,50 @@ export const DEFAULT_CUSTOMIZATION: CustomizationOptions = {
 
 export function buildCustomizationSuffix(options: CustomizationOptions): string {
   const paletteInfo = PALETTES.find((p) => p.id === options.palette);
-  let paletteDesc = "";
+
+  // Build explicit color instructions with ACTUAL hex values
+  let colorInstruction = "";
   if (options.palette === "custom" && options.customColors) {
-    paletteDesc = `Custom color palette (primary: ${options.customColors.primary}, accent: ${options.customColors.accent})`;
-  } else if (paletteInfo) {
-    const colorNames: Record<string, string> = {
-      professional: "navy/white/gray",
-      vibrant: "purple/cyan/orange",
-      nature: "green/brown/cream",
-      tech: "dark/blue/cyan",
-    };
-    paletteDesc = `${paletteInfo.label} color palette (${colorNames[options.palette] || ""})`;
+    colorInstruction = `MANDATORY COLORS — You MUST use these exact colors:
+--color-primary: ${options.customColors.primary}
+--color-accent: ${options.customColors.accent}`;
+  } else if (paletteInfo && paletteInfo.colors.length > 0) {
+    const [primary, secondary, tertiary] = paletteInfo.colors;
+    colorInstruction = `MANDATORY COLORS — You MUST use these exact colors in your :root CSS custom properties:
+--color-primary: ${primary}
+${secondary ? `--color-bg or --color-surface base: ${secondary}` : ""}
+${tertiary ? `--color-text-muted or --color-border: ${tertiary}` : ""}
+These are NON-NEGOTIABLE. The user specifically selected the "${paletteInfo.label}" palette.`;
   }
 
-  const typoInfo = TYPOGRAPHY_OPTIONS.find((t) => t.id === options.typography);
-  const layoutInfo = LAYOUT_OPTIONS.find((l) => l.id === options.layout);
+  const typoMap: Record<string, string> = {
+    modern: "Use a modern sans-serif like Inter, DM Sans, or Outfit for both headings and body.",
+    classic: "Use a serif font like Playfair Display or Lora for headings, and a clean sans-serif like Inter for body text.",
+    playful: "Use a rounded, friendly font like Nunito, Quicksand, or Poppins.",
+    corporate: "Use a strict professional font like IBM Plex Sans or Source Sans 3.",
+  };
+  const typoInstruction = typoMap[options.typography] || typoMap.modern;
+
+  const layoutMap: Record<string, string> = {
+    "hero-first": "Start with a dramatic full-height hero section, then features, then content.",
+    "storytelling": "Build a scrolling narrative — each section flows into the next like a story.",
+    "feature-grid": "Lead with features in a dense grid layout, compact and information-rich.",
+    "minimal": "Clean, spacious design with generous whitespace between elements.",
+  };
+  const layoutInstruction = layoutMap[options.layout] || layoutMap["hero-first"];
 
   const parts = [
-    `Style preferences: ${paletteDesc}`,
-    `${typoInfo?.label || "Modern"} typography`,
-    `${layoutInfo?.label || "Hero-first"} layout`,
+    colorInstruction,
+    `TYPOGRAPHY: ${typoInstruction}`,
+    `LAYOUT: ${layoutInstruction}`,
   ];
 
   const includedSections = options.sections;
   if (includedSections.length < ALL_SECTIONS.length) {
-    parts.push(`Include sections: ${includedSections.join(", ")}`);
+    parts.push(`SECTIONS TO INCLUDE: ${includedSections.join(", ")} (omit sections not in this list)`);
   }
 
-  return parts.join(", ") + ".";
+  return parts.filter(Boolean).join("\n\n");
 }
 
 export default function CustomizationPanel({ options, onChange }: CustomizationPanelProps) {

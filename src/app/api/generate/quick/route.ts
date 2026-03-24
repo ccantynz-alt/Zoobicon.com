@@ -401,7 +401,7 @@ export async function POST(req: NextRequest) {
     const userMessage = isPremium
       ? `Build a world-class PREMIUM website for: ${prompt}
 
-This must look like a $30,000 agency built it. Think Apple.com or Stripe.com — clean white background, generous whitespace, sophisticated typography. Include ALL 13 sections with rich, specific content. Every testimonial mentions real metrics. Every headline drives action. Use a LIGHT color scheme with white/cream backgrounds.
+This must look like a $30,000 agency built it. Think Apple.com or Stripe.com — clean white background, generous whitespace, sophisticated typography. Include ALL 13 sections with rich, specific content. Every testimonial mentions real metrics. Every headline drives action. If "MANDATORY COLORS" are specified below, USE THOSE EXACT COLORS. Otherwise use a LIGHT color scheme with white/cream backgrounds.
 ${imageBlock || "Use CSS gradients and SVG icons instead of external images. For avatars use https://randomuser.me/api/portraits/men/N.jpg or women/N.jpg (N=1-99)."}
 
 Output the <config> block first, then the <body-html> block. Nothing else.`
@@ -416,6 +416,7 @@ REQUIREMENTS:
 - Stats: 4 big numbers with data-target attributes for counter animation
 - FAQ: 5 real questions someone would ask about this business
 - Match the color scheme and aesthetic to the industry
+- If the prompt below includes "MANDATORY COLORS" with hex values, you MUST use those EXACT colors for the config block colors. Do NOT override the user's color selection.
 ${imageBlock || "Use CSS gradients and SVG icons instead of external images. For avatars use https://randomuser.me/api/portraits/men/N.jpg or women/N.jpg (N=1-99)."}
 
 Output the <config> block first, then the <body-html> block. Nothing else.`;

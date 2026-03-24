@@ -308,6 +308,17 @@ export async function POST(request: NextRequest) {
             if (agencyBrand.colors.text) scaffoldConfig.colors.text = agencyBrand.colors.text;
           }
 
+          // Extract MANDATORY COLORS from user's customization selection
+          const mandatoryPrimaryMatch = prompt.match(/--color-primary:\s*(#[0-9a-fA-F]{3,8})/);
+          const mandatoryAccentMatch = prompt.match(/--color-accent:\s*(#[0-9a-fA-F]{3,8})/);
+          if (mandatoryPrimaryMatch) {
+            scaffoldConfig.colors.primary = mandatoryPrimaryMatch[1];
+            scaffoldConfig.colors.primaryDark = mandatoryPrimaryMatch[1];
+          }
+          if (mandatoryAccentMatch) {
+            scaffoldConfig.colors.accent = mandatoryAccentMatch[1];
+          }
+
           // Build the initial scaffold page
           const scaffoldHtml = buildFullPage(scaffoldConfig, scaffoldBody);
 
