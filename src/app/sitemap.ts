@@ -1,6 +1,28 @@
 import { MetadataRoute } from 'next'
 
-export default function sitemap(): MetadataRoute.Sitemap {
+// Try to fetch deployed sites for dynamic sitemap entries
+async function getDeployedSites(): Promise<{ slug: string; updatedAt: string }[]> {
+  try {
+    const { sql } = await import('@/lib/db')
+    const rows = await sql`
+      SELECT DISTINCT s.slug, COALESCE(s.updated_at, s.created_at, NOW()) as updated_at
+      FROM sites s
+      JOIN deployments d ON d.site_id = s.id
+      WHERE s.status != 'deleted' AND d.status = 'live' AND d.environment = 'production'
+      ORDER BY s.updated_at DESC NULLS LAST
+      LIMIT 1000
+    `
+    return rows.map((r) => ({
+      slug: r.slug as string,
+      updatedAt: (r.updated_at as Date)?.toISOString?.() || new Date().toISOString(),
+    }))
+  } catch {
+    // DB not available — return empty (static routes still work)
+    return []
+  }
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://zoobicon.com'
 
   const routes: {
@@ -55,10 +77,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/auth/signup', priority: 0.5, changeFrequency: 'weekly' },
   ]
 
-  return routes.map((route) => ({
+  const staticEntries: MetadataRoute.Sitemap = routes.map((route) => ({
     url: `${baseUrl}${route.path}`,
     lastModified: new Date(),
     changeFrequency: route.changeFrequency,
     priority: route.priority,
   }))
+
+  // Add deployed zoobicon.sh sites to sitemap
+  const deployedSites = await getDeployedSites()
+  const deployedEntries: MetadataRoute.Sitemap = deployedSites.map((site) => ({
+    url: `https://${site.slug}.zoobicon.sh`,
+    lastModified: new Date(site.updatedAt),
+    changeFrequency: 'weekly' as const,
+    priority: 0.6,
+  }))
+
+  return [...staticEntries, ...deployedEntries]
 }

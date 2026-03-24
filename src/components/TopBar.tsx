@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import NotificationInbox from "@/components/NotificationInbox";
 import QuotaBar from "@/components/QuotaBar";
+import { useEmailNotifications } from "@/hooks/useEmailNotifications";
 
 interface AgencyBrand {
   agencyName: string;
@@ -16,6 +17,9 @@ export default function TopBar() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAgency, setIsAgency] = useState(false);
   const [agencyBrand, setAgencyBrand] = useState<AgencyBrand | null>(null);
+
+  // Real-time email notifications — sound + browser push for admin users
+  useEmailNotifications();
 
   useEffect(() => {
     try {
