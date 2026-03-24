@@ -107,17 +107,17 @@ If NO curated URLs are provided, use these fallbacks:
 1. <nav> — sticky, backdrop-blur, logo + links + .btn-primary.btn-sm CTA
 2. Hero — 90-100vh, DRAMATIC visual impact, split layout (text left + visual right). Trust badge pill, punchy headline, subheading, TWO CTAs (.btn-primary.btn-lg + .btn-ghost), trust checkmarks. Right side: if CURATED IMAGES provides a hero URL, use it. Otherwise: TECH/SAAS/CYBER → .hero-aurora or .hero-mesh. Other → CSS gradient. Floating social proof card overlaying the visual.
 3. Logo strip / social proof — trusted-by company names or "10,000+ businesses" metrics in subtle strip
-4. Features — .grid-3 with 6 cards. If CURATED IMAGES provides feature URLs, use them as card images. Otherwise: inline SVG icon (32-48px) + title + description. Use .card class.
+4. Features — .grid-3 with 6 cards. Each: inline SVG icon (40-48px, viewBox="0 0 24 24", stroke="var(--color-primary)", stroke-width="2", fill="none") + title + description. Use .card class. Do NOT use Pexels or picsum for feature cards.
    * REAL ESTATE: Use .property-grid > .property-card with property photos from CURATED IMAGES if provided
 5. About — two-column: image left (with floating highlight stat), text right with heading + paragraph + 4 checkmark benefits
 6. Process — 3-4 numbered steps with icons, connecting lines/arrows
 7. Portfolio/Gallery — .image-gallery with 4-6 project images + captions
 8. Testimonials — 3x .testimonial-card with ★★★★★, detailed quote, avatar, name, role
-9. Stats — 4x .stat-item with large colored numbers
+9. Stats — dark section (style="background:#1e293b;color:#fff;padding:80px 24px"). 4x .stat-item. CRITICAL: .stat-number MUST have style="color:#fff" (default is primary color = invisible on dark). .stat-label: style="color:rgba(255,255,255,0.7)"
 10. Pricing — 3 pricing tiers with highlighted "Popular" middle tier
 11. FAQ — 5x .faq-item accordion
-12. CTA — bold colored background, compelling heading, .btn-primary.btn-lg + .btn-secondary.btn-lg, trust line
-13. Footer — dark bg, 4 columns: about, services, contact, social. Copyright bottom.
+12. CTA — style="background:var(--color-primary);color:#fff;padding:100px 24px;text-align:center". Headlines: style="color:#fff". Button: INVERTED style="background:#fff;color:var(--color-primary)" — do NOT use .btn-primary (invisible on primary bg).
+13. Footer — style="background:#111827;color:rgba(255,255,255,0.85)". 4 columns. ALL text white/light. Headings: style="color:#fff". Links: style="color:rgba(255,255,255,0.6)".
 
 ## BUTTON TEXT — CRITICAL
 .btn-primary gets color:#fff from the component library. NEVER override button color with inline styles. If you use custom button styles, always set color:#fff on colored backgrounds.

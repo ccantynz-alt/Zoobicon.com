@@ -1081,8 +1081,16 @@ function BuilderPage() {
     };
 
     try {
-      // Instant mode uses /api/generate/instant (3s scaffold), Classic uses /api/generate/quick
-      const endpoint = instantMode ? "/api/generate/instant" : "/api/generate/quick";
+      // Route selection:
+      // - Instant mode: /api/generate/instant (3s scaffold)
+      // - Premium/Opus: /api/generate/stream (complete HTML — Opus doesn't follow config/body-html format)
+      // - Standard/Sonnet: /api/generate/quick (config + body-html split — works great with prefill)
+      const isOpusBuild = tier === "premium" || selectedModel?.includes("opus");
+      const endpoint = instantMode
+        ? "/api/generate/instant"
+        : isOpusBuild
+        ? "/api/generate/stream"
+        : "/api/generate/quick";
       setPipelineAgents([
         instantMode
           ? "Instant scaffold loading..."
@@ -1099,7 +1107,7 @@ function BuilderPage() {
           tier,
           ...(selectedModel ? { model: selectedModel } : {}),
           ...(isAdmin ? { isAdmin: true } : {}),
-          ...(generatorBanner ? { generatorType: generatorBanner.id } : {}),
+          ...(generatorBanner ? { generatorType: generatorBanner.id, generator: generatorBanner.id } : {}),
           ...(agencyBrand ? { agencyBrand } : {}),
             ...(agencyId ? { agencyId } : {}),
         }),

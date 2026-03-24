@@ -121,12 +121,31 @@ ${script ? `USER'S SCRIPT/BRIEF:\n${script}` : `No script provided. Generate a c
 
 Generate the complete storyboard as JSON.`;
 
-    const response = await callLLMWithFailover({
-      model: "claude-sonnet-4-6",
-      system: systemPrompt,
-      userMessage,
-      maxTokens: 8192,
-    });
+    let response;
+    try {
+      response = await callLLMWithFailover({
+        model: "claude-sonnet-4-6",
+        system: systemPrompt,
+        userMessage,
+        maxTokens: 8192,
+      });
+    } catch {
+      // If all providers fail, try Haiku as last resort (storyboard is just JSON planning)
+      const Anthropic = (await import("@anthropic-ai/sdk")).default;
+      const apiKey = process.env.ANTHROPIC_API_KEY;
+      if (!apiKey) {
+        return Response.json({ error: "AI service is temporarily unavailable." }, { status: 503 });
+      }
+      const client = new Anthropic({ apiKey });
+      const res = await client.messages.create({
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: 8192,
+        system: systemPrompt,
+        messages: [{ role: "user", content: userMessage }],
+      });
+      const text = res.content.find((b) => b.type === "text")?.text || "";
+      response = { text, model: "claude-haiku-4-5-20251001", provider: "claude" as const };
+    }
 
     // Parse the JSON response
     let parsed;
