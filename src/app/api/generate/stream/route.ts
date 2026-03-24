@@ -40,19 +40,22 @@ If NO curated image URLs are provided, use these fallbacks:
 
 ## BODY SECTIONS — WRITE ALL 11 OF THESE
 1. <nav> — sticky, backdrop-filter:blur, logo left + links + .btn-primary.btn-sm CTA right. Background: color-mix(in srgb, var(--color-bg) 85%, transparent)
-2. Hero — split layout: text left (badge pill, h1, p, two buttons, trust checkmarks) + visual right side. If CURATED IMAGES provides a hero URL, use it as a large image. Otherwise: TECH/SAAS/CYBER → .hero-aurora or .hero-mesh with centered SVG icon. Other → CSS gradient with brand colors. NEVER use picsum for hero. NEVER plain white/empty.
+2. Hero — split layout: text left (badge pill, h1, p, two buttons, trust checkmarks) + visual right side. If CURATED IMAGES provides a hero URL, use it as a large image. Otherwise: DARK themes → .hero-aurora or .hero-mesh with centered SVG icon. LIGHT themes → bold CSS gradient with brand colors (linear-gradient). NOTE: .hero-aurora/.hero-mesh are nearly invisible on light backgrounds — only use them with dark --color-bg. NEVER use picsum for hero. NEVER plain white/empty.
 3. Social proof / Logo strip — company names or trust metrics in a horizontal strip
-4. Features — section heading + .grid-3 with 6 cards. If CURATED IMAGES provides feature URLs, use them as card images. Otherwise: each card gets an inline SVG icon (32-48px) + title + description. Use .card class.
+4. Features — section heading + .grid-3 with 6 cards. Each card gets an inline SVG icon (40-48px, viewBox="0 0 24 24", stroke="var(--color-primary)", stroke-width="2", fill="none") + title + description. Use .card class. Do NOT use Pexels or picsum for feature cards.
 5. About — two-column: image left (with floating stat overlay), text right with heading + paragraph + 4 checkmark benefits
 6. Process/How it works — 3-4 numbered steps with icons and connecting lines/arrows
 7. Testimonials — 3x .testimonial-card with star ratings (★★★★★), quote text, avatar image, name, role
-8. Stats — 4x .stat-item with large colored numbers and labels
+8. Stats — dark background section (style="background:#1e293b;color:#fff;padding:80px 24px"). 4x .stat-item. CRITICAL: .stat-number defaults to primary color which is INVISIBLE on dark bg — add style="color:#fff" to every .stat-number. .stat-label gets style="color:rgba(255,255,255,0.7)".
 9. FAQ — 4-5 .faq-item accordion questions with answers. Use .faq-question and .faq-answer classes.
-10. CTA — colored background (var(--color-bg-alt) or gradient), compelling heading, .btn-primary.btn-lg + .btn-secondary.btn-lg, trust line below
-11. Footer — dark background, 4 columns: about blurb, services links, contact info (phone/email/address), social links. Copyright at bottom.
+10. CTA — Use style="background:var(--color-primary);color:#fff;padding:80px 24px;text-align:center". Headlines: style="color:#fff". Body: style="color:rgba(255,255,255,0.8)". Button: INVERTED (style="background:#fff;color:var(--color-primary)") — do NOT use .btn-primary on a primary-bg section (invisible).
+11. Footer — style="background:#111827;color:rgba(255,255,255,0.85);padding:60px 24px". 4 columns: about blurb, services links, contact info, social links. ALL text white/light. Headings: style="color:#fff". Links: style="color:rgba(255,255,255,0.6)".
 
-## BUTTON TEXT — CRITICAL
-All .btn-primary elements MUST be visible. The component library sets color:#fff on .btn-primary. If you add inline styles to buttons, NEVER override color. If you use custom button styles instead of .btn-primary, always set color:#fff explicitly on dark/colored backgrounds.
+## CONTRAST RULES — ZERO TOLERANCE FOR INVISIBLE TEXT
+- .btn-primary text is white via CSS. NEVER add inline style="color:..." to .btn-primary buttons.
+- .btn-primary on a primary-colored background is INVISIBLE. Use inverted button: style="background:#fff;color:var(--color-primary)".
+- .stat-number on dark backgrounds: MUST have style="color:#fff" (default is primary color = invisible on dark).
+- Dark sections (stats, CTA, footer): ALL text needs explicit style="color:#fff" or style="color:rgba(255,255,255,0.8)". NEVER rely on CSS variable inheritance — it won't apply to dark-bg sections.
 
 ## INDUSTRY AESTHETIC
 - Real Estate: Navy+gold (#1a365d + #c9a96e), serif headings, full-bleed property photos, .property-grid

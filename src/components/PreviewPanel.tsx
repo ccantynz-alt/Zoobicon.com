@@ -564,9 +564,10 @@ export default function PreviewPanel({
   }
 
   // Safety check — if html exists but doesn't look like valid HTML, show diagnostic
-  const looksLikeHtml = html.includes("<html") || html.includes("<!doctype") || html.includes("<!DOCTYPE");
+  // Skip this check during generation — streamed chunks may not have full HTML structure yet
+  const looksLikeHtml = html.includes("<html") || html.includes("<!doctype") || html.includes("<!DOCTYPE") || html.includes("<body") || html.includes("<nav") || html.includes("<section");
 
-  if (!looksLikeHtml && html.length > 0) {
+  if (!looksLikeHtml && html.length > 0 && !isGenerating) {
     return (
       <div className="h-full overflow-auto bg-gray-950 p-6">
         <div className="bg-yellow-900/30 border border-yellow-600/40 rounded-lg p-4 mb-4">
