@@ -21,7 +21,10 @@ export type NotificationType =
   | "traffic_spike"
   | "booking_reminder"
   | "invoice_paid"
-  | "subscriber_milestone";
+  | "subscriber_milestone"
+  | "admin_email"
+  | "support_ticket"
+  | "support_reply";
 
 export interface Notification {
   id: string;

@@ -5,6 +5,7 @@ import {
   parseInboundEmail,
 } from "@/lib/mailgun";
 import { notifyNewTicket } from "@/lib/admin-notify";
+import { emitEmailNotification } from "@/lib/email-notifications";
 
 // ---------------------------------------------------------------------------
 // GET /api/email/webhook — Diagnostic endpoint (check if webhook is reachable)
@@ -177,6 +178,17 @@ export async function POST(req: NextRequest) {
           SET status = 'open', updated_at = NOW()
           WHERE id = ${existingTicketId}
         `;
+
+        // Push real-time notification to admin browsers
+        emitEmailNotification({
+          id: `email_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+          type: "support_reply",
+          from: email.from,
+          fromName: email.fromName || email.from.split("@")[0],
+          subject: email.subject,
+          preview: (email.strippedText || email.bodyText || "").slice(0, 150),
+          timestamp: Date.now(),
+        });
       } else {
         const ticketNumber = await nextTicketNumber();
         const rows = await sql`
@@ -190,6 +202,18 @@ export async function POST(req: NextRequest) {
           INSERT INTO support_messages (ticket_id, sender, body_text, body_html, attachments)
           VALUES (${ticketId}, 'customer', ${email.strippedText}, ${email.bodyHtml}, ${JSON.stringify(email.attachments)})
         `;
+
+        // Push real-time notification to admin browsers
+        emitEmailNotification({
+          id: `email_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+          type: "support_ticket",
+          from: email.from,
+          fromName: email.fromName || email.from.split("@")[0],
+          subject: email.subject,
+          preview: (email.strippedText || email.bodyText || "").slice(0, 150),
+          ticketNumber,
+          timestamp: Date.now(),
+        });
 
         // Notify owner about new ticket (non-blocking)
         notifyNewTicket({
@@ -213,6 +237,17 @@ export async function POST(req: NextRequest) {
         INSERT INTO email_inbound (mailbox_address, from_address, to_address, subject, text_body, html_body)
         VALUES (${effectiveRecipient}, ${email.from}, ${effectiveRecipient}, ${email.subject}, ${email.bodyText}, ${email.bodyHtml})
       `;
+
+      // Push real-time notification to admin browsers
+      emitEmailNotification({
+        id: `email_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+        type: "admin_email",
+        from: email.from,
+        fromName: email.fromName || email.from.split("@")[0],
+        subject: email.subject,
+        preview: (email.bodyText || email.strippedText || "").slice(0, 150),
+        timestamp: Date.now(),
+      });
     }
 
     lastWebhookAttempt.result = `success — stored as ${isSupport ? "support ticket" : "inbox email"}`;

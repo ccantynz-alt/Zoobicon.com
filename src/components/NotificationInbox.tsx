@@ -16,6 +16,9 @@ import {
   Info,
   Check,
   X,
+  Mail,
+  Headphones,
+  Reply,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -29,7 +32,7 @@ import {
 
 // ── Icon mapping ──
 
-const NOTIFICATION_ICONS: Record<NotificationType, typeof Eye> = {
+const NOTIFICATION_ICONS: Partial<Record<NotificationType, typeof Eye>> = {
   site_views: Eye,
   deploy_success: Rocket,
   achievement: Trophy,
@@ -40,9 +43,12 @@ const NOTIFICATION_ICONS: Record<NotificationType, typeof Eye> = {
   referral: UserPlus,
   challenge: Flag,
   system: Info,
+  admin_email: Mail,
+  support_ticket: Headphones,
+  support_reply: Reply,
 };
 
-const NOTIFICATION_COLORS: Record<NotificationType, string> = {
+const NOTIFICATION_COLORS: Partial<Record<NotificationType, string>> = {
   site_views: "#06b6d4",
   deploy_success: "#22c55e",
   achievement: "#eab308",
@@ -53,6 +59,9 @@ const NOTIFICATION_COLORS: Record<NotificationType, string> = {
   referral: "#22c55e",
   challenge: "#ec4899",
   system: "#94a3b8",
+  admin_email: "#f59e0b",
+  support_ticket: "#ef4444",
+  support_reply: "#8b5cf6",
 };
 
 // ── Time-ago helper ──
@@ -211,8 +220,8 @@ export default function NotificationInbox() {
                 </div>
               ) : (
                 notifications.map((notif) => {
-                  const IconComponent = NOTIFICATION_ICONS[notif.type];
-                  const iconColor = NOTIFICATION_COLORS[notif.type];
+                  const IconComponent = NOTIFICATION_ICONS[notif.type] || Info;
+                  const iconColor = NOTIFICATION_COLORS[notif.type] || "#94a3b8";
 
                   const content = (
                     <div
