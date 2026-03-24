@@ -470,35 +470,28 @@ Output the <config> block first, then the <body-html> block. Nothing else.`;
           // Prepend prefill for non-Opus models so parsing regexes still match
           let accumulated = isOpus ? "" : "<config>\n{";
           let bodyStarted = false;
-          let bodyContent = "";
-          // Throttle preview updates to avoid overwhelming the client
-          let lastSendTime = 0;
-          const SEND_INTERVAL = 300; // ms between preview updates
+          let chunkCount = 0;
+          let lastStatusTime = 0;
 
           for await (const ev of stream) {
             if (ev.type === "content_block_delta" && ev.delta.type === "text_delta") {
               accumulated += ev.delta.text;
-              // Stream body-html chunks to client for live preview
-              // Wrap in a minimal HTML shell so the preview can render them properly
-              if (accumulated.includes("<body-html>")) {
+              chunkCount++;
+
+              // Track when body content begins (after <body-html> tag)
+              if (!bodyStarted && accumulated.includes("<body-html>")) {
+                bodyStarted = true;
+                sendEvent({ type: "status", message: "Writing content..." });
+              }
+
+              // Send periodic status updates so the user knows it's working
+              const now = Date.now();
+              if (now - lastStatusTime >= 3000) {
+                lastStatusTime = now;
                 if (!bodyStarted) {
-                  bodyStarted = true;
-                  bodyContent = accumulated.split("<body-html>")[1] || "";
-                } else {
-                  bodyContent += ev.delta.text;
-                }
-                const now = Date.now();
-                if (now - lastSendTime >= SEND_INTERVAL) {
-                  lastSendTime = now;
-                  const previewHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><style>${COMPONENT_LIBRARY_CSS}\n:root{--color-primary:#6366f1;--color-bg:#0f172a;--color-bg-alt:#1e293b;--color-surface:#1e293b;--color-text:#e2e8f0;--color-text-muted:#94a3b8;--color-border:#334155;--color-accent:#8b5cf6;--font-heading:system-ui;--font-body:system-ui}body{background:var(--color-bg);color:var(--color-text);font-family:var(--font-body)}</style></head><body>${bodyContent}</body></html>`;
-                  sendEvent({ type: "replace", content: previewHtml });
-                }
-              } else {
-                // Config phase — send status updates
-                const now = Date.now();
-                if (!bodyStarted && now - lastSendTime >= 2000) {
-                  lastSendTime = now;
                   sendEvent({ type: "status", message: "Planning design system..." });
+                } else if (chunkCount % 100 === 0) {
+                  sendEvent({ type: "status", message: "Building sections..." });
                 }
               }
             }
@@ -629,6 +622,40 @@ Output the <config> block first, then the <body-html> block. Nothing else.`;
 
           // Post-process: replace any picsum URLs the AI used despite instructions
           bodyHtml = replacePicsumUrls(bodyHtml, prompt);
+
+          // Final body text check
+          const finalBodyText = bodyHtml.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+
+          if (finalBodyText.length < 50) {
+            // Body is essentially empty — check if the raw output is a complete HTML doc
+            // (Opus/Sonnet sometimes output <!DOCTYPE html> instead of <config>+<body-html>)
+            console.warn(`[Quick] Body still empty after parsing (${finalBodyText.length} chars), checking raw output`);
+            const rawHasDoctype = /<!doctype\s+html/i.test(raw);
+            const rawBodyMatch = raw.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+            const rawBodyText = rawBodyMatch ? rawBodyMatch[1].replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim() : "";
+
+            if (rawHasDoctype && rawBodyText.length > 100) {
+              // The AI output complete HTML — use it directly with component library injection
+              console.log(`[Quick] Fallback: using raw HTML output (${rawBodyText.length} chars body text)`);
+              let fallbackHtml = raw;
+              // Inject component library if not present
+              if (!fallbackHtml.includes("ZOOBICON COMPONENT LIBRARY")) {
+                const { injectComponentLibrary } = await import("@/lib/component-library");
+                fallbackHtml = injectComponentLibrary(fallbackHtml);
+              }
+              fallbackHtml = replacePicsumUrls(fallbackHtml, prompt);
+              sendEvent({ type: "replace", content: fallbackHtml });
+              sendEvent({ type: "done" });
+              controller.close();
+              return;
+            }
+
+            // Both parsing and fallback failed — send error instead of empty page
+            console.error("[Quick] CRITICAL: All attempts produced empty body");
+            sendEvent({ type: "error", message: "Generation produced an empty page. Please try again." });
+            controller.close();
+            return;
+          }
 
           // Build the complete page
           const fullPage = buildFullPage(config, bodyHtml);
