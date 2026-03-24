@@ -54,3 +54,4 @@ export {
 import "./site-monitor";
 import "./support-responder";
 import "./intel-monitor";
+import "./email-campaign";
