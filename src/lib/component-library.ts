@@ -185,7 +185,7 @@ ul, ol { list-style: none; }
 }
 .testimonial-card::before {
   content: '\\201C'; position: absolute; top: 1rem; left: 1.5rem;
-  font-size: 4rem; line-height: 1; color: var(--color-primary, #2563eb); opacity: 0.15;
+  font-size: 4rem; line-height: 1; color: var(--color-primary, #2563eb); opacity: 0.25;
   font-family: Georgia, serif;
 }
 .testimonial-stars { color: #f59e0b; letter-spacing: 0.1em; }
@@ -209,15 +209,17 @@ ul, ol { list-style: none; }
 }
 .faq-question:hover { color: var(--color-primary, #2563eb); }
 .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease; }
-.faq-answer.open { max-height: 500px; padding-bottom: 1.25rem; }
+.faq-answer.open { max-height: 2000px; padding-bottom: 1.25rem; }
 .faq-answer p { color: var(--color-text-muted, #64748b); line-height: 1.7; }
 
 /* ── Social Proof Bar ── */
 .logo-strip {
   display: flex; align-items: center; justify-content: center; gap: 3rem;
-  padding: 2rem; opacity: 0.4; filter: grayscale(100%);
+  padding: 2rem; opacity: 0.6; filter: grayscale(100%);
   flex-wrap: wrap;
+  transition: opacity 0.3s;
 }
+.logo-strip:hover { opacity: 0.85; }
 .logo-strip img { height: 28px; object-fit: contain; }
 
 /* ── Hero System ── */
@@ -235,11 +237,11 @@ ul, ol { list-style: none; }
   content: ''; position: absolute; inset: -50%;
   background: conic-gradient(
     from 0deg at 50% 50%,
-    color-mix(in srgb, var(--color-primary, #2563eb) 30%, transparent),
+    color-mix(in srgb, var(--color-primary, #2563eb) 50%, transparent),
+    color-mix(in srgb, var(--color-primary, #2563eb) 20%, transparent),
     color-mix(in srgb, var(--color-primary, #2563eb) 10%, transparent),
-    color-mix(in srgb, var(--color-primary, #2563eb) 5%, transparent),
-    color-mix(in srgb, var(--color-primary, #2563eb) 15%, transparent),
-    color-mix(in srgb, var(--color-primary, #2563eb) 30%, transparent)
+    color-mix(in srgb, var(--color-primary, #2563eb) 30%, transparent),
+    color-mix(in srgb, var(--color-primary, #2563eb) 50%, transparent)
   );
   animation: hero-aurora-spin 20s linear infinite;
   filter: blur(80px);
@@ -254,9 +256,9 @@ ul, ol { list-style: none; }
 .hero-mesh::before {
   content: ''; position: absolute; inset: 0; z-index: 0;
   background:
-    radial-gradient(ellipse 80% 60% at 20% 30%, color-mix(in srgb, var(--color-primary, #2563eb) 15%, transparent), transparent),
-    radial-gradient(ellipse 60% 80% at 80% 70%, color-mix(in srgb, var(--color-primary, #2563eb) 10%, transparent), transparent),
-    radial-gradient(ellipse 50% 50% at 50% 50%, color-mix(in srgb, var(--color-primary, #2563eb) 5%, transparent), transparent);
+    radial-gradient(ellipse 80% 60% at 20% 30%, color-mix(in srgb, var(--color-primary, #2563eb) 30%, transparent), transparent),
+    radial-gradient(ellipse 60% 80% at 80% 70%, color-mix(in srgb, var(--color-primary, #2563eb) 20%, transparent), transparent),
+    radial-gradient(ellipse 50% 50% at 50% 50%, color-mix(in srgb, var(--color-primary, #2563eb) 12%, transparent), transparent);
   animation: hero-mesh-drift 15s ease-in-out infinite alternate;
 }
 @keyframes hero-mesh-drift {
@@ -299,7 +301,6 @@ ul, ol { list-style: none; }
   background: linear-gradient(135deg, var(--color-primary, #2563eb), color-mix(in srgb, var(--color-primary, #2563eb) 60%, #8b5cf6));
   -webkit-background-clip: text; background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 30px color-mix(in srgb, var(--color-primary, #2563eb) 20%, transparent));
 }
 
 /* Floating elements — gentle bobbing animation */

@@ -280,22 +280,29 @@ const STANDARD_SECTIONS = `
 4. Features — <section class="section fade-in"> with .section-header (h2 + p) then .grid.grid-3 > .card > .card-body. Each card: inline SVG icon (24x24), <h3>, <p class="text-muted">. Write 6 cards.
 5. About — <section class="section section-alt fade-in"> with .grid.grid-2: one side = CSS gradient div (linear-gradient, 300px tall) with a large centered SVG icon, other side = story text + stats in .flex.gap-3 using .stat-item. If IMAGE GUIDANCE provides an about image URL, use that instead of the gradient.
 6. Testimonials — <section class="section fade-in"> with .section-header then .grid.grid-3 > .testimonial-card. Each: .testimonial-stars ("★★★★★"), <p> with specific quote mentioning metrics, <div> with name+title. 3 testimonials.
-7. Stats — <section class="section section-alt fade-in" with dark or accent background via inline style> with .grid.grid-4 > .stat-item. Use <div class="stat-number" data-target="NUMBER" data-suffix="+" data-prefix="">0</div> for animated counters + .stat-label. 4 stats.
+7. Stats — <section class="section section-alt fade-in" style="background:#1e293b;color:#fff;padding:80px var(--container-padding)"> with .grid.grid-4 > .stat-item. IMPORTANT: Add style="color:#fff" to EVERY .stat-number div (the component library defaults stat numbers to primary color which is unreadable on dark bg). Use <div class="stat-number" style="color:#fff" data-target="NUMBER" data-suffix="+" data-prefix="">0</div> for animated counters + .stat-label (also add style="color:rgba(255,255,255,0.7)" to labels). 4 stats.
 8. FAQ — <section class="section fade-in"> with .section-header then .faq-item > .faq-question (text + <span class="faq-icon">+</span>) + .faq-answer > p. Write 5 Q&As.
-9. CTA — <section class="section fade-in" with dark/accent background via inline style, text-center> Compelling headline, subtext, .btn-primary.btn-lg, trust line.
-10. Footer — <footer class="section fade-in" style="background:var(--color-text);color:#fff;padding:60px var(--container-padding)"> with .container > .grid.grid-4: about blurb, quick links, services, contact info.
+9. CTA — <section class="section fade-in" style="background:var(--color-primary);color:#fff;padding:80px var(--container-padding);text-align:center"> Compelling headline (style="color:#fff"), subtext (style="color:rgba(255,255,255,0.8)"), .btn.btn-lg with style="background:#fff;color:var(--color-primary)" (inverted button), trust line. NEVER use .btn-primary here — it would be invisible on the primary-colored background.
+10. Footer — <footer class="section fade-in" style="background:#111827;color:rgba(255,255,255,0.85);padding:60px var(--container-padding)"> with .container > .grid.grid-4: about blurb, quick links, services, contact info. ALL text in footer must be white/light — use style="color:rgba(255,255,255,0.6)" for muted text, style="color:#fff" for headings.
 
 ## IMAGE RULES — MANDATORY
 Do NOT use picsum.photos for hero, features, or testimonial avatars. Picsum returns random unrelated images.
 
 IMAGE SOURCES BY SECTION:
 - Hero: Use .hero-aurora or .hero-mesh CSS class for animated gradient background. Add 1-2 .hero-orb divs for glow. Do NOT use an <img> tag in the hero. If the user message includes CURATED IMAGES with a hero URL, use that instead.
-- Feature cards: Use inline SVG icons (24-48px) drawn with <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">. Do NOT use <img> tags for feature cards.
+- Feature cards: Use inline SVG icons (40-48px) drawn with <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">. Use stroke="var(--color-primary)" NOT "currentColor". Do NOT use <img> tags or Pexels URLs for feature cards.
 - About section: Use a CSS gradient background div OR an image URL from CURATED IMAGES if provided.
 - Testimonial avatars: Use https://randomuser.me/api/portraits/men/N.jpg or women/N.jpg (N=1-99, unique per person). Style: width:60px; height:60px; border-radius:50%; object-fit:cover.
 - Gallery/portfolio: ONLY here use https://picsum.photos/seed/KEYWORD/WIDTH/HEIGHT.
 
 ALWAYS include a descriptive alt="" attribute on every <img> tag.
+
+## CONTRAST RULES — ZERO TOLERANCE FOR INVISIBLE TEXT
+- On dark backgrounds (#1e293b, #111827, var(--color-primary)): ALL text MUST be white (#fff) or light. Add explicit style="color:#fff" or style="color:rgba(255,255,255,0.8)". NEVER rely on CSS variable inheritance for text color on dark sections.
+- On light backgrounds (#fff, #f8fafc): Text uses var(--color-text) — no override needed.
+- .btn-primary text is white — NEVER add inline color overrides to .btn-primary buttons.
+- .btn-primary on a primary-colored background is INVISIBLE. Use inverted button instead: style="background:#fff;color:var(--color-primary)".
+- .stat-number on dark backgrounds: MUST have style="color:#fff" (default is primary color = invisible).
 
 ## RULES
 - Output ONLY the <config> block and <body-html> block. Nothing else.
@@ -326,18 +333,18 @@ const PREMIUM_SECTIONS = `
 6. About/Story — <section class="section section-alt fade-in-left"> with .grid.grid-2. One side: large image. Other: founder story, mission, 3-4 stats inline using .stat-item.
 7. Process/How it works — <section class="section fade-in"> with .section-header then numbered steps (1→2→3→4) with icons in accent circles, connected by a subtle line. Each step: number badge, heading, description.
 8. Testimonials — <section class="section section-alt fade-in"> with .grid.grid-3 > .testimonial-card. Each: stars, DETAILED quote with specific metrics ("Increased conversion by 47% in 3 months"), avatar image from https://randomuser.me/api/portraits/men/N.jpg or women/N.jpg (60x60, border-radius:50%), name, title, company. 3 testimonials.
-9. Stats — <section class="section fade-in" with subtle accent background (e.g. deep navy #1e3a5f or brand primary, NOT neon) via inline style, white text> with .grid.grid-4 > .stat-item. Use animated counters: <div class="stat-number" data-target="NUMBER" data-suffix="%" data-prefix="">0</div>. 4 impressive stats.
+9. Stats — <section class="section fade-in" style="background:#1e293b;color:#fff;padding:80px var(--container-padding)"> with .grid.grid-4 > .stat-item. CRITICAL: Add style="color:#fff" to EVERY .stat-number div (component library defaults to primary color = invisible on dark bg). Use <div class="stat-number" style="color:#fff" data-target="NUMBER" data-suffix="%" data-prefix="">0</div>. Labels: style="color:rgba(255,255,255,0.7)". 4 impressive stats.
 10. Pricing — <section class="section section-alt fade-in"> with .section-header then .grid.grid-3 for 3 pricing tiers. Middle card gets scale(1.05), accent border, "Most Popular" .badge-primary. Each: price, feature list with checkmarks (✓), CTA button.
 11. FAQ — <section class="section fade-in"> with .section-header then .faq-item > .faq-question (text + <span class="faq-icon">+</span>) + .faq-answer > p. 6 Q&As handling real objections.
-12. Final CTA — <section class="section fade-in" with dramatic dark/gradient background via inline style, centered text, light colors> Big emotional headline, urgency line, .btn-primary.btn-lg, trust badges ("30-day guarantee • No credit card • Cancel anytime").
-13. Footer — <footer class="section" style="background:var(--color-text);color:rgba(255,255,255,0.9);padding:80px var(--container-padding) 40px"> with .container > .grid.grid-4: about + newsletter .input, nav links, services, contact + social icons. Bottom: copyright bar.
+12. Final CTA — <section class="section fade-in" style="background:var(--color-primary);color:#fff;padding:100px var(--container-padding);text-align:center"> Big emotional headline (style="color:#fff"), urgency line (style="color:rgba(255,255,255,0.8)"), .btn.btn-lg with style="background:#fff;color:var(--color-primary)" (inverted = high contrast), trust badges (style="color:rgba(255,255,255,0.6)"). NEVER use .btn-primary on a primary-colored background — invisible.
+13. Footer — <footer class="section" style="background:#111827;color:rgba(255,255,255,0.85);padding:80px var(--container-padding) 40px"> with .container > .grid.grid-4: about + newsletter .input, nav links, services, contact + social icons. ALL text white/light. Headings: style="color:#fff". Links: style="color:rgba(255,255,255,0.6)". Bottom: copyright bar.
 
 ## IMAGE RULES — MANDATORY
 Do NOT use picsum.photos for hero, features, or testimonial avatars. Picsum returns random unrelated images.
 
 IMAGE SOURCES BY SECTION:
 - Hero: Already uses .hero-aurora/.hero-mesh CSS class — NO external image needed.
-- Feature cards: Use inline SVG icons in tinted accent circles. Do NOT use <img> tags.
+- Feature cards: Use inline SVG icons (40-48px) in tinted accent circles (via inline style background). stroke="var(--color-primary)" stroke-width="2". Do NOT use <img> tags or Pexels URLs.
 - About/story image: Use CSS gradient background div (matching brand colors) with large SVG icon. If CURATED IMAGES provides an about URL, use that.
 - Process step: Use numbered divs with accent circle backgrounds. No <img> needed.
 - Testimonial avatars: https://randomuser.me/api/portraits/men/N.jpg or women/N.jpg (N=1-99, unique per person). 60x60px, border-radius:50%, object-fit:cover.
@@ -352,6 +359,12 @@ ALWAYS include a descriptive alt="" attribute on every <img> tag.
 - Copy should handle objections, build trust, and create urgency
 - The overall feel should be "high-end agency" — lots of whitespace, big typography, confident copy, LIGHT backgrounds with pops of color
 - Think Apple.com or Stripe.com — clean, white, spacious. NOT dark/neon/cyberpunk.
+
+## CONTRAST RULES — ZERO TOLERANCE FOR INVISIBLE TEXT
+- On dark backgrounds (#1e293b, #111827, var(--color-primary)): ALL text MUST be white (#fff) or light. Add explicit style="color:#fff". NEVER rely on CSS variable inheritance.
+- .btn-primary on a primary-colored background is INVISIBLE. Use inverted: style="background:#fff;color:var(--color-primary)".
+- .stat-number on dark backgrounds: MUST have style="color:#fff" (default is primary color = invisible).
+- NEVER add inline style="color:..." to .btn-primary buttons — it overrides the white text.
 
 ## RULES
 - Output ONLY the <config> block and <body-html> block. Nothing else.
