@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { sql } from "@/lib/db";
 import { notifySiteDeployed } from "@/lib/admin-notify";
 import { getCreatorBadgeHTML } from "@/components/CreatorBadge";
+import { submitDeployedSite } from "@/lib/search-engine-submit";
 
 function slugify(name: string): string {
   return name
@@ -107,6 +108,9 @@ export async function POST(req: NextRequest) {
       slug,
       email,
     }).catch(() => {});
+
+    // Auto-submit to search engines (fire-and-forget)
+    submitDeployedSite(slug).catch(() => {});
 
     return Response.json({
       deploymentId: deployment.id,
