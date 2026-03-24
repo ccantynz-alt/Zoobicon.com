@@ -94,8 +94,15 @@ export async function POST(request: NextRequest) {
             SET subscription_status = ${status}, updated_at = NOW()
             WHERE stripe_subscription_id = ${sub.id}
           `;
+        } else if (status === "past_due" || status === "unpaid") {
+          // Payment pending — keep existing plan but update status so UI can show warning
+          await sql`
+            UPDATE users
+            SET subscription_status = ${status}, updated_at = NOW()
+            WHERE stripe_subscription_id = ${sub.id}
+          `;
         } else {
-          // Past due or other non-active status — downgrade to free
+          // Canceled, incomplete_expired, or other terminal status — downgrade to free
           await sql`
             UPDATE users
             SET plan = 'free', subscription_status = ${status}, updated_at = NOW()
