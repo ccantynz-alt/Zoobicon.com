@@ -350,7 +350,9 @@ ${imageBlock}`;
     const readable = new ReadableStream({
       async start(controller) {
         try {
-          let accumulated = prefill;
+          // Don't include prefill in accumulated — the model's output already starts with DOCTYPE
+          // Prefill is only sent as the initial client chunk for faster perceived start
+          let accumulated = "";
 
           // Send the prefill as the first chunk so the client has it
           if (prefill) {
@@ -389,21 +391,8 @@ ${imageBlock}`;
                 .trim()
             : "";
 
-          // Inject component library CSS into the final HTML (both new builds and edits)
-          // For edits: we stripped the library before sending to the AI, now re-inject it
-          // For new builds: the AI was told "component library is auto-injected"
-          // Replace any picsum.photos URLs with industry-relevant Unsplash photos
-          accumulated = replacePicsumUrls(accumulated, prompt);
-
-          if (!accumulated.includes("ZOOBICON COMPONENT LIBRARY")) {
-            // Remove the placeholder comment if present
-            accumulated = accumulated.replace(/\/\* \[component library auto-injected\] \*\/\n?/g, '');
-            accumulated = injectComponentLibrary(accumulated);
-            controller.enqueue(
-              encoder.encode(`data: ${JSON.stringify({ type: "replace", content: accumulated })}\n\n`)
-            );
-          }
-
+          // Validate body FIRST — if empty, retry before injecting component library
+          // This prevents sending a broken empty-but-styled page to the client
           if (isEdit && (bodyText.length < 50 || !hasBodyTag)) {
             // Edit response lost the body — the AI spent all tokens on CSS/head and truncated
             // Instead of replacing with broken HTML, send error so client preserves original code
@@ -492,6 +481,20 @@ Output ONLY raw HTML.`
             }
           }
 
+          // Inject component library CSS into the final HTML (both new builds and edits)
+          // For edits: we stripped the library before sending to the AI, now re-inject it
+          // For new builds: the AI was told "component library is auto-injected"
+          // Replace any picsum.photos URLs with industry-relevant Unsplash photos
+          accumulated = replacePicsumUrls(accumulated, prompt);
+
+          if (!accumulated.includes("ZOOBICON COMPONENT LIBRARY")) {
+            accumulated = accumulated.replace(/\/\* \[component library auto-injected\] \*\/\n?/g, '');
+            accumulated = injectComponentLibrary(accumulated);
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify({ type: "replace", content: accumulated })}\n\n`)
+            );
+          }
+
           // Track successful usage
           trackUsage(auth.user.email, usageType).catch((err) => console.error("[Usage] Failed to track:", err));
 
@@ -520,8 +523,10 @@ Output ONLY raw HTML.`
                 }
               );
               if (failoverRes.text) {
+                // Inject component library into failover output — GPT/Gemini don't know about our classes
+                const injectedFailover = injectComponentLibrary(replacePicsumUrls(failoverRes.text, prompt));
                 controller.enqueue(
-                  encoder.encode(`data: ${JSON.stringify({ type: "replace", content: failoverRes.text })}\n\n`)
+                  encoder.encode(`data: ${JSON.stringify({ type: "replace", content: injectedFailover })}\n\n`)
                 );
                 controller.enqueue(
                   encoder.encode(`data: ${JSON.stringify({ type: "done" })}\n\n`)

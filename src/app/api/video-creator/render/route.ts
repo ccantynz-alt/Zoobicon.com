@@ -46,28 +46,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Quota enforcement
-    if (email) {
-      await ensureVideoUsageTable();
-      const limits = getVideoPlanLimits(plan || "free", !!hasAddon);
-      const usage = await getVideoUsage(email);
-      const overageCredits = await getOverageCredits(email);
-      const check = checkVideoQuota(usage, limits, "render", overageCredits);
-      if (!check.allowed) {
-        return Response.json(
-          { error: check.reason, quota: { current: check.current, limit: check.limit, remaining: check.remaining }, canBuyMore: true },
-          { status: 429 }
-        );
-      }
-      // Check if enough credits for all scenes
-      if (check.remaining < scenes.length) {
-        return Response.json(
-          { error: `Not enough render credits. Need ${scenes.length}, have ${check.remaining} remaining this month.`, quota: { current: check.current, limit: check.limit, remaining: check.remaining } },
-          { status: 429 }
-        );
-      }
-    }
-
     if (!style) {
       return Response.json({ error: "style is required" }, { status: 400 });
     }
@@ -85,9 +63,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log(`[video-creator/render] Starting ${scenes.length} scenes with provider: ${activeProvider}`);
-
-    // Validate scene images — Runway/Luma/Pika require publicly accessible HTTP URLs.
+    // Validate scene images BEFORE quota check — Runway/Luma/Pika require publicly accessible HTTP URLs.
     // Base64 data URIs (from Stability AI) cause "request too large" errors.
     const invalidScenes = scenes.filter(
       (s: { imageUrl?: string; sceneNumber: number }) =>
@@ -104,7 +80,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Also check that scenes requiring images actually have them
+    // Check that scenes requiring images actually have them
     const missingImages = scenes.filter(
       (s: { imageUrl?: string; sceneNumber: number }) => !s.imageUrl || !s.imageUrl.startsWith("http")
     );
@@ -117,6 +93,30 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Quota enforcement — check AFTER image validation so we count only renderable scenes
+    const renderableSceneCount = scenes.length - invalidScenes.length - missingImages.length;
+    if (email) {
+      await ensureVideoUsageTable();
+      const limits = getVideoPlanLimits(plan || "free", !!hasAddon);
+      const usage = await getVideoUsage(email);
+      const overageCredits = await getOverageCredits(email);
+      const check = checkVideoQuota(usage, limits, "render", overageCredits);
+      if (!check.allowed) {
+        return Response.json(
+          { error: check.reason, quota: { current: check.current, limit: check.limit, remaining: check.remaining }, canBuyMore: true },
+          { status: 429 }
+        );
+      }
+      if (check.remaining < renderableSceneCount) {
+        return Response.json(
+          { error: `Not enough render credits. Need ${renderableSceneCount}, have ${check.remaining} remaining this month.`, quota: { current: check.current, limit: check.limit, remaining: check.remaining } },
+          { status: 429 }
+        );
+      }
+    }
+
+    console.log(`[video-creator/render] Starting ${scenes.length} scenes with provider: ${activeProvider}`);
 
     // Pre-flight check: test the first scene only to validate the provider works
     // This prevents burning quota on a provider that will fail every time
@@ -156,7 +156,12 @@ export async function POST(req: NextRequest) {
     return Response.json({ ...result, quotaCharged: startedJobs });
   } catch (err) {
     console.error("[video-creator/render] Error:", err);
-    const message = err instanceof Error ? err.message : "Render failed";
+    const raw = err instanceof Error ? err.message : "";
+    let message = "Video rendering failed. Please try again.";
+    if (raw.toLowerCase().includes("rate limit") || raw.includes("429"))
+      message = "Render service is busy. Please wait a moment and try again.";
+    else if (raw.toLowerCase().includes("too_big") || raw.toLowerCase().includes("validation of body"))
+      message = "Video render request was too large. Try shorter scenes or regenerate images.";
     return Response.json({ error: message }, { status: 500 });
   }
 }

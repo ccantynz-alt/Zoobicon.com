@@ -865,7 +865,7 @@ function BuilderPage() {
                 return;
               }
             } catch {
-              // Skip malformed SSE lines
+              // Skip malformed SSE lines — non-JSON data lines are harmless
             }
           }
         };

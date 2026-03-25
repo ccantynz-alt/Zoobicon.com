@@ -144,10 +144,13 @@ export function generateSubtitles(
     if (currentChunk.trim()) chunks.push(currentChunk.trim());
   }
 
-  // Calculate timing
+  // Calculate timing — guard against divide-by-zero
   const totalWords = cleanScript.split(/\s+/).filter(Boolean).length;
+  if (totalWords === 0 || chunks.length === 0) {
+    return { entries: [], srt: "", vtt: "WEBVTT\n\n", totalDuration: totalDuration || 0 };
+  }
   const actualDuration = totalDuration > 0 ? totalDuration : (totalWords / wordsPerMinute) * 60;
-  const wordsPerSecond = totalWords / actualDuration;
+  const wordsPerSecond = totalWords / (actualDuration || 1); // Prevent NaN
 
   let currentTime = 0;
   const entries: SubtitleEntry[] = chunks.map((text, index) => {
@@ -272,6 +275,8 @@ function pad(n: number, width: number = 2): string {
 }
 
 function parseDurationSeconds(duration: string): number {
-  const match = duration.match(/(\d+)/);
-  return match ? parseInt(match[1], 10) : 5;
+  const match = duration.match(/(\d+\.?\d*)/);
+  const seconds = match ? parseFloat(match[1]) : 5;
+  // Clamp to reasonable range: 1s min, 600s (10 min) max
+  return Math.min(600, Math.max(1, seconds));
 }

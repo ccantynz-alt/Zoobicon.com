@@ -148,7 +148,10 @@ Write the script as JSON now.`;
     return Response.json(result);
   } catch (err) {
     console.error("[video-creator/script] Error:", err);
-    const message = err instanceof Error ? err.message : "Internal server error";
+    const raw = err instanceof Error ? err.message : "";
+    let message = "Script generation failed. Please try again.";
+    if (raw.toLowerCase().includes("rate limit") || raw.includes("429"))
+      message = "AI service is busy. Please wait a moment and try again.";
     return Response.json({ error: message }, { status: 500 });
   }
 }

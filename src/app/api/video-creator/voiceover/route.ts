@@ -89,7 +89,21 @@ export async function POST(req: NextRequest) {
     };
 
     if (mode === "per-scene" && scenes && scenes.length > 0) {
+      // Validate scenes have narration text
+      const scenesWithNarration = scenes.filter((s: { narration?: string }) => s.narration?.trim());
+      if (scenesWithNarration.length === 0) {
+        return Response.json(
+          { error: "No scenes have narration text. Add narration to at least one scene before generating voiceover." },
+          { status: 400 }
+        );
+      }
       const results = await generateSceneVoiceovers(scenes, config);
+      if (results.length === 0) {
+        return Response.json(
+          { error: "Voiceover generation failed for all scenes. Please try again." },
+          { status: 500 }
+        );
+      }
       if (email) {
         await incrementVideoUsage(email, "voiceover", results.length);
         await consumeOverageIfNeeded(email, plan, hasAddon, "voiceover", results.length);
@@ -114,7 +128,16 @@ export async function POST(req: NextRequest) {
     }
   } catch (err) {
     console.error("[video-creator/voiceover] Error:", err);
-    const message = err instanceof Error ? err.message : "Voiceover generation failed";
+    const raw = err instanceof Error ? err.message : "Voiceover generation failed";
+    // Sanitize error — never expose API keys, provider names, or internal details to user
+    let message = "Voiceover generation failed. Please try again.";
+    const lower = raw.toLowerCase();
+    if (lower.includes("rate limit") || lower.includes("429"))
+      message = "Voice service is busy. Please wait a moment and try again.";
+    else if (lower.includes("unavailable") || lower.includes("not available"))
+      message = "Voice generation is temporarily unavailable. Please try again later.";
+    else if (lower.includes("try again"))
+      message = raw; // Already user-friendly
     return Response.json({ error: message }, { status: 500 });
   }
 }
