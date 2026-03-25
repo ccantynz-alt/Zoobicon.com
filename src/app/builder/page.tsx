@@ -712,7 +712,7 @@ function BuilderPage() {
     try {
       const res = await fetch("/api/generate/images", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders(),
         body: JSON.stringify({ html, useAI }),
       });
       if (res.ok) {
@@ -757,10 +757,12 @@ function BuilderPage() {
         });
 
         if (!res.ok) {
-          // Check if this is a configuration error — don't retry, surface immediately
+          // Check if this is a non-retryable error — don't fallback, surface immediately
           try {
             const errData = await res.clone().json();
-            if (errData.error && (errData.error.includes("API_KEY") || errData.error.includes("not configured") || errData.error.includes("API key"))) {
+            const isNonRetryable = res.status === 401 || res.status === 403 || res.status === 429 ||
+              (errData.error && (errData.error.includes("API_KEY") || errData.error.includes("not configured") || errData.error.includes("API key")));
+            if (isNonRetryable && errData.error) {
               setError(cleanErrorMessage(errData.error));
               setStatus("error");
               return;
@@ -770,7 +772,7 @@ function BuilderPage() {
           // Fallback to non-streaming endpoint
           const fallbackRes = await fetch("/api/generate", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: authHeaders(),
             body: JSON.stringify({
               prompt: userPrompt,
               tier,
@@ -924,7 +926,7 @@ function BuilderPage() {
             try {
               const retryRes = await fetch("/api/generate", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: authHeaders(),
                 body: JSON.stringify({
                   prompt: userPrompt,
                   tier,
@@ -1101,7 +1103,7 @@ function BuilderPage() {
 
       const res = await fetch(endpoint, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders(),
         body: JSON.stringify({
           prompt: prompt.trim(),
           tier,
@@ -1458,7 +1460,7 @@ function BuilderPage() {
                 try {
                   const res = await fetch("/api/generate/project", {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: authHeaders(),
                     body: JSON.stringify({ prompt: prompt || "Convert the current site", framework: "nextjs" }),
                   });
                   if (res.ok) {
