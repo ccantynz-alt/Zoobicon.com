@@ -356,6 +356,21 @@ export default function VideoCreatorDashboard() {
   const [tiktokUploading, setTiktokUploading] = useState(false);
   const [tiktokStatus, setTiktokStatus] = useState("");
 
+  // HeyGen AI Spokesperson state
+  const [showSpokesperson, setShowSpokesperson] = useState(false);
+  const [spokespersonAvatarId, setSpokespersonAvatarId] = useState("Angela-inTshirt-20220820");
+  const [spokespersonVoiceId, setSpokespersonVoiceId] = useState("");
+  const [spokespersonFormat, setSpokespersonFormat] = useState<"portrait" | "landscape" | "square">("portrait");
+  const [spokespersonBg, setSpokespersonBg] = useState("#1a1a2e");
+  const [spokespersonGenerating, setSpokespersonGenerating] = useState(false);
+  const [spokespersonVideoId, setSpokespersonVideoId] = useState<string | null>(null);
+  const [spokespersonVideoUrl, setSpokespersonVideoUrl] = useState<string | null>(null);
+  const [spokespersonStatus, setSpokespersonStatus] = useState<string | null>(null);
+  const [spokespersonError, setSpokespersonError] = useState("");
+  const [heygenAvailable, setHeygenAvailable] = useState<boolean | null>(null);
+  const [heygenAvatars, setHeygenAvatars] = useState<{ id: string; name: string; gender: string; style: string; description: string }[]>([]);
+  const [heygenVoices, setHeygenVoices] = useState<{ voice_id: string; name: string; gender: string }[]>([]);
+
   // Auth check + addon/plan check
   useEffect(() => {
     try {
@@ -477,7 +492,98 @@ export default function VideoCreatorDashboard() {
       .then((r) => r.json())
       .then((d) => { if (d.templates) setTemplates(d.templates); })
       .catch(() => {});
+    // Check HeyGen availability + load presets
+    fetch("/api/video-creator/heygen")
+      .then((r) => r.json())
+      .then((d) => {
+        setHeygenAvailable(d.available ?? false);
+        if (d.presets) setHeygenAvatars(d.presets);
+      })
+      .catch(() => setHeygenAvailable(false));
   }, []);
+
+  // --- HeyGen Spokesperson Handlers ---
+  const handleSpokespersonGenerate = useCallback(async () => {
+    if (!script.trim()) { setSpokespersonError("Write a script first."); return; }
+    if (!spokespersonAvatarId) { setSpokespersonError("Select a presenter."); return; }
+
+    setSpokespersonGenerating(true);
+    setSpokespersonError("");
+    setSpokespersonVideoUrl(null);
+    setSpokespersonVideoId(null);
+    setSpokespersonStatus("starting");
+
+    try {
+      const res = await fetch("/api/video-creator/heygen", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          script: script.trim(),
+          avatarId: spokespersonAvatarId,
+          voiceId: spokespersonVoiceId || "1bd001e7e50f421d891986aad5158bc8", // default HeyGen voice
+          background: { type: "color", value: spokespersonBg },
+          format: spokespersonFormat,
+          caption: true,
+          test: false,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        setSpokespersonError(data.error || "Failed to start video generation.");
+        setSpokespersonGenerating(false);
+        setSpokespersonStatus(null);
+        return;
+      }
+
+      setSpokespersonVideoId(data.videoId);
+      setSpokespersonStatus("processing");
+
+      // Poll for completion
+      const pollInterval = setInterval(async () => {
+        try {
+          const statusRes = await fetch(`/api/video-creator/heygen?action=status&videoId=${data.videoId}`);
+          const statusData = await statusRes.json();
+
+          if (statusData.status === "completed" && statusData.videoUrl) {
+            clearInterval(pollInterval);
+            setSpokespersonVideoUrl(statusData.videoUrl);
+            setSpokespersonStatus("completed");
+            setSpokespersonGenerating(false);
+          } else if (statusData.status === "failed") {
+            clearInterval(pollInterval);
+            setSpokespersonError(statusData.error || "Video generation failed.");
+            setSpokespersonStatus("failed");
+            setSpokespersonGenerating(false);
+          }
+          // else still processing — keep polling
+        } catch {
+          // Network error — keep polling
+        }
+      }, 5000); // Check every 5 seconds
+
+      // Safety timeout — stop polling after 10 minutes
+      setTimeout(() => {
+        clearInterval(pollInterval);
+        if (spokespersonStatus === "processing") {
+          setSpokespersonError("Video is taking longer than expected. Check back in a few minutes.");
+          setSpokespersonGenerating(false);
+        }
+      }, 600000);
+    } catch {
+      setSpokespersonError("Failed to generate video. Please try again.");
+      setSpokespersonGenerating(false);
+      setSpokespersonStatus(null);
+    }
+  }, [script, spokespersonAvatarId, spokespersonVoiceId, spokespersonBg, spokespersonFormat, spokespersonStatus]);
+
+  const loadHeygenVoices = useCallback(async () => {
+    if (heygenVoices.length > 0) return;
+    try {
+      const res = await fetch("/api/video-creator/heygen?action=voices");
+      const data = await res.json();
+      if (data.voices) setHeygenVoices(data.voices);
+    } catch { /* ignore */ }
+  }, [heygenVoices.length]);
 
   const saveProject = useCallback((sb: Storyboard) => {
     const project: Project = {
@@ -1526,6 +1632,172 @@ export default function VideoCreatorDashboard() {
                     </select>
                   </div>
                 </div>
+              </motion.div>
+
+              {/* ── AI Spokesperson (HeyGen) ── */}
+              <motion.div initial="hidden" animate="visible" variants={fadeIn} className="space-y-2">
+                <button
+                  onClick={() => { setShowSpokesperson(!showSpokesperson); if (!showSpokesperson) loadHeygenVoices(); }}
+                  className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-purple-500/20 bg-purple-500/5 hover:bg-purple-500/10 transition-all text-left"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                      <Smile className="w-3.5 h-3.5 text-white" />
+                    </div>
+                    <div>
+                      <span className="text-xs font-semibold text-white">AI Spokesperson</span>
+                      <span className="text-[10px] text-purple-300/60 block">Real-looking presenter reads your script</span>
+                    </div>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 text-white/40 transition-transform ${showSpokesperson ? "rotate-180" : ""}`} />
+                </button>
+
+                <AnimatePresence>
+                  {showSpokesperson && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="rounded-xl border border-purple-500/15 bg-white/[0.03] p-3 space-y-3">
+                        {/* Avatar Selection */}
+                        <div>
+                          <label className="text-[10px] font-semibold text-white/70 uppercase tracking-wider mb-1.5 block">Choose Presenter</label>
+                          <div className="grid grid-cols-4 gap-1.5">
+                            {heygenAvatars.map((avatar) => (
+                              <button
+                                key={avatar.id}
+                                onClick={() => setSpokespersonAvatarId(avatar.id)}
+                                className={`p-2 rounded-lg border text-center transition-all ${
+                                  spokespersonAvatarId === avatar.id
+                                    ? "border-purple-500/50 bg-purple-500/10 ring-1 ring-purple-500/20"
+                                    : "border-white/[0.08] bg-white/[0.02] hover:border-white/20"
+                                }`}
+                              >
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 mx-auto mb-1 flex items-center justify-center text-white text-[10px] font-bold">
+                                  {avatar.name[0]}
+                                </div>
+                                <div className="text-[9px] font-semibold text-white/80 truncate">{avatar.name}</div>
+                                <div className="text-[8px] text-white/40">{avatar.style}</div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Voice Selection */}
+                        {heygenVoices.length > 0 && (
+                          <div>
+                            <label className="text-[10px] font-semibold text-white/70 uppercase tracking-wider mb-1.5 block">Voice</label>
+                            <select
+                              value={spokespersonVoiceId}
+                              onChange={(e) => setSpokespersonVoiceId(e.target.value)}
+                              className="w-full bg-white/[0.05] border border-white/[0.10] rounded-lg px-3 py-2 text-xs text-white/80 focus:border-purple-500/50 focus:outline-none"
+                            >
+                              <option value="">Default Voice</option>
+                              {heygenVoices.map((v) => (
+                                <option key={v.voice_id} value={v.voice_id}>
+                                  {v.name} ({v.gender})
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        )}
+
+                        {/* Format & Background */}
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="text-[10px] font-semibold text-white/70 uppercase tracking-wider mb-1 block">Format</label>
+                            <div className="flex gap-1">
+                              {([["portrait", Smartphone, "9:16"], ["landscape", Monitor, "16:9"], ["square", Square, "1:1"]] as const).map(([fmt, Icon, label]) => (
+                                <button
+                                  key={fmt}
+                                  onClick={() => setSpokespersonFormat(fmt)}
+                                  className={`flex-1 p-1.5 rounded-lg border text-center transition-all ${
+                                    spokespersonFormat === fmt
+                                      ? "border-purple-500/50 bg-purple-500/10"
+                                      : "border-white/[0.08] bg-white/[0.02] hover:border-white/20"
+                                  }`}
+                                >
+                                  <Icon className="w-3 h-3 mx-auto mb-0.5 text-white/60" />
+                                  <div className="text-[8px] text-white/60">{label}</div>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                          <div>
+                            <label className="text-[10px] font-semibold text-white/70 uppercase tracking-wider mb-1 block">Background</label>
+                            <div className="flex gap-1.5 items-center">
+                              <input
+                                type="color"
+                                value={spokespersonBg}
+                                onChange={(e) => setSpokespersonBg(e.target.value)}
+                                className="w-8 h-8 rounded border-0 cursor-pointer bg-transparent"
+                              />
+                              <span className="text-[10px] text-white/50 font-mono">{spokespersonBg}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Generate Spokesperson Video */}
+                        <button
+                          onClick={handleSpokespersonGenerate}
+                          disabled={spokespersonGenerating || !script.trim()}
+                          className="w-full py-2.5 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-[0.98]"
+                        >
+                          {spokespersonGenerating ? (
+                            <>
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              {spokespersonStatus === "processing" ? "Rendering video (~2 min)..." : "Starting..."}
+                            </>
+                          ) : (
+                            <>
+                              <Video className="w-3.5 h-3.5" />
+                              Generate Spokesperson Video
+                            </>
+                          )}
+                        </button>
+
+                        {/* Status / Video Result */}
+                        {spokespersonError && (
+                          <div className="text-[10px] text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-2.5 py-2">
+                            {spokespersonError}
+                          </div>
+                        )}
+
+                        {spokespersonVideoUrl && (
+                          <div className="space-y-2">
+                            <div className="text-[10px] font-semibold text-green-400 flex items-center gap-1">
+                              <Check className="w-3 h-3" /> Video Ready!
+                            </div>
+                            <video
+                              src={spokespersonVideoUrl}
+                              controls
+                              className="w-full rounded-lg border border-white/10"
+                              style={{ maxHeight: 300 }}
+                            />
+                            <a
+                              href={spokespersonVideoUrl}
+                              download
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center justify-center gap-1.5 w-full py-2 rounded-lg border border-white/[0.10] bg-white/[0.05] text-xs text-white/70 hover:text-white hover:bg-white/[0.10] transition-all"
+                            >
+                              <Download className="w-3 h-3" /> Download Video
+                            </a>
+                          </div>
+                        )}
+
+                        {heygenAvailable === false && (
+                          <div className="text-[10px] text-amber-400/80 bg-amber-500/10 border border-amber-500/15 rounded-lg px-2.5 py-2 flex items-start gap-1.5">
+                            <AlertCircle className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                            <span>AI spokesperson videos are coming soon. The script you write here will also be used for the storyboard pipeline below.</span>
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.div>
 
               {/* Generate Button */}
