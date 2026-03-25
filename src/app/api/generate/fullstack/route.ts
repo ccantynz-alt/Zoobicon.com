@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
+import { authenticateRequest, checkUsageQuota, trackUsage } from "@/lib/auth-guard";
 
 const FULLSTACK_SYSTEM = `You are Zoobicon, a world-class AI full-stack application generator. When given an app description, you produce a complete full-stack application with a database schema, API routes, and a premium interactive frontend.
 
@@ -100,6 +101,12 @@ You must produce a frontend that looks premium, sophisticated, and visually stun
 
 export async function POST(req: NextRequest) {
   try {
+    // Auth + quota enforcement — prevent unauthenticated abuse
+    const auth = await authenticateRequest(req, { requireAuth: true });
+    if (auth.error) return auth.error;
+    const quota = await checkUsageQuota(auth.user.email, auth.user.plan, "generation");
+    if (quota.error) return quota.error;
+
     const { prompt, tier } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {

@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
+import { authenticateRequest, checkUsageQuota, trackUsage } from "@/lib/auth-guard";
 
 const VARIANTS_SYSTEM = `You are Zoobicon, an AI website variant generator. When given a description, you produce multiple DISTINCT design variants of the same website. Each variant must be a complete, standalone HTML file with dramatically different visual approaches.
 
@@ -68,6 +69,12 @@ Each variant must look premium and professionally designed:
 
 export async function POST(req: NextRequest) {
   try {
+    // Auth + quota enforcement — prevent unauthenticated abuse
+    const auth = await authenticateRequest(req, { requireAuth: true });
+    if (auth.error) return auth.error;
+    const quota = await checkUsageQuota(auth.user.email, auth.user.plan, "generation");
+    if (quota.error) return quota.error;
+
     const { prompt, count } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {

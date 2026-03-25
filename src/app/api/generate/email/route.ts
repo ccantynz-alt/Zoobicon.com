@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
+import { authenticateRequest, checkUsageQuota, trackUsage } from "@/lib/auth-guard";
 
 const EMAIL_SYSTEM = `You are Zoobicon, an AI email template generator. When given a description, produce email-compatible HTML and a plain text version.
 
@@ -78,6 +79,12 @@ Output ONLY valid JSON. No markdown, no explanation, no code fences.
 
 export async function POST(req: NextRequest) {
   try {
+    // Auth + quota enforcement — prevent unauthenticated abuse
+    const auth = await authenticateRequest(req, { requireAuth: true });
+    if (auth.error) return auth.error;
+    const quota = await checkUsageQuota(auth.user.email, auth.user.plan, "generation");
+    if (quota.error) return quota.error;
+
     const { prompt, type } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
