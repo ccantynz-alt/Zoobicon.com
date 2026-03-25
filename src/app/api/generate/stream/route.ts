@@ -175,7 +175,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Auth + usage enforcement (runs early to fail fast before DB queries)
-    const auth = await authenticateRequest(req);
+    const auth = await authenticateRequest(req, { requireAuth: true, requireVerified: true });
     if (auth.error) return auth.error;
 
     // Agency generation quota check
@@ -299,9 +299,10 @@ ${imageBlock}`;
       { role: "user", content: userMessage + (!isEdit ? "\n\nIMPORTANT: Start your response IMMEDIATELY with <!DOCTYPE html> — no preamble, no explanation, no code fences. Output raw HTML only. Keep <style> under 30 lines — the component library handles all component styles. Spend 90% of your tokens on <body> content." : "") },
     ];
 
-    // For new builds, use assistant prefill to skip preamble and force HTML output structure.
-    // This saves tokens and prevents the model from wasting output on CSS-only content.
-    if (!isEdit) {
+    // Assistant prefill: skip preamble and force HTML output structure.
+    // NOTE: Opus 4.6 and non-Claude models do NOT support prefill — only use for Sonnet/Haiku.
+    const supportsAssistantPrefill = !model.includes("opus") && model.startsWith("claude-");
+    if (!isEdit && supportsAssistantPrefill) {
       messages.push({
         role: "assistant",
         content: '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">',
@@ -346,8 +347,8 @@ ${imageBlock}`;
 
     const encoder = new TextEncoder();
 
-    // If we used assistant prefill, the accumulated HTML needs to start with it
-    const prefill = !isEdit ? '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">' : '';
+    // If we used assistant prefill, send it as the first chunk so the client has it
+    const prefill = (!isEdit && supportsAssistantPrefill) ? '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">' : '';
 
     const readable = new ReadableStream({
       async start(controller) {

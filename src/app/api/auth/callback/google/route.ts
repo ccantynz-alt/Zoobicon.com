@@ -81,8 +81,8 @@ export async function GET(req: NextRequest) {
       } else {
         // Create new user
         const [newUser] = await sql`
-          INSERT INTO users (email, name, auth_provider, auth_provider_id)
-          VALUES (${email}, ${name}, 'google', ${googleUser.id || ""})
+          INSERT INTO users (email, name, auth_provider, auth_provider_id, email_verified, email_verified_at)
+          VALUES (${email}, ${name}, 'google', ${googleUser.id || ""}, true, NOW())
           RETURNING id, email, name, role, plan
         `;
         user = newUser;

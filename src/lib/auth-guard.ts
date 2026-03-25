@@ -15,6 +15,7 @@ export interface AuthUser {
   plan: string;
   role: string;
   subscription_status: string | null;
+  email_verified?: boolean;
 }
 
 interface AuthSuccess {
@@ -34,7 +35,7 @@ const UNLIMITED = 999_999;
 
 /** Plan limits — generations per month */
 export const PLAN_LIMITS: Record<string, { generations: number; edits: number }> = {
-  free: { generations: 3, edits: 10 },
+  free: { generations: 1, edits: 3 },
   creator: { generations: 15, edits: 100 },
   pro: { generations: 50, edits: 500 },
   agency: { generations: 200, edits: UNLIMITED },
@@ -60,7 +61,7 @@ const RATE_LIMITS: Record<string, RateLimitConfig> = {
  */
 export async function authenticateRequest(
   request: Request,
-  opts?: { requireAuth?: boolean }
+  opts?: { requireAuth?: boolean; requireVerified?: boolean }
 ): Promise<AuthResult> {
   const email = request.headers.get("x-user-email");
   const apiKey = request.headers.get("x-api-key");
@@ -102,9 +103,9 @@ export async function authenticateRequest(
     if (apiKey) {
       // API key auth — stored in user settings or a separate table
       // For now, look up by email encoded in the key
-      rows = await sql`SELECT email, plan, role, subscription_status FROM users WHERE email = ${email} LIMIT 1`;
+      rows = await sql`SELECT email, plan, role, subscription_status, email_verified FROM users WHERE email = ${email} LIMIT 1`;
     } else if (email) {
-      rows = await sql`SELECT email, plan, role, subscription_status FROM users WHERE email = ${email} LIMIT 1`;
+      rows = await sql`SELECT email, plan, role, subscription_status, email_verified FROM users WHERE email = ${email} LIMIT 1`;
     }
 
     if (!rows || rows.length === 0) {
@@ -120,6 +121,20 @@ export async function authenticateRequest(
     // Check subscription status — past_due or canceled means free tier
     if (user.subscription_status === "canceled" || user.subscription_status === "past_due") {
       user.plan = "free";
+    }
+
+    // Block unverified email users from generating (OAuth users are auto-verified)
+    if (opts?.requireVerified && !user.email_verified) {
+      return {
+        user: null,
+        error: Response.json(
+          {
+            error: "Please verify your email before building. Check your inbox for the verification link.",
+            code: "EMAIL_NOT_VERIFIED",
+          },
+          { status: 403 }
+        ),
+      };
     }
 
     // Apply rate limit for this user's plan

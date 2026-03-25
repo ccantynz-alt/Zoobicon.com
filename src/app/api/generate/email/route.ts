@@ -80,7 +80,7 @@ Output ONLY valid JSON. No markdown, no explanation, no code fences.
 export async function POST(req: NextRequest) {
   try {
     // Auth + quota enforcement — prevent unauthenticated abuse
-    const auth = await authenticateRequest(req, { requireAuth: true });
+    const auth = await authenticateRequest(req, { requireAuth: true, requireVerified: true });
     if (auth.error) return auth.error;
     const quota = await checkUsageQuota(auth.user.email, auth.user.plan, "generation");
     if (quota.error) return quota.error;

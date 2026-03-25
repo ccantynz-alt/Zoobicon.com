@@ -104,8 +104,8 @@ export async function GET(req: NextRequest) {
         user = existing;
       } else {
         const [newUser] = await sql`
-          INSERT INTO users (email, name, auth_provider, auth_provider_id)
-          VALUES (${email}, ${name}, 'github', ${String(ghUser.id)})
+          INSERT INTO users (email, name, auth_provider, auth_provider_id, email_verified, email_verified_at)
+          VALUES (${email}, ${name}, 'github', ${String(ghUser.id)}, true, NOW())
           RETURNING id, email, name, role, plan
         `;
         user = newUser;

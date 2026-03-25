@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Auth + usage enforcement
-    const auth = await authenticateRequest(req);
+    const auth = await authenticateRequest(req, { requireAuth: true, requireVerified: true });
     if (auth.error) return auth.error;
     const quota = await checkUsageQuota(auth.user.email, auth.user.plan, "edit");
     if (quota.error) return quota.error;
