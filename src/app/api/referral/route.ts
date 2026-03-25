@@ -1,31 +1,37 @@
 import { NextResponse } from "next/server";
+import {
+  generateReferralCode,
+  getReferralStatsFromDB,
+  trackReferral,
+  getReferralTier,
+  anonymizeEmail,
+} from "@/lib/referral";
 
 /**
  * GET /api/referral — Get referral stats for a user
- * Query: ?code=ref_xxxxx
- *
- * MVP: returns placeholder stats. When DB is wired, query referral tables.
+ * Query: ?email=user@example.com
  */
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const code = searchParams.get("code");
+    const email = searchParams.get("email");
 
-    if (!code) {
+    if (!email) {
       return NextResponse.json(
-        { error: "Missing referral code" },
+        { error: "Missing email parameter" },
         { status: 400 }
       );
     }
 
-    // MVP: return structure that the client can merge with localStorage data
+    const stats = await getReferralStatsFromDB(email);
+    const tier = getReferralTier(stats.totalReferred);
+
     return NextResponse.json({
-      referralCode: code,
-      linkCopied: 0,
-      signups: 0,
-      buildsEarned: 0,
-      history: [],
-      tier: { name: "Newcomer", badge: "🌱", color: "text-gray-400" },
+      referralCode: stats.code,
+      signups: stats.totalReferred,
+      buildsEarned: stats.creditsEarned,
+      history: stats.history,
+      tier: { name: tier.name, badge: tier.badge, color: tier.color },
     });
   } catch (err) {
     console.error("Referral GET error:", err);
@@ -38,25 +44,25 @@ export async function GET(request: Request) {
 
 /**
  * POST /api/referral — Process a referral signup
- * Body: { referrerCode: string, referredEmail: string }
+ * Body: { referralCode: string, referredEmail: string }
  *
- * MVP: validates input, returns success. When DB is wired,
- * create referral record and credit builds to referrer.
+ * Called by the signup flow when a user signs up with ?ref= in the URL.
+ * Awards 1 free build to both the referrer and the referred user.
  */
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { referrerCode, referredEmail } = body;
+    const { referralCode, referredEmail } = body;
 
-    if (!referrerCode || !referredEmail) {
+    if (!referralCode || !referredEmail) {
       return NextResponse.json(
-        { error: "Missing referrerCode or referredEmail" },
+        { error: "Missing referralCode or referredEmail" },
         { status: 400 }
       );
     }
 
     // Validate referral code format
-    if (!referrerCode.startsWith("ref_")) {
+    if (!referralCode.startsWith("ref_")) {
       return NextResponse.json(
         { error: "Invalid referral code format" },
         { status: 400 }
@@ -72,21 +78,21 @@ export async function POST(request: Request) {
       );
     }
 
-    // MVP: acknowledge the referral. In production, this would:
-    // 1. Check referrerCode exists in DB
-    // 2. Ensure referredEmail hasn't already been referred
-    // 3. Create referral record
-    // 4. Credit 5 builds to referrer when referred user builds first site
+    const success = await trackReferral(referralCode, referredEmail);
+
+    if (!success) {
+      return NextResponse.json({
+        success: false,
+        message: "Referral could not be processed (invalid code, self-referral, or already referred)",
+      });
+    }
 
     return NextResponse.json({
       success: true,
-      message: "Referral recorded successfully",
-      buildsAwarded: 5,
-      referrerCode,
-      referredEmail: referredEmail.replace(
-        /^(.)(.*)(@.*)$/,
-        (_: string, first: string, _mid: string, domain: string) => `${first}***${domain}`
-      ),
+      message: "Referral recorded! Both users received 1 free build credit.",
+      buildsAwarded: 1,
+      referralCode,
+      referredEmail: anonymizeEmail(referredEmail),
     });
   } catch (err) {
     console.error("Referral POST error:", err);

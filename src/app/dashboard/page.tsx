@@ -37,6 +37,7 @@ import {
   Crown,
 } from "lucide-react";
 import { getProjects as getLocalProjects, deleteProject as deleteLocalProject, type SavedProject } from "@/lib/storage";
+import ReferralCard from "@/components/ReferralCard";
 
 const QUICK_ACTIONS = [
   { icon: Globe, label: "New Website", href: "/builder", color: "from-brand-500 to-brand-700" },
@@ -379,6 +380,11 @@ export default function DashboardPage() {
               {userRole === "admin" ? "All Agents Active" : "Current Plan"}
             </div>
           </div>
+        </div>
+
+        {/* Referral Card */}
+        <div className="mb-10">
+          <ReferralCard />
         </div>
 
         {/* Section tabs */}
