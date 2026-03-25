@@ -29,6 +29,7 @@
  *   - security-sentinel: Brute force detection, XSS scanning, signup spam blocking (every 5 min)
  *   - seo-auto-fix: Audits and auto-fixes SEO on deployed sites (every 6 hours)
  *   - deployment-guardian: Validates deployments serve correctly with quality HTML (every 10 min)
+ *   - market-crawler: Product feature & pricing crawler for competitors (every 12 hours)
  *
  * Creating custom agents:
  *   1. Extend BaseAgent<TInput, TOutput>
@@ -88,3 +89,4 @@ import "./billing-guardian";
 import "./security-sentinel";
 import "./seo-auto-fix";
 import "./deployment-guardian";
+import "./market-crawler";

@@ -6,6 +6,9 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import BackgroundEffects from "@/components/BackgroundEffects";
 import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
+import SocialPublishPanel from "@/components/SocialPublishPanel";
+import VideoSeriesPanel from "@/components/VideoSeriesPanel";
+import type { VideoSeriesEpisode } from "@/lib/video-social-publish";
 import {
   Video,
   Sparkles,
@@ -643,6 +646,15 @@ export default function VideoCreatorDashboard() {
       setActiveScene(0);
     }
   };
+
+  // Load a series episode into the video creator
+  const handleLoadSeriesEpisode = useCallback((episode: VideoSeriesEpisode, seriesName: string) => {
+    if (episode.script) {
+      setScript(episode.script);
+    }
+    // Scroll to the script textarea area
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   // Generate script with AI
   const handleGenerateScript = async () => {
@@ -1489,6 +1501,13 @@ export default function VideoCreatorDashboard() {
                   ))}
                 </div>
               </motion.div>
+
+              {/* Video Series Panel */}
+              <VideoSeriesPanel
+                onLoadEpisode={handleLoadSeriesEpisode}
+                currentPlatform={platform}
+                currentStyle={style}
+              />
 
               {/* Script Input */}
               <motion.div initial="hidden" animate="visible" variants={fadeIn} className="space-y-2">
@@ -2490,6 +2509,16 @@ export default function VideoCreatorDashboard() {
                                   <Smartphone className="w-3 h-3" /> Connect TikTok Account
                                 </button>
                               )}
+                            </div>
+
+                            {/* Social Media Publishing */}
+                            <div className="pt-1 border-t border-white/[0.06]">
+                              <SocialPublishPanel
+                                script={script}
+                                videoUrl={renderJobs.find((j) => j.status === "succeeded" && j.videoUrl)?.videoUrl || spokespersonVideoUrl}
+                                sceneImages={sceneImages}
+                                voiceoverUrl={voiceoverUrl}
+                              />
                             </div>
 
                             {/* Pipeline capability status */}
