@@ -95,7 +95,7 @@ function getEndpoints(): UptimeCheckInput[] {
       name: "Hosting Serve",
       url: `${base}/api/hosting/serve/health-check`,
       method: "GET",
-      expectedStatus: [200, 404], // 404 is fine, means the route handler works
+      expectedStatus: [200, 401, 404], // 404 = slug not found (normal), 401 = Vercel deployment protection
       critical: true,
       timeoutMs: 10_000,
     },
