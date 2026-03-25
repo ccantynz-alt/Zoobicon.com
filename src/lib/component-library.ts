@@ -233,6 +233,7 @@ ul, ol { list-style: none; }
 .hero-aurora {
   position: relative; overflow: hidden;
 }
+.hero-aurora > * { position: relative; z-index: 2; }
 .hero-aurora::before {
   content: ''; position: absolute; inset: -50%;
   background: conic-gradient(
@@ -253,6 +254,7 @@ ul, ol { list-style: none; }
 .hero-mesh {
   position: relative; overflow: hidden;
 }
+.hero-mesh > * { position: relative; z-index: 2; }
 .hero-mesh::before {
   content: ''; position: absolute; inset: 0; z-index: 0;
   background:
@@ -362,8 +364,11 @@ ul, ol { list-style: none; }
   50% { background-position: 100% 50%; }
 }
 
-/* Hero content always above effects */
-.hero > .container, .hero > .hero-reveal, .hero > div:not(.hero-orb):not(.hero-cursor-glow) {
+/* Hero content always above effects — covers .hero, .hero-aurora, .hero-mesh and any section with hero classes */
+.hero > .container, .hero > .hero-reveal, .hero > div:not(.hero-orb):not(.hero-cursor-glow),
+[class*="hero-aurora"] > .container, [class*="hero-mesh"] > .container,
+[class*="hero-aurora"] > div:not(.hero-orb):not(.hero-cursor-glow),
+[class*="hero-mesh"] > div:not(.hero-orb):not(.hero-cursor-glow) {
   position: relative; z-index: 2;
 }
 

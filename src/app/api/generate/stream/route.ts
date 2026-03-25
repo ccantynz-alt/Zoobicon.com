@@ -32,10 +32,10 @@ If NO curated image URLs are provided, use these fallbacks:
 - NEVER use picsum.photos for hero, feature cards, or testimonial avatars.
 - All images use: object-fit:cover; border-radius:var(--card-radius)
 
-## OUTPUT ORDER — FOLLOW EXACTLY
+## OUTPUT ORDER — FOLLOW EXACTLY (CRITICAL: BODY IS 90% OF OUTPUT)
 1. <head>: title, meta viewport, Google Fonts link (2 fonts: display + body)
-2. <style>: ONLY :root custom properties + max 30 lines of site-specific CSS. The component library provides ALL component styles — do NOT redefine buttons, cards, grids, etc.
-3. <body>: THIS IS 90% OF YOUR OUTPUT. Write every section with full real content, real images, rich copy.
+2. <style>: MAXIMUM 20 LINES. Only :root custom properties + a few layout rules. The component library provides ALL component styles (buttons, cards, grids, badges, animations, hero effects). Writing more than 20 lines of CSS is a FAILURE — you are wasting tokens that should go to body content. CLOSE THE </style> TAG QUICKLY.
+3. <body>: THIS IS 90% OF YOUR OUTPUT. Write every section with full real content, real images, rich copy. If you spend more tokens on <style> than on <body>, the output is BROKEN.
 4. <script>: mobile menu toggle, FAQ accordion, counter animation (under 30 lines)
 
 ## BODY SECTIONS — WRITE ALL 11 OF THESE
@@ -97,10 +97,10 @@ If NO curated URLs are provided, use these fallbacks:
 - Portfolio/Gallery: picsum.photos/seed/KEYWORD/WIDTH/HEIGHT (ONLY acceptable here).
 - NEVER use picsum for hero, features, or testimonials.
 
-## OUTPUT: 90% BODY CONTENT
+## OUTPUT: 90% BODY CONTENT (CRITICAL — DO NOT WASTE TOKENS ON CSS)
 1. <head>: title, meta, 2 Google Fonts
-2. <style>: :root vars + max 30 lines custom CSS. Component library handles all component styles.
-3. <body>: 90% of output. Rich, image-heavy, professionally written.
+2. <style>: MAXIMUM 20 LINES. :root vars + minimal layout. Component library handles ALL component styles — buttons, cards, grids, badges, animations, hero effects. Close </style> QUICKLY. More than 20 lines of CSS = FAILURE.
+3. <body>: 90% of output. Rich, image-heavy, professionally written. If <body> is empty or short, the ENTIRE output is BROKEN.
 4. <script>: mobile menu, FAQ, counters (under 30 lines)
 
 ## BODY SECTIONS — WRITE ALL 13 (PREMIUM TIER)
@@ -294,8 +294,17 @@ ${imageBlock}`;
     }
 
     const messages: { role: "user" | "assistant"; content: string }[] = [
-      { role: "user", content: userMessage + (!isEdit ? "\n\nIMPORTANT: Start your response IMMEDIATELY with <!DOCTYPE html> — no preamble, no explanation, no code fences. Output raw HTML only." : "") },
+      { role: "user", content: userMessage + (!isEdit ? "\n\nIMPORTANT: Start your response IMMEDIATELY with <!DOCTYPE html> — no preamble, no explanation, no code fences. Output raw HTML only. Keep <style> under 30 lines — the component library handles all component styles. Spend 90% of your tokens on <body> content." : "") },
     ];
+
+    // For new builds, use assistant prefill to skip preamble and force HTML output structure.
+    // This saves tokens and prevents the model from wasting output on CSS-only content.
+    if (!isEdit) {
+      messages.push({
+        role: "assistant",
+        content: '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">',
+      });
+    }
 
     let stream;
     try {
@@ -335,10 +344,22 @@ ${imageBlock}`;
 
     const encoder = new TextEncoder();
 
+    // If we used assistant prefill, the accumulated HTML needs to start with it
+    const prefill = !isEdit ? '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">' : '';
+
     const readable = new ReadableStream({
       async start(controller) {
         try {
+          // Don't include prefill in accumulated — the model's output already starts with DOCTYPE
+          // Prefill is only sent as the initial client chunk for faster perceived start
           let accumulated = "";
+
+          // Send the prefill as the first chunk so the client has it
+          if (prefill) {
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify({ type: "chunk", content: prefill })}\n\n`)
+            );
+          }
 
           for await (const event of stream) {
             if (
@@ -352,6 +373,13 @@ ${imageBlock}`;
             }
           }
 
+          // If the model produced HTML without a <body> tag at all (just <head>/<style>),
+          // the response got cut off. Check and flag for retry.
+          const hasBodyTag = /<body[\s>]/i.test(accumulated);
+          if (!hasBodyTag && !isEdit) {
+            console.warn(`[Stream] No <body> tag found in ${accumulated.length} chars of output. Model likely ran out of tokens on CSS.`);
+          }
+
           // Validate body content — same logic as the pipeline's hasBodyContent()
           const bodyMatch = accumulated.match(/<body[^>]*>([\s\S]*)<\/body>/i);
           const bodyText = bodyMatch
@@ -363,31 +391,18 @@ ${imageBlock}`;
                 .trim()
             : "";
 
-          // Inject component library CSS into the final HTML (both new builds and edits)
-          // For edits: we stripped the library before sending to the AI, now re-inject it
-          // For new builds: the AI was told "component library is auto-injected"
-          // Replace any picsum.photos URLs with industry-relevant Unsplash photos
-          accumulated = replacePicsumUrls(accumulated, prompt);
-
-          if (!accumulated.includes("ZOOBICON COMPONENT LIBRARY")) {
-            // Remove the placeholder comment if present
-            accumulated = accumulated.replace(/\/\* \[component library auto-injected\] \*\/\n?/g, '');
-            accumulated = injectComponentLibrary(accumulated);
-            controller.enqueue(
-              encoder.encode(`data: ${JSON.stringify({ type: "replace", content: accumulated })}\n\n`)
-            );
-          }
-
-          if (isEdit && bodyText.length < 50) {
+          // Validate body FIRST — if empty, retry before injecting component library
+          // This prevents sending a broken empty-but-styled page to the client
+          if (isEdit && (bodyText.length < 50 || !hasBodyTag)) {
             // Edit response lost the body — the AI spent all tokens on CSS/head and truncated
             // Instead of replacing with broken HTML, send error so client preserves original code
             console.error(`[Stream] Edit produced empty body (${bodyText.length} chars, ${accumulated.length} total HTML). Original code preserved.`);
             controller.enqueue(
               encoder.encode(`data: ${JSON.stringify({ type: "edit_failed", message: "Edit response was incomplete (no visible content). Your original site has been preserved. Try a simpler edit or try again." })}\n\n`)
             );
-          } else if (!isEdit && bodyText.length < 100) {
-            // Body is empty/near-empty — retry up to 2 times with increasingly aggressive body-first prompts
-            console.warn(`[Stream] Empty body detected (${bodyText.length} chars). Retrying with body-first prompt...`);
+          } else if (!isEdit && (bodyText.length < 100 || !hasBodyTag)) {
+            // Body is empty/near-empty or missing entirely — retry with body-first prompts using Sonnet
+            console.warn(`[Stream] Empty/missing body detected (${bodyText.length} chars, hasBody=${hasBodyTag}). Retrying with body-first prompt...`);
             controller.enqueue(
               encoder.encode(`data: ${JSON.stringify({ type: "status", message: "Retrying — generating content..." })}\n\n`)
             );
@@ -422,10 +437,13 @@ Output ONLY raw HTML.`
             ];
 
             let retrySucceeded = false;
+            // Use Sonnet for retries — if Opus produced empty body, it may be a model access issue
+            const retryModel = "claude-sonnet-4-6";
             for (let i = 0; i < retryPrompts.length && !retrySucceeded; i++) {
               try {
+                console.log(`[Stream] Retry ${i + 1} using ${retryModel}...`);
                 const retryResponse = await client.messages.create({
-                  model,
+                  model: retryModel,
                   max_tokens: maxTokens,
                   system: retryPrompts[i],
                   messages: [{ role: "user", content: userMessage }],
@@ -463,6 +481,20 @@ Output ONLY raw HTML.`
             }
           }
 
+          // Inject component library CSS into the final HTML (both new builds and edits)
+          // For edits: we stripped the library before sending to the AI, now re-inject it
+          // For new builds: the AI was told "component library is auto-injected"
+          // Replace any picsum.photos URLs with industry-relevant Unsplash photos
+          accumulated = replacePicsumUrls(accumulated, prompt);
+
+          if (!accumulated.includes("ZOOBICON COMPONENT LIBRARY")) {
+            accumulated = accumulated.replace(/\/\* \[component library auto-injected\] \*\/\n?/g, '');
+            accumulated = injectComponentLibrary(accumulated);
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify({ type: "replace", content: accumulated })}\n\n`)
+            );
+          }
+
           // Track successful usage
           trackUsage(auth.user.email, usageType).catch((err) => console.error("[Usage] Failed to track:", err));
 
@@ -491,8 +523,10 @@ Output ONLY raw HTML.`
                 }
               );
               if (failoverRes.text) {
+                // Inject component library into failover output — GPT/Gemini don't know about our classes
+                const injectedFailover = injectComponentLibrary(replacePicsumUrls(failoverRes.text, prompt));
                 controller.enqueue(
-                  encoder.encode(`data: ${JSON.stringify({ type: "replace", content: failoverRes.text })}\n\n`)
+                  encoder.encode(`data: ${JSON.stringify({ type: "replace", content: injectedFailover })}\n\n`)
                 );
                 controller.enqueue(
                   encoder.encode(`data: ${JSON.stringify({ type: "done" })}\n\n`)

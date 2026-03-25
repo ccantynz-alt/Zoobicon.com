@@ -54,8 +54,7 @@ export async function POST(req: NextRequest) {
     return Response.json(response);
   } catch (err) {
     console.error("[video-creator/subtitles] Error:", err);
-    const message = err instanceof Error ? err.message : "Subtitle generation failed";
-    return Response.json({ error: message }, { status: 500 });
+    return Response.json({ error: "Subtitle generation failed. Please try again." }, { status: 500 });
   }
 }
 

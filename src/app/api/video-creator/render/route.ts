@@ -46,28 +46,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Quota enforcement
-    if (email) {
-      await ensureVideoUsageTable();
-      const limits = getVideoPlanLimits(plan || "free", !!hasAddon);
-      const usage = await getVideoUsage(email);
-      const overageCredits = await getOverageCredits(email);
-      const check = checkVideoQuota(usage, limits, "render", overageCredits);
-      if (!check.allowed) {
-        return Response.json(
-          { error: check.reason, quota: { current: check.current, limit: check.limit, remaining: check.remaining }, canBuyMore: true },
-          { status: 429 }
-        );
-      }
-      // Check if enough credits for all scenes
-      if (check.remaining < scenes.length) {
-        return Response.json(
-          { error: `Not enough render credits. Need ${scenes.length}, have ${check.remaining} remaining this month.`, quota: { current: check.current, limit: check.limit, remaining: check.remaining } },
-          { status: 429 }
-        );
-      }
-    }
-
     if (!style) {
       return Response.json({ error: "style is required" }, { status: 400 });
     }
@@ -83,6 +61,59 @@ export async function POST(req: NextRequest) {
         },
         { status: 503 }
       );
+    }
+
+    // Validate scene images BEFORE quota check — Runway/Luma/Pika require publicly accessible HTTP URLs.
+    // Base64 data URIs (from Stability AI) cause "request too large" errors.
+    const invalidScenes = scenes.filter(
+      (s: { imageUrl?: string; sceneNumber: number }) =>
+        s.imageUrl && (s.imageUrl.startsWith("data:") || s.imageUrl.length > 10000)
+    );
+    if (invalidScenes.length > 0) {
+      return Response.json(
+        {
+          error: `${invalidScenes.length} scene(s) have base64/embedded images which are too large for video rendering. Please regenerate images using Replicate or DALL-E (which return URL-based images) instead of Stability AI.`,
+          invalidScenes: invalidScenes.map((s: { sceneNumber: number }) => s.sceneNumber),
+          hint: "Try clicking 'Regenerate Images' — the system will use a provider that returns URL-based images.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Check that scenes requiring images actually have them
+    const missingImages = scenes.filter(
+      (s: { imageUrl?: string; sceneNumber: number }) => !s.imageUrl || !s.imageUrl.startsWith("http")
+    );
+    if (missingImages.length > 0 && activeProvider === "runway") {
+      return Response.json(
+        {
+          error: `${missingImages.length} scene(s) are missing images. Runway requires an image for each scene. Generate images first.`,
+          missingScenes: missingImages.map((s: { sceneNumber: number }) => s.sceneNumber),
+        },
+        { status: 400 }
+      );
+    }
+
+    // Quota enforcement — check AFTER image validation so we count only renderable scenes
+    const renderableSceneCount = scenes.length - invalidScenes.length - missingImages.length;
+    if (email) {
+      await ensureVideoUsageTable();
+      const limits = getVideoPlanLimits(plan || "free", !!hasAddon);
+      const usage = await getVideoUsage(email);
+      const overageCredits = await getOverageCredits(email);
+      const check = checkVideoQuota(usage, limits, "render", overageCredits);
+      if (!check.allowed) {
+        return Response.json(
+          { error: check.reason, quota: { current: check.current, limit: check.limit, remaining: check.remaining }, canBuyMore: true },
+          { status: 429 }
+        );
+      }
+      if (check.remaining < renderableSceneCount) {
+        return Response.json(
+          { error: `Not enough render credits. Need ${renderableSceneCount}, have ${check.remaining} remaining this month.`, quota: { current: check.current, limit: check.limit, remaining: check.remaining } },
+          { status: 429 }
+        );
+      }
     }
 
     console.log(`[video-creator/render] Starting ${scenes.length} scenes with provider: ${activeProvider}`);
@@ -125,7 +156,12 @@ export async function POST(req: NextRequest) {
     return Response.json({ ...result, quotaCharged: startedJobs });
   } catch (err) {
     console.error("[video-creator/render] Error:", err);
-    const message = err instanceof Error ? err.message : "Render failed";
+    const raw = err instanceof Error ? err.message : "";
+    let message = "Video rendering failed. Please try again.";
+    if (raw.toLowerCase().includes("rate limit") || raw.includes("429"))
+      message = "Render service is busy. Please wait a moment and try again.";
+    else if (raw.toLowerCase().includes("too_big") || raw.toLowerCase().includes("validation of body"))
+      message = "Video render request was too large. Try shorter scenes or regenerate images.";
     return Response.json({ error: message }, { status: 500 });
   }
 }

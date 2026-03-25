@@ -280,11 +280,22 @@ export async function generateAllSceneImages(
       batch.map((scene) => generateSceneImage(scene, provider))
     );
 
-    for (const result of batchResults) {
+    for (let j = 0; j < batchResults.length; j++) {
+      const result = batchResults[j];
+      const scene = batch[j];
       if (result.status === "fulfilled") {
         results.push(result.value);
       } else {
-        console.error(`[scene-image-gen] Scene failed:`, result.reason);
+        console.error(`[scene-image-gen] Scene ${scene.sceneNumber} failed:`, result.reason);
+        // Return a placeholder result so the caller knows which scenes failed
+        results.push({
+          sceneNumber: scene.sceneNumber,
+          imageUrl: "",
+          provider: "none" as ImageProvider,
+          width: 0,
+          height: 0,
+          error: result.reason instanceof Error ? result.reason.message : String(result.reason),
+        } as SceneImageResult & { error: string });
       }
     }
   }
