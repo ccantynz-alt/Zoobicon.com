@@ -12,6 +12,10 @@
  *   - support-responder: AI support ticket drafting + auto-reply
  *   - intel-monitor: Competitive intelligence monitoring
  *   - daily-todo-sender: Sends Craig's daily to-do list email every morning
+ *   - abuse-detector: Detects spam signups, rate evasion, content policy violations (every 10 min)
+ *   - revenue-monitor: Revenue tracking, drop detection, upgrade opportunities (every 6 hours)
+ *   - quality-auditor: Deployed site quality audits with scoring (every 4 hours)
+ *   - uptime-monitor: Endpoint health + external dependency monitoring (every 5 min)
  *
  * Creating custom agents:
  *   1. Extend BaseAgent<TInput, TOutput>
@@ -57,3 +61,7 @@ import "./support-responder";
 import "./intel-monitor";
 import "./email-campaign";
 import "./daily-todo-sender";
+import "./abuse-detector";
+import "./revenue-monitor";
+import "./quality-auditor";
+import "./uptime-monitor";
