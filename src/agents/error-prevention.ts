@@ -67,10 +67,11 @@ function getBaseUrl(): string {
 
 const CRITICAL_ENDPOINTS = [
   { name: "API Health", path: "/api/health", method: "GET" as const },
-  { name: "Generate Stream", path: "/api/generate/stream", method: "HEAD" as const },
   { name: "Hosting Serve", path: "/api/hosting/serve/health-check", method: "GET" as const },
   { name: "Auth Login", path: "/api/auth/login", method: "HEAD" as const },
   { name: "Builder Page", path: "/builder", method: "HEAD" as const },
+  { name: "Public API Status", path: "/api/v1/status", method: "GET" as const },
+  // NOTE: /api/generate/* routes require auth — don't health-check them without credentials
 ];
 
 const DEPENDENCY_CHECKS = [
