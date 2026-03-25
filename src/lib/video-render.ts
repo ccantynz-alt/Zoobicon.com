@@ -546,6 +546,13 @@ export async function startRender(request: RenderRequest): Promise<RenderResult>
 
   for (const scene of request.scenes) {
     try {
+      // Strip base64 data URIs — they're too large for video APIs and cause payload errors
+      // Providers that need images will get a text-to-video prompt instead
+      if (scene.imageUrl && (scene.imageUrl.startsWith("data:") || scene.imageUrl.length > 10000)) {
+        console.warn(`[video-render] Scene ${scene.sceneNumber}: stripping oversized imageUrl (${scene.imageUrl.length} chars)`);
+        scene.imageUrl = undefined;
+      }
+
       let jobId: string;
 
       switch (provider) {
@@ -595,7 +602,7 @@ export async function startRender(request: RenderRequest): Promise<RenderResult>
         status: "failed",
         videoUrl: null,
         thumbnailUrl: null,
-        error: err instanceof Error ? err.message : "Unknown error",
+        error: err instanceof Error ? sanitizeRenderError(err.message) : "Render failed for this scene",
         createdAt: new Date().toISOString(),
         completedAt: new Date().toISOString(),
       });
@@ -666,6 +673,25 @@ const VIDEO_STYLE_DIRECTIONS: Record<string, string> = {
   "corporate-professional": "Steady, confident camera. Smooth slider or gimbal shots. Professional pacing — not rushed, not slow. Clean reveals.",
   "cinematic": "Dramatic slow dolly push-in. Atmospheric volumetric light rays. Subtle lens flares. Film-like motion cadence. Shallow DOF shifts.",
 };
+
+/** Sanitize render errors — never expose API internals to users */
+function sanitizeRenderError(raw: string): string {
+  const lower = raw.toLowerCase();
+  if (lower.includes("validation of body failed") || lower.includes("too_big") || lower.includes("too large"))
+    return "Video render request was too large. Try shorter scenes.";
+  if (lower.includes("rate limit") || lower.includes("429"))
+    return "Render service is busy. Try again in a moment.";
+  if (lower.includes("requires a scene image") || lower.includes("generate images first"))
+    return "Generate scene images before rendering video.";
+  if (lower.includes("unauthorized") || lower.includes("invalid") || lower.includes("auth"))
+    return "Render service configuration issue. Please try again.";
+  if (lower.includes("api error"))
+    return "Render service temporarily unavailable.";
+  // If message is already short and doesn't contain sensitive info, allow it
+  if (raw.length < 80 && !lower.includes("key") && !lower.includes("token") && !lower.includes("env"))
+    return raw;
+  return "Video rendering failed for this scene.";
+}
 
 function buildVideoPrompt(scene: RenderScene, style: string): string {
   const motionDir = VIDEO_STYLE_DIRECTIONS[style] || VIDEO_STYLE_DIRECTIONS["cinematic"];
