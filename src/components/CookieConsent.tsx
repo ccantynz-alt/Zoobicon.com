@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Cookie } from "lucide-react";
+import { Cookie, X } from "lucide-react";
 import Link from "next/link";
 
 const STORAGE_KEY = "zoobicon_cookie_consent";
@@ -13,12 +13,17 @@ export default function CookieConsent() {
   useEffect(() => {
     const consent = localStorage.getItem(STORAGE_KEY);
     if (!consent) {
-      setVisible(true);
+      // Small delay so it doesn't flash on initial page load
+      const timer = setTimeout(() => setVisible(true), 1200);
+      return () => clearTimeout(timer);
     }
   }, []);
 
   function accept(level: "all" | "essential") {
-    localStorage.setItem(STORAGE_KEY, level);
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ level, date: new Date().toISOString() })
+    );
     setVisible(false);
   }
 
@@ -30,32 +35,50 @@ export default function CookieConsent() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
           transition={{ type: "spring", damping: 25, stiffness: 300 }}
-          className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-gray-900/95 backdrop-blur-md"
+          className="fixed bottom-0 inset-x-0 z-[9999] p-4 sm:p-6 pointer-events-none"
         >
-          <div className="mx-auto flex max-w-5xl flex-col items-center gap-4 px-4 py-4 sm:flex-row sm:gap-6 sm:py-3">
-            <div className="flex flex-1 items-center gap-3 text-sm text-zinc-300">
-              <Cookie className="hidden h-5 w-5 shrink-0 text-purple-400 sm:block" />
-              <p>
-                We use cookies to improve your experience and analyze site traffic.{" "}
-                <Link href="/privacy" className="underline underline-offset-2 hover:text-white">
-                  Privacy Policy
-                </Link>
-              </p>
-            </div>
-
-            <div className="flex shrink-0 gap-3">
-              <button
-                onClick={() => accept("essential")}
-                className="rounded-lg border border-white/20 px-4 py-1.5 text-sm font-medium text-zinc-300 transition-colors hover:border-white/40 hover:text-white"
-              >
-                Essential Only
-              </button>
-              <button
-                onClick={() => accept("all")}
-                className="rounded-lg bg-gradient-to-r from-purple-600 to-violet-600 px-4 py-1.5 text-sm font-medium text-white shadow-lg shadow-purple-500/20 transition-opacity hover:opacity-90"
-              >
-                Accept All
-              </button>
+          <div className="max-w-2xl mx-auto pointer-events-auto rounded-2xl border border-white/[0.08] bg-[#0f0f1a]/95 backdrop-blur-xl shadow-2xl shadow-black/40 p-5 sm:p-6">
+            <div className="flex items-start gap-4">
+              <div className="hidden sm:flex shrink-0 w-10 h-10 rounded-xl bg-brand-500/10 items-center justify-center mt-0.5">
+                <Cookie className="w-5 h-5 text-brand-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-sm font-semibold text-white">We use cookies</h3>
+                  <button
+                    onClick={() => accept("essential")}
+                    className="sm:hidden text-white/40 hover:text-white/60 transition-colors"
+                    aria-label="Dismiss cookie banner"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                <p className="text-xs text-white/50 leading-relaxed mb-4">
+                  We use essential cookies to keep the platform running and optional analytics
+                  cookies to understand how you use Zoobicon so we can improve it. No cross-site
+                  tracking.{" "}
+                  <Link
+                    href="/privacy"
+                    className="text-brand-400 hover:text-brand-300 underline underline-offset-2"
+                  >
+                    Privacy Policy
+                  </Link>
+                </p>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => accept("all")}
+                    className="px-4 py-2 text-xs font-semibold text-white bg-brand-500 hover:bg-brand-400 rounded-lg transition-colors"
+                  >
+                    Accept All
+                  </button>
+                  <button
+                    onClick={() => accept("essential")}
+                    className="px-4 py-2 text-xs font-semibold text-white/70 hover:text-white bg-white/[0.06] hover:bg-white/[0.10] border border-white/[0.08] rounded-lg transition-colors"
+                  >
+                    Essential Only
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </motion.div>

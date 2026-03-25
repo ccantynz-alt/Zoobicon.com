@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import "./globals.css";
 import GlobalChat from "@/components/GlobalChat";
+import AIChatAssistant from "@/components/AIChatAssistant";
+import CookieConsent from "@/components/CookieConsent";
 import SpeculationRules from "@/components/SpeculationRules";
 import AutoIndexNow from "@/components/AutoIndexNow";
 
@@ -341,6 +343,8 @@ export default function RootLayout({
       <body className="grain">
         {children}
         <GlobalChat />
+        <AIChatAssistant />
+        <CookieConsent />
         <AutoIndexNow />
         <SpeculationRules />
       </body>
