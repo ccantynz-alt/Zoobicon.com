@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
 import { getGeneratorSystemSupplement } from "@/lib/generator-prompts";
+import { authenticateRequest, checkUsageQuota, trackUsage } from "@/lib/auth-guard";
 
 const STANDARD_SYSTEM = `You are Zoobicon, an elite AI website generator producing $20K+ agency-quality sites. Output a single, complete HTML file.
 
@@ -102,6 +103,13 @@ export const maxDuration = 120; // Allow up to 2 minutes for Opus generation
 
 export async function POST(req: NextRequest) {
   try {
+    // Auth + quota enforcement — prevent unauthenticated abuse
+    const auth = await authenticateRequest(req, { requireAuth: true, requireVerified: true });
+    if (auth.error) return auth.error;
+
+    const quota = await checkUsageQuota(auth.user.email, auth.user.plan, "generation");
+    if (quota.error) return quota.error;
+
     const { prompt, tier, existingCode, generator, agencyBrand } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
@@ -126,6 +134,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Free tier uses Sonnet to control costs — Opus only for paid plans
+    const isFree = auth.user.plan === "free";
     const client = new Anthropic({ apiKey, timeout: 240_000 });
 
     const isEdit = typeof existingCode === "string" && existingCode.trim().length > 0;
@@ -147,11 +157,12 @@ export async function POST(req: NextRequest) {
       model = "claude-opus-4-6";
       maxTokens = 32000;
     } else {
-      // Standard tier also uses Opus — output quality must impress to convert users
       systemPrompt = STANDARD_SYSTEM;
       userMessage = `Build me a stunning, visually striking website for: ${prompt}\n\nThis must look like it was designed by a top-tier agency with BOLD visual impact. Use vibrant, saturated colors — NOT dull or washed-out. The hero section must be dramatic (full-bleed image, dark gradient, or animated background — NEVER a plain white hero). Every section needs rich content with images, icons, and visual accents. Match the industry aesthetic but always prioritize visual impact and content density. Include: hero with dramatic visual treatment + value proposition, social proof, services/features with image-rich cards, testimonials, stats with bold numbers, CTA with colored background, and comprehensive dark footer.`;
-      model = "claude-opus-4-6";
-      maxTokens = 32000;
+      // Free tier uses Sonnet to control costs (~90% cheaper than Opus)
+      // Paid users get Opus for premium quality
+      model = isFree ? "claude-sonnet-4-6" : "claude-opus-4-6";
+      maxTokens = isFree ? 16000 : 32000;
     }
 
     // Append generator-specific instructions when building from a generator page
@@ -285,6 +296,9 @@ Output ONLY raw HTML — no markdown, no code fences, no explanation.`;
         }
       }
     }
+
+    // Track usage for authenticated users
+    trackUsage(auth.user.email, usageType).catch(() => {});
 
     return NextResponse.json({ html });
   } catch (err) {

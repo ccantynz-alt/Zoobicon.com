@@ -129,22 +129,28 @@ Generate the complete storyboard as JSON.`;
         userMessage,
         maxTokens: 8192,
       });
-    } catch {
+    } catch (primaryErr) {
       // If all providers fail, try Haiku as last resort (storyboard is just JSON planning)
+      console.warn("[video-creator/generate] Primary models failed, trying Haiku:", primaryErr instanceof Error ? primaryErr.message : primaryErr);
       const Anthropic = (await import("@anthropic-ai/sdk")).default;
       const apiKey = process.env.ANTHROPIC_API_KEY;
       if (!apiKey) {
-        return Response.json({ error: "AI service is temporarily unavailable." }, { status: 503 });
+        return Response.json({ error: "AI service is temporarily unavailable. Please check your API key configuration." }, { status: 503 });
       }
-      const client = new Anthropic({ apiKey });
-      const res = await client.messages.create({
-        model: "claude-haiku-4-5-20251001",
-        max_tokens: 8192,
-        system: systemPrompt,
-        messages: [{ role: "user", content: userMessage }],
-      });
-      const text = res.content.find((b) => b.type === "text")?.text || "";
-      response = { text, model: "claude-haiku-4-5-20251001", provider: "claude" as const };
+      try {
+        const client = new Anthropic({ apiKey });
+        const res = await client.messages.create({
+          model: "claude-haiku-4-5-20251001",
+          max_tokens: 8192,
+          system: systemPrompt,
+          messages: [{ role: "user", content: userMessage }],
+        });
+        const text = res.content.find((b) => b.type === "text")?.text || "";
+        response = { text, model: "claude-haiku-4-5-20251001", provider: "claude" as const };
+      } catch (haikuErr) {
+        console.error("[video-creator/generate] Haiku fallback also failed:", haikuErr instanceof Error ? haikuErr.message : haikuErr);
+        return Response.json({ error: "AI service is currently busy. Please try again in a moment." }, { status: 503 });
+      }
     }
 
     // Parse the JSON response — handle code fences, markdown wrapping, etc.

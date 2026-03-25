@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
+import { authenticateRequest, checkUsageQuota, trackUsage } from "@/lib/auth-guard";
 
 interface AnimationConfig {
   selector: string;
@@ -61,6 +62,12 @@ Rules:
 
 export async function POST(req: NextRequest) {
   try {
+    // Auth + quota enforcement — prevent unauthenticated abuse
+    const auth = await authenticateRequest(req, { requireAuth: true, requireVerified: true });
+    if (auth.error) return auth.error;
+    const quota = await checkUsageQuota(auth.user.email, auth.user.plan, "generation");
+    if (quota.error) return quota.error;
+
     const { code, animations } = await req.json();
 
     if (!code || typeof code !== "string") {

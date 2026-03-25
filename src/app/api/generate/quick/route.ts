@@ -4,6 +4,7 @@ import { COMPONENT_LIBRARY_CSS } from "@/lib/component-library";
 import { callLLMWithFailover } from "@/lib/llm-provider";
 import { getGeneratorDef, getGeneratorSystemSupplement } from "@/lib/generator-prompts";
 import { getImagePromptBlockSync, replacePicsumUrls, detectIndustry } from "@/lib/stock-images";
+import { authenticateRequest, checkUsageQuota, trackUsage } from "@/lib/auth-guard";
 
 
 /** Check if an error is a rate limit or overload that warrants model fallback */
@@ -375,6 +376,13 @@ ALWAYS include a descriptive alt="" attribute on every <img> tag.
 
 export async function POST(req: NextRequest) {
   try {
+    // Auth + quota enforcement — prevent unauthenticated abuse
+    const auth = await authenticateRequest(req, { requireAuth: true, requireVerified: true });
+    if (auth.error) return auth.error;
+
+    const quota = await checkUsageQuota(auth.user.email, auth.user.plan, "generation");
+    if (quota.error) return quota.error;
+
     const { prompt, tier, model: requestedModel, isAdmin, generatorType, agencyBrand } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
@@ -393,8 +401,10 @@ export async function POST(req: NextRequest) {
     }
 
     const isPremium = tier === "premium";
-    // Admin: full throttle — Opus + fast mode, max tokens, max timeout
-    const model = requestedModel || (isAdmin ? "claude-opus-4-6" : isPremium ? "claude-opus-4-6" : "claude-sonnet-4-6");
+    const isFree = auth.user.plan === "free";
+    // Free tier: Sonnet only (90% cheaper). Paid: Opus for quality. Admin: override.
+    const isRealAdmin = isAdmin && auth.user.role === "admin"; // Verify admin claim against DB
+    const model = requestedModel || (isRealAdmin ? "claude-opus-4-6" : isPremium && !isFree ? "claude-opus-4-6" : "claude-sonnet-4-6");
     const maxTokens = isAdmin ? 64000 : isPremium ? 32000 : 16000;
     const timeout = isAdmin ? 300_000 : isPremium ? 180_000 : 90_000;
 
@@ -661,6 +671,7 @@ Output the <config> block first, then the <body-html> block. Nothing else.`;
           const fullPage = buildFullPage(config, bodyHtml);
 
           sendEvent({ type: "replace", content: fullPage });
+          trackUsage(auth.user.email, "generation").catch(() => {});
           sendEvent({ type: "done" });
           controller.close();
         } catch (err) {

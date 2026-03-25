@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 import { classifyIntent, getScaffold, getScaffoldConfig, generatePatchPrompt } from "@/lib/scaffold-engine";
 import { COMPONENT_LIBRARY_CSS } from "@/lib/component-library";
 import { replacePicsumUrls } from "@/lib/stock-images";
+import { authenticateRequest, checkUsageQuota, trackUsage } from "@/lib/auth-guard";
 
 export const maxDuration = 300;
 
@@ -277,6 +278,12 @@ export async function POST(request: NextRequest) {
   const encoder = new TextEncoder();
 
   try {
+    // Auth + quota enforcement
+    const auth = await authenticateRequest(request, { requireAuth: true, requireVerified: true });
+    if (auth.error) return auth.error;
+    const quota = await checkUsageQuota(auth.user.email, auth.user.plan, "generation");
+    if (quota.error) return quota.error;
+
     const body = await request.json();
     const { prompt, tier, model, generatorType, agencyBrand } = body as {
       prompt: string;
@@ -407,7 +414,8 @@ export async function POST(request: NextRequest) {
             })));
           }
 
-          // ── Done ──
+          // ── Done — track usage ──
+          trackUsage(auth.user.email, "generation").catch(() => {});
           controller.enqueue(encoder.encode(sseEvent({ type: "done" })));
           controller.close();
         } catch (err) {

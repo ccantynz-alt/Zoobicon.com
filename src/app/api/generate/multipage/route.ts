@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
 import { injectComponentLibrary } from "@/lib/component-library";
+import { authenticateRequest, checkUsageQuota, trackUsage } from "@/lib/auth-guard";
 
 const MULTIPAGE_SYSTEM = `You are Zoobicon, a world-class AI website generator that produces multi-page websites indistinguishable from those built by top design agencies charging $15,000+. When given a description, you produce a complete multi-page website as a JSON object.
 
@@ -160,6 +161,12 @@ interface MultipageResponse {
 
 export async function POST(req: NextRequest) {
   try {
+    // Auth + quota enforcement — prevent unauthenticated abuse
+    const auth = await authenticateRequest(req, { requireAuth: true, requireVerified: true });
+    if (auth.error) return auth.error;
+    const quota = await checkUsageQuota(auth.user.email, auth.user.plan, "generation");
+    if (quota.error) return quota.error;
+
     const { prompt, pages }: MultipageRequest = await req.json();
 
     if (!prompt || typeof prompt !== "string") {

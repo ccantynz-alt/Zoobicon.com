@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { runPipeline } from "@/lib/agents";
+import { authenticateRequest, checkUsageQuota, trackUsage } from "@/lib/auth-guard";
 
 /**
  * Multi-Agent Pipeline API v2
@@ -25,6 +26,12 @@ export const maxDuration = 300; // Allow up to 5 minutes for full pipeline
 
 export async function POST(req: NextRequest) {
   try {
+    // Auth + quota enforcement — prevent unauthenticated abuse
+    const auth = await authenticateRequest(req, { requireAuth: true, requireVerified: true });
+    if (auth.error) return auth.error;
+    const quota = await checkUsageQuota(auth.user.email, auth.user.plan, "generation");
+    if (quota.error) return quota.error;
+
     const { prompt, style, tier, model, generatorType, agencyBrand, externalContext } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {

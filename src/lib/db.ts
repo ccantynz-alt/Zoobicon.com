@@ -53,6 +53,8 @@ export async function initSchema() {
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_status    TEXT`;
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS auth_provider          TEXT`;
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS auth_provider_id       TEXT`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified         BOOLEAN DEFAULT false`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified_at      TIMESTAMPTZ`;
 
   await sql`
     CREATE TABLE IF NOT EXISTS projects (

@@ -139,10 +139,10 @@ export async function POST(req: NextRequest) {
 
     // If ALL jobs failed immediately, don't charge anything and return clear error
     if (startedJobs === 0 && failedJobs.length > 0) {
-      const firstError = failedJobs[0].error || "Unknown error";
+      console.error(`[video-creator/render] All jobs failed. Provider: ${activeProvider}. Error: ${failedJobs[0].error}`);
       return Response.json({
         ...result,
-        error: `Video rendering failed for all scenes. Provider: ${activeProvider}. Error: ${firstError}`,
+        error: "Video rendering provider failed. Images, voiceover, and subtitles are ready.",
         quotaCharged: 0,
       });
     }
@@ -157,12 +157,17 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error("[video-creator/render] Error:", err);
     const raw = err instanceof Error ? err.message : "";
+    const lower = raw.toLowerCase();
     let message = "Video rendering failed. Please try again.";
-    if (raw.toLowerCase().includes("rate limit") || raw.includes("429"))
+    let status = 500;
+    if (lower.includes("no video rendering provider") || lower.includes("not configured")) {
+      message = "Video rendering is coming soon. Stay tuned for updates!";
+      status = 503;
+    } else if (lower.includes("rate limit") || raw.includes("429"))
       message = "Render service is busy. Please wait a moment and try again.";
-    else if (raw.toLowerCase().includes("too_big") || raw.toLowerCase().includes("validation of body"))
+    else if (lower.includes("too_big") || lower.includes("validation of body"))
       message = "Video render request was too large. Try shorter scenes or regenerate images.";
-    return Response.json({ error: message }, { status: 500 });
+    return Response.json({ error: message }, { status });
   }
 }
 
