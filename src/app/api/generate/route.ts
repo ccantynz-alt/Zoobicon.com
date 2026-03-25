@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
 import { getGeneratorSystemSupplement } from "@/lib/generator-prompts";
 import { authenticateRequest, checkUsageQuota, trackUsage } from "@/lib/auth-guard";
+import { injectComponentLibrary } from "@/lib/component-library";
 
 const STANDARD_SYSTEM = `You are Zoobicon, an elite AI website generator producing $20K+ agency-quality sites. Output a single, complete HTML file.
 
@@ -107,10 +108,12 @@ export async function POST(req: NextRequest) {
     const auth = await authenticateRequest(req, { requireAuth: true, requireVerified: true });
     if (auth.error) return auth.error;
 
-    const quota = await checkUsageQuota(auth.user.email, auth.user.plan, "generation");
-    if (quota.error) return quota.error;
-
     const { prompt, tier, existingCode, generator, agencyBrand } = await req.json();
+
+    const isEdit = typeof existingCode === "string" && existingCode.trim().length > 0;
+    const usageType = isEdit ? "edit" as const : "generation" as const;
+    const quota = await checkUsageQuota(auth.user.email, auth.user.plan, usageType);
+    if (quota.error) return quota.error;
 
     if (!prompt || typeof prompt !== "string") {
       return NextResponse.json(
@@ -138,7 +141,6 @@ export async function POST(req: NextRequest) {
     const isFree = auth.user.plan === "free";
     const client = new Anthropic({ apiKey, timeout: 240_000 });
 
-    const isEdit = typeof existingCode === "string" && existingCode.trim().length > 0;
     const isPremium = tier === "premium";
 
     let systemPrompt: string;
@@ -295,6 +297,11 @@ Output ONLY raw HTML — no markdown, no code fences, no explanation.`;
           }
         }
       }
+    }
+
+    // Inject component library CSS into new builds (edits re-inject via stream route)
+    if (!isEdit && !html.includes("ZOOBICON COMPONENT LIBRARY")) {
+      html = injectComponentLibrary(html);
     }
 
     // Track usage for authenticated users
