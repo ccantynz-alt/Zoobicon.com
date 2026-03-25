@@ -139,10 +139,10 @@ export async function POST(req: NextRequest) {
 
     // If ALL jobs failed immediately, don't charge anything and return clear error
     if (startedJobs === 0 && failedJobs.length > 0) {
-      const firstError = failedJobs[0].error || "Unknown error";
+      console.error(`[video-creator/render] All jobs failed. Provider: ${activeProvider}. Error: ${failedJobs[0].error}`);
       return Response.json({
         ...result,
-        error: `Video rendering failed for all scenes. Provider: ${activeProvider}. Error: ${firstError}`,
+        error: "Video rendering provider failed. Images, voiceover, and subtitles are ready.",
         quotaCharged: 0,
       });
     }

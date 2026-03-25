@@ -221,8 +221,14 @@ function sanitizeError(raw: string): string {
     return "Rate limited. Please wait a moment and try again.";
   if (lower.includes("no provider configured") || lower.includes("add api") || lower.includes("not configured") || lower.includes("environment"))
     return "This feature is coming soon.";
+  if (lower.includes("coming soon"))
+    return "Video rendering is coming soon. Images, voiceover, and subtitles are ready!";
+  if (lower.includes("render") && (lower.includes("fail") || lower.includes("error")))
+    return "Video rendering encountered an issue. Images, voiceover, and subtitles are still available.";
   if (lower.includes("timeout") || lower.includes("timed out"))
     return "Request timed out. Please try again.";
+  if (lower.includes("provider") && (lower.includes("fail") || lower.includes("unavailable") || lower.includes("error")))
+    return "Video rendering provider is temporarily unavailable. Other pipeline stages completed successfully.";
   // Strip any JSON, env var references, and technical details from the message
   let cleaned = raw.replace(/\{[\s\S]*\}/, "").replace(/\[[\s\S]*\]/, "").trim();
   cleaned = cleaned.replace(/[A-Z_]{3,}_[A-Z_]+/g, "").trim(); // Strip env var names like ELEVENLABS_API_KEY
