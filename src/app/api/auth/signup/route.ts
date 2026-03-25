@@ -6,6 +6,7 @@ import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { logAudit } from "@/lib/audit";
 import { createResetToken } from "@/lib/resetToken";
 import { sendViaMailgun } from "@/lib/mailgun";
+import { trackReferral } from "@/lib/referral";
 
 const signupLimiter = { limit: 3, windowMs: 60000 };
 
@@ -21,7 +22,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { name, email, password } = await request.json();
+    const { name, email, password, referralCode } = await request.json();
 
     if (!email || !password) {
       return Response.json({ error: "Email and password required" }, { status: 400 });
@@ -59,6 +60,13 @@ export async function POST(request: NextRequest) {
     // Notify admin of new signup (fire-and-forget, don't block response)
     notifyNewSignup({ email: user.email, name: user.name }).catch(() => {});
     logAudit({ action: "signup", email: user.email, ip, metadata: { name: user.name } }).catch(() => {});
+
+    // Track referral if a referral code was provided (fire-and-forget)
+    if (referralCode && typeof referralCode === "string" && referralCode.startsWith("ref_")) {
+      trackReferral(referralCode, user.email).catch((err) =>
+        console.error("[Signup] Referral tracking failed:", err)
+      );
+    }
 
     // Send verification email (fire-and-forget — don't block signup response)
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://zoobicon.com";

@@ -2,6 +2,10 @@ import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import "./globals.css";
 import GlobalChat from "@/components/GlobalChat";
+import AIChatAssistant from "@/components/AIChatAssistant";
+import CookieConsent from "@/components/CookieConsent";
+import SpeculationRules from "@/components/SpeculationRules";
+import AutoIndexNow from "@/components/AutoIndexNow";
 
 
 const BRAND_META: Record<string, {
@@ -45,6 +49,10 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(meta.url),
     alternates: {
       canonical: "/",
+      languages: {
+        "en": "https://zoobicon.com",
+        "x-default": "https://zoobicon.com",
+      },
     },
     openGraph: {
       type: "website",
@@ -110,6 +118,12 @@ export default function RootLayout({
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <head>
+        {/* Hreflang alternate links for multi-domain SEO */}
+        <link rel="alternate" hrefLang="en" href="https://zoobicon.com" />
+        <link rel="alternate" hrefLang="x-default" href="https://zoobicon.com" />
+        <link rel="alternate" href="https://zoobicon.ai" title="Zoobicon AI" />
+        <link rel="alternate" href="https://zoobicon.io" title="Zoobicon for Developers" />
+        <link rel="alternate" href="https://zoobicon.sh" title="Zoobicon Hosting & CLI" />
         {/* Critical inline styles — guarantees dark bg even before CSS bundle loads */}
         <style dangerouslySetInnerHTML={{ __html: `html,body{background:#050508;color:#e4e4e7;margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;letter-spacing:-0.011em}` }} />
         {/* Preconnect to Google Fonts CDN */}
@@ -131,6 +145,8 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://github.com" />
         <meta name="msapplication-TileColor" content="#050508" />
         <meta name="msapplication-config" content="none" />
+        {/* AI Discovery — llms.txt is the "robots.txt for AI" */}
+        <link rel="alternate" type="text/plain" href="/llms.txt" title="LLMs.txt — AI-readable site description" />
         {/* Google Search Console verification — set NEXT_PUBLIC_GSC_VERIFICATION in env */}
         {process.env.NEXT_PUBLIC_GSC_VERIFICATION && (
           <meta name="google-site-verification" content={process.env.NEXT_PUBLIC_GSC_VERIFICATION} />
@@ -142,7 +158,7 @@ export default function RootLayout({
             <script dangerouslySetInnerHTML={{ __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${process.env.NEXT_PUBLIC_GA_ID}',{page_path:window.location.pathname})` }} />
           </>
         )}
-        {/* Organization JSON-LD structured data */}
+        {/* Organization JSON-LD structured data — enhanced for GEO (Generative Engine Optimization) */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify({
@@ -152,15 +168,18 @@ export default function RootLayout({
             "url": "https://zoobicon.com",
             "logo": "https://zoobicon.com/og-image.png",
             "description": "AI Website Builder — 7 AI agents build production-ready websites, SaaS apps, and e-commerce stores from a single prompt.",
+            "foundingDate": "2025",
             "sameAs": [
               "https://zoobicon.ai",
               "https://zoobicon.io",
-              "https://zoobicon.sh"
+              "https://zoobicon.sh",
+              "https://dominat8.io"
             ],
             "contactPoint": {
               "@type": "ContactPoint",
               "email": "support@zoobicon.com",
-              "contactType": "customer support"
+              "contactType": "customer support",
+              "availableLanguage": "English"
             },
             "offers": {
               "@type": "AggregateOffer",
@@ -168,7 +187,88 @@ export default function RootLayout({
               "highPrice": "99",
               "priceCurrency": "USD",
               "offerCount": "4"
-            }
+            },
+            "knowsAbout": [
+              "AI website generation",
+              "Multi-agent AI pipelines",
+              "Website hosting and deployment",
+              "E-commerce storefront generation",
+              "Full-stack application generation",
+              "SEO optimization",
+              "AI-powered web design",
+              "White-label website builder platforms",
+              "Multi-page website generation",
+              "Visual website editing",
+              "AI code generation",
+              "Responsive web design",
+              "Website templates",
+              "SaaS application development",
+              "Agency website management"
+            ],
+            "hasOfferCatalog": {
+              "@type": "OfferCatalog",
+              "name": "Zoobicon Products",
+              "itemListElement": [
+                {
+                  "@type": "OfferCatalog",
+                  "name": "AI Website Builder",
+                  "description": "Generate production-ready websites from text prompts using a 7-agent AI pipeline",
+                  "url": "https://zoobicon.com/products/website-builder"
+                },
+                {
+                  "@type": "OfferCatalog",
+                  "name": "AI SEO Agent",
+                  "description": "Automated SEO analysis and optimization for websites",
+                  "url": "https://zoobicon.com/products/seo-agent"
+                },
+                {
+                  "@type": "OfferCatalog",
+                  "name": "AI Video Creator",
+                  "description": "AI-powered video script, storyboard, and scene generation pipeline",
+                  "url": "https://zoobicon.com/products/video-creator"
+                },
+                {
+                  "@type": "OfferCatalog",
+                  "name": "Email Support System",
+                  "description": "AI-powered email ticketing and support system with Mailgun integration",
+                  "url": "https://zoobicon.com/products/email-support"
+                },
+                {
+                  "@type": "OfferCatalog",
+                  "name": "Website Hosting",
+                  "description": "One-click deploy to zoobicon.sh with SSL, CDN, and custom domains",
+                  "url": "https://zoobicon.com/products/hosting"
+                },
+                {
+                  "@type": "OfferCatalog",
+                  "name": "Agency White-Label Platform",
+                  "description": "White-label website builder for agencies with client portal, bulk generation, and approval workflows",
+                  "url": "https://zoobicon.com/agencies"
+                }
+              ]
+            },
+            "areaServed": [
+              { "@type": "Country", "name": "United States" },
+              { "@type": "Country", "name": "United Kingdom" },
+              { "@type": "Country", "name": "Canada" },
+              { "@type": "Country", "name": "Australia" },
+              { "@type": "Country", "name": "Germany" },
+              { "@type": "Country", "name": "France" },
+              { "@type": "Country", "name": "Netherlands" },
+              { "@type": "Country", "name": "Spain" },
+              { "@type": "Country", "name": "Italy" },
+              { "@type": "Country", "name": "Brazil" },
+              { "@type": "Country", "name": "Mexico" },
+              { "@type": "Country", "name": "India" },
+              { "@type": "Country", "name": "Japan" },
+              { "@type": "Country", "name": "South Korea" },
+              { "@type": "Country", "name": "Singapore" },
+              { "@type": "Country", "name": "Sweden" },
+              { "@type": "Country", "name": "Norway" },
+              { "@type": "Country", "name": "Denmark" },
+              { "@type": "Country", "name": "New Zealand" },
+              { "@type": "Country", "name": "Ireland" }
+            ]
           }) }}
         />
         {/* SoftwareApplication JSON-LD structured data */}
@@ -243,6 +343,10 @@ export default function RootLayout({
       <body className="grain">
         {children}
         <GlobalChat />
+        <AIChatAssistant />
+        <CookieConsent />
+        <AutoIndexNow />
+        <SpeculationRules />
       </body>
     </html>
   );

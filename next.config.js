@@ -3,6 +3,9 @@ const nextConfig = {
   // Tree-shake lucide-react so only used icons are bundled (major size win)
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion"],
+    // Enable native View Transitions API for smooth page navigation
+    // Supported in Chrome 111+, Edge 111+. Gracefully degrades in other browsers.
+    viewTransition: true,
   },
 
   // Disable source maps in production for smaller/faster builds

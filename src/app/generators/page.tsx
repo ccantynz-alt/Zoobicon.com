@@ -124,8 +124,34 @@ export default function GeneratorsPage() {
 
   const totalGenerators = allGenerators.length;
 
+  const generatorsJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Zoobicon AI Generators",
+    "description": "43+ specialized AI generators for websites, business applications, marketing content, developer tools, and design systems.",
+    "url": "https://zoobicon.com/generators",
+    "numberOfItems": totalGenerators,
+    "itemListElement": allGenerators.map((gen, i) => ({
+      "@type": "ListItem",
+      "position": i + 1,
+      "name": gen.name,
+      "description": gen.description,
+      "url": `https://zoobicon.com/generators/${gen.endpoint.replace('/api/generate/', '')}`
+    }))
+  };
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://zoobicon.com" },
+      { "@type": "ListItem", "position": 2, "name": "Generators", "item": "https://zoobicon.com/generators" }
+    ]
+  };
+
   return (
     <div className="min-h-screen text-white relative">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(generatorsJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <BackgroundEffects preset="technical" />
       {/* Nav */}
       <nav className="sticky top-0 z-50 border-b border-white/[0.10] bg-[#0a0a12]/80 backdrop-blur-xl">

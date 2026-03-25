@@ -48,8 +48,84 @@ const STEPS = [
 ];
 
 export default function WebsiteBuilderPage() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Zoobicon AI Website Builder",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "AggregateOffer",
+      "lowPrice": "0",
+      "highPrice": "99",
+      "priceCurrency": "USD",
+      "offerCount": "4"
+    },
+    "description": "Build production-ready websites in 60 seconds with 7 AI agents. No coding required.",
+    "url": "https://zoobicon.com/products/website-builder",
+    "screenshot": "https://zoobicon.com/og-image.png"
+  };
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://zoobicon.com" },
+      { "@type": "ListItem", "position": 2, "name": "Products", "item": "https://zoobicon.com/products" },
+      { "@type": "ListItem", "position": 3, "name": "Website Builder", "item": "https://zoobicon.com/products/website-builder" }
+    ]
+  };
+  const faqLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How long does it take to build a website with Zoobicon?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Zoobicon generates a complete, production-ready website in 60-95 seconds. The 7-agent AI pipeline handles strategy, design, copywriting, architecture, development, SEO, and animations automatically."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do I need coding experience to use Zoobicon?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No coding experience is required. You describe your website in plain English, and Zoobicon's AI generates the complete HTML, CSS, and JavaScript. You can also edit using natural language chat commands like 'make the header blue' or 'add a contact form'."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What AI models power Zoobicon's website builder?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Zoobicon uses Claude Opus 4.6 for the core Developer agent (HTML generation), Claude Haiku for fast planning agents (strategy, brand design, copywriting, architecture), and Claude Sonnet for enhancement agents (SEO, animations). Users can also select GPT-4o or Gemini 2.5 Pro as alternatives."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I export or self-host the websites Zoobicon generates?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. You can deploy to zoobicon.sh with one click (free hosting included), download as standalone HTML, export as a React/Next.js project, push to GitHub, or export as a WordPress theme. The generated code is yours with no lock-in."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What types of websites can Zoobicon build?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Zoobicon supports 43 specialized generators covering landing pages, SaaS apps, e-commerce stores, portfolios, blogs, restaurant sites, real estate listings, healthcare sites, law firm pages, fitness sites, and more. It also generates multi-page sites (3-6 pages) and full-stack applications with databases and APIs."
+        }
+      }
+    ]
+  };
+
   return (
     <div className="relative min-h-screen">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
       <BackgroundEffects preset="technical" />
 
       {/* Nav */}

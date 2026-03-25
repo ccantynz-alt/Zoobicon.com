@@ -57,12 +57,35 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: '/video-creator', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/seo', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/analytics', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/gallery', priority: 0.8, changeFrequency: 'daily' },
+    { path: '/starter-kits', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/referral', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/blog-engine', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/booking', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/invoicing', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/email-marketing', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/store', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/content-calendar', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/content-writer', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/publisher', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/dictation', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/brand-kit', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/creator-marketplace', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/challenges', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/crawl', priority: 0.7, changeFrequency: 'weekly' },
 
     // Brand / domain-specific pages
     { path: '/ai', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/io', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/sh', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/dominat8', priority: 0.8, changeFrequency: 'weekly' },
+
+    // Agency sub-pages
+    { path: '/agencies/dashboard', priority: 0.7, changeFrequency: 'weekly' },
+    { path: '/agencies/portal', priority: 0.7, changeFrequency: 'weekly' },
+
+    // Hosting sub-pages
+    { path: '/hosting/dashboard', priority: 0.7, changeFrequency: 'weekly' },
 
     // Support and legal
     { path: '/support', priority: 0.7, changeFrequency: 'weekly' },
@@ -75,6 +98,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Auth pages
     { path: '/auth/login', priority: 0.5, changeFrequency: 'weekly' },
     { path: '/auth/signup', priority: 0.5, changeFrequency: 'weekly' },
+
+    // Country-specific pages (geo-targeted landing pages)
+    { path: '/us', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/uk', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/ca', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/au', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/de', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/fr', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/es', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/it', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/nl', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/se', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/br', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/mx', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/in', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/jp', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/kr', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/sg', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/ae', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/za', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/nz', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/ie', priority: 0.8, changeFrequency: 'monthly' },
   ]
 
   const staticEntries: MetadataRoute.Sitemap = routes.map((route) => ({

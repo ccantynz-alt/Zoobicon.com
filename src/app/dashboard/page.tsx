@@ -37,6 +37,8 @@ import {
   Crown,
 } from "lucide-react";
 import { getProjects as getLocalProjects, deleteProject as deleteLocalProject, type SavedProject } from "@/lib/storage";
+import ReferralCard from "@/components/ReferralCard";
+import { getUserSegment, getRecommendedGenerators } from "@/lib/user-segment";
 
 const QUICK_ACTIONS = [
   { icon: Globe, label: "New Website", href: "/builder", color: "from-brand-500 to-brand-700" },
@@ -81,6 +83,13 @@ export default function DashboardPage() {
   const [userPlan, setUserPlan] = useState<"free" | "unlimited">("free");
   const [liveSites, setLiveSites] = useState<{ id: string; name: string; slug: string; status: string; updated_at: string }[]>([]);
   const [activeSection, setActiveSection] = useState<"projects" | "deployed">("projects");
+  const [recommendedGenerators, setRecommendedGenerators] = useState<{ id: string; label: string; description: string }[]>([]);
+
+  // Load recommended generators based on user segment
+  useEffect(() => {
+    const segment = getUserSegment();
+    setRecommendedGenerators(getRecommendedGenerators(segment));
+  }, []);
 
   useEffect(() => {
     let userEmail = "";
@@ -380,6 +389,32 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Referral Card */}
+        <div className="mb-10">
+          <ReferralCard />
+        </div>
+
+        {/* Recommended for you */}
+        {recommendedGenerators.length > 0 && (
+          <div className="mb-10">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-white/90 mb-4">Recommended for You</h2>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+              {recommendedGenerators.map((gen) => (
+                <Link
+                  key={gen.id}
+                  href={`/builder?generator=${gen.id}`}
+                  className="group p-4 rounded-xl border border-white/10 bg-[#111318] hover:bg-[#1a1d24] hover:border-brand-500/20 transition-all"
+                >
+                  <div className="text-sm font-semibold text-white/85 group-hover:text-white transition-colors mb-1">
+                    {gen.label}
+                  </div>
+                  <div className="text-xs text-white/50">{gen.description}</div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Section tabs */}
         <div className="flex items-center gap-1 mb-6 border-b border-white/10 pb-1">

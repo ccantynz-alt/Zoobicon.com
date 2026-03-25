@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import BackgroundEffects from "@/components/BackgroundEffects";
 import { Zap, Eye, EyeOff, ArrowRight, Chrome, Check } from "lucide-react";
@@ -12,6 +12,26 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [oauthNotice, setOauthNotice] = useState("");
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+
+  // Check URL for ?ref= referral code on load
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get("ref");
+      if (ref && ref.startsWith("ref_")) {
+        setReferralCode(ref);
+        // Also store in localStorage so it survives OAuth redirects
+        localStorage.setItem("zoobicon_referral_code", ref);
+      } else {
+        // Check localStorage for previously stored referral code
+        const stored = localStorage.getItem("zoobicon_referral_code");
+        if (stored && stored.startsWith("ref_")) {
+          setReferralCode(stored);
+        }
+      }
+    } catch { /* ignore */ }
+  }, []);
 
   const passwordChecks = [
     { label: "8+ characters", met: password.length >= 8 },
@@ -30,7 +50,7 @@ export default function SignupPage() {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, referralCode }),
       });
 
       const data = await res.json();
@@ -40,7 +60,11 @@ export default function SignupPage() {
         return;
       }
 
-      try { localStorage.setItem("zoobicon_user", JSON.stringify(data.user)); } catch {}
+      try {
+        localStorage.setItem("zoobicon_user", JSON.stringify(data.user));
+        // Clear referral code after successful signup
+        localStorage.removeItem("zoobicon_referral_code");
+      } catch {}
       window.location.href = "/dashboard";
     } catch {
       setAuthError("Network error. Please try again.");
@@ -66,6 +90,15 @@ export default function SignupPage() {
           <p className="text-white/50 mb-8">
             Start building with the most advanced AI platform.
           </p>
+
+          {referralCode && (
+            <div className="mb-6 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-2">
+              <span className="text-lg">🎁</span>
+              <p className="text-sm text-emerald-300">
+                You were referred by a friend! Sign up to get <strong>1 free build credit</strong>.
+              </p>
+            </div>
+          )}
 
           {/* OAuth Buttons */}
           <div className="space-y-3 mb-6">

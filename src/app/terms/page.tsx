@@ -6,8 +6,17 @@ import BackgroundEffects from "@/components/BackgroundEffects";
 export const revalidate = 86400; // Revalidate once per day
 
 export const metadata: Metadata = {
-  title: "Terms of Service - Zoobicon",
-  description: "Zoobicon Terms of Service — the rules and conditions for using our platform.",
+  title: "Terms of Service — Zoobicon",
+  description:
+    "Zoobicon Terms of Service — the rules and conditions for using our AI website builder platform. Usage policies, intellectual property, and account terms.",
+  openGraph: {
+    title: "Terms of Service — Zoobicon",
+    description: "Terms and conditions for using the Zoobicon AI website builder platform.",
+    url: "https://zoobicon.com/terms",
+    siteName: "Zoobicon",
+    type: "website",
+  },
+  alternates: { canonical: "https://zoobicon.com/terms" },
 };
 
 export default function TermsPage() {

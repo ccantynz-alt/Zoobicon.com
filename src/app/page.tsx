@@ -840,6 +840,9 @@ export default function LandingPage() {
                   ["/pricing", "Pricing"],
                   ["/privacy", "Privacy"],
                   ["/terms", "Terms"],
+                  ["/refund-policy", "Refund Policy"],
+                  ["/acceptable-use", "Acceptable Use"],
+                  ["/dmca", "DMCA"],
                 ].map(([href, label]) => (
                   <li key={href}><Link href={href} className="text-sm text-white/50 hover:text-white/50 transition-colors">{label}</Link></li>
                 ))}
@@ -851,6 +854,8 @@ export default function LandingPage() {
             <div className="flex items-center gap-6">
               <Link href="/privacy" className="text-xs text-white/50 hover:text-white/50 transition-colors">Privacy</Link>
               <Link href="/terms" className="text-xs text-white/50 hover:text-white/50 transition-colors">Terms</Link>
+              <Link href="/refund-policy" className="text-xs text-white/50 hover:text-white/50 transition-colors">Refunds</Link>
+              <Link href="/dmca" className="text-xs text-white/50 hover:text-white/50 transition-colors">DMCA</Link>
             </div>
           </div>
         </div>

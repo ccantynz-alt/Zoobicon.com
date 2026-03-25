@@ -93,8 +93,37 @@ export default function VideoCreatorPage() {
     }
   };
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Zoobicon AI Video Creator",
+    "applicationCategory": "MultimediaApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "AggregateOffer",
+      "lowPrice": "0",
+      "highPrice": "99",
+      "priceCurrency": "USD",
+      "offerCount": "4"
+    },
+    "description": "AI-powered video creation pipeline with script generation, storyboarding, scene images, voiceover, and auto-captions for TikTok, Instagram Reels, YouTube Shorts, and more.",
+    "url": "https://zoobicon.com/products/video-creator",
+    "screenshot": "https://zoobicon.com/og-image.png"
+  };
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://zoobicon.com" },
+      { "@type": "ListItem", "position": 2, "name": "Products", "item": "https://zoobicon.com/products" },
+      { "@type": "ListItem", "position": 3, "name": "Video Creator", "item": "https://zoobicon.com/products/video-creator" }
+    ]
+  };
+
   return (
     <div className="relative min-h-screen">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <BackgroundEffects preset="technical" />
 
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">

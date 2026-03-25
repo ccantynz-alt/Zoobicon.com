@@ -109,8 +109,37 @@ export default function EmailSupportPage() {
     }
   };
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Zoobicon AI Email Support",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "AggregateOffer",
+      "lowPrice": "0",
+      "highPrice": "99",
+      "priceCurrency": "USD",
+      "offerCount": "4"
+    },
+    "description": "AI-powered email support with auto-replies, smart inbox, sentiment analysis, ticketing, CSAT tracking, and 24/7 automated customer service.",
+    "url": "https://zoobicon.com/products/email-support",
+    "screenshot": "https://zoobicon.com/og-image.png"
+  };
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://zoobicon.com" },
+      { "@type": "ListItem", "position": 2, "name": "Products", "item": "https://zoobicon.com/products" },
+      { "@type": "ListItem", "position": 3, "name": "Email Support", "item": "https://zoobicon.com/products/email-support" }
+    ]
+  };
+
   return (
     <div className="relative min-h-screen">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <BackgroundEffects preset="technical" />
 
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">

@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     siteName: "Zoobicon",
     type: "website",
   },
+  alternates: { canonical: "https://zoobicon.com/builder" },
 };
 
 export default function BuilderLayout({

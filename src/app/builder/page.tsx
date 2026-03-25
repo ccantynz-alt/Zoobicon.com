@@ -46,6 +46,7 @@ import CollaborationBar from "@/components/CollaborationBar";
 import CursorOverlay from "@/components/CursorOverlay";
 import { useCollaboration } from "@/hooks/useCollaboration";
 import OnboardingTooltips, { shouldShowTour } from "@/components/OnboardingTooltips";
+import OnboardingFlow from "@/components/OnboardingFlow";
 import BuildSuccessModal, { shouldShowBuildSuccess, dismissBuildSuccess } from "@/components/BuildSuccessModal";
 import MCPPanel from "@/components/MCPPanel";
 import ShareModal from "@/components/ShareModal";
@@ -435,6 +436,7 @@ function BuilderPage() {
   const [showDiffPanel, setShowDiffPanel] = useState(false);
   const [showTour, setShowTour] = useState(false);
   const [showBuildSuccess, setShowBuildSuccess] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   // Recording mode — ?record=1 hides all chrome for clean screen captures
   const [recordingMode, setRecordingMode] = useState(false);
@@ -451,6 +453,13 @@ function BuilderPage() {
   useEffect(() => {
     if (shouldShowWelcomeModal()) {
       setShowWelcome(true);
+    }
+  }, []);
+
+  // Show onboarding flow for first-time users who haven't completed it
+  useEffect(() => {
+    if (!localStorage.getItem("zoobicon_onboarded")) {
+      setShowOnboarding(true);
     }
   }, []);
 
@@ -1607,6 +1616,13 @@ function BuilderPage() {
       {/* Welcome modal for first-time users */}
       {showWelcome && (
         <WelcomeModal onClose={() => { setShowWelcome(false); dismissWelcomeModal(); setTimeout(() => { if (shouldShowTour()) setShowTour(true); }, 500); }} />
+      )}
+      {showOnboarding && (
+        <OnboardingFlow onComplete={(prompt) => {
+          setShowOnboarding(false);
+          localStorage.setItem("zoobicon_onboarded", "true");
+          if (prompt) setPrompt(prompt);
+        }} />
       )}
       {showDiffPanel && (
         <div className="fixed inset-0 z-50">
