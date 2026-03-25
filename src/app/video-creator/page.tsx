@@ -213,6 +213,8 @@ function sanitizeError(raw: string): string {
     return "Generate scene images before rendering video.";
   if (lower.includes("validation of body failed") || lower.includes("too_big"))
     return "Video render request was too large. Try shorter scenes.";
+  if (lower.includes("base64") || lower.includes("embedded images") || lower.includes("too large for video"))
+    return "Scene images are too large for video rendering. Click 'Regenerate Images' to fix this.";
   if (lower.includes("api error") || lower.includes("api_error"))
     return "Service temporarily unavailable. Please try again.";
   if (lower.includes("rate limit") || lower.includes("429"))

@@ -141,9 +141,10 @@ async function generateElevenLabs(
     lastError = `ElevenLabs ${modelId}: ${res.status} ${errText}`;
     console.error(`[voiceover] ${lastError}`);
 
-    // 429 = rate limit — stop immediately
+    // 429 = rate limit — don't try more ElevenLabs models, but let the outer
+    // fallback chain try PlayHT / browser TTS instead of halting everything
     if (res.status === 429) {
-      throw new Error(`Voice generation is temporarily rate limited. Please wait a moment and try again.`);
+      throw new Error(`ElevenLabs rate limited. Trying alternative provider...`);
     }
 
     // 401 on first model could be a model-level auth issue — try simpler models first
@@ -178,7 +179,7 @@ async function generatePlayHT(
   if (!apiKey || !userId) throw new Error("Voice service is not available. Please try again later.");
 
   const voiceId = config.voiceId || "s3://voice-cloning-zero-shot/775ae416-49bb-4fb6-bd45-740f205d3e11/original/manifest.json";
-  const speed = config.speed ?? 1.0;
+  const speed = Math.min(2.0, Math.max(0.5, config.speed ?? 1.0));
 
   const res = await fetch("https://api.play.ht/api/v2/tts/stream", {
     method: "POST",

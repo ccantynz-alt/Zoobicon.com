@@ -87,6 +87,37 @@ export async function POST(req: NextRequest) {
 
     console.log(`[video-creator/render] Starting ${scenes.length} scenes with provider: ${activeProvider}`);
 
+    // Validate scene images — Runway/Luma/Pika require publicly accessible HTTP URLs.
+    // Base64 data URIs (from Stability AI) cause "request too large" errors.
+    const invalidScenes = scenes.filter(
+      (s: { imageUrl?: string; sceneNumber: number }) =>
+        s.imageUrl && (s.imageUrl.startsWith("data:") || s.imageUrl.length > 10000)
+    );
+    if (invalidScenes.length > 0) {
+      return Response.json(
+        {
+          error: `${invalidScenes.length} scene(s) have base64/embedded images which are too large for video rendering. Please regenerate images using Replicate or DALL-E (which return URL-based images) instead of Stability AI.`,
+          invalidScenes: invalidScenes.map((s: { sceneNumber: number }) => s.sceneNumber),
+          hint: "Try clicking 'Regenerate Images' — the system will use a provider that returns URL-based images.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Also check that scenes requiring images actually have them
+    const missingImages = scenes.filter(
+      (s: { imageUrl?: string; sceneNumber: number }) => !s.imageUrl || !s.imageUrl.startsWith("http")
+    );
+    if (missingImages.length > 0 && activeProvider === "runway") {
+      return Response.json(
+        {
+          error: `${missingImages.length} scene(s) are missing images. Runway requires an image for each scene. Generate images first.`,
+          missingScenes: missingImages.map((s: { sceneNumber: number }) => s.sceneNumber),
+        },
+        { status: 400 }
+      );
+    }
+
     // Pre-flight check: test the first scene only to validate the provider works
     // This prevents burning quota on a provider that will fail every time
     const result = await startRender({

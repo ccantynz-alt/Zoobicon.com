@@ -107,6 +107,11 @@ export function generateSubtitles(
     wordsPerMinute = 150,
   } = options;
 
+  // Guard: empty script → return empty subtitles
+  if (!script?.trim()) {
+    return { entries: [], srt: "", vtt: "WEBVTT\n\n", totalDuration: totalDuration || 0 };
+  }
+
   // Clean script of stage directions
   const cleanScript = script
     .replace(/\(VISUAL CUE:.*?\)/gi, "")

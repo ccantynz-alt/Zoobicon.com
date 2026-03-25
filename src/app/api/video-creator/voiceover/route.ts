@@ -64,12 +64,21 @@ export async function POST(req: NextRequest) {
 
     const activeProvider = provider || getAvailableVoiceProvider();
 
-    // Resolve voice preset
+    // Resolve voice preset — if user passes a preset name like "rachel", resolve to actual API voice ID
     let resolvedVoiceId = voiceId;
     if (voiceId) {
       const preset = VOICE_PRESETS.find((p) => p.id === voiceId);
       if (preset) {
         resolvedVoiceId = preset.voiceId;
+      } else {
+        // If it looks like a preset name but doesn't match, fall back to first available preset
+        const isPresetName = voiceId.length < 30 && !voiceId.includes("/") && !voiceId.includes(":");
+        if (isPresetName) {
+          console.warn(`[voiceover] Unknown voice preset "${voiceId}", falling back to default`);
+          const defaultPreset = VOICE_PRESETS.find((p) => p.provider === (activeProvider || "elevenlabs"));
+          if (defaultPreset) resolvedVoiceId = defaultPreset.voiceId;
+        }
+        // Otherwise it might be a raw voice ID (long string) — pass through as-is
       }
     }
 
