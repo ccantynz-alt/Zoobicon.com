@@ -269,11 +269,50 @@ export default function PricingPage() {
       { "@type": "ListItem", "position": 2, "name": "Pricing", "item": "https://zoobicon.com/pricing" }
     ]
   };
+  const faqLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is there a free plan for Zoobicon?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Zoobicon's free Starter plan includes 3 AI-generated websites per month, 10 edits, and the full 10-agent pipeline with Opus-quality builds. No credit card required. Sites get a 7-day hosting preview before you need to upgrade to keep them live."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What's the difference between Creator, Pro, and Agency plans?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Creator ($19/month) gives 15 builds, custom domains, and React/WordPress export. Pro ($49/month) gives 50 builds, AI-generated images, full SEO agent, and priority generation. Agency ($99/month) gives 200 builds, white-label branding, client portal, bulk generation, and approval workflows for managing client projects."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I cancel my Zoobicon subscription anytime?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. All paid plans are month-to-month with no contracts. You can cancel anytime from your account settings. Your sites remain live until the end of your billing period. Exported code is yours to keep regardless of subscription status."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do all plans use the same AI quality?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Every plan, including the free tier, uses the same Claude Opus 4.6 model for the core Developer agent. The difference between plans is the number of monthly builds, available export formats, and advanced features like white-label branding and the SEO campaign agent."
+        }
+      }
+    ]
+  };
 
   return (
     <div className="relative min-h-screen">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
       <BackgroundEffects preset="technical" />
 
       {/* Nav */}

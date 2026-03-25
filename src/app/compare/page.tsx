@@ -70,6 +70,57 @@ export default function ComparePage() {
           }),
         }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "How does Zoobicon compare to v0 by Vercel?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Zoobicon generates complete deployed websites (single-page, multi-page, and full-stack apps) from a single prompt, while v0 focuses on frontend React component generation within the Vercel ecosystem. Zoobicon offers 43 specialized generators, agency white-label features, and multi-LLM support (Claude, GPT, Gemini). v0 has an in-browser runtime advantage."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Is Zoobicon better than Bolt.new?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Zoobicon and Bolt.new have different strengths. Zoobicon offers higher output quality (powered by Claude Opus 4.6), 43 specialized generators, full-stack app generation with database and API, e-commerce storefronts, and agency white-label tools. Bolt.new offers faster preview via WebContainers (in-browser Node.js) and broader framework support. Zoobicon generates complete sites in 60-95 seconds; Bolt shows previews in 3-5 seconds but requires more manual assembly."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "How does Zoobicon compare to Lovable?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Both Zoobicon and Lovable generate full-stack applications. Zoobicon differentiates with 43 specialized generators (vs generic prompting), a 7-agent pipeline for higher quality output, agency white-label platform, e-commerce storefront generation, AI video creator, and multi-LLM model selection. Lovable offers Supabase integration and WebSocket-based real-time collaboration. Zoobicon starts at $19/month vs Lovable's $20/month."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Which AI website builder has the best free tier?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Zoobicon's free tier includes 3 AI-generated websites per month using the same Opus-quality AI as paid plans, plus 10 edits and 7-day hosting preview. v0 and Bolt offer limited free usage with lower model quality. Lovable offers 5 messages per day. Zoobicon is the only builder offering full pipeline quality on the free tier."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Can Zoobicon generate e-commerce stores?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. Zoobicon is the only AI builder with a dedicated e-commerce generator that creates complete storefronts with shopping cart, checkout, product grid, search/filters, wishlist, reviews, stock badges, discount codes, and shipping calculator. Competitors require manual Shopify or Stripe integration."
+                }
+              }
+            ]
+          }),
+        }}
+      />
 
       {/* Hero */}
       <section className="py-20 px-4">
