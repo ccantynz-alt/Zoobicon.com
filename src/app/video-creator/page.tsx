@@ -215,25 +215,43 @@ function sanitizeError(raw: string): string {
     return "Video render request was too large. Try shorter scenes.";
   if (lower.includes("base64") || lower.includes("embedded images") || lower.includes("too large for video"))
     return "Scene images are too large for video rendering. Click 'Regenerate Images' to fix this.";
-  if (lower.includes("api error") || lower.includes("api_error"))
-    return "Service temporarily unavailable. Please try again.";
   if (lower.includes("rate limit") || lower.includes("429"))
     return "Rate limited. Please wait a moment and try again.";
-  if (lower.includes("no provider configured") || lower.includes("add api") || lower.includes("not configured") || lower.includes("environment"))
-    return "This feature is coming soon.";
-  if (lower.includes("coming soon"))
+  // Video rendering "coming soon" or provider not configured
+  if (lower.includes("coming soon") || lower.includes("no provider configured") || lower.includes("not configured") || lower.includes("no video rendering"))
     return "Video rendering is coming soon. Images, voiceover, and subtitles are ready!";
-  if (lower.includes("render") && (lower.includes("fail") || lower.includes("error")))
-    return "Video rendering encountered an issue. Images, voiceover, and subtitles are still available.";
+  // Video rendering failures (provider issues, all scenes failed, etc.)
+  if (lower.includes("render") && (lower.includes("fail") || lower.includes("error") || lower.includes("unavailable")))
+    return "Video rendering is not yet available. Images, voiceover, and subtitles are still ready!";
+  if (lower.includes("provider") && (lower.includes("fail") || lower.includes("unavailable") || lower.includes("error") || lower.includes("not configured")))
+    return "Video rendering provider is not yet available. Other pipeline stages completed successfully.";
+  // Storyboard / AI generation failures
+  if (lower.includes("storyboard") && (lower.includes("fail") || lower.includes("error")))
+    return "Storyboard generation failed. Please try again.";
+  if (lower.includes("all ai providers") || lower.includes("ai service") || lower.includes("temporarily unavailable"))
+    return "AI service is temporarily unavailable. Please try again in a moment.";
+  if (lower.includes("parse") && lower.includes("storyboard"))
+    return "Storyboard generation encountered an issue. Please try again.";
+  if (lower.includes("api error") || lower.includes("api_error"))
+    return "Service temporarily unavailable. Please try again.";
+  if (lower.includes("add api") || lower.includes("environment"))
+    return "This feature is coming soon.";
   if (lower.includes("timeout") || lower.includes("timed out"))
     return "Request timed out. Please try again.";
-  if (lower.includes("provider") && (lower.includes("fail") || lower.includes("unavailable") || lower.includes("error")))
-    return "Video rendering provider is temporarily unavailable. Other pipeline stages completed successfully.";
+  if (lower.includes("image generation") && lower.includes("fail"))
+    return "Image generation failed. Please try again.";
+  if (lower.includes("voiceover") && lower.includes("fail"))
+    return "Voiceover generation failed. Please try again.";
+  if (lower.includes("subtitle") && lower.includes("fail"))
+    return "Subtitle generation failed. Please try again.";
   // Strip any JSON, env var references, and technical details from the message
   let cleaned = raw.replace(/\{[\s\S]*\}/, "").replace(/\[[\s\S]*\]/, "").trim();
   cleaned = cleaned.replace(/[A-Z_]{3,}_[A-Z_]+/g, "").trim(); // Strip env var names like ELEVENLABS_API_KEY
-  // If what's left is too long or still looks technical, genericize
-  if (cleaned.length > 80 || cleaned.includes("error:") || cleaned.includes("Error:") || cleaned.includes("env") || cleaned.includes("key"))
+  // If what's left still looks technical, genericize — but keep reasonably short user-friendly messages
+  if (cleaned.includes("error:") || cleaned.includes("Error:") || cleaned.includes("env") || cleaned.includes("key") || cleaned.includes("API") || cleaned.includes("module"))
+    return "Something went wrong. Please try again.";
+  // Keep cleaned messages up to 120 chars (previous limit of 80 was too aggressive)
+  if (cleaned.length > 120)
     return "Something went wrong. Please try again.";
   return cleaned || "Something went wrong. Please try again.";
 }
@@ -680,15 +698,27 @@ export default function VideoCreatorDashboard() {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "Failed to generate storyboard");
+        // Map specific error codes to clear messages
+        if (res.status === 503) {
+          throw new Error("AI service is temporarily unavailable. Please try again in a moment.");
+        }
+        throw new Error(data.error || "Storyboard generation failed. Please try again.");
       }
-      const data: Storyboard = await res.json();
+      let data: Storyboard;
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error("Storyboard generation failed. Please try again.");
+      }
+      if (!data.storyboard || !Array.isArray(data.storyboard) || data.storyboard.length === 0) {
+        throw new Error("Storyboard generation failed. Please try again.");
+      }
       setStoryboard(data);
       setActiveScene(0);
       if (!script && data.script) setScript(data.script);
       saveProject(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Generation failed");
+      setError(err instanceof Error ? err.message : "Storyboard generation failed. Please try again.");
     } finally {
       setGenerating(false);
     }
@@ -825,7 +855,7 @@ export default function VideoCreatorDashboard() {
       const allFailed = data.jobs?.length > 0 && data.jobs.every((j: RenderJob) => j.status === "failed");
       if (allFailed || data.error) {
         setRenderJobs(data.jobs || []);
-        throw new Error(data.error || "Video rendering failed — the provider may not be configured correctly. Your images, voiceover, and subtitles are still ready.");
+        throw new Error("Video rendering is not yet available. Your images, voiceover, and subtitles are still ready.");
       }
 
       setRenderJobs(data.jobs || []);
@@ -1091,7 +1121,7 @@ export default function VideoCreatorDashboard() {
         .filter((s) => s.imageUrl && s.imageUrl.startsWith("http"));
 
       if (renderScenes.length === 0) {
-        progress.video = { status: "failed", error: "No scene images available for rendering. Image generation may have failed — try running the pipeline again." };
+        progress.video = { status: "failed", error: "No scene images for rendering. Try running the pipeline again." };
       } else {
         progress.video = { status: "running" };
         setFullPipelineProgress({ ...progress });
@@ -1116,17 +1146,24 @@ export default function VideoCreatorDashboard() {
           const allFailed = data.jobs?.length > 0 && data.jobs.every((j: RenderJob) => j.status === "failed");
           if (allFailed || data.error) {
             setRenderJobs(data.jobs || []);
-            throw new Error(data.error || "Video rendering provider failed. Images, voiceover, and subtitles are ready.");
+            throw new Error("Video rendering is not yet available.");
           }
           setRenderJobs(data.jobs || []);
           pollRenderStatus(data.jobs || []);
           progress.video = { status: "done" };
         } catch (err) {
-          progress.video = { status: "failed", error: err instanceof Error ? err.message : "Render failed" };
+          const msg = err instanceof Error ? err.message : "";
+          // Use a short, clear message that won't be genericized by sanitizeError
+          progress.video = {
+            status: "failed",
+            error: msg.includes("not yet available") || msg.includes("coming soon")
+              ? "Video rendering is coming soon. Other assets are ready!"
+              : "Video rendering unavailable. Other assets are ready!",
+          };
         }
       }
     } else {
-      progress.video = { status: "skipped", error: "No video rendering provider configured. Images, voiceover, and subtitles were generated successfully." };
+      progress.video = { status: "skipped", error: "Video rendering coming soon. Images, voiceover, and subtitles are ready!" };
     }
 
     progress.running = false;
