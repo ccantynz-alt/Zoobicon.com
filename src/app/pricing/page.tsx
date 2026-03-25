@@ -247,8 +247,33 @@ export default function PricingPage() {
     }
   }
 
+  const pricingJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "Zoobicon Plans",
+    "description": "AI Website Builder plans for individuals, creators, professionals, and agencies.",
+    "url": "https://zoobicon.com/pricing",
+    "brand": { "@type": "Brand", "name": "Zoobicon" },
+    "offers": [
+      { "@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "USD", "description": "3 AI-generated websites per month, 10 edits, 7-day hosting preview" },
+      { "@type": "Offer", "name": "Creator", "price": "19", "priceCurrency": "USD", "billingIncrement": "P1M", "description": "15 websites per month, custom domains, React export" },
+      { "@type": "Offer", "name": "Pro", "price": "49", "priceCurrency": "USD", "billingIncrement": "P1M", "description": "50 websites per month, priority generation, all exports" },
+      { "@type": "Offer", "name": "Agency", "price": "99", "priceCurrency": "USD", "billingIncrement": "P1M", "description": "200 websites per month, white-label, client portal, bulk generation" }
+    ]
+  };
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://zoobicon.com" },
+      { "@type": "ListItem", "position": 2, "name": "Pricing", "item": "https://zoobicon.com/pricing" }
+    ]
+  };
+
   return (
     <div className="relative min-h-screen">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <BackgroundEffects preset="technical" />
 
       {/* Nav */}

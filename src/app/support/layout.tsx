@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     siteName: "Zoobicon",
     type: "website",
   },
+  alternates: { canonical: "https://zoobicon.com/support" },
 };
 
 export default function SupportLayout({

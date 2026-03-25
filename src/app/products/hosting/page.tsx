@@ -241,8 +241,37 @@ const MIGRATION_FEATURES = [
 ];
 
 export default function HostingPage() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Zoobicon Hosting",
+    "applicationCategory": "WebApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "AggregateOffer",
+      "lowPrice": "0",
+      "highPrice": "99",
+      "priceCurrency": "USD",
+      "offerCount": "4"
+    },
+    "description": "Deploy AI-generated websites instantly to zoobicon.sh with global CDN, automatic SSL, custom domains, DDoS protection, and 99.99% uptime.",
+    "url": "https://zoobicon.com/products/hosting",
+    "screenshot": "https://zoobicon.com/og-image.png"
+  };
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://zoobicon.com" },
+      { "@type": "ListItem", "position": 2, "name": "Products", "item": "https://zoobicon.com/products" },
+      { "@type": "ListItem", "position": 3, "name": "Hosting", "item": "https://zoobicon.com/products/hosting" }
+    ]
+  };
+
   return (
     <div className="relative min-h-screen">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <BackgroundEffects preset="technical" />
 
       {/* Navigation */}

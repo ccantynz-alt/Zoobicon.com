@@ -6,8 +6,17 @@ import BackgroundEffects from "@/components/BackgroundEffects";
 export const revalidate = 86400; // Revalidate once per day
 
 export const metadata: Metadata = {
-  title: "Privacy Policy - Zoobicon",
-  description: "Zoobicon Privacy Policy — how we collect, use, and protect your data.",
+  title: "Privacy Policy — Zoobicon",
+  description:
+    "Zoobicon Privacy Policy — how we collect, use, and protect your data. Transparent data practices for the AI website builder platform.",
+  openGraph: {
+    title: "Privacy Policy — Zoobicon",
+    description: "How Zoobicon collects, uses, and protects your data. Transparent data practices.",
+    url: "https://zoobicon.com/privacy",
+    siteName: "Zoobicon",
+    type: "website",
+  },
+  alternates: { canonical: "https://zoobicon.com/privacy" },
 };
 
 export default function PrivacyPage() {

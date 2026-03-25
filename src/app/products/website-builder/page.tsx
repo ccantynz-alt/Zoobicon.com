@@ -48,8 +48,37 @@ const STEPS = [
 ];
 
 export default function WebsiteBuilderPage() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Zoobicon AI Website Builder",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "AggregateOffer",
+      "lowPrice": "0",
+      "highPrice": "99",
+      "priceCurrency": "USD",
+      "offerCount": "4"
+    },
+    "description": "Build production-ready websites in 60 seconds with 7 AI agents. No coding required.",
+    "url": "https://zoobicon.com/products/website-builder",
+    "screenshot": "https://zoobicon.com/og-image.png"
+  };
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://zoobicon.com" },
+      { "@type": "ListItem", "position": 2, "name": "Products", "item": "https://zoobicon.com/products" },
+      { "@type": "ListItem", "position": 3, "name": "Website Builder", "item": "https://zoobicon.com/products/website-builder" }
+    ]
+  };
+
   return (
     <div className="relative min-h-screen">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <BackgroundEffects preset="technical" />
 
       {/* Nav */}

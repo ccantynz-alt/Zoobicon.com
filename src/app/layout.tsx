@@ -45,6 +45,10 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(meta.url),
     alternates: {
       canonical: "/",
+      languages: {
+        "en": "https://zoobicon.com",
+        "x-default": "https://zoobicon.com",
+      },
     },
     openGraph: {
       type: "website",
@@ -110,6 +114,12 @@ export default function RootLayout({
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <head>
+        {/* Hreflang alternate links for multi-domain SEO */}
+        <link rel="alternate" hrefLang="en" href="https://zoobicon.com" />
+        <link rel="alternate" hrefLang="x-default" href="https://zoobicon.com" />
+        <link rel="alternate" href="https://zoobicon.ai" title="Zoobicon AI" />
+        <link rel="alternate" href="https://zoobicon.io" title="Zoobicon for Developers" />
+        <link rel="alternate" href="https://zoobicon.sh" title="Zoobicon Hosting & CLI" />
         {/* Critical inline styles — guarantees dark bg even before CSS bundle loads */}
         <style dangerouslySetInnerHTML={{ __html: `html,body{background:#050508;color:#e4e4e7;margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;letter-spacing:-0.011em}` }} />
         {/* Preconnect to Google Fonts CDN */}
