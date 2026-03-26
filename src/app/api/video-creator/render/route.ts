@@ -63,35 +63,22 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Validate scene images BEFORE quota check — Runway/Luma/Pika require publicly accessible HTTP URLs.
-    // Base64 data URIs (from Stability AI) cause "request too large" errors.
-    const invalidScenes = scenes.filter(
-      (s: { imageUrl?: string; sceneNumber: number }) =>
-        s.imageUrl && (s.imageUrl.startsWith("data:") || s.imageUrl.length > 10000)
-    );
-    if (invalidScenes.length > 0) {
-      return Response.json(
-        {
-          error: `${invalidScenes.length} scene(s) have base64/embedded images which are too large for video rendering. Please regenerate images using Replicate or DALL-E (which return URL-based images) instead of Stability AI.`,
-          invalidScenes: invalidScenes.map((s: { sceneNumber: number }) => s.sceneNumber),
-          hint: "Try clicking 'Regenerate Images' — the system will use a provider that returns URL-based images.",
-        },
-        { status: 400 }
-      );
+    // Strip base64/oversized images from scenes — don't reject the whole batch.
+    // Scenes with base64 images will fall back to text-to-video (prompt only).
+    for (const s of scenes) {
+      if (s.imageUrl && (s.imageUrl.startsWith("data:") || s.imageUrl.length > 10000)) {
+        console.warn(`[video-creator/render] Scene ${s.sceneNumber}: stripping base64 image (${s.imageUrl.length} chars) — falling back to text-to-video`);
+        s.imageUrl = undefined;
+      }
     }
 
-    // Check that scenes requiring images actually have them
+    // For Runway (image-to-video), filter to only scenes with valid HTTP URLs.
+    // Scenes without images will use text-to-video via the render engine's fallback.
     const missingImages = scenes.filter(
       (s: { imageUrl?: string; sceneNumber: number }) => !s.imageUrl || !s.imageUrl.startsWith("http")
     );
-    if (missingImages.length > 0 && activeProvider === "runway") {
-      return Response.json(
-        {
-          error: `${missingImages.length} scene(s) are missing images. Runway requires an image for each scene. Generate images first.`,
-          missingScenes: missingImages.map((s: { sceneNumber: number }) => s.sceneNumber),
-        },
-        { status: 400 }
-      );
+    if (missingImages.length > 0) {
+      console.warn(`[video-creator/render] ${missingImages.length} scene(s) missing images — will use text-to-video fallback`);
     }
 
     // Quota enforcement — check AFTER image validation so we count only renderable scenes
