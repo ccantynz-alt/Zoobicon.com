@@ -7,6 +7,7 @@ import { logAudit } from "@/lib/audit";
 import { createResetToken } from "@/lib/resetToken";
 import { sendViaMailgun } from "@/lib/mailgun";
 import { trackReferral } from "@/lib/referral";
+import { emailTemplate } from "@/lib/email-template";
 
 const signupLimiter = { limit: 3, windowMs: 60000 };
 
@@ -76,14 +77,13 @@ export async function POST(request: NextRequest) {
         from: `Zoobicon <noreply@${process.env.MAILGUN_DOMAIN || "zoobicon.com"}>`,
         to: user.email,
         subject: "Verify your Zoobicon account",
-        html: `
-          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 20px;">
-            <h1 style="font-size: 24px; color: #1a1a2e; margin-bottom: 8px;">Welcome to Zoobicon${user.name ? `, ${user.name}` : ""}!</h1>
-            <p style="color: #555; font-size: 16px; line-height: 1.6;">Click the button below to verify your email and start building websites with AI.</p>
-            <a href="${verifyLink}" style="display: inline-block; background: #6366f1; color: #fff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px; margin: 24px 0;">Verify Email</a>
-            <p style="color: #888; font-size: 13px;">This link expires in 1 hour. If you didn't create an account, ignore this email.</p>
-          </div>
-        `,
+        html: emailTemplate({
+          heading: `Welcome to Zoobicon${user.name ? `, ${user.name}` : ""}!`,
+          body: "Click the button below to verify your email and start building websites with AI.",
+          buttonText: "Verify Email",
+          buttonUrl: verifyLink,
+          footerNote: "This link expires in 1 hour. If you didn't create an account, ignore this email.",
+        }),
         tags: ["email-verification"],
       }).catch((err) => console.error("[Signup] Failed to send verification email:", err));
     }).catch((err) => console.error("[Signup] Failed to create verification token:", err));
