@@ -468,17 +468,11 @@ Output the <config> block first, then the <body-html> block. Nothing else.`;
                 cache_control: { type: "ephemeral" as const },
               },
             ],
-            messages: isOpus
-              ? [{ role: "user", content: userMessage }]
-              : [
-                  { role: "user", content: userMessage },
-                  // Assistant prefill: skip preamble (not supported on Opus 4.6)
-                  { role: "assistant", content: "<config>\n{" },
-                ],
+            // No assistant prefill — Claude 4.6 (all models) no longer supports it
+            messages: [{ role: "user", content: userMessage }],
           });
 
-          // Prepend prefill for non-Opus models so parsing regexes still match
-          let accumulated = isOpus ? "" : "<config>\n{";
+          let accumulated = "";
           let bodyStarted = false;
           let chunkCount = 0;
           let lastStatusTime = 0;
