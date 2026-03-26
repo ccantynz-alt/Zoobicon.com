@@ -1159,6 +1159,24 @@ All Tier 1 stickiness components are now wired into the actual user flows:
 3. Real-time collab (WebSocket upgrade from polling)
 4. Design ecosystem (expand component library, add themes)
 
+31. **Four-Domain Signature — MANDATORY on all external communications** — Every email, signature, footer, external reply, or outbound communication from Zoobicon MUST include all four domains displayed prominently:
+
+    **zoobicon.com · zoobicon.ai · zoobicon.io · zoobicon.sh**
+
+    This applies to:
+    - All transactional emails (signup, verification, password reset, deployment notifications)
+    - All marketing emails (campaigns, newsletters, drip sequences)
+    - All support ticket replies (auto and manual)
+    - All admin notification emails
+    - All external correspondence (AWS, partners, vendors)
+    - Email signatures in Apple Mail / Outlook / any email client
+    - Footer of every public page on the website
+    - OG images and social sharing cards where space permits
+
+    The shared email template (`src/lib/email-template.ts`) already implements this. Any new email sending code MUST use `emailTemplate()` from that file — never inline HTML without the domain footer. If a context doesn't support HTML (plain text replies, chat messages), use the text format: `zoobicon.com | zoobicon.ai | zoobicon.io | zoobicon.sh`
+
+    **Key files:** `src/lib/email-template.ts` (HTML template with domain footer), `src/lib/admin-notify.ts` (admin notifications), `src/app/api/auth/signup/route.ts` (verification email), `src/app/api/auth/forgot-password/route.ts` (password reset), `src/app/api/auth/resend-verification/route.ts` (resend verification).
+
 ---
 
 ## MANDATORY SESSION PROTOCOL — AUTONOMOUS ENGINEERING EXCELLENCE

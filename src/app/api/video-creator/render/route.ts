@@ -81,8 +81,8 @@ export async function POST(req: NextRequest) {
       console.warn(`[video-creator/render] ${missingImages.length} scene(s) missing images — will use text-to-video fallback`);
     }
 
-    // Quota enforcement — check AFTER image validation so we count only renderable scenes
-    const renderableSceneCount = scenes.length - invalidScenes.length - missingImages.length;
+    // Quota enforcement — count only scenes with valid images for rendering
+    const renderableSceneCount = scenes.length - missingImages.length;
     if (email) {
       await ensureVideoUsageTable();
       const limits = getVideoPlanLimits(plan || "free", !!hasAddon);
