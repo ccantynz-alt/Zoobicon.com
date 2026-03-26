@@ -38,6 +38,13 @@ export interface MailgunSendResult {
 export async function sendViaMailgun(
   opts: MailgunSendOptions
 ): Promise<MailgunSendResult> {
+  // Staging/preview: log emails instead of sending to prevent accidental real emails
+  const vercelEnv = process.env.VERCEL_ENV;
+  if (vercelEnv === "preview") {
+    console.log(`[Mailgun:STAGING] Would send to: ${Array.isArray(opts.to) ? opts.to.join(", ") : opts.to}, Subject: ${opts.subject}`);
+    return { success: true, messageId: `staging-${Date.now()}` };
+  }
+
   const apiKey = MAILGUN_API_KEY();
   const domain = MAILGUN_DOMAIN();
 
