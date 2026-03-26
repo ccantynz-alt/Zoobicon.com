@@ -2,17 +2,15 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
-  Zap, Shield, CheckCircle2, XCircle, AlertTriangle, LogOut,
-  Settings, Users, Server, Globe, RefreshCw,
-  Copy, Check, ExternalLink, BarChart3, Code2,
+  Zap, Shield, CheckCircle2, XCircle, Settings,
+  Users, Server, Globe, RefreshCw,
+  Copy, Check, BarChart3, Code2,
   Trash2, Edit3, Crown, ImagePlus, Workflow, Layout,
   TrendingUp, UserPlus, FolderOpen, Rocket, Mail, Inbox, HeadphonesIcon,
   Activity, Database, Cpu, Wifi, ArrowUpRight,
 } from "lucide-react";
-import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
-import BackgroundEffects from "@/components/BackgroundEffects";
 
 type AdminTab = "overview" | "users" | "templates" | "analytics";
 
@@ -46,7 +44,7 @@ interface Analytics {
 }
 
 export default function AdminPage() {
-  const [userName, setUserName] = useState("");
+  // userName removed — now displayed by AdminShell sidebar
   const [isAdmin, setIsAdmin] = useState(false);
   const [activeTab, setActiveTab] = useState<AdminTab>("overview");
   const [copied, setCopied] = useState("");
@@ -72,17 +70,11 @@ export default function AdminPage() {
       if (!raw) { window.location.href = "/auth/login"; return; }
       const user = JSON.parse(raw);
       if (user.role !== "admin") { window.location.href = "/dashboard"; return; }
-      setUserName(user.name || user.email || "Admin");
       setIsAdmin(true);
     } catch {
       window.location.href = "/auth/login";
     }
   }, []);
-
-  const handleLogout = () => {
-    try { localStorage.removeItem("zoobicon_user"); } catch {}
-    window.location.href = "/";
-  };
 
   const copyToClipboard = (text: string, key: string) => {
     navigator.clipboard.writeText(text).catch(() => {});
@@ -282,63 +274,35 @@ export default function AdminPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#131520] text-white overflow-hidden">
-      <BackgroundEffects preset="admin" />
-      {/* Animated fog background */}
-      <div className="fog-container">
-        <div className="fog-layer fog-layer-1" />
-        <div className="fog-layer fog-layer-2" />
-        <div className="fog-layer fog-layer-3" />
-        <div className="fog-glow-spot fog-glow-1" />
-        <div className="fog-glow-spot fog-glow-2" />
-        <div className="fog-glow-spot fog-glow-3" />
-        <div className="fog-glow-spot fog-glow-4" />
-      </div>
-      <CursorGlowTracker />
+    <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-8">
 
-      {/* ── Vibrant Nav ── */}
-      <nav className="sticky top-0 z-50 border-b border-violet-500/30 bg-gradient-to-r from-[#0a0a1a]/85 via-[#150a30]/85 to-[#0a0a1a]/85 backdrop-blur-2xl shadow-xl shadow-violet-500/10">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 via-brand-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-brand-500/30 group-hover:shadow-brand-500/50 transition-shadow">
-                <Zap className="w-4.5 h-4.5 text-white" />
-              </div>
-              <span className="text-lg font-bold tracking-tight bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">Zoobicon</span>
-            </Link>
-            <div className="w-px h-5 bg-gradient-to-b from-transparent via-white/20 to-transparent" />
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-violet-500/15 to-brand-500/15 border border-violet-500/25">
-              <Shield className="w-3.5 h-3.5 text-violet-400" />
-              <span className="text-xs font-bold text-violet-300 tracking-wide uppercase">Admin</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-white/60 hidden sm:block font-medium">{userName}</span>
-            <Link href="/builder" className="text-xs text-white/70 hover:text-white px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/10 transition-all">
-              Builder
-            </Link>
-            <Link href="/dashboard" className="text-xs text-white/70 hover:text-white px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/10 transition-all">
-              Dashboard
-            </Link>
-            <button onClick={handleLogout} className="flex items-center gap-1.5 text-xs text-red-400/70 hover:text-red-400 transition-colors">
-              <LogOut className="w-3.5 h-3.5" />
-              Sign out
-            </button>
-          </div>
+      {/* ── Page Header ── */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-white">Command Center</h1>
+          <p className="text-sm text-slate-400 mt-1">System health, configuration, and platform management</p>
         </div>
-      </nav>
+        <div className="flex items-center gap-2">
+          <Link href="/builder" className="text-xs text-slate-400 hover:text-white px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.08] hover:border-white/[0.15] hover:bg-white/[0.07] transition-all">
+            Builder
+          </Link>
+          <Link href="/dashboard" className="text-xs text-slate-400 hover:text-white px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.08] hover:border-white/[0.15] hover:bg-white/[0.07] transition-all">
+            Dashboard
+          </Link>
+        </div>
+      </div>
 
-      {/* ── Tab Navigation ── */}
-      <div className="border-b border-violet-500/10 bg-gradient-to-r from-violet-500/[0.03] via-cyan-500/[0.02] to-violet-500/[0.03] backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex gap-1">
+      {/* ── Content Tabs ── */}
+      <div className="border-b border-white/[0.06]">
+        <div className="flex gap-1">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-5 py-3.5 text-xs font-semibold border-b-2 transition-all ${
+              className={`flex items-center gap-2 px-4 py-2.5 text-xs font-medium border-b-2 transition-all ${
                 activeTab === tab.id
-                  ? "border-violet-500 text-violet-300 bg-violet-500/5"
-                  : "border-transparent text-white/50 hover:text-white/70 hover:bg-white/[0.03]"
+                  ? "border-indigo-500 text-white"
+                  : "border-transparent text-slate-500 hover:text-slate-300 hover:bg-white/[0.02]"
               }`}
             >
               {tab.icon}
@@ -348,39 +312,10 @@ export default function AdminPage() {
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-6 lg:px-8 py-10 space-y-8 relative z-10">
-        <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
-
-        {/* ═══════ OVERVIEW TAB ═══════ */}
-        {activeTab === "overview" && (
-          <>
-            {/* Hero Header */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-600/40 via-brand-500/30 to-cyan-500/40 border border-violet-400/40 p-8 shadow-2xl shadow-violet-500/20 backdrop-blur-xl"
-            >
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(139,92,246,0.35),transparent_50%)]" />
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(6,182,212,0.30),transparent_50%)]" />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(99,102,241,0.15),transparent_70%)]" />
-              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-400/70 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent" />
-              <div className="relative">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-violet-500/30">
-                    <Shield className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h1 className="text-3xl font-black tracking-tight bg-gradient-to-r from-white via-violet-200 to-cyan-200 bg-clip-text text-transparent">
-                      Command Center
-                    </h1>
-                    <p className="text-sm text-white/60">System health, configuration, and platform management</p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* ── Quick Actions: 2 rows ── */}
+      {/* ═══════ OVERVIEW TAB ═══════ */}
+      {activeTab === "overview" && (
+        <>
+            {/* ── Quick Actions ── */}
             <div>
               <h2 className="text-xs font-bold uppercase tracking-widest text-white/50 mb-3 flex items-center gap-2">
                 <Activity className="w-3.5 h-3.5 text-violet-400" />
@@ -928,7 +863,6 @@ export default function AdminPage() {
             )}
           </>
         )}
-      </main>
     </div>
   );
 }

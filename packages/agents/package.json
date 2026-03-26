@@ -1,0 +1,31 @@
+{
+  "name": "@zoobicon/agents",
+  "version": "1.0.0",
+  "description": "Open-source AI agent framework. Build autonomous agents that discover tasks, execute them, and self-heal. By Zoobicon.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist", "README.md", "LICENSE"],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "keywords": ["ai", "agents", "autonomous", "framework", "automation", "scheduler", "tasks"],
+  "author": "Zoobicon <hello@zoobicon.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zoobicon/agents"
+  },
+  "homepage": "https://zoobicon.com/agents",
+  "engines": {
+    "node": ">=18"
+  },
+  "peerDependencies": {
+    "@neondatabase/serverless": ">=0.9.0"
+  },
+  "peerDependenciesMeta": {
+    "@neondatabase/serverless": {
+      "optional": true
+    }
+  }
+}
