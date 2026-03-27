@@ -426,7 +426,7 @@ function BuilderPage() {
   const [reactSource, setReactSource] = useState<Record<string, string> | null>(null);
   const [reactFiles, setReactFiles] = useState<Record<string, string> | null>(null);
   const [reactDeps, setReactDeps] = useState<Record<string, string>>({});
-  const [generationMode, setGenerationMode] = useState<GenerationMode>("single");
+  const [generationMode, setGenerationMode] = useState<GenerationMode>("react");
   const [mcpContext, setMcpContext] = useState("");
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   // Phase 2: Visual editing

@@ -25,6 +25,9 @@ Zoobicon is an AI-built platform. There is NO excuse for using old technology. E
 - **Export**: GitHub sync, real repository, npm packages
 - **Design system**: shadcn/ui components (industry standard for React)
 
+**HARD RULE — NO OLD TECHNOLOGY KEPT AS FALLBACK:**
+When we adopt a new technology, the old one is REMOVED, not kept alongside. No "HTML mode still works." No "legacy fallback." No "kept for backwards compatibility." The old way is deleted. We can never be stale in this market. Stale = dead. If a competitor does something new, we match it AND remove our old way of doing it. Every line of legacy code is a line that makes us look outdated.
+
 **The migration path:**
 - Phase 1: Add Sandpack preview alongside existing HTML builder
 - Phase 2: AI generates React components instead of HTML
@@ -33,6 +36,35 @@ Zoobicon is an AI-built platform. There is NO excuse for using old technology. E
 - Phase 5: One-click Vercel/GitHub deployment
 
 **The test:** If a user builds something on Zoobicon and then tries Lovable or Bolt, they should think "Zoobicon was better." Not "about the same." Not "different but comparable." BETTER. If they don't think that, we've failed.
+
+**TECHNOLOGY RADAR — What Claude Must Research Every Session**
+
+**Before building ANYTHING, Claude must check: is there a newer/better way to do this?**
+
+**ADOPT NOW (proven, must implement):**
+- Sandpack for in-browser React preview ✅ (installed)
+- shadcn/ui as the component design system
+- React Server Components for generation output
+- Tailwind CSS v4 (if stable)
+- MCP (Model Context Protocol) for tool integration
+- GitHub sync for generated projects
+- Vercel deployment integration
+
+**EVALUATE (emerging, first-mover advantage):**
+- WebMCP (Google, Feb 2026) — structured website interactions for AI agents
+- A2A (Agent-to-Agent protocol) — multi-agent communication standard
+- AG-UI (CopilotKit) — agent-to-frontend communication protocol
+- Agent Memory — persistent context across sessions (NO ONE has this yet — massive opportunity)
+- Veo 3.1 API — native audio + video generation (Sora is dead, Veo leads)
+- Kling 3.0 API — cost-effective video at scale with audio sync
+- Seedance 2.0 — multi-modal input (9 images + 3 videos + 3 audio tracks)
+
+**WATCH (not ready yet but coming):**
+- WebContainers (StackBlitz) — full Node.js in browser
+- Real-time AI video editing (late 2026)
+- Agent-native startups bypassing traditional software entirely
+
+**RULE: If a technology on the ADOPT list is not implemented, it's a bug. Fix it immediately. If a technology on the EVALUATE list could give us an advantage, research it and propose implementation. If a WATCH item moves to EVALUATE, flag it immediately.**
 
 ## COMPETITIVE MANDATE — 80-90% MORE ADVANCED THAN COMPETITORS
 
