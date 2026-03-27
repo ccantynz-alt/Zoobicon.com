@@ -39,7 +39,7 @@ export interface AIModel {
   tier: string;
 }
 
-export type GenerationMode = "single" | "multi" | "fullstack";
+export type GenerationMode = "single" | "multi" | "fullstack" | "react";
 
 interface PromptInputProps {
   prompt: string;
