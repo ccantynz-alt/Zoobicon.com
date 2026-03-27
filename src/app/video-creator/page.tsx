@@ -1118,8 +1118,9 @@ export default function VideoCreatorDashboard() {
 
     // --- Step 3: Video render (if provider available) ---
     if (capabilities?.videoRender?.available) {
-      // Only render scenes that have images (image generation may have failed for some)
-      const imageMap = new Map(generatedImages.map((i) => [i.sceneNumber, i.imageUrl]));
+      // Use pipeline-generated images, fall back to previously generated scene images
+      const imagesToUse = generatedImages.length > 0 ? generatedImages : sceneImages;
+      const imageMap = new Map(imagesToUse.map((i) => [i.sceneNumber, i.imageUrl]));
       const renderScenes = storyboard.storyboard
         .map((s) => ({
           sceneNumber: s.sceneNumber,
