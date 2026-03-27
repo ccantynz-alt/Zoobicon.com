@@ -135,8 +135,7 @@ export default function AIChatAssistant() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Don't render on admin pages
-  if (pathname?.startsWith("/admin")) return null;
+  const isAdminPage = pathname?.startsWith("/admin");
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -183,6 +182,9 @@ export default function AIChatAssistant() {
       handleSend();
     }
   };
+
+  // Don't render on admin pages
+  if (isAdminPage) return null;
 
   return (
     <>

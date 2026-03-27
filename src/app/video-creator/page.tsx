@@ -281,7 +281,7 @@ export default function VideoCreatorDashboard() {
 
   // Voice recording state
   const [isRecording, setIsRecording] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   const [recognition, setRecognition] = useState<any>(null);
 
   const toggleVoiceInput = useCallback(() => {
@@ -299,7 +299,7 @@ export default function VideoCreatorDashboard() {
       return;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  
     const recog = new (SpeechRecognitionCtor as any)();
     recog.continuous = true;
     recog.interimResults = true;
@@ -307,7 +307,7 @@ export default function VideoCreatorDashboard() {
 
     let finalTranscript = "";
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  
     recog.onresult = (event: any) => {
       let interim = "";
       for (let i = event.resultIndex; i < event.results.length; i++) {

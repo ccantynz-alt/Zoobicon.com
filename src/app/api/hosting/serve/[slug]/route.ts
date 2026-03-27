@@ -31,7 +31,9 @@ export async function GET(
     const [siteRow] = await sql`
       SELECT name FROM sites WHERE slug = ${slug} AND status = 'active' LIMIT 1
     `;
-    const siteName = siteRow?.name || slug;
+    const rawSiteName = (siteRow?.name || slug) as string;
+    // Escape HTML entities in site name to prevent XSS via OG tag injection
+    const siteName = rawSiteName.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
     if (!deployment || !deployment.code) {
       return new Response(
