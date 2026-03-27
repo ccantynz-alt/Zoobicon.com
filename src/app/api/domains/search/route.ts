@@ -3,7 +3,8 @@ import { createHash } from "crypto";
 
 // ---------------------------------------------------------------------------
 // GET /api/domains/search?q=domainname&tlds=com,io,ai
-// Searches domain availability across 12 TLDs with smart simulation fallback.
+// Searches domain availability via OpenSRS (Tucows) API.
+// Falls back to DNS-based check if OpenSRS credentials aren't configured.
 // ---------------------------------------------------------------------------
 
 // TLD pricing (registration price per year)
@@ -24,124 +25,119 @@ const TLD_PRICING: Record<string, number> = {
 
 const DEFAULT_TLDS = Object.keys(TLD_PRICING);
 
-// Well-known domains that should always show as taken for major TLDs
-const TAKEN_NAMES = new Set([
-  "google", "facebook", "amazon", "apple", "microsoft", "twitter", "x",
-  "instagram", "tiktok", "youtube", "netflix", "spotify", "uber", "airbnb",
-  "stripe", "shopify", "github", "gitlab", "stackoverflow", "reddit",
-  "linkedin", "pinterest", "snapchat", "whatsapp", "telegram", "discord",
-  "slack", "zoom", "dropbox", "paypal", "venmo", "coinbase", "openai",
-  "anthropic", "nvidia", "tesla", "spacex", "meta", "alphabet", "samsung",
-  "sony", "nintendo", "adobe", "oracle", "ibm", "intel", "amd", "cisco",
-  "salesforce", "wordpress", "squarespace", "wix", "godaddy", "namecheap",
-  "cloudflare", "vercel", "netlify", "heroku", "aws", "azure", "firebase",
-  "mongodb", "postgresql", "mysql", "redis", "docker", "kubernetes",
-  "python", "javascript", "typescript", "golang", "rust", "java",
-  "react", "angular", "vue", "svelte", "nextjs", "nodejs",
-  "yahoo", "bing", "baidu", "alibaba", "tencent", "bytedance",
-  "walmart", "target", "costco", "nike", "adidas", "gucci", "prada",
-  "news", "weather", "sports", "music", "video", "photo", "email",
-  "blog", "shop", "store", "buy", "sell", "trade", "money", "bank",
-  "food", "travel", "hotel", "flight", "car", "home", "house",
-  "health", "fitness", "game", "play", "app", "web", "site", "page",
-  "love", "life", "world", "earth", "sky", "star", "moon", "sun",
-]);
+// ---------------------------------------------------------------------------
+// OpenSRS (Tucows) API — Real domain availability lookup
+// ---------------------------------------------------------------------------
 
-// TLDs where well-known names are almost always taken
-const MAJOR_TLDS = new Set(["com", "net", "org", "io", "co", "ai"]);
+function getOpenSRSConfig() {
+  const apiKey = process.env.OPENSRS_API_KEY;
+  const user = process.env.OPENSRS_RESELLER_USER;
+  const env = process.env.OPENSRS_ENV || "test";
 
-// Common English dictionary words that count as premium
-const DICTIONARY_WORDS = new Set([
-  "cloud", "code", "data", "tech", "labs", "hub", "flow", "wave", "core",
-  "mind", "work", "sync", "link", "node", "bolt", "grid", "edge", "pulse",
-  "spark", "swift", "craft", "build", "stack", "vault", "forge", "bloom",
-  "shift", "drift", "flash", "quest", "pixel", "logic", "prime", "atlas",
-  "nova", "apex", "zenith", "orbit", "nexus", "echo", "aura", "flux",
-  "market", "studio", "digital", "agency", "design", "creative", "media",
-  "social", "crypto", "cyber", "smart", "rapid", "turbo", "ultra", "mega",
-  "super", "pro", "max", "elite", "premium", "global", "direct", "express",
-  "secure", "fast", "quick", "easy", "simple", "clean", "pure", "fresh",
-  "bright", "bold", "true", "real", "open", "free", "wise", "keen",
-]);
-
-/**
- * Deterministic hash for a string, returns a number between 0 and 1.
- * Same input always produces the same output.
- */
-function deterministicRandom(input: string): number {
-  const hash = createHash("sha256").update(input).digest("hex");
-  // Use first 8 hex chars (32 bits) as a fraction
-  const num = parseInt(hash.slice(0, 8), 16);
-  return num / 0xffffffff;
-}
-
-/**
- * Check if a name is "short" (1-3 chars) — these are premium.
- */
-function isShortName(name: string): boolean {
-  return name.length <= 3;
-}
-
-/**
- * Check if a name is a dictionary/premium word.
- */
-function isPremiumWord(name: string): boolean {
-  return DICTIONARY_WORDS.has(name.toLowerCase());
-}
-
-/**
- * Determine if a domain is available using deterministic simulation.
- */
-function simulateAvailability(name: string, tld: string): boolean {
-  // Well-known brands: taken on major TLDs, sometimes taken on minor ones
-  if (TAKEN_NAMES.has(name)) {
-    if (MAJOR_TLDS.has(tld)) return false;
-    // 80% chance taken on minor TLDs too for well-known names
-    return deterministicRandom(`${name}.${tld}.avail`) > 0.8;
-  }
-
-  // Short names (1-3 chars): often taken on .com/.net/.org
-  if (isShortName(name) && ["com", "net", "org"].includes(tld)) {
-    return deterministicRandom(`${name}.${tld}.short`) > 0.85;
-  }
-
-  // Dictionary words: higher chance of being taken on .com
-  if (isPremiumWord(name) && tld === "com") {
-    return deterministicRandom(`${name}.${tld}.dict`) > 0.7;
-  }
-
-  // General availability: use deterministic hash
-  // ~75% chance available for most combinations
-  const score = deterministicRandom(`${name}.${tld}.general`);
-
-  // .com is most contested
-  if (tld === "com") return score > 0.4;
-  // .net/.org somewhat contested
-  if (tld === "net" || tld === "org") return score > 0.3;
-  // Other TLDs are mostly available
-  return score > 0.2;
-}
-
-/**
- * Generate mock WHOIS data for taken domains.
- */
-function generateWhoisData(domain: string) {
-  const hash = deterministicRandom(domain + ".whois");
-  const createdYear = 2005 + Math.floor(hash * 18); // 2005-2023
-  const updatedYear = createdYear + Math.floor(deterministicRandom(domain + ".updated") * (2026 - createdYear));
+  if (!apiKey || !user) return null;
 
   return {
-    registrar: hash > 0.5 ? "GoDaddy.com, LLC" : hash > 0.25 ? "Namecheap, Inc." : "Cloudflare, Inc.",
-    createdDate: `${createdYear}-${String(Math.floor(hash * 12) + 1).padStart(2, "0")}-${String(Math.floor(hash * 28) + 1).padStart(2, "0")}`,
-    updatedDate: `${updatedYear}-${String(Math.floor(deterministicRandom(domain + ".umonth") * 12) + 1).padStart(2, "0")}-${String(Math.floor(deterministicRandom(domain + ".uday") * 28) + 1).padStart(2, "0")}`,
-    expiresDate: `${2026 + Math.floor(deterministicRandom(domain + ".expires") * 5)}-${String(Math.floor(deterministicRandom(domain + ".emonth") * 12) + 1).padStart(2, "0")}-${String(Math.floor(deterministicRandom(domain + ".eday") * 28) + 1).padStart(2, "0")}`,
-    nameservers: [
-      hash > 0.5 ? "ns1.domaincontrol.com" : hash > 0.25 ? "dns1.registrar-servers.com" : "ns1.cloudflare.com",
-      hash > 0.5 ? "ns2.domaincontrol.com" : hash > 0.25 ? "dns2.registrar-servers.com" : "ns2.cloudflare.com",
-    ],
-    status: ["clientTransferProhibited"],
+    apiKey,
+    user,
+    baseUrl: env === "live"
+      ? "https://rr-n1-tor.opensrs.net:55443"
+      : "https://horizon.opensrs.net:55443",
   };
 }
+
+/**
+ * Check domain availability via OpenSRS LOOKUP API.
+ * Returns true if available, false if taken.
+ */
+async function checkViaOpenSRS(domain: string): Promise<boolean | null> {
+  const config = getOpenSRSConfig();
+  if (!config) return null;
+
+  const xml = `<?xml version='1.0' encoding='UTF-8' standalone='no' ?>
+<!DOCTYPE OPS_envelope SYSTEM 'ops.dtd'>
+<OPS_envelope>
+  <header><version>0.9</version></header>
+  <body>
+    <data_block>
+      <dt_assoc>
+        <item key="protocol">XCP</item>
+        <item key="action">LOOKUP</item>
+        <item key="object">DOMAIN</item>
+        <item key="attributes">
+          <dt_assoc>
+            <item key="domain">${domain}</item>
+          </dt_assoc>
+        </item>
+      </dt_assoc>
+    </data_block>
+  </body>
+</OPS_envelope>`;
+
+  const inner = createHash("md5").update(xml + config.apiKey).digest("hex");
+  const signature = createHash("md5").update(inner + config.apiKey).digest("hex");
+
+  try {
+    const response = await fetch(config.baseUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/xml",
+        "X-Username": config.user,
+        "X-Signature": signature,
+      },
+      body: xml,
+      signal: AbortSignal.timeout(10000),
+    });
+
+    const text = await response.text();
+
+    // OpenSRS returns response_code 210 for "available" and 211 for "taken"
+    if (text.includes("210")) return true;  // Available
+    if (text.includes("211")) return false; // Taken
+    // Check for explicit status text
+    if (text.includes("available")) return true;
+    if (text.includes("taken") || text.includes("not available")) return false;
+
+    return null; // Can't determine
+  } catch (err) {
+    console.error(`[OpenSRS] Lookup failed for ${domain}:`, err instanceof Error ? err.message : err);
+    return null;
+  }
+}
+
+/**
+ * Fallback: Check domain availability via Google Public DNS.
+ * NXDOMAIN (status 3) = likely available, but not 100% reliable.
+ */
+async function checkViaDNS(domain: string): Promise<boolean | null> {
+  try {
+    const res = await fetch(`https://dns.google/resolve?name=${domain}&type=A`, {
+      signal: AbortSignal.timeout(5000),
+    });
+    const data = await res.json();
+    if (data.Status === 3) return true;  // NXDOMAIN = likely available
+    if (data.Status === 0 && data.Answer) return false; // Resolves = taken
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Check availability using best available method.
+ * Priority: OpenSRS (real registry) → DNS (fallback)
+ */
+async function checkAvailability(domain: string): Promise<boolean | null> {
+  // Try OpenSRS first (authoritative)
+  const opensrsResult = await checkViaOpenSRS(domain);
+  if (opensrsResult !== null) return opensrsResult;
+
+  // Fall back to DNS check
+  return checkViaDNS(domain);
+}
+
+// ---------------------------------------------------------------------------
+// Route Handler
+// ---------------------------------------------------------------------------
 
 export async function GET(req: NextRequest) {
   try {
@@ -160,7 +156,7 @@ export async function GET(req: NextRequest) {
       .toLowerCase()
       .replace(/\s+/g, "-")
       .replace(/[^a-z0-9-]/g, "")
-      .replace(/^-+|-+$/g, "") // no leading/trailing hyphens
+      .replace(/^-+|-+$/g, "")
       .slice(0, 63);
 
     if (!sanitized) {
@@ -175,42 +171,58 @@ export async function GET(req: NextRequest) {
       ? tldsParam.split(",").map((t) => t.trim().replace(/^\./, "").toLowerCase()).filter((t) => t)
       : DEFAULT_TLDS;
 
-    const isPremium = isShortName(sanitized) || isPremiumWord(sanitized);
+    const isShort = sanitized.length <= 3;
+
+    // Check all domains in parallel (batch of 4 to avoid rate limiting)
+    const domains = tlds.map((tld) => `${sanitized}.${tld}`);
+    const availabilityResults = new Map<string, boolean | null>();
+
+    // Process in batches of 4
+    for (let i = 0; i < domains.length; i += 4) {
+      const batch = domains.slice(i, i + 4);
+      const batchResults = await Promise.all(
+        batch.map(async (domain) => ({
+          domain,
+          available: await checkAvailability(domain),
+        }))
+      );
+      for (const { domain, available } of batchResults) {
+        availabilityResults.set(domain, available);
+      }
+    }
 
     const results = tlds.map((tld) => {
       const domain = `${sanitized}.${tld}`;
-      const available = simulateAvailability(sanitized, tld);
+      const available = availabilityResults.get(domain) ?? null;
       const basePrice = TLD_PRICING[tld] ?? 14.99;
-      const price = isPremium ? Math.round(basePrice * 2 * 100) / 100 : basePrice;
+      const price = isShort ? Math.round(basePrice * 2 * 100) / 100 : basePrice;
 
-      const result: Record<string, unknown> = {
+      return {
         domain,
         tld,
         available,
         price,
-        premium: isPremium,
+        premium: isShort,
+        source: getOpenSRSConfig() ? "opensrs" : "dns",
       };
-
-      // Include WHOIS data for taken domains
-      if (!available) {
-        result.whois = generateWhoisData(domain);
-      }
-
-      return result;
     });
 
-    // Sort: available first, then by price ascending
+    // Sort: available first, then unknown, then taken. Within each group, by price.
     results.sort((a, b) => {
-      if (a.available !== b.available) return a.available ? -1 : 1;
-      return (a.price as number) - (b.price as number);
+      const aScore = a.available === true ? 0 : a.available === null ? 1 : 2;
+      const bScore = b.available === true ? 0 : b.available === null ? 1 : 2;
+      if (aScore !== bScore) return aScore - bScore;
+      return a.price - b.price;
     });
 
     return NextResponse.json({
       query: sanitized,
       results,
       count: results.length,
-      available: results.filter((r) => r.available).length,
-      taken: results.filter((r) => !r.available).length,
+      available: results.filter((r) => r.available === true).length,
+      taken: results.filter((r) => r.available === false).length,
+      unknown: results.filter((r) => r.available === null).length,
+      source: getOpenSRSConfig() ? "opensrs-live" : "dns-fallback",
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Internal server error";
