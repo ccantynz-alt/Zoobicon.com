@@ -82,32 +82,34 @@ export async function GET(req: NextRequest) {
     for (let i = 0; i < domains.length; i += 4) {
       const batch = domains.slice(i, i + 4);
 
-      if (useOpenSRS) {
-        // Use real OpenSRS LOOKUP for each domain
-        const batchResults = await Promise.all(
-          batch.map((domain) => checkDomainAvailability(domain)),
-        );
-        for (const result of batchResults) {
-          availabilityResults.set(result.domain, {
-            available: result.status === "error" || result.status === "unknown" ? null : result.available,
-            status: result.status,
-            error: result.error,
-          });
-        }
-      } else {
-        // Fall back to DNS check
-        const batchResults = await Promise.all(
-          batch.map(async (domain) => ({
+      // Always try OpenSRS first, then fall back to DNS for any failures
+      const batchResults = await Promise.all(
+        batch.map(async (domain) => {
+          // Try OpenSRS if configured
+          if (useOpenSRS) {
+            const result = await checkDomainAvailability(domain);
+            if (result.status !== "error" && result.status !== "unknown") {
+              return { domain, available: result.available, status: result.status };
+            }
+            // OpenSRS failed for this domain — fall back to DNS
+            console.warn(`[Domain Search] OpenSRS failed for ${domain}: ${result.error || result.status}, trying DNS fallback`);
+          }
+
+          // DNS fallback — check if domain resolves
+          const dnsAvailable = await checkWithFallback(domain);
+          return {
             domain,
-            available: await checkWithFallback(domain),
-          })),
-        );
-        for (const { domain, available } of batchResults) {
-          availabilityResults.set(domain, {
-            available,
-            status: available === true ? "available" : available === false ? "taken" : "unknown",
-          });
-        }
+            available: dnsAvailable,
+            status: dnsAvailable === true ? "available" : dnsAvailable === false ? "taken" : "unknown",
+          };
+        }),
+      );
+
+      for (const result of batchResults) {
+        availabilityResults.set(result.domain, {
+          available: result.available,
+          status: result.status,
+        });
       }
     }
 
