@@ -100,12 +100,36 @@ export async function authenticateRequest(
   // Look up user in database
   try {
     let rows;
-    if (apiKey) {
-      // API key auth — stored in user settings or a separate table
-      // For now, look up by email encoded in the key
-      rows = await sql`SELECT email, plan, role, subscription_status, email_verified FROM users WHERE email = ${email} LIMIT 1`;
-    } else if (email) {
-      rows = await sql`SELECT email, plan, role, subscription_status, email_verified FROM users WHERE email = ${email} LIMIT 1`;
+    const selectQuery = (e: string) => {
+      // Try with email_verified column first, fall back if migration hasn't run
+      return sql`SELECT email, plan, role, subscription_status, email_verified FROM users WHERE email = ${e} LIMIT 1`;
+    };
+    const selectFallback = (e: string) => {
+      return sql`SELECT email, plan, role, subscription_status FROM users WHERE email = ${e} LIMIT 1`;
+    };
+
+    try {
+      if (apiKey) {
+        rows = await selectQuery(email || "");
+      } else if (email) {
+        rows = await selectQuery(email);
+      }
+    } catch (colErr) {
+      // email_verified column might not exist yet (migration not run)
+      // Fall back to query without it — treat all users as verified
+      const msg = colErr instanceof Error ? colErr.message : "";
+      if (msg.includes("email_verified") || msg.includes("column") || msg.includes("does not exist")) {
+        console.warn("[Auth] email_verified column missing — running migration fallback");
+        // Try to add the column for next time
+        try { await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT false`; } catch { /* ignore */ }
+        if (apiKey) {
+          rows = await selectFallback(email || "");
+        } else if (email) {
+          rows = await selectFallback(email);
+        }
+      } else {
+        throw colErr;
+      }
     }
 
     if (!rows || rows.length === 0) {
@@ -124,7 +148,10 @@ export async function authenticateRequest(
     }
 
     // Block unverified email users from generating (OAuth users are auto-verified)
-    if (opts?.requireVerified && !user.email_verified) {
+    // Skip verification check for admin/unlimited users and if the column doesn't exist yet
+    const isAdminOrUnlimited = user.role === "admin" || user.plan === "unlimited" || user.plan === "enterprise";
+    const verificationRequired = opts?.requireVerified && !isAdminOrUnlimited && user.email_verified === false;
+    if (verificationRequired) {
       return {
         user: null,
         error: Response.json(

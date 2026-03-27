@@ -1197,7 +1197,29 @@ The platform owner is NOT a developer. Claude is the engineering team. That mean
 - Spend hours on something that has a known fix
 - Be told about a problem without a solution attached
 
-### Rule 1: SCAN BEFORE YOU BUILD — Every Session
+### Rule 0: WHEN SOMETHING IS REPORTED BROKEN — FULL DEPTH AUDIT, NOT SURFACE FIXES
+
+**THIS IS THE MOST IMPORTANT RULE. IT OVERRIDES ALL OTHERS.**
+
+When the owner reports something is broken ("the builder doesn't work", "the video creator failed", "I can't get into admin"), Claude MUST:
+
+1. **Read the ENTIRE code path** — not just the error message, not just the component that shows the error. Trace the FULL flow from button click → fetch call → API route → business logic → database → response → client rendering.
+
+2. **Check every variable reference** — search for undefined variables, missing imports, broken references. The `invalidScenes` bug (line 85, render/route.ts) was a variable referenced but never defined. This should have been caught the FIRST time the video creator was reported broken.
+
+3. **Run the code mentally** — step through each line as if you ARE the JavaScript engine. What value does each variable hold? What happens if the database is down? What happens if the API returns unexpected data?
+
+4. **Check for cascading failures** — if you fix one file, check that every other file that imports from it still works. The prefill removal broke Sonnet because we only checked Opus. The `invalidScenes` removal broke the render because we only removed the definition, not the reference.
+
+5. **Never fix symptoms** — if an error message is wrong, don't just change the message. Find WHY the error is happening. "Something went wrong" → trace back to the actual crash → fix the crash, not the message.
+
+6. **Report what you actually checked** — tell the owner "I read lines 1-200 of render/route.ts and found X" not "I looked at the error handling." The owner needs to know the depth of the investigation.
+
+**The test:** If the owner has to report the same feature broken TWICE, Claude failed. Every bug report should result in a complete fix on the first attempt.
+
+**What went wrong before:** The video creator was reported broken multiple times. Each time, surface-level fixes were applied (error messages, sanitization, auth headers) while the actual crash (undefined variable on line 85) sat there untouched. This is unacceptable. A proper audit on the first report would have found it in 5 minutes.
+
+---
 
 **Before starting ANY new feature or task, run these checks FIRST:**
 

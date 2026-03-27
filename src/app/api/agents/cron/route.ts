@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isProduction } from "@/lib/environment";
 
 // ---------------------------------------------------------------------------
 // GET /api/agents/cron — Run all scheduled agents that are due
@@ -17,6 +18,15 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300; // Vercel Pro max
 
 export async function GET() {
+  // Only run agents in production — preview/staging deployments skip entirely
+  if (!isProduction()) {
+    return NextResponse.json({
+      skipped: true,
+      reason: "Agents disabled on preview/staging deployments",
+      environment: process.env.VERCEL_ENV || "development",
+    });
+  }
+
   const startedAt = Date.now();
 
   try {
