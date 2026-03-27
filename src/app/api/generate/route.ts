@@ -161,9 +161,8 @@ export async function POST(req: NextRequest) {
     } else {
       systemPrompt = STANDARD_SYSTEM;
       userMessage = `Build me a stunning, visually striking website for: ${prompt}\n\nThis must look like it was designed by a top-tier agency with BOLD visual impact. Use vibrant, saturated colors — NOT dull or washed-out. The hero section must be dramatic (full-bleed image, dark gradient, or animated background — NEVER a plain white hero). Every section needs rich content with images, icons, and visual accents. Match the industry aesthetic but always prioritize visual impact and content density. Include: hero with dramatic visual treatment + value proposition, social proof, services/features with image-rich cards, testimonials, stats with bold numbers, CTA with colored background, and comprehensive dark footer.`;
-      // Free tier uses Sonnet to control costs (~90% cheaper than Opus)
-      // Paid users get Opus for premium quality
-      model = isFree ? "claude-sonnet-4-6" : "claude-opus-4-6";
+      // Use Sonnet for ALL users during testing — switch back to Opus when API stable
+      model = "claude-sonnet-4-6";
       maxTokens = isFree ? 16000 : 32000;
     }
 
