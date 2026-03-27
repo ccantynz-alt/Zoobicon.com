@@ -86,6 +86,44 @@ Zoobicon must be 80-90% more advanced than every competitor. Not 10% better. Not
 
 **The measurement:** Every month, build the same site on Zoobicon and on Lovable/Bolt/v0. Compare speed, quality, and features. If we're not clearly ahead on at least 2 out of 3, something is wrong and must be fixed immediately.
 
+## TECHNOLOGY RADAR — What Claude Must Research Every Session
+
+**Before building ANYTHING, Claude must check: is there a newer/better way to do this?**
+
+**ADOPT NOW (proven, must implement):**
+- Sandpack for in-browser React preview ✅ (installed)
+- shadcn/ui as the component design system
+- React Server Components for generation output
+- Tailwind CSS v4 (if stable)
+- MCP (Model Context Protocol) for tool integration
+- GitHub sync for generated projects
+- Vercel deployment integration
+
+**EVALUATE (emerging, first-mover advantage):**
+- WebMCP (Google, Feb 2026) — structured website interactions for AI agents
+- A2A (Agent-to-Agent protocol) — multi-agent communication standard
+- AG-UI (CopilotKit) — agent-to-frontend communication protocol
+- Agent Memory — persistent context across sessions (NO ONE has this yet — massive opportunity)
+- Veo 3.1 API — native audio + video generation (Sora is dead, Veo leads)
+- Kling 3.0 API — cost-effective video at scale with audio sync
+- Seedance 2.0 — multi-modal input (9 images + 3 videos + 3 audio tracks)
+
+**WATCH (not ready yet but coming):**
+- WebContainers (StackBlitz) — full Node.js in browser
+- Real-time AI video editing (late 2026)
+- Agent-native startups bypassing traditional software entirely
+
+**RULE: If a technology on the ADOPT list is not implemented, it's a bug. Fix it immediately. If a technology on the EVALUATE list could give us an advantage, research it and propose implementation. If a WATCH item moves to EVALUATE, flag it immediately.**
+
+**VIDEO CREATOR TARGETS:**
+- Support Runway Gen-4.5 (current Gen-3 Alpha)
+- Add Kling 3.0 as video provider (40% cheaper than Runway)
+- Native audio generation (don't rely on separate voiceover step)
+- Character consistency across scenes
+- Multi-modal input (text + image + existing video)
+- Real-time preview during generation
+- Target: generate a 30-second marketing video in under 2 minutes
+
 ---
 
 ## What is this project?
@@ -156,6 +194,7 @@ Build has `ignoreBuildErrors: true` and `ignoreDuringBuilds: true` in next.confi
 | `/api/generate/variants` (POST) | Sonnet | 32K | 2-3 design variants for A/B testing |
 | `/api/generate/email` (POST) | Sonnet | 16K | Email template generation |
 | `/api/generate/quick` (POST) | Haiku | 8K | Lightweight fast generation |
+| `/api/generate/react` (POST) | Sonnet | 32K | React/TypeScript component generation — outputs JSON `{ files, dependencies }` for Sandpack preview |
 | `/api/generate/images` (POST) | — | — | AI image generation (Replicate/Stability) |
 | `/api/generate/ai-images` (POST) | — | — | Embed AI images into existing HTML |
 | `/api/generate/edit-diff` (POST) | — | — | Diff generation for variant comparison |
@@ -167,6 +206,8 @@ Build has `ignoreBuildErrors: true` and `ignoreDuringBuilds: true` in next.confi
 **Multi-page:** JSON with `{ siteName, pages: [{ slug, title, html }], navigation: [{ label, href }] }`. Each page is standalone HTML with shared design (fonts, colors, nav, footer). Max 6 pages.
 
 **Full-stack:** JSON with `{ description, schema (SQL), apiEndpoints: [{ method, path, handler }], code (HTML with CRUD UI) }`. Real PostgreSQL schemas, RESTful Next.js handlers, interactive frontend with forms/tables/modals.
+
+**React App:** JSON with `{ files: { "App.tsx": "...", "components/Hero.tsx": "...", ... }, dependencies: {} }`. React 18 functional components with TypeScript, styled with Tailwind CSS (loaded via CDN in Sandpack). Each component is self-contained. Rendered live in the builder via `@codesandbox/sandpack-react` with the `react-ts` template. Selected via "React App" mode toggle in PromptInput.
 
 ### Hosting & Deployment (src/app/api/hosting/)
 
@@ -1264,6 +1305,8 @@ All Tier 1 stickiness components are now wired into the actual user flows:
     The shared email template (`src/lib/email-template.ts`) already implements this. Any new email sending code MUST use `emailTemplate()` from that file — never inline HTML without the domain footer. If a context doesn't support HTML (plain text replies, chat messages), use the text format: `zoobicon.com | zoobicon.ai | zoobicon.io | zoobicon.sh`
 
     **Key files:** `src/lib/email-template.ts` (HTML template with domain footer), `src/lib/admin-notify.ts` (admin notifications), `src/app/api/auth/signup/route.ts` (verification email), `src/app/api/auth/forgot-password/route.ts` (password reset), `src/app/api/auth/resend-verification/route.ts` (resend verification).
+
+32. **React/Next.js Generation Pipeline** — The builder now supports a "React App" generation mode alongside the existing HTML mode. When users select "React App" in the PromptInput mode selector, the builder calls `/api/generate/react` which instructs the AI to output a JSON object containing React/TypeScript component files (`App.tsx`, `components/Hero.tsx`, etc.) with Tailwind CSS styling. The output is rendered live in the browser using `@codesandbox/sandpack-react` with the `react-ts` template and Tailwind CSS loaded via CDN. HTML mode remains the default and continues to work unchanged. **Key files:** `src/app/api/generate/react/route.ts` (generation endpoint), `src/components/SandpackPreview.tsx` (dual-mode preview — HTML static template or React react-ts template), `src/components/PromptInput.tsx` (mode selector with "React App" option), `src/app/builder/page.tsx` (routes to React endpoint and renders SandpackPreview when in React mode). The `reactFiles` state in the builder holds the file map, `reactDeps` holds dependencies, and both are passed to SandpackPreview. CodePanel and ExportPanel already support `reactSource` for file viewing and export.
 
 ---
 
