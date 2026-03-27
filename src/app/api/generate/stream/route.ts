@@ -459,16 +459,19 @@ Output ONLY raw HTML.`
             }
 
             if (!retrySucceeded) {
-              console.error("[Stream] All retries produced empty body");
+              console.error("[Stream] All retries produced empty body — aborting, NOT sending empty page");
               controller.enqueue(
                 encoder.encode(`data: ${JSON.stringify({ type: "error", message: "Generation produced empty content after retries. Please try again with a different prompt." })}\n\n`)
               );
+              controller.enqueue(
+                encoder.encode(`data: ${JSON.stringify({ type: "done" })}\n\n`)
+              );
+              controller.close();
+              return; // CRITICAL: Stop here — do NOT inject component library into empty HTML
             }
           }
 
-          // Inject component library CSS into the final HTML (both new builds and edits)
-          // For edits: we stripped the library before sending to the AI, now re-inject it
-          // For new builds: the AI was told "component library is auto-injected"
+          // Only inject component library and finalize if we have actual content
           // Replace any picsum.photos URLs with industry-relevant Unsplash photos
           accumulated = replacePicsumUrls(accumulated, prompt);
 
@@ -480,7 +483,7 @@ Output ONLY raw HTML.`
             );
           }
 
-          // Track successful usage
+          // Track successful usage (only when we actually produced content)
           trackUsage(auth.user.email, usageType).catch((err) => console.error("[Usage] Failed to track:", err));
 
           controller.enqueue(
