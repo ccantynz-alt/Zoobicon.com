@@ -1,5 +1,41 @@
 # CLAUDE.md — Zoobicon Project Guide
 
+## CORE PRINCIPLE — NEWEST TECHNOLOGY, ALWAYS FIRST
+
+**THIS OVERRIDES EVERYTHING ELSE IN THIS DOCUMENT.**
+
+Zoobicon is an AI-built platform. There is NO excuse for using old technology. Every decision, every feature, every line of code must use the newest, most advanced technology available. If a competitor has something we don't, we build it better. If a new technology emerges, we adopt it first.
+
+**The rules:**
+1. **No old-school output** — We generate React/Next.js components, NOT static HTML blobs. Every competitor (Lovable, Bolt, v0, Emergent) outputs React. We must match or exceed them.
+2. **In-browser preview** — Use Sandpack or WebContainers for instant live preview. No more 60-95 second waits for a server-side generation to complete.
+3. **Intellectual crawlers** — Our Market Intelligence Crawler agent must run continuously, scanning competitor products for new features. When a competitor ships something new, we know within 12 hours and have a plan to match or beat it within 48 hours.
+4. **First to market** — If we can't be first, we must be best. If we can't be best, we must have a unique angle no one else has. "Good enough" is not acceptable. "Same as competitors" is the MINIMUM — our target is AHEAD.
+5. **Technology currency** — Every session, check: Are we on the latest Next.js? Latest React? Latest Tailwind? Latest Claude/GPT models? Latest browser APIs? If not, upgrade.
+6. **No legacy debt** — If old code is holding us back, replace it. Don't patch around it. Don't "fix it later." Fix it now. The cost of carrying legacy code is higher than the cost of rewriting it.
+7. **Output quality = revenue** — The generated output IS the product. If it looks like 2020 technology, customers won't pay. If it looks like 2027 technology, they'll pay premium. Every generated site must use modern React patterns, modern CSS, modern interactions.
+
+**Current technology targets (March 2026):**
+- **Output format**: React/Next.js components with Tailwind CSS (NOT static HTML)
+- **Preview**: Sandpack in-browser live preview (NOT iframe of server-generated HTML)
+- **Framework**: Next.js 15+ with App Router, Server Components, Streaming
+- **AI Models**: Claude Opus/Sonnet 4.6, GPT-4o/5, Gemini 2.5 Pro
+- **Runtime**: Sandpack/WebContainers for in-browser execution
+- **Deployment**: Vercel one-click deploy from generated code
+- **Export**: GitHub sync, real repository, npm packages
+- **Design system**: shadcn/ui components (industry standard for React)
+
+**The migration path:**
+- Phase 1: Add Sandpack preview alongside existing HTML builder
+- Phase 2: AI generates React components instead of HTML
+- Phase 3: Full project scaffolding (file tree, pages, components, API routes)
+- Phase 4: In-browser editing with hot reload
+- Phase 5: One-click Vercel/GitHub deployment
+
+**The test:** If a user builds something on Zoobicon and then tries Lovable or Bolt, they should think "Zoobicon was better." Not "about the same." Not "different but comparable." BETTER. If they don't think that, we've failed.
+
+---
+
 ## What is this project?
 
 Zoobicon is a **white-label AI website builder platform** built with Next.js 14, React 18, TypeScript, and Tailwind CSS. It uses a multi-LLM pipeline architecture (Claude, GPT, Gemini) with a 7-agent build pipeline. The platform supports multiple brands from a single codebase via `src/lib/brand-config.ts`.
