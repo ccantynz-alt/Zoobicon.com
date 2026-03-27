@@ -169,7 +169,7 @@ export default function QuotaBar({ mode = "full", className = "" }: QuotaBarProp
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
         >
-          You've reached your monthly limit. Upgrade or wait until next month.
+          You&apos;ve reached your monthly limit. Upgrade or wait until next month.
         </motion.p>
       )}
     </div>

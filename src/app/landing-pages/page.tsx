@@ -8,7 +8,7 @@ import {
   Search, Filter, Star, Clock, Users, Mail, Palette,
   Smartphone, Monitor, Tablet, Globe, Layers, MessageSquare,
   ChevronRight, ExternalLink, Wand2, SplitSquareHorizontal,
-  Plus, Settings, AlertCircle
+  Plus, Settings, AlertCircle, Trophy
 } from 'lucide-react';
 
 const TEMPLATE_CATEGORIES = ['All', 'SaaS', 'Webinar', 'Ebook', 'Product Launch', 'App Download', 'Coming Soon', 'Event', 'Agency'];

@@ -580,7 +580,9 @@ export default function PreviewPanel({
   }
 
   // Safety check — if body has no visible text content, show diagnostic instead of blank white
-  if (html && bodyTextLength < 50) {
+  // ONLY show diagnostic when generation is COMPLETE. During generation the server may be retrying
+  // and will send a "replace" event with the final HTML — showing the error prematurely scares users.
+  if (html && bodyTextLength < 50 && !isGenerating) {
     // Detect likely causes from the HTML content
     const hasHead = /<head/i.test(html);
     const hasBody = /<body/i.test(html);
@@ -625,6 +627,38 @@ export default function PreviewPanel({
           <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">Raw HTML (first 1000 chars)</p>
           <pre className="text-[11px] text-blue-300/50 whitespace-pre-wrap break-all font-mono leading-relaxed">{html.substring(0, 1000)}</pre>
         </div>
+      </div>
+    );
+  }
+
+  // During generation, if HTML has empty body (server is retrying), show optimizing state
+  if (html && bodyTextLength < 50 && isGenerating) {
+    return (
+      <div className="relative h-full overflow-hidden">
+        <GeneratingAtmosphere />
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+          <p
+            className="text-lg font-bold uppercase tracking-[8px]"
+            style={{
+              background: "linear-gradient(90deg, #60a5fa, #00ddff, #3b82f6, #60a5fa)",
+              backgroundSize: "300% 100%",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+              animation: "text-shimmer 2s linear infinite",
+              filter: "drop-shadow(0 0 20px rgba(37,99,235,0.4))",
+            }}
+          >
+            Optimizing
+          </p>
+          <p
+            className="text-[11px] text-blue-300/40 mt-4 tracking-[3px] uppercase"
+            style={{ animation: "text-breathe 3s ease-in-out infinite" }}
+          >
+            Enhancing content quality
+          </p>
+        </div>
+        <style>{sharedStyles}</style>
       </div>
     );
   }

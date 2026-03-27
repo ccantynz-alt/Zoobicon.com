@@ -1369,10 +1369,20 @@ When an issue is fixed, move it to a "Recently Fixed" table (keep last 10) so th
 
 | # | Issue | Severity | Found | Proposed Fix | Est. Effort |
 |---|-------|----------|-------|-------------|-------------|
-| — | No known issues logged yet | — | — | — | — |
+| 1 | 22 dead components never imported anywhere (AIChatAssistant, GlobalChat, BusinessChat, ActivityFeed, AchievementToast, BeforeAfter, BuilderDemo, CustomizationPanel, FreemiumWatermark, HeroDemo, LiveCounter, OnboardingChecklist, OptimizerPanel, PageShell, ParallaxSection, SandpackPreview, ScrollProgress, SegmentationModal, TemplateGallery, UpgradePrompt, VideoShowcase, VoiceInput) | Low | 2026-03-27 | Either wire them into the app where intended (per stickiness hooks plan) or remove to reduce bundle. Most are planned features not yet integrated. | 2-4h |
+| 2 | 3 dead lib files never imported (error-sanitizer.ts, react-generator.ts, social-publisher.ts) | Low | 2026-03-27 | Remove or integrate. social-publisher.ts may be superseded by social-publish.ts. | 30min |
+| 3 | Email format validation missing on auth signup route | Low | 2026-03-27 | Add basic email regex check after line 30 in /api/auth/signup/route.ts | 5min |
+| 4 | Remaining lint warnings: 8x `<img>` should be `<Image>` in portfolio, video-creator, TopBar, SupportAvatar pages; 1x missing useEffect dependency in support page; 1x `@next/next/no-page-custom-font` warning in layout.tsx | Low | 2026-03-27 | Replace `<img>` with Next.js `<Image>`, add missing dep to useEffect, move font to `next/font` | 1-2h |
 
 ## Recently Fixed
 
 | # | Issue | Fixed Date | What Was Done |
 |---|-------|-----------|---------------|
-| — | No fixes logged yet | — | — |
+| 1 | Slack events route: unprotected JSON.parse could crash on malformed webhook body | 2026-03-27 | Wrapped JSON.parse in try/catch with 400 response in `src/app/api/slack/events/route.ts` |
+| 2 | XSS vulnerability in hosting serve route: site name injected into OG meta tag without HTML escaping | 2026-03-27 | Added HTML entity escaping for siteName in `src/app/api/hosting/serve/[slug]/route.ts` |
+| 3 | Missing `Trophy` icon import in landing-pages page causing runtime error | 2026-03-27 | Added Trophy to lucide-react imports in `src/app/landing-pages/page.tsx` |
+| 4 | React hooks called conditionally in AIChatAssistant (rules-of-hooks violation) | 2026-03-27 | Moved conditional return after all hook calls in `src/components/AIChatAssistant.tsx` |
+| 5 | Unescaped apostrophe in QuotaBar.tsx causing lint error | 2026-03-27 | Replaced `'` with `&apos;` in `src/components/QuotaBar.tsx` |
+| 6 | Unused imports: SearchIcon in builder, Bot in dashboard | 2026-03-27 | Removed unused imports from `src/app/builder/page.tsx` and `src/app/dashboard/page.tsx` |
+| 7 | Dead code in middleware: CORS check inside block that only executes for pathname "/" | 2026-03-27 | Removed unreachable CORS code from rewrite block in `src/middleware.ts` |
+| 8 | Stale eslint-disable comments for non-existent @typescript-eslint/no-explicit-any rule in video-creator | 2026-03-27 | Removed unnecessary comments from `src/app/video-creator/page.tsx` |

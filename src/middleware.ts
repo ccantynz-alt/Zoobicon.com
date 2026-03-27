@@ -88,9 +88,6 @@ export function middleware(request: NextRequest) {
     response.headers.set("Cache-Control", "public, s-maxage=3600, stale-while-revalidate=86400");
     // Vary by host so CDN caches each domain separately
     response.headers.set("Vary", "Host");
-    if (request.nextUrl.pathname.startsWith("/api/")) {
-      setCorsHeaders(response, origin);
-    }
     return response;
   }
 

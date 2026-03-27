@@ -20,7 +20,6 @@ import {
   Video,
   BarChart3,
   Sparkles,
-  Bot,
   Shield,
   Server,
   Pencil,
