@@ -1,6 +1,8 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
   Check,
@@ -14,7 +16,231 @@ import {
   Palette,
   BarChart3,
   Sparkles,
+  ChevronDown,
 } from "lucide-react";
+
+/* ─── animated counter ─── */
+function Counter({ end, suffix = "" }: { end: number; suffix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [val, setVal] = useState(0);
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting && !started) { setStarted(true); } },
+      { threshold: 0.5 }
+    );
+    obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, [started]);
+
+  useEffect(() => {
+    if (!started) return;
+    const dur = 1800;
+    const t0 = Date.now();
+    const tick = () => {
+      const p = Math.min((Date.now() - t0) / dur, 1);
+      setVal(Math.floor((1 - Math.pow(1 - p, 3)) * end));
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [started, end]);
+
+  return <span ref={ref}>{val.toLocaleString()}{suffix}</span>;
+}
+
+/* ─── hero showcase slides — cinematic backgrounds ─── */
+const HERO_SLIDES = [
+  {
+    bg: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=2400&q=80",
+    badge: "AI Website Builder for the Modern Web",
+    h1: ["Prompt.", "Preview.", "Publish."],
+    accent: 2,
+    sub: "7 AI agents collaborate in real-time to build production-ready websites, apps, and stores — from a single sentence.",
+  },
+  {
+    bg: "https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&w=2400&q=80",
+    badge: "From Idea to Live Site in 95 Seconds",
+    h1: ["Describe.", "Generate.", "Launch."],
+    accent: 2,
+    sub: "Full-stack apps, e-commerce stores, multi-page sites — built by AI agents, deployed instantly to your custom domain.",
+  },
+  {
+    bg: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2400&q=80",
+    badge: "43 Specialized Generators. One Platform.",
+    h1: ["Dream.", "Build.", "Ship."],
+    accent: 2,
+    sub: "SaaS dashboards, restaurant sites, portfolios, email templates — each with a purpose-built AI pipeline tuned for quality.",
+  },
+  {
+    bg: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=2400&q=80",
+    badge: "Full-Stack Apps in Under 2 Minutes",
+    h1: ["Code.", "Create.", "Conquer."],
+    accent: 2,
+    sub: "Database schemas, API routes, and interactive frontends — generated together as a complete, working application.",
+  },
+];
+
+function HeroShowcase() {
+  const [current, setCurrent] = useState(0);
+  const [imagesLoaded, setImagesLoaded] = useState<boolean[]>(HERO_SLIDES.map(() => false));
+
+  useEffect(() => {
+    HERO_SLIDES.forEach((slide, i) => {
+      const img = new Image();
+      img.onload = () => setImagesLoaded(prev => { const n = [...prev]; n[i] = true; return n; });
+      img.src = slide.bg;
+    });
+  }, []);
+
+  useEffect(() => {
+    const id = setInterval(() => setCurrent(i => (i + 1) % HERO_SLIDES.length), 6000);
+    return () => clearInterval(id);
+  }, []);
+
+  const slide = HERO_SLIDES[current];
+
+  return (
+    <section className="relative h-screen min-h-[700px] max-h-[1100px] overflow-hidden pt-16">
+      {/* Background images — all rendered, opacity-switched for smooth crossfade */}
+      {HERO_SLIDES.map((s, i) => (
+        <div
+          key={i}
+          className="absolute inset-0 transition-opacity duration-[1200ms] ease-in-out"
+          style={{ opacity: i === current ? 1 : 0 }}
+        >
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105"
+            style={{
+              backgroundImage: imagesLoaded[i] ? `url(${s.bg})` : undefined,
+              backgroundColor: "#0a0a0f",
+            }}
+          />
+        </div>
+      ))}
+
+      {/* Dark overlays for text readability */}
+      <div className="absolute inset-0 bg-black/55 z-[1]" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a14] via-transparent to-[#0a0a14]/60 z-[2]" />
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/[0.08] via-transparent to-transparent z-[2]" />
+
+      {/* Content */}
+      <div className="relative z-10 h-full flex flex-col items-center justify-center px-6 text-center">
+        {/* Glass pill badge */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={`badge-${current}`}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{ duration: 0.5 }}
+            className="mb-8"
+          >
+            <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium text-white/80 bg-white/[0.08] backdrop-blur-xl border border-white/[0.12] shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
+              {slide.badge}
+            </span>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Massive stacked headline */}
+        <AnimatePresence mode="wait">
+          <motion.h1
+            key={`h1-${current}`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="text-[clamp(3rem,10vw,8rem)] font-black tracking-[-0.04em] leading-[0.95] mb-6"
+          >
+            {slide.h1.map((word, wi) => (
+              <span key={wi}>
+                <span
+                  className={
+                    wi === slide.accent
+                      ? "text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-violet-400"
+                      : "text-white"
+                  }
+                >
+                  {word}
+                </span>
+                {wi < slide.h1.length - 1 && <br />}
+              </span>
+            ))}
+          </motion.h1>
+        </AnimatePresence>
+
+        {/* Subtitle */}
+        <AnimatePresence mode="wait">
+          <motion.p
+            key={`sub-${current}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto mb-10 leading-relaxed font-light"
+          >
+            {slide.sub}
+          </motion.p>
+        </AnimatePresence>
+
+        {/* Dual CTAs */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="flex flex-col sm:flex-row items-center gap-4"
+        >
+          <Link
+            href="/builder"
+            className="group inline-flex items-center gap-2.5 px-8 py-4 rounded-full bg-indigo-600 text-white text-base font-bold hover:bg-indigo-500 transition-all shadow-[0_0_40px_rgba(99,102,241,0.3)] hover:shadow-[0_0_60px_rgba(99,102,241,0.45)]"
+          >
+            Start Building Free
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+          <Link
+            href="/generators"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-semibold text-white/80 bg-white/[0.08] backdrop-blur-sm border border-white/[0.15] hover:bg-white/[0.14] hover:border-white/[0.25] transition-all"
+          >
+            Explore 43 Generators
+          </Link>
+        </motion.div>
+
+        {/* Slide indicators */}
+        <div className="flex items-center gap-2 mt-10">
+          {HERO_SLIDES.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrent(i)}
+              aria-label={`Go to slide ${i + 1}`}
+              className={`transition-all duration-500 rounded-full ${
+                i === current
+                  ? "w-8 h-2 bg-white/80"
+                  : "w-2 h-2 bg-white/25 hover:bg-white/40"
+              }`}
+            />
+          ))}
+        </div>
+
+        {/* Scroll indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 1 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        >
+          <span className="text-xs text-white/50 uppercase tracking-[0.2em] font-medium">Scroll</span>
+          <motion.div
+            animate={{ y: [0, 6, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <ChevronDown className="w-4 h-4 text-white/50" />
+          </motion.div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
 
 /* ─── data ─── */
 
@@ -159,66 +385,14 @@ export default function LandingPage() {
   return (
     <div className="bg-[#0a0a14] text-white selection:bg-indigo-500/30 selection:text-white">
 
-      {/* ── HERO ── */}
-      <section className="relative pt-32 md:pt-44 pb-24 md:pb-32 px-4 sm:px-6 overflow-hidden">
-        {/* Subtle top gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-indigo-600/[0.07] via-transparent to-transparent pointer-events-none" />
-
-        <div className="relative max-w-4xl mx-auto text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 mb-8">
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
-            7 AI agents. One prompt. Production-ready in 95 seconds.
-          </div>
-
-          {/* Headline */}
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6">
-            Build any website with{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-violet-400">
-              a single sentence
-            </span>
-          </h1>
-
-          {/* Subheadline */}
-          <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-            Describe what you want. 7 specialized AI agents collaborate to design, build,
-            and deploy production-ready websites, apps, and stores — in under two minutes.
-          </p>
-
-          {/* CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-            <Link
-              href="/builder"
-              className="group inline-flex items-center gap-2.5 px-8 py-4 rounded-full bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition-colors shadow-lg shadow-indigo-600/20"
-            >
-              Start Building Free
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-            </Link>
-            <Link
-              href="/generators"
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold text-slate-300 bg-white/[0.05] border border-white/[0.08] hover:bg-white/[0.08] hover:border-white/[0.12] transition-all"
-            >
-              Explore 43 Generators
-            </Link>
-          </div>
-
-          {/* Trust stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 max-w-2xl mx-auto">
-            {STATS.map((s) => (
-              <div key={s.label} className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-white mb-1">{s.value}</div>
-                <div className="text-xs text-slate-500 uppercase tracking-wider">{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* ── HERO SLIDESHOW ── */}
+      <HeroShowcase />
 
       {/* ── FOUR DOMAINS ── */}
       <section className="py-24 md:py-32 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-sm font-semibold tracking-widest uppercase text-indigo-400 mb-3">
+            <p className="text-base font-semibold tracking-widest uppercase text-indigo-400 mb-3">
               One Platform, Four Domains
             </p>
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
@@ -238,10 +412,10 @@ export default function LandingPage() {
                   <div className={`w-10 h-10 rounded-xl ${c.iconBg} flex items-center justify-center mb-4`}>
                     <Icon className={`w-5 h-5 ${c.text}`} />
                   </div>
-                  <h3 className="text-lg font-bold text-white mb-0.5">{d.name}</h3>
-                  <p className={`text-sm ${c.text} mb-3`}>{d.role}</p>
-                  <p className="text-sm text-slate-400 leading-relaxed mb-4">{d.desc}</p>
-                  <Link href={d.href} className={`text-xs font-semibold ${c.text} inline-flex items-center gap-1 hover:underline`}>
+                  <h3 className="text-xl font-bold text-white mb-0.5">{d.name}</h3>
+                  <p className={`text-base ${c.text} mb-3`}>{d.role}</p>
+                  <p className="text-base text-slate-400 leading-relaxed mb-4">{d.desc}</p>
+                  <Link href={d.href} className={`text-sm font-semibold ${c.text} inline-flex items-center gap-1 hover:underline`}>
                     {d.cta} <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
@@ -258,7 +432,7 @@ export default function LandingPage() {
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
               Describe it. We build it.
             </h2>
-            <p className="text-lg text-slate-400 max-w-lg mx-auto">
+            <p className="text-xl text-slate-400 max-w-lg mx-auto">
               Three steps. No code. No templates. No compromise.
             </p>
           </div>
@@ -270,11 +444,11 @@ export default function LandingPage() {
                   {step.num}
                 </div>
                 <div className="relative pt-6">
-                  <div className="text-xs font-bold text-indigo-400 mb-3 tracking-widest uppercase">
+                  <div className="text-sm font-bold text-indigo-400 mb-3 tracking-widest uppercase">
                     Step {step.num}
                   </div>
-                  <h3 className="text-xl md:text-2xl font-bold mb-3 tracking-tight">{step.title}</h3>
-                  <p className="text-sm text-slate-400 leading-relaxed">{step.body}</p>
+                  <h3 className="text-2xl md:text-3xl font-bold mb-3 tracking-tight">{step.title}</h3>
+                  <p className="text-base text-slate-400 leading-relaxed">{step.body}</p>
                 </div>
                 {i < 2 && (
                   <div className="hidden md:block absolute top-14 -right-6 text-white/10">
@@ -287,19 +461,19 @@ export default function LandingPage() {
 
           {/* Tags */}
           <div className="mt-16 text-center">
-            <p className="text-xs text-slate-500 uppercase tracking-widest mb-5">What you can build</p>
+            <p className="text-base text-slate-500 uppercase tracking-widest mb-5">What you can build</p>
             <div className="flex flex-wrap justify-center gap-2">
               {[
                 "SaaS Landing Pages", "E-Commerce Stores", "Portfolios", "Dashboards",
                 "Restaurants", "Agency Sites", "Blogs", "Full-Stack Apps",
               ].map((tag) => (
-                <span key={tag} className="px-4 py-2 rounded-full border border-white/[0.06] text-xs text-slate-500">
+                <span key={tag} className="px-4 py-2 rounded-full border border-white/[0.06] text-sm text-slate-500">
                   {tag}
                 </span>
               ))}
               <Link
                 href="/generators"
-                className="px-4 py-2 rounded-full border border-indigo-500/20 text-xs text-indigo-400 hover:border-indigo-500/40 transition-colors"
+                className="px-4 py-2 rounded-full border border-indigo-500/20 text-sm text-indigo-400 hover:border-indigo-500/40 transition-colors"
               >
                 +35 more generators
               </Link>
@@ -315,7 +489,7 @@ export default function LandingPage() {
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
               Everything you need to ship
             </h2>
-            <p className="text-lg text-slate-400 max-w-xl mx-auto">
+            <p className="text-xl text-slate-400 max-w-xl mx-auto">
               Not just a website builder. A complete platform for building, launching,
               and growing your online presence.
             </p>
@@ -332,8 +506,8 @@ export default function LandingPage() {
                   <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center mb-5">
                     <Icon className="w-5 h-5 text-indigo-400" />
                   </div>
-                  <h3 className="text-lg font-bold mb-2">{f.title}</h3>
-                  <p className="text-sm text-slate-400 leading-relaxed">{f.body}</p>
+                  <h3 className="text-xl font-bold mb-2">{f.title}</h3>
+                  <p className="text-base text-slate-400 leading-relaxed">{f.body}</p>
                 </div>
               );
             })}
@@ -344,7 +518,7 @@ export default function LandingPage() {
       {/* ── VALUE PROPOSITION ── */}
       <section className="py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.04]">
         <div className="max-w-4xl mx-auto text-center">
-          <p className="text-sm font-semibold tracking-widest uppercase text-indigo-400 mb-3">
+          <p className="text-base font-semibold tracking-widest uppercase text-indigo-400 mb-3">
             Replace your entire SaaS stack
           </p>
           <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-6">
@@ -353,7 +527,7 @@ export default function LandingPage() {
               $49/month.
             </span>
           </h2>
-          <p className="text-lg text-slate-400 max-w-2xl mx-auto mb-12">
+          <p className="text-xl text-slate-400 max-w-2xl mx-auto mb-12">
             Website builder, CRM, invoicing, booking, email marketing, forms, analytics,
             SEO tools, and more — replacing $923/month in separate subscriptions.
           </p>
@@ -370,8 +544,8 @@ export default function LandingPage() {
               { label: "Analytics", saves: "Replaces Hotjar" },
             ].map((t) => (
               <div key={t.label} className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-4 text-left">
-                <div className="text-sm font-semibold text-white mb-1">{t.label}</div>
-                <div className="text-xs text-slate-500">{t.saves}</div>
+                <div className="text-base font-semibold text-white mb-1">{t.label}</div>
+                <div className="text-sm text-slate-500">{t.saves}</div>
               </div>
             ))}
           </div>
@@ -385,7 +559,7 @@ export default function LandingPage() {
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
               Simple, transparent pricing
             </h2>
-            <p className="text-lg text-slate-400">
+            <p className="text-xl text-slate-400">
               Start free. Upgrade when you need more.
             </p>
           </div>
@@ -405,14 +579,14 @@ export default function LandingPage() {
                     Most Popular
                   </div>
                 )}
-                <div className="text-sm text-slate-400 mb-2">{plan.name}</div>
+                <div className="text-base text-slate-400 mb-2">{plan.name}</div>
                 <div className="text-4xl font-bold mb-1">
                   {plan.price}
                   <span className="text-lg font-normal text-slate-500">{plan.period}</span>
                 </div>
                 <ul className="space-y-3 my-8">
                   {plan.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2.5 text-sm text-slate-400">
+                    <li key={f} className="flex items-start gap-2.5 text-base text-slate-400">
                       <Check className={`w-4 h-4 mt-0.5 shrink-0 ${plan.featured ? "text-indigo-400" : "text-slate-600"}`} />
                       {f}
                     </li>
@@ -420,7 +594,7 @@ export default function LandingPage() {
                 </ul>
                 <Link
                   href={plan.href}
-                  className={`block w-full py-3 text-center rounded-full text-sm font-semibold transition-colors ${
+                  className={`block w-full py-3 text-center rounded-full text-base font-semibold transition-colors ${
                     plan.featured
                       ? "bg-indigo-600 text-white hover:bg-indigo-500"
                       : "border border-white/[0.1] text-slate-400 hover:text-white hover:border-white/[0.2]"
@@ -432,7 +606,7 @@ export default function LandingPage() {
             ))}
           </div>
 
-          <p className="text-center text-xs text-slate-500 mt-8">
+          <p className="text-center text-sm text-slate-500 mt-8">
             Need more?{" "}
             <a href="mailto:sales@zoobicon.com" className="text-slate-400 underline underline-offset-4 hover:text-white transition-colors">
               Contact sales
@@ -449,7 +623,7 @@ export default function LandingPage() {
             Stop browsing.<br />
             Start building.
           </h2>
-          <p className="text-lg text-slate-400 max-w-lg mx-auto mb-10">
+          <p className="text-xl text-slate-400 max-w-lg mx-auto mb-10">
             Join creators, agencies, and entrepreneurs who ship
             production-ready websites in minutes, not months.
           </p>
@@ -464,23 +638,24 @@ export default function LandingPage() {
       </section>
 
       {/* ── FOOTER ── */}
-      <footer className="border-t border-white/[0.04] py-16 px-4 sm:px-6">
+      <footer className="border-t border-white/[0.04] py-20 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-5 gap-8 mb-12">
+          <div className="grid md:grid-cols-5 gap-10 mb-14">
             <div className="md:col-span-2">
-              <div className="text-lg font-bold mb-4">Zoobicon</div>
-              <p className="text-sm text-slate-400 max-w-xs leading-relaxed mb-6">
+              <div className="text-3xl font-black tracking-tight mb-4">Zoobicon</div>
+              <p className="text-lg text-slate-400 max-w-xs leading-relaxed mb-6">
                 The AI platform for building, launching, and scaling
                 websites and web applications.
               </p>
-              <div className="flex flex-wrap gap-2">
-                {["zoobicon.com", "zoobicon.ai", "zoobicon.io", "zoobicon.sh"].map((d) => (
-                  <span key={d} className="text-[10px] text-slate-500 bg-white/[0.04] px-2.5 py-1 rounded-full">{d}</span>
-                ))}
+              <div className="flex flex-wrap gap-3">
+                <a href="https://zoobicon.com" className="px-5 py-2.5 rounded-full bg-indigo-500/20 text-indigo-300 font-semibold text-base hover:bg-indigo-500/30 transition-colors">zoobicon.com</a>
+                <a href="https://zoobicon.ai" className="px-5 py-2.5 rounded-full bg-cyan-500/20 text-cyan-300 font-semibold text-base hover:bg-cyan-500/30 transition-colors">zoobicon.ai</a>
+                <a href="https://zoobicon.io" className="px-5 py-2.5 rounded-full bg-emerald-500/20 text-emerald-300 font-semibold text-base hover:bg-emerald-500/30 transition-colors">zoobicon.io</a>
+                <a href="https://zoobicon.sh" className="px-5 py-2.5 rounded-full bg-amber-500/20 text-amber-300 font-semibold text-base hover:bg-amber-500/30 transition-colors">zoobicon.sh</a>
               </div>
             </div>
             <div>
-              <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-4">Products</div>
+              <div className="text-base font-semibold text-white uppercase tracking-wider mb-4">Products</div>
               <ul className="space-y-2.5">
                 {[
                   ["/products/website-builder", "Website Builder"],
@@ -488,16 +663,16 @@ export default function LandingPage() {
                   ["/products/email-support", "Email Support"],
                   ["/generators", "43 Generators"],
                   ["/marketplace", "Marketplace"],
-                  ["/domains", "Domains"],
+                  ["/domains", "Search Domains"],
                 ].map(([href, label]) => (
                   <li key={href}>
-                    <Link href={href} className="text-sm text-slate-500 hover:text-slate-300 transition-colors">{label}</Link>
+                    <Link href={href} className="text-sm text-slate-400 hover:text-slate-200 transition-colors">{label}</Link>
                   </li>
                 ))}
               </ul>
             </div>
             <div>
-              <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-4">Platform</div>
+              <div className="text-base font-semibold text-white uppercase tracking-wider mb-4">Platform</div>
               <ul className="space-y-2.5">
                 {[
                   ["/developers", "API Docs"],
@@ -506,13 +681,13 @@ export default function LandingPage() {
                   ["/wordpress", "WordPress"],
                 ].map(([href, label]) => (
                   <li key={href}>
-                    <Link href={href} className="text-sm text-slate-500 hover:text-slate-300 transition-colors">{label}</Link>
+                    <Link href={href} className="text-sm text-slate-400 hover:text-slate-200 transition-colors">{label}</Link>
                   </li>
                 ))}
               </ul>
             </div>
             <div>
-              <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-4">Company</div>
+              <div className="text-base font-semibold text-white uppercase tracking-wider mb-4">Company</div>
               <ul className="space-y-2.5">
                 {[
                   ["/agencies", "For Agencies"],
@@ -525,19 +700,19 @@ export default function LandingPage() {
                   ["/dmca", "DMCA"],
                 ].map(([href, label]) => (
                   <li key={href}>
-                    <Link href={href} className="text-sm text-slate-500 hover:text-slate-300 transition-colors">{label}</Link>
+                    <Link href={href} className="text-sm text-slate-400 hover:text-slate-200 transition-colors">{label}</Link>
                   </li>
                 ))}
               </ul>
             </div>
           </div>
           <div className="border-t border-white/[0.04] pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="text-xs text-slate-500">&copy; 2026 Zoobicon. All rights reserved.</div>
+            <div className="text-sm text-slate-500">&copy; 2026 Zoobicon. All rights reserved.</div>
             <div className="flex items-center gap-6">
-              <Link href="/privacy" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">Privacy</Link>
-              <Link href="/terms" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">Terms</Link>
-              <Link href="/refund-policy" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">Refunds</Link>
-              <Link href="/dmca" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">DMCA</Link>
+              <Link href="/privacy" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">Privacy</Link>
+              <Link href="/terms" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">Terms</Link>
+              <Link href="/refund-policy" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">Refunds</Link>
+              <Link href="/dmca" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">DMCA</Link>
             </div>
           </div>
         </div>
