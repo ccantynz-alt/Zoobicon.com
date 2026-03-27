@@ -5,6 +5,7 @@ import CookieConsent from "@/components/CookieConsent";
 import SpeculationRules from "@/components/SpeculationRules";
 import AutoIndexNow from "@/components/AutoIndexNow";
 import StagingBanner from "@/components/StagingBanner";
+import SiteNavigation from "@/components/SiteNavigation";
 
 
 const BRAND_META: Record<string, {
@@ -341,6 +342,7 @@ export default function RootLayout({
       </head>
       <body className="grain">
         <StagingBanner />
+        <SiteNavigation />
         {children}
         <CookieConsent />
         <AutoIndexNow />
