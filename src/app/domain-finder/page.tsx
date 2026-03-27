@@ -89,15 +89,19 @@ export default function DomainFinderPage() {
 
   const checkAvailability = async (domain: string): Promise<boolean | null> => {
     try {
-      // Use DNS lookup as a quick availability check
-      // If DNS resolves, domain is taken. If it fails, might be available.
-      const res = await fetch(`https://dns.google/resolve?name=${domain}&type=A`);
+      // Extract name and tld from full domain string (e.g. "mybiz.ai" -> q=mybiz, tlds=ai)
+      const dotIdx = domain.lastIndexOf(".");
+      if (dotIdx < 1) return null;
+      const name = domain.slice(0, dotIdx);
+      const tld = domain.slice(dotIdx + 1);
+
+      const res = await fetch(`/api/domains/search?q=${encodeURIComponent(name)}&tlds=${encodeURIComponent(tld)}`);
+      if (!res.ok) return null;
       const data = await res.json();
-      // Status 3 = NXDOMAIN (domain doesn't exist = likely available)
-      if (data.Status === 3) return true;
-      // Status 0 with Answer = domain resolves = taken
-      if (data.Status === 0 && data.Answer) return false;
-      // Status 0 without Answer = could be either
+
+      // The API returns { results: [{ domain, available, ... }] }
+      const match = data.results?.find((r: { domain: string }) => r.domain === domain);
+      if (match) return match.available;
       return null;
     } catch {
       return null; // Can't determine
@@ -111,19 +115,44 @@ export default function DomainFinderPage() {
     // Initialize all as checking
     setResults(domains.map(d => ({ domain: d, available: null, checking: true })));
 
-    // Check in batches of 5
-    for (let i = 0; i < domains.length; i += 5) {
-      const batch = domains.slice(i, i + 5);
-      const batchResults = await Promise.all(
-        batch.map(async (domain) => {
-          const available = await checkAvailability(domain);
-          return { domain, available, checking: false };
-        })
-      );
+    // Group domains by base name so we can batch TLDs into a single API call
+    // e.g. { "mybiz": ["ai", "com", "io"], "getmybiz": ["ai", "com"] }
+    const grouped = new Map<string, string[]>();
+    for (const d of domains) {
+      const dotIdx = d.lastIndexOf(".");
+      if (dotIdx < 1) continue;
+      const name = d.slice(0, dotIdx);
+      const tld = d.slice(dotIdx + 1);
+      if (!grouped.has(name)) grouped.set(name, []);
+      grouped.get(name)!.push(tld);
+    }
+
+    // Process groups in batches of 3 (each group can have multiple TLDs)
+    const groups = Array.from(grouped.entries());
+    for (let i = 0; i < groups.length; i += 3) {
+      const batch = groups.slice(i, i + 3);
+      const batchPromises = batch.map(async ([name, tlds]) => {
+        try {
+          const res = await fetch(
+            `/api/domains/search?q=${encodeURIComponent(name)}&tlds=${encodeURIComponent(tlds.join(","))}`,
+          );
+          if (!res.ok) return tlds.map(tld => ({ domain: `${name}.${tld}`, available: null as boolean | null, checking: false }));
+          const data = await res.json();
+          return (data.results || []).map((r: { domain: string; available: boolean | null }) => ({
+            domain: r.domain,
+            available: r.available,
+            checking: false,
+          }));
+        } catch {
+          return tlds.map(tld => ({ domain: `${name}.${tld}`, available: null as boolean | null, checking: false }));
+        }
+      });
+
+      const batchResults = (await Promise.all(batchPromises)).flat();
 
       setResults(prev =>
         prev.map(r => {
-          const updated = batchResults.find(br => br.domain === r.domain);
+          const updated = batchResults.find((br: { domain: string }) => br.domain === r.domain);
           return updated || r;
         })
       );
