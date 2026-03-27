@@ -402,11 +402,10 @@ export async function POST(req: NextRequest) {
 
     const isPremium = tier === "premium";
     const isFree = auth.user.plan === "free";
-    // Free tier: Sonnet only (90% cheaper). Paid: Opus for quality. Admin: override.
-    const isRealAdmin = isAdmin && auth.user.role === "admin"; // Verify admin claim against DB
-    const model = requestedModel || (isRealAdmin ? "claude-opus-4-6" : isPremium && !isFree ? "claude-opus-4-6" : "claude-sonnet-4-6");
-    const maxTokens = isAdmin ? 64000 : isPremium ? 32000 : 16000;
-    const timeout = isAdmin ? 300_000 : isPremium ? 180_000 : 90_000;
+    // Use Sonnet for ALL users during testing — switch back to Opus when API is stable
+    const model = requestedModel || "claude-sonnet-4-6";
+    const maxTokens = isPremium ? 32000 : 16000;
+    const timeout = isPremium ? 180_000 : 90_000;
 
     // Build system prompt: base + sections + generator-specific supplement
     const generatorSupplement = generatorType ? getGeneratorSystemSupplement(generatorType) : "";

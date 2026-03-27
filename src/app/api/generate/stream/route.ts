@@ -284,10 +284,10 @@ Requirements:
 - Use industry-appropriate colors and typography. Match the aesthetic to the business type.
 - NEVER use picsum.photos for hero, feature cards, or testimonial avatars. Only use picsum for gallery/portfolio sections.
 ${imageBlock}`;
-      // Free tier uses Sonnet (90% cheaper) — paid users get Opus for premium quality
-      const isFree = auth.user.plan === "free";
-      model = requestedModel || (isFree ? "claude-sonnet-4-6" : "claude-opus-4-6");
-      maxTokens = isFree ? 16000 : 32000;
+      // Use Sonnet for ALL users during testing — switch back to Opus when stable
+      // Sonnet is faster, cheaper, and currently more reliable than Opus for generation
+      model = requestedModel || "claude-sonnet-4-6";
+      maxTokens = 32000;
     }
 
     // Inject MCP external context (GitHub repos, Notion pages, Figma designs) when provided
