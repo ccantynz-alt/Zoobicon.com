@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState, useCallback } from "react";
-import { Mic, MicOff, Sparkles, Zap, Pencil, Send, Check, ChevronDown, Cpu, LayoutTemplate, SlidersHorizontal, FileText, Files, Layers } from "lucide-react";
+import { Mic, MicOff, Sparkles, Zap, Pencil, Send, Check, ChevronDown, Cpu, LayoutTemplate, SlidersHorizontal, FileText, Files, Layers, Code2 } from "lucide-react";
 import TemplateGallery from "./TemplateGallery";
 import CustomizationPanel, {
   DEFAULT_CUSTOMIZATION,
@@ -74,6 +74,7 @@ const GENERATION_MODES: { id: GenerationMode; label: string; icon: typeof FileTe
   { id: "single", label: "Single Page", icon: FileText, description: "One complete HTML page" },
   { id: "multi", label: "Multi-Page", icon: Files, description: "3-6 connected pages with shared design" },
   { id: "fullstack", label: "Full-Stack", icon: Layers, description: "Database + API + frontend with CRUD" },
+  { id: "react", label: "React App", icon: Code2, description: "React components with TypeScript + Tailwind" },
 ];
 
 export default function PromptInput({

@@ -6,7 +6,10 @@ import Link from "next/link";
 import { getGeneratorDef } from "@/lib/generator-prompts";
 import TopBar from "@/components/TopBar";
 import PromptInput from "@/components/PromptInput";
-import type { Tier, AIModel } from "@/components/PromptInput";
+import type { Tier, AIModel, GenerationMode } from "@/components/PromptInput";
+import dynamic from "next/dynamic";
+
+const SandpackPreview = dynamic(() => import("@/components/SandpackPreview"), { ssr: false });
 import PreviewPanel from "@/components/PreviewPanel";
 import CodePanel from "@/components/CodePanel";
 import ChatPanel from "@/components/ChatPanel";
@@ -421,6 +424,9 @@ function BuilderPage() {
   const [instantMode, setInstantMode] = useState(false); // Default to full AI generation for premium quality
   const [availableModels, setAvailableModels] = useState<AIModel[]>([]);
   const [reactSource, setReactSource] = useState<Record<string, string> | null>(null);
+  const [reactFiles, setReactFiles] = useState<Record<string, string> | null>(null);
+  const [reactDeps, setReactDeps] = useState<Record<string, string>>({});
+  const [generationMode, setGenerationMode] = useState<GenerationMode>("single");
   const [mcpContext, setMcpContext] = useState("");
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   // Phase 2: Visual editing
@@ -1026,6 +1032,54 @@ function BuilderPage() {
     const controller = new AbortController();
     abortRef.current = controller;
 
+    // ── React App mode: call /api/generate/react and show in Sandpack ──
+    if (generationMode === "react") {
+      setPipelineAgents(["Generating React components..."]);
+      try {
+        const res = await fetch("/api/generate/react", {
+          method: "POST",
+          headers: authHeaders(),
+          body: JSON.stringify({
+            prompt: prompt.trim(),
+            tier,
+            ...(selectedModel ? { model: selectedModel } : {}),
+            ...(generatorBanner ? { generator: generatorBanner.id } : {}),
+          }),
+          signal: controller.signal,
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+          throw new Error(errData.error || `HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+        if (!data.files || !data.files["App.tsx"]) {
+          throw new Error("React generation returned invalid response. Please try again.");
+        }
+
+        if (generationIdRef.current === currentGenId) {
+          setReactFiles(data.files);
+          setReactDeps(data.dependencies || {});
+          setReactSource(data.files);
+          // Set generatedCode to a marker so hasCode is true (enables deploy/save/tabs)
+          setGeneratedCode("<!-- react-app-mode -->");
+          setStatus("complete");
+          setPipelineAgents(prev => [...prev, `Generated ${Object.keys(data.files).length} React files`]);
+          trackEvent("build");
+        }
+      } catch (err) {
+        if ((err as Error).name === "AbortError") return;
+        const errMsg = err instanceof Error ? err.message : String(err);
+        console.error("[React Generate] Failed:", errMsg);
+        setGeneratedCode("");
+        setReactFiles(null);
+        setError(cleanErrorMessage(errMsg));
+        setStatus("error");
+      }
+      return;
+    }
+
     // ── Helper: read SSE stream into accumulated HTML ──
     const readSSEStream = async (
       res: Response,
@@ -1179,7 +1233,7 @@ function BuilderPage() {
       setError(cleanErrorMessage(errMsg));
       setStatus("error");
     }
-  }, [prompt, tier, autoReplaceImages, selectedModel, instantMode]);
+  }, [prompt, tier, autoReplaceImages, selectedModel, instantMode, generationMode]);
 
   const handleEdit = useCallback(async () => {
     if (!editPrompt.trim() || !generatedCode) return;
@@ -1291,6 +1345,8 @@ function BuilderPage() {
     setGeneratedCode("");
     setPrompt("");
     setReactSource(null);
+    setReactFiles(null);
+    setReactDeps({});
     setStatus("idle");
     setError("");
     setActiveTool(null);
@@ -1697,6 +1753,8 @@ function BuilderPage() {
                   selectedModel={selectedModel}
                   onModelChange={setSelectedModel}
                   availableModels={availableModels}
+                  generationMode={generationMode}
+                  onGenerationModeChange={setGenerationMode}
                 />
               </div>
             </>
@@ -1874,12 +1932,21 @@ function BuilderPage() {
               </div>
             ) : activeTab === "preview" ? (
               <div ref={previewContainerRef} className="relative h-full">
-                <PreviewPanel
-                  html={generatedCode}
-                  isGenerating={status === "generating"}
-                  visualEditMode={visualEditMode}
-                  onElementSelected={setSelectedElement}
-                />
+                {generationMode === "react" && reactFiles ? (
+                  <SandpackPreview
+                    mode="react"
+                    files={reactFiles}
+                    dependencies={reactDeps}
+                    showEditor={false}
+                  />
+                ) : (
+                  <PreviewPanel
+                    html={generatedCode}
+                    isGenerating={status === "generating"}
+                    visualEditMode={visualEditMode}
+                    onElementSelected={setSelectedElement}
+                  />
+                )}
                 {collab.isConnected && (
                   <CursorOverlay
                     participants={collab.participants}
