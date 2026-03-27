@@ -81,7 +81,6 @@ import {
   Workflow,
   Undo2,
   Redo2,
-  Search as SearchIcon,
   Save,
   Sparkles,
   History,

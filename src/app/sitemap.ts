@@ -47,6 +47,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // Feature / marketing pages
     { path: '/domains', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/domain-search', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/marketplace', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/hosting', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/agencies', priority: 0.8, changeFrequency: 'weekly' },
