@@ -81,8 +81,7 @@ export async function POST(request: NextRequest) {
       mode: isSubscription ? "subscription" : "payment",
       payment_method_types: ["card"],
       customer_email: email,
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-      line_items: [lineItem as any],
+      line_items: [lineItem as any], // eslint-disable-line
       metadata: { email, addonId: addon.id, addonName: addon.name },
       success_url: `${appUrl}/marketplace?success=true&addon=${encodeURIComponent(addon.id)}`,
       cancel_url: `${appUrl}/marketplace?canceled=true`,
