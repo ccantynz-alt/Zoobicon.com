@@ -33,7 +33,11 @@ export type ComponentCategory =
   | "footer"
   | "about"
   | "contact"
-  | "gallery";
+  | "gallery"
+  | "blog"
+  | "ecommerce"
+  | "forms"
+  | "misc";
 
 // ── Registry Store ──
 
@@ -109,16 +113,43 @@ function scoreComponent(component: RegistryComponent, promptLower: string): numb
   const minimalMatch = /portfolio|creative|minimal|designer|artist|photographer|freelance|studio|clean/i.test(promptLower);
   const agencyMatch = /agency|marketing|consulting|branding|firm|services/i.test(promptLower);
 
-  if (techMatch && (component.variant.includes("dark") || component.variant.includes("cards-dark"))) {
+  if (techMatch && (component.variant.includes("dark") || component.variant.includes("cards-dark") || component.variant.includes("dark-gradient") || component.variant.includes("dashboard"))) {
     score += 4;
   }
-  if (warmMatch && (component.variant.includes("warm") || component.variant.includes("image") || component.variant.includes("overlay") || component.variant.includes("quote"))) {
+  if (warmMatch && (component.variant.includes("warm") || component.variant.includes("image") || component.variant.includes("overlay") || component.variant.includes("quote") || component.variant.includes("video") || component.variant.includes("centered"))) {
     score += 4;
   }
   if (minimalMatch && (component.variant.includes("minimal") || component.variant.includes("quote"))) {
     score += 4;
   }
-  if (agencyMatch && (component.variant.includes("alternating") || component.variant.includes("gradient") || component.variant.includes("centered"))) {
+  if (agencyMatch && (component.variant.includes("alternating") || component.variant.includes("gradient") || component.variant.includes("centered") || component.variant.includes("video"))) {
+    score += 3;
+  }
+
+  // Additional industry-variant boosting for newer variants
+  const enterpriseMatch = /enterprise|corporate|fintech|banking|finance|b2b|marketplace/i.test(promptLower);
+  const cryptoMatch = /crypto|web3|defi|blockchain|nft|trading|exchange/i.test(promptLower);
+  const luxuryMatch = /luxury|fashion|beauty|boutique|premium|high-end/i.test(promptLower);
+  const gamingMatch = /gaming|esports|cyberpunk|neon|hacker/i.test(promptLower);
+  const productMatch = /app|mobile|ios|android|product|tool|productivity/i.test(promptLower);
+  const landingMatch = /landing|launch|waitlist|coming soon/i.test(promptLower);
+
+  if (enterpriseMatch && (component.variant.includes("mega") || component.variant.includes("stats") || component.variant.includes("dashboard"))) {
+    score += 4;
+  }
+  if (cryptoMatch && (component.variant.includes("glass") || component.variant.includes("dark-gradient"))) {
+    score += 4;
+  }
+  if (luxuryMatch && (component.variant.includes("centered") || component.variant.includes("glass"))) {
+    score += 3;
+  }
+  if (gamingMatch && (component.variant.includes("dark-gradient") || component.variant.includes("glass"))) {
+    score += 4;
+  }
+  if (productMatch && (component.variant.includes("animated") || component.variant.includes("dashboard") || component.variant.includes("two-cta"))) {
+    score += 3;
+  }
+  if (landingMatch && (component.variant.includes("sticky") || component.variant.includes("animated"))) {
     score += 3;
   }
 
