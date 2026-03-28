@@ -118,6 +118,57 @@ Zoobicon must be 80-90% more advanced than every competitor. Not 10% better. Not
 
 **The measurement:** Every month, build the same site on Zoobicon and on Lovable/Bolt/v0. Compare speed, quality, and features. If we're not clearly ahead on at least 2 out of 3, something is wrong and must be fixed immediately.
 
+## NEXT PRIORITY: Component Registry + Streaming Assembly Architecture
+
+**STATUS: APPROVED, NOT YET BUILT. This is the #1 engineering priority.**
+
+The current React generation asks the AI to generate 9 complete components as JSON in a single API call. This takes 2-3 minutes and is unreliable (timeouts, partial output, quality issues).
+
+**The new architecture:**
+
+```
+User Prompt
+  ↓
+AI selects components from registry (Haiku, <2 seconds)
+  ↓
+Each component streamed to Sandpack as it's customized
+  ↓
+User sees site building itself live (navbar → hero → features → ...)
+  ↓
+Total: <30 seconds for a complete, polished site
+```
+
+**Component Registry (50+ polished React components):**
+- NOT full website templates — individual section components
+- Each component is production-ready, beautiful, responsive
+- Categories: navbars (5), heroes (5), features (5), testimonials (3), pricing (3), stats (3), FAQ (2), CTAs (3), footers (3), about (3), contact (2), galleries (2), etc.
+- Stored as TypeScript string templates in src/lib/component-registry/
+- AI SELECTS which components to use, then CUSTOMIZES content only
+- Like shadcn/ui but for complete page sections
+
+**Streaming Assembly:**
+- SSE stream from /api/generate/react-stream
+- Each component sent as a separate SSE event
+- Sandpack renders incrementally — site builds in front of the user
+- First component visible in <3 seconds
+- Full site in <30 seconds
+
+**Why this is better than snapshots:**
+- Infinite combinations (50 components × N arrangements)
+- AI chooses the best component for each section
+- Customization is per-component (fast) not per-site (slow)
+- New components can be added without rebuilding templates
+- Quality is consistent because each component is hand-polished
+
+**Implementation files needed:**
+- src/lib/component-registry/index.ts — Registry + selection logic
+- src/lib/component-registry/navbars/*.ts — 5 navbar variants
+- src/lib/component-registry/heroes/*.ts — 5 hero variants
+- src/lib/component-registry/features/*.ts — 5 feature variants
+- ... (50+ total)
+- src/app/api/generate/react-stream/route.ts — Streaming endpoint
+- Update builder to use streaming assembly instead of single JSON call
+
 ## TECHNOLOGY RADAR — What Claude Must Research Every Session
 
 **Before building ANYTHING, Claude must check: is there a newer/better way to do this?**
