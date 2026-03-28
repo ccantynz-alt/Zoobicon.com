@@ -87,7 +87,7 @@ Output ONLY a valid JSON object with this exact structure — no markdown, no co
 - Minimum 9 sections: Navbar, Hero, Features, About, Testimonials, Stats, FAQ, CTA, Footer
 - Every component must render meaningful, complete content — no "TODO" or placeholder comments`;
 
-export const maxDuration = 120;
+export const maxDuration = 300; // 5 minutes — React component generation needs more time than HTML
 
 export async function POST(req: NextRequest) {
   try {
