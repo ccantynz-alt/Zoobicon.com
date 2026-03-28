@@ -91,10 +91,19 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
+  // Block known competitor/scraper user agents at the middleware level
+  const ua = request.headers.get("user-agent")?.toLowerCase() || "";
+  const blockedBots = ["scrapy", "semrushbot", "ahrefsbot", "mj12bot", "dotbot", "bytespider", "petalbot"];
+  if (blockedBots.some(bot => ua.includes(bot))) {
+    return new NextResponse("Forbidden", { status: 403 });
+  }
+
   // Pass through — still tag the domain and brand headers
   const response = NextResponse.next();
   response.headers.set("x-zoobicon-domain", domainLabel);
   response.headers.set("x-brand-id", brandId);
+  // Anti-scraping headers
+  response.headers.set("X-Robots-Tag", "noai, noimageai");
   if (request.nextUrl.pathname.startsWith("/api/")) {
     setCorsHeaders(response, origin);
   }

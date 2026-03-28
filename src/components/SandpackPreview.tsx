@@ -8,10 +8,20 @@ import {
 import { useMemo } from "react";
 import { extractSandpackFiles } from "@/lib/sandpack-utils";
 
-interface SandpackPreviewProps {
+interface SandpackPreviewPropsHTML {
+  mode?: "html";
   html: string;
   showEditor?: boolean;
 }
+
+interface SandpackPreviewPropsReact {
+  mode: "react";
+  files: Record<string, string>;
+  dependencies?: Record<string, string>;
+  showEditor?: boolean;
+}
+
+type SandpackPreviewProps = SandpackPreviewPropsHTML | SandpackPreviewPropsReact;
 
 /**
  * Zoobicon-branded dark theme for Sandpack.
@@ -50,24 +60,137 @@ const zoobiconTheme = {
 };
 
 /**
- * In-browser Sandpack preview with optional code editor.
- * Provides hot-reload for generated HTML/CSS/JS sites.
+ * Convert our React files map to Sandpack's expected format.
+ * Sandpack expects paths prefixed with / and an index.tsx entry point.
  */
-export default function SandpackPreview({ html, showEditor = false }: SandpackPreviewProps) {
-  const files = useMemo(() => extractSandpackFiles(html || ""), [html]);
+function buildReactSandpackFiles(
+  files: Record<string, string>,
+): Record<string, string> {
+  const sandpackFiles: Record<string, string> = {};
 
-  if (!html || !html.trim()) {
+  for (const [path, content] of Object.entries(files)) {
+    // Ensure leading slash
+    const key = path.startsWith("/") ? path : `/${path}`;
+    sandpackFiles[key] = content;
+  }
+
+  // Sandpack react-ts template requires /App.tsx at the root.
+  // Our generation outputs "App.tsx" which becomes "/App.tsx" — this is correct.
+  // But the template also needs an index.tsx if one doesn't exist.
+  if (!sandpackFiles["/index.tsx"] && !sandpackFiles["/index.ts"]) {
+    sandpackFiles["/index.tsx"] = `import React from "react";
+import { createRoot } from "react-dom/client";
+import App from "./App";
+
+const root = createRoot(document.getElementById("root")!);
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+`;
+  }
+
+  return sandpackFiles;
+}
+
+/**
+ * In-browser Sandpack preview with optional code editor.
+ * Supports two modes:
+ * - "html" (default): Renders generated HTML/CSS/JS using the static template
+ * - "react": Renders generated React/TypeScript components using the react-ts template
+ */
+export default function SandpackPreview(props: SandpackPreviewProps) {
+  const { showEditor = false } = props;
+  const mode = props.mode || "html";
+
+  // HTML mode: extract files from raw HTML string
+  const htmlFiles = useMemo(() => {
+    if (mode !== "html") return {};
+    const html = (props as SandpackPreviewPropsHTML).html || "";
+    return extractSandpackFiles(html);
+  }, [mode, mode === "html" ? (props as SandpackPreviewPropsHTML).html : ""]);
+
+  // React mode: convert files map to Sandpack format
+  const reactFiles = useMemo(() => {
+    if (mode !== "react") return {};
+    const files = (props as SandpackPreviewPropsReact).files || {};
+    return buildReactSandpackFiles(files);
+  }, [mode, mode === "react" ? (props as SandpackPreviewPropsReact).files : null]);
+
+  const dependencies = mode === "react" ? (props as SandpackPreviewPropsReact).dependencies : undefined;
+
+  // Empty state
+  if (mode === "html") {
+    const html = (props as SandpackPreviewPropsHTML).html;
+    if (!html || !html.trim()) {
+      return (
+        <div className="h-full flex items-center justify-center bg-[#131520] text-white/40 text-sm">
+          <p>No content to preview</p>
+        </div>
+      );
+    }
+  } else if (mode === "react") {
+    const files = (props as SandpackPreviewPropsReact).files;
+    if (!files || Object.keys(files).length === 0) {
+      return (
+        <div className="h-full flex items-center justify-center bg-[#131520] text-white/40 text-sm">
+          <p>No React components to preview</p>
+        </div>
+      );
+    }
+  }
+
+  if (mode === "react") {
     return (
-      <div className="h-full flex items-center justify-center bg-[#131520] text-white/40 text-sm">
-        <p>No content to preview</p>
-      </div>
+      <SandpackProvider
+        template="react-ts"
+        files={reactFiles}
+        theme={zoobiconTheme}
+        customSetup={{
+          dependencies: {
+            ...(dependencies || {}),
+          },
+        }}
+        options={{
+          autorun: true,
+          autoReload: true,
+          recompileMode: "delayed",
+          recompileDelay: 500,
+          externalResources: [
+            "https://cdn.tailwindcss.com",
+          ],
+        }}
+      >
+        <div className="flex h-full w-full overflow-hidden">
+          {showEditor && (
+            <div className="h-full overflow-hidden border-r border-white/5" style={{ flex: 1 }}>
+              <SandpackCodeEditor
+                showTabs
+                showLineNumbers
+                showInlineErrors
+                wrapContent
+                style={{ height: "100%" }}
+              />
+            </div>
+          )}
+          <div style={{ flex: showEditor ? 2 : 1, height: "100%" }}>
+            <SandboxPreview
+              showOpenInCodeSandbox={false}
+              showRefreshButton
+              style={{ height: "100%" }}
+            />
+          </div>
+        </div>
+      </SandpackProvider>
     );
   }
 
+  // HTML mode (default / existing behavior)
   return (
     <SandpackProvider
       template="static"
-      files={files}
+      files={htmlFiles}
       theme={zoobiconTheme}
       options={{
         autorun: true,

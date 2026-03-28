@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState, useCallback } from "react";
-import { Mic, MicOff, Sparkles, Zap, Pencil, Send, Check, ChevronDown, Cpu, LayoutTemplate, SlidersHorizontal, FileText, Files, Layers } from "lucide-react";
+import { Mic, MicOff, Sparkles, Zap, Pencil, Send, Check, ChevronDown, Cpu, LayoutTemplate, SlidersHorizontal, FileText, Files, Layers, Code2 } from "lucide-react";
 import TemplateGallery from "./TemplateGallery";
 import CustomizationPanel, {
   DEFAULT_CUSTOMIZATION,
@@ -39,7 +39,7 @@ export interface AIModel {
   tier: string;
 }
 
-export type GenerationMode = "single" | "multi" | "fullstack";
+export type GenerationMode = "single" | "multi" | "fullstack" | "react";
 
 interface PromptInputProps {
   prompt: string;
@@ -71,9 +71,9 @@ const STANDARD_FEATURES = ["Opus-powered", "Responsive", "Fast single-pass"];
 const PREMIUM_FEATURES = ["10-agent pipeline", "Animations", "SEO + Forms", "React export"];
 
 const GENERATION_MODES: { id: GenerationMode; label: string; icon: typeof FileText; description: string }[] = [
-  { id: "single", label: "Single Page", icon: FileText, description: "One complete HTML page" },
-  { id: "multi", label: "Multi-Page", icon: Files, description: "3-6 connected pages with shared design" },
-  { id: "fullstack", label: "Full-Stack", icon: Layers, description: "Database + API + frontend with CRUD" },
+  { id: "react", label: "React App", icon: Code2, description: "Modern React components with TypeScript + Tailwind" },
+  { id: "multi", label: "Multi-Page", icon: Files, description: "Multi-page React app with routing" },
+  { id: "fullstack", label: "Full-Stack", icon: Layers, description: "React frontend + API routes + database" },
 ];
 
 export default function PromptInput({
@@ -102,7 +102,7 @@ export default function PromptInput({
   const [showTemplateGallery, setShowTemplateGallery] = useState(false);
   const [showCustomization, setShowCustomization] = useState(false);
   const [customization, setCustomization] = useState<CustomizationOptions>(DEFAULT_CUSTOMIZATION);
-  const [internalMode, setInternalMode] = useState<GenerationMode>(generationMode ?? "single");
+  const [internalMode, setInternalMode] = useState<GenerationMode>(generationMode ?? "react");
   const [hoveredMode, setHoveredMode] = useState<GenerationMode | null>(null);
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
 

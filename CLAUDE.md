@@ -1,5 +1,163 @@
 # CLAUDE.md — Zoobicon Project Guide
 
+## CORE PRINCIPLE — NEWEST TECHNOLOGY, ALWAYS FIRST
+
+**THIS OVERRIDES EVERYTHING ELSE IN THIS DOCUMENT.**
+
+Zoobicon is an AI-built platform. There is NO excuse for using old technology. Every decision, every feature, every line of code must use the newest, most advanced technology available. If a competitor has something we don't, we build it better. If a new technology emerges, we adopt it first.
+
+**The rules:**
+1. **No old-school output** — We generate React/Next.js components, NOT static HTML blobs. Every competitor (Lovable, Bolt, v0, Emergent) outputs React. We must match or exceed them.
+2. **In-browser preview** — Use Sandpack or WebContainers for instant live preview. No more 60-95 second waits for a server-side generation to complete.
+3. **Intellectual crawlers** — Our Market Intelligence Crawler agent must run continuously, scanning competitor products for new features. When a competitor ships something new, we know within 12 hours and have a plan to match or beat it within 48 hours.
+4. **First to market** — If we can't be first, we must be best. If we can't be best, we must have a unique angle no one else has. "Good enough" is not acceptable. "Same as competitors" is the MINIMUM — our target is AHEAD.
+5. **Technology currency** — Every session, check: Are we on the latest Next.js? Latest React? Latest Tailwind? Latest Claude/GPT models? Latest browser APIs? If not, upgrade.
+6. **No legacy debt** — If old code is holding us back, replace it. Don't patch around it. Don't "fix it later." Fix it now. The cost of carrying legacy code is higher than the cost of rewriting it.
+7. **Output quality = revenue** — The generated output IS the product. If it looks like 2020 technology, customers won't pay. If it looks like 2027 technology, they'll pay premium. Every generated site must use modern React patterns, modern CSS, modern interactions.
+
+**Current technology targets (March 2026):**
+- **Output format**: React/Next.js components with Tailwind CSS (NOT static HTML)
+- **Preview**: Sandpack in-browser live preview (NOT iframe of server-generated HTML)
+- **Framework**: Next.js 15+ with App Router, Server Components, Streaming
+- **AI Models**: Claude Opus/Sonnet 4.6, GPT-4o/5, Gemini 2.5 Pro
+- **Runtime**: Sandpack/WebContainers for in-browser execution
+- **Deployment**: Vercel one-click deploy from generated code
+- **Export**: GitHub sync, real repository, npm packages
+- **Design system**: shadcn/ui components (industry standard for React)
+
+**HARD RULE — NO OLD TECHNOLOGY KEPT AS FALLBACK:**
+When we adopt a new technology, the old one is REMOVED, not kept alongside. No "HTML mode still works." No "legacy fallback." No "kept for backwards compatibility." The old way is deleted. We can never be stale in this market. Stale = dead. If a competitor does something new, we match it AND remove our old way of doing it. Every line of legacy code is a line that makes us look outdated.
+
+**The migration path:**
+- Phase 1: Add Sandpack preview alongside existing HTML builder
+- Phase 2: AI generates React components instead of HTML
+- Phase 3: Full project scaffolding (file tree, pages, components, API routes)
+- Phase 4: In-browser editing with hot reload
+- Phase 5: One-click Vercel/GitHub deployment
+
+**The test:** If a user builds something on Zoobicon and then tries Lovable or Bolt, they should think "Zoobicon was better." Not "about the same." Not "different but comparable." BETTER. If they don't think that, we've failed.
+
+**TECHNOLOGY RADAR — What Claude Must Research Every Session**
+
+**Before building ANYTHING, Claude must check: is there a newer/better way to do this?**
+
+**ADOPT NOW (proven, must implement):**
+- Sandpack for in-browser React preview ✅ (installed)
+- shadcn/ui as the component design system
+- React Server Components for generation output
+- Tailwind CSS v4 (if stable)
+- MCP (Model Context Protocol) for tool integration
+- GitHub sync for generated projects
+- Vercel deployment integration
+
+**EVALUATE (emerging, first-mover advantage):**
+- WebMCP (Google, Feb 2026) — structured website interactions for AI agents
+- A2A (Agent-to-Agent protocol) — multi-agent communication standard
+- AG-UI (CopilotKit) — agent-to-frontend communication protocol
+- Agent Memory — persistent context across sessions (NO ONE has this yet — massive opportunity)
+- Veo 3.1 API — native audio + video generation (Sora is dead, Veo leads)
+- Kling 3.0 API — cost-effective video at scale with audio sync
+- Seedance 2.0 — multi-modal input (9 images + 3 videos + 3 audio tracks)
+
+**WATCH (not ready yet but coming):**
+- WebContainers (StackBlitz) — full Node.js in browser
+- Real-time AI video editing (late 2026)
+- Agent-native startups bypassing traditional software entirely
+
+**RULE: If a technology on the ADOPT list is not implemented, it's a bug. Fix it immediately. If a technology on the EVALUATE list could give us an advantage, research it and propose implementation. If a WATCH item moves to EVALUATE, flag it immediately.**
+
+## COMPETITIVE MANDATE — 80-90% MORE ADVANCED THAN COMPETITORS
+
+**THIS IS NON-NEGOTIABLE. THIS MUST HAPPEN. OTHERWISE THERE IS NO POINT.**
+
+Zoobicon must be 80-90% more advanced than every competitor. Not 10% better. Not "comparable." Not "different but equal." We must be so far ahead that competitors look outdated by comparison.
+
+**How we achieve this:**
+
+1. **React Scaffold System — Instant Assembly**
+   - Pre-built React component library (Hero, Features, Pricing, Testimonials, Footer, Nav, CTA, FAQ, Stats, Gallery — 50+ components)
+   - Each component is a polished, production-ready React module with TypeScript, Tailwind, and modern patterns
+   - Scaffold loads in <1 second via Sandpack — user sees a complete site INSTANTLY
+   - AI then streams customizations (colors, copy, images, branding) into the scaffold in real-time
+   - User watches their site transform LIVE — not staring at a loading spinner
+   - This is FASTER than any competitor because we're assembling, not generating from scratch
+
+2. **Intellectual Advantage — Always Ahead**
+   - Market Intelligence Crawler runs every 12 hours scanning ALL competitors
+   - When a competitor ships a new feature, we know within 12 hours
+   - We have 48 hours to match it and 7 days to surpass it
+   - Monthly technology audit: are we on the latest everything?
+   - Quarterly competitive review: where do we lead, where do we trail, what's the plan?
+
+3. **Unique Differentiators No Competitor Has**
+   - 18 autonomous AI agents (competitors have 0-5)
+   - AI Video Creator with HeyGen spokesperson
+   - Real domain search via OpenSRS/Tucows
+   - Agency white-label platform
+   - 43 specialized generators
+   - Multi-domain ecosystem (.com, .ai, .io, .sh)
+   - Open-source agent framework (@zoobicon/agents)
+
+4. **Speed Targets**
+   - Scaffold preview: <1 second (Sandpack loads pre-built React components)
+   - AI customization: 3-10 seconds (streaming changes into scaffold)
+   - Full custom generation: <30 seconds (React components, not HTML)
+   - Deploy to production: <5 seconds (Vercel one-click)
+   - Current competitors: Bolt 3-5s preview, Lovable 30-90s full build, v0 5-15s components
+   - Our target: <1s preview, <10s customized, <30s full custom = FASTEST IN MARKET
+
+5. **Quality Standard**
+   - Every generated site must look like a $50K+ agency built it
+   - Modern React patterns (hooks, composition, server components)
+   - shadcn/ui design system (industry standard)
+   - Tailwind CSS (no CSS-in-JS, no styled-components)
+   - TypeScript throughout (type safety = fewer bugs)
+   - Responsive by default (mobile-first)
+   - Accessible by default (WCAG AA minimum)
+   - SEO optimized by default (meta tags, structured data, semantic HTML)
+
+**The measurement:** Every month, build the same site on Zoobicon and on Lovable/Bolt/v0. Compare speed, quality, and features. If we're not clearly ahead on at least 2 out of 3, something is wrong and must be fixed immediately.
+
+## TECHNOLOGY RADAR — What Claude Must Research Every Session
+
+**Before building ANYTHING, Claude must check: is there a newer/better way to do this?**
+
+**ADOPT NOW (proven, must implement):**
+- Sandpack for in-browser React preview ✅ (installed)
+- shadcn/ui as the component design system
+- React Server Components for generation output
+- Tailwind CSS v4 (if stable)
+- MCP (Model Context Protocol) for tool integration
+- GitHub sync for generated projects
+- Vercel deployment integration
+
+**EVALUATE (emerging, first-mover advantage):**
+- WebMCP (Google, Feb 2026) — structured website interactions for AI agents
+- A2A (Agent-to-Agent protocol) — multi-agent communication standard
+- AG-UI (CopilotKit) — agent-to-frontend communication protocol
+- Agent Memory — persistent context across sessions (NO ONE has this yet — massive opportunity)
+- Veo 3.1 API — native audio + video generation (Sora is dead, Veo leads)
+- Kling 3.0 API — cost-effective video at scale with audio sync
+- Seedance 2.0 — multi-modal input (9 images + 3 videos + 3 audio tracks)
+
+**WATCH (not ready yet but coming):**
+- WebContainers (StackBlitz) — full Node.js in browser
+- Real-time AI video editing (late 2026)
+- Agent-native startups bypassing traditional software entirely
+
+**RULE: If a technology on the ADOPT list is not implemented, it's a bug. Fix it immediately. If a technology on the EVALUATE list could give us an advantage, research it and propose implementation. If a WATCH item moves to EVALUATE, flag it immediately.**
+
+**VIDEO CREATOR TARGETS:**
+- Support Runway Gen-4.5 (current Gen-3 Alpha)
+- Add Kling 3.0 as video provider (40% cheaper than Runway)
+- Native audio generation (don't rely on separate voiceover step)
+- Character consistency across scenes
+- Multi-modal input (text + image + existing video)
+- Real-time preview during generation
+- Target: generate a 30-second marketing video in under 2 minutes
+
+---
+
 ## What is this project?
 
 Zoobicon is a **white-label AI website builder platform** built with Next.js 14, React 18, TypeScript, and Tailwind CSS. It uses a multi-LLM pipeline architecture (Claude, GPT, Gemini) with a 7-agent build pipeline. The platform supports multiple brands from a single codebase via `src/lib/brand-config.ts`.
@@ -68,6 +226,7 @@ Build has `ignoreBuildErrors: true` and `ignoreDuringBuilds: true` in next.confi
 | `/api/generate/variants` (POST) | Sonnet | 32K | 2-3 design variants for A/B testing |
 | `/api/generate/email` (POST) | Sonnet | 16K | Email template generation |
 | `/api/generate/quick` (POST) | Haiku | 8K | Lightweight fast generation |
+| `/api/generate/react` (POST) | Sonnet | 32K | React/TypeScript component generation — outputs JSON `{ files, dependencies }` for Sandpack preview |
 | `/api/generate/images` (POST) | — | — | AI image generation (Replicate/Stability) |
 | `/api/generate/ai-images` (POST) | — | — | Embed AI images into existing HTML |
 | `/api/generate/edit-diff` (POST) | — | — | Diff generation for variant comparison |
@@ -79,6 +238,8 @@ Build has `ignoreBuildErrors: true` and `ignoreDuringBuilds: true` in next.confi
 **Multi-page:** JSON with `{ siteName, pages: [{ slug, title, html }], navigation: [{ label, href }] }`. Each page is standalone HTML with shared design (fonts, colors, nav, footer). Max 6 pages.
 
 **Full-stack:** JSON with `{ description, schema (SQL), apiEndpoints: [{ method, path, handler }], code (HTML with CRUD UI) }`. Real PostgreSQL schemas, RESTful Next.js handlers, interactive frontend with forms/tables/modals.
+
+**React App:** JSON with `{ files: { "App.tsx": "...", "components/Hero.tsx": "...", ... }, dependencies: {} }`. React 18 functional components with TypeScript, styled with Tailwind CSS (loaded via CDN in Sandpack). Each component is self-contained. Rendered live in the builder via `@codesandbox/sandpack-react` with the `react-ts` template. Selected via "React App" mode toggle in PromptInput.
 
 ### Hosting & Deployment (src/app/api/hosting/)
 
@@ -1176,6 +1337,8 @@ All Tier 1 stickiness components are now wired into the actual user flows:
     The shared email template (`src/lib/email-template.ts`) already implements this. Any new email sending code MUST use `emailTemplate()` from that file — never inline HTML without the domain footer. If a context doesn't support HTML (plain text replies, chat messages), use the text format: `zoobicon.com | zoobicon.ai | zoobicon.io | zoobicon.sh`
 
     **Key files:** `src/lib/email-template.ts` (HTML template with domain footer), `src/lib/admin-notify.ts` (admin notifications), `src/app/api/auth/signup/route.ts` (verification email), `src/app/api/auth/forgot-password/route.ts` (password reset), `src/app/api/auth/resend-verification/route.ts` (resend verification).
+
+32. **React/Next.js Generation Pipeline** — The builder now supports a "React App" generation mode alongside the existing HTML mode. When users select "React App" in the PromptInput mode selector, the builder calls `/api/generate/react` which instructs the AI to output a JSON object containing React/TypeScript component files (`App.tsx`, `components/Hero.tsx`, etc.) with Tailwind CSS styling. The output is rendered live in the browser using `@codesandbox/sandpack-react` with the `react-ts` template and Tailwind CSS loaded via CDN. HTML mode remains the default and continues to work unchanged. **Key files:** `src/app/api/generate/react/route.ts` (generation endpoint), `src/components/SandpackPreview.tsx` (dual-mode preview — HTML static template or React react-ts template), `src/components/PromptInput.tsx` (mode selector with "React App" option), `src/app/builder/page.tsx` (routes to React endpoint and renders SandpackPreview when in React mode). The `reactFiles` state in the builder holds the file map, `reactDeps` holds dependencies, and both are passed to SandpackPreview. CodePanel and ExportPanel already support `reactSource` for file viewing and export.
 
 ---
 
