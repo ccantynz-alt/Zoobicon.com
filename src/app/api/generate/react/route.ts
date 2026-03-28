@@ -72,10 +72,25 @@ Output ONLY a valid JSON object with this exact structure — no markdown, no co
   - Portfolio: Bold typography, vivid accent colors
 - Text contrast must meet WCAG AA (4.5:1 body, 3:1 large text)
 
-### Copy Quality
-- Headlines MUST be specific to the business — NO generic phrases like "Welcome to [Brand]" or "Get Started Today"
+### Copy Quality — AGENCY STANDARD
+- Headlines MUST be specific to the business — NO generic phrases like "Welcome to [Brand]" or "Get Started Today" or "Your Solution"
+- Every headline should stop someone scrolling — punchy, benefit-driven, specific
 - Testimonials include specific metrics: "Increased conversions by 47%", "Saved 15 hours per week"
 - CTAs are action-specific: "Schedule Free Assessment", "Start Building Today" — NOT generic "Learn More"
+- Company name in the Navbar should be creative and industry-appropriate — NOT "Brand" or "Company"
+- Feature descriptions should be 2-3 sentences of real, specific benefits — NOT one-line platitudes
+- About section tells a compelling origin story — NOT "We are a team of experts"
+
+### Visual Richness — CRITICAL
+- EVERY section must have visual depth — gradients, shadows, rounded corners, accent borders
+- Cards need hover effects: hover:shadow-xl, hover:scale-[1.02], hover:-translate-y-1, transition-all duration-300
+- Use ring-1 ring-white/10 on dark themes, ring-1 ring-gray-200 on light themes
+- Stats section: use a bold gradient background (bg-gradient-to-r from-indigo-600 to-purple-700)
+- Testimonial cards: include star ratings (★★★★★) and company logos (text placeholders)
+- Feature icons: use gradient backgrounds behind icons (bg-gradient-to-br from-indigo-500/20 to-purple-500/20 p-3 rounded-xl)
+- Footer: must have newsletter signup input + social media icon row
+- Hero image area: use glassmorphism cards, floating stat badges, or dashboard mockups — NOT empty placeholder boxes
+- MINIMUM 8 images across the site (hero, features, about, testimonials)
 
 ### Critical Rules
 - Output ONLY the JSON object — start with { and end with }
@@ -122,7 +137,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const client = new Anthropic({ apiKey, timeout: 120_000 });
+    const client = new Anthropic({ apiKey, timeout: 240_000 });
 
     let systemPrompt = REACT_SYSTEM;
 
