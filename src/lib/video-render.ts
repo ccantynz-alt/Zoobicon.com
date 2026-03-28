@@ -696,16 +696,19 @@ function sanitizeRenderError(raw: string): string {
 function buildVideoPrompt(scene: RenderScene, style: string): string {
   const motionDir = VIDEO_STYLE_DIRECTIONS[style] || VIDEO_STYLE_DIRECTIONS["cinematic"];
   const colorDir = scene.colorPalette.length > 0
-    ? `The color grading must emphasize these colors: ${scene.colorPalette.join(", ")}.`
+    ? `Colors: ${scene.colorPalette.slice(0, 3).join(", ")}.`
     : "";
 
-  return [
-    scene.visualDescription,
-    `Camera movement: ${scene.cameraMovement}. The camera motion should feel motivated and intentional.`,
-    motionDir,
-    colorDir,
-    "Cinematic quality. Natural, fluid motion. No artificial-looking elements. Photorealistic. High production value.",
-  ].filter(Boolean).join(" ");
+  // Truncate visual description — Runway has a ~500 char prompt limit
+  const desc = (scene.visualDescription || "").slice(0, 300);
+  const camera = scene.cameraMovement ? `Camera: ${scene.cameraMovement}.` : "";
+
+  const prompt = [desc, camera, motionDir, colorDir, "Cinematic quality. Photorealistic."]
+    .filter(Boolean)
+    .join(" ")
+    .slice(0, 500); // Hard cap at 500 chars for Runway API
+
+  return prompt;
 }
 
 function parseDurationSeconds(duration: string): number {
