@@ -319,3 +319,4 @@ import "./features";
 import "./testimonials";
 import "./footers";
 import "./extras";
+import "./sections";
