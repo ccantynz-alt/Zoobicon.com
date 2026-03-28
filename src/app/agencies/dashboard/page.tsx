@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   LayoutDashboard,
   Users,
@@ -741,10 +742,12 @@ export default function AgencyDashboard() {
             >
               {/* Thumbnail placeholder */}
               <div className="aspect-video bg-[#12121a] relative">
-                <img
+                <Image
                   src={`https://picsum.photos/seed/${site.slug}/400/225`}
                   alt={site.name}
                   className="w-full h-full object-cover opacity-60"
+                  fill
+                  unoptimized
                 />
                 <span
                   className={`absolute top-2 right-2 text-xs px-2 py-0.5 rounded-full ${
@@ -1111,7 +1114,7 @@ export default function AgencyDashboard() {
       <div className="bg-[#1a1a2e] border border-white/10 rounded-xl p-5">
         <div className="flex items-center gap-3 mb-4">
           {brandConfig.logoUrl ? (
-            <img src={brandConfig.logoUrl} alt="Logo" className="w-8 h-8 rounded object-cover" />
+            <Image src={brandConfig.logoUrl} alt="Logo" width={32} height={32} className="w-8 h-8 rounded object-cover" unoptimized />
           ) : (
             <div
               className="w-8 h-8 rounded flex items-center justify-center text-white font-bold text-sm"

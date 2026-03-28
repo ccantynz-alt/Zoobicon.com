@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Headphones, Wifi, Circle } from "lucide-react";
+import Image from "next/image";
 
 interface SupportAvatarProps {
   isSpeaking: boolean;
@@ -35,13 +36,15 @@ export default function SupportAvatar({ isSpeaking, size = "lg" }: SupportAvatar
           />
         )}
         <div
-          className="w-10 h-10 rounded-xl overflow-hidden border border-white/10"
+          className="relative w-10 h-10 rounded-xl overflow-hidden border border-white/10"
           style={{ boxShadow: isSpeaking ? "0 0 12px rgba(52,211,153,0.35)" : undefined }}
         >
-          <img
+          <Image
             src={ZOES_PHOTO}
             alt="Zoe"
-            className="w-full h-full object-cover"
+            fill
+            unoptimized
+            className="object-cover"
             draggable={false}
           />
         </div>
@@ -143,10 +146,12 @@ export default function SupportAvatar({ isSpeaking, size = "lg" }: SupportAvatar
               animate={{ y: [0, -3, 0] }}
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
             >
-              <img
+              <Image
                 src={ZOES_PHOTO}
                 alt="Zoe — Zoobicon AI Support"
-                className="w-full h-full object-cover object-top"
+                fill
+                unoptimized
+                className="object-cover object-top"
                 draggable={false}
                 style={{ filter: "brightness(1.05) saturate(1.08)" }}
               />

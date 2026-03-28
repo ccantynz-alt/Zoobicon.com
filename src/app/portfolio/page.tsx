@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import NextImage from 'next/image';
 import {
   Briefcase, Layout, Grid3X3, Layers, BookOpen, ChevronRight,
   ArrowLeft, Plus, Eye, Edit3, Download, Trash2, ExternalLink,
@@ -193,7 +194,7 @@ export default function PortfolioPage() {
               {filteredProjects.map(project => (
                 <div key={project.id} className="bg-white/5 rounded-2xl border border-white/10 overflow-hidden group hover:border-white/20 transition-all">
                   <div className="relative aspect-[3/2] bg-white/5 overflow-hidden">
-                    <img src={project.image} alt={project.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <NextImage src={project.image} alt={project.title} className="object-cover group-hover:scale-105 transition-transform duration-500" fill unoptimized />
                     {project.featured && (
                       <div className="absolute top-3 left-3 flex items-center gap-1 px-2 py-1 bg-amber-500/90 rounded-full text-xs font-medium text-black">
                         <Star className="w-3 h-3" /> Featured
@@ -296,8 +297,8 @@ export default function PortfolioPage() {
                 <div className={`grid gap-4 ${viewport === 'mobile' ? 'grid-cols-1' : 'grid-cols-2'}`}>
                   {projects.filter(p => p.featured).map(project => (
                     <div key={project.id} className="rounded-xl overflow-hidden bg-white/5">
-                      <div className="aspect-[3/2] bg-white/5">
-                        <img src={project.image} alt={project.title} className="w-full h-full object-cover" />
+                      <div className="relative aspect-[3/2] bg-white/5">
+                        <NextImage src={project.image} alt={project.title} className="object-cover" fill unoptimized />
                       </div>
                       <div className="p-4">
                         <h3 className="font-medium text-sm mb-1">{project.title}</h3>

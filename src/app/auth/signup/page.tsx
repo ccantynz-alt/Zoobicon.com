@@ -40,9 +40,21 @@ export default function SignupPage() {
   ];
 
   const [authError, setAuthError] = useState("");
+  const [emailError, setEmailError] = useState("");
+
+  const validateEmail = (value: string) => {
+    if (!value) return "";
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(value) ? "" : "Please enter a valid email address";
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const emailErr = validateEmail(email);
+    if (emailErr) {
+      setEmailError(emailErr);
+      return;
+    }
     setIsLoading(true);
     setAuthError("");
 
@@ -147,12 +159,14 @@ export default function SignupPage() {
               <input
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => { setEmail(e.target.value); setEmailError(""); }}
+                onBlur={() => setEmailError(validateEmail(email))}
                 placeholder="you@company.com"
                 required
-                className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-sm
-                           placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 transition-all"
+                className={`w-full bg-white/[0.03] border ${emailError ? "border-red-500/50" : "border-white/[0.08]"} rounded-xl px-4 py-3 text-sm
+                           placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 transition-all`}
               />
+              {emailError && <p className="text-red-400 text-xs mt-1">{emailError}</p>}
             </div>
 
             <div>

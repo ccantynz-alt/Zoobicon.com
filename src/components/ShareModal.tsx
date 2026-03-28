@@ -22,6 +22,7 @@ import {
   trackShare,
 } from "@/lib/social-publish";
 import { trackEvent } from "@/lib/achievements";
+import Image from "next/image";
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -421,11 +422,12 @@ export default function ShareModal({
                 {/* Site preview thumbnail */}
                 <div className="flex-1 overflow-hidden rounded-lg border border-white/10 bg-white/5">
                   <div className="relative aspect-video w-full overflow-hidden">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <Image
                       src={generateOGImageUrl(siteUrl) + `&name=${encodeURIComponent(siteName)}`}
                       alt={`Preview of ${siteName}`}
-                      className="h-full w-full object-cover"
+                      fill
+                      unoptimized
+                      className="object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a12]/60 to-transparent" />
                     <div className="absolute bottom-2 left-2">
