@@ -106,8 +106,8 @@ When we adopt new technology, the old is REMOVED. Not kept alongside. Deleted. S
 Zoobicon is a **white-label AI website builder platform** built with Next.js 14, React 18, TypeScript, and Tailwind CSS. Multi-LLM pipeline (Claude, GPT, Gemini) with 7-agent build pipeline. Supports multiple brands from single codebase via `src/lib/brand-config.ts`.
 
 ### Brands / Domains
-- **Zoobicon** (primary): zoobicon.com, zoobicon.ai, zoobicon.sh, zoobicon.io, zoobicon.app
-- **Dominat8** (secondary): dominat8.io, dominat8.com
+- **Zoobicon only**: zoobicon.com, zoobicon.ai, zoobicon.sh, zoobicon.io, zoobicon.app
+- **Dominat8 is a separate codebase** — separate GitHub repo, separate Vercel, separate Supabase. See DOMINAT8_CLAUDE.md.
 
 ## Tech Stack
 
@@ -311,7 +311,7 @@ Replace the 24/7 physical business with Zoobicon. This is the future. Build it l
 | zoobicon.app | Mobile app + admin dashboard | ✅ Registered 2026-03-28 |
 
 **Other domains in Cloudflare (separate projects):**
-48co.nz, bookaride.co.nz (7.44k visitors), hibiscustoairport.co.nz (3.22k visitors), dominat8.com, dominat8.io, ledger.ai (needs setup), verom.ai
+48co.nz, bookaride.co.nz (7.44k visitors), hibiscustoairport.co.nz (3.22k visitors), ledger.ai (needs setup), verom.ai
 
 ---
 
