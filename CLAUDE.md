@@ -154,19 +154,44 @@ Total: <30 seconds for a complete, polished site
 - Full site in <30 seconds
 
 **Why this is better than snapshots:**
-- Infinite combinations (50 components × N arrangements)
+- Infinite combinations (100+ components × N arrangements)
 - AI chooses the best component for each section
 - Customization is per-component (fast) not per-site (slow)
 - New components can be added without rebuilding templates
 - Quality is consistent because each component is hand-polished
 
-**Implementation files needed:**
-- src/lib/component-registry/index.ts — Registry + selection logic
-- src/lib/component-registry/navbars/*.ts — 5 navbar variants
-- src/lib/component-registry/heroes/*.ts — 5 hero variants
-- src/lib/component-registry/features/*.ts — 5 feature variants
-- ... (50+ total)
-- src/app/api/generate/react-stream/route.ts — Streaming endpoint
+**Component count target: 100+ (NOT 50)**
+The owner's words: "If it means creating 100+ then that's what we need to do."
+We're going to take customers from the competition. We need to back what we say.
+
+**Component breakdown (100+ total):**
+- Navbars: 8 variants (transparent, dark, centered, mega, sticky, minimal, colored, glass)
+- Heroes: 10 variants (split, centered, video, gradient, image, animated, minimal, dark, dashboard, stats)
+- Features: 8 variants (icon grid, alternating, cards, tabs, bento, timeline, comparison, numbered)
+- Testimonials: 6 variants (cards, quote, carousel, video, logos, metrics)
+- Pricing: 5 variants (3-tier, 2-tier, toggle, enterprise, comparison)
+- Stats: 4 variants (gradient, cards, counters, strip)
+- FAQ: 3 variants (accordion, two-column, search)
+- CTA: 6 variants (gradient, split, banner, floating, newsletter, app download)
+- Footer: 5 variants (4-column, minimal, mega, centered, dark)
+- About: 5 variants (split, team, timeline, mission, founder)
+- Contact: 4 variants (form+map, simple, split, chat)
+- Gallery: 4 variants (masonry, grid, carousel, lightbox)
+- Blog: 4 variants (grid, featured, minimal, magazine)
+- E-commerce: 6 variants (products, featured, cart, categories, deals, reviews)
+- Forms: 4 variants (signup, waitlist, multi-step, survey)
+- Misc: 8 variants (logos, comparison, process, integrations, dashboard, screenshots, video, countdown)
+
+**Implementation files:**
+- src/lib/component-registry/index.ts — Registry + selection + assembly logic
+- src/lib/component-registry/navbars.ts — All navbar variants
+- src/lib/component-registry/heroes.ts — All hero variants
+- src/lib/component-registry/features.ts — All feature variants
+- src/lib/component-registry/testimonials.ts — All testimonial variants
+- src/lib/component-registry/pricing.ts — All pricing variants
+- src/lib/component-registry/footers.ts — All footer variants
+- src/lib/component-registry/extras.ts — Stats, FAQ, CTA, About, Contact, Gallery, Blog, etc.
+- src/app/api/generate/react-stream/route.ts — Streaming SSE endpoint
 - Update builder to use streaming assembly instead of single JSON call
 
 ## TECHNOLOGY RADAR — What Claude Must Research Every Session
