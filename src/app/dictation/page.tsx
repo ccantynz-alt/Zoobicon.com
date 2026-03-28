@@ -1,5 +1,9 @@
 "use client";
 
+/* Web Speech API — use any for browser APIs not in default TS lib */
+// eslint-disable-next-line
+type SpeechRecognitionAny = any;
+
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
   Mic,
@@ -89,7 +93,7 @@ export default function DictationPage() {
   const [continuousRestart, setContinuousRestart] = useState(true);
 
   // Refs
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<SpeechRecognitionAny | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -181,7 +185,7 @@ export default function DictationPage() {
     recognition.lang = language;
     recognition.maxAlternatives = 1;
 
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
+    recognition.onresult = (event: SpeechRecognitionAny) => {
       let interim = "";
       let finalTranscript = "";
 
@@ -234,7 +238,7 @@ export default function DictationPage() {
       }
     };
 
-    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+    recognition.onerror = (event: SpeechRecognitionAny) => {
       if (event.error === "not-allowed") {
         alert("Microphone access denied. Please allow mic access.");
         setIsListening(false);

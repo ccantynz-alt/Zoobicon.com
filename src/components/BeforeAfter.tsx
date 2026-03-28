@@ -129,7 +129,7 @@ export default function BeforeAfter() {
                     transition={{
                       duration: 1,
                       repeat: Infinity,
-                      ease: "steps(2)",
+                      ease: "steps(2)" as any,
                     }}
                   />
                 </div>

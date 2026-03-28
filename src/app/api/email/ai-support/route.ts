@@ -27,7 +27,7 @@ async function getKnowledgeBase(): Promise<string> {
 
     return articles
       .map(
-        (a) =>
+        (a: Record<string, unknown>) =>
           `## ${a.title} [${a.category}]\n${a.content}`
       )
       .join("\n\n");

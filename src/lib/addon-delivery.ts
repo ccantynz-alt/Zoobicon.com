@@ -82,7 +82,7 @@ export async function getUserAddons(email: string): Promise<AddonPurchase[]> {
     WHERE email = ${email} AND status = 'active'
     ORDER BY purchased_at DESC
   `;
-  return rows.map((r) => ({
+  return rows.map((r: any) => ({
     id: r.id,
     email: r.email,
     addonId: r.addon_id,

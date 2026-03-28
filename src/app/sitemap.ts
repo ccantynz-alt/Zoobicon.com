@@ -12,7 +12,7 @@ async function getDeployedSites(): Promise<{ slug: string; updatedAt: string }[]
       ORDER BY s.updated_at DESC NULLS LAST
       LIMIT 1000
     `
-    return rows.map((r) => ({
+    return rows.map((r: any) => ({
       slug: r.slug as string,
       updatedAt: (r.updated_at as Date)?.toISOString?.() || new Date().toISOString(),
     }))

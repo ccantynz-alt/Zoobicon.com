@@ -33,7 +33,7 @@ interface MCPToolInfo {
 
 interface MCPResultData {
   success: boolean;
-  data: unknown;
+  data: string | Record<string, unknown> | null;
   contentType: string;
   summary: string;
 }
@@ -439,9 +439,9 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
                                 Preview data
                               </summary>
                               <pre className="mt-1 p-2 bg-black/30 rounded text-[10px] text-white/50 overflow-x-auto max-h-40 overflow-y-auto">
-                                {typeof source.result.data === "string"
-                                  ? source.result.data.slice(0, 2000)
-                                  : JSON.stringify(source.result.data, null, 2).slice(0, 2000)}
+                                {String(typeof source.result.data === "string"
+                                  ? (source.result.data as string).slice(0, 2000)
+                                  : JSON.stringify(source.result.data, null, 2).slice(0, 2000))}
                               </pre>
                             </details>
                           )}
