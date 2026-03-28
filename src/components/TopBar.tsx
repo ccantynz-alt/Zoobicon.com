@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import NotificationInbox from "@/components/NotificationInbox";
 import QuotaBar from "@/components/QuotaBar";
 import { useEmailNotifications } from "@/hooks/useEmailNotifications";
@@ -50,7 +51,7 @@ export default function TopBar() {
         {/* Logo mark — agency branded or default */}
         <Link href="/" className="flex items-center gap-3">
           {agencyBrand?.logoUrl ? (
-            <img src={agencyBrand.logoUrl} alt={brandName} className="w-8 h-8 rounded-lg object-cover" />
+            <Image src={agencyBrand.logoUrl} alt={brandName} width={32} height={32} unoptimized className="rounded-lg object-cover" />
           ) : (
             <div
               className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center text-white font-bold text-sm"

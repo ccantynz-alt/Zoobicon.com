@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { ImagePlus, Loader2, CheckCircle2, AlertCircle, Sparkles, Wand2 } from "lucide-react";
 
 interface AiImagesPanelProps {
@@ -203,8 +204,9 @@ export default function AiImagesPanel({ code, onApplyImages }: AiImagesPanelProp
 
         {singleResult && (
           <div className="rounded-lg overflow-hidden border border-white/[0.08]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={singleResult} alt="AI Generated" className="w-full h-40 object-cover" />
+            <div className="relative w-full h-40">
+              <Image src={singleResult} alt="AI Generated" fill unoptimized className="object-cover" />
+            </div>
             <div className="p-2 bg-white/[0.02]">
               <button
                 onClick={() => navigator.clipboard.writeText(singleResult).catch(() => {})}

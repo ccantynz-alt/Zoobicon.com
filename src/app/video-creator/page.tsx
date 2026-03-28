@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import BackgroundEffects from "@/components/BackgroundEffects";
@@ -2480,7 +2481,7 @@ export default function VideoCreatorDashboard() {
                                 <div className="space-y-1.5">
                                   <div className="flex items-center gap-2 text-[10px]">
                                     {tiktokUser?.avatar_url && (
-                                      <img src={tiktokUser.avatar_url} alt="" className="w-5 h-5 rounded-full" />
+                                      <Image src={tiktokUser.avatar_url} alt="" width={20} height={20} unoptimized className="rounded-full" />
                                     )}
                                     <span className="text-green-400">{tiktokUser?.display_name || "Connected"}</span>
                                     <button onClick={handleDisconnectTikTok} className="ml-auto text-white/30 hover:text-red-400 transition-colors text-[9px]">

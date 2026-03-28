@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import Image from "next/image";
 import { Globe, Share2 } from "lucide-react";
 
 interface SeoPreviewProps {
@@ -154,9 +155,8 @@ export default function SeoPreview({ html }: SeoPreviewProps) {
         </div>
         <div className="rounded-lg overflow-hidden border border-[#e1e8ed] bg-white shadow">
           {meta.ogImage && (
-            <div className="w-full h-[160px] bg-gray-200 flex items-center justify-center overflow-hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={meta.ogImage} alt="OG Preview" className="w-full h-full object-cover" />
+            <div className="relative w-full h-[160px] bg-gray-200 overflow-hidden">
+              <Image src={meta.ogImage} alt="OG Preview" fill unoptimized className="object-cover" />
             </div>
           )}
           <div className="p-3">

@@ -265,20 +265,21 @@ Plain English always. Never "I refactored the middleware." Say "I fixed the perm
 
 | # | Issue | Severity | Found | Proposed Fix | Est. Effort |
 |---|-------|----------|-------|-------------|-------------|
-| 1 | 22 dead components never imported | Low | 2026-03-27 | Wire in or remove | 2-4h |
-| 2 | 3 dead lib files never imported | Low | 2026-03-27 | Remove or integrate | 30min |
-| 3 | Email format validation missing on auth signup | Low | 2026-03-27 | Add email regex check | 5min |
-| 4 | 8x `<img>` should be `<Image>`, lint warnings | Low | 2026-03-27 | Replace with Next.js Image | 1-2h |
+| — | No open issues | — | — | — | — |
 
 ## RECENTLY FIXED
 
 | # | Issue | Fixed | What Was Done |
 |---|-------|-------|---------------|
-| 1 | Slack events: unprotected JSON.parse could crash | 2026-03-27 | Wrapped in try/catch |
-| 2 | XSS in hosting serve route | 2026-03-27 | Added HTML entity escaping for siteName |
-| 3 | Missing Trophy icon import in landing-pages | 2026-03-27 | Added to lucide-react imports |
-| 4 | React hooks called conditionally in AIChatAssistant | 2026-03-27 | Moved conditional return after all hooks |
-| 5 | Unescaped apostrophe in QuotaBar.tsx | 2026-03-27 | Replaced with `&apos;` |
+| 1 | 18 dead components never imported | 2026-03-28 | Removed all 18 unused component files |
+| 2 | 4 dead lib files never imported | 2026-03-28 | Removed auto-pilot, error-sanitizer, react-generator, social-publisher |
+| 3 | Email format validation missing on auth signup | 2026-03-28 | Added regex validation with onBlur + submit check |
+| 4 | 14x `<img>` replaced with Next.js `<Image>` | 2026-03-28 | Updated portfolio, video-creator, agencies, SupportAvatar, TopBar, AiImagesPanel, ShareModal, SeoPreview |
+| 5 | Slack events: unprotected JSON.parse could crash | 2026-03-27 | Wrapped in try/catch |
+| 6 | XSS in hosting serve route | 2026-03-27 | Added HTML entity escaping for siteName |
+| 7 | Missing Trophy icon import in landing-pages | 2026-03-27 | Added to lucide-react imports |
+| 8 | React hooks called conditionally in AIChatAssistant | 2026-03-27 | Moved conditional return after all hooks |
+| 9 | Unescaped apostrophe in QuotaBar.tsx | 2026-03-27 | Replaced with `&apos;` |
 
 ---
 
@@ -471,18 +472,23 @@ Each reseller at $499/mo typically brings 20-50 of their own clients. 10 reselle
 
 **Date last updated:** 2026-03-28
 **Current phase:** Phase 1
-**Current step:** STEP 1 — Cloudflare Setup
+**Current step:** STEP 1 — Cloudflare Setup (manual steps remain)
 
 **Completed today:**
 - ✅ Confirmed all 5 Zoobicon domains active in Cloudflare
 - ✅ Registered zoobicon.app
 - ✅ Discovered and reviewed existing technical CLAUDE.md (impressive codebase)
 - ✅ Merged technical + business into single master CLAUDE.md
+- ✅ Fixed all 4 known issues (dead components, dead libs, email validation, img→Image)
+- ✅ Removed 18 dead components + 4 dead lib files (cleaner codebase)
+- ✅ Built `/admin/mobile` — mobile-optimized command centre for iPhone/iPad
+- ✅ Pricing page already built with Stripe checkout, 5 tiers, FAQs, structured data
 
 **Blockers:** None
 
 **NEXT ACTION:**
 Go to dash.cloudflare.com → click zoobicon.com → find "Email" in left sidebar → click "Email Routing" → Enable it. Takes 3 minutes. That's the next checkbox.
+Then: Set up Zoho Mail mailboxes (hello@, support@, billing@, noreply@), enable SSL Full (Strict) on all 5 domains, point all 5 domains to Vercel.
 
 ---
 
