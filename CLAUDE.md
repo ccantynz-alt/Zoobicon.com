@@ -44,6 +44,9 @@ Zoobicon is an AI-built platform. There is NO excuse for using old technology. E
 **HARD RULE — NO OLD TECHNOLOGY KEPT AS FALLBACK:**
 When we adopt new technology, the old is REMOVED. Not kept alongside. Deleted. Stale = dead.
 
+**HARD RULE — FINISH WHAT YOU START:**
+If something is started, it MUST be finished. No half-built features. No abandoned code paths. No "we'll come back to this later." Every feature, every component, every integration must be completed to production quality before moving on. If a task is too big to finish in one session, document EXACTLY where it was left off in CLAUDE.md with a "NEXT ACTION" line so the next session picks it up immediately. Unfinished code is worse than no code — it creates confusion, conflicts, and technical debt. The rule: START → FINISH → TEST → DEPLOY. No exceptions.
+
 **The test:** If a user builds on Zoobicon then tries Lovable or Bolt, they must think "Zoobicon was BETTER." Not "about the same." BETTER. If they don't think that, we've failed.
 
 ---
