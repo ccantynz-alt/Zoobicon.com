@@ -1032,9 +1032,22 @@ function BuilderPage() {
     const controller = new AbortController();
     abortRef.current = controller;
 
-    // ── React App mode: call /api/generate/react and show in Sandpack ──
+    // ── React App mode: instant scaffold + AI customization ──
     if (generationMode === "react") {
-      setPipelineAgents(["Generating React components..."]);
+      // Phase 1: Load instant scaffold (<1 second)
+      try {
+        const { classifyIndustry, getScaffoldForIndustry } = await import("@/lib/react-scaffolds");
+        const industry = classifyIndustry(prompt.trim());
+        const { files: scaffoldFiles } = getScaffoldForIndustry(industry);
+        setReactFiles(scaffoldFiles);
+        setReactDeps({});
+        setStatus("generating");
+        setPipelineAgents(["Scaffold loaded — customizing with AI..."]);
+      } catch {
+        setPipelineAgents(["Generating React components..."]);
+      }
+
+      // Phase 2: AI generates custom components (replaces scaffold)
       try {
         const res = await fetch("/api/generate/react", {
           method: "POST",
