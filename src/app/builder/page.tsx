@@ -1032,19 +1032,29 @@ function BuilderPage() {
     const controller = new AbortController();
     abortRef.current = controller;
 
-    // ── React App mode: instant scaffold + AI customization ──
+    // ── React App mode: instant template snapshot + AI customization ──
     if (generationMode === "react") {
-      // Phase 1: Load instant scaffold (<1 second)
+      // Phase 1: Load premium template snapshot instantly (<1 second)
       try {
-        const { classifyIndustry, getScaffoldForIndustry } = await import("@/lib/react-scaffolds");
-        const industry = classifyIndustry(prompt.trim());
-        const { files: scaffoldFiles } = getScaffoldForIndustry(industry);
-        setReactFiles(scaffoldFiles);
+        const { findBestTemplate } = await import("@/lib/snapshots");
+        const template = findBestTemplate(prompt.trim());
+        setReactFiles(template.files);
         setReactDeps({});
         setStatus("generating");
-        setPipelineAgents(["Scaffold loaded — customizing with AI..."]);
+        setPipelineAgents([`Template loaded: ${template.name} — customizing with AI...`]);
       } catch {
-        setPipelineAgents(["Generating React components..."]);
+        // Fallback to basic scaffold if snapshots fail
+        try {
+          const { classifyIndustry, getScaffoldForIndustry } = await import("@/lib/react-scaffolds");
+          const industry = classifyIndustry(prompt.trim());
+          const { files: scaffoldFiles } = getScaffoldForIndustry(industry);
+          setReactFiles(scaffoldFiles);
+          setReactDeps({});
+          setStatus("generating");
+          setPipelineAgents(["Scaffold loaded — customizing with AI..."]);
+        } catch {
+          setPipelineAgents(["Generating React components..."]);
+        }
       }
 
       // Phase 2: AI generates custom components (replaces scaffold)
