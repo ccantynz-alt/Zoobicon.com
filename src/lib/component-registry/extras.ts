@@ -540,3 +540,233 @@ registerComponent({
   );
 }`,
 });
+
+// ── Stats: Cards ──
+registerComponent({
+  id: "stats-cards",
+  name: "Stats Cards",
+  category: "stats",
+  variant: "cards",
+  description: "Individual stat cards with icons, large numbers, and subtle hover lift",
+  tags: ["modern", "saas", "startup", "tech", "business", "agency", "software", "platform", "clean", "corporate"],
+  code: `export default function Stats() {
+  const stats = [
+    { value: "2.4M+", label: "Requests Handled Daily", desc: "Peak throughput: 48K/sec", icon: "M13 10V3L4 14h7v7l9-11h-7z" },
+    { value: "99.97%", label: "Uptime This Year", desc: "Monitored every 30 seconds", icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" },
+    { value: "38ms", label: "Avg. Response Time", desc: "p99 under 120ms globally", icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" },
+    { value: "140+", label: "Countries Served", desc: "Edge nodes on 6 continents", icon: "M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" },
+  ];
+  return (
+    <section className="py-24 px-6 bg-white">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-14">
+          <p className="text-sm font-semibold text-indigo-600 uppercase tracking-widest mb-3">By the Numbers</p>
+          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900">Infrastructure You Can Trust</h2>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {stats.map((s, i) => (
+            <div key={i} className="group bg-gray-50 border border-gray-200 rounded-2xl p-8 text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-indigo-200">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 mb-5 group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d={s.icon}/></svg>
+              </div>
+              <div className="text-4xl font-extrabold text-gray-900 mb-1">{s.value}</div>
+              <div className="text-sm font-semibold text-gray-700 mb-1">{s.label}</div>
+              <div className="text-xs text-gray-400">{s.desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}`,
+});
+
+// ── Stats: Counters (Dark) ──
+registerComponent({
+  id: "stats-counters",
+  name: "Counter Stats",
+  category: "stats",
+  variant: "counters",
+  description: "Large animated-feel counters on dark background with glow accents",
+  tags: ["modern", "dark", "saas", "startup", "tech", "cyber", "software", "platform", "bold", "agency"],
+  code: `export default function Stats() {
+  const stats = [
+    { value: "500K+", label: "Developers Trust Us", suffix: "" },
+    { value: "12B", label: "API Calls Last Year", suffix: "+" },
+    { value: "4.9", label: "Average Rating", suffix: "/5" },
+    { value: "50", label: "Data Center Regions", suffix: "+" },
+  ];
+  return (
+    <section className="py-28 px-6 bg-gray-950 relative overflow-hidden">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[120px]" />
+      <div className="relative max-w-7xl mx-auto">
+        <div className="text-center mb-16">
+          <p className="text-sm font-semibold text-indigo-400 uppercase tracking-widest mb-3">Platform Scale</p>
+          <h2 className="text-4xl md:text-5xl font-extrabold text-white">Numbers That Speak for Themselves</h2>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
+          {stats.map((s, i) => (
+            <div key={i} className="text-center group">
+              <div className="text-6xl md:text-7xl font-black text-white mb-3 tracking-tight group-hover:text-indigo-400 transition-colors duration-300">
+                {s.value}<span className="text-indigo-500">{s.suffix}</span>
+              </div>
+              <div className="text-sm font-medium text-gray-400 uppercase tracking-wider">{s.label}</div>
+              <div className="mt-4 mx-auto w-12 h-0.5 bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}`,
+});
+
+// ── Stats: Dark Strip ──
+registerComponent({
+  id: "stats-dark-strip",
+  name: "Dark Strip Stats",
+  category: "stats",
+  variant: "dark-strip",
+  description: "Thin horizontal dark strip with 4 inline stats separated by dividers",
+  tags: ["minimal", "dark", "saas", "startup", "tech", "business", "software", "compact", "clean", "modern"],
+  code: `export default function Stats() {
+  const stats = [
+    { value: "10K+", label: "Customers" },
+    { value: "99.9%", label: "Uptime" },
+    { value: "24/7", label: "Support" },
+    { value: "150+", label: "Integrations" },
+  ];
+  return (
+    <section className="bg-gray-900 py-8 px-6">
+      <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-y-4">
+        {stats.map((s, i) => (
+          <div key={i} className="flex items-center">
+            <div className="flex items-center gap-3 px-8">
+              <span className="text-2xl md:text-3xl font-extrabold text-white">{s.value}</span>
+              <span className="text-sm text-gray-400 font-medium">{s.label}</span>
+            </div>
+            {i < stats.length - 1 && <div className="hidden sm:block w-px h-8 bg-gray-700" />}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}`,
+});
+
+// ── FAQ: Two Column ──
+registerComponent({
+  id: "faq-two-column",
+  name: "Two Column FAQ",
+  category: "faq",
+  variant: "two-column",
+  description: "Questions and answers split across two columns for dense layouts",
+  tags: ["saas", "startup", "business", "software", "platform", "service", "tech", "agency", "modern", "clean"],
+  code: `export default function Faq() {
+  const faqs = [
+    { q: "What happens after my trial ends?", a: "Your account automatically switches to the free Starter plan. No charges, no data loss. Upgrade any time to unlock premium features again." },
+    { q: "Can I import data from another platform?", a: "Yes. We support CSV, JSON, and direct API imports from over 30 platforms including Airtable, Notion, and Google Sheets. Our migration team assists Enterprise customers." },
+    { q: "How does team billing work?", a: "Each workspace has one billing owner. Team members are added at no extra cost on Pro. Business plans include per-seat pricing above 25 members." },
+    { q: "Do you offer refunds?", a: "We offer a full refund within the first 30 days, no questions asked. After 30 days, you can cancel anytime and retain access until the end of your billing cycle." },
+    { q: "Is there an API rate limit?", a: "Free plans: 100 requests/minute. Pro plans: 1,000 requests/minute. Business plans: 10,000 requests/minute. Need more? Contact us for custom limits." },
+    { q: "Where is my data stored?", a: "Data is stored in AWS data centers across US-East, EU-West, and AP-Southeast. Enterprise customers can choose their region. All data is encrypted at rest and in transit." },
+  ];
+  const half = Math.ceil(faqs.length / 2);
+  const left = faqs.slice(0, half);
+  const right = faqs.slice(half);
+  return (
+    <section id="faq" className="py-28 px-6 bg-gray-50">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-16">
+          <p className="text-sm font-semibold text-indigo-600 uppercase tracking-widest mb-3">FAQ</p>
+          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">Got Questions? We Have Answers.</h2>
+          <p className="text-lg text-gray-500 max-w-2xl mx-auto">If you can&apos;t find what you need, our support team responds within 4 hours on business days.</p>
+        </div>
+        <div className="grid md:grid-cols-2 gap-8">
+          {[left, right].map((col, ci) => (
+            <div key={ci} className="space-y-6">
+              {col.map((f, i) => (
+                <div key={i} className="bg-white rounded-xl p-6 border border-gray-200 hover:border-indigo-200 hover:shadow-md transition-all duration-300">
+                  <h3 className="font-bold text-gray-900 mb-2 flex items-start gap-3">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold mt-0.5">{ci * half + i + 1}</span>
+                    {f.q}
+                  </h3>
+                  <p className="text-gray-500 text-sm leading-relaxed ml-9">{f.a}</p>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}`,
+});
+
+// ── FAQ: Search ──
+registerComponent({
+  id: "faq-search",
+  name: "Searchable FAQ",
+  category: "faq",
+  variant: "search",
+  description: "FAQ with search input at top to filter questions in real time",
+  tags: ["saas", "startup", "business", "software", "platform", "service", "tech", "agency", "modern", "interactive"],
+  code: `export default function Faq() {
+  const [query, setQuery] = React.useState("");
+  const faqs = [
+    { q: "How do I reset my password?", a: "Click your avatar in the top-right corner, select Settings, then Security. You can reset your password there or use the forgot-password link on the login page." },
+    { q: "Can I use my own custom domain?", a: "Yes. On Pro and Business plans, navigate to Settings > Domains. Add your domain and update your DNS records. We handle SSL automatically — no configuration needed." },
+    { q: "What payment methods do you accept?", a: "We accept all major credit and debit cards (Visa, Mastercard, Amex), PayPal, and wire transfers for annual Enterprise contracts." },
+    { q: "How do I cancel my subscription?", a: "Go to Settings > Billing > Cancel Plan. Your access continues until the end of the current billing period. All your data remains available on the free Starter plan." },
+    { q: "Is there a mobile app?", a: "Our web app is fully responsive and works great on mobile browsers. Native iOS and Android apps are on our roadmap for Q3 2026." },
+    { q: "Do you offer educational discounts?", a: "Yes! Students and educators get 50% off any paid plan. Verify your .edu email at checkout or contact support with proof of enrollment." },
+    { q: "How does version history work?", a: "Every save creates a snapshot. Pro plans keep 30 days of history, Business plans keep unlimited history. You can preview and restore any previous version with one click." },
+    { q: "Can I export my data?", a: "Absolutely. Go to Settings > Data > Export. You can download everything as JSON or CSV at any time. Your data is always yours — no lock-in." },
+  ];
+  const filtered = faqs.filter(
+    (f) =>
+      f.q.toLowerCase().includes(query.toLowerCase()) ||
+      f.a.toLowerCase().includes(query.toLowerCase())
+  );
+  return (
+    <section id="faq" className="py-28 px-6">
+      <div className="max-w-3xl mx-auto">
+        <div className="text-center mb-12">
+          <p className="text-sm font-semibold text-indigo-600 uppercase tracking-widest mb-3">Help Center</p>
+          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">Frequently Asked Questions</h2>
+          <p className="text-lg text-gray-500">Search below or <a href="#contact" className="text-indigo-600 underline underline-offset-4 hover:text-indigo-500">contact our team</a> directly.</p>
+        </div>
+        <div className="relative mb-10">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" className="absolute left-4 top-1/2 -translate-y-1/2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input
+            type="text"
+            placeholder="Search questions..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-full pl-12 pr-4 py-4 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm text-sm"
+          />
+        </div>
+        <div className="space-y-4">
+          {filtered.length === 0 && (
+            <div className="text-center py-12 text-gray-400">
+              <p className="text-lg font-medium mb-1">No matching questions found</p>
+              <p className="text-sm">Try a different search term or <a href="#contact" className="text-indigo-600 underline underline-offset-4">ask us directly</a>.</p>
+            </div>
+          )}
+          {filtered.map((f, i) => (
+            <div key={i} className="bg-white border border-gray-200 rounded-xl p-6 hover:border-indigo-200 hover:shadow-md transition-all duration-300">
+              <h3 className="font-bold text-gray-900 mb-2 flex items-center gap-3">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" className="flex-shrink-0"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                {f.q}
+              </h3>
+              <p className="text-gray-500 text-sm leading-relaxed ml-[30px]">{f.a}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}`,
+});
