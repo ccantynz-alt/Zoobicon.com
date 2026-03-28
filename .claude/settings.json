@@ -1,0 +1,22 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "bash /home/user/Zoobicon.com/.claude/session-health-check.sh 2>&1 | head -100"
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd /home/user/Zoobicon.com && if git diff --cached --name-only 2>/dev/null | grep -q 'CLAUDE.md'; then echo '{\"systemMessage\": \"✅ CLAUDE.md was updated in this session.\"}'; elif git diff --name-only HEAD~1..HEAD 2>/dev/null | grep -q 'CLAUDE.md'; then echo '{\"systemMessage\": \"✅ CLAUDE.md was updated in recent commits.\"}'; else echo '{\"systemMessage\": \"⚠️ CLAUDE.md was NOT updated this session. If you made significant changes (new features, architecture decisions, bug fixes, technology upgrades), update CLAUDE.md before ending. This is a mandatory rule — every achievement must be documented.\"}'; fi",
+            "timeout": 5,
+            "statusMessage": "Checking CLAUDE.md..."
+          }
+        ]
+      }
+    ]
+  }
+}
