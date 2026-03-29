@@ -225,7 +225,7 @@ export default function EditSitePage() {
       abortRef.current = controller;
 
       try {
-        const res = await fetch("/api/generate/stream", {
+        const res = await fetch("/api/generate/react", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -238,7 +238,7 @@ export default function EditSitePage() {
 
         if (!res.ok) {
           // Fallback to non-streaming
-          const fallbackRes = await fetch("/api/generate", {
+          const fallbackRes = await fetch("/api/generate/react", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

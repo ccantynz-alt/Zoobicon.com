@@ -230,7 +230,7 @@ export default function AdminPage() {
 
   const apiRoutes = [
     { method: "POST", path: "/api/generate/pipeline", desc: "10-agent pipeline (Standard/Premium/Ultra)", limit: "—" },
-    { method: "POST", path: "/api/generate/stream", desc: "Stream AI website generation", limit: "10/min" },
+    { method: "POST", path: "/api/generate/react", desc: "Stream React component generation (SSE)", limit: "10/min" },
     { method: "POST", path: "/api/generate/landing", desc: "Landing page generator (12 sections)", limit: "—" },
     { method: "POST", path: "/api/generate/saas", desc: "SaaS dashboard generator", limit: "—" },
     { method: "POST", path: "/api/generate/booking", desc: "Booking system generator", limit: "—" },

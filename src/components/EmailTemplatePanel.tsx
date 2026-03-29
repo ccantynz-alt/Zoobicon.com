@@ -24,7 +24,7 @@ export default function EmailTemplatePanel({
     if (!prompt.trim()) return;
     setLoading(true);
     try {
-      const res = await fetch("/api/generate/email", {
+      const res = await fetch("/api/generate/react", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: prompt.trim(), type: emailType }),

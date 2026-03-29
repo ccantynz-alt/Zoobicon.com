@@ -724,11 +724,12 @@ function BuilderPage() {
     return html;
   }, []);
 
-  const streamGenerate = useCallback(
-    async (userPrompt: string, existingCode?: string) => {
+  // streamGenerate removed — all generation now uses /api/generate/react SSE stream
+  // via handleGenerate (new builds) and handleEdit (edits)
+  const _legacyStreamRemoved = useCallback(
+    async () => {
       setStatus("generating");
       setError("");
-      if (!existingCode) setGeneratedCode("");
       setActiveTab("preview");
 
       abortRef.current?.abort();
@@ -1142,105 +1143,88 @@ function BuilderPage() {
     }
   }, [prompt, tier, autoReplaceImages, selectedModel, instantMode, generationMode]);
 
+  // Edit existing React files via the same streaming endpoint
   const handleEdit = useCallback(async () => {
-    if (!editPrompt.trim() || !generatedCode) return;
+    if (!editPrompt.trim() || !reactFiles) return;
 
     const instruction = editPrompt.trim();
     setStatus("generating");
     setError("");
+    setPipelineAgents([`Editing: ${instruction.slice(0, 60)}...`]);
 
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
 
     try {
-      // Try diff-based edit first (5-10x faster than full rewrite)
-      const res = await fetch("/api/generate/edit-diff", {
+      // Send existing files + edit instruction to React generation endpoint
+      const existingContext = Object.entries(reactFiles)
+        .map(([path, content]) => `--- ${path} ---\n${content}`)
+        .join("\n\n");
+
+      const editPromptText = `I have an existing React application with these files:\n\n${existingContext}\n\nPlease modify it according to this instruction: ${instruction}\n\nReturn the complete updated files JSON (all files, not just changed ones).`;
+
+      const res = await fetch("/api/generate/react", {
         method: "POST",
         headers: authHeaders(),
         body: JSON.stringify({
-          prompt: instruction,
-          existingCode: generatedCode,
+          prompt: editPromptText,
+          tier,
           ...(selectedModel ? { model: selectedModel } : {}),
         }),
         signal: controller.signal,
       });
 
       if (!res.ok) {
-        // Diff endpoint failed — fall back to full rewrite
-        throw new Error("Diff endpoint unavailable");
+        const errData = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+        throw new Error(errData.error || `HTTP ${res.status}`);
       }
 
+      // Read SSE stream
       const reader = res.body?.getReader();
       if (!reader) throw new Error("No response stream");
 
       const decoder = new TextDecoder();
       let lineBuffer = "";
-      let modifiedHtml = generatedCode;
-      let usedFallback = false;
-      let diffCount = 0;
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-
-        const text = decoder.decode(value, { stream: true });
-        lineBuffer += text;
+        lineBuffer += decoder.decode(value, { stream: true });
         const lines = lineBuffer.split("\n");
         lineBuffer = lines.pop() || "";
 
         for (const line of lines) {
           if (!line.startsWith("data: ")) continue;
-          const jsonStr = line.slice(6).trim();
-          if (!jsonStr) continue;
-
           try {
-            const event = JSON.parse(jsonStr);
-
-            if (event.type === "diff" && event.search && event.replace !== undefined) {
-              // Apply diff to the HTML
-              const before = modifiedHtml;
-              modifiedHtml = modifiedHtml.replace(event.search, event.replace);
-              if (modifiedHtml !== before) {
-                diffCount++;
-                setGeneratedCode(modifiedHtml); // Live update preview
-              }
-            } else if (event.type === "fallback" && event.html) {
-              // Full HTML fallback from server
-              modifiedHtml = event.html;
-              usedFallback = true;
-            } else if (event.type === "done") {
-              // Diff complete
-              console.log(`[Edit-Diff] ${event.diffCount || diffCount} diffs applied${event.fallback ? " (fallback)" : ""}`);
+            const event = JSON.parse(line.slice(6).trim());
+            if (event.type === "status") {
+              setPipelineAgents(prev => [...prev, event.message]);
+            } else if (event.type === "partial" && event.files) {
+              setReactFiles(event.files);
+            } else if (event.type === "done" && event.files) {
+              setReactFiles(event.files);
+              setReactDeps(event.dependencies || {});
+              setReactSource(event.files);
+              setStatus("complete");
+              setEditPrompt("");
+              setPipelineAgents(prev => [...prev, `Edit complete — ${Object.keys(event.files).length} files updated`]);
             } else if (event.type === "error") {
-              throw new Error(event.message || "Edit error");
+              throw new Error(event.message);
             }
           } catch (e) {
-            if (e instanceof SyntaxError) continue; // Skip malformed SSE
-            throw e;
+            if (e instanceof Error && (e.message.includes("failed") || e.message.includes("unavailable"))) throw e;
           }
         }
       }
-
-      // Create a labeled snapshot for this edit
-      pendingLabelRef.current = `Edit: ${instruction.slice(0, 50)}`;
-      setGeneratedCode(modifiedHtml);
-      setStatus("complete");
-      setEditPrompt("");
-
-      const method = usedFallback ? "full rewrite" : `${diffCount} diffs`;
-      setPipelineAgents(prev => [...prev, `Edit applied (${method})`]);
-
     } catch (err) {
       if ((err as Error).name === "AbortError") return;
-
-      // Fall back to stream-based full rewrite
-      console.warn("[Edit] Diff failed, falling back to full rewrite:", err instanceof Error ? err.message : err);
-      pendingLabelRef.current = `Edit: ${instruction.slice(0, 50)}`;
-      await streamGenerate(instruction, generatedCode);
-      setEditPrompt("");
+      const errMsg = err instanceof Error ? err.message : String(err);
+      console.error("[Edit] Failed:", errMsg);
+      setError(cleanErrorMessage(errMsg));
+      setStatus("error");
     }
-  }, [editPrompt, generatedCode, streamGenerate, selectedModel]);
+  }, [editPrompt, reactFiles, tier, selectedModel]);
 
   const handleCodeUpdate = useCallback((newCode: string) => {
     setGeneratedCode(newCode);

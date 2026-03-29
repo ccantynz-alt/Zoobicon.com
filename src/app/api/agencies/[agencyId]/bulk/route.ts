@@ -141,7 +141,7 @@ async function processJobInBackground(
         ? `https://${process.env.VERCEL_URL}`
         : "http://localhost:3000";
 
-      const resp = await fetch(`${baseUrl}/api/generate/quick`, {
+      const resp = await fetch(`${baseUrl}/api/generate/react`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt, style: "modern" }),
