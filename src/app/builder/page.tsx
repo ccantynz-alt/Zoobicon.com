@@ -1099,13 +1099,14 @@ function BuilderPage() {
               if (event.type === "status") {
                 setPipelineAgents(prev => [...prev, event.message]);
               } else if (event.type === "partial" && event.files) {
-                // Progressive update — show files as they're completed
+                // Progressive update — MERGE with existing files (don't replace)
+                // This preserves registry components while streaming updates arrive
                 if (generationIdRef.current === currentGenId) {
-                  setReactFiles(event.files);
+                  setReactFiles(prev => ({ ...prev, ...event.files }));
                   setGeneratedCode("<!-- react-app-mode -->");
                 }
               } else if (event.type === "done" && event.files) {
-                // Final complete result
+                // Final complete result — full replacement is OK here since all files are present
                 if (generationIdRef.current === currentGenId) {
                   setReactFiles(event.files);
                   setReactDeps(event.dependencies || {});
