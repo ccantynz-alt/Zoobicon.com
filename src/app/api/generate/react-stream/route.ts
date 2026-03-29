@@ -63,7 +63,8 @@ export async function POST(req: NextRequest) {
 
       try {
         // ── Phase 1: Instant Assembly from Registry (<1 second) ──
-        const { files: assembledFiles, components } = buildFromPrompt(
+        const registry = await getRegistry();
+        const { files: assembledFiles, components } = registry.buildFromPrompt(
           prompt.trim()
         );
 
@@ -71,7 +72,7 @@ export async function POST(req: NextRequest) {
           type: "scaffold",
           files: assembledFiles,
           componentCount: components.length,
-          registrySize: REGISTRY.length,
+          registrySize: registry.REGISTRY.length,
         });
 
         send({
@@ -97,7 +98,7 @@ export async function POST(req: NextRequest) {
         // Build a summary of what sections exist so the AI knows what to customize
         const sectionSummary = components
           .map(
-            (c: RegistryComponent) =>
+            (c: { category: string; variant: string; description: string }) =>
               `- ${c.category} (${c.variant}): ${c.description}`
           )
           .join("\n");
@@ -200,7 +201,7 @@ Rules:
 
           // Also send updated files with colors applied if provided
           if (customization.colors?.primary || customization.colors?.bg) {
-            const updatedFiles = buildFromPrompt(prompt.trim(), {
+            const updatedFiles = registry.buildFromPrompt(prompt.trim(), {
               brandName: customization.brandName,
               primaryColor: customization.colors?.primary,
               bgColor: customization.colors?.bg,
