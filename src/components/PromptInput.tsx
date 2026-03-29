@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState, useCallback } from "react";
-import { Mic, MicOff, Sparkles, Zap, Pencil, Send, Check, ChevronDown, Cpu, LayoutTemplate, SlidersHorizontal, FileText, Files, Layers, Code2 } from "lucide-react";
+import { Mic, MicOff, Sparkles, Zap, Pencil, Send, Check, ChevronDown, Cpu, LayoutTemplate, SlidersHorizontal, FileText, Code2 } from "lucide-react";
 import TemplateGallery from "./TemplateGallery";
 import CustomizationPanel, {
   DEFAULT_CUSTOMIZATION,
@@ -39,7 +39,7 @@ export interface AIModel {
   tier: string;
 }
 
-export type GenerationMode = "single" | "multi" | "fullstack" | "react";
+export type GenerationMode = "react";
 
 interface PromptInputProps {
   prompt: string;
@@ -72,8 +72,6 @@ const PREMIUM_FEATURES = ["10-agent pipeline", "Animations", "SEO + Forms", "Rea
 
 const GENERATION_MODES: { id: GenerationMode; label: string; icon: typeof FileText; description: string }[] = [
   { id: "react", label: "React App", icon: Code2, description: "Modern React components with TypeScript + Tailwind" },
-  { id: "multi", label: "Multi-Page", icon: Files, description: "Multi-page React app with routing" },
-  { id: "fullstack", label: "Full-Stack", icon: Layers, description: "React frontend + API routes + database" },
 ];
 
 export default function PromptInput({

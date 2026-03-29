@@ -10,7 +10,6 @@ import type { Tier, AIModel, GenerationMode } from "@/components/PromptInput";
 import dynamic from "next/dynamic";
 
 const SandpackPreview = dynamic(() => import("@/components/SandpackPreview"), { ssr: false });
-import PreviewPanel from "@/components/PreviewPanel";
 import CodePanel from "@/components/CodePanel";
 import ChatPanel from "@/components/ChatPanel";
 import StatusBar from "@/components/StatusBar";
@@ -31,8 +30,6 @@ import AccessibilityPanel from "@/components/AccessibilityPanel";
 import PerformancePanel from "@/components/PerformancePanel";
 import ExportPanel from "@/components/ExportPanel";
 import VariantsPanel from "@/components/VariantsPanel";
-import MultiPagePanel from "@/components/MultiPagePanel";
-import FullStackPanel from "@/components/FullStackPanel";
 import EmailTemplatePanel from "@/components/EmailTemplatePanel";
 import ClonePanel from "@/components/ClonePanel";
 import AiImagesPanel from "@/components/AiImagesPanel";
@@ -138,8 +135,6 @@ type ToolId =
   | "perf"
   | "export"
   | "variants"
-  | "multipage"
-  | "fullstack"
   | "email"
   | "visual-editor"
   | "sections"
@@ -152,8 +147,6 @@ const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }
   { id: "pipeline", label: "Agent Pipeline", icon: <Workflow size={18} /> },
   { id: "clone", label: "Clone Site", icon: <Globe size={18} /> },
   { id: "ai-images", label: "AI Images", icon: <ImagePlus size={18} /> },
-  { id: "fullstack", label: "Full-Stack App", icon: <Boxes size={18} /> },
-  { id: "multipage", label: "Multi-Page", icon: <FileText size={18} /> },
   { id: "qa", label: "QA Check", icon: <Shield size={18} /> },
   { id: "a11y", label: "Accessibility", icon: <Accessibility size={18} /> },
   { id: "perf", label: "Performance", icon: <Gauge size={18} /> },
@@ -874,7 +867,7 @@ function BuilderPage() {
                 setStatus("error");
                 return;
               } else if (event.type === "error") {
-                // Clear empty/partial HTML so PreviewPanel shows error state, not "empty page detected"
+                // Clear empty/partial code so Sandpack shows clean state
                 setGeneratedCode("");
                 setError(cleanErrorMessage(event.message || "Stream error"));
                 setStatus("error");
@@ -1101,160 +1094,6 @@ function BuilderPage() {
         setStatus("error");
       }
       return;
-    }
-
-    // ── Helper: read SSE stream into accumulated HTML ──
-    const readSSEStream = async (
-      res: Response,
-      onChunk?: (accumulated: string) => void,
-    ): Promise<string> => {
-      const reader = res.body?.getReader();
-      if (!reader) throw new Error("No response stream");
-
-      const decoder = new TextDecoder();
-      let accumulated = "";
-      let lineBuffer = "";
-
-      const processLines = (lines: string[]) => {
-        for (const line of lines) {
-          if (!line.startsWith("data: ")) continue;
-          const jsonStr = line.slice(6).trim();
-          if (!jsonStr) continue;
-          try {
-            const event = JSON.parse(jsonStr);
-            if (event.type === "chunk" && event.content) {
-              accumulated += event.content;
-              onChunk?.(accumulated);
-            } else if (event.type === "scaffold" && event.content) {
-              // Instant mode: scaffold arrived — show immediately
-              accumulated = event.content;
-              onChunk?.(accumulated);
-              setPipelineAgents(prev => [...prev, "Scaffold loaded — customizing..."]);
-            } else if (event.type === "replace" && event.content) {
-              accumulated = event.content;
-              onChunk?.(accumulated);
-            } else if (event.type === "status") {
-              setPipelineAgents(prev => [...prev, event.message || "Processing..."]);
-            } else if (event.type === "done") {
-              // Stream complete
-            } else if (event.type === "edit_failed") {
-              throw new Error(event.message || "Edit failed — original site preserved.");
-            } else if (event.type === "error") {
-              throw new Error(event.message || "Generation error");
-            }
-          } catch (e) {
-            if (e instanceof Error && (e.message.includes("Generation") || e.message.includes("error") || e.message.includes("failed") || e.message.includes("Edit"))) {
-              throw e;
-            }
-            // Skip JSON parse errors
-          }
-        }
-      };
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        lineBuffer += decoder.decode(value, { stream: true });
-        const lines = lineBuffer.split("\n");
-        lineBuffer = lines.pop() || "";
-        processLines(lines);
-      }
-      // Flush remaining buffer
-      if (lineBuffer.trim()) {
-        processLines((decoder.decode() + lineBuffer).split("\n"));
-      }
-
-      return accumulated;
-    };
-
-    try {
-      // Route selection:
-      // - Instant mode: /api/generate/instant (3s scaffold)
-      // - Premium/Opus: /api/generate/stream (complete HTML — Opus doesn't follow config/body-html format)
-      // - Standard/Sonnet: /api/generate/quick (config + body-html split — works great with prefill)
-      const isOpusBuild = tier === "premium" || selectedModel?.includes("opus");
-      const endpoint = instantMode
-        ? "/api/generate/instant"
-        : isOpusBuild
-        ? "/api/generate/stream"
-        : "/api/generate/quick";
-      setPipelineAgents([
-        instantMode
-          ? "Instant scaffold loading..."
-          : tier === "premium"
-          ? "Building premium website..."
-          : "Generating website...",
-      ]);
-
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: authHeaders(),
-        body: JSON.stringify({
-          prompt: prompt.trim(),
-          tier,
-          ...(selectedModel ? { model: selectedModel } : {}),
-          ...(isAdmin ? { isAdmin: true } : {}),
-          ...(generatorBanner ? { generatorType: generatorBanner.id, generator: generatorBanner.id } : {}),
-          ...(agencyBrand ? { agencyBrand } : {}),
-            ...(agencyId ? { agencyId } : {}),
-        }),
-        signal: controller.signal,
-      });
-
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
-        throw new Error(errData.error || `HTTP ${res.status}`);
-      }
-
-      const html = await readSSEStream(res, (acc) => setGeneratedCode(acc));
-
-      // Clean HTML — strip code fences, JSON preamble, trailing text
-      let finalHtml = html.trim();
-      finalHtml = finalHtml.replace(/^```(?:html|HTML)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
-      // Strip any leading JSON config that leaked through (e.g. { "title": "...", ... })
-      finalHtml = finalHtml.replace(/^\s*\{[\s\S]*?\}\s*(?=<[a-zA-Z!])/, "");
-      const ds = finalHtml.search(/<!doctype\s+html|<html/i);
-      if (ds > 0) finalHtml = finalHtml.slice(ds);
-      const he = finalHtml.lastIndexOf("</html>");
-      if (he !== -1) finalHtml = finalHtml.slice(0, he + "</html>".length);
-
-      if (finalHtml && generationIdRef.current === currentGenId) {
-        // Safety check: verify the body actually has content
-        const bodyMatch = finalHtml.match(/<body[^>]*>([\s\S]*)<\/body>/i);
-        const bodyText = bodyMatch
-          ? bodyMatch[1]
-              .replace(/<script[\s\S]*?<\/script>/gi, "")
-              .replace(/<style[\s\S]*?<\/style>/gi, "")
-              .replace(/<[^>]+>/g, "")
-              .replace(/\s+/g, " ")
-              .trim()
-          : "";
-
-        if (bodyText.length < 50) {
-          console.warn(`[Generate] Empty body detected (${bodyText.length} chars), treating as error`);
-          setGeneratedCode("");
-          setError("Generation produced an empty page. Please try again — this is usually a temporary issue.");
-          setStatus("error");
-        } else {
-          setGeneratedCode(finalHtml);
-          setStatus("complete");
-          setPipelineAgents(prev => [...prev, "Complete"]);
-
-          // Auto-replace placeholder images
-          autoReplaceImages(finalHtml).then((improved) => {
-            if (improved !== finalHtml && generationIdRef.current === currentGenId) {
-              setGeneratedCode(improved);
-            }
-          });
-        }
-      }
-    } catch (err) {
-      if ((err as Error).name === "AbortError") return;
-      const errMsg = err instanceof Error ? err.message : String(err);
-      console.error("[Generate] Failed:", errMsg);
-      setGeneratedCode("");
-      setError(cleanErrorMessage(errMsg));
-      setStatus("error");
     }
   }, [prompt, tier, autoReplaceImages, selectedModel, instantMode, generationMode]);
 
@@ -1500,10 +1339,6 @@ function BuilderPage() {
         return <ExportPanel code={generatedCode} reactSource={reactSource} />;
       case "variants":
         return <VariantsPanel code={generatedCode} onApplyVariant={handleCodeUpdate} />;
-      case "multipage":
-        return <MultiPagePanel onApplyPage={handleCodeUpdate} />;
-      case "fullstack":
-        return <FullStackPanel onApplyCode={handleCodeUpdate} />;
       case "email":
         return <EmailTemplatePanel onApplyCode={handleCodeUpdate} />;
       case "visual-editor":
@@ -1644,11 +1479,11 @@ function BuilderPage() {
         )}
 
         {/* Fullscreen preview */}
-        <PreviewPanel
-          html={generatedCode}
-          isGenerating={status === "generating"}
-          visualEditMode={false}
-          onElementSelected={() => {}}
+        <SandpackPreview
+          mode="react"
+          files={reactFiles || {}}
+          dependencies={reactDeps}
+          showEditor={false}
         />
 
         {/* Prompt input overlay at bottom — for recording demo sequences */}
@@ -1955,21 +1790,12 @@ function BuilderPage() {
               </div>
             ) : activeTab === "preview" ? (
               <div ref={previewContainerRef} className="relative h-full">
-                {generationMode === "react" && reactFiles ? (
-                  <SandpackPreview
-                    mode="react"
-                    files={reactFiles}
-                    dependencies={reactDeps}
-                    showEditor={false}
-                  />
-                ) : (
-                  <PreviewPanel
-                    html={generatedCode}
-                    isGenerating={status === "generating"}
-                    visualEditMode={visualEditMode}
-                    onElementSelected={setSelectedElement}
-                  />
-                )}
+                <SandpackPreview
+                  mode="react"
+                  files={reactFiles || {}}
+                  dependencies={reactDeps}
+                  showEditor={false}
+                />
                 {collab.isConnected && (
                   <CursorOverlay
                     participants={collab.participants}

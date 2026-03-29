@@ -449,6 +449,7 @@ export default function HostingPage() {
                 ))}
               </div>
             </motion.div>
+            <p className="text-[10px] text-white/20 mt-3 text-center">Comparison based on publicly available information as of March 2026. Features and pricing may change. All trademarks belong to their respective owners. See our <a href="/disclaimers" className="underline hover:text-white/30">disclaimers</a>.</p>
           </motion.div>
         </div>
       </section>
