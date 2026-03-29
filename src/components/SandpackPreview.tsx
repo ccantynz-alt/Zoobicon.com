@@ -25,7 +25,6 @@ type SandpackPreviewProps = SandpackPreviewPropsHTML | SandpackPreviewPropsReact
 
 /**
  * Zoobicon-branded dark theme for Sandpack.
- * Matches the builder's #131520 / #1a1d2e palette.
  */
 const zoobiconTheme = {
   colors: {
@@ -61,7 +60,6 @@ const zoobiconTheme = {
 
 /**
  * Convert our React files map to Sandpack's expected format.
- * Sandpack expects paths prefixed with / and an index.tsx entry point.
  */
 function buildReactSandpackFiles(
   files: Record<string, string>,
@@ -69,14 +67,10 @@ function buildReactSandpackFiles(
   const sandpackFiles: Record<string, string> = {};
 
   for (const [path, content] of Object.entries(files)) {
-    // Ensure leading slash
     const key = path.startsWith("/") ? path : `/${path}`;
     sandpackFiles[key] = content;
   }
 
-  // Sandpack react-ts template requires /App.tsx at the root.
-  // Our generation outputs "App.tsx" which becomes "/App.tsx" — this is correct.
-  // But the template also needs an index.tsx if one doesn't exist.
   if (!sandpackFiles["/index.tsx"] && !sandpackFiles["/index.ts"]) {
     sandpackFiles["/index.tsx"] = `import React from "react";
 import { createRoot } from "react-dom/client";
@@ -91,23 +85,57 @@ root.render(<App />);
 }
 
 /**
- * In-browser Sandpack preview with optional code editor.
- * Supports two modes:
- * - "html" (default): Renders generated HTML/CSS/JS using the static template
- * - "react": Renders generated React/TypeScript components using the react-ts template
+ * CSS override to force Sandpack's internal elements to fill the container.
+ * Sandpack creates its own wrapper divs that don't respect parent height.
+ * This forces EVERY div in the Sandpack tree to fill available space.
+ */
+const SANDPACK_FULL_HEIGHT_CSS = `
+  .sp-wrapper,
+  .sp-layout,
+  .sp-stack,
+  .sp-preview-container,
+  .sp-preview-iframe,
+  .sp-preview-actions-wrapper {
+    height: 100% !important;
+    max-height: 100% !important;
+  }
+  .sp-wrapper {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .sp-layout {
+    flex: 1 !important;
+    border: none !important;
+    border-radius: 0 !important;
+  }
+  .sp-stack {
+    height: 100% !important;
+  }
+  .sp-preview-container {
+    overflow: hidden !important;
+  }
+  .sp-preview-iframe {
+    border: none !important;
+  }
+`;
+
+/**
+ * In-browser Sandpack preview — FULL HEIGHT, fills parent container.
+ *
+ * The parent MUST have explicit height (h-full, h-screen, or absolute positioning).
+ * This component uses absolute positioning internally to guarantee Sandpack
+ * fills the entire available space regardless of Sandpack's internal layout.
  */
 export default function SandpackPreview(props: SandpackPreviewProps) {
   const { showEditor = false } = props;
   const mode = props.mode || "html";
 
-  // HTML mode: extract files from raw HTML string
   const htmlFiles = useMemo(() => {
     if (mode !== "html") return {};
     const html = (props as SandpackPreviewPropsHTML).html || "";
     return extractSandpackFiles(html);
   }, [mode, mode === "html" ? (props as SandpackPreviewPropsHTML).html : ""]);
 
-  // React mode: convert files map to Sandpack format
   const reactFiles = useMemo(() => {
     if (mode !== "react") return {};
     const files = (props as SandpackPreviewPropsReact).files || {};
@@ -116,12 +144,12 @@ export default function SandpackPreview(props: SandpackPreviewProps) {
 
   const dependencies = mode === "react" ? (props as SandpackPreviewPropsReact).dependencies : undefined;
 
-  // Empty state
+  // Empty states
   if (mode === "html") {
     const html = (props as SandpackPreviewPropsHTML).html;
     if (!html || !html.trim()) {
       return (
-        <div className="h-full flex items-center justify-center bg-[#131520] text-white/40 text-sm">
+        <div className="absolute inset-0 flex items-center justify-center bg-[#131520] text-white/40 text-sm">
           <p>No content to preview</p>
         </div>
       );
@@ -130,7 +158,7 @@ export default function SandpackPreview(props: SandpackPreviewProps) {
     const files = (props as SandpackPreviewPropsReact).files;
     if (!files || Object.keys(files).length === 0) {
       return (
-        <div className="h-full flex items-center justify-center bg-[#131520] text-white/40 text-sm">
+        <div className="absolute inset-0 flex items-center justify-center bg-[#131520] text-white/40 text-sm">
           <p>No React components to preview</p>
         </div>
       );
@@ -139,28 +167,70 @@ export default function SandpackPreview(props: SandpackPreviewProps) {
 
   if (mode === "react") {
     return (
+      <div className="absolute inset-0 flex flex-col overflow-hidden">
+        <style dangerouslySetInnerHTML={{ __html: SANDPACK_FULL_HEIGHT_CSS }} />
+        <SandpackProvider
+          template="react-ts"
+          files={reactFiles}
+          theme={zoobiconTheme}
+          customSetup={{
+            dependencies: {
+              ...(dependencies || {}),
+            },
+          }}
+          options={{
+            autorun: true,
+            autoReload: true,
+            recompileMode: "delayed",
+            recompileDelay: 500,
+            externalResources: [
+              "https://cdn.tailwindcss.com",
+            ],
+          }}
+        >
+          <div className="flex flex-1 min-h-0 w-full overflow-hidden">
+            {showEditor && (
+              <div className="flex-1 min-w-0 overflow-hidden border-r border-white/5">
+                <SandpackCodeEditor
+                  showTabs
+                  showLineNumbers
+                  showInlineErrors
+                  wrapContent
+                  style={{ height: "100%" }}
+                />
+              </div>
+            )}
+            <div className={showEditor ? "flex-[2] min-w-0" : "flex-1 min-w-0"} style={{ height: "100%" }}>
+              <SandboxPreview
+                showOpenInCodeSandbox={false}
+                showRefreshButton
+                style={{ height: "100%" }}
+              />
+            </div>
+          </div>
+        </SandpackProvider>
+      </div>
+    );
+  }
+
+  // HTML mode
+  return (
+    <div className="absolute inset-0 flex flex-col overflow-hidden">
+      <style dangerouslySetInnerHTML={{ __html: SANDPACK_FULL_HEIGHT_CSS }} />
       <SandpackProvider
-        template="react-ts"
-        files={reactFiles}
+        template="static"
+        files={htmlFiles}
         theme={zoobiconTheme}
-        customSetup={{
-          dependencies: {
-            ...(dependencies || {}),
-          },
-        }}
         options={{
           autorun: true,
           autoReload: true,
           recompileMode: "delayed",
-          recompileDelay: 500,
-          externalResources: [
-            "https://cdn.tailwindcss.com",
-          ],
+          recompileDelay: 300,
         }}
       >
-        <div className="flex h-full w-full overflow-hidden">
+        <div className="flex flex-1 min-h-0 w-full overflow-hidden">
           {showEditor && (
-            <div className="h-full overflow-hidden border-r border-white/5" style={{ flex: 1 }}>
+            <div className="flex-1 min-w-0 overflow-hidden border-r border-white/5">
               <SandpackCodeEditor
                 showTabs
                 showLineNumbers
@@ -170,7 +240,7 @@ export default function SandpackPreview(props: SandpackPreviewProps) {
               />
             </div>
           )}
-          <div style={{ flex: showEditor ? 2 : 1, height: "100%" }}>
+          <div className={showEditor ? "flex-[2] min-w-0" : "flex-1 min-w-0"} style={{ height: "100%" }}>
             <SandboxPreview
               showOpenInCodeSandbox={false}
               showRefreshButton
@@ -179,42 +249,6 @@ export default function SandpackPreview(props: SandpackPreviewProps) {
           </div>
         </div>
       </SandpackProvider>
-    );
-  }
-
-  // HTML mode (default / existing behavior)
-  return (
-    <SandpackProvider
-      template="static"
-      files={htmlFiles}
-      theme={zoobiconTheme}
-      options={{
-        autorun: true,
-        autoReload: true,
-        recompileMode: "delayed",
-        recompileDelay: 300,
-      }}
-    >
-      <div className="flex h-full w-full overflow-hidden">
-        {showEditor && (
-          <div className="h-full overflow-hidden border-r border-white/5" style={{ flex: 1 }}>
-            <SandpackCodeEditor
-              showTabs
-              showLineNumbers
-              showInlineErrors
-              wrapContent
-              style={{ height: "100%" }}
-            />
-          </div>
-        )}
-        <div style={{ flex: showEditor ? 2 : 1, height: "100%" }}>
-          <SandboxPreview
-            showOpenInCodeSandbox={false}
-            showRefreshButton
-            style={{ height: "100%" }}
-          />
-        </div>
-      </div>
-    </SandpackProvider>
+    </div>
   );
 }

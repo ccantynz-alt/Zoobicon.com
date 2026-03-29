@@ -35,12 +35,8 @@ import ClonePanel from "@/components/ClonePanel";
 import AiImagesPanel from "@/components/AiImagesPanel";
 import PipelinePanel from "@/components/PipelinePanel";
 import DiffPanel from "@/components/DiffPanel";
-import WelcomeModal, { shouldShowWelcomeModal, dismissWelcomeModal } from "@/components/WelcomeModal";
-import VisualEditor from "@/components/VisualEditor";
 import ProjectTree from "@/components/ProjectTree";
-import type { SelectedElement } from "@/lib/dom-bridge";
-import { applyStyleToHtml, applyTextToHtml, reorderSections, addSectionToHtml } from "@/lib/dom-bridge";
-import SectionLibrary from "@/components/SectionLibrary";
+import WelcomeModal, { shouldShowWelcomeModal, dismissWelcomeModal } from "@/components/WelcomeModal";
 import { downloadZip } from "@/lib/zip-export";
 import CollaborationBar from "@/components/CollaborationBar";
 import CursorOverlay from "@/components/CursorOverlay";
@@ -84,7 +80,6 @@ import {
   Save,
   Sparkles,
   History,
-  MousePointer2,
   FolderTree,
   Package,
   Eye,
@@ -136,8 +131,6 @@ type ToolId =
   | "export"
   | "variants"
   | "email"
-  | "visual-editor"
-  | "sections"
   | "project"
   | "crawl"
   | "mcp"
@@ -163,8 +156,6 @@ const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }
   { id: "github", label: "GitHub Import", icon: <Github size={18} /> },
   { id: "figma", label: "Figma Import", icon: <Figma size={18} /> },
   { id: "wordpress", label: "Zoobicon Connect", icon: <FileArchive size={18} /> },
-  { id: "visual-editor", label: "Visual Editor", icon: <MousePointer2 size={18} /> },
-  { id: "sections", label: "Add Section", icon: <Package size={18} /> },
   { id: "project", label: "Project Mode", icon: <FolderTree size={18} /> },
   { id: "crawl", label: "Crawl Competitor", icon: <Eye size={18} /> },
   { id: "mcp", label: "MCP Context", icon: <ExternalLink size={18} /> },
@@ -423,8 +414,6 @@ function BuilderPage() {
   const [mcpContext, setMcpContext] = useState("");
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   // Phase 2: Visual editing
-  const [visualEditMode, setVisualEditMode] = useState(false);
-  const [selectedElement, setSelectedElement] = useState<SelectedElement | null>(null);
   // Phase 3: Project mode
   const [projectFiles, setProjectFiles] = useState<{ path: string; content: string; language: string; isModified?: boolean }[]>([]);
   const [activeProjectFile, setActiveProjectFile] = useState<string | null>(null);
@@ -1288,9 +1277,6 @@ function BuilderPage() {
   const toggleTool = useCallback((toolId: Exclude<ToolId, null>) => {
     setActiveTool((prev) => {
       const next = prev === toolId ? null : toolId;
-      // Toggle visual edit mode when the visual editor tool is activated/deactivated
-      setVisualEditMode(next === "visual-editor");
-      if (next !== "visual-editor") setSelectedElement(null);
       return next;
     });
   }, []);
@@ -1341,38 +1327,6 @@ function BuilderPage() {
         return <VariantsPanel code={generatedCode} onApplyVariant={handleCodeUpdate} />;
       case "email":
         return <EmailTemplatePanel onApplyCode={handleCodeUpdate} />;
-      case "visual-editor":
-        return (
-          <VisualEditor
-            selectedElement={selectedElement}
-            onStyleChange={(prop, val) => {
-              if (selectedElement) {
-                const updated = applyStyleToHtml(generatedCode, selectedElement.xpath, prop, val);
-                handleCodeUpdate(updated);
-              }
-            }}
-            onTextChange={(newText) => {
-              if (selectedElement) {
-                const updated = applyTextToHtml(generatedCode, selectedElement.xpath, newText);
-                handleCodeUpdate(updated);
-              }
-            }}
-            onSectionReorder={(from, to) => {
-              const updated = reorderSections(generatedCode, from, to);
-              handleCodeUpdate(updated);
-            }}
-            html={generatedCode}
-          />
-        );
-      case "sections":
-        return (
-          <SectionLibrary
-            onAddSection={(sectionHtml) => {
-              const updated = addSectionToHtml(generatedCode, sectionHtml);
-              handleCodeUpdate(updated);
-            }}
-          />
-        );
       case "project":
         return (
           <div className="flex flex-col gap-4 p-4">
@@ -1857,8 +1811,7 @@ function BuilderPage() {
         onAction={(action) => {
           setShowBuildSuccess(false);
           dismissBuildSuccess();
-          if (action === "visual") setActiveTool("visual-editor");
-          else if (action === "deploy") handleDeploy();
+          if (action === "deploy") handleDeploy();
           // "chat" — ChatPanel is always visible in the left sidebar, no action needed
         }}
       />
