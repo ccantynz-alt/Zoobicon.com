@@ -155,7 +155,7 @@ export default function AdminHealthPage() {
             isLoading={loading === "quick"}
           />
           <ResultCard
-            title="Deep Check (Full Generation via /api/generate and /api/generate/stream)"
+            title="Deep Check (Full Generation via /api/generate/react)"
             result={deepResult}
             isLoading={loading === "deep"}
           />

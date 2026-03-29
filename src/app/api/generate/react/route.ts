@@ -86,15 +86,15 @@ Output ONLY a valid JSON object with this exact structure — no markdown, no co
 - Cards need hover effects: hover:shadow-xl, hover:scale-[1.02], hover:-translate-y-1, transition-all duration-300
 - Use ring-1 ring-white/10 on dark themes, ring-1 ring-gray-200 on light themes
 - Stats section: use a bold gradient background (bg-gradient-to-r from-indigo-600 to-purple-700)
-- Testimonial cards: include star ratings (★★★★★) and company logos (text placeholders)
-- Feature icons: use gradient backgrounds behind icons (bg-gradient-to-br from-indigo-500/20 to-purple-500/20 p-3 rounded-xl)
+- Testimonial cards: include star ratings and company logos (text placeholders)
+- Feature icons: use gradient backgrounds behind icons
 - Footer: must have newsletter signup input + social media icon row
-- Hero image area: use glassmorphism cards, floating stat badges, or dashboard mockups — NOT empty placeholder boxes
+- Hero image area: use glassmorphism cards, floating stat badges, or dashboard mockups
 - MINIMUM 8 images across the site (hero, features, about, testimonials)
 
 ### Critical Rules
 - Output ONLY the JSON object — start with { and end with }
-- NO markdown code fences (\`\`\`) around the JSON
+- NO markdown code fences around the JSON
 - NO explanation text before or after the JSON
 - Every file path in "files" must be a string containing valid TypeScript/JSX or CSS
 - App.tsx MUST import every component file using relative paths: import Hero from "./components/Hero"
@@ -102,7 +102,7 @@ Output ONLY a valid JSON object with this exact structure — no markdown, no co
 - Minimum 9 sections: Navbar, Hero, Features, About, Testimonials, Stats, FAQ, CTA, Footer
 - Every component must render meaningful, complete content — no "TODO" or placeholder comments`;
 
-export const maxDuration = 300; // 5 minutes — React component generation needs more time than HTML
+export const maxDuration = 300;
 
 export async function POST(req: NextRequest) {
   try {
@@ -122,7 +122,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Auth + usage enforcement
     const auth = await authenticateRequest(req, { requireAuth: true, requireVerified: true });
     if (auth.error) return auth.error;
 
@@ -140,8 +139,6 @@ export async function POST(req: NextRequest) {
     const client = new Anthropic({ apiKey, timeout: 240_000 });
 
     let systemPrompt = REACT_SYSTEM;
-
-    // Append generator-specific instructions
     if (generator && typeof generator === "string") {
       const supplement = getGeneratorSystemSupplement(generator);
       if (supplement) {
@@ -166,109 +163,168 @@ Requirements:
 
 Output the JSON object with "files" and "dependencies" keys. Start with { — no preamble.`;
 
-    let response;
-    try {
-      response = await client.messages.create({
-        model,
-        max_tokens: maxTokens,
-        system: systemPrompt,
-        messages: [{ role: "user", content: userMessage }],
-      });
-    } catch (apiErr: unknown) {
-      // If primary model fails, try Haiku as fallback
-      if (model !== "claude-haiku-4-5") {
-        console.warn(`[React] ${model} failed, falling back to Haiku`);
+    // ── STREAMING: Send partial results as files are completed ──
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      async start(controller) {
+        const sendEvent = (data: Record<string, unknown>) => {
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
+        };
+
+        sendEvent({ type: "status", message: "AI is generating your React application..." });
+
         try {
-          response = await client.messages.create({
-            model: "claude-haiku-4-5",
+          let fullText = "";
+
+          const apiStream = client.messages.stream({
+            model,
             max_tokens: maxTokens,
             system: systemPrompt,
             messages: [{ role: "user", content: userMessage }],
           });
-        } catch {
-          throw apiErr;
+
+          let lastFileCount = 0;
+          let chunkCounter = 0;
+
+          apiStream.on("text", (text) => {
+            fullText += text;
+            chunkCounter++;
+
+            // Every 20 chunks, try to extract completed files and send them
+            if (chunkCounter % 20 === 0) {
+              try {
+                const partialFiles = extractCompletedFiles(fullText);
+                const fileCount = Object.keys(partialFiles).length;
+
+                if (fileCount > lastFileCount) {
+                  lastFileCount = fileCount;
+                  const fileNames = Object.keys(partialFiles);
+                  const latestFile = fileNames[fileNames.length - 1];
+                  sendEvent({
+                    type: "partial",
+                    files: partialFiles,
+                    fileCount,
+                    latestFile,
+                  });
+                  sendEvent({
+                    type: "status",
+                    message: `Built ${fileCount} files — ${latestFile}...`,
+                  });
+                }
+              } catch {
+                // JSON not complete yet — that's normal during streaming
+              }
+            }
+          });
+
+          const finalMessage = await apiStream.finalMessage();
+
+          // Extract final text
+          const textBlock = finalMessage.content.find((b) => b.type === "text");
+          if (!textBlock || textBlock.type !== "text") {
+            sendEvent({ type: "error", message: "AI returned no text content" });
+            controller.close();
+            return;
+          }
+
+          let rawText = textBlock.text.trim();
+          rawText = rawText.replace(/^```(?:json|JSON)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
+
+          const jsonStart = rawText.indexOf("{");
+          const jsonEnd = rawText.lastIndexOf("}");
+          if (jsonStart === -1 || jsonEnd === -1) {
+            sendEvent({ type: "error", message: "AI response was not valid JSON. Please try again." });
+            controller.close();
+            return;
+          }
+
+          const jsonStr = rawText.slice(jsonStart, jsonEnd + 1);
+
+          let parsed: { files?: Record<string, string>; dependencies?: Record<string, string> };
+          try {
+            parsed = JSON.parse(jsonStr);
+          } catch {
+            sendEvent({ type: "error", message: "AI response contained invalid JSON. Please try again." });
+            controller.close();
+            return;
+          }
+
+          if (!parsed.files || !parsed.files["App.tsx"]) {
+            sendEvent({ type: "error", message: "AI response missing App.tsx. Please try again." });
+            controller.close();
+            return;
+          }
+
+          // Track usage
+          await trackUsage(auth.user.email, "generation").catch(() => {});
+
+          // Send final complete result
+          sendEvent({
+            type: "done",
+            files: parsed.files,
+            dependencies: parsed.dependencies || {},
+            fileCount: Object.keys(parsed.files).length,
+          });
+        } catch (err) {
+          const message =
+            err instanceof Anthropic.AuthenticationError
+              ? "AI service is temporarily unavailable."
+              : err instanceof Anthropic.RateLimitError
+              ? "AI service is busy. Please wait a moment and try again."
+              : "React generation failed. Please try again.";
+          sendEvent({ type: "error", message });
+        } finally {
+          controller.close();
         }
-      } else {
-        throw apiErr;
-      }
-    }
+      },
+    });
 
-    // Extract text from response
-    const textBlock = response.content.find((b) => b.type === "text");
-    if (!textBlock || textBlock.type !== "text") {
-      return new Response(
-        JSON.stringify({ error: "AI returned no text content" }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    let rawText = textBlock.text.trim();
-
-    // Strip markdown code fences if present
-    rawText = rawText.replace(/^```(?:json|JSON)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
-
-    // Find the JSON object boundaries
-    const jsonStart = rawText.indexOf("{");
-    const jsonEnd = rawText.lastIndexOf("}");
-    if (jsonStart === -1 || jsonEnd === -1) {
-      return new Response(
-        JSON.stringify({ error: "AI response was not valid JSON. Please try again." }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    const jsonStr = rawText.slice(jsonStart, jsonEnd + 1);
-
-    let parsed: { files?: Record<string, string>; dependencies?: Record<string, string> };
-    try {
-      parsed = JSON.parse(jsonStr);
-    } catch (parseErr) {
-      console.error("[React] JSON parse failed:", parseErr);
-      return new Response(
-        JSON.stringify({ error: "AI response contained invalid JSON. Please try again." }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    if (!parsed.files || typeof parsed.files !== "object" || Object.keys(parsed.files).length === 0) {
-      return new Response(
-        JSON.stringify({ error: "AI response missing files. Please try again." }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    // Validate that App.tsx exists
-    if (!parsed.files["App.tsx"]) {
-      return new Response(
-        JSON.stringify({ error: "AI response missing App.tsx entry point. Please try again." }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    // Track usage
-    await trackUsage(auth.user.email, "generation").catch(() => {});
-
-    return new Response(
-      JSON.stringify({
-        files: parsed.files,
-        dependencies: parsed.dependencies || {},
-      }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache, no-transform",
+        Connection: "keep-alive",
+      },
+    });
   } catch (err) {
     console.error("[React Generate] Error:", err);
-    const message =
-      err instanceof Anthropic.AuthenticationError
-        ? "AI service is temporarily unavailable. The site owner needs to update their API key."
-        : err instanceof Anthropic.RateLimitError
-        ? "AI service is busy. Please wait a moment and try again."
-        : "React generation failed. Please try again.";
     return new Response(
-      JSON.stringify({ error: message }),
+      JSON.stringify({ error: "React generation failed. Please try again." }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
+}
+
+/**
+ * Try to extract completed file entries from a partially-streamed JSON response.
+ * This is a best-effort parser — it extracts files whose content appears complete
+ * (the value string is closed properly).
+ */
+function extractCompletedFiles(partial: string): Record<string, string> {
+  const files: Record<string, string> = {};
+
+  // Find "files": { ... and try to extract key-value pairs
+  const filesStart = partial.indexOf('"files"');
+  if (filesStart === -1) return files;
+
+  const braceStart = partial.indexOf("{", filesStart + 7);
+  if (braceStart === -1) return files;
+
+  // Extract file entries using regex — match "filename": "content" pairs
+  // where content is a complete string (ends with unescaped quote)
+  const fileRegex = /"([^"]+\.(?:tsx?|css|json))"\s*:\s*"((?:[^"\\]|\\.)*)"/g;
+  const searchArea = partial.slice(braceStart);
+
+  let match;
+  while ((match = fileRegex.exec(searchArea)) !== null) {
+    const fileName = match[1];
+    const content = match[2]
+      .replace(/\\n/g, "\n")
+      .replace(/\\t/g, "\t")
+      .replace(/\\"/g, '"')
+      .replace(/\\\\/g, "\\");
+    files[fileName] = content;
+  }
+
+  return files;
 }

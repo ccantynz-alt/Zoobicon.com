@@ -195,8 +195,8 @@ export default function EmailSupportPage() {
                 <Bot className="w-3 h-3 text-brand-400" />
                 <span className="text-xs font-medium text-brand-400">AI-Powered Support</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium">
-                <Clock size={12} /> Coming Soon
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
+                <Check size={12} /> Available Now
               </span>
             </motion.div>
 
@@ -395,11 +395,8 @@ export default function EmailSupportPage() {
           <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
             Resolve 94% of Tickets<br /><span className="gradient-text">Automatically</span>
           </h2>
-          <p className="text-lg text-white/60 mb-4">Be the first to know when AI Email Support launches. Or try the demo now.</p>
+          <p className="text-lg text-white/60 mb-4">AI-powered email support that never sleeps. Try it now.</p>
           <div className="flex items-center justify-center gap-3 mb-8">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium">
-              <Clock size={12} /> Full Launch Coming Soon
-            </span>
             <Link
               href="/email-support"
               className="group inline-flex items-center gap-2 px-5 py-2 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 text-xs font-semibold hover:bg-brand-500/20 transition-all"

@@ -29,7 +29,7 @@ export default function VariantsPanel({
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/generate/variants", {
+      const res = await fetch("/api/generate/react", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: p, count: 3 }),

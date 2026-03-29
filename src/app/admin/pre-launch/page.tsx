@@ -119,7 +119,7 @@ const CHECKLIST: ChecklistItem[] = [
   { id: "ai-5", label: "Body content validation working", description: "Generate with a prompt that might produce empty body -> verify retry with body-first prompt triggers.", priority: "medium", category: "ai" },
   { id: "ai-6", label: "All 43 generators tested", description: "Run at least 1 generation per generator type. Verify type-specific prompts produce relevant output.", priority: "high", category: "ai", link: "/generators" },
   { id: "ai-7", label: "Component library CSS injected correctly", description: "Generated sites include .btn, .card, .section classes. IntersectionObserver failsafe works.", priority: "high", category: "ai" },
-  { id: "ai-8", label: "Streaming generation working", description: "Test /api/generate/stream endpoint. Verify chunks arrive progressively. Preview updates live.", priority: "critical", category: "ai", link: "/builder" },
+  { id: "ai-8", label: "Streaming React generation working", description: "Test /api/generate/react SSE endpoint. Verify React files stream progressively into Sandpack preview.", priority: "critical", category: "ai", link: "/builder" },
 
   // Competitive Edge
   { id: "comp-1", label: "White-label agency feature complete", description: "Agency signup -> client portal -> white-label branding -> bulk generation -> quota tracking. UNIQUE vs competitors.", priority: "high", category: "competitive", competitorNote: "No competitor (v0, Bolt, Lovable) offers white-label agency features. This is our differentiator." },

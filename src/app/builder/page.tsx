@@ -35,12 +35,8 @@ import ClonePanel from "@/components/ClonePanel";
 import AiImagesPanel from "@/components/AiImagesPanel";
 import PipelinePanel from "@/components/PipelinePanel";
 import DiffPanel from "@/components/DiffPanel";
-import WelcomeModal, { shouldShowWelcomeModal, dismissWelcomeModal } from "@/components/WelcomeModal";
-import VisualEditor from "@/components/VisualEditor";
 import ProjectTree from "@/components/ProjectTree";
-import type { SelectedElement } from "@/lib/dom-bridge";
-import { applyStyleToHtml, applyTextToHtml, reorderSections, addSectionToHtml } from "@/lib/dom-bridge";
-import SectionLibrary from "@/components/SectionLibrary";
+import WelcomeModal, { shouldShowWelcomeModal, dismissWelcomeModal } from "@/components/WelcomeModal";
 import { downloadZip } from "@/lib/zip-export";
 import CollaborationBar from "@/components/CollaborationBar";
 import CursorOverlay from "@/components/CursorOverlay";
@@ -84,7 +80,6 @@ import {
   Save,
   Sparkles,
   History,
-  MousePointer2,
   FolderTree,
   Package,
   Eye,
@@ -136,8 +131,6 @@ type ToolId =
   | "export"
   | "variants"
   | "email"
-  | "visual-editor"
-  | "sections"
   | "project"
   | "crawl"
   | "mcp"
@@ -163,8 +156,6 @@ const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }
   { id: "github", label: "GitHub Import", icon: <Github size={18} /> },
   { id: "figma", label: "Figma Import", icon: <Figma size={18} /> },
   { id: "wordpress", label: "Zoobicon Connect", icon: <FileArchive size={18} /> },
-  { id: "visual-editor", label: "Visual Editor", icon: <MousePointer2 size={18} /> },
-  { id: "sections", label: "Add Section", icon: <Package size={18} /> },
   { id: "project", label: "Project Mode", icon: <FolderTree size={18} /> },
   { id: "crawl", label: "Crawl Competitor", icon: <Eye size={18} /> },
   { id: "mcp", label: "MCP Context", icon: <ExternalLink size={18} /> },
@@ -423,8 +414,6 @@ function BuilderPage() {
   const [mcpContext, setMcpContext] = useState("");
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   // Phase 2: Visual editing
-  const [visualEditMode, setVisualEditMode] = useState(false);
-  const [selectedElement, setSelectedElement] = useState<SelectedElement | null>(null);
   // Phase 3: Project mode
   const [projectFiles, setProjectFiles] = useState<{ path: string; content: string; language: string; isModified?: boolean }[]>([]);
   const [activeProjectFile, setActiveProjectFile] = useState<string | null>(null);
@@ -735,11 +724,12 @@ function BuilderPage() {
     return html;
   }, []);
 
-  const streamGenerate = useCallback(
-    async (userPrompt: string, existingCode?: string) => {
+  // streamGenerate removed — all generation now uses /api/generate/react SSE stream
+  // via handleGenerate (new builds) and handleEdit (edits)
+  const _legacyStreamRemoved = useCallback(
+    async () => {
       setStatus("generating");
       setError("");
-      if (!existingCode) setGeneratedCode("");
       setActiveTab("preview");
 
       abortRef.current?.abort();
@@ -1050,7 +1040,8 @@ function BuilderPage() {
         }
       }
 
-      // Phase 2: AI generates custom components (replaces scaffold)
+      // Phase 2: AI generates custom React components via streaming SSE
+      // Files appear in the preview progressively as they're generated
       try {
         const res = await fetch("/api/generate/react", {
           method: "POST",
@@ -1069,20 +1060,75 @@ function BuilderPage() {
           throw new Error(errData.error || `HTTP ${res.status}`);
         }
 
-        const data = await res.json();
-        if (!data.files || !data.files["App.tsx"]) {
-          throw new Error("React generation returned invalid response. Please try again.");
+        // Read SSE stream — update preview as files arrive
+        const reader = res.body?.getReader();
+        if (!reader) throw new Error("No response stream");
+
+        const decoder = new TextDecoder();
+        let lineBuffer = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          lineBuffer += decoder.decode(value, { stream: true });
+          const lines = lineBuffer.split("\n");
+          lineBuffer = lines.pop() || "";
+
+          for (const line of lines) {
+            if (!line.startsWith("data: ")) continue;
+            const jsonStr = line.slice(6).trim();
+            if (!jsonStr) continue;
+
+            try {
+              const event = JSON.parse(jsonStr);
+
+              if (event.type === "status") {
+                setPipelineAgents(prev => [...prev, event.message]);
+              } else if (event.type === "partial" && event.files) {
+                // Progressive update — show files as they're completed
+                if (generationIdRef.current === currentGenId) {
+                  setReactFiles(event.files);
+                  setGeneratedCode("<!-- react-app-mode -->");
+                }
+              } else if (event.type === "done" && event.files) {
+                // Final complete result
+                if (generationIdRef.current === currentGenId) {
+                  setReactFiles(event.files);
+                  setReactDeps(event.dependencies || {});
+                  setReactSource(event.files);
+                  setGeneratedCode("<!-- react-app-mode -->");
+                  setStatus("complete");
+                  setPipelineAgents(prev => [...prev, `Generated ${event.fileCount} React files`]);
+                  trackEvent("build");
+                }
+              } else if (event.type === "error") {
+                throw new Error(event.message || "Generation failed");
+              }
+            } catch (e) {
+              if (e instanceof Error && (e.message.includes("failed") || e.message.includes("Generation") || e.message.includes("unavailable") || e.message.includes("busy"))) {
+                throw e;
+              }
+              // Skip JSON parse errors from partial chunks
+            }
+          }
         }
 
-        if (generationIdRef.current === currentGenId) {
-          setReactFiles(data.files);
-          setReactDeps(data.dependencies || {});
-          setReactSource(data.files);
-          // Set generatedCode to a marker so hasCode is true (enables deploy/save/tabs)
-          setGeneratedCode("<!-- react-app-mode -->");
-          setStatus("complete");
-          setPipelineAgents(prev => [...prev, `Generated ${Object.keys(data.files).length} React files`]);
-          trackEvent("build");
+        // Flush remaining buffer
+        if (lineBuffer.trim()) {
+          for (const line of lineBuffer.split("\n")) {
+            if (!line.startsWith("data: ")) continue;
+            try {
+              const event = JSON.parse(line.slice(6).trim());
+              if (event.type === "done" && event.files && generationIdRef.current === currentGenId) {
+                setReactFiles(event.files);
+                setReactDeps(event.dependencies || {});
+                setReactSource(event.files);
+                setGeneratedCode("<!-- react-app-mode -->");
+                setStatus("complete");
+                trackEvent("build");
+              }
+            } catch { /* ignore */ }
+          }
         }
       } catch (err) {
         if ((err as Error).name === "AbortError") return;
@@ -1097,105 +1143,88 @@ function BuilderPage() {
     }
   }, [prompt, tier, autoReplaceImages, selectedModel, instantMode, generationMode]);
 
+  // Edit existing React files via the same streaming endpoint
   const handleEdit = useCallback(async () => {
-    if (!editPrompt.trim() || !generatedCode) return;
+    if (!editPrompt.trim() || !reactFiles) return;
 
     const instruction = editPrompt.trim();
     setStatus("generating");
     setError("");
+    setPipelineAgents([`Editing: ${instruction.slice(0, 60)}...`]);
 
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
 
     try {
-      // Try diff-based edit first (5-10x faster than full rewrite)
-      const res = await fetch("/api/generate/edit-diff", {
+      // Send existing files + edit instruction to React generation endpoint
+      const existingContext = Object.entries(reactFiles)
+        .map(([path, content]) => `--- ${path} ---\n${content}`)
+        .join("\n\n");
+
+      const editPromptText = `I have an existing React application with these files:\n\n${existingContext}\n\nPlease modify it according to this instruction: ${instruction}\n\nReturn the complete updated files JSON (all files, not just changed ones).`;
+
+      const res = await fetch("/api/generate/react", {
         method: "POST",
         headers: authHeaders(),
         body: JSON.stringify({
-          prompt: instruction,
-          existingCode: generatedCode,
+          prompt: editPromptText,
+          tier,
           ...(selectedModel ? { model: selectedModel } : {}),
         }),
         signal: controller.signal,
       });
 
       if (!res.ok) {
-        // Diff endpoint failed — fall back to full rewrite
-        throw new Error("Diff endpoint unavailable");
+        const errData = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+        throw new Error(errData.error || `HTTP ${res.status}`);
       }
 
+      // Read SSE stream
       const reader = res.body?.getReader();
       if (!reader) throw new Error("No response stream");
 
       const decoder = new TextDecoder();
       let lineBuffer = "";
-      let modifiedHtml = generatedCode;
-      let usedFallback = false;
-      let diffCount = 0;
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-
-        const text = decoder.decode(value, { stream: true });
-        lineBuffer += text;
+        lineBuffer += decoder.decode(value, { stream: true });
         const lines = lineBuffer.split("\n");
         lineBuffer = lines.pop() || "";
 
         for (const line of lines) {
           if (!line.startsWith("data: ")) continue;
-          const jsonStr = line.slice(6).trim();
-          if (!jsonStr) continue;
-
           try {
-            const event = JSON.parse(jsonStr);
-
-            if (event.type === "diff" && event.search && event.replace !== undefined) {
-              // Apply diff to the HTML
-              const before = modifiedHtml;
-              modifiedHtml = modifiedHtml.replace(event.search, event.replace);
-              if (modifiedHtml !== before) {
-                diffCount++;
-                setGeneratedCode(modifiedHtml); // Live update preview
-              }
-            } else if (event.type === "fallback" && event.html) {
-              // Full HTML fallback from server
-              modifiedHtml = event.html;
-              usedFallback = true;
-            } else if (event.type === "done") {
-              // Diff complete
-              console.log(`[Edit-Diff] ${event.diffCount || diffCount} diffs applied${event.fallback ? " (fallback)" : ""}`);
+            const event = JSON.parse(line.slice(6).trim());
+            if (event.type === "status") {
+              setPipelineAgents(prev => [...prev, event.message]);
+            } else if (event.type === "partial" && event.files) {
+              setReactFiles(event.files);
+            } else if (event.type === "done" && event.files) {
+              setReactFiles(event.files);
+              setReactDeps(event.dependencies || {});
+              setReactSource(event.files);
+              setStatus("complete");
+              setEditPrompt("");
+              setPipelineAgents(prev => [...prev, `Edit complete — ${Object.keys(event.files).length} files updated`]);
             } else if (event.type === "error") {
-              throw new Error(event.message || "Edit error");
+              throw new Error(event.message);
             }
           } catch (e) {
-            if (e instanceof SyntaxError) continue; // Skip malformed SSE
-            throw e;
+            if (e instanceof Error && (e.message.includes("failed") || e.message.includes("unavailable"))) throw e;
           }
         }
       }
-
-      // Create a labeled snapshot for this edit
-      pendingLabelRef.current = `Edit: ${instruction.slice(0, 50)}`;
-      setGeneratedCode(modifiedHtml);
-      setStatus("complete");
-      setEditPrompt("");
-
-      const method = usedFallback ? "full rewrite" : `${diffCount} diffs`;
-      setPipelineAgents(prev => [...prev, `Edit applied (${method})`]);
-
     } catch (err) {
       if ((err as Error).name === "AbortError") return;
-
-      // Fall back to stream-based full rewrite
-      console.warn("[Edit] Diff failed, falling back to full rewrite:", err instanceof Error ? err.message : err);
-      pendingLabelRef.current = `Edit: ${instruction.slice(0, 50)}`;
-      await streamGenerate(instruction, generatedCode);
-      setEditPrompt("");
+      const errMsg = err instanceof Error ? err.message : String(err);
+      console.error("[Edit] Failed:", errMsg);
+      setError(cleanErrorMessage(errMsg));
+      setStatus("error");
     }
-  }, [editPrompt, generatedCode, streamGenerate, selectedModel]);
+  }, [editPrompt, reactFiles, tier, selectedModel]);
 
   const handleCodeUpdate = useCallback((newCode: string) => {
     setGeneratedCode(newCode);
@@ -1288,9 +1317,6 @@ function BuilderPage() {
   const toggleTool = useCallback((toolId: Exclude<ToolId, null>) => {
     setActiveTool((prev) => {
       const next = prev === toolId ? null : toolId;
-      // Toggle visual edit mode when the visual editor tool is activated/deactivated
-      setVisualEditMode(next === "visual-editor");
-      if (next !== "visual-editor") setSelectedElement(null);
       return next;
     });
   }, []);
@@ -1341,38 +1367,6 @@ function BuilderPage() {
         return <VariantsPanel code={generatedCode} onApplyVariant={handleCodeUpdate} />;
       case "email":
         return <EmailTemplatePanel onApplyCode={handleCodeUpdate} />;
-      case "visual-editor":
-        return (
-          <VisualEditor
-            selectedElement={selectedElement}
-            onStyleChange={(prop, val) => {
-              if (selectedElement) {
-                const updated = applyStyleToHtml(generatedCode, selectedElement.xpath, prop, val);
-                handleCodeUpdate(updated);
-              }
-            }}
-            onTextChange={(newText) => {
-              if (selectedElement) {
-                const updated = applyTextToHtml(generatedCode, selectedElement.xpath, newText);
-                handleCodeUpdate(updated);
-              }
-            }}
-            onSectionReorder={(from, to) => {
-              const updated = reorderSections(generatedCode, from, to);
-              handleCodeUpdate(updated);
-            }}
-            html={generatedCode}
-          />
-        );
-      case "sections":
-        return (
-          <SectionLibrary
-            onAddSection={(sectionHtml) => {
-              const updated = addSectionToHtml(generatedCode, sectionHtml);
-              handleCodeUpdate(updated);
-            }}
-          />
-        );
       case "project":
         return (
           <div className="flex flex-col gap-4 p-4">
@@ -1857,8 +1851,7 @@ function BuilderPage() {
         onAction={(action) => {
           setShowBuildSuccess(false);
           dismissBuildSuccess();
-          if (action === "visual") setActiveTool("visual-editor");
-          else if (action === "deploy") handleDeploy();
+          if (action === "deploy") handleDeploy();
           // "chat" — ChatPanel is always visible in the left sidebar, no action needed
         }}
       />
