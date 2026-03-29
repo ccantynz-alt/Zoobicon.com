@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import {
-  Github,
+  GitFork,
   BookOpen,
-  Figma,
+  Layers,
   Sheet,
   Database,
   Link,
@@ -54,9 +54,9 @@ interface ContextSource {
 // ---------------------------------------------------------------------------
 
 const PROVIDER_META: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
-  github: { icon: <Github className="w-4 h-4" />, label: "GitHub", color: "text-white" },
+  github: { icon: <GitFork className="w-4 h-4" />, label: "GitHub", color: "text-white" },
   notion: { icon: <BookOpen className="w-4 h-4" />, label: "Notion", color: "text-white" },
-  figma: { icon: <Figma className="w-4 h-4" />, label: "Figma", color: "text-purple-400" },
+  figma: { icon: <Layers className="w-4 h-4" />, label: "Layers", color: "text-purple-400" },
   "google-sheets": { icon: <Sheet className="w-4 h-4" />, label: "Google Sheets", color: "text-green-400" },
   custom: { icon: <Database className="w-4 h-4" />, label: "Custom", color: "text-blue-400" },
 };
@@ -106,8 +106,8 @@ const PRESETS: QuickAddPreset[] = [
   },
   {
     toolName: "figma_get_design",
-    label: "Reference Figma Design",
-    description: "Fetch design metadata from Figma",
+    label: "Reference Layers Design",
+    description: "Fetch design metadata from Layers",
     fields: [{ key: "fileKey", label: "File Key", placeholder: "From URL: figma.com/file/<KEY>/..." }],
   },
   {
@@ -273,7 +273,7 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
           )}
         </div>
         <p className="text-xs text-white/50 mt-1">
-          Pull context from GitHub, Notion, Figma, or Google Sheets into your AI generation.
+          Pull context from GitHub, Notion, Layers, or Google Sheets into your AI generation.
         </p>
       </div>
 

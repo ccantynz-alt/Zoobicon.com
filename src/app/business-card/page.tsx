@@ -3,10 +3,31 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import {
-  CreditCard, Download, Sparkles, RotateCw, Palette, Type, QrCode,
-  User, Mail, Phone, MapPin, Globe, Linkedin, Twitter, Building2,
-  Printer, Share2, Copy, Check, ChevronRight, Layers, Image,
-  Smartphone, Briefcase, Pen
+  CreditCard,
+  Download,
+  Sparkles,
+  RotateCw,
+  Palette,
+  Type,
+  QrCode,
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Globe,
+  Link2,
+  MessageCircle,
+  Building2,
+  Printer,
+  Share2,
+  Copy,
+  Check,
+  ChevronRight,
+  Layers,
+  Image,
+  Smartphone,
+  Briefcase,
+  Pen,
 } from 'lucide-react';
 
 const TEMPLATES = [
@@ -196,8 +217,8 @@ export default function BusinessCardPage() {
                   { label: 'Phone', key: 'phone', icon: Phone },
                   { label: 'Website', key: 'website', icon: Globe },
                   { label: 'Location', key: 'location', icon: MapPin },
-                  { label: 'LinkedIn', key: 'linkedin', icon: Linkedin },
-                  { label: 'Twitter', key: 'twitter', icon: Twitter },
+                  { label: 'LinkedIn', key: 'linkedin', icon: Link2 },
+                  { label: 'MessageCircle', key: 'twitter', icon: MessageCircle },
                   { label: 'Tagline', key: 'tagline', icon: Sparkles },
                 ].map((field) => (
                   <div key={field.key}>

@@ -2,7 +2,43 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { FileText, Plus, Trash2, GripVertical, Eye, Code, Share2, BarChart3, Wand2, ChevronDown, ChevronRight, Copy, Check, Settings, Mail, Webhook, Zap, Type, Hash, Calendar, Upload, Star, ToggleLeft, List, AlignLeft, Image, Phone, MapPin, CreditCard, Clock, ArrowUp, ArrowDown, Layout, Sparkles, Download } from 'lucide-react';
+import {
+  FileText,
+  Plus,
+  Trash2,
+  GripVertical,
+  Eye,
+  Code,
+  Share2,
+  BarChart3,
+  Wand2,
+  ChevronDown,
+  ChevronRight,
+  Copy,
+  Check,
+  Settings,
+  Mail,
+  Webhook,
+  Zap,
+  Type,
+  Hash,
+  Calendar,
+  Upload,
+  Star,
+  ToggleLeft,
+  List,
+  AlignLeft,
+  Image,
+  Phone,
+  MapPin,
+  CreditCard,
+  Clock,
+  ArrowUp,
+  ArrowDown,
+  Layout,
+  Sparkles,
+  Download,
+} from 'lucide-react';
 
 const FIELD_TYPES = [
   { type: 'text', label: 'Short Text', icon: Type },

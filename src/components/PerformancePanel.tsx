@@ -1,7 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Gauge, Loader2, Zap } from "lucide-react";
+import {
+  Gauge,
+  Loader2,
+  Zap,
+} from "lucide-react";
 
 interface PerfIssue {
   severity: "critical" | "warning" | "info";

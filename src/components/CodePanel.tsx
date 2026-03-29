@@ -1,7 +1,15 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import { FileCode, FileText, FileType, FileJson, File, Save, Download } from "lucide-react";
+import {
+  FileCode,
+  FileText,
+  FileType,
+  FileJson,
+  File,
+  Save,
+  Download,
+} from "lucide-react";
 import type { ProjectFile } from "./ProjectTree";
 
 interface CodePanelProps {

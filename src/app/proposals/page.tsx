@@ -3,10 +3,30 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import {
-  FileText, Send, Eye, PenLine, Check, Clock, ChevronRight,
-  ArrowLeft, Sparkles, Plus, Search, Filter, MoreVertical,
-  DollarSign, Calendar, User, Building, Mail, Download,
-  Copy, Trash2, CheckCircle, AlertCircle, XCircle
+  FileText,
+  Send,
+  Eye,
+  PenLine,
+  Check,
+  Clock,
+  ChevronRight,
+  ArrowLeft,
+  Sparkles,
+  Plus,
+  Search,
+  Filter,
+  MoreVertical,
+  DollarSign,
+  Calendar,
+  User,
+  Building,
+  Mail,
+  Download,
+  Copy,
+  Trash2,
+  CheckCircle,
+  AlertCircle,
+  XCircle,
 } from 'lucide-react';
 
 type TabType = 'pipeline' | 'create' | 'templates' | 'signatures';

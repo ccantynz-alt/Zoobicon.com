@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { MessageSquare, Cpu, Rocket, X } from "lucide-react";
+import {
+  MessageSquare,
+  Cpu,
+  Rocket,
+  X,
+} from "lucide-react";
 
 interface WelcomeModalProps {
   onClose: () => void;

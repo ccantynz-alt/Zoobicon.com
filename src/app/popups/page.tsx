@@ -3,10 +3,30 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import {
-  Maximize2, Clock, ArrowDown, PanelRight, MessageSquare,
-  Eye, Target, Palette, BarChart3, Zap, ArrowRight, Settings,
-  Check, Copy, X, MousePointer2, Users, TrendingUp, Percent,
-  Layout, Type, Image, Sparkles, ChevronDown
+  Maximize2,
+  Clock,
+  ArrowDown,
+  PanelRight,
+  MessageSquare,
+  Eye,
+  Target,
+  Palette,
+  BarChart3,
+  Zap,
+  ArrowRight,
+  Settings,
+  Check,
+  Copy,
+  X,
+  MousePointer2,
+  Users,
+  TrendingUp,
+  Percent,
+  Layout,
+  Type,
+  Image,
+  Sparkles,
+  ChevronDown,
 } from 'lucide-react';
 
 type PopupType = 'exit-intent' | 'timed' | 'scroll' | 'floating-bar' | 'slide-in';

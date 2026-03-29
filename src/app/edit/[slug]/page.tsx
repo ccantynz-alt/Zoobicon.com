@@ -27,14 +27,14 @@ import EmailTemplatePanel from "@/components/EmailTemplatePanel";
 
 import {
   Bug,
-  Github,
+  GitFork,
   Languages,
   FileArchive,
   Database,
   Wand2,
   ShoppingCart,
   Users,
-  Figma,
+  Layers,
   Search,
   X,
   Save,
@@ -44,7 +44,6 @@ import {
   Accessibility,
   Gauge,
   Download,
-  Layers,
   Mail,
   Clock,
   Loader2,
@@ -88,8 +87,8 @@ const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }
   { id: "crm", label: "CRM", icon: <Users size={18} /> },
   { id: "scaffold", label: "Scaffolding", icon: <Database size={18} /> },
   { id: "translate", label: "Translate", icon: <Languages size={18} /> },
-  { id: "github", label: "GitHub Import", icon: <Github size={18} /> },
-  { id: "figma", label: "Figma Import", icon: <Figma size={18} /> },
+  { id: "github", label: "GitHub Import", icon: <GitFork size={18} /> },
+  { id: "figma", label: "Layers Import", icon: <Layers size={18} /> },
   { id: "wordpress", label: "Zoobicon Connect", icon: <FileArchive size={18} /> },
 ];
 

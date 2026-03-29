@@ -2,7 +2,10 @@
 
 import { useMemo } from "react";
 import Image from "next/image";
-import { Globe, Share2 } from "lucide-react";
+import {
+  Globe,
+  Share2,
+} from "lucide-react";
 
 interface SeoPreviewProps {
   html: string;

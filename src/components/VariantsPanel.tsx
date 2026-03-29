@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Layers, Loader2, Eye, AlertCircle } from "lucide-react";
+import {
+  Layers,
+  Loader2,
+  Eye,
+  AlertCircle,
+} from "lucide-react";
 
 interface Variant {
   id: string;

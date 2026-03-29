@@ -4,11 +4,33 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
-  Mail, Save, CheckCircle2, AlertTriangle, ArrowLeft,
-  Server, Send, Eye, EyeOff, Loader2, TestTube,
-  Globe, Key, Bell, ExternalLink, Copy, Check,
-  Inbox, MessageSquare, ArrowRight, Bot, Shield,
-  Smartphone, Laptop2, Wifi, Monitor, RefreshCw,
+  Mail,
+  Save,
+  CheckCircle2,
+  AlertTriangle,
+  ArrowLeft,
+  Server,
+  Send,
+  Eye,
+  EyeOff,
+  Loader2,
+  TestTube,
+  Globe,
+  Key,
+  Bell,
+  ExternalLink,
+  Copy,
+  Check,
+  Inbox,
+  MessageSquare,
+  ArrowRight,
+  Bot,
+  Shield,
+  Smartphone,
+  Laptop2,
+  Wifi,
+  Monitor,
+  RefreshCw,
 } from "lucide-react";
 import BackgroundEffects from "@/components/BackgroundEffects";
 

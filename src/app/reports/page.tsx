@@ -3,10 +3,28 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import {
-  FileText, BarChart3, PieChart, TrendingUp, Download, Send,
-  Clock, Calendar, Palette, Building2, ArrowRight, Check,
-  Globe, ShoppingCart, Users, Search, ChevronDown, Star,
-  Zap, Eye, RefreshCw, Lock
+  FileText,
+  BarChart3,
+  PieChart,
+  TrendingUp,
+  Download,
+  Send,
+  Clock,
+  Calendar,
+  Palette,
+  Building2,
+  ArrowRight,
+  Check,
+  Globe,
+  ShoppingCart,
+  Users,
+  Search,
+  ChevronDown,
+  Star,
+  Zap,
+  Eye,
+  RefreshCw,
+  Lock,
 } from 'lucide-react';
 
 const REPORT_TEMPLATES = [

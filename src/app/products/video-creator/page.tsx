@@ -40,7 +40,7 @@ const PLATFORMS = [
   { name: "YouTube Shorts", format: "9:16 vertical", duration: "15-60s", desc: "Engagement-optimized with thumbnails and end screens." },
   { name: "Facebook Ads", format: "1:1 & 16:9", duration: "15-120s", desc: "Conversion-focused with dynamic product showcases and CTAs." },
   { name: "LinkedIn", format: "1:1 & 16:9", duration: "30-120s", desc: "Professional thought leadership and B2B content." },
-  { name: "Twitter/X", format: "16:9", duration: "15-140s", desc: "Punchy, attention-grabbing clips optimized for the timeline." },
+  { name: "MessageCircle/X", format: "16:9", duration: "15-140s", desc: "Punchy, attention-grabbing clips optimized for the timeline." },
 ];
 
 const FEATURES = [
@@ -50,7 +50,7 @@ const FEATURES = [
   { icon: Palette, title: "Brand Consistency", desc: "Set your brand colors and fonts. Every storyboard, scene image, and caption uses your brand kit." },
   { icon: Layers, title: "Scene-by-Scene Images", desc: "AI generates images for each scene using your storyboard. Supports Replicate (FLUX), DALL-E 3, and Stability AI." },
   { icon: Scissors, title: "AI Voiceover", desc: "10 premium voices via ElevenLabs with adjustable speed and clarity. Browser TTS fallback for free plans." },
-  { icon: Share2, title: "Multi-Platform Formats", desc: "TikTok, Instagram Reels, YouTube, LinkedIn, Twitter — correct aspect ratios and format specs for each." },
+  { icon: Share2, title: "Multi-Platform Formats", desc: "TikTok, Instagram Reels, YouTube, LinkedIn, MessageCircle — correct aspect ratios and format specs for each." },
   { icon: BarChart3, title: "Video Rendering (Coming Soon)", desc: "Scene-by-scene video generation via Runway Gen-3, Luma Dream Machine, Pika, and Kling. Currently in development." },
 ];
 

@@ -3,11 +3,36 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import {
-  Presentation, ChevronRight, ArrowLeft, Sparkles, Plus,
-  ChevronLeft, Play, Download, Copy, Maximize2, Minimize2,
-  Target, Lightbulb, BarChart3, TrendingUp, Users, DollarSign,
-  Rocket, Eye, Settings, Layout, Palette, Image, Type,
-  Globe, Zap, Check, Star, PieChart, ArrowUpRight
+  Presentation,
+  ChevronRight,
+  ArrowLeft,
+  Sparkles,
+  Plus,
+  ChevronLeft,
+  Play,
+  Download,
+  Copy,
+  Maximize2,
+  Minimize2,
+  Target,
+  Lightbulb,
+  BarChart3,
+  TrendingUp,
+  Users,
+  DollarSign,
+  Rocket,
+  Eye,
+  Settings,
+  Layout,
+  Palette,
+  Image,
+  Type,
+  Globe,
+  Zap,
+  Check,
+  Star,
+  PieChart,
+  ArrowUpRight,
 } from 'lucide-react';
 
 type TabType = 'editor' | 'generate' | 'themes' | 'present';
@@ -59,7 +84,7 @@ const DEMO_SLIDES: Slide[] = [
   { id: 's4', type: 'market', title: 'Market Opportunity', content: { tam: '$13.2B', tamLabel: 'Global Website Builder Market (2026)', sam: '$4.1B', samLabel: 'SMB + Freelancer Segment', som: '$82M', somLabel: 'Year 3 Target (2% SAM)' }, bgColor: '#0A0A12', accentColor: '#3B82F6' },
   { id: 's5', type: 'traction', title: 'Traction', content: { metrics: ['47,293 sites generated', '$18.2K MRR (growing 34% MoM)', '12,400 registered users', '89% generation success rate', '4.7/5 user satisfaction score'], timeline: 'Since launch: January 2026' }, bgColor: '#0A0A12', accentColor: '#8B5CF6' },
   { id: 's6', type: 'business-model', title: 'Business Model', content: { headline: 'SaaS + Usage-Based Hybrid', tiers: ['Free: 3 builds/month', 'Creator ($19/mo): 15 builds + custom domains', 'Pro ($49/mo): Unlimited + API access + all tools', 'Agency ($99/mo): White-label + client portal + bulk gen'], arpu: 'Current ARPU: $34/mo' }, bgColor: '#0A0A12', accentColor: '#F59E0B' },
-  { id: 's7', type: 'team', title: 'Team', content: { members: ['CEO — 10yr product leader (ex-Stripe)', 'CTO — Former AI research at DeepMind', 'Head of Design — Led design at Figma', 'Head of Growth — Scaled Vercel to $100M ARR'] }, bgColor: '#0A0A12', accentColor: '#8B5CF6' },
+  { id: 's7', type: 'team', title: 'Team', content: { members: ['CEO — 10yr product leader (ex-Stripe)', 'CTO — Former AI research at DeepMind', 'Head of Design — Led design at Layers', 'Head of Growth — Scaled Vercel to $100M ARR'] }, bgColor: '#0A0A12', accentColor: '#8B5CF6' },
   { id: 's8', type: 'ask', title: 'The Ask', content: { amount: '$4M Seed Round', use: ['40% — Engineering (hire 6 engineers)', '25% — AI compute costs (Anthropic, GPU)', '20% — Sales & Marketing', '15% — Operations & Legal'], timeline: 'Runway: 18 months to Series A' }, bgColor: '#0A0A12', accentColor: '#8B5CF6' },
 ];
 

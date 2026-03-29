@@ -1,7 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Globe, ArrowRight, Loader2, CheckCircle2, AlertCircle, Sparkles } from "lucide-react";
+import {
+  Globe,
+  ArrowRight,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+  Sparkles,
+} from "lucide-react";
 
 interface ClonePanelProps {
   onClone: (html: string) => void;

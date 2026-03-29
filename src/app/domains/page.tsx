@@ -1,7 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Check, X, Loader2, Globe, ShoppingCart, Plus, Minus } from "lucide-react";
+import {
+  Search,
+  Check,
+  X,
+  Loader2,
+  Globe,
+  ShoppingCart,
+  Plus,
+  Minus,
+} from "lucide-react";
 
 interface DomainResult {
   domain: string;

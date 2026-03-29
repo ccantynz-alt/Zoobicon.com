@@ -4,8 +4,20 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Mail, Plus, Search, Edit, Trash2, Power, ArrowRight, Shield,
-  HardDrive, User, X, Loader2, Check, AlertTriangle,
+  Mail,
+  Plus,
+  Search,
+  Edit,
+  Trash2,
+  Power,
+  ArrowRight,
+  Shield,
+  HardDrive,
+  User,
+  X,
+  Loader2,
+  Check,
+  AlertTriangle,
 } from "lucide-react";
 import BackgroundEffects from "@/components/BackgroundEffects";
 

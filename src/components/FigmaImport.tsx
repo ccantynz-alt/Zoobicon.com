@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import {
-  Figma,
+  Layers,
   Upload,
   FileJson,
   Palette,
@@ -33,7 +33,7 @@ interface FigmaImportProps {
 type ImportTab = "url" | "json";
 
 const LOADING_STEPS = [
-  "Connecting to Figma...",
+  "Connecting to Layers...",
   "Extracting design elements...",
   "Converting to HTML/CSS...",
 ];
@@ -109,7 +109,7 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
           }`}
         >
           <Link className="w-4 h-4" />
-          Figma URL
+          Layers URL
         </button>
         <button
           onClick={() => {
@@ -132,10 +132,10 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-[#999] mb-2">
-              Figma File URL
+              Layers File URL
             </label>
             <div className="relative">
-              <Figma className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#555]" />
+              <Layers className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#555]" />
               <input
                 type="url"
                 value={figmaUrl}
@@ -164,7 +164,7 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
               <span className="text-[#888] font-medium">
                 How to get your access token:
               </span>{" "}
-              Open Figma, go to{" "}
+              Open Layers, go to{" "}
               <span className="text-[#3b82f6]">
                 Settings &rarr; Account &rarr; Personal access tokens
               </span>
@@ -184,12 +184,12 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-[#999] mb-2">
-              Figma JSON Export
+              Layers JSON Export
             </label>
             <textarea
               value={figmaJson}
               onChange={(e) => setFigmaJson(e.target.value)}
-              placeholder='Paste your Figma JSON here... (e.g., from Figma API response or "Copy as JSON" plugin)'
+              placeholder='Paste your Layers JSON here... (e.g., from Layers API response or "Copy as JSON" plugin)'
               rows={10}
               className="w-full bg-[#12121a] border border-[#1e1e2e] rounded-xl py-3 px-4 text-sm text-white placeholder-[#444] focus:outline-none focus:border-[#3b82f6] transition-colors font-mono resize-y"
             />
@@ -200,7 +200,7 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
               <span className="text-[#888] font-medium">
                 How to export JSON:
               </span>{" "}
-              Use a Figma plugin like{" "}
+              Use a Layers plugin like{" "}
               <span className="text-[#3b82f6]">
                 &quot;JSON from Design&quot;
               </span>{" "}
@@ -355,7 +355,7 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
 
             {/* Layer Count */}
             <div className="flex items-center gap-2 pt-2 border-t border-[#1e1e2e]">
-              <Figma className="w-4 h-4 text-[#666]" />
+              <Layers className="w-4 h-4 text-[#666]" />
               <span className="text-sm text-[#666]">
                 {result.layers} layers processed
               </span>

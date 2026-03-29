@@ -3,10 +3,30 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import {
-  MessageSquare, ThumbsUp, ChevronRight, ArrowLeft, Plus,
-  Search, Filter, ArrowUpCircle, Clock, CheckCircle, Rocket,
-  Eye, Tag, MoreVertical, TrendingUp, Users, Calendar,
-  Sparkles, Zap, LayoutGrid, List, ChevronUp, X, Star
+  MessageSquare,
+  ThumbsUp,
+  ChevronRight,
+  ArrowLeft,
+  Plus,
+  Search,
+  Filter,
+  ArrowUpCircle,
+  Clock,
+  CheckCircle,
+  Rocket,
+  Eye,
+  Tag,
+  MoreVertical,
+  TrendingUp,
+  Users,
+  Calendar,
+  Sparkles,
+  Zap,
+  LayoutGrid,
+  List,
+  ChevronUp,
+  X,
+  Star,
 } from 'lucide-react';
 
 type TabType = 'board' | 'roadmap' | 'changelog';
@@ -46,7 +66,7 @@ const STATUS_CONFIG: Record<RequestStatus, { label: string; color: string; bgCol
 const DEMO_REQUESTS: FeatureRequest[] = [
   { id: 'r1', title: 'In-Browser Code Runtime (WebContainers)', description: 'Run generated code directly in the browser without deploying. Like Bolt.new and StackBlitz.', status: 'planned', votes: 347, comments: 42, author: 'Alex K.', authorAvatar: 'AK', createdAt: '2026-02-15', category: 'Builder', voted: false },
   { id: 'r2', title: 'AI Auto-Completion in Code Editor', description: 'Add GitHub Copilot-style code completion when editing generated code manually.', status: 'in-progress', votes: 289, comments: 31, author: 'Priya M.', authorAvatar: 'PM', createdAt: '2026-02-20', category: 'Editor', voted: true },
-  { id: 'r3', title: 'Figma Plugin for Direct Import', description: 'Import Figma designs directly into Zoobicon with one click, maintaining layers and styles.', status: 'under-review', votes: 234, comments: 28, author: 'David L.', authorAvatar: 'DL', createdAt: '2026-03-01', category: 'Integrations', voted: false },
+  { id: 'r3', title: 'Layers Plugin for Direct Import', description: 'Import Layers designs directly into Zoobicon with one click, maintaining layers and styles.', status: 'under-review', votes: 234, comments: 28, author: 'David L.', authorAvatar: 'DL', createdAt: '2026-03-01', category: 'Integrations', voted: false },
   { id: 'r4', title: 'Team Workspaces with Role-Based Access', description: 'Allow agencies to create team workspaces with editor, viewer, and admin roles.', status: 'planned', votes: 198, comments: 19, author: 'Sarah C.', authorAvatar: 'SC', createdAt: '2026-03-05', category: 'Agency', voted: false },
   { id: 'r5', title: 'Version Branching and Merge', description: 'Fork a site into branches and merge changes. Like Git branching for websites.', status: 'under-review', votes: 176, comments: 15, author: 'Marcus R.', authorAvatar: 'MR', createdAt: '2026-03-08', category: 'Builder', voted: false },
   { id: 'r6', title: 'React/Next.js Component Export', description: 'Export generated HTML as reusable React components with proper TypeScript types.', status: 'shipped', votes: 312, comments: 56, author: 'Luna W.', authorAvatar: 'LW', createdAt: '2026-01-20', category: 'Export', voted: true },
