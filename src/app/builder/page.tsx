@@ -1039,7 +1039,8 @@ function BuilderPage() {
         }
       }
 
-      // Phase 2: AI generates custom components (replaces scaffold)
+      // Phase 2: AI generates custom React components via streaming SSE
+      // Files appear in the preview progressively as they're generated
       try {
         const res = await fetch("/api/generate/react", {
           method: "POST",
@@ -1058,20 +1059,75 @@ function BuilderPage() {
           throw new Error(errData.error || `HTTP ${res.status}`);
         }
 
-        const data = await res.json();
-        if (!data.files || !data.files["App.tsx"]) {
-          throw new Error("React generation returned invalid response. Please try again.");
+        // Read SSE stream — update preview as files arrive
+        const reader = res.body?.getReader();
+        if (!reader) throw new Error("No response stream");
+
+        const decoder = new TextDecoder();
+        let lineBuffer = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          lineBuffer += decoder.decode(value, { stream: true });
+          const lines = lineBuffer.split("\n");
+          lineBuffer = lines.pop() || "";
+
+          for (const line of lines) {
+            if (!line.startsWith("data: ")) continue;
+            const jsonStr = line.slice(6).trim();
+            if (!jsonStr) continue;
+
+            try {
+              const event = JSON.parse(jsonStr);
+
+              if (event.type === "status") {
+                setPipelineAgents(prev => [...prev, event.message]);
+              } else if (event.type === "partial" && event.files) {
+                // Progressive update — show files as they're completed
+                if (generationIdRef.current === currentGenId) {
+                  setReactFiles(event.files);
+                  setGeneratedCode("<!-- react-app-mode -->");
+                }
+              } else if (event.type === "done" && event.files) {
+                // Final complete result
+                if (generationIdRef.current === currentGenId) {
+                  setReactFiles(event.files);
+                  setReactDeps(event.dependencies || {});
+                  setReactSource(event.files);
+                  setGeneratedCode("<!-- react-app-mode -->");
+                  setStatus("complete");
+                  setPipelineAgents(prev => [...prev, `Generated ${event.fileCount} React files`]);
+                  trackEvent("build");
+                }
+              } else if (event.type === "error") {
+                throw new Error(event.message || "Generation failed");
+              }
+            } catch (e) {
+              if (e instanceof Error && (e.message.includes("failed") || e.message.includes("Generation") || e.message.includes("unavailable") || e.message.includes("busy"))) {
+                throw e;
+              }
+              // Skip JSON parse errors from partial chunks
+            }
+          }
         }
 
-        if (generationIdRef.current === currentGenId) {
-          setReactFiles(data.files);
-          setReactDeps(data.dependencies || {});
-          setReactSource(data.files);
-          // Set generatedCode to a marker so hasCode is true (enables deploy/save/tabs)
-          setGeneratedCode("<!-- react-app-mode -->");
-          setStatus("complete");
-          setPipelineAgents(prev => [...prev, `Generated ${Object.keys(data.files).length} React files`]);
-          trackEvent("build");
+        // Flush remaining buffer
+        if (lineBuffer.trim()) {
+          for (const line of lineBuffer.split("\n")) {
+            if (!line.startsWith("data: ")) continue;
+            try {
+              const event = JSON.parse(line.slice(6).trim());
+              if (event.type === "done" && event.files && generationIdRef.current === currentGenId) {
+                setReactFiles(event.files);
+                setReactDeps(event.dependencies || {});
+                setReactSource(event.files);
+                setGeneratedCode("<!-- react-app-mode -->");
+                setStatus("complete");
+                trackEvent("build");
+              }
+            } catch { /* ignore */ }
+          }
         }
       } catch (err) {
         if ((err as Error).name === "AbortError") return;
