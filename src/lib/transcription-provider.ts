@@ -73,17 +73,17 @@ class DeepgramProvider implements TranscriptionProviderAdapter {
   async getPlans(): Promise<TranscriptionPlan[]> {
     return [
       {
-        id: "dictation-starter", name: "Dictation Starter", price: 9.99, currency: "USD", period: "monthly",
+        id: "dictation-starter", name: "Dictation Starter", price: 4.99, currency: "USD", period: "monthly",
         minutesIncluded: 300, features: ["Real-time dictation", "30+ languages", "Punctuation", "Export to text"],
         languages: 30, realtimeSupport: true,
       },
       {
-        id: "dictation-pro", name: "Dictation Pro", price: 19.99, currency: "USD", period: "monthly",
+        id: "dictation-pro", name: "Dictation Pro", price: 11.99, currency: "USD", period: "monthly",
         minutesIncluded: 1000, features: ["Everything in Starter", "Speaker diarization", "Summary generation", "Custom vocabulary", "API access"],
         languages: 50, realtimeSupport: true,
       },
       {
-        id: "dictation-business", name: "Dictation Business", price: 49.99, currency: "USD", period: "monthly",
+        id: "dictation-business", name: "Dictation Business", price: 29.99, currency: "USD", period: "monthly",
         minutesIncluded: 5000, features: ["Everything in Pro", "Team accounts", "Priority processing", "Webhooks", "Batch transcription"],
         languages: 50, realtimeSupport: true,
       },
@@ -190,17 +190,17 @@ class MockTranscriptionProvider implements TranscriptionProviderAdapter {
   async getPlans(): Promise<TranscriptionPlan[]> {
     return [
       {
-        id: "dictation-starter", name: "Dictation Starter", price: 9.99, currency: "USD", period: "monthly",
+        id: "dictation-starter", name: "Dictation Starter", price: 4.99, currency: "USD", period: "monthly",
         minutesIncluded: 300, features: ["Real-time dictation", "30+ languages", "Punctuation", "Export to text"],
         languages: 30, realtimeSupport: true,
       },
       {
-        id: "dictation-pro", name: "Dictation Pro", price: 19.99, currency: "USD", period: "monthly",
+        id: "dictation-pro", name: "Dictation Pro", price: 11.99, currency: "USD", period: "monthly",
         minutesIncluded: 1000, features: ["Everything in Starter", "Speaker diarization", "Summary generation", "Custom vocabulary", "API access"],
         languages: 50, realtimeSupport: true,
       },
       {
-        id: "dictation-business", name: "Dictation Business", price: 49.99, currency: "USD", period: "monthly",
+        id: "dictation-business", name: "Dictation Business", price: 29.99, currency: "USD", period: "monthly",
         minutesIncluded: 5000, features: ["Everything in Pro", "Team accounts", "Priority processing", "Webhooks", "Batch transcription"],
         languages: 50, realtimeSupport: true,
       },

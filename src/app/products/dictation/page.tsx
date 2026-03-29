@@ -54,14 +54,14 @@ const COMPETITORS = [
   { name: "Bundled Website Builder", zoobicon: true, otter: false, rev: false, descript: false, whisper: false },
   { name: "Bundled eSIM & VPN", zoobicon: true, otter: false, rev: false, descript: false, whisper: false },
   { name: "Self-Hosted Option", zoobicon: false, otter: false, rev: false, descript: false, whisper: true },
-  { name: "300 min/mo Price", zoobicon: "$9.99", otter: "$16.99", rev: "$29.99", descript: "$24.00", whisper: "Free" },
-  { name: "1000 min/mo Price", zoobicon: "$19.99", otter: "$30.00", rev: "$59.99", descript: "$44.00", whisper: "Free" },
+  { name: "300 min/mo Price", zoobicon: "$4.99", otter: "$16.99", rev: "$29.99", descript: "$24.00", whisper: "Free" },
+  { name: "1000 min/mo Price", zoobicon: "$11.99", otter: "$30.00", rev: "$59.99", descript: "$44.00", whisper: "Free" },
 ];
 
 const PLANS = [
-  { name: "Starter", minutes: "300 min/mo", price: "$9.99", period: "/month", desc: "Personal dictation and short recordings", features: ["Real-time dictation", "30+ languages", "Smart punctuation", "Export to text/PDF"], featured: false },
-  { name: "Pro", minutes: "1,000 min/mo", price: "$19.99", period: "/month", desc: "Professionals and content creators", features: ["Everything in Starter", "Speaker diarization", "AI summaries", "Custom vocabulary", "API access"], featured: true },
-  { name: "Business", minutes: "5,000 min/mo", price: "$49.99", period: "/month", desc: "Teams and organizations", features: ["Everything in Pro", "Team accounts", "Priority processing", "Webhooks", "Batch transcription"], featured: false },
+  { name: "Starter", minutes: "300 min/mo", price: "$4.99", period: "/month", desc: "Personal dictation and short recordings", features: ["Real-time dictation", "30+ languages", "Smart punctuation", "Export to text/PDF"], featured: false },
+  { name: "Pro", minutes: "1,000 min/mo", price: "$11.99", period: "/month", desc: "Professionals and content creators", features: ["Everything in Starter", "Speaker diarization", "AI summaries", "Custom vocabulary", "API access"], featured: true },
+  { name: "Business", minutes: "5,000 min/mo", price: "$29.99", period: "/month", desc: "Teams and organizations", features: ["Everything in Pro", "Team accounts", "Priority processing", "Webhooks", "Batch transcription"], featured: false },
 ];
 
 const FAQS = [
@@ -92,7 +92,7 @@ export default function DictationProductPage() {
     applicationCategory: "ProductivityApplication",
     operatingSystem: "Web, iOS, Android",
     keywords: "best dictation app, AI transcription, speech to text, meeting transcription, voice to text",
-    offers: { "@type": "AggregateOffer", lowPrice: "9.99", highPrice: "49.99", priceCurrency: "USD" },
+    offers: { "@type": "AggregateOffer", lowPrice: "4.99", highPrice: "29.99", priceCurrency: "USD" },
     brand: { "@type": "Brand", name: "Zoobicon" },
   };
   const breadcrumbLd = {

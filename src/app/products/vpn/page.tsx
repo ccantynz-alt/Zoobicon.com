@@ -103,7 +103,7 @@ const HOW_IT_WORKS = [
 ];
 
 const COMPETITOR_ROWS = [
-  { feature: "Monthly price (cheapest)", zoobicon: "$4.99", nord: "$4.59", surfshark: "$3.99", express: "$6.67", proton: "$4.99" },
+  { feature: "Monthly price (cheapest)", zoobicon: "$3.99", nord: "$4.59", surfshark: "$3.99", express: "$6.67", proton: "$4.99" },
   { feature: "Server countries", zoobicon: "60+", nord: "111", surfshark: "100", express: "105", proton: "112" },
   { feature: "NZ / Pacific servers", zoobicon: true, nord: true, surfshark: true, express: true, proton: false },
   { feature: "WireGuard support", zoobicon: true, nord: true, surfshark: true, express: false, proton: true },
@@ -120,7 +120,7 @@ const COMPETITOR_ROWS = [
 const PRICING_TIERS = [
   {
     name: "Basic",
-    price: "$4.99",
+    price: "$3.99",
     period: "/mo",
     description: "Essential protection for everyday browsing and travel.",
     features: [
@@ -136,7 +136,7 @@ const PRICING_TIERS = [
   },
   {
     name: "Pro",
-    price: "$7.99",
+    price: "$5.99",
     period: "/mo",
     description: "Full power for professionals and frequent travellers.",
     features: [
@@ -154,12 +154,12 @@ const PRICING_TIERS = [
   },
   {
     name: "Annual",
-    price: "$59.99",
+    price: "$47.99",
     period: "/yr",
-    description: "Pro features at 2 months free. Best value.",
+    description: "Pro features at 4 months free. Best value.",
     features: [
       "Everything in Pro",
-      "Save $35.89 per year",
+      "Save $23.89 per year",
       "Priority server access",
       "Early access to new locations",
       "Dedicated account manager",
@@ -333,7 +333,7 @@ export default function VPNPage() {
             <motion.div variants={fadeInUp} className="flex flex-wrap gap-4">
               <Link href="/auth/signup" className="group btn-gradient px-8 py-4 rounded-2xl text-base font-bold text-white flex items-center gap-3 shadow-glow">
                 <Shield className="w-5 h-5" />
-                <span>Get VPN &mdash; From $4.99/mo</span>
+                <span>Get VPN &mdash; From $3.99/mo</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link href="#pricing" className="px-8 py-4 rounded-2xl text-base font-medium text-white/65 border border-white/[0.12] hover:border-white/20 transition-all flex items-center gap-3">
@@ -675,7 +675,7 @@ export default function VPNPage() {
                 className="group btn-gradient px-10 py-5 rounded-2xl text-lg font-bold text-white flex items-center gap-3 shadow-glow"
               >
                 <Shield className="w-6 h-6" />
-                <span>Get VPN &mdash; From $4.99/mo</span>
+                <span>Get VPN &mdash; From $3.99/mo</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </motion.div>

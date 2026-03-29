@@ -131,18 +131,18 @@ class MockVpnProvider implements VpnProviderAdapter {
   async getPlans(): Promise<VpnPlan[]> {
     return [
       {
-        id: "vpn-basic", name: "VPN Basic", price: 4.99, currency: "USD", period: "monthly",
+        id: "vpn-basic", name: "VPN Basic", price: 3.99, currency: "USD", period: "monthly",
         features: ["256-bit encryption", "No-logs policy", "Kill switch", "5 devices"],
         maxDevices: 5, serverLocations: 35, bandwidthGB: "unlimited",
       },
       {
-        id: "vpn-pro", name: "VPN Pro", price: 7.99, currency: "USD", period: "monthly",
+        id: "vpn-pro", name: "VPN Pro", price: 5.99, currency: "USD", period: "monthly",
         features: ["Everything in Basic", "Double VPN", "Dedicated IP option", "10 devices", "Ad blocker"],
         maxDevices: 10, serverLocations: 60, bandwidthGB: "unlimited",
       },
       {
-        id: "vpn-yearly", name: "VPN Pro Annual", price: 59.99, currency: "USD", period: "yearly",
-        features: ["Everything in Pro", "Save 37%", "Priority support"],
+        id: "vpn-yearly", name: "VPN Pro Annual", price: 47.99, currency: "USD", period: "yearly",
+        features: ["Everything in Pro", "Save 33%", "Priority support"],
         maxDevices: 10, serverLocations: 60, bandwidthGB: "unlimited",
       },
     ];
