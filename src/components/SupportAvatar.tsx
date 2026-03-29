@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Headphones, Wifi, Circle } from "lucide-react";
+import {
+  Headphones,
+  Wifi,
+  Circle,
+} from "lucide-react";
 import Image from "next/image";
 
 interface SupportAvatarProps {

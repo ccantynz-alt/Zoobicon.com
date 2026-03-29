@@ -2,7 +2,33 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Users, PieChart, LayoutGrid, Zap, Search, Plus, Phone, Mail, Calendar, MessageSquare, Star, TrendingUp, DollarSign, Clock, ChevronRight, MoreHorizontal, Sparkles, Filter, ArrowUpRight, Building2, UserPlus, Target, Activity, BarChart3, Send } from 'lucide-react';
+import {
+  Users,
+  PieChart,
+  LayoutGrid,
+  Zap,
+  Search,
+  Plus,
+  Phone,
+  Mail,
+  Calendar,
+  MessageSquare,
+  Star,
+  TrendingUp,
+  DollarSign,
+  Clock,
+  ChevronRight,
+  MoreHorizontal,
+  Sparkles,
+  Filter,
+  ArrowUpRight,
+  Building2,
+  UserPlus,
+  Target,
+  Activity,
+  BarChart3,
+  Send,
+} from 'lucide-react';
 
 interface Deal {
   id: string;

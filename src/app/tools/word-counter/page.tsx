@@ -3,8 +3,18 @@
 import { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import {
-  Zap, Type, Copy, Trash2, FileText, Clock, Mic,
-  BarChart3, Hash, ArrowRight, Sparkles, ChevronDown,
+  Zap,
+  Type,
+  Copy,
+  Trash2,
+  FileText,
+  Clock,
+  Mic,
+  BarChart3,
+  Hash,
+  ArrowRight,
+  Sparkles,
+  ChevronDown,
 } from "lucide-react";
 
 /* ── stop words excluded from frequency analysis ── */

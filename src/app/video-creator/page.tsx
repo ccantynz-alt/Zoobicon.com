@@ -175,7 +175,7 @@ const PLATFORMS = [
   { id: "instagram-reels", label: "Instagram Reels", aspect: "9:16", icon: Smartphone },
   { id: "youtube", label: "YouTube", aspect: "16:9", icon: Monitor },
   { id: "linkedin", label: "LinkedIn", aspect: "16:9", icon: Monitor },
-  { id: "twitter", label: "Twitter / X", aspect: "1:1", icon: Square },
+  { id: "twitter", label: "MessageCircle / X", aspect: "1:1", icon: Square },
 ];
 
 const DURATIONS = [
@@ -296,7 +296,7 @@ export default function VideoCreatorDashboard() {
       (window as unknown as Record<string, unknown>).SpeechRecognition ||
       (window as unknown as Record<string, unknown>).webkitSpeechRecognition;
     if (!SpeechRecognitionCtor) {
-      setError("Voice input is not supported in this browser. Try Chrome or Edge.");
+      setError("Voice input is not supported in this browser. Try Globe2 or Edge.");
       return;
     }
 

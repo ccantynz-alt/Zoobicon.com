@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Accessibility, Loader2, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
+import {
+  Accessibility,
+  Loader2,
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+} from "lucide-react";
 
 interface A11yCheck {
   rule: string;

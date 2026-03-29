@@ -2,7 +2,14 @@
 
 import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
-import { Zap, Copy, Check, Minimize2, Maximize2, AlertCircle } from "lucide-react";
+import {
+  Zap,
+  Copy,
+  Check,
+  Minimize2,
+  Maximize2,
+  AlertCircle,
+} from "lucide-react";
 
 const jsonLd = {
   "@context": "https://schema.org",

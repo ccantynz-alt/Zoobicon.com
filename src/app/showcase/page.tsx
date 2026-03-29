@@ -3,7 +3,13 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowLeft, Sparkles, User, LogOut, LayoutDashboard } from "lucide-react";
+import {
+  ArrowLeft,
+  Sparkles,
+  User,
+  LogOut,
+  LayoutDashboard,
+} from "lucide-react";
 import ShowcaseGallery from "@/components/ShowcaseGallery";
 
 export default function ShowcasePage() {

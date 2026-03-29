@@ -3,10 +3,32 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import {
-  Users, Trophy, TrendingUp, Mail, Search, Filter, Download,
-  Copy, Check, ChevronUp, ChevronDown, Share2, Award, Eye,
-  Sparkles, Palette, Settings, BarChart3, Clock, UserPlus,
-  ExternalLink, ArrowUpRight, Zap, Hash, Globe, Star
+  Users,
+  Trophy,
+  TrendingUp,
+  Mail,
+  Search,
+  Filter,
+  Download,
+  Copy,
+  Check,
+  ChevronUp,
+  ChevronDown,
+  Share2,
+  Award,
+  Eye,
+  Sparkles,
+  Palette,
+  Settings,
+  BarChart3,
+  Clock,
+  UserPlus,
+  ExternalLink,
+  ArrowUpRight,
+  Zap,
+  Hash,
+  Globe,
+  Star,
 } from 'lucide-react';
 
 function generateWaitlistEntries() {

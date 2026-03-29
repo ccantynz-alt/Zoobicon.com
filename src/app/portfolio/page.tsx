@@ -4,11 +4,39 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import NextImage from 'next/image';
 import {
-  Briefcase, Layout, Grid3X3, Layers, BookOpen, ChevronRight,
-  ArrowLeft, Plus, Eye, Edit3, Download, Trash2, ExternalLink,
-  Image, Palette, Type, User, Mail, Globe, MapPin, Github,
-  Linkedin, Twitter, Settings, Sparkles, Monitor, Tablet,
-  Smartphone, Copy, Check, Star, Calendar, Tag
+  Briefcase,
+  Layout,
+  Grid3X3,
+  Layers,
+  BookOpen,
+  ChevronRight,
+  ArrowLeft,
+  Plus,
+  Eye,
+  Edit3,
+  Download,
+  Trash2,
+  ExternalLink,
+  Image,
+  Palette,
+  Type,
+  User,
+  Mail,
+  Globe,
+  MapPin,
+  GitFork,
+  Link2,
+  MessageCircle,
+  Settings,
+  Sparkles,
+  Monitor,
+  Tablet,
+  Smartphone,
+  Copy,
+  Check,
+  Star,
+  Calendar,
+  Tag,
 } from 'lucide-react';
 
 type TabType = 'projects' | 'about' | 'preview' | 'settings';
@@ -48,7 +76,7 @@ const TEMPLATES: { id: TemplateType; name: string; description: string; icon: Re
 
 const DEMO_PROJECTS: Project[] = [
   { id: 'p1', title: 'NeuralPath Dashboard', description: 'A data-driven analytics dashboard for an AI startup. Built with React, D3.js, and a custom design system.', category: 'Web App', image: 'https://picsum.photos/seed/neural-dash/600/400', tags: ['React', 'D3.js', 'TypeScript'], year: '2026', link: 'https://neuralpath.io', featured: true },
-  { id: 'p2', title: 'Bloom Wellness Rebrand', description: 'Complete brand identity overhaul including logo, typography, color system, and marketing materials.', category: 'Branding', image: 'https://picsum.photos/seed/bloom-brand/600/400', tags: ['Branding', 'Figma', 'Print'], year: '2026', featured: true },
+  { id: 'p2', title: 'Bloom Wellness Rebrand', description: 'Complete brand identity overhaul including logo, typography, color system, and marketing materials.', category: 'Branding', image: 'https://picsum.photos/seed/bloom-brand/600/400', tags: ['Branding', 'Layers', 'Print'], year: '2026', featured: true },
   { id: 'p3', title: 'SwiftServe Mobile App', description: 'Logistics management mobile app with real-time tracking, route optimization, and driver dispatch.', category: 'Mobile', image: 'https://picsum.photos/seed/swift-mobile/600/400', tags: ['React Native', 'Maps API', 'Node.js'], year: '2025', link: 'https://swiftserve.com', featured: false },
   { id: 'p4', title: 'Atlas Financial Landing Page', description: 'High-converting landing page for a fintech startup, featuring interactive calculators and trust signals.', category: 'Website', image: 'https://picsum.photos/seed/atlas-finance/600/400', tags: ['Next.js', 'Tailwind', 'Framer Motion'], year: '2025', featured: true },
   { id: 'p5', title: 'GreenLeaf E-Commerce', description: 'Full e-commerce storefront with product filtering, cart, checkout, and order tracking.', category: 'E-Commerce', image: 'https://picsum.photos/seed/greenleaf-shop/600/400', tags: ['Shopify', 'Custom Theme', 'Liquid'], year: '2025', featured: false },
@@ -66,9 +94,9 @@ const DEMO_ABOUT: AboutInfo = {
   socials: [
     { platform: 'GitHub', url: 'github.com/alexrivera' },
     { platform: 'LinkedIn', url: 'linkedin.com/in/alexrivera' },
-    { platform: 'Twitter', url: 'twitter.com/alexrivera' },
+    { platform: 'MessageCircle', url: 'twitter.com/alexrivera' },
   ],
-  skills: ['React', 'Next.js', 'TypeScript', 'Figma', 'Tailwind CSS', 'Node.js', 'PostgreSQL', 'Brand Design', 'UI/UX', 'Motion Design'],
+  skills: ['React', 'Next.js', 'TypeScript', 'Layers', 'Tailwind CSS', 'Node.js', 'PostgreSQL', 'Brand Design', 'UI/UX', 'Motion Design'],
 };
 
 export default function PortfolioPage() {

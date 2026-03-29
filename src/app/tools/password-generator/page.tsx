@@ -3,9 +3,19 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
-  Shield, Copy, Check, RefreshCw, Sliders, Lock,
-  ChevronDown, ChevronUp, Eye, EyeOff, ShieldCheck,
-  AlertTriangle, Zap,
+  Shield,
+  Copy,
+  Check,
+  RefreshCw,
+  Sliders,
+  Lock,
+  ChevronDown,
+  ChevronUp,
+  Eye,
+  EyeOff,
+  ShieldCheck,
+  AlertTriangle,
+  Zap,
 } from "lucide-react";
 
 /* ─── Password generation (client-side, crypto-safe) ─── */

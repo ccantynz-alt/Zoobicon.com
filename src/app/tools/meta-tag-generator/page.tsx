@@ -2,7 +2,14 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { Zap, Copy, Check, AlertTriangle, Globe, Search } from "lucide-react";
+import {
+  Zap,
+  Copy,
+  Check,
+  AlertTriangle,
+  Globe,
+  Search,
+} from "lucide-react";
 
 /* ---------- JSON-LD ---------- */
 const jsonLd = {
@@ -100,9 +107,9 @@ export default function MetaTagGeneratorPage() {
     if (ogImage)
       tags.push(`<meta property="og:image" content="${escapeHtml(ogImage)}">`);
 
-    // Twitter
+    // MessageCircle
     tags.push("");
-    tags.push("<!-- Twitter -->");
+    tags.push("<!-- MessageCircle -->");
     tags.push(`<meta property="twitter:card" content="summary_large_image">`);
     if (siteUrl)
       tags.push(
@@ -330,10 +337,10 @@ export default function MetaTagGeneratorPage() {
                 />
               </div>
 
-              {/* Twitter Handle */}
+              {/* MessageCircle Handle */}
               <div>
                 <label className="block text-xs font-medium text-white/40 mb-1.5">
-                  Twitter / X Handle
+                  MessageCircle / X Handle
                 </label>
                 <input
                   type="text"

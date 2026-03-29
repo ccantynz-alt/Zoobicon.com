@@ -3,11 +3,36 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import {
-  Workflow, Play, Pause, ChevronRight, ArrowLeft, Plus,
-  Zap, Mail, Globe, Clock, Database, Webhook, GitBranch,
-  CheckCircle, XCircle, AlertCircle, Settings, Search,
-  ArrowDown, FileText, Users, ShoppingCart, Bell, Filter,
-  Sparkles, MoreVertical, Trash2, Copy, Eye, ToggleLeft
+  Workflow,
+  Play,
+  Pause,
+  ChevronRight,
+  ArrowLeft,
+  Plus,
+  Zap,
+  Mail,
+  Globe,
+  Clock,
+  Database,
+  Webhook,
+  GitBranch,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Settings,
+  Search,
+  ArrowDown,
+  FileText,
+  Users,
+  ShoppingCart,
+  Bell,
+  Filter,
+  Sparkles,
+  MoreVertical,
+  Trash2,
+  Copy,
+  Eye,
+  ToggleLeft,
 } from 'lucide-react';
 
 type TabType = 'workflows' | 'canvas' | 'templates' | 'logs';

@@ -3,7 +3,15 @@
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Zap, Eye, EyeOff, ArrowRight, CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
+import {
+  Zap,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  CheckCircle2,
+  XCircle,
+  AlertTriangle,
+} from "lucide-react";
 
 function ResetPasswordContent() {
   const searchParams = useSearchParams();

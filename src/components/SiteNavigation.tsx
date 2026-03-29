@@ -4,10 +4,30 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Zap, Globe, Video, Server, Layout, Search, ShoppingBag,
-  Users, Code, BarChart3, Mail, FileText, Palette, Bot,
-  ChevronDown, Menu, X, ArrowRight, LogOut, LayoutDashboard,
-  Rocket, Shield, BookOpen, Sparkles,
+  Zap,
+  Globe,
+  Video,
+  Server,
+  Layout,
+  Search,
+  ShoppingBag,
+  Users,
+  Code,
+  BarChart3,
+  Mail,
+  FileText,
+  Palette,
+  Bot,
+  ChevronDown,
+  Menu,
+  X,
+  ArrowRight,
+  LogOut,
+  LayoutDashboard,
+  Rocket,
+  Shield,
+  BookOpen,
+  Sparkles,
 } from "lucide-react";
 
 // ── Product categories for mega menu ──

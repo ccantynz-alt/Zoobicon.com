@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { Zap } from "lucide-react";
+import {
+  Zap,
+} from "lucide-react";
 import type { Metadata } from "next";
 import BackgroundEffects from "@/components/BackgroundEffects";
 

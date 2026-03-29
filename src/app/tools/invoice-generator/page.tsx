@@ -3,8 +3,16 @@
 import { useState, useMemo, useRef } from "react";
 import Link from "next/link";
 import {
-  FileText, Plus, Trash2, Download, ChevronDown, ChevronUp,
-  ArrowRight, Receipt, DollarSign, Calendar,
+  FileText,
+  Plus,
+  Trash2,
+  Download,
+  ChevronDown,
+  ChevronUp,
+  ArrowRight,
+  Receipt,
+  DollarSign,
+  Calendar,
 } from "lucide-react";
 
 const CURRENCIES = [

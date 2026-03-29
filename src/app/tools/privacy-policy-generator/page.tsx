@@ -3,9 +3,23 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import {
-  Shield, Copy, Download, Check, ChevronDown, ChevronUp,
-  Globe, Mail, Lock, Eye, Cookie, MapPin, CreditCard,
-  User, BarChart3, ArrowRight, FileText,
+  Shield,
+  Copy,
+  Download,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  Globe,
+  Mail,
+  Lock,
+  Eye,
+  Cookie,
+  MapPin,
+  CreditCard,
+  User,
+  BarChart3,
+  ArrowRight,
+  FileText,
 } from "lucide-react";
 
 const DATA_OPTIONS = [

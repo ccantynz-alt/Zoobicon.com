@@ -6,9 +6,25 @@ import { motion } from "framer-motion";
 import BackgroundEffects from "@/components/BackgroundEffects";
 import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
-  Zap, Globe, ArrowRight, Shield, Check, Minus, ChevronDown,
-  Smartphone, Wifi, Signal, Clock, CreditCard, MapPin,
-  Plane, QrCode, Sparkles, ChevronRight, LayoutDashboard, LogOut,
+  Zap,
+  Globe,
+  ArrowRight,
+  Shield,
+  Check,
+  Minus,
+  ChevronDown,
+  Smartphone,
+  Wifi,
+  Signal,
+  Clock,
+  CreditCard,
+  MapPin,
+  Plane,
+  QrCode,
+  Sparkles,
+  ChevronRight,
+  LayoutDashboard,
+  LogOut,
 } from "lucide-react";
 
 const fadeInUp = {

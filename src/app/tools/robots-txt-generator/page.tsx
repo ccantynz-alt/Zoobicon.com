@@ -3,8 +3,17 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import {
-  Bot, Copy, Download, Check, ChevronDown, ChevronUp,
-  Plus, Trash2, ArrowRight, FileCode, Zap,
+  Bot,
+  Copy,
+  Download,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  Plus,
+  Trash2,
+  ArrowRight,
+  FileCode,
+  Zap,
 } from "lucide-react";
 
 const BOTS = [
@@ -23,7 +32,7 @@ const BOTS = [
   { id: "Bytespider", label: "Bytespider", desc: "ByteDance / TikTok" },
   { id: "Applebot", label: "Applebot", desc: "Apple / Siri" },
   { id: "facebookexternalhit", label: "facebookexternalhit", desc: "Facebook" },
-  { id: "Twitterbot", label: "Twitterbot", desc: "X / Twitter" },
+  { id: "Twitterbot", label: "Twitterbot", desc: "X / MessageCircle" },
 ];
 
 interface PathRule {

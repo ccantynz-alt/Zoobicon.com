@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowRight, Check, Quote, Star, TrendingUp } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  Quote,
+  Star,
+  TrendingUp,
+} from "lucide-react";
 import { getIndustry, getAllIndustrySlugs, type IndustryData } from "@/lib/industry-seo";
 
 interface Props {

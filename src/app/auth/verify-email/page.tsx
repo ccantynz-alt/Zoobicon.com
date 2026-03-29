@@ -3,7 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Mail, RefreshCw, CheckCircle, AlertCircle } from "lucide-react";
+import {
+  Mail,
+  RefreshCw,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
 
 export default function VerifyEmailPage() {
   const searchParams = useSearchParams();

@@ -3,10 +3,30 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
-  Sparkles, Search, Check, X, Loader2, Globe, ArrowRight,
-  Zap, ChevronDown, ShoppingCart, RefreshCw, Copy,
-  Briefcase, Coffee, Scissors, Code2, Heart, Truck,
-  Palette, Camera, Dumbbell, Scale, GraduationCap, UtensilsCrossed,
+  Sparkles,
+  Search,
+  Check,
+  X,
+  Loader2,
+  Globe,
+  ArrowRight,
+  Zap,
+  ChevronDown,
+  ShoppingCart,
+  RefreshCw,
+  Copy,
+  Briefcase,
+  Coffee,
+  Scissors,
+  Code2,
+  Heart,
+  Truck,
+  Palette,
+  Camera,
+  Dumbbell,
+  Scale,
+  GraduationCap,
+  UtensilsCrossed,
 } from "lucide-react";
 
 const INDUSTRIES = [

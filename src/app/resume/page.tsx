@@ -3,10 +3,29 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import {
-  FileText, Download, Sparkles, Eye, Edit3, CheckCircle2,
-  Briefcase, GraduationCap, User, Mail, Phone, MapPin,
-  Star, ChevronRight, Wand2, Target, Award, Zap,
-  Layout, Palette, Type, Layers, Crown
+  FileText,
+  Download,
+  Sparkles,
+  Eye,
+  Edit3,
+  CheckCircle2,
+  Briefcase,
+  GraduationCap,
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Star,
+  ChevronRight,
+  Wand2,
+  Target,
+  Award,
+  Zap,
+  Layout,
+  Palette,
+  Type,
+  Layers,
+  Crown,
 } from 'lucide-react';
 
 const TEMPLATES = [
@@ -40,7 +59,7 @@ const DEMO_RESUME = {
     { school: 'Stanford University', degree: 'MBA, Technology Management', year: '2018' },
     { school: 'UC Berkeley', degree: 'BS, Computer Science', year: '2015' },
   ],
-  skills: ['Product Strategy', 'Agile/Scrum', 'SQL & Analytics', 'User Research', 'A/B Testing', 'Roadmap Planning', 'Stakeholder Management', 'Figma', 'Jira', 'Python'],
+  skills: ['Product Strategy', 'Agile/Scrum', 'SQL & Analytics', 'User Research', 'A/B Testing', 'Roadmap Planning', 'Stakeholder Management', 'Layers', 'Jira', 'Python'],
 };
 
 export default function ResumePage() {

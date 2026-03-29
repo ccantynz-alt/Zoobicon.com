@@ -2,7 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Zap, ArrowUpRight } from "lucide-react";
+import {
+  Zap,
+  ArrowUpRight,
+} from "lucide-react";
 import Link from "next/link";
 
 interface QuotaBarProps {

@@ -2,7 +2,33 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { LinkIcon, Plus, Trash2, GripVertical, Eye, Palette, Share2, BarChart3, Sparkles, Instagram, Twitter, Youtube, Music, Globe, Mail, Phone, ExternalLink, ArrowUp, ArrowDown, Image, QrCode, DollarSign, Copy, Check, Smartphone } from 'lucide-react';
+import {
+  LinkIcon,
+  Plus,
+  Trash2,
+  GripVertical,
+  Eye,
+  Palette,
+  Share2,
+  BarChart3,
+  Sparkles,
+  Instagram,
+  MessageCircle,
+  Youtube,
+  Music,
+  Globe,
+  Mail,
+  Phone,
+  ExternalLink,
+  ArrowUp,
+  ArrowDown,
+  Image,
+  QrCode,
+  DollarSign,
+  Copy,
+  Check,
+  Smartphone,
+} from 'lucide-react';
 
 const THEMES = [
   { id: 'dark', name: 'Dark', bg: 'bg-gray-950', text: 'text-white', card: 'bg-white/10' },

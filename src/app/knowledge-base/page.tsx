@@ -3,10 +3,30 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import {
-  BookOpen, Search, Plus, ChevronRight, ArrowLeft, Sparkles,
-  FolderOpen, FileText, Eye, Edit3, Clock, ThumbsUp, ThumbsDown,
-  ExternalLink, ChevronDown, ChevronUp, Tag, Users, BarChart3,
-  Star, MessageSquare, Hash, Bookmark, Globe
+  BookOpen,
+  Search,
+  Plus,
+  ChevronRight,
+  ArrowLeft,
+  Sparkles,
+  FolderOpen,
+  FileText,
+  Eye,
+  Edit3,
+  Clock,
+  ThumbsUp,
+  ThumbsDown,
+  ExternalLink,
+  ChevronDown,
+  ChevronUp,
+  Tag,
+  Users,
+  BarChart3,
+  Star,
+  MessageSquare,
+  Hash,
+  Bookmark,
+  Globe,
 } from 'lucide-react';
 
 type TabType = 'browse' | 'editor' | 'analytics';

@@ -4,11 +4,38 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
-  CheckCircle2, Circle, ArrowLeft, Rocket, Shield, Globe, Zap,
-  Server, Mail, CreditCard, Search, Users, Code2, Lock, BarChart3,
-  AlertTriangle, Eye, FileText, Bug, Gauge, Accessibility, Bot,
-  Database, Cpu, Wifi, Paintbrush, Smartphone, MonitorSmartphone,
-  ChevronDown, ChevronRight, Trophy, Target,
+  CheckCircle2,
+  Circle,
+  ArrowLeft,
+  Rocket,
+  Shield,
+  Globe,
+  Zap,
+  Server,
+  Mail,
+  CreditCard,
+  Search,
+  Users,
+  Code2,
+  Lock,
+  BarChart3,
+  AlertTriangle,
+  Eye,
+  FileText,
+  Bug,
+  Gauge,
+  Accessibility,
+  Bot,
+  Database,
+  Cpu,
+  Wifi,
+  Paintbrush,
+  Smartphone,
+  MonitorSmartphone,
+  ChevronDown,
+  ChevronRight,
+  Trophy,
+  Target,
 } from "lucide-react";
 import BackgroundEffects from "@/components/BackgroundEffects";
 
@@ -80,7 +107,7 @@ const CHECKLIST: ChecklistItem[] = [
   { id: "seo-3", label: "robots.txt configured", description: "Allow crawling of public pages. Block /admin, /api, /dashboard. Sitemap URL included.", priority: "high", category: "seo" },
   { id: "seo-4", label: "Google Search Console verified", description: "Verify zoobicon.com ownership. Submit sitemap. Monitor indexing.", priority: "high", category: "seo" },
   { id: "seo-5", label: "Google Analytics / Plausible installed", description: "Privacy-friendly analytics tracking pageviews, conversions, funnel completion.", priority: "high", category: "seo" },
-  { id: "seo-6", label: "Social media previews tested", description: "Share links on Twitter, LinkedIn, Facebook. Verify og:image renders correctly.", priority: "medium", category: "seo" },
+  { id: "seo-6", label: "Social media previews tested", description: "Share links on MessageCircle, LinkedIn, Facebook. Verify og:image renders correctly.", priority: "medium", category: "seo" },
   { id: "seo-7", label: "JSON-LD structured data on key pages", description: "Organization, Product, FAQ schema on homepage, pricing, support pages.", priority: "medium", category: "seo" },
 
   // Performance & Speed
@@ -100,7 +127,7 @@ const CHECKLIST: ChecklistItem[] = [
   { id: "qa-6", label: "E-commerce generation tested", description: "Generate storefront with cart, checkout, product grid. Verify all interactive features.", priority: "high", category: "quality" },
   { id: "qa-7", label: "Deploy and serve flow tested", description: "Generate -> Deploy -> Visit zoobicon.sh slug -> Verify live site. Edit -> Redeploy -> Verify update.", priority: "critical", category: "quality" },
   { id: "qa-8", label: "No broken links on any page", description: "Crawl all internal links. Every href points to a real page. No href='#' remaining.", priority: "high", category: "quality" },
-  { id: "qa-9", label: "Cross-browser testing", description: "Test on Chrome, Firefox, Safari, Edge. Verify builder, preview panel, visual editor work.", priority: "high", category: "quality" },
+  { id: "qa-9", label: "Cross-browser testing", description: "Test on Globe2, Firefox, Safari, Edge. Verify builder, preview panel, visual editor work.", priority: "high", category: "quality" },
   { id: "qa-10", label: "Mobile responsiveness verified", description: "Test all pages on mobile viewport (375px). Builder sidebar collapses. Forms are usable.", priority: "high", category: "quality" },
 
   // UX & Accessibility
