@@ -283,7 +283,7 @@ export default function VPNPage() {
                 {user.name || "Dashboard"}
               </Link>
             ) : (
-              <Link href="/auth/signin" className="text-sm text-white/65 hover:text-white transition-colors">
+              <Link href="/auth/login" className="text-sm text-white/65 hover:text-white transition-colors">
                 Sign in
               </Link>
             )}

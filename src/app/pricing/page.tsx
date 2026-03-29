@@ -154,13 +154,11 @@ const PRODUCTS = [
 
 // Features that are not yet fully built — show a subtle "Soon" badge
 // NOTE: Only mark features here that genuinely DON'T work yet.
-// Built features: SEO Agent (/seo), Video Creator (/video-creator), Email Support (/email-support),
-// Custom domains (/domains), Agency platform (/agencies)
+// Built: SEO Agent, Video Creator, Email Support, Custom domains, Agency platform,
+// AI Brand Kit (/brand-kit), A/B Testing (/ab-testing), Booking (/products/booking)
 const SOON_FEATURES = new Set([
   // Pro tier
-  "AI Brand Kit",
   "Chatbot Builder",
-  "A/B Testing & Analytics",
   // Agency tier
   "Template marketplace access",
   // Enterprise tier

@@ -19,6 +19,9 @@ import {
   Menu,
   X,
   Zap,
+  Smartphone,
+  Wifi,
+  Calendar,
 } from "lucide-react";
 
 const SIDEBAR_SECTIONS = [
@@ -26,6 +29,7 @@ const SIDEBAR_SECTIONS = [
     label: "OVERVIEW",
     items: [
       { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+      { name: "Mobile", href: "/admin/mobile", icon: Smartphone },
       { name: "Operations", href: "/admin/operations", icon: Activity },
     ],
   },
@@ -35,6 +39,13 @@ const SIDEBAR_SECTIONS = [
       { name: "Health", href: "/admin/health", icon: Heart },
       { name: "Market Intel", href: "/admin/market-intel", icon: Globe },
       { name: "Competitive Intel", href: "/admin/intel", icon: Shield },
+    ],
+  },
+  {
+    label: "PRODUCTS",
+    items: [
+      { name: "eSIM", href: "/admin/esim", icon: Wifi },
+      { name: "Booking", href: "/admin/booking", icon: Calendar },
     ],
   },
   {
@@ -54,6 +65,7 @@ const SIDEBAR_SECTIONS = [
   {
     label: "EMAIL",
     items: [
+      { name: "Email Dashboard", href: "/admin/email", icon: Mail },
       { name: "Email Settings", href: "/admin/email-settings", icon: Mail },
       { name: "Mailboxes", href: "/admin/mailboxes", icon: Inbox },
     ],
