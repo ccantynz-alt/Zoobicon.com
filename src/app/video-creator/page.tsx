@@ -9,6 +9,7 @@ import BackgroundEffects from "@/components/BackgroundEffects";
 import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import SocialPublishPanel from "@/components/SocialPublishPanel";
 import VideoSeriesPanel from "@/components/VideoSeriesPanel";
+import BatchVideosPanel from "@/components/BatchVideosPanel";
 import type { VideoSeriesEpisode } from "@/lib/video-social-publish";
 import {
   Video,
@@ -60,7 +61,10 @@ import {
   CheckCircle2,
   CircleDashed,
   RefreshCw,
+  Globe,
 } from "lucide-react";
+import { SUPPORTED_LANGUAGES } from "@/lib/video-translate";
+import type { TranslationResult, SupportedLanguage } from "@/lib/video-translate";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                             */
@@ -399,6 +403,13 @@ export default function VideoCreatorDashboard() {
   const [heygenAvatars, setHeygenAvatars] = useState<{ id: string; name: string; gender: string; style: string; description: string }[]>([]);
   const [heygenVoices, setHeygenVoices] = useState<{ voice_id: string; name: string; gender: string }[]>([]);
 
+  // Video Translation state
+  const [showTranslate, setShowTranslate] = useState(false);
+  const [selectedTranslateLangs, setSelectedTranslateLangs] = useState<Set<string>>(new Set());
+  const [translationResults, setTranslationResults] = useState<TranslationResult[]>([]);
+  const [translating, setTranslating] = useState(false);
+  const [translateError, setTranslateError] = useState("");
+
   // Auth check + addon/plan check
   useEffect(() => {
     try {
@@ -612,6 +623,92 @@ export default function VideoCreatorDashboard() {
       if (data.voices) setHeygenVoices(data.voices);
     } catch { /* ignore */ }
   }, [heygenVoices.length]);
+
+  // --- Video Translation Handlers ---
+  const toggleTranslateLang = useCallback((code: string) => {
+    setSelectedTranslateLangs((prev) => {
+      const next = new Set(prev);
+      if (next.has(code)) next.delete(code);
+      else next.add(code);
+      return next;
+    });
+  }, []);
+
+  const handleTranslate = useCallback(async () => {
+    if (!spokespersonVideoUrl) return;
+    if (selectedTranslateLangs.size === 0) {
+      setTranslateError("Select at least one language.");
+      return;
+    }
+    setTranslating(true);
+    setTranslateError("");
+    setTranslationResults([]);
+
+    try {
+      const res = await fetch("/api/video-creator/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          videoUrl: spokespersonVideoUrl,
+          targetLanguages: Array.from(selectedTranslateLangs),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setTranslateError(data.error || "Translation failed.");
+        setTranslating(false);
+        return;
+      }
+      setTranslationResults(data.results || []);
+
+      // Poll for completion on processing translations
+      const processing = (data.results || []).filter(
+        (r: TranslationResult) => r.status === "processing" && r.translationId,
+      );
+      if (processing.length > 0) {
+        const pollInterval = setInterval(async () => {
+          let allDone = true;
+          const updated = [...(data.results as TranslationResult[])];
+          for (let i = 0; i < updated.length; i++) {
+            const r = updated[i];
+            if (r.status === "processing" && r.translationId) {
+              try {
+                const statusRes = await fetch(
+                  `/api/video-creator/translate?action=status&translationId=${r.translationId}`,
+                );
+                const statusData = await statusRes.json();
+                if (statusData.status === "completed") {
+                  updated[i] = { ...r, status: "completed", videoUrl: statusData.videoUrl };
+                } else if (statusData.status === "failed") {
+                  updated[i] = { ...r, status: "failed", error: statusData.error || "Translation failed" };
+                } else {
+                  allDone = false;
+                }
+              } catch {
+                allDone = false;
+              }
+            }
+          }
+          setTranslationResults([...updated]);
+          if (allDone) {
+            clearInterval(pollInterval);
+            setTranslating(false);
+          }
+        }, 15000); // Poll every 15 seconds
+
+        // Timeout after 10 minutes
+        setTimeout(() => {
+          clearInterval(pollInterval);
+          setTranslating(false);
+        }, 600000);
+      } else {
+        setTranslating(false);
+      }
+    } catch {
+      setTranslateError("Failed to start translation. Please try again.");
+      setTranslating(false);
+    }
+  }, [spokespersonVideoUrl, selectedTranslateLangs]);
 
   const saveProject = useCallback((sb: Storyboard) => {
     const project: Project = {
@@ -1511,6 +1608,16 @@ export default function VideoCreatorDashboard() {
                 currentStyle={style}
               />
 
+              {/* Batch Personalized Videos Panel */}
+              <BatchVideosPanel
+                currentScript={script}
+                avatarId={spokespersonAvatarId}
+                voiceId={spokespersonVoiceId}
+                format={spokespersonFormat}
+                email={user?.email}
+                plan={user?.plan}
+              />
+
               {/* Script Input */}
               <motion.div initial="hidden" animate="visible" variants={fadeIn} className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -1863,6 +1970,186 @@ export default function VideoCreatorDashboard() {
                   )}
                 </AnimatePresence>
               </motion.div>
+
+              {/* ── Multi-Language Translation ── */}
+              {spokespersonVideoUrl && (
+                <motion.div initial="hidden" animate="visible" variants={fadeIn} className="space-y-2">
+                  <button
+                    onClick={() => setShowTranslate(!showTranslate)}
+                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10 transition-all text-left"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+                        <Globe className="w-3.5 h-3.5 text-white" />
+                      </div>
+                      <div>
+                        <span className="text-xs font-semibold text-white">Translate Video</span>
+                        <span className="text-[10px] text-emerald-300/60 block">Lip-synced translations in 20 languages</span>
+                      </div>
+                    </div>
+                    <ChevronDown className={`w-4 h-4 text-white/40 transition-transform ${showTranslate ? "rotate-180" : ""}`} />
+                  </button>
+
+                  <AnimatePresence>
+                    {showTranslate && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="border border-emerald-500/10 rounded-xl bg-emerald-500/[0.03] p-3 space-y-3">
+                          {/* Language grid */}
+                          <div>
+                            <label className="text-[10px] font-semibold text-white/60 uppercase tracking-wider mb-1.5 block">
+                              Select Languages ({selectedTranslateLangs.size} selected)
+                            </label>
+                            <div className="grid grid-cols-2 gap-1.5 max-h-[220px] overflow-y-auto pr-1">
+                              {SUPPORTED_LANGUAGES.filter((l: SupportedLanguage) => l.code !== "en").map((lang: SupportedLanguage) => (
+                                <button
+                                  key={lang.code}
+                                  onClick={() => toggleTranslateLang(lang.code)}
+                                  disabled={translating}
+                                  className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg border text-left transition-all text-[11px] ${
+                                    selectedTranslateLangs.has(lang.code)
+                                      ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-300"
+                                      : "border-white/[0.06] bg-white/[0.02] text-white/60 hover:text-white/80 hover:bg-white/[0.05]"
+                                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                                >
+                                  <span className="text-sm">{lang.flag}</span>
+                                  <span className="truncate">{lang.name}</span>
+                                  {selectedTranslateLangs.has(lang.code) && (
+                                    <Check className="w-3 h-3 ml-auto flex-shrink-0 text-emerald-400" />
+                                  )}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Quick select buttons */}
+                          <div className="flex flex-wrap gap-1.5">
+                            <button
+                              onClick={() => setSelectedTranslateLangs(new Set(["es", "fr", "de", "pt", "it"]))}
+                              disabled={translating}
+                              className="text-[10px] px-2 py-1 rounded-md border border-white/[0.08] bg-white/[0.03] text-white/50 hover:text-white/80 hover:bg-white/[0.06] transition-all disabled:opacity-50"
+                            >
+                              European (5)
+                            </button>
+                            <button
+                              onClick={() => setSelectedTranslateLangs(new Set(["ja", "ko", "zh", "th", "vi", "id", "ms"]))}
+                              disabled={translating}
+                              className="text-[10px] px-2 py-1 rounded-md border border-white/[0.08] bg-white/[0.03] text-white/50 hover:text-white/80 hover:bg-white/[0.06] transition-all disabled:opacity-50"
+                            >
+                              Asian (7)
+                            </button>
+                            <button
+                              onClick={() => {
+                                const all = SUPPORTED_LANGUAGES.filter((l: SupportedLanguage) => l.code !== "en").map((l: SupportedLanguage) => l.code);
+                                setSelectedTranslateLangs(new Set(all));
+                              }}
+                              disabled={translating}
+                              className="text-[10px] px-2 py-1 rounded-md border border-white/[0.08] bg-white/[0.03] text-white/50 hover:text-white/80 hover:bg-white/[0.06] transition-all disabled:opacity-50"
+                            >
+                              All (19)
+                            </button>
+                            {selectedTranslateLangs.size > 0 && (
+                              <button
+                                onClick={() => setSelectedTranslateLangs(new Set())}
+                                disabled={translating}
+                                className="text-[10px] px-2 py-1 rounded-md border border-white/[0.08] bg-white/[0.03] text-white/50 hover:text-white/80 hover:bg-white/[0.06] transition-all disabled:opacity-50"
+                              >
+                                Clear
+                              </button>
+                            )}
+                          </div>
+
+                          {/* Translate button */}
+                          <button
+                            onClick={handleTranslate}
+                            disabled={translating || selectedTranslateLangs.size === 0}
+                            className="w-full py-2.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+                          >
+                            {translating ? (
+                              <>
+                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                Translating ({translationResults.filter((r) => r.status === "completed").length}/{translationResults.length})...
+                              </>
+                            ) : (
+                              <>
+                                <Globe className="w-3.5 h-3.5" />
+                                Translate to {selectedTranslateLangs.size} Language{selectedTranslateLangs.size !== 1 ? "s" : ""}
+                              </>
+                            )}
+                          </button>
+
+                          {/* Error */}
+                          {translateError && (
+                            <div className="text-[10px] text-red-400 bg-red-500/10 border border-red-500/15 rounded-lg px-2.5 py-2">
+                              {translateError}
+                            </div>
+                          )}
+
+                          {/* Translation results */}
+                          {translationResults.length > 0 && (
+                            <div className="space-y-1.5">
+                              <label className="text-[10px] font-semibold text-white/60 uppercase tracking-wider">
+                                Translations
+                              </label>
+                              {translationResults.map((result) => (
+                                <div
+                                  key={result.language}
+                                  className="flex items-center justify-between px-2.5 py-2 rounded-lg border border-white/[0.06] bg-white/[0.02]"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm">
+                                      {SUPPORTED_LANGUAGES.find((l: SupportedLanguage) => l.code === result.language)?.flag || ""}
+                                    </span>
+                                    <span className="text-[11px] text-white/80">{result.languageName}</span>
+                                  </div>
+                                  <div className="flex items-center gap-1.5">
+                                    {result.status === "processing" && (
+                                      <span className="flex items-center gap-1 text-[10px] text-amber-400">
+                                        <Loader2 className="w-3 h-3 animate-spin" /> Processing
+                                      </span>
+                                    )}
+                                    {result.status === "completed" && result.videoUrl && (
+                                      <a
+                                        href={result.videoUrl}
+                                        download
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-1 text-[10px] text-emerald-400 hover:text-emerald-300 transition-colors"
+                                      >
+                                        <Check className="w-3 h-3" /> Download
+                                      </a>
+                                    )}
+                                    {result.status === "completed" && !result.videoUrl && (
+                                      <span className="flex items-center gap-1 text-[10px] text-emerald-400">
+                                        <Check className="w-3 h-3" /> Done
+                                      </span>
+                                    )}
+                                    {result.status === "failed" && (
+                                      <span className="text-[10px] text-red-400" title={result.error || "Failed"}>
+                                        Failed
+                                      </span>
+                                    )}
+                                    {result.status === "pending" && (
+                                      <span className="text-[10px] text-white/40">
+                                        <CircleDashed className="w-3 h-3" />
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              )}
 
               {/* Generate Button */}
               <motion.div initial="hidden" animate="visible" variants={fadeIn}>

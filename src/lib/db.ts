@@ -505,6 +505,31 @@ export async function initSchema() {
   await sql`CREATE INDEX IF NOT EXISTS support_sessions_user_email_idx ON support_sessions (user_email)`;
   await sql`CREATE INDEX IF NOT EXISTS support_sessions_status_idx ON support_sessions (status)`;
 
+  // ---- Video batch generation (personalized videos) ----
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS video_batches (
+      id              TEXT PRIMARY KEY,
+      email           TEXT,
+      plan            TEXT,
+      script_template TEXT NOT NULL,
+      avatar_id       TEXT NOT NULL,
+      voice_id        TEXT,
+      format          TEXT NOT NULL DEFAULT '16:9',
+      variables       JSONB NOT NULL DEFAULT '[]',
+      total           INTEGER NOT NULL DEFAULT 0,
+      completed       INTEGER NOT NULL DEFAULT 0,
+      failed          INTEGER NOT NULL DEFAULT 0,
+      status          TEXT NOT NULL DEFAULT 'processing',
+      videos          JSONB NOT NULL DEFAULT '[]',
+      created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS video_batches_email_idx ON video_batches (email)`;
+  await sql`CREATE INDEX IF NOT EXISTS video_batches_status_idx ON video_batches (status)`;
+
   // ---- Usage tracking for monthly quotas ----
 
   await sql`
