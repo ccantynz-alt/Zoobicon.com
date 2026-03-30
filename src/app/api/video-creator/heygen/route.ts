@@ -121,11 +121,34 @@ export async function GET(req: NextRequest) {
       return Response.json({ voices });
     }
 
-    // Default: return availability + presets
-    return Response.json({
-      available: true,
-      presets: AVATAR_PRESETS,
-    });
+    // Default: return availability + real avatars from API (not just hardcoded presets)
+    try {
+      const [avatars, voices] = await Promise.all([listAvatars(), listVoices()]);
+      // Build presets from REAL API data — first 12 avatars with preview images
+      const realPresets = avatars
+        .filter((a) => a.preview_image_url)
+        .slice(0, 12)
+        .map((a) => ({
+          id: a.avatar_id,
+          name: a.avatar_name,
+          gender: a.gender,
+          style: "professional",
+          description: a.avatar_name,
+          preview_image_url: a.preview_image_url,
+        }));
+      return Response.json({
+        available: true,
+        presets: realPresets.length > 0 ? realPresets : AVATAR_PRESETS,
+        voices: voices.slice(0, 20),
+        avatarCount: avatars.length,
+      });
+    } catch (err) {
+      console.error("[heygen] Failed to load real avatars, falling back to presets:", err);
+      return Response.json({
+        available: true,
+        presets: AVATAR_PRESETS,
+      });
+    }
   } catch (err) {
     console.error("[video-creator/heygen] GET Error:", err);
     return Response.json(

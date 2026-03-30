@@ -179,16 +179,17 @@ export async function generateVideo(request: HeyGenVideoRequest): Promise<string
   if (!res.ok) {
     const err = await res.text();
     console.error("[heygen] Video generation failed:", res.status, err);
+    console.error("[heygen] Request body was:", JSON.stringify({ avatarId: request.avatarId, voiceId: request.voiceId, scriptLen: request.script.length }));
     const lower = err.toLowerCase();
     if (lower.includes("insufficient") || lower.includes("credit") || lower.includes("quota"))
       throw new Error("AI spokesperson credits exhausted. Please try again later.");
     if (lower.includes("invalid") && lower.includes("avatar"))
-      throw new Error("Selected presenter is not available. Try a different one.");
+      throw new Error(`Selected presenter "${request.avatarId}" is not available. Try a different one.`);
     if (lower.includes("invalid") && lower.includes("voice"))
-      throw new Error("Selected voice is not available. Try a different one.");
+      throw new Error(`Selected voice "${request.voiceId}" is not available. Try a different one.`);
     if (res.status === 429)
       throw new Error("Too many requests. Please wait a moment and try again.");
-    throw new Error("Failed to start video generation. Please try again.");
+    throw new Error(`Video generation failed (${res.status}). Please try again.`);
   }
 
   const data = await res.json();

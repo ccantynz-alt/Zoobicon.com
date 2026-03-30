@@ -199,10 +199,10 @@ function HeroShowcase() {
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </Link>
           <Link
-            href="/generators"
+            href="/domains"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-semibold text-white/80 bg-white/[0.08] backdrop-blur-sm border border-white/[0.15] hover:bg-white/[0.14] hover:border-white/[0.25] transition-all"
           >
-            Explore 43 Generators
+            <Globe className="w-4 h-4" /> Search Domains
           </Link>
         </motion.div>
 
