@@ -1014,50 +1014,13 @@ function BuilderPage() {
     const controller = new AbortController();
     abortRef.current = controller;
 
-    // ── React App mode: instant component assembly + AI customization ──
+    // ── React App mode: server handles everything via streaming ──
     if (generationMode === "react") {
-      // Phase 1: Assemble from 100+ component registry (<1 second)
-      try {
-        const { buildFromPrompt } = await import("@/lib/component-registry");
-        const result = buildFromPrompt(prompt.trim());
-        if (result?.files && Object.keys(result.files).length > 0) {
-          setReactFiles(result.files);
-          setReactDeps({});
-          setStatus("generating");
-          setPipelineAgents([`${result.components?.length || 9} components assembled — customizing with AI...`]);
-        } else {
-          throw new Error("Registry returned empty");
-        }
-      } catch (registryErr) {
-        // Log the actual error so we can debug
-        console.error("[Builder] Component registry failed:", registryErr);
-        // Fallback 1: Premium template snapshots
-        try {
-          const { findBestTemplate } = await import("@/lib/snapshots");
-          const template = findBestTemplate(prompt.trim());
-          setReactFiles(template.files);
-          setReactDeps({});
-          setStatus("generating");
-          setPipelineAgents([`Template loaded: ${template.name} — customizing with AI...`]);
-        } catch {
-          // Fallback 2: Basic scaffolds
-          try {
-            const { classifyIndustry, getScaffoldForIndustry } = await import("@/lib/react-scaffolds");
-            const industry = classifyIndustry(prompt.trim());
-            const { files: scaffoldFiles } = getScaffoldForIndustry(industry);
-            setReactFiles(scaffoldFiles);
-            setReactDeps({});
-            setStatus("generating");
-            setPipelineAgents(["Scaffold loaded — customizing with AI..."]);
-          } catch {
-            setPipelineAgents(["Generating React components..."]);
-          }
-        }
-      }
+      setStatus("generating");
+      setPipelineAgents(["Assembling components..."]);
 
-      // Phase 2: AI customizes content via fast streaming endpoint
-      // Uses registry-assembled components — only customizes content (name, copy, colors)
-      // This is 10x faster than generating components from scratch
+      // The streaming endpoint handles BOTH registry assembly AND AI customization
+      // Server-side registry loading is reliable (no client-side import issues)
       try {
         const res = await fetch("/api/generate/react-stream", {
           method: "POST",
