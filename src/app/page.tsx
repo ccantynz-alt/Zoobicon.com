@@ -389,50 +389,52 @@ export default function LandingPage() {
       <HeroShowcase />
 
       {/* ── FOUR DOMAINS ── */}
-      <section className="py-24 md:py-32 px-4 sm:px-6">
+      <section className="py-28 md:py-36 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-base font-semibold tracking-widest uppercase text-indigo-400 mb-3">
+            <p className="text-sm font-semibold tracking-widest uppercase text-indigo-400 mb-4">
               One Platform, Four Domains
             </p>
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
               Every domain, a different superpower
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {DOMAINS.map((d) => {
               const c = DOMAIN_COLORS[d.color];
               const Icon = d.icon;
               return (
-                <div
+                <Link
                   key={d.name}
-                  className={`rounded-2xl border border-white/[0.06] bg-white/[0.03] p-6 transition-all duration-200 ${c.border}`}
+                  href={d.href}
+                  className={`group rounded-2xl border border-white/[0.06] bg-white/[0.03] p-7 transition-all duration-200 hover:bg-white/[0.06] ${c.border}`}
                 >
-                  <div className={`w-10 h-10 rounded-xl ${c.iconBg} flex items-center justify-center mb-4`}>
+                  <div className={`w-11 h-11 rounded-xl ${c.iconBg} flex items-center justify-center mb-5`}>
                     <Icon className={`w-5 h-5 ${c.text}`} />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-0.5">{d.name}</h3>
-                  <p className={`text-base ${c.text} mb-3`}>{d.role}</p>
-                  <p className="text-base text-slate-400 leading-relaxed mb-4">{d.desc}</p>
-                  <Link href={d.href} className={`text-sm font-semibold ${c.text} inline-flex items-center gap-1 hover:underline`}>
+                  <h3 className="text-xl font-bold text-white mb-1">{d.name}</h3>
+                  <p className={`text-sm font-semibold ${c.text} mb-3`}>{d.role}</p>
+                  <p className="text-[15px] text-slate-400 leading-relaxed mb-5">{d.desc}</p>
+                  <span className={`text-sm font-semibold ${c.text} inline-flex items-center gap-1 group-hover:gap-2 transition-all`}>
                     {d.cta} <ArrowRight className="w-3 h-3" />
-                  </Link>
-                </div>
+                  </span>
+                </Link>
               );
             })}
           </div>
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ── */}
-      <section className="py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.04]">
-        <div className="max-w-5xl mx-auto">
+      {/* ── HOW IT WORKS — lighter background band ── */}
+      <section className="relative py-28 md:py-36 px-4 sm:px-6">
+        <div className="absolute inset-0 bg-gradient-to-b from-indigo-950/20 via-slate-900/30 to-transparent" />
+        <div className="relative max-w-5xl mx-auto">
           <div className="text-center mb-20">
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-5">
               Describe it. We build it.
             </h2>
-            <p className="text-xl text-slate-400 max-w-lg mx-auto">
+            <p className="text-xl text-slate-300 max-w-lg mx-auto">
               Three steps. No code. No templates. No compromise.
             </p>
           </div>
@@ -440,15 +442,15 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-12">
             {STEPS.map((step, i) => (
               <div key={step.num} className="relative">
-                <div className="text-[80px] font-black text-white/[0.03] leading-none absolute -top-4 -left-2 select-none pointer-events-none">
+                <div className="text-[80px] font-black text-white/[0.04] leading-none absolute -top-4 -left-2 select-none pointer-events-none">
                   {step.num}
                 </div>
                 <div className="relative pt-6">
-                  <div className="text-sm font-bold text-indigo-400 mb-3 tracking-widest uppercase">
+                  <div className="text-xs font-bold text-indigo-400 mb-3 tracking-widest uppercase">
                     Step {step.num}
                   </div>
-                  <h3 className="text-2xl md:text-3xl font-bold mb-3 tracking-tight">{step.title}</h3>
-                  <p className="text-base text-slate-400 leading-relaxed">{step.body}</p>
+                  <h3 className="text-2xl md:text-3xl font-bold mb-4 tracking-tight">{step.title}</h3>
+                  <p className="text-[15px] text-slate-400 leading-relaxed">{step.body}</p>
                 </div>
                 {i < 2 && (
                   <div className="hidden md:block absolute top-14 -right-6 text-white/10">
@@ -461,19 +463,19 @@ export default function LandingPage() {
 
           {/* Tags */}
           <div className="mt-16 text-center">
-            <p className="text-base text-slate-500 uppercase tracking-widest mb-5">What you can build</p>
+            <p className="text-sm text-slate-500 uppercase tracking-widest mb-5">What you can build</p>
             <div className="flex flex-wrap justify-center gap-2">
               {[
                 "SaaS Landing Pages", "E-Commerce Stores", "Portfolios", "Dashboards",
                 "Restaurants", "Agency Sites", "Blogs", "Full-Stack Apps",
               ].map((tag) => (
-                <span key={tag} className="px-4 py-2 rounded-full border border-white/[0.06] text-sm text-slate-500">
+                <span key={tag} className="px-4 py-2 rounded-full border border-white/[0.08] bg-white/[0.02] text-sm text-slate-400">
                   {tag}
                 </span>
               ))}
               <Link
                 href="/generators"
-                className="px-4 py-2 rounded-full border border-indigo-500/20 text-sm text-indigo-400 hover:border-indigo-500/40 transition-colors"
+                className="px-4 py-2 rounded-full border border-indigo-500/20 bg-indigo-500/[0.04] text-sm text-indigo-400 hover:border-indigo-500/40 transition-colors"
               >
                 +35 more generators
               </Link>
@@ -483,31 +485,31 @@ export default function LandingPage() {
       </section>
 
       {/* ── FEATURES ── */}
-      <section className="py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.04]">
+      <section className="py-28 md:py-36 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-5">
               Everything you need to ship
             </h2>
-            <p className="text-xl text-slate-400 max-w-xl mx-auto">
+            <p className="text-xl text-slate-300 max-w-xl mx-auto">
               Not just a website builder. A complete platform for building, launching,
               and growing your online presence.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {FEATURES.map((f) => {
               const Icon = f.icon;
               return (
                 <div
                   key={f.title}
-                  className="rounded-2xl border border-white/[0.06] bg-white/[0.03] p-8 hover:bg-white/[0.05] transition-colors"
+                  className="rounded-2xl border border-white/[0.06] bg-white/[0.03] p-8 hover:bg-white/[0.06] hover:border-white/[0.10] transition-all"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center mb-5">
+                  <div className="w-11 h-11 rounded-xl bg-indigo-500/10 flex items-center justify-center mb-5">
                     <Icon className="w-5 h-5 text-indigo-400" />
                   </div>
-                  <h3 className="text-xl font-bold mb-2">{f.title}</h3>
-                  <p className="text-base text-slate-400 leading-relaxed">{f.body}</p>
+                  <h3 className="text-xl font-bold mb-3">{f.title}</h3>
+                  <p className="text-[15px] text-slate-400 leading-relaxed">{f.body}</p>
                 </div>
               );
             })}
@@ -515,19 +517,104 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── VALUE PROPOSITION ── */}
-      <section className="py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.04]">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-base font-semibold tracking-widest uppercase text-indigo-400 mb-3">
+      {/* ── FREE TOOLS — lighter section ── */}
+      <section className="relative py-28 md:py-36 px-4 sm:px-6">
+        <div className="absolute inset-0 bg-gradient-to-b from-emerald-950/10 via-slate-900/20 to-transparent" />
+        <div className="relative max-w-6xl mx-auto">
+          <div className="text-center mb-14">
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium mb-6">
+              <Sparkles className="w-4 h-4" /> 100% Free — No Account Required
+            </span>
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-5">
+              Free tools that actually work
+            </h2>
+            <p className="text-xl text-slate-300 max-w-xl mx-auto">
+              12 essential business and developer tools. Free forever. No strings attached.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {[
+              { name: "Business Name Generator", href: "/tools/business-name-generator", desc: "AI-powered names" },
+              { name: "Password Generator", href: "/tools/password-generator", desc: "Secure passwords" },
+              { name: "QR Code Generator", href: "/tools/qr-code-generator", desc: "Create QR codes" },
+              { name: "Meta Tag Generator", href: "/tools/meta-tag-generator", desc: "SEO meta tags" },
+              { name: "Color Palette", href: "/tools/color-palette-generator", desc: "Design palettes" },
+              { name: "Invoice Generator", href: "/tools/invoice-generator", desc: "Professional invoices" },
+              { name: "JSON Formatter", href: "/tools/json-formatter", desc: "Format & validate" },
+              { name: "Privacy Policy", href: "/tools/privacy-policy-generator", desc: "Legal templates" },
+              { name: "Robots.txt Generator", href: "/tools/robots-txt-generator", desc: "SEO crawl control" },
+              { name: "Word Counter", href: "/tools/word-counter", desc: "Count & analyze" },
+              { name: "Domain Search", href: "/domains", desc: "Real availability" },
+              { name: "Domain Finder", href: "/domain-finder", desc: "AI name ideas" },
+            ].map((tool) => (
+              <Link
+                key={tool.href}
+                href={tool.href}
+                className="group rounded-xl border border-white/[0.06] bg-white/[0.03] p-5 hover:bg-white/[0.06] hover:border-emerald-500/20 transition-all"
+              >
+                <div className="text-[15px] font-semibold text-white group-hover:text-emerald-300 transition-colors mb-1">{tool.name}</div>
+                <div className="text-sm text-slate-500">{tool.desc}</div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── PRODUCTS — what we offer ── */}
+      <section className="py-28 md:py-36 px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-14">
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-5">
+              More than a website builder
+            </h2>
+            <p className="text-xl text-slate-300 max-w-xl mx-auto">
+              eSIM, VPN, cloud storage, AI dictation, booking — everything a modern business needs.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[
+              { name: "eSIM", desc: "Travel data plans for 190+ countries. No physical SIM needed.", href: "/products/esim", color: "text-cyan-400", bg: "bg-cyan-500/10", badge: "New" },
+              { name: "VPN", desc: "Secure, private browsing with global servers. No-log policy.", href: "/products/vpn", color: "text-emerald-400", bg: "bg-emerald-500/10", badge: "New" },
+              { name: "Cloud Storage", desc: "S3-compatible storage. Upload, share, and manage files.", href: "/products/cloud-storage", color: "text-purple-400", bg: "bg-purple-500/10", badge: "New" },
+              { name: "AI Dictation", desc: "Speech-to-text powered by AI. 50+ languages supported.", href: "/products/dictation", color: "text-amber-400", bg: "bg-amber-500/10", badge: "New" },
+              { name: "Booking", desc: "Scheduling, appointments, and calendar management.", href: "/products/booking", color: "text-pink-400", bg: "bg-pink-500/10", badge: "New" },
+              { name: "Video Creator", desc: "AI spokesperson videos, storyboards, and rendering.", href: "/video-creator", color: "text-indigo-400", bg: "bg-indigo-500/10", badge: null },
+            ].map((p) => (
+              <Link
+                key={p.href}
+                href={p.href}
+                className="group rounded-2xl border border-white/[0.06] bg-white/[0.03] p-7 hover:bg-white/[0.06] hover:border-white/[0.10] transition-all"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className={`w-10 h-10 rounded-xl ${p.bg} flex items-center justify-center`}>
+                    <Globe className={`w-5 h-5 ${p.color}`} />
+                  </div>
+                  {p.badge && <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-semibold">{p.badge}</span>}
+                </div>
+                <h3 className="text-xl font-bold mb-2 group-hover:text-white transition-colors">{p.name}</h3>
+                <p className="text-[15px] text-slate-400 leading-relaxed">{p.desc}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── VALUE PROPOSITION — lighter section ── */}
+      <section className="relative py-28 md:py-36 px-4 sm:px-6">
+        <div className="absolute inset-0 bg-gradient-to-b from-purple-950/15 via-slate-900/20 to-transparent" />
+        <div className="relative max-w-4xl mx-auto text-center">
+          <p className="text-sm font-semibold tracking-widest uppercase text-indigo-400 mb-4">
             Replace your entire SaaS stack
           </p>
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-6">
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">
             75+ tools. One platform.{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-violet-400">
               $49/month.
             </span>
           </h2>
-          <p className="text-xl text-slate-400 max-w-2xl mx-auto mb-12">
+          <p className="text-xl text-slate-300 max-w-2xl mx-auto mb-12">
             Website builder, CRM, invoicing, booking, email marketing, forms, analytics,
             SEO tools, and more — replacing $923/month in separate subscriptions.
           </p>
@@ -543,8 +630,8 @@ export default function LandingPage() {
               { label: "Automation", saves: "Replaces Zapier" },
               { label: "Analytics", saves: "Replaces Hotjar" },
             ].map((t) => (
-              <div key={t.label} className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-4 text-left">
-                <div className="text-base font-semibold text-white mb-1">{t.label}</div>
+              <div key={t.label} className="rounded-xl border border-white/[0.08] bg-white/[0.04] p-5 text-left">
+                <div className="text-[15px] font-semibold text-white mb-1">{t.label}</div>
                 <div className="text-sm text-slate-500">{t.saves}</div>
               </div>
             ))}
@@ -637,33 +724,84 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── FOOTER ── */}
-      <footer className="border-t border-white/[0.04] py-20 px-4 sm:px-6">
+      {/* ── FOOTER — comprehensive, shows everything ── */}
+      <footer className="border-t border-white/[0.06] bg-[#080810] py-20 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-5 gap-10 mb-14">
-            <div className="md:col-span-2">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-x-8 gap-y-10 mb-16">
+            {/* Brand */}
+            <div className="col-span-2">
               <div className="text-3xl font-black tracking-tight mb-4">Zoobicon</div>
-              <p className="text-lg text-slate-400 max-w-xs leading-relaxed mb-6">
+              <p className="text-[15px] text-slate-400 max-w-xs leading-relaxed mb-6">
                 The AI platform for building, launching, and scaling
                 websites and web applications.
               </p>
-              <div className="flex flex-wrap gap-3">
-                <a href="https://zoobicon.com" className="px-5 py-2.5 rounded-full bg-indigo-500/20 text-indigo-300 font-semibold text-base hover:bg-indigo-500/30 transition-colors">zoobicon.com</a>
-                <a href="https://zoobicon.ai" className="px-5 py-2.5 rounded-full bg-cyan-500/20 text-cyan-300 font-semibold text-base hover:bg-cyan-500/30 transition-colors">zoobicon.ai</a>
-                <a href="https://zoobicon.io" className="px-5 py-2.5 rounded-full bg-emerald-500/20 text-emerald-300 font-semibold text-base hover:bg-emerald-500/30 transition-colors">zoobicon.io</a>
-                <a href="https://zoobicon.sh" className="px-5 py-2.5 rounded-full bg-amber-500/20 text-amber-300 font-semibold text-base hover:bg-amber-500/30 transition-colors">zoobicon.sh</a>
+              <div className="flex flex-wrap gap-2.5">
+                <a href="https://zoobicon.com" className="px-4 py-2 rounded-full bg-indigo-500/15 text-indigo-300 font-semibold text-sm hover:bg-indigo-500/25 transition-colors">zoobicon.com</a>
+                <a href="https://zoobicon.ai" className="px-4 py-2 rounded-full bg-cyan-500/15 text-cyan-300 font-semibold text-sm hover:bg-cyan-500/25 transition-colors">zoobicon.ai</a>
+                <a href="https://zoobicon.io" className="px-4 py-2 rounded-full bg-emerald-500/15 text-emerald-300 font-semibold text-sm hover:bg-emerald-500/25 transition-colors">zoobicon.io</a>
+                <a href="https://zoobicon.sh" className="px-4 py-2 rounded-full bg-amber-500/15 text-amber-300 font-semibold text-sm hover:bg-amber-500/25 transition-colors">zoobicon.sh</a>
               </div>
             </div>
+
+            {/* Products */}
             <div>
-              <div className="text-base font-semibold text-white uppercase tracking-wider mb-4">Products</div>
+              <div className="text-xs font-semibold text-white uppercase tracking-wider mb-4">Products</div>
               <ul className="space-y-2.5">
                 {[
-                  ["/products/website-builder", "Website Builder"],
+                  ["/builder", "AI Website Builder"],
+                  ["/generators", "43 Generators"],
+                  ["/video-creator", "Video Creator"],
+                  ["/domains", "Domain Search"],
+                  ["/domain-finder", "Domain Finder"],
+                  ["/products/esim", "eSIM"],
+                  ["/products/vpn", "VPN"],
+                  ["/products/cloud-storage", "Cloud Storage"],
+                  ["/products/dictation", "AI Dictation"],
+                  ["/products/booking", "Booking"],
+                ].map(([href, label]) => (
+                  <li key={href}>
+                    <Link href={href} className="text-sm text-slate-400 hover:text-slate-200 transition-colors">{label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Free Tools */}
+            <div>
+              <div className="text-xs font-semibold text-white uppercase tracking-wider mb-4">Free Tools</div>
+              <ul className="space-y-2.5">
+                {[
+                  ["/tools/business-name-generator", "Business Name Generator"],
+                  ["/tools/password-generator", "Password Generator"],
+                  ["/tools/qr-code-generator", "QR Code Generator"],
+                  ["/tools/meta-tag-generator", "Meta Tag Generator"],
+                  ["/tools/color-palette-generator", "Color Palette"],
+                  ["/tools/invoice-generator", "Invoice Generator"],
+                  ["/tools/json-formatter", "JSON Formatter"],
+                  ["/tools/privacy-policy-generator", "Privacy Policy Generator"],
+                  ["/tools/robots-txt-generator", "Robots.txt Generator"],
+                  ["/tools/word-counter", "Word Counter"],
+                ].map(([href, label]) => (
+                  <li key={href}>
+                    <Link href={href} className="text-sm text-slate-400 hover:text-slate-200 transition-colors">{label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Platform */}
+            <div>
+              <div className="text-xs font-semibold text-white uppercase tracking-wider mb-4">Platform</div>
+              <ul className="space-y-2.5">
+                {[
+                  ["/hosting", "Hosting"],
+                  ["/developers", "API Docs"],
+                  ["/agents", "AI Agents"],
+                  ["/marketplace", "Marketplace"],
+                  ["/agencies", "For Agencies"],
                   ["/products/seo-agent", "SEO Agent"],
                   ["/products/email-support", "Email Support"],
-                  ["/generators", "43 Generators"],
-                  ["/marketplace", "Marketplace"],
-                  ["/domains", "Search Domains"],
+                  ["/documentation", "Documentation"],
                 ].map(([href, label]) => (
                   <li key={href}>
                     <Link href={href} className="text-sm text-slate-400 hover:text-slate-200 transition-colors">{label}</Link>
@@ -671,32 +809,20 @@ export default function LandingPage() {
                 ))}
               </ul>
             </div>
+
+            {/* Company */}
             <div>
-              <div className="text-base font-semibold text-white uppercase tracking-wider mb-4">Platform</div>
+              <div className="text-xs font-semibold text-white uppercase tracking-wider mb-4">Company</div>
               <ul className="space-y-2.5">
                 {[
-                  ["/developers", "API Docs"],
-                  ["/cli", "CLI Tools"],
-                  ["/hosting", "Hosting"],
-                  ["/wordpress", "WordPress"],
-                ].map(([href, label]) => (
-                  <li key={href}>
-                    <Link href={href} className="text-sm text-slate-400 hover:text-slate-200 transition-colors">{label}</Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <div className="text-base font-semibold text-white uppercase tracking-wider mb-4">Company</div>
-              <ul className="space-y-2.5">
-                {[
-                  ["/agencies", "For Agencies"],
-                  ["/support", "Support"],
                   ["/pricing", "Pricing"],
-                  ["/privacy", "Privacy"],
-                  ["/terms", "Terms"],
+                  ["/compare", "Compare"],
+                  ["/support", "Support"],
+                  ["/privacy", "Privacy Policy"],
+                  ["/terms", "Terms of Service"],
                   ["/refund-policy", "Refund Policy"],
                   ["/acceptable-use", "Acceptable Use"],
+                  ["/disclaimers", "Disclaimers"],
                   ["/dmca", "DMCA"],
                 ].map(([href, label]) => (
                   <li key={href}>
@@ -706,13 +832,16 @@ export default function LandingPage() {
               </ul>
             </div>
           </div>
-          <div className="border-t border-white/[0.04] pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+
+          {/* Bottom bar */}
+          <div className="border-t border-white/[0.06] pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="text-sm text-slate-500">&copy; 2026 Zoobicon. All rights reserved.</div>
-            <div className="flex items-center gap-6">
-              <Link href="/privacy" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">Privacy</Link>
-              <Link href="/terms" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">Terms</Link>
-              <Link href="/refund-policy" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">Refunds</Link>
-              <Link href="/dmca" className="text-sm text-slate-500 hover:text-slate-300 transition-colors">DMCA</Link>
+            <div className="flex items-center gap-6 text-sm text-slate-500">
+              <Link href="/privacy" className="hover:text-slate-300 transition-colors">Privacy</Link>
+              <Link href="/terms" className="hover:text-slate-300 transition-colors">Terms</Link>
+              <Link href="/refund-policy" className="hover:text-slate-300 transition-colors">Refunds</Link>
+              <Link href="/disclaimers" className="hover:text-slate-300 transition-colors">Disclaimers</Link>
+              <Link href="/dmca" className="hover:text-slate-300 transition-colors">DMCA</Link>
             </div>
           </div>
         </div>
