@@ -17,10 +17,10 @@ import {
   CheckCircle2,
   LayoutDashboard,
   LogOut,
-  Twitter,
-  Linkedin,
-  Instagram,
-  Facebook,
+  Share2,
+  Link2,
+  Camera,
+  Users,
   MessageCircle,
   Eye,
   Heart,
@@ -55,11 +55,11 @@ interface RecentPost {
 }
 
 const PLATFORMS: Platform[] = [
-  { id: "twitter", name: "Twitter / X", icon: Twitter, color: "from-sky-500 to-blue-600", connected: true, followers: "2.4K" },
-  { id: "linkedin", name: "LinkedIn", icon: Linkedin, color: "from-blue-600 to-blue-800", connected: true, followers: "1.8K" },
-  { id: "instagram", name: "Instagram", icon: Instagram, color: "from-pink-500 to-purple-600", connected: false, followers: "0" },
+  { id: "twitter", name: "Twitter / X", icon: Share2, color: "from-sky-500 to-blue-600", connected: true, followers: "2.4K" },
+  { id: "linkedin", name: "LinkedIn", icon: Link2, color: "from-blue-600 to-blue-800", connected: true, followers: "1.8K" },
+  { id: "instagram", name: "Instagram", icon: Camera, color: "from-pink-500 to-purple-600", connected: false, followers: "0" },
   { id: "tiktok", name: "TikTok", icon: Zap, color: "from-rose-500 to-pink-600", connected: false, followers: "0" },
-  { id: "facebook", name: "Facebook", icon: Facebook, color: "from-blue-500 to-indigo-600", connected: true, followers: "890" },
+  { id: "facebook", name: "Facebook", icon: Users, color: "from-blue-500 to-indigo-600", connected: true, followers: "890" },
   { id: "reddit", name: "Reddit", icon: MessageCircle, color: "from-orange-500 to-red-600", connected: false, followers: "0" },
 ];
 
