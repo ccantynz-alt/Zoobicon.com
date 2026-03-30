@@ -20,6 +20,8 @@ import {
   Clock,
   Server,
   BadgeCheck,
+  Sparkles,
+  Wand2,
 } from "lucide-react";
 
 interface DomainResult {
@@ -28,6 +30,13 @@ interface DomainResult {
   available: boolean | null;
   price: number;
   checking: boolean;
+}
+
+interface GeneratedName {
+  name: string;
+  tagline: string;
+  domains: DomainResult[];
+  checkingDomains: boolean;
 }
 
 const TLD_PRICES: Record<string, number> = {
@@ -68,6 +77,7 @@ const COMPARISON = [
 ];
 
 export default function DomainsPage() {
+  const [mode, setMode] = useState<"search" | "generate">("search");
   const [name, setName] = useState("");
   const [selectedTlds, setSelectedTlds] = useState<Set<string>>(new Set(DEFAULT_TLDS));
   const [results, setResults] = useState<DomainResult[]>([]);
@@ -75,6 +85,13 @@ export default function DomainsPage() {
   const [cart, setCart] = useState<DomainResult[]>([]);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const resultsRef = useRef<HTMLDivElement>(null);
+
+  // AI Name Generator state
+  const [genDescription, setGenDescription] = useState("");
+  const [genStyle, setGenStyle] = useState("modern");
+  const [generatedNames, setGeneratedNames] = useState<GeneratedName[]>([]);
+  const [generating, setGenerating] = useState(false);
+  const genResultsRef = useRef<HTMLDivElement>(null);
 
   const allTlds = Object.keys(TLD_PRICES);
 
@@ -146,6 +163,108 @@ export default function DomainsPage() {
     setCart(prev => prev.filter(c => c.domain !== domain));
   };
 
+  // --- AI Name Generator ---
+  const handleGenerate = async () => {
+    if (!genDescription.trim() || genDescription.trim().length < 3) return;
+    if (selectedTlds.size === 0) return;
+
+    setGenerating(true);
+    setGeneratedNames([]);
+    setTimeout(() => genResultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
+
+    try {
+      // Step 1: Generate names via AI
+      const nameRes = await fetch("/api/tools/business-names", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          description: genDescription.trim(),
+          style: genStyle,
+          count: 20,
+        }),
+      });
+
+      if (!nameRes.ok) {
+        setGenerating(false);
+        return;
+      }
+
+      const nameData = await nameRes.json();
+      const names: Array<{ name: string; tagline: string }> = nameData.names || [];
+
+      if (names.length === 0) {
+        setGenerating(false);
+        return;
+      }
+
+      // Step 2: Initialize generated names with empty domain results
+      const tlds = Array.from(selectedTlds);
+      const initial: GeneratedName[] = names.map((n) => ({
+        name: n.name,
+        tagline: n.tagline,
+        domains: tlds.map((tld) => ({
+          domain: `${n.name.toLowerCase().replace(/[^a-z0-9-]/g, "")}.${tld}`,
+          tld,
+          available: null,
+          price: TLD_PRICES[tld] || 9.99,
+          checking: true,
+        })),
+        checkingDomains: true,
+      }));
+      setGeneratedNames(initial);
+      setGenerating(false);
+
+      // Step 3: Batch check availability for each name (3 at a time to not overwhelm API)
+      const batchSize = 3;
+      for (let i = 0; i < names.length; i += batchSize) {
+        const batch = names.slice(i, i + batchSize);
+        const checks = batch.map(async (n, batchIdx) => {
+          const cleanName = n.name.toLowerCase().replace(/[^a-z0-9-]/g, "");
+          if (cleanName.length < 2) return;
+
+          try {
+            const res = await fetch(`/api/domains/search?q=${encodeURIComponent(cleanName)}&tlds=${encodeURIComponent(tlds.join(","))}`);
+            if (res.ok) {
+              const data = await res.json();
+              const apiResults = data.results || [];
+
+              setGeneratedNames((prev) =>
+                prev.map((gn) => {
+                  if (gn.name !== n.name) return gn;
+                  return {
+                    ...gn,
+                    checkingDomains: false,
+                    domains: tlds.map((tld) => {
+                      const match = apiResults.find((r: { domain: string }) => r.domain === `${cleanName}.${tld}`);
+                      return {
+                        domain: `${cleanName}.${tld}`,
+                        tld,
+                        available: match ? match.available : null,
+                        price: match?.price || TLD_PRICES[tld] || 9.99,
+                        checking: false,
+                      };
+                    }),
+                  };
+                })
+              );
+            } else {
+              setGeneratedNames((prev) =>
+                prev.map((gn) => gn.name === n.name ? { ...gn, checkingDomains: false, domains: gn.domains.map((d) => ({ ...d, checking: false })) } : gn)
+              );
+            }
+          } catch {
+            setGeneratedNames((prev) =>
+              prev.map((gn) => gn.name === n.name ? { ...gn, checkingDomains: false, domains: gn.domains.map((d) => ({ ...d, checking: false })) } : gn)
+            );
+          }
+        });
+        await Promise.all(checks);
+      }
+    } catch {
+      setGenerating(false);
+    }
+  };
+
   const availableResults = results.filter(r => r.available === true);
   const takenResults = results.filter(r => r.available === false);
   const unknownResults = results.filter(r => r.available === null && !r.checking);
@@ -185,65 +304,166 @@ export default function DomainsPage() {
             Domains from <span className="text-white font-bold">$2.99/year</span> &middot; .com from <span className="text-white font-bold">$12.99/year</span> &middot; .ai from <span className="text-white font-bold">$79.99/year</span>
           </p>
 
-          {/* ── THE SEARCH BOX — big, bright, inviting ── */}
-          <div className="bg-white/[0.06] backdrop-blur-sm border border-white/[0.10] rounded-3xl p-6 md:p-8 text-left max-w-3xl mx-auto shadow-2xl shadow-indigo-500/[0.05]">
-            <div className="flex flex-col sm:flex-row gap-3 mb-5">
-              <div className="flex-1 relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value.replace(/\s/g, ""))}
-                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                  placeholder="Type your domain name..."
-                  className="w-full pl-12 pr-5 py-4 bg-white/[0.06] border border-white/[0.10] rounded-2xl text-white text-lg placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
-                  autoFocus
-                />
-              </div>
-              <button
-                onClick={handleSearch}
-                disabled={searching || !name.trim() || selectedTlds.size === 0}
-                className="px-8 py-4 bg-indigo-600 hover:bg-indigo-500 rounded-2xl font-bold text-lg flex items-center justify-center gap-2 disabled:opacity-40 transition-all hover:shadow-lg hover:shadow-indigo-500/25 shrink-0"
-              >
-                {searching ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
-                Search
-              </button>
-            </div>
+          {/* ── TABS: Search / Generate ── */}
+          <div className="flex items-center justify-center gap-2 mb-6">
+            <button
+              onClick={() => setMode("search")}
+              className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all ${
+                mode === "search"
+                  ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20"
+                  : "bg-white/[0.06] text-slate-400 hover:text-white border border-white/[0.08]"
+              }`}
+            >
+              <Search className="w-4 h-4" /> Search Exact Name
+            </button>
+            <button
+              onClick={() => setMode("generate")}
+              className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all ${
+                mode === "generate"
+                  ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/20"
+                  : "bg-white/[0.06] text-slate-400 hover:text-white border border-white/[0.08]"
+              }`}
+            >
+              <Wand2 className="w-4 h-4" /> AI Name Generator
+            </button>
+          </div>
 
-            {/* Extension pills */}
-            <div className="flex flex-wrap gap-2">
-              {allTlds.map(tld => (
+          {/* ── SEARCH MODE ── */}
+          {mode === "search" && (
+            <div className="bg-white/[0.06] backdrop-blur-sm border border-white/[0.10] rounded-3xl p-6 md:p-8 text-left max-w-3xl mx-auto shadow-2xl shadow-indigo-500/[0.05]">
+              <div className="flex flex-col sm:flex-row gap-3 mb-5">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value.replace(/\s/g, ""))}
+                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    placeholder="Type your domain name..."
+                    className="w-full pl-12 pr-5 py-4 bg-white/[0.06] border border-white/[0.10] rounded-2xl text-white text-lg placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+                    autoFocus
+                  />
+                </div>
                 <button
-                  key={tld}
-                  onClick={() => toggleTld(tld)}
-                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                    selectedTlds.has(tld)
-                      ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/20"
-                      : "bg-white/[0.04] text-slate-400 hover:bg-white/[0.08] hover:text-white border border-white/[0.06]"
-                  }`}
+                  onClick={handleSearch}
+                  disabled={searching || !name.trim() || selectedTlds.size === 0}
+                  className="px-8 py-4 bg-indigo-600 hover:bg-indigo-500 rounded-2xl font-bold text-lg flex items-center justify-center gap-2 disabled:opacity-40 transition-all hover:shadow-lg hover:shadow-indigo-500/25 shrink-0"
                 >
-                  .{tld}
-                  <span className="ml-1.5 text-xs opacity-70">${TLD_PRICES[tld]}</span>
+                  {searching ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
+                  Search
                 </button>
-              ))}
-            </div>
+              </div>
 
-            {/* Recent Searches */}
-            {searchHistory.length > 0 && results.length === 0 && (
-              <div className="mt-4 pt-4 border-t border-white/[0.06]">
-                <span className="text-xs text-slate-500 mr-2">Recent:</span>
-                {searchHistory.map(h => (
+              {/* Extension pills */}
+              <div className="flex flex-wrap gap-2">
+                {allTlds.map(tld => (
                   <button
-                    key={h}
-                    onClick={() => { setName(h); }}
-                    className="mr-3 text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
+                    key={tld}
+                    onClick={() => toggleTld(tld)}
+                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                      selectedTlds.has(tld)
+                        ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/20"
+                        : "bg-white/[0.04] text-slate-400 hover:bg-white/[0.08] hover:text-white border border-white/[0.06]"
+                    }`}
                   >
-                    {h}
+                    .{tld}
+                    <span className="ml-1.5 text-xs opacity-70">${TLD_PRICES[tld]}</span>
                   </button>
                 ))}
               </div>
-            )}
-          </div>
+
+              {/* Recent Searches */}
+              {searchHistory.length > 0 && results.length === 0 && (
+                <div className="mt-4 pt-4 border-t border-white/[0.06]">
+                  <span className="text-xs text-slate-500 mr-2">Recent:</span>
+                  {searchHistory.map(h => (
+                    <button
+                      key={h}
+                      onClick={() => { setName(h); }}
+                      className="mr-3 text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
+                    >
+                      {h}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── GENERATE MODE — AI Name Generator ── */}
+          {mode === "generate" && (
+            <div className="bg-white/[0.06] backdrop-blur-sm border border-purple-500/[0.15] rounded-3xl p-6 md:p-8 text-left max-w-3xl mx-auto shadow-2xl shadow-purple-500/[0.05]">
+              <div className="mb-5">
+                <label className="block text-sm font-medium text-slate-300 mb-2">Describe your business or idea</label>
+                <textarea
+                  value={genDescription}
+                  onChange={(e) => setGenDescription(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleGenerate(); } }}
+                  placeholder="e.g. AI-powered accounting software for freelancers, sustainable fashion brand for millennials, premium coffee subscription service..."
+                  rows={3}
+                  className="w-full px-5 py-4 bg-white/[0.06] border border-white/[0.10] rounded-2xl text-white text-base placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-shadow resize-none"
+                />
+              </div>
+
+              {/* Style selector */}
+              <div className="mb-5">
+                <label className="block text-sm font-medium text-slate-300 mb-2">Name style</label>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { id: "modern", label: "Modern & Tech" },
+                    { id: "classic", label: "Classic & Professional" },
+                    { id: "playful", label: "Fun & Playful" },
+                    { id: "minimal", label: "Short & Minimal" },
+                  ].map((s) => (
+                    <button
+                      key={s.id}
+                      onClick={() => setGenStyle(s.id)}
+                      className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                        genStyle === s.id
+                          ? "bg-purple-600 text-white shadow-md shadow-purple-500/20"
+                          : "bg-white/[0.04] text-slate-400 hover:bg-white/[0.08] hover:text-white border border-white/[0.06]"
+                      }`}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Extension pills (shared) */}
+              <div className="mb-5">
+                <label className="block text-sm font-medium text-slate-300 mb-2">Check availability on</label>
+                <div className="flex flex-wrap gap-2">
+                  {allTlds.map(tld => (
+                    <button
+                      key={tld}
+                      onClick={() => toggleTld(tld)}
+                      className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                        selectedTlds.has(tld)
+                          ? "bg-purple-600 text-white shadow-md shadow-purple-500/20"
+                          : "bg-white/[0.04] text-slate-400 hover:bg-white/[0.08] hover:text-white border border-white/[0.06]"
+                      }`}
+                    >
+                      .{tld}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Generate button */}
+              <button
+                onClick={handleGenerate}
+                disabled={generating || genDescription.trim().length < 3 || selectedTlds.size === 0}
+                className="w-full py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-2xl font-bold text-lg flex items-center justify-center gap-2 disabled:opacity-40 transition-all hover:shadow-lg hover:shadow-purple-500/20"
+              >
+                {generating ? (
+                  <><Loader2 className="w-5 h-5 animate-spin" /> Generating names...</>
+                ) : (
+                  <><Wand2 className="w-5 h-5" /> Generate 20 Name Ideas</>
+                )}
+              </button>
+            </div>
+          )}
 
           {/* Quick trust stats */}
           <div className="flex flex-wrap justify-center gap-6 md:gap-10 mt-10 text-sm text-slate-400">
@@ -382,6 +602,142 @@ export default function DomainsPage() {
                   Proceed to Registration
                 </button>
                 <p className="text-center text-xs text-slate-500 mt-3">Includes free WHOIS privacy, SSL, and DNS management</p>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* ═══════════════════════════════════════════ */}
+      {/* AI GENERATED NAMES RESULTS                   */}
+      {/* ═══════════════════════════════════════════ */}
+      <div ref={genResultsRef} />
+      {generatedNames.length > 0 && (
+        <section className="pb-16 px-4 sm:px-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                <Wand2 className="w-5 h-5 text-purple-400" />
+                {generatedNames.length} Name Ideas Generated
+              </h2>
+              <button
+                onClick={handleGenerate}
+                disabled={generating}
+                className="text-sm text-purple-400 hover:text-purple-300 flex items-center gap-1 transition-colors"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${generating ? "animate-spin" : ""}`} /> Regenerate
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {generatedNames.map((gn) => {
+                const availableDomains = gn.domains.filter((d) => d.available === true);
+                const hasAvailable = availableDomains.length > 0;
+                const allChecked = gn.domains.every((d) => !d.checking);
+
+                return (
+                  <div
+                    key={gn.name}
+                    className={`rounded-2xl border p-5 transition-all ${
+                      hasAvailable
+                        ? "border-emerald-500/20 bg-emerald-500/[0.04]"
+                        : allChecked
+                        ? "border-white/[0.06] bg-white/[0.02]"
+                        : "border-white/[0.06] bg-white/[0.02]"
+                    }`}
+                  >
+                    {/* Name header */}
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <h3 className="text-lg font-bold text-white">{gn.name}</h3>
+                        <p className="text-sm text-slate-500">{gn.tagline}</p>
+                      </div>
+                      {hasAvailable && (
+                        <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 font-semibold shrink-0">
+                          {availableDomains.length} available
+                        </span>
+                      )}
+                      {allChecked && !hasAvailable && (
+                        <span className="text-xs px-2.5 py-1 rounded-full bg-red-500/10 text-red-400/60 font-semibold shrink-0">
+                          All taken
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Domain results grid */}
+                    <div className="flex flex-wrap gap-2">
+                      {gn.domains.map((d) => (
+                        <div
+                          key={d.domain}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all ${
+                            d.checking
+                              ? "bg-white/[0.04] text-slate-500"
+                              : d.available
+                              ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                              : d.available === false
+                              ? "bg-white/[0.02] text-slate-600 line-through"
+                              : "bg-white/[0.03] text-slate-500"
+                          }`}
+                        >
+                          {d.checking ? (
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                          ) : d.available ? (
+                            <Check className="w-3 h-3" />
+                          ) : d.available === false ? (
+                            <X className="w-3 h-3" />
+                          ) : null}
+                          <span>.{d.tld}</span>
+                          {d.available && (
+                            <>
+                              <span className="text-xs opacity-70">${d.price}</span>
+                              {cart.some((c) => c.domain === d.domain) ? (
+                                <button onClick={() => removeFromCart(d.domain)} className="ml-1 text-emerald-300">
+                                  <Check className="w-3 h-3" />
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => addToCart(d)}
+                                  className="ml-1 text-emerald-400 hover:text-emerald-300"
+                                >
+                                  <Plus className="w-3 h-3" />
+                                </button>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Cart (shared with search results) */}
+            {cart.length > 0 && (
+              <div className="bg-indigo-500/[0.06] border border-indigo-500/20 rounded-2xl p-6 mt-8">
+                <div className="flex items-center justify-between mb-5">
+                  <h2 className="text-lg font-bold flex items-center gap-2">
+                    <ShoppingCart className="w-5 h-5 text-indigo-400" />
+                    Your domains ({cart.length})
+                  </h2>
+                  <span className="text-2xl font-black text-indigo-400">${cartTotal.toFixed(2)}<span className="text-sm font-normal text-slate-400">/yr</span></span>
+                </div>
+                <div className="space-y-2 mb-5">
+                  {cart.map(item => (
+                    <div key={item.domain} className="flex items-center justify-between py-3 border-b border-white/[0.05] last:border-0">
+                      <span className="text-base font-medium">{item.domain}</span>
+                      <div className="flex items-center gap-4">
+                        <span className="text-sm text-slate-400">${item.price}/yr</span>
+                        <button onClick={() => removeFromCart(item.domain)} className="text-red-400/60 hover:text-red-400 transition-colors">
+                          <Minus className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <button className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-lg transition-colors shadow-lg shadow-indigo-500/20">
+                  Proceed to Registration
+                </button>
               </div>
             )}
           </div>

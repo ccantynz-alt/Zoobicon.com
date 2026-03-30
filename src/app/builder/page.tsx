@@ -1110,9 +1110,102 @@ function BuilderPage() {
                   setReactFiles(event.files);
                 }
               } else if (event.type === "customization" && event.data) {
-                // AI content customization received — apply to preview
+                // AI content customization received — apply to the scaffold files
                 if (generationIdRef.current === currentGenId) {
-                  setPipelineAgents(prev => [...prev, `Customized for "${event.data.brandName || 'your brand'}"`]);
+                  const cd = event.data;
+                  setPipelineAgents(prev => [...prev, `Customized for "${cd.brandName || 'your brand'}"`]);
+
+                  // Replace placeholder content in ALL component files with real customization
+                  setReactFiles(prevFiles => {
+                    const updated = { ...prevFiles };
+
+                    for (const [path, content] of Object.entries(updated)) {
+                      if (typeof content !== "string") continue;
+                      let c = content;
+
+                      // Replace brand name (common placeholders in registry templates)
+                      if (cd.brandName) {
+                        c = c.replace(/\bVelocita\b/g, cd.brandName);
+                        c = c.replace(/\bAcme\b(?!\s*Inc)/g, cd.brandName);
+                        c = c.replace(/\bCompanyName\b/g, cd.brandName);
+                        c = c.replace(/\bBrandName\b/g, cd.brandName);
+                        c = c.replace(/\bYourBrand\b/g, cd.brandName);
+                        c = c.replace(/\bStartup\b(?!\s)/g, cd.brandName);
+                      }
+
+                      // Replace hero headline if present
+                      if (cd.headline && path.includes("Hero")) {
+                        // Match common hero headline patterns
+                        c = c.replace(
+                          /Ship Products\s*\n?\s*10x Faster/g,
+                          cd.headline
+                        );
+                        c = c.replace(
+                          /Build Something\s*\n?\s*Extraordinary/g,
+                          cd.headline
+                        );
+                        c = c.replace(
+                          /The Future of\s*\n?\s*\w+/g,
+                          cd.headline
+                        );
+                      }
+
+                      // Replace hero subheadline
+                      if (cd.subheadline && path.includes("Hero")) {
+                        c = c.replace(
+                          /Velocita replaces your entire DevOps stack[^"<]*/g,
+                          cd.subheadline
+                        );
+                        c = c.replace(
+                          /The all-in-one platform[^"<]*/g,
+                          cd.subheadline
+                        );
+                      }
+
+                      // Replace tagline in navbar
+                      if (cd.tagline && path.includes("Navbar")) {
+                        c = c.replace(
+                          /Ship Products 10x Faster/g,
+                          cd.tagline
+                        );
+                      }
+
+                      // Replace footer description
+                      if (cd.footerDescription && path.includes("Footer")) {
+                        c = c.replace(
+                          /Building the future of[^"<]*/g,
+                          cd.footerDescription
+                        );
+                        c = c.replace(
+                          /The next generation[^"<]*/g,
+                          cd.footerDescription
+                        );
+                      }
+
+                      // Replace primary color
+                      if (cd.colors?.primary) {
+                        c = c.replace(/#4f46e5/g, cd.colors.primary);
+                        c = c.replace(/#6366f1/g, cd.colors.primary);
+                        c = c.replace(/indigo-600/g, `[${cd.colors.primary}]`);
+                      }
+
+                      if (c !== content) {
+                        updated[path] = c;
+                      }
+                    }
+
+                    // Also update styles.css with brand colors
+                    if (cd.colors?.primary && updated["styles.css"]) {
+                      updated["styles.css"] = (updated["styles.css"] as string)
+                        .replace(/--color-primary:\s*#[a-fA-F0-9]{3,8}/, `--color-primary: ${cd.colors.primary}`);
+                    }
+                    if (cd.colors?.bg && updated["styles.css"]) {
+                      updated["styles.css"] = (updated["styles.css"] as string)
+                        .replace(/--color-bg:\s*#[a-fA-F0-9]{3,8}/, `--color-bg: ${cd.colors.bg}`);
+                    }
+
+                    return updated;
+                  });
                 }
               } else if (event.type === "partial" && event.files) {
                 // Fallback: old streaming format — merge files
