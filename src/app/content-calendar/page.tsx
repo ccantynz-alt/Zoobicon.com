@@ -69,7 +69,7 @@ const PLATFORM_COLORS: Record<Platform, string> = {
 };
 
 const PLATFORM_LABELS: Record<Platform, string> = {
-  twitter: "Twitter / X",
+  twitter: "MessageCircle / X",
   linkedin: "LinkedIn",
   instagram: "Instagram",
   tiktok: "TikTok",

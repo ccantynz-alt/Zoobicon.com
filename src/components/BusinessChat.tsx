@@ -133,7 +133,7 @@ Just tell me the client name and email, and I'll set it up in your invoicing sys
 **LinkedIn** (Post at 9:00 AM):
 > "3 things I learned building 50+ client websites this year: [Thread] 1. Speed beats perfection at the prototype stage..."
 
-**Twitter/X** (Post at 12:00 PM):
+**MessageCircle/X** (Post at 12:00 PM):
 > "Just shipped a new client site in under 2 minutes with AI. The future of web development isn't code — it's conversation. 🚀"
 
 **Instagram** (Post at 6:00 PM):

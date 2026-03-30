@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Shield, AlertTriangle, Info, CheckCircle, Loader2 } from "lucide-react";
+import {
+  Shield,
+  AlertTriangle,
+  Info,
+  CheckCircle,
+  Loader2,
+} from "lucide-react";
 
 interface QAIssue {
   severity: "error" | "warning" | "info";

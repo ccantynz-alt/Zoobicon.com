@@ -1,7 +1,21 @@
 "use client";
 
 import { useRef, useEffect, useState, useCallback } from "react";
-import { Mic, MicOff, Sparkles, Zap, Pencil, Send, Check, ChevronDown, Cpu, LayoutTemplate, SlidersHorizontal, FileText, Code2 } from "lucide-react";
+import {
+  Mic,
+  MicOff,
+  Sparkles,
+  Zap,
+  Pencil,
+  Send,
+  Check,
+  ChevronDown,
+  Cpu,
+  LayoutTemplate,
+  SlidersHorizontal,
+  FileText,
+  Code2,
+} from "lucide-react";
 import TemplateGallery from "./TemplateGallery";
 import CustomizationPanel, {
   DEFAULT_CUSTOMIZATION,

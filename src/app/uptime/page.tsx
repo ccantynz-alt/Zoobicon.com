@@ -3,9 +3,24 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import {
-  Activity, CheckCircle2, XCircle, AlertTriangle, Clock,
-  Globe, Shield, Bell, Plus, ArrowRight, Settings, Pause,
-  RefreshCw, ExternalLink, Lock, Wifi, Server, Zap
+  Activity,
+  CheckCircle2,
+  XCircle,
+  AlertTriangle,
+  Clock,
+  Globe,
+  Shield,
+  Bell,
+  Plus,
+  ArrowRight,
+  Settings,
+  Pause,
+  RefreshCw,
+  ExternalLink,
+  Lock,
+  Wifi,
+  Server,
+  Zap,
 } from 'lucide-react';
 
 interface Monitor {

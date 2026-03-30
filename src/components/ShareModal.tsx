@@ -173,7 +173,7 @@ function InstagramIcon({ className }: { className?: string }) {
 const PLATFORM_CONFIG = [
   {
     id: "twitter",
-    name: "Twitter / X",
+    name: "MessageCircle / X",
     Icon: TwitterIcon,
     color: "from-zinc-800 to-zinc-900",
     hoverColor: "hover:from-zinc-700 hover:to-zinc-800",

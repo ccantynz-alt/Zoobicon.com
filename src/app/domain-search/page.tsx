@@ -1,8 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  Search, Globe, Check, X, Zap, ArrowRight, Shield,
-  AlertTriangle, Eye, Layers, Sparkles, ChevronRight,
+  Search,
+  Globe,
+  Check,
+  X,
+  Zap,
+  ArrowRight,
+  Shield,
+  AlertTriangle,
+  Eye,
+  Layers,
+  Sparkles,
+  ChevronRight,
 } from "lucide-react";
 
 export const metadata: Metadata = {

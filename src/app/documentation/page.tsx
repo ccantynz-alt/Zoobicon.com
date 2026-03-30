@@ -3,11 +3,35 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import {
-  FileText, Search, ChevronRight, ArrowLeft, Sparkles, Plus,
-  BookOpen, Code, AlertCircle, Info, CheckCircle, Copy,
-  ChevronDown, ChevronUp, Clock, Edit3, Eye, Globe, Hash,
-  Layers, Tag, Users, GitBranch, Terminal, ExternalLink,
-  FolderOpen, File, Settings, Zap
+  FileText,
+  Search,
+  ChevronRight,
+  ArrowLeft,
+  Sparkles,
+  Plus,
+  BookOpen,
+  Code,
+  AlertCircle,
+  Info,
+  CheckCircle,
+  Copy,
+  ChevronDown,
+  ChevronUp,
+  Clock,
+  Edit3,
+  Eye,
+  Globe,
+  Hash,
+  Layers,
+  Tag,
+  Users,
+  GitBranch,
+  Terminal,
+  ExternalLink,
+  FolderOpen,
+  File,
+  Settings,
+  Zap,
 } from 'lucide-react';
 
 type TabType = 'docs' | 'editor' | 'versions' | 'generate';
@@ -34,7 +58,7 @@ const DOC_TREE: DocSection[] = [
     id: 's1', title: 'Getting Started', slug: 'getting-started', icon: <Zap className="w-4 h-4" />,
     children: [
       { id: 'a1', title: 'Introduction', slug: 'introduction', content: '# Introduction\n\nWelcome to the Zoobicon documentation. This guide covers everything you need to know about building and deploying AI-generated websites.\n\n## What is Zoobicon?\n\nZoobicon is an AI website builder that generates production-ready websites in under 90 seconds using a 7-agent pipeline.\n\n## Quick Start\n\n1. Navigate to the [Builder](/builder)\n2. Enter a description of your website\n3. Click Generate\n4. Deploy with one click\n\n> **Tip:** Be specific in your descriptions for better results.', updatedAt: '2026-03-22', author: 'Team' },
-      { id: 'a2', title: 'Installation & Setup', slug: 'installation', content: '# Installation & Setup\n\n## System Requirements\n\n- Node.js 18+\n- npm or yarn\n- Modern browser (Chrome, Firefox, Safari, Edge)\n\n## Quick Install\n\n```bash\nnpm create zoobicon-app my-project\ncd my-project\nnpm run dev\n```\n\n## Environment Variables\n\nCreate a `.env.local` file with your API key:\n\n```\nZOOBICON_API_KEY=zbk_live_your_key\n```\n\n## Configuration\n\nEdit `zoobicon.config.ts` to customize defaults.', updatedAt: '2026-03-20', author: 'Team' },
+      { id: 'a2', title: 'Installation & Setup', slug: 'installation', content: '# Installation & Setup\n\n## System Requirements\n\n- Node.js 18+\n- npm or yarn\n- Modern browser (Globe2, Firefox, Safari, Edge)\n\n## Quick Install\n\n```bash\nnpm create zoobicon-app my-project\ncd my-project\nnpm run dev\n```\n\n## Environment Variables\n\nCreate a `.env.local` file with your API key:\n\n```\nZOOBICON_API_KEY=zbk_live_your_key\n```\n\n## Configuration\n\nEdit `zoobicon.config.ts` to customize defaults.', updatedAt: '2026-03-20', author: 'Team' },
       { id: 'a3', title: 'Your First Website', slug: 'first-website', content: '# Your First Website\n\n## Step 1: Open the Builder\n\nGo to [zoobicon.com/builder](/builder) and sign in.\n\n## Step 2: Write Your Prompt\n\nExample: "A modern cybersecurity consulting firm with dark theme, hero section, services grid, team section, and contact form."\n\n## Step 3: Choose Settings\n\n- **Model:** Claude Opus (recommended)\n- **Tier:** Premium\n- **Style:** Modern\n\n## Step 4: Generate\n\nClick "Generate" and watch the 7-agent pipeline create your site.\n\n## Step 5: Deploy\n\nClick "Deploy" to publish to `your-site.zoobicon.sh`.', updatedAt: '2026-03-18', author: 'Team' },
     ]
   },

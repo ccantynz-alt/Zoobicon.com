@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, Loader2, Copy, Check } from "lucide-react";
+import {
+  Mail,
+  Loader2,
+  Copy,
+  Check,
+} from "lucide-react";
 
 interface EmailResult {
   html: string;

@@ -4,11 +4,34 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Mail, Inbox, Send, Trash2, Search, Star, RefreshCw,
-  ChevronLeft, MoreHorizontal, Paperclip, Reply, Forward,
-  AlertTriangle, X, Loader2, Plus, CheckSquare, Square,
-  Sparkles, Clock, FileText, PenTool, Check, ChevronDown,
-  Wand2, RotateCcw, Zap, Shield,
+  Mail,
+  Inbox,
+  Send,
+  Trash2,
+  Search,
+  Star,
+  RefreshCw,
+  ChevronLeft,
+  MoreHorizontal,
+  Paperclip,
+  Reply,
+  Forward,
+  AlertTriangle,
+  X,
+  Loader2,
+  Plus,
+  CheckSquare,
+  Square,
+  Sparkles,
+  Clock,
+  FileText,
+  PenTool,
+  Check,
+  ChevronDown,
+  Wand2,
+  RotateCcw,
+  Zap,
+  Shield,
 } from "lucide-react";
 import BackgroundEffects from "@/components/BackgroundEffects";
 
@@ -22,7 +45,7 @@ type Folder = "inbox" | "sent" | "spam" | "trash";
 const DEMO_EMAILS: Email[] = [
   { id: "demo-1", mailbox_address: "admin@zoobicon.com", from_address: "sarah@acmecorp.com", to_address: "admin@zoobicon.com", subject: "Partnership Inquiry - Enterprise Plan", text_body: "Hi Zoobicon team,\n\nWe're interested in your enterprise plan for our agency of 50+ clients. Could we schedule a call this week to discuss volume pricing and white-label options?\n\nBest regards,\nSarah Chen\nVP of Digital, Acme Corp", html_body: "", received_at: new Date(Date.now() - 2 * 3600000).toISOString(), read: false, folder: "inbox" },
   { id: "demo-2", mailbox_address: "admin@zoobicon.com", from_address: "noreply@stripe.com", to_address: "admin@zoobicon.com", subject: "Your March payout has been sent", text_body: "Your payout of $4,280.00 has been initiated and should arrive in your bank account within 2 business days.\n\nPayout ID: po_3Ox8kL2eZvKYl2C\nAmount: $4,280.00\nArrival date: March 18, 2026", html_body: "", received_at: new Date(Date.now() - 5 * 3600000).toISOString(), read: false, folder: "inbox" },
-  { id: "demo-3", mailbox_address: "admin@zoobicon.com", from_address: "mike@developer.io", to_address: "admin@zoobicon.com", subject: "Bug Report: Multi-page generation timeout", text_body: "Hey,\n\nI'm hitting a timeout error when generating sites with more than 4 pages. The pipeline stalls at the Developer agent phase. Using GPT-4o.\n\nBrowser: Chrome 124, Plan: Pro\n\nMike", html_body: "", received_at: new Date(Date.now() - 86400000).toISOString(), read: true, folder: "inbox" },
+  { id: "demo-3", mailbox_address: "admin@zoobicon.com", from_address: "mike@developer.io", to_address: "admin@zoobicon.com", subject: "Bug Report: Multi-page generation timeout", text_body: "Hey,\n\nI'm hitting a timeout error when generating sites with more than 4 pages. The pipeline stalls at the Developer agent phase. Using GPT-4o.\n\nBrowser: Globe2 124, Plan: Pro\n\nMike", html_body: "", received_at: new Date(Date.now() - 86400000).toISOString(), read: true, folder: "inbox" },
   { id: "demo-4", mailbox_address: "admin@zoobicon.com", from_address: "spam@quickloans.biz", to_address: "admin@zoobicon.com", subject: "URGENT: You've been pre-approved!!!", text_body: "Click here to claim your $50,000 loan TODAY! No credit check required!", html_body: "", received_at: new Date(Date.now() - 172800000).toISOString(), read: true, folder: "spam" },
 ];
 

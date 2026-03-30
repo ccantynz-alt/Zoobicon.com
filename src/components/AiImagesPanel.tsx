@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { ImagePlus, Loader2, CheckCircle2, AlertCircle, Sparkles, Wand2 } from "lucide-react";
+import {
+  ImagePlus,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+  Sparkles,
+  Wand2,
+} from "lucide-react";
 
 interface AiImagesPanelProps {
   code: string;

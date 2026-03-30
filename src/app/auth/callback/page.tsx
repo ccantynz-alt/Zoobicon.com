@@ -2,7 +2,9 @@
 
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import {
+  Loader2,
+} from "lucide-react";
 
 export default function OAuthCallbackPage() {
   const searchParams = useSearchParams();

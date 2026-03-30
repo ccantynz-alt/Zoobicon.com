@@ -4,8 +4,18 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import BackgroundEffects from "@/components/BackgroundEffects";
 import {
-  ArrowLeft, BookOpen, Plus, Search, Edit3, Trash2,
-  Save, X, Loader2, Tag, RefreshCw, CheckCircle2,
+  ArrowLeft,
+  BookOpen,
+  Plus,
+  Search,
+  Edit3,
+  Trash2,
+  Save,
+  X,
+  Loader2,
+  Tag,
+  RefreshCw,
+  CheckCircle2,
   FolderOpen,
 } from "lucide-react";
 

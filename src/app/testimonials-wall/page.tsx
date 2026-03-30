@@ -3,10 +3,32 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import {
-  MessageSquareQuote, Star, Heart, ThumbsUp, ThumbsDown, Check,
-  X, Plus, Copy, Code, ExternalLink, Filter, Search, Layout,
-  Columns, Grid3X3, Image, Upload, Sparkles, Eye, Award,
-  ChevronDown, MoreHorizontal, Calendar, Globe, Twitter
+  MessageSquareQuote,
+  Star,
+  Heart,
+  ThumbsUp,
+  ThumbsDown,
+  Check,
+  X,
+  Plus,
+  Copy,
+  Code,
+  ExternalLink,
+  Filter,
+  Search,
+  Layout,
+  Columns,
+  Grid3X3,
+  Image,
+  Upload,
+  Sparkles,
+  Eye,
+  Award,
+  ChevronDown,
+  MoreHorizontal,
+  Calendar,
+  Globe,
+  MessageCircle,
 } from 'lucide-react';
 
 const DEMO_TESTIMONIALS = [
@@ -62,7 +84,7 @@ export default function TestimonialsWallPage() {
 
   const sourceIcon = (source: string) => {
     switch (source) {
-      case 'twitter': return <Twitter className="w-3.5 h-3.5 text-blue-400" />;
+      case 'twitter': return <MessageCircle className="w-3.5 h-3.5 text-blue-400" />;
       case 'g2': return <Star className="w-3.5 h-3.5 text-orange-400" />;
       case 'linkedin': return <Globe className="w-3.5 h-3.5 text-blue-500" />;
       default: return <MessageSquareQuote className="w-3.5 h-3.5 text-violet-400" />;
@@ -144,7 +166,7 @@ export default function TestimonialsWallPage() {
                 <Upload className="w-5 h-5 mx-auto mb-1 text-violet-400" /> Import CSV
               </button>
               <button className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition text-sm text-center">
-                <Twitter className="w-5 h-5 mx-auto mb-1 text-blue-400" /> Import Twitter
+                <MessageCircle className="w-5 h-5 mx-auto mb-1 text-blue-400" /> Import MessageCircle
               </button>
               <button className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition text-sm text-center">
                 <Star className="w-5 h-5 mx-auto mb-1 text-orange-400" /> Import G2

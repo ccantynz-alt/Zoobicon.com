@@ -3,7 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, ArrowRight, Clock, Wand2 } from "lucide-react";
+import {
+  Sparkles,
+  ArrowRight,
+  Clock,
+  Wand2,
+} from "lucide-react";
 
 interface ShowcaseItem {
   id: number;

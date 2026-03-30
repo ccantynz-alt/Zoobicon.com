@@ -3,10 +3,29 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import {
-  Map, ChevronUp, Calendar, Filter, Tag, MessageSquare,
-  ArrowRight, Check, Clock, Rocket, Zap, Users, Star,
-  LayoutGrid, GanttChart, ChevronDown, ExternalLink,
-  Lightbulb, Sparkles, Eye, Lock, Globe, Code
+  Map,
+  ChevronUp,
+  Calendar,
+  Filter,
+  Tag,
+  MessageSquare,
+  ArrowRight,
+  Check,
+  Clock,
+  Rocket,
+  Zap,
+  Users,
+  Star,
+  LayoutGrid,
+  GanttChart,
+  ChevronDown,
+  ExternalLink,
+  Lightbulb,
+  Sparkles,
+  Eye,
+  Lock,
+  Globe,
+  Code,
 } from 'lucide-react';
 
 type ViewMode = 'kanban' | 'timeline';
@@ -49,7 +68,7 @@ const ROADMAP_ITEMS: RoadmapItem[] = [
   { id: '3', title: 'React/Next.js code export', description: 'Export as proper React components with JSX and hooks', column: 'planned', category: 'core', votes: 267, quarter: 'Q2 2026', eta: 'May 2026', tags: ['export'] },
   { id: '4', title: 'AI Brand Kit persistence', description: 'Save colors, fonts, logos, voice — auto-apply to all builds', column: 'in-progress', category: 'ai', votes: 234, quarter: 'Q1 2026', tags: ['personalization'] },
   { id: '5', title: 'Custom domain SSL auto-provisioning', description: "Let's Encrypt auto-provision for connected custom domains", column: 'planned', category: 'hosting', votes: 156, quarter: 'Q2 2026', tags: ['security'] },
-  { id: '6', title: 'Figma design import', description: 'Import Figma designs and convert to responsive HTML/CSS', column: 'in-progress', category: 'integrations', votes: 176, quarter: 'Q1 2026', eta: 'Apr 2026', tags: ['design'] },
+  { id: '6', title: 'Layers design import', description: 'Import Layers designs and convert to responsive HTML/CSS', column: 'in-progress', category: 'integrations', votes: 176, quarter: 'Q1 2026', eta: 'Apr 2026', tags: ['design'] },
   { id: '7', title: 'Multi-language generation', description: 'Generate sites in multiple languages from one prompt', column: 'in-progress', category: 'ai', votes: 187, quarter: 'Q1 2026', tags: ['i18n'] },
   { id: '8', title: 'Version branching & merging', description: 'Git-like version control for sites with branch and merge', column: 'backlog', category: 'collaboration', votes: 198, tags: ['versioning'] },
   { id: '9', title: 'Mobile app builder', description: 'React Native export via Expo for instant mobile preview', column: 'backlog', category: 'mobile', votes: 134, tags: ['mobile'] },
@@ -64,7 +83,7 @@ const ROADMAP_ITEMS: RoadmapItem[] = [
   { id: '18', title: 'Creator profiles & portfolios', description: 'Public profile pages showcasing built sites', column: 'planned', category: 'collaboration', votes: 145, quarter: 'Q2 2026', tags: ['community'] },
   { id: '19', title: 'Prompt gallery & community', description: 'Share prompts, upvote, remix sites', column: 'planned', category: 'collaboration', votes: 201, quarter: 'Q2 2026', tags: ['community'] },
   { id: '20', title: 'OpenClaw agent integration', description: 'Autonomous SEO/optimizer agents via OpenClaw framework', column: 'backlog', category: 'ai', votes: 67, tags: ['autonomous'] },
-  { id: '21', title: 'MCP support', description: 'Model Context Protocol for GitHub, Notion, Figma context', column: 'planned', category: 'integrations', votes: 112, quarter: 'Q2 2026', tags: ['context'] },
+  { id: '21', title: 'MCP support', description: 'Model Context Protocol for GitHub, Notion, Layers context', column: 'planned', category: 'integrations', votes: 112, quarter: 'Q2 2026', tags: ['context'] },
   { id: '22', title: 'Email marketing (native)', description: 'Built-in list builder, AI newsletters, one-click send', column: 'planned', category: 'core', votes: 189, quarter: 'Q3 2026', tags: ['marketing'] },
 ];
 

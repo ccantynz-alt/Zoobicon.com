@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Copy, Check, Users, Gift, ExternalLink } from "lucide-react";
+import {
+  Copy,
+  Check,
+  Users,
+  Gift,
+  ExternalLink,
+} from "lucide-react";
 import { getReferralTier } from "@/lib/referral";
 
 interface ReferralData {

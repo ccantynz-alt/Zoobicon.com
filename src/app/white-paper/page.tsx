@@ -3,11 +3,34 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import {
-  FileText, Download, Sparkles, Wand2, BookOpen, Edit3,
-  ChevronRight, ChevronDown, Plus, Trash2, GripVertical,
-  Eye, Lock, Mail, Check, Copy, Settings, Layers,
-  BarChart3, TrendingUp, Lightbulb, Target, Users,
-  ArrowRight, Star, Clock, Zap, Globe
+  FileText,
+  Download,
+  Sparkles,
+  Wand2,
+  BookOpen,
+  Edit3,
+  ChevronRight,
+  ChevronDown,
+  Plus,
+  Trash2,
+  GripVertical,
+  Eye,
+  Lock,
+  Mail,
+  Check,
+  Copy,
+  Settings,
+  Layers,
+  BarChart3,
+  TrendingUp,
+  Lightbulb,
+  Target,
+  Users,
+  ArrowRight,
+  Star,
+  Clock,
+  Zap,
+  Globe,
 } from 'lucide-react';
 
 const TEMPLATE_LIBRARY = [

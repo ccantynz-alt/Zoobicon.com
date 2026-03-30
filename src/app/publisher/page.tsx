@@ -162,7 +162,7 @@ export default function PublisherPage() {
             <h1 className="text-4xl md:text-5xl font-extrabold mb-3">
               <span className="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent">Publish Everywhere</span>
             </h1>
-            <p className="text-lg text-white/50 max-w-2xl">One post. Every platform. AI-optimized. Write once, publish to Twitter, LinkedIn, Instagram, TikTok, Facebook, and Reddit.</p>
+            <p className="text-lg text-white/50 max-w-2xl">One post. Every platform. AI-optimized. Write once, publish to MessageCircle, LinkedIn, Instagram, TikTok, Facebook, and Reddit.</p>
           </motion.div>
         </div>
       </header>

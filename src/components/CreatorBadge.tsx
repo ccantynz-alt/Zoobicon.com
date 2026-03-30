@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
+import {
+  X,
+} from "lucide-react";
 
 // ── React component for preview / embedding inside the app ──
 

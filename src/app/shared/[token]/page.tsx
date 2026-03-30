@@ -2,7 +2,13 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Monitor, Tablet, Smartphone, ExternalLink, Loader2 } from "lucide-react";
+import {
+  Monitor,
+  Tablet,
+  Smartphone,
+  ExternalLink,
+  Loader2,
+} from "lucide-react";
 
 type Viewport = "desktop" | "tablet" | "mobile";
 

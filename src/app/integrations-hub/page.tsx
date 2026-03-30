@@ -3,11 +3,37 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import {
-  Plug, Search, Filter, Check, ExternalLink, Settings, Zap,
-  Plus, Star, ChevronRight, Grid3X3, List, ArrowRight,
-  MessageSquare, Mail, Users, CreditCard, Cloud, FolderKanban,
-  Share2, BarChart3, Code, Sparkles, Megaphone, Database,
-  Globe, Shield, CheckCircle2, X, AlertCircle, Wifi
+  Plug,
+  Search,
+  Filter,
+  Check,
+  ExternalLink,
+  Settings,
+  Zap,
+  Plus,
+  Star,
+  ChevronRight,
+  Grid3X3,
+  List,
+  ArrowRight,
+  MessageSquare,
+  Mail,
+  Users,
+  CreditCard,
+  Cloud,
+  FolderKanban,
+  Share2,
+  BarChart3,
+  Code,
+  Sparkles,
+  Megaphone,
+  Database,
+  Globe,
+  Shield,
+  CheckCircle2,
+  X,
+  AlertCircle,
+  Wifi,
 } from 'lucide-react';
 
 const CATEGORIES = [
@@ -56,7 +82,7 @@ const INTEGRATIONS = [
   { id: 21, name: 'Notion', desc: 'Documentation and knowledge base', category: 'pm', connected: false, popular: true, color: '#000000' },
   { id: 22, name: 'Asana', desc: 'Task and project management', category: 'pm', connected: false, popular: false, color: '#F06A6A' },
   // Social
-  { id: 23, name: 'Twitter/X', desc: 'Auto-post deployments to X', category: 'social', connected: false, popular: true, color: '#1DA1F2' },
+  { id: 23, name: 'MessageCircle/X', desc: 'Auto-post deployments to X', category: 'social', connected: false, popular: true, color: '#1DA1F2' },
   { id: 24, name: 'LinkedIn', desc: 'Share professional updates', category: 'social', connected: false, popular: false, color: '#0A66C2' },
   { id: 25, name: 'Instagram', desc: 'Auto-generate social images', category: 'social', connected: false, popular: false, color: '#E4405F' },
   { id: 26, name: 'Facebook', desc: 'Page updates and marketing', category: 'social', connected: false, popular: false, color: '#1877F2' },

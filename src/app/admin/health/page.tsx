@@ -3,7 +3,14 @@
 import { useState, useCallback } from "react";
 import Link from "next/link";
 import BackgroundEffects from "@/components/BackgroundEffects";
-import { ArrowLeft, RefreshCw, CheckCircle, XCircle, AlertTriangle, Activity } from "lucide-react";
+import {
+  ArrowLeft,
+  RefreshCw,
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  Activity,
+} from "lucide-react";
 
 interface CheckResult {
   name: string;

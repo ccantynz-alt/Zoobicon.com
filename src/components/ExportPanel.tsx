@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Download, Loader2, FileCode, FolderOpen } from "lucide-react";
+import {
+  Download,
+  Loader2,
+  FileCode,
+  FolderOpen,
+} from "lucide-react";
 import { transpileHtmlToReact, buildReactProjectFiles } from "@/lib/html-to-react";
 
 interface ExportResult {
