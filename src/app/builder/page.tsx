@@ -1019,12 +1019,12 @@ function BuilderPage() {
       // Phase 1: Assemble from 100+ component registry (<1 second)
       try {
         const { buildFromPrompt } = await import("@/lib/component-registry");
-        const registryFiles = buildFromPrompt(prompt.trim());
-        if (registryFiles && Object.keys(registryFiles).length > 0) {
-          setReactFiles(registryFiles);
+        const result = buildFromPrompt(prompt.trim());
+        if (result?.files && Object.keys(result.files).length > 0) {
+          setReactFiles(result.files);
           setReactDeps({});
           setStatus("generating");
-          setPipelineAgents(["Components assembled — customizing with AI..."]);
+          setPipelineAgents([`${result.components?.length || 9} components assembled — customizing with AI...`]);
         } else {
           throw new Error("Registry returned empty");
         }
