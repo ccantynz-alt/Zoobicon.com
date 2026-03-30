@@ -1015,42 +1015,54 @@ function BuilderPage() {
     const controller = new AbortController();
     abortRef.current = controller;
 
-    // ── React App mode: instant template snapshot + AI customization ──
+    // ── React App mode: instant component assembly + AI customization ──
     if (generationMode === "react") {
-      // Phase 1: Load premium template snapshot instantly (<1 second)
+      // Phase 1: Assemble from 100+ component registry (<1 second)
       try {
-        const { findBestTemplate } = await import("@/lib/snapshots");
-        const template = findBestTemplate(prompt.trim());
-        setReactFiles(template.files);
-        setReactDeps({});
-        setStatus("generating");
-        setPipelineAgents([`Template loaded: ${template.name} — customizing with AI...`]);
-      } catch {
-        // Fallback to basic scaffold if snapshots fail
-        try {
-          const { classifyIndustry, getScaffoldForIndustry } = await import("@/lib/react-scaffolds");
-          const industry = classifyIndustry(prompt.trim());
-          const { files: scaffoldFiles } = getScaffoldForIndustry(industry);
-          setReactFiles(scaffoldFiles);
+        const { buildFromPrompt } = await import("@/lib/component-registry");
+        const registryFiles = buildFromPrompt(prompt.trim());
+        if (registryFiles && Object.keys(registryFiles).length > 0) {
+          setReactFiles(registryFiles);
           setReactDeps({});
           setStatus("generating");
-          setPipelineAgents(["Scaffold loaded — customizing with AI..."]);
+          setPipelineAgents(["Components assembled — customizing with AI..."]);
+        } else {
+          throw new Error("Registry returned empty");
+        }
+      } catch {
+        // Fallback 1: Premium template snapshots
+        try {
+          const { findBestTemplate } = await import("@/lib/snapshots");
+          const template = findBestTemplate(prompt.trim());
+          setReactFiles(template.files);
+          setReactDeps({});
+          setStatus("generating");
+          setPipelineAgents([`Template loaded: ${template.name} — customizing with AI...`]);
         } catch {
-          setPipelineAgents(["Generating React components..."]);
+          // Fallback 2: Basic scaffolds
+          try {
+            const { classifyIndustry, getScaffoldForIndustry } = await import("@/lib/react-scaffolds");
+            const industry = classifyIndustry(prompt.trim());
+            const { files: scaffoldFiles } = getScaffoldForIndustry(industry);
+            setReactFiles(scaffoldFiles);
+            setReactDeps({});
+            setStatus("generating");
+            setPipelineAgents(["Scaffold loaded — customizing with AI..."]);
+          } catch {
+            setPipelineAgents(["Generating React components..."]);
+          }
         }
       }
 
-      // Phase 2: AI generates custom React components via streaming SSE
-      // Files appear in the preview progressively as they're generated
+      // Phase 2: AI customizes content via fast streaming endpoint
+      // Uses registry-assembled components — only customizes content (name, copy, colors)
+      // This is 10x faster than generating components from scratch
       try {
-        const res = await fetch("/api/generate/react", {
+        const res = await fetch("/api/generate/react-stream", {
           method: "POST",
           headers: authHeaders(),
           body: JSON.stringify({
             prompt: prompt.trim(),
-            tier,
-            ...(selectedModel ? { model: selectedModel } : {}),
-            ...(generatorBanner ? { generator: generatorBanner.id } : {}),
           }),
           signal: controller.signal,
         });
@@ -1084,21 +1096,40 @@ function BuilderPage() {
 
               if (event.type === "status") {
                 setPipelineAgents(prev => [...prev, event.message]);
-              } else if (event.type === "partial" && event.files) {
-                // Progressive update — show files as they're completed
+              } else if (event.type === "scaffold" && event.files) {
+                // Registry-assembled scaffold — instant preview
                 if (generationIdRef.current === currentGenId) {
                   setReactFiles(event.files);
+                  setGeneratedCode("<!-- react-app-mode -->");
+                  setPipelineAgents(prev => [...prev, `${event.componentCount || 9} components assembled from registry`]);
+                }
+              } else if (event.type === "scaffold-update" && event.files) {
+                // Updated scaffold with AI-customized colors/branding
+                if (generationIdRef.current === currentGenId) {
+                  setReactFiles(event.files);
+                }
+              } else if (event.type === "customization" && event.data) {
+                // AI content customization received — apply to preview
+                if (generationIdRef.current === currentGenId) {
+                  setPipelineAgents(prev => [...prev, `Customized for "${event.data.brandName || 'your brand'}"`]);
+                }
+              } else if (event.type === "partial" && event.files) {
+                // Fallback: old streaming format — merge files
+                if (generationIdRef.current === currentGenId) {
+                  setReactFiles(prev => ({ ...prev, ...event.files }));
                   setGeneratedCode("<!-- react-app-mode -->");
                 }
-              } else if (event.type === "done" && event.files) {
-                // Final complete result
+              } else if ((event.type === "done" && event.files) || (event.type === "done")) {
+                // Generation complete
                 if (generationIdRef.current === currentGenId) {
-                  setReactFiles(event.files);
-                  setReactDeps(event.dependencies || {});
-                  setReactSource(event.files);
+                  if (event.files) {
+                    setReactFiles(event.files);
+                    setReactDeps(event.dependencies || {});
+                    setReactSource(event.files);
+                  }
                   setGeneratedCode("<!-- react-app-mode -->");
                   setStatus("complete");
-                  setPipelineAgents(prev => [...prev, `Generated ${event.fileCount} React files`]);
+                  setPipelineAgents(prev => [...prev, "Build complete"]);
                   trackEvent("build");
                 }
               } else if (event.type === "error") {
