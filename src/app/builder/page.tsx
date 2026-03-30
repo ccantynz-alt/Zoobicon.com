@@ -1028,7 +1028,9 @@ function BuilderPage() {
         } else {
           throw new Error("Registry returned empty");
         }
-      } catch {
+      } catch (registryErr) {
+        // Log the actual error so we can debug
+        console.error("[Builder] Component registry failed:", registryErr);
         // Fallback 1: Premium template snapshots
         try {
           const { findBestTemplate } = await import("@/lib/snapshots");
