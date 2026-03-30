@@ -603,25 +603,51 @@ Each reseller at $499/mo typically brings 20-50 of their own clients. 10 reselle
 
 ## CURRENT STATUS — UPDATE THIS EVERY EVENING BEFORE STOPPING
 
-**Date last updated:** 2026-03-28
+**Date last updated:** 2026-03-29
 **Current phase:** Phase 1
-**Current step:** STEP 1 — Cloudflare Setup (manual steps remain)
+**Current step:** Builder + Video Creator UI overhaul — CRITICAL PRIORITY
 
-**Completed today:**
-- ✅ Confirmed all 5 Zoobicon domains active in Cloudflare
-- ✅ Registered zoobicon.app
-- ✅ Discovered and reviewed existing technical CLAUDE.md (impressive codebase)
-- ✅ Merged technical + business into single master CLAUDE.md
+**Completed 2026-03-29 (massive build day):**
 - ✅ Fixed all 4 known issues (dead components, dead libs, email validation, img→Image)
-- ✅ Removed 18 dead components + 4 dead lib files (cleaner codebase)
-- ✅ Built `/admin/mobile` — mobile-optimized command centre for iPhone/iPad
-- ✅ Pricing page already built with Stripe checkout, 5 tiers, FAQs, structured data
+- ✅ KILLED HTML OUTPUT — React/Sandpack is the ONLY generation mode
+- ✅ Streaming React generation — files appear progressively in preview
+- ✅ Fixed Sandpack full-screen preview (was only showing tiny portion)
+- ✅ Fixed streaming placeholder stubs (no more module-not-found during generation)
+- ✅ Deep audit — 19 broken references fixed, 20,000+ lines dead code removed
+- ✅ Built 6 new products: eSIM, VPN, Dictation, Cloud Storage, Booking, + provider layers
+- ✅ Built 50 country-specific eSIM SEO pages
+- ✅ Built 10 SEO product pages (VPN, eSIM, Dictation, Storage, Booking, Hosting, etc.)
+- ✅ Built 12 free SEO tools targeting 11.4M monthly searches
+- ✅ Built Business Name Generator (nuclear SEO funnel → domain → website → everything)
+- ✅ Built bulletproof resilience layer (retry, circuit breaker, error sanitization)
+- ✅ Built Technology Currency Agent (monitors stack, alerts on outdated deps)
+- ✅ Built /admin/mobile command centre
+- ✅ Built /disclaimers legal page + disclaimers on all comparison tables
+- ✅ Added connectivity + cloud infra monitoring to market crawler (Starlink, Celitech, etc.)
+- ✅ Retention-optimized pricing across all products
+- ✅ Upgraded: Anthropic SDK 0.39→0.80, framer-motion→12.38, Stripe→21.0, lucide-react→1.7
 
-**Blockers:** None
+**Products ready to go live (just need API keys):**
+| Product | Env Variable Needed |
+|---|---|
+| eSIM (190+ countries) | CELITECH_API_KEY |
+| VPN | WIREGUARD_API_URL + WIREGUARD_API_KEY |
+| AI Dictation | DEEPGRAM_API_KEY |
+| Cloud Storage | B2_KEY_ID + B2_APP_KEY |
+| Booking & Scheduling | CALCOM_API_URL + CALCOM_API_KEY |
+| AI Website Builder | ANTHROPIC_API_KEY (already set) |
+| Stripe Payments | STRIPE_SECRET_KEY + price IDs |
 
-**NEXT ACTION:**
-Go to dash.cloudflare.com → click zoobicon.com → find "Email" in left sidebar → click "Email Routing" → Enable it. Takes 3 minutes. That's the next checkbox.
-Then: Set up Zoho Mail mailboxes (hello@, support@, billing@, noreply@), enable SSL Full (Strict) on all 5 domains, point all 5 domains to Vercel.
+**CRITICAL — NEXT ACTIONS (in order):**
+1. **Builder UI overhaul** — must feel like a $50M product, not a beta. Match Bolt/Lovable quality.
+2. **Video Creator UI overhaul** — needs timeline, real-time preview, avatar support
+3. **Craig manual tasks:** Zoho Mail setup, Cloudflare email routing, Stripe products
+4. **Next.js 14→15 upgrade** (dedicated sprint)
+5. **Go live with first customers**
+
+**Blockers:** Builder and Video Creator UI quality not at competitive standard. Must fix before launch.
+
+**MANDATE: 80-90% ahead of competitors. If a user tries Zoobicon then tries Lovable/Bolt, they must think Zoobicon was BETTER. Currently we are NOT there on UI polish. Fix immediately.**
 
 ---
 

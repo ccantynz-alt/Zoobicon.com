@@ -3,9 +3,25 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import {
-  Lightbulb, ChevronUp, MessageSquare, Tag, Search, Plus,
-  ArrowRight, Filter, Check, Clock, Rocket, Zap, Users,
-  AlertCircle, Merge, UserPlus, MoreHorizontal, X, Flag
+  Lightbulb,
+  ChevronUp,
+  MessageSquare,
+  Tag,
+  Search,
+  Plus,
+  ArrowRight,
+  Filter,
+  Check,
+  Clock,
+  Rocket,
+  Zap,
+  Users,
+  AlertCircle,
+  Merge,
+  UserPlus,
+  MoreHorizontal,
+  X,
+  Flag,
 } from 'lucide-react';
 
 type Status = 'new' | 'planned' | 'in-progress' | 'completed';
@@ -46,7 +62,7 @@ const DEMO_REQUESTS: FeatureRequest[] = [
   { id: '3', title: 'React/Next.js code export (not just HTML)', description: 'Export generated sites as React components with proper JSX, hooks, and Next.js routing instead of vanilla HTML.', status: 'planned', priority: 'high', votes: 267, comments: 52, author: 'ReactDev99', date: '1 month ago', tags: ['export', 'framework'] },
   { id: '4', title: 'Version control with branching and merging', description: 'Git-like version control for sites — create branches, make changes, merge back to main. Essential for teams.', status: 'new', priority: 'medium', votes: 198, comments: 23, author: 'GitLover', date: '1 week ago', tags: ['collaboration', 'versioning'] },
   { id: '5', title: 'AI image generation directly in builder', description: 'Generate custom images inline while building sites instead of using stock photos. DALL-E or Stable Diffusion integration.', status: 'completed', priority: 'high', votes: 245, comments: 38, author: 'DesignPro', date: '2 months ago', tags: ['ai', 'images'] },
-  { id: '6', title: 'Figma import — design to code in one click', description: 'Import Figma designs directly and convert to responsive HTML/CSS with AI. Preserve layers, components, and auto-layout.', status: 'in-progress', priority: 'medium', votes: 176, comments: 19, author: 'FigmaFan', date: '3 weeks ago', tags: ['import', 'design'], assignee: 'AI Team' },
+  { id: '6', title: 'Layers import — design to code in one click', description: 'Import Layers designs directly and convert to responsive HTML/CSS with AI. Preserve layers, components, and auto-layout.', status: 'in-progress', priority: 'medium', votes: 176, comments: 19, author: 'FigmaFan', date: '3 weeks ago', tags: ['import', 'design'], assignee: 'AI Team' },
   { id: '7', title: 'Custom domain SSL auto-provisioning', description: 'Automatically provision and renew SSL certificates when users connect custom domains, via Let\'s Encrypt.', status: 'planned', priority: 'high', votes: 156, comments: 14, author: 'HostingPro', date: '1 month ago', tags: ['hosting', 'security'] },
   { id: '8', title: 'Dark/light mode toggle on generated sites', description: 'Generate sites with built-in dark/light mode toggle. AI creates both color schemes, user switches with a button.', status: 'completed', priority: 'medium', votes: 203, comments: 28, author: 'DarkModeUser', date: '2 months ago', tags: ['feature', 'design'] },
   { id: '9', title: 'Mobile app builder (React Native export)', description: 'Generate React Native apps from prompts, not just websites. Export to Expo for instant mobile preview.', status: 'new', priority: 'low', votes: 134, comments: 42, author: 'MobileDev', date: '2 weeks ago', tags: ['mobile', 'export'] },

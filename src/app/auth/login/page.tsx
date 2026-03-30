@@ -4,7 +4,13 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import BackgroundEffects from "@/components/BackgroundEffects";
-import { Zap, Eye, EyeOff, ArrowRight, Chrome } from "lucide-react";
+import {
+  Zap,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  Globe2,
+} from "lucide-react";
 
 const OAUTH_ERRORS: Record<string, string> = {
   no_code: "Authentication was cancelled. Please try again.",
@@ -86,7 +92,7 @@ export default function LoginPage() {
               href="/api/auth/oauth/google"
               className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.05] transition-colors text-sm font-medium"
             >
-              <Chrome className="w-4 h-4" />
+              <Globe2 className="w-4 h-4" />
               Continue with Google
             </a>
             <a

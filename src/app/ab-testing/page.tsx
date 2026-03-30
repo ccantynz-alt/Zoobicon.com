@@ -3,11 +3,32 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import {
-  FlaskConical, Plus, Play, Pause, Check, BarChart3,
-  ArrowRight, Zap, TrendingUp, Target, Eye, RefreshCw,
-  Sparkles, Clock, Users, AlertCircle, ChevronDown,
-  ArrowUpRight, ArrowDownRight, Trophy, Lightbulb, X,
-  Percent, MousePointer2, ShoppingCart, Mail
+  FlaskConical,
+  Plus,
+  Play,
+  Pause,
+  Check,
+  BarChart3,
+  ArrowRight,
+  Zap,
+  TrendingUp,
+  Target,
+  Eye,
+  RefreshCw,
+  Sparkles,
+  Clock,
+  Users,
+  AlertCircle,
+  ChevronDown,
+  ArrowUpRight,
+  ArrowDownRight,
+  Trophy,
+  Lightbulb,
+  X,
+  Percent,
+  MousePointer2,
+  ShoppingCart,
+  Mail,
 } from 'lucide-react';
 
 type ExperimentStatus = 'running' | 'completed' | 'draft' | 'paused';

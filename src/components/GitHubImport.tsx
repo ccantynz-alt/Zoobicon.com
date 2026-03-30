@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import {
-  Github,
+  GitFork,
   GitBranch,
   FileCode,
   ArrowRight,
@@ -102,7 +102,7 @@ export default function GitHubImport({ onImport }: GitHubImportProps) {
       <div className="rounded-xl border border-white/10 bg-[#0a0a0f] p-6 space-y-4">
         <div className="flex items-center gap-3 mb-2">
           <div className="p-2 rounded-lg bg-white/5">
-            <Github className="w-5 h-5 text-white" />
+            <GitFork className="w-5 h-5 text-white" />
           </div>
           <h3 className="text-lg font-semibold text-white">Import from GitHub</h3>
         </div>

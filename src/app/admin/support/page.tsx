@@ -4,10 +4,25 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import BackgroundEffects from "@/components/BackgroundEffects";
 import {
-  ArrowLeft, Search, RefreshCw, Loader2, Send, X,
-  AlertCircle, CheckCircle2, Clock, Inbox, Bot,
-  ChevronRight, Sparkles, BookOpen, Filter,
-  MessageSquare, Tag, User, Zap,
+  ArrowLeft,
+  Search,
+  RefreshCw,
+  Loader2,
+  Send,
+  X,
+  AlertCircle,
+  CheckCircle2,
+  Clock,
+  Inbox,
+  Bot,
+  ChevronRight,
+  Sparkles,
+  BookOpen,
+  Filter,
+  MessageSquare,
+  Tag,
+  User,
+  Zap,
 } from "lucide-react";
 
 interface Ticket {

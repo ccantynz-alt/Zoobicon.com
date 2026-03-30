@@ -3,9 +3,24 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import {
-  Megaphone, Sparkles, Wrench, Bug, Tag, ThumbsUp, Heart,
-  Rocket, PartyPopper, Code, Bell, ArrowRight, Copy, Check,
-  ExternalLink, Calendar, Filter, ChevronDown
+  Megaphone,
+  Sparkles,
+  Wrench,
+  Bug,
+  Tag,
+  ThumbsUp,
+  Heart,
+  Rocket,
+  PartyPopper,
+  Code,
+  Bell,
+  ArrowRight,
+  Copy,
+  Check,
+  ExternalLink,
+  Calendar,
+  Filter,
+  ChevronDown,
 } from 'lucide-react';
 
 type Category = 'all' | 'new' | 'improvement' | 'fix';

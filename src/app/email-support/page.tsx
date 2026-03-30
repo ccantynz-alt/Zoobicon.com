@@ -237,8 +237,8 @@ const DEMO_TICKETS: Ticket[] = [
   },
   {
     id: "TK-3009",
-    subject: "Feature request: Figma plugin",
-    body: "Would love a Figma plugin that lets me send designs directly to Zoobicon for conversion. Currently I'm using the import panel but a plugin would be way faster.",
+    subject: "Feature request: Layers plugin",
+    body: "Would love a Layers plugin that lets me send designs directly to Zoobicon for conversion. Currently I'm using the import panel but a plugin would be way faster.",
     from: "emma@uxstudio.com",
     customerName: "Emma Wilson",
     status: "resolved",
@@ -247,8 +247,8 @@ const DEMO_TICKETS: Ticket[] = [
     createdAt: "2026-03-14T14:20:00Z",
     updatedAt: "2026-03-14T14:25:00Z",
     messages: [
-      { id: "m12", from: "customer", body: "Would love a Figma plugin that lets me send designs directly to Zoobicon for conversion. Currently I'm using the import panel but a plugin would be way faster.", timestamp: "2026-03-14T14:20:00Z" },
-      { id: "m13", from: "ai", body: "Great suggestion, Emma! A Figma plugin is on our roadmap. I've added your vote to the feature request. In the meantime, our Figma Import panel supports direct URL import - just paste your Figma share link!", timestamp: "2026-03-14T14:21:00Z" },
+      { id: "m12", from: "customer", body: "Would love a Layers plugin that lets me send designs directly to Zoobicon for conversion. Currently I'm using the import panel but a plugin would be way faster.", timestamp: "2026-03-14T14:20:00Z" },
+      { id: "m13", from: "ai", body: "Great suggestion, Emma! A Layers plugin is on our roadmap. I've added your vote to the feature request. In the meantime, our Layers Import panel supports direct URL import - just paste your Layers share link!", timestamp: "2026-03-14T14:21:00Z" },
     ],
     tags: ["feature-request", "figma"],
   },

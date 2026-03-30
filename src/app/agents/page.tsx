@@ -22,7 +22,7 @@ import {
   Bell,
   ChevronRight,
   Zap,
-  Github,
+  GitFork,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -299,7 +299,7 @@ export default function AgentsPage() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-white/20 hover:bg-white/5 text-white font-semibold transition-colors"
               >
-                <Github className="w-4 h-4" />
+                <GitFork className="w-4 h-4" />
                 View on GitHub
               </a>
             </motion.div>

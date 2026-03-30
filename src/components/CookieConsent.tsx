@@ -2,7 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Cookie, X } from "lucide-react";
+import {
+  Cookie,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 
 const STORAGE_KEY = "zoobicon_cookie_consent";

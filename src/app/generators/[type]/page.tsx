@@ -31,7 +31,7 @@ import {
   Type,
   ListChecks,
   Server,
-  Chrome,
+  Globe2,
   Layers,
   Smartphone,
   Brush,
@@ -92,7 +92,7 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   Type,
   ListChecks,
   Server,
-  Chrome,
+  Globe2,
   Layers,
   Smartphone,
   Brush,
@@ -1600,10 +1600,10 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
     ],
   },
   "chrome-ext": {
-    name: "Chrome Extension",
+    name: "Globe2 Extension",
     description:
-      "Generate Chrome extension popup UIs, options pages, and content scripts with proper manifest.json configuration.",
-    icon: "Chrome",
+      "Generate Globe2 extension popup UIs, options pages, and content scripts with proper manifest.json configuration.",
+    icon: "Globe2",
     category: "Tool",
     color: "from-yellow-500 to-green-500",
     fields: [
@@ -1657,7 +1657,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "manifest.json with proper permissions",
       "Background service worker template",
       "Content script injection template",
-      "Chrome storage API integration for settings",
+      "Globe2 storage API integration for settings",
     ],
   },
   "component-lib": {

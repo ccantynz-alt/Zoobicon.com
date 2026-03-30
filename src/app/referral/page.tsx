@@ -400,7 +400,7 @@ export default function ReferralPage() {
                   {/* Share buttons */}
                   <div className="flex flex-wrap gap-2">
                     <ShareButton icon={Copy} label="Copy Link" color="bg-white/[0.06] hover:bg-white/[0.1] text-white/80" onClick={copyLink} />
-                    <ShareButton icon={ExternalLink} label="Twitter" color="bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 border border-sky-500/20" onClick={shareTwitter} />
+                    <ShareButton icon={ExternalLink} label="MessageCircle" color="bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 border border-sky-500/20" onClick={shareTwitter} />
                     <ShareButton icon={TrendingUp} label="LinkedIn" color="bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/20" onClick={shareLinkedIn} />
                     <ShareButton icon={Mail} label="Email" color="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20" onClick={shareEmail} />
                     <ShareButton icon={MessageSquare} label="WhatsApp" color="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20" onClick={shareWhatsApp} />

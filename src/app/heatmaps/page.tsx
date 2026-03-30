@@ -3,9 +3,24 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import {
-  Flame, MousePointer2, ArrowDown, Video, AlertTriangle,
-  Code, Eye, Layers, Monitor, Smartphone, Clock, Copy,
-  ArrowRight, Zap, BarChart3, Target, RefreshCw, Check
+  Flame,
+  MousePointer2,
+  ArrowDown,
+  Video,
+  AlertTriangle,
+  Code,
+  Eye,
+  Layers,
+  Monitor,
+  Smartphone,
+  Clock,
+  Copy,
+  ArrowRight,
+  Zap,
+  BarChart3,
+  Target,
+  RefreshCw,
+  Check,
 } from 'lucide-react';
 
 const DEMO_CLICKS = [

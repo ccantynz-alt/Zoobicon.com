@@ -3,10 +3,29 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import {
-  Activity, CheckCircle, AlertTriangle, XCircle, Clock,
-  ChevronRight, ArrowLeft, Plus, Bell, Globe, Server,
-  Database, Shield, Zap, Wifi, Mail, Eye, Settings,
-  Calendar, TrendingUp, Users, ExternalLink, ChevronDown
+  Activity,
+  CheckCircle,
+  AlertTriangle,
+  XCircle,
+  Clock,
+  ChevronRight,
+  ArrowLeft,
+  Plus,
+  Bell,
+  Globe,
+  Server,
+  Database,
+  Shield,
+  Zap,
+  Wifi,
+  Mail,
+  Eye,
+  Settings,
+  Calendar,
+  TrendingUp,
+  Users,
+  ExternalLink,
+  ChevronDown,
 } from 'lucide-react';
 
 type TabType = 'status' | 'incidents' | 'subscribers' | 'settings';

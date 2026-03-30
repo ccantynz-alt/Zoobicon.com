@@ -2,9 +2,20 @@
 
 import { useState, useEffect, useCallback } from "react";
 import {
-  Wifi, RefreshCw, Globe, Signal, Smartphone, Search,
-  TrendingUp, Package, AlertCircle, CheckCircle2,
-  ChevronDown, ChevronRight, Loader2, DollarSign,
+  Wifi,
+  RefreshCw,
+  Globe,
+  Signal,
+  Smartphone,
+  Search,
+  TrendingUp,
+  Package,
+  AlertCircle,
+  CheckCircle2,
+  ChevronDown,
+  ChevronRight,
+  Loader2,
+  DollarSign,
 } from "lucide-react";
 
 interface Plan {

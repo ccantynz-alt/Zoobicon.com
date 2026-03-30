@@ -1,7 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { X, Search, LayoutTemplate } from "lucide-react";
+import {
+  X,
+  Search,
+  LayoutTemplate,
+} from "lucide-react";
 import { TEMPLATES, TEMPLATE_CATEGORIES } from "@/lib/templates";
 
 interface TemplateGalleryProps {

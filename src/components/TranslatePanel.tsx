@@ -1,7 +1,12 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import { Globe, Check, Languages, Loader2 } from "lucide-react";
+import {
+  Globe,
+  Check,
+  Languages,
+  Loader2,
+} from "lucide-react";
 
 interface TranslatePanelProps {
   code: string;

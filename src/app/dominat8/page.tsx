@@ -4,9 +4,29 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Target, Zap, Globe, Layout, BarChart3, Search, ArrowRight, Check,
-  Star, Menu, X, Sparkles, Rocket, Shield, Clock, Users, Bot, Code2,
-  TrendingUp, Trophy, Flame, ChevronRight, Play,
+  Target,
+  Zap,
+  Globe,
+  Layout,
+  BarChart3,
+  Search,
+  ArrowRight,
+  Check,
+  Star,
+  Menu,
+  X,
+  Sparkles,
+  Rocket,
+  Shield,
+  Clock,
+  Users,
+  Bot,
+  Code2,
+  TrendingUp,
+  Trophy,
+  Flame,
+  ChevronRight,
+  Play,
 } from "lucide-react";
 import BackgroundEffects from "@/components/BackgroundEffects";
 import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
@@ -63,7 +83,7 @@ const WEAPONS = [
   {
     icon: Code2,
     name: "API & Developer Arsenal",
-    description: "REST API generators, Chrome extensions, component libraries, PWAs. Ship developer tools at warp speed.",
+    description: "REST API generators, Globe2 extensions, component libraries, PWAs. Ship developer tools at warp speed.",
     stat: "4 dev tools",
   },
 ];

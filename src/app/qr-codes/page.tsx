@@ -3,10 +3,29 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import {
-  QrCode, Link2, Wifi, Contact, Mail, Phone, MessageSquare,
-  Palette, Download, Copy, Grid3X3, Image, Layers, Zap,
-  ChevronRight, Check, Settings, Eye, LayoutGrid, FileText,
-  ArrowLeft, Sparkles, Package
+  QrCode,
+  Link2,
+  Wifi,
+  Contact,
+  Mail,
+  Phone,
+  MessageSquare,
+  Palette,
+  Download,
+  Copy,
+  Grid3X3,
+  Image,
+  Layers,
+  Zap,
+  ChevronRight,
+  Check,
+  Settings,
+  Eye,
+  LayoutGrid,
+  FileText,
+  ArrowLeft,
+  Sparkles,
+  Package,
 } from 'lucide-react';
 
 type QRType = 'url' | 'wifi' | 'vcard' | 'email' | 'phone' | 'sms';

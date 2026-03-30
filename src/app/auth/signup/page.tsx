@@ -3,7 +3,14 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import BackgroundEffects from "@/components/BackgroundEffects";
-import { Zap, Eye, EyeOff, ArrowRight, Chrome, Check } from "lucide-react";
+import {
+  Zap,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  Globe2,
+  Check,
+} from "lucide-react";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
@@ -118,7 +125,7 @@ export default function SignupPage() {
               href="/api/auth/oauth/google"
               className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.05] transition-colors text-sm font-medium"
             >
-              <Chrome className="w-4 h-4" />
+              <Globe2 className="w-4 h-4" />
               Sign up with Google
             </a>
             <a

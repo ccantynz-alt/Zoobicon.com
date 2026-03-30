@@ -2,7 +2,32 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { MessageSquare, Bot, Send, Settings, Sparkles, Code, Copy, Check, Palette, Globe, BarChart3, MessageCircle, Users, Zap, Plus, ChevronDown, Brain, Shield, Clock, ArrowRight, Star, TrendingUp, Eye, Hash } from 'lucide-react';
+import {
+  MessageSquare,
+  Bot,
+  Send,
+  Settings,
+  Sparkles,
+  Code,
+  Copy,
+  Check,
+  Palette,
+  Globe,
+  BarChart3,
+  MessageCircle,
+  Users,
+  Zap,
+  Plus,
+  ChevronDown,
+  Brain,
+  Shield,
+  Clock,
+  ArrowRight,
+  Star,
+  TrendingUp,
+  Eye,
+  Hash,
+} from 'lucide-react';
 
 const TEMPLATES = [
   { id: 'support', name: 'Customer Support', desc: 'Answer FAQs, troubleshoot issues, collect tickets', icon: '🛟', popular: true },

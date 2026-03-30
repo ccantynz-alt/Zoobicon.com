@@ -1,6 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Check, X, Minus, Star, Zap, Shield, Globe } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  X,
+  Minus,
+  Star,
+  Zap,
+  Shield,
+  Globe,
+} from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Zoobicon vs v0 vs Bolt vs Lovable — AI Website Builder Comparison 2026",

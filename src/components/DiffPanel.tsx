@@ -1,7 +1,15 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { X, History, GitBranch, Plus, Minus, Eye, Columns2 } from "lucide-react";
+import {
+  X,
+  History,
+  GitBranch,
+  Plus,
+  Minus,
+  Eye,
+  Columns2,
+} from "lucide-react";
 
 /* ─── Types ─── */
 interface Snapshot {

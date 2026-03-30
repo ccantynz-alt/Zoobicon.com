@@ -1,7 +1,12 @@
 "use client";
 
 import { useMemo, useState, useEffect, useRef, useCallback, lazy, Suspense } from "react";
-import { Monitor, Tablet, Smartphone, Play } from "lucide-react";
+import {
+  Monitor,
+  Tablet,
+  Smartphone,
+  Play,
+} from "lucide-react";
 import { injectVisualEditingScript } from "@/lib/dom-bridge";
 import type { SelectedElement, BridgeMessage } from "@/lib/dom-bridge";
 
