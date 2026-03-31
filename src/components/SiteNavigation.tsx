@@ -140,7 +140,10 @@ export default function SiteNavigation() {
   // Close mega menu on click outside
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (megaRef.current && !megaRef.current.contains(e.target as Node)) {
+      // Don't close if clicking inside the mega menu panel itself
+      const target = e.target as HTMLElement;
+      if (target.closest("[data-mega-menu]")) return;
+      if (megaRef.current && !megaRef.current.contains(target)) {
         setMegaOpen(false);
       }
     }
@@ -178,8 +181,6 @@ export default function SiteNavigation() {
             <div ref={megaRef} className="relative">
               <button
                 onClick={() => setMegaOpen(!megaOpen)}
-                onMouseEnter={() => { clearTimeout(timeoutRef.current); setMegaOpen(true); }}
-                onMouseLeave={() => { timeoutRef.current = setTimeout(() => setMegaOpen(false), 300); }}
                 className={`flex items-center gap-1 px-3 py-2 text-sm rounded-lg transition-colors ${
                   megaOpen ? "text-white bg-white/[0.08]" : "text-white/60 hover:text-white hover:bg-white/[0.04]"
                 }`}
@@ -190,8 +191,7 @@ export default function SiteNavigation() {
               {/* Mega Menu Panel — FULL WIDTH 6 columns */}
               {megaOpen && (
                 <div
-                  onMouseEnter={() => clearTimeout(timeoutRef.current)}
-                  onMouseLeave={() => { timeoutRef.current = setTimeout(() => setMegaOpen(false), 300); }}
+                  data-mega-menu
                   className="fixed top-[64px] left-0 right-0 bg-[#141420] border-b border-white/[0.08] shadow-2xl shadow-black/50"
                 >
                   <div className="max-w-7xl mx-auto px-6 py-6">
