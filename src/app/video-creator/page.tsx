@@ -220,30 +220,39 @@ export default function VideoCreatorChat() {
       setVideoStatus("Rendering video — this takes about 2 minutes...");
 
       // Poll for completion
+      let pollDone = false;
       const pollInterval = setInterval(async () => {
+        if (pollDone) return;
         try {
           const statusRes = await fetch(`/api/video-creator/heygen?action=status&videoId=${videoId}`);
           const statusData = await statusRes.json();
+          console.log("[video-creator] Poll status:", statusData.status, videoId);
 
           if (statusData.status === "completed" && statusData.videoUrl) {
+            pollDone = true;
             clearInterval(pollInterval);
             setVideoUrl(statusData.videoUrl);
             setVideoStatus("");
             setGenerating(false);
           } else if (statusData.status === "failed") {
+            pollDone = true;
             clearInterval(pollInterval);
-            setVideoError(statusData.error || "Video generation failed.");
+            setVideoError(statusData.error || "Video generation failed. Try a different presenter or shorter script.");
             setVideoStatus("");
             setGenerating(false);
+          } else {
+            // Still processing — update status
+            setVideoStatus(`Rendering video — ${statusData.status || "processing"}...`);
           }
-        } catch { /* keep polling */ }
+        } catch { /* keep polling on network error */ }
       }, 5000);
 
       // Safety timeout after 10 minutes
       setTimeout(() => {
-        clearInterval(pollInterval);
-        if (!videoUrl) {
-          setVideoError("Video is taking longer than expected. Check back in a few minutes.");
+        if (!pollDone) {
+          pollDone = true;
+          clearInterval(pollInterval);
+          setVideoError("Video is taking longer than expected. It may still complete — refresh in a few minutes to check.");
           setGenerating(false);
         }
       }, 600000);

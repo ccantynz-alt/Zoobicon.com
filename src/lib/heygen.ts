@@ -209,18 +209,21 @@ export async function getVideoStatus(videoId: string): Promise<HeyGenVideoStatus
   });
 
   if (!res.ok) {
+    const errText = await res.text().catch(() => "");
+    console.error(`[heygen] Status check failed for ${videoId}: ${res.status} ${errText}`);
     return {
       videoId,
       status: "failed",
       videoUrl: null,
       thumbnailUrl: null,
       duration: null,
-      error: "Failed to check video status.",
+      error: `Failed to check video status (${res.status}).`,
     };
   }
 
   const data = await res.json();
   const info = data?.data;
+  console.log(`[heygen] Status for ${videoId}: ${info?.status}${info?.error ? ` error=${info.error}` : ""}${info?.video_url ? " (has video URL)" : ""}`);
 
   return {
     videoId,
