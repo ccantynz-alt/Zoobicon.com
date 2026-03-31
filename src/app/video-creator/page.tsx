@@ -81,49 +81,30 @@ export default function VideoCreatorChat() {
     }
   }, [router]);
 
-  // Check which pipeline is available: our custom one (Replicate) or HeyGen
+  // ALWAYS load HeyGen as a reliable fallback — it's proven to work
   useEffect(() => {
-    // Check custom pipeline first
-    fetch("/api/v1/video/generate")
+    fetch("/api/video-creator/heygen")
       .then((r) => r.json())
-      .then((d) => {
-        if (d.available) {
-          setPipelineAvailable(true);
-        } else {
-          // Fall back to HeyGen
-          setUseHeyGen(true);
-          fetch("/api/video-creator/heygen")
-            .then((r) => r.json())
-            .then((h) => {
-              if (h.presets?.length > 0) {
-                setAvatars(h.presets);
-                setSelectedAvatar(h.presets[0].id);
-              }
-              if (h.voices?.length > 0) {
-                setVoices(h.voices);
-                // Auto-select female voice by default
-                const femaleVoice = h.voices.find((v: { gender: string }) => v.gender === "female");
-                setSelectedVoice(femaleVoice?.voice_id || h.voices[0].voice_id);
-              }
-            })
-            .catch(() => {});
+      .then((h) => {
+        if (h.presets?.length > 0) {
+          setAvatars(h.presets);
+          // Auto-select first female avatar
+          const female = h.presets.find((a: { gender: string }) => a.gender === "female");
+          setSelectedAvatar(female?.id || h.presets[0].id);
+        }
+        if (h.voices?.length > 0) {
+          setVoices(h.voices);
+          const femaleVoice = h.voices.find((v: { gender: string }) => v.gender === "female");
+          setSelectedVoice(femaleVoice?.voice_id || h.voices[0].voice_id);
         }
       })
-      .catch(() => {
-        // Pipeline check failed — try HeyGen
-        setUseHeyGen(true);
-        fetch("/api/video-creator/heygen")
-          .then((r) => r.json())
-          .then((h) => {
-            if (h.presets?.length > 0) { setAvatars(h.presets); setSelectedAvatar(h.presets[0].id); }
-            if (h.voices?.length > 0) {
-              setVoices(h.voices);
-              const femaleVoice = h.voices.find((v: { gender: string }) => v.gender === "female");
-              setSelectedVoice(femaleVoice?.voice_id || h.voices[0].voice_id);
-            }
-          })
-          .catch(() => {});
-      });
+      .catch(() => {});
+
+    // Also check if our custom pipeline is available (bonus, not required)
+    fetch("/api/v1/video/generate")
+      .then((r) => r.json())
+      .then((d) => { if (d.available) setPipelineAvailable(true); })
+      .catch(() => {});
   }, []);
 
   // Auto-scroll
@@ -245,82 +226,19 @@ export default function VideoCreatorChat() {
     }
   };
 
-  // Generate video — uses our pipeline (Replicate) or HeyGen fallback
+  // Generate video — ALWAYS uses HeyGen (proven, reliable)
+  // Custom pipeline (Replicate) available as future upgrade
   const handleGenerateVideo = async (isPreview = false) => {
-    if (!finalScript) return;
-
-    // Use our custom pipeline if available
-    if (pipelineAvailable && !useHeyGen) {
-      setGenerating(true);
-      setVideoError("");
-      setVideoUrl(null);
-      setVideoStatus("Starting AI video pipeline...");
-
-      try {
-        const res = await fetch("/api/v1/video/generate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            script: finalScript,
-            avatarDescription: presenterDesc,
-            voiceGender: presenterGender,
-            voiceStyle: "professional",
-            background: bgColor,
-            format,
-          }),
-        });
-
-        if (!res.ok) {
-          const data = await res.json().catch(() => ({}));
-          setVideoError(data.error || "Video generation failed.");
-          setGenerating(false);
-          return;
-        }
-
-        // Read SSE stream for progress
-        const reader = res.body?.getReader();
-        if (!reader) throw new Error("No stream");
-
-        const decoder = new TextDecoder();
-        let buffer = "";
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split("\n");
-          buffer = lines.pop() || "";
-
-          for (const line of lines) {
-            if (!line.startsWith("data: ")) continue;
-            try {
-              const event = JSON.parse(line.slice(6));
-              if (event.type === "status") {
-                setVideoStatus(event.message || "Processing...");
-              } else if (event.type === "done" && event.videoUrl) {
-                setVideoUrl(event.videoUrl);
-                setVideoStatus("");
-                setGenerating(false);
-              } else if (event.type === "error") {
-                setVideoError(event.message || "Video generation failed.");
-                setVideoStatus("");
-                setGenerating(false);
-              }
-            } catch { /* skip */ }
-          }
-        }
-
-        setGenerating(false);
-      } catch {
-        setVideoError("Failed to connect. Please try again.");
-        setGenerating(false);
-      }
+    if (!finalScript) {
+      setVideoError("No script approved yet. Pick a draft from the chat first.");
       return;
     }
-
-    // HeyGen fallback
-    if (!selectedAvatar || !selectedVoice) {
-      setVideoError("Select a presenter and voice first.");
+    if (!selectedAvatar) {
+      setVideoError("No presenter available. Please reload the page.");
+      return;
+    }
+    if (!selectedVoice) {
+      setVideoError("No voice available. Please reload the page.");
       return;
     }
 
@@ -539,95 +457,60 @@ export default function VideoCreatorChat() {
                 </div>
               </div>
 
-              {/* Presenter — describe or pick */}
-              {pipelineAvailable && !useHeyGen ? (
-                <>
-                  {/* Custom pipeline — describe your presenter */}
-                  <div>
-                    <label className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-2 block">Describe Your Presenter</label>
-                    <textarea
-                      value={presenterDesc}
-                      onChange={(e) => setPresenterDesc(e.target.value)}
-                      rows={3}
-                      className="w-full px-3 py-2.5 bg-white/[0.06] border border-white/[0.10] rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
-                      placeholder="Beautiful woman, warm smile, sitting at a modern desk, professional attire..."
-                    />
-                    <p className="text-xs text-slate-500 mt-1.5">AI generates a unique presenter matching your description</p>
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-2 block">Voice</label>
-                    <div className="grid grid-cols-2 gap-2">
+              {/* Choose Presenter — real HeyGen avatars with photos */}
+              <div>
+                <label className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-2 block">Choose Presenter</label>
+                {avatars.length > 0 ? (
+                  <div className="grid grid-cols-3 gap-2 max-h-60 overflow-y-auto">
+                    {avatars.map((avatar) => (
                       <button
-                        onClick={() => setPresenterGender("female")}
-                        className={`p-3 rounded-xl border text-center transition-all ${
-                          presenterGender === "female"
-                            ? "border-pink-500/50 bg-pink-500/10 ring-1 ring-pink-500/20"
+                        key={avatar.id}
+                        onClick={() => {
+                          setSelectedAvatar(avatar.id);
+                          // ALWAYS match voice gender to avatar
+                          const matchGender = avatar.gender || (avatar.name.match(/^(Abigail|Anna|Angela|Daisy|Kristin|Briana|Monica)/) ? "female" : "male");
+                          const matchingVoice = voices.find((v) => v.gender === matchGender);
+                          if (matchingVoice) setSelectedVoice(matchingVoice.voice_id);
+                        }}
+                        className={`p-2 rounded-xl border text-center transition-all ${
+                          selectedAvatar === avatar.id
+                            ? "border-purple-500/50 bg-purple-500/10 ring-1 ring-purple-500/20"
                             : "border-white/[0.08] bg-white/[0.02] hover:border-white/20"
                         }`}
                       >
-                        <div className="text-sm font-semibold">Female</div>
-                        <div className="text-xs text-slate-500">Professional, warm</div>
+                        {avatar.preview_image_url ? (
+                          <img src={avatar.preview_image_url} alt={avatar.name} className="w-14 h-14 rounded-full mx-auto mb-1.5 object-cover" />
+                        ) : (
+                          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 mx-auto mb-1.5 flex items-center justify-center text-white font-bold text-lg">
+                            {avatar.name[0]}
+                          </div>
+                        )}
+                        <div className="text-[11px] font-medium text-white/80 truncate">{avatar.name}</div>
                       </button>
-                      <button
-                        onClick={() => setPresenterGender("male")}
-                        className={`p-3 rounded-xl border text-center transition-all ${
-                          presenterGender === "male"
-                            ? "border-blue-500/50 bg-blue-500/10 ring-1 ring-blue-500/20"
-                            : "border-white/[0.08] bg-white/[0.02] hover:border-white/20"
-                        }`}
-                      >
-                        <div className="text-sm font-semibold">Male</div>
-                        <div className="text-xs text-slate-500">Confident, clear</div>
-                      </button>
-                    </div>
+                    ))}
                   </div>
-                </>
-              ) : (
-                <>
-                  {/* HeyGen fallback — pick from avatar list */}
-                  <div>
-                    <label className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-2 block">Choose Presenter</label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {avatars.map((avatar) => (
-                        <button
-                          key={avatar.id}
-                          onClick={() => {
-                            setSelectedAvatar(avatar.id);
-                            // Auto-match voice gender to avatar gender
-                            const matchingVoice = voices.find((v) => v.gender === avatar.gender);
-                            if (matchingVoice) setSelectedVoice(matchingVoice.voice_id);
-                          }}
-                          className={`p-2 rounded-xl border text-center transition-all ${
-                            selectedAvatar === avatar.id
-                              ? "border-purple-500/50 bg-purple-500/10 ring-1 ring-purple-500/20"
-                              : "border-white/[0.08] bg-white/[0.02] hover:border-white/20"
-                          }`}
-                        >
-                          {avatar.preview_image_url ? (
-                            <img src={avatar.preview_image_url} alt={avatar.name} className="w-12 h-12 rounded-full mx-auto mb-1.5 object-cover" />
-                          ) : (
-                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 mx-auto mb-1.5 flex items-center justify-center text-white font-bold">
-                              {avatar.name[0]}
-                            </div>
-                          )}
-                          <div className="text-xs font-medium text-white/80 truncate">{avatar.name}</div>
-                        </button>
-                      ))}
-                    </div>
+                ) : (
+                  <div className="p-4 rounded-xl bg-white/[0.04] border border-white/[0.08] text-center">
+                    <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2 text-purple-400" />
+                    <div className="text-sm text-slate-400">Loading presenters...</div>
                   </div>
-                  <div>
-                    <label className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-2 block">Voice</label>
-                    <select
-                      value={selectedVoice}
-                      onChange={(e) => setSelectedVoice(e.target.value)}
-                      className="w-full bg-white/[0.06] border border-white/[0.10] rounded-xl px-3 py-2.5 text-sm text-white/80 focus:border-purple-500/50 focus:outline-none"
-                    >
-                      {voices.map((v) => (
-                        <option key={v.voice_id} value={v.voice_id}>{v.name} ({v.gender})</option>
-                      ))}
-                    </select>
-                  </div>
-                </>
+                )}
+              </div>
+
+              {/* Voice — filtered to show only matching gender */}
+              {voices.length > 0 && (
+                <div>
+                  <label className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-2 block">Voice</label>
+                  <select
+                    value={selectedVoice}
+                    onChange={(e) => setSelectedVoice(e.target.value)}
+                    className="w-full bg-white/[0.06] border border-white/[0.10] rounded-xl px-3 py-2.5 text-sm text-white/80 focus:border-purple-500/50 focus:outline-none"
+                  >
+                    {voices.map((v) => (
+                      <option key={v.voice_id} value={v.voice_id}>{v.name} ({v.gender})</option>
+                    ))}
+                  </select>
+                </div>
               )}
 
               {/* Format */}
