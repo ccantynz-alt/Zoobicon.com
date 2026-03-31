@@ -81,30 +81,19 @@ export default function VideoCreatorChat() {
     }
   }, [router]);
 
-  // ALWAYS load HeyGen as a reliable fallback — it's proven to work
+  // Check our pipeline availability on load
   useEffect(() => {
-    fetch("/api/video-creator/heygen")
-      .then((r) => r.json())
-      .then((h) => {
-        if (h.presets?.length > 0) {
-          setAvatars(h.presets);
-          // Auto-select first female avatar
-          const female = h.presets.find((a: { gender: string }) => a.gender === "female");
-          setSelectedAvatar(female?.id || h.presets[0].id);
-        }
-        if (h.voices?.length > 0) {
-          setVoices(h.voices);
-          const femaleVoice = h.voices.find((v: { gender: string }) => v.gender === "female");
-          setSelectedVoice(femaleVoice?.voice_id || h.voices[0].voice_id);
-        }
-      })
-      .catch(() => {});
-
-    // Also check if our custom pipeline is available (bonus, not required)
     fetch("/api/v1/video/generate")
       .then((r) => r.json())
-      .then((d) => { if (d.available) setPipelineAvailable(true); })
-      .catch(() => {});
+      .then((d) => {
+        setPipelineAvailable(d.available ?? false);
+        if (!d.available) {
+          setVideoError("Video pipeline is being configured. Add REPLICATE_API_TOKEN to your environment variables.");
+        }
+      })
+      .catch(() => {
+        setVideoError("Could not connect to video pipeline.");
+      });
   }, []);
 
   // Auto-scroll
@@ -226,19 +215,15 @@ export default function VideoCreatorChat() {
     }
   };
 
-  // Generate video — ALWAYS uses HeyGen (proven, reliable)
-  // Custom pipeline (Replicate) available as future upgrade
+  // Generate video using OUR pipeline (Replicate: FLUX + Fish Speech + SadTalker)
+  // NO HeyGen. We own the stack.
   const handleGenerateVideo = async (isPreview = false) => {
     if (!finalScript) {
       setVideoError("No script approved yet. Pick a draft from the chat first.");
       return;
     }
-    if (!selectedAvatar) {
-      setVideoError("No presenter available. Please reload the page.");
-      return;
-    }
-    if (!selectedVoice) {
-      setVideoError("No voice available. Please reload the page.");
+    if (!pipelineAvailable) {
+      setVideoError("Video pipeline not configured. Add REPLICATE_API_TOKEN to environment variables.");
       return;
     }
 
@@ -457,61 +442,47 @@ export default function VideoCreatorChat() {
                 </div>
               </div>
 
-              {/* Choose Presenter — real HeyGen avatars with photos */}
+              {/* Describe Your Presenter — AI generates a unique face */}
               <div>
-                <label className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-2 block">Choose Presenter</label>
-                {avatars.length > 0 ? (
-                  <div className="grid grid-cols-3 gap-2 max-h-60 overflow-y-auto">
-                    {avatars.map((avatar) => (
-                      <button
-                        key={avatar.id}
-                        onClick={() => {
-                          setSelectedAvatar(avatar.id);
-                          // ALWAYS match voice gender to avatar
-                          const matchGender = avatar.gender || (avatar.name.match(/^(Abigail|Anna|Angela|Daisy|Kristin|Briana|Monica)/) ? "female" : "male");
-                          const matchingVoice = voices.find((v) => v.gender === matchGender);
-                          if (matchingVoice) setSelectedVoice(matchingVoice.voice_id);
-                        }}
-                        className={`p-2 rounded-xl border text-center transition-all ${
-                          selectedAvatar === avatar.id
-                            ? "border-purple-500/50 bg-purple-500/10 ring-1 ring-purple-500/20"
-                            : "border-white/[0.08] bg-white/[0.02] hover:border-white/20"
-                        }`}
-                      >
-                        {avatar.preview_image_url ? (
-                          <img src={avatar.preview_image_url} alt={avatar.name} className="w-14 h-14 rounded-full mx-auto mb-1.5 object-cover" />
-                        ) : (
-                          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 mx-auto mb-1.5 flex items-center justify-center text-white font-bold text-lg">
-                            {avatar.name[0]}
-                          </div>
-                        )}
-                        <div className="text-[11px] font-medium text-white/80 truncate">{avatar.name}</div>
-                      </button>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="p-4 rounded-xl bg-white/[0.04] border border-white/[0.08] text-center">
-                    <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2 text-purple-400" />
-                    <div className="text-sm text-slate-400">Loading presenters...</div>
-                  </div>
-                )}
+                <label className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-2 block">Describe Your Presenter</label>
+                <textarea
+                  value={presenterDesc}
+                  onChange={(e) => setPresenterDesc(e.target.value)}
+                  rows={3}
+                  className="w-full px-3 py-2.5 bg-white/[0.06] border border-white/[0.10] rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                  placeholder="Beautiful woman, warm smile, professional, sitting at desk..."
+                />
+                <p className="text-xs text-slate-500 mt-1.5">AI generates a unique presenter from your description — no stock avatars</p>
               </div>
 
-              {/* Voice — filtered to show only matching gender */}
-              {voices.length > 0 && (
-                <div>
-                  <label className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-2 block">Voice</label>
-                  <select
-                    value={selectedVoice}
-                    onChange={(e) => setSelectedVoice(e.target.value)}
-                    className="w-full bg-white/[0.06] border border-white/[0.10] rounded-xl px-3 py-2.5 text-sm text-white/80 focus:border-purple-500/50 focus:outline-none"
+              {/* Voice Gender */}
+              <div>
+                <label className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-2 block">Voice</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setPresenterGender("female")}
+                    className={`p-3 rounded-xl border text-center transition-all ${
+                      presenterGender === "female"
+                        ? "border-pink-500/50 bg-pink-500/10 ring-1 ring-pink-500/20"
+                        : "border-white/[0.08] bg-white/[0.02] hover:border-white/20"
+                    }`}
                   >
-                    {voices.map((v) => (
-                      <option key={v.voice_id} value={v.voice_id}>{v.name} ({v.gender})</option>
-                    ))}
-                  </select>
+                    <div className="text-sm font-semibold">Female</div>
+                    <div className="text-xs text-slate-500">Professional, warm</div>
+                  </button>
+                  <button
+                    onClick={() => setPresenterGender("male")}
+                    className={`p-3 rounded-xl border text-center transition-all ${
+                      presenterGender === "male"
+                        ? "border-blue-500/50 bg-blue-500/10 ring-1 ring-blue-500/20"
+                        : "border-white/[0.08] bg-white/[0.02] hover:border-white/20"
+                    }`}
+                  >
+                    <div className="text-sm font-semibold">Male</div>
+                    <div className="text-xs text-slate-500">Confident, clear</div>
+                  </button>
                 </div>
-              )}
+              </div>
 
               {/* Format */}
               <div>
