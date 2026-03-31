@@ -93,6 +93,10 @@ export default function DomainsPage() {
   const [generating, setGenerating] = useState(false);
   const genResultsRef = useRef<HTMLDivElement>(null);
 
+  // Checkout state
+  const [checkingOut, setCheckingOut] = useState(false);
+  const [checkoutError, setCheckoutError] = useState("");
+
   const allTlds = Object.keys(TLD_PRICES);
 
   const toggleTld = (tld: string) => {
@@ -161,6 +165,41 @@ export default function DomainsPage() {
 
   const removeFromCart = (domain: string) => {
     setCart(prev => prev.filter(c => c.domain !== domain));
+  };
+
+  // --- Checkout ---
+  const handleCheckout = async () => {
+    if (cart.length === 0) return;
+    setCheckingOut(true);
+    setCheckoutError("");
+
+    try {
+      const res = await fetch("/api/domains/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          domains: cart.map((d) => ({ domain: d.domain, tld: d.tld, price: d.price })),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setCheckoutError(data.error || "Checkout failed. Please try again.");
+        setCheckingOut(false);
+        return;
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setCheckoutError("Failed to create checkout session.");
+        setCheckingOut(false);
+      }
+    } catch {
+      setCheckoutError("Connection error. Please try again.");
+      setCheckingOut(false);
+    }
   };
 
   // --- AI Name Generator ---
@@ -598,9 +637,14 @@ export default function DomainsPage() {
                     </div>
                   ))}
                 </div>
-                <button className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-lg transition-colors shadow-lg shadow-indigo-500/20">
-                  Proceed to Registration
+                <button
+                  onClick={handleCheckout}
+                  disabled={checkingOut}
+                  className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-lg transition-colors shadow-lg shadow-indigo-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {checkingOut ? <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</> : "Proceed to Registration"}
                 </button>
+                {checkoutError && <p className="text-center text-sm text-red-400 mt-2">{checkoutError}</p>}
                 <p className="text-center text-xs text-slate-500 mt-3">Includes free WHOIS privacy, SSL, and DNS management</p>
               </div>
             )}
@@ -735,9 +779,14 @@ export default function DomainsPage() {
                     </div>
                   ))}
                 </div>
-                <button className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-lg transition-colors shadow-lg shadow-indigo-500/20">
-                  Proceed to Registration
+                <button
+                  onClick={handleCheckout}
+                  disabled={checkingOut}
+                  className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-lg transition-colors shadow-lg shadow-indigo-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {checkingOut ? <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</> : "Proceed to Registration"}
                 </button>
+                {checkoutError && <p className="text-center text-sm text-red-400 mt-2">{checkoutError}</p>}
               </div>
             )}
           </div>
