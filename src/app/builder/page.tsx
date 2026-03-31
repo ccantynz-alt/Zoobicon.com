@@ -1022,11 +1022,12 @@ function BuilderPage() {
       // The streaming endpoint handles BOTH registry assembly AND AI customization
       // Server-side registry loading is reliable (no client-side import issues)
       try {
-        const res = await fetch("/api/generate/react-stream", {
+        const res = await fetch("/api/generate/react", {
           method: "POST",
           headers: authHeaders(),
           body: JSON.stringify({
             prompt: prompt.trim(),
+            tier: "premium",
           }),
           signal: controller.signal,
         });
@@ -1060,28 +1061,14 @@ function BuilderPage() {
 
               if (event.type === "status") {
                 setPipelineAgents(prev => [...prev, event.message]);
-              } else if (event.type === "scaffold" && event.files) {
-                // Registry-assembled scaffold — instant preview
-                if (generationIdRef.current === currentGenId) {
-                  setReactFiles(event.files);
-                  setGeneratedCode("<!-- react-app-mode -->");
-                  setPipelineAgents(prev => [...prev, `${event.componentCount || 9} components assembled from registry`]);
-                }
-              } else if (event.type === "scaffold-update" && event.files) {
-                // Updated scaffold with AI-customized colors/branding
-                if (generationIdRef.current === currentGenId) {
-                  setReactFiles(event.files);
-                }
-              } else if (event.type === "customization" && event.data) {
-                // AI content customization received — apply to preview
-                if (generationIdRef.current === currentGenId) {
-                  setPipelineAgents(prev => [...prev, `Customized for "${event.data.brandName || 'your brand'}"`]);
-                }
               } else if (event.type === "partial" && event.files) {
-                // Fallback: old streaming format — merge files
+                // Streaming: files arrive as they're generated
                 if (generationIdRef.current === currentGenId) {
                   setReactFiles(prev => ({ ...prev, ...event.files }));
                   setGeneratedCode("<!-- react-app-mode -->");
+                  if (event.latestFile) {
+                    setPipelineAgents(prev => [...prev, `Built ${event.fileCount} files — ${event.latestFile}`]);
+                  }
                 }
               } else if ((event.type === "done" && event.files) || (event.type === "done")) {
                 // Generation complete

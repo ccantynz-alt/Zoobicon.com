@@ -389,8 +389,8 @@ export default function VideoCreatorDashboard() {
   const [tiktokStatus, setTiktokStatus] = useState("");
 
   // HeyGen AI Spokesperson state
-  const [showSpokesperson, setShowSpokesperson] = useState(false);
-  const [spokespersonAvatarId, setSpokespersonAvatarId] = useState("Angela-inTshirt-20220820");
+  const [showSpokesperson, setShowSpokesperson] = useState(true);
+  const [spokespersonAvatarId, setSpokespersonAvatarId] = useState("");
   const [spokespersonVoiceId, setSpokespersonVoiceId] = useState("");
   const [spokespersonFormat, setSpokespersonFormat] = useState<"portrait" | "landscape" | "square">("portrait");
   const [spokespersonBg, setSpokespersonBg] = useState("#1a1a2e");
@@ -400,7 +400,7 @@ export default function VideoCreatorDashboard() {
   const [spokespersonStatus, setSpokespersonStatus] = useState<string | null>(null);
   const [spokespersonError, setSpokespersonError] = useState("");
   const [heygenAvailable, setHeygenAvailable] = useState<boolean | null>(null);
-  const [heygenAvatars, setHeygenAvatars] = useState<{ id: string; name: string; gender: string; style: string; description: string }[]>([]);
+  const [heygenAvatars, setHeygenAvatars] = useState<{ id: string; name: string; gender: string; style: string; description: string; preview_image_url?: string }[]>([]);
   const [heygenVoices, setHeygenVoices] = useState<{ voice_id: string; name: string; gender: string }[]>([]);
 
   // Video Translation state
@@ -531,12 +531,22 @@ export default function VideoCreatorDashboard() {
       .then((r) => r.json())
       .then((d) => { if (d.templates) setTemplates(d.templates); })
       .catch(() => {});
-    // Check HeyGen availability + load presets
+    // Check HeyGen availability + load real avatars from API
     fetch("/api/video-creator/heygen")
       .then((r) => r.json())
       .then((d) => {
         setHeygenAvailable(d.available ?? false);
-        if (d.presets) setHeygenAvatars(d.presets);
+        if (d.presets) {
+          setHeygenAvatars(d.presets);
+          // Auto-select first avatar if none selected
+          if (d.presets.length > 0) setSpokespersonAvatarId((prev) => prev || d.presets[0].id);
+        }
+        // Also load voices from initial response
+        if (d.voices && d.voices.length > 0) {
+          setHeygenVoices(d.voices);
+          // Auto-select first voice
+          setSpokespersonVoiceId((prev) => prev || d.voices[0].voice_id);
+        }
       })
       .catch(() => setHeygenAvailable(false));
   }, []);
@@ -545,6 +555,7 @@ export default function VideoCreatorDashboard() {
   const handleSpokespersonGenerate = useCallback(async () => {
     if (!script.trim()) { setSpokespersonError("Write a script first."); return; }
     if (!spokespersonAvatarId) { setSpokespersonError("Select a presenter."); return; }
+    if (!spokespersonVoiceId) { setSpokespersonError("Select a voice."); return; }
 
     setSpokespersonGenerating(true);
     setSpokespersonError("");
@@ -559,7 +570,7 @@ export default function VideoCreatorDashboard() {
         body: JSON.stringify({
           script: script.trim(),
           avatarId: spokespersonAvatarId,
-          voiceId: spokespersonVoiceId || "1bd001e7e50f421d891986aad5158bc8", // default HeyGen voice
+          voiceId: spokespersonVoiceId, // loaded from real HeyGen API
           background: { type: "color", value: spokespersonBg },
           format: spokespersonFormat,
           caption: true,
@@ -1846,9 +1857,13 @@ export default function VideoCreatorDashboard() {
                                     : "border-white/[0.08] bg-white/[0.02] hover:border-white/20"
                                 }`}
                               >
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 mx-auto mb-1 flex items-center justify-center text-white text-[10px] font-bold">
-                                  {avatar.name[0]}
-                                </div>
+                                {avatar.preview_image_url ? (
+                                  <img src={avatar.preview_image_url} alt={avatar.name} className="w-8 h-8 rounded-full mx-auto mb-1 object-cover" />
+                                ) : (
+                                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 mx-auto mb-1 flex items-center justify-center text-white text-[10px] font-bold">
+                                    {avatar.name[0]}
+                                  </div>
+                                )}
                                 <div className="text-[9px] font-semibold text-white/80 truncate">{avatar.name}</div>
                                 <div className="text-[8px] text-white/40">{avatar.style}</div>
                               </button>
