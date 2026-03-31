@@ -513,7 +513,7 @@ export default function VideoCreatorDashboard() {
   useEffect(() => {
     try {
       const stored = localStorage.getItem("zoobicon_video_projects");
-      if (stored) setProjects(JSON.parse(stored));
+      if (stored) { try { setProjects(JSON.parse(stored)); } catch { /* ignore corrupt data */ } }
     } catch { /* ignore */ }
   }, []);
 
@@ -588,20 +588,25 @@ export default function VideoCreatorDashboard() {
       setSpokespersonVideoId(data.videoId);
       setSpokespersonStatus("processing");
 
-      // Poll for completion
+      // Poll for completion — use videoId directly (not stale closure)
+      const videoId = data.videoId;
+      let pollStopped = false;
       const pollInterval = setInterval(async () => {
+        if (pollStopped) return;
         try {
-          const statusRes = await fetch(`/api/video-creator/heygen?action=status&videoId=${data.videoId}`);
+          const statusRes = await fetch(`/api/video-creator/heygen?action=status&videoId=${videoId}`);
           const statusData = await statusRes.json();
 
           if (statusData.status === "completed" && statusData.videoUrl) {
+            pollStopped = true;
             clearInterval(pollInterval);
             setSpokespersonVideoUrl(statusData.videoUrl);
             setSpokespersonStatus("completed");
             setSpokespersonGenerating(false);
           } else if (statusData.status === "failed") {
+            pollStopped = true;
             clearInterval(pollInterval);
-            setSpokespersonError(statusData.error || "Video generation failed.");
+            setSpokespersonError(statusData.error || "Video generation failed. Please try a different presenter or shorter script.");
             setSpokespersonStatus("failed");
             setSpokespersonGenerating(false);
           }
@@ -609,13 +614,14 @@ export default function VideoCreatorDashboard() {
         } catch {
           // Network error — keep polling
         }
-      }, 5000); // Check every 5 seconds
+      }, 5000);
 
       // Safety timeout — stop polling after 10 minutes
       setTimeout(() => {
-        clearInterval(pollInterval);
-        if (spokespersonStatus === "processing") {
-          setSpokespersonError("Video is taking longer than expected. Check back in a few minutes.");
+        if (!pollStopped) {
+          pollStopped = true;
+          clearInterval(pollInterval);
+          setSpokespersonError("Video is taking longer than expected. It may still complete — check back in a few minutes.");
           setSpokespersonGenerating(false);
         }
       }, 600000);
@@ -966,7 +972,7 @@ export default function VideoCreatorDashboard() {
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
         if (res.status === 503) {
-          throw new Error("Video rendering is not available yet. Your storyboard, images, voiceover, and subtitles are ready — video rendering via Runway/Luma/Pika is coming soon.");
+          throw new Error("Video rendering is coming soon. Use the AI Spokesperson above for instant video generation with a real presenter.");
         }
         throw new Error(d.error || "Render failed");
       }
