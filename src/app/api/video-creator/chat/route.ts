@@ -76,8 +76,8 @@ RULES:
     async start(controller) {
       try {
         const apiStream = client.messages.stream({
-          model: "claude-sonnet-4-6",
-          max_tokens: 4096,
+          model: "claude-haiku-4-5-20251001",
+          max_tokens: 2048,
           system: systemPrompt,
           messages: messages.map((m: { role: string; content: string }) => ({
             role: m.role as "user" | "assistant",
