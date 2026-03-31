@@ -389,7 +389,7 @@ export default function VideoCreatorDashboard() {
   const [tiktokStatus, setTiktokStatus] = useState("");
 
   // HeyGen AI Spokesperson state
-  const [showSpokesperson, setShowSpokesperson] = useState(false);
+  const [showSpokesperson, setShowSpokesperson] = useState(true);
   const [spokespersonAvatarId, setSpokespersonAvatarId] = useState("");
   const [spokespersonVoiceId, setSpokespersonVoiceId] = useState("");
   const [spokespersonFormat, setSpokespersonFormat] = useState<"portrait" | "landscape" | "square">("portrait");
