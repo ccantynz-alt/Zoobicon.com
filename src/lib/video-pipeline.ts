@@ -70,16 +70,14 @@ export async function generateVoice(
   text: string,
   options?: { gender?: "female" | "male"; style?: string; speed?: number }
 ): Promise<{ audioUrl: string; duration: number }> {
-  // Fish Speech 1.5 on Replicate
-  const res = await fetch(`${REPLICATE_API}/predictions`, {
+  // Fish Speech on Replicate — use model name, no version hash needed
+  const res = await fetch(`${REPLICATE_API}/models/jichengdu/fish-speech/predictions`, {
     method: "POST",
     headers: replicateHeaders(),
     body: JSON.stringify({
-      version: "fc2f4d09471e11e4b7d30338511c14ea26ae2170f33f6c9ea4b319affc579608",
       input: {
         text,
         speed: options?.speed || 1.0,
-        // Fish Speech auto-selects a natural voice
       },
     }),
   });
@@ -125,13 +123,10 @@ export async function generateVoiceXTTS(
     input.speaker = referenceAudioUrl; // Clone this voice
   }
 
-  const res = await fetch(`${REPLICATE_API}/predictions`, {
+  const res = await fetch(`${REPLICATE_API}/models/lucataco/xtts-v2/predictions`, {
     method: "POST",
     headers: replicateHeaders(),
-    body: JSON.stringify({
-      version: "684bc3855b37866c0c65add2ff39c78f3dea3f4ff103a436465326e0f438d55e",
-      input,
-    }),
+    body: JSON.stringify({ input }),
   });
 
   if (!res.ok) throw new Error("Voice generation failed.");
@@ -160,11 +155,11 @@ export async function generateAvatar(
 ): Promise<{ imageUrl: string }> {
   const prompt = `Professional headshot portrait photo of ${description}. Clean background, studio lighting, sharp focus, photorealistic, 8k quality. Looking directly at camera with neutral pleasant expression. Shoulders visible. Professional attire.`;
 
-  const res = await fetch(`${REPLICATE_API}/predictions`, {
+  // FLUX.1 schnell — official Replicate model, no version hash needed
+  const res = await fetch(`${REPLICATE_API}/models/black-forest-labs/flux-schnell/predictions`, {
     method: "POST",
     headers: replicateHeaders(),
     body: JSON.stringify({
-      version: "f2ab8a5bfe79f02f0789a146e5e5bfb6dc027de3c1e77c3f0e5a545b29e5f0c6",
       input: {
         prompt,
         num_outputs: 1,
@@ -202,18 +197,18 @@ export async function generateLipSync(
   audioUrl: string,
   options?: { enhanceFace?: boolean }
 ): Promise<{ videoUrl: string }> {
-  // SadTalker — reliable lip-sync generation
+  // SadTalker — reliable lip-sync generation, latest version
   const res = await fetch(`${REPLICATE_API}/predictions`, {
     method: "POST",
     headers: replicateHeaders(),
     body: JSON.stringify({
-      version: "a519cc0cfebaaeade0642141e4e445765f0e3c04e4f8ec5ea13dc8258e298832",
+      version: "3aa3dac9353cc4d6bd62a8f95957bd844003b401ca4e4a9b33baa574c549d376",
       input: {
         source_image: faceImageUrl,
         driven_audio: audioUrl,
         enhancer: options?.enhanceFace !== false ? "gfpgan" : "none",
         preprocess: "crop",
-        still: false, // Allow natural head movement
+        still: false,
       },
     }),
   });

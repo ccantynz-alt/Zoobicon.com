@@ -330,6 +330,9 @@ npm run lint     # ESLint
 16. **Auth-aware navbars** — Read `localStorage("zoobicon_user")`. Do not revert to hardcoded "Sign in."
 17. **Opus for builds** — Pipeline v3 fits ~95s within Vercel 300s limit via parallelizing planners.
 18. **Public API v1** — `/api/v1/*` uses stateless HMAC-SHA256 keys (`zbk_live_*`). Do not change auth scheme without updating all v1 routes.
+19. **AI Video Pipeline — OWN STACK, NO HEYGEN** — We build our own video generation pipeline. NEVER depend on HeyGen or any third-party avatar API. Our pipeline uses Replicate (bridge) then self-hosted GPUs: Fish Speech (voice) → FLUX (avatar generation) → SadTalker (lip-sync). We control the stack, we set the pricing, we sell the API. HeyGen code may remain as legacy but is NOT the primary path. `REPLICATE_API_TOKEN` is the required env var. Goal: be the BEST AI video generator on the market — 80-90% ahead of competition. No compromises.
+20. **Video Creator — Chat-based flow ONLY** — The video creator at `/video-creator` uses a conversational chat interface. User describes what they want → Claude writes scripts → user approves → video generates. NO storyboard editor, NO font pickers, NO platform selectors. Simple. The old storyboard page lives at `/video-creator/storyboard` and is NOT the default.
+21. **No flip-flopping on architecture decisions** — Once a decision is locked in CLAUDE.md, it stays. Don't switch between HeyGen and Replicate. Don't switch between scaffold templates and AI generation. Pick ONE path, commit, ship.
 
 ---
 
