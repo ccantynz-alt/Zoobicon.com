@@ -289,6 +289,33 @@ Output the JSON object with "files" and "dependencies" keys. Start with { — no
           // Track usage
           await trackUsage(auth.user.email, "generation").catch(() => {});
 
+          // Auto-inject backend service into every generated app
+          try {
+            const { getBackendCapabilities } = await import("@/lib/backend-service");
+            const caps = getBackendCapabilities();
+
+            if (caps.mode === "supabase") {
+              // Inject Supabase client
+              const { generateClientCode } = await import("@/lib/supabase-provision");
+              // Placeholder URLs — replaced when app is deployed with real Supabase project
+              parsed.files["lib/backend.ts"] = generateClientCode(
+                "SUPABASE_URL_PLACEHOLDER",
+                "SUPABASE_ANON_KEY_PLACEHOLDER"
+              );
+            } else {
+              // Inject local backend (localStorage-based, works in preview)
+              const { provisionBackend } = await import("@/lib/backend-service");
+              const backend = await provisionBackend(
+                prompt.slice(0, 30),
+                auth.user.email,
+                prompt
+              );
+              parsed.files["lib/backend.ts"] = backend.clientCode;
+            }
+          } catch {
+            // Backend injection failed — app still works without it
+          }
+
           // Send final complete result
           sendEvent({
             type: "done",
