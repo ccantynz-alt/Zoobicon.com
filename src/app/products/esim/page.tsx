@@ -163,8 +163,8 @@ export default function EsimProductPage() {
         <HeroEffects variant="cyan" cursorGlow particles particleCount={25} aurora />
         <CursorGlowTracker />
         <motion.div className="relative z-10 max-w-5xl mx-auto px-6 text-center" variants={staggerContainer} initial="hidden" animate="visible">
-          <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 mb-8">
-            <Plane className="w-3.5 h-3.5 text-cyan-400" /><span className="text-xs font-medium text-cyan-300">Travel Data, Instantly</span>
+          <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 mb-8">
+            <Clock className="w-3.5 h-3.5 text-amber-400" /><span className="text-xs font-medium text-amber-300">Coming Soon — Join the Waitlist</span>
           </motion.div>
           <motion.h1 variants={fadeInUp} className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6">
             Stay connected in{" "}<span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">190+ countries</span>
@@ -173,7 +173,7 @@ export default function EsimProductPage() {
             Instant eSIM data plans. No physical SIM card. No store visits. Scan a QR code and you&apos;re online in seconds.
           </motion.p>
           <motion.div variants={fadeInUp} className="flex flex-wrap justify-center gap-4">
-            <Link href="/auth/signup" className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 font-semibold hover:from-cyan-400 hover:to-blue-500 transition-all flex items-center gap-2">Get eSIM <ArrowRight className="w-4 h-4" /></Link>
+            <Link href="/auth/signup" className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 font-semibold hover:from-cyan-400 hover:to-blue-500 transition-all flex items-center gap-2">Join Waitlist <ArrowRight className="w-4 h-4" /></Link>
             <Link href="#pricing" className="px-8 py-3.5 rounded-xl bg-white/[0.05] border border-white/[0.1] font-semibold hover:bg-white/[0.08] transition-all">View Plans</Link>
           </motion.div>
         </motion.div>
