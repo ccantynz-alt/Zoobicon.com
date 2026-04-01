@@ -3,13 +3,18 @@
  *
  * NO dependency on HeyGen. We control the entire pipeline:
  *   1. Voice Generation — Fish Speech 1.5 (text → natural speech)
- *   2. Avatar Generation — FLUX.1 (text → photorealistic face)
- *   3. Lip Sync — SadTalker / MuseTalk (audio + face → talking video)
+ *   2. Avatar Generation — FLUX.1 schnell (text → photorealistic face)
+ *   3. Lip Sync — OmniHuman v1.5 (ByteDance, best quality) or SadTalker (fallback)
  *   4. Background — FLUX.1 (text → scene background)
- *   5. Compositing — FFmpeg (combine avatar + background + audio)
  *
  * All models run on Replicate (bridge) or self-hosted GPU (future).
- * Total cost: ~$0.10-0.20 per 30-second video vs HeyGen's $1-2.
+ * Total cost: ~$0.10-0.30 per 30-second video.
+ *
+ * Model selection based on March 2026 research:
+ *   - OmniHuman v1.5 (ByteDance): Full upper-body animation with gestures + emotions
+ *   - FLUX.1 schnell: $0.003/image, fastest high-quality image model
+ *   - Fish Speech 1.5: Multilingual TTS with voice cloning from 10s of audio
+ *   - SadTalker: Reliable fallback for lip-sync if OmniHuman unavailable
  *
  * Env vars:
  *   REPLICATE_API_TOKEN — Replicate API token (required for bridge mode)
@@ -189,15 +194,50 @@ export async function generateAvatar(
 // ── Step 3: Lip Sync — The Magic ──
 
 /**
- * Generate a talking-head video by syncing audio to a face image
- * Uses SadTalker (most reliable) or MuseTalk (higher quality)
+ * Generate a talking-head video by syncing audio to a face image.
+ * Tries OmniHuman v1.5 (ByteDance) first — best quality, full upper-body
+ * animation with gestures and emotions. Falls back to SadTalker if unavailable.
  */
 export async function generateLipSync(
   faceImageUrl: string,
   audioUrl: string,
   options?: { enhanceFace?: boolean }
 ): Promise<{ videoUrl: string }> {
-  // SadTalker — reliable lip-sync generation, latest version
+  // Try OmniHuman v1.5 first — ByteDance's state-of-the-art
+  try {
+    console.log("[video-pipeline] Trying OmniHuman v1.5 for lip-sync...");
+    const omniRes = await fetch(`${REPLICATE_API}/models/bytedance/omni-human/predictions`, {
+      method: "POST",
+      headers: replicateHeaders(),
+      body: JSON.stringify({
+        input: {
+          image: faceImageUrl,
+          audio: audioUrl,
+        },
+      }),
+    });
+
+    if (omniRes.ok) {
+      const omniData = await omniRes.json();
+      const videoUrl = extractReplicateOutput(omniData);
+      if (videoUrl) {
+        console.log("[video-pipeline] OmniHuman succeeded");
+        return { videoUrl };
+      }
+      if (omniData.urls?.get) {
+        const result = await pollReplicatePrediction(omniData.urls.get);
+        const url = extractReplicateOutput(result);
+        if (url) return { videoUrl: url };
+      }
+    } else {
+      console.warn("[video-pipeline] OmniHuman failed, falling back to SadTalker");
+    }
+  } catch (err) {
+    console.warn("[video-pipeline] OmniHuman error, falling back to SadTalker:", err instanceof Error ? err.message : err);
+  }
+
+  // Fallback: SadTalker — proven reliable
+  console.log("[video-pipeline] Using SadTalker for lip-sync...");
   const res = await fetch(`${REPLICATE_API}/predictions`, {
     method: "POST",
     headers: replicateHeaders(),
@@ -215,17 +255,17 @@ export async function generateLipSync(
 
   if (!res.ok) {
     const err = await res.text();
-    console.error("[video-pipeline] Lip sync failed:", res.status, err);
+    console.error("[video-pipeline] SadTalker also failed:", res.status, err);
     throw new Error("Video animation failed. Please try again.");
   }
 
   const data = await res.json();
-  const videoUrl = typeof data.output === "string" ? data.output : data.output?.video || data.output?.[0];
+  const videoUrl = extractReplicateOutput(data);
 
   if (!videoUrl) {
     if (data.urls?.get) {
       const result = await pollReplicatePrediction(data.urls.get);
-      const url = typeof result.output === "string" ? result.output : result.output?.video || result.output?.[0];
+      const url = extractReplicateOutput(result);
       if (url) return { videoUrl: url };
     }
     throw new Error("Video animation returned no video.");
