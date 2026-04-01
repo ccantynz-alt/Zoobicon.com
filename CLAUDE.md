@@ -745,3 +745,190 @@ Each reseller at $499/mo typically brings 20-50 of their own clients. 10 reselle
 **Rule: Every completed item gets marked ✅ with date. Nothing gets removed. Nothing gets forgotten.**
 **Rule: 80-90% ahead of competition on EVERY feature. If it's not best-in-class, it's not done.**
 **Rule: No flip-flopping. Decisions locked above in IMPORTANT DECISIONS. Build forward only.**
+
+---
+
+## SESSION NOTES — 2026-04-01/02 (CRITICAL SESSION — DO NOT DELETE)
+
+> Craig said: "This is the best feedback I've ever had. Please write everything down."
+> Everything below was discussed, decided, or discovered in this session. NOTHING gets lost.
+
+### PRODUCT DECISIONS MADE
+
+1. **Domain Search is our #1 product** — it actually works (real OpenSRS registry checks). No other tool on the internet does it this well. It's the entry point to the entire platform. Market it aggressively with SEO.
+
+2. **Domain search must be FREE** — it's the top of the funnel. Money comes from registration ($12.99+ per domain), hosting ($19-49/mo), email, and the platform subscription. Free search → paid registration → recurring revenue forever.
+
+3. **AI Video Creator uses OUR OWN pipeline** — Fish Speech (voice) → FLUX (avatar) → OmniHuman/SadTalker (lip-sync) via Replicate. NO HeyGen dependency. We control the stack, we set the pricing, we sell the API. This is rule #19 in IMPORTANT DECISIONS.
+
+4. **Video Creator is chat-based → 3-step flow** — Step 1: Describe what you want. Step 2: Pick from 2 script drafts. Step 3: Generate. No storyboard editor. No font pickers. No platform selectors. Simple.
+
+5. **AI Builder generates FULL-STACK working apps** — Contact forms that validate, pricing toggles that work, FAQ accordions that animate, auth that logs in. NOT just pretty pages with fake data. This is what Lovable does. We must match and beat it.
+
+6. **Diff-based editing** — "Change the header to blue" regenerates ONE file in 2-5 seconds, not the whole site in 30. This is what Bolt does. Endpoint at /api/generate/edit using Haiku.
+
+7. **eSIM marked as Coming Soon** — Celitech requires video training before API access. Waitlist page is live. Book the training, get the key, swap the badge.
+
+8. **Every product page needs excitement** — Big hero sections, effects, animations. "The thing is we've got amazing products and we need to showcase them." No more bare pages with a product slapped in the middle.
+
+### COMPETITIVE INTELLIGENCE (March 2026)
+
+**OpenAI killed Sora on March 24, 2026** — burning $15M/day, only $2.1M lifetime revenue. This removes a major competitor from the video space.
+
+**Key competitor capabilities:**
+- Lovable: $6.6B valuation, $20M ARR in 2 months. Deep Supabase integration (auto-provisions Postgres + auth + storage + RLS + real-time). This is their moat.
+- Bolt.new: $40M ARR in 6 months. WebContainers (full Node.js in browser). Diff-based editing. 3-5 second first preview.
+- v0 (Vercel): Frontend-only. No database. 6M+ developers. Best UI code quality but no backend.
+- Emergent: 5 specialized agents, Kubernetes pods per project, MCP integration, adaptive learning.
+- HeyGen: $100M+ ARR. Avatar IV, LiveAvatar (real-time), 175 languages. $29-149/mo.
+- Captions app: 10M downloads. AI Twins viral on TikTok. $10-70/mo.
+- CapCut: 300M monthly users. Seedance 2.0 integration. $0-8/mo.
+- InVideo AI: Combines Sora 2 + Veo 3.1. $25-100/mo.
+- Descript: 6M users. Text-based video editing. Underlord AI editor. $24-65/mo.
+- Kling 3.0: Native 4K 60fps. Motion Brush. AI Director.
+
+**Where we lead:**
+- 75+ products in one platform (nobody else does this)
+- Real domain search with AI name generation (unique)
+- Price: $49/mo for everything vs $200+/mo buying separately
+- White-label agency platform (nobody else across all products)
+- Own video pipeline (10-20x cheaper than HeyGen)
+
+**Where we trail (closing):**
+- Builder speed (Bolt 3-5s vs our 20-30s) — diff editing + parallel generation closing this
+- Full-stack generation (Lovable auto-provisions Supabase) — we now do this too
+- Video quality (untested pipeline) — OmniHuman upgrade done, needs testing
+- Real-time collaboration — on build list
+- MCP integration — on build list
+
+### ARCHITECTURE DECISIONS
+
+**Backend-as-a-Service (built this session):**
+- Every generated app gets lib/backend.ts automatically
+- Two modes: Local (localStorage, works in preview) and Supabase (real Postgres, works in production)
+- Same API in both modes: signUp, signIn, query, insert, update, remove, uploadFile
+- Email reputation protection: content filtering, rate limiting per app, SPF/DKIM/DMARC
+
+**API Gateway (built this session):**
+- Unified service router at api.zoobicon.ai (foundation)
+- Model warmup cron — pings Replicate models every 5 minutes to prevent cold starts
+- Routes: /video, /site, /db, /email, /domains
+
+**Parallel Generation (built this session):**
+- Frontend (Sonnet) + Backend schema (Haiku) + SEO metadata (Haiku) run simultaneously
+- Total time = longest task, not sum of all tasks
+- 30-50% faster than sequential
+
+**Email Reputation Strategy:**
+- Layer 1: Content filtering + rate limiting + SPF/DKIM/DMARC
+- Layer 2: Separate IP pools (transactional vs marketing vs customer app email)
+- Layer 3: Mailgun now → Postal on Hetzner alongside → Full Postal later
+- Warmup: 50/day → 500/day → 5000/day over 6-12 weeks
+
+### BUSINESS STRATEGY
+
+**The Untouchable Fortress:**
+- Layer 1: Own infrastructure (GPU, registrar, email, CDN, nameservers)
+- Layer 2: Platform (single login, customer data lock-in, agency white-label, marketplace)
+- Layer 3: AI products (builder, video, domains, SEO, chatbot)
+- Layer 4: Recurring revenue (domains, hosting, email, subscriptions, API, transaction clip)
+
+**Revenue model:**
+- Domain search = free (entry drug)
+- Domain registration = $12.99-79.99/yr (recurring forever)
+- Platform subscription = $49-499/mo
+- Video API = $0.50-1.00/video (cost $0.10-0.20)
+- Agency white-label = $499/mo (each reseller brings 20-50 clients)
+- Transaction clip = 1.5% on bookings/payments
+
+**5-Year Path:**
+- Year 1: 80-120 customers, $5-12K/mo
+- Year 2: Own infrastructure, 5-10 agency resellers, public API. $28-50K/mo
+- Year 3: ICANN registrar, 50+ agencies, 1000+ API customers. $100-200K/mo
+- Year 4-5: 4000+ customers, $290K+/mo MRR. Exit at $10-24M
+
+**What we can resell (all wholesale API → retail):**
+- SSL certificates (Sectigo, $3-8 cost → $19-49 sell)
+- Business email (Zoho/MXRoute, $1-2 cost → $6-12 sell)
+- SMS/WhatsApp (Twilio, $0.005 cost → $0.03 sell)
+- Push notifications (OneSignal, $0-5 cost → $15-29 sell)
+- CDN (BunnyCDN, $0.005/GB cost → $0.05/GB sell)
+- AI chatbots (Claude API, $0.01 cost → $29-49/mo sell)
+- AI image generation (Replicate FLUX, $0.003 cost → $0.10-0.25 sell)
+- AI voice cloning (Replicate, $0.01/min cost → $0.50-1.00/min sell)
+- Screen recording, PDF generation, QR code API (self-hosted, $0 cost)
+
+### PRODUCTS — HONEST STATUS
+
+**REAL (working end-to-end):**
+- AI Website Builder ✅
+- Domain Search + AI Name Generator ✅
+- 12 Free Tools (client-side) ✅
+- Video Creator (3-step flow, needs Replicate pipeline testing) ⚠️
+
+**SHELL (pretty UI, mock data — needs "Coming Soon" or real backend):**
+- CRM — 100% hardcoded demo data
+- Email Marketing — 100% hardcoded mock
+- Analytics — localStorage only
+- Invoicing — 100% hardcoded mock
+- VPN — needs WireGuard infrastructure
+- Cloud Storage — needs Backblaze B2 key
+- AI Dictation — needs Deepgram key
+- Booking — needs Cal.com key
+
+**COMING SOON (intentionally marked):**
+- eSIM — Celitech training required
+
+### CRAIG'S ACCOUNTS
+
+- Primary Claude: cccantynz@gmail.com
+- Secondary Claude: ccantyusa@gmail.com (Max plan)
+- Can switch between accounts for uninterrupted development
+- Each new session: paste CLAUDE.md, say "Continue from where I left off"
+
+### RULES ADDED THIS SESSION (22-25)
+
+22. Speed is non-negotiable — build faster if we can't be fastest
+23. Backend + Frontend built together — every app gets real backend
+24. Models stay warm — cron pings every 5 min, no cold starts
+25. No timelines, no phases — build everything NOW
+
+### KEY QUOTES FROM CRAIG (for context in future sessions)
+
+- "We need to be 80-90% out in front of the competition"
+- "If it means creating 100+ then that's what we need to do. We're going to have a big customer base"
+- "We don't take our foot off the accelerator — that's what we do"
+- "If we can't be the fastest with what's currently available then we build something in parallel"
+- "We need to have a strong foothold in this market big enough that we can't be touched"
+- "We need to control the narrative"
+- "We should be making our own API as well"
+- "Nothing ever works" — Builder showed wrong content, video failed to generate, navigation broken on iPad. These must NEVER happen again.
+- "Please don't do any chicken scratching" — Stop patching. Do deep audits. Fix root causes.
+- "This is the best feedback I've ever had. Please write everything down."
+
+### WHAT WAS BUILT THIS SESSION
+
+1. HeyGen avatar fix — loads real avatars from API
+2. Video creator rebuilt — 3-step flow (describe → scripts → generate)
+3. Own video pipeline — Fish Speech + FLUX + OmniHuman via Replicate
+4. Builder fix — no more "Velocita"/"Launchpad" placeholder content
+5. Builder upgrade — generates working interactive apps with state management
+6. Diff-based editing — /api/generate/edit (2-5 second edits)
+7. Navigation overhaul — 6-column mega menu, works on touch devices
+8. Homepage redesign — lighter sections, all products visible, 6-column footer
+9. Domain search redesign — full landing page with pricing comparison
+10. AI Name Generator — describe business → 20 names with availability check
+11. Domain purchase checkout — Stripe integration
+12. 6 TLD-specific SEO landing pages with structured data
+13. Sitemap updated with 21 new pages
+14. HeyGen webhook endpoint
+15. Supabase auto-provisioning for generated apps
+16. Backend-as-a-Service (auth + database + storage + email)
+17. Email reputation protection layer
+18. API gateway with model warmup cron
+19. Parallel generation engine
+20. Visual editor overlay component
+21. Auto-captions via Whisper
+22. Background music via MusicGen
+23. eSIM marked as Coming Soon
+24. CLAUDE.md updated with 40-item build list + rules 19-25
