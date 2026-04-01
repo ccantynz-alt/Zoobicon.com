@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -16,136 +16,74 @@ import {
   RefreshCw,
   User,
   Bot,
-  Mic,
   Monitor,
   Smartphone,
   Square,
   Play,
+  AlertCircle,
 } from "lucide-react";
 
-interface Message {
-  role: "user" | "assistant";
-  content: string;
-}
-
-interface VideoConfig {
-  type: string;
-  duration: string;
-  tone: string;
-  background: string;
-}
-
-export default function VideoCreatorChat() {
+export default function VideoCreator() {
   const router = useRouter();
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
-  const [streaming, setStreaming] = useState(false);
-  const [user, setUser] = useState<{ email: string; plan: string; role: string } | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [user, setUser] = useState<{ email: string } | null>(null);
 
-  // Production state
-  const [finalScript, setFinalScript] = useState<string | null>(null);
-  const [videoConfig, setVideoConfig] = useState<VideoConfig | null>(null);
-  const [showProduction, setShowProduction] = useState(false);
-  const [presenterDesc, setPresenterDesc] = useState("Beautiful professional woman, mid-30s, warm confident smile, sitting at a modern desk with a laptop, excited and engaging expression, business casual attire");
+  // Step tracking
+  const [step, setStep] = useState<"describe" | "scripts" | "produce">("describe");
+
+  // Step 1: Describe
+  const [description, setDescription] = useState("");
+  const [generatingScripts, setGeneratingScripts] = useState(false);
+
+  // Step 2: Scripts
+  const [scripts, setScripts] = useState<string[]>([]);
+  const [selectedScript, setSelectedScript] = useState<number | null>(null);
+  const [editedScript, setEditedScript] = useState("");
+
+  // Step 3: Produce
   const [presenterGender, setPresenterGender] = useState<"female" | "male">("female");
-  const [presenterPreviewUrl, setPresenterPreviewUrl] = useState<string | null>(null);
-  const [generatingPreview, setGeneratingPreview] = useState(false);
-  const [format, setFormat] = useState<"portrait" | "landscape" | "square">("landscape");
-  const [bgColor, setBgColor] = useState("#1a1a2e");
+  const [format, setFormat] = useState<"landscape" | "portrait" | "square">("landscape");
   const [generating, setGenerating] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [videoError, setVideoError] = useState("");
   const [videoStatus, setVideoStatus] = useState("");
-  const [pipelineAvailable, setPipelineAvailable] = useState(false);
-
-  // HeyGen fallback state (used when custom pipeline not available)
-  const [avatars, setAvatars] = useState<{ id: string; name: string; preview_image_url?: string; gender: string }[]>([]);
-  const [voices, setVoices] = useState<{ voice_id: string; name: string; gender: string }[]>([]);
-  const [selectedAvatar, setSelectedAvatar] = useState("");
-  const [selectedVoice, setSelectedVoice] = useState("");
-  const [useHeyGen, setUseHeyGen] = useState(false);
 
   // Auth
   useEffect(() => {
     try {
       const stored = localStorage.getItem("zoobicon_user");
-      if (stored) {
-        setUser(JSON.parse(stored));
-      } else {
-        router.push("/auth/login");
-      }
-    } catch {
-      router.push("/auth/login");
-    }
+      if (stored) setUser(JSON.parse(stored));
+      else router.push("/auth/login");
+    } catch { router.push("/auth/login"); }
   }, [router]);
 
-  // Check our pipeline availability on load
-  useEffect(() => {
-    fetch("/api/v1/video/generate")
-      .then((r) => r.json())
-      .then((d) => {
-        setPipelineAvailable(d.available ?? false);
-        if (!d.available) {
-          setVideoError("Video pipeline is being configured. Add REPLICATE_API_TOKEN to your environment variables.");
-        }
-      })
-      .catch(() => {
-        setVideoError("Could not connect to video pipeline.");
-      });
-  }, []);
-
-  // Auto-scroll
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, streaming]);
-
-  // Parse final script from assistant messages
-  const checkForFinalScript = useCallback((text: string) => {
-    const scriptMatch = text.match(/---FINAL_SCRIPT---\n?([\s\S]*?)\n?---END_SCRIPT---/);
-    const configMatch = text.match(/---VIDEO_CONFIG---\n?([\s\S]*?)\n?---END_CONFIG---/);
-
-    if (scriptMatch) {
-      setFinalScript(scriptMatch[1].trim());
-      setShowProduction(true);
-
-      if (configMatch) {
-        try {
-          const config = JSON.parse(configMatch[1].trim());
-          setVideoConfig(config);
-          if (config.background) setBgColor(config.background);
-        } catch { /* ignore parse errors */ }
-      }
-    }
-  }, []);
-
-  // Send message
-  const handleSend = async () => {
-    if (!input.trim() || streaming) return;
-
-    const userMsg: Message = { role: "user", content: input.trim() };
-    const newMessages = [...messages, userMsg];
-    setMessages(newMessages);
-    setInput("");
-    setStreaming(true);
-
-    // Add empty assistant message for streaming
-    const assistantMsg: Message = { role: "assistant", content: "" };
-    setMessages([...newMessages, assistantMsg]);
+  // Step 1: Generate scripts from description
+  const handleGenerateScripts = async () => {
+    if (!description.trim()) return;
+    setGeneratingScripts(true);
+    setScripts([]);
+    setVideoError("");
 
     try {
       const res = await fetch("/api/video-creator/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: newMessages }),
+        body: JSON.stringify({
+          messages: [{
+            role: "user",
+            content: `Write exactly 2 video scripts for this: ${description.trim()}
+
+Output ONLY the scripts in this exact format, nothing else:
+
+SCRIPT_1:
+[First script here - 30-60 seconds, natural conversational tone]
+
+SCRIPT_2:
+[Second script here - different approach, same length]`
+          }],
+        }),
       });
 
-      if (!res.ok) {
-        setMessages([...newMessages, { role: "assistant", content: "Sorry, something went wrong. Please try again." }]);
-        setStreaming(false);
-        return;
-      }
+      if (!res.ok) throw new Error("Failed to generate scripts");
 
       const reader = res.body?.getReader();
       if (!reader) throw new Error("No stream");
@@ -160,151 +98,133 @@ export default function VideoCreatorChat() {
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split("\n");
         buffer = lines.pop() || "";
-
         for (const line of lines) {
           if (!line.startsWith("data: ")) continue;
           try {
             const event = JSON.parse(line.slice(6));
-            if (event.type === "text") {
-              fullText += event.content;
-              setMessages((prev) => {
-                const updated = [...prev];
-                updated[updated.length - 1] = { role: "assistant", content: fullText };
-                return updated;
-              });
-            }
-          } catch { /* skip */ }
+            if (event.type === "text") fullText += event.content;
+          } catch {}
         }
       }
 
-      // Check if assistant produced a final script
-      checkForFinalScript(fullText);
-    } catch {
-      setMessages((prev) => {
-        const updated = [...prev];
-        updated[updated.length - 1] = { role: "assistant", content: "Connection error. Please try again." };
-        return updated;
-      });
-    }
+      // Parse scripts from response
+      const parsed: string[] = [];
+      const script1Match = fullText.match(/SCRIPT_1:\s*([\s\S]*?)(?=SCRIPT_2:|$)/);
+      const script2Match = fullText.match(/SCRIPT_2:\s*([\s\S]*?)$/);
 
-    setStreaming(false);
-    inputRef.current?.focus();
+      if (script1Match?.[1]?.trim()) parsed.push(script1Match[1].trim().replace(/^\[|\]$/g, "").replace(/\*\*/g, ""));
+      if (script2Match?.[1]?.trim()) parsed.push(script2Match[1].trim().replace(/^\[|\]$/g, "").replace(/\*\*/g, ""));
+
+      // Fallback: if parsing failed, split by double newline
+      if (parsed.length === 0) {
+        const chunks = fullText.split(/\n\n+/).filter(c => c.trim().length > 50);
+        if (chunks.length >= 2) {
+          parsed.push(chunks[0].trim());
+          parsed.push(chunks[1].trim());
+        } else if (chunks.length === 1) {
+          parsed.push(chunks[0].trim());
+        } else {
+          parsed.push(fullText.trim());
+        }
+      }
+
+      setScripts(parsed);
+      setStep("scripts");
+    } catch (err) {
+      setVideoError("Failed to generate scripts. Please try again.");
+    }
+    setGeneratingScripts(false);
   };
 
-  // Generate presenter preview using FLUX
-  const handlePreviewPresenter = async () => {
-    if (!presenterDesc.trim()) return;
-    setGeneratingPreview(true);
-    setPresenterPreviewUrl(null);
+  // Step 2: Select and move to production
+  const handleSelectScript = (index: number) => {
+    setSelectedScript(index);
+    setEditedScript(scripts[index]);
+  };
+
+  const handleProceedToProduction = () => {
+    if (editedScript.trim().length < 10) {
+      setVideoError("Script is too short. Please write at least a few sentences.");
+      return;
+    }
+    setStep("produce");
+    setVideoError("");
+  };
+
+  // Step 3: Generate video using our Replicate pipeline
+  const handleGenerateVideo = async () => {
+    if (!editedScript.trim()) return;
+
+    setGenerating(true);
+    setVideoError("");
+    setVideoUrl(null);
+    setVideoStatus("Starting video generation...");
+
     try {
       const res = await fetch("/api/v1/video/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          script: "test",
-          avatarDescription: presenterDesc,
+          script: editedScript.trim(),
+          avatarDescription: presenterGender === "female"
+            ? "Beautiful professional woman, mid-30s, warm confident smile, friendly expression, business casual attire, looking at camera"
+            : "Professional man, mid-30s, confident smile, business casual attire, looking at camera",
           voiceGender: presenterGender,
-          _previewOnly: true,
-        }),
-      });
-      // For now, just show we're working on it
-      // Full preview will come from the FLUX model
-      setGeneratingPreview(false);
-    } catch {
-      setGeneratingPreview(false);
-    }
-  };
-
-  // Generate video using OUR pipeline (Replicate: FLUX + Fish Speech + SadTalker)
-  // NO HeyGen. We own the stack.
-  const handleGenerateVideo = async (isPreview = false) => {
-    if (!finalScript) {
-      setVideoError("No script approved yet. Pick a draft from the chat first.");
-      return;
-    }
-    if (!pipelineAvailable) {
-      setVideoError("Video pipeline not configured. Add REPLICATE_API_TOKEN to environment variables.");
-      return;
-    }
-
-    setGenerating(true);
-    setVideoError("");
-    setVideoUrl(null);
-    setVideoStatus(isPreview ? "Generating preview..." : "Starting...");
-
-    try {
-      const res = await fetch("/api/video-creator/heygen", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          script: finalScript,
-          avatarId: selectedAvatar,
-          voiceId: selectedVoice,
-          background: { type: "color", value: bgColor },
+          voiceStyle: "professional",
+          background: "#0f172a",
           format,
-          test: isPreview,
         }),
       });
 
-      const data = await res.json();
       if (!res.ok) {
-        setVideoError(data.error || "Failed to start video generation.");
-        setGenerating(false);
-        return;
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || `Video generation failed (${res.status})`);
       }
 
-      const videoId = data.videoId;
-      setVideoStatus("Rendering video — this takes about 2 minutes...");
+      // Read SSE stream for progress updates
+      const reader = res.body?.getReader();
+      if (!reader) throw new Error("No response stream");
 
-      // Poll for completion
-      let pollDone = false;
-      const pollInterval = setInterval(async () => {
-        if (pollDone) return;
-        try {
-          const statusRes = await fetch(`/api/video-creator/heygen?action=status&videoId=${videoId}`);
-          const statusData = await statusRes.json();
-          console.log("[video-creator] Poll status:", statusData.status, videoId);
+      const decoder = new TextDecoder();
+      let buf = "";
 
-          if (statusData.status === "completed" && statusData.videoUrl) {
-            pollDone = true;
-            clearInterval(pollInterval);
-            setVideoUrl(statusData.videoUrl);
-            setVideoStatus("");
-            setGenerating(false);
-          } else if (statusData.status === "failed") {
-            pollDone = true;
-            clearInterval(pollInterval);
-            setVideoError(statusData.error || "Video generation failed. Try a different presenter or shorter script.");
-            setVideoStatus("");
-            setGenerating(false);
-          } else {
-            // Still processing — update status
-            setVideoStatus(`Rendering video — ${statusData.status || "processing"}...`);
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        const lines = buf.split("\n");
+        buf = lines.pop() || "";
+
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          try {
+            const event = JSON.parse(line.slice(6));
+            if (event.type === "status") {
+              setVideoStatus(event.message || "Processing...");
+            } else if (event.type === "done" && event.videoUrl) {
+              setVideoUrl(event.videoUrl);
+              setVideoStatus("");
+              setGenerating(false);
+              return;
+            } else if (event.type === "error") {
+              throw new Error(event.message || "Video generation failed.");
+            }
+          } catch (e) {
+            if (e instanceof Error && e.message.includes("failed")) throw e;
           }
-        } catch { /* keep polling on network error */ }
-      }, 5000);
-
-      // Safety timeout after 10 minutes
-      setTimeout(() => {
-        if (!pollDone) {
-          pollDone = true;
-          clearInterval(pollInterval);
-          setVideoError("Video is taking longer than expected. It may still complete — refresh in a few minutes to check.");
-          setGenerating(false);
         }
-      }, 600000);
-    } catch {
-      setVideoError("Failed to connect. Please try again.");
-      setGenerating(false);
-    }
-  };
+      }
 
-  // Clean display text (remove script/config blocks from visible messages)
-  const cleanMessageText = (text: string) => {
-    return text
-      .replace(/---FINAL_SCRIPT---[\s\S]*?---END_SCRIPT---/g, "\n\n**Script approved and ready for production.**")
-      .replace(/---VIDEO_CONFIG---[\s\S]*?---END_CONFIG---/g, "")
-      .trim();
+      // If we got here without a video URL, something went wrong
+      if (!videoUrl) {
+        throw new Error("Video generation completed but no video was returned. Please try again.");
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Video generation failed.";
+      setVideoError(msg);
+      setGenerating(false);
+      setVideoStatus("");
+    }
   };
 
   const handleLogout = () => {
@@ -312,13 +232,25 @@ export default function VideoCreatorChat() {
     window.location.href = "/";
   };
 
+  const handleStartOver = () => {
+    setStep("describe");
+    setDescription("");
+    setScripts([]);
+    setSelectedScript(null);
+    setEditedScript("");
+    setVideoUrl(null);
+    setVideoError("");
+    setVideoStatus("");
+    setGenerating(false);
+  };
+
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-[#0a0a14] text-white flex flex-col">
+    <div className="min-h-screen bg-[#0a0a14] text-white">
       {/* Nav */}
       <nav className="border-b border-white/[0.06] bg-[#0a0a14]/90 backdrop-blur-xl">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-14">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 flex items-center justify-between h-14">
           <div className="flex items-center gap-2.5">
             <Link href="/" className="flex items-center gap-2">
               <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
@@ -340,145 +272,193 @@ export default function VideoCreatorChat() {
         </div>
       </nav>
 
-      <div className="flex-1 flex max-w-6xl mx-auto w-full">
-        {/* Chat Panel */}
-        <div className={`flex-1 flex flex-col ${showProduction ? "border-r border-white/[0.06]" : ""}`}>
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 space-y-6">
-            {messages.length === 0 && (
-              <div className="flex flex-col items-center justify-center h-full text-center px-4">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center mb-6">
-                  <Video className="w-8 h-8 text-white" />
-                </div>
-                <h1 className="text-2xl font-bold mb-3">What video do you want to create?</h1>
-                <p className="text-base text-slate-400 max-w-md mb-8">
-                  Describe your video in plain English. I&apos;ll write the script, you approve it, and we&apos;ll generate a professional AI spokesperson video.
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-lg w-full">
-                  {[
-                    "A 30-second promo video for Zoobicon showing how easy it is to build a website with AI",
-                    "A professional product launch video for our new domain search tool",
-                    "A short explainer about what Zoobicon does — aimed at small business owners",
-                    "A testimonial-style video about how AI is changing web development",
-                  ].map((suggestion) => (
-                    <button
-                      key={suggestion}
-                      onClick={() => { setInput(suggestion); inputRef.current?.focus(); }}
-                      className="p-3 rounded-xl border border-white/[0.08] bg-white/[0.03] text-left text-sm text-slate-400 hover:text-white hover:border-purple-500/30 hover:bg-purple-500/5 transition-all"
-                    >
-                      {suggestion}
-                    </button>
-                  ))}
-                </div>
+      {/* Steps indicator */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-8 pb-4">
+        <div className="flex items-center gap-3">
+          {[
+            { key: "describe", label: "1. Describe", icon: Sparkles },
+            { key: "scripts", label: "2. Pick Script", icon: Bot },
+            { key: "produce", label: "3. Generate Video", icon: Video },
+          ].map((s, i) => (
+            <div key={s.key} className="flex items-center gap-3">
+              {i > 0 && <div className={`w-8 h-px ${step === s.key || (s.key === "scripts" && step === "produce") || (s.key === "describe" && step !== "describe") ? "bg-purple-500" : "bg-white/10"}`} />}
+              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                step === s.key ? "bg-purple-600 text-white" :
+                (s.key === "describe" && step !== "describe") || (s.key === "scripts" && step === "produce") ? "bg-purple-600/20 text-purple-300" :
+                "bg-white/[0.05] text-white/40"
+              }`}>
+                <s.icon className="w-3.5 h-3.5" />
+                {s.label}
               </div>
-            )}
+            </div>
+          ))}
+        </div>
+      </div>
 
-            {messages.map((msg, i) => (
-              <div key={i} className={`flex gap-3 ${msg.role === "user" ? "justify-end" : ""}`}>
-                {msg.role === "assistant" && (
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center flex-shrink-0 mt-1">
-                    <Bot className="w-4 h-4 text-white" />
-                  </div>
-                )}
-                <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-[15px] leading-relaxed whitespace-pre-wrap ${
-                  msg.role === "user"
-                    ? "bg-indigo-600 text-white"
-                    : "bg-white/[0.06] text-slate-200"
-                }`}>
-                  {msg.role === "assistant" ? cleanMessageText(msg.content) : msg.content}
-                  {msg.role === "assistant" && streaming && i === messages.length - 1 && (
-                    <span className="inline-block w-1.5 h-5 bg-purple-400 ml-0.5 animate-pulse" />
-                  )}
-                </div>
-                {msg.role === "user" && (
-                  <div className="w-8 h-8 rounded-lg bg-indigo-600/30 flex items-center justify-center flex-shrink-0 mt-1">
-                    <User className="w-4 h-4 text-indigo-300" />
-                  </div>
-                )}
-              </div>
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-20">
 
-          {/* Input */}
-          <div className="border-t border-white/[0.06] px-4 sm:px-6 py-4">
-            <div className="flex gap-3 max-w-3xl mx-auto">
-              <textarea
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-                placeholder="Describe the video you want to create..."
-                rows={2}
-                className="flex-1 px-4 py-3 bg-white/[0.06] border border-white/[0.10] rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none text-[15px]"
-              />
-              <button
-                onClick={handleSend}
-                disabled={streaming || !input.trim()}
-                className="px-5 py-3 bg-purple-600 hover:bg-purple-500 rounded-xl font-semibold disabled:opacity-40 transition-all self-end flex items-center gap-2"
-              >
-                {streaming ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-              </button>
+        {/* Error display */}
+        {videoError && (
+          <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+            <div>
+              <div className="text-sm font-medium text-red-400">Something went wrong</div>
+              <div className="text-sm text-red-400/80 mt-1">{videoError}</div>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Production Panel — appears when script is approved */}
-        {showProduction && (
-          <div className="w-[380px] flex-shrink-0 overflow-y-auto border-l border-white/[0.06] bg-white/[0.02]">
-            <div className="p-5 space-y-5">
-              <div>
-                <h2 className="text-lg font-bold flex items-center gap-2 mb-1">
-                  <Sparkles className="w-5 h-5 text-purple-400" /> Ready to Produce
-                </h2>
-                <p className="text-sm text-slate-400">Pick your presenter and generate the video.</p>
+        {/* ═══ STEP 1: DESCRIBE ═══ */}
+        {step === "describe" && (
+          <div className="space-y-6">
+            <div className="text-center pt-8 pb-4">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center mx-auto mb-6">
+                <Video className="w-8 h-8 text-white" />
               </div>
+              <h1 className="text-3xl font-bold mb-3">What video do you want to create?</h1>
+              <p className="text-lg text-slate-400 max-w-md mx-auto">
+                Describe it in plain English. We&apos;ll write the script and generate a professional AI spokesperson video.
+              </p>
+            </div>
 
-              {/* Script preview */}
-              <div>
-                <label className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-2 block">Approved Script</label>
-                <div className="p-3 rounded-xl bg-white/[0.04] border border-white/[0.08] text-sm text-slate-300 max-h-40 overflow-y-auto whitespace-pre-wrap">
-                  {finalScript}
-                </div>
+            <div className="max-w-2xl mx-auto">
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleGenerateScripts(); } }}
+                placeholder="e.g. A 30-second promo video for Zoobicon featuring an excited female presenter explaining our AI website builder and domain search tools..."
+                rows={4}
+                className="w-full px-5 py-4 bg-white/[0.06] border border-white/[0.10] rounded-2xl text-white text-base placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                autoFocus
+              />
+
+              <button
+                onClick={handleGenerateScripts}
+                disabled={generatingScripts || description.trim().length < 10}
+                className="w-full mt-4 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-2xl font-bold text-lg disabled:opacity-40 transition-all flex items-center justify-center gap-2"
+              >
+                {generatingScripts ? (
+                  <><Loader2 className="w-5 h-5 animate-spin" /> Writing scripts...</>
+                ) : (
+                  <><Sparkles className="w-5 h-5" /> Write 2 Script Options</>
+                )}
+              </button>
+
+              {/* Quick suggestions */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-8">
+                {[
+                  "30-second promo for Zoobicon — excited female presenter showing off the AI builder and domain search",
+                  "Product launch video for our free domain search tool — professional, confident tone",
+                  "Short explainer about Zoobicon for small business owners who need a website fast",
+                  "Testimonial-style video about how AI is making web development accessible to everyone",
+                ].map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    onClick={() => setDescription(suggestion)}
+                    className="p-3 rounded-xl border border-white/[0.08] bg-white/[0.03] text-left text-sm text-slate-400 hover:text-white hover:border-purple-500/30 hover:bg-purple-500/5 transition-all"
+                  >
+                    {suggestion}
+                  </button>
+                ))}
               </div>
+            </div>
+          </div>
+        )}
 
-              {/* Describe Your Presenter — AI generates a unique face */}
+        {/* ═══ STEP 2: PICK SCRIPT ═══ */}
+        {step === "scripts" && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
               <div>
-                <label className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-2 block">Describe Your Presenter</label>
+                <h2 className="text-2xl font-bold">Pick your script</h2>
+                <p className="text-sm text-slate-400 mt-1">Select one, edit it if needed, then proceed.</p>
+              </div>
+              <button onClick={() => setStep("describe")} className="text-sm text-purple-400 hover:text-purple-300">
+                &larr; Back
+              </button>
+            </div>
+
+            <div className="grid gap-4">
+              {scripts.map((script, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleSelectScript(i)}
+                  className={`p-5 rounded-2xl border text-left transition-all ${
+                    selectedScript === i
+                      ? "border-purple-500/50 bg-purple-500/10 ring-1 ring-purple-500/20"
+                      : "border-white/[0.08] bg-white/[0.03] hover:border-white/20"
+                  }`}
+                >
+                  <div className="text-xs font-semibold text-purple-400 mb-2">Draft {i + 1}</div>
+                  <div className="text-[15px] text-slate-300 leading-relaxed whitespace-pre-wrap">{script}</div>
+                </button>
+              ))}
+            </div>
+
+            {selectedScript !== null && (
+              <div className="space-y-4">
+                <label className="text-sm font-semibold text-white/70">Edit your script (optional)</label>
                 <textarea
-                  value={presenterDesc}
-                  onChange={(e) => setPresenterDesc(e.target.value)}
-                  rows={3}
-                  className="w-full px-3 py-2.5 bg-white/[0.06] border border-white/[0.10] rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
-                  placeholder="Beautiful woman, warm smile, professional, sitting at desk..."
+                  value={editedScript}
+                  onChange={(e) => setEditedScript(e.target.value)}
+                  rows={6}
+                  className="w-full px-5 py-4 bg-white/[0.06] border border-white/[0.10] rounded-2xl text-white text-[15px] focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none leading-relaxed"
                 />
-                <p className="text-xs text-slate-500 mt-1.5">AI generates a unique presenter from your description — no stock avatars</p>
+                <button
+                  onClick={handleProceedToProduction}
+                  className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2"
+                >
+                  <Play className="w-5 h-5" /> Proceed to Generate Video
+                </button>
               </div>
+            )}
+          </div>
+        )}
 
-              {/* Voice Gender */}
+        {/* ═══ STEP 3: PRODUCE ═══ */}
+        {step === "produce" && !videoUrl && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
               <div>
-                <label className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-2 block">Voice</label>
+                <h2 className="text-2xl font-bold">Generate your video</h2>
+                <p className="text-sm text-slate-400 mt-1">Choose your presenter style, then hit generate.</p>
+              </div>
+              <button onClick={() => setStep("scripts")} className="text-sm text-purple-400 hover:text-purple-300">
+                &larr; Back to scripts
+              </button>
+            </div>
+
+            {/* Script preview */}
+            <div className="p-4 rounded-xl bg-white/[0.04] border border-white/[0.08]">
+              <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Your Script</div>
+              <div className="text-[15px] text-slate-300 leading-relaxed whitespace-pre-wrap max-h-32 overflow-y-auto">{editedScript}</div>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-4">
+              {/* Presenter gender */}
+              <div>
+                <label className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-3 block">Presenter</label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => setPresenterGender("female")}
-                    className={`p-3 rounded-xl border text-center transition-all ${
+                    className={`p-4 rounded-xl border text-center transition-all ${
                       presenterGender === "female"
                         ? "border-pink-500/50 bg-pink-500/10 ring-1 ring-pink-500/20"
                         : "border-white/[0.08] bg-white/[0.02] hover:border-white/20"
                     }`}
                   >
-                    <div className="text-sm font-semibold">Female</div>
-                    <div className="text-xs text-slate-500">Professional, warm</div>
+                    <div className="text-base font-semibold">Female</div>
+                    <div className="text-xs text-slate-500">Warm, professional</div>
                   </button>
                   <button
                     onClick={() => setPresenterGender("male")}
-                    className={`p-3 rounded-xl border text-center transition-all ${
+                    className={`p-4 rounded-xl border text-center transition-all ${
                       presenterGender === "male"
                         ? "border-blue-500/50 bg-blue-500/10 ring-1 ring-blue-500/20"
                         : "border-white/[0.08] bg-white/[0.02] hover:border-white/20"
                     }`}
                   >
-                    <div className="text-sm font-semibold">Male</div>
+                    <div className="text-base font-semibold">Male</div>
                     <div className="text-xs text-slate-500">Confident, clear</div>
                   </button>
                 </div>
@@ -486,7 +466,7 @@ export default function VideoCreatorChat() {
 
               {/* Format */}
               <div>
-                <label className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-2 block">Format</label>
+                <label className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-3 block">Format</label>
                 <div className="grid grid-cols-3 gap-2">
                   {([
                     { id: "landscape" as const, icon: Monitor, label: "16:9" },
@@ -509,71 +489,64 @@ export default function VideoCreatorChat() {
                 </div>
               </div>
 
-              {/* Background color */}
+              {/* How it works */}
               <div>
-                <label className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-2 block">Background</label>
-                <div className="flex gap-3 items-center">
-                  <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} className="w-10 h-10 rounded-lg border-0 cursor-pointer bg-transparent" />
-                  <span className="text-sm text-white/50 font-mono">{bgColor}</span>
+                <label className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-3 block">Pipeline</label>
+                <div className="p-3 rounded-xl bg-white/[0.04] border border-white/[0.06] text-xs text-slate-500 space-y-1.5">
+                  <div>1. FLUX generates your presenter</div>
+                  <div>2. Fish Speech creates the voice</div>
+                  <div>3. OmniHuman animates the face</div>
+                  <div className="text-purple-400 font-medium pt-1">~60-90 seconds total</div>
                 </div>
               </div>
+            </div>
 
-              {/* Preview + Generate buttons */}
-              <div className="space-y-2">
-                <button
-                  onClick={() => handleGenerateVideo(true)}
-                  disabled={generating || !selectedAvatar || !selectedVoice || !finalScript}
-                  className="w-full py-3 border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 rounded-xl font-semibold text-sm transition-all disabled:opacity-40 flex items-center justify-center gap-2 text-purple-300"
-                >
-                  {generating && videoStatus.includes("preview") ? (
-                    <><Loader2 className="w-4 h-4 animate-spin" /> Generating preview...</>
-                  ) : (
-                    <><Play className="w-4 h-4" /> Preview (free, watermarked)</>
-                  )}
-                </button>
-                <button
-                  onClick={() => handleGenerateVideo(false)}
-                  disabled={generating || !selectedAvatar || !selectedVoice || !finalScript}
-                  className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-xl font-bold text-base transition-all disabled:opacity-40 flex items-center justify-center gap-2"
-                >
-                  {generating && !videoStatus.includes("preview") ? (
-                    <><Loader2 className="w-5 h-5 animate-spin" /> {videoStatus || "Generating..."}</>
-                  ) : (
-                    <><Sparkles className="w-5 h-5" /> Generate Final Video</>
-                  )}
-                </button>
+            <button
+              onClick={handleGenerateVideo}
+              disabled={generating}
+              className="w-full py-5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-2xl font-bold text-xl disabled:opacity-50 transition-all flex items-center justify-center gap-3"
+            >
+              {generating ? (
+                <><Loader2 className="w-6 h-6 animate-spin" /> {videoStatus || "Generating..."}</>
+              ) : (
+                <><Sparkles className="w-6 h-6" /> Generate Video</>
+              )}
+            </button>
+          </div>
+        )}
+
+        {/* ═══ VIDEO RESULT ═══ */}
+        {videoUrl && (
+          <div className="space-y-6 pt-4">
+            <div className="text-center">
+              <div className="inline-flex items-center gap-2 text-emerald-400 font-semibold text-lg mb-4">
+                <Check className="w-5 h-5" /> Your video is ready!
               </div>
+            </div>
 
-              {videoError && (
-                <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-400">
-                  {videoError}
-                </div>
-              )}
+            <video
+              src={videoUrl}
+              controls
+              autoPlay
+              className="w-full max-w-2xl mx-auto rounded-2xl border border-white/10 shadow-2xl"
+            />
 
-              {/* Video result */}
-              {videoUrl && (
-                <div className="space-y-3">
-                  <div className="text-sm font-semibold text-emerald-400 flex items-center gap-1.5">
-                    <Check className="w-4 h-4" /> Video Ready!
-                  </div>
-                  <video src={videoUrl} controls className="w-full rounded-xl border border-white/10" />
-                  <a
-                    href={videoUrl}
-                    download
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 w-full py-3 rounded-xl border border-white/[0.10] bg-white/[0.05] text-sm text-white/80 hover:text-white hover:bg-white/[0.10] transition-all"
-                  >
-                    <Download className="w-4 h-4" /> Download Video
-                  </a>
-                  <button
-                    onClick={() => { setVideoUrl(null); setFinalScript(null); setShowProduction(false); }}
-                    className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm text-white/50 hover:text-white transition-colors"
-                  >
-                    <RefreshCw className="w-4 h-4" /> Create Another Video
-                  </button>
-                </div>
-              )}
+            <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto">
+              <a
+                href={videoUrl}
+                download
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition-colors"
+              >
+                <Download className="w-4 h-4" /> Download Video
+              </a>
+              <button
+                onClick={handleStartOver}
+                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-white/[0.10] text-white/70 hover:text-white hover:bg-white/[0.05] transition-all"
+              >
+                <RefreshCw className="w-4 h-4" /> Create Another
+              </button>
             </div>
           </div>
         )}
