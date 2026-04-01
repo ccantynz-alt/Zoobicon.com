@@ -33,7 +33,8 @@ function replicateHeaders() {
   return {
     Authorization: `Bearer ${getReplicateToken()}`,
     "Content-Type": "application/json",
-    Prefer: "wait", // Synchronous mode — wait for result
+    // NO "Prefer: wait" — community models can cold-start for 60s+
+    // We always use async mode with polling for reliability
   };
 }
 
@@ -75,14 +76,19 @@ export async function generateVoice(
   text: string,
   options?: { gender?: "female" | "male"; style?: string; speed?: number }
 ): Promise<{ audioUrl: string; duration: number }> {
-  // Fish Speech on Replicate — use model name, no version hash needed
-  const res = await fetch(`${REPLICATE_API}/models/jichengdu/fish-speech/predictions`, {
+  // Fish Speech V1.5 on Replicate — community model, needs version hash
+  // Using async mode (no Prefer:wait) because cold starts can take 60s+
+  const token = getReplicateToken();
+  const res = await fetch(`${REPLICATE_API}/predictions`, {
     method: "POST",
-    headers: replicateHeaders(),
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({
+      version: "11f3e0394c06dcc099c0cbaf75f4a6e7da84cb4aaa5d53bedfc3234b5c8aaefc",
       input: {
         text,
-        speed: options?.speed || 1.0,
       },
     }),
   });
@@ -328,6 +334,139 @@ export async function generateSpokespersonVideo(
     duration: voice.duration,
     cost: estimatedCost,
     pipeline: "zoobicon-v1",
+  };
+}
+
+// ── Auto-Captions (Whisper) ──
+
+/**
+ * Transcribe audio to generate captions/subtitles.
+ * Uses Whisper on Replicate — returns SRT format.
+ */
+export async function generateCaptions(
+  audioUrl: string
+): Promise<{ srt: string; text: string }> {
+  const res = await fetch(`${REPLICATE_API}/models/openai/whisper/predictions`, {
+    method: "POST",
+    headers: replicateHeaders(),
+    body: JSON.stringify({
+      input: {
+        audio: audioUrl,
+        model: "large-v3",
+        translate: false,
+        language: "en",
+        transcription: "srt",
+      },
+    }),
+  });
+
+  if (!res.ok) throw new Error("Caption generation failed.");
+  const data = await res.json();
+
+  const transcription = extractReplicateOutput(data);
+  if (!transcription) {
+    if (data.urls?.get) {
+      const result = await pollReplicatePrediction(data.urls.get);
+      const output = result.output as Record<string, unknown> | null;
+      return {
+        srt: (output?.transcription || output?.srt || "") as string,
+        text: (output?.text || "") as string,
+      };
+    }
+    throw new Error("No captions generated.");
+  }
+
+  return {
+    srt: typeof transcription === "string" ? transcription : "",
+    text: typeof transcription === "string" ? transcription : "",
+  };
+}
+
+// ── Background Music (MusicGen) ──
+
+/**
+ * Generate background music from a text description.
+ * Uses MusicGen on Replicate.
+ */
+export async function generateMusic(
+  description: string,
+  durationSeconds: number = 30
+): Promise<{ musicUrl: string }> {
+  const res = await fetch(`${REPLICATE_API}/models/meta/musicgen/predictions`, {
+    method: "POST",
+    headers: replicateHeaders(),
+    body: JSON.stringify({
+      input: {
+        prompt: description,
+        duration: Math.min(durationSeconds, 60),
+        model_version: "stereo-melody-large",
+        output_format: "mp3",
+        normalization_strategy: "loudness",
+      },
+    }),
+  });
+
+  if (!res.ok) throw new Error("Music generation failed.");
+  const data = await res.json();
+
+  const musicUrl = extractReplicateOutput(data);
+  if (!musicUrl) {
+    if (data.urls?.get) {
+      const result = await pollReplicatePrediction(data.urls.get);
+      const url = extractReplicateOutput(result);
+      if (url) return { musicUrl: url };
+    }
+    throw new Error("No music generated.");
+  }
+
+  return { musicUrl };
+}
+
+// ── Full Pipeline with Captions + Music ──
+
+/**
+ * Generate a complete video with optional captions and background music.
+ */
+export async function generateFullVideo(
+  request: VideoGenerationRequest & { captions?: boolean; music?: string },
+  onProgress?: (status: PipelineStatus) => void
+): Promise<VideoGenerationResult & { captionsSrt?: string; musicUrl?: string }> {
+  // Generate the base spokesperson video
+  const result = await generateSpokespersonVideo(request, onProgress);
+
+  let captionsSrt: string | undefined;
+  let musicUrl: string | undefined;
+
+  // Add captions if requested
+  if (request.captions !== false) {
+    try {
+      onProgress?.({ step: "captions", progress: 92, message: "Generating captions..." });
+      const captions = await generateCaptions(result.audioUrl);
+      captionsSrt = captions.srt;
+    } catch (err) {
+      console.warn("[video-pipeline] Caption generation failed:", err);
+      // Non-fatal — video still works without captions
+    }
+  }
+
+  // Add background music if requested
+  if (request.music) {
+    try {
+      onProgress?.({ step: "music", progress: 95, message: "Creating background music..." });
+      const music = await generateMusic(request.music, result.duration);
+      musicUrl = music.musicUrl;
+    } catch (err) {
+      console.warn("[video-pipeline] Music generation failed:", err);
+      // Non-fatal — video still works without music
+    }
+  }
+
+  onProgress?.({ step: "done", progress: 100, message: "Complete" });
+
+  return {
+    ...result,
+    captionsSrt,
+    musicUrl,
   };
 }
 
