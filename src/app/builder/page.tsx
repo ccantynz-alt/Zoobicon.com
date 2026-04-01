@@ -1191,20 +1191,13 @@ export default function App() {
     abortRef.current = controller;
 
     try {
-      // Send existing files + edit instruction to React generation endpoint
-      const existingContext = Object.entries(reactFiles)
-        .map(([path, content]) => `--- ${path} ---\n${content}`)
-        .join("\n\n");
-
-      const editPromptText = `I have an existing React application with these files:\n\n${existingContext}\n\nPlease modify it according to this instruction: ${instruction}\n\nReturn the complete updated files JSON (all files, not just changed ones).`;
-
-      const res = await fetch("/api/generate/react", {
+      // Use diff-based editing — only regenerate changed files (2-5s vs 30s)
+      const res = await fetch("/api/generate/edit", {
         method: "POST",
         headers: authHeaders(),
         body: JSON.stringify({
-          prompt: editPromptText,
-          tier,
-          ...(selectedModel ? { model: selectedModel } : {}),
+          instruction,
+          files: reactFiles,
         }),
         signal: controller.signal,
       });
@@ -1235,14 +1228,18 @@ export default function App() {
             if (event.type === "status") {
               setPipelineAgents(prev => [...prev, event.message]);
             } else if (event.type === "partial" && event.files) {
-              setReactFiles(event.files);
+              // Merge changed files into existing files (diff-based)
+              setReactFiles(prev => ({ ...prev, ...event.files }));
             } else if (event.type === "done" && event.files) {
-              setReactFiles(event.files);
-              setReactDeps(event.dependencies || {});
-              setReactSource(event.files);
+              // Merge ONLY the changed files — keep everything else
+              setReactFiles(prev => {
+                const merged = { ...prev, ...event.files };
+                setReactSource(merged);
+                return merged;
+              });
               setStatus("complete");
               setEditPrompt("");
-              setPipelineAgents(prev => [...prev, `Edit complete — ${Object.keys(event.files).length} files updated`]);
+              setPipelineAgents(prev => [...prev, `Edit complete — ${event.changedCount || Object.keys(event.files).length} file(s) changed`]);
             } else if (event.type === "error") {
               throw new Error(event.message);
             }

@@ -153,18 +153,43 @@ export async function POST(req: NextRequest) {
     }
 
     const isPremium = tier === "premium";
+    const fullStack = body.fullStack === true;
     const model = requestedModel || (isPremium ? "claude-sonnet-4-6" : "claude-sonnet-4-6");
     const maxTokens = 32000;
 
-    const userMessage = `Build a premium, agency-quality React application for: ${prompt}
+    // If full-stack requested AND Supabase is configured, add database integration
+    let supabaseContext = "";
+    if (fullStack) {
+      try {
+        const { isSupabaseConfigured, generateClientCode } = await import("@/lib/supabase-provision");
+        if (isSupabaseConfigured()) {
+          supabaseContext = `\n\nFULL-STACK MODE — INCLUDE THESE ADDITIONAL FILES:
+- "lib/supabase.ts" — Supabase client with auth helpers (signUp, signIn, signOut, getUser) and database helpers (query, insert, update, remove). Use this URL pattern: const supabaseUrl = 'SUPABASE_URL'; const supabaseAnonKey = 'SUPABASE_ANON_KEY'; (these will be replaced after provisioning)
+- "components/AuthForm.tsx" — Working login/signup form with email + password, form validation, error states, toggle between login/signup modes
+- "components/Dashboard.tsx" — Protected dashboard that shows after login. Displays user data from Supabase.
+- "lib/store.ts" — MUST include auth state (user, isLoggedIn) managed via Supabase auth listener
 
+The app MUST have:
+1. A working auth flow (signup → verify → login → dashboard)
+2. Database reads/writes using the Supabase client
+3. Protected routes that redirect to login if not authenticated
+4. Real-time data updates using Supabase subscriptions where appropriate`;
+        }
+      } catch { /* Supabase not available, generate frontend-only */ }
+    }
+
+    const userMessage = `Build a premium, agency-quality React application for: ${prompt}
+${supabaseContext}
 Requirements:
-- Split into logical components (Navbar, Hero, Features, About, Testimonials, Stats, FAQ, CTA, Footer)
+- Split into logical components (Navbar, Hero, Features, About, Testimonials, Stats, Pricing, FAQ, Contact, CTA, Footer)
 - Use Tailwind CSS classes for all styling
 - Industry-appropriate colors and typography
 - Professional copy specific to the business — no generic placeholder text
 - Every section must be visually complete with real content
 - FAQ should have working accordion (useState toggle)
+- Contact form MUST validate and show success state
+- Pricing cards MUST have monthly/annual toggle
+- Stats MUST animate when scrolling into view
 - Mobile-responsive (use Tailwind responsive prefixes: sm:, md:, lg:)
 
 Output the JSON object with "files" and "dependencies" keys. Start with { — no preamble.`;
