@@ -1284,7 +1284,12 @@ export default function App() {
   );
 
   const handleDeploy = useCallback(async () => {
-    if (!generatedCode || isDeploying) return;
+    // For React app mode, build a single HTML file from the React files
+    const hasReactFiles = Object.keys(reactFiles).length > 0;
+    const hasHtml = generatedCode && generatedCode !== "<!-- react-app-mode -->";
+
+    if (!hasReactFiles && !hasHtml) return;
+    if (isDeploying) return;
 
     setIsDeploying(true);
     setDeployStatus("deploying");
@@ -1295,10 +1300,52 @@ export default function App() {
       const email = user?.email || "anonymous@zoobicon.com";
       const siteName = prompt.trim().slice(0, 50) || "My Site";
 
+      // Build deployable code — either raw HTML or assembled React app
+      let deployCode = generatedCode;
+
+      if (hasReactFiles && !hasHtml) {
+        // React mode: combine all files into a single deployable HTML page
+        // This wraps the React components in an HTML shell with Tailwind + React CDN
+        const appCode = reactFiles["App.tsx"] || "";
+        const cssCode = reactFiles["styles.css"] || "";
+        const componentCodes = Object.entries(reactFiles)
+          .filter(([path]) => path.startsWith("components/") && path.endsWith(".tsx"))
+          .map(([path, code]) => {
+            const name = path.replace("components/", "").replace(".tsx", "");
+            return `// --- ${name} ---\n${code}`;
+          })
+          .join("\n\n");
+
+        deployCode = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${siteName}</title>
+  <script src="https://cdn.tailwindcss.com"><\/script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"><\/script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"><\/script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"><\/script>
+  <style>${cssCode}</style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+${componentCodes}
+
+${appCode}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(React.createElement(App));
+  <\/script>
+</body>
+</html>`;
+      }
+
       const res = await fetch("/api/hosting/deploy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: siteName, email, code: generatedCode }),
+        body: JSON.stringify({ name: siteName, email, code: deployCode }),
       });
 
       if (!res.ok) {
