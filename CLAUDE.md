@@ -654,4 +654,90 @@ Each reseller at $499/mo typically brings 20-50 of their own clients. 10 reselle
 
 ---
 
-*One file. One source of truth. Technical rules in Part 1. Business rules in Part 2. Update the CURRENT STATUS section every evening. Tomorrow-Craig will know exactly where today-Craig left off.*
+## URGENT BUILD LIST — EVERYTHING BELOW MUST BE BUILT. NO EXCEPTIONS.
+
+**Status: CRITICAL PRIORITY. Competition is moving. Every day we don't build this, we fall further behind.**
+
+**The 80-90% rule applies to EVERY item. If a competitor has it, we must have it better.**
+
+### TIER 1: BUILD IMMEDIATELY (blocks revenue and competitiveness)
+
+| # | Task | Why | Competitor reference | Status |
+|---|------|-----|---------------------|--------|
+| 1 | **Supabase auto-provisioning for generated apps** | Lovable's #1 feature. Generated apps get real Postgres + auth + storage + real-time. Without this we're frontend-only like v0. | Lovable ($6.6B valuation) | Code built, needs SUPABASE_ACCESS_TOKEN |
+| 2 | **Wire Supabase into builder generation flow** | Builder must auto-create database + inject client code when generating full-stack apps | Lovable, Bolt | NOT STARTED |
+| 3 | **Diff-based editing working end-to-end** | Change one thing in 2-5s instead of regenerating in 30s. This is why Bolt feels fast. | Bolt.new ($40M ARR) | API built at /api/generate/edit, needs UI wiring |
+| 4 | **Wire diff editing into builder UI** | "Make the header blue" → only header file regenerates. Chat panel in builder sends edits. | Bolt.new | NOT STARTED |
+| 5 | **Video pipeline producing actual videos** | Test every Replicate model, fix failures, produce one real video end-to-end | HeyGen, InVideo | Pipeline code built, UNTESTED |
+| 6 | **Auto-captions on generated videos** | Use Whisper on Replicate to transcribe audio → generate SRT → burn into video | Captions app, CapCut | NOT STARTED |
+| 7 | **Background music generation** | MusicGen on Replicate. "upbeat corporate" → 30-second track layered onto video | InVideo, CapCut | NOT STARTED |
+| 8 | **Stripe payments fully working** | Domain checkout, subscription plans, video credit packs | ALL competitors | Code built, needs Craig to create Stripe products |
+| 9 | **Builder streaming — show components as they generate** | Don't wait 30s for all 12 components. Show each one as it completes. | Bolt (3-5s first preview) | Partially working |
+| 10 | **MCP integration (Model Context Protocol)** | Let users feed GitHub repos, Figma designs, Notion docs into generation | Emergent, Cursor | NOT STARTED |
+
+### TIER 2: BUILD THIS WEEK (competitive parity)
+
+| # | Task | Why | Competitor reference | Status |
+|---|------|-----|---------------------|--------|
+| 11 | **AI dubbing — multi-language video** | Fish Speech supports 50+ languages. Generate same video in Spanish/French/Japanese | HeyGen (175 languages) | NOT STARTED |
+| 12 | **AI Twins — upload your face, get talking video** | Viral on TikTok. Upload a selfie, AI makes a video of "you" talking | Captions app | NOT STARTED |
+| 13 | **Auth generation in every full-stack app** | Login/signup pages, OAuth buttons, session management auto-generated | Lovable, Bolt | Supabase client built, needs UI generation |
+| 14 | **One-click deploy generated apps to zoobicon.sh** | Currently works but needs polish. Must be instant and reliable. | Lovable Cloud, Bolt Cloud | PARTIAL |
+| 15 | **GitHub sync for generated projects** | Every change committed to Git. Developer can take over at any point. | Lovable, Bolt | Export exists, sync NOT STARTED |
+| 16 | **Next.js 14 → 15 upgrade** | Server Components, Partial Prerendering, streaming Suspense boundaries. 30-50% faster page loads. | Industry standard | NOT STARTED |
+| 17 | **AG-UI protocol adoption** | Replace custom SSE streaming with standardized protocol. Gets CopilotKit components free. | Google, Microsoft, Oracle adopting | NOT STARTED |
+| 18 | **WebContainers evaluation** | Full Node.js in browser. If feasible, replaces Sandpack and matches Bolt's speed. | Bolt.new | NOT STARTED |
+| 19 | **Real-time collaborative editing** | Multiple users editing the same site simultaneously | Lovable, v0 | NOT STARTED |
+| 20 | **AI chatbot widget for customer sites** | Drop-in chat widget powered by Claude. Every generated site can have AI support. | Nobody has this built-in | NOT STARTED |
+
+### TIER 3: BUILD THIS MONTH (market leadership)
+
+| # | Task | Why | Competitor reference | Status |
+|---|------|-----|---------------------|--------|
+| 21 | **Self-hosted GPU infrastructure (Hetzner)** | Kill Replicate costs. $0.02/video instead of $0.10. Own the compute. | Internal cost optimization | NOT STARTED |
+| 22 | **Public API at api.zoobicon.ai** | Sell video/image/site generation to other developers. Recurring API revenue. | Stripe, Twilio model | Endpoints exist, needs auth + docs + billing |
+| 23 | **ICANN registrar accreditation** | Buy domains at cost instead of through OpenSRS. 90%+ margins on domains. | GoDaddy, Namecheap | NOT STARTED |
+| 24 | **Own email infrastructure (Postal)** | Kill Mailgun costs. Full control over email delivery. | Internal cost optimization | NOT STARTED |
+| 25 | **AI SEO agent that actually works** | Crawl customer sites, find issues, fix them automatically. Competitor monitoring. | Semrush, Ahrefs | DB tables exist, logic NOT STARTED |
+| 26 | **CRM with real database** | Currently 100% mock data. Needs Postgres tables and real CRUD. | HubSpot free tier | NOT STARTED |
+| 27 | **Email marketing with real backend** | Currently 100% mock data. Needs subscriber management, campaign sending. | ConvertKit, Mailchimp | NOT STARTED |
+| 28 | **Invoicing with real backend** | Currently 100% mock data. Needs PDF generation, payment tracking. | FreshBooks, Wave | NOT STARTED |
+| 29 | **Analytics with real backend** | Currently localStorage only. Needs server-side event tracking. | Google Analytics, Plausible | NOT STARTED |
+| 30 | **Agency white-label dashboard** | Resellers manage their clients, billing, sites from one panel. | Nobody has this | PARTIAL |
+| 31 | **AI video editing — smart cuts, transitions** | Auto-edit longer videos into short-form clips. | Opus Clip, Descript | NOT STARTED |
+| 32 | **Voice cloning for video** | Clone customer's voice from 10s sample. Their voice, our avatar. | HeyGen, ElevenLabs | Fish Speech supports this, NOT WIRED |
+| 33 | **SMS/WhatsApp integration** | Twilio API for notifications, bookings, marketing messages. | Twilio reseller opportunity | NOT STARTED |
+| 34 | **AI chatbot builder** | Customers create chatbots for THEIR websites. Powered by Claude. | Intercom, Drift | NOT STARTED |
+| 35 | **Mobile app (zoobicon.app)** | Wrap admin dashboard in Expo for App Store presence. | Native mobile gap | NOT STARTED |
+
+### TIER 4: INFRASTRUCTURE OWNERSHIP (the moat)
+
+| # | Task | Why | Status |
+|---|------|-----|--------|
+| 36 | **Own CDN edge network** | Serve customer sites from edge. Faster than Vercel for our use case. | NOT STARTED |
+| 37 | **Own nameservers** | ns1.zoobicon.io, ns2.zoobicon.io. Full DNS control. | NOT STARTED |
+| 38 | **Own auth service (auth.zoobicon.io)** | Drop-in auth for generated apps. Like Auth0 but built-in. | NOT STARTED |
+| 39 | **Own managed database service (db.zoobicon.io)** | Per-customer Postgres instances. Like Supabase but we own it. | NOT STARTED |
+| 40 | **Own file storage (storage.zoobicon.io)** | S3-compatible storage for customer apps. | NOT STARTED |
+
+### CRAIG'S TASKS (manual, can't be automated)
+
+| # | Task | Where | Status |
+|---|------|-------|--------|
+| C1 | **Merge branch on GitHub** | github.com/ccantynz-alt/Zoobicon.com | BLOCKING EVERYTHING |
+| C2 | **Create 3 Stripe products** | dashboard.stripe.com → Products | NOT DONE |
+| C3 | **Set OPENSRS_ENV=live in Vercel** | Vercel → Environment Variables | CHECK |
+| C4 | **Add SUPABASE_ACCESS_TOKEN to Vercel** | supabase.com → org → management API token | NOT DONE |
+| C5 | **Add SUPABASE_ORG_ID to Vercel** | supabase.com → org settings | NOT DONE |
+| C6 | **Run /api/db/init** | Visit zoobicon.com/api/db/init once after deploy | NOT DONE |
+| C7 | **Book Celitech training** | celitech.com | SCHEDULED (for eSIM) |
+| C8 | **Set up Mailgun domain** | app.mailgun.com | CHECK |
+| C9 | **Cloudflare email routing** | Cloudflare → zoobicon.com → Email | NOT DONE |
+| C10 | **Set up Zoho Mail** | zoho.com/mail | NOT DONE |
+
+---
+
+**TOTAL: 40 build tasks + 10 Craig tasks = 50 items to market dominance.**
+**Rule: Every completed item gets marked ✅ with date. Nothing gets removed. Nothing gets forgotten.**
+**Rule: 80-90% ahead of competition on EVERY feature. If it's not best-in-class, it's not done.**
+**Rule: No flip-flopping. Decisions locked above in IMPORTANT DECISIONS. Build forward only.**
