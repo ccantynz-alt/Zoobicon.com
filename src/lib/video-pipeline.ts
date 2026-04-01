@@ -33,7 +33,8 @@ function replicateHeaders() {
   return {
     Authorization: `Bearer ${getReplicateToken()}`,
     "Content-Type": "application/json",
-    Prefer: "wait", // Synchronous mode — wait for result
+    // NO "Prefer: wait" — community models can cold-start for 60s+
+    // We always use async mode with polling for reliability
   };
 }
 
@@ -75,14 +76,19 @@ export async function generateVoice(
   text: string,
   options?: { gender?: "female" | "male"; style?: string; speed?: number }
 ): Promise<{ audioUrl: string; duration: number }> {
-  // Fish Speech on Replicate — use model name, no version hash needed
-  const res = await fetch(`${REPLICATE_API}/models/jichengdu/fish-speech/predictions`, {
+  // Fish Speech V1.5 on Replicate — community model, needs version hash
+  // Using async mode (no Prefer:wait) because cold starts can take 60s+
+  const token = getReplicateToken();
+  const res = await fetch(`${REPLICATE_API}/predictions`, {
     method: "POST",
-    headers: replicateHeaders(),
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({
+      version: "11f3e0394c06dcc099c0cbaf75f4a6e7da84cb4aaa5d53bedfc3234b5c8aaefc",
       input: {
         text,
-        speed: options?.speed || 1.0,
       },
     }),
   });
