@@ -1014,65 +1014,13 @@ function BuilderPage() {
     const controller = new AbortController();
     abortRef.current = controller;
 
-    // ── React App mode: full AI generation with streaming ──
+    // ── React App mode: server handles everything via streaming ──
     if (generationMode === "react") {
       setStatus("generating");
-      setPipelineAgents(["AI is building your site..."]);
+      setPipelineAgents(["Assembling components..."]);
 
-      // Show loading skeleton immediately so the preview isn't blank
-      setReactFiles({
-        "App.tsx": `import React from "react";
-import "./styles.css";
-
-export default function App() {
-  return (
-    <div style={{ minHeight: "100vh", background: "#f8fafc", fontFamily: "'Inter', system-ui, sans-serif" }}>
-      {/* Loading skeleton — real content is being generated */}
-      <div style={{ background: "#0f172a", padding: "16px 24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div style={{ width: 120, height: 24, background: "#1e293b", borderRadius: 6 }} />
-        <div style={{ display: "flex", gap: 16 }}>
-          <div style={{ width: 60, height: 16, background: "#1e293b", borderRadius: 4 }} />
-          <div style={{ width: 60, height: 16, background: "#1e293b", borderRadius: 4 }} />
-          <div style={{ width: 60, height: 16, background: "#1e293b", borderRadius: 4 }} />
-          <div style={{ width: 100, height: 32, background: "#4f46e5", borderRadius: 8 }} />
-        </div>
-      </div>
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "80px 24px", textAlign: "center" }}>
-        <div style={{ width: 200, height: 28, background: "#e2e8f0", borderRadius: 16, margin: "0 auto 24px" }} />
-        <div style={{ width: "70%", height: 48, background: "#cbd5e1", borderRadius: 8, margin: "0 auto 16px" }} />
-        <div style={{ width: "50%", height: 48, background: "#cbd5e1", borderRadius: 8, margin: "0 auto 24px" }} />
-        <div style={{ width: "60%", height: 20, background: "#e2e8f0", borderRadius: 4, margin: "0 auto 32px" }} />
-        <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
-          <div style={{ width: 160, height: 48, background: "#4f46e5", borderRadius: 12 }} />
-          <div style={{ width: 160, height: 48, background: "#f1f5f9", borderRadius: 12, border: "1px solid #e2e8f0" }} />
-        </div>
-      </div>
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "60px 24px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }}>
-          {[1,2,3].map(i => (
-            <div key={i} style={{ padding: 32, borderRadius: 16, border: "1px solid #e2e8f0", background: "#fff" }}>
-              <div style={{ width: 48, height: 48, background: "#ede9fe", borderRadius: 12, marginBottom: 16 }} />
-              <div style={{ width: "80%", height: 20, background: "#e2e8f0", borderRadius: 4, marginBottom: 8 }} />
-              <div style={{ width: "100%", height: 14, background: "#f1f5f9", borderRadius: 4, marginBottom: 6 }} />
-              <div style={{ width: "90%", height: 14, background: "#f1f5f9", borderRadius: 4 }} />
-            </div>
-          ))}
-        </div>
-      </div>
-      <p style={{ textAlign: "center", color: "#94a3b8", fontSize: 14, padding: "40px 0", animation: "pulse 2s infinite" }}>
-        Generating your site...
-      </p>
-      <style>{"@keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.5 } }"}</style>
-    </div>
-  );
-}`,
-        "styles.css": `@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-* { margin: 0; padding: 0; box-sizing: border-box; }`,
-      });
-      setGeneratedCode("<!-- react-app-mode -->");
-
-      // Use the full AI generation endpoint — generates real content from scratch
-      // No placeholder templates, no scaffolds, no "Launchpad" or "Velocita"
+      // The streaming endpoint handles BOTH registry assembly AND AI customization
+      // Server-side registry loading is reliable (no client-side import issues)
       try {
         const res = await fetch("/api/generate/react", {
           method: "POST",
