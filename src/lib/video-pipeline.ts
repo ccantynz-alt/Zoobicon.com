@@ -76,46 +76,80 @@ export async function generateVoice(
   text: string,
   options?: { gender?: "female" | "male"; style?: string; speed?: number }
 ): Promise<{ audioUrl: string; duration: number }> {
-  // Fish Speech V1.5 on Replicate — community model, needs version hash
-  // Using async mode (no Prefer:wait) because cold starts can take 60s+
   const token = getReplicateToken();
-  const res = await fetch(`${REPLICATE_API}/predictions`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
+
+  // Try multiple TTS models in order — first one that works wins
+  const ttsModels = [
+    {
+      name: "Fish Speech V1.5",
       version: "11f3e0394c06dcc099c0cbaf75f4a6e7da84cb4aaa5d53bedfc3234b5c8aaefc",
-      input: {
-        text,
-      },
-    }),
-  });
+      input: { text },
+    },
+    {
+      name: "XTTS-v2",
+      version: "684bc3855b37866c0c65add2ff39c78f3dea3f4ff103a436465326e0f438d55e",
+      input: { text, language: "en" },
+    },
+    {
+      name: "Kokoro TTS",
+      version: "dfdf537ba482b029e0a761699e6f55e9162c7d7b148d671f9cf05e3e3b58a837",
+      input: { text, speed: options?.speed || 1.0 },
+    },
+  ];
 
-  if (!res.ok) {
-    const err = await res.text();
-    console.error("[video-pipeline] Voice generation failed:", res.status, err);
-    throw new Error("Voice generation failed. Please try again.");
-  }
+  let lastError = "";
 
-  const data = await res.json();
+  for (const model of ttsModels) {
+    try {
+      console.log(`[video-pipeline] Trying ${model.name} for voice generation...`);
 
-  // If synchronous (Prefer: wait), output is in data.output
-  // If async, we'd need to poll — but we use sync mode
-  const audioUrl = typeof data.output === "string" ? data.output : data.output?.audio || data.output?.[0];
+      const res = await fetch(`${REPLICATE_API}/predictions`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          version: model.version,
+          input: model.input,
+        }),
+      });
 
-  if (!audioUrl) {
-    // Fallback: try polling if sync didn't work
-    if (data.urls?.get) {
-      const result = await pollReplicatePrediction(data.urls.get);
-      const url = typeof result.output === "string" ? result.output : result.output?.audio || result.output?.[0];
-      if (url) return { audioUrl: url, duration: estimateDuration(text) };
+      if (!res.ok) {
+        const errText = await res.text();
+        console.error(`[video-pipeline] ${model.name} failed: ${res.status} ${errText}`);
+        lastError = `${model.name}: ${res.status}`;
+        continue; // Try next model
+      }
+
+      const data = await res.json();
+      console.log(`[video-pipeline] ${model.name} response status:`, data.status);
+
+      // Check if output is immediately available (unlikely without Prefer:wait)
+      let audioUrl = extractReplicateOutput(data);
+
+      if (!audioUrl && data.urls?.get) {
+        // Poll for completion — model is processing async
+        console.log(`[video-pipeline] ${model.name} processing async, polling...`);
+        const result = await pollReplicatePrediction(data.urls.get);
+        audioUrl = extractReplicateOutput(result);
+      }
+
+      if (audioUrl) {
+        console.log(`[video-pipeline] ${model.name} succeeded!`);
+        return { audioUrl, duration: estimateDuration(text) };
+      }
+
+      console.warn(`[video-pipeline] ${model.name} returned no audio output`);
+      lastError = `${model.name}: no output`;
+    } catch (err) {
+      console.error(`[video-pipeline] ${model.name} error:`, err instanceof Error ? err.message : err);
+      lastError = `${model.name}: ${err instanceof Error ? err.message : "unknown error"}`;
     }
-    throw new Error("Voice generation returned no audio.");
   }
 
-  return { audioUrl, duration: estimateDuration(text) };
+  // All models failed
+  throw new Error(`Voice generation failed after trying all models. Last error: ${lastError}`);
 }
 
 /**

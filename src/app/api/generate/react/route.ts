@@ -221,8 +221,9 @@ Output the JSON object with "files" and "dependencies" keys. Start with { — no
             fullText += text;
             chunkCounter++;
 
-            // Every 20 chunks, try to extract completed files and send them
-            if (chunkCounter % 20 === 0) {
+            // Every 8 chunks, try to extract completed files and send them
+            // More frequent = components appear in preview faster
+            if (chunkCounter % 8 === 0) {
               try {
                 const partialFiles = extractCompletedFiles(fullText);
                 const fileCount = Object.keys(partialFiles).length;
