@@ -333,6 +333,10 @@ npm run lint     # ESLint
 19. **AI Video Pipeline — OWN STACK, NO HEYGEN** — We build our own video generation pipeline. NEVER depend on HeyGen or any third-party avatar API. Our pipeline uses Replicate (bridge) then self-hosted GPUs: Fish Speech (voice) → FLUX (avatar generation) → SadTalker (lip-sync). We control the stack, we set the pricing, we sell the API. HeyGen code may remain as legacy but is NOT the primary path. `REPLICATE_API_TOKEN` is the required env var. Goal: be the BEST AI video generator on the market — 80-90% ahead of competition. No compromises.
 20. **Video Creator — Chat-based flow ONLY** — The video creator at `/video-creator` uses a conversational chat interface. User describes what they want → Claude writes scripts → user approves → video generates. NO storyboard editor, NO font pickers, NO platform selectors. Simple. The old storyboard page lives at `/video-creator/storyboard` and is NOT the default.
 21. **No flip-flopping on architecture decisions** — Once a decision is locked in CLAUDE.md, it stays. Don't switch between HeyGen and Replicate. Don't switch between scaffold templates and AI generation. Pick ONE path, commit, ship.
+22. **Speed is non-negotiable** — If we can't be the fastest with what's currently available, we BUILD something in parallel to make sure we ARE the fastest. No excuses. No "it takes time." Build a faster path or optimise until we lead.
+23. **Backend + Frontend built together** — Every generated app includes a working backend from day one. No frontend-only sites. Auth, database, storage, email — all auto-provisioned. This is what Lovable does. We do it better.
+24. **Models stay warm** — Cron job pings Replicate models every 5 minutes. No cold starts. First request hits a warm model. Cost ~$0.50/day is worth saving 60 seconds per customer request.
+25. **No timelines, no phases** — Don't say "this week" or "next month." Build everything NOW. The competition doesn't take breaks and neither do we. Foot on the accelerator at all times.
 
 ---
 
