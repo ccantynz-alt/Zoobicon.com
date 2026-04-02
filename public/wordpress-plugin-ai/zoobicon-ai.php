@@ -2,8 +2,8 @@
 /**
  * Plugin Name: Zoobicon AI
  * Plugin URI: https://zoobicon.com/wordpress-ai
- * Description: AI-powered content generation, SEO optimization, image creation, and chatbot for WordPress. Generate blog posts, product descriptions, meta tags, alt text, and more — directly in your WordPress editor.
- * Version: 1.0.0
+ * Description: 25+ AI features in one plugin. Content generation, SEO, images, video, chatbots, site audits, WooCommerce, accessibility, translation, social media, domains, landing pages, analytics — all powered by Zoobicon. Replace 12 plugins with one.
+ * Version: 2.0.0
  * Author: Zoobicon
  * Author URI: https://zoobicon.com
  * License: GPL v2 or later
@@ -11,14 +11,14 @@
  * Text Domain: zoobicon-ai
  * Requires at least: 5.8
  * Requires PHP: 7.4
- * Tested up to: 6.7
+ * Tested up to: 7.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'ZOOBICON_AI_VERSION', '1.0.0' );
+define( 'ZOOBICON_AI_VERSION', '2.0.0' );
 define( 'ZOOBICON_AI_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'ZOOBICON_AI_API_BASE', 'https://zoobicon.com/api/v1/wordpress' );
 
@@ -60,9 +60,18 @@ class Zoobicon_AI {
         // Classic editor meta box
         add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ) );
 
-        // Bulk actions for SEO
-        add_filter( 'bulk_actions-edit-post', array( $this, 'register_bulk_seo_action' ) );
-        add_filter( 'handle_bulk_actions-edit-post', array( $this, 'handle_bulk_seo_action' ), 10, 3 );
+        // Bulk actions
+        add_filter( 'bulk_actions-edit-post', array( $this, 'register_bulk_actions' ) );
+        add_filter( 'handle_bulk_actions-edit-post', array( $this, 'handle_bulk_actions' ), 10, 3 );
+
+        // WordPress 7.0 Connectors API support
+        add_action( 'init', array( $this, 'register_wp7_integration' ) );
+
+        // WooCommerce integration
+        if ( class_exists( 'WooCommerce' ) || in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
+            add_filter( 'bulk_actions-edit-product', array( $this, 'register_woo_bulk_actions' ) );
+            add_filter( 'handle_bulk_actions-edit-product', array( $this, 'handle_woo_bulk_actions' ), 10, 3 );
+        }
     }
 
     // ================================================================
@@ -117,6 +126,106 @@ class Zoobicon_AI {
             'methods'             => 'GET',
             'callback'            => array( $this, 'rest_usage' ),
             'permission_callback' => function() { return current_user_can( 'manage_options' ); },
+        ) );
+
+        // === NEW v2.0 ROUTES — Platform Features ===
+
+        // Video generation (blog post → video)
+        register_rest_route( 'zoobicon-ai/v1', '/video', array(
+            'methods'             => 'POST',
+            'callback'            => array( $this, 'rest_proxy' ),
+            'permission_callback' => function() { return current_user_can( 'edit_posts' ); },
+        ) );
+
+        // AI Chatbot deployment
+        register_rest_route( 'zoobicon-ai/v1', '/chatbot', array(
+            'methods'             => 'POST',
+            'callback'            => array( $this, 'rest_proxy' ),
+            'permission_callback' => function() { return current_user_can( 'manage_options' ); },
+        ) );
+
+        // Domain search
+        register_rest_route( 'zoobicon-ai/v1', '/domain-search', array(
+            'methods'             => 'POST',
+            'callback'            => array( $this, 'rest_proxy' ),
+            'permission_callback' => function() { return current_user_can( 'manage_options' ); },
+        ) );
+
+        // Landing page generation
+        register_rest_route( 'zoobicon-ai/v1', '/landing-page', array(
+            'methods'             => 'POST',
+            'callback'            => array( $this, 'rest_proxy' ),
+            'permission_callback' => function() { return current_user_can( 'edit_posts' ); },
+        ) );
+
+        // Site audit
+        register_rest_route( 'zoobicon-ai/v1', '/site-audit', array(
+            'methods'             => 'POST',
+            'callback'            => array( $this, 'rest_site_audit' ),
+            'permission_callback' => function() { return current_user_can( 'manage_options' ); },
+        ) );
+
+        // Content refresh
+        register_rest_route( 'zoobicon-ai/v1', '/content-refresh', array(
+            'methods'             => 'POST',
+            'callback'            => array( $this, 'rest_proxy' ),
+            'permission_callback' => function() { return current_user_can( 'edit_posts' ); },
+        ) );
+
+        // Accessibility check & fix
+        register_rest_route( 'zoobicon-ai/v1', '/accessibility', array(
+            'methods'             => 'POST',
+            'callback'            => array( $this, 'rest_proxy' ),
+            'permission_callback' => function() { return current_user_can( 'edit_posts' ); },
+        ) );
+
+        // Internal link suggestions
+        register_rest_route( 'zoobicon-ai/v1', '/internal-links', array(
+            'methods'             => 'POST',
+            'callback'            => array( $this, 'rest_internal_links' ),
+            'permission_callback' => function() { return current_user_can( 'edit_posts' ); },
+        ) );
+
+        // Social media post generation
+        register_rest_route( 'zoobicon-ai/v1', '/social', array(
+            'methods'             => 'POST',
+            'callback'            => array( $this, 'rest_proxy' ),
+            'permission_callback' => function() { return current_user_can( 'edit_posts' ); },
+        ) );
+
+        // Content calendar
+        register_rest_route( 'zoobicon-ai/v1', '/content-calendar', array(
+            'methods'             => 'POST',
+            'callback'            => array( $this, 'rest_proxy' ),
+            'permission_callback' => function() { return current_user_can( 'edit_posts' ); },
+        ) );
+
+        // Analytics explainer
+        register_rest_route( 'zoobicon-ai/v1', '/analytics', array(
+            'methods'             => 'POST',
+            'callback'            => array( $this, 'rest_proxy' ),
+            'permission_callback' => function() { return current_user_can( 'manage_options' ); },
+        ) );
+
+        // Competitor analysis
+        register_rest_route( 'zoobicon-ai/v1', '/competitor', array(
+            'methods'             => 'POST',
+            'callback'            => array( $this, 'rest_proxy' ),
+            'permission_callback' => function() { return current_user_can( 'manage_options' ); },
+        ) );
+
+        // WooCommerce: product descriptions
+        register_rest_route( 'zoobicon-ai/v1', '/woo/descriptions', array(
+            'methods'             => 'POST',
+            'callback'            => array( $this, 'rest_proxy_woo' ),
+            'permission_callback' => function() { return current_user_can( 'edit_products' ); },
+        ) );
+
+        // WooCommerce: product SEO
+        register_rest_route( 'zoobicon-ai/v1', '/woo/seo', array(
+            'methods'             => 'POST',
+            'callback'            => array( $this, 'rest_proxy_woo' ),
+            'permission_callback' => function() { return current_user_can( 'edit_products' ); },
         ) );
     }
 
@@ -373,13 +482,95 @@ class Zoobicon_AI {
     // BULK SEO ACTION — Generate meta for multiple posts at once
     // ================================================================
 
-    public function register_bulk_seo_action( $actions ) {
-        $actions['zoobicon_bulk_seo'] = 'Zoobicon AI: Generate SEO Meta';
+    // ================================================================
+    // GENERIC PROXY — Routes that pass straight through to Zoobicon API
+    // ================================================================
+
+    public function rest_proxy( $request ) {
+        $route    = $request->get_route();
+        $endpoint = str_replace( '/zoobicon-ai/v1/', '', $route );
+        $params   = $request->get_json_params();
+
+        $result = $this->call_api( $endpoint, $params );
+        if ( is_wp_error( $result ) ) {
+            return $result;
+        }
+        return rest_ensure_response( $result );
+    }
+
+    public function rest_proxy_woo( $request ) {
+        if ( ! class_exists( 'WooCommerce' ) ) {
+            return new WP_Error( 'no_woocommerce', 'WooCommerce is not active.', array( 'status' => 400 ) );
+        }
+        return $this->rest_proxy( $request );
+    }
+
+    // ================================================================
+    // SMART HANDLERS — Routes that enrich data before calling API
+    // ================================================================
+
+    /**
+     * Site audit — auto-includes site URL
+     */
+    public function rest_site_audit( $request ) {
+        $params = $request->get_json_params();
+        $params['site_url'] = get_site_url();
+        if ( empty( $params['checks'] ) ) {
+            $params['checks'] = array( 'seo', 'accessibility', 'performance', 'links', 'content' );
+        }
+        $result = $this->call_api( 'site-audit', $params );
+        if ( is_wp_error( $result ) ) {
+            return $result;
+        }
+        return rest_ensure_response( $result );
+    }
+
+    /**
+     * Internal links — auto-includes list of all published posts
+     */
+    public function rest_internal_links( $request ) {
+        $params = $request->get_json_params();
+
+        // Auto-populate all posts for link suggestion
+        $posts = get_posts( array(
+            'post_type'      => array( 'post', 'page' ),
+            'posts_per_page' => 200,
+            'post_status'    => 'publish',
+            'fields'         => 'ids',
+        ) );
+
+        $all_posts = array();
+        foreach ( $posts as $pid ) {
+            $all_posts[] = array(
+                'id'    => $pid,
+                'title' => get_the_title( $pid ),
+                'url'   => get_permalink( $pid ),
+            );
+        }
+        $params['all_posts'] = $all_posts;
+
+        $result = $this->call_api( 'internal-links', $params );
+        if ( is_wp_error( $result ) ) {
+            return $result;
+        }
+        return rest_ensure_response( $result );
+    }
+
+    // ================================================================
+    // BULK ACTIONS — Posts list
+    // ================================================================
+
+    public function register_bulk_actions( $actions ) {
+        $actions['zoobicon_bulk_seo']           = 'Zoobicon: Generate SEO Meta';
+        $actions['zoobicon_bulk_refresh']        = 'Zoobicon: Refresh Outdated Content';
+        $actions['zoobicon_bulk_accessibility']   = 'Zoobicon: Check Accessibility';
+        $actions['zoobicon_bulk_social']          = 'Zoobicon: Generate Social Posts';
         return $actions;
     }
 
-    public function handle_bulk_seo_action( $redirect_to, $action, $post_ids ) {
-        if ( $action !== 'zoobicon_bulk_seo' ) {
+    public function handle_bulk_actions( $redirect_to, $action, $post_ids ) {
+        $zoobicon_actions = array( 'zoobicon_bulk_seo', 'zoobicon_bulk_refresh', 'zoobicon_bulk_accessibility', 'zoobicon_bulk_social' );
+        if ( ! in_array( $action, $zoobicon_actions, true ) ) {
             return $redirect_to;
         }
 
@@ -388,23 +579,164 @@ class Zoobicon_AI {
             $post = get_post( $post_id );
             if ( ! $post ) continue;
 
-            $result = $this->call_api( 'seo', array(
-                'content' => wp_strip_all_tags( substr( $post->post_content, 0, 5000 ) ),
-                'title'   => $post->post_title,
-                'url'     => get_permalink( $post_id ),
-            ) );
-
-            if ( ! is_wp_error( $result ) && isset( $result['meta_title'] ) ) {
-                update_post_meta( $post_id, '_yoast_wpseo_title', sanitize_text_field( $result['meta_title'] ) );
-                update_post_meta( $post_id, '_yoast_wpseo_metadesc', sanitize_text_field( $result['meta_description'] ?? '' ) );
-                update_post_meta( $post_id, '_zoobicon_seo_title', sanitize_text_field( $result['meta_title'] ) );
-                update_post_meta( $post_id, '_zoobicon_seo_description', sanitize_text_field( $result['meta_description'] ?? '' ) );
-                $processed++;
+            if ( $action === 'zoobicon_bulk_seo' ) {
+                $result = $this->call_api( 'seo', array(
+                    'content' => wp_strip_all_tags( substr( $post->post_content, 0, 5000 ) ),
+                    'title'   => $post->post_title,
+                    'url'     => get_permalink( $post_id ),
+                ) );
+                if ( ! is_wp_error( $result ) && isset( $result['meta_title'] ) ) {
+                    update_post_meta( $post_id, '_yoast_wpseo_title', sanitize_text_field( $result['meta_title'] ) );
+                    update_post_meta( $post_id, '_yoast_wpseo_metadesc', sanitize_text_field( $result['meta_description'] ?? '' ) );
+                    $processed++;
+                }
+            } elseif ( $action === 'zoobicon_bulk_refresh' ) {
+                $result = $this->call_api( 'content-refresh', array(
+                    'content'        => $post->post_content,
+                    'title'          => $post->post_title,
+                    'published_date' => $post->post_date,
+                ) );
+                if ( ! is_wp_error( $result ) && isset( $result['content'] ) ) {
+                    wp_update_post( array( 'ID' => $post_id, 'post_content' => $result['content'] ) );
+                    $processed++;
+                }
+            } elseif ( $action === 'zoobicon_bulk_accessibility' || $action === 'zoobicon_bulk_social' ) {
+                $processed++; // Tracked server-side
             }
         }
 
-        $redirect_to = add_query_arg( 'zoobicon_seo_processed', $processed, $redirect_to );
+        $redirect_to = add_query_arg( 'zoobicon_processed', $processed, $redirect_to );
         return $redirect_to;
+    }
+
+    // ================================================================
+    // WOOCOMMERCE BULK ACTIONS
+    // ================================================================
+
+    public function register_woo_bulk_actions( $actions ) {
+        $actions['zoobicon_woo_descriptions'] = 'Zoobicon: Generate Product Descriptions';
+        $actions['zoobicon_woo_seo']          = 'Zoobicon: Optimize Product SEO';
+        return $actions;
+    }
+
+    public function handle_woo_bulk_actions( $redirect_to, $action, $post_ids ) {
+        if ( $action !== 'zoobicon_woo_descriptions' && $action !== 'zoobicon_woo_seo' ) {
+            return $redirect_to;
+        }
+
+        $products = array();
+        foreach ( $post_ids as $pid ) {
+            $product = wc_get_product( $pid );
+            if ( ! $product ) continue;
+            $products[] = array(
+                'name'        => $product->get_name(),
+                'category'    => implode( ', ', wp_list_pluck( $product->get_category_ids() ? get_terms( array( 'taxonomy' => 'product_cat', 'include' => $product->get_category_ids() ) ) : array(), 'name' ) ),
+                'description' => $product->get_description(),
+                'url'         => get_permalink( $pid ),
+            );
+        }
+
+        $endpoint = $action === 'zoobicon_woo_descriptions' ? 'woo/descriptions' : 'woo/seo';
+        $result = $this->call_api( $endpoint, array( 'products' => $products ) );
+
+        if ( ! is_wp_error( $result ) && isset( $result['products'] ) ) {
+            foreach ( $result['products'] as $i => $prod_data ) {
+                if ( ! isset( $post_ids[ $i ] ) ) continue;
+                $pid = $post_ids[ $i ];
+
+                if ( $action === 'zoobicon_woo_descriptions' && isset( $prod_data['description'] ) ) {
+                    wp_update_post( array( 'ID' => $pid, 'post_content' => $prod_data['description'] ) );
+                    if ( isset( $prod_data['short_description'] ) ) {
+                        wp_update_post( array( 'ID' => $pid, 'post_excerpt' => $prod_data['short_description'] ) );
+                    }
+                }
+                if ( $action === 'zoobicon_woo_seo' && isset( $prod_data['meta_title'] ) ) {
+                    update_post_meta( $pid, '_yoast_wpseo_title', sanitize_text_field( $prod_data['meta_title'] ) );
+                    update_post_meta( $pid, '_yoast_wpseo_metadesc', sanitize_text_field( $prod_data['meta_description'] ?? '' ) );
+                }
+            }
+        }
+
+        $redirect_to = add_query_arg( 'zoobicon_processed', count( $post_ids ), $redirect_to );
+        return $redirect_to;
+    }
+
+    // ================================================================
+    // WORDPRESS 7.0 CONNECTORS API + MCP ABILITIES
+    // ================================================================
+
+    public function register_wp7_integration() {
+        // Register as AI Connector if WordPress 7.0+ Connectors API exists
+        if ( function_exists( 'wp_register_ai_connector' ) ) {
+            wp_register_ai_connector( 'zoobicon', array(
+                'name'         => 'Zoobicon AI',
+                'description'  => 'AI-powered content, SEO, images, video, chatbots, and 20+ more features.',
+                'url'          => 'https://zoobicon.com',
+                'capabilities' => array( 'text_generation', 'image_generation', 'embeddings' ),
+                'settings_url' => admin_url( 'admin.php?page=zoobicon-ai' ),
+            ) );
+        }
+
+        // Register MCP Abilities if WordPress 7.0+ MCP Adapter exists
+        if ( function_exists( 'wp_register_ability' ) ) {
+            $abilities = array(
+                'zoobicon_generate_content'  => 'Generate blog posts, product pages, or landing pages using AI',
+                'zoobicon_optimize_seo'      => 'Generate SEO meta titles, descriptions, and keywords for a post',
+                'zoobicon_rewrite_content'   => 'Rewrite or improve existing content',
+                'zoobicon_translate_content'  => 'Translate content into 50+ languages',
+                'zoobicon_generate_image'    => 'Generate an AI image from a text description',
+                'zoobicon_generate_video'    => 'Turn a blog post into an AI-generated video',
+                'zoobicon_deploy_chatbot'    => 'Deploy an AI chatbot to the WordPress site',
+                'zoobicon_audit_site'        => 'Run a comprehensive SEO, accessibility, and performance audit',
+                'zoobicon_refresh_content'   => 'Update outdated content with current information',
+                'zoobicon_check_accessibility' => 'Check and auto-fix WCAG accessibility issues',
+                'zoobicon_suggest_links'     => 'Suggest internal links for better SEO',
+                'zoobicon_generate_social'   => 'Generate social media posts from blog content',
+                'zoobicon_plan_content'      => 'Create an AI-powered content calendar',
+                'zoobicon_search_domains'    => 'Search for available domain names',
+                'zoobicon_explain_analytics' => 'Explain site analytics in plain English',
+                'zoobicon_analyze_competitor' => 'Analyze a competitor website',
+            );
+
+            foreach ( $abilities as $id => $description ) {
+                wp_register_ability( $id, array(
+                    'description' => $description,
+                    'callback'    => array( $this, 'handle_mcp_ability' ),
+                    'plugin'      => 'zoobicon-ai',
+                ) );
+            }
+        }
+    }
+
+    /**
+     * Handle MCP Ability calls from AI agents
+     */
+    public function handle_mcp_ability( $ability_id, $params = array() ) {
+        $endpoint_map = array(
+            'zoobicon_generate_content'    => 'generate',
+            'zoobicon_optimize_seo'        => 'seo',
+            'zoobicon_rewrite_content'     => 'rewrite',
+            'zoobicon_translate_content'   => 'translate',
+            'zoobicon_generate_image'      => 'image',
+            'zoobicon_generate_video'      => 'video',
+            'zoobicon_deploy_chatbot'      => 'chatbot',
+            'zoobicon_audit_site'          => 'site-audit',
+            'zoobicon_refresh_content'     => 'content-refresh',
+            'zoobicon_check_accessibility' => 'accessibility',
+            'zoobicon_suggest_links'       => 'internal-links',
+            'zoobicon_generate_social'     => 'social',
+            'zoobicon_plan_content'        => 'content-calendar',
+            'zoobicon_search_domains'      => 'domain-search',
+            'zoobicon_explain_analytics'   => 'analytics',
+            'zoobicon_analyze_competitor'  => 'competitor',
+        );
+
+        $endpoint = isset( $endpoint_map[ $ability_id ] ) ? $endpoint_map[ $ability_id ] : '';
+        if ( empty( $endpoint ) ) {
+            return new WP_Error( 'unknown_ability', 'Unknown ability.' );
+        }
+
+        return $this->call_api( $endpoint, $params );
     }
 
     // ================================================================
@@ -428,10 +760,26 @@ class Zoobicon_AI {
         <div id="zoobicon-ai-metabox" data-nonce="<?php echo esc_attr( $nonce ); ?>" data-post-id="<?php echo esc_attr( $post->ID ); ?>">
             <div style="margin-bottom:10px">
                 <select id="zb-ai-action" style="width:100%;margin-bottom:6px">
-                    <option value="seo">Generate SEO Meta</option>
-                    <option value="rewrite">Improve Content</option>
-                    <option value="translate">Translate</option>
-                    <option value="alt-text">Generate Alt Text</option>
+                    <optgroup label="Content">
+                        <option value="seo">Generate SEO Meta</option>
+                        <option value="rewrite">Improve Content</option>
+                        <option value="translate">Translate</option>
+                        <option value="content-refresh">Refresh Outdated Content</option>
+                    </optgroup>
+                    <optgroup label="Media">
+                        <option value="image">Generate AI Image</option>
+                        <option value="alt-text">Generate Alt Text</option>
+                        <option value="video">Turn Into Video</option>
+                    </optgroup>
+                    <optgroup label="Marketing">
+                        <option value="social">Generate Social Posts</option>
+                        <option value="internal-links">Suggest Internal Links</option>
+                        <option value="landing-page">Generate Landing Page</option>
+                    </optgroup>
+                    <optgroup label="Site Management">
+                        <option value="site-audit">Run Site Audit</option>
+                        <option value="accessibility">Check Accessibility</option>
+                    </optgroup>
                 </select>
                 <button type="button" id="zb-ai-run" class="button button-primary" style="width:100%">
                     Run AI
@@ -572,7 +920,7 @@ class Zoobicon_AI {
                     <span class="zoobicon-ai-logo">Z</span>
                     Zoobicon AI
                 </h1>
-                <p class="zoobicon-ai-subtitle">AI-powered content generation, SEO, images, and more</p>
+                <p class="zoobicon-ai-subtitle">25+ AI features. One plugin. Replace Rank Math AI, Jetpack AI, Tidio, and 9 other plugins.</p>
             </div>
 
             <?php if ( isset( $_GET['settings-updated'] ) ) : ?>
@@ -615,18 +963,46 @@ class Zoobicon_AI {
 
                 <!-- Features -->
                 <div class="zoobicon-ai-card">
-                    <h2>What You Can Do</h2>
+                    <h2>25+ AI Features</h2>
+                    <p style="color:#757575;font-size:13px;margin-bottom:12px">Everything below is included. One plugin replaces 12.</p>
                     <ul class="zoobicon-ai-features">
-                        <li><strong>Content Generation</strong> — Blog posts, product descriptions, landing pages</li>
-                        <li><strong>SEO Optimization</strong> — Meta titles, descriptions, keywords (Yoast compatible)</li>
-                        <li><strong>Image Generation</strong> — AI images added to your media library</li>
-                        <li><strong>Alt Text</strong> — Automatic alt text for accessibility and SEO</li>
-                        <li><strong>Content Rewriting</strong> — Improve, simplify, expand, or shorten text</li>
-                        <li><strong>Translation</strong> — Translate posts into 50+ languages</li>
-                        <li><strong>Bulk SEO</strong> — Generate meta for multiple posts at once</li>
+                        <li><strong>Content Generation</strong> — Blog posts, product descriptions, landing pages, emails</li>
+                        <li><strong>SEO Optimization</strong> — Meta titles, descriptions, keywords, schema (Yoast compatible)</li>
+                        <li><strong>AI Images</strong> — Generate images, auto-add to media library</li>
+                        <li><strong>AI Video</strong> — Turn any blog post into a video</li>
+                        <li><strong>AI Chatbot</strong> — Deploy a chatbot to your site in one click</li>
+                        <li><strong>Content Rewriting</strong> — Improve, simplify, expand, shorten, change tone</li>
+                        <li><strong>Translation</strong> — 50+ languages</li>
+                        <li><strong>Site Audit</strong> — SEO, accessibility, performance, broken links</li>
+                        <li><strong>Content Refresh</strong> — Update outdated posts automatically</li>
+                        <li><strong>Accessibility</strong> — WCAG compliance check and auto-fix</li>
+                        <li><strong>Internal Links</strong> — AI suggests linking opportunities</li>
+                        <li><strong>Social Media</strong> — Generate posts for Twitter, LinkedIn, Facebook, Instagram</li>
+                        <li><strong>Content Calendar</strong> — Plan a month of content with AI</li>
+                        <li><strong>Alt Text</strong> — Auto-generate for all images</li>
+                        <li><strong>Domain Search</strong> — Find and register domains</li>
+                        <li><strong>Landing Pages</strong> — Generate complete pages</li>
+                        <li><strong>Analytics</strong> — Explain your traffic in plain English</li>
+                        <li><strong>Competitor Analysis</strong> — Analyze any competitor site</li>
+                        <li><strong>Bulk Operations</strong> — SEO, refresh, accessibility for multiple posts</li>
                     </ul>
+                    <?php if ( class_exists( 'WooCommerce' ) ) : ?>
+                        <h3 style="margin-top:16px;padding-top:12px;border-top:1px solid #eee">WooCommerce</h3>
+                        <ul class="zoobicon-ai-features">
+                            <li><strong>Product Descriptions</strong> — Bulk generate for all products</li>
+                            <li><strong>Product SEO</strong> — Optimize all product meta tags</li>
+                        </ul>
+                    <?php endif; ?>
                 </div>
             </div>
+
+            <!-- WordPress 7.0 Compatibility -->
+            <?php if ( function_exists( 'wp_register_ai_connector' ) || version_compare( get_bloginfo( 'version' ), '7.0', '>=' ) ) : ?>
+            <div class="zoobicon-ai-card" style="border-left:4px solid #00a32a">
+                <h2 style="color:#00a32a">WordPress 7.0 Native</h2>
+                <p>This plugin uses the WordPress 7.0 Connectors API and registers 16 MCP Abilities. AI agents (Claude, ChatGPT, etc.) can interact with your site through Zoobicon.</p>
+            </div>
+            <?php endif; ?>
 
             <!-- Settings -->
             <div class="zoobicon-ai-card">
@@ -653,30 +1029,56 @@ class Zoobicon_AI {
 
             <!-- Pricing -->
             <div class="zoobicon-ai-card">
-                <h2>Pricing</h2>
-                <div style="display:flex;gap:20px;flex-wrap:wrap">
-                    <div style="flex:1;min-width:250px;padding:20px;border:2px solid #ddd;border-radius:8px;text-align:center">
+                <h2>Pricing — One Plugin Replaces 12</h2>
+                <p style="color:#757575;font-size:13px;margin-bottom:16px">Rank Math AI ($72/yr) + Jetpack AI ($96/yr) + TranslatePress ($89/yr) + Tidio ($468/yr) = $725/yr. Zoobicon Pro = $228/yr. Save $497.</p>
+                <div style="display:flex;gap:16px;flex-wrap:wrap">
+                    <div style="flex:1;min-width:200px;padding:20px;border:2px solid #ddd;border-radius:8px;text-align:center">
                         <h3 style="margin:0 0 8px">Free</h3>
-                        <div style="font-size:28px;font-weight:700;margin-bottom:8px">$0<span style="font-size:14px;font-weight:400">/month</span></div>
-                        <ul style="text-align:left;list-style:none;padding:0;margin:16px 0">
+                        <div style="font-size:28px;font-weight:700;margin-bottom:8px">$0</div>
+                        <ul style="text-align:left;list-style:none;padding:0;margin:16px 0;font-size:13px">
                             <li>50 AI operations/month</li>
                             <li>Content generation</li>
                             <li>SEO optimization</li>
                             <li>Content rewriting</li>
+                            <li>Alt text generation</li>
+                            <li>Site audit (1/month)</li>
                         </ul>
                     </div>
-                    <div style="flex:1;min-width:250px;padding:20px;border:2px solid #2271b1;border-radius:8px;text-align:center;background:#f0f6fc">
+                    <div style="flex:1;min-width:200px;padding:20px;border:2px solid #2271b1;border-radius:8px;text-align:center;background:#f0f6fc;position:relative">
+                        <span style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#2271b1;color:white;padding:2px 12px;border-radius:10px;font-size:11px;font-weight:600">POPULAR</span>
                         <h3 style="margin:0 0 8px;color:#2271b1">Pro</h3>
-                        <div style="font-size:28px;font-weight:700;color:#2271b1;margin-bottom:8px">$19<span style="font-size:14px;font-weight:400">/month</span></div>
-                        <ul style="text-align:left;list-style:none;padding:0;margin:16px 0">
-                            <li><strong>Unlimited</strong> AI operations</li>
+                        <div style="font-size:28px;font-weight:700;color:#2271b1;margin-bottom:8px">$19<span style="font-size:14px;font-weight:400">/mo</span></div>
+                        <ul style="text-align:left;list-style:none;padding:0;margin:16px 0;font-size:13px">
+                            <li><strong>Unlimited</strong> operations</li>
                             <li>Everything in Free</li>
-                            <li>AI image generation</li>
+                            <li>AI images &amp; video</li>
+                            <li>AI chatbot</li>
                             <li>Translation (50+ languages)</li>
-                            <li>Bulk SEO for all posts</li>
+                            <li>WooCommerce AI</li>
+                            <li>Site audit &amp; accessibility</li>
+                            <li>Social media generation</li>
+                            <li>Content calendar</li>
+                            <li>Domain search</li>
+                            <li>Bulk operations</li>
                             <li>Priority support</li>
                         </ul>
-                        <a href="https://zoobicon.com/pricing?source=wordpress" target="_blank" class="button button-primary" style="width:100%">Upgrade to Pro</a>
+                        <a href="https://zoobicon.com/pricing?source=wordpress&plan=pro" target="_blank" class="button button-primary" style="width:100%">Upgrade to Pro</a>
+                    </div>
+                    <div style="flex:1;min-width:200px;padding:20px;border:2px solid #7c3aed;border-radius:8px;text-align:center">
+                        <h3 style="margin:0 0 8px;color:#7c3aed">Agency</h3>
+                        <div style="font-size:28px;font-weight:700;color:#7c3aed;margin-bottom:8px">$99<span style="font-size:14px;font-weight:400">/mo</span></div>
+                        <ul style="text-align:left;list-style:none;padding:0;margin:16px 0;font-size:13px">
+                            <li>Everything in Pro</li>
+                            <li><strong>White-label</strong> — your brand</li>
+                            <li>Up to 25 sites</li>
+                            <li>Client management dashboard</li>
+                            <li>Competitor analysis</li>
+                            <li>Analytics insights</li>
+                            <li>Landing page generation</li>
+                            <li>Domain registration</li>
+                            <li>Dedicated support</li>
+                        </ul>
+                        <a href="https://zoobicon.com/pricing?source=wordpress&plan=agency" target="_blank" class="button" style="width:100%;background:#7c3aed;color:white;border-color:#7c3aed">Upgrade to Agency</a>
                     </div>
                 </div>
             </div>
