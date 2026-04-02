@@ -8,8 +8,7 @@ export const maxDuration = 30;
  * Called every 5 minutes by Vercel Cron to keep Replicate models warm.
  * Prevents cold starts that add 30-60 seconds to video generation.
  *
- * Add to vercel.json:
- * { "crons": [{ "path": "/api/cron/warmup", "schedule": "*/5 * * * *" }] }
+ * Add to vercel.json crons array with path "/api/cron/warmup" and schedule every 5 min.
  */
 export async function GET(req: Request) {
   // Optional: verify cron secret
