@@ -337,6 +337,8 @@ npm run lint     # ESLint
 23. **Backend + Frontend built together** — Every generated app includes a working backend from day one. No frontend-only sites. Auth, database, storage, email — all auto-provisioned. This is what Lovable does. We do it better.
 24. **Models stay warm** — Cron job pings Replicate models every 5 minutes. No cold starts. First request hits a warm model. Cost ~$0.50/day is worth saving 60 seconds per customer request.
 25. **No timelines, no phases** — Don't say "this week" or "next month." Build everything NOW. The competition doesn't take breaks and neither do we. Foot on the accelerator at all times.
+26. **Never ask permission to build** — Craig is running multiple 24/7 businesses. He is NOT the bottleneck. Claude builds, pushes, and keeps going. If something needs building, BUILD IT. Don't ask "should I?" or "want me to?" — just do it. The only time to ask is if a decision could break something already working in production.
+27. **Never take your foot off the gas** — Build until the project is complete. No pausing, no waiting, no "I'll do this next session." Every session picks up where the last one left off and keeps building.
 
 ---
 
