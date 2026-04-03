@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   Check,
@@ -35,6 +35,18 @@ export default function DomainsPage() {
   const [searching, setSearching] = useState(false);
   const [cart, setCart] = useState<DomainResult[]>([]);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const [registering, setRegistering] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("zoobicon_user");
+      if (raw) {
+        const user = JSON.parse(raw);
+        setUserEmail(user.email || "");
+      }
+    } catch {}
+  }, []);
 
   const allTlds = Object.keys(TLD_PRICES);
 
@@ -104,6 +116,38 @@ export default function DomainsPage() {
 
   const removeFromCart = (domain: string) => {
     setCart(prev => prev.filter(c => c.domain !== domain));
+  };
+
+  const handleRegister = async () => {
+    if (cart.length === 0) return;
+    const email = userEmail || window.prompt("Enter your email to register domains:");
+    if (!email) return;
+
+    setRegistering(true);
+    try {
+      const res = await fetch("/api/domains/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          domains: cart.map(c => ({ domain: c.domain, tld: c.tld, years: 1 })),
+          registrant: { email },
+        }),
+      });
+      const data = await res.json();
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else if (data.success) {
+        alert("Domains registered successfully! View them in your dashboard.");
+        setCart([]);
+        window.location.href = "/my-domains";
+      } else {
+        alert(data.error || "Registration failed. Please try again.");
+      }
+    } catch {
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setRegistering(false);
+    }
   };
 
   const availableResults = results.filter(r => r.available === true);
@@ -274,8 +318,12 @@ export default function DomainsPage() {
                 </div>
               ))}
             </div>
-            <button className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-semibold text-base transition-colors">
-              Proceed to Registration
+            <button
+              onClick={handleRegister}
+              disabled={registering}
+              className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-semibold text-base transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {registering ? <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</> : "Proceed to Registration"}
             </button>
           </div>
         )}

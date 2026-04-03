@@ -40,6 +40,7 @@ import { getUserSegment, getRecommendedGenerators } from "@/lib/user-segment";
 
 const QUICK_ACTIONS = [
   { icon: Globe, label: "New Website", href: "/builder", color: "from-brand-500 to-brand-700" },
+  { icon: Globe, label: "My Domains", href: "/my-domains", color: "from-indigo-500 to-purple-600" },
   { icon: Sparkles, label: "SEO Agent", href: "/seo", color: "from-accent-cyan to-emerald-600" },
   { icon: Search, label: "Crawl Competitor", href: "/crawl", color: "from-violet-500 to-purple-600" },
   { icon: BarChart3, label: "Analytics", href: "/analytics", color: "from-blue-500 to-fuchsia-600" },
