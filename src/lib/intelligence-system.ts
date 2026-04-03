@@ -14,15 +14,9 @@
  * All results stored in database. Alerts sent via email when action needed.
  *
  * VERCEL CRON SETUP (add to vercel.json):
- * {
- *   "crons": [
- *     { "path": "/api/intel/competitors", "schedule": "0 */12 * * *" },
- *     { "path": "/api/intel/technology", "schedule": "0 0 */2 * *" },
- *     { "path": "/api/intel/seo", "schedule": "0 6 * * *" },
- *     { "path": "/api/intel/health", "schedule": "0/15 * * * *" },
- *     { "path": "/api/cron/warmup", "schedule": "0/5 * * * *" }
- *   ]
- * }
+ * See vercel.json for cron configuration.
+ * Competitors: every 12h, Technology: every 2d, SEO: daily,
+ * Health: every 15min, Warmup: every 5min
  */
 
 import { sql } from "./db";
