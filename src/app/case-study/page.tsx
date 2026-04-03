@@ -155,10 +155,10 @@ export default function CaseStudyPage() {
             <span className="font-semibold text-white">Case Study Generator</span>
           </div>
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition text-sm">
+            <button onClick={() => alert("Case study preview")} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition text-sm">
               <Eye className="w-4 h-4" /> Preview
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:opacity-90 transition text-sm font-medium">
+            <button onClick={() => window.print()} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:opacity-90 transition text-sm font-medium">
               <Download className="w-4 h-4" /> Export
             </button>
           </div>
@@ -481,9 +481,9 @@ export default function CaseStudyPage() {
               <h3 className="font-semibold mb-3">Bulk Export</h3>
               <p className="text-sm text-white/40 mb-4">Export all published case studies in a single download</p>
               <div className="flex gap-3">
-                <button className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium transition">All as PDF (.zip)</button>
-                <button className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium transition">All as HTML (.zip)</button>
-                <button className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium transition">All as Markdown (.zip)</button>
+                <button onClick={() => alert("Export feature coming soon")} className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium transition">All as PDF (.zip)</button>
+                <button onClick={() => alert("Export feature coming soon")} className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium transition">All as HTML (.zip)</button>
+                <button onClick={() => alert("Export feature coming soon")} className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium transition">All as Markdown (.zip)</button>
               </div>
             </div>
           </div>

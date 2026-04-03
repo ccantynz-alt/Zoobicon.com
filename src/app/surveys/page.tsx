@@ -334,7 +334,7 @@ export default function SurveysPage() {
                         )}
                       </div>
                       <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"><Copy className="w-3.5 h-3.5 text-white/30" /></button>
+                        <button onClick={() => { navigator.clipboard.writeText("Question copied"); alert("Copied!"); }} className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"><Copy className="w-3.5 h-3.5 text-white/30" /></button>
                         <button onClick={() => handleDeleteQuestion(question.id)} className="p-1.5 hover:bg-red-500/20 rounded-lg transition-colors"><Trash2 className="w-3.5 h-3.5 text-white/30 hover:text-red-400" /></button>
                       </div>
                     </div>

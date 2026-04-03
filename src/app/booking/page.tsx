@@ -263,7 +263,26 @@ export default function BookingPage() {
         {tab === "services" && (
           <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-4">
             <div className="flex justify-end">
-              <button className="text-sm text-indigo-400 hover:text-indigo-300 flex items-center gap-1"><Plus className="w-4 h-4" /> Add Service</button>
+              <button onClick={() => {
+                const name = prompt("Service name:");
+                if (!name) return;
+                const duration = parseInt(prompt("Duration in minutes (e.g. 30):") || "30", 10);
+                const price = parseFloat(prompt("Price in USD (e.g. 50):") || "0");
+                setServices((prev) => [
+                  ...prev,
+                  {
+                    id: `svc-${Date.now()}`,
+                    name,
+                    description: "Custom service",
+                    duration: isNaN(duration) ? 30 : duration,
+                    price: isNaN(price) ? 0 : price,
+                    currency: "USD",
+                    color: "#6366f1",
+                    location: "video" as const,
+                    enabled: true,
+                  },
+                ]);
+              }} className="text-sm text-indigo-400 hover:text-indigo-300 flex items-center gap-1"><Plus className="w-4 h-4" /> Add Service</button>
             </div>
             {services.map((svc) => {
               const Icon = LOCATION_ICONS[svc.location] || MapPin;

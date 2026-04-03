@@ -24,6 +24,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Quality Gate
+        run: node scripts/quality-gate.js
+
       - name: Lint
         run: npm run lint
 
