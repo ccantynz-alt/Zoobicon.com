@@ -432,14 +432,14 @@ SCRIPT_2:
                 <h2 className="text-2xl font-bold">Generate your video</h2>
                 <p className="text-sm text-slate-400 mt-1">Choose your presenter style, then hit generate.</p>
               </div>
-              <button onClick={() => setStep("scripts")} className="text-sm text-purple-400 hover:text-purple-300">
+              <button onClick={() => setStep("scripts")} className="text-sm text-amber-400 hover:text-amber-300 transition-colors">
                 &larr; Back to scripts
               </button>
             </div>
 
             {/* Script preview */}
-            <div className="p-4 rounded-xl bg-white/[0.04] border border-white/[0.08]">
-              <div className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Your Script</div>
+            <div className="p-4 rounded-2xl bg-white/[0.04] border border-amber-500/10">
+              <div className="text-xs font-semibold text-amber-400/70 uppercase tracking-wider mb-2">Your Script</div>
               <div className="text-[15px] text-slate-300 leading-relaxed whitespace-pre-wrap max-h-32 overflow-y-auto">{editedScript}</div>
             </div>
 
@@ -487,8 +487,8 @@ SCRIPT_2:
                       onClick={() => setFormat(f.id)}
                       className={`p-3 rounded-xl border text-center transition-all ${
                         format === f.id
-                          ? "border-purple-500/50 bg-purple-500/10"
-                          : "border-white/[0.08] bg-white/[0.02] hover:border-white/20"
+                          ? "border-amber-500/40 bg-amber-500/10 shadow-sm shadow-amber-500/10"
+                          : "border-white/[0.08] bg-white/[0.02] hover:border-amber-500/20"
                       }`}
                     >
                       <f.icon className="w-5 h-5 mx-auto mb-1 text-white/60" />
@@ -501,11 +501,11 @@ SCRIPT_2:
               {/* How it works */}
               <div>
                 <label className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-3 block">Pipeline</label>
-                <div className="p-3 rounded-xl bg-white/[0.04] border border-white/[0.06] text-xs text-slate-500 space-y-1.5">
+                <div className="p-3 rounded-xl bg-white/[0.04] border border-amber-500/[0.08] text-xs text-slate-500 space-y-1.5">
                   <div>1. FLUX generates your presenter</div>
                   <div>2. Fish Speech creates the voice</div>
                   <div>3. OmniHuman animates the face</div>
-                  <div className="text-purple-400 font-medium pt-1">~60-90 seconds total</div>
+                  <div className="text-amber-400 font-medium pt-1">~60-90 seconds total</div>
                 </div>
               </div>
             </div>
@@ -513,7 +513,7 @@ SCRIPT_2:
             <button
               onClick={handleGenerateVideo}
               disabled={generating}
-              className="w-full py-5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-2xl font-bold text-xl disabled:opacity-50 transition-all flex items-center justify-center gap-3"
+              className="w-full py-5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 rounded-2xl font-bold text-xl disabled:opacity-50 transition-all flex items-center justify-center gap-3 shadow-xl shadow-amber-500/25 hover:shadow-2xl hover:shadow-amber-500/30"
             >
               {generating ? (
                 <><Loader2 className="w-6 h-6 animate-spin" /> {videoStatus || "Generating..."}</>
@@ -528,17 +528,22 @@ SCRIPT_2:
         {videoUrl && (
           <div className="space-y-6 pt-4">
             <div className="text-center">
-              <div className="inline-flex items-center gap-2 text-emerald-400 font-semibold text-lg mb-4">
-                <Check className="w-5 h-5" /> Your video is ready!
+              <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-semibold text-base mb-6">
+                <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                  <Check className="w-3.5 h-3.5" />
+                </div>
+                Your video is ready!
               </div>
             </div>
 
-            <video
-              src={videoUrl}
-              controls
-              autoPlay
-              className="w-full max-w-2xl mx-auto rounded-2xl border border-white/10 shadow-2xl"
-            />
+            <div className="max-w-2xl mx-auto rounded-2xl overflow-hidden border border-white/[0.08] shadow-2xl shadow-black/40 bg-black/40">
+              <video
+                src={videoUrl}
+                controls
+                autoPlay
+                className="w-full"
+              />
+            </div>
 
             <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto">
               <a
@@ -546,13 +551,13 @@ SCRIPT_2:
                 download
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-semibold transition-all shadow-lg shadow-amber-500/20"
               >
                 <Download className="w-4 h-4" /> Download Video
               </a>
               <button
                 onClick={handleStartOver}
-                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-white/[0.10] text-white/70 hover:text-white hover:bg-white/[0.05] transition-all"
+                className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl border border-white/[0.10] text-white/70 hover:text-white hover:bg-white/[0.05] transition-all"
               >
                 <RefreshCw className="w-4 h-4" /> Create Another
               </button>
