@@ -585,7 +585,7 @@ export default function DashboardPage() {
                     >
                       Edit
                     </Link>
-                    <button className="px-3 py-1.5 bg-white/10 rounded-lg text-xs font-semibold text-white">
+                    <button onClick={() => {}} className="px-3 py-1.5 bg-white/10 rounded-lg text-xs font-semibold text-white">
                       <ExternalLink className="w-3 h-3" />
                     </button>
                   </div>

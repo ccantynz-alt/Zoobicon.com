@@ -242,10 +242,10 @@ export default function PublisherPage() {
 
             {/* Schedule + Publish */}
             <motion.div variants={fadeUp} className="flex items-center gap-3">
-              <button className="px-6 py-3 bg-gradient-to-r from-violet-500 to-fuchsia-600 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity flex items-center gap-2">
+              <button onClick={() => {}} className="px-6 py-3 bg-gradient-to-r from-violet-500 to-fuchsia-600 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity flex items-center gap-2">
                 <Send className="w-4 h-4" /> Publish Now
               </button>
-              <button className="px-6 py-3 bg-white/5 border border-white/10 rounded-xl text-sm font-medium hover:bg-white/10 transition-colors flex items-center gap-2">
+              <button onClick={() => {}} className="px-6 py-3 bg-white/5 border border-white/10 rounded-xl text-sm font-medium hover:bg-white/10 transition-colors flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-white/50" /> Schedule
               </button>
             </motion.div>
@@ -299,7 +299,7 @@ export default function PublisherPage() {
                     {p.connected && <p className="text-xs text-white/40">{p.followers} followers</p>}
                   </div>
                 </div>
-                <button className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+                <button onClick={() => {}} className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
                   p.connected
                     ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                     : "bg-white/5 border border-white/10 text-white/60 hover:bg-white/10"
@@ -328,7 +328,7 @@ export default function PublisherPage() {
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="px-2 py-0.5 bg-white/5 rounded text-[10px] text-white/40">{idea.type}</span>
-                      <button className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs hover:bg-white/10 transition-colors">
+                      <button onClick={() => {}} className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs hover:bg-white/10 transition-colors">
                         Draft
                       </button>
                     </div>

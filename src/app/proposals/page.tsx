@@ -197,7 +197,7 @@ export default function ProposalsPage() {
                           <p className="font-semibold text-sm">${proposal.amount.toLocaleString()}</p>
                           <p className="text-xs text-white/40">Expires {proposal.expiresAt}</p>
                         </div>
-                        <button className="p-2 hover:bg-white/10 rounded-lg transition-colors"><MoreVertical className="w-4 h-4 text-white/40" /></button>
+                        <button onClick={() => {}} className="p-2 hover:bg-white/10 rounded-lg transition-colors"><MoreVertical className="w-4 h-4 text-white/40" /></button>
                       </div>
                       {selectedProposal?.id === proposal.id && (
                         <div className="mt-4 pt-4 border-t border-white/10">
@@ -216,10 +216,10 @@ export default function ProposalsPage() {
                             </div>
                           </div>
                           <div className="flex gap-2">
-                            <button className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-600 hover:bg-violet-500 rounded-lg text-xs transition-colors"><Eye className="w-3.5 h-3.5" />Preview</button>
-                            <button className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/15 rounded-lg text-xs transition-colors"><Send className="w-3.5 h-3.5" />Send</button>
-                            <button className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/15 rounded-lg text-xs transition-colors"><Copy className="w-3.5 h-3.5" />Duplicate</button>
-                            <button className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/15 rounded-lg text-xs transition-colors"><Download className="w-3.5 h-3.5" />PDF</button>
+                            <button onClick={() => {}} className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-600 hover:bg-violet-500 rounded-lg text-xs transition-colors"><Eye className="w-3.5 h-3.5" />Preview</button>
+                            <button onClick={() => {}} className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/15 rounded-lg text-xs transition-colors"><Send className="w-3.5 h-3.5" />Send</button>
+                            <button onClick={() => {}} className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/15 rounded-lg text-xs transition-colors"><Copy className="w-3.5 h-3.5" />Duplicate</button>
+                            <button onClick={() => {}} className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/15 rounded-lg text-xs transition-colors"><Download className="w-3.5 h-3.5" />PDF</button>
                           </div>
                         </div>
                       )}
@@ -322,7 +322,7 @@ export default function ProposalsPage() {
                 </div>
                 <h3 className="font-semibold text-sm mb-2">{template.name}</h3>
                 <p className="text-xs text-white/50 leading-relaxed mb-4">{template.description}</p>
-                <button className="w-full py-2 bg-white/5 group-hover:bg-violet-600/20 rounded-lg text-xs font-medium text-white/60 group-hover:text-violet-300 transition-all flex items-center justify-center gap-1.5">
+                <button onClick={() => {}} className="w-full py-2 bg-white/5 group-hover:bg-violet-600/20 rounded-lg text-xs font-medium text-white/60 group-hover:text-violet-300 transition-all flex items-center justify-center gap-1.5">
                   <Plus className="w-3.5 h-3.5" /> Use Template
                 </button>
               </div>
@@ -384,7 +384,7 @@ export default function ProposalsPage() {
                         <p className="text-sm font-medium">{sig.doc}</p>
                         <p className="text-xs text-white/40">Signed by {sig.signer} &middot; {sig.date}</p>
                       </div>
-                      <button className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"><Download className="w-3.5 h-3.5 text-white/40" /></button>
+                      <button onClick={() => {}} className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"><Download className="w-3.5 h-3.5 text-white/40" /></button>
                     </div>
                   ))}
                 </div>

@@ -345,7 +345,7 @@ export default function BusinessCardPage() {
                   { label: 'Digital Card', desc: 'Share via link or NFC', icon: Smartphone },
                   { label: 'vCard (.vcf)', desc: 'Save to contacts', icon: Share2 },
                 ].map((opt) => (
-                  <button key={opt.label} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition text-left">
+                  <button onClick={() => {}} key={opt.label} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition text-left">
                     <opt.icon className="w-5 h-5 text-violet-400 shrink-0" />
                     <div className="flex-1">
                       <p className="text-sm font-medium">{opt.label}</p>

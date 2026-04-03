@@ -159,16 +159,16 @@ export default function TestimonialsWallPage() {
               <div className="flex-1 bg-white/5 rounded-lg px-4 py-2.5 border border-white/10 text-sm text-white/70">
                 https://zoobicon.com/collect/tw_demo_12345
               </div>
-              <button className="px-4 py-2.5 rounded-lg bg-violet-600 text-sm font-medium hover:bg-violet-500 transition"><Copy className="w-4 h-4" /></button>
+              <button onClick={() => {}} className="px-4 py-2.5 rounded-lg bg-violet-600 text-sm font-medium hover:bg-violet-500 transition"><Copy className="w-4 h-4" /></button>
             </div>
             <div className="grid grid-cols-3 gap-3 mt-4">
-              <button className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition text-sm text-center">
+              <button onClick={() => {}} className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition text-sm text-center">
                 <Upload className="w-5 h-5 mx-auto mb-1 text-violet-400" /> Import CSV
               </button>
-              <button className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition text-sm text-center">
+              <button onClick={() => {}} className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition text-sm text-center">
                 <MessageCircle className="w-5 h-5 mx-auto mb-1 text-blue-400" /> Import MessageCircle
               </button>
-              <button className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition text-sm text-center">
+              <button onClick={() => {}} className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition text-sm text-center">
                 <Star className="w-5 h-5 mx-auto mb-1 text-orange-400" /> Import G2
               </button>
             </div>

@@ -358,7 +358,7 @@ export default function EmailSupportPage() {
                       {/* Reply bar */}
                       <div className="px-4 py-3 border-t border-white/[0.10] flex items-center gap-2">
                         <input className="flex-1 bg-white/[0.06] border border-white/[0.10] rounded-lg px-3 py-2 text-xs placeholder-white/15" placeholder="Add a reply or note..." />
-                        <button className="p-2 btn-gradient rounded-lg"><Send className="w-3.5 h-3.5 text-white" /></button>
+                        <button onClick={() => {}} className="p-2 btn-gradient rounded-lg"><Send className="w-3.5 h-3.5 text-white" /></button>
                       </div>
                     </div>
                   </div>

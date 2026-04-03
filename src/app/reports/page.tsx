@@ -251,8 +251,8 @@ export default function ReportsPage() {
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold text-lg">{selectedTemplate.name} — February 2026</h3>
                   <div className="flex gap-2">
-                    <button className="px-3 py-1.5 rounded-lg bg-white/10 text-sm hover:bg-white/20 transition-colors flex items-center gap-1"><Download className="w-3 h-3" /> PDF</button>
-                    <button className="px-3 py-1.5 rounded-lg bg-white/10 text-sm hover:bg-white/20 transition-colors flex items-center gap-1"><Send className="w-3 h-3" /> Send</button>
+                    <button onClick={() => {}} className="px-3 py-1.5 rounded-lg bg-white/10 text-sm hover:bg-white/20 transition-colors flex items-center gap-1"><Download className="w-3 h-3" /> PDF</button>
+                    <button onClick={() => {}} className="px-3 py-1.5 rounded-lg bg-white/10 text-sm hover:bg-white/20 transition-colors flex items-center gap-1"><Send className="w-3 h-3" /> Send</button>
                   </div>
                 </div>
 

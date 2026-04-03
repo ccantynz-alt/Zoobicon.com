@@ -93,10 +93,10 @@ export default function WhitePaperPage() {
             <span className="font-semibold text-white">White Paper Generator</span>
           </div>
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition text-sm">
+            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition text-sm">
               <Eye className="w-4 h-4" /> Preview
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:opacity-90 transition text-sm font-medium">
+            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:opacity-90 transition text-sm font-medium">
               <Download className="w-4 h-4" /> Export PDF
             </button>
           </div>
@@ -178,7 +178,7 @@ export default function WhitePaperPage() {
                   <label className="text-sm text-white/50 mb-1 block">Tone & Style</label>
                   <div className="flex gap-2">
                     {['Authoritative', 'Data-driven', 'Conversational', 'Academic'].map((tone) => (
-                      <button key={tone} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/30 text-xs transition">{tone}</button>
+                      <button onClick={() => {}} key={tone} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/30 text-xs transition">{tone}</button>
                     ))}
                   </div>
                 </div>
@@ -186,7 +186,7 @@ export default function WhitePaperPage() {
                   <label className="text-sm text-white/50 mb-1 block">Target Length</label>
                   <div className="flex gap-2">
                     {['5-8 pages', '10-15 pages', '15-20 pages', '20+ pages'].map((len) => (
-                      <button key={len} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/30 text-xs transition">{len}</button>
+                      <button onClick={() => {}} key={len} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/30 text-xs transition">{len}</button>
                     ))}
                   </div>
                 </div>
@@ -237,7 +237,7 @@ export default function WhitePaperPage() {
             <div className="space-y-3">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-semibold">Sections</h3>
-                <button className="flex items-center gap-1 text-sm text-violet-400 hover:text-violet-300"><Plus className="w-4 h-4" /> Add Section</button>
+                <button onClick={() => {}} className="flex items-center gap-1 text-sm text-violet-400 hover:text-violet-300"><Plus className="w-4 h-4" /> Add Section</button>
               </div>
               {sections.map((section, i) => (
                 <div key={section.id} className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
@@ -255,8 +255,8 @@ export default function WhitePaperPage() {
                         className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm resize-none h-24 focus:outline-none focus:ring-2 focus:ring-violet-500/50"
                       />
                       <div className="flex items-center gap-2 mt-2">
-                        <button className="flex items-center gap-1 text-xs text-violet-400 hover:text-violet-300"><Sparkles className="w-3 h-3" /> AI Expand</button>
-                        <button className="flex items-center gap-1 text-xs text-white/40 hover:text-white/60"><Trash2 className="w-3 h-3" /> Remove</button>
+                        <button onClick={() => {}} className="flex items-center gap-1 text-xs text-violet-400 hover:text-violet-300"><Sparkles className="w-3 h-3" /> AI Expand</button>
+                        <button onClick={() => {}} className="flex items-center gap-1 text-xs text-white/40 hover:text-white/60"><Trash2 className="w-3 h-3" /> Remove</button>
                       </div>
                     </div>
                   )}
@@ -392,7 +392,7 @@ export default function WhitePaperPage() {
                         placeholder="your@company.com"
                         className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50 text-center"
                       />
-                      <button className="w-full py-3 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 font-medium text-sm hover:opacity-90 transition flex items-center justify-center gap-2">
+                      <button onClick={() => {}} className="w-full py-3 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 font-medium text-sm hover:opacity-90 transition flex items-center justify-center gap-2">
                         <Download className="w-4 h-4" /> Get Free Download
                       </button>
                       <p className="text-xs text-white/30">No spam. Unsubscribe anytime.</p>

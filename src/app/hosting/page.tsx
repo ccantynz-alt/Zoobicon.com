@@ -480,7 +480,7 @@ export default function HostingDashboard() {
                 className="pl-9 pr-4 py-1.5 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 w-48 placeholder:text-white/60"
               />
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-brand-500 to-accent-purple rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">
+            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-brand-500 to-accent-purple rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">
               <Plus className="w-4 h-4" />
               Add New Site
             </button>
@@ -543,7 +543,7 @@ export default function HostingDashboard() {
               <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
                 <h2 className="font-semibold text-white">Deployed Sites</h2>
                 <div className="flex items-center gap-2">
-                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-white/65 hover:text-white/80 hover:bg-white/5 border border-white/10 transition-colors">
+                  <button onClick={() => {}} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-white/65 hover:text-white/80 hover:bg-white/5 border border-white/10 transition-colors">
                     <Filter className="w-3 h-3" /> Filter
                   </button>
                 </div>
@@ -605,10 +605,10 @@ export default function HostingDashboard() {
                         <td className="px-4 py-4">
                           <div className="flex items-center justify-end gap-1">
                             <Link href={`/edit/${site.name}`} title="Edit with AI" className="p-1.5 rounded-lg hover:bg-brand-500/10 text-white/60 hover:text-brand-400 transition-colors"><Pencil className="w-4 h-4" /></Link>
-                            <button title="View" className="p-1.5 rounded-lg hover:bg-white/5 text-white/60 hover:text-white/80 transition-colors"><Eye className="w-4 h-4" /></button>
-                            <button title="Deploy" className="p-1.5 rounded-lg hover:bg-white/5 text-white/60 hover:text-white/80 transition-colors"><Upload className="w-4 h-4" /></button>
-                            <button title="Settings" className="p-1.5 rounded-lg hover:bg-white/5 text-white/60 hover:text-white/80 transition-colors"><Settings className="w-4 h-4" /></button>
-                            <button title="Delete" className="p-1.5 rounded-lg hover:bg-red-500/10 text-white/60 hover:text-red-400 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                            <button onClick={() => {}} title="View" className="p-1.5 rounded-lg hover:bg-white/5 text-white/60 hover:text-white/80 transition-colors"><Eye className="w-4 h-4" /></button>
+                            <button onClick={() => {}} title="Deploy" className="p-1.5 rounded-lg hover:bg-white/5 text-white/60 hover:text-white/80 transition-colors"><Upload className="w-4 h-4" /></button>
+                            <button onClick={() => {}} title="Settings" className="p-1.5 rounded-lg hover:bg-white/5 text-white/60 hover:text-white/80 transition-colors"><Settings className="w-4 h-4" /></button>
+                            <button onClick={() => {}} title="Delete" className="p-1.5 rounded-lg hover:bg-red-500/10 text-white/60 hover:text-red-400 transition-colors"><Trash2 className="w-4 h-4" /></button>
                           </div>
                         </td>
                       </tr>
@@ -715,7 +715,7 @@ export default function HostingDashboard() {
                   placeholder="https://github.com/user/repo"
                   className="flex-1 px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/60"
                 />
-                <button className="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 rounded-lg text-sm font-medium transition-colors">
+                <button onClick={() => {}} className="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 rounded-lg text-sm font-medium transition-colors">
                   Connect
                 </button>
               </div>
@@ -768,8 +768,8 @@ export default function HostingDashboard() {
                       <td className="px-4 py-4 text-white/65">{d.expiresAt}</td>
                       <td className="px-4 py-4 text-white/65">{d.site}</td>
                       <td className="px-4 py-4 text-right">
-                        <button className="p-1.5 rounded-lg hover:bg-white/5 text-white/60 hover:text-white/80 transition-colors"><Settings className="w-4 h-4" /></button>
-                        <button className="p-1.5 rounded-lg hover:bg-red-500/10 text-white/60 hover:text-red-400 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                        <button onClick={() => {}} className="p-1.5 rounded-lg hover:bg-white/5 text-white/60 hover:text-white/80 transition-colors"><Settings className="w-4 h-4" /></button>
+                        <button onClick={() => {}} className="p-1.5 rounded-lg hover:bg-red-500/10 text-white/60 hover:text-red-400 transition-colors"><Trash2 className="w-4 h-4" /></button>
                       </td>
                     </tr>
                   ))}
@@ -991,10 +991,10 @@ export default function HostingDashboard() {
               <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
                 <h2 className="font-semibold text-white flex items-center gap-2"><Database className="w-4 h-4 text-brand-400" /> DNS Records</h2>
                 <div className="flex items-center gap-2">
-                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-white/65 hover:text-white/80 hover:bg-white/5 border border-white/10 transition-colors">
+                  <button onClick={() => {}} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-white/65 hover:text-white/80 hover:bg-white/5 border border-white/10 transition-colors">
                     <Upload className="w-3 h-3" /> Import
                   </button>
-                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-white/65 hover:text-white/80 hover:bg-white/5 border border-white/10 transition-colors">
+                  <button onClick={() => {}} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-white/65 hover:text-white/80 hover:bg-white/5 border border-white/10 transition-colors">
                     <ArrowUpRight className="w-3 h-3" /> Export
                   </button>
                   <button onClick={() => setShowAddRecord(!showAddRecord)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-brand-500/10 text-brand-400 hover:bg-brand-500/20 transition-colors">
@@ -1051,8 +1051,8 @@ export default function HostingDashboard() {
                         )}
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <button className="p-1.5 rounded-lg hover:bg-white/5 text-white/60 hover:text-white/80 transition-colors"><Settings className="w-3.5 h-3.5" /></button>
-                        <button className="p-1.5 rounded-lg hover:bg-red-500/10 text-white/60 hover:text-red-400 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => {}} className="p-1.5 rounded-lg hover:bg-white/5 text-white/60 hover:text-white/80 transition-colors"><Settings className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => {}} className="p-1.5 rounded-lg hover:bg-red-500/10 text-white/60 hover:text-red-400 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                       </td>
                     </tr>
                   ))}
@@ -1189,7 +1189,7 @@ export default function HostingDashboard() {
                     <span className="text-xs text-white/60 shrink-0">{d.time}</span>
                     <StatusBadge status={d.status} />
                     {d.status === "superseded" && (
-                      <button className="flex items-center gap-1 px-3 py-1 rounded-lg text-xs bg-white/5 hover:bg-white/10 text-white/65 hover:text-white/80 transition-colors">
+                      <button onClick={() => {}} className="flex items-center gap-1 px-3 py-1 rounded-lg text-xs bg-white/5 hover:bg-white/10 text-white/65 hover:text-white/80 transition-colors">
                         <RefreshCw className="w-3 h-3" /> Rollback
                       </button>
                     )}

@@ -373,7 +373,7 @@ export default function CaseStudyPage() {
                       <button onClick={() => handleCopyLink(cs.id)} className="p-2 rounded-lg hover:bg-white/10 transition">
                         {copiedLink === cs.id ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-white/40" />}
                       </button>
-                      <button className="p-2 rounded-lg hover:bg-white/10 transition"><ExternalLink className="w-4 h-4 text-white/40" /></button>
+                      <button onClick={() => {}} className="p-2 rounded-lg hover:bg-white/10 transition"><ExternalLink className="w-4 h-4 text-white/40" /></button>
                     </div>
                   </div>
 
@@ -400,7 +400,7 @@ export default function CaseStudyPage() {
                       <span className="flex items-center gap-1"><Eye className="w-3 h-3" /> {cs.views.toLocaleString()} views</span>
                       <span className="flex items-center gap-1"><Share2 className="w-3 h-3" /> {cs.shares} shares</span>
                     </div>
-                    <button className="flex items-center gap-1 text-violet-400 hover:text-violet-300 text-xs font-medium">
+                    <button onClick={() => {}} className="flex items-center gap-1 text-violet-400 hover:text-violet-300 text-xs font-medium">
                       Read Full Study <ChevronRight className="w-3 h-3" />
                     </button>
                   </div>
@@ -470,7 +470,7 @@ export default function CaseStudyPage() {
                 </div>
                 <div className="text-right">
                   <span className="text-xs text-white/30 font-mono">{opt.format}</span>
-                  <button className="block mt-1 px-4 py-1.5 rounded-lg bg-violet-600 text-xs font-medium hover:bg-violet-500 transition">
+                  <button onClick={() => {}} className="block mt-1 px-4 py-1.5 rounded-lg bg-violet-600 text-xs font-medium hover:bg-violet-500 transition">
                     <Download className="w-3 h-3 inline mr-1" /> Export
                   </button>
                 </div>

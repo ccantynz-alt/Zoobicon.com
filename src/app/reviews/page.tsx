@@ -217,8 +217,8 @@ export default function ReviewsPage() {
                           </div>
                           <p className="text-sm text-gray-300">{aiResponses[review.id]}</p>
                           <div className="flex gap-2 mt-2">
-                            <button className="px-3 py-1 rounded bg-blue-600 text-xs font-medium hover:bg-blue-500 transition-colors flex items-center gap-1"><Send className="w-3 h-3" /> Send</button>
-                            <button className="px-3 py-1 rounded bg-white/10 text-xs hover:bg-white/20 transition-colors">Edit</button>
+                            <button onClick={() => {}} className="px-3 py-1 rounded bg-blue-600 text-xs font-medium hover:bg-blue-500 transition-colors flex items-center gap-1"><Send className="w-3 h-3" /> Send</button>
+                            <button onClick={() => {}} className="px-3 py-1 rounded bg-white/10 text-xs hover:bg-white/20 transition-colors">Edit</button>
                           </div>
                         </div>
                       ) : !review.replied && (
@@ -325,7 +325,7 @@ export default function ReviewsPage() {
               </div>
               <div className="grid grid-cols-3 gap-3">
                 {['Carousel', 'Grid', 'List'].map(layout => (
-                  <button key={layout} className="p-3 rounded-lg border border-white/10 bg-white/5 text-sm text-center hover:border-yellow-500/30 transition-colors">{layout}</button>
+                  <button onClick={() => {}} key={layout} className="p-3 rounded-lg border border-white/10 bg-white/5 text-sm text-center hover:border-yellow-500/30 transition-colors">{layout}</button>
                 ))}
               </div>
             </div>

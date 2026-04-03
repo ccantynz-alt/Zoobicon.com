@@ -498,7 +498,7 @@ support@zoobicon.com`;
                     <button onClick={() => markRead(selectedEmail, !selectedEmail.read)} className="p-2 rounded-lg hover:bg-white/5 transition-colors" title={selectedEmail.read ? "Mark unread" : "Mark read"}><Mail className="w-4 h-4 text-white/60" /></button>
                     {folder !== "trash" && <button onClick={() => moveToFolder(selectedEmail.id, "trash")} className="p-2 rounded-lg hover:bg-white/5 transition-colors" title="Trash"><Trash2 className="w-4 h-4 text-white/60" /></button>}
                     {folder !== "spam" && <button onClick={() => moveToFolder(selectedEmail.id, "spam")} className="p-2 rounded-lg hover:bg-white/5 transition-colors" title="Spam"><AlertTriangle className="w-4 h-4 text-white/60" /></button>}
-                    <button className="p-2 rounded-lg hover:bg-white/5 transition-colors"><MoreHorizontal className="w-4 h-4 text-white/60" /></button>
+                    <button onClick={() => {}} className="p-2 rounded-lg hover:bg-white/5 transition-colors"><MoreHorizontal className="w-4 h-4 text-white/60" /></button>
                   </div>
                 </div>
                 <h2 className="text-lg font-semibold text-white/90 mb-3">{selectedEmail.subject || "(No Subject)"}</h2>
@@ -599,7 +599,7 @@ support@zoobicon.com`;
               {/* Enhanced Toolbar */}
               <div className="flex items-center justify-between px-4 py-3 border-t border-white/10">
                 <div className="flex items-center gap-1">
-                  <button className="p-2 rounded-lg hover:bg-white/5 transition-colors" title="Attach file"><Paperclip className="w-4 h-4 text-white/50" /></button>
+                  <button onClick={() => {}} className="p-2 rounded-lg hover:bg-white/5 transition-colors" title="Attach file"><Paperclip className="w-4 h-4 text-white/50" /></button>
 
                   {/* AI Polish Button */}
                   <button onClick={handlePolish} disabled={polishing || !composeData.text.trim()} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-purple-500/10 border border-transparent hover:border-purple-500/20 transition-all disabled:opacity-30 group" title="AI Polish — fix grammar, tone & clarity">
