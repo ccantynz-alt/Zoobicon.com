@@ -736,7 +736,7 @@ function BuilderPage() {
       abortRef.current = controller;
 
       try {
-        const res = await fetch("/api/generate/stream", {
+        const res = await fetch("/api/generate/react", {
           method: "POST",
           headers: authHeaders(),
           body: JSON.stringify({
@@ -766,7 +766,7 @@ function BuilderPage() {
           } catch { /* not JSON, continue to fallback */ }
 
           // Fallback to non-streaming endpoint
-          const fallbackRes = await fetch("/api/generate", {
+          const fallbackRes = await fetch("/api/generate/react", {
             method: "POST",
             headers: authHeaders(),
             body: JSON.stringify({
@@ -920,7 +920,7 @@ function BuilderPage() {
             // Body is empty even after server retry — do one client-side retry via non-streaming endpoint
             console.warn(`[Builder] Empty body after stream (${bodyChars} chars). Client-side retry...`);
             try {
-              const retryRes = await fetch("/api/generate", {
+              const retryRes = await fetch("/api/generate/react", {
                 method: "POST",
                 headers: authHeaders(),
                 body: JSON.stringify({

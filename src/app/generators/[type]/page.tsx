@@ -2117,7 +2117,7 @@ export default function GeneratorTypePage() {
     const prompt = buildPrompt();
 
     try {
-      const res = await fetch("/api/generate", {
+      const res = await fetch("/api/generate/react", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt, tier: "standard", generator: type }),
