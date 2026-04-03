@@ -1808,10 +1808,10 @@ root.render(React.createElement(App));
                 <button
                   onClick={handleDeploy}
                   disabled={isDeploying}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                  className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                     isDeploying
-                      ? "bg-brand-500/10 text-brand-400/50 cursor-wait"
-                      : "bg-brand-500/20 text-brand-400 hover:bg-brand-500/30"
+                      ? "bg-amber-500/10 text-amber-400/50 cursor-wait"
+                      : "bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-400 hover:to-amber-500 shadow-lg shadow-amber-500/20"
                   }`}
                 >
                   <Rocket size={14} className={isDeploying ? "animate-pulse" : ""} />
@@ -1839,7 +1839,7 @@ root.render(React.createElement(App));
                   <p className="text-red-200/60 text-xs mb-4">{error}</p>
                   <button
                     onClick={() => { setError(""); setStatus("idle"); }}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded-lg transition-colors"
+                    className="px-5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white text-xs font-semibold rounded-xl transition-all shadow-lg shadow-amber-500/20"
                   >
                     Try Again
                   </button>
