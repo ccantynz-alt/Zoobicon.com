@@ -501,6 +501,23 @@ function BuilderPage() {
   const canUndo = historyIndex > 0;
   const canRedo = historyIndex < history.length - 1;
 
+  // Restore saved prompt after signup redirect
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("zoobicon_pending_prompt");
+      if (saved && !prompt) {
+        setPrompt(saved);
+        localStorage.removeItem("zoobicon_pending_prompt");
+      }
+      // Also check URL params for prompt
+      const params = new URLSearchParams(window.location.search);
+      const urlPrompt = params.get("prompt");
+      if (urlPrompt && !prompt) {
+        setPrompt(decodeURIComponent(urlPrompt));
+      }
+    } catch {}
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Admin always gets premium tier locked + load agency branding
   useEffect(() => {
     try {
@@ -995,6 +1012,15 @@ function BuilderPage() {
 
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim()) return;
+
+    // CHECK AUTH FIRST — don't waste the user's time
+    const userStr = typeof window !== "undefined" ? localStorage.getItem("zoobicon_user") : null;
+    if (!userStr) {
+      // Save their prompt so it's not lost after signup
+      try { localStorage.setItem("zoobicon_pending_prompt", prompt.trim()); } catch {}
+      window.location.href = `/auth/signup?redirect=/builder&prompt=${encodeURIComponent(prompt.trim().slice(0, 200))}`;
+      return;
+    }
 
     // Close welcome modal if open
     if (showWelcome) {
