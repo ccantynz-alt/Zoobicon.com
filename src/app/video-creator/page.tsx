@@ -364,7 +364,7 @@ SCRIPT_2:
                   <button
                     key={suggestion}
                     onClick={() => setDescription(suggestion)}
-                    className="p-3 rounded-xl border border-white/[0.08] bg-white/[0.03] text-left text-sm text-slate-400 hover:text-white hover:border-purple-500/30 hover:bg-purple-500/5 transition-all"
+                    className="p-3 rounded-xl border border-white/[0.08] bg-white/[0.03] text-left text-sm text-slate-400 hover:text-white hover:border-amber-500/30 hover:bg-amber-500/5 transition-all"
                   >
                     {suggestion}
                   </button>
@@ -382,7 +382,7 @@ SCRIPT_2:
                 <h2 className="text-2xl font-bold">Pick your script</h2>
                 <p className="text-sm text-slate-400 mt-1">Select one, edit it if needed, then proceed.</p>
               </div>
-              <button onClick={() => setStep("describe")} className="text-sm text-purple-400 hover:text-purple-300">
+              <button onClick={() => setStep("describe")} className="text-sm text-amber-400 hover:text-amber-300 transition-colors">
                 &larr; Back
               </button>
             </div>
@@ -394,11 +394,11 @@ SCRIPT_2:
                   onClick={() => handleSelectScript(i)}
                   className={`p-5 rounded-2xl border text-left transition-all ${
                     selectedScript === i
-                      ? "border-purple-500/50 bg-purple-500/10 ring-1 ring-purple-500/20"
-                      : "border-white/[0.08] bg-white/[0.03] hover:border-white/20"
+                      ? "border-amber-500/40 bg-amber-500/[0.08] ring-1 ring-amber-500/20 shadow-lg shadow-amber-500/5"
+                      : "border-white/[0.08] bg-white/[0.03] hover:border-amber-500/20 hover:bg-amber-500/[0.03]"
                   }`}
                 >
-                  <div className="text-xs font-semibold text-purple-400 mb-2">Draft {i + 1}</div>
+                  <div className="text-xs font-semibold text-amber-400 mb-2">Draft {i + 1}</div>
                   <div className="text-[15px] text-slate-300 leading-relaxed whitespace-pre-wrap">{script}</div>
                 </button>
               ))}
@@ -411,11 +411,11 @@ SCRIPT_2:
                   value={editedScript}
                   onChange={(e) => setEditedScript(e.target.value)}
                   rows={6}
-                  className="w-full px-5 py-4 bg-white/[0.06] border border-white/[0.10] rounded-2xl text-white text-[15px] focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none leading-relaxed"
+                  className="w-full px-5 py-4 bg-white/[0.05] border border-white/[0.10] rounded-2xl text-white text-[15px] focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/30 resize-none leading-relaxed transition-all"
                 />
                 <button
                   onClick={handleProceedToProduction}
-                  className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2"
+                  className="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 hover:shadow-xl hover:shadow-amber-500/30"
                 >
                   <Play className="w-5 h-5" /> Proceed to Generate Video
                 </button>
