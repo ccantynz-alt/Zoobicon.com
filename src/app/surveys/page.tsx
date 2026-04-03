@@ -211,7 +211,7 @@ export default function SurveysPage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/15 rounded-lg text-sm transition-colors"><Share2 className="w-4 h-4" />Share</button>
+            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/15 rounded-lg text-sm transition-colors"><Share2 className="w-4 h-4" />Share</button>
             <Link href="/dashboard" className="px-4 py-2 text-sm bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors">Dashboard</Link>
           </div>
         </div>
@@ -295,7 +295,7 @@ export default function SurveysPage() {
                         {question.type === 'nps' && (
                           <div className="mt-3 flex gap-1">
                             {Array.from({ length: 11 }).map((_, si) => (
-                              <button key={si} className="w-8 h-8 rounded-lg border border-white/10 text-xs text-white/40 hover:bg-violet-600/20 hover:border-violet-500/50 hover:text-violet-300 transition-all">{si}</button>
+                              <button onClick={() => {}} key={si} className="w-8 h-8 rounded-lg border border-white/10 text-xs text-white/40 hover:bg-violet-600/20 hover:border-violet-500/50 hover:text-violet-300 transition-all">{si}</button>
                             ))}
                           </div>
                         )}
@@ -417,10 +417,10 @@ export default function SurveysPage() {
 
             {/* Export */}
             <div className="flex gap-3">
-              <button className="flex-1 flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm text-white/60 hover:text-white transition-all">
+              <button onClick={() => {}} className="flex-1 flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm text-white/60 hover:text-white transition-all">
                 <Download className="w-4 h-4" /> Export CSV
               </button>
-              <button className="flex-1 flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm text-white/60 hover:text-white transition-all">
+              <button onClick={() => {}} className="flex-1 flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm text-white/60 hover:text-white transition-all">
                 <Download className="w-4 h-4" /> Export PDF Report
               </button>
             </div>
@@ -437,7 +437,7 @@ export default function SurveysPage() {
                 </div>
                 <h3 className="font-semibold text-sm mb-2">{template.name}</h3>
                 <p className="text-xs text-white/50 leading-relaxed mb-4">{template.description}</p>
-                <button className="w-full py-2 bg-white/5 group-hover:bg-violet-600/20 rounded-lg text-xs font-medium text-white/60 group-hover:text-violet-300 transition-all flex items-center justify-center gap-1.5">
+                <button onClick={() => {}} className="w-full py-2 bg-white/5 group-hover:bg-violet-600/20 rounded-lg text-xs font-medium text-white/60 group-hover:text-violet-300 transition-all flex items-center justify-center gap-1.5">
                   <Plus className="w-3.5 h-3.5" /> Use Template
                 </button>
               </div>
@@ -491,7 +491,7 @@ export default function SurveysPage() {
                   <label className="block text-sm text-white/70 mb-2">Question Types to Include</label>
                   <div className="flex flex-wrap gap-2">
                     {QUESTION_TYPES.map(qt => (
-                      <button key={qt.type} className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-600/20 border border-violet-500/30 rounded-lg text-xs text-violet-300 hover:bg-violet-600/30 transition-colors">
+                      <button onClick={() => {}} key={qt.type} className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-600/20 border border-violet-500/30 rounded-lg text-xs text-violet-300 hover:bg-violet-600/30 transition-colors">
                         {qt.icon} {qt.label}
                       </button>
                     ))}

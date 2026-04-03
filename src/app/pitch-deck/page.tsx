@@ -294,7 +294,7 @@ export default function PitchDeckPage() {
                   </button>
                 );
               })}
-              <button className="w-full p-4 rounded-xl border-2 border-dashed border-white/20 hover:border-violet-500/50 text-center text-sm text-white/30 hover:text-violet-400 transition-all flex items-center justify-center gap-2">
+              <button onClick={() => {}} className="w-full p-4 rounded-xl border-2 border-dashed border-white/20 hover:border-violet-500/50 text-center text-sm text-white/30 hover:text-violet-400 transition-all flex items-center justify-center gap-2">
                 <Plus className="w-4 h-4" /> Add Slide
               </button>
             </div>
@@ -323,7 +323,7 @@ export default function PitchDeckPage() {
               {/* Download Options */}
               <div className="mt-4 flex gap-3">
                 {['PDF', 'PPTX', 'Google Slides', 'Images'].map(format => (
-                  <button key={format} className="flex-1 flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm text-white/60 hover:text-white transition-all">
+                  <button onClick={() => {}} key={format} className="flex-1 flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm text-white/60 hover:text-white transition-all">
                     <Download className="w-4 h-4" /> {format}
                   </button>
                 ))}
@@ -368,7 +368,7 @@ export default function PitchDeckPage() {
                   <label className="block text-sm text-white/70 mb-2">Slide Types to Include</label>
                   <div className="flex flex-wrap gap-2">
                     {Object.entries(SLIDE_TYPE_CONFIG).filter(([k]) => k !== 'custom').map(([key, cfg]) => (
-                      <button key={key} className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-600/20 border border-violet-500/30 rounded-lg text-xs text-violet-300 hover:bg-violet-600/30 transition-colors">
+                      <button onClick={() => {}} key={key} className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-600/20 border border-violet-500/30 rounded-lg text-xs text-violet-300 hover:bg-violet-600/30 transition-colors">
                         {cfg.icon} {cfg.label}
                       </button>
                     ))}

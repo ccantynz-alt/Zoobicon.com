@@ -239,7 +239,7 @@ export default function CreatorMarketplacePage() {
                 <p className="text-sm text-white/50 mb-1">Pending Payout</p>
                 <p className="text-3xl font-bold text-amber-400">${(earnings.pendingPayout / 100).toLocaleString()}</p>
                 {!earnings.stripeConnected && (
-                  <button className="mt-2 px-3 py-1.5 bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 rounded-lg text-xs font-medium">
+                  <button onClick={() => {}} className="mt-2 px-3 py-1.5 bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 rounded-lg text-xs font-medium">
                     Connect Stripe
                   </button>
                 )}

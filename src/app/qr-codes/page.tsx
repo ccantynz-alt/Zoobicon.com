@@ -271,7 +271,7 @@ export default function QRCodesPage() {
                     {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
                     {copied ? 'Copied!' : 'Copy'}
                   </button>
-                  <button className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/15 rounded-lg text-sm transition-colors">
+                  <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/15 rounded-lg text-sm transition-colors">
                     <Eye className="w-4 h-4" />
                     Preview
                   </button>
@@ -385,7 +385,7 @@ export default function QRCodesPage() {
                 </div>
               </div>
 
-              <button className="w-full py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-violet-600/25">
+              <button onClick={() => {}} className="w-full py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-violet-600/25">
                 <Sparkles className="w-4 h-4" />
                 Generate QR Code
               </button>
@@ -437,7 +437,7 @@ export default function QRCodesPage() {
               />
               <div className="flex items-center justify-between">
                 <span className="text-sm text-white/50">{batchUrls.split('\n').filter(l => l.trim()).length} URLs detected</span>
-                <button className="flex items-center gap-2 px-6 py-2.5 bg-violet-600 hover:bg-violet-500 rounded-xl text-sm font-medium transition-colors shadow-lg shadow-violet-600/25">
+                <button onClick={() => {}} className="flex items-center gap-2 px-6 py-2.5 bg-violet-600 hover:bg-violet-500 rounded-xl text-sm font-medium transition-colors shadow-lg shadow-violet-600/25">
                   <Zap className="w-4 h-4" />
                   Generate All
                 </button>
@@ -487,7 +487,7 @@ export default function QRCodesPage() {
                       <p className="text-sm font-medium text-violet-400">{item.scans.toLocaleString()}</p>
                       <p className="text-xs text-white/40">scans</p>
                     </div>
-                    <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+                    <button onClick={() => {}} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
                       <Download className="w-4 h-4 text-white/40" />
                     </button>
                   </div>

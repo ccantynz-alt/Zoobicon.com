@@ -351,7 +351,7 @@ export default function FormsPage() {
                     <button onClick={() => setShowEmbed(true)} className="px-3 py-1.5 bg-white/10 rounded-lg text-sm text-white/60 hover:text-white flex items-center gap-1.5 transition-colors">
                       <Code className="w-3.5 h-3.5" /> Embed
                     </button>
-                    <button className="px-3 py-1.5 bg-white/10 rounded-lg text-sm text-white/60 hover:text-white flex items-center gap-1.5 transition-colors">
+                    <button onClick={() => {}} className="px-3 py-1.5 bg-white/10 rounded-lg text-sm text-white/60 hover:text-white flex items-center gap-1.5 transition-colors">
                       <Share2 className="w-3.5 h-3.5" /> Share
                     </button>
                   </div>
@@ -538,7 +538,7 @@ export default function FormsPage() {
                 <label className="block text-sm text-white/50 mb-2">Direct Link</label>
                 <div className="flex gap-2">
                   <input value={`https://zoobicon.sh/f/${formName.toLowerCase().replace(/\s+/g, '-')}`} readOnly className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm" />
-                  <button className="px-3 py-2 bg-violet-600 rounded-lg text-sm"><Copy className="w-4 h-4" /></button>
+                  <button onClick={() => {}} className="px-3 py-2 bg-violet-600 rounded-lg text-sm"><Copy className="w-4 h-4" /></button>
                 </div>
               </div>
               <div className="flex gap-3">

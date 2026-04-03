@@ -246,7 +246,7 @@ export default function HeatmapsPage() {
                     </div>
                   </div>
                   <span className="text-xs text-gray-500">{s.date}</span>
-                  <button className="px-3 py-1.5 rounded-lg bg-orange-500/20 text-orange-400 text-xs font-medium hover:bg-orange-500/30 transition-colors">Watch</button>
+                  <button onClick={() => {}} className="px-3 py-1.5 rounded-lg bg-orange-500/20 text-orange-400 text-xs font-medium hover:bg-orange-500/30 transition-colors">Watch</button>
                 </div>
               ))}
             </div>

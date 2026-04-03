@@ -224,7 +224,7 @@ export default function FeatureRequestsPage() {
                 { icon: Tag, label: 'Bulk Tag', desc: 'Add tags to multiple requests' },
                 { icon: AlertCircle, label: 'Flag for Review', desc: 'Mark requests needing moderation' },
               ].map((tool, i) => (
-                <button key={i} className="p-3 rounded-lg border border-white/10 bg-white/5 text-left hover:border-purple-500/30 transition-colors">
+                <button onClick={() => {}} key={i} className="p-3 rounded-lg border border-white/10 bg-white/5 text-left hover:border-purple-500/30 transition-colors">
                   <tool.icon className="w-4 h-4 text-purple-400 mb-1" />
                   <div className="text-sm font-medium">{tool.label}</div>
                   <div className="text-xs text-gray-500">{tool.desc}</div>

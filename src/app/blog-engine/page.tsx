@@ -225,7 +225,7 @@ export default function BlogEnginePage() {
           <motion.div variants={fadeUp} initial="hidden" animate="visible" className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
             <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
               <h3 className="text-lg font-semibold">All Posts</h3>
-              <button className="text-sm text-orange-400 hover:text-orange-300 flex items-center gap-1"><Plus className="w-4 h-4" /> New Post</button>
+              <button onClick={() => {}} className="text-sm text-orange-400 hover:text-orange-300 flex items-center gap-1"><Plus className="w-4 h-4" /> New Post</button>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">

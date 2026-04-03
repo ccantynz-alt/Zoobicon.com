@@ -106,7 +106,7 @@ export default function ResumePage() {
             <button onClick={() => setShowPreview(!showPreview)} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition text-sm">
               <Eye className="w-4 h-4" /> {showPreview ? 'Hide' : 'Show'} Preview
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:opacity-90 transition text-sm font-medium">
+            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:opacity-90 transition text-sm font-medium">
               <Download className="w-4 h-4" /> Export PDF
             </button>
           </div>
@@ -263,7 +263,7 @@ export default function ResumePage() {
                     onChange={(e) => setResume({ ...resume, summary: e.target.value })}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm resize-none h-32 focus:outline-none focus:ring-2 focus:ring-violet-500/50"
                   />
-                  <button className="flex items-center gap-2 text-sm text-violet-400 hover:text-violet-300">
+                  <button onClick={() => {}} className="flex items-center gap-2 text-sm text-violet-400 hover:text-violet-300">
                     <Sparkles className="w-4 h-4" /> AI Enhance Summary
                   </button>
                 </div>
@@ -278,7 +278,7 @@ export default function ResumePage() {
                           <p className="font-medium">{exp.role}</p>
                           <p className="text-sm text-white/50">{exp.company} | {exp.period}</p>
                         </div>
-                        <button className="p-1.5 hover:bg-white/10 rounded-lg"><Edit3 className="w-4 h-4 text-white/40" /></button>
+                        <button onClick={() => {}} className="p-1.5 hover:bg-white/10 rounded-lg"><Edit3 className="w-4 h-4 text-white/40" /></button>
                       </div>
                       <ul className="space-y-1">
                         {exp.highlights.map((h, j) => (
@@ -290,7 +290,7 @@ export default function ResumePage() {
                       </ul>
                     </div>
                   ))}
-                  <button className="w-full py-3 rounded-xl border border-dashed border-white/20 text-sm text-white/40 hover:text-white/60 hover:border-white/30 transition">+ Add Experience</button>
+                  <button onClick={() => {}} className="w-full py-3 rounded-xl border border-dashed border-white/20 text-sm text-white/40 hover:text-white/60 hover:border-white/30 transition">+ Add Experience</button>
                 </div>
               )}
               {activeSection === 'education' && (
@@ -302,10 +302,10 @@ export default function ResumePage() {
                         <p className="font-medium">{edu.degree}</p>
                         <p className="text-sm text-white/50">{edu.school} | {edu.year}</p>
                       </div>
-                      <button className="p-1.5 hover:bg-white/10 rounded-lg"><Edit3 className="w-4 h-4 text-white/40" /></button>
+                      <button onClick={() => {}} className="p-1.5 hover:bg-white/10 rounded-lg"><Edit3 className="w-4 h-4 text-white/40" /></button>
                     </div>
                   ))}
-                  <button className="w-full py-3 rounded-xl border border-dashed border-white/20 text-sm text-white/40 hover:text-white/60 hover:border-white/30 transition">+ Add Education</button>
+                  <button onClick={() => {}} className="w-full py-3 rounded-xl border border-dashed border-white/20 text-sm text-white/40 hover:text-white/60 hover:border-white/30 transition">+ Add Education</button>
                 </div>
               )}
               {activeSection === 'skills' && (
@@ -320,9 +320,9 @@ export default function ResumePage() {
                   </div>
                   <div className="flex gap-2">
                     <input type="text" placeholder="Add a skill..." className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50" />
-                    <button className="px-4 py-2 rounded-lg bg-violet-600 text-sm font-medium hover:bg-violet-500 transition">Add</button>
+                    <button onClick={() => {}} className="px-4 py-2 rounded-lg bg-violet-600 text-sm font-medium hover:bg-violet-500 transition">Add</button>
                   </div>
-                  <button className="flex items-center gap-2 text-sm text-violet-400 hover:text-violet-300">
+                  <button onClick={() => {}} className="flex items-center gap-2 text-sm text-violet-400 hover:text-violet-300">
                     <Sparkles className="w-4 h-4" /> AI Suggest Skills
                   </button>
                 </div>

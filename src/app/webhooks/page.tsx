@@ -307,7 +307,7 @@ export default function WebhooksPage() {
                         <div><span className="text-white/30">Endpoint:</span> <span className="font-mono">{webhooks.find(w => w.id === d.webhook_id)?.url}</span></div>
                         <div><span className="text-white/30">Status:</span> <span className={d.status === 200 ? 'text-emerald-400' : 'text-red-400'}>{d.status}</span></div>
                       </div>
-                      <button className="flex items-center gap-1 text-xs text-violet-400 hover:text-violet-300">
+                      <button onClick={() => {}} className="flex items-center gap-1 text-xs text-violet-400 hover:text-violet-300">
                         <RotateCw className="w-3 h-3" /> Retry delivery
                       </button>
                     </div>
