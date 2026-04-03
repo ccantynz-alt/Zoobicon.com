@@ -544,7 +544,7 @@ function extractReplicateOutput(data: Record<string, unknown>): string | null {
 
 async function pollReplicatePrediction(
   getUrl: string,
-  maxAttempts = 120,
+  maxAttempts = 50,
   intervalMs = 3000
 ): Promise<Record<string, unknown>> {
   const token = getReplicateToken();
