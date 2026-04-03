@@ -1132,21 +1132,40 @@ function BuilderPage() {
           }
         }
 
-        // Flush remaining buffer
+        // Flush remaining buffer — handle all event types, not just "done"
         if (lineBuffer.trim()) {
           for (const line of lineBuffer.split("\n")) {
             if (!line.startsWith("data: ")) continue;
+            const jsonStr = line.slice(6).trim();
+            if (!jsonStr) continue;
             try {
-              const event = JSON.parse(line.slice(6).trim());
-              if (event.type === "done" && event.files && generationIdRef.current === currentGenId) {
-                setReactFiles(event.files);
-                setReactDeps(event.dependencies || {});
-                setReactSource(event.files);
+              const event = JSON.parse(jsonStr);
+              if (event.type === "status") {
+                setPipelineAgents(prev => [...prev, event.message]);
+              } else if (event.type === "partial" && event.files) {
+                if (generationIdRef.current === currentGenId) {
+                  setReactFiles(prev => ({ ...prev, ...event.files }));
+                  setGeneratedCode("<!-- react-app-mode -->");
+                }
+              } else if (event.type === "done" && generationIdRef.current === currentGenId) {
+                if (event.files) {
+                  setReactFiles(event.files);
+                  setReactDeps(event.dependencies || {});
+                  setReactSource(event.files);
+                }
                 setGeneratedCode("<!-- react-app-mode -->");
                 setStatus("complete");
+                setPipelineAgents(prev => [...prev, "Build complete"]);
                 trackEvent("build");
+              } else if (event.type === "error") {
+                throw new Error(event.message || "Generation failed");
               }
-            } catch { /* ignore */ }
+            } catch (e) {
+              if (e instanceof Error && (e.message.includes("failed") || e.message.includes("Generation") || e.message.includes("unavailable") || e.message.includes("busy"))) {
+                throw e;
+              }
+              // Skip JSON parse errors from partial chunks
+            }
           }
         }
       } catch (err) {
