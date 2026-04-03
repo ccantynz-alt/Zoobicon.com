@@ -112,7 +112,7 @@ export const maxDuration = 300;
 
 export async function POST(req: NextRequest) {
   try {
-    const { prompt, tier, model: requestedModel, generator } = await req.json();
+    const { prompt, tier, model: requestedModel, generator, fullStack: requestedFullStack } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       return new Response(
@@ -153,8 +153,8 @@ export async function POST(req: NextRequest) {
     }
 
     const isPremium = tier === "premium";
-    const fullStack = body.fullStack === true;
-    const model = requestedModel || (isPremium ? "claude-sonnet-4-6" : "claude-sonnet-4-6");
+    const fullStack = requestedFullStack === true;
+    const model = requestedModel || (isPremium ? "claude-opus-4-6" : "claude-sonnet-4-6");
     const maxTokens = 32000;
 
     // If full-stack requested AND Supabase is configured, add database integration

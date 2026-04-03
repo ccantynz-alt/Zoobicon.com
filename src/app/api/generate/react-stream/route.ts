@@ -84,11 +84,10 @@ export async function POST(req: NextRequest) {
         const apiKey = process.env.ANTHROPIC_API_KEY;
         if (!apiKey) {
           send({
-            type: "status",
+            type: "error",
             message:
-              "AI service unavailable — using assembled scaffold with default content",
+              "AI service unavailable — ANTHROPIC_API_KEY is not configured. Please contact support.",
           });
-          send({ type: "done" });
           controller.close();
           return;
         }
@@ -216,12 +215,14 @@ Rules:
             type: "status",
             message: "Content customized — site ready",
           });
-        } catch {
-          // Customization parse failed — scaffold is still fully functional
+        } catch (customizeErr) {
+          // Customization failed — scaffold still works but tell the user honestly
+          const errMsg = customizeErr instanceof Error ? customizeErr.message : "Unknown error";
+          console.error("[react-stream] AI customization failed:", errMsg);
           send({
             type: "status",
             message:
-              "Using default content — you can customize via the editor",
+              `AI customization encountered an issue (${errMsg.slice(0, 80)}). Scaffold loaded — you can customize manually via the editor.`,
           });
         }
 

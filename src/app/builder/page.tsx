@@ -1069,10 +1069,21 @@ function BuilderPage() {
 
         const decoder = new TextDecoder();
         let lineBuffer = "";
+        const STREAM_TIMEOUT_MS = 240000; // 4 minutes max with no data
+        let lastDataAt = Date.now();
 
         while (true) {
-          const { done, value } = await reader.read();
+          const readPromise = reader.read();
+          const timeoutPromise = new Promise<never>((_, reject) => {
+            setTimeout(() => {
+              if (Date.now() - lastDataAt > STREAM_TIMEOUT_MS) {
+                reject(new Error("Generation timed out — no data received for 4 minutes. Please try again."));
+              }
+            }, STREAM_TIMEOUT_MS);
+          });
+          const { done, value } = await Promise.race([readPromise, timeoutPromise]);
           if (done) break;
+          lastDataAt = Date.now();
           lineBuffer += decoder.decode(value, { stream: true });
           const lines = lineBuffer.split("\n");
           lineBuffer = lines.pop() || "";
