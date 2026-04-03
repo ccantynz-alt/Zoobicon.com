@@ -61,7 +61,6 @@ export async function POST(request: NextRequest) {
         // Domain registration purchase — MUST actually register with OpenSRS
         if (session.metadata?.type === "domain_registration" || session.metadata?.domains) {
           const rawDomains = session.metadata?.domains || "";
-          // Handle both comma-separated and JSON array formats
           let domainList: string[] = [];
           try {
             const parsed = JSON.parse(rawDomains);
@@ -75,7 +74,6 @@ export async function POST(request: NextRequest) {
           const expiresAt = new Date();
           expiresAt.setFullYear(expiresAt.getFullYear() + years);
 
-          // Parse registrant contact info from metadata (stored as JSON)
           let registrant = {
             firstName: session.metadata?.firstName || "Domain",
             lastName: session.metadata?.lastName || "Owner",
@@ -94,7 +92,6 @@ export async function POST(request: NextRequest) {
             }
           } catch { /* use defaults */ }
 
-          // STEP 1: Actually register each domain with OpenSRS/Tucows
           const { registerDomain, hasOpenSRSConfig } = await import("@/lib/domain-reseller");
           const registeredDomains: string[] = [];
           const failedDomains: string[] = [];
@@ -105,7 +102,6 @@ export async function POST(request: NextRequest) {
 
             try {
               if (hasOpenSRSConfig()) {
-                // REAL registration with OpenSRS
                 const result = await registerDomain({
                   domain: trimmed,
                   period: years,
@@ -123,7 +119,6 @@ export async function POST(request: NextRequest) {
                   console.error(`[webhook] OpenSRS registration FAILED for ${trimmed}: ${result.error}`);
                 }
               } else {
-                // OpenSRS not configured — log warning but still save to DB
                 console.warn(`[webhook] OpenSRS NOT CONFIGURED — domain ${trimmed} saved locally but NOT registered with registrar`);
                 registeredDomains.push(trimmed);
               }
@@ -133,7 +128,6 @@ export async function POST(request: NextRequest) {
             }
           }
 
-          // STEP 2: Save successfully registered domains to database
           for (const domain of registeredDomains) {
             try {
               await sql`
@@ -149,11 +143,8 @@ export async function POST(request: NextRequest) {
             }
           }
 
-          // STEP 3: If any domains failed, attempt Stripe refund for those
           if (failedDomains.length > 0) {
             console.error(`[webhook] ${failedDomains.length} domains FAILED registration: ${failedDomains.join(", ")}`);
-            // TODO: Partial refund via Stripe for failed domains
-            // For now, save them with 'failed' status so admin can investigate
             for (const domain of failedDomains) {
               try {
                 await sql`
