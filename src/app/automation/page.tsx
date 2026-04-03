@@ -91,7 +91,7 @@ const ACTION_TYPES = [
 
 const DEMO_WORKFLOWS: Workflow[] = [
   { id: 'w1', name: 'New Lead Nurture', description: 'When a form is submitted, create CRM contact, send welcome email, notify team.', status: 'active', trigger: 'Form Submitted', actions: ['Create CRM Contact', 'Send Welcome Email', 'Notify Team'], executions: 1247, lastRun: '2 min ago', successRate: 99.2 },
-  { id: 'w2', name: 'Deploy Notification', description: 'Send email and Slack notification when a site is deployed.', status: 'active', trigger: 'Site Deployed', actions: ['Send Email', 'Send Webhook (Slack)'], executions: 892, lastRun: '14 min ago', successRate: 100 },
+  { id: 'w2', name: 'Deploy Notification', description: 'Send email and Hash notification when a site is deployed.', status: 'active', trigger: 'Site Deployed', actions: ['Send Email', 'Send Webhook (Hash)'], executions: 892, lastRun: '14 min ago', successRate: 100 },
   { id: 'w3', name: 'Weekly SEO Report', description: 'Every Monday at 9 AM, run SEO analysis and email results.', status: 'active', trigger: 'Schedule (Monday 9 AM)', actions: ['Run SEO Analysis', 'Generate Report', 'Send Email'], executions: 42, lastRun: '3 days ago', successRate: 95.2 },
   { id: 'w4', name: 'Onboarding Sequence', description: 'Welcome new users with a 3-email drip sequence over 7 days.', status: 'paused', trigger: 'New User Signup', actions: ['Send Welcome Email', 'Wait 2 Days', 'Send Tips Email', 'Wait 5 Days', 'Send Upgrade Email'], executions: 3201, lastRun: '1 hour ago', successRate: 97.8 },
   { id: 'w5', name: 'Purchase Follow-Up', description: 'Thank customer, provision service, notify accounting.', status: 'active', trigger: 'Purchase Made', actions: ['Send Receipt', 'Provision Service', 'Create Invoice', 'Notify Accounting'], executions: 156, lastRun: '5 hours ago', successRate: 100 },
@@ -111,7 +111,7 @@ const DEMO_LOGS: LogEntry[] = [
 
 const TEMPLATES = [
   { name: 'Lead Capture to CRM', trigger: 'Form Submitted', actions: 3, description: 'Capture form submissions, create CRM contacts, and send welcome emails.' },
-  { name: 'Deploy + Notify', trigger: 'Site Deployed', actions: 2, description: 'Notify your team via email and Slack when a site goes live.' },
+  { name: 'Deploy + Notify', trigger: 'Site Deployed', actions: 2, description: 'Notify your team via email and Hash when a site goes live.' },
   { name: 'Weekly Report', trigger: 'Schedule', actions: 3, description: 'Automated weekly analytics and SEO reports delivered to your inbox.' },
   { name: 'Onboarding Drip', trigger: 'New Signup', actions: 5, description: '7-day email sequence to onboard and convert new signups.' },
   { name: 'Payment Processing', trigger: 'Purchase', actions: 4, description: 'Receipt, provisioning, invoicing, and team notification on purchase.' },

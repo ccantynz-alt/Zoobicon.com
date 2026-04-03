@@ -84,7 +84,7 @@ const FAQS = [
   { q: "Will I lose my existing phone number?", a: "No. The eSIM runs as a second line on your phone, used only for data. Your existing SIM card and phone number remain active for calls and texts. You choose which line to use for data in your phone settings." },
   { q: "How fast is the activation?", a: "Under 60 seconds. Purchase a plan, scan the QR code (or tap the deep link on newer phones), and your eSIM is active. No store visits, no waiting for physical SIM delivery, no PIN codes." },
   { q: "Does unused data roll over?", a: "Data is valid for the plan period (7 or 30 days from activation). Unused data does not roll over, but you can top up anytime if you need more. We recommend our AI plan recommender to help you pick the right amount." },
-  { q: "Can I use eSIM for calls and texts?", a: "Our eSIM plans are data-only, which is what most travelers need. For calls and texts, use your existing SIM or apps like WhatsApp, FaceTime, or Telegram over the eSIM data connection — this is usually cheaper than international calling anyway." },
+  { q: "Can I use eSIM for calls and texts?", a: "Our eSIM plans are data-only, which is what most travelers need. For calls and texts, use your existing SIM or apps like WhatsApp, FaceTime, or Send over the eSIM data connection — this is usually cheaper than international calling anyway." },
 ];
 
 export default function EsimProductPage() {

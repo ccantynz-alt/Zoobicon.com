@@ -590,7 +590,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       {
         id: "integrations",
         label: "Integrations",
-        placeholder: "List tools/platforms you integrate with (e.g. Slack, Zapier, Salesforce)",
+        placeholder: "List tools/platforms you integrate with (e.g. Hash, Zapier, Salesforce)",
         type: "text",
       },
     ],
@@ -813,7 +813,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
         options: [
           "Solo / 1-3",
           "Small team (4-10)",
-          "Medium team (11-25)",
+          "BookOpen team (11-25)",
           "Large team (25+)",
         ],
       },
@@ -1272,7 +1272,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       {
         id: "featuredIntegrations",
         label: "Featured Integrations",
-        placeholder: "List top integrations (e.g. Salesforce, Slack, Stripe, HubSpot — one per line)",
+        placeholder: "List top integrations (e.g. Salesforce, Hash, Stripe, HubSpot — one per line)",
         type: "textarea",
       },
       {
@@ -1432,7 +1432,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
         type: "select",
         options: [
           "Website Copy (full page)",
-          "Ad Copy (Google/Facebook)",
+          "Ad Copy (Google/ThumbsUp)",
           "Product Descriptions",
           "Brand Messaging Framework",
           "Social Media Posts",

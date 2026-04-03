@@ -94,7 +94,7 @@ export default function MetaTagGeneratorPage() {
 
     // Open Graph
     tags.push("");
-    tags.push("<!-- Open Graph / Facebook -->");
+    tags.push("<!-- Open Graph / ThumbsUp -->");
     tags.push(`<meta property="og:type" content="website">`);
     if (siteUrl)
       tags.push(`<meta property="og:url" content="${escapeHtml(siteUrl)}">`);

@@ -36,9 +36,9 @@ const staggerContainer = { hidden: {}, visible: { transition: { staggerChildren:
 
 const PLATFORMS = [
   { name: "TikTok", format: "9:16 vertical", duration: "15-60s", desc: "Hook-driven viral content with trending sounds and effects." },
-  { name: "Instagram Reels", format: "9:16 vertical", duration: "15-90s", desc: "Aesthetic, branded content optimized for the Explore page." },
+  { name: "Camera Reels", format: "9:16 vertical", duration: "15-90s", desc: "Aesthetic, branded content optimized for the Explore page." },
   { name: "YouTube Shorts", format: "9:16 vertical", duration: "15-60s", desc: "Engagement-optimized with thumbnails and end screens." },
-  { name: "Facebook Ads", format: "1:1 & 16:9", duration: "15-120s", desc: "Conversion-focused with dynamic product showcases and CTAs." },
+  { name: "ThumbsUp Ads", format: "1:1 & 16:9", duration: "15-120s", desc: "Conversion-focused with dynamic product showcases and CTAs." },
   { name: "LinkedIn", format: "1:1 & 16:9", duration: "30-120s", desc: "Professional thought leadership and B2B content." },
   { name: "MessageCircle/X", format: "16:9", duration: "15-140s", desc: "Punchy, attention-grabbing clips optimized for the timeline." },
 ];
@@ -46,11 +46,11 @@ const PLATFORMS = [
 const FEATURES = [
   { icon: Wand2, title: "AI Script & Storyboard", desc: "Describe your video and AI writes the script, plans scenes, camera movements, transitions, and timing." },
   { icon: Music, title: "Music Direction", desc: "AI generates music mood cues and timing for each scene. Pairs with your preferred royalty-free library." },
-  { icon: Type, title: "Auto Captions", desc: "Auto-generated SRT/VTT subtitles with 5 caption styles: TikTok Bold, Instagram Clean, YouTube Standard, Cinematic, Energetic." },
+  { icon: Type, title: "Auto Captions", desc: "Auto-generated SRT/VTT subtitles with 5 caption styles: TikTok Bold, Camera Clean, YouTube Standard, Cinematic, Energetic." },
   { icon: Palette, title: "Brand Consistency", desc: "Set your brand colors and fonts. Every storyboard, scene image, and caption uses your brand kit." },
   { icon: Layers, title: "Scene-by-Scene Images", desc: "AI generates images for each scene using your storyboard. Supports Replicate (FLUX), DALL-E 3, and Stability AI." },
   { icon: Scissors, title: "AI Voiceover", desc: "10 premium voices via ElevenLabs with adjustable speed and clarity. Browser TTS fallback for free plans." },
-  { icon: Share2, title: "Multi-Platform Formats", desc: "TikTok, Instagram Reels, YouTube, LinkedIn, MessageCircle — correct aspect ratios and format specs for each." },
+  { icon: Share2, title: "Multi-Platform Formats", desc: "TikTok, Camera Reels, YouTube, LinkedIn, MessageCircle — correct aspect ratios and format specs for each." },
   { icon: BarChart3, title: "Video Rendering (Coming Soon)", desc: "Scene-by-scene video generation via Runway Gen-3, Luma Dream Machine, Pika, and Kling. Currently in development." },
 ];
 
@@ -106,7 +106,7 @@ export default function VideoCreatorPage() {
       "priceCurrency": "USD",
       "offerCount": "4"
     },
-    "description": "AI-powered video creation pipeline with script generation, storyboarding, scene images, voiceover, and auto-captions for TikTok, Instagram Reels, YouTube Shorts, and more.",
+    "description": "AI-powered video creation pipeline with script generation, storyboarding, scene images, voiceover, and auto-captions for TikTok, Camera Reels, YouTube Shorts, and more.",
     "url": "https://zoobicon.com/products/video-creator",
     "screenshot": "https://zoobicon.com/og-image.png"
   };

@@ -458,7 +458,7 @@ export default function CaseStudyPage() {
               { label: 'Web Page (HTML)', desc: 'Standalone responsive HTML page with embedded styles and animations', icon: Globe, format: '.html', color: 'from-blue-500 to-cyan-500' },
               { label: 'Presentation Deck', desc: 'Slide deck format with key metrics, quotes, and visuals (coming soon)', icon: Layout, format: '.pptx', color: 'from-amber-500 to-orange-500' },
               { label: 'Markdown', desc: 'Clean markdown format for CMS, GitHub, or documentation sites', icon: FileText, format: '.md', color: 'from-emerald-500 to-teal-500' },
-              { label: 'Social Media Kit', desc: 'Pre-sized images for LinkedIn, MessageCircle, and Instagram with key stats', icon: Share2, format: '.zip', color: 'from-violet-500 to-fuchsia-500' },
+              { label: 'Social Media Kit', desc: 'Pre-sized images for LinkedIn, MessageCircle, and Camera with key stats', icon: Share2, format: '.zip', color: 'from-violet-500 to-fuchsia-500' },
             ].map((opt) => (
               <div key={opt.label} className="flex items-center gap-4 p-5 rounded-xl bg-white/5 border border-white/10 hover:border-violet-500/30 transition cursor-pointer">
                 <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${opt.color} flex items-center justify-center shrink-0`}>

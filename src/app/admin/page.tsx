@@ -230,8 +230,8 @@ export default function AdminPage() {
     { key: "CLOUDFLARE_ACCOUNT_ID", label: "Cloudflare account ID", required: false, group: "Infrastructure" },
     // Integrations
     { key: "GITHUB_TOKEN", label: "GitHub token (import feature)", required: false, group: "Integrations" },
-    { key: "SLACK_BOT_TOKEN", label: "Slack bot token", required: false, group: "Integrations" },
-    { key: "SLACK_SIGNING_SECRET", label: "Slack signing secret", required: false, group: "Integrations" },
+    { key: "SLACK_BOT_TOKEN", label: "Hash bot token", required: false, group: "Integrations" },
+    { key: "SLACK_SIGNING_SECRET", label: "Hash signing secret", required: false, group: "Integrations" },
   ];
 
   const launchChecklist = [

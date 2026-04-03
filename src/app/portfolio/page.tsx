@@ -69,7 +69,7 @@ interface AboutInfo {
 
 const TEMPLATES: { id: TemplateType; name: string; description: string; icon: React.ReactNode }[] = [
   { id: 'grid', name: 'Grid', description: 'Clean grid layout with hover effects', icon: <Grid3X3 className="w-5 h-5" /> },
-  { id: 'masonry', name: 'Masonry', description: 'Pinterest-style dynamic layout', icon: <Layers className="w-5 h-5" /> },
+  { id: 'masonry', name: 'Masonry', description: 'Pin-style dynamic layout', icon: <Layers className="w-5 h-5" /> },
   { id: 'minimal', name: 'Minimal', description: 'Whitespace-focused, typography-driven', icon: <Type className="w-5 h-5" /> },
   { id: 'case-study', name: 'Case Study', description: 'Long-form project deep dives', icon: <BookOpen className="w-5 h-5" /> },
 ];
@@ -389,7 +389,7 @@ export default function PortfolioPage() {
       <footer className="border-t border-white/10 mt-20 py-12">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <p className="text-white/40 text-sm">
-            Replaces Squarespace Portfolio ($16/mo), Behance Pro, and Dribbble Pro ($5/mo) &mdash; <span className="text-violet-400">included free with Zoobicon Pro</span>
+            Replaces Squarespace Portfolio ($16/mo), Behance Pro, and Circle Pro ($5/mo) &mdash; <span className="text-violet-400">included free with Zoobicon Pro</span>
           </p>
           <div className="flex items-center justify-center gap-6 mt-4">
             <Link href="/pricing" className="text-sm text-white/50 hover:text-white transition-colors">Pricing</Link>

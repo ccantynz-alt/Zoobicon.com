@@ -19,8 +19,8 @@ import {
   LogOut,
   MessageCircle,
   Link2,
-  Instagram,
-  Facebook,
+  Camera,
+  ThumbsUp,
   Eye,
   Heart,
   Lightbulb,
@@ -56,10 +56,10 @@ interface RecentPost {
 const PLATFORMS: Platform[] = [
   { id: "twitter", name: "MessageCircle / X", icon: MessageCircle, color: "from-sky-500 to-blue-600", connected: true, followers: "2.4K" },
   { id: "linkedin", name: "LinkedIn", icon: Link2, color: "from-blue-600 to-blue-800", connected: true, followers: "1.8K" },
-  { id: "instagram", name: "Instagram", icon: Instagram, color: "from-pink-500 to-purple-600", connected: false, followers: "0" },
+  { id: "instagram", name: "Camera", icon: Camera, color: "from-pink-500 to-purple-600", connected: false, followers: "0" },
   { id: "tiktok", name: "TikTok", icon: Zap, color: "from-rose-500 to-pink-600", connected: false, followers: "0" },
-  { id: "facebook", name: "Facebook", icon: Facebook, color: "from-blue-500 to-indigo-600", connected: true, followers: "890" },
-  { id: "reddit", name: "Reddit", icon: MessageCircle, color: "from-orange-500 to-red-600", connected: false, followers: "0" },
+  { id: "facebook", name: "ThumbsUp", icon: ThumbsUp, color: "from-blue-500 to-indigo-600", connected: true, followers: "890" },
+  { id: "reddit", name: "MessageSquare", icon: MessageCircle, color: "from-orange-500 to-red-600", connected: false, followers: "0" },
 ];
 
 const RECENT_POSTS: RecentPost[] = [
@@ -161,7 +161,7 @@ export default function PublisherPage() {
             <h1 className="text-4xl md:text-5xl font-extrabold mb-3">
               <span className="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent">Publish Everywhere</span>
             </h1>
-            <p className="text-lg text-white/50 max-w-2xl">One post. Every platform. AI-optimized. Write once, publish to MessageCircle, LinkedIn, Instagram, TikTok, Facebook, and Reddit.</p>
+            <p className="text-lg text-white/50 max-w-2xl">One post. Every platform. AI-optimized. Write once, publish to MessageCircle, LinkedIn, Camera, TikTok, ThumbsUp, and MessageSquare.</p>
           </motion.div>
         </div>
       </header>

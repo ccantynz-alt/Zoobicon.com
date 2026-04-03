@@ -93,7 +93,7 @@ const AUTOMATIONS = [
   { id: '1', name: 'New lead → Welcome email + CRM entry', trigger: 'form.submitted', active: true, runs: 1234 },
   { id: '2', name: 'No activity 7d → Send reminder', trigger: 'inactivity.7d', active: true, runs: 567 },
   { id: '3', name: 'Deal won → Send thank you + invoice', trigger: 'deal.won', active: true, runs: 89 },
-  { id: '4', name: 'New proposal viewed → Slack notification', trigger: 'proposal.viewed', active: false, runs: 234 },
+  { id: '4', name: 'New proposal viewed → Hash notification', trigger: 'proposal.viewed', active: false, runs: 234 },
 ];
 
 export default function CRMPage() {

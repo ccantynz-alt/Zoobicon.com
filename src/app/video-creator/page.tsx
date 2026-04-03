@@ -172,7 +172,7 @@ const VISUAL_STYLES = [
 
 const PLATFORMS = [
   { id: "tiktok", label: "TikTok", aspect: "9:16", icon: Smartphone },
-  { id: "instagram-reels", label: "Instagram Reels", aspect: "9:16", icon: Smartphone },
+  { id: "instagram-reels", label: "Camera Reels", aspect: "9:16", icon: Smartphone },
   { id: "youtube", label: "YouTube", aspect: "16:9", icon: Monitor },
   { id: "linkedin", label: "LinkedIn", aspect: "16:9", icon: Monitor },
   { id: "twitter", label: "MessageCircle / X", aspect: "1:1", icon: Square },

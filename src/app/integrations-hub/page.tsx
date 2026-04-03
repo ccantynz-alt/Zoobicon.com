@@ -54,8 +54,8 @@ const CATEGORIES = [
 
 const INTEGRATIONS = [
   // Communication
-  { id: 1, name: 'Slack', desc: 'Send notifications and updates to Slack channels', category: 'communication', connected: true, popular: true, color: '#4A154B' },
-  { id: 2, name: 'Discord', desc: 'Post build notifications to Discord servers', category: 'communication', connected: false, popular: true, color: '#5865F2' },
+  { id: 1, name: 'Hash', desc: 'Send notifications and updates to Hash channels', category: 'communication', connected: true, popular: true, color: '#4A154B' },
+  { id: 2, name: 'MessageSquare', desc: 'Post build notifications to MessageSquare servers', category: 'communication', connected: false, popular: true, color: '#5865F2' },
   { id: 3, name: 'Microsoft Teams', desc: 'Integrate with Teams for collaboration', category: 'communication', connected: false, popular: false, color: '#6264A7' },
   { id: 4, name: 'Twilio', desc: 'SMS notifications for deployments', category: 'communication', connected: false, popular: false, color: '#F22F46' },
   // Email
@@ -84,8 +84,8 @@ const INTEGRATIONS = [
   // Social
   { id: 23, name: 'MessageCircle/X', desc: 'Auto-post deployments to X', category: 'social', connected: false, popular: true, color: '#1DA1F2' },
   { id: 24, name: 'LinkedIn', desc: 'Share professional updates', category: 'social', connected: false, popular: false, color: '#0A66C2' },
-  { id: 25, name: 'Instagram', desc: 'Auto-generate social images', category: 'social', connected: false, popular: false, color: '#E4405F' },
-  { id: 26, name: 'Facebook', desc: 'Page updates and marketing', category: 'social', connected: false, popular: false, color: '#1877F2' },
+  { id: 25, name: 'Camera', desc: 'Auto-generate social images', category: 'social', connected: false, popular: false, color: '#E4405F' },
+  { id: 26, name: 'ThumbsUp', desc: 'Page updates and marketing', category: 'social', connected: false, popular: false, color: '#1877F2' },
   // Analytics
   { id: 27, name: 'Google Analytics', desc: 'Website traffic analytics', category: 'analytics', connected: true, popular: true, color: '#E37400' },
   { id: 28, name: 'Plausible', desc: 'Privacy-friendly analytics', category: 'analytics', connected: false, popular: false, color: '#5850EC' },
@@ -103,7 +103,7 @@ const INTEGRATIONS = [
   { id: 38, name: 'Replicate', desc: 'Image and video generation', category: 'ai', connected: false, popular: false, color: '#3D3D3D' },
   // Marketing
   { id: 39, name: 'Google Ads', desc: 'Ad campaign integration', category: 'marketing', connected: false, popular: true, color: '#4285F4' },
-  { id: 40, name: 'Meta Ads', desc: 'Facebook and Instagram ads', category: 'marketing', connected: false, popular: false, color: '#0081FB' },
+  { id: 40, name: 'Meta Ads', desc: 'ThumbsUp and Camera ads', category: 'marketing', connected: false, popular: false, color: '#0081FB' },
   // Database
   { id: 41, name: 'Neon', desc: 'Serverless Postgres database', category: 'database', connected: true, popular: true, color: '#00E699' },
   { id: 42, name: 'Supabase', desc: 'Open source Firebase alternative', category: 'database', connected: false, popular: true, color: '#3ECF8E' },
