@@ -294,13 +294,14 @@ export default function WebsiteBuilderPage() {
         </div>
       </section>
 
-      <footer className="border-t border-white/[0.08] py-8">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <div className="text-xs text-white/60">&copy; 2026 Zoobicon</div>
+      <footer className="border-t border-white/[0.06] py-10">
+        <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-xs text-white/30">&copy; 2026 Zoobicon. All rights reserved.</div>
+          <div className="text-xs text-white/20">zoobicon.com &middot; zoobicon.ai &middot; zoobicon.io &middot; zoobicon.sh</div>
           <div className="flex gap-4">
-            <Link href="/" className="text-xs text-white/60 hover:text-white/60">Home</Link>
-            <Link href="/products/seo-agent" className="text-xs text-white/60 hover:text-white/60">SEO Agent</Link>
-            <Link href="/products/video-creator" className="text-xs text-white/60 hover:text-white/60">Video Creator</Link>
+            <Link href="/privacy" className="text-xs text-white/30 hover:text-white/50 transition-colors">Privacy</Link>
+            <Link href="/terms" className="text-xs text-white/30 hover:text-white/50 transition-colors">Terms</Link>
+            <Link href="/disclaimers" className="text-xs text-white/30 hover:text-white/50 transition-colors">Disclaimers</Link>
           </div>
         </div>
       </footer>
