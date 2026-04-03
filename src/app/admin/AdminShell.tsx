@@ -76,16 +76,37 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userName, setUserName] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem("zoobicon_user");
-      if (raw) {
-        const user = JSON.parse(raw);
-        setUserName(user.name || user.email || "Admin");
+      if (!raw) {
+        window.location.href = "/auth/login";
+        return;
       }
-    } catch {}
+      const user = JSON.parse(raw);
+      if (user.role !== "admin") {
+        window.location.href = "/dashboard";
+        return;
+      }
+      setUserName(user.name || user.email || "Admin");
+      setIsAdmin(true);
+    } catch {
+      window.location.href = "/auth/login";
+    }
+    setChecking(false);
   }, []);
+
+  // Don't render anything until auth check completes
+  if (checking || !isAdmin) {
+    return (
+      <div className="min-h-screen bg-[#131520] flex items-center justify-center">
+        <div className="text-white/30 text-sm">Checking permissions...</div>
+      </div>
+    );
+  }
 
   const handleLogout = () => {
     try {
