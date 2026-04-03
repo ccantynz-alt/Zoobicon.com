@@ -26,9 +26,33 @@ export default defineConfig({
   },
 
   projects: [
-    { name: "Desktop Chrome", use: { ...devices["Desktop Chrome"] } },
-    { name: "Mobile Safari", use: { ...devices["iPhone 13"] } },
-    { name: "Tablet", use: { ...devices["iPad (gen 7)"] } },
+    {
+      name: "Desktop Chrome",
+      use: {
+        ...devices["Desktop Chrome"],
+        launchOptions: {
+          executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH || undefined,
+        },
+      },
+    },
+    {
+      name: "Mobile Safari",
+      use: {
+        ...devices["iPhone 13"],
+        launchOptions: {
+          executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH || undefined,
+        },
+      },
+    },
+    {
+      name: "Tablet",
+      use: {
+        ...devices["iPad (gen 7)"],
+        launchOptions: {
+          executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH || undefined,
+        },
+      },
+    },
   ],
 
   webServer: process.env.CI ? undefined : {
