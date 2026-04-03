@@ -1,0 +1,64 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main, master, "claude/**"]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  e2e:
+    name: End-to-End Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Build app
+        run: npm run build
+        env:
+          ANTHROPIC_API_KEY: sk-ant-ci-placeholder
+          ADMIN_EMAIL: admin@zoobicon.com
+          ADMIN_PASSWORD: ci-placeholder
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+          STRIPE_SECRET_KEY: sk_test_ci_placeholder
+
+      - name: Run E2E tests
+        run: npx playwright test --project="Desktop Chrome"
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:3000
+          ANTHROPIC_API_KEY: sk-ant-ci-placeholder
+          ADMIN_EMAIL: admin@zoobicon.com
+          ADMIN_PASSWORD: ci-placeholder
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+          STRIPE_SECRET_KEY: sk_test_ci_placeholder
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Upload screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failure-screenshots
+          path: test-results/
+          retention-days: 7
