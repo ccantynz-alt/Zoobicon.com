@@ -97,8 +97,8 @@ export async function generateVoice(
       input: { text },
     },
     {
-      name: "XTTS-v2",
-      modelPath: "lucataco/xtts-v2",
+      name: "Tortoise TTS",
+      modelPath: "afiaka87/tortoise-tts",
       input: { text, language: "en" },
     },
   ];
@@ -173,7 +173,7 @@ export async function generateVoiceXTTS(
     input.speaker = referenceAudioUrl; // Clone this voice
   }
 
-  const res = await fetch(`${REPLICATE_API}/models/lucataco/xtts-v2/predictions`, {
+  const res = await fetch(`${REPLICATE_API}/models/jaaari/kokoro-82m/predictions`, {
     method: "POST",
     headers: replicateHeaders(),
     body: JSON.stringify({ input }),
