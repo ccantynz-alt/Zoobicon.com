@@ -4,11 +4,131 @@
 ---
 
 > **HOW TO USE THIS FILE EVERY MORNING:**
-> 1. Scroll to CURRENT STATUS at the very bottom
-> 2. Read the "Next action" line
-> 3. Open a new Claude session, paste this whole file, say:
+> 1. Read LIVE REPO STATUS below — it tells you exactly what's built, what's broken, what's next
+> 2. Open a new Claude session, paste this whole file, say:
 >    *"I'm working on Zoobicon. Here is my CLAUDE.md. Continue from where I left off."*
-> 4. Claude will know everything. No explanation needed.
+> 3. Claude will know everything. No explanation needed.
+
+---
+
+# LIVE REPO STATUS — READ THIS FIRST
+## Last updated: 2026-04-04 | Build: PASSING | Branch: main
+
+### QUICK FACTS
+- **141 pages** | **223 API routes** | **74 layouts** | **130 lib files**
+- **Framework:** Next.js 14.2 + React 18.3 + TypeScript + Tailwind CSS 3.4
+- **AI:** Anthropic SDK 0.80, multi-LLM (Claude/GPT/Gemini) via `src/lib/llm-provider.ts`
+- **DB:** Neon serverless Postgres via `@neondatabase/serverless`
+- **Payments:** Stripe 21.0 | **Icons:** lucide-react 1.7 | **Animation:** framer-motion 12.38
+- **Preview:** Sandpack in-browser React preview
+- **Build command:** `npm run build` | **Dev:** `npm run dev` | **Tests:** `npm run test`
+- **E2E:** `npx playwright test` (Playwright 1.56, 60+ test cases)
+- **Deploy:** Vercel (iad1 region), 9 cron jobs configured
+
+### CORE PRODUCT STATUS
+
+| Feature | Status | Key Files | What Works | What's Missing |
+|---------|--------|-----------|------------|----------------|
+| **AI Website Builder** | WORKING | `src/app/builder/page.tsx`, `src/lib/agents.ts`, `src/app/api/generate/react-stream/route.ts` | React generation via Sandpack, streaming SSE, 100-component registry | Diff editing not wired to UI, streaming could be smoother |
+| **Domain Search** | WORKING | `src/app/domains/page.tsx`, `src/app/api/domains/search/route.ts`, `src/lib/opensrs.ts` | Real OpenSRS registry checks, AI name generator, TLD pages | Checkout needs Stripe products |
+| **Video Creator** | PARTIAL | `src/app/video-creator/page.tsx`, `src/lib/video-pipeline.ts`, `src/lib/video-render.ts` | Chat-based 3-step flow, script generation | Pipeline UNTESTED on Replicate, needs REPLICATE_API_TOKEN |
+| **Pricing** | WORKING | `src/app/pricing/page.tsx`, `src/lib/stripe.ts` | Page renders with tiers | Needs Craig to create Stripe products + price IDs |
+| **Auth** | WORKING | `src/app/auth/*/page.tsx`, `src/app/api/auth/*/route.ts` | Login, signup, OAuth (Google/GitHub), email verify, password reset | Needs DATABASE_URL for persistence |
+| **12 Free Tools** | WORKING | `src/app/tools/*/page.tsx` | All client-side, no API needed | Fully functional |
+| **10 Product Pages** | WORKING | `src/app/products/*/page.tsx` | eSIM, VPN, dictation, storage, booking, hosting, builder, video, SEO, email | Most are showcase pages |
+| **50 eSIM Country Pages** | WORKING | `src/app/esim/[country]/page.tsx` | SEO pages with structured data | Needs CELITECH_API_KEY for real data |
+| **Admin Dashboard** | WORKING | `src/app/admin/*/page.tsx` | 16+ admin pages, mobile command centre | Uses mock data without DB |
+| **Hosting/Deploy** | PARTIAL | `src/app/api/hosting/deploy/route.ts`, `src/app/api/hosting/serve/[slug]/route.ts` | Deploy to DB, serve at zoobicon.sh | Needs polish |
+| **CRM** | SHELL | `src/app/crm/page.tsx` | Pretty UI | 100% hardcoded mock data |
+| **Email Marketing** | SHELL | `src/app/email-marketing/page.tsx` | Pretty UI | 100% hardcoded mock data |
+| **Invoicing** | SHELL | `src/app/invoicing/page.tsx` | Pretty UI | 100% hardcoded mock data |
+| **Analytics** | SHELL | `src/app/analytics/page.tsx` | Pretty UI | localStorage only |
+
+### BUILD PIPELINE
+```
+User Prompt → Haiku classifies intent (<1s) → Select from 100-component registry
+  → Stream components via SSE (/api/generate/react-stream)
+  → Sandpack renders progressively in browser
+  → Full site in <30 seconds
+```
+**Key pipeline files:**
+- `src/lib/agents.ts` (51KB) — 7-agent orchestration
+- `src/lib/generator-prompts.ts` (82KB) — prompt templates
+- `src/lib/scaffold-engine.ts` (49KB) — scaffold system
+- `src/lib/component-registry/index.ts` — 100 components
+- `src/lib/templates.ts` (108KB) — template library
+
+### ENV VARS NEEDED (Craig must set in Vercel)
+| Variable | For | Status |
+|----------|-----|--------|
+| ANTHROPIC_API_KEY | AI generation | SET |
+| DATABASE_URL | Neon Postgres | CHECK |
+| STRIPE_SECRET_KEY | Payments | CHECK |
+| STRIPE_WEBHOOK_SECRET | Stripe webhooks | NOT SET |
+| OPENSRS_API_KEY | Domain registration | CHECK |
+| REPLICATE_API_TOKEN | Video pipeline | NOT SET |
+| SUPABASE_ACCESS_TOKEN | Auto-provisioning | NOT SET |
+| CELITECH_API_KEY | eSIM product | NOT SET |
+| DEEPGRAM_API_KEY | AI Dictation | NOT SET |
+| MAILGUN_API_KEY | Transactional email | CHECK |
+
+### WHAT TO BUILD NEXT (priority order)
+1. **Wire diff editing into builder UI** — endpoint exists at `/api/generate/edit`, needs chat panel integration
+2. **Fix builder streaming** — components should appear one-by-one, not all at once
+3. **Stripe checkout flow** — pricing page exists, needs real Stripe product IDs + webhook handler
+4. **Supabase auto-provisioning** — code exists in `src/lib/supabase-provisioner.ts`, needs wiring into generation
+5. **GitHub sync** — export exists, continuous sync NOT STARTED
+6. **Deploy polish** — one-click deploy works but needs UX improvements
+7. **Video pipeline testing** — code exists, needs REPLICATE_API_TOKEN to test
+8. **MCP integration** — foundation at `/api/mcp/route.ts`, needs real tool connections
+
+### CRITICAL PATHS (file → file dependencies)
+```
+Builder:     src/app/builder/page.tsx → /api/generate/react-stream → src/lib/agents.ts → src/lib/llm-provider.ts
+Domains:     src/app/domains/page.tsx → /api/domains/search → src/lib/opensrs.ts
+Video:       src/app/video-creator/page.tsx → /api/video-creator/chat → src/lib/video-pipeline.ts
+Hosting:     src/app/builder/page.tsx → /api/hosting/deploy → src/lib/db.ts
+Auth:        src/app/auth/*/page.tsx → /api/auth/* → src/lib/db.ts
+Payments:    src/app/pricing/page.tsx → /api/stripe/checkout → src/lib/stripe.ts
+```
+
+### DIRECTORY MAP
+```
+src/
+  app/                    # 141 pages, 223 API routes, 74 layouts
+    api/                  # All backend endpoints
+      generate/           # AI generation (react, react-stream, edit, pipeline, images)
+      hosting/            # Deploy, serve, DNS, SSL, CDN
+      domains/            # Search, register, checkout, manage, DNS
+      auth/               # Login, signup, OAuth, password reset
+      stripe/             # Checkout, portal, webhook
+      video-creator/      # Generate, script, voiceover, render, chat
+      email/              # Send, inbox, support, marketing
+      intel/              # Competitor crawling, technology tracking
+      v1/                 # Public API (booking, eSIM, VPN, storage, video)
+    builder/              # AI website builder
+    domains/              # Domain search + TLD pages
+    pricing/              # Subscription tiers
+    admin/                # 16+ admin pages
+    tools/                # 12 free SEO tools
+    products/             # 10 product pages
+    video-creator/        # AI video creator
+    auth/                 # Login, signup, OAuth
+  lib/                    # 130 helper modules
+    agents.ts             # 7-agent pipeline (51KB)
+    llm-provider.ts       # Multi-LLM abstraction
+    component-registry/   # 100 React components for assembly
+    scaffold-engine.ts    # Instant scaffold system
+    templates.ts          # Template library (108KB)
+    stripe.ts             # Stripe integration
+    opensrs.ts            # Domain registration
+    db.ts                 # Neon database
+    video-pipeline.ts     # Own video pipeline (Fish Speech + FLUX + OmniHuman)
+  components/             # Shared React components
+e2e/                      # Playwright E2E tests (60+ cases)
+tests/                    # Vitest unit tests (7 files, 180+ cases)
+.github/workflows/        # CI (ci.yml) + E2E (e2e.yml)
+```
 
 ---
 
