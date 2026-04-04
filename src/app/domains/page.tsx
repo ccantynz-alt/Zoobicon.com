@@ -260,12 +260,23 @@ export default function DomainsPage() {
     setCheckingOut(true);
     setCheckoutError("");
 
+    // Get user email from localStorage
+    let userEmail = "";
+    try {
+      const raw = localStorage.getItem("zoobicon_user");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        userEmail = parsed.email || "";
+      }
+    } catch { /* no user */ }
+
     try {
       const res = await fetch("/api/domains/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           domains: cart.map((d) => ({ domain: d.domain, tld: d.tld, price: d.price })),
+          email: userEmail,
         }),
       });
 
