@@ -481,7 +481,11 @@ function BuilderPage() {
 
   const abortRef = useRef<AbortController | null>(null);
   const generationIdRef = useRef(0); // Tracks current generation to prevent stale image replacements
-  const hasCode = generatedCode.length > 0;
+  // hasCode must check for REAL content — not just the "<!-- react-app-mode -->" marker
+  // which can linger after a failed generation, leaving the builder stuck in "AI Editor" mode
+  const hasCode = generatedCode.length > 0 && (
+    generatedCode !== "<!-- react-app-mode -->" || (reactFiles !== null && Object.keys(reactFiles).length > 0)
+  );
 
   // Get user email for auth headers
   const getUserEmail = useCallback(() => {
