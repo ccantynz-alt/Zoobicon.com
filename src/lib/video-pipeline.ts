@@ -24,7 +24,12 @@
 const REPLICATE_API = "https://api.replicate.com/v1";
 
 function getReplicateToken(): string {
-  const token = process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY;
+  // Vercel's Replicate integration may use different env var names
+  const token =
+    process.env.REPLICATE_API_TOKEN ||
+    process.env.REPLICATE_API_KEY ||
+    process.env.REPLICATE_TOKEN ||
+    process.env.REPLICATE_KEY;
   if (!token) throw new Error("Video generation is being set up. Please try again shortly.");
   return token;
 }
@@ -506,7 +511,7 @@ export async function generateFullVideo(
 // ── Provider Check ──
 
 export function isCustomPipelineAvailable(): boolean {
-  return !!(process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY || process.env.ZOOBICON_VIDEO_API_URL);
+  return !!(process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY || process.env.REPLICATE_TOKEN || process.env.REPLICATE_KEY || process.env.ZOOBICON_VIDEO_API_URL);
 }
 
 export function getVideoPipelineInfo(): {
@@ -517,7 +522,7 @@ export function getVideoPipelineInfo(): {
   if (process.env.ZOOBICON_VIDEO_API_URL) {
     return { available: true, provider: "self-hosted", models: ["fish-speech", "flux", "sadtalker"] };
   }
-  if (process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY) {
+  if (process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY || process.env.REPLICATE_TOKEN || process.env.REPLICATE_KEY) {
     return { available: true, provider: "replicate", models: ["fish-speech", "flux", "sadtalker"] };
   }
   return { available: false, provider: "none", models: [] };

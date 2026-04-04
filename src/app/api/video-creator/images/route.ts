@@ -119,7 +119,7 @@ export async function GET() {
     activeProvider: provider || null,
     providers: {
       replicate: {
-        available: !!(process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY),
+        available: !!(process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY || process.env.REPLICATE_TOKEN || process.env.REPLICATE_KEY),
         models: ["FLUX Schnell", "Stable Diffusion XL"],
       },
       openai: {
