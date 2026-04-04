@@ -404,7 +404,7 @@ function BuilderPage() {
   const [showShareModal, setShowShareModal] = useState(false);
   const [pipelineAgents, setPipelineAgents] = useState<string[]>([]);
   const [selectedModel, setSelectedModel] = useState("");  // Empty = use pipeline's smart routing (Haiku/Opus/Sonnet)
-  const [instantMode, setInstantMode] = useState(false); // Default to full AI generation for premium quality
+  const [instantMode, setInstantMode] = useState(true); // Default to fast registry assembly (scaffold <1s + AI customize ~10s)
   const [availableModels, setAvailableModels] = useState<AIModel[]>([]);
   const [reactSource, setReactSource] = useState<Record<string, string> | null>(null);
   const [reactFiles, setReactFiles] = useState<Record<string, string> | null>(null);
@@ -1043,17 +1043,21 @@ function BuilderPage() {
     // ── React App mode: server handles everything via streaming ──
     if (generationMode === "react") {
       setStatus("generating");
-      setPipelineAgents(["Assembling components..."]);
 
-      // The streaming endpoint handles BOTH registry assembly AND AI customization
-      // Server-side registry loading is reliable (no client-side import issues)
+      // TWO PATHS:
+      // 1. Fast path (instantMode=true, DEFAULT): Registry scaffold (<1s) + AI customization (~10s)
+      // 2. Full path (instantMode=false): Opus generates everything from scratch (~30s)
+      const useFastPath = instantMode;
+      const endpoint = useFastPath ? "/api/generate/react-stream" : "/api/generate/react";
+      setPipelineAgents([useFastPath ? "Assembling components from registry..." : "AI generating full application..."]);
+
       try {
-        const res = await fetch("/api/generate/react", {
+        const res = await fetch(endpoint, {
           method: "POST",
           headers: authHeaders(),
           body: JSON.stringify({
             prompt: prompt.trim(),
-            tier: "premium",
+            tier: useFastPath ? "standard" : "premium",
           }),
           signal: controller.signal,
         });
@@ -1098,8 +1102,26 @@ function BuilderPage() {
 
               if (event.type === "status") {
                 setPipelineAgents(prev => [...prev, event.message]);
+              } else if (event.type === "scaffold" && event.files) {
+                // FAST PATH: Registry scaffold arrived (<1 second!)
+                if (generationIdRef.current === currentGenId) {
+                  setReactFiles(event.files);
+                  setGeneratedCode("<!-- react-app-mode -->");
+                  setPipelineAgents(prev => [...prev, `Scaffold ready — ${event.componentCount} components assembled`]);
+                }
+              } else if (event.type === "customization" && event.data) {
+                // FAST PATH: AI customization data arrived — content being applied
+                if (generationIdRef.current === currentGenId) {
+                  setPipelineAgents(prev => [...prev, `Customizing for "${event.data.brandName || "your business"}"...`]);
+                }
+              } else if (event.type === "scaffold-update" && event.files) {
+                // FAST PATH: Updated scaffold with custom colors/content
+                if (generationIdRef.current === currentGenId) {
+                  setReactFiles(event.files);
+                  setGeneratedCode("<!-- react-app-mode -->");
+                }
               } else if (event.type === "partial" && event.files) {
-                // Streaming: files arrive as they're generated
+                // FULL PATH: files arrive as they're generated
                 if (generationIdRef.current === currentGenId) {
                   setReactFiles(prev => ({ ...prev, ...event.files }));
                   setGeneratedCode("<!-- react-app-mode -->");
@@ -1142,6 +1164,16 @@ function BuilderPage() {
               const event = JSON.parse(jsonStr);
               if (event.type === "status") {
                 setPipelineAgents(prev => [...prev, event.message]);
+              } else if (event.type === "scaffold" && event.files) {
+                if (generationIdRef.current === currentGenId) {
+                  setReactFiles(event.files);
+                  setGeneratedCode("<!-- react-app-mode -->");
+                }
+              } else if (event.type === "scaffold-update" && event.files) {
+                if (generationIdRef.current === currentGenId) {
+                  setReactFiles(event.files);
+                  setGeneratedCode("<!-- react-app-mode -->");
+                }
               } else if (event.type === "partial" && event.files) {
                 if (generationIdRef.current === currentGenId) {
                   setReactFiles(prev => ({ ...prev, ...event.files }));
@@ -1579,12 +1611,12 @@ root.render(React.createElement(App));
                 onClick={() => setInstantMode(!instantMode)}
                 className={`px-3 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-wider transition-all border ${
                   instantMode
-                    ? "bg-amber-500/10 border-amber-500/30 text-amber-400"
-                    : "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                    : "bg-violet-500/10 border-violet-500/30 text-violet-400"
                 }`}
-                title={instantMode ? "Quick: 3s scaffold preview (lower quality)" : "Premium: full AI generation (best quality)"}
+                title={instantMode ? "Instant: <3s preview from component library" : "Deep Build: full AI generation with Opus (~30s)"}
               >
-                {instantMode ? "⚡ Quick" : "✨ Premium"}
+                {instantMode ? "Instant" : "Deep Build"}
               </button>
               <button
                 onClick={handleGenerate}

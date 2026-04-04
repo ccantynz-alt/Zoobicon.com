@@ -61,6 +61,9 @@ export async function POST(req: NextRequest) {
         controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
       };
 
+      // Track the latest file state so we can send it with done
+      let latestFiles: Record<string, string> = {};
+
       try {
         // ── Phase 1: Instant Assembly from Registry (<1 second) ──
         const registry = await getRegistry();
@@ -68,6 +71,7 @@ export async function POST(req: NextRequest) {
           prompt.trim()
         );
 
+        latestFiles = assembledFiles;
         send({
           type: "scaffold",
           files: assembledFiles,
@@ -92,7 +96,7 @@ export async function POST(req: NextRequest) {
           return;
         }
 
-        const client = new Anthropic({ apiKey, timeout: 240000 });
+        const client = new Anthropic({ apiKey, timeout: 60000 });
 
         // Build a summary of what sections exist so the AI knows what to customize
         const sectionSummary = components
@@ -167,7 +171,7 @@ Rules:
 - Output ONLY the JSON — no markdown fences, no explanation, no commentary`;
 
         const response = await client.messages.create({
-          model: "claude-sonnet-4-6",
+          model: "claude-haiku-4-5-20251001",
           max_tokens: 4096,
           system: customizationPrompt,
           messages: [
@@ -205,6 +209,7 @@ Rules:
               primaryColor: customization.colors?.primary,
               bgColor: customization.colors?.bg,
             });
+            latestFiles = updatedFiles.files;
             send({
               type: "scaffold-update",
               files: updatedFiles.files,
@@ -238,9 +243,9 @@ Rules:
         );
       }
 
-      // Always close cleanly
+      // Always close cleanly — include latest files so the client can set reactSource
       controller.enqueue(
-        encoder.encode(`data: ${JSON.stringify({ type: "done" })}\n\n`)
+        encoder.encode(`data: ${JSON.stringify({ type: "done", files: latestFiles })}\n\n`)
       );
       controller.close();
     },
