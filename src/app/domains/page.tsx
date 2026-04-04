@@ -844,45 +844,71 @@ export default function DomainsPage() {
                       )}
                     </div>
 
-                    {/* Domain results grid — only show available and checking domains */}
-                    <div className="flex flex-wrap gap-2">
+                    {/* Domain results — proper register buttons */}
+                    <div className="space-y-2 mb-3">
                       {gn.domains
                         .filter((d) => d.checking || d.available === true)
                         .map((d) => (
                         <div
                           key={d.domain}
-                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all ${
+                          className={`flex items-center justify-between p-3 rounded-xl transition-all ${
                             d.checking
-                              ? "bg-white/[0.04] text-slate-500"
-                              : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                              ? "bg-white/[0.03]"
+                              : "bg-emerald-500/[0.06] border border-emerald-500/15"
                           }`}
                         >
-                          {d.checking ? (
-                            <Loader2 className="w-3 h-3 animate-spin" />
-                          ) : (
-                            <Check className="w-3 h-3" />
-                          )}
-                          <span>.{d.tld}</span>
+                          <div className="flex items-center gap-2.5">
+                            {d.checking ? (
+                              <Loader2 className="w-4 h-4 text-slate-500 animate-spin" />
+                            ) : (
+                              <Check className="w-4 h-4 text-emerald-400" />
+                            )}
+                            <span className={`font-semibold ${d.checking ? "text-slate-400" : "text-white"}`}>
+                              {d.domain}
+                            </span>
+                          </div>
                           {d.available && (
-                            <>
-                              <span className="text-xs opacity-70">${d.price}</span>
+                            <div className="flex items-center gap-3">
+                              <span className="text-sm font-bold text-white">${d.price}<span className="text-xs text-slate-400 font-normal">/yr</span></span>
                               {cart.some((c) => c.domain === d.domain) ? (
-                                <button onClick={() => removeFromCart(d.domain)} className="ml-1 text-emerald-300">
-                                  <Check className="w-3 h-3" />
+                                <button
+                                  onClick={() => removeFromCart(d.domain)}
+                                  className="px-4 py-2 rounded-lg bg-emerald-600/20 text-emerald-300 text-sm font-semibold flex items-center gap-1.5"
+                                >
+                                  <Check className="w-3.5 h-3.5" /> In Cart
                                 </button>
                               ) : (
                                 <button
                                   onClick={() => addToCart(d)}
-                                  className="ml-1 text-emerald-400 hover:text-emerald-300"
+                                  className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold flex items-center gap-1.5 transition-colors shadow-md shadow-indigo-500/20"
                                 >
-                                  <Plus className="w-3 h-3" />
+                                  <ShoppingCart className="w-3.5 h-3.5" /> Register
                                 </button>
                               )}
-                            </>
+                            </div>
+                          )}
+                          {d.checking && (
+                            <span className="text-xs text-slate-500">Checking...</span>
                           )}
                         </div>
                       ))}
                     </div>
+
+                    {/* Add All button */}
+                    {hasAvailable && availableDomains.length > 1 && (
+                      <button
+                        onClick={() => {
+                          availableDomains.forEach((d) => {
+                            if (!cart.some((c) => c.domain === d.domain)) {
+                              addToCart(d);
+                            }
+                          });
+                        }}
+                        className="w-full py-2.5 rounded-xl border border-emerald-500/20 text-emerald-400 text-sm font-semibold hover:bg-emerald-500/[0.06] transition-colors flex items-center justify-center gap-2"
+                      >
+                        <Plus className="w-4 h-4" /> Add All {availableDomains.length} Domains to Cart
+                      </button>
+                    )}
                   </div>
                 );
               })}
@@ -1136,6 +1162,48 @@ export default function DomainsPage() {
           </div>
         </div>
       </section>
+
+      {/* ═══════════════════════════════════════════ */}
+      {/* STICKY CART BAR — always visible at bottom  */}
+      {/* ═══════════════════════════════════════════ */}
+      {cart.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#0d0d1a]/95 backdrop-blur-xl border-t border-indigo-500/20 shadow-2xl shadow-black/50">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center shrink-0">
+                <ShoppingCart className="w-5 h-5 text-indigo-400" />
+              </div>
+              <div className="min-w-0">
+                <span className="text-sm font-bold text-white">{cart.length} domain{cart.length > 1 ? "s" : ""}</span>
+                <span className="text-xs text-slate-400 block truncate">
+                  {cart.map(c => c.domain).join(", ")}
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 shrink-0">
+              <span className="text-xl font-black text-indigo-400">
+                ${cartTotal.toFixed(2)}<span className="text-xs font-normal text-slate-400">/yr</span>
+              </span>
+              <button
+                onClick={handleCheckout}
+                disabled={checkingOut}
+                className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-base transition-colors shadow-lg shadow-indigo-500/25 disabled:opacity-50 flex items-center gap-2"
+              >
+                {checkingOut ? (
+                  <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
+                ) : (
+                  <><Lock className="w-4 h-4" /> Register Now</>
+                )}
+              </button>
+            </div>
+          </div>
+          {checkoutError && (
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-2">
+              <p className="text-center text-sm text-red-400">{checkoutError}</p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
