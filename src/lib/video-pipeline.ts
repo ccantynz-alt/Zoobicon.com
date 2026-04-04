@@ -79,21 +79,22 @@ export async function generateVoice(
   const token = getReplicateToken();
 
   // Try multiple TTS models in order — first one that works wins
+  // Using model names (not version hashes) so we always get the latest version
   const ttsModels = [
     {
+      name: "Kokoro TTS",
+      model: "jaaari/kokoro-82m",
+      input: { text, speed: options?.speed || 1.0 },
+    },
+    {
       name: "Fish Speech V1.5",
-      version: "11f3e0394c06dcc099c0cbaf75f4a6e7da84cb4aaa5d53bedfc3234b5c8aaefc",
+      model: "fishaudio/fish-speech-1.5",
       input: { text },
     },
     {
-      name: "XTTS-v2",
-      version: "684bc3855b37866c0c65add2ff39c78f3dea3f4ff103a436465326e0f438d55e",
-      input: { text, language: "en" },
-    },
-    {
-      name: "Kokoro TTS",
-      version: "dfdf537ba482b029e0a761699e6f55e9162c7d7b148d671f9cf05e3e3b58a837",
-      input: { text, speed: options?.speed || 1.0 },
+      name: "Coqui XTTS-v2",
+      model: "afiaka87/tortoise-tts",
+      input: { text, preset: "fast" },
     },
   ];
 
@@ -103,14 +104,15 @@ export async function generateVoice(
     try {
       console.log(`[video-pipeline] Trying ${model.name} for voice generation...`);
 
-      const res = await fetch(`${REPLICATE_API}/predictions`, {
+      // Use /models/{owner}/{name}/predictions endpoint (always latest version)
+      const res = await fetch(`${REPLICATE_API}/models/${model.model}/predictions`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
+          Prefer: "wait",
         },
         body: JSON.stringify({
-          version: model.version,
           input: model.input,
         }),
       });
@@ -168,10 +170,10 @@ export async function generateVoiceXTTS(
     input.speaker = referenceAudioUrl; // Clone this voice
   }
 
-  const res = await fetch(`${REPLICATE_API}/models/lucataco/xtts-v2/predictions`, {
+  const res = await fetch(`${REPLICATE_API}/models/jaaari/kokoro-82m/predictions`, {
     method: "POST",
-    headers: replicateHeaders(),
-    body: JSON.stringify({ input }),
+    headers: { ...replicateHeaders(), Prefer: "wait" },
+    body: JSON.stringify({ input: referenceAudioUrl ? { text, language: "en", speaker: referenceAudioUrl } : { text, language: "en" } }),
   });
 
   if (!res.ok) throw new Error("Voice generation failed.");
