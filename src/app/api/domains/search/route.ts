@@ -70,6 +70,7 @@ export async function GET(req: NextRequest) {
 
     const isShort = sanitized.length <= 3;
     const useOpenSRS = isOpenSRSConfigured();
+    console.log(`[Domain Search] query="${sanitized}" tlds=${tlds.join(",")} source=${useOpenSRS ? "opensrs" : "dns-fallback"}`);
 
     // Check all domains in parallel (batch of 4 to avoid rate limiting)
     const domains = tlds.map((tld) => `${sanitized}.${tld}`);
