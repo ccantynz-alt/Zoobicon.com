@@ -128,15 +128,58 @@ export async function POST(request: NextRequest) {
             }
           }
 
+          // ── Auto-setup Cloudflare for each registered domain ──
+          const { getCloudflareConfig, createZone, setupDefaultDns, provisionSsl } = await import("@/lib/cloudflare");
+          const cfConfig = getCloudflareConfig();
+
           for (const domain of registeredDomains) {
+            let cloudflareZoneId = "";
+            let cloudflareNameservers: string[] = [];
+
+            // Step 1: Add domain to Cloudflare
+            if (cfConfig) {
+              try {
+                const zoneResult = await createZone(cfConfig, domain);
+                if (zoneResult.success && zoneResult.zoneId) {
+                  cloudflareZoneId = zoneResult.zoneId;
+                  cloudflareNameservers = zoneResult.nameservers || [];
+                  console.log(`[webhook] Cloudflare zone created for ${domain}: ${cloudflareZoneId}`);
+
+                  // Step 2: Set up default DNS records (A → Vercel, www CNAME, MX for email)
+                  await setupDefaultDns(cloudflareZoneId, domain, cfConfig);
+
+                  // Step 3: Ensure SSL is set to Full
+                  await provisionSsl({ ...cfConfig, zoneId: cloudflareZoneId }, domain);
+
+                  // Step 4: Update nameservers at OpenSRS to point to Cloudflare
+                  if (cloudflareNameservers.length >= 2 && hasOpenSRSConfig()) {
+                    const { updateNameservers } = await import("@/lib/domain-reseller");
+                    const nsResult = await updateNameservers(domain, cloudflareNameservers);
+                    if (nsResult.success) {
+                      console.log(`[webhook] Nameservers updated for ${domain} → ${cloudflareNameservers.join(", ")}`);
+                    } else {
+                      console.error(`[webhook] Failed to update NS for ${domain}: ${nsResult.error}`);
+                    }
+                  }
+                } else {
+                  console.error(`[webhook] Cloudflare zone creation failed for ${domain}: ${zoneResult.error}`);
+                }
+              } catch (cfErr) {
+                console.error(`[webhook] Cloudflare auto-setup error for ${domain}:`, cfErr);
+              }
+            }
+
+            // Step 5: Save domain to database
             try {
               await sql`
-                INSERT INTO registered_domains (domain, user_email, status, expires_at, auto_renew, privacy_protection)
-                VALUES (${domain}, ${registrantEmail}, ${hasOpenSRSConfig() ? 'active' : 'pending_registration'}, ${expiresAt.toISOString()}, true, true)
+                INSERT INTO registered_domains (domain, user_email, status, expires_at, auto_renew, privacy_protection, cloudflare_zone_id, nameservers)
+                VALUES (${domain}, ${registrantEmail}, ${hasOpenSRSConfig() ? 'active' : 'pending_registration'}, ${expiresAt.toISOString()}, true, true, ${cloudflareZoneId || null}, ${cloudflareNameservers.length > 0 ? JSON.stringify(cloudflareNameservers) : null})
                 ON CONFLICT (domain) DO UPDATE SET
                   status = ${hasOpenSRSConfig() ? 'active' : 'pending_registration'},
                   expires_at = ${expiresAt.toISOString()},
-                  user_email = ${registrantEmail}
+                  user_email = ${registrantEmail},
+                  cloudflare_zone_id = ${cloudflareZoneId || null},
+                  nameservers = ${cloudflareNameservers.length > 0 ? JSON.stringify(cloudflareNameservers) : null}
               `;
             } catch (err) {
               console.error(`[webhook] Failed to save domain ${domain} to DB:`, err);
