@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
   Search,
@@ -97,7 +97,94 @@ export default function DomainsPage() {
   const [checkingOut, setCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
 
+  // Track whether we've already tried expanding TLDs for this search
+  const [autoExpandedTlds, setAutoExpandedTlds] = useState(false);
+  // Track whether we're auto-generating alternatives
+  const [autoGenerating, setAutoGenerating] = useState(false);
+  // Flag to trigger generation after state updates
+  const [pendingGenerate, setPendingGenerate] = useState(false);
+
   const allTlds = Object.keys(TLD_PRICES);
+
+  // Auto-expand: when all selected TLDs are taken, try ALL TLDs automatically
+  const handleAutoExpand = useCallback(async (searchName: string) => {
+    const tlds: string[] = Object.keys(TLD_PRICES);
+    setAutoExpandedTlds(true);
+    setSearching(true);
+
+    const initial: DomainResult[] = tlds.map(tld => ({
+      domain: `${searchName}.${tld}`,
+      tld,
+      available: null,
+      price: TLD_PRICES[tld] || 9.99,
+      checking: true,
+    }));
+    setResults(initial);
+
+    try {
+      const res = await fetch(`/api/domains/search?q=${encodeURIComponent(searchName)}&tlds=${encodeURIComponent(tlds.join(","))}`);
+      if (res.ok) {
+        const data = await res.json();
+        const apiResults = data.results || [];
+        setResults(tlds.map(tld => {
+          const match = apiResults.find((r: { domain: string }) => r.domain === `${searchName}.${tld}`);
+          return {
+            domain: `${searchName}.${tld}`,
+            tld,
+            available: match ? match.available : null,
+            price: match?.price || TLD_PRICES[tld] || 9.99,
+            checking: false,
+          };
+        }));
+      } else {
+        setResults(initial.map(r => ({ ...r, checking: false })));
+      }
+    } catch {
+      setResults(initial.map(r => ({ ...r, checking: false })));
+    }
+    setSearching(false);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // When results finish loading and nothing is available — auto-expand or auto-suggest
+  useEffect(() => {
+    if (results.length === 0 || searching) return;
+    const allDone = results.every(r => !r.checking);
+    if (!allDone) return;
+
+    const anyAvailable = results.some(r => r.available === true);
+    if (anyAvailable) return;
+
+    const cleanName = name.trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
+    if (!cleanName) return;
+
+    // Step 1: If we haven't tried all TLDs yet, expand the search
+    if (!autoExpandedTlds && selectedTlds.size < allTlds.length) {
+      handleAutoExpand(cleanName);
+      return;
+    }
+
+    // Step 2: All TLDs checked, still nothing — auto-switch to AI generator
+    if (!autoGenerating) {
+      setAutoGenerating(true);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [results, searching]);
+
+  // Reset auto-expand state when search term changes
+  useEffect(() => {
+    setAutoExpandedTlds(false);
+    setAutoGenerating(false);
+  }, [name]);
+
+  // Trigger generation after genDescription state has been set
+  useEffect(() => {
+    if (pendingGenerate && genDescription.trim().length >= 3) {
+      setPendingGenerate(false);
+      handleGenerate();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingGenerate, genDescription]);
 
   const toggleTld = (tld: string) => {
     setSelectedTlds(prev => {
@@ -356,7 +443,13 @@ export default function DomainsPage() {
               <Search className="w-4 h-4" /> Search Exact Name
             </button>
             <button
-              onClick={() => setMode("generate")}
+              onClick={() => {
+                setMode("generate");
+                // Carry over search term to AI generator if it has a value and generator is empty
+                if (name.trim() && !genDescription.trim()) {
+                  setGenDescription(name.trim());
+                }
+              }}
               className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all ${
                 mode === "generate"
                   ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/20"
@@ -536,13 +629,89 @@ export default function DomainsPage() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">
                 {searching ? "Checking availability..." :
-                  `${availableResults.length} available, ${takenResults.length} taken`}
+                  results.some(r => r.checking)
+                    ? "Checking availability..."
+                    : availableResults.length > 0
+                    ? `${availableResults.length} domain${availableResults.length > 1 ? "s" : ""} available`
+                    : "No exact matches found"}
               </h2>
               {name && <span className="text-sm text-slate-500">Results for &ldquo;{name.trim().toLowerCase()}&rdquo;</span>}
             </div>
 
             <div className="space-y-3 mb-8">
-              {/* Available — bright green */}
+              {/* Checking — show while still loading */}
+              {results.filter(r => r.checking).map(r => (
+                <div key={r.domain} className="flex items-center justify-between p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05]">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-white/[0.05] flex items-center justify-center">
+                      <Loader2 className="w-5 h-5 text-slate-500 animate-spin" />
+                    </div>
+                    <span className="text-lg text-slate-400">{r.domain}</span>
+                  </div>
+                  <span className="text-sm text-slate-600">Checking...</span>
+                </div>
+              ))}
+
+              {/* No available results — suggest alternatives */}
+              {!searching && !results.some(r => r.checking) && availableResults.length === 0 && results.length > 0 && !autoGenerating && (
+                <div className="rounded-2xl border border-amber-500/20 bg-amber-500/[0.05] p-6 text-center">
+                  <div className="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
+                    <Sparkles className="w-7 h-7 text-amber-400" />
+                  </div>
+                  <h3 className="text-lg font-bold mb-2">
+                    {autoExpandedTlds
+                      ? `"${name.trim().toLowerCase()}" is taken across all 13 extensions`
+                      : `"${name.trim().toLowerCase()}" isn't available on selected extensions`}
+                  </h3>
+                  <p className="text-sm text-slate-400 mb-5">
+                    {autoExpandedTlds
+                      ? "We checked every extension. Let our AI find similar names that ARE available."
+                      : "We're searching all 13 extensions now..."}
+                  </p>
+                  {autoExpandedTlds && (
+                    <button
+                      onClick={() => {
+                        setGenDescription(name.trim());
+                        setMode("generate");
+                        setResults([]);
+                        setPendingGenerate(true);
+                      }}
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-xl font-bold text-base transition-all shadow-lg shadow-purple-500/20"
+                    >
+                      <Wand2 className="w-5 h-5" /> Generate Available Alternatives
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Auto-generating alternatives */}
+              {autoGenerating && (
+                <div className="rounded-2xl border border-purple-500/20 bg-purple-500/[0.05] p-6 text-center">
+                  <div className="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center mx-auto mb-4">
+                    <Wand2 className="w-7 h-7 text-purple-400" />
+                  </div>
+                  <h3 className="text-lg font-bold mb-2">
+                    &ldquo;{name.trim().toLowerCase()}&rdquo; is taken everywhere
+                  </h3>
+                  <p className="text-sm text-slate-400 mb-5">
+                    Let our AI generate similar names with available domains.
+                  </p>
+                  <button
+                    onClick={() => {
+                      setGenDescription(name.trim());
+                      setMode("generate");
+                      setResults([]);
+                      setAutoGenerating(false);
+                      setPendingGenerate(true);
+                    }}
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-xl font-bold text-base transition-all shadow-lg shadow-purple-500/20"
+                  >
+                    <Wand2 className="w-5 h-5" /> Find Available Alternatives
+                  </button>
+                </div>
+              )}
+
+              {/* Available — bright green — ONLY show available domains */}
               {availableResults.map(r => (
                 <div key={r.domain} className="flex items-center justify-between p-5 rounded-2xl bg-emerald-500/[0.08] border border-emerald-500/20 hover:border-emerald-500/30 transition-colors">
                   <div className="flex items-center gap-3">
@@ -569,47 +738,6 @@ export default function DomainsPage() {
                       </button>
                     )}
                   </div>
-                </div>
-              ))}
-
-              {/* Taken */}
-              {takenResults.map(r => (
-                <div key={r.domain} className="flex items-center justify-between p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05]">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center">
-                      <X className="w-5 h-5 text-red-400/50" />
-                    </div>
-                    <div>
-                      <span className="text-lg text-slate-500 line-through">{r.domain}</span>
-                      <span className="block text-sm text-red-400/50">Taken</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              {/* Checking */}
-              {results.filter(r => r.checking).map(r => (
-                <div key={r.domain} className="flex items-center justify-between p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05]">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-white/[0.05] flex items-center justify-center">
-                      <Loader2 className="w-5 h-5 text-slate-500 animate-spin" />
-                    </div>
-                    <span className="text-lg text-slate-400">{r.domain}</span>
-                  </div>
-                  <span className="text-sm text-slate-600">Checking...</span>
-                </div>
-              ))}
-
-              {/* Unknown */}
-              {unknownResults.map(r => (
-                <div key={r.domain} className="flex items-center justify-between p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05]">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-yellow-500/10 flex items-center justify-center">
-                      <Globe className="w-5 h-5 text-yellow-400/50" />
-                    </div>
-                    <span className="text-lg text-slate-400">{r.domain}</span>
-                  </div>
-                  <span className="text-sm text-slate-600">Unable to check</span>
                 </div>
               ))}
             </div>
@@ -662,7 +790,14 @@ export default function DomainsPage() {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold flex items-center gap-2">
                 <Wand2 className="w-5 h-5 text-purple-400" />
-                {generatedNames.length} Name Ideas Generated
+                {(() => {
+                  const withAvailable = generatedNames.filter(gn => gn.domains.some(d => d.available === true)).length;
+                  const stillChecking = generatedNames.some(gn => gn.domains.some(d => d.checking));
+                  if (stillChecking) return `Checking ${generatedNames.length} names...`;
+                  return withAvailable > 0
+                    ? `${withAvailable} name${withAvailable > 1 ? "s" : ""} with available domains`
+                    : "No available domains found";
+                })()}
               </h2>
               <button
                 onClick={handleGenerate}
@@ -677,7 +812,10 @@ export default function DomainsPage() {
               {generatedNames.map((gn) => {
                 const availableDomains = gn.domains.filter((d) => d.available === true);
                 const hasAvailable = availableDomains.length > 0;
-                const allChecked = gn.domains.every((d) => !d.checking);
+                const stillChecking = gn.domains.some((d) => d.checking);
+
+                // Hide names with zero available domains (unless still checking)
+                if (!hasAvailable && !stillChecking) return null;
 
                 return (
                   <div
@@ -685,8 +823,6 @@ export default function DomainsPage() {
                     className={`rounded-2xl border p-5 transition-all ${
                       hasAvailable
                         ? "border-emerald-500/20 bg-emerald-500/[0.04]"
-                        : allChecked
-                        ? "border-white/[0.06] bg-white/[0.02]"
                         : "border-white/[0.06] bg-white/[0.02]"
                     }`}
                   >
@@ -701,35 +837,31 @@ export default function DomainsPage() {
                           {availableDomains.length} available
                         </span>
                       )}
-                      {allChecked && !hasAvailable && (
-                        <span className="text-xs px-2.5 py-1 rounded-full bg-red-500/10 text-red-400/60 font-semibold shrink-0">
-                          All taken
+                      {stillChecking && (
+                        <span className="text-xs px-2.5 py-1 rounded-full bg-white/[0.06] text-slate-400 font-semibold shrink-0 flex items-center gap-1">
+                          <Loader2 className="w-3 h-3 animate-spin" /> Checking...
                         </span>
                       )}
                     </div>
 
-                    {/* Domain results grid */}
+                    {/* Domain results grid — only show available and checking domains */}
                     <div className="flex flex-wrap gap-2">
-                      {gn.domains.map((d) => (
+                      {gn.domains
+                        .filter((d) => d.checking || d.available === true)
+                        .map((d) => (
                         <div
                           key={d.domain}
                           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all ${
                             d.checking
                               ? "bg-white/[0.04] text-slate-500"
-                              : d.available
-                              ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                              : d.available === false
-                              ? "bg-white/[0.02] text-slate-600 line-through"
-                              : "bg-white/[0.03] text-slate-500"
+                              : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                           }`}
                         >
                           {d.checking ? (
                             <Loader2 className="w-3 h-3 animate-spin" />
-                          ) : d.available ? (
+                          ) : (
                             <Check className="w-3 h-3" />
-                          ) : d.available === false ? (
-                            <X className="w-3 h-3" />
-                          ) : null}
+                          )}
                           <span>.{d.tld}</span>
                           {d.available && (
                             <>
@@ -754,6 +886,24 @@ export default function DomainsPage() {
                   </div>
                 );
               })}
+
+              {/* If all generated names are checked and none have available domains */}
+              {generatedNames.length > 0 &&
+                generatedNames.every((gn) => gn.domains.every((d) => !d.checking)) &&
+                !generatedNames.some((gn) => gn.domains.some((d) => d.available === true)) && (
+                <div className="rounded-2xl border border-amber-500/20 bg-amber-500/[0.05] p-6 text-center">
+                  <Sparkles className="w-8 h-8 text-amber-400 mx-auto mb-3" />
+                  <h3 className="text-lg font-bold mb-2">All names are taken</h3>
+                  <p className="text-sm text-slate-400 mb-4">Try a different description or style to find more options.</p>
+                  <button
+                    onClick={handleGenerate}
+                    disabled={generating}
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-xl font-bold transition-all"
+                  >
+                    <RefreshCw className={`w-4 h-4 ${generating ? "animate-spin" : ""}`} /> Generate More Names
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Cart (shared with search results) */}
