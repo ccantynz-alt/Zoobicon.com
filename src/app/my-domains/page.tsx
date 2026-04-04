@@ -31,10 +31,26 @@ export default function MyDomainsPage() {
       if (!raw) { window.location.href = "/auth/login"; return; }
       const parsed = JSON.parse(raw);
       setUser(parsed);
-      fetchDomains(parsed.email);
+
+      // If arriving from Stripe checkout, verify the purchase first
+      const params = new URLSearchParams(window.location.search);
+      const sessionId = params.get("session_id");
+      if (sessionId) {
+        // Verify and save the purchase, then fetch domains
+        fetch("/api/domains/verify-purchase", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId, email: parsed.email }),
+        })
+          .then(() => fetchDomains(parsed.email))
+          .catch(() => fetchDomains(parsed.email));
+      } else {
+        fetchDomains(parsed.email);
+      }
     } catch {
       window.location.href = "/auth/login";
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchDomains = async (email: string) => {
