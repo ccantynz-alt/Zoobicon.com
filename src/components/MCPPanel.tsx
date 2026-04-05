@@ -134,6 +134,10 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
   const [sources, setSources] = useState<ContextSource[]>([]);
   const [showAddMenu, setShowAddMenu] = useState(false);
   const [loadingTools, setLoadingTools] = useState(true);
+  // Quick-import state
+  const [quickUrl, setQuickUrl] = useState("");
+  const [quickLoading, setQuickLoading] = useState(false);
+  const [quickError, setQuickError] = useState("");
 
   // Load available tools on mount
   useEffect(() => {
@@ -152,6 +156,49 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
     };
     loadTools();
   }, []);
+
+  // Quick-import: paste any URL and auto-detect source type
+  const handleQuickImport = async () => {
+    if (!quickUrl.trim() || quickLoading) return;
+    setQuickLoading(true);
+    setQuickError("");
+
+    try {
+      const res = await fetch("/api/mcp/connect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: quickUrl.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setQuickError(data.error || "Failed to fetch context");
+        return;
+      }
+
+      // Add as a resolved source
+      const newSource: ContextSource = {
+        id: `mcp-quick-${Date.now()}`,
+        toolName: `${data.source.type}_import`,
+        provider: data.source.type === "github" ? "github" : data.source.type === "notion" ? "notion" : data.source.type === "figma" ? "figma" : "custom",
+        params: { url: quickUrl.trim() },
+        result: {
+          success: true,
+          data: data.content,
+          contentType: "text",
+          summary: `Imported from ${data.source.name} (${data.tokens} tokens)`,
+        },
+        loading: false,
+        included: true,
+        expanded: false,
+      };
+      setSources((prev) => [...prev, newSource]);
+      setQuickUrl("");
+    } catch {
+      setQuickError("Network error — could not reach the server");
+    } finally {
+      setQuickLoading(false);
+    }
+  };
 
   // Notify parent when included context changes
   const buildContextString = useCallback(() => {
@@ -274,6 +321,38 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
         </div>
         <p className="text-xs text-white/50 mt-1">
           Pull context from GitHub, Notion, Layers, or Google Sheets into your AI generation.
+        </p>
+      </div>
+
+      {/* Quick Import — paste any URL */}
+      <div className="px-4 py-3 border-b border-white/10">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={quickUrl}
+            onChange={(e) => { setQuickUrl(e.target.value); setQuickError(""); }}
+            onKeyDown={(e) => { if (e.key === "Enter") handleQuickImport(); }}
+            placeholder="Paste GitHub, Notion, Figma, or any URL..."
+            className="flex-1 px-2.5 py-1.5 text-xs bg-white/5 border border-white/10 rounded-lg focus:border-indigo-500/50 focus:outline-none text-white placeholder-white/30"
+          />
+          <button
+            onClick={handleQuickImport}
+            disabled={quickLoading || !quickUrl.trim()}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-indigo-500/20 text-indigo-300 rounded-lg hover:bg-indigo-500/30 transition-colors disabled:opacity-40"
+          >
+            {quickLoading ? (
+              <Loader2 className="w-3 h-3 animate-spin" />
+            ) : (
+              <Download className="w-3 h-3" />
+            )}
+            Import
+          </button>
+        </div>
+        {quickError && (
+          <p className="mt-1.5 text-[10px] text-red-400">{quickError}</p>
+        )}
+        <p className="mt-1.5 text-[10px] text-white/30">
+          Auto-detects GitHub repos, Notion pages, Figma files, or crawls any website.
         </p>
       </div>
 
@@ -432,7 +511,7 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
                           </div>
 
                           {/* Preview data */}
-                          {source.result.success && source.result.data && (
+                          {source.result.success && source.result.data != null && (
                             <details className="mt-2">
                               <summary className="text-[10px] text-white/50 cursor-pointer hover:text-white/60 flex items-center gap-1">
                                 <Eye className="w-3 h-3" />
@@ -440,7 +519,7 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
                               </summary>
                               <pre className="mt-1 p-2 bg-black/30 rounded text-[10px] text-white/50 overflow-x-auto max-h-40 overflow-y-auto">
                                 {typeof source.result.data === "string"
-                                  ? source.result.data.slice(0, 2000)
+                                  ? (source.result.data as string).slice(0, 2000)
                                   : JSON.stringify(source.result.data, null, 2).slice(0, 2000)}
                               </pre>
                             </details>

@@ -377,8 +377,8 @@ export async function POST(req: NextRequest) {
           registrantEmail: registrant.email,
           type: "domain_registration",
         },
-        success_url: `${appUrl}/domains?order=${orderId}&status=success`,
-        cancel_url: `${appUrl}/domains?order=${orderId}&status=cancelled`,
+        success_url: `${appUrl}/my-domains?success=true&order=${orderId}`,
+        cancel_url: `${appUrl}/domains?cancelled=true`,
       });
 
       return NextResponse.json({

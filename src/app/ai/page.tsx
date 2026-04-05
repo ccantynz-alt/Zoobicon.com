@@ -181,7 +181,7 @@ export default function AiPage() {
     setGeneratedPreview(null);
 
     try {
-      const res = await fetch("/api/generate", {
+      const res = await fetch("/api/generate/react", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt }),

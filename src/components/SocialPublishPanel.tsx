@@ -237,7 +237,7 @@ export default function SocialPublishPanel({
               Publish to Social Media
             </div>
             <div className="text-[11px] text-white/50">
-              Auto-post to TikTok, YouTube Shorts & Instagram Reels
+              Auto-post to TikTok, YouTube Shorts & Camera Reels
             </div>
           </div>
         </div>

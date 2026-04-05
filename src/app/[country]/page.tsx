@@ -29,9 +29,10 @@ export function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ country: string }>;
+  params: { country: string } | Promise<{ country: string }>;
 }): Promise<Metadata> {
-  const { country } = await params;
+  const resolved = params instanceof Promise ? await params : params;
+  const { country } = resolved;
   const data = getCountryData(country);
   if (!data || !isValidCountry(country)) {
     return { title: 'Not Found' };
@@ -132,9 +133,10 @@ function PricingCard({
 export default async function CountryPage({
   params,
 }: {
-  params: Promise<{ country: string }>;
+  params: { country: string } | Promise<{ country: string }>;
 }) {
-  const { country } = await params;
+  const resolved = params instanceof Promise ? await params : params;
+  const { country } = resolved;
 
   if (!isValidCountry(country)) {
     notFound();

@@ -42,7 +42,7 @@ const PRESET_TABS: { id: PresetTab; label: string; icon: typeof Link2 }[] = [
 
 const EC_LEVELS: { value: ECLevel; label: string; description: string }[] = [
   { value: "L", label: "Low (7%)", description: "Smallest QR code" },
-  { value: "M", label: "Medium (15%)", description: "Balanced" },
+  { value: "M", label: "BookOpen (15%)", description: "Balanced" },
   { value: "Q", label: "Quartile (25%)", description: "Good recovery" },
   { value: "H", label: "High (30%)", description: "Best recovery" },
 ];

@@ -386,10 +386,12 @@ export async function initSchema() {
       user_email          TEXT NOT NULL,
       status              VARCHAR(20) NOT NULL DEFAULT 'active',
       registered_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      expires_at          TIMESTAMPTZ NOT NULL,
+      expires_at          TIMESTAMPTZ NOT NULL DEFAULT (NOW() + INTERVAL '1 year'),
       auto_renew          BOOLEAN NOT NULL DEFAULT true,
       privacy_protection  BOOLEAN NOT NULL DEFAULT true,
-      nameservers         JSONB DEFAULT '["ns1.zoobicon.io", "ns2.zoobicon.io"]'
+      nameservers         JSONB DEFAULT '["ns1.zoobicon.io", "ns2.zoobicon.io"]',
+      cloudflare_zone_id  TEXT,
+      stripe_session_id   TEXT
     )
   `;
 

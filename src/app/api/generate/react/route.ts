@@ -221,9 +221,9 @@ Output the JSON object with "files" and "dependencies" keys. Start with { — no
             fullText += text;
             chunkCounter++;
 
-            // Every 8 chunks, try to extract completed files and send them
+            // Every 4 chunks, try to extract completed files and send them
             // More frequent = components appear in preview faster
-            if (chunkCounter % 8 === 0) {
+            if (chunkCounter % 4 === 0) {
               try {
                 const partialFiles = extractCompletedFiles(fullText);
                 const fileCount = Object.keys(partialFiles).length;
@@ -291,30 +291,38 @@ Output the JSON object with "files" and "dependencies" keys. Start with { — no
           await trackUsage(auth.user.email, "generation").catch(() => {});
 
           // Auto-inject backend service into every generated app
-          try {
-            const { getBackendCapabilities } = await import("@/lib/backend-service");
-            const caps = getBackendCapabilities();
+          if (fullStack) {
+            try {
+              const { generateBackend, needsBackend: checkBackend } = await import("@/lib/backend-generator");
+              if (fullStack || checkBackend(prompt)) {
+                const appName = prompt.slice(0, 40).replace(/[^a-zA-Z0-9 ]/g, "").trim() || "app";
+                const backendResult = await generateBackend(
+                  appName,
+                  prompt,
+                  auth.user.email,
+                );
 
-            if (caps.mode === "supabase") {
-              // Inject Supabase client
-              const { generateClientCode } = await import("@/lib/supabase-provision");
-              // Placeholder URLs — replaced when app is deployed with real Supabase project
-              parsed.files["lib/backend.ts"] = generateClientCode(
-                "SUPABASE_URL_PLACEHOLDER",
-                "SUPABASE_ANON_KEY_PLACEHOLDER"
-              );
-            } else {
-              // Inject local backend (localStorage-based, works in preview)
-              const { provisionBackend } = await import("@/lib/backend-service");
-              const backend = await provisionBackend(
-                prompt.slice(0, 30),
-                auth.user.email,
-                prompt
-              );
-              parsed.files["lib/backend.ts"] = backend.clientCode;
+                // Merge backend files into the generated app
+                for (const [filePath, code] of Object.entries(backendResult.files)) {
+                  parsed.files[filePath] = code;
+                }
+
+                // Merge backend dependencies
+                if (Object.keys(backendResult.dependencies).length > 0) {
+                  parsed.dependencies = { ...(parsed.dependencies || {}), ...backendResult.dependencies };
+                }
+
+                sendEvent({
+                  type: "status",
+                  message: backendResult.provisioned
+                    ? "Backend ready — Supabase (real Postgres + auth + storage)"
+                    : "Backend ready — Local mode (deploy to Zoobicon Cloud for real database)",
+                });
+              }
+            } catch (backendErr) {
+              console.error("[react] Backend injection failed:", backendErr);
+              // App still works without backend — continue
             }
-          } catch {
-            // Backend injection failed — app still works without it
           }
 
           // Send final complete result

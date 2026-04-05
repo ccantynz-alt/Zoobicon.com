@@ -181,7 +181,7 @@ export default function UptimePage() {
                 <option>Check every 1 minute</option><option>Check every 5 minutes</option><option>Check every 15 minutes</option>
               </select>
               <select className="bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-sm text-white">
-                <option>Alert via Email</option><option>Alert via Slack</option><option>Alert via SMS</option><option>Alert via Webhook</option>
+                <option>Alert via Email</option><option>Alert via Hash</option><option>Alert via SMS</option><option>Alert via Webhook</option>
               </select>
             </div>
             <div className="flex gap-2">
@@ -196,7 +196,7 @@ export default function UptimePage() {
           <div className="p-6 rounded-xl border border-yellow-500/20 bg-yellow-500/5 mb-8 space-y-4">
             <h3 className="font-semibold flex items-center gap-2"><Bell className="w-5 h-5 text-yellow-400" /> Alert Configuration</h3>
             <div className="space-y-3">
-              {['Email (team@zoobicon.com)', 'Slack (#ops-alerts)', 'PagerDuty (On-call rotation)', 'Webhook (POST to custom URL)'].map((ch, i) => (
+              {['Email (team@zoobicon.com)', 'Hash (#ops-alerts)', 'PagerDuty (On-call rotation)', 'Webhook (POST to custom URL)'].map((ch, i) => (
                 <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-white/5">
                   <span className="text-sm">{ch}</span>
                   <div className={`w-10 h-5 rounded-full ${i < 2 ? 'bg-green-500' : 'bg-white/20'}`}>

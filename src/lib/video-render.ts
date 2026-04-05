@@ -70,7 +70,7 @@ interface ReplicatePrediction {
 const REPLICATE_API = "https://api.replicate.com/v1";
 
 async function replicateHeaders(): Promise<Record<string, string>> {
-  const token = process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY;
+  const token = process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY || process.env.REPLICATE_TOKEN || process.env.REPLICATE_KEY;
   if (!token) throw new Error("REPLICATE_API_TOKEN not configured");
   return {
     Authorization: `Bearer ${token}`,
@@ -548,7 +548,7 @@ export function selectBestProvider(scene: RenderScene): VideoProvider {
   }
 
   // Replicate: Good general purpose, fastest turnaround
-  if (process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY) {
+  if (process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY || process.env.REPLICATE_TOKEN || process.env.REPLICATE_KEY) {
     return "replicate";
   }
 
@@ -625,7 +625,7 @@ export function getAvailableProvider(): VideoProvider | null {
   if (process.env.PIKA_API_KEY) return "pika";
   if (process.env.KLING_API_KEY) return "kling";
   // Replicate last — primarily an image provider, video models rotate frequently
-  if (process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY) return "replicate";
+  if (process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY || process.env.REPLICATE_TOKEN || process.env.REPLICATE_KEY) return "replicate";
   return null;
 }
 
@@ -634,7 +634,7 @@ export function getAvailableProvider(): VideoProvider | null {
  */
 export function getAllConfiguredProviders(): { provider: VideoProvider; configured: boolean; models: string[] }[] {
   return [
-    { provider: "replicate", configured: !!(process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY), models: ["MiniMax Video-01-Live", "FLUX"] },
+    { provider: "replicate", configured: !!(process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY || process.env.REPLICATE_TOKEN || process.env.REPLICATE_KEY), models: ["MiniMax Video-01-Live", "FLUX"] },
     { provider: "runway", configured: !!process.env.RUNWAY_API_KEY, models: ["Gen-3 Alpha Turbo"] },
     { provider: "luma", configured: !!process.env.LUMA_API_KEY, models: ["Dream Machine"] },
     { provider: "pika", configured: !!process.env.PIKA_API_KEY, models: ["Pika 1.5"] },

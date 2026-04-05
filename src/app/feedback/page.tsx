@@ -189,7 +189,7 @@ export default function FeedbackPage() {
               <textarea value={newDescription} onChange={e => setNewDescription(e.target.value)} rows={3} placeholder="Describe the feature and why it would be useful..." className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-violet-500/50 resize-none" />
               <div className="flex justify-end gap-3">
                 <button onClick={() => setShowNewForm(false)} className="px-4 py-2 text-sm text-white/60 hover:text-white transition-colors">Cancel</button>
-                <button className="px-6 py-2 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm font-medium transition-colors">Submit</button>
+                <button onClick={() => {}} className="px-6 py-2 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm font-medium transition-colors">Submit</button>
               </div>
             </div>
           </div>

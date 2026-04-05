@@ -106,10 +106,10 @@ export default function WaitlistPage() {
             <span className="font-semibold text-white">Waitlist Builder</span>
           </div>
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition text-sm">
+            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition text-sm">
               <Download className="w-4 h-4" /> Export CSV
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:opacity-90 transition text-sm font-medium">
+            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:opacity-90 transition text-sm font-medium">
               <Eye className="w-4 h-4" /> Preview Page
             </button>
           </div>
@@ -333,7 +333,7 @@ export default function WaitlistPage() {
                   <label className="text-xs text-white/40 mb-1 block">Brand Color</label>
                   <div className="flex gap-2">
                     {['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#06b6d4'].map((c) => (
-                      <button key={c} className="w-8 h-8 rounded-lg border-2 border-white/10 hover:border-white/40 transition" style={{ backgroundColor: c }} />
+                      <button onClick={() => {}} key={c} className="w-8 h-8 rounded-lg border-2 border-white/10 hover:border-white/40 transition" style={{ backgroundColor: c }} />
                     ))}
                   </div>
                 </div>
@@ -344,7 +344,7 @@ export default function WaitlistPage() {
                   </div>
                 </div>
               </div>
-              <button className="w-full py-3 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 font-medium text-sm hover:opacity-90 transition flex items-center justify-center gap-2">
+              <button onClick={() => {}} className="w-full py-3 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 font-medium text-sm hover:opacity-90 transition flex items-center justify-center gap-2">
                 <Sparkles className="w-4 h-4" /> Generate Waitlist Page
               </button>
             </div>
@@ -358,7 +358,7 @@ export default function WaitlistPage() {
                   <p className="text-white/50 mb-6">Be the first to experience the future of AI website building.</p>
                   <div className="flex gap-2 max-w-sm mx-auto">
                     <input type="email" placeholder="your@email.com" className="flex-1 bg-white/10 border border-white/20 rounded-lg px-4 py-2.5 text-sm focus:outline-none" />
-                    <button className="px-6 py-2.5 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 font-medium text-sm whitespace-nowrap">Join the Waitlist</button>
+                    <button onClick={() => {}} className="px-6 py-2.5 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 font-medium text-sm whitespace-nowrap">Join the Waitlist</button>
                   </div>
                   <p className="text-xs text-white/30 mt-4">53 people already on the list</p>
                 </div>

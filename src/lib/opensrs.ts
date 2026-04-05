@@ -159,15 +159,27 @@ export async function checkWithFallback(domain: string): Promise<boolean | null>
     }
   }
 
-  // DNS fallback — not authoritative but better than nothing
+  // Fallback 1: RDAP (Registration Data Access Protocol) — authoritative registry check
+  // RDAP is the official replacement for WHOIS, run by registries themselves
+  try {
+    const rdapRes = await fetch(`https://rdap.org/domain/${domain}`, {
+      signal: AbortSignal.timeout(6000),
+      headers: { Accept: "application/rdap+json" },
+    });
+    if (rdapRes.status === 404) return true; // Not found in registry = available
+    if (rdapRes.ok) return false; // Found in registry = taken
+  } catch {
+    // RDAP failed, try DNS
+  }
+
+  // Fallback 2: DNS — only trust NXDOMAIN as "likely available"
   try {
     const res = await fetch(`https://dns.google/resolve?name=${domain}&type=A`, {
       signal: AbortSignal.timeout(5000),
     });
     const data = await res.json();
     if (data.Status === 3) return true; // NXDOMAIN = likely available
-    if (data.Status === 0 && data.Answer) return false; // Resolves = taken
-    return null;
+    return null; // Unknown — don't assume taken from DNS alone
   } catch {
     return null;
   }

@@ -12,9 +12,9 @@ import {
   Share2,
   BarChart3,
   Sparkles,
-  Instagram,
+  Camera,
   MessageCircle,
-  Youtube,
+  Play,
   Music,
   Globe,
   Mail,
@@ -62,7 +62,7 @@ export default function LinkBioPage() {
   const [links, setLinks] = useState<BioLink[]>([
     { id: '1', title: 'My Website', url: 'https://example.com', icon: '🌐', featured: true },
     { id: '2', title: 'Latest Blog Post', url: 'https://blog.example.com', icon: '📝', featured: false },
-    { id: '3', title: 'Instagram', url: 'https://instagram.com/yourname', icon: '📸', featured: false },
+    { id: '3', title: 'Camera', url: 'https://instagram.com/yourname', icon: '📸', featured: false },
     { id: '4', title: 'YouTube Channel', url: 'https://youtube.com/@yourname', icon: '🎬', featured: false },
     { id: '5', title: 'Buy My Course', url: 'https://course.example.com', icon: '🎓', featured: false },
     { id: '6', title: 'Newsletter', url: 'https://newsletter.example.com', icon: '📧', featured: false },
@@ -106,7 +106,7 @@ export default function LinkBioPage() {
             <button onClick={() => { navigator.clipboard.writeText(pageUrl); setCopied(true); setTimeout(() => setCopied(false), 2000); }} className="px-4 py-2 bg-white/10 rounded-lg text-sm flex items-center gap-2 hover:bg-white/20 transition-colors">
               {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />} {pageUrl}
             </button>
-            <button className="px-4 py-2 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm font-medium transition-colors">Publish</button>
+            <button onClick={() => alert('Publishing your link bio page...')} className="px-4 py-2 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm font-medium transition-colors">Publish</button>
           </div>
         </div>
       </header>
@@ -128,7 +128,7 @@ export default function LinkBioPage() {
               <div className="bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 border border-violet-500/20 rounded-xl p-4">
                 <div className="flex gap-3">
                   <input value={aiPrompt} onChange={e => setAiPrompt(e.target.value)} placeholder="Describe your brand and AI will create your link page..." className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" />
-                  <button className="px-4 py-2 bg-violet-600 rounded-lg text-sm font-medium flex items-center gap-2"><Sparkles className="w-4 h-4" /> Generate</button>
+                  <button onClick={() => alert('AI link generation coming soon')} className="px-4 py-2 bg-violet-600 rounded-lg text-sm font-medium flex items-center gap-2"><Sparkles className="w-4 h-4" /> Generate</button>
                 </div>
               </div>
 

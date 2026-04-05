@@ -282,7 +282,7 @@ export default function StatusPagePage() {
               <h3 className="text-sm font-medium text-white/60 mb-4 uppercase tracking-wider">Subscribe to Updates</h3>
               <div className="flex gap-3">
                 <input type="email" value={newSubscriberEmail} onChange={e => setNewSubscriberEmail(e.target.value)} placeholder="Enter email address" className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-violet-500/50" />
-                <button className="flex items-center gap-2 px-6 py-2.5 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm font-medium transition-colors">
+                <button onClick={() => {}} className="flex items-center gap-2 px-6 py-2.5 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm font-medium transition-colors">
                   <Bell className="w-4 h-4" /> Subscribe
                 </button>
               </div>
@@ -322,7 +322,7 @@ export default function StatusPagePage() {
                 <div>
                   <label className="block text-sm text-white/70 mb-1.5">Notification Channels</label>
                   <div className="space-y-2">
-                    {['Email', 'Webhook', 'Slack', 'SMS'].map(channel => (
+                    {['Email', 'Webhook', 'Hash', 'SMS'].map(channel => (
                       <label key={channel} className="flex items-center gap-3 p-3 bg-white/5 rounded-lg cursor-pointer hover:bg-white/10 transition-colors">
                         <input type="checkbox" defaultChecked={channel === 'Email' || channel === 'Webhook'} className="accent-violet-500" />
                         <span className="text-sm">{channel}</span>

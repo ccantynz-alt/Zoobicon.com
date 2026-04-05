@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
-import Link from "next/link";
+import { useState, useEffect } from "react";
 import {
   Search,
   Check,
@@ -84,20 +83,100 @@ export default function DomainsPage() {
   const [searching, setSearching] = useState(false);
   const [cart, setCart] = useState<DomainResult[]>([]);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
-  const resultsRef = useRef<HTMLDivElement>(null);
+  const [registering, setRegistering] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
 
-  // AI Name Generator state
-  const [genDescription, setGenDescription] = useState("");
-  const [genStyle, setGenStyle] = useState("modern");
-  const [generatedNames, setGeneratedNames] = useState<GeneratedName[]>([]);
-  const [generating, setGenerating] = useState(false);
-  const genResultsRef = useRef<HTMLDivElement>(null);
-
-  // Checkout state
-  const [checkingOut, setCheckingOut] = useState(false);
-  const [checkoutError, setCheckoutError] = useState("");
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("zoobicon_user");
+      if (raw) {
+        const user = JSON.parse(raw);
+        setUserEmail(user.email || "");
+      }
+    } catch {}
+  }, []);
 
   const allTlds = Object.keys(TLD_PRICES);
+
+  // Auto-expand: when all selected TLDs are taken, try ALL TLDs automatically
+  const handleAutoExpand = useCallback(async (searchName: string) => {
+    const tlds: string[] = Object.keys(TLD_PRICES);
+    setAutoExpandedTlds(true);
+    setSearching(true);
+
+    const initial: DomainResult[] = tlds.map(tld => ({
+      domain: `${searchName}.${tld}`,
+      tld,
+      available: null,
+      price: TLD_PRICES[tld] || 9.99,
+      checking: true,
+    }));
+    setResults(initial);
+
+    try {
+      const res = await fetch(`/api/domains/search?q=${encodeURIComponent(searchName)}&tlds=${encodeURIComponent(tlds.join(","))}`);
+      if (res.ok) {
+        const data = await res.json();
+        const apiResults = data.results || [];
+        setResults(tlds.map(tld => {
+          const match = apiResults.find((r: { domain: string }) => r.domain === `${searchName}.${tld}`);
+          return {
+            domain: `${searchName}.${tld}`,
+            tld,
+            available: match ? match.available : null,
+            price: match?.price || TLD_PRICES[tld] || 9.99,
+            checking: false,
+          };
+        }));
+      } else {
+        setResults(initial.map(r => ({ ...r, checking: false })));
+      }
+    } catch {
+      setResults(initial.map(r => ({ ...r, checking: false })));
+    }
+    setSearching(false);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // When results finish loading and nothing is available — auto-expand or auto-suggest
+  useEffect(() => {
+    if (results.length === 0 || searching) return;
+    const allDone = results.every(r => !r.checking);
+    if (!allDone) return;
+
+    const anyAvailable = results.some(r => r.available === true);
+    if (anyAvailable) return;
+
+    const cleanName = name.trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
+    if (!cleanName) return;
+
+    // Step 1: If we haven't tried all TLDs yet, expand the search
+    if (!autoExpandedTlds && selectedTlds.size < allTlds.length) {
+      handleAutoExpand(cleanName);
+      return;
+    }
+
+    // Step 2: All TLDs checked, still nothing — auto-switch to AI generator
+    if (!autoGenerating) {
+      setAutoGenerating(true);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [results, searching]);
+
+  // Reset auto-expand state when search term changes
+  useEffect(() => {
+    setAutoExpandedTlds(false);
+    setAutoGenerating(false);
+  }, [name]);
+
+  // Trigger generation after genDescription state has been set
+  useEffect(() => {
+    if (pendingGenerate && genDescription.trim().length >= 3) {
+      setPendingGenerate(false);
+      handleGenerate();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingGenerate, genDescription]);
 
   const toggleTld = (tld: string) => {
     setSelectedTlds(prev => {
@@ -167,140 +246,35 @@ export default function DomainsPage() {
     setCart(prev => prev.filter(c => c.domain !== domain));
   };
 
-  // --- Checkout ---
-  const handleCheckout = async () => {
+  const handleRegister = async () => {
     if (cart.length === 0) return;
-    setCheckingOut(true);
-    setCheckoutError("");
+    const email = userEmail || window.prompt("Enter your email to register domains:");
+    if (!email) return;
 
+    setRegistering(true);
     try {
-      const res = await fetch("/api/domains/checkout", {
+      const res = await fetch("/api/domains/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          domains: cart.map((d) => ({ domain: d.domain, tld: d.tld, price: d.price })),
+          domains: cart.map(c => ({ domain: c.domain, tld: c.tld, years: 1 })),
+          registrant: { email },
         }),
       });
-
       const data = await res.json();
-
-      if (!res.ok) {
-        setCheckoutError(data.error || "Checkout failed. Please try again.");
-        setCheckingOut(false);
-        return;
-      }
-
-      if (data.url) {
-        window.location.href = data.url;
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else if (data.success) {
+        alert("Domains registered successfully! View them in your dashboard.");
+        setCart([]);
+        window.location.href = "/my-domains";
       } else {
-        setCheckoutError("Failed to create checkout session.");
-        setCheckingOut(false);
+        alert(data.error || "Registration failed. Please try again.");
       }
     } catch {
-      setCheckoutError("Connection error. Please try again.");
-      setCheckingOut(false);
-    }
-  };
-
-  // --- AI Name Generator ---
-  const handleGenerate = async () => {
-    if (!genDescription.trim() || genDescription.trim().length < 3) return;
-    if (selectedTlds.size === 0) return;
-
-    setGenerating(true);
-    setGeneratedNames([]);
-    setTimeout(() => genResultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
-
-    try {
-      // Step 1: Generate names via AI
-      const nameRes = await fetch("/api/tools/business-names", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          description: genDescription.trim(),
-          style: genStyle,
-          count: 20,
-        }),
-      });
-
-      if (!nameRes.ok) {
-        setGenerating(false);
-        return;
-      }
-
-      const nameData = await nameRes.json();
-      const names: Array<{ name: string; tagline: string }> = nameData.names || [];
-
-      if (names.length === 0) {
-        setGenerating(false);
-        return;
-      }
-
-      // Step 2: Initialize generated names with empty domain results
-      const tlds = Array.from(selectedTlds);
-      const initial: GeneratedName[] = names.map((n) => ({
-        name: n.name,
-        tagline: n.tagline,
-        domains: tlds.map((tld) => ({
-          domain: `${n.name.toLowerCase().replace(/[^a-z0-9-]/g, "")}.${tld}`,
-          tld,
-          available: null,
-          price: TLD_PRICES[tld] || 9.99,
-          checking: true,
-        })),
-        checkingDomains: true,
-      }));
-      setGeneratedNames(initial);
-      setGenerating(false);
-
-      // Step 3: Batch check availability for each name (3 at a time to not overwhelm API)
-      const batchSize = 3;
-      for (let i = 0; i < names.length; i += batchSize) {
-        const batch = names.slice(i, i + batchSize);
-        const checks = batch.map(async (n, batchIdx) => {
-          const cleanName = n.name.toLowerCase().replace(/[^a-z0-9-]/g, "");
-          if (cleanName.length < 2) return;
-
-          try {
-            const res = await fetch(`/api/domains/search?q=${encodeURIComponent(cleanName)}&tlds=${encodeURIComponent(tlds.join(","))}`);
-            if (res.ok) {
-              const data = await res.json();
-              const apiResults = data.results || [];
-
-              setGeneratedNames((prev) =>
-                prev.map((gn) => {
-                  if (gn.name !== n.name) return gn;
-                  return {
-                    ...gn,
-                    checkingDomains: false,
-                    domains: tlds.map((tld) => {
-                      const match = apiResults.find((r: { domain: string }) => r.domain === `${cleanName}.${tld}`);
-                      return {
-                        domain: `${cleanName}.${tld}`,
-                        tld,
-                        available: match ? match.available : null,
-                        price: match?.price || TLD_PRICES[tld] || 9.99,
-                        checking: false,
-                      };
-                    }),
-                  };
-                })
-              );
-            } else {
-              setGeneratedNames((prev) =>
-                prev.map((gn) => gn.name === n.name ? { ...gn, checkingDomains: false, domains: gn.domains.map((d) => ({ ...d, checking: false })) } : gn)
-              );
-            }
-          } catch {
-            setGeneratedNames((prev) =>
-              prev.map((gn) => gn.name === n.name ? { ...gn, checkingDomains: false, domains: gn.domains.map((d) => ({ ...d, checking: false })) } : gn)
-            );
-          }
-        });
-        await Promise.all(checks);
-      }
-    } catch {
-      setGenerating(false);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setRegistering(false);
     }
   };
 
@@ -356,7 +330,13 @@ export default function DomainsPage() {
               <Search className="w-4 h-4" /> Search Exact Name
             </button>
             <button
-              onClick={() => setMode("generate")}
+              onClick={() => {
+                setMode("generate");
+                // Carry over search term to AI generator if it has a value and generator is empty
+                if (name.trim() && !genDescription.trim()) {
+                  setGenDescription(name.trim());
+                }
+              }}
               className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all ${
                 mode === "generate"
                   ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/20"
@@ -536,13 +516,89 @@ export default function DomainsPage() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">
                 {searching ? "Checking availability..." :
-                  `${availableResults.length} available, ${takenResults.length} taken`}
+                  results.some(r => r.checking)
+                    ? "Checking availability..."
+                    : availableResults.length > 0
+                    ? `${availableResults.length} domain${availableResults.length > 1 ? "s" : ""} available`
+                    : "No exact matches found"}
               </h2>
               {name && <span className="text-sm text-slate-500">Results for &ldquo;{name.trim().toLowerCase()}&rdquo;</span>}
             </div>
 
             <div className="space-y-3 mb-8">
-              {/* Available — bright green */}
+              {/* Checking — show while still loading */}
+              {results.filter(r => r.checking).map(r => (
+                <div key={r.domain} className="flex items-center justify-between p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05]">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-white/[0.05] flex items-center justify-center">
+                      <Loader2 className="w-5 h-5 text-slate-500 animate-spin" />
+                    </div>
+                    <span className="text-lg text-slate-400">{r.domain}</span>
+                  </div>
+                  <span className="text-sm text-slate-600">Checking...</span>
+                </div>
+              ))}
+
+              {/* No available results — suggest alternatives */}
+              {!searching && !results.some(r => r.checking) && availableResults.length === 0 && results.length > 0 && !autoGenerating && (
+                <div className="rounded-2xl border border-amber-500/20 bg-amber-500/[0.05] p-6 text-center">
+                  <div className="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
+                    <Sparkles className="w-7 h-7 text-amber-400" />
+                  </div>
+                  <h3 className="text-lg font-bold mb-2">
+                    {autoExpandedTlds
+                      ? `"${name.trim().toLowerCase()}" is taken across all 13 extensions`
+                      : `"${name.trim().toLowerCase()}" isn't available on selected extensions`}
+                  </h3>
+                  <p className="text-sm text-slate-400 mb-5">
+                    {autoExpandedTlds
+                      ? "We checked every extension. Let our AI find similar names that ARE available."
+                      : "We're searching all 13 extensions now..."}
+                  </p>
+                  {autoExpandedTlds && (
+                    <button
+                      onClick={() => {
+                        setGenDescription(name.trim());
+                        setMode("generate");
+                        setResults([]);
+                        setPendingGenerate(true);
+                      }}
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-xl font-bold text-base transition-all shadow-lg shadow-purple-500/20"
+                    >
+                      <Wand2 className="w-5 h-5" /> Generate Available Alternatives
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Auto-generating alternatives */}
+              {autoGenerating && (
+                <div className="rounded-2xl border border-purple-500/20 bg-purple-500/[0.05] p-6 text-center">
+                  <div className="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center mx-auto mb-4">
+                    <Wand2 className="w-7 h-7 text-purple-400" />
+                  </div>
+                  <h3 className="text-lg font-bold mb-2">
+                    &ldquo;{name.trim().toLowerCase()}&rdquo; is taken everywhere
+                  </h3>
+                  <p className="text-sm text-slate-400 mb-5">
+                    Let our AI generate similar names with available domains.
+                  </p>
+                  <button
+                    onClick={() => {
+                      setGenDescription(name.trim());
+                      setMode("generate");
+                      setResults([]);
+                      setAutoGenerating(false);
+                      setPendingGenerate(true);
+                    }}
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-xl font-bold text-base transition-all shadow-lg shadow-purple-500/20"
+                  >
+                    <Wand2 className="w-5 h-5" /> Find Available Alternatives
+                  </button>
+                </div>
+              )}
+
+              {/* Available — bright green — ONLY show available domains */}
               {availableResults.map(r => (
                 <div key={r.domain} className="flex items-center justify-between p-5 rounded-2xl bg-emerald-500/[0.08] border border-emerald-500/20 hover:border-emerald-500/30 transition-colors">
                   <div className="flex items-center gap-3">
@@ -569,47 +625,6 @@ export default function DomainsPage() {
                       </button>
                     )}
                   </div>
-                </div>
-              ))}
-
-              {/* Taken */}
-              {takenResults.map(r => (
-                <div key={r.domain} className="flex items-center justify-between p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05]">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center">
-                      <X className="w-5 h-5 text-red-400/50" />
-                    </div>
-                    <div>
-                      <span className="text-lg text-slate-500 line-through">{r.domain}</span>
-                      <span className="block text-sm text-red-400/50">Taken</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              {/* Checking */}
-              {results.filter(r => r.checking).map(r => (
-                <div key={r.domain} className="flex items-center justify-between p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05]">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-white/[0.05] flex items-center justify-center">
-                      <Loader2 className="w-5 h-5 text-slate-500 animate-spin" />
-                    </div>
-                    <span className="text-lg text-slate-400">{r.domain}</span>
-                  </div>
-                  <span className="text-sm text-slate-600">Checking...</span>
-                </div>
-              ))}
-
-              {/* Unknown */}
-              {unknownResults.map(r => (
-                <div key={r.domain} className="flex items-center justify-between p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05]">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-yellow-500/10 flex items-center justify-center">
-                      <Globe className="w-5 h-5 text-yellow-400/50" />
-                    </div>
-                    <span className="text-lg text-slate-400">{r.domain}</span>
-                  </div>
-                  <span className="text-sm text-slate-600">Unable to check</span>
                 </div>
               ))}
             </div>
@@ -662,7 +677,14 @@ export default function DomainsPage() {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold flex items-center gap-2">
                 <Wand2 className="w-5 h-5 text-purple-400" />
-                {generatedNames.length} Name Ideas Generated
+                {(() => {
+                  const withAvailable = generatedNames.filter(gn => gn.domains.some(d => d.available === true)).length;
+                  const stillChecking = generatedNames.some(gn => gn.domains.some(d => d.checking));
+                  if (stillChecking) return `Checking ${generatedNames.length} names...`;
+                  return withAvailable > 0
+                    ? `${withAvailable} name${withAvailable > 1 ? "s" : ""} with available domains`
+                    : "No available domains found";
+                })()}
               </h2>
               <button
                 onClick={handleGenerate}
@@ -677,7 +699,10 @@ export default function DomainsPage() {
               {generatedNames.map((gn) => {
                 const availableDomains = gn.domains.filter((d) => d.available === true);
                 const hasAvailable = availableDomains.length > 0;
-                const allChecked = gn.domains.every((d) => !d.checking);
+                const stillChecking = gn.domains.some((d) => d.checking);
+
+                // Hide names with zero available domains (unless still checking)
+                if (!hasAvailable && !stillChecking) return null;
 
                 return (
                   <div
@@ -685,8 +710,6 @@ export default function DomainsPage() {
                     className={`rounded-2xl border p-5 transition-all ${
                       hasAvailable
                         ? "border-emerald-500/20 bg-emerald-500/[0.04]"
-                        : allChecked
-                        ? "border-white/[0.06] bg-white/[0.02]"
                         : "border-white/[0.06] bg-white/[0.02]"
                     }`}
                   >
@@ -701,59 +724,99 @@ export default function DomainsPage() {
                           {availableDomains.length} available
                         </span>
                       )}
-                      {allChecked && !hasAvailable && (
-                        <span className="text-xs px-2.5 py-1 rounded-full bg-red-500/10 text-red-400/60 font-semibold shrink-0">
-                          All taken
+                      {stillChecking && (
+                        <span className="text-xs px-2.5 py-1 rounded-full bg-white/[0.06] text-slate-400 font-semibold shrink-0 flex items-center gap-1">
+                          <Loader2 className="w-3 h-3 animate-spin" /> Checking...
                         </span>
                       )}
                     </div>
 
-                    {/* Domain results grid */}
-                    <div className="flex flex-wrap gap-2">
-                      {gn.domains.map((d) => (
+                    {/* Domain results — proper register buttons */}
+                    <div className="space-y-2 mb-3">
+                      {gn.domains
+                        .filter((d) => d.checking || d.available === true)
+                        .map((d) => (
                         <div
                           key={d.domain}
-                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all ${
+                          className={`flex items-center justify-between p-3 rounded-xl transition-all ${
                             d.checking
-                              ? "bg-white/[0.04] text-slate-500"
-                              : d.available
-                              ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                              : d.available === false
-                              ? "bg-white/[0.02] text-slate-600 line-through"
-                              : "bg-white/[0.03] text-slate-500"
+                              ? "bg-white/[0.03]"
+                              : "bg-emerald-500/[0.06] border border-emerald-500/15"
                           }`}
                         >
-                          {d.checking ? (
-                            <Loader2 className="w-3 h-3 animate-spin" />
-                          ) : d.available ? (
-                            <Check className="w-3 h-3" />
-                          ) : d.available === false ? (
-                            <X className="w-3 h-3" />
-                          ) : null}
-                          <span>.{d.tld}</span>
+                          <div className="flex items-center gap-2.5">
+                            {d.checking ? (
+                              <Loader2 className="w-4 h-4 text-slate-500 animate-spin" />
+                            ) : (
+                              <Check className="w-4 h-4 text-emerald-400" />
+                            )}
+                            <span className={`font-semibold ${d.checking ? "text-slate-400" : "text-white"}`}>
+                              {d.domain}
+                            </span>
+                          </div>
                           {d.available && (
-                            <>
-                              <span className="text-xs opacity-70">${d.price}</span>
+                            <div className="flex items-center gap-3">
+                              <span className="text-sm font-bold text-white">${d.price}<span className="text-xs text-slate-400 font-normal">/yr</span></span>
                               {cart.some((c) => c.domain === d.domain) ? (
-                                <button onClick={() => removeFromCart(d.domain)} className="ml-1 text-emerald-300">
-                                  <Check className="w-3 h-3" />
+                                <button
+                                  onClick={() => removeFromCart(d.domain)}
+                                  className="px-4 py-2 rounded-lg bg-emerald-600/20 text-emerald-300 text-sm font-semibold flex items-center gap-1.5"
+                                >
+                                  <Check className="w-3.5 h-3.5" /> In Cart
                                 </button>
                               ) : (
                                 <button
                                   onClick={() => addToCart(d)}
-                                  className="ml-1 text-emerald-400 hover:text-emerald-300"
+                                  className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold flex items-center gap-1.5 transition-colors shadow-md shadow-indigo-500/20"
                                 >
-                                  <Plus className="w-3 h-3" />
+                                  <ShoppingCart className="w-3.5 h-3.5" /> Register
                                 </button>
                               )}
-                            </>
+                            </div>
+                          )}
+                          {d.checking && (
+                            <span className="text-xs text-slate-500">Checking...</span>
                           )}
                         </div>
                       ))}
                     </div>
+
+                    {/* Add All button */}
+                    {hasAvailable && availableDomains.length > 1 && (
+                      <button
+                        onClick={() => {
+                          availableDomains.forEach((d) => {
+                            if (!cart.some((c) => c.domain === d.domain)) {
+                              addToCart(d);
+                            }
+                          });
+                        }}
+                        className="w-full py-2.5 rounded-xl border border-emerald-500/20 text-emerald-400 text-sm font-semibold hover:bg-emerald-500/[0.06] transition-colors flex items-center justify-center gap-2"
+                      >
+                        <Plus className="w-4 h-4" /> Add All {availableDomains.length} Domains to Cart
+                      </button>
+                    )}
                   </div>
                 );
               })}
+
+              {/* If all generated names are checked and none have available domains */}
+              {generatedNames.length > 0 &&
+                generatedNames.every((gn) => gn.domains.every((d) => !d.checking)) &&
+                !generatedNames.some((gn) => gn.domains.some((d) => d.available === true)) && (
+                <div className="rounded-2xl border border-amber-500/20 bg-amber-500/[0.05] p-6 text-center">
+                  <Sparkles className="w-8 h-8 text-amber-400 mx-auto mb-3" />
+                  <h3 className="text-lg font-bold mb-2">All names are taken</h3>
+                  <p className="text-sm text-slate-400 mb-4">Try a different description or style to find more options.</p>
+                  <button
+                    onClick={handleGenerate}
+                    disabled={generating}
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-xl font-bold transition-all"
+                  >
+                    <RefreshCw className={`w-4 h-4 ${generating ? "animate-spin" : ""}`} /> Generate More Names
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Cart (shared with search results) */}
@@ -900,58 +963,12 @@ export default function DomainsPage() {
               <div className="text-sm font-semibold text-slate-500 text-center">GoDaddy</div>
               <div className="text-sm font-semibold text-slate-500 text-center">Namecheap</div>
             </div>
-            {COMPARISON.map((row, i) => (
-              <div key={row.feature} className={`grid grid-cols-4 px-6 py-4 ${i < COMPARISON.length - 1 ? "border-b border-white/[0.04]" : ""}`}>
-                <div className="text-sm text-slate-300">{row.feature}</div>
-                <div className="text-sm font-semibold text-center">
-                  {row.zoobicon === "Free" || row.zoobicon === "Included" ? (
-                    <span className="text-emerald-400">{row.zoobicon}</span>
-                  ) : (
-                    <span className="text-white">{row.zoobicon}</span>
-                  )}
-                </div>
-                <div className="text-sm text-slate-500 text-center">{row.godaddy}</div>
-                <div className="text-sm text-slate-500 text-center">{row.namecheap}</div>
-              </div>
-            ))}
-          </div>
-
-          <p className="text-center text-xs text-slate-600 mt-4">
-            Prices as of March 2026. Competitor prices may vary. See our{" "}
-            <Link href="/disclaimers" className="text-slate-500 underline underline-offset-2 hover:text-slate-400">disclaimers</Link>.
-          </p>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════ */}
-      {/* BUNDLE CTA                                  */}
-      {/* ═══════════════════════════════════════════ */}
-      <section className="py-20 md:py-28 px-4 sm:px-6 border-t border-white/[0.04]">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-sm font-medium mb-8">
-            <Star className="w-4 h-4" />
-            Domain + Website + Hosting — all included
-          </div>
-
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight leading-tight mb-6">
-            Get your domain.<br />
-            Build your site.<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
-              Go live in minutes.
-            </span>
-          </h2>
-          <p className="text-lg text-slate-400 max-w-xl mx-auto mb-10">
-            Every domain includes free hosting on zoobicon.sh, a free SSL certificate,
-            and access to our AI website builder. No extra charges. No gotchas.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <button
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="group inline-flex items-center gap-2.5 px-8 py-4 rounded-full bg-indigo-600 text-white text-lg font-bold hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/20"
+              onClick={handleRegister}
+              disabled={registering}
+              className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-semibold text-base transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              Search Domains
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              {registering ? <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</> : "Proceed to Registration"}
             </button>
             <Link
               href="/builder"
@@ -986,6 +1003,48 @@ export default function DomainsPage() {
           </div>
         </div>
       </section>
+
+      {/* ═══════════════════════════════════════════ */}
+      {/* STICKY CART BAR — always visible at bottom  */}
+      {/* ═══════════════════════════════════════════ */}
+      {cart.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#0d0d1a]/95 backdrop-blur-xl border-t border-indigo-500/20 shadow-2xl shadow-black/50">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center shrink-0">
+                <ShoppingCart className="w-5 h-5 text-indigo-400" />
+              </div>
+              <div className="min-w-0">
+                <span className="text-sm font-bold text-white">{cart.length} domain{cart.length > 1 ? "s" : ""}</span>
+                <span className="text-xs text-slate-400 block truncate">
+                  {cart.map(c => c.domain).join(", ")}
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 shrink-0">
+              <span className="text-xl font-black text-indigo-400">
+                ${cartTotal.toFixed(2)}<span className="text-xs font-normal text-slate-400">/yr</span>
+              </span>
+              <button
+                onClick={handleCheckout}
+                disabled={checkingOut}
+                className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-base transition-colors shadow-lg shadow-indigo-500/25 disabled:opacity-50 flex items-center gap-2"
+              >
+                {checkingOut ? (
+                  <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
+                ) : (
+                  <><Lock className="w-4 h-4" /> Register Now</>
+                )}
+              </button>
+            </div>
+          </div>
+          {checkoutError && (
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-2">
+              <p className="text-center text-sm text-red-400">{checkoutError}</p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

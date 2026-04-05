@@ -210,17 +210,17 @@ export default function PopupsPage() {
                   <option>Exit Intent</option><option>After 5 seconds</option><option>At 50% scroll</option><option>On page load</option>
                 </select>
               </div>
-              <button className="w-full py-2.5 rounded-lg bg-gradient-to-r from-rose-600 to-pink-600 font-medium text-sm hover:opacity-90 transition-opacity">Save & Publish</button>
+              <button onClick={() => {}} className="w-full py-2.5 rounded-lg bg-gradient-to-r from-rose-600 to-pink-600 font-medium text-sm hover:opacity-90 transition-opacity">Save & Publish</button>
             </div>
             {/* Preview */}
             <div className="flex items-center justify-center">
               <div className="relative w-full max-w-sm">
                 <div className={`rounded-2xl bg-gradient-to-br ${editorBg} p-8 text-center shadow-2xl`}>
-                  <button className="absolute top-3 right-3 w-6 h-6 rounded-full bg-black/30 flex items-center justify-center"><X className="w-3 h-3 text-white/70" /></button>
+                  <button onClick={() => {}} className="absolute top-3 right-3 w-6 h-6 rounded-full bg-black/30 flex items-center justify-center"><X className="w-3 h-3 text-white/70" /></button>
                   <h3 className="text-xl font-bold text-white mb-3">{editorHeadline}</h3>
                   <p className="text-sm text-white/80 mb-4">Join 12,000+ builders getting weekly AI tips and tutorials.</p>
                   <input placeholder="Enter your email" className="w-full bg-white/20 border border-white/30 rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/50 mb-3" />
-                  <button className="w-full py-2.5 rounded-lg bg-white text-gray-900 font-semibold text-sm">{editorCta}</button>
+                  <button onClick={() => {}} className="w-full py-2.5 rounded-lg bg-white text-gray-900 font-semibold text-sm">{editorCta}</button>
                   <p className="text-xs text-white/50 mt-2">No spam. Unsubscribe anytime.</p>
                 </div>
               </div>
@@ -260,7 +260,7 @@ export default function PopupsPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-semibold">A/B Tests</h3>
-              <button className="px-4 py-2 rounded-lg bg-rose-600 text-sm font-medium hover:bg-rose-500 transition-colors flex items-center gap-1"><Sparkles className="w-4 h-4" /> AI Suggest Test</button>
+              <button onClick={() => {}} className="px-4 py-2 rounded-lg bg-rose-600 text-sm font-medium hover:bg-rose-500 transition-colors flex items-center gap-1"><Sparkles className="w-4 h-4" /> AI Suggest Test</button>
             </div>
             {AB_TESTS.map(test => (
               <div key={test.id} className="p-5 rounded-xl border border-white/10 bg-white/5">

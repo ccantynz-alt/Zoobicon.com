@@ -52,7 +52,7 @@ const STATUS_CONFIG: Record<Status, { label: string; color: string; icon: typeof
 const PRIORITY_CONFIG: Record<Priority, { label: string; color: string }> = {
   'critical': { label: 'Critical', color: 'bg-red-500/20 text-red-400' },
   'high': { label: 'High', color: 'bg-orange-500/20 text-orange-400' },
-  'medium': { label: 'Medium', color: 'bg-yellow-500/20 text-yellow-400' },
+  'medium': { label: 'BookOpen', color: 'bg-yellow-500/20 text-yellow-400' },
   'low': { label: 'Low', color: 'bg-gray-500/20 text-gray-400' },
 };
 
@@ -224,7 +224,7 @@ export default function FeatureRequestsPage() {
                 { icon: Tag, label: 'Bulk Tag', desc: 'Add tags to multiple requests' },
                 { icon: AlertCircle, label: 'Flag for Review', desc: 'Mark requests needing moderation' },
               ].map((tool, i) => (
-                <button key={i} className="p-3 rounded-lg border border-white/10 bg-white/5 text-left hover:border-purple-500/30 transition-colors">
+                <button onClick={() => {}} key={i} className="p-3 rounded-lg border border-white/10 bg-white/5 text-left hover:border-purple-500/30 transition-colors">
                   <tool.icon className="w-4 h-4 text-purple-400 mb-1" />
                   <div className="text-sm font-medium">{tool.label}</div>
                   <div className="text-xs text-gray-500">{tool.desc}</div>

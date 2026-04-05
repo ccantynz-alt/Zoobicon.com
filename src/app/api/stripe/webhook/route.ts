@@ -58,6 +58,33 @@ export async function POST(request: NextRequest) {
           break;
         }
 
+        // Domain registration purchase
+        if (session.metadata?.type === "domain_registration") {
+          const domainList = session.metadata?.domains?.split(",") || [];
+          const registrantEmail = session.metadata?.registrantEmail || email;
+          const years = parseInt(session.metadata?.years || "1", 10);
+          const expiresAt = new Date();
+          expiresAt.setFullYear(expiresAt.getFullYear() + years);
+
+          for (const domain of domainList) {
+            if (!domain.trim()) continue;
+            try {
+              await sql`
+                INSERT INTO registered_domains (domain, user_email, status, expires_at, auto_renew, privacy_protection)
+                VALUES (${domain.trim()}, ${registrantEmail}, 'active', ${expiresAt.toISOString()}, true, true)
+                ON CONFLICT (domain) DO UPDATE SET
+                  status = 'active',
+                  expires_at = ${expiresAt.toISOString()},
+                  user_email = ${registrantEmail}
+              `;
+            } catch (err) {
+              console.error(`[webhook] Failed to save domain ${domain}:`, err);
+            }
+          }
+          console.log(`[webhook] Domain registration: ${domainList.length} domains for ${registrantEmail}`);
+          break;
+        }
+
         if (addonId && addonName) {
           // Record the add-on purchase for delivery
           await recordPurchase({

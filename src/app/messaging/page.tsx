@@ -66,7 +66,7 @@ const CHANNEL_CONFIG = {
   sms: { name: 'SMS', icon: Phone, color: 'text-green-400', bg: 'bg-green-500/20', gradient: 'from-green-500 to-emerald-500' },
   whatsapp: { name: 'WhatsApp', icon: MessageSquare, color: 'text-emerald-400', bg: 'bg-emerald-500/20', gradient: 'from-emerald-500 to-teal-500' },
   push: { name: 'Push', icon: Bell, color: 'text-blue-400', bg: 'bg-blue-500/20', gradient: 'from-blue-500 to-indigo-500' },
-  telegram: { name: 'Telegram', icon: Send, color: 'text-cyan-400', bg: 'bg-cyan-500/20', gradient: 'from-cyan-500 to-blue-500' },
+  telegram: { name: 'Send', icon: Send, color: 'text-cyan-400', bg: 'bg-cyan-500/20', gradient: 'from-cyan-500 to-blue-500' },
 };
 
 const DEMO_MESSAGES: Message[] = [
@@ -94,7 +94,7 @@ const DEMO_AUTOMATIONS: Automation[] = [
   { id: 'a2', name: 'Trial Expiry Reminder', trigger: '3 days before trial ends', channel: 'SMS + Push', status: 'active', sent: 1820, openRate: 62 },
   { id: 'a3', name: 'Review Request', trigger: '7 days after first deploy', channel: 'WhatsApp', status: 'active', sent: 3450, openRate: 45 },
   { id: 'a4', name: 'Win-back Campaign', trigger: '30 days inactive', channel: 'SMS', status: 'paused', sent: 890, openRate: 18 },
-  { id: 'a5', name: 'Feature Announcement', trigger: 'Manual trigger', channel: 'Push + Telegram', status: 'draft', sent: 0, openRate: 0 },
+  { id: 'a5', name: 'Feature Announcement', trigger: 'Manual trigger', channel: 'Push + Send', status: 'draft', sent: 0, openRate: 0 },
 ];
 
 export default function MessagingPage() {
@@ -131,7 +131,7 @@ export default function MessagingPage() {
             <MessageSquare className="w-4 h-4" /> Unified Messaging
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            SMS, WhatsApp, Push & Telegram — <span className="bg-gradient-to-r from-green-400 to-teal-400 bg-clip-text text-transparent">One Inbox</span>
+            SMS, WhatsApp, Push & Send — <span className="bg-gradient-to-r from-green-400 to-teal-400 bg-clip-text text-transparent">One Inbox</span>
           </h1>
           <p className="text-lg text-gray-400 max-w-2xl mx-auto">
             Reach customers on every channel. Unified inbox, broadcast messaging, automation sequences, and AI-powered responses.
@@ -227,8 +227,8 @@ export default function MessagingPage() {
                   </div>
                   <div className="flex gap-2">
                     <input value={replyText} onChange={e => setReplyText(e.target.value)} placeholder="Type a reply..." className="flex-1 bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-500" />
-                    <button className="px-4 py-2 rounded-lg bg-green-600 text-sm font-medium hover:bg-green-500 transition-colors flex items-center gap-1"><Send className="w-4 h-4" /></button>
-                    <button className="px-4 py-2 rounded-lg bg-white/10 text-sm hover:bg-white/20 transition-colors flex items-center gap-1"><Zap className="w-4 h-4 text-yellow-400" /> AI</button>
+                    <button onClick={() => {}} className="px-4 py-2 rounded-lg bg-green-600 text-sm font-medium hover:bg-green-500 transition-colors flex items-center gap-1"><Send className="w-4 h-4" /></button>
+                    <button onClick={() => {}} className="px-4 py-2 rounded-lg bg-white/10 text-sm hover:bg-white/20 transition-colors flex items-center gap-1"><Zap className="w-4 h-4 text-yellow-400" /> AI</button>
                   </div>
                 </div>
               ) : (
@@ -271,7 +271,7 @@ export default function MessagingPage() {
                   className="w-full bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-500 resize-none" />
                 <div className="flex items-center justify-between mt-1">
                   <span className="text-xs text-gray-500">{broadcastMessage.length} characters</span>
-                  <button className="text-xs text-green-400 hover:text-green-300 flex items-center gap-1"><Zap className="w-3 h-3" /> AI Write</button>
+                  <button onClick={() => {}} className="text-xs text-green-400 hover:text-green-300 flex items-center gap-1"><Zap className="w-3 h-3" /> AI Write</button>
                 </div>
               </div>
               <button onClick={() => { setBroadcastSent(true); setTimeout(() => setBroadcastSent(false), 3000); }}
@@ -287,7 +287,7 @@ export default function MessagingPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-semibold">Automation Sequences</h3>
-              <button className="px-4 py-2 rounded-lg bg-green-600 text-sm font-medium hover:bg-green-500 transition-colors flex items-center gap-1"><Plus className="w-4 h-4" /> New Automation</button>
+              <button onClick={() => {}} className="px-4 py-2 rounded-lg bg-green-600 text-sm font-medium hover:bg-green-500 transition-colors flex items-center gap-1"><Plus className="w-4 h-4" /> New Automation</button>
             </div>
             {DEMO_AUTOMATIONS.map(auto => (
               <div key={auto.id} className="p-4 rounded-xl border border-white/10 bg-white/5">
@@ -311,7 +311,7 @@ export default function MessagingPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-semibold">{DEMO_CONTACTS.length} Contacts</h3>
-              <button className="px-4 py-2 rounded-lg bg-green-600 text-sm font-medium hover:bg-green-500 transition-colors flex items-center gap-1"><Plus className="w-4 h-4" /> Add Contact</button>
+              <button onClick={() => {}} className="px-4 py-2 rounded-lg bg-green-600 text-sm font-medium hover:bg-green-500 transition-colors flex items-center gap-1"><Plus className="w-4 h-4" /> Add Contact</button>
             </div>
             {DEMO_CONTACTS.map(contact => (
               <div key={contact.id} className="p-4 rounded-xl border border-white/10 bg-white/5 flex items-center gap-4">
@@ -364,7 +364,7 @@ export default function MessagingPage() {
         {/* CTA */}
         <div className="mt-20 text-center p-12 rounded-2xl bg-gradient-to-br from-green-600/20 to-teal-600/20 border border-green-500/20">
           <h2 className="text-3xl font-bold mb-4">Reach Every Customer, Every Channel</h2>
-          <p className="text-gray-400 mb-6 max-w-xl mx-auto">SMS, WhatsApp, Push, and Telegram in one unified inbox. Automate sequences, broadcast updates, and manage contacts.</p>
+          <p className="text-gray-400 mb-6 max-w-xl mx-auto">SMS, WhatsApp, Push, and Send in one unified inbox. Automate sequences, broadcast updates, and manage contacts.</p>
           <Link href="/auth/signup" className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-green-600 to-teal-600 font-semibold hover:opacity-90 transition-opacity">
             Start Messaging Free <ArrowRight className="w-4 h-4" />
           </Link>

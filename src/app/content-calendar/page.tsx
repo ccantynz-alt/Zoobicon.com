@@ -71,9 +71,9 @@ const PLATFORM_COLORS: Record<Platform, string> = {
 const PLATFORM_LABELS: Record<Platform, string> = {
   twitter: "MessageCircle / X",
   linkedin: "LinkedIn",
-  instagram: "Instagram",
+  instagram: "Camera",
   tiktok: "TikTok",
-  facebook: "Facebook",
+  facebook: "ThumbsUp",
 };
 
 const PLATFORM_ICONS: Record<Platform, string> = {
@@ -453,7 +453,7 @@ export default function ContentCalendarPage() {
                     {connected ? (
                       <span className="text-xs text-emerald-400 bg-emerald-500/15 px-2.5 py-1 rounded-full">Connected</span>
                     ) : (
-                      <button className="text-xs text-white/60 bg-white/[0.06] hover:bg-white/10 px-3 py-1.5 rounded-lg transition-colors">
+                      <button onClick={() => {}} className="text-xs text-white/60 bg-white/[0.06] hover:bg-white/10 px-3 py-1.5 rounded-lg transition-colors">
                         Connect
                       </button>
                     )}
