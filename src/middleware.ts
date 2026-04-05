@@ -41,11 +41,32 @@ function setCorsHeaders(response: NextResponse, origin: string | null) {
 
 export function middleware(request: NextRequest) {
   const hostname = request.headers.get("host") ?? "";
-  const domain = hostname.split(":")[0]; // strip port for localhost
+  const domain = hostname.split(":")[0];
   const origin = request.headers.get("origin");
+  const pathname = request.nextUrl.pathname;
+
+  // ── MAINTENANCE MODE ──
+  // Set MAINTENANCE_MODE=true in Vercel env to show maintenance page
+  // Admin (/admin/*), API routes, and static assets are excluded
+  if (process.env.MAINTENANCE_MODE === "true") {
+    const isExcluded =
+      pathname.startsWith("/api/") ||
+      pathname.startsWith("/admin") ||
+      pathname.startsWith("/auth") ||
+      pathname.startsWith("/_next/") ||
+      pathname.startsWith("/maintenance") ||
+      pathname === "/favicon.ico" ||
+      pathname.endsWith(".png") ||
+      pathname.endsWith(".svg") ||
+      pathname.endsWith(".ico");
+
+    if (!isExcluded) {
+      return NextResponse.rewrite(new URL("/maintenance", request.url));
+    }
+  }
 
   // Handle CORS preflight for API routes
-  if (request.nextUrl.pathname.startsWith("/api/") && request.method === "OPTIONS") {
+  if (pathname.startsWith("/api/") && request.method === "OPTIONS") {
     const preflightResponse = new NextResponse(null, { status: 204 });
     setCorsHeaders(preflightResponse, origin);
     return preflightResponse;
