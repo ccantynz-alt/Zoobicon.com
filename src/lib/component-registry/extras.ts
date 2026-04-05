@@ -295,7 +295,7 @@ registerComponent({
   name: "Two Tier Pricing",
   category: "pricing",
   variant: "two-tier",
-  description: "Simple side-by-side comparison of free and pro plans with feature lists",
+  description: "Premium side-by-side free/pro comparison with gradient pro card, hover lift, and conversion-focused layout",
   tags: ["saas", "startup", "business", "software", "platform", "service", "tech", "minimal", "clean"],
   code: `export default function Pricing() {
   const plans = [
@@ -303,52 +303,71 @@ registerComponent({
       name: "Free",
       price: "0",
       period: "forever",
-      desc: "Everything you need to get started",
-      features: ["5 projects", "1GB storage", "Community support", "Basic analytics", "Email notifications"],
+      desc: "Everything you need to validate your idea and get started",
+      features: ["5 active projects", "1GB cloud storage", "Community support", "Core analytics", "Email notifications", "Custom subdomain"],
       cta: "Get Started Free",
       dark: false,
+      badge: null,
     },
     {
       name: "Pro",
       price: "29",
       period: "/month",
-      desc: "For professionals who need more power",
-      features: ["Unlimited projects", "50GB storage", "Priority support", "Advanced analytics", "Custom domains", "Team collaboration", "API access", "White-label exports"],
-      cta: "Upgrade to Pro",
+      desc: "Unlock the full platform. Built for professionals who ship.",
+      features: ["Unlimited projects", "50GB cloud storage", "Priority support (4hr SLA)", "Advanced analytics + exports", "Custom domains + SSL", "Team collaboration (10 seats)", "Full API access", "White-label exports"],
+      cta: "Start 14-Day Free Trial",
       dark: true,
+      badge: "Recommended",
     },
   ];
   return (
-    <section id="pricing" className="py-28 px-6 bg-white">
+    <section id="pricing" className="py-32 px-6 bg-white">
       <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-16">
-          <p className="text-sm font-semibold text-indigo-600 uppercase tracking-widest mb-3">Simple Pricing</p>
-          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">One Free Plan. One Pro Plan.</h2>
-          <p className="text-lg text-gray-500 max-w-xl mx-auto">No tiers to decode. Pick free or pro. Upgrade when you are ready.</p>
+        <div className="text-center mb-20">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50 border border-indigo-100 mb-6">
+            <span className="text-sm font-semibold text-indigo-700">Simple, honest pricing</span>
+          </div>
+          <h2 className="text-4xl md:text-6xl font-extrabold text-gray-900 mb-5 tracking-tight">One Free Plan. One Pro Plan.</h2>
+          <p className="text-xl text-gray-500 max-w-xl mx-auto">No tiers to decode, no hidden fees. Pick free or pro. Upgrade when you&apos;re ready.</p>
         </div>
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           {plans.map((p, i) => (
-            <div key={i} className={\`rounded-2xl p-10 transition-all duration-300 \${p.dark ? "bg-gray-900 text-white shadow-2xl shadow-gray-900/20 hover:shadow-3xl" : "bg-white border-2 border-gray-200 hover:border-indigo-300 hover:shadow-lg"}\`}>
-              <h3 className={\`text-xl font-bold mb-2 \${p.dark ? "text-white" : "text-gray-900"}\`}>{p.name}</h3>
-              <p className={\`text-sm mb-6 \${p.dark ? "text-gray-400" : "text-gray-500"}\`}>{p.desc}</p>
-              <div className="flex items-baseline gap-1 mb-8">
-                <span className={\`text-6xl font-extrabold \${p.dark ? "text-white" : "text-gray-900"}\`}>{"$"}{p.price}</span>
-                <span className={\`text-sm \${p.dark ? "text-gray-400" : "text-gray-500"}\`}>{p.period}</span>
+            <div key={i} className={\`group relative rounded-3xl transition-all duration-500 hover:-translate-y-1 \${p.dark ? "bg-gradient-to-br from-gray-900 via-gray-900 to-indigo-950 text-white shadow-2xl shadow-gray-900/20 ring-1 ring-white/10" : "bg-white border-2 border-gray-200 hover:border-indigo-200 hover:shadow-xl"}\`}>
+              {p.badge && (
+                <div className="absolute -top-3.5 right-8">
+                  <span className="px-4 py-1.5 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-xs font-bold shadow-lg shadow-indigo-500/30">{p.badge}</span>
+                </div>
+              )}
+              <div className="p-10 md:p-12">
+                <h3 className={\`text-xl font-bold mb-2 \${p.dark ? "text-white" : "text-gray-900"}\`}>{p.name}</h3>
+                <p className={\`text-sm mb-8 leading-relaxed \${p.dark ? "text-gray-400" : "text-gray-500"}\`}>{p.desc}</p>
+                <div className="flex items-baseline gap-1 mb-2">
+                  <span className={\`text-6xl font-extrabold tracking-tight \${p.dark ? "text-white" : "text-gray-900"}\`}>{"$"}{p.price}</span>
+                  <span className={\`text-sm font-medium \${p.dark ? "text-gray-400" : "text-gray-500"}\`}>{p.period}</span>
+                </div>
+                {p.dark && <p className="text-xs text-indigo-400 mb-8">Billed monthly &middot; Save 20% on annual</p>}
+                {!p.dark && <div className="mb-8" />}
+                <button className={\`w-full py-4 rounded-2xl font-bold text-sm transition-all duration-300 \${p.dark ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white hover:from-indigo-400 hover:to-violet-400 shadow-lg shadow-indigo-500/30 hover:shadow-xl" : "bg-gray-900 text-white hover:bg-gray-800"}\`}>
+                  {p.cta}
+                </button>
+                <div className={\`mt-10 pt-8 border-t \${p.dark ? "border-white/10" : "border-gray-100"}\`}>
+                  <p className={\`text-xs font-semibold uppercase tracking-wider mb-5 \${p.dark ? "text-gray-500" : "text-gray-400"}\`}>What&apos;s included:</p>
+                  <ul className="space-y-4">
+                    {p.features.map((f, j) => (
+                      <li key={j} className={\`flex items-center gap-3 text-sm \${p.dark ? "text-gray-300" : "text-gray-600"}\`}>
+                        <div className={\`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center \${p.dark ? "bg-indigo-500/20" : "bg-indigo-50"}\`}>
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={p.dark ? "#a5b4fc" : "#6366f1"} strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-              <button className={\`w-full py-4 rounded-xl font-bold text-sm transition-all duration-200 \${p.dark ? "bg-indigo-500 text-white hover:bg-indigo-400 shadow-lg shadow-indigo-500/25" : "bg-gray-100 text-gray-900 hover:bg-gray-200"}\`}>
-                {p.cta}
-              </button>
-              <ul className="mt-8 space-y-3">
-                {p.features.map((f, j) => (
-                  <li key={j} className={\`flex items-center gap-3 text-sm \${p.dark ? "text-gray-300" : "text-gray-600"}\`}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={p.dark ? "#818cf8" : "#6366f1"} strokeWidth="2.5" strokeLinecap="round" className="flex-shrink-0"><polyline points="20 6 9 17 4 12"/></svg>
-                    {f}
-                  </li>
-                ))}
-              </ul>
             </div>
           ))}
         </div>
+        <p className="text-center text-sm text-gray-400 mt-10">No credit card required &middot; Cancel anytime &middot; Trusted by 12,000+ teams</p>
       </div>
     </section>
   );
