@@ -84,19 +84,24 @@ registerComponent({
   name: "Centered Gradient Hero",
   category: "hero",
   variant: "centered-gradient",
-  description: "Full-width gradient background with centered text and trust badges. Versatile for any industry",
+  description: "Full-width gradient background with centered text, social proof, metrics, and trust badges. $100K agency quality",
   tags: ["gradient", "centered", "modern", "saas", "startup", "agency", "marketing", "business", "service"],
   code: `export default function Hero() {
   const logos = ["Stripe", "Vercel", "Linear", "Notion", "Figma"];
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-24 pb-16 overflow-hidden bg-gradient-to-b from-violet-50 via-white to-white">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-gradient-to-br from-violet-200/40 to-indigo-200/30 rounded-full blur-3xl" />
+      {/* Animated glow orbs */}
+      <div className="absolute top-20 left-1/4 w-[500px] h-[500px] bg-violet-300/30 rounded-full blur-[120px] animate-pulse" style={{ animationDuration: "4s" }} />
+      <div className="absolute bottom-20 right-1/4 w-[400px] h-[400px] bg-indigo-300/20 rounded-full blur-[100px] animate-pulse" style={{ animationDuration: "6s" }} />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-gradient-to-br from-violet-200/40 to-indigo-200/30 rounded-full blur-3xl" />
       <div className="relative text-center max-w-4xl mx-auto">
-        <div className="inline-flex items-center gap-2 bg-violet-100 text-violet-700 text-xs font-semibold px-4 py-1.5 rounded-full mb-8">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-          Launching Spring 2026
+        {/* Announcement badge */}
+        <div className="inline-flex items-center gap-2 bg-violet-100/80 backdrop-blur-sm text-violet-700 text-xs font-semibold px-4 py-2 rounded-full mb-8 border border-violet-200/50 shadow-sm">
+          <span className="w-2 h-2 bg-violet-500 rounded-full animate-pulse" />
+          New: AI-Powered Analytics Dashboard
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
         </div>
-        <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 leading-[1.08] tracking-tight mb-6">
+        <h1 className="text-5xl md:text-7xl lg:text-8xl font-extrabold text-gray-900 leading-[1.05] tracking-tight mb-6">
           The Smarter Way to
           <br />
           <span className="bg-gradient-to-r from-violet-600 via-indigo-600 to-blue-600 bg-clip-text text-transparent">Grow Your Business</span>
@@ -104,19 +109,49 @@ registerComponent({
         <p className="text-lg md:text-xl text-gray-500 leading-relaxed mb-10 max-w-2xl mx-auto">
           Automate your marketing, streamline operations, and unlock insights that drive real revenue growth. All from one beautiful dashboard.
         </p>
-        <div className="flex flex-wrap justify-center gap-4 mb-12">
-          <button className="px-8 py-4 bg-gray-900 text-white font-bold rounded-2xl hover:bg-gray-800 transition-all shadow-lg shadow-gray-900/10 text-sm">
+        {/* CTAs with gradient primary */}
+        <div className="flex flex-wrap justify-center gap-4 mb-10">
+          <button className="group px-8 py-4 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold rounded-2xl hover:shadow-xl hover:shadow-violet-500/25 transition-all duration-300 text-sm flex items-center gap-2">
             Start Free Trial
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="group-hover:translate-x-1 transition-transform"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
           </button>
-          <button className="px-8 py-4 bg-white text-gray-700 font-semibold rounded-2xl border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all text-sm flex items-center gap-2">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <button className="px-8 py-4 bg-white/80 backdrop-blur-sm text-gray-700 font-semibold rounded-2xl border border-gray-200 hover:border-violet-200 hover:shadow-md transition-all duration-300 text-sm flex items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-violet-600"><polygon points="5 3 19 12 5 21 5 3"/></svg>
             Watch Demo
           </button>
         </div>
+        {/* Social proof strip */}
+        <div className="flex items-center justify-center gap-4 mb-12">
+          <div className="flex -space-x-2">
+            {[11, 26, 44, 52, 68].map(n => (
+              <img key={n} src={\`https://randomuser.me/api/portraits/\${n % 2 === 0 ? "women" : "men"}/\${n}.jpg\`} alt="" className="w-8 h-8 rounded-full border-2 border-white object-cover shadow-sm" />
+            ))}
+          </div>
+          <div className="flex items-center gap-1">
+            {[1,2,3,4,5].map(i => (
+              <svg key={i} width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" strokeWidth="1"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            ))}
+          </div>
+          <span className="text-sm text-gray-500">Loved by <strong className="text-gray-800">12,000+</strong> teams</span>
+        </div>
+        {/* Metrics strip */}
+        <div className="grid grid-cols-3 gap-8 max-w-lg mx-auto mb-14">
+          {[
+            { value: "99.9%", label: "Uptime SLA" },
+            { value: "3.2s", label: "Avg. Setup" },
+            { value: "40%", label: "Cost Savings" },
+          ].map((m, i) => (
+            <div key={i} className="text-center">
+              <div className="text-2xl font-extrabold text-gray-900">{m.value}</div>
+              <div className="text-xs text-gray-400 mt-1">{m.label}</div>
+            </div>
+          ))}
+        </div>
+        {/* Trust logos */}
         <p className="text-xs text-gray-400 uppercase tracking-widest font-medium mb-6">Trusted by forward-thinking teams</p>
         <div className="flex flex-wrap justify-center items-center gap-x-10 gap-y-4">
           {logos.map(l => (
-            <span key={l} className="text-gray-300 font-bold text-lg tracking-tight">{l}</span>
+            <span key={l} className="text-gray-300 font-bold text-lg tracking-tight hover:text-gray-400 transition-colors cursor-default">{l}</span>
           ))}
         </div>
       </div>
