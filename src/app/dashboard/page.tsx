@@ -48,14 +48,15 @@ const QUICK_ACTIONS = [
 
 const ADMIN_QUICK_ACTIONS = [
   { icon: Globe, label: "AI Builder", desc: "Premium generation", href: "/builder", color: "from-brand-500 to-brand-700" },
-  { icon: Layers, label: "Multi-Page", desc: "Full site builds", href: "/builder", color: "from-indigo-500 to-blue-600" },
+  { icon: Globe, label: "My Domains", desc: "View purchased domains", href: "/my-domains", color: "from-indigo-500 to-purple-600" },
+  { icon: Search, label: "Register Domain", desc: "Search & buy domains", href: "/domains", color: "from-emerald-500 to-teal-600" },
   { icon: Server, label: "Hosting", desc: "Deploy & manage", href: "/hosting", color: "from-emerald-500 to-teal-600" },
   { icon: Pencil, label: "Live Editor", desc: "Edit deployed sites", href: "/edit", color: "from-amber-500 to-orange-600" },
   { icon: Shield, label: "Admin Panel", desc: "System controls", href: "/admin", color: "from-red-500 to-rose-600" },
   { icon: Key, label: "API Keys", desc: "Developer access", href: "/auth/settings", color: "from-cyan-500 to-blue-600" },
   { icon: BarChart3, label: "Analytics", desc: "Site performance", href: "/analytics", color: "from-blue-500 to-fuchsia-600" },
-  { icon: Settings, label: "Settings", desc: "Account config", href: "/auth/settings", color: "from-gray-500 to-slate-600" },
   { icon: Mail, label: "Email Support", desc: "Tickets & inbox", href: "/email-support", color: "from-cyan-500 to-rose-600" },
+  { icon: Settings, label: "Settings", desc: "Account config", href: "/auth/settings", color: "from-gray-500 to-slate-600" },
 ];
 
 const ADMIN_TOOLS = [
