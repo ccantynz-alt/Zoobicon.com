@@ -483,10 +483,25 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden min-h-screen flex items-center pt-16">
-        {/* Clean dark background with subtle ambient light */}
+        {/* Rich gradient mesh background */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-[800px] h-[800px] rounded-full bg-blue-600/[0.04] blur-[150px]" />
-          <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] rounded-full bg-indigo-600/[0.03] blur-[130px]" />
+          {/* Primary gradient blobs — layered for depth */}
+          <div className="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] rounded-full bg-blue-600/[0.07] blur-[120px]" />
+          <div className="absolute top-[10%] right-[-5%] w-[50%] h-[60%] rounded-full bg-indigo-600/[0.06] blur-[100px]" />
+          <div className="absolute bottom-[-10%] left-[20%] w-[45%] h-[50%] rounded-full bg-cyan-600/[0.04] blur-[120px]" />
+          <div className="absolute top-[40%] left-[40%] w-[30%] h-[30%] rounded-full bg-blue-500/[0.05] blur-[80px]" />
+          {/* Subtle dot pattern overlay with radial fade */}
+          <div
+            className="absolute inset-0 opacity-[0.35]"
+            style={{
+              backgroundImage: "radial-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 1px)",
+              backgroundSize: "32px 32px",
+              maskImage: "radial-gradient(ellipse 70% 60% at 50% 40%, black 10%, transparent 70%)",
+              WebkitMaskImage: "radial-gradient(ellipse 70% 60% at 50% 40%, black 10%, transparent 70%)",
+            }}
+          />
+          {/* Top edge highlight — subtle light bleed from above */}
+          <div className="absolute top-0 left-[15%] right-[15%] h-[1px] bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
         </div>
 
         <div className="max-w-7xl mx-auto px-6 lg:px-8 w-full relative z-10 py-20 lg:py-28">
