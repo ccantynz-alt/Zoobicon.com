@@ -902,13 +902,104 @@ registerComponent({
 });
 
 // ── CTA: Split ──
-registerComponent({ id: "cta-split", name: "CTA Split", category: "cta", variant: "split", description: "Text left, email input right", tags: ["cta", "newsletter", "signup", "subscribe"], code: `export default function CTA() { return (<section className="py-24 px-6 bg-indigo-600"><div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center"><div><h2 className="text-4xl font-bold text-white mb-4">Ready to Transform Your Workflow?</h2><p className="text-xl text-indigo-200">Join 10,000+ teams shipping faster. Start free today.</p></div><div className="flex gap-3"><input type="email" placeholder="Enter your email" className="flex-1 px-5 py-4 rounded-xl text-gray-900" /><button className="px-8 py-4 bg-white text-indigo-600 font-semibold rounded-xl hover:bg-indigo-50 transition-colors">Get Started</button></div></div></section>); }` });
+registerComponent({
+  id: "cta-split",
+  name: "CTA Split",
+  category: "cta",
+  variant: "split",
+  description: "Premium split CTA with gradient background, email capture, and trust signals",
+  tags: ["cta", "newsletter", "signup", "subscribe"],
+  code: `export default function CTA() {
+  return (
+    <section className="py-28 px-6 bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-700 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iLjA1Ij48cGF0aCBkPSJNMzYgMzRWMGgydjM0aDM0djJIMzZ6TTAgMzRWMGgydjM0aDM0djJIMHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-30" />
+      <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center relative">
+        <div>
+          <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-5 leading-tight tracking-tight">Ready to Transform Your Workflow?</h2>
+          <p className="text-xl text-indigo-200 mb-8 leading-relaxed">Join 10,000+ teams who ship faster, build smarter, and scale without limits.</p>
+          <div className="flex items-center gap-4">
+            <div className="flex -space-x-2">
+              {["AK","MR","SL","JD"].map((n,i)=>(
+                <div key={i} className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white text-xs font-bold ring-2 ring-indigo-600">{n}</div>
+              ))}
+            </div>
+            <div className="text-indigo-200 text-sm"><span className="text-white font-semibold">4.9/5</span> from 2,000+ reviews</div>
+          </div>
+        </div>
+        <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20">
+          <p className="text-white font-bold text-lg mb-6">Start building for free</p>
+          <div className="space-y-4">
+            <input type="email" placeholder="Enter your work email" className="w-full px-5 py-4 rounded-xl text-gray-900 bg-white placeholder-gray-400 focus:ring-2 focus:ring-indigo-300 outline-none" />
+            <button className="w-full px-8 py-4 bg-white text-indigo-700 font-bold rounded-xl hover:bg-indigo-50 transition-all shadow-lg shadow-black/10 hover:shadow-xl text-sm">
+              Get Started Free
+            </button>
+          </div>
+          <p className="text-indigo-300 text-xs mt-4 text-center">No credit card required &middot; Setup in 2 minutes</p>
+        </div>
+      </div>
+    </section>
+  );
+}`,
+});
 
 // ── CTA: Newsletter ──
-registerComponent({ id: "cta-newsletter", name: "CTA Newsletter", category: "cta", variant: "newsletter", description: "Email capture with social proof", tags: ["newsletter", "email", "subscribe", "updates"], code: `export default function CTA() { return (<section className="py-24 px-6 bg-gray-50"><div className="max-w-2xl mx-auto text-center"><h2 className="text-4xl font-bold text-gray-900 mb-4">Stay in the Loop</h2><p className="text-lg text-gray-600 mb-8">Weekly insights on product development and AI. 15,000+ subscribers.</p><div className="flex gap-3 max-w-md mx-auto mb-4"><input type="email" placeholder="you@company.com" className="flex-1 px-5 py-3 border border-gray-200 rounded-xl" /><button className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors">Subscribe</button></div><p className="text-sm text-gray-400">No spam. Unsubscribe anytime.</p></div></section>); }` });
+registerComponent({
+  id: "cta-newsletter",
+  name: "CTA Newsletter",
+  category: "cta",
+  variant: "newsletter",
+  description: "Premium newsletter CTA with subscriber count, email input, and social proof",
+  tags: ["newsletter", "email", "subscribe", "updates"],
+  code: `export default function CTA() {
+  return (
+    <section className="py-28 px-6 bg-gradient-to-b from-gray-50 to-white">
+      <div className="max-w-2xl mx-auto text-center">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50 border border-indigo-100 mb-6">
+          <div className="w-2 h-2 rounded-full bg-emerald-500" />
+          <span className="text-sm font-semibold text-indigo-700">15,000+ subscribers</span>
+        </div>
+        <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-5 tracking-tight">Stay in the Loop</h2>
+        <p className="text-lg text-gray-500 mb-10 leading-relaxed">Weekly insights on product development, AI, and startup growth. Read by founders and engineers at top companies.</p>
+        <div className="flex gap-3 max-w-lg mx-auto mb-4">
+          <input type="email" placeholder="you@company.com" className="flex-1 px-5 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-300 outline-none transition-all" />
+          <button className="px-8 py-4 bg-gray-900 text-white font-bold rounded-xl hover:bg-gray-800 transition-all shadow-lg hover:shadow-xl text-sm whitespace-nowrap">Subscribe</button>
+        </div>
+        <p className="text-sm text-gray-400">No spam, ever. Unsubscribe in one click.</p>
+      </div>
+    </section>
+  );
+}`,
+});
 
 // ── CTA: Banner ──
-registerComponent({ id: "cta-banner", name: "CTA Banner", category: "cta", variant: "banner", description: "Full-width gradient banner", tags: ["cta", "banner", "promo", "launch", "offer"], code: `export default function CTA() { return (<section className="py-16 px-6 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600"><div className="max-w-4xl mx-auto text-center"><span className="inline-block text-sm font-semibold text-purple-200 bg-white/10 px-4 py-1 rounded-full mb-4">Limited Time</span><h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Get 3 Months Free When You Sign Up Today</h2><button className="px-8 py-4 bg-white text-purple-600 font-semibold rounded-xl hover:bg-purple-50 transition-colors shadow-lg">Claim Free Trial</button></div></section>); }` });
+registerComponent({
+  id: "cta-banner",
+  name: "CTA Banner",
+  category: "cta",
+  variant: "banner",
+  description: "Premium full-width gradient banner with countdown urgency and glow effect",
+  tags: ["cta", "banner", "promo", "launch", "offer"],
+  code: `export default function CTA() {
+  return (
+    <section className="py-20 px-6 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 relative overflow-hidden">
+      <div className="absolute top-0 right-1/4 w-[400px] h-[400px] bg-white/5 rounded-full blur-[100px]" />
+      <div className="absolute bottom-0 left-1/4 w-[300px] h-[300px] bg-indigo-400/10 rounded-full blur-[80px]" />
+      <div className="max-w-4xl mx-auto text-center relative">
+        <span className="inline-flex items-center gap-2 text-sm font-bold text-purple-200 bg-white/10 backdrop-blur-sm px-5 py-2 rounded-full mb-6 border border-white/10">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Limited Time Offer
+        </span>
+        <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-5 tracking-tight">Get 3 Months Free When You Sign Up Today</h2>
+        <p className="text-lg text-purple-200 mb-8 max-w-2xl mx-auto">Join now and lock in our best price. This offer expires at the end of the month.</p>
+        <button className="group px-10 py-4 bg-white text-purple-700 font-bold rounded-2xl hover:bg-purple-50 transition-all shadow-xl shadow-black/10 hover:shadow-2xl hover:-translate-y-0.5 text-sm flex items-center gap-2 mx-auto">
+          Claim Free Trial
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="transition-transform group-hover:translate-x-1"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </section>
+  );
+}`,
+});
 
 // ── Footer: Mega ──
 registerComponent({ id: "footer-mega", name: "Footer Mega", category: "footer", variant: "mega", description: "Large footer with 5 columns and newsletter", tags: ["footer", "links", "newsletter", "social", "enterprise"], code: `export default function Footer() { return (<footer className="bg-gray-900 text-gray-400 pt-20 pb-8 px-6"><div className="max-w-7xl mx-auto"><div className="grid md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16"><div className="lg:col-span-2"><span className="text-2xl font-bold text-white">Brand</span><p className="mt-4 text-sm leading-relaxed max-w-sm">Building the future of modern software.</p><div className="mt-6 flex gap-2"><input type="email" placeholder="Newsletter" className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white" /><button className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg">Join</button></div></div><div><h4 className="font-semibold text-white mb-4">Product</h4><ul className="space-y-2 text-sm"><li><a href="#" className="hover:text-white">Features</a></li><li><a href="#" className="hover:text-white">Pricing</a></li><li><a href="#" className="hover:text-white">Integrations</a></li></ul></div><div><h4 className="font-semibold text-white mb-4">Company</h4><ul className="space-y-2 text-sm"><li><a href="#" className="hover:text-white">About</a></li><li><a href="#" className="hover:text-white">Blog</a></li><li><a href="#" className="hover:text-white">Careers</a></li></ul></div><div><h4 className="font-semibold text-white mb-4">Legal</h4><ul className="space-y-2 text-sm"><li><a href="#" className="hover:text-white">Privacy</a></li><li><a href="#" className="hover:text-white">Terms</a></li></ul></div></div><div className="border-t border-gray-800 pt-8 text-sm text-center">© {new Date().getFullYear()} Brand. All rights reserved.</div></div></footer>); }` });
