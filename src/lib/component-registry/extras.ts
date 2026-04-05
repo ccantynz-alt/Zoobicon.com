@@ -1008,7 +1008,83 @@ registerComponent({ id: "footer-mega", name: "Footer Mega", category: "footer", 
 registerComponent({ id: "footer-centered", name: "Footer Centered", category: "footer", variant: "centered", description: "Centered minimal footer", tags: ["footer", "minimal", "centered", "clean"], code: `export default function Footer() { return (<footer className="bg-white border-t border-gray-100 py-12 px-6"><div className="max-w-4xl mx-auto text-center"><span className="text-xl font-bold text-gray-900">Brand</span><div className="flex flex-wrap justify-center gap-6 mt-6 mb-8"><a href="#" className="text-sm text-gray-500 hover:text-gray-900">Features</a><a href="#" className="text-sm text-gray-500 hover:text-gray-900">Pricing</a><a href="#" className="text-sm text-gray-500 hover:text-gray-900">About</a><a href="#" className="text-sm text-gray-500 hover:text-gray-900">Blog</a></div><p className="text-sm text-gray-400">© {new Date().getFullYear()} Brand. All rights reserved.</p></div></footer>); }` });
 
 // ── About: Team ──
-registerComponent({ id: "about-team", name: "About Team", category: "about", variant: "team", description: "Team member grid with photos", tags: ["about", "team", "people", "staff", "founders"], code: `export default function About() { const team = [{name:"Sarah Chen",role:"CEO",img:"https://randomuser.me/api/portraits/women/44.jpg"},{name:"Marcus Johnson",role:"CTO",img:"https://randomuser.me/api/portraits/men/32.jpg"},{name:"Emily Park",role:"Head of Design",img:"https://randomuser.me/api/portraits/women/68.jpg"},{name:"David Kim",role:"Engineering Lead",img:"https://randomuser.me/api/portraits/men/75.jpg"}]; return (<section className="py-24 px-6 bg-white"><div className="max-w-7xl mx-auto text-center"><h2 className="text-4xl font-bold text-gray-900 mb-4">Meet Our Team</h2><p className="text-xl text-gray-600 mb-16">Passionate builders and relentless problem-solvers.</p><div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">{team.map((t,i)=>(<div key={i} className="group"><img src={t.img} alt={t.name} className="w-32 h-32 rounded-full mx-auto mb-4 object-cover ring-4 ring-gray-100 group-hover:ring-indigo-200 transition-all" /><h3 className="font-semibold text-gray-900 text-lg">{t.name}</h3><p className="text-gray-500">{t.role}</p></div>))}</div></div></section>); }` });
+registerComponent({
+  id: "about-team",
+  name: "About Team",
+  category: "about",
+  variant: "team",
+  description: "Premium team grid with role badges, social links, and hover effects",
+  tags: ["about", "team", "people", "staff", "founders"],
+  code: `export default function About() {
+  const team = [
+    { name: "Sarah Chen", role: "CEO & Co-founder", bio: "Previously VP Eng at Stripe. Stanford CS.", initials: "SC", color: "from-violet-500 to-purple-600" },
+    { name: "Marcus Johnson", role: "CTO & Co-founder", bio: "Ex-Google Staff Engineer. Built systems at scale.", initials: "MJ", color: "from-blue-500 to-indigo-600" },
+    { name: "Emily Park", role: "Head of Design", bio: "Led design at Figma. 15 years in product design.", initials: "EP", color: "from-pink-500 to-rose-600" },
+    { name: "David Kim", role: "Engineering Lead", bio: "Open source contributor. Prev. Meta and Vercel.", initials: "DK", color: "from-emerald-500 to-teal-600" },
+  ];
+  return (
+    <section id="team" className="py-32 px-6 bg-white">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-20">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50 border border-indigo-100 mb-6">
+            <span className="text-sm font-semibold text-indigo-700">Our team</span>
+          </div>
+          <h2 className="text-4xl md:text-6xl font-extrabold text-gray-900 mb-5 tracking-tight">Meet the People Behind the Product</h2>
+          <p className="text-xl text-gray-500 max-w-2xl mx-auto">Passionate builders from the world&apos;s best companies, united by a mission to make software accessible to everyone.</p>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {team.map((t, i) => (
+            <div key={i} className="group text-center">
+              <div className="relative mb-6 mx-auto w-40 h-40">
+                <div className={\`w-full h-full rounded-3xl bg-gradient-to-br \${t.color} flex items-center justify-center text-white text-3xl font-bold transition-all duration-500 group-hover:rounded-[2rem] group-hover:shadow-xl group-hover:scale-105\`}>
+                  {t.initials}
+                </div>
+              </div>
+              <h3 className="font-bold text-gray-900 text-lg mb-1">{t.name}</h3>
+              <p className="text-indigo-600 text-sm font-semibold mb-2">{t.role}</p>
+              <p className="text-gray-500 text-sm leading-relaxed">{t.bio}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}`,
+});
 
 // ── About: Mission ──
-registerComponent({ id: "about-mission", name: "About Mission", category: "about", variant: "mission", description: "Mission Vision Values cards", tags: ["about", "mission", "vision", "values", "purpose"], code: `export default function About() { const cards=[{icon:"🎯",title:"Our Mission",text:"To democratize software by making AI tools accessible to everyone."},{icon:"🔭",title:"Our Vision",text:"A world where anyone brings ideas to life in minutes, not months."},{icon:"💎",title:"Our Values",text:"Quality over quantity. Transparency over secrecy. Speed without sacrifice."}]; return (<section className="py-24 px-6 bg-gray-50"><div className="max-w-7xl mx-auto"><h2 className="text-4xl font-bold text-gray-900 text-center mb-16">What Drives Us</h2><div className="grid md:grid-cols-3 gap-8">{cards.map((c,i)=>(<div key={i} className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md transition-shadow text-center"><div className="text-4xl mb-4">{c.icon}</div><h3 className="text-xl font-semibold text-gray-900 mb-3">{c.title}</h3><p className="text-gray-600 leading-relaxed">{c.text}</p></div>))}</div></div></section>); }` });
+registerComponent({
+  id: "about-mission",
+  name: "About Mission",
+  category: "about",
+  variant: "mission",
+  description: "Premium mission/vision/values with gradient icon cards and large typography",
+  tags: ["about", "mission", "vision", "values", "purpose"],
+  code: `export default function About() {
+  const cards = [
+    { icon: "M13 10V3L4 14h7v7l9-11h-7z", title: "Our Mission", text: "To democratize software creation. We believe every business deserves world-class technology — regardless of technical expertise or budget.", color: "from-indigo-500 to-violet-600" },
+    { icon: "M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z", title: "Our Vision", text: "A world where anyone can bring ideas to life in minutes, not months. Where the gap between imagination and execution disappears entirely.", color: "from-emerald-500 to-teal-600" },
+    { icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z", title: "Our Values", text: "Quality over quantity. Transparency over secrecy. Speed without sacrifice. We earn trust by being honest about what works and what doesn&apos;t.", color: "from-amber-500 to-orange-600" },
+  ];
+  return (
+    <section className="py-32 px-6 bg-gradient-to-b from-gray-50 to-white">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-20">
+          <h2 className="text-4xl md:text-6xl font-extrabold text-gray-900 tracking-tight">What Drives Us</h2>
+        </div>
+        <div className="grid md:grid-cols-3 gap-8">
+          {cards.map((c, i) => (
+            <div key={i} className="group bg-white rounded-3xl p-10 border border-gray-200/80 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-500 hover:-translate-y-1">
+              <div className={\`w-14 h-14 rounded-2xl bg-gradient-to-br \${c.color} flex items-center justify-center mb-8 shadow-lg group-hover:scale-110 transition-transform duration-300\`}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={c.icon}/></svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">{c.title}</h3>
+              <p className="text-gray-500 leading-relaxed">{c.text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}`,
+});
