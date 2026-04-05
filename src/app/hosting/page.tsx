@@ -1239,7 +1239,7 @@ export default function HostingDashboard() {
                       </li>
                     ))}
                   </ul>
-                  <button
+                  <button onClick={() => {}}
                     className={`w-full py-2.5 rounded-lg text-sm font-medium transition-colors ${
                       plan.current
                         ? "bg-white/5 text-white/65 cursor-default"

@@ -30,6 +30,14 @@ export async function POST(request: NextRequest) {
 
     const priceId = getPriceId(planSlug, billingInterval);
 
+    // SAFETY: Don't take payment if webhook can't process it
+    if (!process.env.STRIPE_WEBHOOK_SECRET) {
+      return Response.json(
+        { error: "Payment processing is being configured. Please try again shortly." },
+        { status: 503 }
+      );
+    }
+
     if (!priceId) {
       const envVar = billingInterval === "annual"
         ? `STRIPE_PRICE_${planSlug.toUpperCase()}_ANNUAL`
