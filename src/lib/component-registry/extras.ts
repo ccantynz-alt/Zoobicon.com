@@ -1182,3 +1182,433 @@ registerComponent({
   );
 }`,
 });
+
+// ══════════════════════════════════════════════════════════════════
+// NEXT-GEN COMPONENTS — Cutting-edge 2026/2027 patterns
+// Bento grids, scroll animations, text reveals, spotlights, marquees
+// These are what separate a $100K site from a $200K+ site
+// ══════════════════════════════════════════════════════════════════
+
+// ── Features: Bento Grid ──
+registerComponent({
+  id: "features-bento-grid",
+  name: "Bento Grid Features",
+  category: "features",
+  variant: "bento-grid",
+  description: "Asymmetric bento grid layout with mixed-size feature cards, hover animations, and gradient accents. The gold standard for modern SaaS",
+  tags: ["bento", "grid", "modern", "saas", "tech", "startup", "platform", "advanced", "premium", "cutting-edge", "ai", "software"],
+  code: `export default function Features() {
+  const features = [
+    { title: "AI-Powered Analytics", desc: "Real-time insights powered by machine learning. Predict trends before they happen.", icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z", span: "col-span-2 row-span-2", accent: "from-violet-500 to-indigo-500" },
+    { title: "Lightning Fast", desc: "Sub-millisecond response times globally.", icon: "M13 10V3L4 14h7v7l9-11h-7z", span: "col-span-1", accent: "from-amber-500 to-orange-500" },
+    { title: "Enterprise Security", desc: "SOC 2 Type II certified. Zero-trust architecture.", icon: "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z", span: "col-span-1", accent: "from-emerald-500 to-teal-500" },
+    { title: "Smart Automation", desc: "Set it and forget it. Workflows that learn and adapt to your patterns.", icon: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15", span: "col-span-1 row-span-2", accent: "from-cyan-500 to-blue-500" },
+    { title: "Seamless Integrations", desc: "Connect with 200+ tools your team already uses.", icon: "M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1", span: "col-span-2", accent: "from-rose-500 to-pink-500" },
+  ];
+  return (
+    <section className="py-24 px-6 bg-gray-950" id="features">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 bg-white/5 text-gray-300 text-xs font-semibold px-4 py-1.5 rounded-full border border-white/10 mb-6">
+            <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+            Platform Features
+          </div>
+          <h2 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4">
+            Everything you need.
+            <br />
+            <span className="bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent">Nothing you don&apos;t.</span>
+          </h2>
+        </div>
+        <div className="grid grid-cols-3 auto-rows-[minmax(180px,auto)] gap-4">
+          {features.map(f => (
+            <div key={f.title} className={\`group relative \${f.span} bg-white/[0.03] rounded-2xl border border-white/[0.06] p-8 hover:bg-white/[0.06] hover:border-white/10 transition-all duration-500 overflow-hidden\`}>
+              {/* Hover gradient glow */}
+              <div className={\`absolute inset-0 bg-gradient-to-br \${f.accent} opacity-0 group-hover:opacity-[0.04] transition-opacity duration-500 rounded-2xl\`} />
+              {/* Top accent line */}
+              <div className={\`absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent \${f.accent.replace("from-", "via-").split(" ")[0]} to-transparent opacity-0 group-hover:opacity-40 transition-opacity duration-500\`} />
+              <div className="relative">
+                <div className={\`w-12 h-12 rounded-xl bg-gradient-to-br \${f.accent} bg-opacity-10 flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300\`} style={{ background: \`linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.03))\` }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d={f.icon}/></svg>
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text transition-all duration-300" style={{ WebkitBackgroundClip: "text" }}>{f.title}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed group-hover:text-gray-400 transition-colors">{f.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}`,
+});
+
+// ── Hero: Animated Text Reveal ──
+registerComponent({
+  id: "hero-text-reveal",
+  name: "Animated Text Reveal Hero",
+  category: "hero",
+  variant: "text-reveal",
+  description: "Words fade in one-by-one with blur-to-sharp transitions. The most premium hero pattern in 2026. Jaw-dropping first impression",
+  tags: ["animated", "text-reveal", "premium", "luxury", "saas", "tech", "startup", "ai", "modern", "cutting-edge", "motion", "advanced"],
+  code: `export default function Hero() {
+  const [revealed, setRevealed] = React.useState(0);
+  const words = ["Build", "something", "people", "actually", "love."];
+  const subWords = ["The", "AI-powered", "platform", "that", "turns", "your", "vision", "into", "reality."];
+
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setRevealed(prev => {
+        if (prev >= words.length + subWords.length + 3) {
+          clearInterval(timer);
+          return prev;
+        }
+        return prev + 1;
+      });
+    }, 120);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <section className="relative min-h-screen flex items-center justify-center px-6 pt-24 pb-16 overflow-hidden bg-gray-950">
+      {/* Animated gradient orbs */}
+      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-gradient-to-r from-violet-600/15 to-transparent rounded-full blur-[120px] animate-pulse" style={{ animationDuration: "4s" }} />
+      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-gradient-to-l from-cyan-600/10 to-transparent rounded-full blur-[100px] animate-pulse" style={{ animationDuration: "6s" }} />
+
+      {/* Dot grid */}
+      <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
+
+      <div className="relative text-center max-w-5xl mx-auto">
+        {/* Badge */}
+        <div className={\`inline-flex items-center gap-2 bg-white/5 text-gray-400 text-xs font-medium px-4 py-2 rounded-full border border-white/10 mb-12 transition-all duration-700 \${revealed > 0 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}\`}>
+          <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+          Now available worldwide
+        </div>
+
+        {/* Main headline — word by word reveal */}
+        <h1 className="text-6xl md:text-8xl font-extrabold leading-[1.05] tracking-tight mb-8">
+          {words.map((word, i) => (
+            <span key={i} className={\`inline-block mr-[0.3em] transition-all duration-700 \${revealed > i + 1 ? "opacity-100 translate-y-0 blur-0" : "opacity-0 translate-y-6 blur-sm"}\`}>
+              {i === words.length - 1 ? (
+                <span className="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">{word}</span>
+              ) : (
+                <span className="text-white">{word}</span>
+              )}
+            </span>
+          ))}
+        </h1>
+
+        {/* Sub-headline — word by word */}
+        <p className="text-xl md:text-2xl font-light leading-relaxed mb-12 max-w-2xl mx-auto">
+          {subWords.map((word, i) => (
+            <span key={i} className={\`inline-block mr-[0.25em] transition-all duration-500 \${revealed > i + words.length + 1 ? "opacity-100 translate-y-0 text-gray-400" : "opacity-0 translate-y-3 text-gray-600"}\`}>
+              {word}
+            </span>
+          ))}
+        </p>
+
+        {/* CTAs */}
+        <div className={\`flex flex-wrap justify-center gap-4 mb-16 transition-all duration-700 delay-300 \${revealed > words.length + subWords.length ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}\`}>
+          <button className="group relative px-8 py-4 bg-white text-gray-900 font-bold rounded-xl hover:shadow-2xl hover:shadow-white/10 hover:-translate-y-0.5 transition-all text-sm overflow-hidden">
+            <span className="relative z-10 flex items-center gap-2">
+              Get Started Free
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="group-hover:translate-x-1 transition-transform"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </span>
+          </button>
+          <button className="px-8 py-4 bg-white/5 text-gray-300 font-semibold rounded-xl border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all text-sm backdrop-blur-sm">
+            Watch Demo
+          </button>
+        </div>
+
+        {/* Social proof */}
+        <div className={\`flex items-center justify-center gap-6 transition-all duration-700 delay-500 \${revealed > words.length + subWords.length + 1 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}\`}>
+          <div className="flex -space-x-2">
+            {[11, 26, 44, 52, 68].map(n => (
+              <img key={n} src={\`https://randomuser.me/api/portraits/\${n % 2 === 0 ? "women" : "men"}/\${n}.jpg\`} alt="" className="w-8 h-8 rounded-full border-2 border-gray-950 object-cover" />
+            ))}
+          </div>
+          <div className="text-left">
+            <div className="flex items-center gap-1">
+              {[1,2,3,4,5].map(i => (
+                <svg key={i} width="14" height="14" viewBox="0 0 24 24" fill="#FBBF24" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              ))}
+            </div>
+            <span className="text-xs text-gray-500">Loved by <strong className="text-gray-300">25,000+</strong> teams</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}`,
+});
+
+// ── Misc: Logo Marquee / Ticker ──
+registerComponent({
+  id: "logos-marquee",
+  name: "Logo Marquee Ticker",
+  category: "misc",
+  variant: "marquee",
+  description: "Infinite scrolling logo ticker with smooth CSS animation. Grayscale logos that colorize on hover. Used by every premium SaaS site",
+  tags: ["logos", "marquee", "ticker", "clients", "partners", "trust", "social-proof", "saas", "tech", "startup", "modern"],
+  code: `export default function LogoMarquee() {
+  const logos = ["Stripe", "Notion", "Linear", "Vercel", "Figma", "Slack", "GitHub", "Shopify", "Twilio", "Datadog"];
+  return (
+    <section className="py-16 bg-white border-y border-gray-100 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 mb-8">
+        <p className="text-center text-xs uppercase tracking-[0.3em] text-gray-400 font-medium">Trusted by industry leaders</p>
+      </div>
+      <div className="relative">
+        {/* Fade edges */}
+        <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-white to-transparent z-10" />
+        <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-white to-transparent z-10" />
+        {/* Scrolling track */}
+        <div className="flex animate-marquee" style={{ animationDuration: "30s", animationTimingFunction: "linear", animationIterationCount: "infinite" }}>
+          {[...logos, ...logos].map((name, i) => (
+            <div key={i} className="flex-shrink-0 mx-10 flex items-center justify-center group cursor-default">
+              <div className="flex items-center gap-2 opacity-30 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-500">
+                <div className="w-8 h-8 rounded-lg bg-gray-100 group-hover:bg-gray-200 flex items-center justify-center transition-colors">
+                  <span className="text-sm font-bold text-gray-400 group-hover:text-gray-700 transition-colors">{name.charAt(0)}</span>
+                </div>
+                <span className="text-base font-semibold text-gray-400 group-hover:text-gray-800 transition-colors whitespace-nowrap">{name}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <style>{\`
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+          animation: marquee 30s linear infinite;
+        }
+        .animate-marquee:hover {
+          animation-play-state: paused;
+        }
+      \`}</style>
+    </section>
+  );
+}`,
+});
+
+// ── Features: Spotlight Cards ──
+registerComponent({
+  id: "features-spotlight-cards",
+  name: "Spotlight Card Features",
+  category: "features",
+  variant: "spotlight-cards",
+  description: "Cards with cursor-tracking gradient spotlight effect on hover. Premium interactive feel that competitors can't match",
+  tags: ["spotlight", "interactive", "cards", "premium", "saas", "tech", "ai", "modern", "cutting-edge", "advanced", "hover", "glow"],
+  code: `export default function Features() {
+  const cardRef = React.useRef([]);
+  const [mousePos, setMousePos] = React.useState({ x: 0, y: 0, active: -1 });
+
+  const handleMouseMove = (e, index) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top, active: index });
+  };
+
+  const features = [
+    { title: "Intelligent Routing", desc: "AI analyzes every request and routes it to the optimal server in under 10ms. Zero config, zero latency.", icon: "M13 10V3L4 14h7v7l9-11h-7z", color: "violet" },
+    { title: "Adaptive Scaling", desc: "From 10 to 10 million requests. Infrastructure that scales itself based on real-time demand patterns.", icon: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15", color: "cyan" },
+    { title: "Predictive Caching", desc: "ML models predict what users need next and pre-cache it. 94% cache hit rate out of the box.", icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z", color: "emerald" },
+    { title: "Zero-Trust Security", desc: "Every request verified. Every connection encrypted. Every access logged. Enterprise-grade by default.", icon: "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z", color: "amber" },
+    { title: "Real-Time Sync", desc: "Changes propagate globally in under 50ms. Conflict resolution that actually works.", icon: "M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4", color: "rose" },
+    { title: "Deep Observability", desc: "Traces, metrics, and logs unified in one view. Find the needle in the haystack in seconds.", icon: "M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z", color: "fuchsia" },
+  ];
+
+  const colorMap = { violet: "139,92,246", cyan: "6,182,212", emerald: "16,185,129", amber: "245,158,11", rose: "244,63,94", fuchsia: "217,70,239" };
+
+  return (
+    <section className="py-24 px-6 bg-gray-950" id="features">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4">
+            Built for the
+            <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent"> future</span>
+          </h2>
+          <p className="text-lg text-gray-500 max-w-2xl mx-auto">Every feature designed to give you an unfair advantage.</p>
+        </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {features.map((f, i) => (
+            <div
+              key={f.title}
+              onMouseMove={(e) => handleMouseMove(e, i)}
+              onMouseLeave={() => setMousePos(p => ({ ...p, active: -1 }))}
+              className="group relative bg-white/[0.02] rounded-2xl border border-white/[0.06] p-8 hover:border-white/10 transition-all duration-300 overflow-hidden cursor-default"
+            >
+              {/* Spotlight gradient - follows cursor */}
+              {mousePos.active === i && (
+                <div
+                  className="absolute pointer-events-none w-[300px] h-[300px] rounded-full opacity-20 transition-opacity"
+                  style={{
+                    background: \`radial-gradient(circle, rgba(\${colorMap[f.color]},0.15) 0%, transparent 70%)\`,
+                    left: mousePos.x - 150,
+                    top: mousePos.y - 150,
+                  }}
+                />
+              )}
+              <div className="relative">
+                <div className={\`w-10 h-10 rounded-lg bg-\${f.color}-500/10 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300\`}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={\`rgb(\${colorMap[f.color]})\`} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d={f.icon}/></svg>
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2">{f.title}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed">{f.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}`,
+});
+
+// ── Stats: Scroll-Animated Counter ──
+registerComponent({
+  id: "stats-animated-counter",
+  name: "Scroll-Animated Stats Counter",
+  category: "stats",
+  variant: "animated-counter",
+  description: "Stats that count up with spring animation when they scroll into view. Numbers roll to their final value. Premium interactive feel",
+  tags: ["stats", "counter", "animated", "scroll", "numbers", "traction", "social-proof", "saas", "tech", "startup", "modern", "premium"],
+  code: `export default function Stats() {
+  const [visible, setVisible] = React.useState(false);
+  const [counts, setCounts] = React.useState([0, 0, 0, 0]);
+  const ref = React.useRef(null);
+
+  const stats = [
+    { target: 50000, label: "Active Users", suffix: "+", prefix: "", color: "from-violet-400 to-indigo-400" },
+    { target: 99.9, label: "Uptime SLA", suffix: "%", prefix: "", color: "from-emerald-400 to-teal-400", decimals: 1 },
+    { target: 2.4, label: "Revenue Processed", suffix: "B", prefix: "$", color: "from-amber-400 to-orange-400", decimals: 1 },
+    { target: 150, label: "Countries Served", suffix: "+", prefix: "", color: "from-cyan-400 to-blue-400" },
+  ];
+
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !visible) {
+          setVisible(true);
+        }
+      },
+      { threshold: 0.3 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [visible]);
+
+  React.useEffect(() => {
+    if (!visible) return;
+    const duration = 2000;
+    const start = performance.now();
+    const animate = (now) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease-out cubic for spring-like feel
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCounts(stats.map(s => {
+        const val = s.target * eased;
+        return s.decimals ? parseFloat(val.toFixed(s.decimals)) : Math.floor(val);
+      }));
+      if (progress < 1) requestAnimationFrame(animate);
+    };
+    requestAnimationFrame(animate);
+  }, [visible]);
+
+  return (
+    <section ref={ref} className="relative py-24 px-6 bg-gray-950 overflow-hidden">
+      {/* Background glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.06),transparent_60%)]" />
+
+      <div className="relative max-w-6xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight mb-4">
+            Numbers that
+            <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent"> speak</span>
+          </h2>
+          <p className="text-gray-500">Trusted by the world&apos;s most ambitious companies</p>
+        </div>
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          {stats.map((s, i) => (
+            <div key={s.label} className="group relative bg-white/[0.02] rounded-2xl border border-white/[0.06] p-8 text-center hover:bg-white/[0.05] hover:border-white/10 transition-all duration-500">
+              {/* Top accent */}
+              <div className={\`absolute top-0 left-6 right-6 h-px bg-gradient-to-r \${s.color} opacity-0 group-hover:opacity-30 transition-opacity duration-500\`} />
+              <div className={\`text-4xl md:text-5xl font-extrabold bg-gradient-to-r \${s.color} bg-clip-text text-transparent mb-2 tabular-nums tracking-tight\`}>
+                {s.prefix}{visible ? counts[i] : 0}{s.suffix}
+              </div>
+              <div className="text-sm text-gray-500 font-medium">{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}`,
+});
+
+// ── CTA: Gradient Border Card ──
+registerComponent({
+  id: "cta-gradient-border",
+  name: "Gradient Border CTA",
+  category: "cta",
+  variant: "gradient-border",
+  description: "CTA card with animated rotating gradient border. Eye-catching shimmer effect that draws attention. Premium conversion driver",
+  tags: ["cta", "gradient", "border", "animated", "premium", "saas", "tech", "startup", "modern", "conversion", "advanced", "cutting-edge"],
+  code: `export default function CTA() {
+  return (
+    <section className="py-24 px-6 bg-gray-950">
+      <div className="max-w-4xl mx-auto">
+        <div className="relative rounded-2xl p-px overflow-hidden">
+          {/* Animated gradient border */}
+          <div className="absolute inset-0 rounded-2xl" style={{
+            background: "conic-gradient(from var(--angle, 0deg), #7c3aed, #06b6d4, #10b981, #f59e0b, #ef4444, #7c3aed)",
+            animation: "rotate-gradient 4s linear infinite",
+          }} />
+
+          {/* Inner card */}
+          <div className="relative bg-gray-950 rounded-[15px] p-12 md:p-16 text-center">
+            {/* Background glow */}
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(124,58,237,0.08),transparent_60%)] rounded-[15px]" />
+
+            <div className="relative">
+              <div className="inline-flex items-center gap-2 bg-violet-500/10 text-violet-400 text-xs font-semibold px-4 py-1.5 rounded-full border border-violet-500/20 mb-8">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                Limited Time &mdash; 3 months free
+              </div>
+              <h2 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-6 leading-tight">
+                Ready to build the
+                <br />
+                <span className="bg-gradient-to-r from-violet-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">future?</span>
+              </h2>
+              <p className="text-lg text-gray-400 mb-10 max-w-xl mx-auto leading-relaxed">
+                Join 25,000+ teams who ship faster, scale effortlessly, and sleep better at night. No credit card required.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button className="group px-10 py-4 bg-white text-gray-900 font-bold rounded-xl hover:shadow-2xl hover:shadow-white/10 hover:-translate-y-0.5 transition-all text-sm flex items-center justify-center gap-2">
+                  Start Building Free
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="group-hover:translate-x-1 transition-transform"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </button>
+                <button className="px-10 py-4 bg-white/5 text-gray-300 font-semibold rounded-xl border border-white/10 hover:bg-white/10 transition-all text-sm">
+                  Talk to Sales
+                </button>
+              </div>
+              <p className="text-xs text-gray-600 mt-6">No credit card &middot; 14-day free trial &middot; Cancel anytime</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <style>{\`
+        @property --angle {
+          syntax: "<angle>";
+          initial-value: 0deg;
+          inherits: false;
+        }
+        @keyframes rotate-gradient {
+          to { --angle: 360deg; }
+        }
+      \`}</style>
+    </section>
+  );
+}`,
+});
