@@ -31,7 +31,7 @@
 |---------|--------|-----------|------------|----------------|
 | **AI Website Builder** | WORKING | `src/app/builder/page.tsx`, `src/lib/agents.ts`, `src/app/api/generate/react-stream/route.ts` | React generation via Sandpack, streaming SSE, 100-component registry, **diff editing fully wired** (PromptInput + ChatPanel → /api/generate/edit → merge changed files → Sandpack updates) | Streaming could be smoother, pre-warm Sandpack for faster first preview |
 | **Domain Search** | WORKING | `src/app/domains/page.tsx`, `src/app/api/domains/search/route.ts`, `src/lib/opensrs.ts` | Real OpenSRS registry checks, AI name generator, TLD pages | Checkout needs Stripe products |
-| **Video Creator** | PARTIAL | `src/app/video-creator/page.tsx`, `src/lib/video-pipeline.ts`, `src/lib/video-render.ts` | Chat-based 3-step flow, script generation | Pipeline UNTESTED on Replicate, needs REPLICATE_API_TOKEN |
+| **Video Creator** | PARTIAL | `src/app/video-creator/page.tsx`, `src/lib/video-pipeline.ts`, `src/lib/video-render.ts` | Chat-based 3-step flow, script generation | Pipeline UNTESTED on Replicate, needs end-to-end test |
 | **Pricing** | WORKING | `src/app/pricing/page.tsx`, `src/lib/stripe.ts` | Page renders with tiers | Needs Craig to create Stripe products + price IDs |
 | **Auth** | WORKING | `src/app/auth/*/page.tsx`, `src/app/api/auth/*/route.ts` | Login, signup, OAuth (Google/GitHub), email verify, password reset | Needs DATABASE_URL for persistence |
 | **12 Free Tools** | WORKING | `src/app/tools/*/page.tsx` | All client-side, no API needed | Fully functional |
@@ -66,7 +66,7 @@ User Prompt → Haiku classifies intent (<1s) → Select from 100-component regi
 | STRIPE_SECRET_KEY | Payments | CHECK |
 | STRIPE_WEBHOOK_SECRET | Stripe webhooks | NOT SET |
 | OPENSRS_API_KEY | Domain registration | CHECK |
-| REPLICATE_API_TOKEN | Video pipeline | NOT SET |
+| REPLICATE_API_TOKEN | Video pipeline | ✅ SET |
 | SUPABASE_ACCESS_TOKEN | Auto-provisioning | NOT SET |
 | CELITECH_API_KEY | eSIM product | NOT SET |
 | DEEPGRAM_API_KEY | AI Dictation | NOT SET |
@@ -80,7 +80,7 @@ User Prompt → Haiku classifies intent (<1s) → Select from 100-component regi
 5. **GitHub sync** — export exists, continuous sync NOT STARTED. All 4 competitors have this — table stakes.
 6. **Stripe checkout flow** — pricing page exists, needs real Stripe product IDs + webhook handler
 7. **MCP integration** — foundation at `/api/mcp/route.ts`, needs real tool connections. Emergent has this.
-8. **Video pipeline testing** — code exists, needs REPLICATE_API_TOKEN to test
+8. **Video pipeline testing** — code exists, REPLICATE_API_TOKEN is set, needs end-to-end test
 9. **Deploy polish** — one-click deploy works but needs UX improvements
 
 ### CRITICAL PATHS (file → file dependencies)
@@ -547,7 +547,7 @@ Plain English always. Never "I refactored the middleware." Say "I fixed the perm
 
 | # | Issue | Severity | Found | Proposed Fix | Est. Effort |
 |---|-------|----------|-------|-------------|-------------|
-| 1 | REPLICATE_API_TOKEN may not be set | HIGH | 2026-04-05 | Craig must set in Vercel env vars | Craig task |
+| ~~1~~ | ~~REPLICATE_API_TOKEN~~ | ~~FIXED~~ | 2026-04-05 | ✅ SET in Vercel | Done |
 | 2 | Database tables may not exist | HIGH | 2026-04-05 | Craig must visit /api/db/init after deploy | Craig task |
 | 3 | Text corruption across codebase | LOW | 2026-04-05 | ~60 files have "MessageCircle" instead of "Twitter", "ThumbsUp" instead of "Facebook" from bad find/replace | Batch fix |
 
@@ -872,18 +872,18 @@ Each reseller at $499/mo typically brings 20-50 of their own clients. 10 reselle
 - These patterns are what Lovable/Bolt/v0 output looks like — now we match AND beat them
 
 **CRITICAL — NEXT ACTIONS (in order):**
-1. **CRAIG: Set REPLICATE_API_TOKEN in Vercel** — video pipeline is ready, needs this key
+1. ~~**CRAIG: Set REPLICATE_API_TOKEN in Vercel**~~ ✅ DONE — token is set
 2. **CRAIG: Visit zoobicon.com/api/db/init** — creates database tables for domain purchases
 3. **CRAIG: Set up Stripe webhook** — point to zoobicon.com/api/stripe/webhook in Stripe dashboard
 4. **Developer Platform (Monaco editor + terminal + Git + deploy)** — "hook in mouth" retention. Craig's #1 priority. Developers build on-platform, never leave.
 5. **Pre-warm Sandpack for instant preview** — target <3s first preview (currently ~20-30s). Match Bolt's speed.
 6. **Deepen Supabase auto-provisioning** — match Lovable's auto-tables, auto-RLS, auto-auth
 7. **GitHub sync** — ALL competitors have it. Table stakes. Export exists, continuous sync NOT STARTED.
-8. **Video end-to-end test** — after REPLICATE_API_TOKEN set, generate one real video
+8. **Video end-to-end test** — REPLICATE_API_TOKEN is set, generate one real video
 9. **MCP integration** — Emergent has it. Foundation exists at `/api/mcp/route.ts`
 10. **Next.js 14→15 upgrade** (dedicated sprint)
 
-**Blockers:** REPLICATE_API_TOKEN and database tables. Both are Craig tasks.
+**Blockers:** Database tables (Craig must visit /api/db/init) and Stripe webhook setup.
 
 **MANDATE: Lovable is at $400M ARR with 146 employees. They added $100M in a single month. The market is MASSIVE. But they have ONE product. We have 75+. Their moat is polish on one feature. Our moat is the ecosystem. A customer who uses Zoobicon for domains + hosting + email + builder + video is never leaving.**
 
