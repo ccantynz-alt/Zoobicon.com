@@ -752,8 +752,7 @@ function BuilderPage() {
     return html;
   }, []);
 
-  // streamGenerate removed — all generation now uses /api/generate/react SSE stream
-  // via handleGenerate (new builds) and handleEdit (edits)
+  // Legacy HTML stream generation removed — React/Sandpack is the only mode now
   const _legacyStreamRemoved = useCallback(
     async () => {
       setStatus("generating");
