@@ -23,7 +23,7 @@ registerComponent({
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/></svg>
               </div>
-              <span className="text-lg font-bold text-white">Acme</span>
+              <span className="text-lg font-bold text-white">Catalyst</span>
             </div>
             <p className="text-sm leading-relaxed mb-6 max-w-sm">
               Building the tools that modern teams need to ship faster, scale smarter, and stay ahead of the competition.
@@ -59,7 +59,7 @@ registerComponent({
           ))}
         </div>
         <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs">&copy; {new Date().getFullYear()} Acme Inc. All rights reserved.</p>
+          <p className="text-xs">&copy; {new Date().getFullYear()} Catalyst Inc. All rights reserved.</p>
           <div className="flex gap-6 text-xs">
             <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
