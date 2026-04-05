@@ -172,17 +172,17 @@ export async function POST(request: NextRequest) {
             // Step 5: Save domain to database
             try {
               await sql`
-                INSERT INTO registered_domains (domain, user_email, status, expires_at, auto_renew, privacy_protection, cloudflare_zone_id, nameservers)
-                VALUES (${domain}, ${registrantEmail}, ${hasOpenSRSConfig() ? 'active' : 'pending_registration'}, ${expiresAt.toISOString()}, true, true, ${cloudflareZoneId || null}, ${cloudflareNameservers.length > 0 ? JSON.stringify(cloudflareNameservers) : null})
+                INSERT INTO registered_domains (domain, user_email, status, expires_at, auto_renew, privacy_protection, nameservers)
+                VALUES (${domain}, ${registrantEmail}, ${hasOpenSRSConfig() ? 'active' : 'pending_registration'}, ${expiresAt.toISOString()}, true, true, ${cloudflareNameservers.length > 0 ? JSON.stringify(cloudflareNameservers) : '["ns1.zoobicon.io","ns2.zoobicon.io"]'})
                 ON CONFLICT (domain) DO UPDATE SET
                   status = ${hasOpenSRSConfig() ? 'active' : 'pending_registration'},
                   expires_at = ${expiresAt.toISOString()},
                   user_email = ${registrantEmail},
-                  cloudflare_zone_id = ${cloudflareZoneId || null},
-                  nameservers = ${cloudflareNameservers.length > 0 ? JSON.stringify(cloudflareNameservers) : null}
+                  nameservers = ${cloudflareNameservers.length > 0 ? JSON.stringify(cloudflareNameservers) : '["ns1.zoobicon.io","ns2.zoobicon.io"]'}
               `;
+              console.log(`[webhook] Domain ${domain} saved to database successfully`);
             } catch (err) {
-              console.error(`[webhook] Failed to save domain ${domain} to DB:`, err);
+              console.error(`[webhook] CRITICAL: Failed to save domain ${domain} to DB:`, err);
             }
           }
 
