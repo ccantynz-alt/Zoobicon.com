@@ -265,8 +265,14 @@ export default function DomainsPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          domains: cart.map(c => ({ domain: c.domain, tld: c.tld, years: 1 })),
+          domains: cart.map(c => {
+            const parts = c.domain.split(".");
+            const tld = parts.pop() || c.tld;
+            const name = parts.join(".");
+            return { name, tld };
+          }),
           registrant: { email },
+          years: 1,
         }),
       });
       const data = await res.json();
@@ -661,11 +667,11 @@ export default function DomainsPage() {
                   ))}
                 </div>
                 <button
-                  onClick={handleCheckout}
-                  disabled={checkingOut}
+                  onClick={handleRegister}
+                  disabled={registering}
                   className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-lg transition-colors shadow-lg shadow-indigo-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {checkingOut ? <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</> : "Proceed to Registration"}
+                  {registering ? <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</> : "Proceed to Registration"}
                 </button>
                 {checkoutError && <p className="text-center text-sm text-red-400 mt-2">{checkoutError}</p>}
                 <p className="text-center text-xs text-slate-500 mt-3">Includes free WHOIS privacy, SSL, and DNS management</p>
@@ -851,11 +857,11 @@ export default function DomainsPage() {
                   ))}
                 </div>
                 <button
-                  onClick={handleCheckout}
-                  disabled={checkingOut}
+                  onClick={handleRegister}
+                  disabled={registering}
                   className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-lg transition-colors shadow-lg shadow-indigo-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {checkingOut ? <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</> : "Proceed to Registration"}
+                  {registering ? <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</> : "Proceed to Registration"}
                 </button>
                 {checkoutError && <p className="text-center text-sm text-red-400 mt-2">{checkoutError}</p>}
               </div>
@@ -1034,11 +1040,11 @@ export default function DomainsPage() {
                 ${cartTotal.toFixed(2)}<span className="text-xs font-normal text-slate-400">/yr</span>
               </span>
               <button
-                onClick={handleCheckout}
-                disabled={checkingOut}
+                onClick={handleRegister}
+                disabled={registering}
                 className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-base transition-colors shadow-lg shadow-indigo-500/25 disabled:opacity-50 flex items-center gap-2"
               >
-                {checkingOut ? (
+                {registering ? (
                   <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
                 ) : (
                   <><Lock className="w-4 h-4" /> Register Now</>
