@@ -119,20 +119,27 @@ export async function POST(req: NextRequest) {
         });
 
         // ── Phase 3: Stream each component progressively ──
-        // Build AI client once (reused for all customization calls)
+        // Build AI client — REQUIRED for customization
         const apiKey = process.env.ANTHROPIC_API_KEY;
-        const client = apiKey
-          ? new Anthropic({ apiKey, timeout: 30000 })
-          : null;
+        if (!apiKey) {
+          send({
+            type: "error",
+            message: "AI service is not configured. Please contact support or check that ANTHROPIC_API_KEY is set.",
+          });
+          send({ type: "done", files, dependencies: {} });
+          controller.close();
+          return;
+        }
+        const client = new Anthropic({ apiKey, timeout: 30000 });
 
         // Track which components have been added so far (for incremental App.tsx)
         const addedComponents: typeof components = [];
 
         // Start brand colors determination in parallel with component streaming
-        // This runs alongside the loop and resolves by the time we need it
-        const colorsPromise = client
-          ? determineBrandColors(client, promptTrimmed).catch(() => null)
-          : Promise.resolve(null);
+        const colorsPromise = determineBrandColors(client, promptTrimmed).catch((err) => {
+          console.warn("[react-stream] Brand color detection failed, using defaults:", err);
+          return null;
+        });
 
         for (let i = 0; i < components.length; i++) {
           const comp = components[i];
@@ -168,44 +175,51 @@ export async function POST(req: NextRequest) {
           });
 
           // ── AI Customization for this specific component ──
-          if (client) {
-            try {
-              const customized = await customizeComponent(
-                client,
-                comp,
-                promptTrimmed,
-                i === 0 // first component gets extra brand context
-              );
-              if (customized) {
-                files[fileName] = `import React from "react";\n\n${customized}\n`;
-                files["App.tsx"] = registry.buildAppFile(addedComponents);
+          try {
+            const customized = await customizeComponent(
+              client,
+              comp,
+              promptTrimmed,
+              i === 0 // first component gets extra brand context
+            );
+            if (customized) {
+              files[fileName] = `import React from "react";\n\n${customized}\n`;
+              files["App.tsx"] = registry.buildAppFile(addedComponents);
 
-                send({
-                  type: "partial",
-                  files: { ...files },
-                  fileCount: stepNumber,
-                  totalComponents,
-                  latestFile: fileName,
-                  section: comp.category,
-                  customized: true,
-                });
-              }
-            } catch (err) {
-              // Component customization failed — raw scaffold still works, continue
-              const msg = err instanceof Error ? err.message : "Unknown error";
-              console.error(
-                `[react-stream] Customization failed for ${comp.category}: ${msg}`
-              );
+              send({
+                type: "partial",
+                files: { ...files },
+                fileCount: stepNumber,
+                totalComponents,
+                latestFile: fileName,
+                section: comp.category,
+                customized: true,
+              });
+            } else {
               send({
                 type: "status",
-                message: `${label} loaded (customization skipped)`,
+                message: `${label} loaded with default content`,
                 phase: "building",
                 current: stepNumber,
                 total: totalComponents,
                 section: comp.category,
               });
-              // Continue to next component — do not abort the whole build
             }
+          } catch (err) {
+            // Component customization failed — raw scaffold still works, continue
+            const msg = err instanceof Error ? err.message : "Unknown error";
+            console.error(
+              `[react-stream] Customization failed for ${comp.category}: ${msg}`
+            );
+            send({
+              type: "status",
+              message: `${label} loaded (AI customization unavailable — using template)`,
+              phase: "building",
+              current: stepNumber,
+              total: totalComponents,
+              section: comp.category,
+            });
+            // Continue to next component — do not abort the whole build
           }
         }
 

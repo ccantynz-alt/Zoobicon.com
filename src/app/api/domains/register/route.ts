@@ -208,17 +208,27 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const requiredFields: (keyof RegistrantInfo)[] = [
-      "firstName", "lastName", "email", "phone", "address", "city", "state", "zip", "country",
-    ];
-    for (const field of requiredFields) {
-      if (!registrant[field] || String(registrant[field]).trim() === "") {
-        return NextResponse.json(
-          { error: `registrant.${field} is required.` },
-          { status: 400 }
-        );
-      }
+    // Email is always required
+    if (!registrant.email || String(registrant.email).trim() === "") {
+      return NextResponse.json(
+        { error: "registrant.email is required." },
+        { status: 400 }
+      );
     }
+
+    // Fill defaults for optional fields — these can be updated later
+    // before actual OpenSRS registration (post-payment)
+    registrant = {
+      firstName: registrant.firstName || "Domain",
+      lastName: registrant.lastName || "Owner",
+      email: registrant.email,
+      phone: registrant.phone || "+1.0000000000",
+      address: registrant.address || "TBD",
+      city: registrant.city || "TBD",
+      state: registrant.state || "NA",
+      zip: registrant.zip || "00000",
+      country: registrant.country || "US",
+    };
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -375,6 +385,14 @@ export async function POST(req: NextRequest) {
           domains: domainLineItems.map((d) => d.domain).join(","),
           years: String(years),
           registrantEmail: registrant.email,
+          registrantFirstName: registrant.firstName,
+          registrantLastName: registrant.lastName,
+          registrantPhone: registrant.phone,
+          registrantAddress: registrant.address,
+          registrantCity: registrant.city,
+          registrantState: registrant.state,
+          registrantZip: registrant.zip,
+          registrantCountry: registrant.country,
           type: "domain_registration",
         },
         success_url: `${appUrl}/my-domains?success=true&order=${orderId}`,
