@@ -703,6 +703,8 @@ export async function startRender(request: RenderRequest): Promise<RenderResult>
           jobId = result.taskId;
           break;
         }
+        default:
+          throw new Error(`[video-render] Unsupported provider: ${provider}`);
       }
 
       jobs.push({
@@ -776,6 +778,8 @@ export async function checkRenderStatus(jobs: RenderJob[]): Promise<RenderJob[]>
         case "kling":
           result = await checkKlingJob(job.id);
           break;
+        default:
+          throw new Error(`[video-render] Unsupported provider for status check: ${job.provider}`);
       }
 
       result.sceneNumber = job.sceneNumber;
