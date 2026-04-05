@@ -12,7 +12,7 @@
 ---
 
 # LIVE REPO STATUS — READ THIS FIRST
-## Last updated: 2026-04-04 | Build: PASSING | Branch: main
+## Last updated: 2026-04-05 | Build: PASSING (463 pages) | Branch: main
 
 ### QUICK FACTS
 - **141 pages** | **223 API routes** | **74 layouts** | **130 lib files**
@@ -458,6 +458,12 @@ npm run lint     # ESLint
 24. **Models stay warm** — Cron job pings Replicate models every 5 minutes. No cold starts. First request hits a warm model. Cost ~$0.50/day is worth saving 60 seconds per customer request.
 25. **No timelines, no phases** — Don't say "this week" or "next month." Build everything NOW. The competition doesn't take breaks and neither do we. Foot on the accelerator at all times.
 26. **NEVER ASK — JUST BUILD** — Craig runs multiple projects and cannot monitor everything. Claude MUST NOT ask "want me to build this?" or "should I proceed?" — just build it. If the code needs it, build it. If a feature is missing, build it. If something is broken, fix it. If Cloudflare needs wiring up, wire it up. Never touch the brake. The only time to pause is if an action is destructive and irreversible (deleting production data, force-pushing to main). Everything else: accelerator, full throttle, always.
+27. **NO PATCHING — FIX ROOT CAUSES** — The #1 recurring failure pattern: symptoms get patched, root cause stays. Every fix must trace the FULL code path. If a variable is undefined, don't just add it — find out WHY it was removed or never added. If a build fails, find ALL errors in one pass, not one at a time. Run `npm run build` BEFORE pushing. No exceptions.
+28. **CONTINUOUS GREEN BUILD — NEVER BREAK PRODUCTION** — Every push to main MUST pass build. CI runs: quality gate → icon check → lint → unit tests → build. If CI fails, the push is rejected. Automated icon validation script (`scripts/check-icons.js`) catches the #1 recurring build error. Run `node scripts/check-icons.js && npm run build` before every push.
+29. **ALL FIXES GO TO MAIN — NO ORPHAN BRANCHES** — Fixes that sit on feature branches while Vercel deploys from main = fixes that never reach production. Every fix goes to main directly. Feature branches are for NEW features only, not bug fixes. Merge fast, push fast, deploy fast.
+30. **NEVER SHOW BLANK SCREENS** — Every UI state must have a visible message. "No React components to preview" without explanation = broken product. Builder shows exact error: "API key missing", "Auth failed", "Rate limited". Video creator shows exact error: "TTS model unavailable", "No Replicate token". Users must ALWAYS know what's wrong and what to do.
+31. **VERIFY BEFORE PUSH — BUILD MUST PASS LOCALLY** — Run `npm run build` locally before every git push. Check the output for prerender errors. These are NOT caught by `ignoreBuildErrors: true` — they cause page-level failures. Missing imports, undefined variables, and broken refs ALL show up as prerender errors.
+32. **REPLICATE MODELS ARE VOLATILE** — Models get removed without notice. ALWAYS use a fallback chain (4+ models). NEVER depend on a single model. Check model availability quarterly. When a model returns 404, the pipeline must gracefully try the next one and log a warning. Current TTS chain: Kokoro → Fish Speech → Orpheus → XTTS v2.
 
 ---
 
@@ -526,12 +532,24 @@ Plain English always. Never "I refactored the middleware." Say "I fixed the perm
 
 | # | Issue | Severity | Found | Proposed Fix | Est. Effort |
 |---|-------|----------|-------|-------------|-------------|
-| — | No open issues | — | — | — | — |
+| 1 | REPLICATE_API_TOKEN may not be set | HIGH | 2026-04-05 | Craig must set in Vercel env vars | Craig task |
+| 2 | Database tables may not exist | HIGH | 2026-04-05 | Craig must visit /api/db/init after deploy | Craig task |
+| 3 | Text corruption across codebase | LOW | 2026-04-05 | ~60 files have "MessageCircle" instead of "Twitter", "ThumbsUp" instead of "Facebook" from bad find/replace | Batch fix |
 
 ## RECENTLY FIXED
 
 | # | Issue | Fixed | What Was Done |
 |---|-------|-------|---------------|
+| 10 | Build failing — 5 undeclared state vars in domains page | 2026-04-05 | Added generatedNames, genDescription, pendingGenerate, autoExpandedTlds, autoGenerating |
+| 11 | Build failing — 9 missing lucide icons in video-creator | 2026-04-05 | Added BookOpen, Briefcase, GraduationCap, etc. to imports |
+| 12 | Build failing — missing `replicate` npm package | 2026-04-05 | Replaced SDK with direct Replicate API fetch |
+| 13 | Video TTS pipeline dead — Tortoise TTS 404 | 2026-04-05 | New 4-model fallback chain: Kokoro → Fish Speech → Orpheus → XTTS v2 |
+| 14 | Builder silent blank screen on failure | 2026-04-05 | Added receivedFiles/receivedDone tracking with clear error messages |
+| 15 | Publisher page text corruption | 2026-04-05 | Fixed "Camera"→"Instagram", platform names restored |
+| 16 | Domain purchase flow broken | 2026-04-05 | Added verify-purchase endpoint, admin domains page, purchase verification banners |
+| 17 | Dictation CTAs sending logged-in users to signup | 2026-04-05 | Auth-aware CTA buttons check localStorage |
+| 18 | Automated icon validation | 2026-04-05 | scripts/check-icons.js catches missing/invalid lucide imports at CI time |
+| 19 | CI pipeline missing unit tests | 2026-04-05 | Added npm test + icon check to ci.yml |
 | 1 | 18 dead components never imported | 2026-03-28 | Removed all 18 unused component files |
 | 2 | 4 dead lib files never imported | 2026-03-28 | Removed auto-pilot, error-sanitizer, react-generator, social-publisher |
 | 3 | Email format validation missing on auth signup | 2026-03-28 | Added regex validation with onBlur + submit check |
@@ -731,9 +749,21 @@ Each reseller at $499/mo typically brings 20-50 of their own clients. 10 reselle
 
 ## CURRENT STATUS — UPDATE THIS EVERY EVENING BEFORE STOPPING
 
-**Date last updated:** 2026-03-29
+**Date last updated:** 2026-04-05
 **Current phase:** Phase 1
-**Current step:** Builder + Video Creator UI overhaul — CRITICAL PRIORITY
+**Current step:** AGGRESSIVE MODE — Builder + Video must work end-to-end. No more patching.
+
+**Completed 2026-04-05 (foundation repair day):**
+- ✅ BUILD NOW PASSES CLEAN — 463/463 pages generated
+- ✅ Merged all feature branch fixes to main (domain purchase, admin domains, dictation auth)
+- ✅ Fixed ROOT CAUSE of builder "No React components" — missing state vars and refs
+- ✅ Fixed ROOT CAUSE of video TTS failure — dead Replicate models replaced with 4-model chain
+- ✅ Added builder error visibility — no more silent blank screens
+- ✅ Built automated icon validation (scripts/check-icons.js) — #1 recurring build error eliminated
+- ✅ Updated CI pipeline — quality gate → icon check → lint → unit tests → build
+- ✅ Added rules 27-32 to IMPORTANT DECISIONS (no patching, continuous green, main-first)
+- ✅ Publisher page: restored platform names (Instagram, Facebook, Reddit)
+- ✅ Domain purchase: verify-purchase endpoint, admin domains page, Stripe checkout with email
 
 **Completed 2026-03-29 (massive build day):**
 - ✅ Fixed all 4 known issues (dead components, dead libs, email validation, img→Image)
@@ -767,15 +797,25 @@ Each reseller at $499/mo typically brings 20-50 of their own clients. 10 reselle
 | Stripe Payments | STRIPE_SECRET_KEY + price IDs |
 
 **CRITICAL — NEXT ACTIONS (in order):**
-1. **Builder UI overhaul** — must feel like a $50M product, not a beta. Match Bolt/Lovable quality.
-2. **Video Creator UI overhaul** — needs timeline, real-time preview, avatar support
-3. **Craig manual tasks:** Zoho Mail setup, Cloudflare email routing, Stripe products
-4. **Next.js 14→15 upgrade** (dedicated sprint)
-5. **Go live with first customers**
+1. **CRAIG: Set REPLICATE_API_TOKEN in Vercel** — video pipeline is ready, needs this key
+2. **CRAIG: Visit zoobicon.com/api/db/init** — creates database tables for domain purchases
+3. **CRAIG: Set up Stripe webhook** — point to zoobicon.com/api/stripe/webhook in Stripe dashboard
+4. **Builder end-to-end test** — after deploy, verify generation produces components in Sandpack
+5. **Video end-to-end test** — after REPLICATE_API_TOKEN set, generate one real video
+6. **Diff editing into builder UI** — "Change the header to blue" edits ONE file in 2-5s
+7. **Supabase auto-provisioning** — full-stack apps get real Postgres + auth
+8. **Next.js 14→15 upgrade** (dedicated sprint)
 
-**Blockers:** Builder and Video Creator UI quality not at competitive standard. Must fix before launch.
+**Blockers:** REPLICATE_API_TOKEN and database tables. Both are Craig tasks.
 
-**MANDATE: 80-90% ahead of competitors. If a user tries Zoobicon then tries Lovable/Bolt, they must think Zoobicon was BETTER. Currently we are NOT there on UI polish. Fix immediately.**
+**MANDATE: 80-90% ahead of competitors. $6.6B valuation = that many people we could help. Lovable has ONE product. We have 75+. Their moat is polish on one feature. Our moat is the ecosystem. A customer who uses Zoobicon for domains + hosting + email + builder + video is never leaving.**
+
+**BUILD DISCIPLINE (locked in — rules 27-32):**
+- `node scripts/check-icons.js && npm run build` before EVERY push
+- ALL fixes go to main directly — no orphan branches
+- NO blank screens — every failure shows a clear error message
+- NO patching — trace full code path, fix root cause
+- Replicate models: ALWAYS 4+ fallback chain, NEVER single model
 
 ---
 
