@@ -23,6 +23,51 @@
 
 const REPLICATE_API = "https://api.replicate.com/v1";
 
+/**
+ * Create a prediction on Replicate with automatic version fallback.
+ * Tries model-based endpoint first, then falls back to version-based if 404.
+ */
+async function createReplicatePrediction(
+  modelPath: string,
+  input: Record<string, unknown>,
+  token: string
+): Promise<Response> {
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  };
+
+  // Strategy 1: Model-based endpoint (newer, simpler)
+  let res = await fetch(`${REPLICATE_API}/models/${modelPath}/predictions`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ input }),
+  });
+
+  // Strategy 2: If 404/422, get latest version and use /predictions
+  if (res.status === 404 || res.status === 422) {
+    console.log(`[replicate] Model endpoint 404 for ${modelPath}, trying version-based...`);
+    try {
+      const modelInfo = await fetch(`${REPLICATE_API}/models/${modelPath}`, { headers });
+      if (modelInfo.ok) {
+        const info = await modelInfo.json();
+        const version = info.latest_version?.id;
+        if (version) {
+          res = await fetch(`${REPLICATE_API}/predictions`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify({ version, input }),
+          });
+        }
+      }
+    } catch (e) {
+      console.error(`[replicate] Version fallback failed for ${modelPath}:`, e);
+    }
+  }
+
+  return res;
+}
+
 function getReplicateToken(): string {
   // Vercel's Replicate integration may use different env var names
   const token =
@@ -84,7 +129,7 @@ export async function generateVoice(
   const token = getReplicateToken();
 
   // Try multiple TTS models in order — first one that works wins
-  // Use model paths (not version hashes) so we always get the latest version
+  // Each model has both a model-based endpoint AND a version-based fallback
   const ttsModels = [
     {
       name: "Kokoro TTS",
@@ -114,19 +159,10 @@ export async function generateVoice(
     try {
       console.log(`[video-pipeline] Trying ${model.name} for voice generation...`);
 
-      const res = await fetch(`${REPLICATE_API}/models/${model.modelPath}/predictions`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          input: model.input,
-        }),
-      });
+      const res = await createReplicatePrediction(model.modelPath, model.input, token);
 
       if (!res.ok) {
-        const errText = await res.text();
+        const errText = await res.text().catch(() => "");
         console.error(`[video-pipeline] ${model.name} failed: ${res.status} ${errText}`);
         lastError = `${model.name}: ${res.status}`;
         continue; // Try next model
@@ -210,22 +246,23 @@ export async function generateAvatar(
 ): Promise<{ imageUrl: string }> {
   const prompt = `Professional headshot portrait photo of ${description}. Clean background, studio lighting, sharp focus, photorealistic, 8k quality. Looking directly at camera with neutral pleasant expression. Shoulders visible. Professional attire.`;
 
-  // FLUX.1 schnell — official Replicate model, no version hash needed
-  const res = await fetch(`${REPLICATE_API}/models/black-forest-labs/flux-schnell/predictions`, {
-    method: "POST",
-    headers: replicateHeaders(),
-    body: JSON.stringify({
-      input: {
-        prompt,
-        num_outputs: 1,
-        aspect_ratio: "1:1",
-        output_format: "webp",
-        output_quality: 90,
-      },
-    }),
-  });
+  // FLUX.1 schnell — with version fallback for reliability
+  const res = await createReplicatePrediction(
+    "black-forest-labs/flux-schnell",
+    {
+      prompt,
+      num_outputs: 1,
+      aspect_ratio: "1:1",
+      output_format: "webp",
+      output_quality: 90,
+    },
+    getReplicateToken()
+  );
 
-  if (!res.ok) throw new Error("Avatar generation failed.");
+  if (!res.ok) {
+    const errText = await res.text().catch(() => "");
+    throw new Error(`Avatar generation failed: ${res.status} ${errText}`);
+  }
   const data = await res.json();
 
   const imageUrl = Array.isArray(data.output) ? data.output[0] : data.output;
@@ -256,16 +293,11 @@ export async function generateLipSync(
   // Try OmniHuman v1.5 first — ByteDance's state-of-the-art
   try {
     console.log("[video-pipeline] Trying OmniHuman v1.5 for lip-sync...");
-    const omniRes = await fetch(`${REPLICATE_API}/models/bytedance/omni-human/predictions`, {
-      method: "POST",
-      headers: replicateHeaders(),
-      body: JSON.stringify({
-        input: {
-          image: faceImageUrl,
-          audio: audioUrl,
-        },
-      }),
-    });
+    const omniRes = await createReplicatePrediction(
+      "bytedance/omni-human",
+      { image: faceImageUrl, audio: audioUrl },
+      getReplicateToken()
+    );
 
     if (omniRes.ok) {
       const omniData = await omniRes.json();
@@ -288,19 +320,17 @@ export async function generateLipSync(
 
   // Fallback: SadTalker — proven reliable (use model path for latest version)
   console.log("[video-pipeline] Using SadTalker for lip-sync...");
-  const res = await fetch(`${REPLICATE_API}/models/cjwbw/sadtalker/predictions`, {
-    method: "POST",
-    headers: replicateHeaders(),
-    body: JSON.stringify({
-      input: {
-        source_image: faceImageUrl,
-        driven_audio: audioUrl,
-        enhancer: options?.enhanceFace !== false ? "gfpgan" : "none",
-        preprocess: "crop",
-        still: false,
-      },
-    }),
-  });
+  const res = await createReplicatePrediction(
+    "cjwbw/sadtalker",
+    {
+      source_image: faceImageUrl,
+      driven_audio: audioUrl,
+      enhancer: options?.enhanceFace !== false ? "gfpgan" : "none",
+      preprocess: "crop",
+      still: false,
+    },
+    getReplicateToken()
+  );
 
   if (!res.ok) {
     const err = await res.text();
