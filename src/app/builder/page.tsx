@@ -1086,6 +1086,8 @@ function BuilderPage() {
 
         const decoder = new TextDecoder();
         let lineBuffer = "";
+        let receivedFiles = false;
+        let receivedDone = false;
         const STREAM_TIMEOUT_MS = 240000; // 4 minutes max with no data
         let lastDataAt = Date.now();
 
@@ -1124,6 +1126,7 @@ function BuilderPage() {
                 if (generationIdRef.current === currentGenId) {
                   setReactFiles(event.files);
                   setGeneratedCode("<!-- react-app-mode -->");
+                  receivedFiles = true;
                   setPipelineAgents(prev => [...prev, `Scaffold ready — ${event.componentCount} components assembled`]);
                 }
               } else if (event.type === "customization" && event.data) {
@@ -1136,12 +1139,14 @@ function BuilderPage() {
                 if (generationIdRef.current === currentGenId) {
                   setReactFiles(event.files);
                   setGeneratedCode("<!-- react-app-mode -->");
+                  receivedFiles = true;
                 }
               } else if (event.type === "partial" && event.files) {
                 // Progressive streaming: each partial carries the full file map so far
                 if (generationIdRef.current === currentGenId) {
                   setReactFiles(event.files);
                   setGeneratedCode("<!-- react-app-mode -->");
+                  receivedFiles = true;
                   // Update progress indicator
                   if (event.fileCount != null && event.totalComponents != null) {
                     setBuildProgress({ current: event.fileCount, total: event.totalComponents, section: event.section || "" });
@@ -1154,10 +1159,12 @@ function BuilderPage() {
                     setReactFiles(event.files);
                     setReactDeps(event.dependencies || {});
                     setReactSource(event.files);
+                    receivedFiles = true;
                   }
                   setGeneratedCode("<!-- react-app-mode -->");
                   setStatus("complete");
                   setBuildProgress(null);
+                  receivedDone = true;
                   setPipelineAgents(prev => [...prev, "Build complete"]);
                   trackEvent("build");
                 }
@@ -1225,6 +1232,18 @@ function BuilderPage() {
               // Skip JSON parse errors from partial chunks
             }
           }
+        }
+
+        // Safety net: if stream ended but we never received files, show a clear error
+        if (generationIdRef.current === currentGenId && !receivedFiles) {
+          setError("No components were generated. The AI service may be unavailable or misconfigured. Please try again in a moment.");
+          setStatus("error");
+          setBuildProgress(null);
+        } else if (generationIdRef.current === currentGenId && !receivedDone) {
+          // Got partial files but stream ended without "done" — show what we have
+          setStatus("complete");
+          setBuildProgress(null);
+          setPipelineAgents(prev => [...prev, "Build complete (stream ended early — partial results shown)"]);
         }
       } catch (err) {
         if ((err as Error).name === "AbortError") return;
