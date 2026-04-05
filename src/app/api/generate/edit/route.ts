@@ -38,9 +38,24 @@ export async function POST(req: NextRequest) {
 
   // Build context: show the AI which files exist and their content
   const fileList = Object.keys(files);
-  const fileContext = targetFile && files[targetFile]
-    ? `TARGET FILE (${targetFile}):\n\`\`\`\n${files[targetFile]}\n\`\`\``
-    : fileList.map(f => `FILE: ${f}\n\`\`\`\n${files[f]}\n\`\`\``).join("\n\n");
+
+  // Smart context: if targetFile specified, show it fully + just filenames for others
+  // If no target, show all files but truncate very large ones
+  let fileContext: string;
+  if (targetFile && files[targetFile]) {
+    const otherFiles = fileList.filter(f => f !== targetFile);
+    fileContext = `TARGET FILE (${targetFile}):\n\`\`\`\n${files[targetFile]}\n\`\`\`\n\nOTHER FILES (for reference, names only): ${otherFiles.join(", ")}`;
+  } else {
+    // Show all files, but if total context is huge, truncate large files
+    const MAX_FILE_CHARS = 3000;
+    fileContext = fileList.map(f => {
+      const content = files[f];
+      const truncated = content.length > MAX_FILE_CHARS
+        ? content.slice(0, MAX_FILE_CHARS) + `\n// ... (${content.length - MAX_FILE_CHARS} more chars truncated)`
+        : content;
+      return `FILE: ${f}\n\`\`\`\n${truncated}\n\`\`\``;
+    }).join("\n\n");
+  }
 
   const systemPrompt = `You are a code editor. You receive existing React/TypeScript files and an instruction to modify them.
 
@@ -50,6 +65,7 @@ RULES:
 - Preserve all existing functionality — only change what was asked
 - Keep the same coding style, imports, and structure
 - If the change affects multiple files (e.g. adding a new section), include all affected files
+- Output the COMPLETE file content for each changed file (not a diff/patch)
 - Start with { and end with } — no markdown, no explanation`;
 
   const encoder = new TextEncoder();
@@ -64,7 +80,7 @@ RULES:
 
         const response = await client.messages.create({
           model: "claude-haiku-4-5-20251001",
-          max_tokens: 8192,
+          max_tokens: 16384,
           system: systemPrompt,
           messages: [{
             role: "user",

@@ -505,11 +505,17 @@ function BuilderPage() {
   }, []);
 
   const authHeaders = useCallback(() => {
-    const email = getUserEmail();
     const headers: Record<string, string> = { "Content-Type": "application/json" };
-    if (email) headers["x-user-email"] = email;
+    try {
+      const u = localStorage.getItem("zoobicon_user");
+      if (u) {
+        const parsed = JSON.parse(u);
+        if (parsed.email) headers["x-user-email"] = parsed.email;
+        if (parsed.role === "admin" || parsed.plan === "unlimited") headers["x-admin"] = "1";
+      }
+    } catch { /* ignore */ }
     return headers;
-  }, [getUserEmail]);
+  }, []);
   const canUndo = historyIndex > 0;
   const canRedo = historyIndex < history.length - 1;
 
