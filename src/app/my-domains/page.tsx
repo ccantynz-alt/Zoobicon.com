@@ -22,8 +22,9 @@ interface Domain {
 export default function MyDomainsPage() {
   const [domains, setDomains] = useState<Domain[]>([]);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<{ email: string; name?: string } | null>(null);
+  const [user, setUser] = useState<{ email: string; name?: string; role?: string } | null>(null);
   const [copied, setCopied] = useState("");
+  const [purchaseStatus, setPurchaseStatus] = useState<"" | "verifying" | "success" | "error">("");
 
   useEffect(() => {
     try {
@@ -31,16 +32,42 @@ export default function MyDomainsPage() {
       if (!raw) { window.location.href = "/auth/login"; return; }
       const parsed = JSON.parse(raw);
       setUser(parsed);
-      fetchDomains(parsed.email);
+
+      // If arriving from Stripe checkout, verify the purchase first
+      const params = new URLSearchParams(window.location.search);
+      const sessionId = params.get("session_id");
+      if (sessionId) {
+        setPurchaseStatus("verifying");
+        fetch("/api/domains/verify-purchase", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId, email: parsed.email }),
+        })
+          .then(res => res.json())
+          .then(data => {
+            setPurchaseStatus(data.success ? "success" : "error");
+            fetchDomains(parsed);
+          })
+          .catch(() => {
+            setPurchaseStatus("error");
+            fetchDomains(parsed);
+          });
+      } else {
+        fetchDomains(parsed);
+      }
     } catch {
       window.location.href = "/auth/login";
     }
   }, []);
 
-  const fetchDomains = async (email: string) => {
+  const fetchDomains = async (userData: { email: string; role?: string }) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/domains/register?email=${encodeURIComponent(email)}`);
+      // Admin sees ALL domains, regular users see only their own
+      const url = userData.role === "admin"
+        ? "/api/admin/domains"
+        : `/api/domains/register?email=${encodeURIComponent(userData.email)}`;
+      const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
         setDomains(data.domains || []);
@@ -98,11 +125,8 @@ export default function MyDomainsPage() {
             <p className="text-sm text-white/40 mt-1">Manage your registered domains</p>
           </div>
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => user && fetchDomains(user.email)}
-              disabled={loading}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.08] border border-white/[0.08] text-sm transition-colors"
-            >
+            <button onClick={() => user && fetchDomains(user)} disabled={loading}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.08] border border-white/[0.08] text-sm transition-colors">
               <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /> Refresh
             </button>
             <Link
@@ -114,7 +138,23 @@ export default function MyDomainsPage() {
           </div>
         </div>
 
-        {/* Domain list */}
+        {/* Purchase verification status */}
+        {purchaseStatus === "verifying" && (
+          <div className="rounded-xl bg-indigo-500/10 border border-indigo-500/20 p-4 mb-6 flex items-center gap-3 text-sm text-indigo-300">
+            <RefreshCw className="w-4 h-4 animate-spin" /> Verifying your purchase...
+          </div>
+        )}
+        {purchaseStatus === "success" && (
+          <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-4 mb-6 flex items-center gap-3 text-sm text-emerald-300">
+            <Check className="w-4 h-4" /> Purchase verified! Your domains are ready.
+          </div>
+        )}
+        {purchaseStatus === "error" && (
+          <div className="rounded-xl bg-amber-500/10 border border-amber-500/20 p-4 mb-6 flex items-center gap-3 text-sm text-amber-300">
+            <AlertCircle className="w-4 h-4" /> We&apos;re processing your purchase. Domains may take a moment to appear — try refreshing.
+          </div>
+        )}
+
         {loading ? (
           <div className="flex items-center justify-center h-40">
             <RefreshCw className="w-5 h-5 text-indigo-400 animate-spin" />
