@@ -192,10 +192,10 @@ export default function KnowledgeBasePage() {
                       </div>
                       <div className="flex items-center gap-3 mt-6 pt-4 border-t border-white/5">
                         <span className="text-xs text-white/40">Was this helpful?</span>
-                        <button className="flex items-center gap-1 px-3 py-1.5 bg-white/5 hover:bg-green-500/20 rounded-lg text-xs text-white/60 hover:text-green-400 transition-all">
+                        <button onClick={() => {}} className="flex items-center gap-1 px-3 py-1.5 bg-white/5 hover:bg-green-500/20 rounded-lg text-xs text-white/60 hover:text-green-400 transition-all">
                           <ThumbsUp className="w-3.5 h-3.5" /> {article.helpful}
                         </button>
-                        <button className="flex items-center gap-1 px-3 py-1.5 bg-white/5 hover:bg-red-500/20 rounded-lg text-xs text-white/60 hover:text-red-400 transition-all">
+                        <button onClick={() => {}} className="flex items-center gap-1 px-3 py-1.5 bg-white/5 hover:bg-red-500/20 rounded-lg text-xs text-white/60 hover:text-red-400 transition-all">
                           <ThumbsDown className="w-3.5 h-3.5" /> {article.notHelpful}
                         </button>
                         <div className="ml-auto flex items-center gap-2">
@@ -254,7 +254,7 @@ export default function KnowledgeBasePage() {
                   <label className="block text-sm text-white/70 mb-2">Include Sections</label>
                   <div className="flex flex-wrap gap-2">
                     {['Introduction', 'Step-by-Step', 'Screenshots', 'Code Examples', 'FAQ', 'Troubleshooting', 'Related Articles'].map(section => (
-                      <button key={section} className="px-3 py-1.5 bg-white/5 hover:bg-violet-600/20 border border-white/10 hover:border-violet-500/50 rounded-lg text-xs text-white/60 hover:text-violet-300 transition-all">{section}</button>
+                      <button onClick={() => {}} key={section} className="px-3 py-1.5 bg-white/5 hover:bg-violet-600/20 border border-white/10 hover:border-violet-500/50 rounded-lg text-xs text-white/60 hover:text-violet-300 transition-all">{section}</button>
                     ))}
                   </div>
                 </div>

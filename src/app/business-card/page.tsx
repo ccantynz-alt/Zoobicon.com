@@ -63,6 +63,7 @@ export default function BusinessCardPage() {
   const [showQR, setShowQR] = useState(true);
   const [primaryColor, setPrimaryColor] = useState('#8b5cf6');
   const [fontFamily, setFontFamily] = useState('Inter');
+  const [selectedShape, setSelectedShape] = useState('Standard (3.5" x 2")');
 
   const handleCopyVCard = () => {
     setCopied(true);
@@ -83,10 +84,33 @@ export default function BusinessCardPage() {
               {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
               {copied ? 'Copied!' : 'Copy vCard'}
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition text-sm">
+            <button onClick={() => window.print()} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition text-sm">
               <Printer className="w-4 h-4" /> Print Ready
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:opacity-90 transition text-sm font-medium">
+            <button onClick={() => {
+              const cardEl = document.querySelector('[style*="perspective"]')?.querySelector('[style*="transformStyle"]') as HTMLElement;
+              if (!cardEl) return;
+              const canvas = document.createElement('canvas');
+              canvas.width = 840; canvas.height = 504;
+              const ctx = canvas.getContext('2d');
+              if (!ctx) return;
+              ctx.fillStyle = '#8b5cf6';
+              ctx.fillRect(0, 0, 840, 504);
+              ctx.fillStyle = '#ffffff';
+              ctx.font = 'bold 36px Inter, sans-serif';
+              ctx.fillText(card.name, 48, 80);
+              ctx.font = '24px Inter, sans-serif';
+              ctx.fillText(card.title, 48, 120);
+              ctx.font = '18px Inter, sans-serif';
+              ctx.fillText(card.company, 48, 150);
+              ctx.fillText(card.email, 48, 400);
+              ctx.fillText(card.phone, 48, 430);
+              ctx.fillText(card.website, 48, 460);
+              const link = document.createElement('a');
+              link.download = `${card.name.replace(/\s+/g, '-').toLowerCase()}-business-card.png`;
+              link.href = canvas.toDataURL('image/png');
+              link.click();
+            }} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:opacity-90 transition text-sm font-medium">
               <Download className="w-4 h-4" /> Export
             </button>
           </div>
@@ -269,7 +293,7 @@ export default function BusinessCardPage() {
                   <label className="text-sm font-medium text-white/60 mb-3 block">Card Shape</label>
                   <div className="grid grid-cols-3 gap-3">
                     {['Standard (3.5" x 2")', 'Square (2.5" x 2.5")', 'Mini (3" x 1.5")'].map((s) => (
-                      <button key={s} className="px-4 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-sm transition">{s}</button>
+                      <button key={s} onClick={() => setSelectedShape(s)} className={`px-4 py-3 rounded-xl border text-sm transition ${selectedShape === s ? 'border-violet-500 bg-violet-500/10' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>{s}</button>
                     ))}
                   </div>
                 </div>
@@ -321,7 +345,7 @@ export default function BusinessCardPage() {
                   { label: 'Digital Card', desc: 'Share via link or NFC', icon: Smartphone },
                   { label: 'vCard (.vcf)', desc: 'Save to contacts', icon: Share2 },
                 ].map((opt) => (
-                  <button key={opt.label} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition text-left">
+                  <button onClick={() => {}} key={opt.label} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition text-left">
                     <opt.icon className="w-5 h-5 text-violet-400 shrink-0" />
                     <div className="flex-1">
                       <p className="text-sm font-medium">{opt.label}</p>
@@ -340,7 +364,7 @@ export default function BusinessCardPage() {
               </div>
               <p className="text-sm text-white/50 mb-4">Describe your brand and AI will design the perfect card</p>
               <textarea placeholder="e.g., Modern tech startup, clean and bold..." className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm resize-none h-20 focus:outline-none focus:ring-2 focus:ring-violet-500/50 mb-3" />
-              <button className="w-full py-3 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 font-medium text-sm hover:opacity-90 transition flex items-center justify-center gap-2">
+              <button onClick={() => alert('AI design generation coming soon')} className="w-full py-3 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 font-medium text-sm hover:opacity-90 transition flex items-center justify-center gap-2">
                 <Sparkles className="w-4 h-4" /> Generate Design
               </button>
             </div>

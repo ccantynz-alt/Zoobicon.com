@@ -10,10 +10,12 @@ export async function GET(req: NextRequest) {
   const redirectUri = `${origin}/api/auth/callback/github`;
   const state = crypto.randomUUID();
 
+  // "repo" scope: needed so users can push generated projects to their GitHub
+  // "read:user user:email": needed for auth
   const params = new URLSearchParams({
     client_id: clientId,
     redirect_uri: redirectUri,
-    scope: "read:user user:email",
+    scope: "repo read:user user:email",
     state,
   });
 

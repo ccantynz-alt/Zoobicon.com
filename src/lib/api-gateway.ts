@@ -35,7 +35,7 @@ const WARMUP_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
  * Called by cron job every 5 minutes to prevent cold starts.
  */
 export async function warmupModels(): Promise<{ warmed: string[]; failed: string[] }> {
-  const token = process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY;
+  const token = process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY || process.env.REPLICATE_TOKEN || process.env.REPLICATE_KEY;
   if (!token) return { warmed: [], failed: [] };
 
   const models = [

@@ -4,6 +4,7 @@ import { stripe } from "@/lib/stripe";
 import { sql } from "@/lib/db";
 import { recordPurchase } from "@/lib/addon-delivery";
 import { OVERAGE_PACKS, addOverageCredits } from "@/lib/video-usage";
+import { registerDomain, type ContactInfo } from "@/lib/domain-reseller";
 
 /**
  * POST /api/stripe/webhook
@@ -55,6 +56,85 @@ export async function POST(request: NextRequest) {
             await addOverageCredits(email, pack, session.id);
             console.log(`[webhook] Video credits fulfilled: ${pack.name} for ${email}`);
           }
+          break;
+        }
+
+        // Domain registration purchase — register with OpenSRS + save to DB
+        if (session.metadata?.type === "domain_registration") {
+          const domainList = session.metadata?.domains?.split(",") || [];
+          const registrantEmail = session.metadata?.registrantEmail || email;
+          const years = parseInt(session.metadata?.years || "1", 10);
+          const expiresAt = new Date();
+          expiresAt.setFullYear(expiresAt.getFullYear() + years);
+
+          // Parse registrant contact info from metadata
+          const registrant: ContactInfo = {
+            firstName: session.metadata?.registrantFirstName || "Domain",
+            lastName: session.metadata?.registrantLastName || "Owner",
+            email: registrantEmail,
+            phone: session.metadata?.registrantPhone || "+1.0000000000",
+            address1: session.metadata?.registrantAddress || "TBD",
+            city: session.metadata?.registrantCity || "TBD",
+            state: session.metadata?.registrantState || "NA",
+            postalCode: session.metadata?.registrantZip || "00000",
+            country: session.metadata?.registrantCountry || "US",
+          };
+
+          for (const domain of domainList) {
+            if (!domain.trim()) continue;
+            const trimmedDomain = domain.trim();
+
+            // Step 1: Save to database as "pending_registration"
+            try {
+              await sql`
+                INSERT INTO registered_domains (domain, user_email, status, expires_at, auto_renew, privacy_protection)
+                VALUES (${trimmedDomain}, ${registrantEmail}, ${"pending_registration"}, ${expiresAt.toISOString()}, true, true)
+                ON CONFLICT (domain) DO UPDATE SET
+                  status = ${"pending_registration"},
+                  expires_at = ${expiresAt.toISOString()},
+                  user_email = ${registrantEmail}
+              `;
+            } catch (err) {
+              console.error(`[webhook] Failed to save domain ${trimmedDomain} to DB:`, err);
+            }
+
+            // Step 2: Register with OpenSRS
+            try {
+              const result = await registerDomain({
+                domain: trimmedDomain,
+                period: years,
+                registrant,
+                autoRenew: true,
+                privacyProtection: true,
+              });
+
+              if (result.success) {
+                // Update status to active
+                await sql`
+                  UPDATE registered_domains SET status = 'active', opensrs_order_id = ${result.orderId || null}
+                  WHERE domain = ${trimmedDomain}
+                `;
+                console.log(`[webhook] Domain registered with OpenSRS: ${trimmedDomain} (order: ${result.orderId})`);
+              } else {
+                // Registration failed — mark for manual review
+                await sql`
+                  UPDATE registered_domains SET status = 'registration_failed', registration_error = ${result.error || 'Unknown error'}
+                  WHERE domain = ${trimmedDomain}
+                `;
+                console.error(`[webhook] OpenSRS registration failed for ${trimmedDomain}: ${result.error}`);
+              }
+            } catch (err) {
+              const msg = err instanceof Error ? err.message : "Unknown error";
+              console.error(`[webhook] OpenSRS registration error for ${trimmedDomain}:`, msg);
+              try {
+                await sql`
+                  UPDATE registered_domains SET status = 'registration_failed', registration_error = ${msg}
+                  WHERE domain = ${trimmedDomain}
+                `;
+              } catch { /* DB update failed too — logged above */ }
+            }
+          }
+          console.log(`[webhook] Domain registration: ${domainList.length} domains for ${registrantEmail}`);
           break;
         }
 

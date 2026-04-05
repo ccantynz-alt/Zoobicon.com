@@ -41,11 +41,17 @@ function setCorsHeaders(response: NextResponse, origin: string | null) {
 
 export function middleware(request: NextRequest) {
   const hostname = request.headers.get("host") ?? "";
-  const domain = hostname.split(":")[0]; // strip port for localhost
+  const domain = hostname.split(":")[0];
   const origin = request.headers.get("origin");
+  const pathname = request.nextUrl.pathname;
+
+  // ── MAINTENANCE MODE ──
+  // Set MAINTENANCE_MODE=true in Vercel env to show maintenance banner
+  // Banner is rendered by MaintenanceBanner component in layout.tsx
+  // No redirect — site stays accessible but banner shows at top
 
   // Handle CORS preflight for API routes
-  if (request.nextUrl.pathname.startsWith("/api/") && request.method === "OPTIONS") {
+  if (pathname.startsWith("/api/") && request.method === "OPTIONS") {
     const preflightResponse = new NextResponse(null, { status: 204 });
     setCorsHeaders(preflightResponse, origin);
     return preflightResponse;

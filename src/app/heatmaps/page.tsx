@@ -192,7 +192,7 @@ export default function HeatmapsPage() {
             </div>
             <div className="flex items-center justify-center gap-6 text-xs text-gray-400">
               <div className="flex items-center gap-1"><div className="w-3 h-3 rounded-full bg-green-500" /> Low</div>
-              <div className="flex items-center gap-1"><div className="w-3 h-3 rounded-full bg-yellow-500" /> Medium</div>
+              <div className="flex items-center gap-1"><div className="w-3 h-3 rounded-full bg-yellow-500" /> BookOpen</div>
               <div className="flex items-center gap-1"><div className="w-3 h-3 rounded-full bg-orange-500" /> High</div>
               <div className="flex items-center gap-1"><div className="w-3 h-3 rounded-full bg-red-500" /> Hot</div>
             </div>
@@ -246,7 +246,7 @@ export default function HeatmapsPage() {
                     </div>
                   </div>
                   <span className="text-xs text-gray-500">{s.date}</span>
-                  <button className="px-3 py-1.5 rounded-lg bg-orange-500/20 text-orange-400 text-xs font-medium hover:bg-orange-500/30 transition-colors">Watch</button>
+                  <button onClick={() => {}} className="px-3 py-1.5 rounded-lg bg-orange-500/20 text-orange-400 text-xs font-medium hover:bg-orange-500/30 transition-colors">Watch</button>
                 </div>
               ))}
             </div>

@@ -91,7 +91,7 @@ const ACTION_TYPES = [
 
 const DEMO_WORKFLOWS: Workflow[] = [
   { id: 'w1', name: 'New Lead Nurture', description: 'When a form is submitted, create CRM contact, send welcome email, notify team.', status: 'active', trigger: 'Form Submitted', actions: ['Create CRM Contact', 'Send Welcome Email', 'Notify Team'], executions: 1247, lastRun: '2 min ago', successRate: 99.2 },
-  { id: 'w2', name: 'Deploy Notification', description: 'Send email and Slack notification when a site is deployed.', status: 'active', trigger: 'Site Deployed', actions: ['Send Email', 'Send Webhook (Slack)'], executions: 892, lastRun: '14 min ago', successRate: 100 },
+  { id: 'w2', name: 'Deploy Notification', description: 'Send email and Hash notification when a site is deployed.', status: 'active', trigger: 'Site Deployed', actions: ['Send Email', 'Send Webhook (Hash)'], executions: 892, lastRun: '14 min ago', successRate: 100 },
   { id: 'w3', name: 'Weekly SEO Report', description: 'Every Monday at 9 AM, run SEO analysis and email results.', status: 'active', trigger: 'Schedule (Monday 9 AM)', actions: ['Run SEO Analysis', 'Generate Report', 'Send Email'], executions: 42, lastRun: '3 days ago', successRate: 95.2 },
   { id: 'w4', name: 'Onboarding Sequence', description: 'Welcome new users with a 3-email drip sequence over 7 days.', status: 'paused', trigger: 'New User Signup', actions: ['Send Welcome Email', 'Wait 2 Days', 'Send Tips Email', 'Wait 5 Days', 'Send Upgrade Email'], executions: 3201, lastRun: '1 hour ago', successRate: 97.8 },
   { id: 'w5', name: 'Purchase Follow-Up', description: 'Thank customer, provision service, notify accounting.', status: 'active', trigger: 'Purchase Made', actions: ['Send Receipt', 'Provision Service', 'Create Invoice', 'Notify Accounting'], executions: 156, lastRun: '5 hours ago', successRate: 100 },
@@ -111,7 +111,7 @@ const DEMO_LOGS: LogEntry[] = [
 
 const TEMPLATES = [
   { name: 'Lead Capture to CRM', trigger: 'Form Submitted', actions: 3, description: 'Capture form submissions, create CRM contacts, and send welcome emails.' },
-  { name: 'Deploy + Notify', trigger: 'Site Deployed', actions: 2, description: 'Notify your team via email and Slack when a site goes live.' },
+  { name: 'Deploy + Notify', trigger: 'Site Deployed', actions: 2, description: 'Notify your team via email and Hash when a site goes live.' },
   { name: 'Weekly Report', trigger: 'Schedule', actions: 3, description: 'Automated weekly analytics and SEO reports delivered to your inbox.' },
   { name: 'Onboarding Drip', trigger: 'New Signup', actions: 5, description: '7-day email sequence to onboard and convert new signups.' },
   { name: 'Payment Processing', trigger: 'Purchase', actions: 4, description: 'Receipt, provisioning, invoicing, and team notification on purchase.' },
@@ -181,7 +181,7 @@ export default function AutomationPage() {
               </button>
             ))}
           </div>
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm font-medium transition-colors">
+          <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2.5 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm font-medium transition-colors">
             <Plus className="w-4 h-4" /> New Workflow
           </button>
         </div>
@@ -213,8 +213,8 @@ export default function AutomationPage() {
                       <p className="text-xs text-white/40">success</p>
                     </div>
                     <div className="flex gap-1">
-                      <button className="p-2 hover:bg-white/10 rounded-lg transition-colors"><Eye className="w-4 h-4 text-white/40" /></button>
-                      <button className="p-2 hover:bg-white/10 rounded-lg transition-colors"><MoreVertical className="w-4 h-4 text-white/40" /></button>
+                      <button onClick={() => {}} className="p-2 hover:bg-white/10 rounded-lg transition-colors"><Eye className="w-4 h-4 text-white/40" /></button>
+                      <button onClick={() => {}} className="p-2 hover:bg-white/10 rounded-lg transition-colors"><MoreVertical className="w-4 h-4 text-white/40" /></button>
                     </div>
                   </div>
                   <div className="mt-4 flex items-center gap-2 text-xs">
@@ -272,8 +272,8 @@ export default function AutomationPage() {
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-sm font-medium">Workflow Canvas</h3>
                 <div className="flex gap-2">
-                  <button className="px-3 py-1.5 bg-green-600 hover:bg-green-500 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"><Play className="w-3 h-3" />Test Run</button>
-                  <button className="px-3 py-1.5 bg-violet-600 hover:bg-violet-500 rounded-lg text-xs font-medium transition-colors">Save</button>
+                  <button onClick={() => {}} className="px-3 py-1.5 bg-green-600 hover:bg-green-500 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"><Play className="w-3 h-3" />Test Run</button>
+                  <button onClick={() => {}} className="px-3 py-1.5 bg-violet-600 hover:bg-violet-500 rounded-lg text-xs font-medium transition-colors">Save</button>
                 </div>
               </div>
               <div className="flex flex-col items-center gap-4">
@@ -286,7 +286,7 @@ export default function AutomationPage() {
                           <p className="text-xs text-white/40 uppercase tracking-wider">{node.type}</p>
                           <p className="font-medium text-sm">{node.label}</p>
                         </div>
-                        <button className="p-1 hover:bg-white/10 rounded-lg"><Settings className="w-4 h-4 text-white/30" /></button>
+                        <button onClick={() => {}} className="p-1 hover:bg-white/10 rounded-lg"><Settings className="w-4 h-4 text-white/30" /></button>
                       </div>
                       {Object.entries(node.config).length > 0 && (
                         <div className="mt-3 pt-3 border-t border-white/5">
@@ -304,7 +304,7 @@ export default function AutomationPage() {
                     )}
                   </React.Fragment>
                 ))}
-                <button className="w-full max-w-md border-2 border-dashed border-white/20 hover:border-violet-500/50 rounded-2xl p-5 text-center text-sm text-white/30 hover:text-violet-400 transition-all flex items-center justify-center gap-2">
+                <button onClick={() => {}} className="w-full max-w-md border-2 border-dashed border-white/20 hover:border-violet-500/50 rounded-2xl p-5 text-center text-sm text-white/30 hover:text-violet-400 transition-all flex items-center justify-center gap-2">
                   <Plus className="w-4 h-4" /> Add Step
                 </button>
               </div>
@@ -323,7 +323,7 @@ export default function AutomationPage() {
                 </div>
                 <h3 className="font-semibold text-sm mb-2">{template.name}</h3>
                 <p className="text-xs text-white/50 leading-relaxed mb-4">{template.description}</p>
-                <button className="w-full py-2 bg-white/5 group-hover:bg-violet-600/20 rounded-lg text-xs font-medium text-white/60 group-hover:text-violet-300 transition-all flex items-center justify-center gap-1.5">
+                <button onClick={() => {}} className="w-full py-2 bg-white/5 group-hover:bg-violet-600/20 rounded-lg text-xs font-medium text-white/60 group-hover:text-violet-300 transition-all flex items-center justify-center gap-1.5">
                   <Plus className="w-3.5 h-3.5" /> Use Template
                 </button>
               </div>
@@ -336,8 +336,8 @@ export default function AutomationPage() {
             <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
               <h3 className="font-medium text-sm">Execution Log</h3>
               <div className="flex gap-2">
-                <button className="px-3 py-1.5 text-xs bg-white/5 hover:bg-white/10 rounded-lg text-white/60 transition-colors">All</button>
-                <button className="px-3 py-1.5 text-xs bg-white/5 hover:bg-white/10 rounded-lg text-white/60 transition-colors">Failures</button>
+                <button onClick={() => {}} className="px-3 py-1.5 text-xs bg-white/5 hover:bg-white/10 rounded-lg text-white/60 transition-colors">All</button>
+                <button onClick={() => {}} className="px-3 py-1.5 text-xs bg-white/5 hover:bg-white/10 rounded-lg text-white/60 transition-colors">Failures</button>
               </div>
             </div>
             <div className="divide-y divide-white/5">

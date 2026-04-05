@@ -40,7 +40,7 @@ const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.07 } }
 type Tab = "writer" | "posts" | "seo" | "calendar";
 
 const TONES = ["Professional", "Casual", "Technical", "Persuasive", "Educational", "Storytelling"];
-const LENGTHS = ["Short (~500 words)", "Medium (~1,000 words)", "Long (~2,000 words)", "Comprehensive (~3,000 words)"];
+const LENGTHS = ["Short (~500 words)", "BookOpen (~1,000 words)", "Long (~2,000 words)", "Comprehensive (~3,000 words)"];
 
 export default function BlogEnginePage() {
   const [user, setUser] = useState<{ email: string; name?: string } | null>(null);
@@ -57,7 +57,7 @@ export default function BlogEnginePage() {
   const [tab, setTab] = useState<Tab>("writer");
   const [topic, setTopic] = useState("");
   const [tone, setTone] = useState("Professional");
-  const [length, setLength] = useState("Medium (~1,000 words)");
+  const [length, setLength] = useState("BookOpen (~1,000 words)");
   const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
@@ -225,7 +225,7 @@ export default function BlogEnginePage() {
           <motion.div variants={fadeUp} initial="hidden" animate="visible" className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
             <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
               <h3 className="text-lg font-semibold">All Posts</h3>
-              <button className="text-sm text-orange-400 hover:text-orange-300 flex items-center gap-1"><Plus className="w-4 h-4" /> New Post</button>
+              <button onClick={() => {}} className="text-sm text-orange-400 hover:text-orange-300 flex items-center gap-1"><Plus className="w-4 h-4" /> New Post</button>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">

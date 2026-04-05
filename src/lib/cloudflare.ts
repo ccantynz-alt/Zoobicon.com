@@ -346,3 +346,163 @@ export async function getZoneInfo(
     `/zones/${config.zoneId}`
   );
 }
+
+// ---------------------------------------------------------------------------
+// Zone Creation (for newly purchased domains)
+// ---------------------------------------------------------------------------
+
+interface CloudflareZone {
+  id: string;
+  name: string;
+  status: string;
+  name_servers: string[];
+  original_name_servers?: string[];
+}
+
+/**
+ * Create a new Cloudflare zone for a purchased domain.
+ * Returns the zone ID and Cloudflare nameservers that the domain must point to.
+ *
+ * Requires CLOUDFLARE_ACCOUNT_ID in environment.
+ */
+export async function createZone(
+  config: CloudflareConfig,
+  domain: string
+): Promise<{
+  success: boolean;
+  zoneId?: string;
+  nameservers?: string[];
+  error?: string;
+}> {
+  if (!config.accountId) {
+    return { success: false, error: "CLOUDFLARE_ACCOUNT_ID required to create zones" };
+  }
+
+  try {
+    const res = await fetch(`${CF_BASE}/zones`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${config.apiToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: domain,
+        account: { id: config.accountId },
+        type: "full", // Full zone — Cloudflare manages DNS
+      }),
+    });
+
+    const data = (await res.json()) as CloudflareApiResponse<CloudflareZone>;
+
+    if (!data.success) {
+      const errMsg = data.errors?.map((e) => e.message).join(", ") || "Unknown error";
+      // "already exists" is not a failure — domain was added previously
+      if (errMsg.includes("already exists")) {
+        console.log(`[Cloudflare] Zone already exists for ${domain}, looking up nameservers...`);
+        const existing = await lookupZoneByName(config, domain);
+        if (existing) {
+          return {
+            success: true,
+            zoneId: existing.id,
+            nameservers: existing.name_servers,
+          };
+        }
+      }
+      console.error(`[Cloudflare] Failed to create zone for ${domain}: ${errMsg}`);
+      return { success: false, error: errMsg };
+    }
+
+    console.log(`[Cloudflare] Zone created for ${domain}: ${data.result.id}, NS: ${data.result.name_servers.join(", ")}`);
+
+    return {
+      success: true,
+      zoneId: data.result.id,
+      nameservers: data.result.name_servers,
+    };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Network error";
+    console.error(`[Cloudflare] createZone error for ${domain}:`, msg);
+    return { success: false, error: msg };
+  }
+}
+
+/**
+ * Look up an existing Cloudflare zone by domain name.
+ */
+async function lookupZoneByName(
+  config: CloudflareConfig,
+  domain: string
+): Promise<CloudflareZone | null> {
+  try {
+    const res = await fetch(`${CF_BASE}/zones?name=${encodeURIComponent(domain)}`, {
+      headers: {
+        Authorization: `Bearer ${config.apiToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = (await res.json()) as CloudflareApiResponse<CloudflareZone[]>;
+    if (data.success && data.result.length > 0) {
+      return data.result[0];
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Set default DNS records for a newly purchased domain.
+ * Points the domain to Vercel for hosting.
+ */
+export async function setupDefaultDns(
+  zoneId: string,
+  domain: string,
+  config: CloudflareConfig
+): Promise<void> {
+  // Override zoneId for this specific domain's zone (not the default zoobicon zone)
+  const domainConfig = { ...config, zoneId };
+
+  // A record → Vercel
+  await createDnsRecord(domainConfig, {
+    type: "A",
+    name: domain,
+    content: "76.76.21.21", // Vercel's IP
+    proxied: true,
+  });
+
+  // www CNAME → Vercel
+  await createDnsRecord(domainConfig, {
+    type: "CNAME",
+    name: `www.${domain}`,
+    content: "cname.vercel-dns.com",
+    proxied: true,
+  });
+
+  // MX records for email (Cloudflare Email Routing)
+  await createDnsRecord(domainConfig, {
+    type: "MX",
+    name: domain,
+    content: "route1.mx.cloudflare.net",
+    priority: 69,
+    proxied: false,
+  });
+
+  await createDnsRecord(domainConfig, {
+    type: "MX",
+    name: domain,
+    content: "route2.mx.cloudflare.net",
+    priority: 24,
+    proxied: false,
+  });
+
+  await createDnsRecord(domainConfig, {
+    type: "MX",
+    name: domain,
+    content: "route3.mx.cloudflare.net",
+    priority: 98,
+    proxied: false,
+  });
+
+  console.log(`[Cloudflare] Default DNS records created for ${domain}`);
+}

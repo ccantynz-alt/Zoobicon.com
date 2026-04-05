@@ -1,27 +1,51 @@
 import { NextRequest } from "next/server";
-import { stripe, PLAN_PRICE_IDS, PLAN_NAMES, PRO_PRICE_ID, type PlanSlug } from "@/lib/stripe";
+import { stripe, getPriceId, PLANS, PLAN_NAMES, type PlanSlug, type BillingInterval } from "@/lib/stripe";
 import { sql } from "@/lib/db";
 
 /**
  * POST /api/stripe/checkout
- * Body: { email: string, plan?: "creator" | "pro" | "agency" }
- * Creates a Stripe Checkout session for the specified plan (defaults to Pro)
- * and returns the URL.
+ * Body: { email: string, plan?: PlanSlug, interval?: "monthly" | "annual" }
+ * Creates a Stripe Checkout session and returns the URL.
  */
 export async function POST(request: NextRequest) {
   try {
-    const { email, plan } = await request.json();
+    const body = await request.json();
+    const { email, plan, interval } = body as {
+      email?: string;
+      plan?: string;
+      interval?: string;
+    };
+
     if (!email || typeof email !== "string") {
       return Response.json({ error: "email is required" }, { status: 400 });
     }
 
-    // Resolve plan → price ID (backwards-compatible: defaults to Pro)
-    const planSlug: PlanSlug = (plan && plan in PLAN_PRICE_IDS) ? plan : "pro";
-    const priceId = PLAN_PRICE_IDS[planSlug] || PRO_PRICE_ID;
+    const validPlans = Object.keys(PLANS);
+    const planSlug: PlanSlug = (plan && validPlans.includes(plan))
+      ? (plan as PlanSlug)
+      : "pro";
+
+    const billingInterval: BillingInterval =
+      interval === "annual" ? "annual" : "monthly";
+
+    const priceId = getPriceId(planSlug, billingInterval);
+
+    // SAFETY: Don't take payment if webhook can't process it
+    if (!process.env.STRIPE_WEBHOOK_SECRET) {
+      return Response.json(
+        { error: "Payment processing is being configured. Please try again shortly." },
+        { status: 503 }
+      );
+    }
 
     if (!priceId) {
+      const envVar = billingInterval === "annual"
+        ? `STRIPE_PRICE_${planSlug.toUpperCase()}_ANNUAL`
+        : `STRIPE_PRICE_${planSlug.toUpperCase()}`;
       return Response.json(
-        { error: `No Stripe price ID configured for the ${PLAN_NAMES[planSlug]} plan. Set STRIPE_${planSlug.toUpperCase()}_PRICE_ID in your environment variables.` },
+        {
+          error: `No Stripe price ID configured for the ${PLAN_NAMES[planSlug] || planSlug} plan (${billingInterval}). Set ${envVar} in your environment variables.`,
+        },
         { status: 400 }
       );
     }
@@ -49,11 +73,12 @@ export async function POST(request: NextRequest) {
       line_items: [{ price: priceId, quantity: 1 }],
       subscription_data: {
         trial_period_days: 14,
-        metadata: { email, plan: planSlug },
+        metadata: { email, plan: planSlug, interval: billingInterval },
       },
-      metadata: { email, plan: planSlug },
-      success_url: `${appUrl}/dashboard?subscription=success&plan=${planSlug}`,
+      metadata: { email, plan: planSlug, interval: billingInterval },
+      success_url: `${appUrl}/dashboard/billing?subscription=success&plan=${planSlug}`,
       cancel_url: `${appUrl}/pricing`,
+      allow_promotion_codes: true,
     });
 
     return Response.json({ url: session.url });

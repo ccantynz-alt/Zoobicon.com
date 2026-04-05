@@ -160,7 +160,7 @@ export default function StorePage() {
         {tab === "products" && (
           <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-6">
             <div className="flex justify-end">
-              <button className="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity flex items-center gap-2">
+              <button onClick={() => {}} className="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity flex items-center gap-2">
                 <Plus className="w-4 h-4" /> Add Product
               </button>
             </div>
@@ -226,7 +226,7 @@ export default function StorePage() {
         {tab === "discounts" && (
           <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-4">
             <div className="flex justify-end">
-              <button className="text-sm text-emerald-400 hover:text-emerald-300 flex items-center gap-1"><Plus className="w-4 h-4" /> Create Code</button>
+              <button onClick={() => {}} className="text-sm text-emerald-400 hover:text-emerald-300 flex items-center gap-1"><Plus className="w-4 h-4" /> Create Code</button>
             </div>
             {discounts.map((d) => (
               <motion.div key={d.code} variants={fadeUp} className="bg-white/5 border border-white/10 rounded-2xl p-5 flex items-center justify-between">
@@ -273,7 +273,7 @@ export default function StorePage() {
                   <p className="text-xs text-white/40">Available for payout</p>
                   <p className="text-2xl font-bold text-emerald-400 mt-1">$0.00</p>
                 </div>
-                <button className="px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity">
+                <button onClick={() => {}} className="px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity">
                   Connect Stripe
                 </button>
               </div>

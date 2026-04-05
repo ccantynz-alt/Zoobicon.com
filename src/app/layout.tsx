@@ -5,6 +5,7 @@ import CookieConsent from "@/components/CookieConsent";
 import SpeculationRules from "@/components/SpeculationRules";
 import AutoIndexNow from "@/components/AutoIndexNow";
 import StagingBanner from "@/components/StagingBanner";
+import MaintenanceBanner from "@/components/MaintenanceBanner";
 import SiteNavigation from "@/components/SiteNavigation";
 
 
@@ -125,7 +126,7 @@ export default function RootLayout({
         <link rel="alternate" href="https://zoobicon.io" title="Zoobicon for Developers" />
         <link rel="alternate" href="https://zoobicon.sh" title="Zoobicon Hosting & CLI" />
         {/* Critical inline styles — guarantees dark bg even before CSS bundle loads */}
-        <style dangerouslySetInnerHTML={{ __html: `html,body{background:#050508;color:#e4e4e7;margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;letter-spacing:-0.011em}` }} />
+        <style dangerouslySetInnerHTML={{ __html: `html,body{background:#050508;color:#e4e4e7;margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;letter-spacing:-0.011em;overscroll-behavior:none;-webkit-overflow-scrolling:touch}html{overflow-x:hidden}` }} />
         {/* Preconnect to Google Fonts CDN */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -341,6 +342,7 @@ export default function RootLayout({
         />
       </head>
       <body className="grain">
+        <MaintenanceBanner />
         <StagingBanner />
         <SiteNavigation />
         {children}

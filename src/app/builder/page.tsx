@@ -46,11 +46,14 @@ import OnboardingFlow from "@/components/OnboardingFlow";
 import BuildSuccessModal, { shouldShowBuildSuccess, dismissBuildSuccess } from "@/components/BuildSuccessModal";
 import MCPPanel from "@/components/MCPPanel";
 import ShareModal from "@/components/ShareModal";
+import GitHubSyncPanel from "@/components/GitHubSyncPanel";
+import DeployModal from "@/components/DeployModal";
 import { trackEvent } from "@/lib/achievements";
 import { notifyDeploy } from "@/lib/notifications";
 
 import {
   Bug,
+  GitBranchPlus,
   GitFork,
   Languages,
   FileArchive,
@@ -116,6 +119,7 @@ type ToolId =
   | "ai-images"
   | "debug"
   | "github"
+  | "github-sync"
   | "translate"
   | "wordpress"
   | "scaffold"
@@ -145,6 +149,7 @@ const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }
   { id: "variants", label: "A/B Variants", icon: <Layers size={18} /> },
   { id: "email", label: "Email Template", icon: <Mail size={18} /> },
   { id: "export", label: "Export", icon: <Download size={18} /> },
+  { id: "github-sync", label: "Push to GitHub", icon: <GitBranchPlus size={18} /> },
   { id: "debug", label: "Auto Debug", icon: <Bug size={18} /> },
   { id: "seo", label: "SEO Score", icon: <Search size={18} /> },
   { id: "animations", label: "Animations", icon: <Wand2 size={18} /> },
@@ -157,7 +162,7 @@ const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }
   { id: "wordpress", label: "Zoobicon Connect", icon: <FileArchive size={18} /> },
   { id: "project", label: "Project Mode", icon: <FolderTree size={18} /> },
   { id: "crawl", label: "Crawl Competitor", icon: <Eye size={18} /> },
-  { id: "mcp", label: "MCP Context", icon: <ExternalLink size={18} /> },
+  { id: "mcp", label: "Import From...", icon: <ExternalLink size={18} /> },
 ];
 
 /* ─── Interactive particle constellation background ─── */
@@ -402,9 +407,12 @@ function BuilderPage() {
   const [deployUrl, setDeployUrl] = useState("");
   const [deployStatus, setDeployStatus] = useState<"idle" | "deploying" | "deployed" | "error">("idle");
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showDeployModal, setShowDeployModal] = useState(false);
   const [pipelineAgents, setPipelineAgents] = useState<string[]>([]);
+  const [buildProgress, setBuildProgress] = useState<{ current: number; total: number; section: string } | null>(null);
   const [selectedModel, setSelectedModel] = useState("");  // Empty = use pipeline's smart routing (Haiku/Opus/Sonnet)
-  const [instantMode, setInstantMode] = useState(false); // Default to full AI generation for premium quality
+  const [instantMode, setInstantMode] = useState(true); // Default to fast registry assembly (scaffold <1s + AI customize ~10s)
+  const [fullStack, setFullStack] = useState(false); // Full-stack mode: auto-provisions Supabase backend (auth, database, storage)
   const [availableModels, setAvailableModels] = useState<AIModel[]>([]);
   const [reactSource, setReactSource] = useState<Record<string, string> | null>(null);
   const [reactFiles, setReactFiles] = useState<Record<string, string> | null>(null);
@@ -481,7 +489,11 @@ function BuilderPage() {
 
   const abortRef = useRef<AbortController | null>(null);
   const generationIdRef = useRef(0); // Tracks current generation to prevent stale image replacements
-  const hasCode = generatedCode.length > 0;
+  // hasCode must check for REAL content — not just the "<!-- react-app-mode -->" marker
+  // which can linger after a failed generation, leaving the builder stuck in "AI Editor" mode
+  const hasCode = generatedCode.length > 0 && (
+    generatedCode !== "<!-- react-app-mode -->" || (reactFiles !== null && Object.keys(reactFiles).length > 0)
+  );
 
   // Get user email for auth headers
   const getUserEmail = useCallback(() => {
@@ -493,13 +505,36 @@ function BuilderPage() {
   }, []);
 
   const authHeaders = useCallback(() => {
-    const email = getUserEmail();
     const headers: Record<string, string> = { "Content-Type": "application/json" };
-    if (email) headers["x-user-email"] = email;
+    try {
+      const u = localStorage.getItem("zoobicon_user");
+      if (u) {
+        const parsed = JSON.parse(u);
+        if (parsed.email) headers["x-user-email"] = parsed.email;
+        if (parsed.role === "admin" || parsed.plan === "unlimited") headers["x-admin"] = "1";
+      }
+    } catch { /* ignore */ }
     return headers;
-  }, [getUserEmail]);
+  }, []);
   const canUndo = historyIndex > 0;
   const canRedo = historyIndex < history.length - 1;
+
+  // Restore saved prompt after signup redirect
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("zoobicon_pending_prompt");
+      if (saved && !prompt) {
+        setPrompt(saved);
+        localStorage.removeItem("zoobicon_pending_prompt");
+      }
+      // Also check URL params for prompt
+      const params = new URLSearchParams(window.location.search);
+      const urlPrompt = params.get("prompt");
+      if (urlPrompt && !prompt) {
+        setPrompt(decodeURIComponent(urlPrompt));
+      }
+    } catch {}
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Admin always gets premium tier locked + load agency branding
   useEffect(() => {
@@ -723,278 +758,17 @@ function BuilderPage() {
     return html;
   }, []);
 
-  // streamGenerate removed — all generation now uses /api/generate/react SSE stream
-  // via handleGenerate (new builds) and handleEdit (edits)
-  const _legacyStreamRemoved = useCallback(
-    async () => {
-      setStatus("generating");
-      setError("");
-      setActiveTab("preview");
-
-      abortRef.current?.abort();
-      const controller = new AbortController();
-      abortRef.current = controller;
-
-      try {
-        const res = await fetch("/api/generate/stream", {
-          method: "POST",
-          headers: authHeaders(),
-          body: JSON.stringify({
-            prompt: userPrompt,
-            tier,
-            ...(existingCode ? { existingCode } : {}),
-            ...(selectedModel ? { model: selectedModel } : {}),
-            ...(generatorBanner ? { generator: generatorBanner.id } : {}),
-            ...(agencyBrand ? { agencyBrand } : {}),
-            ...(agencyId ? { agencyId } : {}),
-            ...(mcpContext ? { externalContext: mcpContext } : {}),
-          }),
-          signal: controller.signal,
-        });
-
-        if (!res.ok) {
-          // Check if this is a non-retryable error — don't fallback, surface immediately
-          try {
-            const errData = await res.clone().json();
-            const isNonRetryable = res.status === 401 || res.status === 403 || res.status === 429 ||
-              (errData.error && (errData.error.includes("API_KEY") || errData.error.includes("not configured") || errData.error.includes("API key")));
-            if (isNonRetryable && errData.error) {
-              setError(cleanErrorMessage(errData.error));
-              setStatus("error");
-              return;
-            }
-          } catch { /* not JSON, continue to fallback */ }
-
-          // Fallback to non-streaming endpoint
-          const fallbackRes = await fetch("/api/generate", {
-            method: "POST",
-            headers: authHeaders(),
-            body: JSON.stringify({
-              prompt: userPrompt,
-              tier,
-              ...(existingCode ? { existingCode } : {}),
-              ...(selectedModel ? { model: selectedModel } : {}),
-              ...(generatorBanner ? { generator: generatorBanner.id } : {}),
-              ...(agencyBrand ? { agencyBrand } : {}),
-            ...(agencyId ? { agencyId } : {}),
-            }),
-          });
-          if (!fallbackRes.ok) {
-            let fbErrMsg = `Generation returned HTTP ${fallbackRes.status}`;
-            try {
-              const data = await fallbackRes.json();
-              fbErrMsg = data.error || fbErrMsg;
-            } catch {
-              if (fallbackRes.status === 504 || fallbackRes.status === 502) {
-                fbErrMsg = "AI model timed out. Try again with a simpler prompt.";
-              }
-            }
-            throw new Error(fbErrMsg);
-          }
-          const data = await fallbackRes.json();
-          let fbHtml = (data.html || "").trim();
-          fbHtml = fbHtml.replace(/^```(?:html|HTML)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
-          const fbStart = fbHtml.search(/<!doctype\s+html|<html/i);
-          if (fbStart > 0) fbHtml = fbHtml.slice(fbStart);
-          const fbEnd = fbHtml.lastIndexOf("</html>");
-          if (fbEnd !== -1) fbHtml = fbHtml.slice(0, fbEnd + "</html>".length);
-          // Validate body content before accepting fallback
-          const fbBodyM = fbHtml.match(/<body[^>]*>([\s\S]*)<\/body>/i);
-          const fbBodyChars = fbBodyM
-            ? fbBodyM[1].replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().length
-            : 0;
-          if (fbBodyChars < 50) {
-            throw new Error(`Fallback generation produced empty body (${fbBodyChars} chars). The AI model may be unavailable — check /api/health for diagnostics.`);
-          }
-          setGeneratedCode(fbHtml);
-          setStatus("complete");
-          // Auto-replace placeholder images
-          autoReplaceImages(fbHtml).then((improved) => {
-            if (improved !== fbHtml) setGeneratedCode(improved);
-          });
-          return;
-        }
-
-        const reader = res.body?.getReader();
-        if (!reader) throw new Error("No response stream");
-
-        const decoder = new TextDecoder();
-        let accumulated = "";
-        let lineBuffer = ""; // Buffer for incomplete SSE lines split across chunks
-        let streamAborted = false; // Set when edit_failed or error terminates the stream early
-
-        const processStreamLines = (lines: string[]) => {
-          for (const line of lines) {
-            if (streamAborted) return;
-            if (!line.startsWith("data: ")) continue;
-            const jsonStr = line.slice(6).trim();
-            if (!jsonStr) continue;
-
-            try {
-              const event = JSON.parse(jsonStr);
-              if (event.type === "chunk" && event.content) {
-                accumulated += event.content;
-                setGeneratedCode(accumulated);
-              } else if (event.type === "replace" && event.content) {
-                // Server retried due to empty body — replace accumulated HTML entirely
-                accumulated = event.content;
-                setGeneratedCode(accumulated);
-              } else if (event.type === "status") {
-                // Informational status update (e.g., "Retrying...")
-              } else if (event.type === "done") {
-                if (!streamAborted) {
-                  setStatus("complete");
-                  trackEvent("build");
-                }
-              } else if (event.type === "edit_failed") {
-                // Edit produced empty body — preserve original code, show warning
-                streamAborted = true;
-                if (existingCode) {
-                  setGeneratedCode(existingCode);
-                }
-                setError(event.message || "Edit failed — original site preserved.");
-                setStatus("error");
-                return;
-              } else if (event.type === "error") {
-                // Clear empty/partial code so Sandpack shows clean state
-                setGeneratedCode("");
-                setError(cleanErrorMessage(event.message || "Stream error"));
-                setStatus("error");
-                return;
-              }
-            } catch {
-              // Skip malformed SSE lines — non-JSON data lines are harmless
-            }
-          }
-        };
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const text = decoder.decode(value, { stream: true });
-          lineBuffer += text;
-          const lines = lineBuffer.split("\n");
-          // Keep the last (potentially incomplete) line in the buffer
-          lineBuffer = lines.pop() || "";
-          processStreamLines(lines);
-        }
-
-        // Flush any remaining data after stream closes
-        if (lineBuffer.trim()) {
-          const finalText = decoder.decode();
-          lineBuffer += finalText;
-          processStreamLines(lineBuffer.split("\n"));
-        }
-
-        if (streamAborted) {
-          // edit_failed or error already handled — don't process accumulated HTML
-          return;
-        }
-
-        if (accumulated) {
-          // Clean accumulated HTML — strip code fences, JSON preamble
-          let clean = accumulated.trim();
-          clean = clean.replace(/^```(?:html|HTML)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
-          // Strip any leading JSON config that leaked through
-          clean = clean.replace(/^\s*\{[\s\S]*?\}\s*(?=<[a-zA-Z!])/, "");
-          const ds = clean.search(/<!doctype\s+html|<html/i);
-          if (ds > 0) clean = clean.slice(ds);
-          const he = clean.lastIndexOf("</html>");
-          if (he !== -1) clean = clean.slice(0, he + "</html>".length);
-
-          // Client-side body check — last line of defense against empty pages
-          const bodyM = clean.match(/<body[^>]*>([\s\S]*)<\/body>/i);
-          const bodyChars = bodyM
-            ? bodyM[1].replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().length
-            : 0;
-
-          if (existingCode && bodyChars < 50) {
-            // Edit produced empty body — restore original code
-            console.warn(`[Builder] Edit produced empty body (${bodyChars} chars). Restoring original code.`);
-            setGeneratedCode(existingCode);
-            setError("Edit response was incomplete. Your original site has been preserved. Try a simpler edit or try again.");
-            setStatus("error");
-            return;
-          } else if (!existingCode && bodyChars < 50) {
-            // Body is empty even after server retry — do one client-side retry via non-streaming endpoint
-            console.warn(`[Builder] Empty body after stream (${bodyChars} chars). Client-side retry...`);
-            try {
-              const retryRes = await fetch("/api/generate", {
-                method: "POST",
-                headers: authHeaders(),
-                body: JSON.stringify({
-                  prompt: userPrompt,
-                  tier,
-                  ...(selectedModel ? { model: selectedModel } : {}),
-                  ...(agencyBrand ? { agencyBrand } : {}),
-            ...(agencyId ? { agencyId } : {}),
-                }),
-                signal: controller.signal,
-              });
-              if (retryRes.ok) {
-                const retryData = await retryRes.json();
-                let retryHtml = (retryData.html || "").trim();
-                retryHtml = retryHtml.replace(/^```(?:html|HTML)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
-                const rds = retryHtml.search(/<!doctype\s+html|<html/i);
-                if (rds > 0) retryHtml = retryHtml.slice(rds);
-                const rhe = retryHtml.lastIndexOf("</html>");
-                if (rhe !== -1) retryHtml = retryHtml.slice(0, rhe + "</html>".length);
-                // Only accept retry if it actually has body content
-                const retryBodyM = retryHtml.match(/<body[^>]*>([\s\S]*)<\/body>/i);
-                const retryBodyChars = retryBodyM
-                  ? retryBodyM[1].replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().length
-                  : 0;
-                if (retryBodyChars >= 50) {
-                  clean = retryHtml;
-                } else {
-                  console.warn(`[Builder] Client-side retry also empty (${retryBodyChars} body chars)`);
-                  // All retries exhausted — clear HTML and show error instead of empty page warning
-                  setGeneratedCode("");
-                  setError("Generation produced empty content after multiple retries. Your API key may be invalid or rate-limited — check /api/health for diagnostics, then try again.");
-                  setStatus("error");
-                  return;
-                }
-              } else {
-                // Retry request failed — read actual error and show it
-                let retryErrMsg = "Generation failed after retries. Please try again.";
-                try {
-                  const retryErrData = await retryRes.json();
-                  if (retryErrData.error) retryErrMsg = retryErrData.error;
-                } catch { /* ignore parse errors */ }
-                setGeneratedCode("");
-                setError(retryErrMsg);
-                setStatus("error");
-                return;
-              }
-            } catch (retryErr) {
-              console.error("[Builder] Client-side retry failed:", retryErr);
-              setGeneratedCode("");
-              setError("Generation failed — please try again.");
-              setStatus("error");
-              return;
-            }
-          }
-
-          setGeneratedCode(clean);
-          setStatus("complete");
-          trackEvent("build");
-          // Auto-replace placeholder images
-          autoReplaceImages(clean).then((improved) => {
-            if (improved !== clean) setGeneratedCode(improved);
-          });
-        }
-      } catch (err) {
-        if ((err as Error).name === "AbortError") return;
-        setError(cleanErrorMessage(err instanceof Error ? err.message : "Something went wrong"));
-        setStatus("error");
-      }
-    },
-    [tier, autoReplaceImages, selectedModel]
-  );
-
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim()) return;
+
+    // CHECK AUTH FIRST — don't waste the user's time
+    const userStr = typeof window !== "undefined" ? localStorage.getItem("zoobicon_user") : null;
+    if (!userStr) {
+      // Save their prompt so it's not lost after signup
+      try { localStorage.setItem("zoobicon_pending_prompt", prompt.trim()); } catch {}
+      window.location.href = `/auth/signup?redirect=/builder&prompt=${encodeURIComponent(prompt.trim().slice(0, 200))}`;
+      return;
+    }
 
     // Close welcome modal if open
     if (showWelcome) {
@@ -1008,78 +782,32 @@ function BuilderPage() {
     setGeneratedCode("");
     setActiveTab("preview");
     setPipelineAgents([]);
+    setBuildProgress(null);
     pendingLabelRef.current = `Build: ${prompt.trim().slice(0, 50)}`;
 
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
 
-    // ── React App mode: full AI generation with streaming ──
+    // ── React App mode: server handles everything via streaming ──
     if (generationMode === "react") {
       setStatus("generating");
-      setPipelineAgents(["AI is building your site..."]);
 
-      // Show loading skeleton immediately so the preview isn't blank
-      setReactFiles({
-        "App.tsx": `import React from "react";
-import "./styles.css";
+      // TWO PATHS:
+      // 1. Fast path (instantMode=true, DEFAULT): Registry scaffold (<1s) + AI customization (~10s)
+      // 2. Full path (instantMode=false): Opus generates everything from scratch (~30s)
+      const useFastPath = instantMode;
+      const endpoint = useFastPath ? "/api/generate/react-stream" : "/api/generate/react";
+      setPipelineAgents([useFastPath ? "Assembling components from registry..." : "AI generating full application..."]);
 
-export default function App() {
-  return (
-    <div style={{ minHeight: "100vh", background: "#f8fafc", fontFamily: "'Inter', system-ui, sans-serif" }}>
-      {/* Loading skeleton — real content is being generated */}
-      <div style={{ background: "#0f172a", padding: "16px 24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div style={{ width: 120, height: 24, background: "#1e293b", borderRadius: 6 }} />
-        <div style={{ display: "flex", gap: 16 }}>
-          <div style={{ width: 60, height: 16, background: "#1e293b", borderRadius: 4 }} />
-          <div style={{ width: 60, height: 16, background: "#1e293b", borderRadius: 4 }} />
-          <div style={{ width: 60, height: 16, background: "#1e293b", borderRadius: 4 }} />
-          <div style={{ width: 100, height: 32, background: "#4f46e5", borderRadius: 8 }} />
-        </div>
-      </div>
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "80px 24px", textAlign: "center" }}>
-        <div style={{ width: 200, height: 28, background: "#e2e8f0", borderRadius: 16, margin: "0 auto 24px" }} />
-        <div style={{ width: "70%", height: 48, background: "#cbd5e1", borderRadius: 8, margin: "0 auto 16px" }} />
-        <div style={{ width: "50%", height: 48, background: "#cbd5e1", borderRadius: 8, margin: "0 auto 24px" }} />
-        <div style={{ width: "60%", height: 20, background: "#e2e8f0", borderRadius: 4, margin: "0 auto 32px" }} />
-        <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
-          <div style={{ width: 160, height: 48, background: "#4f46e5", borderRadius: 12 }} />
-          <div style={{ width: 160, height: 48, background: "#f1f5f9", borderRadius: 12, border: "1px solid #e2e8f0" }} />
-        </div>
-      </div>
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "60px 24px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }}>
-          {[1,2,3].map(i => (
-            <div key={i} style={{ padding: 32, borderRadius: 16, border: "1px solid #e2e8f0", background: "#fff" }}>
-              <div style={{ width: 48, height: 48, background: "#ede9fe", borderRadius: 12, marginBottom: 16 }} />
-              <div style={{ width: "80%", height: 20, background: "#e2e8f0", borderRadius: 4, marginBottom: 8 }} />
-              <div style={{ width: "100%", height: 14, background: "#f1f5f9", borderRadius: 4, marginBottom: 6 }} />
-              <div style={{ width: "90%", height: 14, background: "#f1f5f9", borderRadius: 4 }} />
-            </div>
-          ))}
-        </div>
-      </div>
-      <p style={{ textAlign: "center", color: "#94a3b8", fontSize: 14, padding: "40px 0", animation: "pulse 2s infinite" }}>
-        Generating your site...
-      </p>
-      <style>{"@keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.5 } }"}</style>
-    </div>
-  );
-}`,
-        "styles.css": `@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-* { margin: 0; padding: 0; box-sizing: border-box; }`,
-      });
-      setGeneratedCode("<!-- react-app-mode -->");
-
-      // Use the full AI generation endpoint — generates real content from scratch
-      // No placeholder templates, no scaffolds, no "Launchpad" or "Velocita"
       try {
-        const res = await fetch("/api/generate/react", {
+        const res = await fetch(endpoint, {
           method: "POST",
           headers: authHeaders(),
           body: JSON.stringify({
             prompt: prompt.trim(),
-            tier: "premium",
+            tier: useFastPath ? "standard" : "premium",
+            fullStack,
           }),
           signal: controller.signal,
         });
@@ -1095,10 +823,23 @@ export default function App() {
 
         const decoder = new TextDecoder();
         let lineBuffer = "";
+        let receivedFiles = false;
+        let receivedDone = false;
+        const STREAM_TIMEOUT_MS = 270000; // 4.5 minutes — leaves headroom before Vercel's 5min limit
+        let lastDataAt = Date.now();
 
         while (true) {
-          const { done, value } = await reader.read();
+          const readPromise = reader.read();
+          const timeoutPromise = new Promise<never>((_, reject) => {
+            setTimeout(() => {
+              if (Date.now() - lastDataAt > STREAM_TIMEOUT_MS) {
+                reject(new Error("Generation timed out — no data received for 4 minutes. Please try again."));
+              }
+            }, STREAM_TIMEOUT_MS);
+          });
+          const { done, value } = await Promise.race([readPromise, timeoutPromise]);
           if (done) break;
+          lastDataAt = Date.now();
           lineBuffer += decoder.decode(value, { stream: true });
           const lines = lineBuffer.split("\n");
           lineBuffer = lines.pop() || "";
@@ -1113,13 +854,39 @@ export default function App() {
 
               if (event.type === "status") {
                 setPipelineAgents(prev => [...prev, event.message]);
-              } else if (event.type === "partial" && event.files) {
-                // Streaming: files arrive as they're generated
+                // Update progress bar if event carries progress numbers
+                if (event.current != null && event.total != null) {
+                  setBuildProgress({ current: event.current, total: event.total, section: event.section || "" });
+                }
+              } else if (event.type === "scaffold" && event.files) {
+                // Legacy scaffold event (full assembly at once) — still supported
                 if (generationIdRef.current === currentGenId) {
-                  setReactFiles(prev => ({ ...prev, ...event.files }));
+                  setReactFiles(event.files);
                   setGeneratedCode("<!-- react-app-mode -->");
-                  if (event.latestFile) {
-                    setPipelineAgents(prev => [...prev, `Built ${event.fileCount} files — ${event.latestFile}`]);
+                  receivedFiles = true;
+                  setPipelineAgents(prev => [...prev, `Scaffold ready — ${event.componentCount} components assembled`]);
+                }
+              } else if (event.type === "customization" && event.data) {
+                // Legacy customization event
+                if (generationIdRef.current === currentGenId) {
+                  setPipelineAgents(prev => [...prev, `Customizing for "${event.data.brandName || "your business"}"...`]);
+                }
+              } else if (event.type === "scaffold-update" && event.files) {
+                // Legacy scaffold update
+                if (generationIdRef.current === currentGenId) {
+                  setReactFiles(event.files);
+                  setGeneratedCode("<!-- react-app-mode -->");
+                  receivedFiles = true;
+                }
+              } else if (event.type === "partial" && event.files) {
+                // Progressive streaming: each partial carries the full file map so far
+                if (generationIdRef.current === currentGenId) {
+                  setReactFiles(event.files);
+                  setGeneratedCode("<!-- react-app-mode -->");
+                  receivedFiles = true;
+                  // Update progress indicator
+                  if (event.fileCount != null && event.totalComponents != null) {
+                    setBuildProgress({ current: event.fileCount, total: event.totalComponents, section: event.section || "" });
                   }
                 }
               } else if ((event.type === "done" && event.files) || (event.type === "done")) {
@@ -1129,9 +896,12 @@ export default function App() {
                     setReactFiles(event.files);
                     setReactDeps(event.dependencies || {});
                     setReactSource(event.files);
+                    receivedFiles = true;
                   }
                   setGeneratedCode("<!-- react-app-mode -->");
                   setStatus("complete");
+                  setBuildProgress(null);
+                  receivedDone = true;
                   setPipelineAgents(prev => [...prev, "Build complete"]);
                   trackEvent("build");
                 }
@@ -1147,22 +917,70 @@ export default function App() {
           }
         }
 
-        // Flush remaining buffer
+        // Flush remaining buffer — handle all event types, not just "done"
         if (lineBuffer.trim()) {
           for (const line of lineBuffer.split("\n")) {
             if (!line.startsWith("data: ")) continue;
+            const jsonStr = line.slice(6).trim();
+            if (!jsonStr) continue;
             try {
-              const event = JSON.parse(line.slice(6).trim());
-              if (event.type === "done" && event.files && generationIdRef.current === currentGenId) {
-                setReactFiles(event.files);
-                setReactDeps(event.dependencies || {});
-                setReactSource(event.files);
+              const event = JSON.parse(jsonStr);
+              if (event.type === "status") {
+                setPipelineAgents(prev => [...prev, event.message]);
+                if (event.current != null && event.total != null) {
+                  setBuildProgress({ current: event.current, total: event.total, section: event.section || "" });
+                }
+              } else if (event.type === "scaffold" && event.files) {
+                if (generationIdRef.current === currentGenId) {
+                  setReactFiles(event.files);
+                  setGeneratedCode("<!-- react-app-mode -->");
+                }
+              } else if (event.type === "scaffold-update" && event.files) {
+                if (generationIdRef.current === currentGenId) {
+                  setReactFiles(event.files);
+                  setGeneratedCode("<!-- react-app-mode -->");
+                }
+              } else if (event.type === "partial" && event.files) {
+                if (generationIdRef.current === currentGenId) {
+                  setReactFiles(event.files);
+                  setGeneratedCode("<!-- react-app-mode -->");
+                  if (event.fileCount != null && event.totalComponents != null) {
+                    setBuildProgress({ current: event.fileCount, total: event.totalComponents, section: event.section || "" });
+                  }
+                }
+              } else if (event.type === "done" && generationIdRef.current === currentGenId) {
+                if (event.files) {
+                  setReactFiles(event.files);
+                  setReactDeps(event.dependencies || {});
+                  setReactSource(event.files);
+                }
                 setGeneratedCode("<!-- react-app-mode -->");
                 setStatus("complete");
+                setBuildProgress(null);
+                setPipelineAgents(prev => [...prev, "Build complete"]);
                 trackEvent("build");
+              } else if (event.type === "error") {
+                throw new Error(event.message || "Generation failed");
               }
-            } catch { /* ignore */ }
+            } catch (e) {
+              if (e instanceof Error && (e.message.includes("failed") || e.message.includes("Generation") || e.message.includes("unavailable") || e.message.includes("busy"))) {
+                throw e;
+              }
+              // Skip JSON parse errors from partial chunks
+            }
           }
+        }
+
+        // Safety net: if stream ended but we never received files, show a clear error
+        if (generationIdRef.current === currentGenId && !receivedFiles) {
+          setError("No components were generated. The AI service may be unavailable or misconfigured. Please try again in a moment.");
+          setStatus("error");
+          setBuildProgress(null);
+        } else if (generationIdRef.current === currentGenId && !receivedDone) {
+          // Got partial files but stream ended without "done" — show what we have
+          setStatus("complete");
+          setBuildProgress(null);
+          setPipelineAgents(prev => [...prev, "Build complete (stream ended early — partial results shown)"]);
         }
       } catch (err) {
         if ((err as Error).name === "AbortError") return;
@@ -1170,12 +988,13 @@ export default function App() {
         console.error("[React Generate] Failed:", errMsg);
         setGeneratedCode("");
         setReactFiles(null);
+        setBuildProgress(null);
         setError(cleanErrorMessage(errMsg));
         setStatus("error");
       }
       return;
     }
-  }, [prompt, tier, autoReplaceImages, selectedModel, instantMode, generationMode]);
+  }, [prompt, tier, autoReplaceImages, selectedModel, instantMode, generationMode, fullStack]);
 
   // Edit existing React files via the same streaming endpoint
   const handleEdit = useCallback(async () => {
@@ -1283,40 +1102,27 @@ export default function App() {
     []
   );
 
-  const handleDeploy = useCallback(async () => {
-    // For React app mode, build a single HTML file from the React files
-    const hasReactFiles = Object.keys(reactFiles).length > 0;
+  /** Build the deployable HTML code from current state (React files or raw HTML) */
+  const buildDeployCode = useCallback((siteName: string): string | null => {
+    const files = reactFiles ?? {};
+    const hasReactFiles = Object.keys(files).length > 0;
     const hasHtml = generatedCode && generatedCode !== "<!-- react-app-mode -->";
 
-    if (!hasReactFiles && !hasHtml) return;
-    if (isDeploying) return;
+    if (!hasReactFiles && !hasHtml) return null;
 
-    setIsDeploying(true);
-    setDeployStatus("deploying");
+    if (hasReactFiles && !hasHtml) {
+      // React mode: combine all files into a single deployable HTML page
+      const appCode = files["App.tsx"] || "";
+      const cssCode = files["styles.css"] || "";
+      const componentCodes = Object.entries(files)
+        .filter(([path]) => path.startsWith("components/") && path.endsWith(".tsx"))
+        .map(([path, code]) => {
+          const name = path.replace("components/", "").replace(".tsx", "");
+          return `// --- ${name} ---\n${code}`;
+        })
+        .join("\n\n");
 
-    try {
-      const userStr = typeof window !== "undefined" ? localStorage.getItem("zoobicon_user") : null;
-      const user = userStr ? JSON.parse(userStr) : null;
-      const email = user?.email || "anonymous@zoobicon.com";
-      const siteName = prompt.trim().slice(0, 50) || "My Site";
-
-      // Build deployable code — either raw HTML or assembled React app
-      let deployCode = generatedCode;
-
-      if (hasReactFiles && !hasHtml) {
-        // React mode: combine all files into a single deployable HTML page
-        // This wraps the React components in an HTML shell with Tailwind + React CDN
-        const appCode = reactFiles["App.tsx"] || "";
-        const cssCode = reactFiles["styles.css"] || "";
-        const componentCodes = Object.entries(reactFiles)
-          .filter(([path]) => path.startsWith("components/") && path.endsWith(".tsx"))
-          .map(([path, code]) => {
-            const name = path.replace("components/", "").replace(".tsx", "");
-            return `// --- ${name} ---\n${code}`;
-          })
-          .join("\n\n");
-
-        deployCode = `<!DOCTYPE html>
+      return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -1340,7 +1146,23 @@ root.render(React.createElement(App));
   <\/script>
 </body>
 </html>`;
-      }
+    }
+
+    return generatedCode;
+  }, [generatedCode, reactFiles]);
+
+  /** Called by DeployModal when user confirms deploy */
+  const handleDeployWithName = useCallback(async (siteName: string): Promise<{ url: string; slug: string; deployTimeMs?: number } | null> => {
+    const deployCode = buildDeployCode(siteName);
+    if (!deployCode) throw new Error("No code to deploy");
+
+    setIsDeploying(true);
+    setDeployStatus("deploying");
+
+    try {
+      const userStr = typeof window !== "undefined" ? localStorage.getItem("zoobicon_user") : null;
+      const user = userStr ? JSON.parse(userStr) : null;
+      const email = user?.email || "anonymous@zoobicon.com";
 
       const res = await fetch("/api/hosting/deploy", {
         method: "POST",
@@ -1361,15 +1183,20 @@ root.render(React.createElement(App));
       trackEvent("deploy");
       notifyDeploy(siteName, data.url);
 
-      // Show share modal after successful deploy
-      setShowShareModal(true);
+      return { url: data.url, slug: data.siteSlug, deployTimeMs: data.deployTimeMs };
     } catch (err) {
       setError(err instanceof Error ? err.message : "Deploy failed");
       setDeployStatus("error");
+      throw err;
     } finally {
       setIsDeploying(false);
     }
-  }, [generatedCode, isDeploying, prompt]);
+  }, [buildDeployCode]);
+
+  /** Quick deploy handler for inline button and BuildSuccessModal */
+  const handleDeploy = useCallback(() => {
+    setShowDeployModal(true);
+  }, []);
 
   const handleSaveTemplate = useCallback(async () => {
     if (!generatedCode || saveStatus === "saving") return;
@@ -1411,6 +1238,13 @@ root.render(React.createElement(App));
         return <AutoDebugPanel code={generatedCode} onApplyFix={handleCodeUpdate} />;
       case "github":
         return <GitHubImport onImport={handleCodeUpdate} />;
+      case "github-sync":
+        return (
+          <GitHubSyncPanel
+            files={reactFiles || {}}
+            suggestedName={prompt.trim().slice(0, 50) || "zoobicon-project"}
+          />
+        );
       case "translate":
         return (
           <TranslatePanel code={generatedCode} onApplyTranslation={handleCodeUpdate} />
@@ -1536,16 +1370,29 @@ root.render(React.createElement(App));
           </button>
         </div>
 
-        {/* Pipeline status overlay — shows during generation */}
+        {/* Pipeline status overlay — shows during generation with progress bar */}
         {status === "generating" && pipelineAgents.length > 0 && (
           <div className="absolute bottom-6 left-6 right-6 z-40">
-            <div className="max-w-xl mx-auto px-5 py-3 rounded-2xl bg-black/60 backdrop-blur-xl border border-white/[0.08]">
-              <div className="flex items-center gap-3">
-                <div className="w-2.5 h-2.5 rounded-full bg-violet-500 animate-pulse" />
-                <span className="text-sm text-white/80 font-medium">
+            <div className="max-w-xl mx-auto px-5 py-3 rounded-2xl bg-black/70 backdrop-blur-xl border border-white/[0.08] shadow-2xl">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-violet-500 animate-pulse flex-shrink-0" />
+                <span className="text-sm text-white/80 font-medium truncate">
                   {pipelineAgents[pipelineAgents.length - 1]}
                 </span>
+                {buildProgress && buildProgress.total > 0 && (
+                  <span className="text-xs text-white/40 ml-auto flex-shrink-0">
+                    {buildProgress.current}/{buildProgress.total}
+                  </span>
+                )}
               </div>
+              {buildProgress && buildProgress.total > 0 && (
+                <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 transition-all duration-500 ease-out"
+                    style={{ width: `${Math.round((buildProgress.current / buildProgress.total) * 100)}%` }}
+                  />
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -1575,12 +1422,24 @@ root.render(React.createElement(App));
                 onClick={() => setInstantMode(!instantMode)}
                 className={`px-3 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-wider transition-all border ${
                   instantMode
-                    ? "bg-amber-500/10 border-amber-500/30 text-amber-400"
-                    : "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                    : "bg-violet-500/10 border-violet-500/30 text-violet-400"
                 }`}
-                title={instantMode ? "Quick: 3s scaffold preview (lower quality)" : "Premium: full AI generation (best quality)"}
+                title={instantMode ? "Instant: <3s preview from component library" : "Deep Build: full AI generation with Opus (~30s)"}
               >
-                {instantMode ? "⚡ Quick" : "✨ Premium"}
+                {instantMode ? "Instant" : "Deep Build"}
+              </button>
+              <button
+                onClick={() => setFullStack(!fullStack)}
+                className={`px-3 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-wider transition-all border ${
+                  fullStack
+                    ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-400"
+                    : "bg-white/5 border-white/10 text-white/40"
+                }`}
+                title={fullStack ? "Full-Stack: auto-provisions database, auth, and storage" : "Frontend only: no backend services"}
+              >
+                <Database size={12} className="inline mr-1" />
+                {fullStack ? "Full-Stack" : "Frontend"}
               </button>
               <button
                 onClick={handleGenerate}
@@ -1668,6 +1527,31 @@ root.render(React.createElement(App));
                   </span>
                 )}
               </div>
+              {/* Quick import context bar */}
+              {mcpContext && (
+                <div className="px-4 py-1.5 border-b border-white/[0.05] flex items-center gap-2">
+                  <span className="text-[10px] text-indigo-400/70">
+                    Context imported
+                  </span>
+                  <button
+                    onClick={() => setActiveTool("mcp")}
+                    className="text-[10px] text-indigo-400/50 hover:text-indigo-400 transition-colors"
+                  >
+                    Manage
+                  </button>
+                </div>
+              )}
+              {!mcpContext && !hasCode && (
+                <div className="px-4 py-1.5 border-b border-white/[0.05]">
+                  <button
+                    onClick={() => setActiveTool("mcp")}
+                    className="flex items-center gap-1.5 text-[10px] text-white/30 hover:text-indigo-400/70 transition-colors"
+                  >
+                    <ExternalLink size={10} />
+                    Import from GitHub, Figma, or URL
+                  </button>
+                </div>
+              )}
               <div className="flex-1 overflow-hidden">
                 <PromptInput
                   prompt={prompt}
@@ -1685,6 +1569,8 @@ root.render(React.createElement(App));
                   availableModels={availableModels}
                   generationMode={generationMode}
                   onGenerationModeChange={setGenerationMode}
+                  fullStack={fullStack}
+                  onFullStackChange={setFullStack}
                 />
               </div>
             </>
@@ -1703,9 +1589,19 @@ root.render(React.createElement(App));
               </div>
               <div className="flex-1 overflow-hidden">
                 <ChatPanel
-                  currentCode={generatedCode}
-                  onCodeUpdate={handleCodeUpdate}
+                  reactFiles={reactFiles}
+                  onFilesUpdate={(changedFiles) => {
+                    // Merge only the changed files into the existing set (diff-based)
+                    setReactFiles(prev => {
+                      const merged = { ...prev, ...changedFiles };
+                      setReactSource(merged);
+                      return merged;
+                    });
+                    setStatus("complete");
+                    pendingLabelRef.current = `Edit: ${Object.keys(changedFiles).join(", ")}`;
+                  }}
                   isVisible={true}
+                  isGenerating={status === "generating"}
                 />
               </div>
             </>
@@ -1812,6 +1708,18 @@ root.render(React.createElement(App));
                   </div>
                 )}
                 <button
+                  onClick={() => setActiveTool(activeTool === "github-sync" ? null : "github-sync")}
+                  title="Push to GitHub"
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                    activeTool === "github-sync"
+                      ? "bg-white/10 text-white/80"
+                      : "bg-white/[0.07] text-white/60 hover:text-white/60 hover:bg-white/[0.08]"
+                  }`}
+                >
+                  <GitBranchPlus size={14} />
+                  GitHub
+                </button>
+                <button
                   onClick={handleSaveTemplate}
                   disabled={saveStatus === "saving"}
                   title="Save as reusable template"
@@ -1821,12 +1729,12 @@ root.render(React.createElement(App));
                   {saveStatus === "saving" ? "Saving..." : saveStatus === "saved" ? "Saved" : "Save"}
                 </button>
                 <button
-                  onClick={handleDeploy}
+                  onClick={() => setShowDeployModal(true)}
                   disabled={isDeploying}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                  className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                     isDeploying
-                      ? "bg-brand-500/10 text-brand-400/50 cursor-wait"
-                      : "bg-brand-500/20 text-brand-400 hover:bg-brand-500/30"
+                      ? "bg-amber-500/10 text-amber-400/50 cursor-wait"
+                      : "bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-400 hover:to-amber-500 shadow-lg shadow-amber-500/20"
                   }`}
                 >
                   <Rocket size={14} className={isDeploying ? "animate-pulse" : ""} />
@@ -1854,7 +1762,7 @@ root.render(React.createElement(App));
                   <p className="text-red-200/60 text-xs mb-4">{error}</p>
                   <button
                     onClick={() => { setError(""); setStatus("idle"); }}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded-lg transition-colors"
+                    className="px-5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white text-xs font-semibold rounded-xl transition-all shadow-lg shadow-amber-500/20"
                   >
                     Try Again
                   </button>
@@ -1873,6 +1781,31 @@ root.render(React.createElement(App));
                     participants={collab.participants}
                     containerRect={previewRect}
                   />
+                )}
+                {status === "generating" && pipelineAgents.length > 0 && (
+                  <div className="absolute bottom-4 left-4 right-4 z-30 pointer-events-none">
+                    <div className="max-w-lg mx-auto px-4 py-3 rounded-xl bg-black/70 backdrop-blur-xl border border-white/[0.08] shadow-2xl pointer-events-auto">
+                      <div className="flex items-center gap-3 mb-1.5">
+                        <div className="w-2 h-2 rounded-full bg-violet-500 animate-pulse flex-shrink-0" />
+                        <span className="text-xs text-white/80 font-medium truncate">
+                          {pipelineAgents[pipelineAgents.length - 1]}
+                        </span>
+                        {buildProgress && buildProgress.total > 0 && (
+                          <span className="text-[10px] text-white/40 ml-auto flex-shrink-0 tabular-nums">
+                            {buildProgress.current}/{buildProgress.total}
+                          </span>
+                        )}
+                      </div>
+                      {buildProgress && buildProgress.total > 0 && (
+                        <div className="w-full h-1 rounded-full bg-white/10 overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 transition-all duration-500 ease-out"
+                            style={{ width: `${Math.round((buildProgress.current / buildProgress.total) * 100)}%` }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 )}
               </div>
             ) : activeTab === "seo" ? (
@@ -1938,6 +1871,18 @@ root.render(React.createElement(App));
         onClose={() => setShowShareModal(false)}
         siteUrl={deployUrl}
         siteName={prompt.trim().slice(0, 50) || "My Site"}
+      />
+      <DeployModal
+        isOpen={showDeployModal}
+        onClose={() => {
+          setShowDeployModal(false);
+          // If deploy succeeded, show share modal
+          if (deployStatus === "deployed" && deployUrl) {
+            setShowShareModal(true);
+          }
+        }}
+        onDeploy={handleDeployWithName}
+        defaultName={prompt.trim().slice(0, 50) || "My Site"}
       />
     </div>
   );

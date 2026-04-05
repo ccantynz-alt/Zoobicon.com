@@ -6,7 +6,7 @@ registerComponent({
   name: "Testimonial Cards",
   category: "testimonials",
   variant: "cards",
-  description: "3 testimonial cards with star ratings, avatars, company names, and specific metrics",
+  description: "3 testimonial cards with star ratings, avatars, metrics, gradient accents, and aggregate social proof. $100K quality",
   tags: ["modern", "saas", "startup", "business", "agency", "tech", "software", "service", "marketing"],
   code: `export default function Testimonials() {
   const testimonials = [
@@ -16,8 +16,10 @@ registerComponent({
       role: "VP of Engineering",
       company: "Meridian Health",
       avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-      metric: "94% faster response times",
+      metric: "94% faster",
+      metricLabel: "response times",
       stars: 5,
+      featured: true,
     },
     {
       quote: "The ROI was undeniable within 30 days. We cut our cloud spend by 40% while handling 3x more traffic. The auto-scaling alone paid for the annual plan.",
@@ -25,8 +27,10 @@ registerComponent({
       role: "CTO",
       company: "Paystream",
       avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-      metric: "40% cost reduction",
+      metric: "40% less",
+      metricLabel: "cloud spend",
       stars: 5,
+      featured: false,
     },
     {
       quote: "Our dev team ships 5 releases a day now instead of 2 per week. The CI/CD integration was seamless and the deployment previews changed how we do code review.",
@@ -34,30 +38,43 @@ registerComponent({
       role: "Head of Product",
       company: "Canopy Analytics",
       avatar: "https://randomuser.me/api/portraits/women/68.jpg",
-      metric: "17x faster shipping",
+      metric: "17x faster",
+      metricLabel: "shipping",
       stars: 5,
+      featured: false,
     },
   ];
   return (
-    <section className="py-28 px-6 bg-gray-50">
-      <div className="max-w-7xl mx-auto">
+    <section className="py-28 px-6 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-indigo-100/40 rounded-full blur-[100px]" />
+      <div className="relative max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <p className="text-sm font-semibold text-indigo-600 uppercase tracking-widest mb-3">Testimonials</p>
           <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">Teams Ship Faster With Us</h2>
           <p className="text-lg text-gray-500 max-w-2xl mx-auto">Join 12,000+ companies that improved their velocity and cut costs.</p>
+          {/* Aggregate rating */}
+          <div className="flex items-center justify-center gap-2 mt-6">
+            <div className="flex gap-0.5">{[1,2,3,4,5].map(i => <svg key={i} width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" strokeWidth="1"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>)}</div>
+            <span className="text-sm text-gray-500"><strong className="text-gray-800">4.9/5</strong> from 2,847 reviews</span>
+          </div>
         </div>
         <div className="grid md:grid-cols-3 gap-6">
           {testimonials.map((t, i) => (
-            <div key={i} className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col">
+            <div key={i} className={\`group relative bg-white rounded-2xl p-8 border hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col \${t.featured ? "border-indigo-200 ring-1 ring-indigo-100 shadow-lg shadow-indigo-500/5" : "border-gray-100 shadow-sm"}\`}>
+              {t.featured && <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 via-indigo-500 to-blue-500 rounded-t-2xl" />}
               <div className="flex gap-1 mb-4">
                 {Array.from({ length: t.stars }).map((_, j) => (
-                  <svg key={j} width="18" height="18" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" strokeWidth="1"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg key={j} width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" strokeWidth="1"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                 ))}
               </div>
-              <p className="text-gray-700 leading-relaxed mb-6 flex-1">&ldquo;{t.quote}&rdquo;</p>
-              <div className="bg-indigo-50 text-indigo-700 text-xs font-bold px-3 py-1.5 rounded-full w-fit mb-5">{t.metric}</div>
+              <p className="text-gray-700 leading-relaxed mb-6 flex-1 text-[15px]">&ldquo;{t.quote}&rdquo;</p>
+              {/* Metric highlight */}
+              <div className="flex items-baseline gap-2 mb-5">
+                <span className="text-2xl font-extrabold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">{t.metric}</span>
+                <span className="text-sm text-gray-400">{t.metricLabel}</span>
+              </div>
               <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
-                <img src={t.avatar} alt={t.name} className="w-11 h-11 rounded-full object-cover ring-2 ring-white" />
+                <img src={t.avatar} alt={t.name} className="w-11 h-11 rounded-full object-cover ring-2 ring-gray-100 shadow-sm" />
                 <div>
                   <div className="font-semibold text-gray-900 text-sm">{t.name}</div>
                   <div className="text-xs text-gray-500">{t.role}, {t.company}</div>

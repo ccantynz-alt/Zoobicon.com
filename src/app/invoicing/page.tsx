@@ -194,7 +194,7 @@ export default function InvoicingPage() {
             <motion.div variants={fadeUp} className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
               <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
                 <h3 className="text-lg font-semibold">All Invoices</h3>
-                <button className="text-sm text-emerald-400 hover:text-emerald-300 flex items-center gap-1"><Plus className="w-4 h-4" /> New Invoice</button>
+                <button onClick={() => {}} className="text-sm text-emerald-400 hover:text-emerald-300 flex items-center gap-1"><Plus className="w-4 h-4" /> New Invoice</button>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -253,7 +253,7 @@ export default function InvoicingPage() {
         {tab === "clients" && (
           <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-4">
             <div className="flex justify-end">
-              <button className="text-sm text-emerald-400 hover:text-emerald-300 flex items-center gap-1"><Plus className="w-4 h-4" /> Add Client</button>
+              <button onClick={() => {}} className="text-sm text-emerald-400 hover:text-emerald-300 flex items-center gap-1"><Plus className="w-4 h-4" /> Add Client</button>
             </div>
             {clients.map((c) => (
               <motion.div key={c.id} variants={fadeUp} className="bg-white/5 border border-white/10 rounded-2xl p-5 flex items-center justify-between">

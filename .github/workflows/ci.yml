@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Type-check & Build
+    name: Quality Gate → Test → Build
     runs-on: ubuntu-latest
 
     steps:
@@ -24,8 +24,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Quality Gate
+        run: node scripts/quality-gate.js
+
+      - name: Icon Import Check
+        run: node scripts/check-icons.js
+
       - name: Lint
         run: npm run lint
+
+      - name: Unit Tests
+        run: npm test
 
       - name: Build
         run: npm run build

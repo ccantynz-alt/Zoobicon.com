@@ -47,7 +47,7 @@ const TONES = [
 
 const LENGTHS = [
   { label: "Short", description: "~200 words" },
-  { label: "Medium", description: "~500 words" },
+  { label: "BookOpen", description: "~500 words" },
   { label: "Long", description: "1000+ words" },
 ] as const;
 
@@ -56,7 +56,7 @@ const STORAGE_KEY = "zoobicon_content_history";
 export default function ContentWriterPage() {
   const [contentType, setContentType] = useState<string>("Blog Post");
   const [tone, setTone] = useState<string>("Professional");
-  const [length, setLength] = useState<string>("Medium");
+  const [length, setLength] = useState<string>("BookOpen");
   const [topic, setTopic] = useState("");
   const [audience, setAudience] = useState("");
   const [keywords, setKeywords] = useState("");

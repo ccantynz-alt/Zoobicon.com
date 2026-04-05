@@ -23,8 +23,58 @@
 
 const REPLICATE_API = "https://api.replicate.com/v1";
 
+/**
+ * Create a prediction on Replicate with automatic version fallback.
+ * Tries model-based endpoint first, then falls back to version-based if 404.
+ */
+async function createReplicatePrediction(
+  modelPath: string,
+  input: Record<string, unknown>,
+  token: string
+): Promise<Response> {
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  };
+
+  // Strategy 1: Model-based endpoint (newer, simpler)
+  let res = await fetch(`${REPLICATE_API}/models/${modelPath}/predictions`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ input }),
+  });
+
+  // Strategy 2: If 404/422, get latest version and use /predictions
+  if (res.status === 404 || res.status === 422) {
+    console.log(`[replicate] Model endpoint 404 for ${modelPath}, trying version-based...`);
+    try {
+      const modelInfo = await fetch(`${REPLICATE_API}/models/${modelPath}`, { headers });
+      if (modelInfo.ok) {
+        const info = await modelInfo.json();
+        const version = info.latest_version?.id;
+        if (version) {
+          res = await fetch(`${REPLICATE_API}/predictions`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify({ version, input }),
+          });
+        }
+      }
+    } catch (e) {
+      console.error(`[replicate] Version fallback failed for ${modelPath}:`, e);
+    }
+  }
+
+  return res;
+}
+
 function getReplicateToken(): string {
-  const token = process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY;
+  // Vercel's Replicate integration may use different env var names
+  const token =
+    process.env.REPLICATE_API_TOKEN ||
+    process.env.REPLICATE_API_KEY ||
+    process.env.REPLICATE_TOKEN ||
+    process.env.REPLICATE_KEY;
   if (!token) throw new Error("Video generation is being set up. Please try again shortly.");
   return token;
 }
@@ -78,22 +128,31 @@ export async function generateVoice(
 ): Promise<{ audioUrl: string; duration: number }> {
   const token = getReplicateToken();
 
+  // Select voice based on gender
+  const kokoroVoice = options?.gender === "male" ? "am_adam" : "af_bella";
+
   // Try multiple TTS models in order — first one that works wins
+  // Each model has both a model-based endpoint AND a version-based fallback
   const ttsModels = [
     {
-      name: "Fish Speech V1.5",
-      version: "11f3e0394c06dcc099c0cbaf75f4a6e7da84cb4aaa5d53bedfc3234b5c8aaefc",
+      name: "Kokoro TTS",
+      modelPath: "jaaari/kokoro-82m",
+      input: { text, voice: kokoroVoice, speed: options?.speed || 1.0 },
+    },
+    {
+      name: "Fish Speech",
+      modelPath: "jichengdu/fish-speech",
       input: { text },
     },
     {
-      name: "XTTS-v2",
-      version: "684bc3855b37866c0c65add2ff39c78f3dea3f4ff103a436465326e0f438d55e",
-      input: { text, language: "en" },
+      name: "Orpheus TTS",
+      modelPath: "lucataco/orpheus-3b-0.1-ft",
+      input: { prompt: text },
     },
     {
-      name: "Kokoro TTS",
-      version: "dfdf537ba482b029e0a761699e6f55e9162c7d7b148d671f9cf05e3e3b58a837",
-      input: { text, speed: options?.speed || 1.0 },
+      name: "XTTS v2",
+      modelPath: "lucataco/xtts-v2",
+      input: { text },
     },
   ];
 
@@ -103,20 +162,10 @@ export async function generateVoice(
     try {
       console.log(`[video-pipeline] Trying ${model.name} for voice generation...`);
 
-      const res = await fetch(`${REPLICATE_API}/predictions`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          version: model.version,
-          input: model.input,
-        }),
-      });
+      const res = await createReplicatePrediction(model.modelPath, model.input, token);
 
       if (!res.ok) {
-        const errText = await res.text();
+        const errText = await res.text().catch(() => "");
         console.error(`[video-pipeline] ${model.name} failed: ${res.status} ${errText}`);
         lastError = `${model.name}: ${res.status}`;
         continue; // Try next model
@@ -168,7 +217,7 @@ export async function generateVoiceXTTS(
     input.speaker = referenceAudioUrl; // Clone this voice
   }
 
-  const res = await fetch(`${REPLICATE_API}/models/lucataco/xtts-v2/predictions`, {
+  const res = await fetch(`${REPLICATE_API}/models/jaaari/kokoro-82m/predictions`, {
     method: "POST",
     headers: replicateHeaders(),
     body: JSON.stringify({ input }),
@@ -200,22 +249,23 @@ export async function generateAvatar(
 ): Promise<{ imageUrl: string }> {
   const prompt = `Professional headshot portrait photo of ${description}. Clean background, studio lighting, sharp focus, photorealistic, 8k quality. Looking directly at camera with neutral pleasant expression. Shoulders visible. Professional attire.`;
 
-  // FLUX.1 schnell — official Replicate model, no version hash needed
-  const res = await fetch(`${REPLICATE_API}/models/black-forest-labs/flux-schnell/predictions`, {
-    method: "POST",
-    headers: replicateHeaders(),
-    body: JSON.stringify({
-      input: {
-        prompt,
-        num_outputs: 1,
-        aspect_ratio: "1:1",
-        output_format: "webp",
-        output_quality: 90,
-      },
-    }),
-  });
+  // FLUX.1 schnell — with version fallback for reliability
+  const res = await createReplicatePrediction(
+    "black-forest-labs/flux-schnell",
+    {
+      prompt,
+      num_outputs: 1,
+      aspect_ratio: "1:1",
+      output_format: "webp",
+      output_quality: 90,
+    },
+    getReplicateToken()
+  );
 
-  if (!res.ok) throw new Error("Avatar generation failed.");
+  if (!res.ok) {
+    const errText = await res.text().catch(() => "");
+    throw new Error(`Avatar generation failed: ${res.status} ${errText}`);
+  }
   const data = await res.json();
 
   const imageUrl = Array.isArray(data.output) ? data.output[0] : data.output;
@@ -243,75 +293,88 @@ export async function generateLipSync(
   audioUrl: string,
   options?: { enhanceFace?: boolean }
 ): Promise<{ videoUrl: string }> {
-  // Try OmniHuman v1.5 first — ByteDance's state-of-the-art
-  try {
-    console.log("[video-pipeline] Trying OmniHuman v1.5 for lip-sync...");
-    const omniRes = await fetch(`${REPLICATE_API}/models/bytedance/omni-human/predictions`, {
-      method: "POST",
-      headers: replicateHeaders(),
-      body: JSON.stringify({
-        input: {
-          image: faceImageUrl,
-          audio: audioUrl,
+  const token = getReplicateToken();
+
+  // Lip-sync model chain — try each in order until one works
+  const lipSyncModels = [
+    {
+      name: "OmniHuman v1.5",
+      modelPath: "bytedance/omni-human",
+      // Try both param naming conventions — Replicate official models use image_url/audio_url
+      inputVariants: [
+        { image_url: faceImageUrl, audio_url: audioUrl },
+        { image: faceImageUrl, audio: audioUrl },
+      ],
+    },
+    {
+      name: "SadTalker (cjwbw)",
+      modelPath: "cjwbw/sadtalker",
+      inputVariants: [
+        {
+          source_image: faceImageUrl,
+          driven_audio: audioUrl,
+          enhancer: options?.enhanceFace !== false ? "gfpgan" : "none",
+          preprocess: "crop",
+          still: false,
         },
-      }),
-    });
+      ],
+    },
+    {
+      name: "SadTalker (lucataco)",
+      modelPath: "lucataco/sadtalker",
+      inputVariants: [
+        {
+          source_image: faceImageUrl,
+          driven_audio: audioUrl,
+          enhancer: options?.enhanceFace !== false ? "gfpgan" : "none",
+          preprocess: "crop",
+          still: false,
+        },
+      ],
+    },
+  ];
 
-    if (omniRes.ok) {
-      const omniData = await omniRes.json();
-      const videoUrl = extractReplicateOutput(omniData);
-      if (videoUrl) {
-        console.log("[video-pipeline] OmniHuman succeeded");
-        return { videoUrl };
+  let lastError = "";
+
+  for (const model of lipSyncModels) {
+    for (const input of model.inputVariants) {
+      try {
+        console.log(`[video-pipeline] Trying ${model.name} for lip-sync...`);
+        const res = await createReplicatePrediction(model.modelPath, input, token);
+
+        if (!res.ok) {
+          const errText = await res.text().catch(() => "");
+          console.warn(`[video-pipeline] ${model.name} failed: ${res.status} ${errText}`);
+          lastError = `${model.name}: ${res.status}`;
+          continue; // Try next input variant or model
+        }
+
+        const data = await res.json();
+        let videoUrl = extractReplicateOutput(data);
+
+        if (!videoUrl && data.urls?.get) {
+          console.log(`[video-pipeline] ${model.name} processing async, polling...`);
+          const result = await pollReplicatePrediction(data.urls.get);
+          videoUrl = extractReplicateOutput(result);
+        }
+
+        if (videoUrl) {
+          console.log(`[video-pipeline] ${model.name} succeeded!`);
+          return { videoUrl };
+        }
+
+        console.warn(`[video-pipeline] ${model.name} returned no video output`);
+        lastError = `${model.name}: no output`;
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "unknown error";
+        console.warn(`[video-pipeline] ${model.name} error: ${msg}`);
+        lastError = `${model.name}: ${msg}`;
       }
-      if (omniData.urls?.get) {
-        const result = await pollReplicatePrediction(omniData.urls.get);
-        const url = extractReplicateOutput(result);
-        if (url) return { videoUrl: url };
-      }
-    } else {
-      console.warn("[video-pipeline] OmniHuman failed, falling back to SadTalker");
     }
-  } catch (err) {
-    console.warn("[video-pipeline] OmniHuman error, falling back to SadTalker:", err instanceof Error ? err.message : err);
   }
 
-  // Fallback: SadTalker — proven reliable
-  console.log("[video-pipeline] Using SadTalker for lip-sync...");
-  const res = await fetch(`${REPLICATE_API}/predictions`, {
-    method: "POST",
-    headers: replicateHeaders(),
-    body: JSON.stringify({
-      version: "3aa3dac9353cc4d6bd62a8f95957bd844003b401ca4e4a9b33baa574c549d376",
-      input: {
-        source_image: faceImageUrl,
-        driven_audio: audioUrl,
-        enhancer: options?.enhanceFace !== false ? "gfpgan" : "none",
-        preprocess: "crop",
-        still: false,
-      },
-    }),
-  });
-
-  if (!res.ok) {
-    const err = await res.text();
-    console.error("[video-pipeline] SadTalker also failed:", res.status, err);
-    throw new Error("Video animation failed. Please try again.");
-  }
-
-  const data = await res.json();
-  const videoUrl = extractReplicateOutput(data);
-
-  if (!videoUrl) {
-    if (data.urls?.get) {
-      const result = await pollReplicatePrediction(data.urls.get);
-      const url = extractReplicateOutput(result);
-      if (url) return { videoUrl: url };
-    }
-    throw new Error("Video animation returned no video.");
-  }
-
-  return { videoUrl };
+  // All models failed
+  throw new Error(`Video animation failed after trying all models. Last error: ${lastError}`);
 }
 
 // ── Full Pipeline ──
@@ -507,7 +570,7 @@ export async function generateFullVideo(
 // ── Provider Check ──
 
 export function isCustomPipelineAvailable(): boolean {
-  return !!(process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY || process.env.ZOOBICON_VIDEO_API_URL);
+  return !!(process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY || process.env.REPLICATE_TOKEN || process.env.REPLICATE_KEY || process.env.ZOOBICON_VIDEO_API_URL);
 }
 
 export function getVideoPipelineInfo(): {
@@ -518,7 +581,7 @@ export function getVideoPipelineInfo(): {
   if (process.env.ZOOBICON_VIDEO_API_URL) {
     return { available: true, provider: "self-hosted", models: ["fish-speech", "flux", "sadtalker"] };
   }
-  if (process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY) {
+  if (process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY || process.env.REPLICATE_TOKEN || process.env.REPLICATE_KEY) {
     return { available: true, provider: "replicate", models: ["fish-speech", "flux", "sadtalker"] };
   }
   return { available: false, provider: "none", models: [] };
@@ -544,7 +607,7 @@ function extractReplicateOutput(data: Record<string, unknown>): string | null {
 
 async function pollReplicatePrediction(
   getUrl: string,
-  maxAttempts = 120,
+  maxAttempts = 50,
   intervalMs = 3000
 ): Promise<Record<string, unknown>> {
   const token = getReplicateToken();
