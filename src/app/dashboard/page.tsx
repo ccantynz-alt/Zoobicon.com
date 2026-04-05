@@ -50,7 +50,7 @@ const ADMIN_QUICK_ACTIONS = [
   { icon: Globe, label: "AI Builder", desc: "Premium generation", href: "/builder", color: "from-brand-500 to-brand-700" },
   { icon: Layers, label: "Multi-Page", desc: "Full site builds", href: "/builder", color: "from-indigo-500 to-blue-600" },
   { icon: Server, label: "Hosting", desc: "Deploy & manage", href: "/hosting", color: "from-emerald-500 to-teal-600" },
-  { icon: Pencil, label: "Live Editor", desc: "Edit deployed sites", href: "/edit", color: "from-amber-500 to-orange-600" },
+  { icon: Pencil, label: "My Domains", desc: "Manage domains", href: "/my-domains", color: "from-amber-500 to-orange-600" },
   { icon: Shield, label: "Admin Panel", desc: "System controls", href: "/admin", color: "from-red-500 to-rose-600" },
   { icon: Key, label: "API Keys", desc: "Developer access", href: "/auth/settings", color: "from-cyan-500 to-blue-600" },
   { icon: BarChart3, label: "Analytics", desc: "Site performance", href: "/analytics", color: "from-blue-500 to-fuchsia-600" },
