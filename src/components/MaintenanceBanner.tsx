@@ -1,16 +1,14 @@
 "use client";
 
 /**
- * Maintenance Banner — shows at the top of every page when
- * MAINTENANCE_MODE=true is set in environment variables.
- *
- * Non-intrusive: site stays functional, banner just informs visitors.
+ * Maintenance Banner — shows at the top of every page.
+ * Remove this component or set MAINTENANCE_ACTIVE to false to disable.
  */
 export default function MaintenanceBanner() {
-  // This reads from a build-time env var injected by Next.js
-  const isMaintenanceMode = process.env.NEXT_PUBLIC_MAINTENANCE_MODE === "true";
+  // HARDCODED ON — remove this line or set to false to disable
+  const MAINTENANCE_ACTIVE = true;
 
-  if (!isMaintenanceMode) return null;
+  if (!MAINTENANCE_ACTIVE) return null;
 
   return (
     <div className="bg-gradient-to-r from-amber-600 to-orange-600 text-white text-center py-2.5 px-4 text-sm font-medium z-[9999] relative">
