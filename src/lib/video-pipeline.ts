@@ -92,14 +92,19 @@ export async function generateVoice(
       input: { text, speed: options?.speed || 1.0 },
     },
     {
-      name: "Fish Speech V1.5",
-      modelPath: "fishaudio/fish-speech-1.5",
+      name: "Fish Speech",
+      modelPath: "jichengdu/fish-speech",
       input: { text },
     },
     {
-      name: "Tortoise TTS",
-      modelPath: "afiaka87/tortoise-tts",
-      input: { text, language: "en" },
+      name: "Orpheus TTS",
+      modelPath: "lucataco/orpheus-3b-0.1-ft",
+      input: { prompt: text },
+    },
+    {
+      name: "XTTS v2",
+      modelPath: "lucataco/xtts-v2",
+      input: { text },
     },
   ];
 
