@@ -86,6 +86,11 @@ export default function DomainsPage() {
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [registering, setRegistering] = useState(false);
   const [userEmail, setUserEmail] = useState("");
+  const [showCheckoutForm, setShowCheckoutForm] = useState(false);
+  const [contactInfo, setContactInfo] = useState({
+    firstName: "", lastName: "", email: "", phone: "",
+    address: "", city: "", state: "", zip: "", country: "US",
+  });
   const [generatedNames, setGeneratedNames] = useState<Array<{ name: string; results: DomainResult[] }>>([]);
   const [genDescription, setGenDescription] = useState("");
   const [pendingGenerate, setPendingGenerate] = useState(false);
@@ -254,10 +259,21 @@ export default function DomainsPage() {
     setCart(prev => prev.filter(c => c.domain !== domain));
   };
 
-  const handleRegister = async () => {
+  const handleRegister = () => {
     if (cart.length === 0) return;
-    const email = userEmail || window.prompt("Enter your email to register domains:");
-    if (!email) return;
+    // Pre-fill email from logged-in user
+    if (userEmail && !contactInfo.email) {
+      setContactInfo(prev => ({ ...prev, email: userEmail }));
+    }
+    setShowCheckoutForm(true);
+  };
+
+  const handleSubmitRegistration = async () => {
+    // Validate required fields
+    if (!contactInfo.firstName || !contactInfo.lastName || !contactInfo.email) {
+      alert("Please fill in at least your name and email.");
+      return;
+    }
 
     setRegistering(true);
     try {
@@ -271,7 +287,7 @@ export default function DomainsPage() {
             const name = parts.join(".");
             return { name, tld };
           }),
-          registrant: { email },
+          registrant: contactInfo,
           years: 1,
         }),
       });
@@ -281,6 +297,7 @@ export default function DomainsPage() {
       } else if (data.success) {
         alert("Domains registered successfully! View them in your dashboard.");
         setCart([]);
+        setShowCheckoutForm(false);
         window.location.href = "/my-domains";
       } else {
         alert(data.error || "Registration failed. Please try again.");
@@ -299,6 +316,119 @@ export default function DomainsPage() {
 
   return (
     <div className="min-h-screen bg-[#0b0b16] text-white">
+
+      {/* ═══════════════════════════════════════════ */}
+      {/* CHECKOUT FORM MODAL                        */}
+      {/* ═══════════════════════════════════════════ */}
+      {showCheckoutForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="bg-[#131520] border border-slate-700/50 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 sm:p-8 shadow-2xl">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-white">Domain Registration</h2>
+              <button onClick={() => setShowCheckoutForm(false)} className="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+            </div>
+
+            {/* Cart summary */}
+            <div className="mb-6 p-4 rounded-xl bg-slate-800/50 border border-slate-700/30">
+              <p className="text-sm text-slate-400 mb-2">{cart.length} domain{cart.length > 1 ? "s" : ""}</p>
+              {cart.map(c => (
+                <div key={c.domain} className="flex justify-between text-sm py-1">
+                  <span className="text-white font-medium">{c.domain}</span>
+                  <span className="text-emerald-400">${c.price.toFixed(2)}/yr</span>
+                </div>
+              ))}
+              <div className="flex justify-between mt-2 pt-2 border-t border-slate-700/30 font-bold">
+                <span>Total</span>
+                <span className="text-emerald-400">${cartTotal.toFixed(2)}/yr</span>
+              </div>
+            </div>
+
+            {/* Contact info form */}
+            <div className="space-y-4">
+              <p className="text-sm text-slate-400">Required for domain registration (ICANN policy).</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">First Name *</label>
+                  <input type="text" value={contactInfo.firstName} onChange={e => setContactInfo(p => ({ ...p, firstName: e.target.value }))}
+                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Craig" />
+                </div>
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">Last Name *</label>
+                  <input type="text" value={contactInfo.lastName} onChange={e => setContactInfo(p => ({ ...p, lastName: e.target.value }))}
+                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Smith" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Email *</label>
+                <input type="email" value={contactInfo.email} onChange={e => setContactInfo(p => ({ ...p, email: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="you@example.com" />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Phone *</label>
+                <input type="tel" value={contactInfo.phone} onChange={e => setContactInfo(p => ({ ...p, phone: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="+64.211234567" />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Street Address *</label>
+                <input type="text" value={contactInfo.address} onChange={e => setContactInfo(p => ({ ...p, address: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="123 Main Street" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">City *</label>
+                  <input type="text" value={contactInfo.city} onChange={e => setContactInfo(p => ({ ...p, city: e.target.value }))}
+                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Auckland" />
+                </div>
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">State/Region</label>
+                  <input type="text" value={contactInfo.state} onChange={e => setContactInfo(p => ({ ...p, state: e.target.value }))}
+                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Auckland" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">Postal Code *</label>
+                  <input type="text" value={contactInfo.zip} onChange={e => setContactInfo(p => ({ ...p, zip: e.target.value }))}
+                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="1010" />
+                </div>
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">Country *</label>
+                  <select value={contactInfo.country} onChange={e => setContactInfo(p => ({ ...p, country: e.target.value }))}
+                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    <option value="NZ">New Zealand</option>
+                    <option value="AU">Australia</option>
+                    <option value="US">United States</option>
+                    <option value="GB">United Kingdom</option>
+                    <option value="CA">Canada</option>
+                    <option value="DE">Germany</option>
+                    <option value="FR">France</option>
+                    <option value="JP">Japan</option>
+                    <option value="SG">Singapore</option>
+                    <option value="IN">India</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2 text-xs text-slate-500 mt-2">
+                <svg className="w-4 h-4 flex-shrink-0 mt-0.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                <span>WHOIS privacy protection is included free. Your contact details are kept private.</span>
+              </div>
+
+              <button
+                onClick={handleSubmitRegistration}
+                disabled={registering || !contactInfo.firstName || !contactInfo.lastName || !contactInfo.email}
+                className="w-full py-3.5 mt-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-bold text-base transition-colors flex items-center justify-center gap-2"
+              >
+                {registering ? (
+                  <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</>
+                ) : (
+                  <>Pay ${cartTotal.toFixed(2)} &amp; Register</>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ═══════════════════════════════════════════ */}
       {/* HERO — Big, bright, impossible to miss     */}
