@@ -380,56 +380,76 @@ registerComponent({
   name: "Toggle Pricing",
   category: "pricing",
   variant: "toggle",
-  description: "Monthly/annual toggle with savings badge and three tiers",
+  description: "Premium monthly/annual toggle with animated savings badge, glass featured tier, and gradient accents",
   tags: ["saas", "startup", "business", "software", "platform", "service", "tech", "modern", "agency"],
   code: `export default function Pricing() {
   const [annual, setAnnual] = React.useState(false);
   const plans = [
-    { name: "Starter", mo: 19, yr: 15, features: ["5 projects", "2GB storage", "Email support", "Basic analytics"] },
-    { name: "Growth", mo: 49, yr: 39, features: ["25 projects", "20GB storage", "Priority support", "Advanced analytics", "Custom domains", "Team seats (5)"], featured: true },
-    { name: "Scale", mo: 99, yr: 79, features: ["Unlimited projects", "100GB storage", "Dedicated support", "Enterprise analytics", "SSO", "Unlimited seats", "SLA"] },
+    { name: "Starter", desc: "For individuals getting started", mo: 19, yr: 15, features: ["5 projects", "2GB storage", "Email support", "Core analytics", "Custom subdomain"], cta: "Start Free" },
+    { name: "Growth", desc: "For teams scaling fast", mo: 49, yr: 39, features: ["25 projects", "20GB storage", "Priority support (4hr)", "Advanced analytics", "Custom domains + SSL", "Team seats (5)", "API access", "Webhooks"], featured: true, cta: "Start 14-Day Trial" },
+    { name: "Scale", desc: "For organizations at scale", mo: 99, yr: 79, features: ["Unlimited projects", "100GB storage", "Dedicated support", "Enterprise analytics", "SSO / SAML", "Unlimited seats", "99.99% SLA", "Custom contracts"], cta: "Contact Sales" },
   ];
   return (
-    <section id="pricing" className="py-28 px-6 bg-gray-50">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
-          <p className="text-sm font-semibold text-indigo-600 uppercase tracking-widest mb-3">Pricing</p>
-          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">Invest in Growth</h2>
-          <p className="text-lg text-gray-500 max-w-2xl mx-auto mb-8">Choose monthly flexibility or save up to 20% with annual billing.</p>
-          <div className="inline-flex items-center gap-4 bg-white rounded-full p-1.5 border border-gray-200 shadow-sm">
-            <button onClick={() => setAnnual(false)} className={\`px-6 py-2.5 rounded-full text-sm font-semibold transition-all \${!annual ? "bg-gray-900 text-white shadow-md" : "text-gray-500 hover:text-gray-700"}\`}>Monthly</button>
-            <button onClick={() => setAnnual(true)} className={\`px-6 py-2.5 rounded-full text-sm font-semibold transition-all flex items-center gap-2 \${annual ? "bg-gray-900 text-white shadow-md" : "text-gray-500 hover:text-gray-700"}\`}>
+    <section id="pricing" className="py-32 px-6 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-indigo-100/30 rounded-full blur-3xl pointer-events-none" />
+      <div className="max-w-7xl mx-auto relative">
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50 border border-indigo-100 mb-6">
+            <span className="text-sm font-semibold text-indigo-700">Transparent pricing</span>
+          </div>
+          <h2 className="text-4xl md:text-6xl font-extrabold text-gray-900 mb-5 tracking-tight">Invest in Growth</h2>
+          <p className="text-xl text-gray-500 max-w-2xl mx-auto mb-10">Choose monthly flexibility or save with annual billing. No hidden fees.</p>
+          <div className="inline-flex items-center bg-white rounded-2xl p-1.5 border border-gray-200 shadow-sm">
+            <button onClick={() => setAnnual(false)} className={\`px-8 py-3 rounded-xl text-sm font-bold transition-all duration-300 \${!annual ? "bg-gray-900 text-white shadow-lg" : "text-gray-500 hover:text-gray-700"}\`}>Monthly</button>
+            <button onClick={() => setAnnual(true)} className={\`px-8 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2.5 \${annual ? "bg-gray-900 text-white shadow-lg" : "text-gray-500 hover:text-gray-700"}\`}>
               Annual
-              <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold">SAVE 20%</span>
+              <span className={\`text-[10px] px-2.5 py-1 rounded-full font-bold transition-all \${annual ? "bg-emerald-400 text-emerald-950" : "bg-emerald-100 text-emerald-700"}\`}>-20%</span>
             </button>
           </div>
         </div>
-        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto items-start">
+        <div className="grid md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto items-start">
           {plans.map((p, i) => {
             const price = annual ? p.yr : p.mo;
             return (
-              <div key={i} className={\`rounded-2xl p-8 transition-all duration-300 \${p.featured ? "bg-gray-900 text-white ring-2 ring-indigo-500 shadow-2xl md:-mt-4 md:pb-12 md:pt-12" : "bg-white border border-gray-200 hover:shadow-lg"}\`}>
-                {p.featured && <span className="inline-block text-[10px] font-bold bg-indigo-500 text-white px-3 py-1 rounded-full uppercase tracking-wider mb-4">Most Popular</span>}
-                <h3 className={\`text-lg font-bold mb-4 \${p.featured ? "text-white" : "text-gray-900"}\`}>{p.name}</h3>
-                <div className="flex items-baseline gap-1 mb-6">
-                  <span className={\`text-5xl font-extrabold \${p.featured ? "text-white" : "text-gray-900"}\`}>{"$"}{price}</span>
-                  <span className={\`text-sm \${p.featured ? "text-gray-400" : "text-gray-500"}\`}>/mo</span>
+              <div key={i} className={\`group relative rounded-3xl transition-all duration-500 hover:-translate-y-1 \${p.featured ? "bg-gray-900 text-white md:-mt-6 md:mb-[-24px] ring-2 ring-indigo-500/50 shadow-2xl shadow-indigo-500/10" : "bg-white border border-gray-200/80 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/5"}\`}>
+                {p.featured && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                    <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-indigo-500/30">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                      Most Popular
+                    </span>
+                  </div>
+                )}
+                <div className={\`p-10 \${p.featured ? "pt-12" : ""}\`}>
+                  <h3 className={\`text-lg font-bold mb-1 \${p.featured ? "text-white" : "text-gray-900"}\`}>{p.name}</h3>
+                  <p className={\`text-sm mb-6 \${p.featured ? "text-gray-400" : "text-gray-500"}\`}>{p.desc}</p>
+                  <div className="flex items-baseline gap-1 mb-2">
+                    <span className={\`text-6xl font-extrabold tracking-tight \${p.featured ? "text-white" : "text-gray-900"}\`}>{"$"}{price}</span>
+                    <span className={\`text-sm font-medium \${p.featured ? "text-gray-400" : "text-gray-500"}\`}>/mo</span>
+                  </div>
+                  {annual && <p className={\`text-xs mb-6 \${p.featured ? "text-emerald-400" : "text-emerald-600"}\`}>{"$"}{(price * 12)} billed annually (save {"$"}{(p.mo - p.yr) * 12}/yr)</p>}
+                  {!annual && <div className="mb-6" />}
+                  <button className={\`w-full py-4 rounded-2xl font-bold text-sm transition-all duration-300 \${p.featured ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white hover:from-indigo-400 hover:to-violet-400 shadow-lg shadow-indigo-500/30 hover:shadow-xl" : "bg-gray-900 text-white hover:bg-gray-800"}\`}>
+                    {p.cta}
+                  </button>
+                  <div className={\`mt-8 pt-8 border-t \${p.featured ? "border-white/10" : "border-gray-100"}\`}>
+                    <ul className="space-y-3.5">
+                      {p.features.map((f, j) => (
+                        <li key={j} className={\`flex items-center gap-3 text-sm \${p.featured ? "text-gray-300" : "text-gray-600"}\`}>
+                          <div className={\`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center \${p.featured ? "bg-indigo-500/20" : "bg-indigo-50"}\`}>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={p.featured ? "#a5b4fc" : "#6366f1"} strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                          </div>
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
-                <button className={\`w-full py-3.5 rounded-xl font-bold text-sm transition-all \${p.featured ? "bg-indigo-500 text-white hover:bg-indigo-400 shadow-lg shadow-indigo-500/30" : "bg-gray-900 text-white hover:bg-gray-800"}\`}>
-                  Start Free Trial
-                </button>
-                <ul className="mt-8 space-y-3">
-                  {p.features.map((f, j) => (
-                    <li key={j} className={\`flex items-center gap-2.5 text-sm \${p.featured ? "text-gray-300" : "text-gray-600"}\`}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={p.featured ? "#818cf8" : "#6366f1"} strokeWidth="2.5" strokeLinecap="round" className="flex-shrink-0"><polyline points="20 6 9 17 4 12"/></svg>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
               </div>
             );
           })}
         </div>
+        <p className="text-center text-sm text-gray-400 mt-14">All plans include SSL, 99.9% uptime, and GDPR compliance &middot; No credit card required</p>
       </div>
     </section>
   );
