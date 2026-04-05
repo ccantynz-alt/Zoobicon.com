@@ -82,28 +82,45 @@ registerComponent({
   tags: ["minimal", "clean", "portfolio", "creative", "designer", "simple", "elegant", "dark", "restaurant", "warm"],
   code: `export default function Footer() {
   return (
-    <footer className="bg-gray-950 py-12 px-6">
-      <div className="max-w-4xl mx-auto text-center">
-        <div className="flex items-center justify-center gap-2 mb-6">
-          <div className="w-7 h-7 rounded-md bg-gradient-to-br from-gray-200 to-gray-400 flex items-center justify-center">
+    <footer className="relative bg-gray-950 py-16 px-6 overflow-hidden">
+      {/* Subtle gradient glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-gradient-to-b from-white/[0.02] to-transparent rounded-full blur-3xl" />
+
+      <div className="relative max-w-4xl mx-auto text-center">
+        {/* Logo */}
+        <div className="flex items-center justify-center gap-2.5 mb-10">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-gray-100 to-gray-300 flex items-center justify-center shadow-lg shadow-white/5">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="2.5" strokeLinecap="round"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/></svg>
           </div>
-          <span className="text-sm font-semibold text-white">Studio</span>
+          <span className="text-sm font-semibold text-white tracking-wide">Studio</span>
         </div>
-        <div className="flex flex-wrap justify-center gap-8 mb-8">
+
+        {/* Links with hover underline */}
+        <div className="flex flex-wrap justify-center gap-8 mb-10">
           {["Home", "Work", "About", "Blog", "Contact"].map(l => (
-            <a key={l} href="#" className="text-sm text-gray-400 hover:text-white transition-colors">{l}</a>
+            <a key={l} href="#" className="group relative text-sm text-gray-500 hover:text-white transition-colors duration-300">
+              {l}
+              <span className="absolute -bottom-1 left-0 w-0 h-px bg-gradient-to-r from-white/60 to-white/20 group-hover:w-full transition-all duration-500" />
+            </a>
           ))}
         </div>
-        <div className="flex justify-center gap-5 mb-8">
+
+        {/* Social icons with hover glow */}
+        <div className="flex justify-center gap-4 mb-10">
           {[
-            <svg key="tw" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>,
-            <svg key="ig" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>,
-            <svg key="dr" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 24C5.385 24 0 18.615 0 12S5.385 0 12 0s12 5.385 12 12-5.385 12-12 12zm10.12-10.358c-.35-.11-3.17-.953-6.384-.438 1.34 3.684 1.887 6.684 1.992 7.308 2.3-1.555 3.936-4.02 4.395-6.87zm-6.115 7.808c-.153-.9-.75-4.032-2.19-7.77l-.066.02c-5.79 2.015-7.86 6.025-8.04 6.4 1.73 1.358 3.92 2.166 6.29 2.166 1.42 0 2.77-.29 4-.81zm-11.62-2.58c.232-.4 3.045-5.055 8.332-6.765.135-.045.27-.084.405-.12-.26-.585-.54-1.167-.832-1.74C7.17 11.775 2.206 11.71 1.756 11.7l-.004.312c0 2.633.998 5.037 2.634 6.855zm-2.42-8.955c.46.008 4.683.026 9.477-1.248-1.698-3.018-3.53-5.558-3.8-5.928-2.868 1.35-5.01 3.99-5.676 7.17zM9.6 2.052c.282.38 2.145 2.914 3.822 6 3.645-1.365 5.19-3.44 5.373-3.702-2.09-1.86-4.83-2.99-7.83-2.99-.46 0-.91.03-1.36.09zm10.14 3.266c-.22.3-1.9 2.49-5.66 4.012.22.45.44.908.64 1.372.07.16.14.32.205.48 3.39-.427 6.753.26 7.09.33-.02-2.335-.846-4.482-2.27-6.2z"/></svg>,
-          ].map((icon, i) => (
-            <a key={i} href="#" className="text-gray-500 hover:text-white transition-colors">{icon}</a>
+            { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>, label: "X" },
+            { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>, label: "Instagram" },
+            { icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 24C5.385 24 0 18.615 0 12S5.385 0 12 0s12 5.385 12 12-5.385 12-12 12zm10.12-10.358c-.35-.11-3.17-.953-6.384-.438 1.34 3.684 1.887 6.684 1.992 7.308 2.3-1.555 3.936-4.02 4.395-6.87zm-6.115 7.808c-.153-.9-.75-4.032-2.19-7.77l-.066.02c-5.79 2.015-7.86 6.025-8.04 6.4 1.73 1.358 3.92 2.166 6.29 2.166 1.42 0 2.77-.29 4-.81zm-11.62-2.58c.232-.4 3.045-5.055 8.332-6.765.135-.045.27-.084.405-.12-.26-.585-.54-1.167-.832-1.74C7.17 11.775 2.206 11.71 1.756 11.7l-.004.312c0 2.633.998 5.037 2.634 6.855zm-2.42-8.955c.46.008 4.683.026 9.477-1.248-1.698-3.018-3.53-5.558-3.8-5.928-2.868 1.35-5.01 3.99-5.676 7.17zM9.6 2.052c.282.38 2.145 2.914 3.822 6 3.645-1.365 5.19-3.44 5.373-3.702-2.09-1.86-4.83-2.99-7.83-2.99-.46 0-.91.03-1.36.09zm10.14 3.266c-.22.3-1.9 2.49-5.66 4.012.22.45.44.908.64 1.372.07.16.14.32.205.48 3.39-.427 6.753.26 7.09.33-.02-2.335-.846-4.482-2.27-6.2z"/></svg>, label: "Dribbble" },
+          ].map((s, i) => (
+            <a key={i} href="#" className="w-10 h-10 rounded-full bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-gray-500 hover:text-white hover:bg-white/[0.08] hover:border-white/10 transition-all duration-300" aria-label={s.label}>
+              {s.icon}
+            </a>
           ))}
         </div>
+
+        {/* Divider */}
+        <div className="h-px bg-gradient-to-r from-transparent via-gray-800 to-transparent mb-8" />
+
         <p className="text-xs text-gray-600">&copy; {new Date().getFullYear()} Studio. Crafted with care.</p>
       </div>
     </footer>
@@ -279,47 +296,80 @@ registerComponent({
   tags: ["luxury", "premium", "fashion", "architecture", "design", "studio", "real-estate", "hotel", "restaurant", "elegant", "minimal", "clean", "creative"],
   code: `export default function Footer() {
   return (
-    <footer className="bg-[#0a0a0a] text-gray-400">
-      <div className="max-w-7xl mx-auto px-6 pt-24 pb-12">
-        <div className="grid md:grid-cols-2 gap-16 mb-20">
+    <footer className="relative bg-[#080808] text-gray-400 overflow-hidden">
+      {/* Subtle ambient glow */}
+      <div className="absolute top-0 left-1/3 w-[500px] h-[300px] bg-gradient-to-b from-white/[0.01] to-transparent rounded-full blur-[100px]" />
+
+      {/* Top accent line */}
+      <div className="h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
+
+      <div className="relative max-w-7xl mx-auto px-6 pt-28 pb-14">
+        <div className="grid md:grid-cols-2 gap-20 mb-24">
           <div>
-            <h3 className="text-4xl md:text-5xl font-light text-white leading-tight tracking-tight mb-6">
-              Let's create something<br/><em className="font-serif italic text-gray-300">extraordinary</em> together.
+            <h3 className="text-4xl md:text-5xl font-light text-white leading-[1.15] tracking-tight mb-8">
+              Let&apos;s create something
+              <br />
+              <em className="font-serif italic text-gray-400" style={{ fontFamily: "Georgia, serif" }}>extraordinary</em> together.
             </h3>
-            <a href="#" className="inline-flex items-center gap-3 text-sm text-white border-b border-white/30 pb-1 hover:border-white transition-colors group">
-              Start a conversation
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="group-hover:translate-x-1 transition-transform"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            <a href="#" className="group inline-flex items-center gap-3 text-sm text-white/80 hover:text-white transition-colors duration-500">
+              <span className="border-b border-white/20 group-hover:border-white/60 pb-1 transition-colors duration-500">Start a conversation</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="group-hover:translate-x-2 transition-transform duration-500"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </a>
+
+            {/* Newsletter */}
+            <div className="mt-14">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-gray-600 mb-4">Stay informed</p>
+              <div className="flex gap-0 max-w-sm">
+                <input type="email" placeholder="your@email.com" className="flex-1 bg-white/[0.03] border border-white/[0.06] border-r-0 px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-white/10 transition-colors" />
+                <button className="px-6 py-3 bg-white text-gray-900 text-xs font-medium uppercase tracking-[0.15em] hover:bg-gray-100 transition-colors">
+                  Subscribe
+                </button>
+              </div>
+            </div>
           </div>
-          <div className="grid grid-cols-2 gap-8">
+
+          <div className="grid grid-cols-2 gap-12">
             <div>
-              <h4 className="text-[11px] font-medium text-gray-500 uppercase tracking-[3px] mb-6">Navigate</h4>
-              <ul className="space-y-3">
+              <h4 className="text-[10px] font-medium text-gray-600 uppercase tracking-[0.3em] mb-8">Navigate</h4>
+              <ul className="space-y-4">
                 {["Collections", "About", "Process", "Journal", "Contact"].map(l => (
-                  <li key={l}><a href="#" className="text-sm text-gray-300 hover:text-white transition-colors">{l}</a></li>
+                  <li key={l}>
+                    <a href="#" className="group text-sm text-gray-400 hover:text-white transition-colors duration-300 flex items-center gap-0 hover:gap-2">
+                      <span className="w-0 group-hover:w-3 h-px bg-white/40 transition-all duration-300" />
+                      {l}
+                    </a>
+                  </li>
                 ))}
               </ul>
             </div>
             <div>
-              <h4 className="text-[11px] font-medium text-gray-500 uppercase tracking-[3px] mb-6">Connect</h4>
-              <ul className="space-y-3">
+              <h4 className="text-[10px] font-medium text-gray-600 uppercase tracking-[0.3em] mb-8">Connect</h4>
+              <ul className="space-y-4">
                 {["Instagram", "Pinterest", "LinkedIn", "Behance", "Dribbble"].map(l => (
-                  <li key={l}><a href="#" className="text-sm text-gray-300 hover:text-white transition-colors">{l}</a></li>
+                  <li key={l}>
+                    <a href="#" className="group text-sm text-gray-400 hover:text-white transition-colors duration-300 flex items-center gap-0 hover:gap-2">
+                      <span className="w-0 group-hover:w-3 h-px bg-white/40 transition-all duration-300" />
+                      {l}
+                    </a>
+                  </li>
                 ))}
               </ul>
             </div>
           </div>
         </div>
-        <div className="border-t border-white/[0.06] pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
-          <span className="text-2xl font-light text-white tracking-[0.2em] uppercase">Maison</span>
-          <div className="flex items-center gap-8 text-xs text-gray-600">
-            <span>New York</span>
-            <span className="w-1 h-1 rounded-full bg-gray-700" />
-            <span>London</span>
-            <span className="w-1 h-1 rounded-full bg-gray-700" />
-            <span>Tokyo</span>
+
+        {/* Bottom bar */}
+        <div className="border-t border-white/[0.04] pt-10 flex flex-col md:flex-row items-center justify-between gap-8">
+          <span className="text-2xl font-light text-white tracking-[0.3em] uppercase" style={{ fontFamily: "Georgia, serif" }}>Maison</span>
+          <div className="flex items-center gap-6 text-xs text-gray-600">
+            {["New York", "London", "Tokyo"].map((city, i) => (
+              <React.Fragment key={city}>
+                {i > 0 && <span className="w-1 h-1 rounded-full bg-gray-800 shadow-[0_0_4px_rgba(255,255,255,0.05)]" />}
+                <span className="hover:text-gray-400 transition-colors cursor-default">{city}</span>
+              </React.Fragment>
+            ))}
           </div>
-          <p className="text-xs text-gray-600">&copy; {new Date().getFullYear()}</p>
+          <p className="text-[10px] text-gray-700 tracking-wider">&copy; {new Date().getFullYear()} All Rights Reserved</p>
         </div>
       </div>
     </footer>
