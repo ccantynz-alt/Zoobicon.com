@@ -21,6 +21,15 @@ import {
   Square,
   Play,
   AlertCircle,
+  BookOpen,
+  MessageSquareQuote,
+  Briefcase,
+  GraduationCap,
+  Zap,
+  Crown,
+  Smile,
+  Building2,
+  Clapperboard,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -114,7 +123,7 @@ interface VideoTemplate {
 /* ------------------------------------------------------------------ */
 
 const PROJECT_TYPES = [
-  { id: "social-ad", label: "Social Media Ad", icon: Megaphone, desc: "Eye-catching ads for social platforms" },
+  { id: "social-ad", label: "Social Media Ad", icon: Sparkles, desc: "Eye-catching ads for social platforms" },
   { id: "product-demo", label: "Product Demo", icon: Play, desc: "Showcase your product in action" },
   { id: "explainer", label: "Explainer", icon: BookOpen, desc: "Break down complex ideas simply" },
   { id: "testimonial", label: "Testimonial", icon: MessageSquareQuote, desc: "Customer stories that convert" },

@@ -11,30 +11,51 @@ export async function POST(req: NextRequest) {
     const { prompt, style = "realistic", size = "1024x1024" } = await req.json();
     if (!prompt) return apiError(400, "missing_prompt", "An image description is required");
 
-    // Use Replicate FLUX for image generation
     const replicateToken = process.env.REPLICATE_API_TOKEN;
     if (!replicateToken) {
       return apiError(500, "config_error", "Image generation not configured");
     }
 
-    const Replicate = (await import("replicate")).default;
-    const replicate = new Replicate({ auth: replicateToken });
-
     const [width, height] = size.split("x").map(Number);
 
-    const output = await replicate.run(
-      "black-forest-labs/flux-1.1-pro" as `${string}/${string}`,
-      {
+    // Use Replicate FLUX via direct API (no SDK dependency)
+    const res = await fetch("https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${replicateToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
         input: {
           prompt: `${style} style: ${prompt}`,
-          width: width || 1024,
-          height: height || 1024,
           num_outputs: 1,
+          aspect_ratio: width === height ? "1:1" : width > height ? "16:9" : "9:16",
+          output_format: "webp",
+          output_quality: 90,
         },
-      }
-    );
+      }),
+    });
 
-    const imageUrl = Array.isArray(output) ? output[0] : output;
+    if (!res.ok) {
+      console.error("[wp-image] Replicate API error:", res.status);
+      return apiError(500, "generation_failed", "Image generation service unavailable");
+    }
+
+    let data = await res.json();
+
+    // Poll for completion if async
+    if (data.urls?.get && data.status !== "succeeded") {
+      for (let i = 0; i < 30; i++) {
+        await new Promise(r => setTimeout(r, 2000));
+        const pollRes = await fetch(data.urls.get, {
+          headers: { Authorization: `Bearer ${replicateToken}` },
+        });
+        data = await pollRes.json();
+        if (data.status === "succeeded" || data.status === "failed") break;
+      }
+    }
+
+    const imageUrl = Array.isArray(data.output) ? data.output[0] : data.output;
     if (!imageUrl) {
       return apiError(500, "generation_failed", "No image was generated");
     }

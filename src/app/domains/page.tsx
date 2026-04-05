@@ -1,7 +1,5 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
@@ -88,6 +86,13 @@ export default function DomainsPage() {
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [registering, setRegistering] = useState(false);
   const [userEmail, setUserEmail] = useState("");
+  const [generatedNames, setGeneratedNames] = useState<Array<{ name: string; results: DomainResult[] }>>([]);
+  const [genDescription, setGenDescription] = useState("");
+  const [pendingGenerate, setPendingGenerate] = useState(false);
+  const [autoExpandedTlds, setAutoExpandedTlds] = useState(false);
+  const [autoGenerating, setAutoGenerating] = useState(false);
+  const resultsRef = useRef<HTMLDivElement>(null);
+  const genResultsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     try {
