@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
-import { authenticateRequest } from "@/lib/auth-middleware";
+import { authenticateRequest } from "@/lib/auth-guard";
 
 export const maxDuration = 120;
 
