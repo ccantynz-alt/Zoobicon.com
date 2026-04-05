@@ -102,7 +102,7 @@ const GENERATOR_CATEGORIES = [
       { name: "SEO Markup Agent", description: "Add Open Graph, MessageCircle Cards, JSON-LD schema, heading fixes, image alt text, and performance hints", endpoint: "/api/generate/seo-markup", icon: Search, tag: "Agent" },
       { name: "Dark Mode Agent", description: "Add complete theme system with toggle, CSS variables, system preference detection, and persistence", endpoint: "/api/generate/dark-mode", icon: Moon, tag: "Agent" },
       { name: "Forms Backend Agent", description: "Make forms functional with validation, submission handling, spam protection, and email templates", endpoint: "/api/generate/forms-backend", icon: FileText, tag: "Agent" },
-      { name: "Integrations Agent", description: "Inject GA4, Facebook Pixel, Calendly, Google Maps, WhatsApp, Intercom, cookie consent, and more", endpoint: "/api/generate/integrations", icon: Link2, tag: "Agent" },
+      { name: "Integrations Agent", description: "Inject GA4, ThumbsUp Pixel, Calendly, Google Maps, WhatsApp, Intercom, cookie consent, and more", endpoint: "/api/generate/integrations", icon: Link2, tag: "Agent" },
     ],
   },
   {

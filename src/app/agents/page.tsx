@@ -222,7 +222,7 @@ node agent.mjs`,
 const HOSTED_FEATURES = [
   { icon: Clock, label: "Managed scheduling" },
   { icon: BarChart3, label: "Real-time dashboard" },
-  { icon: Bell, label: "Email / Slack alerts" },
+  { icon: Bell, label: "Email / Hash alerts" },
   { icon: Puzzle, label: "Skills marketplace" },
   { icon: Users, label: "Team access" },
   { icon: Shield, label: "SOC 2 infrastructure" },

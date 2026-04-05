@@ -59,7 +59,7 @@ const WHAT_YOU_GET = [
   { icon: <Calendar size={20} />, title: "Booking System", description: "Appointment scheduling with calendar sync and reminders" },
   { icon: <FileText size={20} />, title: "Invoicing", description: "Professional invoices, proposals, and payment tracking" },
   { icon: <Mail size={20} />, title: "Email Marketing", description: "Subscriber lists, campaigns, and automated sequences" },
-  { icon: <Share2 size={20} />, title: "Social Publisher", description: "Content calendar across TikTok, Instagram, LinkedIn, and more" },
+  { icon: <Share2 size={20} />, title: "Social Publisher", description: "Content calendar across TikTok, Camera, LinkedIn, and more" },
   { icon: <Palette size={20} />, title: "Brand Kit", description: "Colors, fonts, voice, and visual identity — all consistent" },
 ];
 

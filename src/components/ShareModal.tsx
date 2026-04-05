@@ -191,7 +191,7 @@ const PLATFORM_CONFIG = [
   },
   {
     id: "facebook",
-    name: "Facebook",
+    name: "ThumbsUp",
     Icon: FacebookIcon,
     color: "from-[#1877F2] to-[#0C5DC7]",
     hoverColor: "hover:from-[#2088FF] hover:to-[#1877F2]",
@@ -200,7 +200,7 @@ const PLATFORM_CONFIG = [
   },
   {
     id: "reddit",
-    name: "Reddit",
+    name: "MessageSquare",
     Icon: RedditIcon,
     color: "from-[#FF4500] to-[#CC3700]",
     hoverColor: "hover:from-[#FF5722] hover:to-[#FF4500]",
@@ -218,7 +218,7 @@ const PLATFORM_CONFIG = [
   },
   {
     id: "instagram",
-    name: "Instagram",
+    name: "Camera",
     Icon: InstagramIcon,
     color: "from-[#833AB4] via-[#E1306C] to-[#F77737]",
     hoverColor: "hover:from-[#9B4DCA] hover:via-[#E94580] hover:to-[#F88B4D]",
@@ -292,7 +292,7 @@ export default function ShareModal({
         // Platforms with web share URLs — open in popup
         window.open(shareUrl, "_blank", "noopener,noreferrer,width=600,height=500");
       } else {
-        // TikTok / Instagram — copy caption to clipboard
+        // TikTok / Camera — copy caption to clipboard
         const success = await copyToClipboard(text);
         if (success) {
           setCopiedPlatform(platformId);

@@ -58,148 +58,30 @@ export async function POST(request: NextRequest) {
           break;
         }
 
-        // Domain registration purchase — MUST actually register with OpenSRS
-        if (session.metadata?.type === "domain_registration" || session.metadata?.domains) {
-          const rawDomains = session.metadata?.domains || "";
-          let domainList: string[] = [];
-          try {
-            const parsed = JSON.parse(rawDomains);
-            domainList = Array.isArray(parsed) ? parsed : rawDomains.split(",").filter(Boolean);
-          } catch {
-            domainList = rawDomains.split(",").filter(Boolean);
-          }
-
+        // Domain registration purchase
+        if (session.metadata?.type === "domain_registration") {
+          const domainList = session.metadata?.domains?.split(",") || [];
           const registrantEmail = session.metadata?.registrantEmail || email;
           const years = parseInt(session.metadata?.years || "1", 10);
           const expiresAt = new Date();
           expiresAt.setFullYear(expiresAt.getFullYear() + years);
 
-          let registrant = {
-            firstName: session.metadata?.firstName || "Domain",
-            lastName: session.metadata?.lastName || "Owner",
-            email: registrantEmail,
-            phone: session.metadata?.phone || "+64.000000000",
-            address1: session.metadata?.address1 || "Not provided",
-            city: session.metadata?.city || "Auckland",
-            state: session.metadata?.state || "Auckland",
-            postalCode: session.metadata?.postalCode || "0000",
-            country: session.metadata?.country || "NZ",
-            organization: session.metadata?.organization || "",
-          };
-          try {
-            if (session.metadata?.registrantInfo) {
-              registrant = { ...registrant, ...JSON.parse(session.metadata.registrantInfo) };
-            }
-          } catch { /* use defaults */ }
-
-          const { registerDomain, hasOpenSRSConfig } = await import("@/lib/domain-reseller");
-          const registeredDomains: string[] = [];
-          const failedDomains: string[] = [];
-
           for (const domain of domainList) {
-            const trimmed = domain.trim();
-            if (!trimmed) continue;
-
-            try {
-              if (hasOpenSRSConfig()) {
-                const result = await registerDomain({
-                  domain: trimmed,
-                  period: years,
-                  registrant,
-                  nameservers: ["ns1.zoobicon.io", "ns2.zoobicon.io"],
-                  autoRenew: true,
-                  privacyProtection: true,
-                });
-
-                if (result.success) {
-                  registeredDomains.push(trimmed);
-                  console.log(`[webhook] Domain REGISTERED with OpenSRS: ${trimmed} (order: ${result.orderId})`);
-                } else {
-                  failedDomains.push(trimmed);
-                  console.error(`[webhook] OpenSRS registration FAILED for ${trimmed}: ${result.error}`);
-                }
-              } else {
-                console.warn(`[webhook] OpenSRS NOT CONFIGURED — domain ${trimmed} saved locally but NOT registered with registrar`);
-                registeredDomains.push(trimmed);
-              }
-            } catch (err) {
-              failedDomains.push(trimmed);
-              console.error(`[webhook] Domain registration error for ${trimmed}:`, err);
-            }
-          }
-
-          // ── Auto-setup Cloudflare for each registered domain ──
-          const { getCloudflareConfig, createZone, setupDefaultDns, provisionSsl } = await import("@/lib/cloudflare");
-          const cfConfig = getCloudflareConfig();
-
-          for (const domain of registeredDomains) {
-            let cloudflareZoneId = "";
-            let cloudflareNameservers: string[] = [];
-
-            // Step 1: Add domain to Cloudflare
-            if (cfConfig) {
-              try {
-                const zoneResult = await createZone(cfConfig, domain);
-                if (zoneResult.success && zoneResult.zoneId) {
-                  cloudflareZoneId = zoneResult.zoneId;
-                  cloudflareNameservers = zoneResult.nameservers || [];
-                  console.log(`[webhook] Cloudflare zone created for ${domain}: ${cloudflareZoneId}`);
-
-                  // Step 2: Set up default DNS records (A → Vercel, www CNAME, MX for email)
-                  await setupDefaultDns(cloudflareZoneId, domain, cfConfig);
-
-                  // Step 3: Ensure SSL is set to Full
-                  await provisionSsl({ ...cfConfig, zoneId: cloudflareZoneId }, domain);
-
-                  // Step 4: Update nameservers at OpenSRS to point to Cloudflare
-                  if (cloudflareNameservers.length >= 2 && hasOpenSRSConfig()) {
-                    const { updateNameservers } = await import("@/lib/domain-reseller");
-                    const nsResult = await updateNameservers(domain, cloudflareNameservers);
-                    if (nsResult.success) {
-                      console.log(`[webhook] Nameservers updated for ${domain} → ${cloudflareNameservers.join(", ")}`);
-                    } else {
-                      console.error(`[webhook] Failed to update NS for ${domain}: ${nsResult.error}`);
-                    }
-                  }
-                } else {
-                  console.error(`[webhook] Cloudflare zone creation failed for ${domain}: ${zoneResult.error}`);
-                }
-              } catch (cfErr) {
-                console.error(`[webhook] Cloudflare auto-setup error for ${domain}:`, cfErr);
-              }
-            }
-
-            // Step 5: Save domain to database
+            if (!domain.trim()) continue;
             try {
               await sql`
-                INSERT INTO registered_domains (domain, user_email, status, expires_at, auto_renew, privacy_protection, nameservers)
-                VALUES (${domain}, ${registrantEmail}, ${hasOpenSRSConfig() ? 'active' : 'pending_registration'}, ${expiresAt.toISOString()}, true, true, ${cloudflareNameservers.length > 0 ? JSON.stringify(cloudflareNameservers) : '["ns1.zoobicon.io","ns2.zoobicon.io"]'})
+                INSERT INTO registered_domains (domain, user_email, status, expires_at, auto_renew, privacy_protection)
+                VALUES (${domain.trim()}, ${registrantEmail}, 'active', ${expiresAt.toISOString()}, true, true)
                 ON CONFLICT (domain) DO UPDATE SET
-                  status = ${hasOpenSRSConfig() ? 'active' : 'pending_registration'},
+                  status = 'active',
                   expires_at = ${expiresAt.toISOString()},
-                  user_email = ${registrantEmail},
-                  nameservers = ${cloudflareNameservers.length > 0 ? JSON.stringify(cloudflareNameservers) : '["ns1.zoobicon.io","ns2.zoobicon.io"]'}
+                  user_email = ${registrantEmail}
               `;
-              console.log(`[webhook] Domain ${domain} saved to database successfully`);
             } catch (err) {
-              console.error(`[webhook] CRITICAL: Failed to save domain ${domain} to DB:`, err);
+              console.error(`[webhook] Failed to save domain ${domain}:`, err);
             }
           }
-
-          if (failedDomains.length > 0) {
-            console.error(`[webhook] ${failedDomains.length} domains FAILED registration: ${failedDomains.join(", ")}`);
-            for (const domain of failedDomains) {
-              try {
-                await sql`
-                  INSERT INTO registered_domains (domain, user_email, status, expires_at)
-                  VALUES (${domain}, ${registrantEmail}, 'failed', ${expiresAt.toISOString()})
-                  ON CONFLICT (domain) DO UPDATE SET status = 'failed', user_email = ${registrantEmail}
-                `;
-              } catch { /* best effort */ }
-            }
-          }
-
-          console.log(`[webhook] Domain registration complete: ${registeredDomains.length} succeeded, ${failedDomains.length} failed for ${registrantEmail}`);
+          console.log(`[webhook] Domain registration: ${domainList.length} domains for ${registrantEmail}`);
           break;
         }
 

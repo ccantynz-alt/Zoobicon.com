@@ -88,7 +88,7 @@ const INTEGRATIONS: IntegrationDef[] = [
   },
   {
     id: "slack",
-    name: "Slack",
+    name: "Hash",
     description: "Receive build notifications and deploy alerts in your channels.",
     icon: MessageSquare,
     color: "#E01E5A",
