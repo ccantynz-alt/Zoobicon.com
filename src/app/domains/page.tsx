@@ -86,25 +86,18 @@ export default function DomainsPage() {
   const [searching, setSearching] = useState(false);
   const [cart, setCart] = useState<DomainResult[]>([]);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
-  const resultsRef = useRef<HTMLDivElement>(null);
+  const [registering, setRegistering] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
 
-  // AI Name Generator state
-  const [genDescription, setGenDescription] = useState("");
-  const [genStyle, setGenStyle] = useState("modern");
-  const [generatedNames, setGeneratedNames] = useState<GeneratedName[]>([]);
-  const [generating, setGenerating] = useState(false);
-  const genResultsRef = useRef<HTMLDivElement>(null);
-
-  // Checkout state
-  const [checkingOut, setCheckingOut] = useState(false);
-  const [checkoutError, setCheckoutError] = useState("");
-
-  // Track whether we've already tried expanding TLDs for this search
-  const [autoExpandedTlds, setAutoExpandedTlds] = useState(false);
-  // Track whether we're auto-generating alternatives
-  const [autoGenerating, setAutoGenerating] = useState(false);
-  // Flag to trigger generation after state updates
-  const [pendingGenerate, setPendingGenerate] = useState(false);
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("zoobicon_user");
+      if (raw) {
+        const user = JSON.parse(raw);
+        setUserEmail(user.email || "");
+      }
+    } catch {}
+  }, []);
 
   const allTlds = Object.keys(TLD_PRICES);
 
@@ -256,151 +249,35 @@ export default function DomainsPage() {
     setCart(prev => prev.filter(c => c.domain !== domain));
   };
 
-  // --- Checkout ---
-  const handleCheckout = async () => {
+  const handleRegister = async () => {
     if (cart.length === 0) return;
-    setCheckingOut(true);
-    setCheckoutError("");
+    const email = userEmail || window.prompt("Enter your email to register domains:");
+    if (!email) return;
 
-    // Get user email from localStorage
-    let userEmail = "";
+    setRegistering(true);
     try {
-      const raw = localStorage.getItem("zoobicon_user");
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        userEmail = parsed.email || "";
-      }
-    } catch { /* no user */ }
-
-    try {
-      const res = await fetch("/api/domains/checkout", {
+      const res = await fetch("/api/domains/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          domains: cart.map((d) => ({ domain: d.domain, tld: d.tld, price: d.price })),
-          email: userEmail,
+          domains: cart.map(c => ({ domain: c.domain, tld: c.tld, years: 1 })),
+          registrant: { email },
         }),
       });
-
       const data = await res.json();
-
-      if (!res.ok) {
-        setCheckoutError(data.error || "Checkout failed. Please try again.");
-        setCheckingOut(false);
-        return;
-      }
-
-      if (data.url) {
-        window.location.href = data.url;
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else if (data.success) {
+        alert("Domains registered successfully! View them in your dashboard.");
+        setCart([]);
+        window.location.href = "/my-domains";
       } else {
-        setCheckoutError("Failed to create checkout session.");
-        setCheckingOut(false);
+        alert(data.error || "Registration failed. Please try again.");
       }
     } catch {
-      setCheckoutError("Connection error. Please try again.");
-      setCheckingOut(false);
-    }
-  };
-
-  // --- AI Name Generator ---
-  const handleGenerate = async () => {
-    if (!genDescription.trim() || genDescription.trim().length < 3) return;
-    if (selectedTlds.size === 0) return;
-
-    setGenerating(true);
-    setGeneratedNames([]);
-    setTimeout(() => genResultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
-
-    try {
-      // Step 1: Generate names via AI
-      const nameRes = await fetch("/api/tools/business-names", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          description: genDescription.trim(),
-          style: genStyle,
-          count: 20,
-        }),
-      });
-
-      if (!nameRes.ok) {
-        setGenerating(false);
-        return;
-      }
-
-      const nameData = await nameRes.json();
-      const names: Array<{ name: string; tagline: string }> = nameData.names || [];
-
-      if (names.length === 0) {
-        setGenerating(false);
-        return;
-      }
-
-      // Step 2: Initialize generated names with empty domain results
-      const tlds = Array.from(selectedTlds);
-      const initial: GeneratedName[] = names.map((n) => ({
-        name: n.name,
-        tagline: n.tagline,
-        domains: tlds.map((tld) => ({
-          domain: `${n.name.toLowerCase().replace(/[^a-z0-9-]/g, "")}.${tld}`,
-          tld,
-          available: null,
-          price: TLD_PRICES[tld] || 9.99,
-          checking: true,
-        })),
-        checkingDomains: true,
-      }));
-      setGeneratedNames(initial);
-      setGenerating(false);
-
-      // Step 3: Batch check availability for each name (3 at a time to not overwhelm API)
-      const batchSize = 3;
-      for (let i = 0; i < names.length; i += batchSize) {
-        const batch = names.slice(i, i + batchSize);
-        const checks = batch.map(async (n, batchIdx) => {
-          const cleanName = n.name.toLowerCase().replace(/[^a-z0-9-]/g, "");
-          if (cleanName.length < 2) return;
-
-          try {
-            const res = await fetch(`/api/domains/search?q=${encodeURIComponent(cleanName)}&tlds=${encodeURIComponent(tlds.join(","))}`);
-            if (res.ok) {
-              const data = await res.json();
-              const apiResults = data.results || [];
-
-              setGeneratedNames((prev) =>
-                prev.map((gn) => {
-                  if (gn.name !== n.name) return gn;
-                  return {
-                    ...gn,
-                    checkingDomains: false,
-                    domains: tlds.map((tld) => {
-                      const match = apiResults.find((r: { domain: string }) => r.domain === `${cleanName}.${tld}`);
-                      return {
-                        domain: `${cleanName}.${tld}`,
-                        tld,
-                        available: match ? match.available : null,
-                        price: match?.price || TLD_PRICES[tld] || 9.99,
-                        checking: false,
-                      };
-                    }),
-                  };
-                })
-              );
-            } else {
-              setGeneratedNames((prev) =>
-                prev.map((gn) => gn.name === n.name ? { ...gn, checkingDomains: false, domains: gn.domains.map((d) => ({ ...d, checking: false })) } : gn)
-              );
-            }
-          } catch {
-            setGeneratedNames((prev) =>
-              prev.map((gn) => gn.name === n.name ? { ...gn, checkingDomains: false, domains: gn.domains.map((d) => ({ ...d, checking: false })) } : gn)
-            );
-          }
-        });
-        await Promise.all(checks);
-      }
-    } catch {
-      setGenerating(false);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setRegistering(false);
     }
   };
 
@@ -1089,58 +966,12 @@ export default function DomainsPage() {
               <div className="text-sm font-semibold text-slate-500 text-center">GoDaddy</div>
               <div className="text-sm font-semibold text-slate-500 text-center">Namecheap</div>
             </div>
-            {COMPARISON.map((row, i) => (
-              <div key={row.feature} className={`grid grid-cols-4 px-6 py-4 ${i < COMPARISON.length - 1 ? "border-b border-white/[0.04]" : ""}`}>
-                <div className="text-sm text-slate-300">{row.feature}</div>
-                <div className="text-sm font-semibold text-center">
-                  {row.zoobicon === "Free" || row.zoobicon === "Included" ? (
-                    <span className="text-emerald-400">{row.zoobicon}</span>
-                  ) : (
-                    <span className="text-white">{row.zoobicon}</span>
-                  )}
-                </div>
-                <div className="text-sm text-slate-500 text-center">{row.godaddy}</div>
-                <div className="text-sm text-slate-500 text-center">{row.namecheap}</div>
-              </div>
-            ))}
-          </div>
-
-          <p className="text-center text-xs text-slate-600 mt-4">
-            Prices as of March 2026. Competitor prices may vary. See our{" "}
-            <Link href="/disclaimers" className="text-slate-500 underline underline-offset-2 hover:text-slate-400">disclaimers</Link>.
-          </p>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════ */}
-      {/* BUNDLE CTA                                  */}
-      {/* ═══════════════════════════════════════════ */}
-      <section className="py-20 md:py-28 px-4 sm:px-6 border-t border-white/[0.04]">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-sm font-medium mb-8">
-            <Star className="w-4 h-4" />
-            Domain + Website + Hosting — all included
-          </div>
-
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight leading-tight mb-6">
-            Get your domain.<br />
-            Build your site.<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
-              Go live in minutes.
-            </span>
-          </h2>
-          <p className="text-lg text-slate-400 max-w-xl mx-auto mb-10">
-            Every domain includes free hosting on zoobicon.sh, a free SSL certificate,
-            and access to our AI website builder. No extra charges. No gotchas.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <button
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="group inline-flex items-center gap-2.5 px-8 py-4 rounded-full bg-indigo-600 text-white text-lg font-bold hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/20"
+              onClick={handleRegister}
+              disabled={registering}
+              className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-semibold text-base transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              Search Domains
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              {registering ? <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</> : "Proceed to Registration"}
             </button>
             <Link
               href="/builder"

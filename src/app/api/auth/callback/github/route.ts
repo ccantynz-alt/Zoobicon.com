@@ -120,14 +120,35 @@ export async function GET(req: NextRequest) {
       name: user.name,
       role: user.role || "user",
       plan: user.plan || "free",
+      githubLogin: ghUser.login,
     }));
 
-    const redirectResponse = Response.redirect(`${origin}/auth/callback?user=${userData}`);
+    // Store the GitHub access token in a secure HttpOnly cookie so the builder
+    // can use it for repo sync without the client ever reading the raw token.
+    // Also pass the GitHub username to localStorage via the redirect URL.
+    const redirectResponse = Response.redirect(
+      `${origin}/auth/callback?user=${userData}&github_login=${encodeURIComponent(ghUser.login)}`
+    );
+
     // Clear the state cookie
     redirectResponse.headers.append(
       "Set-Cookie",
       "zoobicon_oauth_state=; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=0"
     );
+
+    // Store GitHub token in a secure HttpOnly cookie (30 day expiry)
+    // The /api/github/sync routes read this cookie server-side.
+    redirectResponse.headers.append(
+      "Set-Cookie",
+      `zoobicon_github_token=${tokenData.access_token}; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=${30 * 24 * 60 * 60}`
+    );
+
+    // Also store the GitHub login in a readable cookie for the UI
+    redirectResponse.headers.append(
+      "Set-Cookie",
+      `zoobicon_github_login=${ghUser.login}; Path=/; SameSite=Lax; Secure; Max-Age=${30 * 24 * 60 * 60}`
+    );
+
     return redirectResponse;
   } catch (err) {
     console.error("GitHub OAuth callback error:", err);

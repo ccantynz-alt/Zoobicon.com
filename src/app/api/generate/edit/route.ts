@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { authenticateRequest } from "@/lib/auth-guard";
 
 export const maxDuration = 120;
 
@@ -18,6 +19,9 @@ export const maxDuration = 120;
  * Returns: { files: Record<string,string> } — only the CHANGED files
  */
 export async function POST(req: NextRequest) {
+  const auth = await authenticateRequest(req, { requireAuth: true, requireVerified: true });
+  if (auth.error) return auth.error;
+
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     return Response.json({ error: "AI service unavailable" }, { status: 503 });

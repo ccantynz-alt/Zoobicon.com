@@ -133,7 +133,7 @@ const PLANS = [
       "Template marketplace access",
       "Bulk operations & automation",
       "API access (500K req/mo)",
-      "Priority Slack support",
+      "Priority Hash support",
     ],
   },
   {
@@ -230,7 +230,7 @@ const FAQS = [
   },
   {
     q: "What's Live Agent support?",
-    a: "Free users get Zoe, our quick AI assistant (powered by Claude Haiku). Pro includes Live Agent support — a full Claude Sonnet-powered AI that gives deeper, more thorough answers with 30 minutes/month (10 min sessions). Agency and Enterprise don't include it because those users already have Priority Slack and dedicated account managers. Anyone can add Premium Support for $19/month for 60 minutes of live agent time with 20-minute sessions.",
+    a: "Free users get Zoe, our quick AI assistant (powered by Claude Haiku). Pro includes Live Agent support — a full Claude Sonnet-powered AI that gives deeper, more thorough answers with 30 minutes/month (10 min sessions). Agency and Enterprise don't include it because those users already have Priority Hash and dedicated account managers. Anyone can add Premium Support for $19/month for 60 minutes of live agent time with 20-minute sessions.",
   },
   {
     q: "How does white-labeling work on Enterprise?",

@@ -107,7 +107,7 @@ const CHECKLIST: ChecklistItem[] = [
   { id: "seo-3", label: "robots.txt configured", description: "Allow crawling of public pages. Block /admin, /api, /dashboard. Sitemap URL included.", priority: "high", category: "seo" },
   { id: "seo-4", label: "Google Search Console verified", description: "Verify zoobicon.com ownership. Submit sitemap. Monitor indexing.", priority: "high", category: "seo" },
   { id: "seo-5", label: "Google Analytics / Plausible installed", description: "Privacy-friendly analytics tracking pageviews, conversions, funnel completion.", priority: "high", category: "seo" },
-  { id: "seo-6", label: "Social media previews tested", description: "Share links on MessageCircle, LinkedIn, Facebook. Verify og:image renders correctly.", priority: "medium", category: "seo" },
+  { id: "seo-6", label: "Social media previews tested", description: "Share links on MessageCircle, LinkedIn, ThumbsUp. Verify og:image renders correctly.", priority: "medium", category: "seo" },
   { id: "seo-7", label: "JSON-LD structured data on key pages", description: "Organization, Product, FAQ schema on homepage, pricing, support pages.", priority: "medium", category: "seo" },
 
   // Performance & Speed

@@ -33,6 +33,7 @@ body {
   color: #e8e8ec;
   font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   overflow-x: hidden;
+  overscroll-behavior-y: none;
   min-height: 100vh;
   min-height: 100dvh;
   -webkit-text-size-adjust: 100%;

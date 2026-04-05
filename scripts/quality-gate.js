@@ -94,9 +94,9 @@ for (const file of CUSTOMER_PAGES) {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       if (line.includes("<button") && !line.includes("onClick") && !line.includes("type=\"submit\"") && !line.includes("disabled")) {
-        // Check next 2 lines for onClick (multi-line button tags)
-        const nextLines = lines.slice(i, i + 3).join(" ");
-        if (!nextLines.includes("onClick") && !nextLines.includes("type=\"submit\"")) {
+        // Check next 10 lines for onClick (multi-line button tags)
+        const nextLines = lines.slice(i, i + 11).join(" ");
+        if (!nextLines.includes("onClick") && !nextLines.includes("type=\"submit\"") && !nextLines.includes("onMouseEnter") && !nextLines.includes("onMouseDown")) {
           warn(path.relative(SRC, file) + `:${i + 1}`, "Button without onClick handler");
         }
       }

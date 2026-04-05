@@ -1,0 +1,115 @@
+.zoobicon-ai-wrap {
+    max-width: 900px;
+}
+
+.zoobicon-ai-header {
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.zoobicon-ai-header h1 {
+    color: white;
+    margin: 0 0 4px;
+    font-size: 28px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.zoobicon-ai-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: white;
+    color: #4338ca;
+    font-weight: 800;
+    border-radius: 10px;
+    font-size: 22px;
+}
+
+.zoobicon-ai-subtitle {
+    margin: 0;
+    opacity: 0.8;
+    font-size: 14px;
+}
+
+.zoobicon-ai-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 782px) {
+    .zoobicon-ai-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.zoobicon-ai-card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.zoobicon-ai-card h2 {
+    margin-top: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.zoobicon-ai-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.zoobicon-ai-status-connected {
+    background: #edfcf2;
+    color: #166534;
+}
+
+.zoobicon-ai-status-disconnected {
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+.zoobicon-ai-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.zoobicon-ai-status-connected .zoobicon-ai-status-dot {
+    background: #22c55e;
+}
+
+.zoobicon-ai-status-disconnected .zoobicon-ai-status-dot {
+    background: #ef4444;
+}
+
+.zoobicon-ai-features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.zoobicon-ai-features li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f1;
+    font-size: 13px;
+}
+
+.zoobicon-ai-features li:last-child {
+    border-bottom: none;
+}

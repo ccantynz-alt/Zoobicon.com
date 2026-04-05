@@ -52,7 +52,7 @@ const STATUS_CONFIG: Record<Status, { label: string; color: string; icon: typeof
 const PRIORITY_CONFIG: Record<Priority, { label: string; color: string }> = {
   'critical': { label: 'Critical', color: 'bg-red-500/20 text-red-400' },
   'high': { label: 'High', color: 'bg-orange-500/20 text-orange-400' },
-  'medium': { label: 'Medium', color: 'bg-yellow-500/20 text-yellow-400' },
+  'medium': { label: 'BookOpen', color: 'bg-yellow-500/20 text-yellow-400' },
   'low': { label: 'Low', color: 'bg-gray-500/20 text-gray-400' },
 };
 
