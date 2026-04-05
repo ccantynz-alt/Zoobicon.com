@@ -1002,10 +1002,104 @@ registerComponent({
 });
 
 // ── Footer: Mega ──
-registerComponent({ id: "footer-mega", name: "Footer Mega", category: "footer", variant: "mega", description: "Large footer with 5 columns and newsletter", tags: ["footer", "links", "newsletter", "social", "enterprise"], code: `export default function Footer() { return (<footer className="bg-gray-900 text-gray-400 pt-20 pb-8 px-6"><div className="max-w-7xl mx-auto"><div className="grid md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16"><div className="lg:col-span-2"><span className="text-2xl font-bold text-white">Brand</span><p className="mt-4 text-sm leading-relaxed max-w-sm">Building the future of modern software.</p><div className="mt-6 flex gap-2"><input type="email" placeholder="Newsletter" className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white" /><button className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg">Join</button></div></div><div><h4 className="font-semibold text-white mb-4">Product</h4><ul className="space-y-2 text-sm"><li><a href="#" className="hover:text-white">Features</a></li><li><a href="#" className="hover:text-white">Pricing</a></li><li><a href="#" className="hover:text-white">Integrations</a></li></ul></div><div><h4 className="font-semibold text-white mb-4">Company</h4><ul className="space-y-2 text-sm"><li><a href="#" className="hover:text-white">About</a></li><li><a href="#" className="hover:text-white">Blog</a></li><li><a href="#" className="hover:text-white">Careers</a></li></ul></div><div><h4 className="font-semibold text-white mb-4">Legal</h4><ul className="space-y-2 text-sm"><li><a href="#" className="hover:text-white">Privacy</a></li><li><a href="#" className="hover:text-white">Terms</a></li></ul></div></div><div className="border-t border-gray-800 pt-8 text-sm text-center">© {new Date().getFullYear()} Brand. All rights reserved.</div></div></footer>); }` });
+registerComponent({
+  id: "footer-mega",
+  name: "Footer Mega",
+  category: "footer",
+  variant: "mega",
+  description: "Premium 5-column footer with gradient newsletter CTA, status indicator, trust badges, and social links",
+  tags: ["footer", "links", "newsletter", "social", "enterprise"],
+  code: `export default function Footer() {
+  const links = {
+    Product: ["Features", "Pricing", "Integrations", "API", "Changelog", "Status"],
+    Company: ["About", "Blog", "Careers", "Press", "Partners"],
+    Resources: ["Documentation", "Guides", "Templates", "Community", "Webinars"],
+    Legal: ["Privacy Policy", "Terms of Service", "Cookie Policy", "GDPR", "Security"],
+  };
+  return (
+    <footer className="bg-gray-950 text-gray-400 pt-20 pb-8 px-6 relative overflow-hidden">
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
+      <div className="max-w-7xl mx-auto relative">
+        <div className="grid md:grid-cols-2 lg:grid-cols-6 gap-12 mb-16">
+          <div className="lg:col-span-2">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white font-bold text-sm">B</div>
+              <span className="text-xl font-bold text-white">Brand</span>
+            </div>
+            <p className="text-sm leading-relaxed mb-6 max-w-sm">Building the future of modern software. Trusted by 12,000+ teams worldwide.</p>
+            <div className="flex gap-2 mb-6">
+              <input type="email" placeholder="Enter your email" className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder-gray-500 focus:border-indigo-500 outline-none transition-colors" />
+              <button className="px-5 py-3 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-500 transition-colors">Subscribe</button>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-gray-500">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              All systems operational
+            </div>
+          </div>
+          {Object.entries(links).map(([title, items]) => (
+            <div key={title}>
+              <h4 className="font-semibold text-white text-sm mb-5">{title}</h4>
+              <ul className="space-y-3">
+                {items.map((item, i) => (
+                  <li key={i}><a href="#" className="text-sm hover:text-white transition-colors">{item}</a></li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-sm">&copy; {new Date().getFullYear()} Brand. All rights reserved.</p>
+          <div className="flex items-center gap-6 text-xs">
+            <span className="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> SOC 2</span>
+            <span className="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> GDPR</span>
+            <span className="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> ISO 27001</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}`,
+});
 
 // ── Footer: Centered ──
-registerComponent({ id: "footer-centered", name: "Footer Centered", category: "footer", variant: "centered", description: "Centered minimal footer", tags: ["footer", "minimal", "centered", "clean"], code: `export default function Footer() { return (<footer className="bg-white border-t border-gray-100 py-12 px-6"><div className="max-w-4xl mx-auto text-center"><span className="text-xl font-bold text-gray-900">Brand</span><div className="flex flex-wrap justify-center gap-6 mt-6 mb-8"><a href="#" className="text-sm text-gray-500 hover:text-gray-900">Features</a><a href="#" className="text-sm text-gray-500 hover:text-gray-900">Pricing</a><a href="#" className="text-sm text-gray-500 hover:text-gray-900">About</a><a href="#" className="text-sm text-gray-500 hover:text-gray-900">Blog</a></div><p className="text-sm text-gray-400">© {new Date().getFullYear()} Brand. All rights reserved.</p></div></footer>); }` });
+registerComponent({
+  id: "footer-centered",
+  name: "Footer Centered",
+  category: "footer",
+  variant: "centered",
+  description: "Premium centered footer with gradient logo, social icons, and elegant link row",
+  tags: ["footer", "minimal", "centered", "clean"],
+  code: `export default function Footer() {
+  const socialIcons = [
+    { label: "Twitter", path: "M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z" },
+    { label: "GitHub", path: "M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22" },
+    { label: "LinkedIn", path: "M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z M4 6a2 2 0 100-4 2 2 0 000 4z" },
+  ];
+  return (
+    <footer className="bg-white border-t border-gray-100 py-16 px-6">
+      <div className="max-w-4xl mx-auto text-center">
+        <div className="flex items-center justify-center gap-3 mb-6">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white font-bold text-sm">B</div>
+          <span className="text-xl font-bold text-gray-900">Brand</span>
+        </div>
+        <div className="flex flex-wrap justify-center gap-8 mb-8">
+          {["Features", "Pricing", "About", "Blog", "Docs", "Support"].map((link, i) => (
+            <a key={i} href="#" className="text-sm text-gray-500 hover:text-gray-900 transition-colors font-medium">{link}</a>
+          ))}
+        </div>
+        <div className="flex justify-center gap-4 mb-8">
+          {socialIcons.map((s, i) => (
+            <a key={i} href="#" aria-label={s.label} className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-indigo-50 hover:text-indigo-600 transition-all">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={s.path}/></svg>
+            </a>
+          ))}
+        </div>
+        <p className="text-sm text-gray-400">&copy; {new Date().getFullYear()} Brand. All rights reserved.</p>
+      </div>
+    </footer>
+  );
+}`,
+});
 
 // ── About: Team ──
 registerComponent({
