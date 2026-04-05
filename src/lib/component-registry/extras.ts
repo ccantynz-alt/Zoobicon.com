@@ -520,77 +520,101 @@ registerComponent({
   name: "Comparison Table Pricing",
   category: "pricing",
   variant: "comparison",
-  description: "Feature comparison table with checkmarks across plan tiers",
+  description: "Premium feature comparison table with highlighted Pro column, category grouping, and gradient CTA row",
   tags: ["saas", "startup", "business", "software", "platform", "service", "tech", "agency", "enterprise"],
   code: `export default function Pricing() {
-  const plans = ["Free", "Pro", "Business"];
-  const features = [
-    { name: "Projects", values: ["3", "Unlimited", "Unlimited"] },
-    { name: "Storage", values: ["1GB", "50GB", "500GB"] },
-    { name: "Team members", values: ["1", "10", "Unlimited"] },
-    { name: "Custom domains", values: [false, true, true] },
-    { name: "API access", values: [false, true, true] },
-    { name: "Advanced analytics", values: [false, true, true] },
-    { name: "Priority support", values: [false, false, true] },
-    { name: "SSO / SAML", values: [false, false, true] },
-    { name: "SLA guarantee", values: [false, false, true] },
-    { name: "Dedicated account manager", values: [false, false, true] },
+  const plans = [
+    { name: "Free", price: "$0", period: "forever", cta: "Start Free", highlighted: false },
+    { name: "Pro", price: "$49", period: "/month", cta: "Start Trial", highlighted: true },
+    { name: "Business", price: "$149", period: "/month", cta: "Contact Sales", highlighted: false },
   ];
-  const prices = ["$0", "$49", "$149"];
-  const periods = ["forever", "/month", "/month"];
+  const sections = [
+    { category: "Core", features: [
+      { name: "Projects", values: ["3", "Unlimited", "Unlimited"] },
+      { name: "Cloud storage", values: ["1GB", "50GB", "500GB"] },
+      { name: "Team members", values: ["1", "10", "Unlimited"] },
+      { name: "File uploads", values: ["10MB max", "100MB max", "No limit"] },
+    ]},
+    { category: "Features", features: [
+      { name: "Custom domains", values: [false, true, true] },
+      { name: "API access", values: [false, true, true] },
+      { name: "Advanced analytics", values: [false, true, true] },
+      { name: "Webhooks & integrations", values: [false, true, true] },
+      { name: "White-label exports", values: [false, false, true] },
+    ]},
+    { category: "Security & Support", features: [
+      { name: "SSL encryption", values: [true, true, true] },
+      { name: "Priority support", values: [false, true, true] },
+      { name: "SSO / SAML", values: [false, false, true] },
+      { name: "99.99% SLA", values: [false, false, true] },
+      { name: "Dedicated account manager", values: [false, false, true] },
+    ]},
+  ];
   return (
-    <section id="pricing" className="py-28 px-6 bg-white">
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-16">
-          <p className="text-sm font-semibold text-indigo-600 uppercase tracking-widest mb-3">Compare Plans</p>
-          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">Find Your Perfect Fit</h2>
-          <p className="text-lg text-gray-500 max-w-2xl mx-auto">Every feature, every plan, side by side. No surprises.</p>
+    <section id="pricing" className="py-32 px-6 bg-white">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-20">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50 border border-indigo-100 mb-6">
+            <span className="text-sm font-semibold text-indigo-700">Compare all features</span>
+          </div>
+          <h2 className="text-4xl md:text-6xl font-extrabold text-gray-900 mb-5 tracking-tight">Find Your Perfect Fit</h2>
+          <p className="text-xl text-gray-500 max-w-2xl mx-auto">Every feature, every plan, side by side. No surprises, no hidden costs.</p>
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto rounded-2xl border border-gray-200">
           <table className="w-full text-left">
             <thead>
-              <tr className="border-b-2 border-gray-200">
-                <th className="pb-6 pr-4 text-sm text-gray-500 font-medium w-1/4">Features</th>
+              <tr className="bg-gray-50">
+                <th className="p-6 text-sm text-gray-500 font-medium w-1/4 border-b border-gray-200">Features</th>
                 {plans.map((p, i) => (
-                  <th key={i} className="pb-6 px-4 text-center">
-                    <div className="text-lg font-bold text-gray-900">{p}</div>
+                  <th key={i} className={\`p-6 text-center border-b border-gray-200 \${p.highlighted ? "bg-indigo-50/50" : ""}\`}>
+                    {p.highlighted && <span className="inline-block text-[10px] font-bold bg-indigo-600 text-white px-3 py-1 rounded-full uppercase tracking-wider mb-3">Recommended</span>}
+                    <div className={\`text-lg font-bold \${p.highlighted ? "text-indigo-900" : "text-gray-900"}\`}>{p.name}</div>
                     <div className="flex items-baseline justify-center gap-0.5 mt-1">
-                      <span className="text-3xl font-extrabold text-gray-900">{prices[i]}</span>
-                      <span className="text-sm text-gray-400">{periods[i]}</span>
+                      <span className={\`text-3xl font-extrabold \${p.highlighted ? "text-indigo-900" : "text-gray-900"}\`}>{p.price}</span>
+                      <span className="text-sm text-gray-400">{p.period}</span>
                     </div>
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {features.map((f, i) => (
-                <tr key={i} className={\`border-b border-gray-100 \${i % 2 === 0 ? "bg-gray-50/50" : ""}\`}>
-                  <td className="py-4 pr-4 text-sm font-medium text-gray-700">{f.name}</td>
-                  {f.values.map((v, j) => (
-                    <td key={j} className="py-4 px-4 text-center text-sm">
-                      {typeof v === "boolean" ? (
-                        v ? (
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round" className="mx-auto"><polyline points="20 6 9 17 4 12"/></svg>
-                        ) : (
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="2" strokeLinecap="round" className="mx-auto"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                        )
-                      ) : (
-                        <span className="font-semibold text-gray-900">{v}</span>
-                      )}
-                    </td>
+              {sections.map((section, si) => (
+                <React.Fragment key={si}>
+                  <tr><td colSpan={4} className="px-6 pt-6 pb-3 text-xs font-bold uppercase tracking-wider text-gray-400 bg-gray-50/50 border-b border-gray-100">{section.category}</td></tr>
+                  {section.features.map((f, fi) => (
+                    <tr key={fi} className="border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
+                      <td className="py-4 px-6 text-sm font-medium text-gray-700">{f.name}</td>
+                      {f.values.map((v, j) => (
+                        <td key={j} className={\`py-4 px-6 text-center text-sm \${plans[j].highlighted ? "bg-indigo-50/30" : ""}\`}>
+                          {typeof v === "boolean" ? (
+                            v ? (
+                              <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center mx-auto"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                            ) : (
+                              <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center mx-auto"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="2.5" strokeLinecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+                            )
+                          ) : (
+                            <span className="font-semibold text-gray-900">{v}</span>
+                          )}
+                        </td>
+                      ))}
+                    </tr>
                   ))}
-                </tr>
+                </React.Fragment>
               ))}
             </tbody>
           </table>
+          <div className="grid grid-cols-4 bg-gray-50 border-t border-gray-200">
+            <div className="p-6" />
+            {plans.map((p, i) => (
+              <div key={i} className={\`p-6 text-center \${p.highlighted ? "bg-indigo-50/50" : ""}\`}>
+                <button className={\`w-full py-3.5 rounded-xl font-bold text-sm transition-all duration-300 \${p.highlighted ? "bg-gradient-to-r from-indigo-600 to-violet-600 text-white hover:from-indigo-500 hover:to-violet-500 shadow-lg shadow-indigo-500/25" : "bg-gray-900 text-white hover:bg-gray-800"}\`}>
+                  {p.cta}
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="grid grid-cols-3 gap-6 mt-8 max-w-3xl mx-auto ml-auto" style={{marginLeft: "25%"}}>
-          {plans.map((p, i) => (
-            <button key={i} className={\`py-3 rounded-xl font-bold text-sm transition-all \${i === 1 ? "bg-indigo-600 text-white hover:bg-indigo-500 shadow-lg shadow-indigo-500/25" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}\`}>
-              {i === 0 ? "Start Free" : i === 1 ? "Upgrade to Pro" : "Contact Sales"}
-            </button>
-          ))}
-        </div>
+        <p className="text-center text-sm text-gray-400 mt-10">All plans include SSL encryption and GDPR compliance &middot; Cancel anytime</p>
       </div>
     </section>
   );
