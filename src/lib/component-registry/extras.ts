@@ -6,7 +6,7 @@ registerComponent({
   name: "Three Tier Pricing",
   category: "pricing",
   variant: "three-tier",
-  description: "3-column pricing with featured middle tier, checkmark features, and clear CTAs",
+  description: "Premium 3-column pricing with glass morphism featured tier, gradient accents, social proof, and trust badges",
   tags: ["saas", "startup", "business", "software", "platform", "service", "tech", "agency", "modern"],
   code: `export default function Pricing() {
   const plans = [
@@ -14,60 +14,92 @@ registerComponent({
       name: "Starter",
       price: "0",
       period: "Free forever",
-      desc: "For individuals and side projects",
-      features: ["3 active projects", "1GB storage", "Community support", "Basic analytics", "Custom subdomain"],
+      desc: "Everything you need to validate your idea",
+      features: ["3 active projects", "1GB cloud storage", "Community support", "Core analytics dashboard", "Custom subdomain", "SSL included"],
       cta: "Get Started Free",
       featured: false,
+      badge: null,
     },
     {
       name: "Professional",
       price: "49",
       period: "/month",
-      desc: "For growing teams that need more",
-      features: ["Unlimited projects", "100GB storage", "Priority support", "Advanced analytics", "Custom domains", "Team collaboration", "API access", "SSO integration"],
-      cta: "Start 14-Day Trial",
+      desc: "For teams shipping at startup speed",
+      features: ["Unlimited projects", "100GB cloud storage", "Priority support (4hr SLA)", "Advanced analytics + exports", "Custom domains + SSL", "Team collaboration (10 seats)", "Full API access", "SSO integration", "Webhook automations"],
+      cta: "Start 14-Day Free Trial",
       featured: true,
+      badge: "Most Popular",
     },
     {
       name: "Enterprise",
       price: "199",
       period: "/month",
-      desc: "For organizations at scale",
-      features: ["Everything in Pro", "Unlimited storage", "Dedicated account manager", "Custom integrations", "99.99% SLA", "SOC 2 compliance", "Priority phone support"],
-      cta: "Contact Sales",
+      desc: "For organizations that demand the best",
+      features: ["Everything in Professional", "Unlimited storage", "Dedicated account manager", "Custom integrations + SLA", "99.99% uptime guarantee", "SOC 2 Type II certified", "Priority phone support", "Custom contracts"],
+      cta: "Talk to Sales",
       featured: false,
+      badge: null,
     },
   ];
   return (
-    <section id="pricing" className="py-28 px-6 bg-gray-50">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <p className="text-sm font-semibold text-indigo-600 uppercase tracking-widest mb-3">Pricing</p>
-          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">Plans That Scale With You</h2>
-          <p className="text-lg text-gray-500 max-w-2xl mx-auto">Start free. Upgrade when you need more power. No hidden fees, cancel anytime.</p>
+    <section id="pricing" className="py-32 px-6 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-indigo-100/40 rounded-full blur-3xl pointer-events-none" />
+      <div className="max-w-7xl mx-auto relative">
+        <div className="text-center mb-20">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50 border border-indigo-100 mb-6">
+            <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+            <span className="text-sm font-semibold text-indigo-700">Simple, transparent pricing</span>
+          </div>
+          <h2 className="text-4xl md:text-6xl font-extrabold text-gray-900 mb-5 tracking-tight">Plans That Scale With You</h2>
+          <p className="text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed">Start free. Upgrade when you need more power. No hidden fees, no surprises, cancel anytime.</p>
         </div>
-        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto items-start">
+        <div className="grid md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto items-start">
           {plans.map((p, i) => (
-            <div key={i} className={\`rounded-2xl p-8 transition-shadow duration-300 \${p.featured ? "bg-gray-900 text-white ring-2 ring-indigo-500 shadow-2xl shadow-indigo-500/10 md:-mt-4 md:mb-[-16px] md:py-12" : "bg-white border border-gray-200 hover:shadow-lg"}\`}>
-              <h3 className={\`text-lg font-bold mb-1 \${p.featured ? "text-white" : "text-gray-900"}\`}>{p.name}</h3>
-              <p className={\`text-sm mb-5 \${p.featured ? "text-gray-400" : "text-gray-500"}\`}>{p.desc}</p>
-              <div className="flex items-baseline gap-1 mb-6">
-                <span className={\`text-5xl font-extrabold \${p.featured ? "text-white" : "text-gray-900"}\`}>{"$"}{p.price}</span>
-                <span className={\`text-sm \${p.featured ? "text-gray-400" : "text-gray-500"}\`}>{p.period}</span>
+            <div key={i} className={\`group relative rounded-3xl transition-all duration-500 \${p.featured ? "bg-gray-900 text-white md:-mt-6 md:mb-[-24px] ring-2 ring-indigo-500/50 shadow-2xl shadow-indigo-500/10" : "bg-white border border-gray-200/80 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/5"}\`}>
+              {p.badge && (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                  <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-indigo-500/30">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    {p.badge}
+                  </span>
+                </div>
+              )}
+              <div className={\`p-10 \${p.featured ? "pt-12" : "pt-10"}\`}>
+                <h3 className={\`text-lg font-bold mb-1.5 \${p.featured ? "text-white" : "text-gray-900"}\`}>{p.name}</h3>
+                <p className={\`text-sm mb-6 \${p.featured ? "text-gray-400" : "text-gray-500"}\`}>{p.desc}</p>
+                <div className="flex items-baseline gap-1 mb-2">
+                  <span className={\`text-6xl font-extrabold tracking-tight \${p.featured ? "text-white" : "text-gray-900"}\`}>{"$"}{p.price}</span>
+                  <span className={\`text-sm font-medium \${p.featured ? "text-gray-400" : "text-gray-500"}\`}>{p.period}</span>
+                </div>
+                {p.featured && <p className="text-xs text-indigo-400 mb-6">Billed monthly &middot; Save 20% annually</p>}
+                {!p.featured && <div className="mb-6" />}
+                <button className={\`w-full py-4 rounded-2xl font-bold text-sm transition-all duration-300 \${p.featured ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white hover:from-indigo-400 hover:to-violet-400 shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 hover:-translate-y-0.5" : "bg-gray-900 text-white hover:bg-gray-800 hover:-translate-y-0.5"}\`}>
+                  {p.cta}
+                </button>
+                <div className={\`mt-8 pt-8 border-t \${p.featured ? "border-white/10" : "border-gray-100"}\`}>
+                  <p className={\`text-xs font-semibold uppercase tracking-wider mb-4 \${p.featured ? "text-gray-500" : "text-gray-400"}\`}>{i === 2 ? "Everything in Pro, plus:" : "What's included:"}</p>
+                  <ul className="space-y-3.5">
+                    {p.features.map((f, j) => (
+                      <li key={j} className={\`flex items-start gap-3 text-sm \${p.featured ? "text-gray-300" : "text-gray-600"}\`}>
+                        <div className={\`flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5 \${p.featured ? "bg-indigo-500/20" : "bg-indigo-50"}\`}>
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={p.featured ? "#a5b4fc" : "#6366f1"} strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-              <button className={\`w-full py-3.5 rounded-xl font-bold text-sm transition-all duration-200 \${p.featured ? "bg-indigo-500 text-white hover:bg-indigo-400 shadow-lg shadow-indigo-500/30" : "bg-gray-900 text-white hover:bg-gray-800"}\`}>
-                {p.cta}
-              </button>
-              <ul className="mt-8 space-y-3">
-                {p.features.map((f, j) => (
-                  <li key={j} className={\`flex items-start gap-2.5 text-sm \${p.featured ? "text-gray-300" : "text-gray-600"}\`}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={p.featured ? "#818cf8" : "#6366f1"} strokeWidth="2.5" strokeLinecap="round" className="mt-0.5 flex-shrink-0"><polyline points="20 6 9 17 4 12"/></svg>
-                    {f}
-                  </li>
-                ))}
-              </ul>
             </div>
           ))}
+        </div>
+        <div className="flex flex-col items-center mt-16 gap-6">
+          <div className="flex items-center gap-6 text-sm text-gray-500">
+            <span className="flex items-center gap-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> SOC 2 Certified</span>
+            <span className="flex items-center gap-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> GDPR Compliant</span>
+            <span className="flex items-center gap-2"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg> 99.9% Uptime</span>
+          </div>
+          <p className="text-sm text-gray-400">Trusted by 12,000+ teams worldwide &middot; No credit card required to start</p>
         </div>
       </div>
     </section>
@@ -113,69 +145,78 @@ registerComponent({
   name: "FAQ Accordion",
   category: "faq",
   variant: "accordion",
-  description: "Expandable Q&A with smooth toggle, covers common SaaS questions",
+  description: "Premium expandable FAQ with numbered items, smooth animations, gradient accents, and support CTA",
   tags: ["saas", "startup", "business", "software", "platform", "service", "tech", "agency", "modern", "restaurant", "food", "creative"],
   code: `export default function Faq() {
   const [open, setOpen] = React.useState<number | null>(0);
   const faqs = [
     {
       q: "How does the free trial work?",
-      a: "Sign up with just your email — no credit card required. You get full access to all Professional features for 14 days. At the end, choose to upgrade or continue on our free Starter plan with no data loss.",
+      a: "Sign up with just your email — no credit card required. You get full access to all Professional features for 14 days. At the end, choose to upgrade or continue on our free Starter plan. All your data and settings are preserved, so you never lose work.",
     },
     {
-      q: "Can I switch plans at any time?",
-      a: "Absolutely. Upgrade, downgrade, or cancel from your account settings at any time. When upgrading, you only pay the prorated difference. When downgrading, the remaining credit is applied to future billing.",
+      q: "Can I change or cancel my plan anytime?",
+      a: "Absolutely. Upgrade, downgrade, or cancel from your account settings in two clicks. When upgrading, you only pay the prorated difference. When downgrading, remaining credit applies to future billing. We believe in earning your business every month.",
     },
     {
-      q: "What kind of support do you offer?",
-      a: "Starter plans get community forum access. Professional plans include priority email support with a 4-hour response time. Enterprise plans include a dedicated account manager and priority phone support.",
+      q: "What kind of support can I expect?",
+      a: "Starter plans include community forum access and our comprehensive knowledge base. Professional plans include priority email support with a guaranteed 4-hour response time during business hours. Enterprise plans include a dedicated account manager and priority phone support.",
     },
     {
-      q: "Is my data secure and compliant?",
-      a: "Yes. We are SOC 2 Type II certified and GDPR compliant. All data is encrypted at rest (AES-256) and in transit (TLS 1.3). We conduct quarterly penetration tests and publish the results to enterprise customers.",
+      q: "How do you handle data security and compliance?",
+      a: "Security is foundational, not an afterthought. We are SOC 2 Type II certified and GDPR compliant. All data is encrypted at rest (AES-256) and in transit (TLS 1.3). We run quarterly penetration tests by independent auditors and maintain 99.99% uptime SLA for enterprise customers.",
     },
     {
       q: "Do you offer custom enterprise contracts?",
-      a: "Yes. Our Enterprise plan includes custom SLAs, dedicated infrastructure, priority support, and flexible payment terms. Contact our sales team for a tailored proposal based on your organization's needs.",
+      a: "Yes. Our Enterprise plan includes custom SLAs, dedicated infrastructure, priority support, and flexible payment terms including annual billing. Contact our sales team for a tailored proposal. Most enterprise contracts are finalized within 5 business days.",
+    },
+    {
+      q: "What happens to my data if I cancel?",
+      a: "Your data remains accessible for 30 days after cancellation. During this period, you can export everything or reactivate your account with all data intact. After 30 days, data is permanently deleted from our servers and backups per our data retention policy.",
     },
   ];
   return (
-    <section id="faq" className="py-28 px-6">
-      <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-16">
-          <p className="text-sm font-semibold text-indigo-600 uppercase tracking-widest mb-3">FAQ</p>
-          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">Common Questions</h2>
-          <p className="text-lg text-gray-500">Everything you need to know. Can&apos;t find what you&apos;re looking for? <a href="#contact" className="text-indigo-600 underline underline-offset-4">Reach out</a>.</p>
+    <section id="faq" className="py-32 px-6 bg-gradient-to-b from-white to-gray-50">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-20">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50 border border-indigo-100 mb-6">
+            <span className="text-sm font-semibold text-indigo-700">Got questions?</span>
+          </div>
+          <h2 className="text-4xl md:text-6xl font-extrabold text-gray-900 mb-5 tracking-tight">Frequently Asked Questions</h2>
+          <p className="text-xl text-gray-500 max-w-2xl mx-auto">Everything you need to know about getting started. Can&apos;t find what you&apos;re looking for? <a href="#contact" className="text-indigo-600 font-semibold hover:text-indigo-500 underline underline-offset-4 decoration-indigo-300 transition-colors">Talk to our team</a>.</p>
         </div>
-        <div className="space-y-3">
+        <div className="space-y-4">
           {faqs.map((f, i) => (
-            <div key={i} className="bg-white border border-gray-200 rounded-xl overflow-hidden transition-shadow hover:shadow-sm">
+            <div key={i} className={\`rounded-2xl overflow-hidden transition-all duration-300 \${open === i ? "bg-white shadow-lg shadow-indigo-500/5 ring-1 ring-indigo-100" : "bg-white/60 border border-gray-200/80 hover:bg-white hover:shadow-md"}\`}>
               <button
                 onClick={() => setOpen(open === i ? null : i)}
-                className="w-full flex items-center justify-between p-6 text-left"
+                className="w-full flex items-center gap-5 p-6 md:p-7 text-left group"
                 aria-expanded={open === i}
               >
-                <span className="font-semibold text-gray-900 pr-4">{f.q}</span>
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  className={\`text-gray-400 transition-transform duration-200 flex-shrink-0 \${open === i ? "rotate-180" : ""}\`}
-                >
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
+                <span className={\`flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold transition-colors duration-300 \${open === i ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-400 group-hover:bg-indigo-50 group-hover:text-indigo-600"}\`}>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span className={\`font-semibold text-base flex-1 transition-colors \${open === i ? "text-gray-900" : "text-gray-700"}\`}>{f.q}</span>
+                <div className={\`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 \${open === i ? "bg-indigo-100 rotate-180" : "bg-gray-100 group-hover:bg-indigo-50"}\`}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={open === i ? "#4f46e5" : "#9ca3af"} strokeWidth="2.5" strokeLinecap="round"><polyline points="6 9 12 15 18 9" /></svg>
+                </div>
               </button>
               {open === i && (
-                <div className="px-6 pb-6 text-gray-500 leading-relaxed text-sm -mt-1">
-                  {f.a}
+                <div className="px-6 md:px-7 pb-7 pl-[4.75rem]">
+                  <p className="text-gray-500 leading-relaxed text-[15px]">{f.a}</p>
                 </div>
               )}
             </div>
           ))}
+        </div>
+        <div className="mt-16 text-center">
+          <div className="inline-flex flex-col sm:flex-row items-center gap-4 px-8 py-6 rounded-2xl bg-gray-900">
+            <div className="text-left">
+              <p className="text-white font-bold text-sm">Still have questions?</p>
+              <p className="text-gray-400 text-sm">Our team typically responds within 2 hours.</p>
+            </div>
+            <button className="px-6 py-3 bg-white text-gray-900 font-bold text-sm rounded-xl hover:bg-gray-100 transition-colors whitespace-nowrap">Contact Support</button>
+          </div>
         </div>
       </div>
     </section>
@@ -189,32 +230,58 @@ registerComponent({
   name: "Gradient CTA Card",
   category: "cta",
   variant: "gradient-card",
-  description: "Rounded gradient card with dual action buttons and compelling copy",
+  description: "Premium gradient CTA with animated glow, social proof avatars, dual buttons, and trust signals",
   tags: ["modern", "saas", "startup", "business", "agency", "tech", "software", "service", "marketing", "platform", "creative", "restaurant"],
   code: `export default function Cta() {
+  const avatars = [
+    { initials: "AK", bg: "bg-blue-500" },
+    { initials: "MR", bg: "bg-emerald-500" },
+    { initials: "SL", bg: "bg-violet-500" },
+    { initials: "JD", bg: "bg-amber-500" },
+    { initials: "TC", bg: "bg-rose-500" },
+  ];
   return (
-    <section className="py-24 px-6">
-      <div className="max-w-5xl mx-auto relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-900 via-indigo-950 to-gray-900 p-16 md:p-20">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-violet-500/15 rounded-full blur-3xl" />
+    <section className="py-28 px-6">
+      <div className="max-w-6xl mx-auto relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-gray-900 via-indigo-950 to-gray-900 p-12 md:p-20">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/15 rounded-full blur-[100px] animate-pulse" style={{ animationDuration: "4s" }} />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-violet-500/10 rounded-full blur-[100px] animate-pulse" style={{ animationDuration: "6s" }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-400/5 rounded-full blur-[120px]" />
         <div className="relative text-center">
-          <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-5 leading-tight">
+          <div className="flex justify-center mb-8">
+            <div className="flex -space-x-3">
+              {avatars.map((a, i) => (
+                <div key={i} className={\`w-10 h-10 rounded-full \${a.bg} flex items-center justify-center text-white text-xs font-bold ring-2 ring-gray-900\`}>{a.initials}</div>
+              ))}
+            </div>
+            <div className="ml-4 text-left">
+              <div className="flex items-center gap-1">
+                {[1,2,3,4,5].map(s => <svg key={s} width="14" height="14" viewBox="0 0 24 24" fill="#fbbf24" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>)}
+              </div>
+              <p className="text-gray-400 text-xs mt-0.5">Loved by 12,000+ teams</p>
+            </div>
+          </div>
+          <h2 className="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-[1.1] tracking-tight">
             Ready to Build Something
             <br className="hidden md:block" />
-            <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent"> Remarkable?</span>
+            <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-purple-400 bg-clip-text text-transparent"> Remarkable?</span>
           </h2>
-          <p className="text-lg text-gray-400 mb-10 max-w-2xl mx-auto">
-            Join 12,000+ teams who shipped faster, scaled smarter, and stopped worrying about infrastructure. Your 14-day trial starts now.
+          <p className="text-lg md:text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+            Join thousands of teams who shipped faster, scaled smarter, and stopped worrying about infrastructure. Your free trial starts now.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <button className="px-10 py-4 bg-white text-gray-900 font-bold rounded-xl hover:bg-gray-100 transition-colors text-sm shadow-xl">
+            <button className="group px-10 py-4 bg-white text-gray-900 font-bold rounded-2xl hover:bg-gray-50 transition-all text-sm shadow-xl shadow-white/10 hover:shadow-2xl hover:shadow-white/20 hover:-translate-y-0.5 flex items-center gap-2">
               Start Free Trial
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="transition-transform group-hover:translate-x-1"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
-            <button className="px-10 py-4 bg-white/10 text-white font-semibold rounded-xl hover:bg-white/20 transition-colors backdrop-blur-sm border border-white/10 text-sm">
+            <button className="px-10 py-4 bg-white/5 text-white font-semibold rounded-2xl hover:bg-white/10 transition-all backdrop-blur-sm border border-white/10 text-sm hover:-translate-y-0.5">
               Schedule a Demo
             </button>
           </div>
-          <p className="text-xs text-gray-500 mt-6">No credit card required &middot; Cancel anytime &middot; Full access for 14 days</p>
+          <div className="flex flex-wrap justify-center gap-6 mt-10 text-xs text-gray-500">
+            <span className="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg> No credit card required</span>
+            <span className="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg> 14-day full access</span>
+            <span className="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg> Cancel anytime</span>
+          </div>
         </div>
       </div>
     </section>
