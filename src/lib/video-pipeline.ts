@@ -128,13 +128,16 @@ export async function generateVoice(
 ): Promise<{ audioUrl: string; duration: number }> {
   const token = getReplicateToken();
 
+  // Select voice based on gender
+  const kokoroVoice = options?.gender === "male" ? "am_adam" : "af_bella";
+
   // Try multiple TTS models in order — first one that works wins
   // Each model has both a model-based endpoint AND a version-based fallback
   const ttsModels = [
     {
       name: "Kokoro TTS",
       modelPath: "jaaari/kokoro-82m",
-      input: { text, speed: options?.speed || 1.0 },
+      input: { text, voice: kokoroVoice, speed: options?.speed || 1.0 },
     },
     {
       name: "Fish Speech",
@@ -290,67 +293,88 @@ export async function generateLipSync(
   audioUrl: string,
   options?: { enhanceFace?: boolean }
 ): Promise<{ videoUrl: string }> {
-  // Try OmniHuman v1.5 first — ByteDance's state-of-the-art
-  try {
-    console.log("[video-pipeline] Trying OmniHuman v1.5 for lip-sync...");
-    const omniRes = await createReplicatePrediction(
-      "bytedance/omni-human",
-      { image: faceImageUrl, audio: audioUrl },
-      getReplicateToken()
-    );
+  const token = getReplicateToken();
 
-    if (omniRes.ok) {
-      const omniData = await omniRes.json();
-      const videoUrl = extractReplicateOutput(omniData);
-      if (videoUrl) {
-        console.log("[video-pipeline] OmniHuman succeeded");
-        return { videoUrl };
-      }
-      if (omniData.urls?.get) {
-        const result = await pollReplicatePrediction(omniData.urls.get);
-        const url = extractReplicateOutput(result);
-        if (url) return { videoUrl: url };
-      }
-    } else {
-      console.warn("[video-pipeline] OmniHuman failed, falling back to SadTalker");
-    }
-  } catch (err) {
-    console.warn("[video-pipeline] OmniHuman error, falling back to SadTalker:", err instanceof Error ? err.message : err);
-  }
-
-  // Fallback: SadTalker — proven reliable (use model path for latest version)
-  console.log("[video-pipeline] Using SadTalker for lip-sync...");
-  const res = await createReplicatePrediction(
-    "cjwbw/sadtalker",
+  // Lip-sync model chain — try each in order until one works
+  const lipSyncModels = [
     {
-      source_image: faceImageUrl,
-      driven_audio: audioUrl,
-      enhancer: options?.enhanceFace !== false ? "gfpgan" : "none",
-      preprocess: "crop",
-      still: false,
+      name: "OmniHuman v1.5",
+      modelPath: "bytedance/omni-human",
+      // Try both param naming conventions — Replicate official models use image_url/audio_url
+      inputVariants: [
+        { image_url: faceImageUrl, audio_url: audioUrl },
+        { image: faceImageUrl, audio: audioUrl },
+      ],
     },
-    getReplicateToken()
-  );
+    {
+      name: "SadTalker (cjwbw)",
+      modelPath: "cjwbw/sadtalker",
+      inputVariants: [
+        {
+          source_image: faceImageUrl,
+          driven_audio: audioUrl,
+          enhancer: options?.enhanceFace !== false ? "gfpgan" : "none",
+          preprocess: "crop",
+          still: false,
+        },
+      ],
+    },
+    {
+      name: "SadTalker (lucataco)",
+      modelPath: "lucataco/sadtalker",
+      inputVariants: [
+        {
+          source_image: faceImageUrl,
+          driven_audio: audioUrl,
+          enhancer: options?.enhanceFace !== false ? "gfpgan" : "none",
+          preprocess: "crop",
+          still: false,
+        },
+      ],
+    },
+  ];
 
-  if (!res.ok) {
-    const err = await res.text();
-    console.error("[video-pipeline] SadTalker also failed:", res.status, err);
-    throw new Error("Video animation failed. Please try again.");
-  }
+  let lastError = "";
 
-  const data = await res.json();
-  const videoUrl = extractReplicateOutput(data);
+  for (const model of lipSyncModels) {
+    for (const input of model.inputVariants) {
+      try {
+        console.log(`[video-pipeline] Trying ${model.name} for lip-sync...`);
+        const res = await createReplicatePrediction(model.modelPath, input, token);
 
-  if (!videoUrl) {
-    if (data.urls?.get) {
-      const result = await pollReplicatePrediction(data.urls.get);
-      const url = extractReplicateOutput(result);
-      if (url) return { videoUrl: url };
+        if (!res.ok) {
+          const errText = await res.text().catch(() => "");
+          console.warn(`[video-pipeline] ${model.name} failed: ${res.status} ${errText}`);
+          lastError = `${model.name}: ${res.status}`;
+          continue; // Try next input variant or model
+        }
+
+        const data = await res.json();
+        let videoUrl = extractReplicateOutput(data);
+
+        if (!videoUrl && data.urls?.get) {
+          console.log(`[video-pipeline] ${model.name} processing async, polling...`);
+          const result = await pollReplicatePrediction(data.urls.get);
+          videoUrl = extractReplicateOutput(result);
+        }
+
+        if (videoUrl) {
+          console.log(`[video-pipeline] ${model.name} succeeded!`);
+          return { videoUrl };
+        }
+
+        console.warn(`[video-pipeline] ${model.name} returned no video output`);
+        lastError = `${model.name}: no output`;
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "unknown error";
+        console.warn(`[video-pipeline] ${model.name} error: ${msg}`);
+        lastError = `${model.name}: ${msg}`;
+      }
     }
-    throw new Error("Video animation returned no video.");
   }
 
-  return { videoUrl };
+  // All models failed
+  throw new Error(`Video animation failed after trying all models. Last error: ${lastError}`);
 }
 
 // ── Full Pipeline ──
