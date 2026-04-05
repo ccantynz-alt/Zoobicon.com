@@ -1,0 +1,42 @@
+name: Deploy Verification
+
+on:
+  deployment_status:
+
+jobs:
+  verify:
+    name: Verify Deployment
+    runs-on: ubuntu-latest
+    if: github.event.deployment_status.state == 'success' || github.event.deployment_status.state == 'failure' || github.event.deployment_status.state == 'error'
+
+    steps:
+      - name: Deploy Succeeded
+        if: github.event.deployment_status.state == 'success'
+        run: |
+          echo "✅ Deployment SUCCEEDED"
+          echo "URL: ${{ github.event.deployment_status.target_url }}"
+          echo "Environment: ${{ github.event.deployment_status.environment }}"
+
+      - name: Deploy FAILED — Alert
+        if: github.event.deployment_status.state == 'failure' || github.event.deployment_status.state == 'error'
+        run: |
+          echo "❌ DEPLOYMENT FAILED"
+          echo "State: ${{ github.event.deployment_status.state }}"
+          echo "URL: ${{ github.event.deployment_status.target_url }}"
+          echo "Environment: ${{ github.event.deployment_status.environment }}"
+          echo ""
+          echo "CRITICAL: Code was merged but NOT deployed. Live site is running OLD code."
+          echo "Check Vercel dashboard for build logs."
+          exit 1
+
+      - name: Verify live site responds
+        if: github.event.deployment_status.state == 'success' && github.event.deployment_status.environment == 'Production'
+        run: |
+          echo "Checking if live site responds..."
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "https://zoobicon.com" || echo "000")
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "✅ zoobicon.com returns 200 — site is live"
+          else
+            echo "❌ zoobicon.com returned $HTTP_CODE — site may be down"
+            exit 1
+          fi
