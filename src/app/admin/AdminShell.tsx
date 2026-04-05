@@ -22,6 +22,7 @@ import {
   Smartphone,
   Wifi,
   Calendar,
+  Link2,
 } from "lucide-react";
 
 const SIDEBAR_SECTIONS = [
@@ -44,8 +45,7 @@ const SIDEBAR_SECTIONS = [
   {
     label: "PRODUCTS",
     items: [
-      { name: "My Domains", href: "/my-domains", icon: Globe },
-      { name: "Register Domain", href: "/domains", icon: Globe },
+      { name: "Domains", href: "/admin/domains", icon: Globe },
       { name: "eSIM", href: "/admin/esim", icon: Wifi },
       { name: "Booking", href: "/admin/booking", icon: Calendar },
     ],
