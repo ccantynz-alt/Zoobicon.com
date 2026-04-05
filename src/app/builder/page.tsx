@@ -1505,26 +1505,33 @@ root.render(React.createElement(App));
         <div className="w-[400px] min-w-[340px] flex flex-col border-r border-white/[0.08] bg-[#0a0a0f]">
           {!hasCode ? (
             <>
-              <div className="px-4 py-3 border-b border-white/[0.10]">
+              <div className="px-4 py-4 border-b border-white/[0.10]">
                 {generatorBanner ? (
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Sparkles className="w-3.5 h-3.5 text-brand-400" />
-                      <span className="text-[11px] uppercase tracking-[2px] text-brand-400">
-                        {generatorBanner.name} Generator
+                      <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-violet-600 to-purple-700 flex items-center justify-center">
+                        <Sparkles className="w-3 h-3 text-white" />
+                      </div>
+                      <span className="text-xs font-semibold text-white/80">
+                        {generatorBanner.name}
                       </span>
                     </div>
                     <button
                       onClick={() => setGeneratorBanner(null)}
-                      className="text-white/50 hover:text-white/60 text-xs"
+                      className="text-white/30 hover:text-white/50 text-xs transition-colors"
                     >
                       ✕
                     </button>
                   </div>
                 ) : (
-                  <span className="text-[11px] uppercase tracking-[2px] text-brand-400/50">
-                    Prompt
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-violet-600/20 to-purple-700/20 border border-violet-500/10 flex items-center justify-center">
+                      <Sparkles className="w-3 h-3 text-violet-400" />
+                    </div>
+                    <span className="text-xs font-medium text-white/50">
+                      AI Website Builder
+                    </span>
+                  </div>
                 )}
               </div>
               {/* Quick import context bar */}
@@ -1610,40 +1617,23 @@ root.render(React.createElement(App));
 
         {/* Center panel — Preview / Code */}
         <div className="flex-1 flex flex-col bg-[#050508]/80 backdrop-blur-sm">
-          {/* Tabs */}
-          <div className="flex items-center border-b border-white/[0.10] px-2">
-            <button
-              className={`px-4 py-2.5 text-xs font-medium transition-colors border-b-2 ${
-                activeTab === "preview"
-                  ? "border-brand-500 text-brand-400"
-                  : "border-transparent text-white/50 hover:text-white/65"
-              }`}
-              onClick={() => setActiveTab("preview")}
-            >
-              Preview
-            </button>
-            <button
-              className={`px-4 py-2.5 text-xs font-medium transition-colors border-b-2 ${
-                activeTab === "code"
-                  ? "border-brand-500 text-brand-400"
-                  : "border-transparent text-white/50 hover:text-white/65"
-              }`}
-              onClick={() => setActiveTab("code")}
-            >
-              Code
-            </button>
-            {hasCode && (
-              <button
-                className={`px-4 py-2.5 text-xs font-medium transition-colors border-b-2 ${
-                  activeTab === "seo"
-                    ? "border-brand-500 text-brand-400"
-                    : "border-transparent text-white/50 hover:text-white/65"
-                }`}
-                onClick={() => setActiveTab("seo")}
-              >
-                SEO
-              </button>
-            )}
+          {/* Tabs — Premium UI */}
+          <div className="flex items-center border-b border-white/[0.06] px-3 bg-[#0a0a12]/50">
+            <div className="flex items-center gap-1 mr-4">
+              {(["preview", "code", ...(hasCode ? ["seo"] : [])] as const).map(tab => (
+                <button
+                  key={tab}
+                  className={`px-4 py-2.5 text-xs font-medium transition-all rounded-t-lg ${
+                    activeTab === tab
+                      ? "bg-white/[0.06] text-white border-b-2 border-violet-500"
+                      : "text-white/40 hover:text-white/60 hover:bg-white/[0.03]"
+                  }`}
+                  onClick={() => setActiveTab(tab as typeof activeTab)}
+                >
+                  {tab === "preview" ? "Preview" : tab === "code" ? "Code" : "SEO"}
+                </button>
+              ))}
+            </div>
 
             {/* Undo / Redo */}
             {hasCode && (
@@ -1753,19 +1743,67 @@ root.render(React.createElement(App));
           {/* Content */}
           <div className="flex-1 overflow-hidden relative">
             {status === "error" && error && !hasCode ? (
-              <div className="h-full flex items-center justify-center bg-gray-950">
+              <div className="h-full flex items-center justify-center bg-[#050508]">
                 <div className="max-w-md text-center px-6">
-                  <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-6 h-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
+                  <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-6">
+                    <svg className="w-8 h-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
                   </div>
-                  <p className="text-red-300 text-sm font-medium mb-2">Generation Failed</p>
-                  <p className="text-red-200/60 text-xs mb-4">{error}</p>
+                  <h3 className="text-lg font-semibold text-red-300 mb-2">Generation Failed</h3>
+                  <p className="text-red-200/50 text-sm mb-6 leading-relaxed">{error}</p>
                   <button
                     onClick={() => { setError(""); setStatus("idle"); }}
-                    className="px-5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white text-xs font-semibold rounded-xl transition-all shadow-lg shadow-amber-500/20"
+                    className="px-6 py-2.5 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white text-sm font-semibold rounded-xl transition-all shadow-lg shadow-violet-500/20"
                   >
                     Try Again
                   </button>
+                </div>
+              </div>
+            ) : status === "generating" ? (
+              <div className="h-full flex flex-col items-center justify-center bg-[#050508] relative overflow-hidden">
+                {/* Animated background */}
+                <div className="absolute inset-0 pointer-events-none">
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-violet-600/5 blur-[120px] animate-pulse" />
+                  <div className="absolute top-1/3 left-1/3 w-[400px] h-[400px] rounded-full bg-blue-600/5 blur-[100px] animate-pulse" style={{ animationDelay: "1s" }} />
+                </div>
+                <div className="relative z-10 text-center px-6">
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-600 to-purple-700 mx-auto mb-8 flex items-center justify-center shadow-2xl shadow-violet-500/30">
+                    <Sparkles className="w-10 h-10 text-white animate-pulse" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-3">Building your website</h3>
+                  <p className="text-white/40 text-sm mb-8 max-w-sm">AI is generating production-ready React components with TypeScript and Tailwind CSS</p>
+                  <div className="flex flex-col items-center gap-3">
+                    {pipelineAgents.slice(-3).map((msg, i) => (
+                      <div key={i} className={`flex items-center gap-2 text-xs ${i === pipelineAgents.length - 1 ? "text-violet-400" : "text-white/30"}`}>
+                        {i === pipelineAgents.slice(-3).length - 1 ? (
+                          <div className="w-2 h-2 rounded-full bg-violet-500 animate-pulse" />
+                        ) : (
+                          <Check size={12} className="text-emerald-400" />
+                        )}
+                        {msg}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : activeTab === "preview" && !hasCode ? (
+              <div className="h-full flex items-center justify-center bg-[#050508] relative overflow-hidden">
+                {/* Subtle background glow */}
+                <div className="absolute inset-0 pointer-events-none">
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-violet-600/3 blur-[150px]" />
+                </div>
+                <div className="relative z-10 text-center px-6 max-w-lg">
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-600/20 to-purple-700/20 border border-violet-500/10 mx-auto mb-8 flex items-center justify-center">
+                    <Sparkles className="w-10 h-10 text-violet-400/50" />
+                  </div>
+                  <h2 className="text-2xl font-bold mb-3 bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">Describe your dream website</h2>
+                  <p className="text-white/30 text-sm mb-8 leading-relaxed">
+                    Type a description in the prompt panel and click Build. Our AI will generate a complete, production-ready React application in under 60 seconds.
+                  </p>
+                  <div className="flex flex-wrap justify-center gap-2">
+                    {["SaaS Landing", "Restaurant", "Portfolio", "E-Commerce", "Agency"].map(tag => (
+                      <span key={tag} className="px-3 py-1 rounded-full bg-white/[0.04] border border-white/[0.06] text-[11px] text-white/30">{tag}</span>
+                    ))}
+                  </div>
                 </div>
               </div>
             ) : activeTab === "preview" ? (
