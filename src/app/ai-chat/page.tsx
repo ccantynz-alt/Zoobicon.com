@@ -170,13 +170,13 @@ export default function AIChatPage() {
               <div className="bg-white/5 border border-white/10 rounded-xl p-5">
                 <h3 className="font-semibold mb-3 flex items-center gap-2"><Brain className="w-4 h-4 text-violet-400" /> Knowledge Sources</h3>
                 <div className="space-y-2">
-                  <button className="w-full p-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-left hover:border-violet-500/30 transition-colors flex items-center gap-2">
+                  <button onClick={() => {}} className="w-full p-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-left hover:border-violet-500/30 transition-colors flex items-center gap-2">
                     <Globe className="w-4 h-4 text-blue-400" /> Add Website URL
                   </button>
-                  <button className="w-full p-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-left hover:border-violet-500/30 transition-colors flex items-center gap-2">
+                  <button onClick={() => {}} className="w-full p-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-left hover:border-violet-500/30 transition-colors flex items-center gap-2">
                     <Hash className="w-4 h-4 text-green-400" /> Add FAQ Entries
                   </button>
-                  <button className="w-full p-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-left hover:border-violet-500/30 transition-colors flex items-center gap-2">
+                  <button onClick={() => {}} className="w-full p-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-left hover:border-violet-500/30 transition-colors flex items-center gap-2">
                     <Shield className="w-4 h-4 text-orange-400" /> Set Escalation Rules
                   </button>
                 </div>

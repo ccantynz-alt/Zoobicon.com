@@ -46,11 +46,14 @@ import OnboardingFlow from "@/components/OnboardingFlow";
 import BuildSuccessModal, { shouldShowBuildSuccess, dismissBuildSuccess } from "@/components/BuildSuccessModal";
 import MCPPanel from "@/components/MCPPanel";
 import ShareModal from "@/components/ShareModal";
+import GitHubSyncPanel from "@/components/GitHubSyncPanel";
+import DeployModal from "@/components/DeployModal";
 import { trackEvent } from "@/lib/achievements";
 import { notifyDeploy } from "@/lib/notifications";
 
 import {
   Bug,
+  GitBranchPlus,
   GitFork,
   Languages,
   FileArchive,
@@ -116,6 +119,7 @@ type ToolId =
   | "ai-images"
   | "debug"
   | "github"
+  | "github-sync"
   | "translate"
   | "wordpress"
   | "scaffold"
@@ -145,6 +149,7 @@ const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }
   { id: "variants", label: "A/B Variants", icon: <Layers size={18} /> },
   { id: "email", label: "Email Template", icon: <Mail size={18} /> },
   { id: "export", label: "Export", icon: <Download size={18} /> },
+  { id: "github-sync", label: "Push to GitHub", icon: <GitBranchPlus size={18} /> },
   { id: "debug", label: "Auto Debug", icon: <Bug size={18} /> },
   { id: "seo", label: "SEO Score", icon: <Search size={18} /> },
   { id: "animations", label: "Animations", icon: <Wand2 size={18} /> },
@@ -157,7 +162,7 @@ const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }
   { id: "wordpress", label: "Zoobicon Connect", icon: <FileArchive size={18} /> },
   { id: "project", label: "Project Mode", icon: <FolderTree size={18} /> },
   { id: "crawl", label: "Crawl Competitor", icon: <Eye size={18} /> },
-  { id: "mcp", label: "MCP Context", icon: <ExternalLink size={18} /> },
+  { id: "mcp", label: "Import From...", icon: <ExternalLink size={18} /> },
 ];
 
 /* ─── Interactive particle constellation background ─── */
@@ -402,9 +407,12 @@ function BuilderPage() {
   const [deployUrl, setDeployUrl] = useState("");
   const [deployStatus, setDeployStatus] = useState<"idle" | "deploying" | "deployed" | "error">("idle");
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showDeployModal, setShowDeployModal] = useState(false);
   const [pipelineAgents, setPipelineAgents] = useState<string[]>([]);
+  const [buildProgress, setBuildProgress] = useState<{ current: number; total: number; section: string } | null>(null);
   const [selectedModel, setSelectedModel] = useState("");  // Empty = use pipeline's smart routing (Haiku/Opus/Sonnet)
-  const [instantMode, setInstantMode] = useState(false); // Default to full AI generation for premium quality
+  const [instantMode, setInstantMode] = useState(true); // Default to fast registry assembly (scaffold <1s + AI customize ~10s)
+  const [fullStack, setFullStack] = useState(false); // Full-stack mode: auto-provisions Supabase backend (auth, database, storage)
   const [availableModels, setAvailableModels] = useState<AIModel[]>([]);
   const [reactSource, setReactSource] = useState<Record<string, string> | null>(null);
   const [reactFiles, setReactFiles] = useState<Record<string, string> | null>(null);
@@ -481,7 +489,11 @@ function BuilderPage() {
 
   const abortRef = useRef<AbortController | null>(null);
   const generationIdRef = useRef(0); // Tracks current generation to prevent stale image replacements
-  const hasCode = generatedCode.length > 0;
+  // hasCode must check for REAL content — not just the "<!-- react-app-mode -->" marker
+  // which can linger after a failed generation, leaving the builder stuck in "AI Editor" mode
+  const hasCode = generatedCode.length > 0 && (
+    generatedCode !== "<!-- react-app-mode -->" || (reactFiles !== null && Object.keys(reactFiles).length > 0)
+  );
 
   // Get user email for auth headers
   const getUserEmail = useCallback(() => {
@@ -500,6 +512,23 @@ function BuilderPage() {
   }, [getUserEmail]);
   const canUndo = historyIndex > 0;
   const canRedo = historyIndex < history.length - 1;
+
+  // Restore saved prompt after signup redirect
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("zoobicon_pending_prompt");
+      if (saved && !prompt) {
+        setPrompt(saved);
+        localStorage.removeItem("zoobicon_pending_prompt");
+      }
+      // Also check URL params for prompt
+      const params = new URLSearchParams(window.location.search);
+      const urlPrompt = params.get("prompt");
+      if (urlPrompt && !prompt) {
+        setPrompt(decodeURIComponent(urlPrompt));
+      }
+    } catch {}
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Admin always gets premium tier locked + load agency branding
   useEffect(() => {
@@ -736,7 +765,7 @@ function BuilderPage() {
       abortRef.current = controller;
 
       try {
-        const res = await fetch("/api/generate/stream", {
+        const res = await fetch("/api/generate/react", {
           method: "POST",
           headers: authHeaders(),
           body: JSON.stringify({
@@ -766,7 +795,7 @@ function BuilderPage() {
           } catch { /* not JSON, continue to fallback */ }
 
           // Fallback to non-streaming endpoint
-          const fallbackRes = await fetch("/api/generate", {
+          const fallbackRes = await fetch("/api/generate/react", {
             method: "POST",
             headers: authHeaders(),
             body: JSON.stringify({
@@ -920,7 +949,7 @@ function BuilderPage() {
             // Body is empty even after server retry — do one client-side retry via non-streaming endpoint
             console.warn(`[Builder] Empty body after stream (${bodyChars} chars). Client-side retry...`);
             try {
-              const retryRes = await fetch("/api/generate", {
+              const retryRes = await fetch("/api/generate/react", {
                 method: "POST",
                 headers: authHeaders(),
                 body: JSON.stringify({
@@ -996,6 +1025,15 @@ function BuilderPage() {
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim()) return;
 
+    // CHECK AUTH FIRST — don't waste the user's time
+    const userStr = typeof window !== "undefined" ? localStorage.getItem("zoobicon_user") : null;
+    if (!userStr) {
+      // Save their prompt so it's not lost after signup
+      try { localStorage.setItem("zoobicon_pending_prompt", prompt.trim()); } catch {}
+      window.location.href = `/auth/signup?redirect=/builder&prompt=${encodeURIComponent(prompt.trim().slice(0, 200))}`;
+      return;
+    }
+
     // Close welcome modal if open
     if (showWelcome) {
       setShowWelcome(false);
@@ -1008,48 +1046,32 @@ function BuilderPage() {
     setGeneratedCode("");
     setActiveTab("preview");
     setPipelineAgents([]);
+    setBuildProgress(null);
     pendingLabelRef.current = `Build: ${prompt.trim().slice(0, 50)}`;
 
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
 
-    // ── React App mode: instant template snapshot + AI customization ──
+    // ── React App mode: server handles everything via streaming ──
     if (generationMode === "react") {
-      // Phase 1: Load premium template snapshot instantly (<1 second)
-      try {
-        const { findBestTemplate } = await import("@/lib/snapshots");
-        const template = findBestTemplate(prompt.trim());
-        setReactFiles(template.files);
-        setReactDeps({});
-        setStatus("generating");
-        setPipelineAgents([`Template loaded: ${template.name} — customizing with AI...`]);
-      } catch {
-        // Fallback to basic scaffold if snapshots fail
-        try {
-          const { classifyIndustry, getScaffoldForIndustry } = await import("@/lib/react-scaffolds");
-          const industry = classifyIndustry(prompt.trim());
-          const { files: scaffoldFiles } = getScaffoldForIndustry(industry);
-          setReactFiles(scaffoldFiles);
-          setReactDeps({});
-          setStatus("generating");
-          setPipelineAgents(["Scaffold loaded — customizing with AI..."]);
-        } catch {
-          setPipelineAgents(["Generating React components..."]);
-        }
-      }
+      setStatus("generating");
 
-      // Phase 2: AI generates custom React components via streaming SSE
-      // Files appear in the preview progressively as they're generated
+      // TWO PATHS:
+      // 1. Fast path (instantMode=true, DEFAULT): Registry scaffold (<1s) + AI customization (~10s)
+      // 2. Full path (instantMode=false): Opus generates everything from scratch (~30s)
+      const useFastPath = instantMode;
+      const endpoint = useFastPath ? "/api/generate/react-stream" : "/api/generate/react";
+      setPipelineAgents([useFastPath ? "Assembling components from registry..." : "AI generating full application..."]);
+
       try {
-        const res = await fetch("/api/generate/react", {
+        const res = await fetch(endpoint, {
           method: "POST",
           headers: authHeaders(),
           body: JSON.stringify({
             prompt: prompt.trim(),
-            tier,
-            ...(selectedModel ? { model: selectedModel } : {}),
-            ...(generatorBanner ? { generator: generatorBanner.id } : {}),
+            tier: useFastPath ? "standard" : "premium",
+            fullStack,
           }),
           signal: controller.signal,
         });
@@ -1065,10 +1087,21 @@ function BuilderPage() {
 
         const decoder = new TextDecoder();
         let lineBuffer = "";
+        const STREAM_TIMEOUT_MS = 240000; // 4 minutes max with no data
+        let lastDataAt = Date.now();
 
         while (true) {
-          const { done, value } = await reader.read();
+          const readPromise = reader.read();
+          const timeoutPromise = new Promise<never>((_, reject) => {
+            setTimeout(() => {
+              if (Date.now() - lastDataAt > STREAM_TIMEOUT_MS) {
+                reject(new Error("Generation timed out — no data received for 4 minutes. Please try again."));
+              }
+            }, STREAM_TIMEOUT_MS);
+          });
+          const { done, value } = await Promise.race([readPromise, timeoutPromise]);
           if (done) break;
+          lastDataAt = Date.now();
           lineBuffer += decoder.decode(value, { stream: true });
           const lines = lineBuffer.split("\n");
           lineBuffer = lines.pop() || "";
@@ -1083,21 +1116,50 @@ function BuilderPage() {
 
               if (event.type === "status") {
                 setPipelineAgents(prev => [...prev, event.message]);
-              } else if (event.type === "partial" && event.files) {
-                // Progressive update — show files as they're completed
+                // Update progress bar if event carries progress numbers
+                if (event.current != null && event.total != null) {
+                  setBuildProgress({ current: event.current, total: event.total, section: event.section || "" });
+                }
+              } else if (event.type === "scaffold" && event.files) {
+                // Legacy scaffold event (full assembly at once) — still supported
+                if (generationIdRef.current === currentGenId) {
+                  setReactFiles(event.files);
+                  setGeneratedCode("<!-- react-app-mode -->");
+                  setPipelineAgents(prev => [...prev, `Scaffold ready — ${event.componentCount} components assembled`]);
+                }
+              } else if (event.type === "customization" && event.data) {
+                // Legacy customization event
+                if (generationIdRef.current === currentGenId) {
+                  setPipelineAgents(prev => [...prev, `Customizing for "${event.data.brandName || "your business"}"...`]);
+                }
+              } else if (event.type === "scaffold-update" && event.files) {
+                // Legacy scaffold update
                 if (generationIdRef.current === currentGenId) {
                   setReactFiles(event.files);
                   setGeneratedCode("<!-- react-app-mode -->");
                 }
-              } else if (event.type === "done" && event.files) {
-                // Final complete result
+              } else if (event.type === "partial" && event.files) {
+                // Progressive streaming: each partial carries the full file map so far
                 if (generationIdRef.current === currentGenId) {
                   setReactFiles(event.files);
-                  setReactDeps(event.dependencies || {});
-                  setReactSource(event.files);
+                  setGeneratedCode("<!-- react-app-mode -->");
+                  // Update progress indicator
+                  if (event.fileCount != null && event.totalComponents != null) {
+                    setBuildProgress({ current: event.fileCount, total: event.totalComponents, section: event.section || "" });
+                  }
+                }
+              } else if ((event.type === "done" && event.files) || (event.type === "done")) {
+                // Generation complete
+                if (generationIdRef.current === currentGenId) {
+                  if (event.files) {
+                    setReactFiles(event.files);
+                    setReactDeps(event.dependencies || {});
+                    setReactSource(event.files);
+                  }
                   setGeneratedCode("<!-- react-app-mode -->");
                   setStatus("complete");
-                  setPipelineAgents(prev => [...prev, `Generated ${event.fileCount} React files`]);
+                  setBuildProgress(null);
+                  setPipelineAgents(prev => [...prev, "Build complete"]);
                   trackEvent("build");
                 }
               } else if (event.type === "error") {
@@ -1112,21 +1174,57 @@ function BuilderPage() {
           }
         }
 
-        // Flush remaining buffer
+        // Flush remaining buffer — handle all event types, not just "done"
         if (lineBuffer.trim()) {
           for (const line of lineBuffer.split("\n")) {
             if (!line.startsWith("data: ")) continue;
+            const jsonStr = line.slice(6).trim();
+            if (!jsonStr) continue;
             try {
-              const event = JSON.parse(line.slice(6).trim());
-              if (event.type === "done" && event.files && generationIdRef.current === currentGenId) {
-                setReactFiles(event.files);
-                setReactDeps(event.dependencies || {});
-                setReactSource(event.files);
+              const event = JSON.parse(jsonStr);
+              if (event.type === "status") {
+                setPipelineAgents(prev => [...prev, event.message]);
+                if (event.current != null && event.total != null) {
+                  setBuildProgress({ current: event.current, total: event.total, section: event.section || "" });
+                }
+              } else if (event.type === "scaffold" && event.files) {
+                if (generationIdRef.current === currentGenId) {
+                  setReactFiles(event.files);
+                  setGeneratedCode("<!-- react-app-mode -->");
+                }
+              } else if (event.type === "scaffold-update" && event.files) {
+                if (generationIdRef.current === currentGenId) {
+                  setReactFiles(event.files);
+                  setGeneratedCode("<!-- react-app-mode -->");
+                }
+              } else if (event.type === "partial" && event.files) {
+                if (generationIdRef.current === currentGenId) {
+                  setReactFiles(event.files);
+                  setGeneratedCode("<!-- react-app-mode -->");
+                  if (event.fileCount != null && event.totalComponents != null) {
+                    setBuildProgress({ current: event.fileCount, total: event.totalComponents, section: event.section || "" });
+                  }
+                }
+              } else if (event.type === "done" && generationIdRef.current === currentGenId) {
+                if (event.files) {
+                  setReactFiles(event.files);
+                  setReactDeps(event.dependencies || {});
+                  setReactSource(event.files);
+                }
                 setGeneratedCode("<!-- react-app-mode -->");
                 setStatus("complete");
+                setBuildProgress(null);
+                setPipelineAgents(prev => [...prev, "Build complete"]);
                 trackEvent("build");
+              } else if (event.type === "error") {
+                throw new Error(event.message || "Generation failed");
               }
-            } catch { /* ignore */ }
+            } catch (e) {
+              if (e instanceof Error && (e.message.includes("failed") || e.message.includes("Generation") || e.message.includes("unavailable") || e.message.includes("busy"))) {
+                throw e;
+              }
+              // Skip JSON parse errors from partial chunks
+            }
           }
         }
       } catch (err) {
@@ -1135,12 +1233,13 @@ function BuilderPage() {
         console.error("[React Generate] Failed:", errMsg);
         setGeneratedCode("");
         setReactFiles(null);
+        setBuildProgress(null);
         setError(cleanErrorMessage(errMsg));
         setStatus("error");
       }
       return;
     }
-  }, [prompt, tier, autoReplaceImages, selectedModel, instantMode, generationMode]);
+  }, [prompt, tier, autoReplaceImages, selectedModel, instantMode, generationMode, fullStack]);
 
   // Edit existing React files via the same streaming endpoint
   const handleEdit = useCallback(async () => {
@@ -1156,20 +1255,13 @@ function BuilderPage() {
     abortRef.current = controller;
 
     try {
-      // Send existing files + edit instruction to React generation endpoint
-      const existingContext = Object.entries(reactFiles)
-        .map(([path, content]) => `--- ${path} ---\n${content}`)
-        .join("\n\n");
-
-      const editPromptText = `I have an existing React application with these files:\n\n${existingContext}\n\nPlease modify it according to this instruction: ${instruction}\n\nReturn the complete updated files JSON (all files, not just changed ones).`;
-
-      const res = await fetch("/api/generate/react", {
+      // Use diff-based editing — only regenerate changed files (2-5s vs 30s)
+      const res = await fetch("/api/generate/edit", {
         method: "POST",
         headers: authHeaders(),
         body: JSON.stringify({
-          prompt: editPromptText,
-          tier,
-          ...(selectedModel ? { model: selectedModel } : {}),
+          instruction,
+          files: reactFiles,
         }),
         signal: controller.signal,
       });
@@ -1200,14 +1292,18 @@ function BuilderPage() {
             if (event.type === "status") {
               setPipelineAgents(prev => [...prev, event.message]);
             } else if (event.type === "partial" && event.files) {
-              setReactFiles(event.files);
+              // Merge changed files into existing files (diff-based)
+              setReactFiles(prev => ({ ...prev, ...event.files }));
             } else if (event.type === "done" && event.files) {
-              setReactFiles(event.files);
-              setReactDeps(event.dependencies || {});
-              setReactSource(event.files);
+              // Merge ONLY the changed files — keep everything else
+              setReactFiles(prev => {
+                const merged = { ...prev, ...event.files };
+                setReactSource(merged);
+                return merged;
+              });
               setStatus("complete");
               setEditPrompt("");
-              setPipelineAgents(prev => [...prev, `Edit complete — ${Object.keys(event.files).length} files updated`]);
+              setPipelineAgents(prev => [...prev, `Edit complete — ${event.changedCount || Object.keys(event.files).length} file(s) changed`]);
             } else if (event.type === "error") {
               throw new Error(event.message);
             }
@@ -1251,8 +1347,59 @@ function BuilderPage() {
     []
   );
 
-  const handleDeploy = useCallback(async () => {
-    if (!generatedCode || isDeploying) return;
+  /** Build the deployable HTML code from current state (React files or raw HTML) */
+  const buildDeployCode = useCallback((siteName: string): string | null => {
+    const files = reactFiles ?? {};
+    const hasReactFiles = Object.keys(files).length > 0;
+    const hasHtml = generatedCode && generatedCode !== "<!-- react-app-mode -->";
+
+    if (!hasReactFiles && !hasHtml) return null;
+
+    if (hasReactFiles && !hasHtml) {
+      // React mode: combine all files into a single deployable HTML page
+      const appCode = files["App.tsx"] || "";
+      const cssCode = files["styles.css"] || "";
+      const componentCodes = Object.entries(files)
+        .filter(([path]) => path.startsWith("components/") && path.endsWith(".tsx"))
+        .map(([path, code]) => {
+          const name = path.replace("components/", "").replace(".tsx", "");
+          return `// --- ${name} ---\n${code}`;
+        })
+        .join("\n\n");
+
+      return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${siteName}</title>
+  <script src="https://cdn.tailwindcss.com"><\/script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"><\/script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"><\/script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"><\/script>
+  <style>${cssCode}</style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+${componentCodes}
+
+${appCode}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(React.createElement(App));
+  <\/script>
+</body>
+</html>`;
+    }
+
+    return generatedCode;
+  }, [generatedCode, reactFiles]);
+
+  /** Called by DeployModal when user confirms deploy */
+  const handleDeployWithName = useCallback(async (siteName: string): Promise<{ url: string; slug: string; deployTimeMs?: number } | null> => {
+    const deployCode = buildDeployCode(siteName);
+    if (!deployCode) throw new Error("No code to deploy");
 
     setIsDeploying(true);
     setDeployStatus("deploying");
@@ -1261,12 +1408,11 @@ function BuilderPage() {
       const userStr = typeof window !== "undefined" ? localStorage.getItem("zoobicon_user") : null;
       const user = userStr ? JSON.parse(userStr) : null;
       const email = user?.email || "anonymous@zoobicon.com";
-      const siteName = prompt.trim().slice(0, 50) || "My Site";
 
       const res = await fetch("/api/hosting/deploy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: siteName, email, code: generatedCode }),
+        body: JSON.stringify({ name: siteName, email, code: deployCode }),
       });
 
       if (!res.ok) {
@@ -1282,15 +1428,20 @@ function BuilderPage() {
       trackEvent("deploy");
       notifyDeploy(siteName, data.url);
 
-      // Show share modal after successful deploy
-      setShowShareModal(true);
+      return { url: data.url, slug: data.siteSlug, deployTimeMs: data.deployTimeMs };
     } catch (err) {
       setError(err instanceof Error ? err.message : "Deploy failed");
       setDeployStatus("error");
+      throw err;
     } finally {
       setIsDeploying(false);
     }
-  }, [generatedCode, isDeploying, prompt]);
+  }, [buildDeployCode]);
+
+  /** Quick deploy handler for inline button and BuildSuccessModal */
+  const handleDeploy = useCallback(() => {
+    setShowDeployModal(true);
+  }, []);
 
   const handleSaveTemplate = useCallback(async () => {
     if (!generatedCode || saveStatus === "saving") return;
@@ -1332,6 +1483,13 @@ function BuilderPage() {
         return <AutoDebugPanel code={generatedCode} onApplyFix={handleCodeUpdate} />;
       case "github":
         return <GitHubImport onImport={handleCodeUpdate} />;
+      case "github-sync":
+        return (
+          <GitHubSyncPanel
+            files={reactFiles || {}}
+            suggestedName={prompt.trim().slice(0, 50) || "zoobicon-project"}
+          />
+        );
       case "translate":
         return (
           <TranslatePanel code={generatedCode} onApplyTranslation={handleCodeUpdate} />
@@ -1457,16 +1615,29 @@ function BuilderPage() {
           </button>
         </div>
 
-        {/* Pipeline status overlay — shows during generation */}
+        {/* Pipeline status overlay — shows during generation with progress bar */}
         {status === "generating" && pipelineAgents.length > 0 && (
           <div className="absolute bottom-6 left-6 right-6 z-40">
-            <div className="max-w-xl mx-auto px-5 py-3 rounded-2xl bg-black/60 backdrop-blur-xl border border-white/[0.08]">
-              <div className="flex items-center gap-3">
-                <div className="w-2.5 h-2.5 rounded-full bg-violet-500 animate-pulse" />
-                <span className="text-sm text-white/80 font-medium">
+            <div className="max-w-xl mx-auto px-5 py-3 rounded-2xl bg-black/70 backdrop-blur-xl border border-white/[0.08] shadow-2xl">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-violet-500 animate-pulse flex-shrink-0" />
+                <span className="text-sm text-white/80 font-medium truncate">
                   {pipelineAgents[pipelineAgents.length - 1]}
                 </span>
+                {buildProgress && buildProgress.total > 0 && (
+                  <span className="text-xs text-white/40 ml-auto flex-shrink-0">
+                    {buildProgress.current}/{buildProgress.total}
+                  </span>
+                )}
               </div>
+              {buildProgress && buildProgress.total > 0 && (
+                <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 transition-all duration-500 ease-out"
+                    style={{ width: `${Math.round((buildProgress.current / buildProgress.total) * 100)}%` }}
+                  />
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -1496,12 +1667,24 @@ function BuilderPage() {
                 onClick={() => setInstantMode(!instantMode)}
                 className={`px-3 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-wider transition-all border ${
                   instantMode
-                    ? "bg-amber-500/10 border-amber-500/30 text-amber-400"
-                    : "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                    : "bg-violet-500/10 border-violet-500/30 text-violet-400"
                 }`}
-                title={instantMode ? "Quick: 3s scaffold preview (lower quality)" : "Premium: full AI generation (best quality)"}
+                title={instantMode ? "Instant: <3s preview from component library" : "Deep Build: full AI generation with Opus (~30s)"}
               >
-                {instantMode ? "⚡ Quick" : "✨ Premium"}
+                {instantMode ? "Instant" : "Deep Build"}
+              </button>
+              <button
+                onClick={() => setFullStack(!fullStack)}
+                className={`px-3 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-wider transition-all border ${
+                  fullStack
+                    ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-400"
+                    : "bg-white/5 border-white/10 text-white/40"
+                }`}
+                title={fullStack ? "Full-Stack: auto-provisions database, auth, and storage" : "Frontend only: no backend services"}
+              >
+                <Database size={12} className="inline mr-1" />
+                {fullStack ? "Full-Stack" : "Frontend"}
               </button>
               <button
                 onClick={handleGenerate}
@@ -1589,6 +1772,31 @@ function BuilderPage() {
                   </span>
                 )}
               </div>
+              {/* Quick import context bar */}
+              {mcpContext && (
+                <div className="px-4 py-1.5 border-b border-white/[0.05] flex items-center gap-2">
+                  <span className="text-[10px] text-indigo-400/70">
+                    Context imported
+                  </span>
+                  <button
+                    onClick={() => setActiveTool("mcp")}
+                    className="text-[10px] text-indigo-400/50 hover:text-indigo-400 transition-colors"
+                  >
+                    Manage
+                  </button>
+                </div>
+              )}
+              {!mcpContext && !hasCode && (
+                <div className="px-4 py-1.5 border-b border-white/[0.05]">
+                  <button
+                    onClick={() => setActiveTool("mcp")}
+                    className="flex items-center gap-1.5 text-[10px] text-white/30 hover:text-indigo-400/70 transition-colors"
+                  >
+                    <ExternalLink size={10} />
+                    Import from GitHub, Figma, or URL
+                  </button>
+                </div>
+              )}
               <div className="flex-1 overflow-hidden">
                 <PromptInput
                   prompt={prompt}
@@ -1606,6 +1814,8 @@ function BuilderPage() {
                   availableModels={availableModels}
                   generationMode={generationMode}
                   onGenerationModeChange={setGenerationMode}
+                  fullStack={fullStack}
+                  onFullStackChange={setFullStack}
                 />
               </div>
             </>
@@ -1624,9 +1834,19 @@ function BuilderPage() {
               </div>
               <div className="flex-1 overflow-hidden">
                 <ChatPanel
-                  currentCode={generatedCode}
-                  onCodeUpdate={handleCodeUpdate}
+                  reactFiles={reactFiles}
+                  onFilesUpdate={(changedFiles) => {
+                    // Merge only the changed files into the existing set (diff-based)
+                    setReactFiles(prev => {
+                      const merged = { ...prev, ...changedFiles };
+                      setReactSource(merged);
+                      return merged;
+                    });
+                    setStatus("complete");
+                    pendingLabelRef.current = `Edit: ${Object.keys(changedFiles).join(", ")}`;
+                  }}
                   isVisible={true}
+                  isGenerating={status === "generating"}
                 />
               </div>
             </>
@@ -1733,6 +1953,18 @@ function BuilderPage() {
                   </div>
                 )}
                 <button
+                  onClick={() => setActiveTool(activeTool === "github-sync" ? null : "github-sync")}
+                  title="Push to GitHub"
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                    activeTool === "github-sync"
+                      ? "bg-white/10 text-white/80"
+                      : "bg-white/[0.07] text-white/60 hover:text-white/60 hover:bg-white/[0.08]"
+                  }`}
+                >
+                  <GitBranchPlus size={14} />
+                  GitHub
+                </button>
+                <button
                   onClick={handleSaveTemplate}
                   disabled={saveStatus === "saving"}
                   title="Save as reusable template"
@@ -1742,12 +1974,12 @@ function BuilderPage() {
                   {saveStatus === "saving" ? "Saving..." : saveStatus === "saved" ? "Saved" : "Save"}
                 </button>
                 <button
-                  onClick={handleDeploy}
+                  onClick={() => setShowDeployModal(true)}
                   disabled={isDeploying}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                  className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                     isDeploying
-                      ? "bg-brand-500/10 text-brand-400/50 cursor-wait"
-                      : "bg-brand-500/20 text-brand-400 hover:bg-brand-500/30"
+                      ? "bg-amber-500/10 text-amber-400/50 cursor-wait"
+                      : "bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-400 hover:to-amber-500 shadow-lg shadow-amber-500/20"
                   }`}
                 >
                   <Rocket size={14} className={isDeploying ? "animate-pulse" : ""} />
@@ -1775,7 +2007,7 @@ function BuilderPage() {
                   <p className="text-red-200/60 text-xs mb-4">{error}</p>
                   <button
                     onClick={() => { setError(""); setStatus("idle"); }}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded-lg transition-colors"
+                    className="px-5 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white text-xs font-semibold rounded-xl transition-all shadow-lg shadow-amber-500/20"
                   >
                     Try Again
                   </button>
@@ -1794,6 +2026,31 @@ function BuilderPage() {
                     participants={collab.participants}
                     containerRect={previewRect}
                   />
+                )}
+                {status === "generating" && pipelineAgents.length > 0 && (
+                  <div className="absolute bottom-4 left-4 right-4 z-30 pointer-events-none">
+                    <div className="max-w-lg mx-auto px-4 py-3 rounded-xl bg-black/70 backdrop-blur-xl border border-white/[0.08] shadow-2xl pointer-events-auto">
+                      <div className="flex items-center gap-3 mb-1.5">
+                        <div className="w-2 h-2 rounded-full bg-violet-500 animate-pulse flex-shrink-0" />
+                        <span className="text-xs text-white/80 font-medium truncate">
+                          {pipelineAgents[pipelineAgents.length - 1]}
+                        </span>
+                        {buildProgress && buildProgress.total > 0 && (
+                          <span className="text-[10px] text-white/40 ml-auto flex-shrink-0 tabular-nums">
+                            {buildProgress.current}/{buildProgress.total}
+                          </span>
+                        )}
+                      </div>
+                      {buildProgress && buildProgress.total > 0 && (
+                        <div className="w-full h-1 rounded-full bg-white/10 overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 transition-all duration-500 ease-out"
+                            style={{ width: `${Math.round((buildProgress.current / buildProgress.total) * 100)}%` }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 )}
               </div>
             ) : activeTab === "seo" ? (
@@ -1859,6 +2116,18 @@ function BuilderPage() {
         onClose={() => setShowShareModal(false)}
         siteUrl={deployUrl}
         siteName={prompt.trim().slice(0, 50) || "My Site"}
+      />
+      <DeployModal
+        isOpen={showDeployModal}
+        onClose={() => {
+          setShowDeployModal(false);
+          // If deploy succeeded, show share modal
+          if (deployStatus === "deployed" && deployUrl) {
+            setShowShareModal(true);
+          }
+        }}
+        onDeploy={handleDeployWithName}
+        defaultName={prompt.trim().slice(0, 50) || "My Site"}
       />
     </div>
   );

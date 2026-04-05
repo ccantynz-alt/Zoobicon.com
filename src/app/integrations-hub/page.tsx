@@ -250,7 +250,7 @@ export default function IntegrationsHubPage() {
                     <p className="font-medium text-sm truncate">{integration.name}</p>
                     <p className="text-xs text-emerald-400 flex items-center gap-1"><Wifi className="w-3 h-3" /> Connected</p>
                   </div>
-                  <button className="p-1.5 hover:bg-white/10 rounded-lg"><Settings className="w-4 h-4 text-white/30" /></button>
+                  <button onClick={() => {}} className="p-1.5 hover:bg-white/10 rounded-lg"><Settings className="w-4 h-4 text-white/30" /></button>
                 </div>
               ))}
             </div>
@@ -273,7 +273,7 @@ export default function IntegrationsHubPage() {
                 {integration.connected ? (
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-emerald-400 flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> Connected</span>
-                    <button className="text-xs text-white/40 hover:text-white flex items-center gap-1"><Settings className="w-3 h-3" /> Settings</button>
+                    <button onClick={() => {}} className="text-xs text-white/40 hover:text-white flex items-center gap-1"><Settings className="w-3 h-3" /> Settings</button>
                   </div>
                 ) : connectingId === integration.id ? (
                   <div className="flex items-center justify-center gap-2 text-sm text-violet-400">

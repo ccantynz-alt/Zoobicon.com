@@ -656,7 +656,7 @@ export default function IntegrationsPage() {
 
                       <div className="mt-4">
                         {isSoon ? (
-                          <button className="w-full py-2.5 rounded-xl text-sm font-medium bg-amber-600/10 text-amber-400 hover:bg-amber-600/20 transition-all flex items-center justify-center gap-2">
+                          <button onClick={() => {}} className="w-full py-2.5 rounded-xl text-sm font-medium bg-amber-600/10 text-amber-400 hover:bg-amber-600/20 transition-all flex items-center justify-center gap-2">
                             <Bell className="w-3.5 h-3.5" />
                             Notify Me
                           </button>

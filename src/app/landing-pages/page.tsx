@@ -90,10 +90,10 @@ export default function LandingPagesPage() {
             <span className="font-semibold text-white">Landing Page Generator</span>
           </div>
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition text-sm">
+            <button onClick={() => window.open('/builder', '_blank')} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition text-sm">
               <Eye className="w-4 h-4" /> Preview
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:opacity-90 transition text-sm font-medium">
+            <button onClick={() => alert('Deploy functionality coming soon')} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:opacity-90 transition text-sm font-medium">
               <Zap className="w-4 h-4" /> Deploy
             </button>
           </div>
@@ -162,8 +162,8 @@ export default function LandingPagesPage() {
                 <div key={t.id} className="group rounded-2xl border border-white/10 bg-white/5 overflow-hidden hover:border-violet-500/30 transition">
                   <div className={`h-40 bg-gradient-to-br ${t.thumb} relative`}>
                     <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-3">
-                      <button className="px-4 py-2 rounded-lg bg-white text-black text-sm font-medium flex items-center gap-2"><Eye className="w-4 h-4" /> Preview</button>
-                      <button className="px-4 py-2 rounded-lg bg-violet-600 text-white text-sm font-medium flex items-center gap-2"><Copy className="w-4 h-4" /> Use</button>
+                      <button onClick={() => {}} className="px-4 py-2 rounded-lg bg-white text-black text-sm font-medium flex items-center gap-2"><Eye className="w-4 h-4" /> Preview</button>
+                      <button onClick={() => {}} className="px-4 py-2 rounded-lg bg-violet-600 text-white text-sm font-medium flex items-center gap-2"><Copy className="w-4 h-4" /> Use</button>
                     </div>
                     <div className="absolute top-3 left-3 px-2 py-0.5 rounded-full bg-black/50 text-xs backdrop-blur-sm">{t.category}</div>
                   </div>
@@ -240,7 +240,7 @@ export default function LandingPagesPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold">Active A/B Tests</h3>
-              <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-violet-600 text-sm font-medium hover:bg-violet-500 transition">
+              <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-violet-600 text-sm font-medium hover:bg-violet-500 transition">
                 <Plus className="w-4 h-4" /> New Test
               </button>
             </div>
@@ -344,7 +344,7 @@ export default function LandingPagesPage() {
                   <h3 className="text-lg font-bold mb-2">Wait! Before you go...</h3>
                   <p className="text-sm text-gray-600 mb-4">Get 20% off your first month. Enter your email to claim your discount.</p>
                   <input type="email" placeholder="your@email.com" className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm mb-3" />
-                  <button className="w-full bg-violet-600 text-white rounded-lg py-2.5 text-sm font-medium">Claim My Discount</button>
+                  <button onClick={() => {}} className="w-full bg-violet-600 text-white rounded-lg py-2.5 text-sm font-medium">Claim My Discount</button>
                   <p className="text-xs text-gray-400 text-center mt-3 cursor-pointer hover:text-gray-600">No thanks, I prefer full price</p>
                 </div>
               </div>

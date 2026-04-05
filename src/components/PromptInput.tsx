@@ -71,6 +71,8 @@ interface PromptInputProps {
   availableModels?: AIModel[];
   generationMode?: GenerationMode;
   onGenerationModeChange?: (mode: GenerationMode) => void;
+  fullStack?: boolean;
+  onFullStackChange?: (enabled: boolean) => void;
 }
 
 const EXAMPLE_PROMPTS = [
@@ -104,6 +106,8 @@ export default function PromptInput({
   availableModels,
   generationMode,
   onGenerationModeChange,
+  fullStack,
+  onFullStackChange,
 }: PromptInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const editInputRef = useRef<HTMLTextAreaElement>(null);
@@ -473,6 +477,26 @@ export default function PromptInput({
           {isMac ? "Cmd" : "Ctrl"}+Enter to build
         </span>
       </div>
+
+      {/* Full-Stack toggle */}
+      {onFullStackChange && (
+        <button
+          type="button"
+          onClick={() => onFullStackChange(!fullStack)}
+          className={`w-full py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all border flex items-center justify-center gap-2 ${
+            fullStack
+              ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20"
+              : "bg-white/[0.03] border-white/[0.08] text-white/40 hover:text-white/60 hover:border-white/20"
+          }`}
+          title={fullStack
+            ? "Full-Stack enabled: generates real database, auth, and storage"
+            : "Frontend only: click to enable database, auth, and storage"
+          }
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+          {fullStack ? "Full-Stack (Database + Auth + Storage)" : "Frontend Only — click for Full-Stack"}
+        </button>
+      )}
 
       {/* Build button */}
       <button

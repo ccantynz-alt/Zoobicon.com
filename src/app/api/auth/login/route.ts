@@ -6,9 +6,9 @@ import { logAudit } from "@/lib/audit";
 
 const loginLimiter = { limit: 5, windowMs: 60000 };
 
-/* Default admin credentials — override with ADMIN_EMAIL / ADMIN_PASSWORD env vars */
-const DEFAULT_ADMIN_EMAIL = "admin@zoobicon.com";
-const DEFAULT_ADMIN_PASSWORD = "Zoobicon2024!Admin";
+/* Admin credentials — MUST be set via environment variables. No hardcoded defaults. */
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "";
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,8 +29,8 @@ export async function POST(request: NextRequest) {
     }
 
     // ── Admin login (env-based, no database needed) ──
-    const adminEmail = process.env.ADMIN_EMAIL || DEFAULT_ADMIN_EMAIL;
-    const adminPassword = process.env.ADMIN_PASSWORD || DEFAULT_ADMIN_PASSWORD;
+    const adminEmail = ADMIN_EMAIL;
+    const adminPassword = ADMIN_PASSWORD;
 
     if (
       email.toLowerCase() === adminEmail.toLowerCase() &&

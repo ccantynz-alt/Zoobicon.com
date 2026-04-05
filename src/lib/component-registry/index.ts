@@ -303,6 +303,116 @@ export function buildFromPrompt(
   return { files, components };
 }
 
+// ── Incremental Assembly (for streaming) ──
+
+/**
+ * Build the styles.css file with given colors.
+ */
+export function buildStylesFile(options?: {
+  primaryColor?: string;
+  bgColor?: string;
+}): string {
+  const primaryColor = options?.primaryColor || "#4f46e5";
+  const bgColor = options?.bgColor || "#ffffff";
+
+  return `@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  --color-primary: ${primaryColor};
+  --color-bg: ${bgColor};
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+`;
+}
+
+/**
+ * Build a single component file.
+ */
+export function buildComponentFile(component: RegistryComponent): { fileName: string; code: string } {
+  const componentName = capitalize(component.category);
+  return {
+    fileName: `components/${componentName}.tsx`,
+    code: `import React from "react";\n\n${component.code}\n`,
+  };
+}
+
+/**
+ * Build App.tsx that imports and renders the given components in order.
+ * Called incrementally as each component is added.
+ */
+export function buildAppFile(components: RegistryComponent[]): string {
+  const imports = components
+    .map(c => {
+      const name = capitalize(c.category);
+      return `import ${name} from "./components/${name}";`;
+    })
+    .join("\n");
+
+  const renders = components
+    .map(c => {
+      const name = capitalize(c.category);
+      return `      <${name} />`;
+    })
+    .join("\n");
+
+  return `import React from "react";
+import "./styles.css";
+${imports}
+
+export default function App() {
+  return (
+    <div className="min-h-screen bg-white">
+${renders}
+    </div>
+  );
+}`;
+}
+
+/** Human-readable label for a component category */
+export function categoryLabel(category: string): string {
+  const labels: Record<string, string> = {
+    navbar: "Navigation bar",
+    hero: "Hero section",
+    features: "Features section",
+    about: "About section",
+    testimonials: "Testimonials",
+    stats: "Statistics",
+    faq: "FAQ section",
+    cta: "Call to action",
+    footer: "Footer",
+    contact: "Contact section",
+    gallery: "Gallery",
+    blog: "Blog section",
+    pricing: "Pricing section",
+    ecommerce: "E-commerce section",
+    forms: "Form section",
+    misc: "Additional section",
+  };
+  return labels[category] || capitalize(category);
+}
+
 // ── Helpers ──
 
 function capitalize(str: string): string {

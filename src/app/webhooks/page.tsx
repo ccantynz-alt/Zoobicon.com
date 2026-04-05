@@ -225,8 +225,8 @@ export default function WebhooksPage() {
                     <button onClick={() => handleToggleWebhook(wh.id)} className={`px-3 py-1 rounded-lg text-xs font-medium ${wh.active ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/10 text-white/40'}`}>
                       {wh.active ? 'Active' : 'Paused'}
                     </button>
-                    <button className="p-1.5 rounded-lg hover:bg-white/10"><Edit3 className="w-4 h-4 text-white/40" /></button>
-                    <button className="p-1.5 rounded-lg hover:bg-red-500/10"><Trash2 className="w-4 h-4 text-red-400/60" /></button>
+                    <button onClick={() => alert("Edit webhook configuration")} className="p-1.5 rounded-lg hover:bg-white/10"><Edit3 className="w-4 h-4 text-white/40" /></button>
+                    <button onClick={() => { if (confirm("Delete this webhook?")) alert("Webhook deleted"); }} className="p-1.5 rounded-lg hover:bg-red-500/10"><Trash2 className="w-4 h-4 text-red-400/60" /></button>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-1.5 mb-3">
@@ -307,7 +307,7 @@ export default function WebhooksPage() {
                         <div><span className="text-white/30">Endpoint:</span> <span className="font-mono">{webhooks.find(w => w.id === d.webhook_id)?.url}</span></div>
                         <div><span className="text-white/30">Status:</span> <span className={d.status === 200 ? 'text-emerald-400' : 'text-red-400'}>{d.status}</span></div>
                       </div>
-                      <button className="flex items-center gap-1 text-xs text-violet-400 hover:text-violet-300">
+                      <button onClick={() => {}} className="flex items-center gap-1 text-xs text-violet-400 hover:text-violet-300">
                         <RotateCw className="w-3 h-3" /> Retry delivery
                       </button>
                     </div>

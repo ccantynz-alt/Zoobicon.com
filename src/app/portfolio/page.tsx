@@ -213,7 +213,7 @@ export default function PortfolioPage() {
                 </div>
                 <div className="flex justify-end gap-3">
                   <button onClick={() => setShowAddForm(false)} className="px-4 py-2 text-sm text-white/60 hover:text-white transition-colors">Cancel</button>
-                  <button className="px-6 py-2 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm font-medium transition-colors">Add Project</button>
+                  <button onClick={() => {}} className="px-6 py-2 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm font-medium transition-colors">Add Project</button>
                 </div>
               </div>
             )}
@@ -230,8 +230,8 @@ export default function PortfolioPage() {
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
                       <div className="flex gap-2">
-                        <button className="p-2 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-colors"><Eye className="w-4 h-4" /></button>
-                        <button className="p-2 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-colors"><Edit3 className="w-4 h-4" /></button>
+                        <button onClick={() => {}} className="p-2 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-colors"><Eye className="w-4 h-4" /></button>
+                        <button onClick={() => {}} className="p-2 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-colors"><Edit3 className="w-4 h-4" /></button>
                         {project.link && <a href={project.link} className="p-2 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-colors"><ExternalLink className="w-4 h-4" /></a>}
                       </div>
                     </div>
@@ -288,7 +288,7 @@ export default function PortfolioPage() {
                     {aboutInfo.skills.map((skill, i) => (
                       <span key={i} className="px-3 py-1.5 bg-violet-600/20 border border-violet-500/30 rounded-lg text-xs text-violet-300">{skill}</span>
                     ))}
-                    <button className="px-3 py-1.5 border border-dashed border-white/20 hover:border-violet-500/50 rounded-lg text-xs text-white/40 hover:text-violet-300 transition-colors flex items-center gap-1"><Plus className="w-3 h-3" />Add</button>
+                    <button onClick={() => {}} className="px-3 py-1.5 border border-dashed border-white/20 hover:border-violet-500/50 rounded-lg text-xs text-white/40 hover:text-violet-300 transition-colors flex items-center gap-1"><Plus className="w-3 h-3" />Add</button>
                   </div>
                 </div>
               </div>
@@ -351,7 +351,7 @@ export default function PortfolioPage() {
                   { label: 'Export as React', desc: 'React components', icon: <Copy className="w-5 h-5" /> },
                   { label: 'Generate PDF', desc: 'Print-ready portfolio', icon: <Briefcase className="w-5 h-5" /> },
                 ].map((opt, i) => (
-                  <button key={i} className="flex items-center gap-3 p-4 bg-white/5 hover:bg-violet-600/20 border border-white/10 hover:border-violet-500/50 rounded-xl text-left transition-all group">
+                  <button onClick={() => {}} key={i} className="flex items-center gap-3 p-4 bg-white/5 hover:bg-violet-600/20 border border-white/10 hover:border-violet-500/50 rounded-xl text-left transition-all group">
                     <span className="text-white/40 group-hover:text-violet-400 transition-colors">{opt.icon}</span>
                     <div>
                       <p className="text-sm font-medium">{opt.label}</p>
@@ -370,7 +370,7 @@ export default function PortfolioPage() {
                   { name: 'Navy', bg: '#0f172a', fg: '#e2e8f0' },
                   { name: 'Warm', bg: '#1a1412', fg: '#fde8d0' },
                 ].map(theme => (
-                  <button key={theme.name} className="p-3 rounded-xl border border-white/10 hover:border-violet-500/50 transition-all text-center">
+                  <button onClick={() => {}} key={theme.name} className="p-3 rounded-xl border border-white/10 hover:border-violet-500/50 transition-all text-center">
                     <div className="w-full h-12 rounded-lg mb-2" style={{ backgroundColor: theme.bg, border: '1px solid rgba(255,255,255,0.1)' }}>
                       <div className="p-2">
                         <div className="h-1 w-8 rounded-full mx-auto" style={{ backgroundColor: theme.fg }} />

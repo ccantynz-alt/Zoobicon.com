@@ -13,7 +13,10 @@ export const maxDuration = 300; // 5 minutes for full crawl
 export async function POST(req: NextRequest) {
   // Simple auth check — admin only
   const authHeader = req.headers.get("x-admin-key");
-  const adminKey = process.env.ADMIN_API_KEY || "zoobicon-admin-2024";
+  const adminKey = process.env.ADMIN_API_KEY;
+  if (!adminKey) {
+    return NextResponse.json({ error: "Admin API key not configured" }, { status: 503 });
+  }
   if (authHeader !== adminKey) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -43,7 +46,10 @@ export async function POST(req: NextRequest) {
  */
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get("x-admin-key");
-  const adminKey = process.env.ADMIN_API_KEY || "zoobicon-admin-2024";
+  const adminKey = process.env.ADMIN_API_KEY;
+  if (!adminKey) {
+    return NextResponse.json({ error: "Admin API key not configured" }, { status: 503 });
+  }
   if (authHeader !== adminKey) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

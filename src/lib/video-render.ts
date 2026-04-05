@@ -70,7 +70,7 @@ interface ReplicatePrediction {
 const REPLICATE_API = "https://api.replicate.com/v1";
 
 async function replicateHeaders(): Promise<Record<string, string>> {
-  const token = process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY;
+  const token = process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY || process.env.REPLICATE_TOKEN || process.env.REPLICATE_KEY;
   if (!token) throw new Error("REPLICATE_API_TOKEN not configured");
   return {
     Authorization: `Bearer ${token}`,
@@ -83,8 +83,8 @@ async function replicateHeaders(): Promise<Record<string, string>> {
  * Previously used SVD XT which was deprecated. Video-01-Live is fast (~30s)
  * and produces high-quality 720p video from text prompts.
  */
-async function startReplicateJob(scene: RenderScene, style: string): Promise<{ predictionId: string }> {
-  const prompt = buildVideoPrompt(scene, style);
+async function startReplicateJob(scene: RenderScene, style: string, provider?: VideoProvider): Promise<{ predictionId: string }> {
+  const prompt = buildVideoPrompt(scene, style, provider || "replicate");
 
   const res = await fetch(`${REPLICATE_API}/models/minimax/video-01-live/predictions`, {
     method: "POST",
@@ -167,8 +167,8 @@ async function runwayHeaders(): Promise<Record<string, string>> {
   };
 }
 
-async function startRunwayJob(scene: RenderScene, style: string): Promise<{ taskId: string }> {
-  const prompt = buildVideoPrompt(scene, style);
+async function startRunwayJob(scene: RenderScene, style: string, provider?: VideoProvider): Promise<{ taskId: string }> {
+  const prompt = buildVideoPrompt(scene, style, provider || "runway");
   const rawDuration = parseDurationSeconds(scene.duration);
   // Runway only accepts duration of 5 or 10 seconds
   const duration = rawDuration <= 7 ? 5 : 10;
@@ -259,8 +259,8 @@ async function lumaHeaders(): Promise<Record<string, string>> {
   };
 }
 
-async function startLumaJob(scene: RenderScene, style: string): Promise<{ generationId: string }> {
-  const prompt = buildVideoPrompt(scene, style);
+async function startLumaJob(scene: RenderScene, style: string, provider?: VideoProvider): Promise<{ generationId: string }> {
+  const prompt = buildVideoPrompt(scene, style, provider || "luma");
 
   const res = await fetch("https://api.lumalabs.ai/dream-machine/v1/generations", {
     method: "POST",
@@ -334,8 +334,8 @@ async function pikaHeaders(): Promise<Record<string, string>> {
   };
 }
 
-async function startPikaJob(scene: RenderScene, style: string): Promise<{ generationId: string }> {
-  const prompt = buildVideoPrompt(scene, style);
+async function startPikaJob(scene: RenderScene, style: string, provider?: VideoProvider): Promise<{ generationId: string }> {
+  const prompt = buildVideoPrompt(scene, style, provider || "pika");
 
   const body: Record<string, unknown> = {
     promptText: prompt,
@@ -421,14 +421,15 @@ async function klingHeaders(): Promise<Record<string, string>> {
   };
 }
 
-async function startKlingJob(scene: RenderScene, style: string): Promise<{ taskId: string }> {
-  const prompt = buildVideoPrompt(scene, style);
+async function startKlingJob(scene: RenderScene, style: string, provider?: VideoProvider): Promise<{ taskId: string }> {
+  const prompt = buildVideoPrompt(scene, style, provider || "kling");
   const durationSec = Math.min(10, parseDurationSeconds(scene.duration));
 
   const body: Record<string, unknown> = {
     prompt,
     negative_prompt: "blurry, low quality, distorted, watermark",
     duration: durationSec <= 5 ? "5" : "10",
+    model_name: "kling-v3", // Kling 3.0 — latest model
     mode: "std", // "std" for standard, "pro" for higher quality
     cfg_scale: 0.5,
     aspect_ratio: "16:9",
@@ -499,6 +500,118 @@ async function checkKlingJob(taskId: string): Promise<RenderJob> {
   };
 }
 
+// --- Provider Prompt Limits ---
+
+const PROVIDER_PROMPT_LIMITS: Record<VideoProvider, number> = {
+  runway: 512,
+  kling: 2000,
+  replicate: 1000,
+  luma: 1000,
+  pika: 800,
+};
+
+// --- Smart Provider Selection ---
+
+/**
+ * Select the best provider for a given scene based on content analysis.
+ *
+ * Logic:
+ *   - Runway: Best for cinematic, professional, narrative content + camera work
+ *   - Kling: Best for photorealistic humans, social media, cost-effective
+ *   - Replicate: Good general purpose, fastest turnaround
+ *   - Luma/Pika: Fallback chain
+ *
+ * Falls back through available providers if the ideal one isn't configured.
+ */
+export function selectBestProvider(scene: RenderScene): VideoProvider {
+  const desc = (scene.visualDescription || "").toLowerCase();
+  const camera = (scene.cameraMovement || "").toLowerCase();
+
+  // Runway: Best for cinematic, professional, narrative content with camera work
+  const isCinematic = camera.includes("dolly") || camera.includes("crane") ||
+    camera.includes("tracking") || camera.includes("slow motion") ||
+    /cinematic|film|dramatic|slow\s?mo|epic|aerial|sweeping/i.test(desc);
+  if (isCinematic && process.env.RUNWAY_API_KEY) {
+    return "runway";
+  }
+
+  // Kling: Best for photorealistic humans, social media, portraits
+  const isPeopleFocused = /person|people|face|portrait|social|tiktok|influencer|testimonial|team|headshot|interview|presenter/i.test(desc);
+  if (isPeopleFocused && process.env.KLING_API_KEY) {
+    return "kling";
+  }
+
+  // Kling: Also good for longer scenes (supports 10s natively, cost-effective)
+  const duration = parseDurationSeconds(scene.duration);
+  if (duration >= 8 && process.env.KLING_API_KEY) {
+    return "kling";
+  }
+
+  // Replicate: Good general purpose, fastest turnaround
+  if (process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY || process.env.REPLICATE_TOKEN || process.env.REPLICATE_KEY) {
+    return "replicate";
+  }
+
+  // Fallback chain: try each configured provider in quality order
+  if (process.env.RUNWAY_API_KEY) return "runway";
+  if (process.env.KLING_API_KEY) return "kling";
+  if (process.env.LUMA_API_KEY) return "luma";
+  if (process.env.PIKA_API_KEY) return "pika";
+
+  return getAvailableProvider() || "replicate";
+}
+
+// --- Quality Scoring ---
+
+export interface RenderQualityLog {
+  sceneNumber: number;
+  provider: VideoProvider;
+  status: "succeeded" | "failed";
+  durationMs: number;
+  promptLength: number;
+  sceneType: string;
+  timestamp: string;
+}
+
+/**
+ * Classify a scene into a type for quality tracking.
+ */
+function classifySceneType(scene: RenderScene): string {
+  const desc = (scene.visualDescription || "").toLowerCase();
+  if (/person|people|face|portrait|team/i.test(desc)) return "people";
+  if (/cinematic|film|dramatic|epic/i.test(desc)) return "cinematic";
+  if (/product|item|showcase|detail/i.test(desc)) return "product";
+  if (/landscape|nature|aerial|sky/i.test(desc)) return "landscape";
+  if (/text|logo|brand|title/i.test(desc)) return "text-overlay";
+  if (/social|tiktok|reel|story/i.test(desc)) return "social-media";
+  return "general";
+}
+
+/**
+ * Log render quality data for provider intelligence.
+ * This data feeds into the Market Intelligence system to optimize future selections.
+ */
+export function logRenderQuality(
+  scene: RenderScene,
+  provider: VideoProvider,
+  status: "succeeded" | "failed",
+  startTime: number
+): RenderQualityLog {
+  const log: RenderQualityLog = {
+    sceneNumber: scene.sceneNumber,
+    provider,
+    status,
+    durationMs: Date.now() - startTime,
+    promptLength: (scene.visualDescription || "").length,
+    sceneType: classifySceneType(scene),
+    timestamp: new Date().toISOString(),
+  };
+
+  console.log(`[video-render] Quality log: provider=${log.provider} scene=${log.sceneNumber} type=${log.sceneType} status=${log.status} duration=${log.durationMs}ms`);
+
+  return log;
+}
+
 // --- Unified API ---
 
 /**
@@ -512,7 +625,7 @@ export function getAvailableProvider(): VideoProvider | null {
   if (process.env.PIKA_API_KEY) return "pika";
   if (process.env.KLING_API_KEY) return "kling";
   // Replicate last — primarily an image provider, video models rotate frequently
-  if (process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY) return "replicate";
+  if (process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY || process.env.REPLICATE_TOKEN || process.env.REPLICATE_KEY) return "replicate";
   return null;
 }
 
@@ -521,30 +634,37 @@ export function getAvailableProvider(): VideoProvider | null {
  */
 export function getAllConfiguredProviders(): { provider: VideoProvider; configured: boolean; models: string[] }[] {
   return [
-    { provider: "replicate", configured: !!(process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY), models: ["MiniMax Video-01-Live", "FLUX"] },
+    { provider: "replicate", configured: !!(process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY || process.env.REPLICATE_TOKEN || process.env.REPLICATE_KEY), models: ["MiniMax Video-01-Live", "FLUX"] },
     { provider: "runway", configured: !!process.env.RUNWAY_API_KEY, models: ["Gen-3 Alpha Turbo"] },
     { provider: "luma", configured: !!process.env.LUMA_API_KEY, models: ["Dream Machine"] },
     { provider: "pika", configured: !!process.env.PIKA_API_KEY, models: ["Pika 1.5"] },
-    { provider: "kling", configured: !!process.env.KLING_API_KEY, models: ["Kling 1.6"] },
+    { provider: "kling", configured: !!process.env.KLING_API_KEY, models: ["Kling 3.0"] },
   ];
 }
 
 /**
  * Start rendering all scenes for a storyboard.
+ * Each scene is routed to the best provider based on content analysis.
+ * If request.provider is set, it overrides smart selection for ALL scenes.
  * Returns job IDs that can be polled for completion.
  */
 export async function startRender(request: RenderRequest): Promise<RenderResult> {
-  const provider = request.provider || getAvailableProvider();
-  if (!provider) {
+  // If no provider override and no providers configured at all, fail fast
+  if (!request.provider && !getAvailableProvider()) {
     throw new Error(
-      "No video rendering provider configured. Set REPLICATE_API_TOKEN, RUNWAY_API_KEY, or LUMA_API_KEY in your environment."
+      "No video rendering provider configured. Set REPLICATE_API_TOKEN, RUNWAY_API_KEY, KLING_API_KEY, or LUMA_API_KEY in your environment."
     );
   }
 
   const masterJobId = `render_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
   const jobs: RenderJob[] = [];
+  const qualityLogs: RenderQualityLog[] = [];
 
   for (const scene of request.scenes) {
+    // Smart provider selection: use override if provided, otherwise pick best per scene
+    const provider = request.provider || selectBestProvider(scene);
+    const startTime = Date.now();
+
     try {
       // Strip base64 data URIs — they're too large for video APIs and cause payload errors
       // Providers that need images will get a text-to-video prompt instead
@@ -553,31 +673,33 @@ export async function startRender(request: RenderRequest): Promise<RenderResult>
         scene.imageUrl = undefined;
       }
 
+      console.log(`[video-render] Scene ${scene.sceneNumber}: selected provider=${provider} (type=${classifySceneType(scene)})`);
+
       let jobId: string;
 
       switch (provider) {
         case "replicate": {
-          const result = await startReplicateJob(scene, request.style);
+          const result = await startReplicateJob(scene, request.style, provider);
           jobId = result.predictionId;
           break;
         }
         case "runway": {
-          const result = await startRunwayJob(scene, request.style);
+          const result = await startRunwayJob(scene, request.style, provider);
           jobId = result.taskId;
           break;
         }
         case "luma": {
-          const result = await startLumaJob(scene, request.style);
+          const result = await startLumaJob(scene, request.style, provider);
           jobId = result.generationId;
           break;
         }
         case "pika": {
-          const result = await startPikaJob(scene, request.style);
+          const result = await startPikaJob(scene, request.style, provider);
           jobId = result.generationId;
           break;
         }
         case "kling": {
-          const result = await startKlingJob(scene, request.style);
+          const result = await startKlingJob(scene, request.style, provider);
           jobId = result.taskId;
           break;
         }
@@ -594,7 +716,11 @@ export async function startRender(request: RenderRequest): Promise<RenderResult>
         createdAt: new Date().toISOString(),
         completedAt: null,
       });
+
+      qualityLogs.push(logRenderQuality(scene, provider, "succeeded", startTime));
     } catch (err) {
+      qualityLogs.push(logRenderQuality(scene, provider, "failed", startTime));
+
       jobs.push({
         id: `error_${scene.sceneNumber}`,
         provider,
@@ -693,20 +819,43 @@ function sanitizeRenderError(raw: string): string {
   return "Video rendering failed for this scene.";
 }
 
-function buildVideoPrompt(scene: RenderScene, style: string): string {
+/**
+ * Build a video prompt optimized for the target provider's capabilities.
+ *
+ * Prompt limits vary by provider:
+ *   - Runway: 512 chars (concise, focused)
+ *   - Kling: 2000 chars (can include rich detail, scene composition, lighting)
+ *   - Replicate: 1000 chars (moderate detail)
+ *   - Luma: 1000 chars
+ *   - Pika: 800 chars
+ */
+function buildVideoPrompt(scene: RenderScene, style: string, provider?: VideoProvider): string {
+  const maxLength = provider ? PROVIDER_PROMPT_LIMITS[provider] : 500;
   const motionDir = VIDEO_STYLE_DIRECTIONS[style] || VIDEO_STYLE_DIRECTIONS["cinematic"];
   const colorDir = scene.colorPalette.length > 0
     ? `Colors: ${scene.colorPalette.slice(0, 3).join(", ")}.`
     : "";
 
-  // Truncate visual description — Runway has a ~500 char prompt limit
-  const desc = (scene.visualDescription || "").slice(0, 300);
+  // Scale description length based on provider's prompt limit
+  const descMaxLength = Math.floor(maxLength * 0.6);
+  const desc = (scene.visualDescription || "").slice(0, descMaxLength);
   const camera = scene.cameraMovement ? `Camera: ${scene.cameraMovement}.` : "";
 
-  const prompt = [desc, camera, motionDir, colorDir, "Cinematic quality. Photorealistic."]
+  const parts = [desc, camera, motionDir, colorDir, "Cinematic quality. Photorealistic."];
+
+  // For providers with larger limits (Kling 2000 chars), add extra detail
+  if (maxLength >= 1500) {
+    parts.push(`Scene ${scene.sceneNumber}. Duration: ${scene.duration}.`);
+    if (scene.textOverlay) {
+      parts.push(`On-screen text: "${scene.textOverlay}".`);
+    }
+    parts.push("High resolution, professional lighting, smooth motion, no artifacts.");
+  }
+
+  const prompt = parts
     .filter(Boolean)
     .join(" ")
-    .slice(0, 500); // Hard cap at 500 chars for Runway API
+    .slice(0, maxLength);
 
   return prompt;
 }

@@ -461,13 +461,13 @@ export default function BrandKitPage() {
                 <p className="text-lg mb-6 max-w-xl mx-auto" style={{ color: `${kit.colors.text}70`, fontFamily: kit.typography.bodyFont }}>
                   Building the future, one pixel at a time. Let us help you create something extraordinary.
                 </p>
-                <button
+                <button onClick={() => {}}
                   className="px-6 py-3 rounded-xl text-sm font-semibold text-white"
                   style={{ backgroundColor: kit.colors.primary }}
                 >
                   Get Started
                 </button>
-                <button
+                <button onClick={() => {}}
                   className="px-6 py-3 rounded-xl text-sm font-semibold ml-3 border"
                   style={{ color: kit.colors.secondary, borderColor: kit.colors.secondary }}
                 >
@@ -483,7 +483,7 @@ export default function BrandKitPage() {
                     </div>
                     <h3 className="font-semibold mb-1" style={{ color: kit.colors.text, fontFamily: kit.typography.headingFont }}>{feat}</h3>
                     <p className="text-xs" style={{ color: `${kit.colors.text}50`, fontFamily: kit.typography.bodyFont }}>
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                      A powerful feature that sets your brand apart from the competition.
                     </p>
                   </div>
                 ))}

@@ -15,7 +15,6 @@ import {
   Code,
   BarChart3,
   Mail,
-  FileText,
   Palette,
   Bot,
   ChevronDown,
@@ -28,18 +27,31 @@ import {
   Shield,
   BookOpen,
   Sparkles,
+  Wifi,
+  Lock,
+  HardDrive,
+  Mic,
+  Calendar,
+  Wrench,
+  KeyRound,
+  FileText,
+  QrCode,
+  Hash,
+  Type,
+  FileCode,
+  Smartphone,
 } from "lucide-react";
 
-// ── Product categories for mega menu ──
+// ── Product categories for mega menu — 6 columns ──
 
 const PRODUCT_SECTIONS = [
   {
     label: "Build",
     items: [
       { name: "AI Website Builder", href: "/builder", icon: Zap, desc: "Build sites in 60 seconds", badge: "Core" },
-      { name: "Generators", href: "/generators", icon: Sparkles, desc: "43 specialized AI generators" },
+      { name: "Generators", href: "/generators", icon: Sparkles, desc: "43 specialized generators" },
       { name: "Templates", href: "/starter-kits", icon: Layout, desc: "100+ ready-made templates" },
-      { name: "Video Creator", href: "/video-creator", icon: Video, desc: "AI video production pipeline" },
+      { name: "Video Creator", href: "/video-creator", icon: Video, desc: "AI video production" },
     ],
   },
   {
@@ -47,8 +59,8 @@ const PRODUCT_SECTIONS = [
     items: [
       { name: "Hosting", href: "/hosting", icon: Server, desc: "Deploy to zoobicon.sh" },
       { name: "Domains", href: "/domains", icon: Globe, desc: "Search & register domains" },
-      { name: "Domain Finder", href: "/domain-finder", icon: Search, desc: "AI domain name discovery" },
-      { name: "SEO Dashboard", href: "/seo", icon: BarChart3, desc: "Optimize your rankings" },
+      { name: "Domain Finder", href: "/domain-finder", icon: Search, desc: "AI domain discovery" },
+      { name: "SEO Dashboard", href: "/seo", icon: BarChart3, desc: "Optimize rankings" },
     ],
   },
   {
@@ -61,19 +73,41 @@ const PRODUCT_SECTIONS = [
     ],
   },
   {
+    label: "Products",
+    items: [
+      { name: "eSIM", href: "/products/esim", icon: Wifi, desc: "190+ countries", badge: "New" },
+      { name: "VPN", href: "/products/vpn", icon: Lock, desc: "Secure browsing" },
+      { name: "Cloud Storage", href: "/products/cloud-storage", icon: HardDrive, desc: "S3-compatible" },
+      { name: "AI Dictation", href: "/products/dictation", icon: Mic, desc: "Speech to text" },
+      { name: "Booking", href: "/products/booking", icon: Calendar, desc: "Scheduling & appointments" },
+    ],
+  },
+  {
+    label: "Free Tools",
+    items: [
+      { name: "Business Name Generator", href: "/tools/business-name-generator", icon: Sparkles, desc: "AI-powered names" },
+      { name: "Password Generator", href: "/tools/password-generator", icon: KeyRound, desc: "Secure passwords" },
+      { name: "QR Code Generator", href: "/tools/qr-code-generator", icon: QrCode, desc: "Create QR codes" },
+      { name: "Meta Tag Generator", href: "/tools/meta-tag-generator", icon: FileCode, desc: "SEO meta tags" },
+      { name: "More Tools", href: "/tools/word-counter", icon: Wrench, desc: "12 free tools" },
+    ],
+  },
+  {
     label: "Scale",
     items: [
       { name: "Agency Platform", href: "/agencies", icon: Shield, desc: "White-label for agencies" },
-      { name: "API & Developers", href: "/developers", icon: Code, desc: "REST API & CLI tools" },
-      { name: "AI Agents", href: "/agents", icon: Bot, desc: "Open-source agent framework" },
-      { name: "Documentation", href: "/documentation", icon: BookOpen, desc: "Guides & API reference" },
+      { name: "API & Developers", href: "/developers", icon: Code, desc: "REST API & CLI" },
+      { name: "AI Agents", href: "/agents", icon: Bot, desc: "Agent framework" },
+      { name: "Documentation", href: "/documentation", icon: BookOpen, desc: "Guides & reference" },
     ],
   },
 ];
 
 const TOP_NAV_LINKS = [
   { name: "Pricing", href: "/pricing" },
-  { name: "Compare", href: "/compare" },
+  { name: "Domains", href: "/domains" },
+  { name: "eSIM", href: "/products/esim" },
+  { name: "Free Tools", href: "/tools/business-name-generator" },
 ];
 
 export default function SiteNavigation() {
@@ -106,7 +140,10 @@ export default function SiteNavigation() {
   // Close mega menu on click outside
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (megaRef.current && !megaRef.current.contains(e.target as Node)) {
+      // Don't close if clicking inside the mega menu panel itself
+      const target = e.target as HTMLElement;
+      if (target.closest("[data-mega-menu]")) return;
+      if (megaRef.current && !megaRef.current.contains(target)) {
         setMegaOpen(false);
       }
     }
@@ -139,13 +176,11 @@ export default function SiteNavigation() {
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-1">
             {/* Products mega menu trigger */}
             <div ref={megaRef} className="relative">
               <button
                 onClick={() => setMegaOpen(!megaOpen)}
-                onMouseEnter={() => { clearTimeout(timeoutRef.current); setMegaOpen(true); }}
-                onMouseLeave={() => { timeoutRef.current = setTimeout(() => setMegaOpen(false), 300); }}
                 className={`flex items-center gap-1 px-3 py-2 text-sm rounded-lg transition-colors ${
                   megaOpen ? "text-white bg-white/[0.08]" : "text-white/60 hover:text-white hover:bg-white/[0.04]"
                 }`}
@@ -153,52 +188,58 @@ export default function SiteNavigation() {
                 Products <ChevronDown className={`w-3.5 h-3.5 transition-transform ${megaOpen ? "rotate-180" : ""}`} />
               </button>
 
-              {/* Mega Menu Panel */}
+              {/* Mega Menu Panel — FULL WIDTH 6 columns */}
               {megaOpen && (
                 <div
-                  onMouseEnter={() => clearTimeout(timeoutRef.current)}
-                  onMouseLeave={() => { timeoutRef.current = setTimeout(() => setMegaOpen(false), 300); }}
-                  className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[720px] bg-[#141420] border border-white/[0.08] rounded-2xl shadow-2xl shadow-black/50 p-6"
+                  data-mega-menu
+                  className="fixed top-[64px] left-0 right-0 bg-[#141420] border-b border-white/[0.08] shadow-2xl shadow-black/50"
                 >
-                  <div className="grid grid-cols-4 gap-6">
-                    {PRODUCT_SECTIONS.map((section) => (
-                      <div key={section.label}>
-                        <h3 className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mb-3">{section.label}</h3>
-                        <div className="space-y-1">
-                          {section.items.map((item) => (
-                            <Link
-                              key={item.href}
-                              href={item.href}
-                              className="flex items-start gap-2.5 p-2 rounded-lg hover:bg-white/[0.05] transition-colors group"
-                              onClick={() => setMegaOpen(false)}
-                            >
-                              <item.icon className="w-4 h-4 text-slate-500 group-hover:text-indigo-400 transition-colors mt-0.5 flex-shrink-0" />
-                              <div>
-                                <div className="text-sm text-white/80 group-hover:text-white font-medium flex items-center gap-1.5">
-                                  {item.name}
-                                  {item.badge && (
-                                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-semibold">{item.badge}</span>
-                                  )}
+                  <div className="max-w-7xl mx-auto px-6 py-6">
+                    <div className="grid grid-cols-6 gap-6">
+                      {PRODUCT_SECTIONS.map((section) => (
+                        <div key={section.label}>
+                          <h3 className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mb-3">{section.label}</h3>
+                          <div className="space-y-0.5">
+                            {section.items.map((item) => (
+                              <Link
+                                key={item.href}
+                                href={item.href}
+                                className="flex items-start gap-2 p-2 rounded-lg hover:bg-white/[0.05] transition-colors group"
+                                onClick={() => setMegaOpen(false)}
+                              >
+                                <item.icon className="w-4 h-4 text-slate-500 group-hover:text-indigo-400 transition-colors mt-0.5 flex-shrink-0" />
+                                <div className="min-w-0">
+                                  <div className="text-[13px] text-white/80 group-hover:text-white font-medium flex items-center gap-1.5 truncate">
+                                    {item.name}
+                                    {item.badge && (
+                                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-semibold flex-shrink-0">{item.badge}</span>
+                                    )}
+                                  </div>
+                                  <div className="text-[11px] text-slate-500 mt-0.5 truncate">{item.desc}</div>
                                 </div>
-                                <div className="text-[11px] text-slate-500 mt-0.5">{item.desc}</div>
-                              </div>
-                            </Link>
-                          ))}
+                              </Link>
+                            ))}
+                          </div>
                         </div>
+                      ))}
+                    </div>
+                    <div className="mt-4 pt-4 border-t border-white/[0.06] flex items-center justify-between">
+                      <span className="text-xs text-slate-500">75+ tools replacing $923/mo in SaaS subscriptions</span>
+                      <div className="flex items-center gap-4">
+                        <Link href="/domains" className="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1" onClick={() => setMegaOpen(false)}>
+                          Search domains <ArrowRight className="w-3 h-3" />
+                        </Link>
+                        <Link href="/generators" className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1" onClick={() => setMegaOpen(false)}>
+                          All generators <ArrowRight className="w-3 h-3" />
+                        </Link>
                       </div>
-                    ))}
-                  </div>
-                  <div className="mt-4 pt-4 border-t border-white/[0.06] flex items-center justify-between">
-                    <span className="text-xs text-slate-500">75+ tools replacing $923/mo in SaaS subscriptions</span>
-                    <Link href="/generators" className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1">
-                      View all products <ArrowRight className="w-3 h-3" />
-                    </Link>
+                    </div>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Static links */}
+            {/* Static links — most important pages always visible */}
             {TOP_NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
@@ -215,7 +256,7 @@ export default function SiteNavigation() {
           </div>
 
           {/* Right side: Auth + CTA */}
-          <div className="hidden md:flex items-center gap-2">
+          <div className="hidden lg:flex items-center gap-2">
             {isLoggedIn ? (
               <>
                 <Link href="/dashboard" className="px-3 py-2 text-sm text-white/60 hover:text-white rounded-lg hover:bg-white/[0.04] transition-colors flex items-center gap-1.5">
@@ -245,10 +286,10 @@ export default function SiteNavigation() {
             </Link>
           </div>
 
-          {/* Mobile hamburger */}
+          {/* Mobile/tablet hamburger */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden p-2 text-white/60 hover:text-white rounded-lg"
+            className="lg:hidden p-2 text-white/60 hover:text-white rounded-lg"
           >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -257,12 +298,12 @@ export default function SiteNavigation() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-[#0a0a14] border-t border-white/[0.06] max-h-[80vh] overflow-y-auto">
-          <div className="px-4 py-4 space-y-6">
+        <div className="lg:hidden bg-[#0a0a14] border-t border-white/[0.06] max-h-[85vh] overflow-y-auto">
+          <div className="px-4 py-4 space-y-5">
             {PRODUCT_SECTIONS.map((section) => (
               <div key={section.label}>
                 <h3 className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mb-2">{section.label}</h3>
-                <div className="space-y-1">
+                <div className="space-y-0.5">
                   {section.items.map((item) => (
                     <Link
                       key={item.href}
@@ -270,8 +311,16 @@ export default function SiteNavigation() {
                       onClick={() => setMobileOpen(false)}
                       className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-white/[0.05] transition-colors"
                     >
-                      <item.icon className="w-4 h-4 text-slate-500" />
-                      <span className="text-sm text-white/80">{item.name}</span>
+                      <item.icon className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <span className="text-sm text-white/80 flex items-center gap-1.5">
+                          {item.name}
+                          {item.badge && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-semibold">{item.badge}</span>
+                          )}
+                        </span>
+                        <span className="text-[11px] text-slate-500 block">{item.desc}</span>
+                      </div>
                     </Link>
                   ))}
                 </div>
@@ -279,20 +328,16 @@ export default function SiteNavigation() {
             ))}
 
             <div className="pt-4 border-t border-white/[0.06] space-y-2">
-              {TOP_NAV_LINKS.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="block p-2.5 text-sm text-white/80 rounded-lg hover:bg-white/[0.05]"
-                >
-                  {link.name}
-                </Link>
-              ))}
+              <Link href="/pricing" onClick={() => setMobileOpen(false)} className="block p-2.5 text-sm text-white/80 rounded-lg hover:bg-white/[0.05] font-medium">
+                Pricing
+              </Link>
+              <Link href="/compare" onClick={() => setMobileOpen(false)} className="block p-2.5 text-sm text-white/80 rounded-lg hover:bg-white/[0.05]">
+                Compare
+              </Link>
               {isLoggedIn ? (
                 <>
                   <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="block p-2.5 text-sm text-white/80 rounded-lg hover:bg-white/[0.05]">Dashboard</Link>
-                  {isAdmin && <Link href="/admin" onClick={() => setMobileOpen(false)} className="block p-2.5 text-sm text-indigo-400 rounded-lg hover:bg-indigo-500/10">Admin</Link>}
+                  {isAdmin && <Link href="/admin" onClick={() => setMobileOpen(false)} className="block p-2.5 text-sm text-indigo-400 rounded-lg hover:bg-indigo-500/10">Admin Panel</Link>}
                 </>
               ) : (
                 <Link href="/auth/login" onClick={() => setMobileOpen(false)} className="block p-2.5 text-sm text-white/80 rounded-lg hover:bg-white/[0.05]">Sign in</Link>

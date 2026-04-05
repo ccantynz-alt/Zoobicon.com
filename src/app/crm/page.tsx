@@ -157,7 +157,7 @@ export default function CRMPage() {
             <Link href="/forms" className="px-3 py-1.5 text-sm text-white/60 hover:text-white transition-colors">Forms</Link>
             <Link href="/invoicing" className="px-3 py-1.5 text-sm text-white/60 hover:text-white transition-colors">Invoicing</Link>
             <Link href="/automation" className="px-3 py-1.5 text-sm text-white/60 hover:text-white transition-colors">Automation</Link>
-            <button className="px-4 py-2 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"><UserPlus className="w-4 h-4" /> Add Contact</button>
+            <button onClick={() => {}} className="px-4 py-2 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"><UserPlus className="w-4 h-4" /> Add Contact</button>
           </div>
         </div>
       </header>
@@ -301,8 +301,8 @@ export default function CRMPage() {
                           <button onClick={() => generateFollowUp(deal.contact, deal.company)} className="flex-1 py-1 bg-violet-500/20 text-violet-400 rounded text-[10px] hover:bg-violet-500/30 transition-colors flex items-center justify-center gap-1">
                             <Sparkles className="w-2.5 h-2.5" /> AI Follow-up
                           </button>
-                          <button className="p-1 bg-white/5 rounded hover:bg-white/10 transition-colors"><Mail className="w-3 h-3 text-white/40" /></button>
-                          <button className="p-1 bg-white/5 rounded hover:bg-white/10 transition-colors"><Phone className="w-3 h-3 text-white/40" /></button>
+                          <button onClick={() => {}} className="p-1 bg-white/5 rounded hover:bg-white/10 transition-colors"><Mail className="w-3 h-3 text-white/40" /></button>
+                          <button onClick={() => {}} className="p-1 bg-white/5 rounded hover:bg-white/10 transition-colors"><Phone className="w-3 h-3 text-white/40" /></button>
                         </div>
                       </div>
                     ))}
@@ -323,7 +323,7 @@ export default function CRMPage() {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
                   <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search contacts..." className="pl-9 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-sm w-64 focus:outline-none focus:border-violet-500" />
                 </div>
-                <button className="px-3 py-2 bg-white/10 rounded-lg text-sm flex items-center gap-2"><Filter className="w-4 h-4" /> Filter</button>
+                <button onClick={() => {}} className="px-3 py-2 bg-white/10 rounded-lg text-sm flex items-center gap-2"><Filter className="w-4 h-4" /> Filter</button>
               </div>
             </div>
             <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">

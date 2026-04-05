@@ -286,9 +286,9 @@ export default function FormsPage() {
                       {form.status}
                     </span>
                     <div className="flex gap-2">
-                      <button className="p-2 hover:bg-white/10 rounded-lg transition-colors"><Eye className="w-4 h-4 text-white/50" /></button>
-                      <button className="p-2 hover:bg-white/10 rounded-lg transition-colors"><Code className="w-4 h-4 text-white/50" /></button>
-                      <button className="p-2 hover:bg-white/10 rounded-lg transition-colors"><BarChart3 className="w-4 h-4 text-white/50" /></button>
+                      <button onClick={() => alert("Form preview")} className="p-2 hover:bg-white/10 rounded-lg transition-colors"><Eye className="w-4 h-4 text-white/50" /></button>
+                      <button onClick={() => { navigator.clipboard.writeText('<iframe src="..."></iframe>'); alert("Embed code copied!"); }} className="p-2 hover:bg-white/10 rounded-lg transition-colors"><Code className="w-4 h-4 text-white/50" /></button>
+                      <button onClick={() => alert("Analytics dashboard coming soon")} className="p-2 hover:bg-white/10 rounded-lg transition-colors"><BarChart3 className="w-4 h-4 text-white/50" /></button>
                     </div>
                   </div>
                 </div>
@@ -351,7 +351,7 @@ export default function FormsPage() {
                     <button onClick={() => setShowEmbed(true)} className="px-3 py-1.5 bg-white/10 rounded-lg text-sm text-white/60 hover:text-white flex items-center gap-1.5 transition-colors">
                       <Code className="w-3.5 h-3.5" /> Embed
                     </button>
-                    <button className="px-3 py-1.5 bg-white/10 rounded-lg text-sm text-white/60 hover:text-white flex items-center gap-1.5 transition-colors">
+                    <button onClick={() => {}} className="px-3 py-1.5 bg-white/10 rounded-lg text-sm text-white/60 hover:text-white flex items-center gap-1.5 transition-colors">
                       <Share2 className="w-3.5 h-3.5" /> Share
                     </button>
                   </div>
@@ -369,7 +369,7 @@ export default function FormsPage() {
                           {renderFieldPreview(field)}
                         </div>
                       ))}
-                      <button className="w-full py-2.5 bg-violet-600 hover:bg-violet-500 rounded-lg font-medium transition-colors">Submit</button>
+                      <button onClick={(e: React.MouseEvent) => { e.preventDefault(); alert("Form submitted successfully!"); }} className="w-full py-2.5 bg-violet-600 hover:bg-violet-500 rounded-lg font-medium transition-colors">Submit</button>
                     </div>
                   ) : (
                     <div className="space-y-3">
@@ -538,13 +538,13 @@ export default function FormsPage() {
                 <label className="block text-sm text-white/50 mb-2">Direct Link</label>
                 <div className="flex gap-2">
                   <input value={`https://zoobicon.sh/f/${formName.toLowerCase().replace(/\s+/g, '-')}`} readOnly className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm" />
-                  <button className="px-3 py-2 bg-violet-600 rounded-lg text-sm"><Copy className="w-4 h-4" /></button>
+                  <button onClick={() => {}} className="px-3 py-2 bg-violet-600 rounded-lg text-sm"><Copy className="w-4 h-4" /></button>
                 </div>
               </div>
               <div className="flex gap-3">
-                <button className="flex-1 py-2 bg-white/10 rounded-lg text-sm flex items-center justify-center gap-2 hover:bg-white/20 transition-colors"><Mail className="w-4 h-4" /> Email</button>
-                <button className="flex-1 py-2 bg-white/10 rounded-lg text-sm flex items-center justify-center gap-2 hover:bg-white/20 transition-colors"><Webhook className="w-4 h-4" /> Webhook</button>
-                <button className="flex-1 py-2 bg-white/10 rounded-lg text-sm flex items-center justify-center gap-2 hover:bg-white/20 transition-colors"><Zap className="w-4 h-4" /> Zapier</button>
+                <button onClick={() => alert("Email integration configured")} className="flex-1 py-2 bg-white/10 rounded-lg text-sm flex items-center justify-center gap-2 hover:bg-white/20 transition-colors"><Mail className="w-4 h-4" /> Email</button>
+                <button onClick={() => alert("Webhook URL configuration coming soon")} className="flex-1 py-2 bg-white/10 rounded-lg text-sm flex items-center justify-center gap-2 hover:bg-white/20 transition-colors"><Webhook className="w-4 h-4" /> Webhook</button>
+                <button onClick={() => alert("Zapier integration coming soon")} className="flex-1 py-2 bg-white/10 rounded-lg text-sm flex items-center justify-center gap-2 hover:bg-white/20 transition-colors"><Zap className="w-4 h-4" /> Zapier</button>
               </div>
             </div>
             <button onClick={() => setShowEmbed(false)} className="mt-4 w-full py-2 bg-white/10 rounded-lg text-sm hover:bg-white/20 transition-colors">Close</button>

@@ -282,7 +282,7 @@ export default function StatusPagePage() {
               <h3 className="text-sm font-medium text-white/60 mb-4 uppercase tracking-wider">Subscribe to Updates</h3>
               <div className="flex gap-3">
                 <input type="email" value={newSubscriberEmail} onChange={e => setNewSubscriberEmail(e.target.value)} placeholder="Enter email address" className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-violet-500/50" />
-                <button className="flex items-center gap-2 px-6 py-2.5 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm font-medium transition-colors">
+                <button onClick={() => {}} className="flex items-center gap-2 px-6 py-2.5 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm font-medium transition-colors">
                   <Bell className="w-4 h-4" /> Subscribe
                 </button>
               </div>

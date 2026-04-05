@@ -240,8 +240,8 @@ export default function DocumentationPage() {
                 </div>
                 <div className="mt-8 pt-6 border-t border-white/10 flex items-center justify-between">
                   <div className="flex gap-2">
-                    <button className="px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-xs text-white/50 transition-colors flex items-center gap-1"><Edit3 className="w-3 h-3" /> Edit Page</button>
-                    <button className="px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-xs text-white/50 transition-colors flex items-center gap-1"><ExternalLink className="w-3 h-3" /> View on GitHub</button>
+                    <button onClick={() => {}} className="px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-xs text-white/50 transition-colors flex items-center gap-1"><Edit3 className="w-3 h-3" /> Edit Page</button>
+                    <button onClick={() => {}} className="px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded-lg text-xs text-white/50 transition-colors flex items-center gap-1"><ExternalLink className="w-3 h-3" /> View on GitHub</button>
                   </div>
                   <p className="text-xs text-white/20">Was this page helpful?</p>
                 </div>
@@ -256,13 +256,13 @@ export default function DocumentationPage() {
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold">Editing: {selectedArticle.title}</h3>
                 <div className="flex gap-2">
-                  <button className="px-3 py-1.5 bg-white/10 hover:bg-white/15 rounded-lg text-xs transition-colors">Preview</button>
-                  <button className="px-3 py-1.5 bg-violet-600 hover:bg-violet-500 rounded-lg text-xs transition-colors">Save</button>
+                  <button onClick={() => {}} className="px-3 py-1.5 bg-white/10 hover:bg-white/15 rounded-lg text-xs transition-colors">Preview</button>
+                  <button onClick={() => {}} className="px-3 py-1.5 bg-violet-600 hover:bg-violet-500 rounded-lg text-xs transition-colors">Save</button>
                 </div>
               </div>
               <div className="flex gap-2 mb-3">
                 {['Heading', 'Bold', 'Code', 'Link', 'List', 'Callout', 'Image', 'Table'].map(btn => (
-                  <button key={btn} className="px-2.5 py-1 bg-white/5 hover:bg-white/10 rounded text-xs text-white/50 transition-colors">{btn}</button>
+                  <button onClick={() => {}} key={btn} className="px-2.5 py-1 bg-white/5 hover:bg-white/10 rounded text-xs text-white/50 transition-colors">{btn}</button>
                 ))}
               </div>
               <textarea defaultValue={selectedArticle.content} rows={20} className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-mono focus:outline-none focus:border-violet-500/50 resize-none leading-relaxed" />
@@ -334,7 +334,7 @@ export default function DocumentationPage() {
                   <label className="block text-sm text-white/70 mb-2">Include</label>
                   <div className="flex flex-wrap gap-2">
                     {['Code Examples', 'API Tables', 'Callout Boxes', 'Step-by-Step', 'Diagrams', 'FAQ'].map(item => (
-                      <button key={item} className="px-3 py-1.5 bg-white/5 hover:bg-violet-600/20 border border-white/10 hover:border-violet-500/50 rounded-lg text-xs text-white/60 hover:text-violet-300 transition-all">{item}</button>
+                      <button onClick={() => {}} key={item} className="px-3 py-1.5 bg-white/5 hover:bg-violet-600/20 border border-white/10 hover:border-violet-500/50 rounded-lg text-xs text-white/60 hover:text-violet-300 transition-all">{item}</button>
                     ))}
                   </div>
                 </div>

@@ -304,21 +304,21 @@ export default function AdminPage() {
       {/* ── Page Header ── */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">Command Center</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-800">Command Center</h1>
           <p className="text-sm text-slate-400 mt-1">System health, configuration, and platform management</p>
         </div>
         <div className="flex items-center gap-2">
-          <Link href="/builder" className="text-xs text-slate-400 hover:text-white px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.08] hover:border-white/[0.15] hover:bg-white/[0.07] transition-all">
+          <Link href="/builder" className="text-xs text-slate-500 hover:text-slate-700 px-3 py-1.5 rounded-xl bg-white/60 border border-slate-200 hover:border-amber-300 hover:bg-white/80 backdrop-blur-sm transition-all shadow-sm">
             Builder
           </Link>
-          <Link href="/dashboard" className="text-xs text-slate-400 hover:text-white px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.08] hover:border-white/[0.15] hover:bg-white/[0.07] transition-all">
+          <Link href="/dashboard" className="text-xs text-white px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 shadow-md shadow-amber-500/20 transition-all">
             Dashboard
           </Link>
         </div>
       </div>
 
       {/* ── Content Tabs ── */}
-      <div className="border-b border-white/[0.06]">
+      <div className="border-b border-slate-200">
         <div className="flex gap-1">
           {tabs.map((tab) => (
             <button
@@ -326,8 +326,8 @@ export default function AdminPage() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2.5 text-xs font-medium border-b-2 transition-all ${
                 activeTab === tab.id
-                  ? "border-indigo-500 text-white"
-                  : "border-transparent text-slate-500 hover:text-slate-300 hover:bg-white/[0.02]"
+                  ? "border-amber-500 text-amber-700"
+                  : "border-transparent text-slate-400 hover:text-slate-600 hover:bg-slate-50"
               }`}
             >
               {tab.icon}
@@ -342,21 +342,21 @@ export default function AdminPage() {
         <>
             {/* ── Quick Actions ── */}
             <div>
-              <h2 className="text-xs font-bold uppercase tracking-widest text-white/50 mb-3 flex items-center gap-2">
-                <Activity className="w-3.5 h-3.5 text-violet-400" />
+              <h2 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3 flex items-center gap-2">
+                <Activity className="w-3.5 h-3.5 text-amber-500" />
                 Quick Actions
               </h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                 {[
-                  { icon: Mail, label: "Email Inbox", href: "/admin/email", desc: "Read & manage email", gradient: "from-rose-500 to-orange-500", glow: "shadow-rose-500/20" },
-                  { icon: Inbox, label: "Mailboxes", href: "/admin/mailboxes", desc: "Manage mailboxes & routing", gradient: "from-amber-500 to-yellow-500", glow: "shadow-amber-500/20" },
-                  { icon: Settings, label: "Email Settings", href: "/admin/email-settings", desc: "Configure admin email", gradient: "from-cyan-500 to-rose-500", glow: "shadow-cyan-500/20" },
-                  { icon: HeadphonesIcon, label: "Support", href: "/admin/support", desc: "Support tickets & knowledge", gradient: "from-emerald-500 to-teal-500", glow: "shadow-emerald-500/20" },
-                  { icon: Rocket, label: "Pre-Launch", href: "/admin/pre-launch", desc: "Launch checklist & readiness", gradient: "from-blue-500 to-purple-600", glow: "shadow-blue-500/20" },
-                  { icon: Code2, label: "Builder", href: "/builder", desc: "AI website builder", gradient: "from-violet-500 to-purple-500", glow: "shadow-violet-500/20" },
-                  { icon: Globe, label: "View Site", href: "/", desc: "Public homepage", gradient: "from-cyan-500 to-blue-500", glow: "shadow-cyan-500/20", external: true },
-                  { icon: Settings, label: "Settings", href: "/auth/settings", desc: "Account settings", gradient: "from-slate-400 to-zinc-500", glow: "shadow-slate-500/20" },
-                  { icon: BarChart3, label: "Dashboard", href: "/dashboard", desc: "Project dashboard", gradient: "from-brand-500 to-indigo-500", glow: "shadow-brand-500/20" },
+                  { icon: Mail, label: "Email Inbox", href: "/admin/email", desc: "Read & manage email", gradient: "from-rose-400 to-orange-400" },
+                  { icon: Inbox, label: "Mailboxes", href: "/admin/mailboxes", desc: "Manage mailboxes & routing", gradient: "from-amber-400 to-yellow-400" },
+                  { icon: Settings, label: "Email Settings", href: "/admin/email-settings", desc: "Configure admin email", gradient: "from-cyan-400 to-rose-400" },
+                  { icon: HeadphonesIcon, label: "Support", href: "/admin/support", desc: "Support tickets & knowledge", gradient: "from-emerald-400 to-teal-400" },
+                  { icon: Rocket, label: "Pre-Launch", href: "/admin/pre-launch", desc: "Launch checklist & readiness", gradient: "from-blue-400 to-purple-500" },
+                  { icon: Code2, label: "Builder", href: "/builder", desc: "AI website builder", gradient: "from-violet-400 to-purple-400" },
+                  { icon: Globe, label: "View Site", href: "/", desc: "Public homepage", gradient: "from-cyan-400 to-blue-400", external: true },
+                  { icon: Settings, label: "Settings", href: "/auth/settings", desc: "Account settings", gradient: "from-slate-400 to-zinc-400" },
+                  { icon: BarChart3, label: "Dashboard", href: "/dashboard", desc: "Project dashboard", gradient: "from-amber-500 to-amber-600" },
                 ].map((a, i) => (
                   <motion.div
                     key={a.label}
@@ -367,16 +367,16 @@ export default function AdminPage() {
                     <Link
                       href={a.href}
                       target={(a as { external?: boolean }).external ? "_blank" : undefined}
-                      className={`group relative overflow-hidden rounded-2xl border border-white/[0.15] hover:border-violet-500/40 bg-white/[0.07] hover:bg-white/[0.14] backdrop-blur-xl p-5 flex items-start gap-4 transition-all duration-300 shadow-xl ${a.glow} hover:shadow-2xl hover:scale-[1.03]`}
+                      className="group relative overflow-hidden rounded-2xl border border-slate-200/80 hover:border-amber-300 bg-white/70 hover:bg-white/90 backdrop-blur-xl p-5 flex items-start gap-4 transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-amber-100/50 hover:scale-[1.02]"
                     >
-                      <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${a.gradient} flex items-center justify-center flex-shrink-0 shadow-lg ${a.glow} group-hover:scale-110 transition-transform`}>
+                      <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${a.gradient} flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform`}>
                         <a.icon className="w-5 h-5 text-white" />
                       </div>
                       <div className="min-w-0">
-                        <div className="text-sm font-bold truncate text-white/90 group-hover:text-white transition-colors">{a.label}</div>
-                        <div className="text-[11px] text-white/50 truncate mt-0.5">{a.desc}</div>
+                        <div className="text-sm font-semibold truncate text-slate-700 group-hover:text-slate-900 transition-colors">{a.label}</div>
+                        <div className="text-[11px] text-slate-400 truncate mt-0.5">{a.desc}</div>
                       </div>
-                      <ArrowUpRight className="w-4 h-4 text-white/50 group-hover:text-white/50 absolute top-4 right-4 transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                      <ArrowUpRight className="w-4 h-4 text-slate-300 group-hover:text-amber-500 absolute top-4 right-4 transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                     </Link>
                   </motion.div>
                 ))}
@@ -386,22 +386,22 @@ export default function AdminPage() {
             {/* ── Feature Highlights ── */}
             <div className="grid md:grid-cols-3 gap-4">
               {[
-                { icon: Workflow, title: "10-Agent Pipeline", desc: "Strategist, Brand, Copywriter, Architect, Developer, Animator, SEO, Forms, Integrations, QA — 3 tiers.", gradient: "from-violet-500/30 to-purple-500/15", iconGradient: "from-violet-500 to-purple-600", borderColor: "border-violet-500/30" },
-                { icon: ImagePlus, title: "AI Image Generation", desc: "DALL-E 3, Stability AI, and Unsplash integration. Contextual AI images.", gradient: "from-cyan-500/30 to-blue-500/15", iconGradient: "from-cyan-500 to-blue-500", borderColor: "border-cyan-500/30" },
-                { icon: Globe, title: "Website Cloner", desc: "Paste any URL to analyze, extract content, and rebuild as a premium site.", gradient: "from-emerald-500/30 to-teal-500/15", iconGradient: "from-emerald-500 to-teal-500", borderColor: "border-emerald-500/30" },
+                { icon: Workflow, title: "10-Agent Pipeline", desc: "Strategist, Brand, Copywriter, Architect, Developer, Animator, SEO, Forms, Integrations, QA — 3 tiers.", iconGradient: "from-violet-400 to-purple-500" },
+                { icon: ImagePlus, title: "AI Image Generation", desc: "DALL-E 3, Stability AI, and Unsplash integration. Contextual AI images.", iconGradient: "from-cyan-400 to-blue-500" },
+                { icon: Globe, title: "Website Cloner", desc: "Paste any URL to analyze, extract content, and rebuild as a premium site.", iconGradient: "from-emerald-400 to-teal-500" },
               ].map((f, i) => (
                 <motion.div
                   key={f.title}
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 + i * 0.1 }}
-                  className={`rounded-2xl p-6 bg-gradient-to-br ${f.gradient} border ${f.borderColor} backdrop-blur-md shadow-xl hover:scale-[1.02] transition-transform duration-300`}
+                  className="rounded-2xl p-6 bg-white/60 border border-slate-200/80 backdrop-blur-xl shadow-sm hover:shadow-lg hover:shadow-amber-100/30 hover:border-amber-200 hover:scale-[1.02] transition-all duration-300"
                 >
                   <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${f.iconGradient} flex items-center justify-center mb-4 shadow-lg`}>
                     <f.icon className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-sm font-bold mb-1.5 text-white/90">{f.title}</h3>
-                  <p className="text-xs text-white/55 leading-relaxed">{f.desc}</p>
+                  <h3 className="text-sm font-bold mb-1.5 text-slate-700">{f.title}</h3>
+                  <p className="text-xs text-slate-400 leading-relaxed">{f.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -412,52 +412,52 @@ export default function AdminPage() {
                 initial={{ opacity: 0, x: -15 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 }}
-                className="rounded-2xl border border-emerald-500/35 bg-gradient-to-br from-emerald-500/[0.15] via-emerald-500/[0.05] to-transparent p-6 backdrop-blur-xl shadow-xl shadow-emerald-500/10"
+                className="rounded-2xl border border-emerald-200 bg-white/70 backdrop-blur-xl p-6 shadow-sm"
               >
                 <div className="flex items-center justify-between mb-5">
-                  <h2 className="text-base font-bold flex items-center gap-2">
-                    <Cpu className="w-4 h-4 text-emerald-400" />
+                  <h2 className="text-base font-bold flex items-center gap-2 text-slate-700">
+                    <Cpu className="w-4 h-4 text-emerald-500" />
                     System Status
                   </h2>
-                  <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-                    <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-lg shadow-emerald-400/50" />
-                    <span className="text-xs font-semibold text-emerald-400">All Systems Go</span>
+                  <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-lg shadow-emerald-400/50" />
+                    <span className="text-xs font-semibold text-emerald-600">All Systems Go</span>
                   </div>
                 </div>
                 <div className="space-y-3">
                   {[
-                    { label: "AI Generation Engine", detail: "Claude Sonnet + streaming SSE", color: "text-emerald-400" },
-                    { label: "Multi-Agent Pipeline", detail: "10 agents · 3 tiers · Parallel execution", color: "text-emerald-400" },
-                    { label: "AI Generators", detail: "32+ specialized generators across 6 categories", color: "text-emerald-400" },
-                    { label: "Dominat8 Brand", detail: "dominat8.io + dominat8.com white-label active", color: "text-emerald-400" },
-                    { label: "AI Image Engine", detail: "DALL-E 3 / Stability AI / Unsplash", color: "text-emerald-400" },
-                    { label: "Website Cloner", detail: "Fetch, analyze, rebuild premium", color: "text-emerald-400" },
-                    { label: "Rate Limiting", detail: "10 gen/min · 20 chat/min · 30 support/min", color: "text-emerald-400" },
+                    { label: "AI Generation Engine", detail: "Claude Sonnet + streaming SSE" },
+                    { label: "Multi-Agent Pipeline", detail: "10 agents · 3 tiers · Parallel execution" },
+                    { label: "AI Generators", detail: "32+ specialized generators across 6 categories" },
+                    { label: "Dominat8 Brand", detail: "dominat8.io + dominat8.com white-label active" },
+                    { label: "AI Image Engine", detail: "DALL-E 3 / Stability AI / Unsplash" },
+                    { label: "Website Cloner", detail: "Fetch, analyze, rebuild premium" },
+                    { label: "Rate Limiting", detail: "10 gen/min · 20 chat/min · 30 support/min" },
                   ].map((c) => (
                     <div key={c.label} className="flex items-start gap-3 py-1">
-                      <CheckCircle2 className={`w-4 h-4 ${c.color} flex-shrink-0 mt-0.5`} />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
                       <div>
-                        <div className="text-sm font-medium text-white/85">{c.label}</div>
-                        <div className="text-xs text-white/50">{c.detail}</div>
+                        <div className="text-sm font-medium text-slate-700">{c.label}</div>
+                        <div className="text-xs text-slate-400">{c.detail}</div>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="mt-5 pt-5 border-t border-white/10">
+                <div className="mt-5 pt-5 border-t border-slate-100">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <Wifi className="w-4 h-4 text-cyan-400" />
-                      <span className="text-sm font-medium">Anthropic API</span>
+                      <Wifi className="w-4 h-4 text-amber-500" />
+                      <span className="text-sm font-medium text-slate-700">Anthropic API</span>
                     </div>
                     <button onClick={testApiConnection} disabled={apiTest === "loading"}
-                      className="flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 border border-cyan-500/20 hover:border-cyan-500/40 bg-cyan-500/5 hover:bg-cyan-500/10 rounded-lg px-3 py-1.5 transition-all disabled:opacity-50">
+                      className="flex items-center gap-1.5 text-xs text-amber-600 hover:text-amber-700 border border-amber-200 hover:border-amber-300 bg-amber-50 hover:bg-amber-100 rounded-xl px-3 py-1.5 transition-all disabled:opacity-50 shadow-sm">
                       <RefreshCw className={`w-3 h-3 ${apiTest === "loading" ? "animate-spin" : ""}`} />
                       Test Connection
                     </button>
                   </div>
-                  {apiTest === "ok" && <div className="flex items-center gap-2 text-xs text-emerald-400 font-medium"><CheckCircle2 className="w-3.5 h-3.5" />Connection successful</div>}
-                  {apiTest === "error" && <div className="flex items-center gap-2 text-xs text-red-400 font-medium"><XCircle className="w-3.5 h-3.5" />{apiError}</div>}
+                  {apiTest === "ok" && <div className="flex items-center gap-2 text-xs text-emerald-600 font-medium"><CheckCircle2 className="w-3.5 h-3.5" />Connection successful</div>}
+                  {apiTest === "error" && <div className="flex items-center gap-2 text-xs text-red-500 font-medium"><XCircle className="w-3.5 h-3.5" />{apiError}</div>}
                 </div>
               </motion.div>
 
@@ -466,13 +466,13 @@ export default function AdminPage() {
                 initial={{ opacity: 0, x: 15 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 }}
-                className="rounded-2xl border border-violet-500/35 bg-gradient-to-br from-violet-500/[0.15] via-violet-500/[0.05] to-transparent p-6 backdrop-blur-xl shadow-xl shadow-violet-500/10"
+                className="rounded-2xl border border-slate-200/80 bg-white/70 backdrop-blur-xl p-6 shadow-sm"
               >
-                <h2 className="text-base font-bold mb-1 flex items-center gap-2">
-                  <Database className="w-4 h-4 text-violet-400" />
+                <h2 className="text-base font-bold mb-1 flex items-center gap-2 text-slate-700">
+                  <Database className="w-4 h-4 text-amber-500" />
                   Environment Variables
                 </h2>
-                <p className="text-xs text-white/50 mb-5">Set in <span className="text-violet-300/70 font-medium">Vercel → Environment Variables</span> · {envKeys.length} total</p>
+                <p className="text-xs text-slate-400 mb-5">Set in <span className="text-amber-600 font-medium">Vercel → Environment Variables</span> · {envKeys.length} total</p>
                 <div className="space-y-1 max-h-[420px] overflow-y-auto pr-1 custom-scrollbar">
                   {(() => {
                     let lastGroup = "";
@@ -482,17 +482,17 @@ export default function AdminPage() {
                       return (
                         <div key={e.key}>
                           {showGroup && (
-                            <div className="text-[10px] font-semibold uppercase tracking-wider text-violet-400/70 mt-3 mb-1.5 first:mt-0">{e.group}</div>
+                            <div className="text-[10px] font-semibold uppercase tracking-wider text-amber-600 mt-3 mb-1.5 first:mt-0">{e.group}</div>
                           )}
-                          <div className="flex items-center justify-between gap-3 py-1">
+                          <div className="flex items-center justify-between gap-3 py-1.5">
                             <div className="min-w-0">
-                              <div className="text-xs font-mono text-white/75 truncate">{e.key}</div>
-                              <div className="text-[10px] text-white/50">{e.label}</div>
+                              <div className="text-xs font-mono text-slate-600 truncate">{e.key}</div>
+                              <div className="text-[10px] text-slate-400">{e.label}</div>
                             </div>
                             <div className={`text-[10px] font-bold px-2.5 py-1 rounded-full flex-shrink-0 ${
                               e.required
-                                ? "bg-gradient-to-r from-amber-500/15 to-orange-500/15 text-amber-400 border border-amber-500/25"
-                                : "bg-white/[0.06] text-white/50 border border-white/[0.10]"
+                                ? "bg-amber-50 text-amber-700 border border-amber-200"
+                                : "bg-slate-50 text-slate-400 border border-slate-200"
                             }`}>
                               {e.required ? "Required" : "Optional"}
                             </div>
@@ -502,15 +502,15 @@ export default function AdminPage() {
                     });
                   })()}
                 </div>
-                <div className="mt-5 pt-5 border-t border-white/10">
+                <div className="mt-5 pt-5 border-t border-slate-100">
                   <button
                     onClick={() => copyToClipboard(
                       "# Core AI\nANTHROPIC_API_KEY=\nOPENAI_API_KEY=\nGOOGLE_AI_API_KEY=\n\n# Images\nSTABILITY_API_KEY=\nUNSPLASH_ACCESS_KEY=\n\n# Database & Auth\nDATABASE_URL=\nADMIN_EMAIL=admin@zoobicon.com\nADMIN_PASSWORD=\nRESET_TOKEN_SECRET=\n\n# OAuth\nGOOGLE_CLIENT_ID=\nGOOGLE_CLIENT_SECRET=\nGITHUB_OAUTH_CLIENT_ID=\nGITHUB_OAUTH_CLIENT_SECRET=\n\n# Payments (Stripe)\nSTRIPE_SECRET_KEY=\nSTRIPE_CREATOR_PRICE_ID=\nSTRIPE_PRO_PRICE_ID=\nSTRIPE_AGENCY_PRICE_ID=\nSTRIPE_WEBHOOK_SECRET=\n\n# Email (Mailgun)\nMAILGUN_API_KEY=\nMAILGUN_DOMAIN=zoobicon.com\nMAILGUN_WEBHOOK_SIGNING_KEY=\nADMIN_NOTIFICATION_EMAIL=\n\n# Infrastructure\nNEXT_PUBLIC_APP_URL=https://zoobicon.com\nCLOUDFLARE_API_TOKEN=\nCLOUDFLARE_ZONE_ID=\nCLOUDFLARE_ACCOUNT_ID=\n\n# Integrations\nGITHUB_TOKEN=\nSLACK_BOT_TOKEN=\nSLACK_SIGNING_SECRET=",
                       "envblock"
                     )}
-                    className="flex items-center gap-2 text-xs text-violet-400 hover:text-violet-300 border border-violet-500/20 hover:border-violet-500/40 bg-violet-500/5 hover:bg-violet-500/10 rounded-lg px-4 py-2 transition-all"
+                    className="flex items-center gap-2 text-xs text-amber-600 hover:text-amber-700 border border-amber-200 hover:border-amber-300 bg-amber-50 hover:bg-amber-100 rounded-xl px-4 py-2 transition-all shadow-sm"
                   >
-                    {copied === "envblock" ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copied === "envblock" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
                     {copied === "envblock" ? "Copied!" : "Copy .env.local template"}
                   </button>
                 </div>
@@ -522,34 +522,34 @@ export default function AdminPage() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="rounded-2xl border border-brand-500/35 bg-gradient-to-br from-brand-500/[0.15] via-transparent to-cyan-500/[0.12] p-6 backdrop-blur-xl shadow-xl shadow-brand-500/10"
+              className="rounded-2xl border border-amber-200 bg-gradient-to-br from-white/80 via-amber-50/30 to-white/60 p-6 backdrop-blur-xl shadow-sm"
             >
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-base font-bold flex items-center gap-2">
-                    <Rocket className="w-4 h-4 text-brand-400" />
+                  <h2 className="text-base font-bold flex items-center gap-2 text-slate-700">
+                    <Rocket className="w-4 h-4 text-amber-500" />
                     Launch Checklist
                   </h2>
-                  <p className="text-xs text-white/50 mt-0.5">
+                  <p className="text-xs text-slate-400 mt-0.5">
                     {launchChecklist.filter((i) => i.done).length} of {launchChecklist.length} complete
                   </p>
                 </div>
-                <div className="text-3xl font-black bg-gradient-to-r from-brand-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent">
+                <div className="text-3xl font-black bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 bg-clip-text text-transparent">
                   {Math.round((launchChecklist.filter((i) => i.done).length / launchChecklist.length) * 100)}%
                 </div>
               </div>
-              <div className="h-3 bg-white/[0.06] rounded-full mb-6 overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-violet-500 via-brand-500 to-cyan-500 rounded-full transition-all duration-700 shadow-lg shadow-brand-500/30"
+              <div className="h-3 bg-slate-100 rounded-full mb-6 overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 rounded-full transition-all duration-700 shadow-lg shadow-amber-400/30"
                   style={{ width: `${(launchChecklist.filter((i) => i.done).length / launchChecklist.length) * 100}%` }} />
               </div>
               <div className="grid md:grid-cols-2 gap-2.5">
                 {launchChecklist.map((item, i) => (
-                  <div key={i} className={`flex items-center gap-3 py-2 px-3 rounded-lg ${item.done ? "bg-emerald-500/[0.04]" : "bg-white/[0.02]"}`}>
+                  <div key={i} className={`flex items-center gap-3 py-2 px-3 rounded-xl ${item.done ? "bg-emerald-50/80" : "bg-slate-50/60"}`}>
                     {item.done
-                      ? <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                      : <div className="w-4 h-4 rounded-full border-2 border-white/15 flex-shrink-0" />
+                      ? <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                      : <div className="w-4 h-4 rounded-full border-2 border-slate-200 flex-shrink-0" />
                     }
-                    <span className={`text-sm ${item.done ? "text-white/65" : "text-white/50"}`}>{item.label}</span>
+                    <span className={`text-sm ${item.done ? "text-slate-600" : "text-slate-400"}`}>{item.label}</span>
                   </div>
                 ))}
               </div>
@@ -560,23 +560,23 @@ export default function AdminPage() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="rounded-2xl border border-cyan-500/30 bg-gradient-to-br from-cyan-500/[0.08] via-white/[0.05] to-violet-500/[0.06] p-6 backdrop-blur-xl shadow-xl shadow-cyan-500/10"
+              className="rounded-2xl border border-slate-200/80 bg-white/70 backdrop-blur-xl p-6 shadow-sm"
             >
-              <h2 className="text-base font-bold mb-5 flex items-center gap-2">
-                <Server className="w-4 h-4 text-cyan-400" />
+              <h2 className="text-base font-bold mb-5 flex items-center gap-2 text-slate-700">
+                <Server className="w-4 h-4 text-amber-500" />
                 API Reference
               </h2>
               <div className="space-y-1.5">
                 {apiRoutes.map((r) => (
-                  <div key={r.path} className="flex items-center gap-4 py-2.5 px-3 rounded-lg border-b border-white/[0.04] last:border-0 hover:bg-white/[0.03] transition-colors">
-                    <span className={`text-[10px] font-mono font-bold px-2.5 py-1 rounded-md w-14 text-center flex-shrink-0 ${
+                  <div key={r.path} className="flex items-center gap-4 py-2.5 px-3 rounded-xl border-b border-slate-100 last:border-0 hover:bg-amber-50/40 transition-colors">
+                    <span className={`text-[10px] font-mono font-bold px-2.5 py-1 rounded-lg w-14 text-center flex-shrink-0 ${
                       r.method === "GET"
-                        ? "text-emerald-400 bg-emerald-500/15 border border-emerald-500/20"
-                        : "text-violet-400 bg-violet-500/15 border border-violet-500/20"
+                        ? "text-emerald-600 bg-emerald-50 border border-emerald-200"
+                        : "text-amber-700 bg-amber-50 border border-amber-200"
                     }`}>{r.method}</span>
-                    <code className="text-xs font-mono text-cyan-300/70 w-60 flex-shrink-0">{r.path}</code>
-                    <span className="text-xs text-white/50 flex-1">{r.desc}</span>
-                    <span className="text-[10px] text-white/50 flex-shrink-0 font-medium">{r.limit}</span>
+                    <code className="text-xs font-mono text-slate-500 w-60 flex-shrink-0">{r.path}</code>
+                    <span className="text-xs text-slate-400 flex-1">{r.desc}</span>
+                    <span className="text-[10px] text-slate-400 flex-shrink-0 font-medium">{r.limit}</span>
                   </div>
                 ))}
               </div>
@@ -588,8 +588,8 @@ export default function AdminPage() {
         {activeTab === "analytics" && (
           <>
             <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-black tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">Analytics</h1>
-              <button onClick={fetchAnalytics} className="flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 border border-cyan-500/20 bg-cyan-500/5 rounded-lg px-3 py-1.5 transition-all">
+              <h1 className="text-2xl font-black tracking-tight text-slate-800">Analytics</h1>
+              <button onClick={fetchAnalytics} className="flex items-center gap-1.5 text-xs text-amber-600 hover:text-amber-700 border border-amber-200 bg-amber-50 hover:bg-amber-100 rounded-xl px-3 py-1.5 transition-all shadow-sm">
                 <RefreshCw className={`w-3 h-3 ${analyticsLoading ? "animate-spin" : ""}`} />
                 Refresh
               </button>
@@ -598,33 +598,33 @@ export default function AdminPage() {
             {/* Stat cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { label: "Total Users", value: analytics?.stats.totalUsers || 0, icon: Users, gradient: "from-violet-500/35 to-purple-500/20", iconGradient: "from-violet-500 to-purple-600", border: "border-violet-500/35" },
-                { label: "Projects", value: analytics?.stats.totalProjects || 0, icon: FolderOpen, gradient: "from-blue-500/35 to-indigo-500/20", iconGradient: "from-blue-500 to-indigo-500", border: "border-blue-500/35" },
-                { label: "Sites Deployed", value: analytics?.stats.totalSites || 0, icon: Rocket, gradient: "from-cyan-500/35 to-teal-500/20", iconGradient: "from-cyan-500 to-teal-500", border: "border-cyan-500/35" },
-                { label: "Deployments", value: analytics?.stats.totalDeployments || 0, icon: TrendingUp, gradient: "from-emerald-500/35 to-green-500/20", iconGradient: "from-emerald-500 to-green-500", border: "border-emerald-500/35" },
+                { label: "Total Users", value: analytics?.stats.totalUsers || 0, icon: Users, iconGradient: "from-violet-400 to-purple-500" },
+                { label: "Projects", value: analytics?.stats.totalProjects || 0, icon: FolderOpen, iconGradient: "from-blue-400 to-indigo-500" },
+                { label: "Sites Deployed", value: analytics?.stats.totalSites || 0, icon: Rocket, iconGradient: "from-amber-400 to-amber-500" },
+                { label: "Deployments", value: analytics?.stats.totalDeployments || 0, icon: TrendingUp, iconGradient: "from-emerald-400 to-green-500" },
               ].map((s) => (
                 <motion.div
                   key={s.label}
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className={`rounded-2xl p-5 bg-gradient-to-br ${s.gradient} border ${s.border} backdrop-blur-md shadow-lg hover:scale-[1.03] transition-transform duration-300`}
+                  className="rounded-2xl p-5 bg-white/70 border border-slate-200/80 backdrop-blur-xl shadow-sm hover:shadow-lg hover:shadow-amber-100/30 hover:scale-[1.03] transition-all duration-300"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.iconGradient} flex items-center justify-center shadow-lg`}>
                       <s.icon className="w-5 h-5 text-white" />
                     </div>
                   </div>
-                  <div className="text-3xl font-black text-white/90">{s.value}</div>
-                  <div className="text-xs text-white/50 mt-1 font-medium">{s.label}</div>
+                  <div className="text-3xl font-black text-slate-800">{s.value}</div>
+                  <div className="text-xs text-slate-400 mt-1 font-medium">{s.label}</div>
                 </motion.div>
               ))}
             </div>
 
             <div className="grid lg:grid-cols-2 gap-6">
               {/* Plan Distribution */}
-              <div className="rounded-2xl p-6 border border-violet-500/35 bg-gradient-to-br from-violet-500/[0.15] to-transparent backdrop-blur-xl shadow-xl shadow-violet-500/10">
-                <h2 className="text-base font-bold mb-4 flex items-center gap-2">
-                  <Crown className="w-4 h-4 text-violet-400" />
+              <div className="rounded-2xl p-6 border border-slate-200/80 bg-white/70 backdrop-blur-xl shadow-sm">
+                <h2 className="text-base font-bold mb-4 flex items-center gap-2 text-slate-700">
+                  <Crown className="w-4 h-4 text-amber-500" />
                   Plan Distribution
                 </h2>
                 {analytics?.planDistribution && analytics.planDistribution.length > 0 ? (
@@ -632,69 +632,69 @@ export default function AdminPage() {
                     {analytics.planDistribution.map((p) => (
                       <div key={p.plan} className="space-y-1.5">
                         <div className="flex justify-between text-xs">
-                          <span className="text-white/70 capitalize font-medium">{p.plan || "free"}</span>
-                          <span className="text-white/50">{p.count} users</span>
+                          <span className="text-slate-600 capitalize font-medium">{p.plan || "free"}</span>
+                          <span className="text-slate-400">{p.count} users</span>
                         </div>
-                        <div className="h-2.5 bg-white/[0.06] rounded-full overflow-hidden">
-                          <div className="h-full bg-gradient-to-r from-violet-500 to-brand-500 rounded-full shadow-sm"
+                        <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                          <div className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full shadow-sm"
                             style={{ width: `${Math.max(5, (p.count / (analytics.stats.totalUsers || 1)) * 100)}%` }} />
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-white/50">No user data available yet.</p>
+                  <p className="text-xs text-slate-400">No user data available yet.</p>
                 )}
               </div>
 
               {/* Recent signups */}
-              <div className="rounded-2xl p-6 border border-cyan-500/35 bg-gradient-to-br from-cyan-500/[0.15] to-transparent backdrop-blur-xl shadow-xl shadow-cyan-500/10">
-                <h2 className="text-base font-bold mb-4 flex items-center gap-2">
-                  <UserPlus className="w-4 h-4 text-cyan-400" />
+              <div className="rounded-2xl p-6 border border-slate-200/80 bg-white/70 backdrop-blur-xl shadow-sm">
+                <h2 className="text-base font-bold mb-4 flex items-center gap-2 text-slate-700">
+                  <UserPlus className="w-4 h-4 text-amber-500" />
                   Recent Signups
                 </h2>
                 {analytics?.recentUsers && analytics.recentUsers.length > 0 ? (
                   <div className="space-y-3">
                     {analytics.recentUsers.slice(0, 8).map((u, i) => (
-                      <div key={i} className="flex items-center justify-between py-2 border-b border-white/[0.06] last:border-0">
+                      <div key={i} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
                         <div>
-                          <div className="text-xs font-semibold text-white/80">{u.name || u.email}</div>
-                          <div className="text-[10px] text-white/50">{u.email}</div>
+                          <div className="text-xs font-semibold text-slate-700">{u.name || u.email}</div>
+                          <div className="text-[10px] text-slate-400">{u.email}</div>
                         </div>
-                        <div className="text-[10px] text-white/50 font-medium">
+                        <div className="text-[10px] text-slate-400 font-medium">
                           {new Date(u.created_at).toLocaleDateString()}
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-white/50">No users yet. They&apos;ll show up here once people sign up.</p>
+                  <p className="text-xs text-slate-400">No users yet. They&apos;ll show up here once people sign up.</p>
                 )}
               </div>
             </div>
 
             {/* Recent projects */}
-            <div className="rounded-2xl p-6 border border-emerald-500/35 bg-gradient-to-br from-emerald-500/[0.15] to-transparent backdrop-blur-xl shadow-xl shadow-emerald-500/10">
-              <h2 className="text-base font-bold mb-4 flex items-center gap-2">
-                <FolderOpen className="w-4 h-4 text-emerald-400" />
+            <div className="rounded-2xl p-6 border border-slate-200/80 bg-white/70 backdrop-blur-xl shadow-sm">
+              <h2 className="text-base font-bold mb-4 flex items-center gap-2 text-slate-700">
+                <FolderOpen className="w-4 h-4 text-amber-500" />
                 Recent Projects
               </h2>
               {analytics?.recentProjects && analytics.recentProjects.length > 0 ? (
                 <div className="grid md:grid-cols-2 gap-3">
                   {analytics.recentProjects.map((p, i) => (
-                    <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.04] border border-white/10 hover:bg-white/[0.07] transition-colors">
+                    <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/60 border border-slate-200/80 hover:bg-amber-50/30 hover:border-amber-200 transition-all">
                       <div>
-                        <div className="text-xs font-semibold text-white/80">{p.name}</div>
-                        <div className="text-[10px] text-white/50">{p.user_email}</div>
+                        <div className="text-xs font-semibold text-slate-700">{p.name}</div>
+                        <div className="text-[10px] text-slate-400">{p.user_email}</div>
                       </div>
-                      <div className="text-[10px] text-white/50 font-medium">
+                      <div className="text-[10px] text-slate-400 font-medium">
                         {new Date(p.created_at).toLocaleDateString()}
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-white/50">No projects created yet.</p>
+                <p className="text-xs text-slate-400">No projects created yet.</p>
               )}
             </div>
           </>
@@ -705,48 +705,48 @@ export default function AdminPage() {
           <>
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-black tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">User Management</h1>
-                <p className="text-white/50 text-sm mt-1 font-medium">{users.length} registered users</p>
+                <h1 className="text-2xl font-black tracking-tight text-slate-800">User Management</h1>
+                <p className="text-slate-400 text-sm mt-1 font-medium">{users.length} registered users</p>
               </div>
-              <button onClick={fetchUsers} className="flex items-center gap-1.5 text-xs text-violet-400 hover:text-violet-300 border border-violet-500/20 bg-violet-500/5 rounded-lg px-3 py-1.5 transition-all">
+              <button onClick={fetchUsers} className="flex items-center gap-1.5 text-xs text-amber-600 hover:text-amber-700 border border-amber-200 bg-amber-50 hover:bg-amber-100 rounded-xl px-3 py-1.5 transition-all shadow-sm">
                 <RefreshCw className={`w-3 h-3 ${usersLoading ? "animate-spin" : ""}`} />
                 Refresh
               </button>
             </div>
 
             {users.length > 0 ? (
-              <div className="rounded-2xl border border-violet-500/30 bg-gradient-to-br from-violet-500/[0.08] via-white/[0.05] to-transparent overflow-hidden backdrop-blur-xl shadow-xl shadow-violet-500/10">
+              <div className="rounded-2xl border border-slate-200/80 bg-white/70 overflow-hidden backdrop-blur-xl shadow-sm">
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-white/10 bg-gradient-to-r from-violet-500/[0.06] to-transparent">
-                        <th className="text-left text-[10px] uppercase tracking-wider text-violet-300/70 px-4 py-3 font-bold">User</th>
-                        <th className="text-left text-[10px] uppercase tracking-wider text-violet-300/70 px-4 py-3 font-bold">Role</th>
-                        <th className="text-left text-[10px] uppercase tracking-wider text-violet-300/70 px-4 py-3 font-bold">Plan</th>
-                        <th className="text-left text-[10px] uppercase tracking-wider text-violet-300/70 px-4 py-3 font-bold">Projects</th>
-                        <th className="text-left text-[10px] uppercase tracking-wider text-violet-300/70 px-4 py-3 font-bold">Joined</th>
-                        <th className="text-right text-[10px] uppercase tracking-wider text-violet-300/70 px-4 py-3 font-bold">Actions</th>
+                      <tr className="border-b border-slate-100 bg-slate-50/50">
+                        <th className="text-left text-[10px] uppercase tracking-wider text-slate-400 px-4 py-3 font-bold">User</th>
+                        <th className="text-left text-[10px] uppercase tracking-wider text-slate-400 px-4 py-3 font-bold">Role</th>
+                        <th className="text-left text-[10px] uppercase tracking-wider text-slate-400 px-4 py-3 font-bold">Plan</th>
+                        <th className="text-left text-[10px] uppercase tracking-wider text-slate-400 px-4 py-3 font-bold">Projects</th>
+                        <th className="text-left text-[10px] uppercase tracking-wider text-slate-400 px-4 py-3 font-bold">Joined</th>
+                        <th className="text-right text-[10px] uppercase tracking-wider text-slate-400 px-4 py-3 font-bold">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {users.map((user) => (
-                        <tr key={user.id} className="border-b border-white/[0.06] hover:bg-white/[0.04] transition-colors">
+                        <tr key={user.id} className="border-b border-slate-100 hover:bg-amber-50/30 transition-colors">
                           <td className="px-4 py-3">
-                            <div className="text-sm font-semibold text-white/85">{user.name || "—"}</div>
-                            <div className="text-[10px] text-white/50">{user.email}</div>
+                            <div className="text-sm font-semibold text-slate-700">{user.name || "—"}</div>
+                            <div className="text-[10px] text-slate-400">{user.email}</div>
                           </td>
                           <td className="px-4 py-3">
                             {editingUser === user.id ? (
                               <select value={editRole} onChange={(e) => setEditRole(e.target.value)}
-                                className="bg-white/[0.09] border border-white/[0.15] rounded-lg px-2 py-1 text-xs">
+                                className="bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs text-slate-700">
                                 <option value="user">User</option>
                                 <option value="admin">Admin</option>
                               </select>
                             ) : (
                               <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${
                                 user.role === "admin"
-                                  ? "bg-gradient-to-r from-violet-500/15 to-purple-500/15 text-violet-300 border border-violet-500/25"
-                                  : "bg-white/[0.06] text-white/60 border border-white/[0.10]"
+                                  ? "bg-amber-50 text-amber-700 border border-amber-200"
+                                  : "bg-slate-50 text-slate-500 border border-slate-200"
                               }`}>
                                 {user.role === "admin" && <Crown className="w-3 h-3 inline mr-1" />}
                                 {user.role}
@@ -756,20 +756,20 @@ export default function AdminPage() {
                           <td className="px-4 py-3">
                             {editingUser === user.id ? (
                               <select value={editPlan} onChange={(e) => setEditPlan(e.target.value)}
-                                className="bg-white/[0.09] border border-white/[0.15] rounded-lg px-2 py-1 text-xs">
+                                className="bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs text-slate-700">
                                 <option value="free">Free</option>
                                 <option value="pro">Pro</option>
                                 <option value="unlimited">Unlimited</option>
                               </select>
                             ) : (
-                              <span className="text-xs text-white/65 capitalize font-medium">{user.plan || "free"}</span>
+                              <span className="text-xs text-slate-500 capitalize font-medium">{user.plan || "free"}</span>
                             )}
                           </td>
                           <td className="px-4 py-3">
-                            <span className="text-xs text-white/60 font-medium">{user.projectCount}</span>
+                            <span className="text-xs text-slate-500 font-medium">{user.projectCount}</span>
                           </td>
                           <td className="px-4 py-3">
-                            <span className="text-xs text-white/50">
+                            <span className="text-xs text-slate-400">
                               {new Date(user.created_at).toLocaleDateString()}
                             </span>
                           </td>
@@ -777,22 +777,22 @@ export default function AdminPage() {
                             {editingUser === user.id ? (
                               <div className="flex items-center justify-end gap-1.5">
                                 <button onClick={() => updateUser(user.id)}
-                                  className="text-xs text-emerald-400 hover:text-emerald-300 px-3 py-1.5 rounded-lg border border-emerald-500/25 hover:bg-emerald-500/10 transition-all font-semibold">
+                                  className="text-xs text-emerald-600 hover:text-emerald-700 px-3 py-1.5 rounded-xl border border-emerald-200 hover:bg-emerald-50 transition-all font-semibold">
                                   Save
                                 </button>
                                 <button onClick={() => setEditingUser(null)}
-                                  className="text-xs text-white/50 hover:text-white/70 px-3 py-1.5 rounded-lg border border-white/[0.10] transition-all">
+                                  className="text-xs text-slate-400 hover:text-slate-600 px-3 py-1.5 rounded-xl border border-slate-200 transition-all">
                                   Cancel
                                 </button>
                               </div>
                             ) : (
                               <div className="flex items-center justify-end gap-1.5">
                                 <button onClick={() => { setEditingUser(user.id); setEditRole(user.role); setEditPlan(user.plan); }}
-                                  className="text-white/50 hover:text-violet-400 p-1.5 rounded-lg hover:bg-violet-500/10 transition-all" title="Edit">
+                                  className="text-slate-400 hover:text-amber-600 p-1.5 rounded-lg hover:bg-amber-50 transition-all" title="Edit">
                                   <Edit3 className="w-3.5 h-3.5" />
                                 </button>
                                 <button onClick={() => deleteUser(user.id, user.email)}
-                                  className="text-white/50 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-500/10 transition-all" title="Delete">
+                                  className="text-slate-400 hover:text-red-500 p-1.5 rounded-lg hover:bg-red-50 transition-all" title="Delete">
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                               </div>
@@ -805,10 +805,10 @@ export default function AdminPage() {
                 </div>
               </div>
             ) : (
-              <div className="rounded-2xl border border-violet-500/15 bg-gradient-to-br from-violet-500/[0.06] to-transparent p-12 text-center">
-                <Users className="w-14 h-14 text-violet-400/30 mx-auto mb-4" />
-                <h3 className="text-sm font-bold mb-1 text-white/70">No users yet</h3>
-                <p className="text-xs text-white/50">
+              <div className="rounded-2xl border border-slate-200 bg-white/60 p-12 text-center">
+                <Users className="w-14 h-14 text-slate-200 mx-auto mb-4" />
+                <h3 className="text-sm font-bold mb-1 text-slate-600">No users yet</h3>
+                <p className="text-xs text-slate-400">
                   {usersLoading ? "Loading..." : "Users will appear here once they sign up. Make sure DATABASE_URL is configured."}
                 </p>
               </div>
@@ -821,10 +821,10 @@ export default function AdminPage() {
           <>
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-black tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">Template Gallery</h1>
-                <p className="text-white/50 text-sm mt-1 font-medium">{templates.length} curated templates</p>
+                <h1 className="text-2xl font-black tracking-tight text-slate-800">Template Gallery</h1>
+                <p className="text-slate-400 text-sm mt-1 font-medium">{templates.length} curated templates</p>
               </div>
-              <button onClick={fetchTemplates} className="flex items-center gap-1.5 text-xs text-violet-400 hover:text-violet-300 border border-violet-500/20 bg-violet-500/5 rounded-lg px-3 py-1.5 transition-all">
+              <button onClick={fetchTemplates} className="flex items-center gap-1.5 text-xs text-amber-600 hover:text-amber-700 border border-amber-200 bg-amber-50 hover:bg-amber-100 rounded-xl px-3 py-1.5 transition-all shadow-sm">
                 <RefreshCw className={`w-3 h-3 ${templatesLoading ? "animate-spin" : ""}`} />
                 Refresh
               </button>
@@ -837,42 +837,42 @@ export default function AdminPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.03 }}
-                  className="rounded-2xl p-5 border border-white/[0.12] bg-white/[0.05] hover:bg-white/[0.09] hover:border-violet-500/25 backdrop-blur-md transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-violet-500/5"
+                  className="rounded-2xl p-5 border border-slate-200/80 bg-white/70 hover:bg-white/90 hover:border-amber-200 backdrop-blur-xl transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-amber-100/30"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <h3 className="text-sm font-bold text-white/85">{t.name}</h3>
-                      <span className="text-[10px] text-white/50 font-medium">{t.category}</span>
+                      <h3 className="text-sm font-bold text-slate-700">{t.name}</h3>
+                      <span className="text-[10px] text-slate-400 font-medium">{t.category}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       {t.featured && (
-                        <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500/15 to-orange-500/15 text-amber-400 border border-amber-500/20">
+                        <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200">
                           Featured
                         </span>
                       )}
                       <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
                         t.tier === "premium"
-                          ? "bg-gradient-to-r from-violet-500/15 to-brand-500/15 text-violet-300 border border-violet-500/20"
-                          : "bg-white/[0.06] text-white/50 border border-white/[0.10]"
+                          ? "bg-amber-50 text-amber-700 border border-amber-200"
+                          : "bg-slate-50 text-slate-400 border border-slate-200"
                       }`}>
                         {t.tier}
                       </span>
                     </div>
                   </div>
-                  <p className="text-xs text-white/50 mb-3 line-clamp-2">{t.description}</p>
+                  <p className="text-xs text-slate-400 mb-3 line-clamp-2">{t.description}</p>
                   <div className="flex flex-wrap gap-1">
                     {t.tags.map((tag) => (
-                      <span key={tag} className="text-[9px] text-white/50 px-1.5 py-0.5 rounded-md bg-white/[0.05] border border-white/10">
+                      <span key={tag} className="text-[9px] text-slate-400 px-1.5 py-0.5 rounded-md bg-slate-50 border border-slate-200">
                         {tag}
                       </span>
                     ))}
                   </div>
-                  <div className="mt-3 pt-3 border-t border-white/[0.06]">
+                  <div className="mt-3 pt-3 border-t border-slate-100">
                     <button
                       onClick={() => copyToClipboard(t.prompt, t.id)}
-                      className="flex items-center gap-1.5 text-[10px] text-cyan-400/70 hover:text-cyan-400 transition-colors font-medium"
+                      className="flex items-center gap-1.5 text-[10px] text-amber-500 hover:text-amber-600 transition-colors font-medium"
                     >
-                      {copied === t.id ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                      {copied === t.id ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
                       {copied === t.id ? "Copied prompt!" : "Copy prompt"}
                     </button>
                   </div>
@@ -881,9 +881,9 @@ export default function AdminPage() {
             </div>
 
             {templates.length === 0 && !templatesLoading && (
-              <div className="rounded-2xl border border-violet-500/15 bg-gradient-to-br from-violet-500/[0.06] to-transparent p-12 text-center">
-                <Layout className="w-14 h-14 text-violet-400/30 mx-auto mb-4" />
-                <h3 className="text-sm font-bold mb-1 text-white/70">Loading templates...</h3>
+              <div className="rounded-2xl border border-slate-200 bg-white/60 p-12 text-center">
+                <Layout className="w-14 h-14 text-slate-200 mx-auto mb-4" />
+                <h3 className="text-sm font-bold mb-1 text-slate-600">Loading templates...</h3>
               </div>
             )}
           </>

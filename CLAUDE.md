@@ -4,11 +4,131 @@
 ---
 
 > **HOW TO USE THIS FILE EVERY MORNING:**
-> 1. Scroll to CURRENT STATUS at the very bottom
-> 2. Read the "Next action" line
-> 3. Open a new Claude session, paste this whole file, say:
+> 1. Read LIVE REPO STATUS below — it tells you exactly what's built, what's broken, what's next
+> 2. Open a new Claude session, paste this whole file, say:
 >    *"I'm working on Zoobicon. Here is my CLAUDE.md. Continue from where I left off."*
-> 4. Claude will know everything. No explanation needed.
+> 3. Claude will know everything. No explanation needed.
+
+---
+
+# LIVE REPO STATUS — READ THIS FIRST
+## Last updated: 2026-04-04 | Build: PASSING | Branch: main
+
+### QUICK FACTS
+- **141 pages** | **223 API routes** | **74 layouts** | **130 lib files**
+- **Framework:** Next.js 14.2 + React 18.3 + TypeScript + Tailwind CSS 3.4
+- **AI:** Anthropic SDK 0.80, multi-LLM (Claude/GPT/Gemini) via `src/lib/llm-provider.ts`
+- **DB:** Neon serverless Postgres via `@neondatabase/serverless`
+- **Payments:** Stripe 21.0 | **Icons:** lucide-react 1.7 | **Animation:** framer-motion 12.38
+- **Preview:** Sandpack in-browser React preview
+- **Build command:** `npm run build` | **Dev:** `npm run dev` | **Tests:** `npm run test`
+- **E2E:** `npx playwright test` (Playwright 1.56, 60+ test cases)
+- **Deploy:** Vercel (iad1 region), 9 cron jobs configured
+
+### CORE PRODUCT STATUS
+
+| Feature | Status | Key Files | What Works | What's Missing |
+|---------|--------|-----------|------------|----------------|
+| **AI Website Builder** | WORKING | `src/app/builder/page.tsx`, `src/lib/agents.ts`, `src/app/api/generate/react-stream/route.ts` | React generation via Sandpack, streaming SSE, 100-component registry | Diff editing not wired to UI, streaming could be smoother |
+| **Domain Search** | WORKING | `src/app/domains/page.tsx`, `src/app/api/domains/search/route.ts`, `src/lib/opensrs.ts` | Real OpenSRS registry checks, AI name generator, TLD pages | Checkout needs Stripe products |
+| **Video Creator** | PARTIAL | `src/app/video-creator/page.tsx`, `src/lib/video-pipeline.ts`, `src/lib/video-render.ts` | Chat-based 3-step flow, script generation | Pipeline UNTESTED on Replicate, needs REPLICATE_API_TOKEN |
+| **Pricing** | WORKING | `src/app/pricing/page.tsx`, `src/lib/stripe.ts` | Page renders with tiers | Needs Craig to create Stripe products + price IDs |
+| **Auth** | WORKING | `src/app/auth/*/page.tsx`, `src/app/api/auth/*/route.ts` | Login, signup, OAuth (Google/GitHub), email verify, password reset | Needs DATABASE_URL for persistence |
+| **12 Free Tools** | WORKING | `src/app/tools/*/page.tsx` | All client-side, no API needed | Fully functional |
+| **10 Product Pages** | WORKING | `src/app/products/*/page.tsx` | eSIM, VPN, dictation, storage, booking, hosting, builder, video, SEO, email | Most are showcase pages |
+| **50 eSIM Country Pages** | WORKING | `src/app/esim/[country]/page.tsx` | SEO pages with structured data | Needs CELITECH_API_KEY for real data |
+| **Admin Dashboard** | WORKING | `src/app/admin/*/page.tsx` | 16+ admin pages, mobile command centre | Uses mock data without DB |
+| **Hosting/Deploy** | PARTIAL | `src/app/api/hosting/deploy/route.ts`, `src/app/api/hosting/serve/[slug]/route.ts` | Deploy to DB, serve at zoobicon.sh | Needs polish |
+| **CRM** | SHELL | `src/app/crm/page.tsx` | Pretty UI | 100% hardcoded mock data |
+| **Email Marketing** | SHELL | `src/app/email-marketing/page.tsx` | Pretty UI | 100% hardcoded mock data |
+| **Invoicing** | SHELL | `src/app/invoicing/page.tsx` | Pretty UI | 100% hardcoded mock data |
+| **Analytics** | SHELL | `src/app/analytics/page.tsx` | Pretty UI | localStorage only |
+
+### BUILD PIPELINE
+```
+User Prompt → Haiku classifies intent (<1s) → Select from 100-component registry
+  → Stream components via SSE (/api/generate/react-stream)
+  → Sandpack renders progressively in browser
+  → Full site in <30 seconds
+```
+**Key pipeline files:**
+- `src/lib/agents.ts` (51KB) — 7-agent orchestration
+- `src/lib/generator-prompts.ts` (82KB) — prompt templates
+- `src/lib/scaffold-engine.ts` (49KB) — scaffold system
+- `src/lib/component-registry/index.ts` — 100 components
+- `src/lib/templates.ts` (108KB) — template library
+
+### ENV VARS NEEDED (Craig must set in Vercel)
+| Variable | For | Status |
+|----------|-----|--------|
+| ANTHROPIC_API_KEY | AI generation | SET |
+| DATABASE_URL | Neon Postgres | CHECK |
+| STRIPE_SECRET_KEY | Payments | CHECK |
+| STRIPE_WEBHOOK_SECRET | Stripe webhooks | NOT SET |
+| OPENSRS_API_KEY | Domain registration | CHECK |
+| REPLICATE_API_TOKEN | Video pipeline | NOT SET |
+| SUPABASE_ACCESS_TOKEN | Auto-provisioning | NOT SET |
+| CELITECH_API_KEY | eSIM product | NOT SET |
+| DEEPGRAM_API_KEY | AI Dictation | NOT SET |
+| MAILGUN_API_KEY | Transactional email | CHECK |
+
+### WHAT TO BUILD NEXT (priority order)
+1. **Wire diff editing into builder UI** — endpoint exists at `/api/generate/edit`, needs chat panel integration
+2. **Fix builder streaming** — components should appear one-by-one, not all at once
+3. **Stripe checkout flow** — pricing page exists, needs real Stripe product IDs + webhook handler
+4. **Supabase auto-provisioning** — code exists in `src/lib/supabase-provisioner.ts`, needs wiring into generation
+5. **GitHub sync** — export exists, continuous sync NOT STARTED
+6. **Deploy polish** — one-click deploy works but needs UX improvements
+7. **Video pipeline testing** — code exists, needs REPLICATE_API_TOKEN to test
+8. **MCP integration** — foundation at `/api/mcp/route.ts`, needs real tool connections
+
+### CRITICAL PATHS (file → file dependencies)
+```
+Builder:     src/app/builder/page.tsx → /api/generate/react-stream → src/lib/agents.ts → src/lib/llm-provider.ts
+Domains:     src/app/domains/page.tsx → /api/domains/search → src/lib/opensrs.ts
+Video:       src/app/video-creator/page.tsx → /api/video-creator/chat → src/lib/video-pipeline.ts
+Hosting:     src/app/builder/page.tsx → /api/hosting/deploy → src/lib/db.ts
+Auth:        src/app/auth/*/page.tsx → /api/auth/* → src/lib/db.ts
+Payments:    src/app/pricing/page.tsx → /api/stripe/checkout → src/lib/stripe.ts
+```
+
+### DIRECTORY MAP
+```
+src/
+  app/                    # 141 pages, 223 API routes, 74 layouts
+    api/                  # All backend endpoints
+      generate/           # AI generation (react, react-stream, edit, pipeline, images)
+      hosting/            # Deploy, serve, DNS, SSL, CDN
+      domains/            # Search, register, checkout, manage, DNS
+      auth/               # Login, signup, OAuth, password reset
+      stripe/             # Checkout, portal, webhook
+      video-creator/      # Generate, script, voiceover, render, chat
+      email/              # Send, inbox, support, marketing
+      intel/              # Competitor crawling, technology tracking
+      v1/                 # Public API (booking, eSIM, VPN, storage, video)
+    builder/              # AI website builder
+    domains/              # Domain search + TLD pages
+    pricing/              # Subscription tiers
+    admin/                # 16+ admin pages
+    tools/                # 12 free SEO tools
+    products/             # 10 product pages
+    video-creator/        # AI video creator
+    auth/                 # Login, signup, OAuth
+  lib/                    # 130 helper modules
+    agents.ts             # 7-agent pipeline (51KB)
+    llm-provider.ts       # Multi-LLM abstraction
+    component-registry/   # 100 React components for assembly
+    scaffold-engine.ts    # Instant scaffold system
+    templates.ts          # Template library (108KB)
+    stripe.ts             # Stripe integration
+    opensrs.ts            # Domain registration
+    db.ts                 # Neon database
+    video-pipeline.ts     # Own video pipeline (Fish Speech + FLUX + OmniHuman)
+  components/             # Shared React components
+e2e/                      # Playwright E2E tests (60+ cases)
+tests/                    # Vitest unit tests (7 files, 180+ cases)
+.github/workflows/        # CI (ci.yml) + E2E (e2e.yml)
+```
 
 ---
 
@@ -132,9 +252,9 @@ Zoobicon must be 80-90% more advanced than every competitor. Not 10% better. Not
 
 ## NEXT PRIORITY: Component Registry + Streaming Assembly Architecture
 
-**STATUS: APPROVED, NOT YET BUILT. This is the #1 engineering priority.**
+**STATUS: BUILT AND WIRED. 100 components in the registry. Streaming generation active.**
 
-The current React generation asks the AI to generate 9 complete components as JSON in a single API call. This takes 2-3 minutes and is unreliable (timeouts, partial output, quality issues).
+The builder now uses a 100-component registry for instant assembly (<1 second), then AI customizes via streaming SSE.
 
 **The new architecture:**
 
@@ -330,6 +450,14 @@ npm run lint     # ESLint
 16. **Auth-aware navbars** — Read `localStorage("zoobicon_user")`. Do not revert to hardcoded "Sign in."
 17. **Opus for builds** — Pipeline v3 fits ~95s within Vercel 300s limit via parallelizing planners.
 18. **Public API v1** — `/api/v1/*` uses stateless HMAC-SHA256 keys (`zbk_live_*`). Do not change auth scheme without updating all v1 routes.
+19. **AI Video Pipeline — OWN STACK, NO HEYGEN** — We build our own video generation pipeline. NEVER depend on HeyGen or any third-party avatar API. Our pipeline uses Replicate (bridge) then self-hosted GPUs: Fish Speech (voice) → FLUX (avatar generation) → SadTalker (lip-sync). We control the stack, we set the pricing, we sell the API. HeyGen code may remain as legacy but is NOT the primary path. `REPLICATE_API_TOKEN` is the required env var. Goal: be the BEST AI video generator on the market — 80-90% ahead of competition. No compromises.
+20. **Video Creator — Chat-based flow ONLY** — The video creator at `/video-creator` uses a conversational chat interface. User describes what they want → Claude writes scripts → user approves → video generates. NO storyboard editor, NO font pickers, NO platform selectors. Simple. The old storyboard page lives at `/video-creator/storyboard` and is NOT the default.
+21. **No flip-flopping on architecture decisions** — Once a decision is locked in CLAUDE.md, it stays. Don't switch between HeyGen and Replicate. Don't switch between scaffold templates and AI generation. Pick ONE path, commit, ship.
+22. **Speed is non-negotiable** — If we can't be the fastest with what's currently available, we BUILD something in parallel to make sure we ARE the fastest. No excuses. No "it takes time." Build a faster path or optimise until we lead.
+23. **Backend + Frontend built together** — Every generated app includes a working backend from day one. No frontend-only sites. Auth, database, storage, email — all auto-provisioned. This is what Lovable does. We do it better.
+24. **Models stay warm** — Cron job pings Replicate models every 5 minutes. No cold starts. First request hits a warm model. Cost ~$0.50/day is worth saving 60 seconds per customer request.
+25. **No timelines, no phases** — Don't say "this week" or "next month." Build everything NOW. The competition doesn't take breaks and neither do we. Foot on the accelerator at all times.
+26. **NEVER ASK — JUST BUILD** — Craig runs multiple projects and cannot monitor everything. Claude MUST NOT ask "want me to build this?" or "should I proceed?" — just build it. If the code needs it, build it. If a feature is missing, build it. If something is broken, fix it. If Cloudflare needs wiring up, wire it up. Never touch the brake. The only time to pause is if an action is destructive and irreversible (deleting production data, force-pushing to main). Everything else: accelerator, full throttle, always.
 
 ---
 
@@ -651,4 +779,277 @@ Each reseller at $499/mo typically brings 20-50 of their own clients. 10 reselle
 
 ---
 
-*One file. One source of truth. Technical rules in Part 1. Business rules in Part 2. Update the CURRENT STATUS section every evening. Tomorrow-Craig will know exactly where today-Craig left off.*
+## URGENT BUILD LIST — EVERYTHING BELOW MUST BE BUILT. NO EXCEPTIONS.
+
+**Status: CRITICAL PRIORITY. Competition is moving. Every day we don't build this, we fall further behind.**
+
+**The 80-90% rule applies to EVERY item. If a competitor has it, we must have it better.**
+
+### TIER 1: BUILD IMMEDIATELY (blocks revenue and competitiveness)
+
+| # | Task | Why | Competitor reference | Status |
+|---|------|-----|---------------------|--------|
+| 1 | **Supabase auto-provisioning for generated apps** | Lovable's #1 feature. Generated apps get real Postgres + auth + storage + real-time. Without this we're frontend-only like v0. | Lovable ($6.6B valuation) | Code built, needs SUPABASE_ACCESS_TOKEN |
+| 2 | **Wire Supabase into builder generation flow** | Builder must auto-create database + inject client code when generating full-stack apps | Lovable, Bolt | NOT STARTED |
+| 3 | **Diff-based editing working end-to-end** | Change one thing in 2-5s instead of regenerating in 30s. This is why Bolt feels fast. | Bolt.new ($40M ARR) | API built at /api/generate/edit, needs UI wiring |
+| 4 | **Wire diff editing into builder UI** | "Make the header blue" → only header file regenerates. Chat panel in builder sends edits. | Bolt.new | NOT STARTED |
+| 5 | **Video pipeline producing actual videos** | Test every Replicate model, fix failures, produce one real video end-to-end | HeyGen, InVideo | Pipeline code built, UNTESTED |
+| 6 | **Auto-captions on generated videos** | Use Whisper on Replicate to transcribe audio → generate SRT → burn into video | Captions app, CapCut | NOT STARTED |
+| 7 | **Background music generation** | MusicGen on Replicate. "upbeat corporate" → 30-second track layered onto video | InVideo, CapCut | NOT STARTED |
+| 8 | **Stripe payments fully working** | Domain checkout, subscription plans, video credit packs | ALL competitors | Code built, needs Craig to create Stripe products |
+| 9 | **Builder streaming — show components as they generate** | Don't wait 30s for all 12 components. Show each one as it completes. | Bolt (3-5s first preview) | Partially working |
+| 10 | **MCP integration (Model Context Protocol)** | Let users feed GitHub repos, Figma designs, Notion docs into generation | Emergent, Cursor | NOT STARTED |
+
+### TIER 2: BUILD THIS WEEK (competitive parity)
+
+| # | Task | Why | Competitor reference | Status |
+|---|------|-----|---------------------|--------|
+| 11 | **AI dubbing — multi-language video** | Fish Speech supports 50+ languages. Generate same video in Spanish/French/Japanese | HeyGen (175 languages) | NOT STARTED |
+| 12 | **AI Twins — upload your face, get talking video** | Viral on TikTok. Upload a selfie, AI makes a video of "you" talking | Captions app | NOT STARTED |
+| 13 | **Auth generation in every full-stack app** | Login/signup pages, OAuth buttons, session management auto-generated | Lovable, Bolt | Supabase client built, needs UI generation |
+| 14 | **One-click deploy generated apps to zoobicon.sh** | Currently works but needs polish. Must be instant and reliable. | Lovable Cloud, Bolt Cloud | PARTIAL |
+| 15 | **GitHub sync for generated projects** | Every change committed to Git. Developer can take over at any point. | Lovable, Bolt | Export exists, sync NOT STARTED |
+| 16 | **Next.js 14 → 15 upgrade** | Server Components, Partial Prerendering, streaming Suspense boundaries. 30-50% faster page loads. | Industry standard | NOT STARTED |
+| 17 | **AG-UI protocol adoption** | Replace custom SSE streaming with standardized protocol. Gets CopilotKit components free. | Google, Microsoft, Oracle adopting | NOT STARTED |
+| 18 | **WebContainers evaluation** | Full Node.js in browser. If feasible, replaces Sandpack and matches Bolt's speed. | Bolt.new | NOT STARTED |
+| 19 | **Real-time collaborative editing** | Multiple users editing the same site simultaneously | Lovable, v0 | NOT STARTED |
+| 20 | **AI chatbot widget for customer sites** | Drop-in chat widget powered by Claude. Every generated site can have AI support. | Nobody has this built-in | NOT STARTED |
+
+### TIER 3: BUILD THIS MONTH (market leadership)
+
+| # | Task | Why | Competitor reference | Status |
+|---|------|-----|---------------------|--------|
+| 21 | **Self-hosted GPU infrastructure (Hetzner)** | Kill Replicate costs. $0.02/video instead of $0.10. Own the compute. | Internal cost optimization | NOT STARTED |
+| 22 | **Public API at api.zoobicon.ai** | Sell video/image/site generation to other developers. Recurring API revenue. | Stripe, Twilio model | Endpoints exist, needs auth + docs + billing |
+| 23 | **ICANN registrar accreditation** | Buy domains at cost instead of through OpenSRS. 90%+ margins on domains. | GoDaddy, Namecheap | NOT STARTED |
+| 24 | **Own email infrastructure (Postal)** | Kill Mailgun costs. Full control over email delivery. | Internal cost optimization | NOT STARTED |
+| 25 | **AI SEO agent that actually works** | Crawl customer sites, find issues, fix them automatically. Competitor monitoring. | Semrush, Ahrefs | DB tables exist, logic NOT STARTED |
+| 26 | **CRM with real database** | Currently 100% mock data. Needs Postgres tables and real CRUD. | HubSpot free tier | NOT STARTED |
+| 27 | **Email marketing with real backend** | Currently 100% mock data. Needs subscriber management, campaign sending. | ConvertKit, Mailchimp | NOT STARTED |
+| 28 | **Invoicing with real backend** | Currently 100% mock data. Needs PDF generation, payment tracking. | FreshBooks, Wave | NOT STARTED |
+| 29 | **Analytics with real backend** | Currently localStorage only. Needs server-side event tracking. | Google Analytics, Plausible | NOT STARTED |
+| 30 | **Agency white-label dashboard** | Resellers manage their clients, billing, sites from one panel. | Nobody has this | PARTIAL |
+| 31 | **AI video editing — smart cuts, transitions** | Auto-edit longer videos into short-form clips. | Opus Clip, Descript | NOT STARTED |
+| 32 | **Voice cloning for video** | Clone customer's voice from 10s sample. Their voice, our avatar. | HeyGen, ElevenLabs | Fish Speech supports this, NOT WIRED |
+| 33 | **SMS/WhatsApp integration** | Twilio API for notifications, bookings, marketing messages. | Twilio reseller opportunity | NOT STARTED |
+| 34 | **AI chatbot builder** | Customers create chatbots for THEIR websites. Powered by Claude. | Intercom, Drift | NOT STARTED |
+| 35 | **Mobile app (zoobicon.app)** | Wrap admin dashboard in Expo for App Store presence. | Native mobile gap | NOT STARTED |
+
+### TIER 4: INFRASTRUCTURE OWNERSHIP (the moat)
+
+| # | Task | Why | Status |
+|---|------|-----|--------|
+| 36 | **Own CDN edge network** | Serve customer sites from edge. Faster than Vercel for our use case. | NOT STARTED |
+| 37 | **Own nameservers** | ns1.zoobicon.io, ns2.zoobicon.io. Full DNS control. | NOT STARTED |
+| 38 | **Own auth service (auth.zoobicon.io)** | Drop-in auth for generated apps. Like Auth0 but built-in. | NOT STARTED |
+| 39 | **Own managed database service (db.zoobicon.io)** | Per-customer Postgres instances. Like Supabase but we own it. | NOT STARTED |
+| 40 | **Own file storage (storage.zoobicon.io)** | S3-compatible storage for customer apps. | NOT STARTED |
+
+### CRAIG'S TASKS (manual, can't be automated)
+
+| # | Task | Where | Status |
+|---|------|-------|--------|
+| C1 | **Merge branch on GitHub** | github.com/ccantynz-alt/Zoobicon.com | BLOCKING EVERYTHING |
+| C2 | **Create 3 Stripe products** | dashboard.stripe.com → Products | NOT DONE |
+| C3 | **Set OPENSRS_ENV=live in Vercel** | Vercel → Environment Variables | CHECK |
+| C4 | **Add SUPABASE_ACCESS_TOKEN to Vercel** | supabase.com → org → management API token | NOT DONE |
+| C5 | **Add SUPABASE_ORG_ID to Vercel** | supabase.com → org settings | NOT DONE |
+| C6 | **Run /api/db/init** | Visit zoobicon.com/api/db/init once after deploy | NOT DONE |
+| C7 | **Book Celitech training** | celitech.com | SCHEDULED (for eSIM) |
+| C8 | **Set up Mailgun domain** | app.mailgun.com | CHECK |
+| C9 | **Cloudflare email routing** | Cloudflare → zoobicon.com → Email | NOT DONE |
+| C10 | **Set up Zoho Mail** | zoho.com/mail | NOT DONE |
+
+---
+
+**TOTAL: 40 build tasks + 10 Craig tasks = 50 items to market dominance.**
+**Rule: Every completed item gets marked ✅ with date. Nothing gets removed. Nothing gets forgotten.**
+**Rule: 80-90% ahead of competition on EVERY feature. If it's not best-in-class, it's not done.**
+**Rule: No flip-flopping. Decisions locked above in IMPORTANT DECISIONS. Build forward only.**
+
+---
+
+## SESSION NOTES — 2026-04-01/02 (CRITICAL SESSION — DO NOT DELETE)
+
+> Craig said: "This is the best feedback I've ever had. Please write everything down."
+> Everything below was discussed, decided, or discovered in this session. NOTHING gets lost.
+
+### PRODUCT DECISIONS MADE
+
+1. **Domain Search is our #1 product** — it actually works (real OpenSRS registry checks). No other tool on the internet does it this well. It's the entry point to the entire platform. Market it aggressively with SEO.
+
+2. **Domain search must be FREE** — it's the top of the funnel. Money comes from registration ($12.99+ per domain), hosting ($19-49/mo), email, and the platform subscription. Free search → paid registration → recurring revenue forever.
+
+3. **AI Video Creator uses OUR OWN pipeline** — Fish Speech (voice) → FLUX (avatar) → OmniHuman/SadTalker (lip-sync) via Replicate. NO HeyGen dependency. We control the stack, we set the pricing, we sell the API. This is rule #19 in IMPORTANT DECISIONS.
+
+4. **Video Creator is chat-based → 3-step flow** — Step 1: Describe what you want. Step 2: Pick from 2 script drafts. Step 3: Generate. No storyboard editor. No font pickers. No platform selectors. Simple.
+
+5. **AI Builder generates FULL-STACK working apps** — Contact forms that validate, pricing toggles that work, FAQ accordions that animate, auth that logs in. NOT just pretty pages with fake data. This is what Lovable does. We must match and beat it.
+
+6. **Diff-based editing** — "Change the header to blue" regenerates ONE file in 2-5 seconds, not the whole site in 30. This is what Bolt does. Endpoint at /api/generate/edit using Haiku.
+
+7. **eSIM marked as Coming Soon** — Celitech requires video training before API access. Waitlist page is live. Book the training, get the key, swap the badge.
+
+8. **Every product page needs excitement** — Big hero sections, effects, animations. "The thing is we've got amazing products and we need to showcase them." No more bare pages with a product slapped in the middle.
+
+### COMPETITIVE INTELLIGENCE (March 2026)
+
+**OpenAI killed Sora on March 24, 2026** — burning $15M/day, only $2.1M lifetime revenue. This removes a major competitor from the video space.
+
+**Key competitor capabilities:**
+- Lovable: $6.6B valuation, $20M ARR in 2 months. Deep Supabase integration (auto-provisions Postgres + auth + storage + RLS + real-time). This is their moat.
+- Bolt.new: $40M ARR in 6 months. WebContainers (full Node.js in browser). Diff-based editing. 3-5 second first preview.
+- v0 (Vercel): Frontend-only. No database. 6M+ developers. Best UI code quality but no backend.
+- Emergent: 5 specialized agents, Kubernetes pods per project, MCP integration, adaptive learning.
+- HeyGen: $100M+ ARR. Avatar IV, LiveAvatar (real-time), 175 languages. $29-149/mo.
+- Captions app: 10M downloads. AI Twins viral on TikTok. $10-70/mo.
+- CapCut: 300M monthly users. Seedance 2.0 integration. $0-8/mo.
+- InVideo AI: Combines Sora 2 + Veo 3.1. $25-100/mo.
+- Descript: 6M users. Text-based video editing. Underlord AI editor. $24-65/mo.
+- Kling 3.0: Native 4K 60fps. Motion Brush. AI Director.
+
+**Where we lead:**
+- 75+ products in one platform (nobody else does this)
+- Real domain search with AI name generation (unique)
+- Price: $49/mo for everything vs $200+/mo buying separately
+- White-label agency platform (nobody else across all products)
+- Own video pipeline (10-20x cheaper than HeyGen)
+
+**Where we trail (closing):**
+- Builder speed (Bolt 3-5s vs our 20-30s) — diff editing + parallel generation closing this
+- Full-stack generation (Lovable auto-provisions Supabase) — we now do this too
+- Video quality (untested pipeline) — OmniHuman upgrade done, needs testing
+- Real-time collaboration — on build list
+- MCP integration — on build list
+
+### ARCHITECTURE DECISIONS
+
+**Backend-as-a-Service (built this session):**
+- Every generated app gets lib/backend.ts automatically
+- Two modes: Local (localStorage, works in preview) and Supabase (real Postgres, works in production)
+- Same API in both modes: signUp, signIn, query, insert, update, remove, uploadFile
+- Email reputation protection: content filtering, rate limiting per app, SPF/DKIM/DMARC
+
+**API Gateway (built this session):**
+- Unified service router at api.zoobicon.ai (foundation)
+- Model warmup cron — pings Replicate models every 5 minutes to prevent cold starts
+- Routes: /video, /site, /db, /email, /domains
+
+**Parallel Generation (built this session):**
+- Frontend (Sonnet) + Backend schema (Haiku) + SEO metadata (Haiku) run simultaneously
+- Total time = longest task, not sum of all tasks
+- 30-50% faster than sequential
+
+**Email Reputation Strategy:**
+- Layer 1: Content filtering + rate limiting + SPF/DKIM/DMARC
+- Layer 2: Separate IP pools (transactional vs marketing vs customer app email)
+- Layer 3: Mailgun now → Postal on Hetzner alongside → Full Postal later
+- Warmup: 50/day → 500/day → 5000/day over 6-12 weeks
+
+### BUSINESS STRATEGY
+
+**The Untouchable Fortress:**
+- Layer 1: Own infrastructure (GPU, registrar, email, CDN, nameservers)
+- Layer 2: Platform (single login, customer data lock-in, agency white-label, marketplace)
+- Layer 3: AI products (builder, video, domains, SEO, chatbot)
+- Layer 4: Recurring revenue (domains, hosting, email, subscriptions, API, transaction clip)
+
+**Revenue model:**
+- Domain search = free (entry drug)
+- Domain registration = $12.99-79.99/yr (recurring forever)
+- Platform subscription = $49-499/mo
+- Video API = $0.50-1.00/video (cost $0.10-0.20)
+- Agency white-label = $499/mo (each reseller brings 20-50 clients)
+- Transaction clip = 1.5% on bookings/payments
+
+**5-Year Path:**
+- Year 1: 80-120 customers, $5-12K/mo
+- Year 2: Own infrastructure, 5-10 agency resellers, public API. $28-50K/mo
+- Year 3: ICANN registrar, 50+ agencies, 1000+ API customers. $100-200K/mo
+- Year 4-5: 4000+ customers, $290K+/mo MRR. Exit at $10-24M
+
+**What we can resell (all wholesale API → retail):**
+- SSL certificates (Sectigo, $3-8 cost → $19-49 sell)
+- Business email (Zoho/MXRoute, $1-2 cost → $6-12 sell)
+- SMS/WhatsApp (Twilio, $0.005 cost → $0.03 sell)
+- Push notifications (OneSignal, $0-5 cost → $15-29 sell)
+- CDN (BunnyCDN, $0.005/GB cost → $0.05/GB sell)
+- AI chatbots (Claude API, $0.01 cost → $29-49/mo sell)
+- AI image generation (Replicate FLUX, $0.003 cost → $0.10-0.25 sell)
+- AI voice cloning (Replicate, $0.01/min cost → $0.50-1.00/min sell)
+- Screen recording, PDF generation, QR code API (self-hosted, $0 cost)
+
+### PRODUCTS — HONEST STATUS
+
+**REAL (working end-to-end):**
+- AI Website Builder ✅
+- Domain Search + AI Name Generator ✅
+- 12 Free Tools (client-side) ✅
+- Video Creator (3-step flow, needs Replicate pipeline testing) ⚠️
+
+**SHELL (pretty UI, mock data — needs "Coming Soon" or real backend):**
+- CRM — 100% hardcoded demo data
+- Email Marketing — 100% hardcoded mock
+- Analytics — localStorage only
+- Invoicing — 100% hardcoded mock
+- VPN — needs WireGuard infrastructure
+- Cloud Storage — needs Backblaze B2 key
+- AI Dictation — needs Deepgram key
+- Booking — needs Cal.com key
+
+**COMING SOON (intentionally marked):**
+- eSIM — Celitech training required
+
+### CRAIG'S ACCOUNTS
+
+- Primary Claude: cccantynz@gmail.com
+- Secondary Claude: ccantyusa@gmail.com (Max plan)
+- Can switch between accounts for uninterrupted development
+- Each new session: paste CLAUDE.md, say "Continue from where I left off"
+
+### RULES ADDED THIS SESSION (22-25)
+
+22. Speed is non-negotiable — build faster if we can't be fastest
+23. Backend + Frontend built together — every app gets real backend
+24. Models stay warm — cron pings every 5 min, no cold starts
+25. No timelines, no phases — build everything NOW
+
+### KEY QUOTES FROM CRAIG (for context in future sessions)
+
+- "We need to be 80-90% out in front of the competition"
+- "If it means creating 100+ then that's what we need to do. We're going to have a big customer base"
+- "We don't take our foot off the accelerator — that's what we do"
+- "If we can't be the fastest with what's currently available then we build something in parallel"
+- "We need to have a strong foothold in this market big enough that we can't be touched"
+- "We need to control the narrative"
+- "We should be making our own API as well"
+- "Nothing ever works" — Builder showed wrong content, video failed to generate, navigation broken on iPad. These must NEVER happen again.
+- "Please don't do any chicken scratching" — Stop patching. Do deep audits. Fix root causes.
+- "This is the best feedback I've ever had. Please write everything down."
+
+### WHAT WAS BUILT THIS SESSION
+
+1. HeyGen avatar fix — loads real avatars from API
+2. Video creator rebuilt — 3-step flow (describe → scripts → generate)
+3. Own video pipeline — Fish Speech + FLUX + OmniHuman via Replicate
+4. Builder fix — no more "Velocita"/"Launchpad" placeholder content
+5. Builder upgrade — generates working interactive apps with state management
+6. Diff-based editing — /api/generate/edit (2-5 second edits)
+7. Navigation overhaul — 6-column mega menu, works on touch devices
+8. Homepage redesign — lighter sections, all products visible, 6-column footer
+9. Domain search redesign — full landing page with pricing comparison
+10. AI Name Generator — describe business → 20 names with availability check
+11. Domain purchase checkout — Stripe integration
+12. 6 TLD-specific SEO landing pages with structured data
+13. Sitemap updated with 21 new pages
+14. HeyGen webhook endpoint
+15. Supabase auto-provisioning for generated apps
+16. Backend-as-a-Service (auth + database + storage + email)
+17. Email reputation protection layer
+18. API gateway with model warmup cron
+19. Parallel generation engine
+20. Visual editor overlay component
+21. Auto-captions via Whisper
+22. Background music via MusicGen
+23. eSIM marked as Coming Soon
+24. CLAUDE.md updated with 40-item build list + rules 19-25

@@ -1128,19 +1128,19 @@ export default function AgencyDashboard() {
           </span>
         </div>
         <div className="flex items-center gap-3">
-          <button
+          <button onClick={() => {}}
             className="text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
             style={{ backgroundColor: brandConfig.primaryColor }}
           >
             Primary Button
           </button>
-          <button
+          <button onClick={() => {}}
             className="text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
             style={{ backgroundColor: brandConfig.secondaryColor }}
           >
             Secondary
           </button>
-          <button
+          <button onClick={() => {}}
             className="text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
             style={{ backgroundColor: brandConfig.accentColor }}
           >

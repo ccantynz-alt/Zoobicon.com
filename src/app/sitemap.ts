@@ -75,6 +75,34 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: '/challenges', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/crawl', priority: 0.7, changeFrequency: 'weekly' },
 
+    // Domain SEO pages — high-value funnel pages
+    { path: '/domain-finder', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/domains/ai', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/domains/io', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/domains/com', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/domains/sh', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/domains/dev', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/domains/app', priority: 0.8, changeFrequency: 'weekly' },
+
+    // Products
+    { path: '/products/esim', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/products/vpn', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/products/cloud-storage', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/products/dictation', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/products/booking', priority: 0.8, changeFrequency: 'weekly' },
+
+    // Free tools — SEO magnets
+    { path: '/tools/business-name-generator', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/tools/password-generator', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/tools/qr-code-generator', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/tools/meta-tag-generator', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/tools/color-palette-generator', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/tools/invoice-generator', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/tools/json-formatter', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/tools/privacy-policy-generator', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/tools/robots-txt-generator', priority: 0.8, changeFrequency: 'monthly' },
+    { path: '/tools/word-counter', priority: 0.8, changeFrequency: 'monthly' },
+
     // Brand / domain-specific pages
     { path: '/ai', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/io', priority: 0.8, changeFrequency: 'weekly' },

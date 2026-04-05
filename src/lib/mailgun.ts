@@ -49,9 +49,8 @@ export async function sendViaMailgun(
   const domain = MAILGUN_DOMAIN();
 
   if (!apiKey) {
-    console.log("[Mailgun] No API key configured — logging email to console");
-    console.log("[Mailgun] To:", opts.to, "Subject:", opts.subject);
-    return { success: true, messageId: `local-${Date.now()}` };
+    console.error("[Mailgun] MAILGUN_API_KEY not configured — email NOT sent. To:", opts.to, "Subject:", opts.subject);
+    return { success: false, messageId: "", error: "Email service not configured. Please contact support." };
   }
 
   // Check suppression list — don't send to bounced/complained addresses

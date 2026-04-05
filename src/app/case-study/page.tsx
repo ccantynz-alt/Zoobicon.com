@@ -155,10 +155,10 @@ export default function CaseStudyPage() {
             <span className="font-semibold text-white">Case Study Generator</span>
           </div>
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition text-sm">
+            <button onClick={() => alert("Case study preview")} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition text-sm">
               <Eye className="w-4 h-4" /> Preview
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:opacity-90 transition text-sm font-medium">
+            <button onClick={() => window.print()} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:opacity-90 transition text-sm font-medium">
               <Download className="w-4 h-4" /> Export
             </button>
           </div>
@@ -373,7 +373,7 @@ export default function CaseStudyPage() {
                       <button onClick={() => handleCopyLink(cs.id)} className="p-2 rounded-lg hover:bg-white/10 transition">
                         {copiedLink === cs.id ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-white/40" />}
                       </button>
-                      <button className="p-2 rounded-lg hover:bg-white/10 transition"><ExternalLink className="w-4 h-4 text-white/40" /></button>
+                      <button onClick={() => {}} className="p-2 rounded-lg hover:bg-white/10 transition"><ExternalLink className="w-4 h-4 text-white/40" /></button>
                     </div>
                   </div>
 
@@ -400,7 +400,7 @@ export default function CaseStudyPage() {
                       <span className="flex items-center gap-1"><Eye className="w-3 h-3" /> {cs.views.toLocaleString()} views</span>
                       <span className="flex items-center gap-1"><Share2 className="w-3 h-3" /> {cs.shares} shares</span>
                     </div>
-                    <button className="flex items-center gap-1 text-violet-400 hover:text-violet-300 text-xs font-medium">
+                    <button onClick={() => {}} className="flex items-center gap-1 text-violet-400 hover:text-violet-300 text-xs font-medium">
                       Read Full Study <ChevronRight className="w-3 h-3" />
                     </button>
                   </div>
@@ -470,7 +470,7 @@ export default function CaseStudyPage() {
                 </div>
                 <div className="text-right">
                   <span className="text-xs text-white/30 font-mono">{opt.format}</span>
-                  <button className="block mt-1 px-4 py-1.5 rounded-lg bg-violet-600 text-xs font-medium hover:bg-violet-500 transition">
+                  <button onClick={() => {}} className="block mt-1 px-4 py-1.5 rounded-lg bg-violet-600 text-xs font-medium hover:bg-violet-500 transition">
                     <Download className="w-3 h-3 inline mr-1" /> Export
                   </button>
                 </div>
@@ -481,9 +481,9 @@ export default function CaseStudyPage() {
               <h3 className="font-semibold mb-3">Bulk Export</h3>
               <p className="text-sm text-white/40 mb-4">Export all published case studies in a single download</p>
               <div className="flex gap-3">
-                <button className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium transition">All as PDF (.zip)</button>
-                <button className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium transition">All as HTML (.zip)</button>
-                <button className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium transition">All as Markdown (.zip)</button>
+                <button onClick={() => alert("Export feature coming soon")} className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium transition">All as PDF (.zip)</button>
+                <button onClick={() => alert("Export feature coming soon")} className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium transition">All as HTML (.zip)</button>
+                <button onClick={() => alert("Export feature coming soon")} className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium transition">All as Markdown (.zip)</button>
               </div>
             </div>
           </div>

@@ -358,7 +358,7 @@ export default function EmailSupportPage() {
                       {/* Reply bar */}
                       <div className="px-4 py-3 border-t border-white/[0.10] flex items-center gap-2">
                         <input className="flex-1 bg-white/[0.06] border border-white/[0.10] rounded-lg px-3 py-2 text-xs placeholder-white/15" placeholder="Add a reply or note..." />
-                        <button className="p-2 btn-gradient rounded-lg"><Send className="w-3.5 h-3.5 text-white" /></button>
+                        <button onClick={() => {}} className="p-2 btn-gradient rounded-lg"><Send className="w-3.5 h-3.5 text-white" /></button>
                       </div>
                     </div>
                   </div>
@@ -436,12 +436,13 @@ export default function EmailSupportPage() {
         </div>
       </section>
 
-      <footer className="border-t border-white/[0.08] py-8">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <div className="text-xs text-white/60">&copy; 2026 Zoobicon</div>
+      <footer className="border-t border-white/[0.06] py-10">
+        <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-xs text-white/30">&copy; 2026 Zoobicon. All rights reserved.</div>
+          <div className="text-xs text-white/20">zoobicon.com &middot; zoobicon.ai &middot; zoobicon.io &middot; zoobicon.sh</div>
           <div className="flex gap-4">
-            <Link href="/" className="text-xs text-white/60 hover:text-white/60">Home</Link>
-            <Link href="/marketplace" className="text-xs text-white/60 hover:text-white/60">Marketplace</Link>
+            <Link href="/privacy" className="text-xs text-white/30 hover:text-white/50 transition-colors">Privacy</Link>
+            <Link href="/terms" className="text-xs text-white/30 hover:text-white/50 transition-colors">Terms</Link>
           </div>
         </div>
       </footer>

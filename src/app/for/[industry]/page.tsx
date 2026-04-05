@@ -11,7 +11,7 @@ import {
 import { getIndustry, getAllIndustrySlugs, type IndustryData } from "@/lib/industry-seo";
 
 interface Props {
-  params: Promise<{ industry: string }>;
+  params: { industry: string } | Promise<{ industry: string }>;
 }
 
 export async function generateStaticParams() {
@@ -19,7 +19,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { industry: slug } = await params;
+  const resolved = params instanceof Promise ? await params : params;
+  const { industry: slug } = resolved;
   const data = getIndustry(slug);
   if (!data) return {};
 
@@ -45,7 +46,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function IndustryPage({ params }: Props) {
-  const { industry: slug } = await params;
+  const resolved = params instanceof Promise ? await params : params;
+  const { industry: slug } = resolved;
   const data = getIndustry(slug);
   if (!data) notFound();
 

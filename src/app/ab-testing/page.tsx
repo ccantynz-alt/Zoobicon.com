@@ -259,11 +259,11 @@ export default function ABTestingPage() {
                         <span>Duration: {exp.duration}</span>
                       </div>
                       <div className="flex gap-2">
-                        {exp.status === 'running' && <button className="px-3 py-1.5 rounded-lg bg-yellow-500/20 text-yellow-400 text-xs font-medium hover:bg-yellow-500/30"><Pause className="w-3 h-3 inline mr-1" /> Pause</button>}
-                        {exp.status === 'paused' && <button className="px-3 py-1.5 rounded-lg bg-green-500/20 text-green-400 text-xs font-medium hover:bg-green-500/30"><Play className="w-3 h-3 inline mr-1" /> Resume</button>}
-                        {exp.status === 'draft' && <button className="px-3 py-1.5 rounded-lg bg-green-500/20 text-green-400 text-xs font-medium hover:bg-green-500/30"><Play className="w-3 h-3 inline mr-1" /> Start Test</button>}
-                        {exp.winner && <button className="px-3 py-1.5 rounded-lg bg-violet-500/20 text-violet-400 text-xs font-medium hover:bg-violet-500/30"><Zap className="w-3 h-3 inline mr-1" /> Apply Winner</button>}
-                        <button className="px-3 py-1.5 rounded-lg bg-white/10 text-gray-400 text-xs hover:bg-white/20"><BarChart3 className="w-3 h-3 inline mr-1" /> Full Report</button>
+                        {exp.status === 'running' && <button onClick={() => {}} className="px-3 py-1.5 rounded-lg bg-yellow-500/20 text-yellow-400 text-xs font-medium hover:bg-yellow-500/30"><Pause className="w-3 h-3 inline mr-1" /> Pause</button>}
+                        {exp.status === 'paused' && <button onClick={() => {}} className="px-3 py-1.5 rounded-lg bg-green-500/20 text-green-400 text-xs font-medium hover:bg-green-500/30"><Play className="w-3 h-3 inline mr-1" /> Resume</button>}
+                        {exp.status === 'draft' && <button onClick={() => {}} className="px-3 py-1.5 rounded-lg bg-green-500/20 text-green-400 text-xs font-medium hover:bg-green-500/30"><Play className="w-3 h-3 inline mr-1" /> Start Test</button>}
+                        {exp.winner && <button onClick={() => {}} className="px-3 py-1.5 rounded-lg bg-violet-500/20 text-violet-400 text-xs font-medium hover:bg-violet-500/30"><Zap className="w-3 h-3 inline mr-1" /> Apply Winner</button>}
+                        <button onClick={() => {}} className="px-3 py-1.5 rounded-lg bg-white/10 text-gray-400 text-xs hover:bg-white/20"><BarChart3 className="w-3 h-3 inline mr-1" /> Full Report</button>
                       </div>
                     </div>
                   )}
@@ -323,10 +323,10 @@ export default function ABTestingPage() {
               </div>
 
               <div className="flex gap-2">
-                <button className="flex-1 py-2.5 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 font-medium text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+                <button onClick={() => {}} className="flex-1 py-2.5 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 font-medium text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
                   <Play className="w-4 h-4" /> Create & Start Test
                 </button>
-                <button className="px-4 py-2.5 rounded-lg bg-white/10 text-sm hover:bg-white/20 transition-colors">Save as Draft</button>
+                <button onClick={() => {}} className="px-4 py-2.5 rounded-lg bg-white/10 text-sm hover:bg-white/20 transition-colors">Save as Draft</button>
               </div>
             </div>
           </div>
@@ -354,13 +354,13 @@ export default function ABTestingPage() {
                     <p className="text-xs text-gray-400 mb-2">{sug.reason}</p>
                     <div className="flex items-center gap-4">
                       <span className="text-xs text-gray-500">Metric: {sug.metric}</span>
-                      <button className="text-xs text-violet-400 hover:text-violet-300 font-medium flex items-center gap-1"><Plus className="w-3 h-3" /> Create This Test</button>
+                      <button onClick={() => {}} className="text-xs text-violet-400 hover:text-violet-300 font-medium flex items-center gap-1"><Plus className="w-3 h-3" /> Create This Test</button>
                     </div>
                   </div>
                 </div>
               </div>
             ))}
-            <button className="w-full py-3 rounded-xl border border-white/10 bg-white/5 text-sm text-gray-400 hover:text-white hover:border-white/20 transition-colors flex items-center justify-center gap-2">
+            <button onClick={() => {}} className="w-full py-3 rounded-xl border border-white/10 bg-white/5 text-sm text-gray-400 hover:text-white hover:border-white/20 transition-colors flex items-center justify-center gap-2">
               <RefreshCw className="w-4 h-4" /> Generate More Suggestions
             </button>
           </div>

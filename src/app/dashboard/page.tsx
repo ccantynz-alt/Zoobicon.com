@@ -49,7 +49,8 @@ const QUICK_ACTIONS = [
 
 const ADMIN_QUICK_ACTIONS = [
   { icon: Globe, label: "AI Builder", desc: "Premium generation", href: "/builder", color: "from-brand-500 to-brand-700" },
-  { icon: Layers, label: "Multi-Page", desc: "Full site builds", href: "/builder", color: "from-indigo-500 to-blue-600" },
+  { icon: Globe, label: "My Domains", desc: "View purchased domains", href: "/my-domains", color: "from-indigo-500 to-purple-600" },
+  { icon: Search, label: "Register Domain", desc: "Search & buy domains", href: "/domains", color: "from-emerald-500 to-teal-600" },
   { icon: Server, label: "Hosting", desc: "Deploy & manage", href: "/hosting", color: "from-emerald-500 to-teal-600" },
   { icon: Pencil, label: "Live Editor", desc: "Edit deployed sites", href: "/edit", color: "from-amber-500 to-orange-600" },
   { icon: Shield, label: "Admin Panel", desc: "System controls", href: "/admin", color: "from-red-500 to-rose-600" },
@@ -586,7 +587,7 @@ export default function DashboardPage() {
                     >
                       Edit
                     </Link>
-                    <button className="px-3 py-1.5 bg-white/10 rounded-lg text-xs font-semibold text-white">
+                    <button onClick={() => {}} className="px-3 py-1.5 bg-white/10 rounded-lg text-xs font-semibold text-white">
                       <ExternalLink className="w-3 h-3" />
                     </button>
                   </div>

@@ -72,17 +72,17 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // For Runway (image-to-video), filter to only scenes with valid HTTP URLs.
-    // Scenes without images will use text-to-video via the render engine's fallback.
-    const missingImages = scenes.filter(
-      (s: { imageUrl?: string; sceneNumber: number }) => !s.imageUrl || !s.imageUrl.startsWith("http")
+    // Count scenes with valid images vs text-only scenes
+    const withImages = scenes.filter(
+      (s: { imageUrl?: string }) => s.imageUrl && s.imageUrl.startsWith("http")
     );
-    if (missingImages.length > 0) {
-      console.warn(`[video-creator/render] ${missingImages.length} scene(s) missing images — will use text-to-video fallback`);
+    const textOnly = scenes.length - withImages.length;
+    if (textOnly > 0) {
+      console.log(`[video-creator/render] ${withImages.length} scene(s) with images, ${textOnly} scene(s) will use text-to-video`);
     }
 
-    // Quota enforcement — count only scenes with valid images for rendering
-    const renderableSceneCount = scenes.length - missingImages.length;
+    // Quota enforcement — ALL scenes count against quota
+    const renderableSceneCount = scenes.length;
     if (email) {
       await ensureVideoUsageTable();
       const limits = getVideoPlanLimits(plan || "free", !!hasAddon);
