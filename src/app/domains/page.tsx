@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import Link from "next/link";
 import {
   Search,
   Check,
@@ -85,6 +86,11 @@ export default function DomainsPage() {
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [registering, setRegistering] = useState(false);
   const [userEmail, setUserEmail] = useState("");
+  const [generating, setGenerating] = useState(false);
+  const [genDescription, setGenDescription] = useState("");
+  const [generatedNames, setGeneratedNames] = useState<Array<{ name: string; slug: string; domains: Array<{ tld: string; available: boolean | null; checking: boolean }> }>>([]);
+  const resultsRef = useRef<HTMLDivElement>(null);
+  const genResultsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     try {
