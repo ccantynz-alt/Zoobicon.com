@@ -21,7 +21,7 @@ import {
   Link2,
   Camera,
   Users,
-  MessageCircle,
+  MessageSquare,
   Eye,
   Heart,
   Lightbulb,
@@ -60,7 +60,7 @@ const PLATFORMS: Platform[] = [
   { id: "instagram", name: "Instagram", icon: Camera, color: "from-pink-500 to-purple-600", connected: false, followers: "0" },
   { id: "tiktok", name: "TikTok", icon: Zap, color: "from-rose-500 to-pink-600", connected: false, followers: "0" },
   { id: "facebook", name: "Facebook", icon: Users, color: "from-blue-500 to-indigo-600", connected: true, followers: "890" },
-  { id: "reddit", name: "Reddit", icon: MessageCircle, color: "from-orange-500 to-red-600", connected: false, followers: "0" },
+  { id: "reddit", name: "Reddit", icon: MessageSquare, color: "from-orange-500 to-red-600", connected: false, followers: "0" },
 ];
 
 const RECENT_POSTS: RecentPost[] = [
@@ -162,7 +162,7 @@ export default function PublisherPage() {
             <h1 className="text-4xl md:text-5xl font-extrabold mb-3">
               <span className="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent">Publish Everywhere</span>
             </h1>
-            <p className="text-lg text-white/50 max-w-2xl">One post. Every platform. AI-optimized. Write once, publish to MessageCircle, LinkedIn, Instagram, TikTok, Facebook, and Reddit.</p>
+            <p className="text-lg text-white/50 max-w-2xl">One post. Every platform. AI-optimized. Write once, publish to X, LinkedIn, Instagram, TikTok, Facebook, and Reddit.</p>
           </motion.div>
         </div>
       </header>
