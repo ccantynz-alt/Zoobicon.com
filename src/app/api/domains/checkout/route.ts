@@ -26,11 +26,19 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: "No domains selected" }, { status: 400 });
     }
 
-    // SAFETY CHECK: Don't take payment if we can't register domains
+    // SAFETY CHECK 1: Don't take payment if we can't register domains
     if (!hasOpenSRSConfig()) {
       return Response.json({
         error: "Domain registration is not available yet. We're setting up our registrar integration. Please try again soon or register directly at porkbun.com.",
         registrarNotConfigured: true,
+      }, { status: 503 });
+    }
+
+    // SAFETY CHECK 2: Don't take payment if webhook can't process it
+    if (!process.env.STRIPE_WEBHOOK_SECRET) {
+      return Response.json({
+        error: "Payment processing is being configured. Please try again shortly.",
+        webhookNotConfigured: true,
       }, { status: 503 });
     }
 

@@ -19,6 +19,14 @@ export async function POST(request: NextRequest) {
     const planSlug: PlanSlug = (plan && plan in PLAN_PRICE_IDS) ? plan : "pro";
     const priceId = PLAN_PRICE_IDS[planSlug] || PRO_PRICE_ID;
 
+    // SAFETY: Don't take payment if webhook can't process it
+    if (!process.env.STRIPE_WEBHOOK_SECRET) {
+      return Response.json(
+        { error: "Payment processing is being configured. Please try again shortly." },
+        { status: 503 }
+      );
+    }
+
     if (!priceId) {
       return Response.json(
         { error: `No Stripe price ID configured for the ${PLAN_NAMES[planSlug]} plan. Set STRIPE_${planSlug.toUpperCase()}_PRICE_ID in your environment variables.` },
