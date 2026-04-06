@@ -88,6 +88,7 @@ const AI_TOOLS = [
     color: "from-blue-500 to-indigo-600",
     glowColor: "shadow-blue-500/25",
     tag: "Agent",
+    href: "/chatbot-widget",
   },
   {
     icon: Video,
@@ -341,13 +342,18 @@ export default function AiPage() {
             viewport={{ once: true, amount: 0.1 }}
             className="grid md:grid-cols-2 lg:grid-cols-4 gap-5"
           >
-            {AI_TOOLS.map((tool) => (
+            {AI_TOOLS.map((tool) => {
+              const href = (tool as { href?: string }).href;
+              const Wrapper = ({ children }: { children: React.ReactNode }) =>
+                href ? <Link href={href} className="block h-full">{children}</Link> : <>{children}</>;
+              return (
               <motion.div
                 key={tool.name}
                 variants={fadeInUp}
                 whileHover={{ y: -6, transition: { duration: 0.2, ease: "easeOut" as const } }}
                 className={`group relative p-6 rounded-2xl border border-white/10 bg-white/[0.05] hover:border-white/15 hover:bg-white/[0.07] transition-all cursor-pointer shadow-lg ${tool.glowColor}`}
               >
+                <Wrapper>
                 {/* Tag */}
                 <span className="absolute top-4 right-4 text-[10px] font-semibold uppercase tracking-wider text-gray-300 bg-white/5 px-2 py-0.5 rounded-full">
                   {tool.tag}
@@ -367,8 +373,10 @@ export default function AiPage() {
                   Explore
                   <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </div>
+                </Wrapper>
               </motion.div>
-            ))}
+              );
+            })}
           </motion.div>
         </div>
       </section>
