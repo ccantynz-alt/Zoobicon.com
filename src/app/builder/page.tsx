@@ -85,6 +85,7 @@ import {
   FolderTree,
   Package,
   Eye,
+  Code2,
 } from "lucide-react";
 
 /** Sanitize raw API error messages for user display */
@@ -1697,6 +1698,21 @@ root.render(React.createElement(App));
                     })()}
                   </div>
                 )}
+                <button
+                  onClick={() => {
+                    if (reactFiles && Object.keys(reactFiles).length > 0) {
+                      try {
+                        localStorage.setItem("zoobicon_ide_files", JSON.stringify(reactFiles));
+                      } catch { /* quota */ }
+                    }
+                    window.open("/builder/ide", "_blank");
+                  }}
+                  title="Open full code editor"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-white/[0.07] text-white/60 hover:text-white/60 hover:bg-white/[0.08]"
+                >
+                  <Code2 size={14} />
+                  IDE
+                </button>
                 <button
                   onClick={() => setActiveTool(activeTool === "github-sync" ? null : "github-sync")}
                   title="Push to GitHub"
