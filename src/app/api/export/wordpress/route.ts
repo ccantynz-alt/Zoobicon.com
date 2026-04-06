@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        { error: "ANTHROPIC_API_KEY is not configured" },
+        { error: "AI service is temporarily unavailable. Please try again later." },
         { status: 500 }
       );
     }
@@ -70,8 +70,8 @@ export async function POST(req: NextRequest) {
       ],
     });
 
-    const responseText =
-      message.content[0].type === "text" ? message.content[0].text : "";
+    const textBlock = message.content.find((b: { type: string }) => b.type === "text") as { type: "text"; text: string } | undefined;
+    const responseText = textBlock?.text || "";
 
     let parsed;
     try {

@@ -1,7 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { ImagePlus, Loader2, CheckCircle2, AlertCircle, Sparkles, Wand2 } from "lucide-react";
+import Image from "next/image";
+import {
+  ImagePlus,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+  Sparkles,
+  Wand2,
+} from "lucide-react";
 
 interface AiImagesPanelProps {
   code: string;
@@ -18,6 +26,7 @@ export default function AiImagesPanel({ code, onApplyImages }: AiImagesPanelProp
   const [singlePrompt, setSinglePrompt] = useState("");
   const [singleResult, setSingleResult] = useState<string | null>(null);
   const [singleStatus, setSingleStatus] = useState<"idle" | "generating" | "done" | "error">("idle");
+  const [singleError, setSingleError] = useState("");
 
   const handleReplaceAll = async () => {
     if (!code) return;
@@ -56,6 +65,7 @@ export default function AiImagesPanel({ code, onApplyImages }: AiImagesPanelProp
 
     setSingleStatus("generating");
     setSingleResult(null);
+    setSingleError("");
 
     try {
       const res = await fetch("/api/generate/ai-images", {
@@ -64,12 +74,16 @@ export default function AiImagesPanel({ code, onApplyImages }: AiImagesPanelProp
         body: JSON.stringify({ prompt: singlePrompt.trim() }),
       });
 
-      if (!res.ok) throw new Error("Generation failed");
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Image generation failed");
+      }
 
       const data = await res.json();
       setSingleResult(data.image?.url || null);
       setSingleStatus("done");
-    } catch {
+    } catch (err) {
+      setSingleError(err instanceof Error ? err.message : "Image generation failed");
       setSingleStatus("error");
     }
   };
@@ -82,7 +96,7 @@ export default function AiImagesPanel({ code, onApplyImages }: AiImagesPanelProp
           <ImagePlus className="w-4 h-4 text-brand-400" />
           AI Image Engine
         </h3>
-        <p className="text-xs text-white/30">
+        <p className="text-xs text-white/50">
           Replace placeholder images with AI-generated or premium stock photos.
         </p>
       </div>
@@ -95,14 +109,14 @@ export default function AiImagesPanel({ code, onApplyImages }: AiImagesPanelProp
           { name: "Unsplash", key: "UNSPLASH_ACCESS_KEY" },
         ].map((p) => (
           <div key={p.name} className="text-center p-2 rounded-lg bg-white/[0.02] border border-white/[0.04]">
-            <span className="text-[10px] text-white/40">{p.name}</span>
+            <span className="text-[10px] text-white/50">{p.name}</span>
           </div>
         ))}
       </div>
 
       {/* Replace all images in page */}
       <div className="space-y-2">
-        <p className="text-[10px] uppercase tracking-widest text-white/20 flex items-center gap-1.5">
+        <p className="text-[10px] uppercase tracking-widest text-white/50 flex items-center gap-1.5">
           <Sparkles className="w-3 h-3" />
           Replace Page Images
         </p>
@@ -112,7 +126,7 @@ export default function AiImagesPanel({ code, onApplyImages }: AiImagesPanelProp
           value={industry}
           onChange={(e) => setIndustry(e.target.value)}
           placeholder="Industry (e.g., real estate, restaurant)"
-          className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white placeholder-white/20 focus:outline-none focus:border-brand-500/40 transition-colors"
+          className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white placeholder-white/50 focus:outline-none focus:border-brand-500/40 transition-colors"
         />
 
         <button
@@ -157,7 +171,7 @@ export default function AiImagesPanel({ code, onApplyImages }: AiImagesPanelProp
 
       {/* Single image generation */}
       <div className="space-y-2 pt-3 border-t border-white/[0.06]">
-        <p className="text-[10px] uppercase tracking-widest text-white/20 flex items-center gap-1.5">
+        <p className="text-[10px] uppercase tracking-widest text-white/50 flex items-center gap-1.5">
           <Wand2 className="w-3 h-3" />
           Generate Single Image
         </p>
@@ -167,7 +181,7 @@ export default function AiImagesPanel({ code, onApplyImages }: AiImagesPanelProp
           onChange={(e) => setSinglePrompt(e.target.value)}
           placeholder="Describe the image you want..."
           rows={2}
-          className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white placeholder-white/20 focus:outline-none focus:border-brand-500/40 transition-colors resize-none"
+          className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white placeholder-white/50 focus:outline-none focus:border-brand-500/40 transition-colors resize-none"
         />
 
         <button
@@ -188,10 +202,18 @@ export default function AiImagesPanel({ code, onApplyImages }: AiImagesPanelProp
           )}
         </button>
 
+        {singleStatus === "error" && (
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+            <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-red-400">{singleError || "Image generation failed"}</p>
+          </div>
+        )}
+
         {singleResult && (
           <div className="rounded-lg overflow-hidden border border-white/[0.08]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={singleResult} alt="AI Generated" className="w-full h-40 object-cover" />
+            <div className="relative w-full h-40">
+              <Image src={singleResult} alt="AI Generated" fill unoptimized className="object-cover" />
+            </div>
             <div className="p-2 bg-white/[0.02]">
               <button
                 onClick={() => navigator.clipboard.writeText(singleResult).catch(() => {})}

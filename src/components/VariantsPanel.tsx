@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Layers, Loader2, Eye } from "lucide-react";
+import {
+  Layers,
+  Loader2,
+  Eye,
+  AlertCircle,
+} from "lucide-react";
 
 interface Variant {
   id: string;
@@ -20,24 +25,28 @@ export default function VariantsPanel({
 }) {
   const [variants, setVariants] = useState<Variant[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [prompt, setPrompt] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
 
   const generateVariants = async () => {
     const p = prompt.trim() || "Generate design variants of this website";
     setLoading(true);
+    setError("");
     try {
-      const res = await fetch("/api/generate/variants", {
+      const res = await fetch("/api/generate/react", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: p, count: 3 }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        setVariants(data.variants || []);
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || `Generation failed (${res.status})`);
       }
-    } catch {
-      // silent
+      const data = await res.json();
+      setVariants(data.variants || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to generate variants");
     } finally {
       setLoading(false);
     }
@@ -45,7 +54,7 @@ export default function VariantsPanel({
 
   return (
     <div className="p-4 space-y-4">
-      <p className="text-xs text-white/40">
+      <p className="text-xs text-white/50">
         Generate multiple design variants of your site. Pick the one you like best.
       </p>
 
@@ -75,6 +84,13 @@ export default function VariantsPanel({
           </span>
         )}
       </button>
+
+      {error && (
+        <div className="flex items-start gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+          <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+          <p className="text-xs text-red-400">{error}</p>
+        </div>
+      )}
 
       {variants.length > 0 && (
         <div className="space-y-2">

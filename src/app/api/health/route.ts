@@ -37,34 +37,44 @@ export async function GET(req: NextRequest) {
     durationMs: Date.now() - keyStart,
   });
 
-  // 2. API key valid (tiny call to verify auth)
+  // 2 & 3. Test Haiku auth + Opus access IN PARALLEL to cut wait time
   if (apiKey) {
-    const authStart = Date.now();
-    try {
-      const client = new Anthropic({ apiKey });
-      await client.messages.create({
-        model: "claude-haiku-4-5-20251001",
-        max_tokens: 10,
-        messages: [{ role: "user", content: "Say OK" }],
-      });
-      checks.push({
-        name: "anthropic_auth",
-        status: "pass",
-        message: "API key valid, Anthropic reachable",
-        durationMs: Date.now() - authStart,
-      });
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      checks.push({
-        name: "anthropic_auth",
-        status: "fail",
-        message: `API auth failed: ${msg}`,
-        durationMs: Date.now() - authStart,
-      });
-    }
+    const authCheck = async (): Promise<CheckResult> => {
+      const start = Date.now();
+      try {
+        const c = new Anthropic({ apiKey, timeout: 15_000 });
+        await c.messages.create({
+          model: "claude-haiku-4-5-20251001",
+          max_tokens: 10,
+          messages: [{ role: "user", content: "Say OK" }],
+        });
+        return { name: "anthropic_auth", status: "pass", message: "API key valid, Anthropic reachable", durationMs: Date.now() - start };
+      } catch (err) {
+        return { name: "anthropic_auth", status: "fail", message: `API auth failed: ${err instanceof Error ? err.message : String(err)}`, durationMs: Date.now() - start };
+      }
+    };
+
+    const opusCheck = async (): Promise<CheckResult> => {
+      const start = Date.now();
+      try {
+        const c = new Anthropic({ apiKey, timeout: 30_000 });
+        const res = await c.messages.create({
+          model: "claude-opus-4-6",
+          max_tokens: 10,
+          messages: [{ role: "user", content: "Say OK" }],
+        });
+        const text = res.content.find((b) => b.type === "text")?.text || "";
+        return { name: "opus_access", status: text ? "pass" : "fail", message: text ? "Opus model accessible" : "Opus returned empty response", durationMs: Date.now() - start };
+      } catch (err) {
+        return { name: "opus_access", status: "fail", message: `Opus NOT accessible: ${err instanceof Error ? err.message : String(err)}. This means ALL new builds will fail.`, durationMs: Date.now() - start };
+      }
+    };
+
+    const [authResult, opusResult] = await Promise.all([authCheck(), opusCheck()]);
+    checks.push(authResult, opusResult);
   }
 
-  // 3. Check OpenAI key (optional)
+  // 4. Check OpenAI key (optional)
   checks.push({
     name: "openai_api_key",
     status: process.env.OPENAI_API_KEY ? "pass" : "warn",
@@ -80,24 +90,64 @@ export async function GET(req: NextRequest) {
     durationMs: 0,
   });
 
-  // 5. Database connectivity
-  const dbStart = Date.now();
-  const dbUrl = process.env.DATABASE_URL;
+  // 5. Database connectivity — actually test the connection
+  {
+    const dbStart = Date.now();
+    const dbUrl = process.env.DATABASE_URL;
+    if (!dbUrl) {
+      checks.push({ name: "database", status: "warn", message: "No DATABASE_URL — running without DB", durationMs: 0 });
+    } else {
+      try {
+        const { neon } = await import("@neondatabase/serverless");
+        const sql = neon(dbUrl);
+        await sql`SELECT 1 AS ok`;
+        checks.push({ name: "database", status: "pass", message: "Database connected and responding", durationMs: Date.now() - dbStart });
+      } catch (err) {
+        checks.push({ name: "database", status: "fail", message: `Database connection failed: ${err instanceof Error ? err.message : String(err)}`, durationMs: Date.now() - dbStart });
+      }
+    }
+  }
+
+  // 6. Replicate API (video pipeline)
+  {
+    const repStart = Date.now();
+    const repToken = process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY;
+    if (!repToken) {
+      checks.push({ name: "replicate", status: "warn", message: "No REPLICATE_API_TOKEN — video creator disabled", durationMs: 0 });
+    } else {
+      try {
+        const res = await fetch("https://api.replicate.com/v1/models/black-forest-labs/flux-schnell", {
+          headers: { Authorization: `Bearer ${repToken}` },
+          signal: AbortSignal.timeout(10000),
+        });
+        checks.push({
+          name: "replicate",
+          status: res.ok ? "pass" : "fail",
+          message: res.ok ? "Replicate API reachable and token valid" : `Replicate returned HTTP ${res.status}`,
+          durationMs: Date.now() - repStart,
+        });
+      } catch (err) {
+        checks.push({ name: "replicate", status: "fail", message: `Replicate unreachable: ${err instanceof Error ? err.message : String(err)}`, durationMs: Date.now() - repStart });
+      }
+    }
+  }
+
+  // 7. Stripe
   checks.push({
-    name: "database",
-    status: dbUrl ? "pass" : "warn",
-    message: dbUrl ? "Database URL configured" : "No DATABASE_URL — running without DB",
-    durationMs: Date.now() - dbStart,
+    name: "stripe",
+    status: process.env.STRIPE_SECRET_KEY ? "pass" : "warn",
+    message: process.env.STRIPE_SECRET_KEY ? "Stripe key configured" : "No STRIPE_SECRET_KEY — payments disabled",
+    durationMs: 0,
   });
 
   const hasFail = checks.some((c) => c.status === "fail");
   const deep = req.nextUrl.searchParams.get("deep") === "true";
 
-  // If deep=true, also run a quick generation test
+  // If deep=true, also run a quick generation test — 45s timeout
   if (deep && apiKey) {
     const genStart = Date.now();
     try {
-      const client = new Anthropic({ apiKey });
+      const client = new Anthropic({ apiKey, timeout: 45_000 });
       const res = await client.messages.create({
         model: "claude-haiku-4-5-20251001",
         max_tokens: 2000,
@@ -183,7 +233,7 @@ export async function POST(req: NextRequest) {
   {
     const start = Date.now();
     try {
-      const res = await fetch(new URL("/api/generate", req.url).toString(), {
+      const res = await fetch(new URL("/api/generate/react", req.url).toString(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -233,7 +283,7 @@ export async function POST(req: NextRequest) {
   {
     const start = Date.now();
     try {
-      const res = await fetch(new URL("/api/generate/stream", req.url).toString(), {
+      const res = await fetch(new URL("/api/generate/react", req.url).toString(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

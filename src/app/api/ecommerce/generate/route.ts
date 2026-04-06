@@ -1,5 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
+import { injectComponentLibrary } from "@/lib/component-library";
+import { authenticateRequest, checkUsageQuota, trackUsage } from "@/lib/auth-guard";
 
 interface Product {
   name: string;
@@ -110,6 +112,12 @@ Make it production-quality with attention to spacing, typography, color harmony,
 
 export async function POST(req: NextRequest) {
   try {
+    // Auth + quota enforcement — prevent unauthenticated abuse
+    const auth = await authenticateRequest(req, { requireAuth: true, requireVerified: true });
+    if (auth.error) return auth.error;
+    const quota = await checkUsageQuota(auth.user.email, auth.user.plan, "generation");
+    if (quota.error) return quota.error;
+
     const body = await req.json();
     const { businessType, products, features, theme } = body as EcommerceRequest;
 
@@ -160,7 +168,7 @@ export async function POST(req: NextRequest) {
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        { error: "ANTHROPIC_API_KEY is not configured" },
+        { error: "AI service is temporarily unavailable. Please try again later." },
         { status: 500 }
       );
     }
@@ -169,7 +177,7 @@ export async function POST(req: NextRequest) {
 
     const message = await client.messages.create({
       model: "claude-sonnet-4-6",
-      max_tokens: 16000,
+      max_tokens: 32000,
       system: buildSystemPrompt(theme),
       messages: [
         {
@@ -192,6 +200,11 @@ export async function POST(req: NextRequest) {
     // Strip markdown code fences if present
     if (html.startsWith("```")) {
       html = html.replace(/^```(?:html)?\n?/, "").replace(/\n?```$/, "");
+    }
+
+    // Inject component library CSS for consistent styling
+    if (!html.includes("ZOOBICON COMPONENT LIBRARY")) {
+      html = injectComponentLibrary(html);
     }
 
     return NextResponse.json({

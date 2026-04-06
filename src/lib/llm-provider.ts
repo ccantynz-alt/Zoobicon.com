@@ -57,7 +57,7 @@ function getProviderForModel(modelId: string): LLMProvider {
 async function callClaude(req: LLMRequest): Promise<LLMResponse> {
   const Anthropic = (await import("@anthropic-ai/sdk")).default;
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) throw new Error("ANTHROPIC_API_KEY not configured");
+  if (!apiKey) throw new Error("AI service is temporarily unavailable.");
 
   const client = new Anthropic({ apiKey });
   const res = await client.messages.create({
@@ -79,7 +79,7 @@ async function callClaude(req: LLMRequest): Promise<LLMResponse> {
 
 async function callOpenAI(req: LLMRequest): Promise<LLMResponse> {
   const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) throw new Error("OPENAI_API_KEY not configured — add it to .env to use GPT models");
+  if (!apiKey) throw new Error("AI service is temporarily unavailable.");
 
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
@@ -115,7 +115,7 @@ async function callOpenAI(req: LLMRequest): Promise<LLMResponse> {
 
 async function callGemini(req: LLMRequest): Promise<LLMResponse> {
   const apiKey = process.env.GOOGLE_AI_API_KEY;
-  if (!apiKey) throw new Error("GOOGLE_AI_API_KEY not configured — add it to .env to use Gemini models");
+  if (!apiKey) throw new Error("AI service is temporarily unavailable.");
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${req.model}:generateContent?key=${apiKey}`;
 
@@ -163,6 +163,66 @@ export async function callLLM(req: LLMRequest): Promise<LLMResponse> {
     default:
       return callClaude(req);
   }
+}
+
+/**
+ * Unified LLM call with automatic cross-provider failover.
+ * Tries the requested model first, then falls back through available providers
+ * when rate-limited or overloaded. Preferred fallback order: OpenAI → Gemini → Claude.
+ */
+export async function callLLMWithFailover(
+  req: LLMRequest,
+  onFallback?: (provider: LLMProvider, model: string) => void
+): Promise<LLMResponse> {
+  const primaryProvider = getProviderForModel(req.model);
+
+  // Try primary model first
+  try {
+    return await callLLM(req);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    const isRetryable = /rate.limit|overloaded|529|too many|503|500/i.test(msg);
+    if (!isRetryable) throw err; // Non-retryable errors (auth, bad request) — don't failover
+
+    console.warn(`[LLM Failover] ${req.model} failed: ${msg}`);
+  }
+
+  // Build fallback order: try other providers with their best available model
+  const fallbacks: { provider: LLMProvider; model: string; maxTokens: number }[] = [];
+  const available = getAvailableProviders().filter((p) => p !== primaryProvider);
+
+  for (const provider of available) {
+    const models = getModelsForProvider(provider);
+    // Prefer balanced tier, then premium, then fast
+    const best = models.find((m) => m.tier === "balanced")
+      || models.find((m) => m.tier === "premium")
+      || models[0];
+    if (best) fallbacks.push({ provider, model: best.id, maxTokens: best.maxTokens });
+  }
+
+  // Also try other models from the same provider (e.g., Sonnet if Opus failed)
+  if (primaryProvider === "claude") {
+    const sonnet = AVAILABLE_MODELS.find((m) => m.id === "claude-sonnet-4-6");
+    if (sonnet && req.model !== sonnet.id) {
+      fallbacks.unshift({ provider: "claude", model: sonnet.id, maxTokens: sonnet.maxTokens });
+    }
+  }
+
+  for (const fb of fallbacks) {
+    try {
+      console.log(`[LLM Failover] Trying ${fb.model} (${fb.provider})`);
+      onFallback?.(fb.provider, fb.model);
+      return await callLLM({
+        ...req,
+        model: fb.model,
+        maxTokens: Math.min(req.maxTokens || fb.maxTokens, fb.maxTokens),
+      });
+    } catch (fbErr) {
+      console.warn(`[LLM Failover] ${fb.model} also failed: ${fbErr instanceof Error ? fbErr.message : fbErr}`);
+    }
+  }
+
+  throw new Error("All AI providers are currently unavailable. Please try again later.");
 }
 
 /**

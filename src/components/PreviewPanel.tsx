@@ -1,10 +1,26 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useEffect, useRef, useCallback, lazy, Suspense } from "react";
+import {
+  Monitor,
+  Tablet,
+  Smartphone,
+  Play,
+} from "lucide-react";
+import { injectVisualEditingScript } from "@/lib/dom-bridge";
+import type { SelectedElement, BridgeMessage } from "@/lib/dom-bridge";
+
+const SandpackPreview = lazy(() => import("@/components/SandpackPreview"));
+
+type PreviewMode = "iframe" | "sandpack";
 
 interface PreviewPanelProps {
   html: string;
   isGenerating: boolean;
+  visualEditMode?: boolean;
+  previewMode?: PreviewMode;
+  onElementSelected?: (element: SelectedElement | null) => void;
+  onElementHover?: (element: SelectedElement | null) => void;
 }
 
 /** Particle field — scattered glowing dots across the entire canvas */
@@ -309,7 +325,69 @@ function GeneratingAtmosphere() {
   );
 }
 
-export default function PreviewPanel({ html, isGenerating }: PreviewPanelProps) {
+type ViewportMode = "desktop" | "tablet" | "mobile";
+
+const viewportConfig: Record<ViewportMode, { width: string; icon: typeof Monitor; label: string }> = {
+  desktop: { width: "100%", icon: Monitor, label: "Desktop" },
+  tablet: { width: "768px", icon: Tablet, label: "Tablet" },
+  mobile: { width: "375px", icon: Smartphone, label: "Mobile" },
+};
+
+export default function PreviewPanel({
+  html,
+  isGenerating,
+  visualEditMode = false,
+  previewMode: previewModeProp = "iframe",
+  onElementSelected,
+  onElementHover,
+}: PreviewPanelProps) {
+  const [viewport, setViewport] = useState<ViewportMode>("desktop");
+  const [activePreviewMode, setActivePreviewMode] = useState<PreviewMode>(previewModeProp);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // Listen for postMessage from the iframe when visual editing is active
+  useEffect(() => {
+    if (!visualEditMode) return;
+
+    function handleMessage(event: MessageEvent) {
+      const data = event.data as BridgeMessage;
+      if (!data || !data.type) return;
+
+      switch (data.type) {
+        case "element-selected":
+          onElementSelected?.(data.element);
+          break;
+        case "element-hover":
+          onElementHover?.(data.element);
+          break;
+        case "text-updated":
+          // Text was updated inline in the iframe — parent can handle syncing
+          break;
+        case "visual-editing-enabled":
+          // Visual editing script loaded successfully
+          break;
+      }
+    }
+
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [visualEditMode, onElementSelected, onElementHover]);
+
+  // Send style/text changes to iframe via postMessage
+  const sendToIframe = useCallback(
+    (message: Record<string, unknown>) => {
+      if (iframeRef.current?.contentWindow) {
+        iframeRef.current.contentWindow.postMessage(message, "*");
+      }
+    },
+    []
+  );
+
+  // Prepare HTML with visual editing script injected when in edit mode
+  const previewHtml = useMemo(() => {
+    if (!html || !visualEditMode) return html;
+    return injectVisualEditingScript(html);
+  }, [html, visualEditMode]);
 
   // Extract body text to validate content exists
   const bodyTextLength = useMemo(() => {
@@ -426,7 +504,7 @@ export default function PreviewPanel({ html, isGenerating }: PreviewPanelProps) 
     }
   `;
 
-  if (isGenerating) {
+  if (isGenerating && !html) {
     return (
       <div className="relative h-full overflow-hidden">
         <GeneratingAtmosphere />
@@ -491,9 +569,10 @@ export default function PreviewPanel({ html, isGenerating }: PreviewPanelProps) 
   }
 
   // Safety check — if html exists but doesn't look like valid HTML, show diagnostic
-  const looksLikeHtml = html.includes("<html") || html.includes("<!doctype") || html.includes("<!DOCTYPE");
+  // Skip this check during generation — streamed chunks may not have full HTML structure yet
+  const looksLikeHtml = html.includes("<html") || html.includes("<!doctype") || html.includes("<!DOCTYPE") || html.includes("<body") || html.includes("<nav") || html.includes("<section");
 
-  if (!looksLikeHtml && html.length > 0) {
+  if (!looksLikeHtml && html.length > 0 && !isGenerating) {
     return (
       <div className="h-full overflow-auto bg-gray-950 p-6">
         <div className="bg-yellow-900/30 border border-yellow-600/40 rounded-lg p-4 mb-4">
@@ -506,16 +585,48 @@ export default function PreviewPanel({ html, isGenerating }: PreviewPanelProps) 
   }
 
   // Safety check — if body has no visible text content, show diagnostic instead of blank white
-  if (html && bodyTextLength < 50) {
+  // ONLY show diagnostic when generation is COMPLETE. During generation the server may be retrying
+  // and will send a "replace" event with the final HTML — showing the error prematurely scares users.
+  if (html && bodyTextLength < 50 && !isGenerating) {
+    // Detect likely causes from the HTML content
+    const hasHead = /<head/i.test(html);
+    const hasBody = /<body/i.test(html);
+    const hasStyle = /<style/i.test(html);
+    const hasScript = /<script/i.test(html);
+    const htmlLen = html.length;
+
+    let likelyCause = "";
+    if (!hasBody) {
+      likelyCause = "The HTML has no <body> tag at all. This usually means the AI model returned an incomplete response — it may have been cut off due to token limits or the API key may lack access to the selected model (Opus).";
+    } else if (hasStyle && htmlLen > 500) {
+      likelyCause = "The HTML contains CSS but the <body> is empty. The AI spent all its tokens on styling and never got to the page content.";
+    } else if (htmlLen < 200) {
+      likelyCause = "The HTML is very short (" + htmlLen + " chars). The AI returned almost nothing — this often means the API key is invalid, rate-limited, or doesn't have access to the model being used.";
+    } else {
+      likelyCause = "The AI generated some HTML but the body lacks visible text content.";
+    }
+
     return (
       <div className="h-full overflow-auto bg-gray-950 p-6">
         <div className="bg-red-900/30 border border-red-600/40 rounded-lg p-4 mb-4">
           <p className="text-red-300 text-sm font-medium mb-2">Generation incomplete — empty page detected</p>
           <p className="text-red-200/60 text-xs mb-3">
-            The AI generated HTML structure ({html.length.toLocaleString()} chars) but the body has very little visible text content ({bodyTextLength} chars).
-            This usually means the AI produced CSS/JS but forgot the actual page content.
+            {likelyCause}
           </p>
-          <p className="text-red-200/60 text-xs">Try clicking &quot;New Site&quot; and generating again, or switch to the Code tab to inspect the output.</p>
+          <div className="bg-red-950/50 rounded p-3 mb-3">
+            <p className="text-[10px] text-red-300/60 uppercase tracking-wider mb-2">Diagnostics</p>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-red-200/50 font-mono">
+              <span>Total HTML:</span><span>{htmlLen.toLocaleString()} chars</span>
+              <span>Body text:</span><span>{bodyTextLength} chars</span>
+              <span>Has &lt;head&gt;:</span><span>{hasHead ? "yes" : "NO"}</span>
+              <span>Has &lt;body&gt;:</span><span>{hasBody ? "yes" : "NO"}</span>
+              <span>Has &lt;style&gt;:</span><span>{hasStyle ? "yes" : "no"}</span>
+              <span>Has &lt;script&gt;:</span><span>{hasScript ? "yes" : "no"}</span>
+            </div>
+          </div>
+          <p className="text-red-200/60 text-xs">
+            <strong className="text-red-300/80">Next steps:</strong> Visit <code className="text-red-300/70 bg-red-950/50 px-1 rounded">/api/health</code> to check if your API key and models are working. Then try &quot;New Site&quot; again.
+          </p>
         </div>
         <div className="bg-gray-900/50 rounded-lg p-4">
           <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">Raw HTML (first 1000 chars)</p>
@@ -525,14 +636,125 @@ export default function PreviewPanel({ html, isGenerating }: PreviewPanelProps) 
     );
   }
 
+  // During generation, if HTML has empty body (server is retrying), show optimizing state
+  if (html && bodyTextLength < 50 && isGenerating) {
+    return (
+      <div className="relative h-full overflow-hidden">
+        <GeneratingAtmosphere />
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+          <p
+            className="text-lg font-bold uppercase tracking-[8px]"
+            style={{
+              background: "linear-gradient(90deg, #60a5fa, #00ddff, #3b82f6, #60a5fa)",
+              backgroundSize: "300% 100%",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+              animation: "text-shimmer 2s linear infinite",
+              filter: "drop-shadow(0 0 20px rgba(37,99,235,0.4))",
+            }}
+          >
+            Optimizing
+          </p>
+          <p
+            className="text-[11px] text-blue-300/40 mt-4 tracking-[3px] uppercase"
+            style={{ animation: "text-breathe 3s ease-in-out infinite" }}
+          >
+            Enhancing content quality
+          </p>
+        </div>
+        <style>{sharedStyles}</style>
+      </div>
+    );
+  }
+
   return (
-    <div className="relative w-full h-full">
-      <iframe
-        srcDoc={html}
-        className="w-full h-full border-0 bg-white"
-        title="Website preview"
-        sandbox="allow-scripts allow-same-origin"
-      />
+    <div className="relative w-full h-full flex flex-col">
+      {/* Device toolbar */}
+      <div className="flex items-center gap-1 px-3 bg-gray-900/50 border-b border-white/5" style={{ height: 32, minHeight: 32 }}>
+        {(Object.keys(viewportConfig) as ViewportMode[]).map((mode) => {
+          const config = viewportConfig[mode];
+          const Icon = config.icon;
+          const isActive = viewport === mode;
+          return (
+            <button
+              key={mode}
+              onClick={() => setViewport(mode)}
+              className={`flex items-center gap-1.5 px-2 py-1 rounded text-[11px] transition-colors duration-150 ${
+                isActive
+                  ? "text-blue-400"
+                  : "text-white/50 hover:text-white/70"
+              }`}
+              title={config.label}
+            >
+              <Icon size={14} />
+              <span className="hidden sm:inline">{config.label}</span>
+            </button>
+          );
+        })}
+        {/* Separator */}
+        <div className="w-px h-4 bg-white/10 mx-1" />
+
+        {/* Sandpack hot-reload toggle */}
+        <button
+          onClick={() => setActivePreviewMode(activePreviewMode === "iframe" ? "sandpack" : "iframe")}
+          className={`flex items-center gap-1.5 px-2 py-1 rounded text-[11px] transition-colors duration-150 ${
+            activePreviewMode === "sandpack"
+              ? "text-green-400"
+              : "text-white/50 hover:text-white/70"
+          }`}
+          title={activePreviewMode === "sandpack" ? "Switch to iframe preview" : "Switch to Sandpack hot-reload preview"}
+        >
+          <Play size={12} />
+          <span className="hidden sm:inline">Hot Reload</span>
+        </button>
+
+        {visualEditMode && (
+          <div className="ml-auto flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+            <span className="text-[10px] text-blue-400/70 uppercase tracking-wider font-medium">
+              Visual Edit
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Preview area */}
+      <div className="flex-1 overflow-hidden bg-gray-950 flex items-start justify-center">
+        {activePreviewMode === "sandpack" ? (
+          <div className="w-full h-full">
+            <Suspense
+              fallback={
+                <div className="h-full flex items-center justify-center bg-[#131520] text-white/40 text-sm">
+                  Loading Sandpack...
+                </div>
+              }
+            >
+              <SandpackPreview html={previewHtml} />
+            </Suspense>
+          </div>
+        ) : (
+          <div
+            className={`h-full transition-all duration-300 ease-in-out ${
+              viewport !== "desktop"
+                ? "my-0 border-x border-white/10 rounded-md shadow-lg shadow-black/30"
+                : ""
+            }`}
+            style={{
+              width: viewportConfig[viewport].width,
+              maxWidth: "100%",
+            }}
+          >
+            <iframe
+              ref={iframeRef}
+              srcDoc={previewHtml}
+              className="w-full h-full border-0 bg-white"
+              title="Website preview"
+              sandbox="allow-scripts allow-same-origin"
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -1,7 +1,27 @@
 "use client";
 
 import { useRef, useEffect, useState, useCallback } from "react";
-import { Mic, MicOff, Sparkles, Zap, Pencil, Send, Check, ChevronDown, Cpu } from "lucide-react";
+import {
+  Mic,
+  MicOff,
+  Sparkles,
+  Zap,
+  Pencil,
+  Send,
+  Check,
+  ChevronDown,
+  Cpu,
+  LayoutTemplate,
+  SlidersHorizontal,
+  FileText,
+  Code2,
+} from "lucide-react";
+import TemplateGallery from "./TemplateGallery";
+import CustomizationPanel, {
+  DEFAULT_CUSTOMIZATION,
+  buildCustomizationSuffix,
+  type CustomizationOptions,
+} from "./CustomizationPanel";
 
 interface SpeechResult {
   isFinal: boolean;
@@ -33,6 +53,8 @@ export interface AIModel {
   tier: string;
 }
 
+export type GenerationMode = "react";
+
 interface PromptInputProps {
   prompt: string;
   onPromptChange: (value: string) => void;
@@ -47,6 +69,10 @@ interface PromptInputProps {
   selectedModel?: string;
   onModelChange?: (modelId: string) => void;
   availableModels?: AIModel[];
+  generationMode?: GenerationMode;
+  onGenerationModeChange?: (mode: GenerationMode) => void;
+  fullStack?: boolean;
+  onFullStackChange?: (enabled: boolean) => void;
 }
 
 const EXAMPLE_PROMPTS = [
@@ -57,8 +83,12 @@ const EXAMPLE_PROMPTS = [
   "A SaaS pricing page with three tiers, toggle for monthly/annual, and FAQ section",
 ];
 
-const STANDARD_FEATURES = ["Clean layout", "Responsive", "Fast build"];
-const PREMIUM_FEATURES = ["Agency-quality", "Animations", "Glass effects", "Rich layouts"];
+const STANDARD_FEATURES = ["Opus-powered", "Responsive", "Fast single-pass"];
+const PREMIUM_FEATURES = ["10-agent pipeline", "Animations", "SEO + Forms", "React export"];
+
+const GENERATION_MODES: { id: GenerationMode; label: string; icon: typeof FileText; description: string }[] = [
+  { id: "react", label: "React App", icon: Code2, description: "Modern React components with TypeScript + Tailwind" },
+];
 
 export default function PromptInput({
   prompt,
@@ -74,6 +104,10 @@ export default function PromptInput({
   selectedModel,
   onModelChange,
   availableModels,
+  generationMode,
+  onGenerationModeChange,
+  fullStack,
+  onFullStackChange,
 }: PromptInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const editInputRef = useRef<HTMLTextAreaElement>(null);
@@ -81,7 +115,18 @@ export default function PromptInput({
   const [isListening, setIsListening] = useState(false);
   const [micSupported, setMicSupported] = useState(false);
   const [showModelPicker, setShowModelPicker] = useState(false);
+  const [showTemplateGallery, setShowTemplateGallery] = useState(false);
+  const [showCustomization, setShowCustomization] = useState(false);
+  const [customization, setCustomization] = useState<CustomizationOptions>(DEFAULT_CUSTOMIZATION);
+  const [internalMode, setInternalMode] = useState<GenerationMode>(generationMode ?? "react");
+  const [hoveredMode, setHoveredMode] = useState<GenerationMode | null>(null);
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+
+  const activeMode = generationMode ?? internalMode;
+  const handleModeChange = useCallback((mode: GenerationMode) => {
+    setInternalMode(mode);
+    onGenerationModeChange?.(mode);
+  }, [onGenerationModeChange]);
 
   useEffect(() => {
     const nav = navigator as Navigator & { userAgentData?: { platform: string } };
@@ -154,10 +199,23 @@ export default function PromptInput({
     setIsListening(true);
   }, [isListening, createRecognition, hasExistingCode, onPromptChange, onEditPromptChange]);
 
+  const handleGenerateWithCustomization = useCallback(() => {
+    if (showCustomization) {
+      const suffix = buildCustomizationSuffix(customization);
+      const currentPrompt = prompt.trim();
+      if (currentPrompt && !currentPrompt.includes("Style preferences:")) {
+        onPromptChange(currentPrompt + "\n\n" + suffix);
+      }
+      setTimeout(() => onGenerate(), 0);
+    } else {
+      onGenerate();
+    }
+  }, [showCustomization, customization, prompt, onPromptChange, onGenerate]);
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
-      onGenerate();
+      handleGenerateWithCustomization();
     }
   };
 
@@ -185,10 +243,10 @@ export default function PromptInput({
             <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${
               tier === "standard" ? "bg-white/15" : "bg-white/[0.06]"
             }`}>
-              <Zap className={`w-3.5 h-3.5 ${tier === "standard" ? "text-white" : "text-white/30"}`} />
+              <Zap className={`w-3.5 h-3.5 ${tier === "standard" ? "text-white" : "text-white/50"}`} />
             </div>
             <span className={`text-xs font-bold uppercase tracking-wider ${
-              tier === "standard" ? "text-white" : "text-white/30"
+              tier === "standard" ? "text-white" : "text-white/50"
             }`}>
               Standard
             </span>
@@ -237,11 +295,11 @@ export default function PromptInput({
                 : "bg-white/[0.06]"
             }`}>
               <Sparkles className={`w-3.5 h-3.5 ${
-                tier === "premium" ? "text-brand-300" : "text-white/30"
+                tier === "premium" ? "text-brand-300" : "text-white/50"
               }`} />
             </div>
             <span className={`text-xs font-bold uppercase tracking-wider ${
-              tier === "premium" ? "text-brand-300" : "text-white/30"
+              tier === "premium" ? "text-brand-300" : "text-white/50"
             }`}>
               Premium
             </span>
@@ -277,12 +335,12 @@ export default function PromptInput({
           >
             <div className="flex items-center gap-2 min-w-0">
               <Cpu className="w-3.5 h-3.5 text-brand-400/60 flex-shrink-0" />
-              <span className="text-[10px] uppercase tracking-wider text-white/40 flex-shrink-0">Model</span>
+              <span className="text-[10px] uppercase tracking-wider text-white/50 flex-shrink-0">Model</span>
               <span className="text-xs text-white/70 truncate">
                 {availableModels.find(m => m.id === selectedModel)?.label || "Auto (Opus Build)"}
               </span>
             </div>
-            <ChevronDown className={`w-3.5 h-3.5 text-white/30 transition-transform ${showModelPicker ? "rotate-180" : ""}`} />
+            <ChevronDown className={`w-3.5 h-3.5 text-white/50 transition-transform ${showModelPicker ? "rotate-180" : ""}`} />
           </button>
           {showModelPicker && (
             <div className="absolute top-full left-0 right-0 mt-1 bg-[#12121a] border border-white/[0.08] rounded-lg shadow-2xl z-50 max-h-[240px] overflow-y-auto">
@@ -291,7 +349,7 @@ export default function PromptInput({
                 if (providerModels.length === 0) return null;
                 return (
                   <div key={provider}>
-                    <div className="px-3 py-1.5 text-[9px] uppercase tracking-widest text-white/20 border-b border-white/[0.04]">
+                    <div className="px-3 py-1.5 text-[9px] uppercase tracking-widest text-white/50 border-b border-white/[0.04]">
                       {provider === "claude" ? "Anthropic" : provider === "openai" ? "OpenAI" : "Google"}
                     </div>
                     {providerModels.map(model => (
@@ -322,11 +380,72 @@ export default function PromptInput({
         </div>
       )}
 
+      {/* Customization toggle + panel */}
+      {!hasExistingCode && (
+        <>
+          <button
+            onClick={() => setShowCustomization(!showCustomization)}
+            className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg transition-colors text-left ${
+              showCustomization
+                ? "bg-brand-500/10 border border-brand-500/20"
+                : "bg-white/[0.03] border border-white/[0.06] hover:border-white/10"
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <SlidersHorizontal className={`w-3.5 h-3.5 ${showCustomization ? "text-brand-400" : "text-white/50"}`} />
+              <span className={`text-[10px] uppercase tracking-wider ${showCustomization ? "text-brand-300" : "text-white/50"}`}>
+                Customize Style
+              </span>
+            </div>
+            <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showCustomization ? "rotate-180 text-brand-400" : "text-white/50"}`} />
+          </button>
+          {showCustomization && (
+            <CustomizationPanel options={customization} onChange={setCustomization} />
+          )}
+        </>
+      )}
+
+      {/* Generation mode selector */}
+      {!hasExistingCode && (
+        <div>
+          <div className="flex gap-1.5">
+            {GENERATION_MODES.map((mode) => {
+              const Icon = mode.icon;
+              const isActive = activeMode === mode.id;
+              return (
+                <button
+                  key={mode.id}
+                  onClick={() => handleModeChange(mode.id)}
+                  onMouseEnter={() => setHoveredMode(mode.id)}
+                  onMouseLeave={() => setHoveredMode(null)}
+                  disabled={isGenerating}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium transition-all disabled:opacity-40 ${
+                    isActive
+                      ? "bg-blue-600 text-white shadow-md shadow-blue-600/20"
+                      : "bg-white/[0.05] text-white/50 hover:bg-white/[0.10] hover:text-white/70"
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  {mode.label}
+                </button>
+              );
+            })}
+          </div>
+          {(() => {
+            const descMode = hoveredMode ?? activeMode;
+            const desc = GENERATION_MODES.find(m => m.id === descMode)?.description;
+            return desc ? (
+              <p className="text-[10px] text-white/50 mt-1 ml-0.5">{desc}</p>
+            ) : null;
+          })()}
+        </div>
+      )}
+
       {/* Main textarea */}
       <div className="relative flex-1 min-h-0">
         <textarea
           ref={textareaRef}
-          className="w-full h-full min-h-[120px] bg-[#0a0a0f] border border-white/[0.06] text-white/90 text-sm font-mono rounded-xl p-4 pr-12 outline-none transition-colors focus:border-brand-500/50 focus:shadow-glow resize-none placeholder:text-white/20"
+          className="w-full h-full min-h-[120px] bg-[#0a0a0f] border border-white/[0.06] text-white/90 text-sm font-mono rounded-xl p-4 pr-12 outline-none transition-colors focus:border-brand-500/50 focus:shadow-glow resize-none placeholder:text-white/50"
           placeholder="Describe the website you want to build..."
           value={prompt}
           onChange={(e) => onPromptChange(e.target.value)}
@@ -342,7 +461,7 @@ export default function PromptInput({
             className={`absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-lg transition-all ${
               isListening
                 ? "bg-red-500/20 text-red-400 animate-pulse"
-                : "bg-white/[0.04] text-white/20 hover:text-white/50 hover:bg-white/[0.08]"
+                : "bg-white/[0.04] text-white/50 hover:text-white/50 hover:bg-white/[0.08]"
             }`}
             title={isListening ? "Stop listening" : "Voice input"}
           >
@@ -352,12 +471,32 @@ export default function PromptInput({
       </div>
 
       {/* Character count + shortcut */}
-      <div className="flex justify-between items-center text-[10px] text-white/20">
+      <div className="flex justify-between items-center text-[10px] text-white/50">
         <span>{prompt.length.toLocaleString()} / 20,000</span>
-        <span className="text-brand-400/50">
+        <span className="text-brand-400/70">
           {isMac ? "Cmd" : "Ctrl"}+Enter to build
         </span>
       </div>
+
+      {/* Full-Stack toggle */}
+      {onFullStackChange && (
+        <button
+          type="button"
+          onClick={() => onFullStackChange(!fullStack)}
+          className={`w-full py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all border flex items-center justify-center gap-2 ${
+            fullStack
+              ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20"
+              : "bg-white/[0.03] border-white/[0.08] text-white/40 hover:text-white/60 hover:border-white/20"
+          }`}
+          title={fullStack
+            ? "Full-Stack enabled: generates real database, auth, and storage"
+            : "Frontend only: click to enable database, auth, and storage"
+          }
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+          {fullStack ? "Full-Stack (Database + Auth + Storage)" : "Frontend Only — click for Full-Stack"}
+        </button>
+      )}
 
       {/* Build button */}
       <button
@@ -366,7 +505,7 @@ export default function PromptInput({
             ? "bg-gradient-to-r from-brand-500 via-accent-purple to-brand-600 hover:shadow-glow"
             : "btn-gradient"
         }`}
-        onClick={onGenerate}
+        onClick={handleGenerateWithCustomization}
         disabled={isGenerating || !prompt.trim()}
       >
         {isGenerating ? (
@@ -393,7 +532,7 @@ export default function PromptInput({
           <div className="relative">
             <textarea
               ref={editInputRef}
-              className="w-full min-h-[70px] bg-[#0a0a0f] border border-white/[0.06] text-white/90 text-sm font-mono rounded-xl p-3 pr-20 outline-none transition-colors focus:border-brand-500/50 resize-none placeholder:text-white/20"
+              className="w-full min-h-[70px] bg-[#0a0a0f] border border-white/[0.06] text-white/90 text-sm font-mono rounded-xl p-3 pr-20 outline-none transition-colors focus:border-brand-500/50 resize-none placeholder:text-white/50"
               placeholder="e.g. Change the hero background to blue, add a pricing section..."
               value={editPrompt}
               onChange={(e) => onEditPromptChange(e.target.value)}
@@ -408,7 +547,7 @@ export default function PromptInput({
                   className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all ${
                     isListening
                       ? "bg-red-500/20 text-red-400 animate-pulse"
-                      : "bg-white/[0.04] text-white/20 hover:text-white/50"
+                      : "bg-white/[0.04] text-white/50 hover:text-white/50"
                   }`}
                   title={isListening ? "Stop listening" : "Voice input"}
                 >
@@ -428,17 +567,27 @@ export default function PromptInput({
         </div>
       )}
 
-      {/* Example prompts — only when no existing code */}
+      {/* Example prompts + Browse Templates — only when no existing code */}
       {!hasExistingCode && (
         <div className="mt-1">
-          <span className="text-[10px] uppercase tracking-[2px] text-white/20 block mb-2">
-            Try an example
-          </span>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[10px] uppercase tracking-[2px] text-white/50">
+              Try an example
+            </span>
+            <button
+              onClick={() => setShowTemplateGallery(true)}
+              disabled={isGenerating}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-medium text-brand-400/80 hover:text-brand-400 bg-brand-500/[0.08] hover:bg-brand-500/[0.14] border border-brand-500/15 hover:border-brand-500/30 transition-all disabled:opacity-40"
+            >
+              <LayoutTemplate className="w-3 h-3" />
+              Browse Templates
+            </button>
+          </div>
           <div className="flex flex-col gap-1.5 overflow-y-auto max-h-[160px]">
             {EXAMPLE_PROMPTS.map((example, i) => (
               <button
                 key={i}
-                className="text-left text-xs text-brand-400/50 hover:text-brand-400 transition-colors p-2 rounded-lg hover:bg-white/[0.03] leading-relaxed"
+                className="text-left text-xs text-white/50 hover:text-brand-400 transition-colors p-2 rounded-lg hover:bg-white/[0.03] leading-relaxed"
                 onClick={() => onPromptChange(example)}
                 disabled={isGenerating}
               >
@@ -447,6 +596,17 @@ export default function PromptInput({
             ))}
           </div>
         </div>
+      )}
+
+      {/* Template gallery modal */}
+      {showTemplateGallery && (
+        <TemplateGallery
+          onSelectTemplate={(templatePrompt) => {
+            onPromptChange(templatePrompt);
+            setShowTemplateGallery(false);
+          }}
+          onClose={() => setShowTemplateGallery(false)}
+        />
       )}
     </div>
   );

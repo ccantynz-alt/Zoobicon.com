@@ -2,12 +2,39 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import {
-  Zap, Shield, CheckCircle2, XCircle, AlertTriangle, LogOut,
-  Settings, Users, Server, Globe, RefreshCw,
-  Copy, Check, ExternalLink, BarChart3, Code2,
-  Trash2, Edit3, Crown, ImagePlus, Workflow, Layout,
-  TrendingUp, UserPlus, FolderOpen, Rocket,
+  Zap,
+  Shield,
+  CheckCircle2,
+  XCircle,
+  Settings,
+  Users,
+  Server,
+  Globe,
+  RefreshCw,
+  Copy,
+  Check,
+  BarChart3,
+  Code2,
+  Trash2,
+  Edit3,
+  Crown,
+  ImagePlus,
+  Workflow,
+  Layout,
+  TrendingUp,
+  UserPlus,
+  FolderOpen,
+  Rocket,
+  Mail,
+  Inbox,
+  HeadphonesIcon,
+  Activity,
+  Database,
+  Cpu,
+  Wifi,
+  ArrowUpRight,
 } from "lucide-react";
 
 type AdminTab = "overview" | "users" | "templates" | "analytics";
@@ -42,7 +69,7 @@ interface Analytics {
 }
 
 export default function AdminPage() {
-  const [userName, setUserName] = useState("");
+  // userName removed — now displayed by AdminShell sidebar
   const [isAdmin, setIsAdmin] = useState(false);
   const [activeTab, setActiveTab] = useState<AdminTab>("overview");
   const [copied, setCopied] = useState("");
@@ -68,17 +95,11 @@ export default function AdminPage() {
       if (!raw) { window.location.href = "/auth/login"; return; }
       const user = JSON.parse(raw);
       if (user.role !== "admin") { window.location.href = "/dashboard"; return; }
-      setUserName(user.name || user.email || "Admin");
       setIsAdmin(true);
     } catch {
       window.location.href = "/auth/login";
     }
   }, []);
-
-  const handleLogout = () => {
-    try { localStorage.removeItem("zoobicon_user"); } catch {}
-    window.location.href = "/";
-  };
 
   const copyToClipboard = (text: string, key: string) => {
     navigator.clipboard.writeText(text).catch(() => {});
@@ -173,15 +194,44 @@ export default function AdminPage() {
     { id: "templates", label: "Templates", icon: <Layout className="w-4 h-4" /> },
   ];
 
-  const envKeys = [
-    { key: "ANTHROPIC_API_KEY", label: "Anthropic (Claude)", required: true },
-    { key: "OPENAI_API_KEY", label: "OpenAI (DALL-E images)", required: false },
-    { key: "STABILITY_API_KEY", label: "Stability AI (SDXL images)", required: false },
-    { key: "UNSPLASH_ACCESS_KEY", label: "Unsplash (stock photos)", required: false },
-    { key: "RESEND_API_KEY", label: "Resend (Email)", required: false },
-    { key: "DATABASE_URL", label: "Neon Database", required: false },
-    { key: "ADMIN_EMAIL", label: "Admin Email", required: true },
-    { key: "ADMIN_PASSWORD", label: "Admin Password", required: true },
+  const envKeys: { key: string; label: string; required: boolean; group: string }[] = [
+    // Core AI
+    { key: "ANTHROPIC_API_KEY", label: "Anthropic (Claude) — powers the AI pipeline", required: true, group: "Core AI" },
+    { key: "OPENAI_API_KEY", label: "OpenAI (GPT-4o, DALL-E images)", required: false, group: "Core AI" },
+    { key: "GOOGLE_AI_API_KEY", label: "Google (Gemini 2.5 Pro/Flash)", required: false, group: "Core AI" },
+    // Images
+    { key: "STABILITY_API_KEY", label: "Stability AI (SDXL images)", required: false, group: "Images" },
+    { key: "UNSPLASH_ACCESS_KEY", label: "Unsplash (stock photos)", required: false, group: "Images" },
+    // Database & Auth
+    { key: "DATABASE_URL", label: "Neon serverless Postgres", required: true, group: "Database & Auth" },
+    { key: "ADMIN_EMAIL", label: "Admin login email", required: true, group: "Database & Auth" },
+    { key: "ADMIN_PASSWORD", label: "Admin login password", required: true, group: "Database & Auth" },
+    { key: "RESET_TOKEN_SECRET", label: "JWT/reset token signing secret", required: false, group: "Database & Auth" },
+    // OAuth
+    { key: "GOOGLE_CLIENT_ID", label: "Google OAuth client ID", required: false, group: "OAuth" },
+    { key: "GOOGLE_CLIENT_SECRET", label: "Google OAuth client secret", required: false, group: "OAuth" },
+    { key: "GITHUB_OAUTH_CLIENT_ID", label: "GitHub OAuth client ID", required: false, group: "OAuth" },
+    { key: "GITHUB_OAUTH_CLIENT_SECRET", label: "GitHub OAuth client secret", required: false, group: "OAuth" },
+    // Payments
+    { key: "STRIPE_SECRET_KEY", label: "Stripe secret key", required: false, group: "Payments" },
+    { key: "STRIPE_CREATOR_PRICE_ID", label: "Stripe Creator plan price ID ($19)", required: false, group: "Payments" },
+    { key: "STRIPE_PRO_PRICE_ID", label: "Stripe Pro plan price ID ($49)", required: false, group: "Payments" },
+    { key: "STRIPE_AGENCY_PRICE_ID", label: "Stripe Agency plan price ID ($99)", required: false, group: "Payments" },
+    { key: "STRIPE_WEBHOOK_SECRET", label: "Stripe webhook signing secret", required: false, group: "Payments" },
+    // Email
+    { key: "MAILGUN_API_KEY", label: "Mailgun API key", required: false, group: "Email" },
+    { key: "MAILGUN_DOMAIN", label: "Mailgun sending domain", required: false, group: "Email" },
+    { key: "MAILGUN_WEBHOOK_SIGNING_KEY", label: "Mailgun webhook verification", required: false, group: "Email" },
+    { key: "ADMIN_NOTIFICATION_EMAIL", label: "Where to send admin notifications", required: false, group: "Email" },
+    // Infrastructure
+    { key: "NEXT_PUBLIC_APP_URL", label: "Public app URL (emails, Stripe redirects)", required: false, group: "Infrastructure" },
+    { key: "CLOUDFLARE_API_TOKEN", label: "Cloudflare API token (DNS/SSL/CDN)", required: false, group: "Infrastructure" },
+    { key: "CLOUDFLARE_ZONE_ID", label: "Cloudflare zone ID", required: false, group: "Infrastructure" },
+    { key: "CLOUDFLARE_ACCOUNT_ID", label: "Cloudflare account ID", required: false, group: "Infrastructure" },
+    // Integrations
+    { key: "GITHUB_TOKEN", label: "GitHub token (import feature)", required: false, group: "Integrations" },
+    { key: "SLACK_BOT_TOKEN", label: "Hash bot token", required: false, group: "Integrations" },
+    { key: "SLACK_SIGNING_SECRET", label: "Hash signing secret", required: false, group: "Integrations" },
   ];
 
   const launchChecklist = [
@@ -199,13 +249,13 @@ export default function AdminPage() {
     { done: true,  label: "Site hosting & deploy" },
     { done: false, label: "Stripe billing live" },
     { done: false, label: "OPENAI_API_KEY for DALL-E images" },
-    { done: false, label: "Google / GitHub OAuth" },
+    { done: true, label: "Google / GitHub OAuth" },
     { done: false, label: "Production database (DATABASE_URL)" },
   ];
 
   const apiRoutes = [
     { method: "POST", path: "/api/generate/pipeline", desc: "10-agent pipeline (Standard/Premium/Ultra)", limit: "—" },
-    { method: "POST", path: "/api/generate/stream", desc: "Stream AI website generation", limit: "10/min" },
+    { method: "POST", path: "/api/generate/react", desc: "Stream React component generation (SSE)", limit: "10/min" },
     { method: "POST", path: "/api/generate/landing", desc: "Landing page generator (12 sections)", limit: "—" },
     { method: "POST", path: "/api/generate/saas", desc: "SaaS dashboard generator", limit: "—" },
     { method: "POST", path: "/api/generate/booking", desc: "Booking system generator", limit: "—" },
@@ -232,7 +282,7 @@ export default function AdminPage() {
     { method: "POST", path: "/api/generate/copy", desc: "Copywriter agent", limit: "—" },
     { method: "POST", path: "/api/generate/brand-kit", desc: "Brand kit / design system generator", limit: "—" },
     { method: "POST", path: "/api/generate/api-gen", desc: "REST API code generator", limit: "—" },
-    { method: "POST", path: "/api/generate/chrome-ext", desc: "Chrome extension generator", limit: "—" },
+    { method: "POST", path: "/api/generate/chrome-ext", desc: "Globe2 extension generator", limit: "—" },
     { method: "POST", path: "/api/generate/component-lib", desc: "Component library generator", limit: "—" },
     { method: "POST", path: "/api/generate/pwa", desc: "Progressive web app generator", limit: "—" },
     { method: "POST", path: "/api/generate/form-builder", desc: "Form builder generator", limit: "—" },
@@ -249,50 +299,35 @@ export default function AdminPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#050507]">
-      {/* Nav */}
-      <nav className="sticky top-0 z-50 border-b border-white/[0.04] bg-[#050507]/80 backdrop-blur-2xl">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
-                <Zap className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-lg font-bold tracking-tight">Zoobicon</span>
-            </Link>
-            <div className="w-px h-4 bg-white/10" />
-            <div className="flex items-center gap-1.5">
-              <Shield className="w-3.5 h-3.5 text-brand-400" />
-              <span className="text-sm font-semibold text-white/70">Admin</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-white/30 hidden sm:block">{userName}</span>
-            <Link href="/builder" className="text-xs text-white/40 hover:text-white/60 px-3 py-1.5 rounded-lg border border-white/[0.06] transition-colors">
-              Builder
-            </Link>
-            <Link href="/dashboard" className="text-xs text-white/40 hover:text-white/60 px-3 py-1.5 rounded-lg border border-white/[0.06] transition-colors">
-              Dashboard
-            </Link>
-            <button onClick={handleLogout} className="flex items-center gap-1.5 text-xs text-red-400/60 hover:text-red-400 transition-colors">
-              <LogOut className="w-3.5 h-3.5" />
-              Sign out
-            </button>
-          </div>
-        </div>
-      </nav>
+    <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-8">
 
-      {/* Tab Navigation */}
-      <div className="border-b border-white/[0.04]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex gap-1">
+      {/* ── Page Header ── */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-800">Command Center</h1>
+          <p className="text-sm text-slate-400 mt-1">System health, configuration, and platform management</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Link href="/builder" className="text-xs text-slate-500 hover:text-slate-700 px-3 py-1.5 rounded-xl bg-white/60 border border-slate-200 hover:border-amber-300 hover:bg-white/80 backdrop-blur-sm transition-all shadow-sm">
+            Builder
+          </Link>
+          <Link href="/dashboard" className="text-xs text-white px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 shadow-md shadow-amber-500/20 transition-all">
+            Dashboard
+          </Link>
+        </div>
+      </div>
+
+      {/* ── Content Tabs ── */}
+      <div className="border-b border-slate-200">
+        <div className="flex gap-1">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-3 text-xs font-medium border-b-2 transition-colors ${
+              className={`flex items-center gap-2 px-4 py-2.5 text-xs font-medium border-b-2 transition-all ${
                 activeTab === tab.id
-                  ? "border-brand-500 text-brand-400"
-                  : "border-transparent text-white/30 hover:text-white/50"
+                  ? "border-amber-500 text-amber-700"
+                  : "border-transparent text-slate-400 hover:text-slate-600 hover:bg-slate-50"
               }`}
             >
               {tab.icon}
@@ -302,66 +337,91 @@ export default function AdminPage() {
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-6 lg:px-8 py-10 space-y-8">
-
-        {/* ═══════ OVERVIEW TAB ═══════ */}
-        {activeTab === "overview" && (
-          <>
+      {/* ═══════ OVERVIEW TAB ═══════ */}
+      {activeTab === "overview" && (
+        <>
+            {/* ── Quick Actions ── */}
             <div>
-              <h1 className="text-2xl font-black tracking-tight mb-1">Admin Panel</h1>
-              <p className="text-white/40 text-sm">System health, configuration, and launch checklist.</p>
+              <h2 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3 flex items-center gap-2">
+                <Activity className="w-3.5 h-3.5 text-amber-500" />
+                Quick Actions
+              </h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                {[
+                  { icon: Mail, label: "Email Inbox", href: "/admin/email", desc: "Read & manage email", gradient: "from-rose-400 to-orange-400" },
+                  { icon: Inbox, label: "Mailboxes", href: "/admin/mailboxes", desc: "Manage mailboxes & routing", gradient: "from-amber-400 to-yellow-400" },
+                  { icon: Settings, label: "Email Settings", href: "/admin/email-settings", desc: "Configure admin email", gradient: "from-cyan-400 to-rose-400" },
+                  { icon: HeadphonesIcon, label: "Support", href: "/admin/support", desc: "Support tickets & knowledge", gradient: "from-emerald-400 to-teal-400" },
+                  { icon: Rocket, label: "Pre-Launch", href: "/admin/pre-launch", desc: "Launch checklist & readiness", gradient: "from-blue-400 to-purple-500" },
+                  { icon: Code2, label: "Builder", href: "/builder", desc: "AI website builder", gradient: "from-violet-400 to-purple-400" },
+                  { icon: Globe, label: "View Site", href: "/", desc: "Public homepage", gradient: "from-cyan-400 to-blue-400", external: true },
+                  { icon: Settings, label: "Settings", href: "/auth/settings", desc: "Account settings", gradient: "from-slate-400 to-zinc-400" },
+                  { icon: BarChart3, label: "Dashboard", href: "/dashboard", desc: "Project dashboard", gradient: "from-amber-500 to-amber-600" },
+                ].map((a, i) => (
+                  <motion.div
+                    key={a.label}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                  >
+                    <Link
+                      href={a.href}
+                      target={(a as { external?: boolean }).external ? "_blank" : undefined}
+                      className="group relative overflow-hidden rounded-2xl border border-slate-200/80 hover:border-amber-300 bg-white/70 hover:bg-white/90 backdrop-blur-xl p-5 flex items-start gap-4 transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-amber-100/50 hover:scale-[1.02]"
+                    >
+                      <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${a.gradient} flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform`}>
+                        <a.icon className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-sm font-semibold truncate text-slate-700 group-hover:text-slate-900 transition-colors">{a.label}</div>
+                        <div className="text-[11px] text-slate-400 truncate mt-0.5">{a.desc}</div>
+                      </div>
+                      <ArrowUpRight className="w-4 h-4 text-slate-300 group-hover:text-amber-500 absolute top-4 right-4 transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
             </div>
 
-            {/* Quick Actions */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {[
-                { icon: Code2, label: "Builder", href: "/builder", desc: "AI website builder" },
-                { icon: Globe, label: "View Site", href: "/", desc: "Public homepage", external: true },
-                { icon: Settings, label: "Settings", href: "/auth/settings", desc: "Change password" },
-                { icon: BarChart3, label: "Dashboard", href: "/dashboard", desc: "Project dashboard" },
-              ].map((a) => (
-                <Link
-                  key={a.label}
-                  href={a.href}
-                  target={a.external ? "_blank" : undefined}
-                  className="gradient-border p-4 rounded-xl card-hover flex items-center gap-3 group"
-                >
-                  <div className="w-9 h-9 rounded-lg bg-brand-500/10 border border-brand-500/20 flex items-center justify-center flex-shrink-0">
-                    <a.icon className="w-4 h-4 text-brand-400" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-sm font-semibold truncate">{a.label}</div>
-                    <div className="text-[10px] text-white/30 truncate">{a.desc}</div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-
-            {/* New Feature Highlights */}
+            {/* ── Feature Highlights ── */}
             <div className="grid md:grid-cols-3 gap-4">
               {[
-                { icon: Workflow, title: "10-Agent Pipeline", desc: "Strategist, Brand, Copywriter, Architect, Developer, Animator, SEO, Forms, Integrations, QA — 3 tiers: Standard, Premium, Ultra.", color: "brand" },
-                { icon: ImagePlus, title: "AI Image Generation", desc: "DALL-E 3, Stability AI, and Unsplash integration. Replace placeholders with contextual AI images.", color: "accent-cyan" },
-                { icon: Globe, title: "Website Cloner", desc: "Paste any URL to analyze, extract content, and rebuild as a premium modern website.", color: "accent-purple" },
-              ].map((f) => (
-                <div key={f.title} className="gradient-border rounded-2xl p-5">
-                  <div className={`w-10 h-10 rounded-xl bg-${f.color === "brand" ? "brand-500" : f.color === "accent-cyan" ? "cyan-500" : "purple-500"}/10 flex items-center justify-center mb-3`}>
-                    <f.icon className={`w-5 h-5 ${f.color === "brand" ? "text-brand-400" : f.color === "accent-cyan" ? "text-cyan-400" : "text-blue-400"}`} />
+                { icon: Workflow, title: "10-Agent Pipeline", desc: "Strategist, Brand, Copywriter, Architect, Developer, Animator, SEO, Forms, Integrations, QA — 3 tiers.", iconGradient: "from-violet-400 to-purple-500" },
+                { icon: ImagePlus, title: "AI Image Generation", desc: "DALL-E 3, Stability AI, and Unsplash integration. Contextual AI images.", iconGradient: "from-cyan-400 to-blue-500" },
+                { icon: Globe, title: "Website Cloner", desc: "Paste any URL to analyze, extract content, and rebuild as a premium site.", iconGradient: "from-emerald-400 to-teal-500" },
+              ].map((f, i) => (
+                <motion.div
+                  key={f.title}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 + i * 0.1 }}
+                  className="rounded-2xl p-6 bg-white/60 border border-slate-200/80 backdrop-blur-xl shadow-sm hover:shadow-lg hover:shadow-amber-100/30 hover:border-amber-200 hover:scale-[1.02] transition-all duration-300"
+                >
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${f.iconGradient} flex items-center justify-center mb-4 shadow-lg`}>
+                    <f.icon className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-sm font-bold mb-1">{f.title}</h3>
-                  <p className="text-xs text-white/30 leading-relaxed">{f.desc}</p>
-                </div>
+                  <h3 className="text-sm font-bold mb-1.5 text-slate-700">{f.title}</h3>
+                  <p className="text-xs text-slate-400 leading-relaxed">{f.desc}</p>
+                </motion.div>
               ))}
             </div>
 
             <div className="grid lg:grid-cols-2 gap-6">
               {/* System Checks */}
-              <div className="gradient-border rounded-2xl p-6">
+              <motion.div
+                initial={{ opacity: 0, x: -15 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+                className="rounded-2xl border border-emerald-200 bg-white/70 backdrop-blur-xl p-6 shadow-sm"
+              >
                 <div className="flex items-center justify-between mb-5">
-                  <h2 className="text-base font-bold">System Status</h2>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-xs text-emerald-400/80">Operational</span>
+                  <h2 className="text-base font-bold flex items-center gap-2 text-slate-700">
+                    <Cpu className="w-4 h-4 text-emerald-500" />
+                    System Status
+                  </h2>
+                  <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-lg shadow-emerald-400/50" />
+                    <span className="text-xs font-semibold text-emerald-600">All Systems Go</span>
                   </div>
                 </div>
                 <div className="space-y-3">
@@ -374,110 +434,153 @@ export default function AdminPage() {
                     { label: "Website Cloner", detail: "Fetch, analyze, rebuild premium" },
                     { label: "Rate Limiting", detail: "10 gen/min · 20 chat/min · 30 support/min" },
                   ].map((c) => (
-                    <div key={c.label} className="flex items-start gap-3">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                    <div key={c.label} className="flex items-start gap-3 py-1">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
                       <div>
-                        <div className="text-sm font-medium">{c.label}</div>
-                        <div className="text-xs text-white/30">{c.detail}</div>
+                        <div className="text-sm font-medium text-slate-700">{c.label}</div>
+                        <div className="text-xs text-slate-400">{c.detail}</div>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="mt-5 pt-5 border-t border-white/[0.06]">
+                <div className="mt-5 pt-5 border-t border-slate-100">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <Server className="w-4 h-4 text-white/40" />
-                      <span className="text-sm font-medium">Anthropic API</span>
+                      <Wifi className="w-4 h-4 text-amber-500" />
+                      <span className="text-sm font-medium text-slate-700">Anthropic API</span>
                     </div>
                     <button onClick={testApiConnection} disabled={apiTest === "loading"}
-                      className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white/60 border border-white/[0.06] rounded-lg px-3 py-1.5 transition-colors disabled:opacity-50">
+                      className="flex items-center gap-1.5 text-xs text-amber-600 hover:text-amber-700 border border-amber-200 hover:border-amber-300 bg-amber-50 hover:bg-amber-100 rounded-xl px-3 py-1.5 transition-all disabled:opacity-50 shadow-sm">
                       <RefreshCw className={`w-3 h-3 ${apiTest === "loading" ? "animate-spin" : ""}`} />
-                      Test
+                      Test Connection
                     </button>
                   </div>
-                  {apiTest === "ok" && <div className="flex items-center gap-2 text-xs text-emerald-400"><CheckCircle2 className="w-3.5 h-3.5" />Connection successful</div>}
-                  {apiTest === "error" && <div className="flex items-center gap-2 text-xs text-red-400"><XCircle className="w-3.5 h-3.5" />{apiError}</div>}
+                  {apiTest === "ok" && <div className="flex items-center gap-2 text-xs text-emerald-600 font-medium"><CheckCircle2 className="w-3.5 h-3.5" />Connection successful</div>}
+                  {apiTest === "error" && <div className="flex items-center gap-2 text-xs text-red-500 font-medium"><XCircle className="w-3.5 h-3.5" />{apiError}</div>}
                 </div>
-              </div>
+              </motion.div>
 
               {/* Env Vars */}
-              <div className="gradient-border rounded-2xl p-6">
-                <h2 className="text-base font-bold mb-1">Environment Variables</h2>
-                <p className="text-xs text-white/30 mb-5">Set in <span className="text-white/50">Vercel → Environment Variables</span></p>
-                <div className="space-y-2.5">
-                  {envKeys.map((e) => (
-                    <div key={e.key} className="flex items-center justify-between gap-3">
-                      <div className="min-w-0">
-                        <div className="text-xs font-mono text-white/70 truncate">{e.key}</div>
-                        <div className="text-[10px] text-white/25">{e.label}</div>
-                      </div>
-                      <div className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${
-                        e.required ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" : "bg-white/[0.04] text-white/30 border border-white/[0.06]"
-                      }`}>
-                        {e.required ? "Required" : "Optional"}
-                      </div>
-                    </div>
-                  ))}
+              <motion.div
+                initial={{ opacity: 0, x: 15 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+                className="rounded-2xl border border-slate-200/80 bg-white/70 backdrop-blur-xl p-6 shadow-sm"
+              >
+                <h2 className="text-base font-bold mb-1 flex items-center gap-2 text-slate-700">
+                  <Database className="w-4 h-4 text-amber-500" />
+                  Environment Variables
+                </h2>
+                <p className="text-xs text-slate-400 mb-5">Set in <span className="text-amber-600 font-medium">Vercel → Environment Variables</span> · {envKeys.length} total</p>
+                <div className="space-y-1 max-h-[420px] overflow-y-auto pr-1 custom-scrollbar">
+                  {(() => {
+                    let lastGroup = "";
+                    return envKeys.map((e) => {
+                      const showGroup = e.group !== lastGroup;
+                      lastGroup = e.group;
+                      return (
+                        <div key={e.key}>
+                          {showGroup && (
+                            <div className="text-[10px] font-semibold uppercase tracking-wider text-amber-600 mt-3 mb-1.5 first:mt-0">{e.group}</div>
+                          )}
+                          <div className="flex items-center justify-between gap-3 py-1.5">
+                            <div className="min-w-0">
+                              <div className="text-xs font-mono text-slate-600 truncate">{e.key}</div>
+                              <div className="text-[10px] text-slate-400">{e.label}</div>
+                            </div>
+                            <div className={`text-[10px] font-bold px-2.5 py-1 rounded-full flex-shrink-0 ${
+                              e.required
+                                ? "bg-amber-50 text-amber-700 border border-amber-200"
+                                : "bg-slate-50 text-slate-400 border border-slate-200"
+                            }`}>
+                              {e.required ? "Required" : "Optional"}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    });
+                  })()}
                 </div>
-                <div className="mt-5 pt-5 border-t border-white/[0.06]">
+                <div className="mt-5 pt-5 border-t border-slate-100">
                   <button
                     onClick={() => copyToClipboard(
-                      "ANTHROPIC_API_KEY=\nOPENAI_API_KEY=\nSTABILITY_API_KEY=\nUNSPLASH_ACCESS_KEY=\nDATABASE_URL=\nADMIN_EMAIL=admin@zoobicon.com\nADMIN_PASSWORD=\nRESEND_API_KEY=\nNEXT_PUBLIC_APP_URL=https://zoobicon.com",
+                      "# Core AI\nANTHROPIC_API_KEY=\nOPENAI_API_KEY=\nGOOGLE_AI_API_KEY=\n\n# Images\nSTABILITY_API_KEY=\nUNSPLASH_ACCESS_KEY=\n\n# Database & Auth\nDATABASE_URL=\nADMIN_EMAIL=admin@zoobicon.com\nADMIN_PASSWORD=\nRESET_TOKEN_SECRET=\n\n# OAuth\nGOOGLE_CLIENT_ID=\nGOOGLE_CLIENT_SECRET=\nGITHUB_OAUTH_CLIENT_ID=\nGITHUB_OAUTH_CLIENT_SECRET=\n\n# Payments (Stripe)\nSTRIPE_SECRET_KEY=\nSTRIPE_CREATOR_PRICE_ID=\nSTRIPE_PRO_PRICE_ID=\nSTRIPE_AGENCY_PRICE_ID=\nSTRIPE_WEBHOOK_SECRET=\n\n# Email (Mailgun)\nMAILGUN_API_KEY=\nMAILGUN_DOMAIN=zoobicon.com\nMAILGUN_WEBHOOK_SIGNING_KEY=\nADMIN_NOTIFICATION_EMAIL=\n\n# Infrastructure\nNEXT_PUBLIC_APP_URL=https://zoobicon.com\nCLOUDFLARE_API_TOKEN=\nCLOUDFLARE_ZONE_ID=\nCLOUDFLARE_ACCOUNT_ID=\n\n# Integrations\nGITHUB_TOKEN=\nSLACK_BOT_TOKEN=\nSLACK_SIGNING_SECRET=",
                       "envblock"
                     )}
-                    className="flex items-center gap-2 text-xs text-white/40 hover:text-white/60 border border-white/[0.06] rounded-lg px-3 py-1.5 transition-colors"
+                    className="flex items-center gap-2 text-xs text-amber-600 hover:text-amber-700 border border-amber-200 hover:border-amber-300 bg-amber-50 hover:bg-amber-100 rounded-xl px-4 py-2 transition-all shadow-sm"
                   >
-                    {copied === "envblock" ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                    {copied === "envblock" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
                     {copied === "envblock" ? "Copied!" : "Copy .env.local template"}
                   </button>
                 </div>
-              </div>
+              </motion.div>
             </div>
 
             {/* Launch Checklist */}
-            <div className="gradient-border rounded-2xl p-6">
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="rounded-2xl border border-amber-200 bg-gradient-to-br from-white/80 via-amber-50/30 to-white/60 p-6 backdrop-blur-xl shadow-sm"
+            >
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-base font-bold">Launch Checklist</h2>
-                  <p className="text-xs text-white/30 mt-0.5">
+                  <h2 className="text-base font-bold flex items-center gap-2 text-slate-700">
+                    <Rocket className="w-4 h-4 text-amber-500" />
+                    Launch Checklist
+                  </h2>
+                  <p className="text-xs text-slate-400 mt-0.5">
                     {launchChecklist.filter((i) => i.done).length} of {launchChecklist.length} complete
                   </p>
                 </div>
-                <div className="text-2xl font-black gradient-text-static">
+                <div className="text-3xl font-black bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 bg-clip-text text-transparent">
                   {Math.round((launchChecklist.filter((i) => i.done).length / launchChecklist.length) * 100)}%
                 </div>
               </div>
-              <div className="h-2 bg-white/[0.04] rounded-full mb-6 overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-brand-500 to-accent-cyan rounded-full transition-all duration-500"
+              <div className="h-3 bg-slate-100 rounded-full mb-6 overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 rounded-full transition-all duration-700 shadow-lg shadow-amber-400/30"
                   style={{ width: `${(launchChecklist.filter((i) => i.done).length / launchChecklist.length) * 100}%` }} />
               </div>
-              <div className="grid md:grid-cols-2 gap-2">
+              <div className="grid md:grid-cols-2 gap-2.5">
                 {launchChecklist.map((item, i) => (
-                  <div key={i} className="flex items-center gap-3 py-1.5">
-                    {item.done ? <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" /> : <div className="w-4 h-4 rounded-full border border-white/[0.12] flex-shrink-0" />}
-                    <span className={`text-sm ${item.done ? "text-white/60" : "text-white/40"}`}>{item.label}</span>
+                  <div key={i} className={`flex items-center gap-3 py-2 px-3 rounded-xl ${item.done ? "bg-emerald-50/80" : "bg-slate-50/60"}`}>
+                    {item.done
+                      ? <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                      : <div className="w-4 h-4 rounded-full border-2 border-slate-200 flex-shrink-0" />
+                    }
+                    <span className={`text-sm ${item.done ? "text-slate-600" : "text-slate-400"}`}>{item.label}</span>
                   </div>
                 ))}
               </div>
-            </div>
+            </motion.div>
 
             {/* API Reference */}
-            <div className="gradient-border rounded-2xl p-6">
-              <h2 className="text-base font-bold mb-5">API Reference</h2>
-              <div className="space-y-2">
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="rounded-2xl border border-slate-200/80 bg-white/70 backdrop-blur-xl p-6 shadow-sm"
+            >
+              <h2 className="text-base font-bold mb-5 flex items-center gap-2 text-slate-700">
+                <Server className="w-4 h-4 text-amber-500" />
+                API Reference
+              </h2>
+              <div className="space-y-1.5">
                 {apiRoutes.map((r) => (
-                  <div key={r.path} className="flex items-center gap-4 py-2 border-b border-white/[0.04] last:border-0">
-                    <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded w-12 text-center flex-shrink-0 ${
-                      r.method === "GET" ? "text-emerald-400 bg-emerald-500/10" : "text-brand-400 bg-brand-500/10"
+                  <div key={r.path} className="flex items-center gap-4 py-2.5 px-3 rounded-xl border-b border-slate-100 last:border-0 hover:bg-amber-50/40 transition-colors">
+                    <span className={`text-[10px] font-mono font-bold px-2.5 py-1 rounded-lg w-14 text-center flex-shrink-0 ${
+                      r.method === "GET"
+                        ? "text-emerald-600 bg-emerald-50 border border-emerald-200"
+                        : "text-amber-700 bg-amber-50 border border-amber-200"
                     }`}>{r.method}</span>
-                    <code className="text-xs font-mono text-white/60 w-56 flex-shrink-0">{r.path}</code>
-                    <span className="text-xs text-white/30 flex-1">{r.desc}</span>
-                    <span className="text-[10px] text-white/20 flex-shrink-0">{r.limit}</span>
+                    <code className="text-xs font-mono text-slate-500 w-60 flex-shrink-0">{r.path}</code>
+                    <span className="text-xs text-slate-400 flex-1">{r.desc}</span>
+                    <span className="text-[10px] text-slate-400 flex-shrink-0 font-medium">{r.limit}</span>
                   </div>
                 ))}
               </div>
-            </div>
+            </motion.div>
           </>
         )}
 
@@ -485,8 +588,8 @@ export default function AdminPage() {
         {activeTab === "analytics" && (
           <>
             <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-black tracking-tight">Analytics</h1>
-              <button onClick={fetchAnalytics} className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white/60 border border-white/[0.06] rounded-lg px-3 py-1.5 transition-colors">
+              <h1 className="text-2xl font-black tracking-tight text-slate-800">Analytics</h1>
+              <button onClick={fetchAnalytics} className="flex items-center gap-1.5 text-xs text-amber-600 hover:text-amber-700 border border-amber-200 bg-amber-50 hover:bg-amber-100 rounded-xl px-3 py-1.5 transition-all shadow-sm">
                 <RefreshCw className={`w-3 h-3 ${analyticsLoading ? "animate-spin" : ""}`} />
                 Refresh
               </button>
@@ -495,93 +598,103 @@ export default function AdminPage() {
             {/* Stat cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { label: "Total Users", value: analytics?.stats.totalUsers || 0, icon: Users, color: "brand" },
-                { label: "Projects", value: analytics?.stats.totalProjects || 0, icon: FolderOpen, color: "purple" },
-                { label: "Sites Deployed", value: analytics?.stats.totalSites || 0, icon: Rocket, color: "cyan" },
-                { label: "Deployments", value: analytics?.stats.totalDeployments || 0, icon: TrendingUp, color: "emerald" },
+                { label: "Total Users", value: analytics?.stats.totalUsers || 0, icon: Users, iconGradient: "from-violet-400 to-purple-500" },
+                { label: "Projects", value: analytics?.stats.totalProjects || 0, icon: FolderOpen, iconGradient: "from-blue-400 to-indigo-500" },
+                { label: "Sites Deployed", value: analytics?.stats.totalSites || 0, icon: Rocket, iconGradient: "from-amber-400 to-amber-500" },
+                { label: "Deployments", value: analytics?.stats.totalDeployments || 0, icon: TrendingUp, iconGradient: "from-emerald-400 to-green-500" },
               ].map((s) => (
-                <div key={s.label} className="gradient-border rounded-2xl p-5">
+                <motion.div
+                  key={s.label}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="rounded-2xl p-5 bg-white/70 border border-slate-200/80 backdrop-blur-xl shadow-sm hover:shadow-lg hover:shadow-amber-100/30 hover:scale-[1.03] transition-all duration-300"
+                >
                   <div className="flex items-center justify-between mb-3">
-                    <s.icon className={`w-5 h-5 ${s.color === "brand" ? "text-brand-400" : s.color === "purple" ? "text-blue-400" : s.color === "cyan" ? "text-cyan-400" : "text-emerald-400"}`} />
+                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.iconGradient} flex items-center justify-center shadow-lg`}>
+                      <s.icon className="w-5 h-5 text-white" />
+                    </div>
                   </div>
-                  <div className="text-3xl font-black">{s.value}</div>
-                  <div className="text-xs text-white/30 mt-1">{s.label}</div>
-                </div>
+                  <div className="text-3xl font-black text-slate-800">{s.value}</div>
+                  <div className="text-xs text-slate-400 mt-1 font-medium">{s.label}</div>
+                </motion.div>
               ))}
             </div>
 
             <div className="grid lg:grid-cols-2 gap-6">
               {/* Plan Distribution */}
-              <div className="gradient-border rounded-2xl p-6">
-                <h2 className="text-base font-bold mb-4">Plan Distribution</h2>
+              <div className="rounded-2xl p-6 border border-slate-200/80 bg-white/70 backdrop-blur-xl shadow-sm">
+                <h2 className="text-base font-bold mb-4 flex items-center gap-2 text-slate-700">
+                  <Crown className="w-4 h-4 text-amber-500" />
+                  Plan Distribution
+                </h2>
                 {analytics?.planDistribution && analytics.planDistribution.length > 0 ? (
                   <div className="space-y-3">
                     {analytics.planDistribution.map((p) => (
-                      <div key={p.plan} className="space-y-1">
+                      <div key={p.plan} className="space-y-1.5">
                         <div className="flex justify-between text-xs">
-                          <span className="text-white/60 capitalize">{p.plan || "free"}</span>
-                          <span className="text-white/30">{p.count} users</span>
+                          <span className="text-slate-600 capitalize font-medium">{p.plan || "free"}</span>
+                          <span className="text-slate-400">{p.count} users</span>
                         </div>
-                        <div className="h-2 bg-white/[0.04] rounded-full overflow-hidden">
-                          <div className="h-full bg-gradient-to-r from-brand-500 to-accent-purple rounded-full"
+                        <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                          <div className="h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full shadow-sm"
                             style={{ width: `${Math.max(5, (p.count / (analytics.stats.totalUsers || 1)) * 100)}%` }} />
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-white/20">No user data available yet.</p>
+                  <p className="text-xs text-slate-400">No user data available yet.</p>
                 )}
               </div>
 
               {/* Recent signups */}
-              <div className="gradient-border rounded-2xl p-6">
-                <h2 className="text-base font-bold mb-4 flex items-center gap-2">
-                  <UserPlus className="w-4 h-4 text-brand-400" />
+              <div className="rounded-2xl p-6 border border-slate-200/80 bg-white/70 backdrop-blur-xl shadow-sm">
+                <h2 className="text-base font-bold mb-4 flex items-center gap-2 text-slate-700">
+                  <UserPlus className="w-4 h-4 text-amber-500" />
                   Recent Signups
                 </h2>
                 {analytics?.recentUsers && analytics.recentUsers.length > 0 ? (
                   <div className="space-y-3">
                     {analytics.recentUsers.slice(0, 8).map((u, i) => (
-                      <div key={i} className="flex items-center justify-between py-1.5 border-b border-white/[0.04] last:border-0">
+                      <div key={i} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
                         <div>
-                          <div className="text-xs font-medium">{u.name || u.email}</div>
-                          <div className="text-[10px] text-white/20">{u.email}</div>
+                          <div className="text-xs font-semibold text-slate-700">{u.name || u.email}</div>
+                          <div className="text-[10px] text-slate-400">{u.email}</div>
                         </div>
-                        <div className="text-[10px] text-white/20">
+                        <div className="text-[10px] text-slate-400 font-medium">
                           {new Date(u.created_at).toLocaleDateString()}
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-white/20">No users yet. They&apos;ll show up here once people sign up.</p>
+                  <p className="text-xs text-slate-400">No users yet. They&apos;ll show up here once people sign up.</p>
                 )}
               </div>
             </div>
 
             {/* Recent projects */}
-            <div className="gradient-border rounded-2xl p-6">
-              <h2 className="text-base font-bold mb-4 flex items-center gap-2">
-                <FolderOpen className="w-4 h-4 text-blue-400" />
+            <div className="rounded-2xl p-6 border border-slate-200/80 bg-white/70 backdrop-blur-xl shadow-sm">
+              <h2 className="text-base font-bold mb-4 flex items-center gap-2 text-slate-700">
+                <FolderOpen className="w-4 h-4 text-amber-500" />
                 Recent Projects
               </h2>
               {analytics?.recentProjects && analytics.recentProjects.length > 0 ? (
                 <div className="grid md:grid-cols-2 gap-3">
                   {analytics.recentProjects.map((p, i) => (
-                    <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-white/[0.02] border border-white/[0.04]">
+                    <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/60 border border-slate-200/80 hover:bg-amber-50/30 hover:border-amber-200 transition-all">
                       <div>
-                        <div className="text-xs font-medium">{p.name}</div>
-                        <div className="text-[10px] text-white/20">{p.user_email}</div>
+                        <div className="text-xs font-semibold text-slate-700">{p.name}</div>
+                        <div className="text-[10px] text-slate-400">{p.user_email}</div>
                       </div>
-                      <div className="text-[10px] text-white/20">
+                      <div className="text-[10px] text-slate-400 font-medium">
                         {new Date(p.created_at).toLocaleDateString()}
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-white/20">No projects created yet.</p>
+                <p className="text-xs text-slate-400">No projects created yet.</p>
               )}
             </div>
           </>
@@ -592,46 +705,48 @@ export default function AdminPage() {
           <>
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-black tracking-tight">User Management</h1>
-                <p className="text-white/40 text-sm mt-1">{users.length} registered users</p>
+                <h1 className="text-2xl font-black tracking-tight text-slate-800">User Management</h1>
+                <p className="text-slate-400 text-sm mt-1 font-medium">{users.length} registered users</p>
               </div>
-              <button onClick={fetchUsers} className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white/60 border border-white/[0.06] rounded-lg px-3 py-1.5 transition-colors">
+              <button onClick={fetchUsers} className="flex items-center gap-1.5 text-xs text-amber-600 hover:text-amber-700 border border-amber-200 bg-amber-50 hover:bg-amber-100 rounded-xl px-3 py-1.5 transition-all shadow-sm">
                 <RefreshCw className={`w-3 h-3 ${usersLoading ? "animate-spin" : ""}`} />
                 Refresh
               </button>
             </div>
 
             {users.length > 0 ? (
-              <div className="gradient-border rounded-2xl overflow-hidden">
+              <div className="rounded-2xl border border-slate-200/80 bg-white/70 overflow-hidden backdrop-blur-xl shadow-sm">
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-white/[0.06]">
-                        <th className="text-left text-[10px] uppercase tracking-wider text-white/30 px-4 py-3">User</th>
-                        <th className="text-left text-[10px] uppercase tracking-wider text-white/30 px-4 py-3">Role</th>
-                        <th className="text-left text-[10px] uppercase tracking-wider text-white/30 px-4 py-3">Plan</th>
-                        <th className="text-left text-[10px] uppercase tracking-wider text-white/30 px-4 py-3">Projects</th>
-                        <th className="text-left text-[10px] uppercase tracking-wider text-white/30 px-4 py-3">Joined</th>
-                        <th className="text-right text-[10px] uppercase tracking-wider text-white/30 px-4 py-3">Actions</th>
+                      <tr className="border-b border-slate-100 bg-slate-50/50">
+                        <th className="text-left text-[10px] uppercase tracking-wider text-slate-400 px-4 py-3 font-bold">User</th>
+                        <th className="text-left text-[10px] uppercase tracking-wider text-slate-400 px-4 py-3 font-bold">Role</th>
+                        <th className="text-left text-[10px] uppercase tracking-wider text-slate-400 px-4 py-3 font-bold">Plan</th>
+                        <th className="text-left text-[10px] uppercase tracking-wider text-slate-400 px-4 py-3 font-bold">Projects</th>
+                        <th className="text-left text-[10px] uppercase tracking-wider text-slate-400 px-4 py-3 font-bold">Joined</th>
+                        <th className="text-right text-[10px] uppercase tracking-wider text-slate-400 px-4 py-3 font-bold">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {users.map((user) => (
-                        <tr key={user.id} className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
+                        <tr key={user.id} className="border-b border-slate-100 hover:bg-amber-50/30 transition-colors">
                           <td className="px-4 py-3">
-                            <div className="text-sm font-medium">{user.name || "—"}</div>
-                            <div className="text-[10px] text-white/30">{user.email}</div>
+                            <div className="text-sm font-semibold text-slate-700">{user.name || "—"}</div>
+                            <div className="text-[10px] text-slate-400">{user.email}</div>
                           </td>
                           <td className="px-4 py-3">
                             {editingUser === user.id ? (
                               <select value={editRole} onChange={(e) => setEditRole(e.target.value)}
-                                className="bg-white/[0.06] border border-white/[0.1] rounded px-2 py-1 text-xs">
+                                className="bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs text-slate-700">
                                 <option value="user">User</option>
                                 <option value="admin">Admin</option>
                               </select>
                             ) : (
-                              <span className={`text-xs px-2 py-0.5 rounded-full ${
-                                user.role === "admin" ? "bg-brand-500/10 text-brand-400 border border-brand-500/20" : "bg-white/[0.04] text-white/40 border border-white/[0.06]"
+                              <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${
+                                user.role === "admin"
+                                  ? "bg-amber-50 text-amber-700 border border-amber-200"
+                                  : "bg-slate-50 text-slate-500 border border-slate-200"
                               }`}>
                                 {user.role === "admin" && <Crown className="w-3 h-3 inline mr-1" />}
                                 {user.role}
@@ -641,20 +756,20 @@ export default function AdminPage() {
                           <td className="px-4 py-3">
                             {editingUser === user.id ? (
                               <select value={editPlan} onChange={(e) => setEditPlan(e.target.value)}
-                                className="bg-white/[0.06] border border-white/[0.1] rounded px-2 py-1 text-xs">
+                                className="bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs text-slate-700">
                                 <option value="free">Free</option>
                                 <option value="pro">Pro</option>
                                 <option value="unlimited">Unlimited</option>
                               </select>
                             ) : (
-                              <span className="text-xs text-white/50 capitalize">{user.plan || "free"}</span>
+                              <span className="text-xs text-slate-500 capitalize font-medium">{user.plan || "free"}</span>
                             )}
                           </td>
                           <td className="px-4 py-3">
-                            <span className="text-xs text-white/40">{user.projectCount}</span>
+                            <span className="text-xs text-slate-500 font-medium">{user.projectCount}</span>
                           </td>
                           <td className="px-4 py-3">
-                            <span className="text-xs text-white/30">
+                            <span className="text-xs text-slate-400">
                               {new Date(user.created_at).toLocaleDateString()}
                             </span>
                           </td>
@@ -662,22 +777,22 @@ export default function AdminPage() {
                             {editingUser === user.id ? (
                               <div className="flex items-center justify-end gap-1.5">
                                 <button onClick={() => updateUser(user.id)}
-                                  className="text-xs text-emerald-400 hover:text-emerald-300 px-2 py-1 rounded border border-emerald-500/20 hover:bg-emerald-500/10 transition-colors">
+                                  className="text-xs text-emerald-600 hover:text-emerald-700 px-3 py-1.5 rounded-xl border border-emerald-200 hover:bg-emerald-50 transition-all font-semibold">
                                   Save
                                 </button>
                                 <button onClick={() => setEditingUser(null)}
-                                  className="text-xs text-white/30 hover:text-white/50 px-2 py-1 rounded border border-white/[0.06] transition-colors">
+                                  className="text-xs text-slate-400 hover:text-slate-600 px-3 py-1.5 rounded-xl border border-slate-200 transition-all">
                                   Cancel
                                 </button>
                               </div>
                             ) : (
                               <div className="flex items-center justify-end gap-1.5">
                                 <button onClick={() => { setEditingUser(user.id); setEditRole(user.role); setEditPlan(user.plan); }}
-                                  className="text-white/20 hover:text-white/50 p-1 transition-colors" title="Edit">
+                                  className="text-slate-400 hover:text-amber-600 p-1.5 rounded-lg hover:bg-amber-50 transition-all" title="Edit">
                                   <Edit3 className="w-3.5 h-3.5" />
                                 </button>
                                 <button onClick={() => deleteUser(user.id, user.email)}
-                                  className="text-white/20 hover:text-red-400 p-1 transition-colors" title="Delete">
+                                  className="text-slate-400 hover:text-red-500 p-1.5 rounded-lg hover:bg-red-50 transition-all" title="Delete">
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                               </div>
@@ -690,10 +805,10 @@ export default function AdminPage() {
                 </div>
               </div>
             ) : (
-              <div className="gradient-border rounded-2xl p-12 text-center">
-                <Users className="w-12 h-12 text-white/10 mx-auto mb-4" />
-                <h3 className="text-sm font-semibold mb-1">No users yet</h3>
-                <p className="text-xs text-white/30">
+              <div className="rounded-2xl border border-slate-200 bg-white/60 p-12 text-center">
+                <Users className="w-14 h-14 text-slate-200 mx-auto mb-4" />
+                <h3 className="text-sm font-bold mb-1 text-slate-600">No users yet</h3>
+                <p className="text-xs text-slate-400">
                   {usersLoading ? "Loading..." : "Users will appear here once they sign up. Make sure DATABASE_URL is configured."}
                 </p>
               </div>
@@ -706,68 +821,73 @@ export default function AdminPage() {
           <>
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-black tracking-tight">Template Gallery</h1>
-                <p className="text-white/40 text-sm mt-1">{templates.length} curated templates</p>
+                <h1 className="text-2xl font-black tracking-tight text-slate-800">Template Gallery</h1>
+                <p className="text-slate-400 text-sm mt-1 font-medium">{templates.length} curated templates</p>
               </div>
-              <button onClick={fetchTemplates} className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white/60 border border-white/[0.06] rounded-lg px-3 py-1.5 transition-colors">
+              <button onClick={fetchTemplates} className="flex items-center gap-1.5 text-xs text-amber-600 hover:text-amber-700 border border-amber-200 bg-amber-50 hover:bg-amber-100 rounded-xl px-3 py-1.5 transition-all shadow-sm">
                 <RefreshCw className={`w-3 h-3 ${templatesLoading ? "animate-spin" : ""}`} />
                 Refresh
               </button>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {templates.map((t) => (
-                <div key={t.id} className="gradient-border rounded-2xl p-5 hover:bg-white/[0.02] transition-colors">
+              {templates.map((t, i) => (
+                <motion.div
+                  key={t.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.03 }}
+                  className="rounded-2xl p-5 border border-slate-200/80 bg-white/70 hover:bg-white/90 hover:border-amber-200 backdrop-blur-xl transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-amber-100/30"
+                >
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <h3 className="text-sm font-bold">{t.name}</h3>
-                      <span className="text-[10px] text-white/30">{t.category}</span>
+                      <h3 className="text-sm font-bold text-slate-700">{t.name}</h3>
+                      <span className="text-[10px] text-slate-400 font-medium">{t.category}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       {t.featured && (
-                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                        <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200">
                           Featured
                         </span>
                       )}
-                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
+                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
                         t.tier === "premium"
-                          ? "bg-brand-500/10 text-brand-400 border border-brand-500/20"
-                          : "bg-white/[0.04] text-white/30 border border-white/[0.06]"
+                          ? "bg-amber-50 text-amber-700 border border-amber-200"
+                          : "bg-slate-50 text-slate-400 border border-slate-200"
                       }`}>
                         {t.tier}
                       </span>
                     </div>
                   </div>
-                  <p className="text-xs text-white/30 mb-3 line-clamp-2">{t.description}</p>
+                  <p className="text-xs text-slate-400 mb-3 line-clamp-2">{t.description}</p>
                   <div className="flex flex-wrap gap-1">
                     {t.tags.map((tag) => (
-                      <span key={tag} className="text-[9px] text-white/20 px-1.5 py-0.5 rounded bg-white/[0.03] border border-white/[0.04]">
+                      <span key={tag} className="text-[9px] text-slate-400 px-1.5 py-0.5 rounded-md bg-slate-50 border border-slate-200">
                         {tag}
                       </span>
                     ))}
                   </div>
-                  <div className="mt-3 pt-3 border-t border-white/[0.04]">
+                  <div className="mt-3 pt-3 border-t border-slate-100">
                     <button
                       onClick={() => copyToClipboard(t.prompt, t.id)}
-                      className="flex items-center gap-1.5 text-[10px] text-white/30 hover:text-white/60 transition-colors"
+                      className="flex items-center gap-1.5 text-[10px] text-amber-500 hover:text-amber-600 transition-colors font-medium"
                     >
-                      {copied === t.id ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                      {copied === t.id ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
                       {copied === t.id ? "Copied prompt!" : "Copy prompt"}
                     </button>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
 
             {templates.length === 0 && !templatesLoading && (
-              <div className="gradient-border rounded-2xl p-12 text-center">
-                <Layout className="w-12 h-12 text-white/10 mx-auto mb-4" />
-                <h3 className="text-sm font-semibold mb-1">Loading templates...</h3>
+              <div className="rounded-2xl border border-slate-200 bg-white/60 p-12 text-center">
+                <Layout className="w-14 h-14 text-slate-200 mx-auto mb-4" />
+                <h3 className="text-sm font-bold mb-1 text-slate-600">Loading templates...</h3>
               </div>
             )}
           </>
         )}
-      </main>
     </div>
   );
 }

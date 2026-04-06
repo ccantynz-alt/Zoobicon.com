@@ -20,9 +20,42 @@ import type { NextRequest } from "next/server";
  * Only the root "/" path is rewritten — everything else passes through.
  */
 
+const ALLOWED_ORIGINS = new Set([
+  "https://zoobicon.com",
+  "https://zoobicon.ai",
+  "https://zoobicon.io",
+  "https://zoobicon.sh",
+  "https://dominat8.io",
+  "https://dominat8.com",
+  "http://localhost:3000",
+]);
+
+function setCorsHeaders(response: NextResponse, origin: string | null) {
+  if (origin && ALLOWED_ORIGINS.has(origin)) {
+    response.headers.set("Access-Control-Allow-Origin", origin);
+    response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    response.headers.set("Access-Control-Max-Age", "86400");
+  }
+}
+
 export function middleware(request: NextRequest) {
   const hostname = request.headers.get("host") ?? "";
-  const domain = hostname.split(":")[0]; // strip port for localhost
+  const domain = hostname.split(":")[0];
+  const origin = request.headers.get("origin");
+  const pathname = request.nextUrl.pathname;
+
+  // ── MAINTENANCE MODE ──
+  // Set MAINTENANCE_MODE=true in Vercel env to show maintenance banner
+  // Banner is rendered by MaintenanceBanner component in layout.tsx
+  // No redirect — site stays accessible but banner shows at top
+
+  // Handle CORS preflight for API routes
+  if (pathname.startsWith("/api/") && request.method === "OPTIONS") {
+    const preflightResponse = new NextResponse(null, { status: 204 });
+    setCorsHeaders(preflightResponse, origin);
+    return preflightResponse;
+  }
 
   let rewritePath: string | null = null;
   let domainLabel = "com";
@@ -64,10 +97,22 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
+  // Block known competitor/scraper user agents at the middleware level
+  const ua = request.headers.get("user-agent")?.toLowerCase() || "";
+  const blockedBots = ["scrapy", "semrushbot", "ahrefsbot", "mj12bot", "dotbot", "bytespider", "petalbot"];
+  if (blockedBots.some(bot => ua.includes(bot))) {
+    return new NextResponse("Forbidden", { status: 403 });
+  }
+
   // Pass through — still tag the domain and brand headers
   const response = NextResponse.next();
   response.headers.set("x-zoobicon-domain", domainLabel);
   response.headers.set("x-brand-id", brandId);
+  // Anti-scraping headers
+  response.headers.set("X-Robots-Tag", "noai, noimageai");
+  if (request.nextUrl.pathname.startsWith("/api/")) {
+    setCorsHeaders(response, origin);
+  }
   return response;
 }
 

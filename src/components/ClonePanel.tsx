@@ -1,7 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Globe, ArrowRight, Loader2, CheckCircle2, AlertCircle, Sparkles } from "lucide-react";
+import {
+  Globe,
+  ArrowRight,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+  Sparkles,
+} from "lucide-react";
 
 interface ClonePanelProps {
   onClone: (html: string) => void;
@@ -21,11 +28,17 @@ export default function ClonePanel({ onClone }: ClonePanelProps) {
     setError("");
     setAnalysis("");
 
+    // Auto-prepend https:// if no protocol provided
+    let normalizedUrl = url.trim();
+    if (!/^https?:\/\//i.test(normalizedUrl)) {
+      normalizedUrl = `https://${normalizedUrl}`;
+    }
+
     try {
       const res = await fetch("/api/clone", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: url.trim(), upgradeTier: tier }),
+        body: JSON.stringify({ url: normalizedUrl, upgradeTier: tier }),
       });
 
       if (!res.ok) {
@@ -51,7 +64,7 @@ export default function ClonePanel({ onClone }: ClonePanelProps) {
           <Globe className="w-4 h-4 text-brand-400" />
           Website Cloner
         </h3>
-        <p className="text-xs text-white/30">
+        <p className="text-xs text-white/50">
           Paste any URL and we&apos;ll rebuild it as a premium, modern website.
         </p>
       </div>
@@ -60,11 +73,11 @@ export default function ClonePanel({ onClone }: ClonePanelProps) {
       <div className="space-y-2">
         <div className="relative">
           <input
-            type="url"
+            type="text"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://example.com"
-            className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white placeholder-white/20 focus:outline-none focus:border-brand-500/40 transition-colors"
+            placeholder="example.com"
+            className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-white placeholder-white/50 focus:outline-none focus:border-brand-500/40 transition-colors"
             onKeyDown={(e) => e.key === "Enter" && handleClone()}
           />
         </div>
@@ -76,7 +89,7 @@ export default function ClonePanel({ onClone }: ClonePanelProps) {
             className={`flex-1 text-xs py-1.5 rounded-lg border transition-colors ${
               tier === "standard"
                 ? "bg-white/[0.06] border-white/[0.12] text-white"
-                : "border-white/[0.04] text-white/30 hover:text-white/50"
+                : "border-white/[0.04] text-white/50 hover:text-white/50"
             }`}
           >
             Standard
@@ -86,7 +99,7 @@ export default function ClonePanel({ onClone }: ClonePanelProps) {
             className={`flex-1 text-xs py-1.5 rounded-lg border transition-colors flex items-center justify-center gap-1 ${
               tier === "premium"
                 ? "bg-brand-500/10 border-brand-500/30 text-brand-400"
-                : "border-white/[0.04] text-white/30 hover:text-white/50"
+                : "border-white/[0.04] text-white/50 hover:text-white/50"
             }`}
           >
             <Sparkles className="w-3 h-3" />
@@ -139,7 +152,7 @@ export default function ClonePanel({ onClone }: ClonePanelProps) {
 
       {/* How it works */}
       <div className="space-y-2 pt-2 border-t border-white/[0.06]">
-        <p className="text-[10px] uppercase tracking-widest text-white/20">How it works</p>
+        <p className="text-[10px] uppercase tracking-widest text-white/50">How it works</p>
         <div className="space-y-1.5">
           {[
             "Fetches and analyzes the target website",
@@ -151,7 +164,7 @@ export default function ClonePanel({ onClone }: ClonePanelProps) {
               <div className="w-4 h-4 rounded-full bg-brand-500/10 border border-brand-500/20 flex items-center justify-center flex-shrink-0">
                 <span className="text-[8px] text-brand-400 font-bold">{i + 1}</span>
               </div>
-              <span className="text-[11px] text-white/30">{step}</span>
+              <span className="text-[11px] text-white/50">{step}</span>
             </div>
           ))}
         </div>

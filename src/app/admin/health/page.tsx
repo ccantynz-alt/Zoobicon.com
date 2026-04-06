@@ -2,7 +2,15 @@
 
 import { useState, useCallback } from "react";
 import Link from "next/link";
-import { ArrowLeft, RefreshCw, CheckCircle, XCircle, AlertTriangle, Activity } from "lucide-react";
+import BackgroundEffects from "@/components/BackgroundEffects";
+import {
+  ArrowLeft,
+  RefreshCw,
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  Activity,
+} from "lucide-react";
 
 interface CheckResult {
   name: string;
@@ -83,7 +91,7 @@ export default function AdminHealthPage() {
       </div>
 
       {isLoading && (
-        <div className="flex items-center gap-3 py-8 justify-center text-slate-400">
+        <div className="flex items-center gap-3 py-8 justify-center text-white/70">
           <RefreshCw className="w-5 h-5 animate-spin" />
           <span>Running checks...</span>
         </div>
@@ -99,15 +107,15 @@ export default function AdminHealthPage() {
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-white">{check.name}</span>
                     {check.durationMs > 0 && (
-                      <span className="text-[10px] text-slate-500">{(check.durationMs / 1000).toFixed(1)}s</span>
+                      <span className="text-[10px] text-white/60">{(check.durationMs / 1000).toFixed(1)}s</span>
                     )}
                   </div>
-                  <p className="text-xs text-slate-400 mt-0.5 break-words">{check.message}</p>
+                  <p className="text-xs text-white/70 mt-0.5 break-words">{check.message}</p>
                 </div>
               </div>
             ))}
           </div>
-          <div className="text-[10px] text-slate-500 flex items-center justify-between">
+          <div className="text-[10px] text-white/60 flex items-center justify-between">
             <span>Total: {(result.totalDurationMs / 1000).toFixed(1)}s</span>
             <span>{new Date(result.timestamp).toLocaleString()}</span>
           </div>
@@ -115,15 +123,16 @@ export default function AdminHealthPage() {
       )}
 
       {!isLoading && !result && (
-        <p className="text-sm text-slate-500 py-4 text-center">Click a button below to run</p>
+        <p className="text-sm text-white/60 py-4 text-center">Click a button below to run</p>
       )}
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-[#0b0b11] text-slate-200">
+    <div className="min-h-screen bg-[#131520] text-white">
+      <BackgroundEffects preset="admin" />
       <div className="max-w-3xl mx-auto px-6 py-12">
-        <Link href="/admin" className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors mb-8">
+        <Link href="/admin" className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors mb-8">
           <ArrowLeft className="w-4 h-4" />
           Back to Admin
         </Link>
@@ -134,7 +143,7 @@ export default function AdminHealthPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-white">System Health</h1>
-            <p className="text-sm text-slate-400">Monitor builder health, generation status, and API connectivity</p>
+            <p className="text-sm text-white/70">Monitor builder health, generation status, and API connectivity</p>
           </div>
         </div>
 
@@ -142,7 +151,7 @@ export default function AdminHealthPage() {
         <div className="bg-blue-500/[0.06] border border-blue-500/20 rounded-xl p-4 mb-8">
           <p className="text-sm text-blue-200/80">
             <strong>Auto-monitoring active.</strong> Vercel Cron runs a deep health check every 2 hours at <code className="text-xs bg-blue-500/10 px-1.5 py-0.5 rounded">/api/health?deep=true</code>.
-            Add <code className="text-xs bg-blue-500/10 px-1.5 py-0.5 rounded">?webhook=YOUR_SLACK_URL</code> to get Slack alerts on failures.
+            Add <code className="text-xs bg-blue-500/10 px-1.5 py-0.5 rounded">?webhook=YOUR_SLACK_URL</code> to get Hash alerts on failures.
           </p>
         </div>
 
@@ -153,7 +162,7 @@ export default function AdminHealthPage() {
             isLoading={loading === "quick"}
           />
           <ResultCard
-            title="Deep Check (Full Generation via /api/generate and /api/generate/stream)"
+            title="Deep Check (Full Generation via /api/generate/react)"
             result={deepResult}
             isLoading={loading === "deep"}
           />
@@ -179,21 +188,21 @@ export default function AdminHealthPage() {
         {/* External monitoring setup guide */}
         <div className="mt-12 bg-white/[0.02] border border-white/[0.06] rounded-2xl p-6">
           <h3 className="text-base font-semibold text-white mb-3">External Monitoring Setup</h3>
-          <p className="text-sm text-slate-400 mb-4">For continuous monitoring while you&apos;re away, use any of these free services to ping your health endpoint:</p>
-          <div className="space-y-3 text-sm text-slate-300">
+          <p className="text-sm text-white/70 mb-4">For continuous monitoring while you&apos;re away, use any of these free services to ping your health endpoint:</p>
+          <div className="space-y-3 text-sm text-white/85">
             <div className="bg-white/[0.03] rounded-lg p-3">
               <p className="font-medium text-white mb-1">UptimeRobot (free, 5-min intervals)</p>
-              <p className="text-xs text-slate-400">Add HTTP monitor: <code className="text-blue-300">GET https://zoobicon.com/api/health</code></p>
-              <p className="text-xs text-slate-400">Alert on non-200 status. Gets you email/SMS on failures.</p>
+              <p className="text-xs text-white/70">Add HTTP monitor: <code className="text-blue-300">GET https://zoobicon.com/api/health</code></p>
+              <p className="text-xs text-white/70">Alert on non-200 status. Gets you email/SMS on failures.</p>
             </div>
             <div className="bg-white/[0.03] rounded-lg p-3">
-              <p className="font-medium text-white mb-1">Slack Webhook Alerts</p>
-              <p className="text-xs text-slate-400">Create a Slack webhook, then set the cron URL to:</p>
+              <p className="font-medium text-white mb-1">Hash Webhook Alerts</p>
+              <p className="text-xs text-white/70">Create a Hash webhook, then set the cron URL to:</p>
               <code className="text-xs text-blue-300 break-all">/api/health?deep=true&webhook=https://hooks.slack.com/services/YOUR/WEBHOOK/URL</code>
             </div>
             <div className="bg-white/[0.03] rounded-lg p-3">
               <p className="font-medium text-white mb-1">Vercel Cron (already configured)</p>
-              <p className="text-xs text-slate-400">Runs every 2 hours automatically. Check Vercel dashboard &gt; Cron Jobs for logs.</p>
+              <p className="text-xs text-white/70">Runs every 2 hours automatically. Check Vercel dashboard &gt; Cron Jobs for logs.</p>
             </div>
           </div>
         </div>

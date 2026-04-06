@@ -1,25 +1,14 @@
-import { NextRequest } from "next/server";
 import { initSchema } from "@/lib/db";
 
 /**
  * GET /api/db/init
  * Runs CREATE TABLE IF NOT EXISTS for all tables.
- * Protected by ADMIN_PASSWORD — call once after deploying.
+ * Safe to run multiple times — only creates tables that don't exist.
  */
-export async function GET(request: NextRequest) {
-  const auth = request.headers.get("authorization") ?? "";
-  const expected = `Bearer ${process.env.ADMIN_PASSWORD}`;
-
-  if (!process.env.ADMIN_PASSWORD || auth !== expected) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
+export async function GET() {
   try {
     await initSchema();
-    return new Response(JSON.stringify({ ok: true, message: "Schema ready" }), {
+    return new Response(JSON.stringify({ ok: true, message: "Schema ready — all tables created." }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });

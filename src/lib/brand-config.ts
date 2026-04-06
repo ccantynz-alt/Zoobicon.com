@@ -169,3 +169,73 @@ export function getCurrentBrand(): BrandConfig {
 export function getAllBrands(): BrandConfig[] {
   return Object.values(BRAND_CONFIGS);
 }
+
+/**
+ * Create a BrandConfig from agency brand_config JSONB.
+ * Used for white-label agencies — their branding overrides the default.
+ */
+export interface AgencyBrandInput {
+  agencyName: string;
+  logoUrl?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
+  accentColor?: string;
+  tagline?: string;
+  customDomain?: string;
+}
+
+export function createAgencyBrand(input: AgencyBrandInput): BrandConfig {
+  const primary = input.primaryColor || "#2563eb";
+  const secondary = input.secondaryColor || "#0ea5e9";
+
+  return {
+    id: `agency-${input.agencyName.toLowerCase().replace(/\s+/g, "-")}`,
+    name: input.agencyName,
+    tagline: input.tagline || `${input.agencyName} — AI Website Builder`,
+    description: `${input.agencyName}'s AI-powered website builder platform.`,
+    domains: input.customDomain ? [input.customDomain] : [],
+    logo: {
+      text: input.agencyName,
+      icon: "Zap",
+    },
+    colors: {
+      primary,
+      primaryHover: primary,
+      primaryLight: `${primary}26`,
+      gradientFrom: primary,
+      gradientTo: secondary,
+      accentGlow: `${primary}4D`,
+    },
+    meta: {
+      title: `${input.agencyName} — AI Website Builder`,
+      description: `Build production-ready websites with AI. Powered by ${input.agencyName}.`,
+      ogImage: input.logoUrl || "/og-zoobicon.png",
+    },
+    features: {
+      headline: `Build anything with ${input.agencyName}`,
+      subheadline: "AI-powered website generation — describe what you need, get it in seconds.",
+      ctaPrimary: "Start Building",
+      ctaSecondary: "View Templates",
+    },
+    pricing: {
+      free: { name: "Starter", price: "Free", features: ["3 sites/month", "Standard generation"] },
+      pro: { name: "Pro", price: "Contact us", features: ["Unlimited sites", "All generators", "Priority support"] },
+      enterprise: { name: "Enterprise", price: "Custom", features: ["Custom AI", "Dedicated infrastructure", "SLA"] },
+    },
+    footer: {
+      copyright: input.agencyName,
+      socialLinks: [],
+    },
+    analytics: {},
+  };
+}
+
+/**
+ * Get brand config for a user — checks if they belong to a white-label agency.
+ * Called client-side with agency data from localStorage.
+ */
+export function getAgencyBrandConfig(agencyBrandConfig: AgencyBrandInput | null): BrandConfig | null {
+  if (!agencyBrandConfig || !agencyBrandConfig.agencyName) return null;
+  return createAgencyBrand(agencyBrandConfig);
+}
+

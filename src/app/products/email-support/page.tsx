@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import BackgroundEffects from "@/components/BackgroundEffects";
+import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
   Zap,
   Mail,
@@ -25,8 +27,11 @@ import {
   Workflow,
   Send,
   Search,
+  LayoutDashboard,
+  LogOut,
+  User,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -67,21 +72,77 @@ const statusBadge = (s: string) => {
   if (s === "ai-replied") return <span className="px-2 py-0.5 rounded-full bg-brand-500/15 text-brand-400 text-[9px] font-bold">AI Replied</span>;
   if (s === "resolved") return <span className="px-2 py-0.5 rounded-full bg-accent-cyan/15 text-accent-cyan text-[9px] font-bold">Resolved</span>;
   if (s === "escalated") return <span className="px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 text-[9px] font-bold">Escalated</span>;
-  return <span className="px-2 py-0.5 rounded-full bg-white/10 text-white/40 text-[9px] font-bold">Open</span>;
+  return <span className="px-2 py-0.5 rounded-full bg-white/10 text-white/60 text-[9px] font-bold">Open</span>;
 };
 
 export default function EmailSupportPage() {
   const [selectedTicket, setSelectedTicket] = useState(MOCK_TICKETS[0]);
+  const [user, setUser] = useState<{ email: string; name?: string; role?: string } | null>(null);
+  const [waitlistEmail, setWaitlistEmail] = useState("");
+  const [waitlistStatus, setWaitlistStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("zoobicon_user");
+      if (stored) setUser(JSON.parse(stored));
+    } catch { /* Safari private mode / storage unavailable */ }
+  }, []);
+
+  const handleLogout = () => {
+    try { localStorage.removeItem("zoobicon_user"); } catch {}
+    setUser(null);
+  };
+
+  const handleWaitlistSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!waitlistEmail.trim() || waitlistStatus === "loading") return;
+    setWaitlistStatus("loading");
+    try {
+      await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: waitlistEmail, source: "email-support-waitlist" }),
+      });
+      setWaitlistStatus("success");
+    } catch {
+      setWaitlistStatus("error");
+    }
+  };
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Zoobicon AI Email Support",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "AggregateOffer",
+      "lowPrice": "0",
+      "highPrice": "99",
+      "priceCurrency": "USD",
+      "offerCount": "4"
+    },
+    "description": "AI-powered email support with auto-replies, smart inbox, sentiment analysis, ticketing, CSAT tracking, and 24/7 automated customer service.",
+    "url": "https://zoobicon.com/products/email-support",
+    "screenshot": "https://zoobicon.com/og-image.png"
+  };
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://zoobicon.com" },
+      { "@type": "ListItem", "position": 2, "name": "Products", "item": "https://zoobicon.com/products" },
+      { "@type": "ListItem", "position": 3, "name": "Email Support", "item": "https://zoobicon.com/products/email-support" }
+    ]
+  };
 
   return (
     <div className="relative min-h-screen">
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="glow-orb glow-orb-blue w-[500px] h-[500px] -top-[150px] left-[20%] opacity-10" />
-        <div className="glow-orb glow-orb-purple w-[400px] h-[400px] bottom-[20%] right-[5%] opacity-10" />
-        <div className="grid-pattern fixed inset-0" />
-      </div>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      <BackgroundEffects preset="technical" />
 
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.04] bg-[#050507]/80 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
@@ -90,22 +151,53 @@ export default function EmailSupportPage() {
               </div>
               <span className="text-lg font-bold tracking-tight">Zoobicon</span>
             </Link>
-            <span className="text-xs text-white/20">/</span>
-            <span className="text-sm text-white/50">AI Email Support</span>
+            <span className="text-xs text-white/60">/</span>
+            <span className="text-sm text-white/65">AI Email Support</span>
           </div>
-          <Link href="/auth/signup" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white">
-            <span>Start Free</span>
-          </Link>
+          <div className="flex items-center gap-4">
+            {user ? (
+              <>
+                <Link href="/dashboard" className="text-sm text-white/65 hover:text-white transition-colors px-4 py-2 flex items-center gap-1.5">
+                  <LayoutDashboard className="w-3.5 h-3.5" />
+                  Dashboard
+                </Link>
+                <button onClick={handleLogout} className="text-sm text-white/65 hover:text-white transition-colors px-4 py-2 flex items-center gap-1.5">
+                  <LogOut className="w-3.5 h-3.5" />
+                  Sign out
+                </button>
+                <Link href="/builder" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white flex items-center gap-2">
+                  <User className="w-3.5 h-3.5" />
+                  <span>{user.name || user.email.split("@")[0]}</span>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href="/auth/login" className="text-sm text-white/65 hover:text-white transition-colors px-4 py-2">
+                  Sign in
+                </Link>
+                <Link href="/auth/signup" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white">
+                  <span>Get Started</span>
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </nav>
+      <CursorGlowTracker />
 
       {/* Hero */}
-      <section className="pt-32 pb-20 lg:pt-44 lg:pb-28">
+      <section className="relative pt-32 pb-20 lg:pt-44 lg:pb-28">
+        <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
-            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand-500/20 bg-brand-500/5 mb-6">
-              <Bot className="w-3 h-3 text-brand-400" />
-              <span className="text-xs font-medium text-brand-400">AI-Powered Support</span>
+            <motion.div variants={fadeInUp} className="flex flex-wrap items-center gap-3 mb-6">
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand-500/20 bg-brand-500/5">
+                <Bot className="w-3 h-3 text-brand-400" />
+                <span className="text-xs font-medium text-brand-400">AI-Powered Support</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
+                <Check size={12} /> Available Now
+              </span>
             </motion.div>
 
             <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl lg:text-8xl font-black tracking-tight leading-[0.9] mb-6">
@@ -113,16 +205,45 @@ export default function EmailSupportPage() {
               <span className="gradient-text-hero">That Never Sleeps.</span>
             </motion.h1>
 
-            <motion.p variants={fadeInUp} className="max-w-2xl text-lg md:text-xl text-white/40 leading-relaxed mb-10">
+            <motion.p variants={fadeInUp} className="max-w-2xl text-lg md:text-xl text-white/60 leading-relaxed mb-10">
               AI reads every email, understands the issue, drafts the perfect reply, and resolves tickets —
               all in under 30 seconds. Your customers think they&apos;re talking to your best agent.
             </motion.p>
 
-            <motion.div variants={fadeInUp} className="flex flex-wrap gap-4 mb-16">
-              <Link href="/auth/signup" className="group btn-gradient px-8 py-4 rounded-2xl text-base font-bold text-white flex items-center gap-3 shadow-glow">
-                <span>Start Free Trial</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            <motion.div variants={fadeInUp} className="max-w-lg mb-16 space-y-4">
+              <Link
+                href="/email-support"
+                className="group inline-flex items-center gap-2.5 btn-gradient px-6 py-4 rounded-xl text-sm font-bold text-white shadow-glow"
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                <span>Try Demo Dashboard</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
+              {waitlistStatus === "success" ? (
+                <div className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                  <Check className="w-5 h-5 flex-shrink-0" />
+                  <span className="text-sm font-medium">You&apos;re on the list! We&apos;ll notify you when AI Email Support launches.</span>
+                </div>
+              ) : (
+                <form onSubmit={handleWaitlistSubmit} className="flex items-center gap-3">
+                  <input
+                    type="email"
+                    required
+                    value={waitlistEmail}
+                    onChange={(e) => setWaitlistEmail(e.target.value)}
+                    placeholder="Or enter your email for early access"
+                    className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-xl px-5 py-4 text-white placeholder:text-white/60 outline-none text-sm focus:border-brand-500/30 transition-colors"
+                  />
+                  <button
+                    type="submit"
+                    disabled={waitlistStatus === "loading"}
+                    className="group btn-gradient px-6 py-4 rounded-xl text-sm font-bold text-white flex items-center gap-2 shadow-glow whitespace-nowrap disabled:opacity-50"
+                  >
+                    <span>{waitlistStatus === "loading" ? "Joining..." : "Join Early Access"}</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </form>
+              )}
             </motion.div>
 
             {/* Stats */}
@@ -135,7 +256,7 @@ export default function EmailSupportPage() {
               ].map((stat) => (
                 <div key={stat.label} className="gradient-border p-4 rounded-xl text-center">
                   <div className="text-2xl font-black gradient-text-static">{stat.value}</div>
-                  <div className="text-xs text-white/30 mt-1">{stat.label}</div>
+                  <div className="text-xs text-white/60 mt-1">{stat.label}</div>
                 </div>
               ))}
             </motion.div>
@@ -145,7 +266,7 @@ export default function EmailSupportPage() {
               <div className="gradient-border rounded-2xl overflow-hidden">
                 <div className="bg-dark-300/90 backdrop-blur-xl">
                   {/* Inbox header */}
-                  <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.06]">
+                  <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.10]">
                     <div className="flex items-center gap-3">
                       <Mail className="w-4 h-4 text-brand-400" />
                       <span className="text-sm font-semibold text-white/70">AI Support Inbox</span>
@@ -155,25 +276,25 @@ export default function EmailSupportPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="relative">
-                        <Search className="w-3.5 h-3.5 text-white/20 absolute left-2.5 top-1/2 -translate-y-1/2" />
-                        <input className="bg-white/[0.03] border border-white/[0.06] rounded-lg pl-8 pr-3 py-1.5 text-xs text-white/60 placeholder-white/20 w-48" placeholder="Search tickets..." />
+                        <Search className="w-3.5 h-3.5 text-white/60 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                        <input className="bg-white/[0.06] border border-white/[0.10] rounded-lg pl-8 pr-3 py-1.5 text-xs text-white/60 placeholder-white/50 w-48" placeholder="Search tickets..." />
                       </div>
                     </div>
                   </div>
 
                   <div className="flex h-[420px]">
                     {/* Ticket list */}
-                    <div className="w-[45%] border-r border-white/[0.06] overflow-y-auto">
+                    <div className="w-[45%] border-r border-white/[0.10] overflow-y-auto">
                       {MOCK_TICKETS.map((ticket) => (
                         <button
                           key={ticket.id}
                           onClick={() => setSelectedTicket(ticket)}
-                          className={`w-full text-left px-4 py-3 border-b border-white/[0.04] transition-colors ${
-                            selectedTicket.id === ticket.id ? "bg-brand-500/5 border-l-2 border-l-brand-500" : "hover:bg-white/[0.02]"
+                          className={`w-full text-left px-4 py-3 border-b border-white/[0.06] transition-colors ${
+                            selectedTicket.id === ticket.id ? "bg-brand-500/5 border-l-2 border-l-brand-500" : "hover:bg-white/[0.05]"
                           }`}
                         >
                           <div className="flex items-center justify-between mb-1">
-                            <span className="text-[10px] font-mono text-white/20">{ticket.id}</span>
+                            <span className="text-[10px] font-mono text-white/60">{ticket.id}</span>
                             <div className="flex items-center gap-2">
                               {sentimentIcon(ticket.sentiment)}
                               {statusBadge(ticket.status)}
@@ -181,8 +302,8 @@ export default function EmailSupportPage() {
                           </div>
                           <div className="text-xs font-semibold text-white/70 truncate">{ticket.subject}</div>
                           <div className="flex items-center justify-between mt-1">
-                            <span className="text-[10px] text-white/25 truncate">{ticket.from}</span>
-                            <span className="text-[10px] text-white/15">{ticket.time}</span>
+                            <span className="text-[10px] text-white/60 truncate">{ticket.from}</span>
+                            <span className="text-[10px] text-white/60">{ticket.time}</span>
                           </div>
                         </button>
                       ))}
@@ -190,14 +311,14 @@ export default function EmailSupportPage() {
 
                     {/* Ticket detail */}
                     <div className="flex-1 flex flex-col">
-                      <div className="px-5 py-3 border-b border-white/[0.06]">
+                      <div className="px-5 py-3 border-b border-white/[0.10]">
                         <div className="flex items-center justify-between">
                           <h3 className="text-sm font-bold text-white/80">{selectedTicket.subject}</h3>
                           <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
-                            selectedTicket.priority === "high" ? "bg-red-500/15 text-red-400" : selectedTicket.priority === "medium" ? "bg-amber-500/15 text-amber-400" : "bg-white/10 text-white/40"
+                            selectedTicket.priority === "high" ? "bg-red-500/15 text-red-400" : selectedTicket.priority === "medium" ? "bg-amber-500/15 text-amber-400" : "bg-white/10 text-white/60"
                           }`}>{selectedTicket.priority}</span>
                         </div>
-                        <div className="text-[10px] text-white/25 mt-0.5">From: {selectedTicket.from} • {selectedTicket.time}</div>
+                        <div className="text-[10px] text-white/60 mt-0.5">From: {selectedTicket.from} • {selectedTicket.time}</div>
                       </div>
 
                       <div className="flex-1 p-5 overflow-y-auto">
@@ -205,10 +326,10 @@ export default function EmailSupportPage() {
                           <div className="space-y-4">
                             {/* Customer message */}
                             <div className="flex gap-3">
-                              <div className="w-7 h-7 rounded-full bg-white/[0.06] flex items-center justify-center flex-shrink-0 text-[10px] font-bold text-white/30">
+                              <div className="w-7 h-7 rounded-full bg-white/[0.09] flex items-center justify-center flex-shrink-0 text-[10px] font-bold text-white/60">
                                 {selectedTicket.from.charAt(0).toUpperCase()}
                               </div>
-                              <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-xs text-white/50 max-w-[80%]">
+                              <div className="bg-white/[0.06] border border-white/[0.10] rounded-xl px-4 py-3 text-xs text-white/65 max-w-[80%]">
                                 {selectedTicket.subject}
                               </div>
                             </div>
@@ -228,16 +349,16 @@ export default function EmailSupportPage() {
                             </div>
                           </div>
                         ) : (
-                          <div className="flex items-center justify-center h-full text-xs text-white/20">
+                          <div className="flex items-center justify-center h-full text-xs text-white/60">
                             Escalated to human agent — awaiting response
                           </div>
                         )}
                       </div>
 
                       {/* Reply bar */}
-                      <div className="px-4 py-3 border-t border-white/[0.06] flex items-center gap-2">
-                        <input className="flex-1 bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2 text-xs placeholder-white/15" placeholder="Add a reply or note..." />
-                        <button className="p-2 btn-gradient rounded-lg"><Send className="w-3.5 h-3.5 text-white" /></button>
+                      <div className="px-4 py-3 border-t border-white/[0.10] flex items-center gap-2">
+                        <input className="flex-1 bg-white/[0.06] border border-white/[0.10] rounded-lg px-3 py-2 text-xs placeholder-white/15" placeholder="Add a reply or note..." />
+                        <button onClick={() => {}} className="p-2 btn-gradient rounded-lg"><Send className="w-3.5 h-3.5 text-white" /></button>
                       </div>
                     </div>
                   </div>
@@ -249,7 +370,7 @@ export default function EmailSupportPage() {
       </section>
 
       {/* Features */}
-      <section className="py-20 border-t border-white/[0.04]">
+      <section className="py-20 border-t border-white/[0.08]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="text-center mb-12">
@@ -260,7 +381,7 @@ export default function EmailSupportPage() {
                 <motion.div key={i} variants={fadeInUp} className="gradient-border card-hover p-6 rounded-xl group">
                   <f.icon className="w-8 h-8 text-brand-400/50 mb-4 group-hover:text-brand-400 transition-colors" />
                   <h3 className="text-lg font-bold mb-2">{f.title}</h3>
-                  <p className="text-sm text-white/40 leading-relaxed">{f.desc}</p>
+                  <p className="text-sm text-white/60 leading-relaxed">{f.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -269,25 +390,59 @@ export default function EmailSupportPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 border-t border-white/[0.04]">
+      <section className="py-20 border-t border-white/[0.08]">
         <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
           <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
             Resolve 94% of Tickets<br /><span className="gradient-text">Automatically</span>
           </h2>
-          <p className="text-lg text-white/40 mb-8">Free for up to 100 tickets/month. Scale from there.</p>
-          <Link href="/auth/signup" className="inline-flex group btn-gradient px-10 py-4 rounded-2xl text-lg font-bold text-white items-center gap-3 shadow-glow-lg">
-            <span>Start Free Trial</span>
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </Link>
+          <p className="text-lg text-white/60 mb-4">AI-powered email support that never sleeps. Try it now.</p>
+          <div className="flex items-center justify-center gap-3 mb-8">
+            <Link
+              href="/email-support"
+              className="group inline-flex items-center gap-2 px-5 py-2 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 text-xs font-semibold hover:bg-brand-500/20 transition-all"
+            >
+              <LayoutDashboard size={12} />
+              Try Demo Dashboard
+              <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+          <div className="max-w-lg mx-auto">
+            {waitlistStatus === "success" ? (
+              <div className="flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                <Check className="w-5 h-5 flex-shrink-0" />
+                <span className="text-sm font-medium">You&apos;re on the list! We&apos;ll notify you when AI Email Support launches.</span>
+              </div>
+            ) : (
+              <form onSubmit={handleWaitlistSubmit} className="flex items-center gap-3">
+                <input
+                  type="email"
+                  required
+                  value={waitlistEmail}
+                  onChange={(e) => setWaitlistEmail(e.target.value)}
+                  placeholder="Enter your email for early access"
+                  className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-xl px-5 py-4 text-white placeholder:text-white/60 outline-none text-sm focus:border-brand-500/30 transition-colors"
+                />
+                <button
+                  type="submit"
+                  disabled={waitlistStatus === "loading"}
+                  className="group btn-gradient px-6 py-4 rounded-xl text-sm font-bold text-white flex items-center gap-2 shadow-glow whitespace-nowrap disabled:opacity-50"
+                >
+                  <span>{waitlistStatus === "loading" ? "Joining..." : "Join Waitlist"}</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </form>
+            )}
+          </div>
         </div>
       </section>
 
-      <footer className="border-t border-white/[0.04] py-8">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <div className="text-xs text-white/20">&copy; 2026 Zoobicon</div>
+      <footer className="border-t border-white/[0.06] py-10">
+        <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-xs text-white/30">&copy; 2026 Zoobicon. All rights reserved.</div>
+          <div className="text-xs text-white/20">zoobicon.com &middot; zoobicon.ai &middot; zoobicon.io &middot; zoobicon.sh</div>
           <div className="flex gap-4">
-            <Link href="/" className="text-xs text-white/20 hover:text-white/40">Home</Link>
-            <Link href="/marketplace" className="text-xs text-white/20 hover:text-white/40">Marketplace</Link>
+            <Link href="/privacy" className="text-xs text-white/30 hover:text-white/50 transition-colors">Privacy</Link>
+            <Link href="/terms" className="text-xs text-white/30 hover:text-white/50 transition-colors">Terms</Link>
           </div>
         </div>
       </footer>

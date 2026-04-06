@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
-import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
+import { checkRateLimit, checkRateLimitAdmin, getClientIp } from "@/lib/rateLimit";
 import { validateApiKey } from "@/lib/apiKey";
 
 function getClient() {
@@ -9,6 +9,7 @@ function getClient() {
   });
 }
 
+// ─── Full-document edit prompt (fallback for complex edits) ───
 const SYSTEM_PROMPT = `You are ZOOBICON's elite AI editing assistant. The user has a generated HTML website and wants to make changes.
 
 CRITICAL RULES:
@@ -23,7 +24,137 @@ CRITICAL RULES:
 - Maintain all hover states, transitions, and micro-interactions.
 - NEVER output partial HTML. The document must be complete from <!DOCTYPE html> to </html>.`;
 
-export const maxDuration = 120; // Allow up to 2 minutes for large edits
+// ─── Targeted section edit prompt (fast path for surgical edits) ───
+const TARGETED_SYSTEM = `You are ZOOBICON's precision HTML editor. You receive a SINGLE HTML section extracted from a larger page, plus an edit instruction.
+
+RULES:
+- Output ONLY the updated HTML section. No markdown, no explanation, no code fences.
+- Apply the requested change precisely. Do not add, remove, or reorganize anything else.
+- Preserve all classes, IDs, data attributes, inline styles, and aria attributes.
+- Preserve the exact tag structure — same opening and closing tags.
+- If the edit involves CSS (colors, sizes, spacing), modify only the relevant inline style or class.
+- Output the section exactly as it should appear when spliced back into the full document.`;
+
+// ─── CSS-only edit prompt ───
+const CSS_EDIT_SYSTEM = `You are ZOOBICON's CSS editor. You receive the full <style> block from an HTML page and an edit instruction about visual styling.
+
+RULES:
+- Output ONLY the updated <style> block contents (the CSS rules). No <style> tags, no markdown, no explanation.
+- Apply the requested visual change precisely. Only modify the rules that need to change.
+- Preserve all existing rules, media queries, keyframes, and custom properties unless the user asks to remove them.
+- Do not reorganize, reformat, or "clean up" existing CSS.`;
+
+export const maxDuration = 120;
+
+// ─── Section extraction for targeted edits ───
+
+interface ExtractedSection {
+  sectionHtml: string;
+  startIndex: number;
+  endIndex: number;
+  sectionName: string;
+}
+
+/** Map keywords in user instructions to HTML section patterns */
+const SECTION_KEYWORDS: Record<string, RegExp[]> = {
+  hero: [/<section[^>]*(?:hero|banner|jumbotron)[^>]*>[\s\S]*?<\/section>/gi, /<!--\s*hero\s*-->[\s\S]*?<!--\s*\/hero\s*-->/gi],
+  header: [/<header[^>]*>[\s\S]*?<\/header>/gi, /<nav[^>]*>[\s\S]*?<\/nav>/gi],
+  nav: [/<nav[^>]*>[\s\S]*?<\/nav>/gi, /<header[^>]*>[\s\S]*?<\/header>/gi],
+  footer: [/<footer[^>]*>[\s\S]*?<\/footer>/gi],
+  pricing: [/<section[^>]*(?:pricing|plans)[^>]*>[\s\S]*?<\/section>/gi],
+  features: [/<section[^>]*(?:features|benefits|services)[^>]*>[\s\S]*?<\/section>/gi],
+  about: [/<section[^>]*(?:about|story|mission)[^>]*>[\s\S]*?<\/section>/gi],
+  testimonials: [/<section[^>]*(?:testimonial|review|quote)[^>]*>[\s\S]*?<\/section>/gi],
+  contact: [/<section[^>]*(?:contact|form|cta)[^>]*>[\s\S]*?<\/section>/gi, /<form[^>]*>[\s\S]*?<\/form>/gi],
+  faq: [/<section[^>]*(?:faq|question|accordion)[^>]*>[\s\S]*?<\/section>/gi],
+  cta: [/<section[^>]*(?:cta|call-to-action)[^>]*>[\s\S]*?<\/section>/gi],
+};
+
+/** Detect which section the user wants to edit based on their instruction */
+function detectTargetSection(instruction: string, html: string): ExtractedSection | null {
+  const lower = instruction.toLowerCase();
+
+  // Check each keyword
+  for (const [keyword, patterns] of Object.entries(SECTION_KEYWORDS)) {
+    if (!lower.includes(keyword)) continue;
+
+    for (const pattern of patterns) {
+      // Reset lastIndex for global regex
+      pattern.lastIndex = 0;
+      const match = pattern.exec(html);
+      if (match) {
+        return {
+          sectionHtml: match[0],
+          startIndex: match.index,
+          endIndex: match.index + match[0].length,
+          sectionName: keyword,
+        };
+      }
+    }
+  }
+
+  // Try to find section by heading text mentioned in the instruction
+  const quotedText = instruction.match(/["']([^"']+)["']/);
+  if (quotedText) {
+    const searchText = quotedText[1];
+    // Find the section containing this text
+    const sectionRegex = /<section[^>]*>[\s\S]*?<\/section>/gi;
+    let match;
+    while ((match = sectionRegex.exec(html)) !== null) {
+      if (match[0].includes(searchText)) {
+        return {
+          sectionHtml: match[0],
+          startIndex: match.index,
+          endIndex: match.index + match[0].length,
+          sectionName: "matched-section",
+        };
+      }
+    }
+  }
+
+  return null;
+}
+
+/** Detect if the edit is CSS-only (colors, fonts, spacing, backgrounds) */
+function isCssOnlyEdit(instruction: string): boolean {
+  return /^(change|make|set|update|switch)\s+(the\s+)?(color|colour|font|text-color|background|bg|primary|accent|gradient|shadow|border-color|opacity)\b/i.test(instruction)
+    || /\b(color|background|bg|font-family|font-size|border-radius|shadow|opacity)\s+(to|from|into)\b/i.test(instruction)
+    || /^(make|change)\s+(everything|all|the site|the page|it)\s+(darker|lighter|more colorful|monochrome|warmer|cooler)/i.test(instruction);
+}
+
+/** Extract the contents of the first <style> block */
+function extractStyleBlock(html: string): { css: string; startIndex: number; endIndex: number } | null {
+  const match = html.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
+  if (!match) return null;
+  const fullMatchStart = html.indexOf(match[0]);
+  const cssStart = fullMatchStart + match[0].indexOf(match[1]);
+  return {
+    css: match[1],
+    startIndex: cssStart,
+    endIndex: cssStart + match[1].length,
+  };
+}
+
+type EditMode = "targeted" | "css-only" | "full";
+
+function classifyEdit(instruction: string, html: string): { mode: EditMode; section?: ExtractedSection; styleBlock?: ReturnType<typeof extractStyleBlock> } {
+  // CSS-only edits (global color/font changes)
+  if (isCssOnlyEdit(instruction)) {
+    const styleBlock = extractStyleBlock(html);
+    if (styleBlock) {
+      return { mode: "css-only", styleBlock };
+    }
+  }
+
+  // Targeted section edits
+  const section = detectTargetSection(instruction, html);
+  if (section) {
+    return { mode: "targeted", section };
+  }
+
+  // Fallback: full document edit
+  return { mode: "full" };
+}
 
 export async function POST(request: NextRequest) {
   // API key auth — valid zbk_live_ key gets higher rate limit
@@ -31,11 +162,14 @@ export async function POST(request: NextRequest) {
   const apiKeyResult = bearerKey ? await validateApiKey(bearerKey) : null;
   const isApiKeyRequest = apiKeyResult?.valid === true;
 
-  // Rate limit: 20 edits/min for browsers, 120/min for valid API key holders
+  // Admin bypass: no rate limits
+  const isAdminRequest = request.headers.get("x-admin") === "1";
+
+  // Rate limit: unlimited for admin, 120/min for API keys, 20/min for browsers
   const ip = getClientIp(request);
   const rateLimitId = isApiKeyRequest ? `chat:key:${bearerKey.slice(-8)}` : `chat:${ip}`;
   const rateLimit = isApiKeyRequest ? { limit: 120, windowMs: 60_000 } : { limit: 20, windowMs: 60_000 };
-  const rl = checkRateLimit(rateLimitId, rateLimit);
+  const rl = isAdminRequest ? checkRateLimitAdmin() : checkRateLimit(rateLimitId, rateLimit);
   if (!rl.allowed) {
     return new Response(
       JSON.stringify({ error: "Too many requests. Please wait a moment and try again." }),
@@ -64,31 +198,47 @@ export async function POST(request: NextRequest) {
 
     if (!process.env.ANTHROPIC_API_KEY) {
       return new Response(
-        JSON.stringify({ error: "ANTHROPIC_API_KEY is not configured." }),
+        JSON.stringify({ error: "AI service is temporarily unavailable." }),
         { status: 500, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    // Classify edit complexity to pick the right model + tokens
-    const isSimpleEdit = /^(change|make|set|update|replace|switch)\s+(the\s+)?(color|colour|font|text|heading|title|background|bg|padding|margin|spacing|size|border)/i.test(instruction)
-      || /^(change|replace|update)\s+["'].+["']\s+(to|with)\s+["']/i.test(instruction)
-      || instruction.split(/\s+/).length <= 8;
+    // ─── Classify the edit to pick the optimal strategy ───
+    const editClass = currentCode ? classifyEdit(instruction, currentCode) : { mode: "full" as EditMode };
 
-    const userMessage = currentCode
-      ? `Here is the current website HTML:\n\n${currentCode}\n\n---\n\nIMPORTANT: Output the COMPLETE updated HTML from <!DOCTYPE html> to </html>. Do NOT skip or truncate any sections.\n\nEdit instruction: ${instruction}`
-      : `Create a website with this requirement: ${instruction}`;
+    let systemPrompt: string;
+    let userMessage: string;
+    let maxTokens: number;
 
-    // Simple edits (color/text changes) → Sonnet for speed
-    // Complex edits (add sections, restructure) → Sonnet with higher tokens
+    if (editClass.mode === "css-only" && editClass.styleBlock) {
+      // CSS-only: send just the style block
+      systemPrompt = CSS_EDIT_SYSTEM;
+      userMessage = `Here is the current CSS:\n\n${editClass.styleBlock.css}\n\n---\n\nEdit instruction: ${instruction}\n\nOutput ONLY the updated CSS rules. No <style> tags, no explanation.`;
+      maxTokens = 16000;
+    } else if (editClass.mode === "targeted" && editClass.section) {
+      // Targeted: send just the section
+      systemPrompt = TARGETED_SYSTEM;
+      userMessage = `Here is the HTML section to edit (${editClass.section.sectionName}):\n\n${editClass.section.sectionHtml}\n\n---\n\nEdit instruction: ${instruction}\n\nOutput ONLY the updated section HTML. No explanation, no code fences.`;
+      maxTokens = 16000;
+    } else {
+      // Full document edit (complex changes, new sections, etc.)
+      systemPrompt = SYSTEM_PROMPT;
+      userMessage = currentCode
+        ? `Here is the current website HTML:\n\n${currentCode}\n\n---\n\nIMPORTANT: Output the COMPLETE updated HTML from <!DOCTYPE html> to </html>. Do NOT skip or truncate any sections.\n\nEdit instruction: ${instruction}`
+        : `Create a website with this requirement: ${instruction}`;
+
+      const isSimpleEdit = instruction.split(/\s+/).length <= 8;
+      maxTokens = isSimpleEdit ? 32000 : 64000;
+    }
+
     const model = "claude-sonnet-4-6";
-    const maxTokens = isSimpleEdit ? 32000 : 64000;
 
     let stream;
     try {
       stream = await getClient().messages.stream({
         model,
         max_tokens: maxTokens,
-        system: SYSTEM_PROMPT,
+        system: systemPrompt,
         messages: [{ role: "user", content: userMessage }],
       });
     } catch (apiErr: unknown) {
@@ -106,9 +256,19 @@ export async function POST(request: NextRequest) {
 
     const encoder = new TextEncoder();
 
+    // Send the edit mode as the first SSE event so the client knows how to reassemble
+    const modeEvent = JSON.stringify({
+      type: "meta",
+      editMode: editClass.mode,
+      sectionName: editClass.mode === "targeted" ? editClass.section?.sectionName : undefined,
+    });
+
     const readable = new ReadableStream({
       async start(controller) {
         try {
+          // Send meta event first
+          controller.enqueue(encoder.encode(`data: ${modeEvent}\n\n`));
+
           for await (const event of stream) {
             if (
               event.type === "content_block_delta" &&

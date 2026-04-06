@@ -36,6 +36,11 @@ export interface RateLimitResult {
   resetAt: number;
 }
 
+/** Admin bypass — always allowed, unlimited remaining */
+export function checkRateLimitAdmin(): RateLimitResult {
+  return { allowed: true, remaining: Infinity, resetAt: 0 };
+}
+
 export function checkRateLimit(
   identifier: string,
   config: RateLimitConfig

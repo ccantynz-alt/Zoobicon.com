@@ -1,7 +1,12 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import { Globe, Check, Languages, Loader2 } from "lucide-react";
+import {
+  Globe,
+  Check,
+  Languages,
+  Loader2,
+} from "lucide-react";
 
 interface TranslatePanelProps {
   code: string;
@@ -148,7 +153,7 @@ export default function TranslatePanel({
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="text-white/40 transition-colors hover:text-white"
+              className="text-white/50 transition-colors hover:text-white"
             >
               &times;
             </button>
@@ -180,11 +185,11 @@ export default function TranslatePanel({
                     <span className="text-sm text-white/70">
                       Language Switcher
                     </span>
-                    <span className="ml-auto text-xs text-white/40">
+                    <span className="ml-auto text-xs text-white/50">
                       {languageCount + 1} languages available
                     </span>
                   </div>
-                  <p className="mt-2 text-xs text-white/40">
+                  <p className="mt-2 text-xs text-white/50">
                     A floating language switcher has been added to the top-right
                     corner of your page. Users can switch between all{" "}
                     {languageCount + 1} languages instantly.
@@ -207,7 +212,7 @@ export default function TranslatePanel({
                 <p className="text-sm font-medium text-white/70">
                   Translating to {selectedLanguages.size} languages...
                 </p>
-                <p className="mt-1 text-xs text-white/40">
+                <p className="mt-1 text-xs text-white/50">
                   This may take a moment
                 </p>
               </div>
@@ -234,7 +239,7 @@ export default function TranslatePanel({
                     >
                       Select All
                     </button>
-                    <span className="text-white/20">|</span>
+                    <span className="text-white/50">|</span>
                     <button
                       onClick={deselectAll}
                       className="text-xs text-blue-400 transition-colors hover:text-blue-300"

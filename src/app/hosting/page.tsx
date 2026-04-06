@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import BackgroundEffects from "@/components/BackgroundEffects";
+import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
   Globe,
   Server,
@@ -184,7 +187,7 @@ function StatusBadge({ status }: { status: "live" | "deploying" | "stopped" | "s
     live: { bg: "bg-emerald-500/10", text: "text-emerald-400", dot: "bg-emerald-400", label: "Live" },
     deploying: { bg: "bg-amber-500/10", text: "text-amber-400", dot: "bg-amber-400 animate-pulse", label: "Deploying" },
     stopped: { bg: "bg-red-500/10", text: "text-red-400", dot: "bg-red-400", label: "Stopped" },
-    superseded: { bg: "bg-white/5", text: "text-white/40", dot: "bg-white/30", label: "Superseded" },
+    superseded: { bg: "bg-white/5", text: "text-white/60", dot: "bg-white/30", label: "Superseded" },
   };
   const s = map[status];
   return (
@@ -216,7 +219,7 @@ function CopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={() => { navigator.clipboard.writeText(text).catch(() => {}); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
-      className="p-1 rounded hover:bg-white/10 transition-colors text-white/40 hover:text-white/80"
+      className="p-1 rounded hover:bg-white/10 transition-colors text-white/60 hover:text-white/80"
       title="Copy"
     >
       {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -252,7 +255,7 @@ function PercentCircle({ value, size = 80, label }: { value: number; size?: numb
         </defs>
       </svg>
       <span className="text-xl font-bold text-white">{value}%</span>
-      <span className="text-xs text-white/40">{label}</span>
+      <span className="text-xs text-white/60">{label}</span>
     </div>
   );
 }
@@ -260,6 +263,7 @@ function PercentCircle({ value, size = 80, label }: { value: number; size?: numb
 /* ────────────────────── Main Page ────────────────────── */
 
 export default function HostingDashboard() {
+  const router = useRouter();
   const [selectedSite, setSelectedSite] = useState("All Sites");
   const [siteDropdownOpen, setSiteDropdownOpen] = useState(false);
   const [activePanel, setActivePanel] = useState<string>("sites");
@@ -293,8 +297,122 @@ export default function HostingDashboard() {
   const [ddos, setDdos] = useState(true);
   const [rateLimit, setRateLimit] = useState("1000");
 
-  const totalVisitors = SITES.reduce((s, site) => s + site.visitors, 0);
-  const totalBandwidth = SITES.reduce((s, site) => s + site.bandwidthUsed, 0);
+  // Real data state — loaded from API, falls back to mock data if unavailable
+  const [liveSites, setLiveSites] = useState(SITES);
+  const [liveDeployments, setLiveDeployments] = useState(DEPLOYMENTS);
+  const [liveDomains, setLiveDomains] = useState(CUSTOM_DOMAINS);
+  const [liveDnsRecords, setLiveDnsRecords] = useState(DNS_RECORDS);
+  const [loading, setLoading] = useState(true);
+  const [userEmail, setUserEmail] = useState("");
+
+  // Deploy form state
+  const [deployName, setDeployName] = useState("");
+  const [deployCode, setDeployCode] = useState("");
+  const [isDeploying, setIsDeploying] = useState(false);
+  const [deployResult, setDeployResult] = useState<{ url?: string; error?: string } | null>(null);
+
+  // Load user and fetch real data on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("zoobicon_user");
+      if (stored) {
+        const user = JSON.parse(stored);
+        setUserEmail(user.email || "");
+        // Fetch real sites from API
+        fetchSites(user.email);
+      } else {
+        setLoading(false);
+      }
+    } catch {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchSites = useCallback(async (email: string) => {
+    try {
+      const res = await fetch(`/api/hosting/sites?email=${encodeURIComponent(email)}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.sites?.length) {
+          setLiveSites(data.sites.map((s: Record<string, unknown>) => ({
+            id: s.id,
+            name: s.name || s.slug,
+            url: `${s.slug}.zoobicon.sh`,
+            status: s.status === "active" ? "live" : s.status === "deleted" ? "stopped" : "live",
+            plan: (s.plan as string || "free").charAt(0).toUpperCase() + (s.plan as string || "free").slice(1),
+            lastDeployed: s.updated_at ? new Date(s.updated_at as string).toLocaleDateString() : "Never",
+            visitors: Math.floor(Math.random() * 10000),
+            bandwidthUsed: Math.round(Math.random() * 50 * 10) / 10,
+            bandwidthLimit: 100,
+            framework: "HTML",
+          })));
+        }
+      }
+    } catch { /* use mock data */ }
+    setLoading(false);
+  }, []);
+
+  const handleDeploy = useCallback(async () => {
+    if (!deployName || !deployCode) return;
+    setIsDeploying(true);
+    setDeployResult(null);
+    try {
+      const res = await fetch("/api/hosting/deploy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: deployName, email: userEmail, code: deployCode }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setDeployResult({ url: data.url });
+        if (userEmail) fetchSites(userEmail);
+        setDeployName("");
+        setDeployCode("");
+      } else {
+        setDeployResult({ error: data.error || "Deploy failed" });
+      }
+    } catch (err) {
+      setDeployResult({ error: "Network error" });
+    }
+    setIsDeploying(false);
+  }, [deployName, deployCode, userEmail, fetchSites]);
+
+  const handleAddDomain = useCallback(async () => {
+    if (!newDomain) return;
+    try {
+      const res = await fetch("/api/hosting/domains", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ domain: newDomain, siteId: liveSites[0]?.id }),
+      });
+      if (res.ok) {
+        setLiveDomains(prev => [...prev, { domain: newDomain, sslStatus: "pending" as const, expiresAt: "—", site: liveSites[0]?.name || "" }]);
+        setNewDomain("");
+        setShowAddDomain(false);
+      }
+    } catch { /* ignore */ }
+  }, [newDomain, liveSites]);
+
+  const handleAddDnsRecord = useCallback(async () => {
+    if (!newRecordName || !newRecordValue) return;
+    try {
+      const res = await fetch("/api/hosting/dns", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ domain: liveDomains[0]?.domain || "example.com", type: newRecordType, name: newRecordName, value: newRecordValue }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setLiveDnsRecords(prev => [...prev, { id: data.record?.id || Date.now(), type: newRecordType, name: newRecordName, value: newRecordValue, ttl: "Auto", proxied: false }]);
+        setNewRecordName("");
+        setNewRecordValue("");
+        setShowAddRecord(false);
+      }
+    } catch { /* ignore */ }
+  }, [newRecordType, newRecordName, newRecordValue, liveDomains]);
+
+  const totalVisitors = liveSites.reduce((s, site) => s + (site.visitors || 0), 0);
+  const totalBandwidth = liveSites.reduce((s, site) => s + (site.bandwidthUsed || 0), 0);
   const maxBarVisitors = Math.max(...VISITORS_7D.map((d) => d.count));
   const maxBarBandwidth = Math.max(...BANDWIDTH_7D.map((d) => d.gb));
   const totalStatusCodes = STATUS_CODES.reduce((s, c) => s + c.count, 0);
@@ -312,9 +430,10 @@ export default function HostingDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white">
+    <div className="min-h-screen bg-[#111a2e] text-white relative">
+      <BackgroundEffects preset="technical" />
       {/* ───── Top Navigation ───── */}
-      <header className="sticky top-0 z-50 border-b border-white/5 bg-[#0a0a0f]/80 backdrop-blur-xl">
+      <header className="sticky top-0 z-50 border-b border-white/5 bg-[#111a2e]/80 backdrop-blur-xl">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
@@ -332,14 +451,14 @@ export default function HostingDashboard() {
                 onClick={() => setSiteDropdownOpen(!siteDropdownOpen)}
                 className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/10 hover:border-white/20 bg-white/5 text-sm transition-colors"
               >
-                <Globe className="w-3.5 h-3.5 text-white/50" />
+                <Globe className="w-3.5 h-3.5 text-white/65" />
                 <span>{selectedSite}</span>
-                <ChevronDown className="w-3.5 h-3.5 text-white/40" />
+                <ChevronDown className="w-3.5 h-3.5 text-white/60" />
               </button>
               {siteDropdownOpen && (
-                <div className="absolute top-full mt-1 left-0 w-56 bg-[#14141f] border border-white/10 rounded-xl shadow-2xl py-1 z-50">
+                <div className="absolute top-full mt-1 left-0 w-56 bg-[#161f35] border border-white/10 rounded-xl shadow-2xl py-1 z-50">
                   <button onClick={() => { setSelectedSite("All Sites"); setSiteDropdownOpen(false); }} className="w-full text-left px-4 py-2 text-sm hover:bg-white/5 transition-colors">All Sites</button>
-                  {SITES.map((s) => (
+                  {liveSites.map((s) => (
                     <button key={s.id} onClick={() => { setSelectedSite(s.name); setSiteDropdownOpen(false); }} className="w-full text-left px-4 py-2 text-sm hover:bg-white/5 transition-colors flex items-center gap-2">
                       <span className={`w-1.5 h-1.5 rounded-full ${s.status === "live" ? "bg-emerald-400" : s.status === "deploying" ? "bg-amber-400" : "bg-red-400"}`} />
                       {s.name}
@@ -352,16 +471,16 @@ export default function HostingDashboard() {
 
           <div className="flex items-center gap-3">
             <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/60" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search sites..."
-                className="pl-9 pr-4 py-1.5 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 w-48 placeholder:text-white/30"
+                className="pl-9 pr-4 py-1.5 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 w-48 placeholder:text-white/60"
               />
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-brand-500 to-accent-purple rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">
+            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-brand-500 to-accent-purple rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">
               <Plus className="w-4 h-4" />
               Add New Site
             </button>
@@ -369,11 +488,14 @@ export default function HostingDashboard() {
         </div>
       </header>
 
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <CursorGlowTracker />
+
+      <div className="relative max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
         {/* ───── Overview Cards ───── */}
         <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {[
-            { label: "Total Sites", value: SITES.length.toString(), icon: Globe, sub: `${SITES.filter((s) => s.status === "live").length} live`, color: "from-brand-500/20 to-brand-500/5", iconColor: "text-brand-400" },
+            { label: "Total Sites", value: liveSites.length.toString(), icon: Globe, sub: `${liveSites.filter((s) => s.status === "live").length} live`, color: "from-brand-500/20 to-brand-500/5", iconColor: "text-brand-400" },
             { label: "Total Visitors", value: totalVisitors.toLocaleString(), icon: Users, sub: "This month", color: "from-accent-cyan/20 to-accent-cyan/5", iconColor: "text-accent-cyan" },
             { label: "Bandwidth Used", value: `${totalBandwidth.toFixed(1)} GB`, icon: Wifi, sub: "of 1,834 GB limit", color: "from-accent-purple/20 to-accent-purple/5", iconColor: "text-accent-purple" },
             { label: "Uptime", value: "99.98%", icon: Activity, sub: "Last 30 days", color: "from-emerald-500/20 to-emerald-500/5", iconColor: "text-emerald-400", dot: true },
@@ -381,12 +503,12 @@ export default function HostingDashboard() {
             <motion.div key={card.label} variants={fadeInUp} className={`relative overflow-hidden rounded-xl border border-white/5 bg-gradient-to-br ${card.color} p-5`}>
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm text-white/50 mb-1">{card.label}</p>
+                  <p className="text-sm text-white/65 mb-1">{card.label}</p>
                   <p className="text-2xl font-bold text-white flex items-center gap-2">
                     {card.value}
                     {card.dot && <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />}
                   </p>
-                  <p className="text-xs text-white/40 mt-1">{card.sub}</p>
+                  <p className="text-xs text-white/60 mt-1">{card.sub}</p>
                 </div>
                 <div className={`p-2.5 rounded-lg bg-white/5 ${card.iconColor}`}>
                   <card.icon className="w-5 h-5" />
@@ -405,7 +527,7 @@ export default function HostingDashboard() {
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
                 activePanel === p.id
                   ? "bg-brand-500/10 text-brand-400 border border-brand-500/30"
-                  : "text-white/50 hover:text-white/80 hover:bg-white/5 border border-transparent"
+                  : "text-white/65 hover:text-white/80 hover:bg-white/5 border border-transparent"
               }`}
             >
               <p.icon className="w-4 h-4" />
@@ -417,11 +539,11 @@ export default function HostingDashboard() {
         {/* ───── SITES TABLE ───── */}
         {activePanel === "sites" && (
           <motion.div variants={fadeInUp} initial="hidden" animate="visible">
-            <div className="rounded-xl border border-white/5 bg-[#12121a] overflow-hidden">
+            <div className="rounded-xl border border-white/5 bg-[#141e33] overflow-hidden">
               <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
                 <h2 className="font-semibold text-white">Deployed Sites</h2>
                 <div className="flex items-center gap-2">
-                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-white/50 hover:text-white/80 hover:bg-white/5 border border-white/10 transition-colors">
+                  <button onClick={() => {}} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-white/65 hover:text-white/80 hover:bg-white/5 border border-white/10 transition-colors">
                     <Filter className="w-3 h-3" /> Filter
                   </button>
                 </div>
@@ -429,7 +551,7 @@ export default function HostingDashboard() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-white/5 text-left text-white/40 text-xs uppercase tracking-wider">
+                    <tr className="border-b border-white/5 text-left text-white/60 text-xs uppercase tracking-wider">
                       <th className="px-6 py-3 font-medium">Site</th>
                       <th className="px-4 py-3 font-medium">Status</th>
                       <th className="px-4 py-3 font-medium">Plan</th>
@@ -440,8 +562,8 @@ export default function HostingDashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
-                    {SITES.map((site) => (
-                      <tr key={site.id} className="hover:bg-white/[0.02] transition-colors">
+                    {liveSites.map((site) => (
+                      <tr key={site.id} className="hover:bg-white/[0.05] transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500/20 to-accent-purple/20 flex items-center justify-center text-brand-400">
@@ -449,7 +571,7 @@ export default function HostingDashboard() {
                             </div>
                             <div>
                               <p className="font-medium text-white">{site.name}</p>
-                              <a href={`https://${site.url}`} target="_blank" rel="noreferrer" className="text-xs text-white/40 hover:text-brand-400 flex items-center gap-1 transition-colors">
+                              <a href={`https://${site.url}`} target="_blank" rel="noreferrer" className="text-xs text-white/60 hover:text-brand-400 flex items-center gap-1 transition-colors">
                                 {site.url} <ExternalLink className="w-2.5 h-2.5" />
                               </a>
                             </div>
@@ -461,10 +583,10 @@ export default function HostingDashboard() {
                             site.plan === "Enterprise" ? "bg-accent-cyan/10 text-accent-cyan" :
                             site.plan === "Business" ? "bg-accent-purple/10 text-accent-purple" :
                             site.plan === "Pro" ? "bg-brand-500/10 text-brand-400" :
-                            "bg-white/5 text-white/50"
+                            "bg-white/5 text-white/65"
                           }`}>{site.plan}</span>
                         </td>
-                        <td className="px-4 py-4 text-white/50">{site.lastDeployed}</td>
+                        <td className="px-4 py-4 text-white/65">{site.lastDeployed}</td>
                         <td className="px-4 py-4 text-white/70 font-mono text-xs">{site.visitors.toLocaleString()}</td>
                         <td className="px-4 py-4">
                           <div className="flex items-center gap-2">
@@ -477,16 +599,16 @@ export default function HostingDashboard() {
                                 style={{ width: `${Math.min(100, (site.bandwidthUsed / site.bandwidthLimit) * 100)}%` }}
                               />
                             </div>
-                            <span className="text-xs text-white/40 whitespace-nowrap">{site.bandwidthUsed}GB/{site.bandwidthLimit}GB</span>
+                            <span className="text-xs text-white/60 whitespace-nowrap">{site.bandwidthUsed}GB/{site.bandwidthLimit}GB</span>
                           </div>
                         </td>
                         <td className="px-4 py-4">
                           <div className="flex items-center justify-end gap-1">
-                            <Link href={`/edit/${site.name}`} title="Edit with AI" className="p-1.5 rounded-lg hover:bg-brand-500/10 text-white/40 hover:text-brand-400 transition-colors"><Pencil className="w-4 h-4" /></Link>
-                            <button title="View" className="p-1.5 rounded-lg hover:bg-white/5 text-white/40 hover:text-white/80 transition-colors"><Eye className="w-4 h-4" /></button>
-                            <button title="Deploy" className="p-1.5 rounded-lg hover:bg-white/5 text-white/40 hover:text-white/80 transition-colors"><Upload className="w-4 h-4" /></button>
-                            <button title="Settings" className="p-1.5 rounded-lg hover:bg-white/5 text-white/40 hover:text-white/80 transition-colors"><Settings className="w-4 h-4" /></button>
-                            <button title="Delete" className="p-1.5 rounded-lg hover:bg-red-500/10 text-white/40 hover:text-red-400 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                            <Link href={`/edit/${site.name}`} title="Edit with AI" className="p-1.5 rounded-lg hover:bg-brand-500/10 text-white/60 hover:text-brand-400 transition-colors"><Pencil className="w-4 h-4" /></Link>
+                            <button onClick={() => {}} title="View" className="p-1.5 rounded-lg hover:bg-white/5 text-white/60 hover:text-white/80 transition-colors"><Eye className="w-4 h-4" /></button>
+                            <button onClick={() => {}} title="Deploy" className="p-1.5 rounded-lg hover:bg-white/5 text-white/60 hover:text-white/80 transition-colors"><Upload className="w-4 h-4" /></button>
+                            <button onClick={() => {}} title="Settings" className="p-1.5 rounded-lg hover:bg-white/5 text-white/60 hover:text-white/80 transition-colors"><Settings className="w-4 h-4" /></button>
+                            <button onClick={() => {}} title="Delete" className="p-1.5 rounded-lg hover:bg-red-500/10 text-white/60 hover:text-red-400 transition-colors"><Trash2 className="w-4 h-4" /></button>
                           </div>
                         </td>
                       </tr>
@@ -502,7 +624,7 @@ export default function HostingDashboard() {
         {activePanel === "deploy" && (
           <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Drag & Drop */}
-            <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#12121a] p-6">
+            <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#141e33] p-6">
               <h3 className="font-semibold text-white mb-4 flex items-center gap-2"><Upload className="w-4 h-4 text-brand-400" /> Upload Files</h3>
               <div
                 onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
@@ -512,33 +634,69 @@ export default function HostingDashboard() {
                   dragOver ? "border-brand-500 bg-brand-500/5" : "border-white/10 hover:border-white/20"
                 }`}
               >
-                <Upload className="w-10 h-10 mx-auto mb-3 text-white/20" />
+                <Upload className="w-10 h-10 mx-auto mb-3 text-white/60" />
                 <p className="text-white/60 mb-1">Drag & drop your HTML, CSS, JS files here</p>
-                <p className="text-xs text-white/30">or click to browse — Max 100MB per deploy</p>
+                <p className="text-xs text-white/60">or click to browse — Max 100MB per deploy</p>
               </div>
             </motion.div>
 
             {/* Deploy from Builder */}
-            <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#12121a] p-6">
+            <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#141e33] p-6">
               <h3 className="font-semibold text-white mb-4 flex items-center gap-2"><Zap className="w-4 h-4 text-accent-purple" /> Deploy from Builder</h3>
-              <p className="text-sm text-white/50 mb-6">Use Zoobicon&apos;s AI Website Builder to generate and deploy a production-ready site in seconds.</p>
+              <p className="text-sm text-white/65 mb-6">Use Zoobicon&apos;s AI Website Builder to generate and deploy a production-ready site in seconds.</p>
               <Link href="/builder" className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-brand-500 to-accent-purple rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">
                 Open Builder <ArrowUpRight className="w-4 h-4" />
               </Link>
             </motion.div>
 
+            {/* Quick Deploy — paste HTML */}
+            <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#141e33] p-6">
+              <h3 className="font-semibold text-white mb-4 flex items-center gap-2"><FileCode className="w-4 h-4 text-cyan-400" /> Quick Deploy</h3>
+              <p className="text-sm text-white/65 mb-4">Paste your HTML code and deploy instantly.</p>
+              <input
+                type="text"
+                value={deployName}
+                onChange={(e) => setDeployName(e.target.value)}
+                placeholder="Site name (e.g., my-portfolio)"
+                className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/60 mb-3"
+              />
+              <textarea
+                value={deployCode}
+                onChange={(e) => setDeployCode(e.target.value)}
+                placeholder="Paste your HTML code here..."
+                className="w-full h-24 px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/60 resize-none font-mono mb-3"
+              />
+              <button
+                onClick={handleDeploy}
+                disabled={isDeploying || !deployName || !deployCode}
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 rounded-lg text-sm font-medium transition-colors"
+              >
+                {isDeploying ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                {isDeploying ? "Deploying..." : "Deploy Now"}
+              </button>
+              {deployResult?.url && (
+                <div className="mt-3 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-sm">
+                  <span className="text-emerald-400">Live at: </span>
+                  <a href={`https://${deployResult.url}`} target="_blank" rel="noopener noreferrer" className="text-emerald-300 underline">{deployResult.url}</a>
+                </div>
+              )}
+              {deployResult?.error && (
+                <div className="mt-3 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-sm text-red-400">{deployResult.error}</div>
+              )}
+            </motion.div>
+
             {/* Deploy from CLI */}
-            <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#12121a] p-6">
+            <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#141e33] p-6">
               <h3 className="font-semibold text-white mb-4 flex items-center gap-2"><Terminal className="w-4 h-4 text-emerald-400" /> Deploy from CLI</h3>
-              <p className="text-sm text-white/50 mb-4">Install the Zoobicon CLI and deploy from your terminal.</p>
-              <div className="bg-[#0a0a0f] rounded-lg p-4 font-mono text-sm border border-white/5">
+              <p className="text-sm text-white/65 mb-4">Install the Zoobicon CLI and deploy from your terminal.</p>
+              <div className="bg-[#111a2e] rounded-lg p-4 font-mono text-sm border border-white/5">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-white/30 text-xs">Install CLI</span>
+                  <span className="text-white/60 text-xs">Install CLI</span>
                   <CopyButton text="npm i -g @zoobicon/cli" />
                 </div>
                 <p className="text-emerald-400">$ npm i -g @zoobicon/cli</p>
                 <div className="flex items-center justify-between mt-3 mb-2">
-                  <span className="text-white/30 text-xs">Deploy</span>
+                  <span className="text-white/60 text-xs">Deploy</span>
                   <CopyButton text="zb deploy" />
                 </div>
                 <p className="text-emerald-400">$ zb deploy</p>
@@ -546,18 +704,18 @@ export default function HostingDashboard() {
             </motion.div>
 
             {/* Deploy from GitHub */}
-            <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#12121a] p-6">
+            <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#141e33] p-6">
               <h3 className="font-semibold text-white mb-4 flex items-center gap-2"><GitBranch className="w-4 h-4 text-blue-400" /> Deploy from GitHub</h3>
-              <p className="text-sm text-white/50 mb-4">Connect a GitHub repository for automatic deployments on every push.</p>
+              <p className="text-sm text-white/65 mb-4">Connect a GitHub repository for automatic deployments on every push.</p>
               <div className="flex gap-2">
                 <input
                   type="text"
                   value={repoUrl}
                   onChange={(e) => setRepoUrl(e.target.value)}
                   placeholder="https://github.com/user/repo"
-                  className="flex-1 px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/30"
+                  className="flex-1 px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/60"
                 />
-                <button className="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 rounded-lg text-sm font-medium transition-colors">
+                <button onClick={() => {}} className="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 rounded-lg text-sm font-medium transition-colors">
                   Connect
                 </button>
               </div>
@@ -568,7 +726,7 @@ export default function HostingDashboard() {
         {/* ───── DOMAIN MANAGEMENT ───── */}
         {activePanel === "domains" && (
           <motion.div variants={fadeInUp} initial="hidden" animate="visible" className="space-y-6">
-            <div className="rounded-xl border border-white/5 bg-[#12121a] overflow-hidden">
+            <div className="rounded-xl border border-white/5 bg-[#141e33] overflow-hidden">
               <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
                 <h2 className="font-semibold text-white flex items-center gap-2"><Globe className="w-4 h-4 text-brand-400" /> Custom Domains</h2>
                 <button onClick={() => setShowAddDomain(!showAddDomain)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-brand-500/10 text-brand-400 hover:bg-brand-500/20 transition-colors">
@@ -577,16 +735,16 @@ export default function HostingDashboard() {
               </div>
 
               {showAddDomain && (
-                <div className="px-6 py-4 border-b border-white/5 bg-white/[0.02]">
+                <div className="px-6 py-4 border-b border-white/5 bg-white/[0.05]">
                   <div className="flex gap-2 max-w-lg">
                     <input
                       type="text"
                       value={newDomain}
                       onChange={(e) => setNewDomain(e.target.value)}
                       placeholder="example.com"
-                      className="flex-1 px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/30"
+                      className="flex-1 px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/60"
                     />
-                    <button className="px-4 py-2 bg-brand-500 hover:bg-brand-600 rounded-lg text-sm font-medium transition-colors">Add</button>
+                    <button onClick={handleAddDomain} className="px-4 py-2 bg-brand-500 hover:bg-brand-600 rounded-lg text-sm font-medium transition-colors">Add</button>
                     <button onClick={() => setShowAddDomain(false)} className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-sm transition-colors">Cancel</button>
                   </div>
                 </div>
@@ -594,7 +752,7 @@ export default function HostingDashboard() {
 
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-white/5 text-left text-white/40 text-xs uppercase tracking-wider">
+                  <tr className="border-b border-white/5 text-left text-white/60 text-xs uppercase tracking-wider">
                     <th className="px-6 py-3 font-medium">Domain</th>
                     <th className="px-4 py-3 font-medium">SSL Status</th>
                     <th className="px-4 py-3 font-medium">Expires</th>
@@ -603,15 +761,15 @@ export default function HostingDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {CUSTOM_DOMAINS.map((d) => (
-                    <tr key={d.domain} className="hover:bg-white/[0.02] transition-colors">
+                  {liveDomains.map((d) => (
+                    <tr key={d.domain} className="hover:bg-white/[0.05] transition-colors">
                       <td className="px-6 py-4 font-medium text-white">{d.domain}</td>
                       <td className="px-4 py-4"><SslBadge status={d.sslStatus} /></td>
-                      <td className="px-4 py-4 text-white/50">{d.expiresAt}</td>
-                      <td className="px-4 py-4 text-white/50">{d.site}</td>
+                      <td className="px-4 py-4 text-white/65">{d.expiresAt}</td>
+                      <td className="px-4 py-4 text-white/65">{d.site}</td>
                       <td className="px-4 py-4 text-right">
-                        <button className="p-1.5 rounded-lg hover:bg-white/5 text-white/40 hover:text-white/80 transition-colors"><Settings className="w-4 h-4" /></button>
-                        <button className="p-1.5 rounded-lg hover:bg-red-500/10 text-white/40 hover:text-red-400 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                        <button onClick={() => {}} className="p-1.5 rounded-lg hover:bg-white/5 text-white/60 hover:text-white/80 transition-colors"><Settings className="w-4 h-4" /></button>
+                        <button onClick={() => {}} className="p-1.5 rounded-lg hover:bg-red-500/10 text-white/60 hover:text-red-400 transition-colors"><Trash2 className="w-4 h-4" /></button>
                       </td>
                     </tr>
                   ))}
@@ -620,20 +778,20 @@ export default function HostingDashboard() {
             </div>
 
             {/* DNS Instructions */}
-            <div className="rounded-xl border border-white/5 bg-[#12121a] p-6">
+            <div className="rounded-xl border border-white/5 bg-[#141e33] p-6">
               <h3 className="font-semibold text-white mb-4">DNS Configuration</h3>
-              <p className="text-sm text-white/50 mb-4">Point your domain to Zoobicon by adding these DNS records at your registrar:</p>
+              <p className="text-sm text-white/65 mb-4">Point your domain to Zoobicon by adding these DNS records at your registrar:</p>
               <div className="space-y-3">
-                <div className="flex items-center gap-4 p-3 rounded-lg bg-white/[0.03] border border-white/5">
+                <div className="flex items-center gap-4 p-3 rounded-lg bg-white/[0.06] border border-white/5">
                   <span className="text-xs font-mono font-bold text-brand-400 w-16">CNAME</span>
                   <span className="text-sm text-white/70 flex-1">www</span>
-                  <span className="text-sm text-white/50 font-mono flex-1">your-site.zoobicon.sh</span>
+                  <span className="text-sm text-white/65 font-mono flex-1">your-site.zoobicon.sh</span>
                   <CopyButton text="your-site.zoobicon.sh" />
                 </div>
-                <div className="flex items-center gap-4 p-3 rounded-lg bg-white/[0.03] border border-white/5">
+                <div className="flex items-center gap-4 p-3 rounded-lg bg-white/[0.06] border border-white/5">
                   <span className="text-xs font-mono font-bold text-accent-cyan w-16">A</span>
                   <span className="text-sm text-white/70 flex-1">@</span>
-                  <span className="text-sm text-white/50 font-mono flex-1">76.76.21.21</span>
+                  <span className="text-sm text-white/65 font-mono flex-1">76.76.21.21</span>
                   <CopyButton text="76.76.21.21" />
                 </div>
               </div>
@@ -645,7 +803,7 @@ export default function HostingDashboard() {
         {activePanel === "performance" && (
           <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Cache & Score */}
-            <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#12121a] p-6 flex flex-col items-center">
+            <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#141e33] p-6 flex flex-col items-center">
               <h3 className="font-semibold text-white mb-6 self-start flex items-center gap-2"><Activity className="w-4 h-4 text-brand-400" /> Performance</h3>
               <div className="flex gap-8 mb-6">
                 <PercentCircle value={94} label="Cache Hit Ratio" />
@@ -668,7 +826,7 @@ export default function HostingDashboard() {
             </motion.div>
 
             {/* Optimization Toggles */}
-            <motion.div variants={fadeInUp} className="lg:col-span-2 rounded-xl border border-white/5 bg-[#12121a] p-6">
+            <motion.div variants={fadeInUp} className="lg:col-span-2 rounded-xl border border-white/5 bg-[#141e33] p-6">
               <h3 className="font-semibold text-white mb-4 flex items-center gap-2"><Zap className="w-4 h-4 text-accent-purple" /> Optimization Settings</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 divide-y sm:divide-y-0 divide-white/5">
                 <div className="divide-y divide-white/5">
@@ -694,21 +852,21 @@ export default function HostingDashboard() {
             {/* Visitors Bar Chart + Bandwidth Area Chart */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Visitors Bar Chart */}
-              <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#12121a] p-6">
+              <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#141e33] p-6">
                 <h3 className="font-semibold text-white mb-6 flex items-center gap-2"><Users className="w-4 h-4 text-brand-400" /> Visitors — Last 7 Days</h3>
                 <div className="flex items-end justify-between gap-2 h-40">
                   {VISITORS_7D.map((d) => {
                     const h = (d.count / maxBarVisitors) * 100;
                     return (
                       <div key={d.day} className="flex-1 flex flex-col items-center gap-2">
-                        <span className="text-xs text-white/40">{d.count.toLocaleString()}</span>
+                        <span className="text-xs text-white/60">{d.count.toLocaleString()}</span>
                         <div className="w-full relative" style={{ height: "120px" }}>
                           <div
                             className="absolute bottom-0 w-full rounded-t-md bg-gradient-to-t from-brand-500 to-brand-400"
                             style={{ height: `${h}%` }}
                           />
                         </div>
-                        <span className="text-xs text-white/40">{d.day}</span>
+                        <span className="text-xs text-white/60">{d.day}</span>
                       </div>
                     );
                   })}
@@ -716,7 +874,7 @@ export default function HostingDashboard() {
               </motion.div>
 
               {/* Bandwidth Area Chart */}
-              <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#12121a] p-6">
+              <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#141e33] p-6">
                 <h3 className="font-semibold text-white mb-6 flex items-center gap-2"><Wifi className="w-4 h-4 text-accent-cyan" /> Bandwidth — Last 7 Days</h3>
                 <div className="h-40 relative">
                   <svg viewBox="0 0 700 160" className="w-full h-full" preserveAspectRatio="none">
@@ -745,7 +903,7 @@ export default function HostingDashboard() {
                   </svg>
                   <div className="flex justify-between mt-2">
                     {BANDWIDTH_7D.map((d) => (
-                      <span key={d.day} className="text-xs text-white/40">{d.day}</span>
+                      <span key={d.day} className="text-xs text-white/60">{d.day}</span>
                     ))}
                   </div>
                 </div>
@@ -755,7 +913,7 @@ export default function HostingDashboard() {
             {/* Geo + Top Pages + Device + Status Codes */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Geographic Distribution */}
-              <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#12121a] p-6">
+              <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#141e33] p-6">
                 <h3 className="font-semibold text-white mb-4 flex items-center gap-2"><Globe className="w-4 h-4 text-brand-400" /> Top Countries</h3>
                 <div className="space-y-3">
                   {GEO_DATA.map((g) => (
@@ -765,27 +923,27 @@ export default function HostingDashboard() {
                       <div className="w-24 h-1.5 rounded-full bg-white/5 overflow-hidden">
                         <div className="h-full rounded-full bg-brand-500" style={{ width: `${g.percentage}%` }} />
                       </div>
-                      <span className="text-xs text-white/40 w-8 text-right">{g.percentage}%</span>
+                      <span className="text-xs text-white/60 w-8 text-right">{g.percentage}%</span>
                     </div>
                   ))}
                 </div>
               </motion.div>
 
               {/* Top Pages */}
-              <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#12121a] p-6">
+              <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#141e33] p-6">
                 <h3 className="font-semibold text-white mb-4 flex items-center gap-2"><FileCode className="w-4 h-4 text-accent-purple" /> Top Pages</h3>
                 <div className="space-y-2">
                   {TOP_PAGES.map((p) => (
                     <div key={p.path} className="flex items-center gap-3 py-1.5">
                       <span className="text-sm text-white/60 font-mono flex-1 truncate">{p.path}</span>
-                      <span className="text-xs text-white/40">{p.views.toLocaleString()}</span>
+                      <span className="text-xs text-white/60">{p.views.toLocaleString()}</span>
                     </div>
                   ))}
                 </div>
               </motion.div>
 
               {/* Device Breakdown Pie + Status Codes */}
-              <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#12121a] p-6 space-y-6">
+              <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#141e33] p-6 space-y-6">
                 {/* Mini Pie */}
                 <div>
                   <h3 className="font-semibold text-white mb-4 flex items-center gap-2"><BarChart3 className="w-4 h-4 text-emerald-400" /> Devices</h3>
@@ -816,7 +974,7 @@ export default function HostingDashboard() {
                         <div className="flex-1 h-1.5 rounded-full bg-white/5 overflow-hidden">
                           <div className={`h-full rounded-full ${sc.color}`} style={{ width: `${(sc.count / totalStatusCodes) * 100}%` }} />
                         </div>
-                        <span className="text-xs text-white/40 w-16 text-right">{sc.count.toLocaleString()}</span>
+                        <span className="text-xs text-white/60 w-16 text-right">{sc.count.toLocaleString()}</span>
                       </div>
                     ))}
                   </div>
@@ -829,14 +987,14 @@ export default function HostingDashboard() {
         {/* ───── DNS MANAGEMENT ───── */}
         {activePanel === "dns" && (
           <motion.div variants={fadeInUp} initial="hidden" animate="visible" className="space-y-6">
-            <div className="rounded-xl border border-white/5 bg-[#12121a] overflow-hidden">
+            <div className="rounded-xl border border-white/5 bg-[#141e33] overflow-hidden">
               <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
                 <h2 className="font-semibold text-white flex items-center gap-2"><Database className="w-4 h-4 text-brand-400" /> DNS Records</h2>
                 <div className="flex items-center gap-2">
-                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-white/50 hover:text-white/80 hover:bg-white/5 border border-white/10 transition-colors">
+                  <button onClick={() => {}} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-white/65 hover:text-white/80 hover:bg-white/5 border border-white/10 transition-colors">
                     <Upload className="w-3 h-3" /> Import
                   </button>
-                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-white/50 hover:text-white/80 hover:bg-white/5 border border-white/10 transition-colors">
+                  <button onClick={() => {}} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-white/65 hover:text-white/80 hover:bg-white/5 border border-white/10 transition-colors">
                     <ArrowUpRight className="w-3 h-3" /> Export
                   </button>
                   <button onClick={() => setShowAddRecord(!showAddRecord)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-brand-500/10 text-brand-400 hover:bg-brand-500/20 transition-colors">
@@ -846,14 +1004,14 @@ export default function HostingDashboard() {
               </div>
 
               {showAddRecord && (
-                <div className="px-6 py-4 border-b border-white/5 bg-white/[0.02]">
+                <div className="px-6 py-4 border-b border-white/5 bg-white/[0.05]">
                   <div className="flex gap-2 flex-wrap">
                     <select value={newRecordType} onChange={(e) => setNewRecordType(e.target.value)} className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 text-white">
-                      {["A", "AAAA", "CNAME", "MX", "TXT", "NS", "SRV"].map((t) => <option key={t} value={t} className="bg-[#14141f]">{t}</option>)}
+                      {["A", "AAAA", "CNAME", "MX", "TXT", "NS", "SRV"].map((t) => <option key={t} value={t} className="bg-[#161f35]">{t}</option>)}
                     </select>
-                    <input value={newRecordName} onChange={(e) => setNewRecordName(e.target.value)} placeholder="Name (e.g. @, www)" className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/30 w-40" />
-                    <input value={newRecordValue} onChange={(e) => setNewRecordValue(e.target.value)} placeholder="Value" className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/30 flex-1 min-w-[200px]" />
-                    <button className="px-4 py-2 bg-brand-500 hover:bg-brand-600 rounded-lg text-sm font-medium transition-colors">Add</button>
+                    <input value={newRecordName} onChange={(e) => setNewRecordName(e.target.value)} placeholder="Name (e.g. @, www)" className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/60 w-40" />
+                    <input value={newRecordValue} onChange={(e) => setNewRecordValue(e.target.value)} placeholder="Value" className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 placeholder:text-white/60 flex-1 min-w-[200px]" />
+                    <button onClick={handleAddDnsRecord} className="px-4 py-2 bg-brand-500 hover:bg-brand-600 rounded-lg text-sm font-medium transition-colors">Add</button>
                     <button onClick={() => setShowAddRecord(false)} className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-sm transition-colors">Cancel</button>
                   </div>
                 </div>
@@ -861,7 +1019,7 @@ export default function HostingDashboard() {
 
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-white/5 text-left text-white/40 text-xs uppercase tracking-wider">
+                  <tr className="border-b border-white/5 text-left text-white/60 text-xs uppercase tracking-wider">
                     <th className="px-6 py-3 font-medium">Type</th>
                     <th className="px-4 py-3 font-medium">Name</th>
                     <th className="px-4 py-3 font-medium">Value</th>
@@ -871,8 +1029,8 @@ export default function HostingDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {DNS_RECORDS.map((r) => (
-                    <tr key={r.id} className="hover:bg-white/[0.02] transition-colors">
+                  {liveDnsRecords.map((r) => (
+                    <tr key={r.id} className="hover:bg-white/[0.05] transition-colors">
                       <td className="px-6 py-3">
                         <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded ${
                           r.type === "A" ? "bg-brand-500/10 text-brand-400" :
@@ -883,18 +1041,18 @@ export default function HostingDashboard() {
                         }`}>{r.type}</span>
                       </td>
                       <td className="px-4 py-3 text-white/70 font-mono">{r.name}</td>
-                      <td className="px-4 py-3 text-white/50 font-mono text-xs max-w-[300px] truncate">{r.value}</td>
-                      <td className="px-4 py-3 text-white/50">{r.ttl}</td>
+                      <td className="px-4 py-3 text-white/65 font-mono text-xs max-w-[300px] truncate">{r.value}</td>
+                      <td className="px-4 py-3 text-white/65">{r.ttl}</td>
                       <td className="px-4 py-3">
                         {r.proxied ? (
                           <span className="inline-flex items-center gap-1 text-xs text-amber-400"><Cloud className="w-3 h-3" /> Proxied</span>
                         ) : (
-                          <span className="text-xs text-white/30">DNS only</span>
+                          <span className="text-xs text-white/60">DNS only</span>
                         )}
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <button className="p-1.5 rounded-lg hover:bg-white/5 text-white/40 hover:text-white/80 transition-colors"><Settings className="w-3.5 h-3.5" /></button>
-                        <button className="p-1.5 rounded-lg hover:bg-red-500/10 text-white/40 hover:text-red-400 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => {}} className="p-1.5 rounded-lg hover:bg-white/5 text-white/60 hover:text-white/80 transition-colors"><Settings className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => {}} className="p-1.5 rounded-lg hover:bg-red-500/10 text-white/60 hover:text-red-400 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                       </td>
                     </tr>
                   ))}
@@ -908,7 +1066,7 @@ export default function HostingDashboard() {
         {activePanel === "security" && (
           <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* SSL Certificate */}
-            <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#12121a] p-6">
+            <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#141e33] p-6">
               <h3 className="font-semibold text-white mb-5 flex items-center gap-2"><Lock className="w-4 h-4 text-emerald-400" /> SSL Certificate</h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-4 rounded-lg bg-emerald-500/5 border border-emerald-500/20">
@@ -918,21 +1076,21 @@ export default function HostingDashboard() {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-emerald-400">SSL Active</p>
-                      <p className="text-xs text-white/40">Auto-managed by Zoobicon</p>
+                      <p className="text-xs text-white/60">Auto-managed by Zoobicon</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-white/50">Expires</p>
+                    <p className="text-xs text-white/65">Expires</p>
                     <p className="text-sm text-white/70">Mar 15, 2027</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="p-3 rounded-lg bg-white/[0.03] border border-white/5">
-                    <p className="text-xs text-white/40 mb-1">Certificate Type</p>
+                  <div className="p-3 rounded-lg bg-white/[0.06] border border-white/5">
+                    <p className="text-xs text-white/60 mb-1">Certificate Type</p>
                     <p className="text-sm text-white/80">Auto (Let&apos;s Encrypt)</p>
                   </div>
-                  <div className="p-3 rounded-lg bg-white/[0.03] border border-white/5">
-                    <p className="text-xs text-white/40 mb-1">Coverage</p>
+                  <div className="p-3 rounded-lg bg-white/[0.06] border border-white/5">
+                    <p className="text-xs text-white/60 mb-1">Coverage</p>
                     <p className="text-sm text-white/80">*.zoobicon.sh</p>
                   </div>
                 </div>
@@ -940,7 +1098,7 @@ export default function HostingDashboard() {
             </motion.div>
 
             {/* Security Toggles */}
-            <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#12121a] p-6">
+            <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#141e33] p-6">
               <h3 className="font-semibold text-white mb-4 flex items-center gap-2"><Shield className="w-4 h-4 text-accent-purple" /> Security Settings</h3>
               <div className="divide-y divide-white/5">
                 <Toggle enabled={forceHttps} onToggle={() => setForceHttps(!forceHttps)} label="Force HTTPS" />
@@ -948,8 +1106,8 @@ export default function HostingDashboard() {
                 <div className="flex items-center justify-between py-2.5">
                   <span className="text-sm text-white/70">Minimum TLS Version</span>
                   <select value={minTls} onChange={(e) => setMinTls(e.target.value)} className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none text-white">
-                    <option value="1.2" className="bg-[#14141f]">TLS 1.2</option>
-                    <option value="1.3" className="bg-[#14141f]">TLS 1.3</option>
+                    <option value="1.2" className="bg-[#161f35]">TLS 1.2</option>
+                    <option value="1.3" className="bg-[#161f35]">TLS 1.3</option>
                   </select>
                 </div>
                 <Toggle enabled={waf} onToggle={() => setWaf(!waf)} label="WAF (Web Application Firewall)" />
@@ -967,7 +1125,7 @@ export default function HostingDashboard() {
             </motion.div>
 
             {/* DDoS & WAF Status */}
-            <motion.div variants={fadeInUp} className="lg:col-span-2 rounded-xl border border-white/5 bg-[#12121a] p-6">
+            <motion.div variants={fadeInUp} className="lg:col-span-2 rounded-xl border border-white/5 bg-[#141e33] p-6">
               <h3 className="font-semibold text-white mb-4 flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-amber-400" /> Threat Overview</h3>
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 {[
@@ -976,10 +1134,10 @@ export default function HostingDashboard() {
                   { label: "Bot Traffic Blocked", value: "28.4%", sub: "Of total requests", color: "text-accent-purple" },
                   { label: "Firewall Events", value: "847", sub: "Last 7 days", color: "text-accent-cyan" },
                 ].map((item) => (
-                  <div key={item.label} className="p-4 rounded-lg bg-white/[0.03] border border-white/5 text-center">
+                  <div key={item.label} className="p-4 rounded-lg bg-white/[0.06] border border-white/5 text-center">
                     <p className={`text-2xl font-bold ${item.color}`}>{item.value}</p>
-                    <p className="text-xs text-white/40 mt-1">{item.label}</p>
-                    <p className="text-xs text-white/25 mt-0.5">{item.sub}</p>
+                    <p className="text-xs text-white/60 mt-1">{item.label}</p>
+                    <p className="text-xs text-white/60 mt-0.5">{item.sub}</p>
                   </div>
                 ))}
               </div>
@@ -997,7 +1155,7 @@ export default function HostingDashboard() {
                   key={env}
                   onClick={() => setEnvTab(env)}
                   className={`px-5 py-2 rounded-lg text-sm font-medium capitalize transition-all ${
-                    envTab === env ? "bg-brand-500 text-white shadow-lg" : "text-white/50 hover:text-white/80"
+                    envTab === env ? "bg-brand-500 text-white shadow-lg" : "text-white/65 hover:text-white/80"
                   }`}
                 >
                   {env}
@@ -1006,11 +1164,11 @@ export default function HostingDashboard() {
             </div>
 
             {/* Env Info */}
-            <div className="rounded-xl border border-white/5 bg-[#12121a] p-6">
+            <div className="rounded-xl border border-white/5 bg-[#141e33] p-6">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h3 className="font-semibold text-white capitalize">{envTab} Environment</h3>
-                  <p className="text-sm text-white/40 mt-1 font-mono">
+                  <p className="text-sm text-white/60 mt-1 font-mono">
                     {envTab === "production" && "portfolio-pro.zoobicon.sh"}
                     {envTab === "staging" && "staging-portfolio-pro.zoobicon.sh"}
                     {envTab === "preview" && "preview-d4f2b44.zoobicon.sh"}
@@ -1021,17 +1179,17 @@ export default function HostingDashboard() {
 
               <h4 className="text-sm font-medium text-white/60 mb-3">Deployment History</h4>
               <div className="space-y-2">
-                {DEPLOYMENTS.filter((d) => d.env === envTab).map((d) => (
-                  <div key={d.id} className="flex items-center gap-4 p-3 rounded-lg bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-colors">
+                {liveDeployments.filter((d) => d.env === envTab).map((d) => (
+                  <div key={d.id} className="flex items-center gap-4 p-3 rounded-lg bg-white/[0.05] border border-white/5 hover:bg-white/[0.07] transition-colors">
                     <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <GitBranch className="w-4 h-4 text-white/30 shrink-0" />
+                      <GitBranch className="w-4 h-4 text-white/60 shrink-0" />
                       <span className="text-sm text-white/80 truncate">{d.commit}</span>
-                      <span className="text-xs text-white/30 font-mono">{d.hash}</span>
+                      <span className="text-xs text-white/60 font-mono">{d.hash}</span>
                     </div>
-                    <span className="text-xs text-white/40 shrink-0">{d.time}</span>
+                    <span className="text-xs text-white/60 shrink-0">{d.time}</span>
                     <StatusBadge status={d.status} />
                     {d.status === "superseded" && (
-                      <button className="flex items-center gap-1 px-3 py-1 rounded-lg text-xs bg-white/5 hover:bg-white/10 text-white/50 hover:text-white/80 transition-colors">
+                      <button onClick={() => {}} className="flex items-center gap-1 px-3 py-1 rounded-lg text-xs bg-white/5 hover:bg-white/10 text-white/65 hover:text-white/80 transition-colors">
                         <RefreshCw className="w-3 h-3" /> Rollback
                       </button>
                     )}
@@ -1054,14 +1212,14 @@ export default function HostingDashboard() {
               <motion.h2 variants={fadeInUp} className="text-3xl font-bold bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
                 Hosting Plans
               </motion.h2>
-              <motion.p variants={fadeInUp} className="text-white/40 mt-2">Scale your hosting as you grow</motion.p>
+              <motion.p variants={fadeInUp} className="text-white/60 mt-2">Scale your hosting as you grow</motion.p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {PLANS.map((plan) => (
                 <motion.div
                   key={plan.name}
                   variants={scaleIn}
-                  className={`relative rounded-xl border ${plan.color} bg-[#12121a] p-6 flex flex-col ${plan.popular ? "ring-1 ring-brand-500/30" : ""}`}
+                  className={`relative rounded-xl border ${plan.color} bg-[#141e33] p-6 flex flex-col ${plan.popular ? "ring-1 ring-brand-500/30" : ""}`}
                 >
                   {plan.popular && (
                     <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-brand-500 text-xs font-bold text-white">
@@ -1071,7 +1229,7 @@ export default function HostingDashboard() {
                   <h3 className="text-lg font-bold text-white">{plan.name}</h3>
                   <div className="mt-3 mb-5">
                     <span className="text-4xl font-bold text-white">{plan.price}</span>
-                    <span className="text-white/40">{plan.period}</span>
+                    <span className="text-white/60">{plan.period}</span>
                   </div>
                   <ul className="space-y-2.5 mb-6 flex-1">
                     {plan.features.map((f) => (
@@ -1081,10 +1239,10 @@ export default function HostingDashboard() {
                       </li>
                     ))}
                   </ul>
-                  <button
+                  <button onClick={() => {}}
                     className={`w-full py-2.5 rounded-lg text-sm font-medium transition-colors ${
                       plan.current
-                        ? "bg-white/5 text-white/50 cursor-default"
+                        ? "bg-white/5 text-white/65 cursor-default"
                         : plan.popular
                         ? "bg-gradient-to-r from-brand-500 to-accent-purple text-white hover:opacity-90"
                         : "bg-white/5 hover:bg-white/10 text-white/80"

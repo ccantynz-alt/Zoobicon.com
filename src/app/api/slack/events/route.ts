@@ -44,7 +44,13 @@ export async function POST(request: Request) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const body = JSON.parse(rawBody);
+  let body: Record<string, unknown>;
+  try {
+    body = JSON.parse(rawBody);
+  } catch {
+    console.error("[Slack] Failed to parse request body");
+    return new Response("Bad Request", { status: 400 });
+  }
 
   // Slack URL verification challenge
   if (body.type === "url_verification") {

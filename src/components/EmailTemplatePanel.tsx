@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, Loader2, Copy, Check } from "lucide-react";
+import {
+  Mail,
+  Loader2,
+  Copy,
+  Check,
+} from "lucide-react";
 
 interface EmailResult {
   html: string;
@@ -24,7 +29,7 @@ export default function EmailTemplatePanel({
     if (!prompt.trim()) return;
     setLoading(true);
     try {
-      const res = await fetch("/api/generate/email", {
+      const res = await fetch("/api/generate/react", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: prompt.trim(), type: emailType }),
@@ -56,7 +61,7 @@ export default function EmailTemplatePanel({
 
   return (
     <div className="p-4 space-y-4">
-      <p className="text-xs text-white/40">
+      <p className="text-xs text-white/50">
         Generate email templates compatible with Gmail, Outlook, and Apple Mail.
       </p>
 
@@ -110,7 +115,7 @@ export default function EmailTemplatePanel({
       {result && (
         <>
           <div className="p-3 rounded-lg bg-white/5 border border-white/10">
-            <div className="text-xs text-white/40 mb-1">Subject Line</div>
+            <div className="text-xs text-white/50 mb-1">Subject Line</div>
             <div className="text-sm text-white font-medium">{result.subject}</div>
           </div>
 
@@ -131,7 +136,7 @@ export default function EmailTemplatePanel({
           </div>
 
           <div className="p-3 rounded-lg bg-black/30 border border-white/10 max-h-32 overflow-auto">
-            <div className="text-xs text-white/40 mb-1">Plain Text Version</div>
+            <div className="text-xs text-white/50 mb-1">Plain Text Version</div>
             <pre className="text-[11px] text-white/50 font-mono whitespace-pre-wrap">
               {result.plainText?.slice(0, 300)}
               {(result.plainText?.length || 0) > 300 ? "..." : ""}

@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import BackgroundEffects from "@/components/BackgroundEffects";
+import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
   Zap,
   Globe,
@@ -82,11 +84,11 @@ const DEPLOY_METHODS = [
     desc: "Describe → Generate → Deploy. Your site goes live in 60 seconds.",
     color: "from-brand-500 to-accent-purple",
     content: (
-      <div className="mt-4 rounded-lg bg-white/[0.03] border border-white/[0.06] p-4">
-        <div className="flex items-center gap-2 text-xs text-white/30 mb-2">
+      <div className="mt-4 rounded-lg bg-white/[0.06] border border-white/[0.10] p-4">
+        <div className="flex items-center gap-2 text-xs text-white/60 mb-2">
           <Sparkles className="w-3 h-3" /> AI Builder
         </div>
-        <p className="text-sm text-white/50">&quot;Build me a portfolio site with a dark theme and project gallery&quot;</p>
+        <p className="text-sm text-white/65">&quot;Build me a portfolio site with a dark theme and project gallery&quot;</p>
         <div className="mt-3 flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
           <span className="text-xs text-green-400">Deploying to portfolio.zoobicon.sh...</span>
@@ -100,15 +102,15 @@ const DEPLOY_METHODS = [
     desc: "Deploy from your terminal in one command.",
     color: "from-emerald-500 to-teal-600",
     content: (
-      <div className="mt-4 rounded-lg bg-black/60 border border-white/[0.06] p-4 font-mono text-sm">
-        <div className="flex items-center gap-2 text-xs text-white/30 mb-3">
+      <div className="mt-4 rounded-lg bg-black/60 border border-white/[0.10] p-4 font-mono text-sm">
+        <div className="flex items-center gap-2 text-xs text-white/60 mb-3">
           <div className="w-3 h-3 rounded-full bg-red-500/60" />
           <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
           <div className="w-3 h-3 rounded-full bg-green-500/60" />
         </div>
-        <div className="text-white/40">$ <span className="text-accent-cyan">zb deploy</span></div>
-        <div className="text-white/30 mt-1">✓ Building project...</div>
-        <div className="text-white/30">✓ Optimizing assets...</div>
+        <div className="text-white/60">$ <span className="text-accent-cyan">zb deploy</span></div>
+        <div className="text-white/60 mt-1">✓ Building project...</div>
+        <div className="text-white/60">✓ Optimizing assets...</div>
         <div className="text-green-400">✓ Deployed to my-site.zoobicon.sh</div>
       </div>
     ),
@@ -119,14 +121,14 @@ const DEPLOY_METHODS = [
     desc: "Push to main, auto-deploy. Zero config CI/CD.",
     color: "from-gray-400 to-gray-600",
     content: (
-      <div className="mt-4 rounded-lg bg-white/[0.03] border border-white/[0.06] p-4">
+      <div className="mt-4 rounded-lg bg-white/[0.06] border border-white/[0.10] p-4">
         <div className="flex items-center gap-2 mb-3">
-          <GitBranch className="w-4 h-4 text-white/40" />
-          <span className="text-sm text-white/50">main</span>
+          <GitBranch className="w-4 h-4 text-white/60" />
+          <span className="text-sm text-white/65">main</span>
           <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20">deployed</span>
         </div>
-        <div className="text-xs text-white/30">feat: update hero section</div>
-        <div className="text-xs text-white/20 mt-1">Deployed 3s ago</div>
+        <div className="text-xs text-white/60">feat: update hero section</div>
+        <div className="text-xs text-white/60 mt-1">Deployed 3s ago</div>
       </div>
     ),
   },
@@ -136,10 +138,10 @@ const DEPLOY_METHODS = [
     desc: "Upload your HTML/CSS/JS files directly.",
     color: "from-amber-500 to-orange-600",
     content: (
-      <div className="mt-4 rounded-lg border-2 border-dashed border-white/[0.08] p-6 text-center">
-        <Upload className="w-8 h-8 text-white/20 mx-auto mb-2" />
-        <p className="text-xs text-white/30">Drop your files here</p>
-        <p className="text-xs text-white/20 mt-1">HTML, CSS, JS, images</p>
+      <div className="mt-4 rounded-lg border-2 border-dashed border-white/[0.12] p-6 text-center">
+        <Upload className="w-8 h-8 text-white/60 mx-auto mb-2" />
+        <p className="text-xs text-white/60">Drop your files here</p>
+        <p className="text-xs text-white/60 mt-1">HTML, CSS, JS, images</p>
       </div>
     ),
   },
@@ -239,18 +241,41 @@ const MIGRATION_FEATURES = [
 ];
 
 export default function HostingPage() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Zoobicon Hosting",
+    "applicationCategory": "WebApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "AggregateOffer",
+      "lowPrice": "0",
+      "highPrice": "99",
+      "priceCurrency": "USD",
+      "offerCount": "4"
+    },
+    "description": "Deploy AI-generated websites instantly to zoobicon.sh with global CDN, automatic SSL, custom domains, DDoS protection, and 99.99% uptime.",
+    "url": "https://zoobicon.com/products/hosting",
+    "screenshot": "https://zoobicon.com/og-image.png"
+  };
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://zoobicon.com" },
+      { "@type": "ListItem", "position": 2, "name": "Products", "item": "https://zoobicon.com/products" },
+      { "@type": "ListItem", "position": 3, "name": "Hosting", "item": "https://zoobicon.com/products/hosting" }
+    ]
+  };
+
   return (
     <div className="relative min-h-screen">
-      {/* Background Effects */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="glow-orb glow-orb-blue w-[600px] h-[600px] -top-[200px] left-[20%] opacity-10" />
-        <div className="glow-orb glow-orb-cyan w-[400px] h-[400px] top-[40%] -right-[100px] opacity-10" />
-        <div className="glow-orb glow-orb-purple w-[300px] h-[300px] bottom-[10%] left-[5%] opacity-10" />
-        <div className="grid-pattern fixed inset-0" />
-      </div>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      <BackgroundEffects preset="technical" />
 
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.04] bg-[#050507]/80 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
@@ -259,19 +284,21 @@ export default function HostingPage() {
               </div>
               <span className="text-lg font-bold tracking-tight">Zoobicon</span>
             </Link>
-            <span className="text-xs text-white/20">/</span>
-            <span className="text-sm text-white/50">Hosting</span>
+            <span className="text-xs text-white/60">/</span>
+            <span className="text-sm text-white/65">Hosting</span>
           </div>
-          <Link href="/hosting" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white">
+          <Link href="/builder" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white">
             <span>Deploy Now</span>
           </Link>
         </div>
       </nav>
+      <CursorGlowTracker />
 
       {/* ============================================ */}
       {/* 1. HERO SECTION                              */}
       {/* ============================================ */}
-      <section className="pt-32 pb-20 lg:pt-44 lg:pb-28">
+      <section className="relative pt-32 pb-20 lg:pt-44 lg:pb-28">
+        <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-cyan/20 bg-accent-cyan/5 mb-6">
@@ -285,7 +312,7 @@ export default function HostingPage() {
               <span className="gradient-text-hero">With You</span>
             </motion.h1>
 
-            <motion.p variants={fadeInUp} className="max-w-3xl text-lg md:text-xl text-white/40 leading-relaxed mb-10">
+            <motion.p variants={fadeInUp} className="max-w-3xl text-lg md:text-xl text-white/60 leading-relaxed mb-10">
               AI-powered hosting with global CDN, automatic SSL, edge caching, and 99.99% uptime.
               Deploy in seconds, scale to millions.
             </motion.p>
@@ -294,7 +321,7 @@ export default function HostingPage() {
               {["Global CDN", "Auto SSL", "Edge Functions", "DDoS Protection", "Smart Caching", "Instant Rollbacks"].map((pill) => (
                 <span
                   key={pill}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] text-xs font-medium text-white/50"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/[0.12] bg-white/[0.06] text-xs font-medium text-white/65"
                 >
                   <Check className="w-3 h-3 text-accent-cyan" />
                   {pill}
@@ -303,11 +330,11 @@ export default function HostingPage() {
             </motion.div>
 
             <motion.div variants={fadeInUp} className="flex flex-wrap gap-4">
-              <Link href="/hosting" className="group btn-gradient px-8 py-4 rounded-2xl text-base font-bold text-white flex items-center gap-3 shadow-glow">
+              <Link href="/builder" className="group btn-gradient px-8 py-4 rounded-2xl text-base font-bold text-white flex items-center gap-3 shadow-glow">
                 <span>Deploy Your First Site Free</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link href="#pricing" className="px-8 py-4 rounded-2xl text-base font-medium text-white/50 border border-white/[0.08] hover:border-white/20 transition-all flex items-center gap-3">
+              <Link href="#pricing" className="px-8 py-4 rounded-2xl text-base font-medium text-white/65 border border-white/[0.12] hover:border-white/20 transition-all flex items-center gap-3">
                 <Gauge className="w-5 h-5" />
                 <span>View Plans</span>
               </Link>
@@ -319,7 +346,7 @@ export default function HostingPage() {
       {/* ============================================ */}
       {/* 2. SPEED STATS BANNER                        */}
       {/* ============================================ */}
-      <section className="relative py-16 border-y border-white/[0.04]">
+      <section className="relative py-16 border-y border-white/[0.08]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div
             initial="hidden"
@@ -333,7 +360,7 @@ export default function HostingPage() {
                 <div className="text-4xl md:text-5xl font-black gradient-text-static mb-2">
                   {stat.value}
                 </div>
-                <div className="text-sm text-white/40">{stat.label}</div>
+                <div className="text-sm text-white/60">{stat.label}</div>
               </motion.div>
             ))}
           </motion.div>
@@ -343,7 +370,7 @@ export default function HostingPage() {
       {/* ============================================ */}
       {/* 3. FEATURE COMPARISON VS COMPETITORS         */}
       {/* ============================================ */}
-      <section className="relative py-24 lg:py-32 border-b border-white/[0.04] overflow-hidden">
+      <section className="relative py-24 lg:py-32 border-b border-white/[0.06] overflow-hidden">
         <div className="absolute inset-0">
           <div className="glow-orb glow-orb-blue w-[700px] h-[700px] top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 opacity-5" />
           <div className="glow-orb glow-orb-purple w-[500px] h-[500px] top-1/3 right-0 opacity-5" />
@@ -364,7 +391,7 @@ export default function HostingPage() {
                 See How We<br />
                 <span className="gradient-text">Stack Up</span>
               </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/40">
+              <p className="max-w-2xl mx-auto text-lg text-white/60">
                 The only hosting platform with AI generation, auto-debugging, and a full suite of infrastructure tools.
               </p>
             </motion.div>
@@ -381,16 +408,16 @@ export default function HostingPage() {
                     </div>
                   </div>
                   <div className="p-4 text-center">
-                    <span className="text-sm text-white/40">SiteGround</span>
+                    <span className="text-sm text-white/60">SiteGround</span>
                   </div>
                   <div className="p-4 text-center">
-                    <span className="text-sm text-white/40">Cloudflare</span>
+                    <span className="text-sm text-white/60">Cloudflare</span>
                   </div>
                   <div className="p-4 text-center">
-                    <span className="text-sm text-white/40">Vercel</span>
+                    <span className="text-sm text-white/60">Vercel</span>
                   </div>
                   <div className="p-4 text-center">
-                    <span className="text-sm text-white/40">Netlify</span>
+                    <span className="text-sm text-white/60">Netlify</span>
                   </div>
                 </div>
 
@@ -399,7 +426,7 @@ export default function HostingPage() {
                   <motion.div
                     key={i}
                     variants={fadeInUp}
-                    className={`grid grid-cols-6 gap-0 ${i % 2 === 0 ? "bg-white/[0.02]" : ""} rounded-lg`}
+                    className={`grid grid-cols-6 gap-0 ${i % 2 === 0 ? "bg-white/[0.05]" : ""} rounded-lg`}
                   >
                     <div className="p-4 flex items-center">
                       <span className="text-sm text-white/60">{feature.name}</span>
@@ -412,9 +439,9 @@ export default function HostingPage() {
                     {[feature.siteground, feature.cloudflare, feature.vercel, feature.netlify].map((has, j) => (
                       <div key={j} className="p-4 flex items-center justify-center">
                         {has ? (
-                          <Check className="w-4 h-4 text-white/30" />
+                          <Check className="w-4 h-4 text-white/60" />
                         ) : (
-                          <Minus className="w-4 h-4 text-white/10" />
+                          <Minus className="w-4 h-4 text-white/50" />
                         )}
                       </div>
                     ))}
@@ -422,6 +449,7 @@ export default function HostingPage() {
                 ))}
               </div>
             </motion.div>
+            <p className="text-[10px] text-white/20 mt-3 text-center">Comparison based on publicly available information as of March 2026. Features and pricing may change. All trademarks belong to their respective owners. See our <a href="/disclaimers" className="underline hover:text-white/30">disclaimers</a>.</p>
           </motion.div>
         </div>
       </section>
@@ -429,7 +457,7 @@ export default function HostingPage() {
       {/* ============================================ */}
       {/* 4. HOSTING FEATURES GRID                     */}
       {/* ============================================ */}
-      <section className="py-24 lg:py-32 border-b border-white/[0.04]">
+      <section className="py-24 lg:py-32 border-b border-white/[0.06]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div
             initial="hidden"
@@ -441,7 +469,7 @@ export default function HostingPage() {
               <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
                 Infrastructure That<br /><span className="gradient-text">Just Works</span>
               </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/40">
+              <p className="max-w-2xl mx-auto text-lg text-white/60">
                 Enterprise-grade hosting features on every plan. No surprises, no hidden limits.
               </p>
             </motion.div>
@@ -451,7 +479,7 @@ export default function HostingPage() {
                 <motion.div key={i} variants={fadeInUp} className="gradient-border card-hover p-6 rounded-xl group">
                   <f.icon className="w-8 h-8 text-accent-cyan/50 mb-4 group-hover:text-accent-cyan transition-colors" />
                   <h3 className="text-lg font-bold mb-2">{f.title}</h3>
-                  <p className="text-sm text-white/40 leading-relaxed">{f.desc}</p>
+                  <p className="text-sm text-white/60 leading-relaxed">{f.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -462,7 +490,7 @@ export default function HostingPage() {
       {/* ============================================ */}
       {/* 5. DEPLOYMENT METHODS                        */}
       {/* ============================================ */}
-      <section className="py-24 lg:py-32 border-b border-white/[0.04]">
+      <section className="py-24 lg:py-32 border-b border-white/[0.06]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div
             initial="hidden"
@@ -474,7 +502,7 @@ export default function HostingPage() {
               <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
                 Deploy <span className="gradient-text">Your Way</span>
               </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/40">
+              <p className="max-w-2xl mx-auto text-lg text-white/60">
                 Four ways to go live. Pick the one that fits your workflow.
               </p>
             </motion.div>
@@ -488,7 +516,7 @@ export default function HostingPage() {
                     </div>
                     <div>
                       <h3 className="text-lg font-bold">{method.title}</h3>
-                      <p className="text-sm text-white/40">{method.desc}</p>
+                      <p className="text-sm text-white/60">{method.desc}</p>
                     </div>
                   </div>
                   {method.content}
@@ -502,7 +530,7 @@ export default function HostingPage() {
       {/* ============================================ */}
       {/* 6. PERFORMANCE SHOWCASE                      */}
       {/* ============================================ */}
-      <section className="py-24 lg:py-32 border-b border-white/[0.04] overflow-hidden">
+      <section className="py-24 lg:py-32 border-b border-white/[0.06] overflow-hidden">
         <div className="absolute inset-0">
           <div className="glow-orb glow-orb-cyan w-[600px] h-[600px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-5" />
         </div>
@@ -517,7 +545,7 @@ export default function HostingPage() {
               <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
                 Performance That<br /><span className="gradient-text">Speaks for Itself</span>
               </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/40">
+              <p className="max-w-2xl mx-auto text-lg text-white/60">
                 Faster than 99% of websites. Every metric, green.
               </p>
             </motion.div>
@@ -525,7 +553,7 @@ export default function HostingPage() {
             <div className="grid md:grid-cols-2 gap-8">
               {/* Lighthouse Scores */}
               <motion.div variants={fadeInUp} className="gradient-border p-8 rounded-2xl">
-                <h3 className="text-sm font-semibold text-white/50 uppercase tracking-wider mb-8">Lighthouse Scores</h3>
+                <h3 className="text-sm font-semibold text-white/65 uppercase tracking-wider mb-8">Lighthouse Scores</h3>
                 <div className="grid grid-cols-2 gap-6">
                   {LIGHTHOUSE_SCORES.map((item, i) => (
                     <div key={i} className="text-center">
@@ -545,7 +573,7 @@ export default function HostingPage() {
                           <span className={`text-2xl font-black ${item.color}`}>{item.score}</span>
                         </div>
                       </div>
-                      <span className="text-sm text-white/50">{item.label}</span>
+                      <span className="text-sm text-white/65">{item.label}</span>
                     </div>
                   ))}
                 </div>
@@ -553,16 +581,16 @@ export default function HostingPage() {
 
               {/* Core Web Vitals */}
               <motion.div variants={fadeInUp} className="gradient-border p-8 rounded-2xl">
-                <h3 className="text-sm font-semibold text-white/50 uppercase tracking-wider mb-8">Core Web Vitals</h3>
+                <h3 className="text-sm font-semibold text-white/65 uppercase tracking-wider mb-8">Core Web Vitals</h3>
                 <div className="space-y-6">
                   {CORE_VITALS.map((vital, i) => (
-                    <div key={i} className="flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                    <div key={i} className="flex items-center justify-between p-4 rounded-xl bg-white/[0.05] border border-white/[0.08]">
                       <div>
                         <div className="flex items-center gap-3 mb-1">
                           <span className="text-lg font-bold text-white">{vital.metric}</span>
                           <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20">{vital.status}</span>
                         </div>
-                        <span className="text-sm text-white/40">{vital.label}</span>
+                        <span className="text-sm text-white/60">{vital.label}</span>
                       </div>
                       <div className="text-2xl font-black text-green-400">{vital.value}</div>
                     </div>
@@ -582,7 +610,7 @@ export default function HostingPage() {
       {/* ============================================ */}
       {/* 7. PRICING SECTION                           */}
       {/* ============================================ */}
-      <section id="pricing" className="py-24 lg:py-32 border-b border-white/[0.04]">
+      <section id="pricing" className="py-24 lg:py-32 border-b border-white/[0.06]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div
             initial="hidden"
@@ -594,7 +622,7 @@ export default function HostingPage() {
               <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
                 Simple, Transparent<br /><span className="gradient-text">Pricing</span>
               </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/40">
+              <p className="max-w-2xl mx-auto text-lg text-white/60">
                 Start free. Scale as you grow. No hidden fees.
               </p>
             </motion.div>
@@ -618,9 +646,9 @@ export default function HostingPage() {
                   <h3 className="text-lg font-bold mb-2">{tier.name}</h3>
                   <div className="flex items-baseline gap-1 mb-3">
                     <span className="text-4xl font-black">{tier.price}</span>
-                    {tier.period && <span className="text-sm text-white/40">{tier.period}</span>}
+                    {tier.period && <span className="text-sm text-white/60">{tier.period}</span>}
                   </div>
-                  <p className="text-sm text-white/40 mb-6">{tier.description}</p>
+                  <p className="text-sm text-white/60 mb-6">{tier.description}</p>
                   <ul className="space-y-3 mb-8">
                     {tier.features.map((feature, j) => (
                       <li key={j} className="flex items-center gap-2 text-sm text-white/60">
@@ -630,11 +658,11 @@ export default function HostingPage() {
                     ))}
                   </ul>
                   <Link
-                    href="/hosting"
+                    href={tier.price === "Free" ? "/builder" : "/auth/signup"}
                     className={`block text-center py-3 rounded-xl text-sm font-semibold transition-all ${
                       tier.highlighted
                         ? "btn-gradient text-white shadow-glow"
-                        : "border border-white/[0.08] text-white/60 hover:text-white hover:border-white/20"
+                        : "border border-white/[0.12] text-white/60 hover:text-white hover:border-white/20"
                     }`}
                   >
                     {tier.cta}
@@ -649,7 +677,7 @@ export default function HostingPage() {
       {/* ============================================ */}
       {/* 8. MIGRATION SECTION                         */}
       {/* ============================================ */}
-      <section className="py-24 lg:py-32 border-b border-white/[0.04]">
+      <section className="py-24 lg:py-32 border-b border-white/[0.06]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div
             initial="hidden"
@@ -665,7 +693,7 @@ export default function HostingPage() {
               <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
                 Moving from SiteGround<br /><span className="gradient-text">or Cloudflare?</span>
               </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/40">
+              <p className="max-w-2xl mx-auto text-lg text-white/60">
                 Switch to Zoobicon Hosting in minutes. We handle everything.
               </p>
             </motion.div>
@@ -677,7 +705,7 @@ export default function HostingPage() {
                     <f.icon className="w-6 h-6 text-accent-cyan" />
                   </div>
                   <h3 className="text-lg font-bold mb-2">{f.title}</h3>
-                  <p className="text-sm text-white/40 leading-relaxed">{f.desc}</p>
+                  <p className="text-sm text-white/60 leading-relaxed">{f.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -690,7 +718,7 @@ export default function HostingPage() {
       {/* ============================================ */}
       <section className="py-32 lg:py-40 relative overflow-hidden">
         <div className="absolute inset-0">
-          <div className="glow-orb glow-orb-blue w-[800px] h-[800px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-10" />
+          <div className="glow-orb glow-orb-blue w-[800px] h-[800px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-15" />
         </div>
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center relative z-10">
           <motion.div
@@ -707,7 +735,7 @@ export default function HostingPage() {
               <span className="gradient-text-hero">Site Free</span>
             </motion.h2>
 
-            <motion.p variants={fadeInUp} className="max-w-2xl mx-auto text-lg text-white/40 mb-10">
+            <motion.p variants={fadeInUp} className="max-w-2xl mx-auto text-lg text-white/60 mb-10">
               No credit card required. Go from zero to live in under 60 seconds
               with Zoobicon Hosting.
             </motion.p>
@@ -722,7 +750,7 @@ export default function HostingPage() {
               </Link>
             </motion.div>
 
-            <motion.div variants={fadeInUp} className="flex flex-wrap items-center justify-center gap-6 mt-8 text-sm text-white/30">
+            <motion.div variants={fadeInUp} className="flex flex-wrap items-center justify-center gap-6 mt-8 text-sm text-white/60">
               <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent-cyan" /> No credit card</span>
               <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent-cyan" /> Free subdomain</span>
               <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent-cyan" /> Deploy in seconds</span>
@@ -730,6 +758,28 @@ export default function HostingPage() {
           </motion.div>
         </div>
       </section>
+
+      {/* ── Footer ── */}
+      <footer className="border-t border-white/[0.06] py-12 px-6">
+        <div className="max-w-5xl mx-auto text-center">
+          <div className="flex items-center justify-center gap-6 text-sm text-slate-500 mb-6">
+            <Link href="https://zoobicon.com" className="hover:text-slate-300 transition-colors">zoobicon.com</Link>
+            <span className="text-white/10">·</span>
+            <Link href="https://zoobicon.ai" className="hover:text-slate-300 transition-colors">zoobicon.ai</Link>
+            <span className="text-white/10">·</span>
+            <Link href="https://zoobicon.io" className="hover:text-slate-300 transition-colors">zoobicon.io</Link>
+            <span className="text-white/10">·</span>
+            <Link href="https://zoobicon.sh" className="hover:text-slate-300 transition-colors">zoobicon.sh</Link>
+          </div>
+          <div className="flex items-center justify-center gap-6 text-sm text-slate-500 mb-4">
+            <Link href="/privacy" className="hover:text-slate-300 transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-slate-300 transition-colors">Terms</Link>
+            <Link href="/refund-policy" className="hover:text-slate-300 transition-colors">Refunds</Link>
+            <Link href="/disclaimers" className="hover:text-slate-300 transition-colors">Disclaimers</Link>
+          </div>
+          <p className="text-xs text-slate-600">&copy; 2026 Zoobicon. All rights reserved.</p>
+        </div>
+      </footer>
     </div>
   );
 }

@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Zap, ArrowRight, ArrowLeft, Mail, CheckCircle2 } from "lucide-react";
+import BackgroundEffects from "@/components/BackgroundEffects";
+import {
+  Zap,
+  ArrowRight,
+  ArrowLeft,
+  Mail,
+  CheckCircle2,
+} from "lucide-react";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -37,7 +44,8 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex relative">
+      <BackgroundEffects preset="minimal" />
       {/* Left - Form */}
       <div className="flex-1 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-md">
@@ -55,10 +63,10 @@ export default function ForgotPasswordPage() {
                 <CheckCircle2 className="w-8 h-8 text-brand-400" />
               </div>
               <h1 className="text-2xl font-black tracking-tight mb-3">Check your email</h1>
-              <p className="text-white/40 text-sm mb-2">
+              <p className="text-white/50 text-sm mb-2">
                 If an account exists for <span className="text-white/60">{email}</span>, we&apos;ve sent a password reset link.
               </p>
-              <p className="text-white/30 text-xs mb-8">
+              <p className="text-white/50 text-xs mb-8">
                 Didn&apos;t receive it? Check your spam folder or try again in a few minutes.
               </p>
               <div className="space-y-3">
@@ -82,22 +90,22 @@ export default function ForgotPasswordPage() {
             <>
               <Link
                 href="/auth/login"
-                className="inline-flex items-center gap-1.5 text-sm text-white/30 hover:text-white/60 transition-colors mb-8"
+                className="inline-flex items-center gap-1.5 text-sm text-white/50 hover:text-white/60 transition-colors mb-8"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 Back to sign in
               </Link>
 
               <h1 className="text-3xl font-black tracking-tight mb-2">Reset your password</h1>
-              <p className="text-white/40 mb-8 text-sm">
+              <p className="text-white/50 mb-8 text-sm">
                 Enter the email address for your account and we&apos;ll send you a reset link.
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-medium text-white/40 mb-1.5">Email address</label>
+                  <label className="block text-xs font-medium text-white/50 mb-1.5">Email address</label>
                   <div className="relative">
-                    <Mail className="w-4 h-4 text-white/20 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <Mail className="w-4 h-4 text-white/50 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
                       type="email"
                       value={email}
@@ -105,7 +113,7 @@ export default function ForgotPasswordPage() {
                       placeholder="you@company.com"
                       required
                       className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl pl-9 pr-4 py-3 text-sm
-                                 placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 transition-all"
+                                 placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 transition-all"
                     />
                   </div>
                 </div>
@@ -125,7 +133,7 @@ export default function ForgotPasswordPage() {
                 </button>
               </form>
 
-              <p className="mt-6 text-center text-sm text-white/30">
+              <p className="mt-6 text-center text-sm text-white/50">
                 Remember your password?{" "}
                 <Link href="/auth/login" className="text-brand-400 hover:text-brand-300 font-medium">
                   Sign in
@@ -144,7 +152,7 @@ export default function ForgotPasswordPage() {
           <div className="text-5xl font-black tracking-tight mb-4 gradient-text-hero">
             Build Empires
           </div>
-          <p className="text-white/40 text-lg">
+          <p className="text-white/50 text-lg">
             The most advanced AI platform for creating, marketing, and dominating the digital landscape.
           </p>
         </div>

@@ -1,8 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Zap, Eye, EyeOff, ArrowRight, Chrome, Check } from "lucide-react";
+import BackgroundEffects from "@/components/BackgroundEffects";
+import {
+  Zap,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  Globe2,
+  Check,
+} from "lucide-react";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
@@ -11,6 +19,26 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [oauthNotice, setOauthNotice] = useState("");
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+
+  // Check URL for ?ref= referral code on load
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get("ref");
+      if (ref && ref.startsWith("ref_")) {
+        setReferralCode(ref);
+        // Also store in localStorage so it survives OAuth redirects
+        localStorage.setItem("zoobicon_referral_code", ref);
+      } else {
+        // Check localStorage for previously stored referral code
+        const stored = localStorage.getItem("zoobicon_referral_code");
+        if (stored && stored.startsWith("ref_")) {
+          setReferralCode(stored);
+        }
+      }
+    } catch { /* ignore */ }
+  }, []);
 
   const passwordChecks = [
     { label: "8+ characters", met: password.length >= 8 },
@@ -19,9 +47,21 @@ export default function SignupPage() {
   ];
 
   const [authError, setAuthError] = useState("");
+  const [emailError, setEmailError] = useState("");
+
+  const validateEmail = (value: string) => {
+    if (!value) return "";
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(value) ? "" : "Please enter a valid email address";
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const emailErr = validateEmail(email);
+    if (emailErr) {
+      setEmailError(emailErr);
+      return;
+    }
     setIsLoading(true);
     setAuthError("");
 
@@ -29,7 +69,7 @@ export default function SignupPage() {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, referralCode }),
       });
 
       const data = await res.json();
@@ -39,7 +79,11 @@ export default function SignupPage() {
         return;
       }
 
-      try { localStorage.setItem("zoobicon_user", JSON.stringify(data.user)); } catch {}
+      try {
+        localStorage.setItem("zoobicon_user", JSON.stringify(data.user));
+        // Clear referral code after successful signup
+        localStorage.removeItem("zoobicon_referral_code");
+      } catch {}
       window.location.href = "/dashboard";
     } catch {
       setAuthError("Network error. Please try again.");
@@ -49,7 +93,8 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex relative">
+      <BackgroundEffects preset="minimal" />
       {/* Left - Form */}
       <div className="flex-1 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-md">
@@ -61,28 +106,35 @@ export default function SignupPage() {
           </Link>
 
           <h1 className="text-3xl font-black tracking-tight mb-2">Create your account</h1>
-          <p className="text-white/40 mb-8">
+          <p className="text-white/50 mb-8">
             Start building with the most advanced AI platform.
           </p>
 
+          {referralCode && (
+            <div className="mb-6 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-2">
+              <span className="text-lg">🎁</span>
+              <p className="text-sm text-emerald-300">
+                You were referred by a friend! Sign up to get <strong>1 free build credit</strong>.
+              </p>
+            </div>
+          )}
+
           {/* OAuth Buttons */}
           <div className="space-y-3 mb-6">
-            <button
-              type="button"
-              onClick={() => setOauthNotice("Google sign-up is coming soon. Please use email & password below.")}
+            <a
+              href="/api/auth/oauth/google"
               className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.05] transition-colors text-sm font-medium"
             >
-              <Chrome className="w-4 h-4" />
+              <Globe2 className="w-4 h-4" />
               Sign up with Google
-            </button>
-            <button
-              type="button"
-              onClick={() => setOauthNotice("GitHub sign-up is coming soon. Please use email & password below.")}
+            </a>
+            <a
+              href="/api/auth/oauth/github"
               className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.05] transition-colors text-sm font-medium"
             >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" /></svg>
               Sign up with GitHub
-            </button>
+            </a>
           </div>
           {oauthNotice && (
             <p className="text-xs text-amber-400/80 text-center -mt-2 mb-4 px-2">{oauthNotice}</p>
@@ -90,14 +142,14 @@ export default function SignupPage() {
 
           <div className="flex items-center gap-4 mb-6">
             <div className="flex-1 h-px bg-white/[0.06]" />
-            <span className="text-xs text-white/20">or</span>
+            <span className="text-xs text-white/50">or</span>
             <div className="flex-1 h-px bg-white/[0.06]" />
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-white/40 mb-1.5">Full name</label>
+              <label className="block text-xs font-medium text-white/50 mb-1.5">Full name</label>
               <input
                 type="text"
                 value={name}
@@ -105,25 +157,27 @@ export default function SignupPage() {
                 placeholder="Jane Smith"
                 required
                 className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-sm
-                           placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 transition-all"
+                           placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 transition-all"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-white/40 mb-1.5">Email</label>
+              <label className="block text-xs font-medium text-white/50 mb-1.5">Email</label>
               <input
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => { setEmail(e.target.value); setEmailError(""); }}
+                onBlur={() => setEmailError(validateEmail(email))}
                 placeholder="you@company.com"
                 required
-                className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-sm
-                           placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 transition-all"
+                className={`w-full bg-white/[0.03] border ${emailError ? "border-red-500/50" : "border-white/[0.08]"} rounded-xl px-4 py-3 text-sm
+                           placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 transition-all`}
               />
+              {emailError && <p className="text-red-400 text-xs mt-1">{emailError}</p>}
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-white/40 mb-1.5">Password</label>
+              <label className="block text-xs font-medium text-white/50 mb-1.5">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -132,12 +186,12 @@ export default function SignupPage() {
                   placeholder="Create a strong password"
                   required
                   className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 pr-10 text-sm
-                             placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 transition-all"
+                             placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 transition-all"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/40"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/50"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -147,7 +201,7 @@ export default function SignupPage() {
                   {passwordChecks.map((check) => (
                     <div key={check.label} className="flex items-center gap-1">
                       <Check className={`w-3 h-3 ${check.met ? "text-accent-cyan" : "text-white/15"}`} />
-                      <span className={`text-[10px] ${check.met ? "text-accent-cyan" : "text-white/20"}`}>
+                      <span className={`text-[10px] ${check.met ? "text-accent-cyan" : "text-white/50"}`}>
                         {check.label}
                       </span>
                     </div>
@@ -171,14 +225,14 @@ export default function SignupPage() {
             </button>
           </form>
 
-          <p className="mt-4 text-center text-xs text-white/20">
+          <p className="mt-4 text-center text-xs text-white/50">
             By signing up you agree to our{" "}
-            <Link href="/terms" className="text-white/40 hover:text-white/60">Terms of Service</Link>
+            <Link href="/terms" className="text-white/50 hover:text-white/60">Terms of Service</Link>
             {" "}and{" "}
-            <Link href="/privacy" className="text-white/40 hover:text-white/60">Privacy Policy</Link>.
+            <Link href="/privacy" className="text-white/50 hover:text-white/60">Privacy Policy</Link>.
           </p>
 
-          <p className="mt-4 text-center text-sm text-white/30">
+          <p className="mt-4 text-center text-sm text-white/50">
             Already have an account?{" "}
             <Link href="/auth/login" className="text-brand-400 hover:text-brand-300 font-medium">
               Sign in

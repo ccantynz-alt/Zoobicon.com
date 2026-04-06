@@ -1,7 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Gauge, Loader2, Zap } from "lucide-react";
+import {
+  Gauge,
+  Loader2,
+  Zap,
+} from "lucide-react";
 
 interface PerfIssue {
   severity: "critical" | "warning" | "info";
@@ -67,7 +71,7 @@ export default function PerformancePanel({ code }: { code: string }) {
 
   return (
     <div className="p-4 space-y-4">
-      <p className="text-xs text-white/40">
+      <p className="text-xs text-white/50">
         Lighthouse-style performance analysis. Check CSS/JS size, DOM depth, and optimization opportunities.
       </p>
 
@@ -91,7 +95,7 @@ export default function PerformancePanel({ code }: { code: string }) {
         <>
           <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10">
             <div>
-              <div className="text-xs text-white/40">Performance Score</div>
+              <div className="text-xs text-white/50">Performance Score</div>
               <div className="text-2xl font-bold text-white">{result.score}/100</div>
             </div>
             <div className={`text-4xl font-black ${gradeColor(result.grade)}`}>
@@ -109,7 +113,7 @@ export default function PerformancePanel({ code }: { code: string }) {
               { label: "Ext. Requests", value: String(result.metrics.externalRequests) },
             ].map((m) => (
               <div key={m.label} className="p-2 rounded bg-white/5 text-xs">
-                <div className="text-white/40">{m.label}</div>
+                <div className="text-white/50">{m.label}</div>
                 <div className="text-white font-medium">{m.value}</div>
               </div>
             ))}
@@ -117,14 +121,14 @@ export default function PerformancePanel({ code }: { code: string }) {
 
           {result.issues.length > 0 && (
             <div className="space-y-1.5">
-              <div className="text-xs text-white/40 uppercase tracking-wider">Issues</div>
+              <div className="text-xs text-white/50 uppercase tracking-wider">Issues</div>
               {result.issues.map((issue, i) => (
                 <div key={i} className="p-2 rounded bg-white/5 text-xs space-y-1">
                   <div className="flex items-center gap-2">
                     <Zap size={12} className={severityColor(issue.severity)} />
                     <span className="text-white/80">{issue.message}</span>
                   </div>
-                  <div className="text-white/40 pl-5">{issue.suggestion}</div>
+                  <div className="text-white/50 pl-5">{issue.suggestion}</div>
                 </div>
               ))}
             </div>
@@ -132,7 +136,7 @@ export default function PerformancePanel({ code }: { code: string }) {
 
           {result.optimizations.length > 0 && (
             <div className="space-y-1">
-              <div className="text-xs text-white/40 uppercase tracking-wider">Optimizations</div>
+              <div className="text-xs text-white/50 uppercase tracking-wider">Optimizations</div>
               {result.optimizations.map((opt, i) => (
                 <div key={i} className="flex items-center gap-2 text-xs text-emerald-400/70">
                   <Zap size={12} /> {opt}

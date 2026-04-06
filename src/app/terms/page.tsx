@@ -1,19 +1,32 @@
 import Link from "next/link";
-import { Zap } from "lucide-react";
+import {
+  Zap,
+} from "lucide-react";
 import type { Metadata } from "next";
+import BackgroundEffects from "@/components/BackgroundEffects";
 
 export const revalidate = 86400; // Revalidate once per day
 
 export const metadata: Metadata = {
-  title: "Terms of Service - Zoobicon",
-  description: "Zoobicon Terms of Service — the rules and conditions for using our platform.",
+  title: "Terms of Service — Zoobicon",
+  description:
+    "Zoobicon Terms of Service — the rules and conditions for using our AI website builder platform. Usage policies, intellectual property, and account terms.",
+  openGraph: {
+    title: "Terms of Service — Zoobicon",
+    description: "Terms and conditions for using the Zoobicon AI website builder platform.",
+    url: "https://zoobicon.com/terms",
+    siteName: "Zoobicon",
+    type: "website",
+  },
+  alternates: { canonical: "https://zoobicon.com/terms" },
 };
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-[#050507] text-[#f0f0f2]">
+    <div className="relative min-h-screen bg-[#0a0a12] text-[#e8e8ec]">
+      <BackgroundEffects preset="minimal" />
       {/* Nav */}
-      <nav className="border-b border-white/[0.04] bg-[#050507]/80 backdrop-blur-2xl">
+      <nav className="border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
         <div className="max-w-4xl mx-auto px-6 py-4">
           <Link href="/" className="flex items-center gap-2 w-fit">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
@@ -27,7 +40,7 @@ export default function TermsPage() {
       {/* Content */}
       <div className="max-w-4xl mx-auto px-6 py-16">
         <h1 className="text-4xl font-black mb-2">Terms of Service</h1>
-        <p className="text-sm text-white/40 mb-12">Last updated: March 6, 2026</p>
+        <p className="text-sm text-white/60 mb-12">Last updated: March 6, 2026</p>
 
         <div className="prose prose-invert max-w-none space-y-10 text-white/70 leading-relaxed">
 
@@ -248,7 +261,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-xl font-bold text-white mb-3">15. Contact Us</h2>
             <p>If you have any questions about these Terms, please contact us:</p>
-            <div className="mt-3 p-4 rounded-xl border border-white/[0.06] bg-white/[0.02] space-y-1">
+            <div className="mt-3 p-4 rounded-xl border border-white/[0.10] bg-white/[0.05] space-y-1">
               <p className="font-semibold text-white">Zoobicon</p>
               <p>
                 Email:{" "}
@@ -262,12 +275,12 @@ export default function TermsPage() {
         </div>
 
         {/* Footer nav */}
-        <div className="mt-16 pt-8 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-white/20">&copy; 2026 Zoobicon. All rights reserved.</p>
+        <div className="mt-16 pt-8 border-t border-white/[0.10] flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-white/60">&copy; 2026 Zoobicon. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            <Link href="/privacy" className="text-xs text-white/20 hover:text-white/40 transition-colors">Privacy Policy</Link>
-            <Link href="/terms" className="text-xs text-white/40 hover:text-white/60 transition-colors">Terms of Service</Link>
-            <Link href="/" className="text-xs text-white/20 hover:text-white/40 transition-colors">Home</Link>
+            <Link href="/privacy" className="text-xs text-white/60 hover:text-white/60 transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="text-xs text-white/60 hover:text-white/60 transition-colors">Terms of Service</Link>
+            <Link href="/" className="text-xs text-white/60 hover:text-white/60 transition-colors">Home</Link>
           </div>
         </div>
       </div>
