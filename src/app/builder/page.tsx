@@ -1802,23 +1802,44 @@ root.render(React.createElement(App));
                 </div>
               </div>
             ) : activeTab === "preview" && !hasCode ? (
-              <div className="h-full flex items-center justify-center bg-[#050508] relative overflow-hidden">
-                {/* Subtle background glow */}
-                <div className="absolute inset-0 pointer-events-none">
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-violet-600/3 blur-[150px]" />
+              <div className="h-full relative overflow-hidden bg-[#050508]">
+                {/*
+                  PRE-WARM: Mount Sandpack in the background (hidden behind the welcome screen)
+                  so the bundler, iframe, Tailwind CDN, and react-ts deps all initialize before
+                  the user submits a prompt. When real files arrive the swap is instant instead
+                  of paying a 20-30s cold start. SandpackPreview's own pre-warm path supplies a
+                  minimal placeholder app when files are empty.
+                */}
+                <div className="absolute inset-0 opacity-0 pointer-events-none" aria-hidden="true">
+                  <SandpackPreview
+                    mode="react"
+                    files={{}}
+                    dependencies={reactDeps}
+                    showEditor={false}
+                  />
                 </div>
-                <div className="relative z-10 text-center px-6 max-w-lg">
-                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-600/20 to-purple-700/20 border border-violet-500/10 mx-auto mb-8 flex items-center justify-center">
-                    <Sparkles className="w-10 h-10 text-violet-400/50" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  {/* Subtle background glow */}
+                  <div className="absolute inset-0 pointer-events-none">
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-violet-600/3 blur-[150px]" />
                   </div>
-                  <h2 className="text-2xl font-bold mb-3 bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">Describe your dream website</h2>
-                  <p className="text-white/30 text-sm mb-8 leading-relaxed">
-                    Type a description in the prompt panel and click Build. Our AI will generate a complete, production-ready React application in under 60 seconds.
-                  </p>
-                  <div className="flex flex-wrap justify-center gap-2">
-                    {["SaaS Landing", "Restaurant", "Portfolio", "E-Commerce", "Agency"].map(tag => (
-                      <span key={tag} className="px-3 py-1 rounded-full bg-white/[0.04] border border-white/[0.06] text-[11px] text-white/30">{tag}</span>
-                    ))}
+                  <div className="relative z-10 text-center px-6 max-w-lg">
+                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-600/20 to-purple-700/20 border border-violet-500/10 mx-auto mb-8 flex items-center justify-center">
+                      <Sparkles className="w-10 h-10 text-violet-400/50" />
+                    </div>
+                    <h2 className="text-2xl font-bold mb-3 bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">Describe your dream website</h2>
+                    <p className="text-white/30 text-sm mb-8 leading-relaxed">
+                      Type a description in the prompt panel and click Build. Our AI will generate a complete, production-ready React application in under 60 seconds.
+                    </p>
+                    <div className="flex flex-wrap justify-center gap-2">
+                      {["SaaS Landing", "Restaurant", "Portfolio", "E-Commerce", "Agency"].map(tag => (
+                        <span key={tag} className="px-3 py-1 rounded-full bg-white/[0.04] border border-white/[0.06] text-[11px] text-white/30">{tag}</span>
+                      ))}
+                    </div>
+                    <div className="mt-6 inline-flex items-center gap-2 text-[10px] uppercase tracking-wider text-emerald-400/60">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      Sandbox pre-warmed · instant preview ready
+                    </div>
                   </div>
                 </div>
               </div>

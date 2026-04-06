@@ -435,13 +435,18 @@ Use ONLY the component library's animation system:
 3. Do NOT write your own IntersectionObserver for fade-in animations — it's already handled.
 4. Do NOT set opacity:0 anywhere — the component library handles the initial hidden state safely with failsafes.
 
-## What You CAN Add
+## What You SHOULD Add (this is what makes the site feel alive — DO NOT skip)
 - Parallax effect on hero background (0.3x scroll speed via transform, NOT by hiding content).
 - Animated number counters (0 → target value on scroll) — numbers must START visible at their target value as a fallback.
-- Scroll progress bar at page top (a thin colored bar).
-- Smooth hover micro-interactions (scale, shadow changes).
-- CSS transition enhancements on buttons, cards, links.
-- \`prefers-reduced-motion\` media query that disables all animation.
+- Scroll progress bar at page top (a thin colored gradient bar fixed at top).
+- Sticky navbar that subtly shrinks + adds backdrop-blur after 80px of scroll.
+- Staggered scroll reveals on feature/testimonial cards (use the existing .fade-in class — the failsafe IntersectionObserver handles it). Add nth-child transition-delay so cards appear in sequence (60-100ms apart).
+- Button hover micro-interactions: scale(1.02) + soft glow shadow on hover, scale(0.98) on active.
+- Card hover micro-interactions: translateY(-4px) + larger shadow on hover.
+- Gradient text on the hero headline using background-clip:text (only if the design spec uses a gradient palette).
+- Smooth scroll behavior on the html element + scroll-padding-top to account for sticky nav.
+- Cursor-aware spotlight on the CTA section (radial-gradient that follows mousemove) — guard with prefers-reduced-motion.
+- \`prefers-reduced-motion\` media query that disables all motion animations (transforms only, opacity stays).
 
 ## Rules
 - Output ONLY the complete updated HTML. No markdown, no explanation, no code fences.
