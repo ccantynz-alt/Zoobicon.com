@@ -77,7 +77,7 @@ User Prompt → Haiku classifies intent (<1s) → Select from 100-component regi
 2. **Pre-warm Sandpack for instant preview** — load Sandpack on page load before user submits prompt, pre-bundle components. Target: <3s first preview (currently ~20-30s).
 3. **Fix builder streaming** — components should appear one-by-one, not all at once
 4. **Deepen Supabase auto-provisioning** — match Lovable's auto-tables, auto-RLS, auto-auth. Code exists in `src/lib/supabase-provisioner.ts`
-5. **GitHub sync** — export exists, continuous sync NOT STARTED. All 4 competitors have this — table stakes.
+5. ~~**GitHub sync**~~ ✅ DONE — full OAuth connect, create repo, push files, sync updates, status check. Wired into builder via GitHubSyncPanel.
 6. **Stripe checkout flow** — pricing page exists, needs real Stripe product IDs + webhook handler
 7. **MCP integration** — foundation at `/api/mcp/route.ts`, needs real tool connections. Emergent has this.
 8. **Video pipeline testing** — code exists, REPLICATE_API_TOKEN is set, needs end-to-end test
@@ -878,7 +878,7 @@ Each reseller at $499/mo typically brings 20-50 of their own clients. 10 reselle
 4. **Developer Platform (Monaco editor + terminal + Git + deploy)** — "hook in mouth" retention. Craig's #1 priority. Developers build on-platform, never leave.
 5. **Pre-warm Sandpack for instant preview** — target <3s first preview (currently ~20-30s). Match Bolt's speed.
 6. **Deepen Supabase auto-provisioning** — match Lovable's auto-tables, auto-RLS, auto-auth
-7. **GitHub sync** — ALL competitors have it. Table stakes. Export exists, continuous sync NOT STARTED.
+7. ~~**GitHub sync**~~ ✅ DONE — full OAuth, create/push/update, wired into builder
 8. **Video end-to-end test** — REPLICATE_API_TOKEN is set, generate one real video
 9. **MCP integration** — Emergent has it. Foundation exists at `/api/mcp/route.ts`
 10. **Next.js 14→15 upgrade** (dedicated sprint)
@@ -931,7 +931,7 @@ Each reseller at $499/mo typically brings 20-50 of their own clients. 10 reselle
 | 12 | **AI Twins — upload your face, get talking video** | Viral on TikTok. Upload a selfie, AI makes a video of "you" talking | Captions app | NOT STARTED |
 | 13 | **Auth generation in every full-stack app** | Login/signup pages, OAuth buttons, session management auto-generated | Lovable, Bolt | Supabase client built, needs UI generation |
 | 14 | **One-click deploy generated apps to zoobicon.sh** | Currently works but needs polish. Must be instant and reliable. | Lovable Cloud, Bolt Cloud | PARTIAL |
-| 15 | **GitHub sync for generated projects** | Every change committed to Git. Developer can take over at any point. | Lovable, Bolt | Export exists, sync NOT STARTED |
+| 15 | **GitHub sync for generated projects** | Every change committed to Git. Developer can take over at any point. | Lovable, Bolt | ✅ DONE — OAuth + create repo + push + update via GitHubSyncPanel |
 | 16 | **Next.js 14 → 15 upgrade** | Server Components, Partial Prerendering, streaming Suspense boundaries. 30-50% faster page loads. | Industry standard | NOT STARTED |
 | 17 | **AG-UI protocol adoption** | Replace custom SSE streaming with standardized protocol. Gets CopilotKit components free. | Google, Microsoft, Oracle adopting | NOT STARTED |
 | 18 | **WebContainers evaluation** | Full Node.js in browser. If feasible, replaces Sandpack and matches Bolt's speed. | Bolt.new | NOT STARTED |

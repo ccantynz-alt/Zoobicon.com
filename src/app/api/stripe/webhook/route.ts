@@ -201,6 +201,40 @@ export async function POST(request: NextRequest) {
         `;
         break;
       }
+
+      case "invoice.payment_succeeded": {
+        const invoice = event.data.object as Stripe.Invoice;
+        const subscriptionId = (invoice as Stripe.Invoice & { subscription?: string | null }).subscription;
+        if (subscriptionId && typeof subscriptionId === "string") {
+          await sql`
+            UPDATE users
+            SET subscription_status = 'active', updated_at = NOW()
+            WHERE stripe_subscription_id = ${subscriptionId}
+          `;
+        }
+        break;
+      }
+
+      case "invoice.payment_failed": {
+        const invoice = event.data.object as Stripe.Invoice;
+        const subscriptionId = (invoice as Stripe.Invoice & { subscription?: string | null }).subscription;
+        const customerEmail = invoice.customer_email;
+        if (subscriptionId && typeof subscriptionId === "string") {
+          await sql`
+            UPDATE users
+            SET subscription_status = 'past_due', updated_at = NOW()
+            WHERE stripe_subscription_id = ${subscriptionId}
+          `;
+        }
+        console.warn(`[webhook] Payment failed for ${customerEmail} — subscription ${subscriptionId}`);
+        break;
+      }
+
+      case "charge.refunded": {
+        const charge = event.data.object as Stripe.Charge;
+        console.log(`[webhook] Refund processed for charge ${charge.id}: ${charge.amount_refunded / 100} ${charge.currency}`);
+        break;
+      }
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : "DB error";

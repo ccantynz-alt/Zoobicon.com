@@ -380,8 +380,8 @@ Return ONLY the complete HTML code, no explanations or markdown code blocks.`,
       ],
     });
 
-    const html =
-      message.content[0].type === "text" ? message.content[0].text : "";
+    const textBlock = message.content.find((b: { type: string }) => b.type === "text") as { type: "text"; text: string } | undefined;
+    const html = textBlock?.text || "";
 
     // Clean up the HTML if wrapped in code blocks
     const cleanHtml = html

@@ -600,7 +600,7 @@ function extractReplicateOutput(data: Record<string, unknown>): string | null {
   if (Array.isArray(data.output)) return data.output[0] || null;
   if (data.output && typeof data.output === "object") {
     const out = data.output as Record<string, unknown>;
-    return (out.audio || out.video || out.image || out[0]) as string || null;
+    return ((out.audio || out.video || out.image || out[0]) as string) || null;
   }
   return null;
 }
