@@ -180,7 +180,17 @@ async function callOpenSRS(
         "Content-Length": String(Buffer.byteLength(xml)),
       },
       body: xml,
+      signal: AbortSignal.timeout(10000),
     });
+
+    if (!response.ok) {
+      const body = await response.text().catch(() => "");
+      console.error(`[OpenSRS] HTTP ${response.status}: ${response.statusText}`, body.slice(0, 500));
+      return {
+        success: false,
+        error: `OpenSRS HTTP ${response.status}: ${response.statusText}`,
+      };
+    }
 
     const text = await response.text();
 

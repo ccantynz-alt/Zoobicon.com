@@ -39,10 +39,11 @@ interface GeneratedName {
   checkingDomains: boolean;
 }
 
+// NOTE: must match TLD_PRICING in /api/domains/search/route.ts — source of truth is backend.
 const TLD_PRICES: Record<string, number> = {
-  com: 12.99, ai: 79.99, io: 39.99, sh: 24.99, co: 29.99,
-  dev: 14.99, app: 14.99, net: 13.99, org: 11.99, tech: 6.99,
-  xyz: 2.99, me: 8.99, us: 8.99,
+  com: 12.99, ai: 69.99, io: 39.99, sh: 24.99, co: 29.99,
+  dev: 14.99, app: 14.99, net: 13.99, org: 12.99, tech: 6.99,
+  xyz: 2.99, me: 19.99, us: 9.99,
 };
 
 const DEFAULT_TLDS = ["com", "ai", "io", "sh", "co"];
@@ -50,7 +51,7 @@ const DEFAULT_TLDS = ["com", "ai", "io", "sh", "co"];
 /* ── Popular TLD showcase cards ── */
 const FEATURED_TLDS = [
   { tld: "com", price: 12.99, desc: "The gold standard", color: "from-blue-500 to-blue-600", popular: true },
-  { tld: "ai", price: 79.99, desc: "AI & tech brands", color: "from-purple-500 to-violet-600", popular: true },
+  { tld: "ai", price: 69.99, desc: "AI & tech brands", color: "from-purple-500 to-violet-600", popular: true },
   { tld: "io", price: 39.99, desc: "Startups & SaaS", color: "from-emerald-500 to-teal-600", popular: true },
   { tld: "sh", price: 24.99, desc: "Dev tools & hosting", color: "from-amber-500 to-orange-600", popular: false },
   { tld: "dev", price: 14.99, desc: "Developer projects", color: "from-cyan-500 to-blue-600", popular: false },
@@ -91,8 +92,12 @@ export default function DomainsPage() {
     firstName: "", lastName: "", email: "", phone: "",
     address: "", city: "", state: "", zip: "", country: "US",
   });
-  const [generatedNames, setGeneratedNames] = useState<Array<{ name: string; results: DomainResult[] }>>([]);
+  const [generatedNames, setGeneratedNames] = useState<Array<{ name: string; tagline?: string; domains: Array<DomainResult & { checking?: boolean }> }>>([]);
   const [genDescription, setGenDescription] = useState("");
+  const [genStyle, setGenStyle] = useState<string>("modern");
+  const [generating, setGenerating] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const [pendingGenerate, setPendingGenerate] = useState(false);
   const [autoExpandedTlds, setAutoExpandedTlds] = useState(false);
   const [autoGenerating, setAutoGenerating] = useState(false);
@@ -223,6 +228,7 @@ export default function DomainsPage() {
       setSearchHistory(prev => [cleanName, ...prev].slice(0, 10));
     }
 
+    setSearchError(null);
     try {
       const res = await fetch(`/api/domains/search?q=${encodeURIComponent(cleanName)}&tlds=${encodeURIComponent(tlds.join(","))}`);
       if (res.ok) {
@@ -240,9 +246,12 @@ export default function DomainsPage() {
           };
         }));
       } else {
+        const errBody = await res.json().catch(() => ({}));
+        setSearchError(errBody.error || `Search failed (HTTP ${res.status}). Please try again.`);
         setResults(initial.map(r => ({ ...r, checking: false })));
       }
-    } catch {
+    } catch (err) {
+      setSearchError(err instanceof Error ? err.message : "Network error. Check your connection and try again.");
       setResults(initial.map(r => ({ ...r, checking: false })));
     }
 
@@ -257,6 +266,103 @@ export default function DomainsPage() {
 
   const removeFromCart = (domain: string) => {
     setCart(prev => prev.filter(c => c.domain !== domain));
+  };
+
+  const handleGenerate = async () => {
+    const desc = genDescription.trim();
+    if (desc.length < 3) return;
+    if (selectedTlds.size === 0) return;
+
+    setGenerating(true);
+    setCheckoutError(null);
+    setGeneratedNames([]);
+
+    try {
+      const res = await fetch("/api/domains/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: desc, style: genStyle, count: 20 }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Name generation failed" }));
+        setCheckoutError(err.error || "Name generation failed. Please try again.");
+        setGenerating(false);
+        return;
+      }
+
+      const data: { names: Array<{ name: string; slug: string; tagline: string }> } = await res.json();
+      const tlds = Array.from(selectedTlds);
+
+      // Seed results with "checking" state so the UI can render immediately
+      const seeded = data.names.map((n) => ({
+        name: n.name,
+        tagline: n.tagline,
+        domains: tlds.map((tld) => ({
+          domain: `${n.slug}.${tld}`,
+          tld,
+          available: null as boolean | null,
+          price: TLD_PRICES[tld] || 9.99,
+          checking: true,
+        })),
+      }));
+      setGeneratedNames(seeded);
+      setGenerating(false);
+
+      // Scroll to results
+      setTimeout(
+        () => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
+        100
+      );
+
+      // Fire availability checks in parallel (per generated name)
+      await Promise.all(
+        data.names.map(async (n, idx) => {
+          try {
+            const r = await fetch(
+              `/api/domains/search?q=${encodeURIComponent(n.slug)}&tlds=${encodeURIComponent(tlds.join(","))}`
+            );
+            if (!r.ok) throw new Error("search failed");
+            const payload = await r.json();
+            const apiResults: Array<{ domain: string; available: boolean | null; price?: number }> =
+              payload.results || [];
+
+            setGeneratedNames((prev) => {
+              const next = [...prev];
+              if (!next[idx]) return prev;
+              next[idx] = {
+                ...next[idx],
+                domains: tlds.map((tld) => {
+                  const match = apiResults.find((x) => x.domain === `${n.slug}.${tld}`);
+                  return {
+                    domain: `${n.slug}.${tld}`,
+                    tld,
+                    available: match ? match.available : null,
+                    price: match?.price || TLD_PRICES[tld] || 9.99,
+                    checking: false,
+                  };
+                }),
+              };
+              return next;
+            });
+          } catch {
+            setGeneratedNames((prev) => {
+              const next = [...prev];
+              if (!next[idx]) return prev;
+              next[idx] = {
+                ...next[idx],
+                domains: next[idx].domains.map((d) => ({ ...d, checking: false })),
+              };
+              return next;
+            });
+          }
+        })
+      );
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Something went wrong generating names.";
+      setCheckoutError(message);
+      setGenerating(false);
+    }
   };
 
   const handleRegister = () => {
@@ -654,6 +760,13 @@ export default function DomainsPage() {
       {/* RESULTS SECTION                             */}
       {/* ═══════════════════════════════════════════ */}
       <div ref={resultsRef} />
+      {(searchError || checkoutError) && (
+        <div className="max-w-4xl mx-auto px-6 -mt-4 mb-6">
+          <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+            {searchError || checkoutError}
+          </div>
+        </div>
+      )}
       {results.length > 0 && (
         <section className="pb-16 px-4 sm:px-6">
           <div className="max-w-3xl mx-auto">
