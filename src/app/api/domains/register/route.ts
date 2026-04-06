@@ -208,26 +208,44 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Email is always required
-    if (!registrant.email || String(registrant.email).trim() === "") {
+    // ICANN requires real contact info — reject missing/placeholder values
+    // BEFORE taking payment. Cheaper to fail fast than to refund a failed
+    // OpenSRS registration after the customer has been charged.
+    const missing: string[] = [];
+    if (!registrant.email || String(registrant.email).trim() === "") missing.push("email");
+    if (!registrant.firstName || String(registrant.firstName).trim() === "") missing.push("firstName");
+    if (!registrant.lastName || String(registrant.lastName).trim() === "") missing.push("lastName");
+    if (!registrant.phone || String(registrant.phone).trim() === "") missing.push("phone");
+    if (!registrant.address || String(registrant.address).trim() === "") missing.push("address");
+    if (!registrant.city || String(registrant.city).trim() === "") missing.push("city");
+    if (!registrant.zip || String(registrant.zip).trim() === "") missing.push("zip");
+    if (!registrant.country || String(registrant.country).trim() === "") missing.push("country");
+    if (missing.length > 0) {
       return NextResponse.json(
-        { error: "registrant.email is required." },
+        { error: `Missing required contact info: ${missing.join(", ")}` },
         { status: 400 }
       );
     }
 
-    // Fill defaults for optional fields — these can be updated later
-    // before actual OpenSRS registration (post-payment)
+    // Phone must be in ITU format (+CC.NNNNNNNNNN) with at least 7 real digits.
+    const phoneDigits = String(registrant.phone).replace(/\D/g, "");
+    if (phoneDigits.length < 7 || /^0+$/.test(phoneDigits)) {
+      return NextResponse.json(
+        { error: "Please enter a valid phone number." },
+        { status: 400 }
+      );
+    }
+
     registrant = {
-      firstName: registrant.firstName || "Domain",
-      lastName: registrant.lastName || "Owner",
+      firstName: String(registrant.firstName).trim(),
+      lastName: String(registrant.lastName).trim(),
       email: registrant.email,
-      phone: registrant.phone || "+1.0000000000",
-      address: registrant.address || "TBD",
-      city: registrant.city || "TBD",
+      phone: registrant.phone,
+      address: registrant.address,
+      city: registrant.city,
       state: registrant.state || "NA",
-      zip: registrant.zip || "00000",
-      country: registrant.country || "US",
+      zip: registrant.zip,
+      country: registrant.country,
     };
 
     // Validate email format

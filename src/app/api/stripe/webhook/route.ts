@@ -85,18 +85,35 @@ export async function POST(request: NextRequest) {
             const trimmedDomain = domain.trim();
 
             // Step 1: Save to database as "pending_registration"
+            // CRITICAL: never downgrade status on conflict — if a previous
+            // webhook or verify-purchase already marked this domain 'active',
+            // keep it active. Also skip OpenSRS if already active (idempotency).
+            let alreadyActive = false;
             try {
+              const existing = (await sql`
+                SELECT status FROM registered_domains WHERE domain = ${trimmedDomain} LIMIT 1
+              `) as Array<{ status: string }>;
+              if (existing[0]?.status === "active") {
+                alreadyActive = true;
+                console.log(`[webhook] ${trimmedDomain} already active — skipping duplicate registration`);
+              }
+
               await sql`
                 INSERT INTO registered_domains (domain, user_email, status, expires_at, auto_renew, privacy_protection)
                 VALUES (${trimmedDomain}, ${registrantEmail}, ${"pending_registration"}, ${expiresAt.toISOString()}, true, true)
                 ON CONFLICT (domain) DO UPDATE SET
-                  status = ${"pending_registration"},
+                  status = CASE
+                    WHEN registered_domains.status = 'active' THEN 'active'
+                    ELSE EXCLUDED.status
+                  END,
                   expires_at = ${expiresAt.toISOString()},
                   user_email = ${registrantEmail}
               `;
             } catch (err) {
               console.error(`[webhook] Failed to save domain ${trimmedDomain} to DB:`, err);
             }
+
+            if (alreadyActive) continue;
 
             // Step 2: Register with OpenSRS
             try {
