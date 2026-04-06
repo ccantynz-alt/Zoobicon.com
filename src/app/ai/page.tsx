@@ -92,10 +92,10 @@ const AI_TOOLS = [
   {
     icon: Video,
     name: "AI Video Creator",
-    description: "Transform text scripts into professional marketing videos. Coming soon.",
+    description: "Transform text scripts into professional marketing videos in minutes.",
     color: "from-accent-purple to-blue-700",
     glowColor: "shadow-blue-500/25",
-    tag: "Coming Soon",
+    tag: "Video",
   },
   {
     icon: Mail,
