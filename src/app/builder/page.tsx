@@ -447,6 +447,19 @@ function BuilderPage() {
   const [activeTool, setActiveTool] = useState<ToolId>(null);
   const [tier, setTier] = useState<Tier>("premium");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [useWebContainers, setUseWebContainers] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (typeof navigator === "undefined") return;
+    const ua = navigator.userAgent;
+    const isSafari = /^((?!chrome|android|crios|fxios).)*safari/i.test(ua);
+    const isIOS = /iPad|iPhone|iPod/.test(ua);
+    if (isSafari || isIOS) setUseWebContainers(false);
+  }, []);
+
+  const handleWebContainersFail = useCallback(() => {
+    setUseWebContainers(false);
+  }, []);
   const [isDeploying, setIsDeploying] = useState(false);
   const [deployUrl, setDeployUrl] = useState("");
   const [deployStatus, setDeployStatus] = useState<"idle" | "deploying" | "deployed" | "error">("idle");
@@ -1583,12 +1596,21 @@ root.render(React.createElement(App));
         )}
 
         {/* Fullscreen preview */}
-        <SandpackPreview
-          mode="react"
+        <PreviewSwitcher
+          useWebContainers={useWebContainers}
+          onWebContainersFail={handleWebContainersFail}
           files={reactFiles || {}}
-          dependencies={reactDeps}
-          showEditor={false}
+          reactDeps={reactDeps}
         />
+        {isAdmin && (
+          <button
+            type="button"
+            onClick={() => setUseWebContainers((v) => !v)}
+            className="absolute top-2 right-2 z-50 px-2 py-1 text-[10px] rounded bg-black/70 text-white border border-white/20"
+          >
+            Preview: {useWebContainers ? "WebContainers" : "Sandpack"}
+          </button>
+        )}
 
         {/* Prompt input overlay at bottom — for recording demo sequences */}
         {!hasCode && (
@@ -2029,12 +2051,21 @@ root.render(React.createElement(App));
               </div>
             ) : activeTab === "preview" ? (
               <div ref={previewContainerRef} className="relative h-full">
-                <SandpackPreview
-                  mode="react"
+                <PreviewSwitcher
+                  useWebContainers={useWebContainers}
+                  onWebContainersFail={handleWebContainersFail}
                   files={reactFiles || {}}
-                  dependencies={reactDeps}
-                  showEditor={false}
+                  reactDeps={reactDeps}
                 />
+                {isAdmin && (
+                  <button
+                    type="button"
+                    onClick={() => setUseWebContainers((v) => !v)}
+                    className="absolute top-2 right-2 z-50 px-2 py-1 text-[10px] rounded bg-black/70 text-white border border-white/20"
+                  >
+                    Preview: {useWebContainers ? "WebContainers" : "Sandpack"}
+                  </button>
+                )}
                 {collab.isConnected && (
                   <CursorOverlay
                     participants={collab.participants}

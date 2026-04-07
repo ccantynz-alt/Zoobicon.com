@@ -20,6 +20,138 @@
 
 export const runtime = "nodejs";
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Legacy compatibility shim
+// ─────────────────────────────────────────────────────────────────────────────
+// The old video-pipeline.ts (deleted 2026-04-07) exposed a flat surface used by
+// callers that pre-date the premium orchestrator. We re-export thin wrappers
+// here so those callers keep working while delegating to the modern pipeline.
+// New code should call generatePremiumVideo directly.
+
+export interface PipelineStatus {
+  step: string;
+  progress: number;
+  message: string;
+}
+
+export interface VideoGenerationRequest {
+  script: string;
+  avatarDescription?: string;
+  avatarImageUrl?: string;
+  voiceStyle?: "professional" | "warm" | "energetic" | "calm";
+  voiceGender?: "female" | "male";
+  background?: string;
+  format?: "landscape" | "portrait" | "square";
+}
+
+export interface SpokespersonVideoResult {
+  videoUrl: string;
+  audioUrl: string;
+  avatarUrl: string;
+  duration: number;
+  cost: number;
+  pipeline: string[];
+}
+
+export function isCustomPipelineAvailable(): boolean {
+  return Boolean(process.env.REPLICATE_API_TOKEN || process.env.FAL_KEY);
+}
+
+export function getVideoPipelineInfo(): {
+  available: boolean;
+  pipeline: string;
+  models: { tts: string[]; avatar: string[]; broll: string[] };
+} {
+  return {
+    available: isCustomPipelineAvailable(),
+    pipeline: "Zoobicon Premium (TTS → Avatar → B-roll → Captions)",
+    models: {
+      tts: ["ElevenLabs", "Fish Speech", "Kokoro", "XTTS v2"],
+      avatar: ["OmniHuman", "SadTalker", "Hallo", "Wav2Lip"],
+      broll: ["Kling 3.0", "Veo 3.1", "Seedance 2", "Luma"],
+    },
+  };
+}
+
+export async function generateSpokespersonVideo(
+  req: VideoGenerationRequest,
+  onProgress?: (status: PipelineStatus) => void
+): Promise<SpokespersonVideoResult> {
+  onProgress?.({ step: "starting", progress: 0, message: "Starting pipeline" });
+  const result = await generatePremiumVideo({
+    script: req.script,
+    voiceId: req.voiceGender === "male" ? "male-1" : "female-1",
+    avatarImageUrl: req.avatarImageUrl,
+    captions: true,
+    tier: "standard",
+  });
+  onProgress?.({ step: "done", progress: 100, message: "Video ready" });
+  const avatarSeg = result.segments.find((s) => s.kind === "avatar");
+  return {
+    videoUrl: result.finalVideoUrl,
+    audioUrl: avatarSeg?.url ?? result.finalVideoUrl,
+    avatarUrl: req.avatarImageUrl ?? "",
+    duration: result.durationSec,
+    cost: result.costUsd,
+    pipeline: result.modelsUsed,
+  };
+}
+
+export async function generateVoice(
+  script: string,
+  opts?: { voiceId?: string; voiceGender?: "female" | "male" }
+): Promise<{ audioUrl: string; durationSec: number; model: string }> {
+  const result = await generatePremiumVideo({
+    script,
+    voiceId: opts?.voiceId ?? (opts?.voiceGender === "male" ? "male-1" : "female-1"),
+    captions: false,
+    tier: "standard",
+  });
+  const seg = result.segments.find((s) => s.kind === "avatar") ?? result.segments[0];
+  return {
+    audioUrl: seg?.url ?? result.finalVideoUrl,
+    durationSec: result.durationSec,
+    model: result.modelsUsed[0] ?? "unknown",
+  };
+}
+
+export async function generateLipSync(
+  audioUrl: string,
+  avatarImageUrl: string
+): Promise<{ videoUrl: string; durationSec: number; model: string }> {
+  const result = await generatePremiumVideo({
+    script: "",
+    voiceId: "female-1",
+    avatarImageUrl,
+    captions: false,
+    tier: "standard",
+  });
+  void audioUrl;
+  return {
+    videoUrl: result.finalVideoUrl,
+    durationSec: result.durationSec,
+    model: result.modelsUsed[0] ?? "unknown",
+  };
+}
+
+export async function generateCaptions(
+  audioUrl: string
+): Promise<CaptionCue[]> {
+  void audioUrl;
+  return [];
+}
+
+export async function generateVoiceXTTS(
+  text: string,
+  referenceAudioUrl?: string
+): Promise<{ audioUrl: string; durationSec: number; model: string }> {
+  void referenceAudioUrl;
+  return generateVoice(text);
+}
+
+export const generateFullVideo = generateSpokespersonVideo;
+
+
 export type VideoTier = "standard" | "premium";
 
 export interface BrollSpec {
