@@ -91,8 +91,10 @@ export default function DomainsPage() {
     firstName: "", lastName: "", email: "", phone: "",
     address: "", city: "", state: "", zip: "", country: "US",
   });
-  const [generatedNames, setGeneratedNames] = useState<Array<{ name: string; results: DomainResult[] }>>([]);
+  const [generatedNames, setGeneratedNames] = useState<Array<{ name: string; tagline: string; domains: DomainResult[] }>>([]);
   const [genDescription, setGenDescription] = useState("");
+  const [genStyle, setGenStyle] = useState("modern");
+  const [generating, setGenerating] = useState(false);
   const [pendingGenerate, setPendingGenerate] = useState(false);
   const [autoExpandedTlds, setAutoExpandedTlds] = useState(false);
   const [autoGenerating, setAutoGenerating] = useState(false);
@@ -198,6 +200,112 @@ export default function DomainsPage() {
       return next;
     });
   };
+
+  // ─── AI Name Generator ───────────────────────────────────────────────────
+  // 1. Ask Claude for ~24 brandable names
+  // 2. Check availability for every name × every selected TLD in parallel
+  // 3. Stream results into state as each name resolves
+  // 4. Names with ZERO available TLDs are auto-filtered out at render time
+  const handleGenerate = useCallback(async () => {
+    const desc = genDescription.trim();
+    if (desc.length < 3 || selectedTlds.size === 0 || generating) return;
+
+    setGenerating(true);
+    setGeneratedNames([]);
+    setResults([]);
+
+    // scroll to results
+    setTimeout(() => genResultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
+
+    const tlds = Array.from(selectedTlds);
+
+    // Step 1 — get names from Claude
+    let names: Array<{ name: string; tagline: string }> = [];
+    try {
+      const res = await fetch("/api/tools/business-names", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: desc, style: genStyle, count: 24 }),
+      });
+      const data = await res.json();
+      names = Array.isArray(data?.names) ? data.names : [];
+    } catch {
+      // network error — bail
+    }
+
+    if (names.length === 0) {
+      setGenerating(false);
+      return;
+    }
+
+    // Sanitize names → dns-safe strings
+    const cleaned = names
+      .map((n) => ({
+        name: n.name,
+        tagline: n.tagline || "",
+        slug: n.name.toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 63),
+      }))
+      .filter((n) => n.slug.length >= 2);
+
+    // Seed the UI immediately with everything in "checking" state
+    setGeneratedNames(
+      cleaned.map((n) => ({
+        name: n.name,
+        tagline: n.tagline,
+        domains: tlds.map((tld) => ({
+          domain: `${n.slug}.${tld}`,
+          tld,
+          available: null,
+          price: TLD_PRICES[tld] || 9.99,
+          checking: true,
+        })),
+      })),
+    );
+
+    // Step 2 — check every name in parallel, stream updates
+    await Promise.all(
+      cleaned.map(async (n) => {
+        try {
+          const r = await fetch(
+            `/api/domains/search?q=${encodeURIComponent(n.slug)}&tlds=${encodeURIComponent(tlds.join(","))}`,
+          );
+          if (!r.ok) throw new Error("search failed");
+          const data = await r.json();
+          const apiResults: Array<{ domain: string; available: boolean | null; price: number }> = data.results || [];
+
+          setGeneratedNames((prev) =>
+            prev.map((gn) =>
+              gn.name !== n.name
+                ? gn
+                : {
+                    ...gn,
+                    domains: tlds.map((tld) => {
+                      const match = apiResults.find((x) => x.domain === `${n.slug}.${tld}`);
+                      return {
+                        domain: `${n.slug}.${tld}`,
+                        tld,
+                        available: match ? match.available : null,
+                        price: match?.price ?? TLD_PRICES[tld] ?? 9.99,
+                        checking: false,
+                      };
+                    }),
+                  },
+            ),
+          );
+        } catch {
+          setGeneratedNames((prev) =>
+            prev.map((gn) =>
+              gn.name !== n.name
+                ? gn
+                : { ...gn, domains: gn.domains.map((d) => ({ ...d, checking: false, available: null })) },
+            ),
+          );
+        }
+      }),
+    );
+
+    setGenerating(false);
+  }, [genDescription, genStyle, selectedTlds, generating]);
 
   const handleSearch = async () => {
     const cleanName = name.trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
