@@ -86,6 +86,8 @@ import {
   Package,
   Eye,
   Code2,
+  AlertTriangle,
+  RotateCcw,
 } from "lucide-react";
 
 /** Sanitize raw API error messages for user display */
@@ -411,6 +413,9 @@ function BuilderPage() {
   const [showDeployModal, setShowDeployModal] = useState(false);
   const [pipelineAgents, setPipelineAgents] = useState<string[]>([]);
   const [buildProgress, setBuildProgress] = useState<{ current: number; total: number; section: string } | null>(null);
+  const [sectionTimeline, setSectionTimeline] = useState<Array<{ section: string; label: string; status: "pending" | "scaffolding" | "customizing" | "done"; startedAt: number; finishedAt?: number }>>([]);
+  const [buildError, setBuildError] = useState<{ message: string; suggestion: string } | null>(null);
+  const [streamWarning, setStreamWarning] = useState<string | null>(null);
   const [selectedModel, setSelectedModel] = useState("");  // Empty = use pipeline's smart routing (Haiku/Opus/Sonnet)
   const [instantMode, setInstantMode] = useState(true); // Default to fast registry assembly (scaffold <1s + AI customize ~10s)
   const [fullStack, setFullStack] = useState(false); // Full-stack mode: auto-provisions Supabase backend (auth, database, storage)
@@ -490,6 +495,9 @@ function BuilderPage() {
 
   const abortRef = useRef<AbortController | null>(null);
   const generationIdRef = useRef(0); // Tracks current generation to prevent stale image replacements
+  const watchdogSlowRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const watchdogStuckRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timelineScrollRef = useRef<HTMLDivElement | null>(null);
   // hasCode must check for REAL content — not just the "<!-- react-app-mode -->" marker
   // which can linger after a failed generation, leaving the builder stuck in "AI Editor" mode
   const hasCode = generatedCode.length > 0 && (
@@ -759,6 +767,70 @@ function BuilderPage() {
     return html;
   }, []);
 
+  // Watchdog: warn at 15s of silence, error at 60s
+  const resetWatchdog = useCallback(() => {
+    if (watchdogSlowRef.current) clearTimeout(watchdogSlowRef.current);
+    if (watchdogStuckRef.current) clearTimeout(watchdogStuckRef.current);
+    setStreamWarning(null);
+    watchdogSlowRef.current = setTimeout(() => {
+      setStreamWarning("Connection slow — still working...");
+      console.log("[builder]", "watchdog", "slow", 15000);
+    }, 15000);
+    watchdogStuckRef.current = setTimeout(() => {
+      setBuildError({
+        message: "Build appears stuck — Vercel function may have timed out",
+        suggestion: "Try again, or check the browser console for details",
+      });
+      console.log("[builder]", "watchdog", "stuck", 60000);
+    }, 60000);
+  }, []);
+
+  const clearWatchdog = useCallback(() => {
+    if (watchdogSlowRef.current) clearTimeout(watchdogSlowRef.current);
+    if (watchdogStuckRef.current) clearTimeout(watchdogStuckRef.current);
+    watchdogSlowRef.current = null;
+    watchdogStuckRef.current = null;
+    setStreamWarning(null);
+  }, []);
+
+  // Map raw error message → user suggestion
+  const errorSuggestion = useCallback((raw: string): string => {
+    const m = raw.toLowerCase();
+    if (m.includes("anthropic") || m.includes("api key") || m.includes("api_key")) return "Set ANTHROPIC_API_KEY in Vercel env vars";
+    if (m.includes("rate limit") || m.includes("429")) return "Anthropic rate limit hit — retry in 60s or upgrade plan";
+    if (m.includes("401") || m.includes("403") || m.includes("auth")) return "Sign in required — please log in";
+    if (m.includes("quota")) return "Generation quota exceeded — upgrade your plan";
+    return "Check the browser console for details";
+  }, []);
+
+  // Update timeline based on section state transitions
+  const upsertSection = useCallback((section: string, status: "scaffolding" | "customizing" | "done") => {
+    if (!section) return;
+    const now = Date.now();
+    setSectionTimeline(prev => {
+      const idx = prev.findIndex(s => s.section === section);
+      if (idx === -1) {
+        console.log("[builder]", section, status, 0);
+        return [...prev, { section, label: section, status, startedAt: now }];
+      }
+      const existing = prev[idx];
+      const elapsed = now - existing.startedAt;
+      console.log("[builder]", section, status, elapsed);
+      const next = [...prev];
+      next[idx] = {
+        ...existing,
+        status,
+        finishedAt: status === "done" ? now : existing.finishedAt,
+      };
+      return next;
+    });
+    // Auto-scroll active section into view
+    requestAnimationFrame(() => {
+      const el = timelineScrollRef.current;
+      if (el) el.scrollTop = el.scrollHeight;
+    });
+  }, []);
+
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim()) return;
 
@@ -784,6 +856,10 @@ function BuilderPage() {
     setActiveTab("preview");
     setPipelineAgents([]);
     setBuildProgress(null);
+    setSectionTimeline([]);
+    setBuildError(null);
+    setStreamWarning(null);
+    resetWatchdog();
     pendingLabelRef.current = `Build: ${prompt.trim().slice(0, 50)}`;
 
     abortRef.current?.abort();
@@ -841,6 +917,7 @@ function BuilderPage() {
           const { done, value } = await Promise.race([readPromise, timeoutPromise]);
           if (done) break;
           lastDataAt = Date.now();
+          resetWatchdog();
           lineBuffer += decoder.decode(value, { stream: true });
           const lines = lineBuffer.split("\n");
           lineBuffer = lines.pop() || "";
@@ -858,6 +935,9 @@ function BuilderPage() {
                 // Update progress bar if event carries progress numbers
                 if (event.current != null && event.total != null) {
                   setBuildProgress({ current: event.current, total: event.total, section: event.section || "" });
+                }
+                if (event.section && event.phase === "building") {
+                  upsertSection(event.section, "customizing");
                 }
               } else if (event.type === "scaffold" && event.files) {
                 // Legacy scaffold event (full assembly at once) — still supported
@@ -889,6 +969,11 @@ function BuilderPage() {
                   if (event.fileCount != null && event.totalComponents != null) {
                     setBuildProgress({ current: event.fileCount, total: event.totalComponents, section: event.section || "" });
                   }
+                  if (event.section && event.customized) {
+                    upsertSection(event.section, "done");
+                  } else if (event.section) {
+                    upsertSection(event.section, "scaffolding");
+                  }
                 }
               } else if ((event.type === "done" && event.files) || (event.type === "done")) {
                 // Generation complete
@@ -903,11 +988,15 @@ function BuilderPage() {
                   setStatus("complete");
                   setBuildProgress(null);
                   receivedDone = true;
+                  clearWatchdog();
+                  setSectionTimeline(prev => prev.map(s => s.status === "done" ? s : { ...s, status: "done", finishedAt: Date.now() }));
                   setPipelineAgents(prev => [...prev, "Build complete"]);
                   trackEvent("build");
                 }
               } else if (event.type === "error") {
-                throw new Error(event.message || "Generation failed");
+                const msg = event.message || "Generation failed";
+                setBuildError({ message: cleanErrorMessage(msg), suggestion: errorSuggestion(msg) });
+                throw new Error(msg);
               }
             } catch (e) {
               if (e instanceof Error && (e.message.includes("failed") || e.message.includes("Generation") || e.message.includes("unavailable") || e.message.includes("busy"))) {
@@ -984,18 +1073,21 @@ function BuilderPage() {
           setPipelineAgents(prev => [...prev, "Build complete (stream ended early — partial results shown)"]);
         }
       } catch (err) {
-        if ((err as Error).name === "AbortError") return;
+        if ((err as Error).name === "AbortError") { clearWatchdog(); return; }
         const errMsg = err instanceof Error ? err.message : String(err);
         console.error("[React Generate] Failed:", errMsg);
         setGeneratedCode("");
         setReactFiles(null);
         setBuildProgress(null);
-        setError(cleanErrorMessage(errMsg));
+        clearWatchdog();
+        const cleaned = cleanErrorMessage(errMsg);
+        setError(cleaned);
+        setBuildError(prev => prev || { message: cleaned, suggestion: errorSuggestion(errMsg) });
         setStatus("error");
       }
       return;
     }
-  }, [prompt, tier, autoReplaceImages, selectedModel, instantMode, generationMode, fullStack]);
+  }, [prompt, tier, autoReplaceImages, selectedModel, instantMode, generationMode, fullStack, resetWatchdog, clearWatchdog, errorSuggestion, upsertSection]);
 
   // Edit existing React files via the same streaming endpoint
   const handleEdit = useCallback(async () => {
@@ -1394,6 +1486,57 @@ root.render(React.createElement(App));
                   />
                 </div>
               )}
+              {streamWarning && (
+                <div className="flex items-center gap-2 text-[10px] text-amber-400 mt-2">
+                  <AlertTriangle className="w-3 h-3" />
+                  <span>{streamWarning}</span>
+                </div>
+              )}
+              {sectionTimeline.length > 0 && (
+                <div className="max-h-32 overflow-y-auto space-y-1 pr-1 mt-2">
+                  {sectionTimeline.map((s) => {
+                    const elapsed = s.finishedAt ? ((s.finishedAt - s.startedAt) / 1000).toFixed(1) : null;
+                    return (
+                      <div key={s.section} className="flex items-center gap-2 text-[10px]">
+                        {s.status === "done" ? (
+                          <Check className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                        ) : (
+                          <span className="w-2 h-2 rounded-full bg-violet-500 animate-pulse flex-shrink-0" />
+                        )}
+                        <span className={s.status === "done" ? "text-white/60" : "text-white/90"}>{s.label}</span>
+                        {elapsed && <span className="text-white/30 ml-auto tabular-nums">{elapsed}s</span>}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {buildError && (
+          <div className="absolute top-16 left-6 right-6 z-50">
+            <div className="max-w-2xl mx-auto px-4 py-3 rounded-xl bg-red-950/90 backdrop-blur-xl border border-red-500/40 shadow-2xl">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-semibold text-red-200">{buildError.message}</div>
+                  <div className="text-xs text-red-300/80 mt-0.5">{buildError.suggestion}</div>
+                </div>
+                <button
+                  onClick={() => { setBuildError(null); handleGenerate(); }}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-xs text-red-100 border border-red-500/40 transition"
+                >
+                  <RotateCcw className="w-3 h-3" /> Retry
+                </button>
+                <button
+                  onClick={() => setBuildError(null)}
+                  className="p-1.5 rounded-lg hover:bg-red-500/20 text-red-300 transition"
+                  aria-label="Dismiss"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -1872,13 +2015,65 @@ root.render(React.createElement(App));
                         )}
                       </div>
                       {buildProgress && buildProgress.total > 0 && (
-                        <div className="w-full h-1 rounded-full bg-white/10 overflow-hidden">
+                        <div className="w-full h-1 rounded-full bg-white/10 overflow-hidden mb-2">
                           <div
                             className="h-full rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 transition-all duration-500 ease-out"
                             style={{ width: `${Math.round((buildProgress.current / buildProgress.total) * 100)}%` }}
                           />
                         </div>
                       )}
+                      {streamWarning && (
+                        <div className="flex items-center gap-2 text-[10px] text-amber-400 mb-2">
+                          <AlertTriangle className="w-3 h-3" />
+                          <span>{streamWarning}</span>
+                        </div>
+                      )}
+                      {sectionTimeline.length > 0 && (
+                        <div ref={timelineScrollRef} className="max-h-32 overflow-y-auto space-y-1 pr-1">
+                          {sectionTimeline.map((s) => {
+                            const elapsed = s.finishedAt ? ((s.finishedAt - s.startedAt) / 1000).toFixed(1) : null;
+                            return (
+                              <div key={s.section} className="flex items-center gap-2 text-[10px]">
+                                {s.status === "done" ? (
+                                  <Check className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                                ) : s.status === "customizing" || s.status === "scaffolding" ? (
+                                  <span className="w-2 h-2 rounded-full bg-violet-500 animate-pulse flex-shrink-0" />
+                                ) : (
+                                  <span className="w-2 h-2 rounded-full bg-white/30 flex-shrink-0" />
+                                )}
+                                <span className={s.status === "done" ? "text-white/60" : "text-white/90"}>{s.label}</span>
+                                {elapsed && <span className="text-white/30 ml-auto tabular-nums">{elapsed}s</span>}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                {buildError && (
+                  <div className="absolute top-4 left-4 right-4 z-40">
+                    <div className="max-w-2xl mx-auto px-4 py-3 rounded-xl bg-red-950/90 backdrop-blur-xl border border-red-500/40 shadow-2xl">
+                      <div className="flex items-start gap-3">
+                        <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-semibold text-red-200">{buildError.message}</div>
+                          <div className="text-xs text-red-300/80 mt-0.5">{buildError.suggestion}</div>
+                        </div>
+                        <button
+                          onClick={() => { setBuildError(null); handleGenerate(); }}
+                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-xs text-red-100 border border-red-500/40 transition"
+                        >
+                          <RotateCcw className="w-3 h-3" /> Retry
+                        </button>
+                        <button
+                          onClick={() => setBuildError(null)}
+                          className="p-1.5 rounded-lg hover:bg-red-500/20 text-red-300 transition"
+                          aria-label="Dismiss"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}
