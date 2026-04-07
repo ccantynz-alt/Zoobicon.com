@@ -500,3 +500,4 @@ import "./testimonials";
 import "./footers";
 import "./extras";
 import "./sections";
+import "./advanced";
