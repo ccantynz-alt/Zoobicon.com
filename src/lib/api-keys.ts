@@ -229,3 +229,181 @@ export async function getUsageSummary(
 
   return { totalRequests, totalCost, byEndpoint };
 }
+
+// ---------------------------------------------------------------------------
+// Edge-runtime public API: customer-scoped key issuance + verification
+// ---------------------------------------------------------------------------
+
+const BASE62 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+function toBase62(bytes: Buffer): string {
+  let out = "";
+  for (let i = 0; i < bytes.length; i++) {
+    out += BASE62[bytes[i]! % 62];
+  }
+  return out;
+}
+
+function hashKey(plaintext: string): string {
+  return crypto.createHash("sha256").update(plaintext).digest("hex");
+}
+
+export interface IssuedApiKey {
+  key: string;
+  keyId: string;
+  prefix: string;
+}
+
+export interface ApiKeyRow {
+  id: string;
+  customerId: string;
+  keyPrefix: string;
+  label: string;
+  scopes: string[];
+  rateLimit: number;
+  status: string;
+}
+
+export interface UsageRow {
+  endpoint: string;
+  count: number;
+  avgLatencyMs: number;
+  errors: number;
+}
+
+/**
+ * Ensure customer-scoped api_keys/api_usage schema exists.
+ * Additive ALTERs so it co-exists with the legacy schema above.
+ */
+export async function ensureApiKeyTables(): Promise<void> {
+  await ensureAPIKeyTables();
+  await sql`ALTER TABLE api_keys ADD COLUMN IF NOT EXISTS customer_id TEXT`;
+  await sql`ALTER TABLE api_keys ADD COLUMN IF NOT EXISTS label TEXT`;
+  await sql`ALTER TABLE api_keys ADD COLUMN IF NOT EXISTS scopes TEXT[] DEFAULT '{}'`;
+  await sql`ALTER TABLE api_keys ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'active'`;
+  await sql`CREATE INDEX IF NOT EXISTS api_keys_customer_idx ON api_keys (customer_id)`;
+  await sql`ALTER TABLE api_usage ADD COLUMN IF NOT EXISTS latency_ms INTEGER`;
+}
+
+/**
+ * Issue a new public API key for a customer. Returns plaintext ONCE.
+ */
+export async function issueApiKey(
+  customerId: string,
+  label: string,
+  scopes: string[] = []
+): Promise<IssuedApiKey> {
+  await ensureApiKeyTables();
+
+  const random = crypto.randomBytes(32);
+  const tail = toBase62(random);
+  const plaintext = `zbk_live_${tail}`;
+  const keyHash = hashKey(plaintext);
+  const prefix = plaintext.slice(0, 16);
+
+  const [row] = await sql`
+    INSERT INTO api_keys (
+      key_hash, key_prefix, name, owner_email,
+      plan, environment, rate_limit, active,
+      customer_id, label, scopes, status
+    )
+    VALUES (
+      ${keyHash}, ${prefix}, ${label}, ${customerId},
+      'pro', 'live', 1000, true,
+      ${customerId}, ${label}, ${scopes}, 'active'
+    )
+    RETURNING id
+  `;
+
+  return { key: plaintext, keyId: row.id as string, prefix };
+}
+
+/**
+ * Verify a plaintext API key. Returns the row or null.
+ */
+export async function verifyApiKey(plaintext: string): Promise<ApiKeyRow | null> {
+  if (!plaintext || !plaintext.startsWith("zbk_")) return null;
+  const keyHash = hashKey(plaintext);
+
+  const [row] = await sql`
+    SELECT id, customer_id, key_prefix, label, scopes, rate_limit, status
+    FROM api_keys
+    WHERE key_hash = ${keyHash} AND status = 'active'
+    LIMIT 1
+  `;
+  if (!row) return null;
+
+  await sql`UPDATE api_keys SET last_used_at = NOW() WHERE id = ${row.id}`;
+
+  return {
+    id: row.id as string,
+    customerId: (row.customer_id as string) ?? "",
+    keyPrefix: (row.key_prefix as string) ?? "",
+    label: (row.label as string) ?? "",
+    scopes: (row.scopes as string[]) ?? [],
+    rateLimit: (row.rate_limit as number) ?? 1000,
+    status: (row.status as string) ?? "active",
+  };
+}
+
+/**
+ * Revoke an API key (customer-scoped).
+ */
+export async function revokeApiKey(keyId: string, customerId: string): Promise<boolean> {
+  await ensureApiKeyTables();
+  const rows = await sql`
+    UPDATE api_keys
+    SET status = 'revoked', active = false
+    WHERE id = ${keyId} AND customer_id = ${customerId}
+    RETURNING id
+  `;
+  return rows.length > 0;
+}
+
+/**
+ * Record a usage event for rate limiting + analytics.
+ */
+export async function recordApiUsage(
+  keyId: string,
+  endpoint: string,
+  statusCode: number,
+  latencyMs: number
+): Promise<void> {
+  await sql`
+    INSERT INTO api_usage (key_id, endpoint, status_code, response_time, latency_ms, cost)
+    VALUES (${keyId}, ${endpoint}, ${statusCode}, ${latencyMs}, ${latencyMs}, 0)
+  `;
+}
+
+/**
+ * Aggregated usage for a customer over the last N days.
+ */
+export async function getUsage(
+  customerId: string,
+  days: number = 30
+): Promise<{ usage: UsageRow[]; total: number }> {
+  await ensureApiKeyTables();
+  const rows = await sql`
+    SELECT
+      u.endpoint,
+      COUNT(*)::int AS count,
+      COALESCE(AVG(u.latency_ms), 0)::int AS avg_latency_ms,
+      SUM(CASE WHEN u.status_code >= 400 THEN 1 ELSE 0 END)::int AS errors
+    FROM api_usage u
+    JOIN api_keys k ON k.id = u.key_id
+    WHERE k.customer_id = ${customerId}
+      AND u.created_at > NOW() - INTERVAL '1 day' * ${days}
+    GROUP BY u.endpoint
+    ORDER BY count DESC
+  `;
+
+  const usage: UsageRow[] = rows.map((r) => ({
+    endpoint: r.endpoint as string,
+    count: r.count as number,
+    avgLatencyMs: r.avg_latency_ms as number,
+    errors: r.errors as number,
+  }));
+  const total = usage.reduce((sum, r) => sum + r.count, 0);
+  return { usage, total };
+}
+
