@@ -151,9 +151,9 @@ Every session, ask: **what did the competition ship in the last 48 hours, and ho
 | Lovable | $400M ARR, deep Supabase auto-provisioning | Match Supabase depth + add 75-product ecosystem moat | IN PROGRESS |
 | Bolt.new | 3-5s preview via WebContainers | Pre-warm Sandpack + parallel customization → <3s preview | DONE 2026-04-07 |
 | v0 | Added DB + agentic mode Feb 2026 | Beat with full-stack auto-provision + 60-component registry | IN PROGRESS |
-| Emergent | MCP integration, multi-agent | Match MCP + already have 18 agents | NEXT |
+| Emergent | MCP integration, multi-agent | Match MCP + already have 18 agents | IN PROGRESS (Wave 2 — 2026-04-07) |
 | HeyGen | LiveAvatar, 175 languages | Own pipeline (Fish Speech 50+ langs) + storyboard renderer | IN PROGRESS |
-| Captions | AI Twins viral on TikTok | Build AI Twins on Replicate (Fish Speech voice clone) | NEXT |
+| Captions | AI Twins viral on TikTok | Build AI Twins on Replicate (Fish Speech voice clone) | IN PROGRESS (Wave 2 — 2026-04-07) |
 | Kling 3.0 | Native 4K 60fps | Provider-specific cinematography prompts shipped | DONE 2026-04-07 |
 
 **Rule:** every row in this table must be re-checked every session. New rows added when new threats appear. Stale rows updated within 48 hours.
