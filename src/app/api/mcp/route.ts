@@ -1,95 +1,216 @@
+/**
+ * Zoobicon MCP Server Endpoint
+ *
+ * Implements the Model Context Protocol (JSON-RPC 2.0) so external Claude /
+ * GPT / Gemini clients can list and invoke Zoobicon platform tools.
+ *
+ * Spec: https://modelcontextprotocol.io
+ * Protocol version: 2025-06-18
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import {
-  createMCPContext,
-  executeMCPTool,
-  getConnectedProviders,
-  type MCPConfig,
-} from "@/lib/mcp";
+  MCP_TOOLS,
+  getMCPTool,
+  listMCPToolDescriptors,
+} from "@/lib/mcp-tools";
 
-// ---------------------------------------------------------------------------
-// Helper: load user integration configs from the integrations API / DB
-// ---------------------------------------------------------------------------
+const PROTOCOL_VERSION = "2025-06-18";
+const SERVER_NAME = "zoobicon-mcp";
+const SERVER_VERSION = "1.0.0";
 
-async function loadUserConfig(userEmail: string): Promise<MCPConfig> {
-  const config: MCPConfig = {};
+// ── JSON-RPC types ─────────────────────────────────────────────────────────
 
-  // Try loading from integrations storage
+type JsonRpcId = string | number | null;
+
+interface JsonRpcRequest {
+  jsonrpc: "2.0";
+  id?: JsonRpcId;
+  method: string;
+  params?: unknown;
+}
+
+interface JsonRpcSuccess {
+  jsonrpc: "2.0";
+  id: JsonRpcId;
+  result: unknown;
+}
+
+interface JsonRpcError {
+  jsonrpc: "2.0";
+  id: JsonRpcId;
+  error: { code: number; message: string; data?: unknown };
+}
+
+const ERR_PARSE = -32700;
+const ERR_INVALID_REQUEST = -32600;
+const ERR_METHOD_NOT_FOUND = -32601;
+const ERR_INVALID_PARAMS = -32602;
+const ERR_SERVER = -32000;
+
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS, GET",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, Mcp-Session-Id",
+};
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+function rpcSuccess(id: JsonRpcId, result: unknown): JsonRpcSuccess {
+  return { jsonrpc: "2.0", id, result };
+}
+
+function rpcError(
+  id: JsonRpcId,
+  code: number,
+  message: string,
+  data?: unknown,
+): JsonRpcError {
+  return { jsonrpc: "2.0", id, error: { code, message, ...(data !== undefined ? { data } : {}) } };
+}
+
+function jsonResponse(body: unknown, status = 200): NextResponse {
+  return new NextResponse(JSON.stringify(body), {
+    status,
+    headers: { "Content-Type": "application/json", ...CORS_HEADERS },
+  });
+}
+
+function isJsonRpcRequest(value: unknown): value is JsonRpcRequest {
+  if (value === null || typeof value !== "object") return false;
+  const v = value as Record<string, unknown>;
+  return v.jsonrpc === "2.0" && typeof v.method === "string";
+}
+
+function checkAuth(request: NextRequest): { ok: true; warning?: string } | { ok: false; message: string } {
+  const required = process.env.MCP_BEARER_TOKEN;
+  const header = request.headers.get("authorization") || "";
+  if (!required) {
+    return { ok: true, warning: "MCP_BEARER_TOKEN not set — running in unauthenticated dev mode" };
+  }
+  if (!header.toLowerCase().startsWith("bearer ")) {
+    return { ok: false, message: "Missing Bearer token" };
+  }
+  const token = header.slice(7).trim();
+  if (token !== required) {
+    return { ok: false, message: "Invalid Bearer token" };
+  }
+  return { ok: true };
+}
+
+// ── Method handlers ────────────────────────────────────────────────────────
+
+async function handleInitialize(authWarning?: string): Promise<unknown> {
+  return {
+    protocolVersion: PROTOCOL_VERSION,
+    capabilities: { tools: {} },
+    serverInfo: { name: SERVER_NAME, version: SERVER_VERSION },
+    ...(authWarning ? { warning: authWarning } : {}),
+  };
+}
+
+async function handleToolsList(): Promise<unknown> {
+  return { tools: listMCPToolDescriptors() };
+}
+
+async function handleToolsCall(params: unknown): Promise<unknown> {
+  if (params === null || typeof params !== "object") {
+    throw { code: ERR_INVALID_PARAMS, message: "params must be an object with 'name' and 'arguments'" };
+  }
+  const p = params as Record<string, unknown>;
+  const name = p.name;
+  if (typeof name !== "string") {
+    throw { code: ERR_INVALID_PARAMS, message: "'name' must be a string" };
+  }
+  const tool = getMCPTool(name);
+  if (!tool) {
+    throw { code: ERR_INVALID_PARAMS, message: `Unknown tool: ${name}` };
+  }
+  const args = p.arguments ?? {};
   try {
-    // Use internal fetch to the integrations endpoint
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : "http://localhost:3000");
-    const res = await fetch(`${baseUrl}/api/integrations?email=${encodeURIComponent(userEmail)}`, {
-      cache: "no-store",
-    });
-    if (res.ok) {
-      const data = await res.json();
-      for (const integration of data.integrations || []) {
-        const svc = integration.service as string;
-        const cfg = integration.config as Record<string, string>;
-        if (svc === "github" && cfg.token) config.githubToken = cfg.token;
-        if (svc === "notion" && cfg.token) config.notionToken = cfg.token;
-        if (svc === "figma" && cfg.token) config.figmaToken = cfg.token;
-        if (svc === "google-sheets" && cfg.apiKey) config.googleSheetsApiKey = cfg.apiKey;
-      }
-    }
-  } catch {
-    // Integrations endpoint unavailable — fall through to env vars
+    const result = await tool.handler(args);
+    return {
+      content: [{ type: "text", text: JSON.stringify(result) }],
+      isError: false,
+    };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return {
+      content: [{ type: "text", text: JSON.stringify({ error: message }) }],
+      isError: true,
+    };
+  }
+}
+
+// ── HTTP handlers ──────────────────────────────────────────────────────────
+
+export async function OPTIONS(): Promise<NextResponse> {
+  return new NextResponse(null, { status: 204, headers: CORS_HEADERS });
+}
+
+export async function GET(): Promise<NextResponse> {
+  return jsonResponse({
+    server: { name: SERVER_NAME, version: SERVER_VERSION },
+    protocolVersion: PROTOCOL_VERSION,
+    transport: "http+jsonrpc",
+    endpoint: "/api/mcp",
+    toolCount: MCP_TOOLS.length,
+    tools: MCP_TOOLS.map((t) => t.name),
+    authRequired: Boolean(process.env.MCP_BEARER_TOKEN),
+  });
+}
+
+export async function POST(request: NextRequest): Promise<NextResponse> {
+  const auth = checkAuth(request);
+  if (!auth.ok) {
+    return jsonResponse(rpcError(null, ERR_INVALID_REQUEST, auth.message), 401);
   }
 
-  // Fallback: use environment variables if no user-specific tokens
-  if (!config.githubToken && process.env.GITHUB_TOKEN) config.githubToken = process.env.GITHUB_TOKEN;
-  if (!config.notionToken && process.env.NOTION_TOKEN) config.notionToken = process.env.NOTION_TOKEN;
-  if (!config.figmaToken && process.env.FIGMA_TOKEN) config.figmaToken = process.env.FIGMA_TOKEN;
-  if (!config.googleSheetsApiKey && process.env.GOOGLE_SHEETS_API_KEY) config.googleSheetsApiKey = process.env.GOOGLE_SHEETS_API_KEY;
-
-  return config;
-}
-
-// ---------------------------------------------------------------------------
-// GET /api/mcp — List available MCP tools and connection status
-// ---------------------------------------------------------------------------
-
-export async function GET(request: NextRequest) {
-  const userEmail = request.nextUrl.searchParams.get("email") || "";
-  const config = await loadUserConfig(userEmail);
-  const ctx = createMCPContext(config);
-  const connected = getConnectedProviders(config);
-
-  const tools = ctx.tools.map((t) => ({
-    name: t.name,
-    description: t.description,
-    provider: t.provider,
-    parameters: t.parameters,
-    connected: connected[t.provider] ?? false,
-  }));
-
-  return NextResponse.json({ tools });
-}
-
-// ---------------------------------------------------------------------------
-// POST /api/mcp — Execute an MCP tool call
-// Body: { tool: string, params: Record<string, unknown>, userEmail: string }
-// ---------------------------------------------------------------------------
-
-export async function POST(request: NextRequest) {
+  let body: unknown;
   try {
-    const body = await request.json();
-    const { tool, params, userEmail } = body;
-
-    if (!tool || typeof tool !== "string") {
-      return NextResponse.json({ error: "tool name is required" }, { status: 400 });
-    }
-    if (!params || typeof params !== "object") {
-      return NextResponse.json({ error: "params object is required" }, { status: 400 });
-    }
-
-    const config = await loadUserConfig(userEmail || "");
-    const ctx = createMCPContext(config);
-    const result = await executeMCPTool(ctx, tool, params);
-
-    return NextResponse.json({ result });
+    body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    return jsonResponse(rpcError(null, ERR_PARSE, "Invalid JSON body"), 400);
+  }
+
+  if (!isJsonRpcRequest(body)) {
+    return jsonResponse(
+      rpcError(null, ERR_INVALID_REQUEST, "Request must be a JSON-RPC 2.0 object with 'method'"),
+      400,
+    );
+  }
+
+  const id: JsonRpcId = body.id ?? null;
+  const { method, params } = body;
+
+  try {
+    let result: unknown;
+    switch (method) {
+      case "initialize":
+        result = await handleInitialize(auth.warning);
+        break;
+      case "tools/list":
+        result = await handleToolsList();
+        break;
+      case "tools/call":
+        result = await handleToolsCall(params);
+        break;
+      case "ping":
+        result = {};
+        break;
+      default:
+        return jsonResponse(
+          rpcError(id, ERR_METHOD_NOT_FOUND, `Method not found: ${method}`),
+          200,
+        );
+    }
+    return jsonResponse(rpcSuccess(id, result));
+  } catch (err) {
+    if (err && typeof err === "object" && "code" in err && "message" in err) {
+      const e = err as { code: number; message: string };
+      return jsonResponse(rpcError(id, e.code, e.message), 200);
+    }
+    const message = err instanceof Error ? err.message : String(err);
+    return jsonResponse(rpcError(id, ERR_SERVER, message), 200);
   }
 }
