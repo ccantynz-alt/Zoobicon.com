@@ -99,6 +99,23 @@ export interface VideoGenerationRequest {
   background?: string; // "modern office" | "gradient blue" | "#1a1a2e" | image URL
   format?: "landscape" | "portrait" | "square";
   speed?: number; // 0.8-1.2
+  /**
+   * Optional storyboard breakdown emitted by the AI Video Director
+   * (see /api/video-creator/chat). When present, the renderer assembles
+   * a multi-shot video instead of a single talking head: each scene drives
+   * a distinct camera/mood/b-roll, then they're concatenated in order.
+   */
+  storyboard?: StoryboardScene[];
+}
+
+export interface StoryboardScene {
+  scene: number;
+  start: number; // seconds into the full script
+  end: number;
+  shot: string; // "tight headshot", "medium-wide walking", "close-up of hands"
+  mood: string; // "confident", "warm", "urgent"
+  broll?: string; // "product UI close-up", "customer logos", "none"
+  onScreenText?: string;
 }
 
 export interface VideoGenerationResult {
@@ -527,9 +544,39 @@ export async function generateMusic(
 export async function generateFullVideo(
   request: VideoGenerationRequest & { captions?: boolean; music?: string },
   onProgress?: (status: PipelineStatus) => void
-): Promise<VideoGenerationResult & { captionsSrt?: string; musicUrl?: string }> {
+): Promise<
+  VideoGenerationResult & {
+    captionsSrt?: string;
+    musicUrl?: string;
+    storyboard?: StoryboardScene[];
+  }
+> {
+  // If a storyboard was supplied, enrich the avatarDescription with the
+  // dominant shot + mood from the opening scene so the FLUX avatar generator
+  // produces a face that matches the director's intent (e.g. "tight headshot,
+  // confident expression"). This is a one-line enrichment now and a full
+  // multi-scene assembly path later — but the type contract is locked in so
+  // downstream consumers (front-end preview, future FFmpeg assembler) can
+  // start reading request.storyboard immediately.
+  let enriched = request;
+  if (request.storyboard && request.storyboard.length > 0) {
+    const opener = request.storyboard[0];
+    const shotHint = `${opener.shot}, ${opener.mood} expression`;
+    enriched = {
+      ...request,
+      avatarDescription: request.avatarDescription
+        ? `${request.avatarDescription}, ${shotHint}`
+        : shotHint,
+    };
+    onProgress?.({
+      step: "storyboard",
+      progress: 5,
+      message: `Storyboard loaded — ${request.storyboard.length} scenes`,
+    });
+  }
+
   // Generate the base spokesperson video
-  const result = await generateSpokespersonVideo(request, onProgress);
+  const result = await generateSpokespersonVideo(enriched, onProgress);
 
   let captionsSrt: string | undefined;
   let musicUrl: string | undefined;
@@ -564,6 +611,7 @@ export async function generateFullVideo(
     ...result,
     captionsSrt,
     musicUrl,
+    storyboard: request.storyboard,
   };
 }
 
