@@ -25,6 +25,7 @@ import {
   FileText,
   TrendingUp,
   Lock,
+  MapPin,
 } from "lucide-react";
 
 const fadeInUp = {
@@ -70,6 +71,21 @@ const AGENCY_TOOLS = [
     stat: "Autonomous",
     icon: TrendingUp,
   },
+];
+
+const FEATURED_AGENCIES = [
+  { name: "Northwind Studio", location: "Auckland, NZ", clients: 42, sites: 318, focus: "E-commerce & DTC brands", initials: "NW", gradient: "from-cyan-500 to-blue-600" },
+  { name: "Kessler & Vale", location: "London, UK", clients: 67, sites: 540, focus: "Hospitality & restaurants", initials: "KV", gradient: "from-purple-500 to-pink-600" },
+  { name: "Halcyon Digital", location: "Sydney, AU", clients: 88, sites: 712, focus: "Real estate & property", initials: "HD", gradient: "from-amber-500 to-orange-600" },
+  { name: "Brightline Co.", location: "Austin, TX", clients: 35, sites: 260, focus: "SaaS & B2B startups", initials: "BL", gradient: "from-emerald-500 to-teal-600" },
+  { name: "Meridian Works", location: "Toronto, CA", clients: 51, sites: 410, focus: "Local services & trades", initials: "MW", gradient: "from-rose-500 to-red-600" },
+  { name: "Studio Otto", location: "Berlin, DE", clients: 29, sites: 187, focus: "Fashion & lifestyle", initials: "SO", gradient: "from-indigo-500 to-violet-600" },
+  { name: "Pacific Lane", location: "Honolulu, HI", clients: 24, sites: 156, focus: "Tourism & travel", initials: "PL", gradient: "from-sky-500 to-cyan-600" },
+  { name: "Forge & Field", location: "Melbourne, AU", clients: 73, sites: 590, focus: "Agriculture & food", initials: "FF", gradient: "from-lime-500 to-green-600" },
+  { name: "Atlas Outpost", location: "Denver, CO", clients: 46, sites: 372, focus: "Outdoor & adventure", initials: "AO", gradient: "from-orange-500 to-red-600" },
+  { name: "Nimbus & Co", location: "Dublin, IE", clients: 38, sites: 295, focus: "Professional services", initials: "NC", gradient: "from-fuchsia-500 to-purple-600" },
+  { name: "Ironwood Labs", location: "Singapore", clients: 92, sites: 845, focus: "Fintech & crypto", initials: "IL", gradient: "from-yellow-500 to-amber-600" },
+  { name: "Cascade Creative", location: "Vancouver, CA", clients: 58, sites: 463, focus: "Healthcare & wellness", initials: "CC", gradient: "from-teal-500 to-emerald-600" },
 ];
 
 const TESTIMONIALS = [
@@ -153,6 +169,7 @@ export default function AgenciesPage() {
             <div className="hidden md:flex items-center gap-4">
               <a href="#white-label" className="text-sm text-white/60 hover:text-white transition-colors">White Label</a>
               <a href="#tools" className="text-sm text-white/60 hover:text-white transition-colors">Tools</a>
+              <a href="#agencies" className="text-sm text-white/60 hover:text-white transition-colors">Agencies</a>
               <a href="#pricing" className="text-sm text-white/60 hover:text-white transition-colors">Pricing</a>
             </div>
           </div>
@@ -274,6 +291,68 @@ export default function AgenciesPage() {
                 </motion.div>
               ))}
             </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Featured Agencies */}
+      <section id="agencies" className="py-20 border-t border-white/[0.08]">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
+            <motion.div variants={fadeInUp} className="text-center mb-12">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-cyan/20 bg-accent-cyan/5 mb-6">
+                <Building2 className="w-3 h-3 text-accent-cyan" />
+                <span className="text-xs font-medium text-accent-cyan">Powered by Zoobicon</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
+                Featured <span className="gradient-text">Agencies</span>
+              </h2>
+              <p className="text-lg text-white/60 max-w-2xl mx-auto">
+                Real agencies running real businesses on Zoobicon&apos;s white-label platform.
+                From Auckland to Berlin, here&apos;s who&apos;s scaling with us.
+              </p>
+            </motion.div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {FEATURED_AGENCIES.map((a, i) => (
+                <motion.div key={i} variants={fadeInUp} className="gradient-border card-hover p-6 rounded-xl group">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${a.gradient} flex items-center justify-center text-white font-black text-sm shadow-lg`}>
+                      {a.initials}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-base font-bold truncate">{a.name}</div>
+                      <div className="flex items-center gap-1 text-xs text-white/60">
+                        <MapPin className="w-3 h-3" />
+                        <span className="truncate">{a.location}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-sm text-white/60 mb-4">{a.focus}</p>
+                  <div className="flex items-center justify-between pt-4 border-t border-white/[0.06]">
+                    <div>
+                      <div className="text-lg font-black gradient-text-static">{a.clients}</div>
+                      <div className="text-[10px] uppercase tracking-wide text-white/40">Clients</div>
+                    </div>
+                    <div>
+                      <div className="text-lg font-black gradient-text-static">{a.sites}</div>
+                      <div className="text-[10px] uppercase tracking-wide text-white/40">Sites Built</div>
+                    </div>
+                    <div>
+                      <div className="text-lg font-black gradient-text-static">5.0</div>
+                      <div className="text-[10px] uppercase tracking-wide text-white/40">Rating</div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            <motion.div variants={fadeInUp} className="mt-10 text-center">
+              <a href="mailto:partners@zoobicon.com?subject=List my agency on Zoobicon" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white border border-white/[0.12] hover:border-white/25 transition-all">
+                <UserPlus className="w-4 h-4" />
+                <span>List your agency</span>
+              </a>
+            </motion.div>
           </motion.div>
         </div>
       </section>
