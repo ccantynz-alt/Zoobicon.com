@@ -137,18 +137,17 @@ function loadVapidPrivateKey(b64urlPriv: string, b64urlPub: string) {
 
 function signVapidJwt(audience: string): string {
   const { publicKey, privateKey, subject } = requireEnv();
-  void publicKey;
   const header = { typ: "JWT", alg: "ES256" };
   const exp = Math.floor(Date.now() / 1000) + 12 * 60 * 60;
   const payload = { aud: audience, exp, sub: subject };
   const headerB64 = b64urlEncode(Buffer.from(JSON.stringify(header)));
   const payloadB64 = b64urlEncode(Buffer.from(JSON.stringify(payload)));
   const signingInput = `${headerB64}.${payloadB64}`;
-  const pem = privateKeyToPem(privateKey);
+  const keyObj = loadVapidPrivateKey(privateKey, publicKey);
   const signer = createSign("SHA256");
   signer.update(signingInput);
   signer.end();
-  const der = signer.sign(pem);
+  const der = signer.sign(keyObj);
   const jose = derToJoseEcdsa(der);
   return `${signingInput}.${b64urlEncode(jose)}`;
 }
@@ -323,5 +322,3 @@ export async function broadcastPush(message: PushMessage): Promise<{
   return { sent, failed };
 }
 
-// Reference unused import to keep tree-shaker honest if needed elsewhere.
-void createHash;
