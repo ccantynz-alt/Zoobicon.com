@@ -1,100 +1,76 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
-  createProject,
-  executeSQL,
-  generateClientCode,
-  isSupabaseConfigured,
-} from "@/lib/supabase-provision";
+  isConfigured,
+  provisionFullStack,
+  type SchemaSpec,
+  type AuthProvider,
+  type ProvisionerError,
+} from "@/lib/supabase-provisioner";
 
-/**
- * POST /api/supabase/provision
- *
- * Auto-provisions a Supabase project for a generated app:
- *   1. Creates a new isolated Supabase project
- *   2. Runs the SQL schema against it
- *   3. Returns client code ready to inject into the generated app
- *
- * This is Lovable's moat — we now match it.
- *
- * Body: { appName: string, schemaSQL?: string, region?: string }
- * Returns: { project, clientCode, envVars }
- */
-export async function POST(req: NextRequest) {
-  try {
-    if (!isSupabaseConfigured()) {
-      return NextResponse.json(
-        {
-          error: "Supabase integration not configured",
-          hint: "Admin must set SUPABASE_ACCESS_TOKEN and SUPABASE_ORG_ID in Vercel env vars.",
-        },
-        { status: 503 }
-      );
-    }
+export const runtime = "nodejs";
 
-    const body = await req.json();
-    const { appName, schemaSQL, region } = body;
-
-    if (!appName || typeof appName !== "string") {
-      return NextResponse.json(
-        { error: "appName is required" },
-        { status: 400 }
-      );
-    }
-
-    // Step 1: Create isolated Supabase project
-    const project = await createProject(appName, region || "us-east-1");
-
-    // Step 2: Run schema SQL if provided
-    if (schemaSQL && typeof schemaSQL === "string") {
-      try {
-        await executeSQL(project.id, schemaSQL);
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : "Schema execution failed";
-        // Project created but schema failed — return partial success
-        return NextResponse.json(
-          {
-            project,
-            warning: `Project created but schema failed: ${msg}`,
-            envVars: {
-              NEXT_PUBLIC_SUPABASE_URL: project.projectUrl,
-              NEXT_PUBLIC_SUPABASE_ANON_KEY: project.anonKey,
-            },
-          },
-          { status: 207 }
-        );
-      }
-    }
-
-    // Step 3: Generate ready-to-inject client code
-    const clientCode = generateClientCode(project.projectUrl, project.anonKey);
-
-    return NextResponse.json({
-      project: {
-        id: project.id,
-        name: project.name,
-        projectUrl: project.projectUrl,
-        region: project.region,
-      },
-      clientCode,
-      envVars: {
-        NEXT_PUBLIC_SUPABASE_URL: project.projectUrl,
-        NEXT_PUBLIC_SUPABASE_ANON_KEY: project.anonKey,
-      },
-      message: "Supabase project provisioned. Client code ready to inject.",
-    });
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Provisioning failed";
-    console.error("[supabase/provision] error:", message);
-    return NextResponse.json({ error: message }, { status: 500 });
-  }
+interface ProvisionBody {
+  name?: unknown;
+  region?: unknown;
+  schema?: unknown;
+  auth?: unknown;
+  buckets?: unknown;
 }
 
-/**
- * GET /api/supabase/provision
- * Returns whether Supabase integration is available.
- */
-export async function GET() {
-  return NextResponse.json({
-    configured: isSupabaseConfigured(),
-  });
+export async function POST(req: NextRequest): Promise<NextResponse> {
+  if (!isConfigured()) {
+    return NextResponse.json(
+      {
+        error: "Supabase integration not configured",
+        endpoint: "env",
+        hint: "Set SUPABASE_ACCESS_TOKEN and SUPABASE_ORG_ID in Vercel env vars.",
+      },
+      { status: 503 }
+    );
+  }
+
+  let body: ProvisionBody;
+  try {
+    body = (await req.json()) as ProvisionBody;
+  } catch {
+    return NextResponse.json(
+      { error: "Invalid JSON body", endpoint: "POST /api/supabase/provision" },
+      { status: 400 }
+    );
+  }
+
+  if (!body.name || typeof body.name !== "string") {
+    return NextResponse.json(
+      { error: "name is required (string)", endpoint: "POST /api/supabase/provision" },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const result = await provisionFullStack({
+      name: body.name,
+      region: typeof body.region === "string" ? body.region : undefined,
+      schema:
+        body.schema && typeof body.schema === "object"
+          ? (body.schema as SchemaSpec)
+          : undefined,
+      auth: Array.isArray(body.auth) ? (body.auth as AuthProvider[]) : undefined,
+      buckets: Array.isArray(body.buckets)
+        ? (body.buckets as { name: string; public?: boolean }[])
+        : undefined,
+    });
+    return NextResponse.json({ ok: true, ...result });
+  } catch (err) {
+    const e = err as ProvisionerError;
+    const status = typeof e.status === "number" && e.status >= 400 ? e.status : 500;
+    return NextResponse.json(
+      {
+        error: e.message ?? "Provisioning failed",
+        endpoint: e.endpoint ?? "unknown",
+        status: e.status ?? status,
+        body: e.body ?? null,
+      },
+      { status }
+    );
+  }
 }
