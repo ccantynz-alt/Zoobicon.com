@@ -141,30 +141,19 @@ export async function POST(req: NextRequest) {
           return null;
         });
 
+        // ── Phase 3a: Sequentially deliver raw scaffolds so the user sees
+        // the full skeleton build up (navbar → hero → features → ...) in <2s.
+        const fileNames: string[] = [];
         for (let i = 0; i < components.length; i++) {
           const comp = components[i];
-          const label = SECTION_LABELS[comp.category] || comp.category;
           const stepNumber = i + 1;
 
-          // Progress: "Generating hero section (2/9)..."
-          send({
-            type: "status",
-            message: `Generating ${label} (${stepNumber}/${totalComponents})...`,
-            phase: "building",
-            current: stepNumber,
-            total: totalComponents,
-            section: comp.category,
-          });
-
-          // Add the raw component file immediately so user sees something
           const { fileName, code } = registry.buildComponentFile(comp);
+          fileNames.push(fileName);
           files[fileName] = code;
           addedComponents.push(comp);
-
-          // Update App.tsx to include this component
           files["App.tsx"] = registry.buildAppFile(addedComponents);
 
-          // Send the partial update — preview updates in real-time
           send({
             type: "partial",
             files: { ...files },
@@ -173,55 +162,70 @@ export async function POST(req: NextRequest) {
             latestFile: fileName,
             section: comp.category,
           });
+        }
 
-          // ── AI Customization for this specific component ──
-          try {
-            const customized = await customizeComponent(
-              client,
-              comp,
-              promptTrimmed,
-              i === 0 // first component gets extra brand context
-            );
-            if (customized) {
-              files[fileName] = `import React from "react";\n\n${customized}\n`;
-              files["App.tsx"] = registry.buildAppFile(addedComponents);
+        send({
+          type: "status",
+          message: `Customizing ${totalComponents} sections in parallel...`,
+          phase: "building",
+          current: 0,
+          total: totalComponents,
+        });
 
-              send({
-                type: "partial",
-                files: { ...files },
-                fileCount: stepNumber,
-                totalComponents,
-                latestFile: fileName,
-                section: comp.category,
-                customized: true,
-              });
-            } else {
+        // ── Phase 3b: Customize ALL components in parallel. As each one
+        // resolves, patch the shared files map and emit a partial event.
+        let customizedCount = 0;
+        const customizationPromises = components.map((comp, i) => {
+          const fileName = fileNames[i];
+          const label = SECTION_LABELS[comp.category] || comp.category;
+          return customizeComponent(
+            client,
+            comp,
+            promptTrimmed,
+            i === 0
+          )
+            .then((customized) => {
+              customizedCount++;
+              if (customized) {
+                files[fileName] = `import React from "react";\n\n${customized}\n`;
+                files["App.tsx"] = registry.buildAppFile(addedComponents);
+                send({
+                  type: "partial",
+                  files: { ...files },
+                  fileCount: totalComponents,
+                  totalComponents,
+                  latestFile: fileName,
+                  section: comp.category,
+                  customized: true,
+                });
+              }
               send({
                 type: "status",
-                message: `${label} loaded with default content`,
+                message: `Customizing (${customizedCount}/${totalComponents})...`,
                 phase: "building",
-                current: stepNumber,
+                current: customizedCount,
                 total: totalComponents,
                 section: comp.category,
               });
-            }
-          } catch (err) {
-            // Component customization failed — raw scaffold still works, continue
-            const msg = err instanceof Error ? err.message : "Unknown error";
-            console.error(
-              `[react-stream] Customization failed for ${comp.category}: ${msg}`
-            );
-            send({
-              type: "status",
-              message: `${label} loaded (AI customization unavailable — using template)`,
-              phase: "building",
-              current: stepNumber,
-              total: totalComponents,
-              section: comp.category,
+            })
+            .catch((err) => {
+              customizedCount++;
+              const msg = err instanceof Error ? err.message : "Unknown error";
+              console.error(
+                `[react-stream] Customization failed for ${comp.category}: ${msg}`
+              );
+              send({
+                type: "status",
+                message: `${label} loaded (AI customization unavailable — using template) (${customizedCount}/${totalComponents})`,
+                phase: "building",
+                current: customizedCount,
+                total: totalComponents,
+                section: comp.category,
+              });
             });
-            // Continue to next component — do not abort the whole build
-          }
-        }
+        });
+
+        await Promise.allSettled(customizationPromises);
 
         // ── Phase 4: Apply brand colors (already computed in parallel) ──
         send({

@@ -21,6 +21,8 @@
  *   ZOOBICON_VIDEO_API_URL — Self-hosted endpoint (future, overrides Replicate)
  */
 
+import { assembleScenes, burnInCaptions, mixBackgroundMusic } from "./video-assembler";
+
 const REPLICATE_API = "https://api.replicate.com/v1";
 
 /**
@@ -549,6 +551,8 @@ export async function generateFullVideo(
     captionsSrt?: string;
     musicUrl?: string;
     storyboard?: StoryboardScene[];
+    finalVideoUrl?: string;
+    assembledFromScenes?: boolean;
   }
 > {
   // If a storyboard was supplied, enrich the avatarDescription with the
@@ -605,10 +609,57 @@ export async function generateFullVideo(
     }
   }
 
+  // ── Post-production: assemble scenes, burn captions, mix music ──
+  let finalVideoUrl = result.videoUrl;
+  let assembledFromScenes = false;
+
+  // (Future) Multi-scene assembly: when individual scene clips are produced,
+  // pass them through assembleScenes(). Today generateSpokespersonVideo returns
+  // one clip, so this branch is a no-op — wired for when scene rendering lands.
+  if (request.storyboard && request.storyboard.length > 1) {
+    try {
+      onProgress?.({ step: "assemble", progress: 96, message: "Assembling scenes..." });
+      const scenes = request.storyboard.map((s) => ({
+        videoUrl: result.videoUrl,
+        duration: Math.max(1, s.end - s.start),
+        sceneNumber: s.scene,
+      }));
+      // Only call assembler when there are real distinct clips (>1 unique URL).
+      const unique = new Set(scenes.map((s) => s.videoUrl));
+      if (unique.size > 1) {
+        finalVideoUrl = await assembleScenes(scenes);
+        assembledFromScenes = true;
+      }
+    } catch (err) {
+      console.warn("[video-pipeline] Scene assembly failed:", err);
+    }
+  }
+
+  if (captionsSrt) {
+    try {
+      onProgress?.({ step: "burn-captions", progress: 97, message: "Burning in captions..." });
+      finalVideoUrl = await burnInCaptions(finalVideoUrl, captionsSrt);
+    } catch (err) {
+      console.warn("[video-pipeline] Caption burn-in failed:", err);
+    }
+  }
+
+  if (musicUrl) {
+    try {
+      onProgress?.({ step: "mix-music", progress: 99, message: "Mixing background music..." });
+      finalVideoUrl = await mixBackgroundMusic(finalVideoUrl, musicUrl);
+    } catch (err) {
+      console.warn("[video-pipeline] Music mix failed:", err);
+    }
+  }
+
   onProgress?.({ step: "done", progress: 100, message: "Complete" });
 
   return {
     ...result,
+    videoUrl: finalVideoUrl,
+    finalVideoUrl,
+    assembledFromScenes,
     captionsSrt,
     musicUrl,
     storyboard: request.storyboard,
