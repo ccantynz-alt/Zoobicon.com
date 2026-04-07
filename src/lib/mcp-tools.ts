@@ -125,16 +125,31 @@ const generateSiteTool: MCPTool = {
     required: ["prompt"],
   },
   handler: async (args) => {
-    const obj = asRecord(args);
-    const prompt = asString(obj.prompt, "prompt");
-    const fullStack = asBoolOpt(obj.fullStack, "fullStack") ?? false;
-    return {
-      status: "queued",
-      jobId: newJobId("site"),
-      prompt,
-      fullStack,
-      note: "Stub — wire into real backend in next pass",
-    };
+    try {
+      const obj = asRecord(args);
+      const prompt = asString(obj.prompt, "prompt");
+      if (prompt.length > 1000) {
+        return { ok: false, error: "prompt must be 1-1000 chars" };
+      }
+      const fullStack = asBoolOpt(obj.fullStack, "fullStack") ?? false;
+      const baseUrl = getBaseUrl();
+      // Fire and forget — SSE happens client-side
+      fetch(`${baseUrl}/api/generate/react-stream`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ prompt, fullStack }),
+      }).catch(() => {});
+      return {
+        ok: true,
+        status: "started",
+        message:
+          "Generation started — connect to /api/generate/react-stream for SSE updates",
+        endpoint: "/api/generate/react-stream",
+        payload: { prompt, fullStack },
+      };
+    } catch (e) {
+      return { ok: false, error: e instanceof Error ? e.message : String(e) };
+    }
   },
 };
 
@@ -150,22 +165,43 @@ const generateVideoTool: MCPTool = {
       script: { type: "string", description: "Spoken script for the video" },
       voiceStyle: {
         type: "string",
-        description: "Optional voice style (e.g. 'energetic', 'calm', 'corporate')",
+        enum: ["professional", "warm", "energetic", "calm"],
+        description: "Optional voice style",
       },
     },
     required: ["script"],
   },
   handler: async (args) => {
-    const obj = asRecord(args);
-    const script = asString(obj.script, "script");
-    const voiceStyle = asStringOpt(obj.voiceStyle, "voiceStyle");
-    return {
-      status: "queued",
-      jobId: newJobId("video"),
-      script,
-      voiceStyle: voiceStyle ?? "default",
-      note: "Stub — wire into real backend in next pass",
-    };
+    try {
+      const obj = asRecord(args);
+      const script = asString(obj.script, "script");
+      if (script.length > 2000) {
+        return { ok: false, error: "script must be 1-2000 chars" };
+      }
+      const voiceStyle = asStringOpt(obj.voiceStyle, "voiceStyle");
+      const allowed = ["professional", "warm", "energetic", "calm"] as const;
+      if (voiceStyle && !allowed.includes(voiceStyle as typeof allowed[number])) {
+        return { ok: false, error: `voiceStyle must be one of ${allowed.join(", ")}` };
+      }
+      const mod: any = await import("@/lib/video-pipeline");
+      const fn = mod.generateFullVideo || mod.default;
+      if (typeof fn !== "function") {
+        return { ok: false, error: "video pipeline unavailable" };
+      }
+      const result = await fn({
+        script,
+        voiceStyle: (voiceStyle as any) ?? "professional",
+      });
+      return {
+        ok: true,
+        videoUrl: result?.videoUrl,
+        audioUrl: result?.audioUrl,
+        duration: result?.duration,
+        cost: result?.cost,
+      };
+    } catch (e) {
+      return { ok: false, error: e instanceof Error ? e.message : String(e) };
+    }
   },
 };
 
@@ -204,19 +240,172 @@ const deploySiteTool: MCPTool = {
   inputSchema: {
     type: "object",
     properties: {
-      siteId: { type: "string", description: "Id of the site to deploy" },
+      siteId: { type: "string", description: "Id of an existing site to deploy" },
+      files: {
+        type: "object",
+        description: "Map of filepath -> file contents (alternative to siteId)",
+      },
+      projectName: { type: "string", description: "Project name (required with files)" },
     },
-    required: ["siteId"],
   },
   handler: async (args) => {
-    const obj = asRecord(args);
-    const siteId = asString(obj.siteId, "siteId");
-    return {
-      status: "queued",
-      jobId: newJobId("deploy"),
-      siteId,
-      note: "Stub — wire into real backend in next pass",
-    };
+    try {
+      const obj = asRecord(args);
+      const siteId = asStringOpt(obj.siteId, "siteId");
+      const projectName = asStringOpt(obj.projectName, "projectName");
+      let files: Record<string, string> | undefined;
+      if (obj.files !== undefined && obj.files !== null) {
+        if (typeof obj.files !== "object") {
+          return { ok: false, error: "'files' must be an object" };
+        }
+        files = obj.files as Record<string, string>;
+      }
+
+      if (!siteId && !(files && projectName)) {
+        return {
+          ok: false,
+          error: "provide either 'siteId' or both 'files' and 'projectName'",
+        };
+      }
+
+      // Resolve siteId → files via db, if applicable
+      if (siteId && !files) {
+        try {
+          const dbMod: any = await import("@/lib/db");
+          const getSite = dbMod.getSite || dbMod.getSiteById;
+          if (typeof getSite === "function") {
+            const site = await getSite(siteId);
+            if (site?.files) files = site.files;
+            if (site?.name && !projectName) {
+              (obj as any).projectName = site.name;
+            }
+          }
+        } catch {
+          // db unavailable — fall through to hosting deploy
+        }
+      }
+
+      // Try Vercel deploy module first
+      try {
+        const vercelMod: any = await import("@/lib/vercel-deploy");
+        const deployFn =
+          vercelMod.deployToVercel || vercelMod.deploy || vercelMod.default;
+        if (typeof deployFn === "function") {
+          const result = await deployFn({
+            siteId,
+            files,
+            projectName: projectName || (obj as any).projectName,
+          });
+          return {
+            ok: true,
+            url: result?.url,
+            deploymentId: result?.deploymentId || result?.id,
+          };
+        }
+      } catch {
+        // module not present yet — fall through
+      }
+
+      // Fallback: zoobicon.sh hosting deploy
+      const baseUrl = getBaseUrl();
+      const res = await fetch(`${baseUrl}/api/hosting/deploy`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ siteId, files, projectName }),
+      });
+      if (!res.ok) {
+        return { ok: false, error: `deploy failed: ${res.status} ${res.statusText}` };
+      }
+      const data = await res.json();
+      return {
+        ok: true,
+        url: data?.url,
+        deploymentId: data?.deploymentId || data?.id || data?.slug,
+      };
+    } catch (e) {
+      return { ok: false, error: e instanceof Error ? e.message : String(e) };
+    }
+  },
+};
+
+// ── Tool: zoobicon.transcribe_audio ───────────────────────────────────────
+
+const transcribeAudioTool: MCPTool = {
+  name: "zoobicon.transcribe_audio",
+  description: "Transcribe an audio file URL to text via Deepgram.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      audioUrl: { type: "string", description: "Public URL of the audio file" },
+    },
+    required: ["audioUrl"],
+  },
+  handler: async (args) => {
+    try {
+      const obj = asRecord(args);
+      const audioUrl = asString(obj.audioUrl, "audioUrl");
+      const mod: any = await import("@/lib/deepgram");
+      const fn = mod.transcribeAudio || mod.default;
+      if (typeof fn !== "function") {
+        return { ok: false, error: "deepgram transcribeAudio not available" };
+      }
+      const result = await fn(audioUrl);
+      return {
+        ok: true,
+        text: result?.text ?? result?.transcript ?? "",
+        confidence: result?.confidence ?? null,
+      };
+    } catch (e) {
+      return { ok: false, error: e instanceof Error ? e.message : String(e) };
+    }
+  },
+};
+
+// ── Tool: zoobicon.generate_image ─────────────────────────────────────────
+
+const generateImageTool: MCPTool = {
+  name: "zoobicon.generate_image",
+  description: "Generate AI images via the Zoobicon image generation pipeline.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      prompt: { type: "string", description: "Image description" },
+      style: { type: "string", description: "Optional style hint" },
+      numImages: { type: "number", description: "Number of images to generate" },
+    },
+    required: ["prompt"],
+  },
+  handler: async (args) => {
+    try {
+      const obj = asRecord(args);
+      const prompt = asString(obj.prompt, "prompt");
+      const style = asStringOpt(obj.style, "style");
+      const numImages =
+        typeof obj.numImages === "number" ? obj.numImages : undefined;
+      try {
+        const mod: any = await import("@/lib/image-gen");
+        const fn = mod.generateImage || mod.default;
+        if (typeof fn !== "function") {
+          return {
+            ok: false,
+            error: "Image generation not available — set REPLICATE_API_TOKEN",
+          };
+        }
+        const result = await fn({ prompt, style, numImages });
+        return {
+          ok: true,
+          images: result?.images ?? result?.urls ?? [],
+          cost: result?.cost ?? null,
+        };
+      } catch {
+        return {
+          ok: false,
+          error: "Image generation not available — set REPLICATE_API_TOKEN",
+        };
+      }
+    } catch (e) {
+      return { ok: false, error: e instanceof Error ? e.message : String(e) };
+    }
   },
 };
 
@@ -284,6 +473,8 @@ export const MCP_TOOLS: MCPTool[] = [
   listComponentsTool,
   deploySiteTool,
   getPricingTiersTool,
+  transcribeAudioTool,
+  generateImageTool,
 ];
 
 export function getMCPTool(name: string): MCPTool | undefined {
