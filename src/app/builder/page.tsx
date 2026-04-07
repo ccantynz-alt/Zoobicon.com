@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect, useMemo, Suspense } from "react";
+import { useState, useCallback, useRef, useEffect, useMemo, Suspense, Component, type ErrorInfo, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getGeneratorDef } from "@/lib/generator-prompts";
@@ -10,6 +10,47 @@ import type { Tier, AIModel, GenerationMode } from "@/components/PromptInput";
 import dynamic from "next/dynamic";
 
 const SandpackPreview = dynamic(() => import("@/components/SandpackPreview"), { ssr: false });
+const WebContainerPreview = dynamic(() => import("@/components/WebContainerPreview"), { ssr: false });
+
+interface WCErrorBoundaryProps {
+  onError: () => void;
+  fallback: ReactNode;
+  children: ReactNode;
+}
+interface WCErrorBoundaryState {
+  hasError: boolean;
+}
+class WebContainerErrorBoundary extends Component<WCErrorBoundaryProps, WCErrorBoundaryState> {
+  state: WCErrorBoundaryState = { hasError: false };
+  static getDerivedStateFromError(): WCErrorBoundaryState {
+    return { hasError: true };
+  }
+  componentDidCatch(_error: Error, _info: ErrorInfo): void {
+    this.props.onError();
+  }
+  render(): ReactNode {
+    if (this.state.hasError) return this.props.fallback;
+    return this.props.children;
+  }
+}
+
+interface PreviewSwitcherProps {
+  useWebContainers: boolean;
+  onWebContainersFail: () => void;
+  files: Record<string, string>;
+  reactDeps: Record<string, string>;
+}
+function PreviewSwitcher({ useWebContainers, onWebContainersFail, files, reactDeps }: PreviewSwitcherProps): JSX.Element {
+  const sandpack = (
+    <SandpackPreview mode="react" files={files} dependencies={reactDeps} showEditor={false} />
+  );
+  if (!useWebContainers) return sandpack;
+  return (
+    <WebContainerErrorBoundary onError={onWebContainersFail} fallback={sandpack}>
+      <WebContainerPreview files={files} entry="App.tsx" />
+    </WebContainerErrorBoundary>
+  );
+}
 import CodePanel from "@/components/CodePanel";
 import ChatPanel from "@/components/ChatPanel";
 import StatusBar from "@/components/StatusBar";
