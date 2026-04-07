@@ -161,22 +161,43 @@ function scoreComponent(component: RegistryComponent, promptLower: string): numb
  * Returns an ordered list of components: navbar → hero → features → about → testimonials → stats → faq → cta → footer
  */
 export function selectComponentsForPrompt(prompt: string): RegistryComponent[] {
-  const sectionOrder: ComponentCategory[] = [
-    "navbar",
-    "hero",
-    "features",
-    "about",
-    "testimonials",
-    "stats",
-    "faq",
-    "cta",
-    "footer",
-  ];
-
-  const selected: RegistryComponent[] = [];
   const promptLower = prompt.toLowerCase();
 
-  for (const category of sectionOrder) {
+  // Industry-aware section order. Premium SaaS / startup / agency sites get a
+  // logo strip + pricing block (this is what every Lovable/Bolt/v0 output has).
+  // E-commerce gets a gallery. Restaurants/portfolios skew visual.
+  const isSaaSish = /saas|software|platform|app|startup|tool|api|developer|fintech|enterprise|b2b|marketing|agency|crypto|web3/i.test(promptLower);
+  const isEcom = /shop|store|ecommerce|product|retail|fashion|boutique|brand/i.test(promptLower);
+  const isFood = /restaurant|food|cafe|dining|bakery|catering|chef|cuisine/i.test(promptLower);
+  const isPortfolio = /portfolio|creative|designer|artist|photographer|studio/i.test(promptLower);
+  const isLanding = /landing|launch|waitlist|coming soon/i.test(promptLower);
+
+  // Slot list — "logos" is a virtual slot resolved to the logos-marquee misc component.
+  type Slot = ComponentCategory | "logos";
+  let sectionOrder: Slot[];
+  if (isSaaSish) {
+    sectionOrder = ["navbar", "hero", "logos", "features", "stats", "testimonials", "pricing", "faq", "cta", "footer"];
+  } else if (isEcom) {
+    sectionOrder = ["navbar", "hero", "ecommerce", "features", "gallery", "testimonials", "cta", "footer"];
+  } else if (isFood) {
+    sectionOrder = ["navbar", "hero", "features", "gallery", "about", "testimonials", "contact", "footer"];
+  } else if (isPortfolio) {
+    sectionOrder = ["navbar", "hero", "gallery", "about", "stats", "testimonials", "contact", "footer"];
+  } else if (isLanding) {
+    sectionOrder = ["navbar", "hero", "features", "logos", "stats", "cta", "footer"];
+  } else {
+    sectionOrder = ["navbar", "hero", "features", "about", "testimonials", "stats", "faq", "cta", "footer"];
+  }
+
+  const logoMarquee = getById("logos-marquee");
+  const selected: RegistryComponent[] = [];
+
+  for (const slot of sectionOrder) {
+    const category = slot as ComponentCategory;
+    if (slot === "logos") {
+      if (logoMarquee) selected.push(logoMarquee);
+      continue;
+    }
     const options = getByCategory(category);
     if (options.length === 0) continue;
 

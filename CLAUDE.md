@@ -3,11 +3,171 @@
 
 ---
 
+# THE BIBLE — READ THIS BEFORE EVERY SINGLE ACTION
+## Non-negotiable. Violating any rule below is grounds for reverting the change.
+## Last ratified by Craig: 2026-04-07
+
+> **MANDATE: ZOOBICON MUST RANK #1 AND ANNIHILATE EVERY COMPETITOR.**
+> Lovable, Bolt, v0, Emergent, HeyGen, Captions, Kling — none of them are safe.
+> "Comparable" = failure. "Slightly better" = failure. **80-90% ahead = the floor.**
+
+### THE 12 IRONCLAD LAWS (read every session — top to bottom — before touching any file)
+
+**LAW 1 — THE BIBLE IS LAW.**
+This file is the single source of truth. Before any build, refactor, fix, deletion, push, deploy, or architectural decision: read this top section in full. If a proposed action contradicts the bible, the bible wins. No exceptions. No "I'll check later." No "this is a small one-off." Every action must be justifiable against a written law in this file.
+
+**LAW 2 — CRAIG AUTHORIZES ALL MAJOR CHANGES.**
+The following require Craig's explicit "yes" in writing before execution:
+- Architectural pivots (changing frameworks, database, hosting, auth, payment, AI provider)
+- Removing or replacing any feature in the LIVE REPO STATUS table
+- Changing pricing, branding, copy, or domain strategy
+- Adding/removing recurring revenue streams
+- Touching production env vars, Vercel settings, DNS, Cloudflare, GitHub repo settings
+- Force-push, branch deletion, tag deletion, history rewrite of any kind
+- Adding a new third-party paid dependency or recurring SaaS bill
+- Anything that touches money, security keys, or customer data
+- Anything you can't justify with a one-liner against an existing rule
+Everything else = ship it. The default is full throttle (Law 6).
+
+**LAW 3 — MAXIMUM PARALLELISM ON EVERY BUILD.**
+Single-agent builds are forbidden when work is parallelizable.
+- If 2 non-overlapping files need changes → 2 agents in parallel.
+- If 5 non-overlapping files need changes → 5 agents in parallel.
+- If 8 → 8. If 12 → 12. The cap is the work, not the headcount.
+- Use ONE message with multiple Agent tool calls. Never serialize what can run side-by-side.
+- Each agent gets: a single file or non-overlapping fileset, a concrete spec, type-check verification before completion, and a forced report-back.
+- Never delegate "figure out what to do" — main thread does the planning, agents execute.
+- File-overlap = collision = forbidden. Two agents must NEVER edit the same file in the same wave.
+- After all agents finish, main thread does the integration tsc + commit + push.
+
+**LAW 4 — NEWEST TECHNOLOGY ONLY.**
+- React Server Components, Sandpack, shadcn/ui, latest Anthropic models, latest Replicate models — always.
+- "Old but stable" = dead. If a competitor ships a newer pattern, we adopt within 48 hours.
+- Every session check the TECHNOLOGY RADAR section. ADOPT items not implemented = critical bug.
+- No legacy fallbacks left lying around. When new technology lands, the old code is DELETED, not commented out, not feature-flagged off.
+
+**LAW 5 — $100K AGENCY QUALITY ON EVERYTHING.**
+Every component, every page, every email, every generated output must look like a $100K agency built it.
+- Animations: scroll-triggered, cursor-tracking, gradient borders, text reveals, marquees.
+- Typography: text-balance, tracking-tight, gradient text, serif accents where premium.
+- Spacing: generous, breathable, intentional. Never cramped.
+- Colors: vibrant, intentional, on-brand. Never washed-out.
+- Copy: real metrics, real names, no fluff, no buzzwords ("revolutionary", "unleash", "empower", "synergy", "next-generation", "game-changer", "leverage", "elevate" are BANNED).
+- "Static" = dead. Components must move, respond, animate, pulse.
+- Failing this standard on a single component = revert and rebuild.
+
+**LAW 6 — NEVER ASK, JUST BUILD.**
+Craig runs multiple businesses and cannot baby-sit. Default mode is FULL THROTTLE.
+- "Want me to build X?" → just build it.
+- "Should I proceed?" → just proceed.
+- "Is this worth doing?" → if it's in the build list or fixes a known issue, yes, just do it.
+- The ONLY pause-and-confirm cases are Law 2 (major changes) and irreversible destructive ops.
+- Foot on the accelerator at all times. Always shipping. Always merging to main. Always pushing.
+
+**LAW 7 — NO PATCHING. ROOT CAUSES ONLY.**
+- Every fix traces the FULL code path. Never patch a symptom.
+- If a variable is undefined: find why it was removed or never added.
+- If a build fails: find ALL errors in one pass, not one at a time.
+- If something broke twice: Claude failed. Do a full-depth audit before another fix.
+- Run `node scripts/check-icons.js && npm run build` before EVERY push. No exceptions.
+
+**LAW 8 — NEVER SHOW BLANK SCREENS.**
+Every UI failure mode shows a clear, actionable error with retry/dismiss controls.
+- "API key missing" → tell the user exactly which env var.
+- "Rate limit" → tell them how long to wait + which plan upgrades it.
+- "Auth required" → link them straight to login.
+- Watchdog timers on every long-running operation. 15s stuck → warn. 60s stuck → error.
+- Silent failure = broken product = reverted commit.
+
+**LAW 9 — REPLICATE MODELS ARE VOLATILE — 4-MODEL FALLBACK CHAIN MINIMUM.**
+- Never depend on a single Replicate model. Ever.
+- Every TTS, video, image, audio call has 4+ fallbacks.
+- When a model 404s, gracefully try the next + log a warning.
+- Quarterly model audit — replace deprecated models proactively, not after they break.
+
+**LAW 10 — CONTINUOUS GREEN BUILD. ALL FIXES GO TO MAIN.**
+- Every push to main MUST pass: icon check → lint → unit tests → build.
+- Feature branches are for genuinely new features only. Bug fixes go straight to main.
+- Fixes sitting on orphan branches while Vercel deploys main = fixes that never reach production.
+- No `--no-verify`. No `--no-edit`. No skipping CI. Ever.
+
+**LAW 11 — NEVER COMMIT SECRETS. ZERO TOLERANCE.**
+- Previous Mailgun leak caused a two-week shutdown. Never again.
+- If accidentally staged: `git reset HEAD <file>` immediately.
+- If committed: rotate the key + force-push (with Craig's explicit OK per Law 2).
+- Never `git add -A` blindly. Stage by name when there's any chance of secrets in the diff.
+
+**LAW 12 — DOCUMENT EVERYTHING IN THIS FILE.**
+- Every major decision lands in IMPORTANT DECISIONS or DECISIONS LOG.
+- Every fix lands in RECENTLY FIXED.
+- Every gap lands in KNOWN ISSUES.
+- Every session ends with CURRENT STATUS updated.
+- The next agent that starts must be able to read this file and know EXACTLY what's done, what's next, and why. Scattergun = death.
+
+---
+
+### THE PRE-BUILD CHECKLIST (run this mentally before every single action)
+
+1. **Bible re-read?** Did I just re-skim the 12 laws? (Yes / No → if no, stop and re-read.)
+2. **Craig-auth needed?** Is this a Law 2 major change? (Yes → ask. No → continue.)
+3. **Parallelizable?** Can I split this across N agents right now? (If yes → spawn them in ONE message. If no → why not?)
+4. **Latest tech?** Am I using the newest available approach, model, library? (Yes / No → if no, justify or upgrade.)
+5. **$100K quality?** Will the output look like a $100K agency made it? (Yes / No → if no, redesign before building.)
+6. **Root cause?** Am I fixing the symptom or the root cause? (Root → continue. Symptom → go deeper.)
+7. **Failure modes?** Does this surface clear errors in every failure path? (Yes / No → if no, add error handling.)
+8. **Fallback chain?** If this calls an external model/API, is there a 4-model fallback? (Yes / No → if no, add it.)
+9. **CI green?** Will `node scripts/check-icons.js && npm run build` still pass? (Yes / No → run it locally first.)
+10. **Documented?** Will I update CLAUDE.md when I'm done? (Yes / No → if no, add it to the task list now.)
+
+If any answer is "no" without a written justification, DO NOT PROCEED. Fix the gap first.
+
+---
+
+### PARALLEL AGENT PROTOCOL — MANDATORY ON EVERY MULTI-FILE BUILD
+
+When the work involves more than one file or more than one independent concern:
+
+1. **Plan first (main thread).** Identify every file that needs changes. Group them into non-overlapping buckets. Each bucket = one agent.
+2. **Spawn in ONE message.** All agent invocations must be in a single message with multiple Agent tool calls. Sequential agent spawns are forbidden when parallel is possible.
+3. **One file per agent.** Each agent gets a hard "ONLY this file/folder" rule. Cross-contamination = collision = data loss.
+4. **Concrete spec per agent.** Each prompt includes: file paths, line ranges, exact changes, constraints, verification command, report-back format.
+5. **Verification baked in.** Each agent must run `npx tsc --noEmit -p tsconfig.json 2>&1 | grep <their-file>` and report zero errors before declaring done.
+6. **Main thread integrates.** After all agents finish, main thread runs the full type-check + build, fixes any cross-file issues, then commits + pushes in one clean commit.
+7. **Minimum agent count = number of independent files.** If 5 files need work, 5 agents. Not 1 agent doing 5 things.
+8. **Cap = none.** If 12 components need upgrading, spawn 12 agents. The constraint is parallelizable work, not arbitrary headcount.
+9. **Subagent type matters.** Use `general-purpose` for code-writing tasks, `Explore` for read-only investigation, specialized agents (Plan, statusline-setup) only for their narrow purpose.
+10. **Background long-runners.** If an agent will take >2 minutes, run it in background and continue with other work. Never sleep, never poll — wait for the auto-notification.
+
+**Failure mode to avoid:** main thread doing sequential edits when it could have spawned a swarm. This is the #1 efficiency leak. Every minute spent serializing work the user could have had in parallel is a minute the competition pulls ahead.
+
+---
+
+### THE COMPETITIVE KILL LIST — UPDATE EVERY SESSION
+
+Every session, ask: **what did the competition ship in the last 48 hours, and how do we beat it within 48 more?**
+
+| Competitor | Their newest move | Our counter | Status |
+|---|---|---|---|
+| Lovable | $400M ARR, deep Supabase auto-provisioning | Match Supabase depth + add 75-product ecosystem moat | IN PROGRESS |
+| Bolt.new | 3-5s preview via WebContainers | Pre-warm Sandpack + parallel customization → <3s preview | DONE 2026-04-07 |
+| v0 | Added DB + agentic mode Feb 2026 | Beat with full-stack auto-provision + 60-component registry | IN PROGRESS |
+| Emergent | MCP integration, multi-agent | Match MCP + already have 18 agents | IN PROGRESS (Wave 2 — 2026-04-07) |
+| HeyGen | LiveAvatar, 175 languages | Own pipeline (Fish Speech 50+ langs) + storyboard renderer | IN PROGRESS |
+| Captions | AI Twins viral on TikTok | Build AI Twins on Replicate (Fish Speech voice clone) | IN PROGRESS (Wave 2 — 2026-04-07) |
+| Kling 3.0 | Native 4K 60fps | Provider-specific cinematography prompts shipped | DONE 2026-04-07 |
+
+**Rule:** every row in this table must be re-checked every session. New rows added when new threats appear. Stale rows updated within 48 hours.
+
+---
+
 > **HOW TO USE THIS FILE EVERY MORNING:**
-> 1. Read LIVE REPO STATUS below — it tells you exactly what's built, what's broken, what's next
-> 2. Open a new Claude session, paste this whole file, say:
->    *"I'm working on Zoobicon. Here is my CLAUDE.md. Continue from where I left off."*
-> 3. Claude will know everything. No explanation needed.
+> 1. Read THE BIBLE above — top to bottom, every single law.
+> 2. Read LIVE REPO STATUS below — it tells you exactly what's built, what's broken, what's next.
+> 3. Run the PRE-BUILD CHECKLIST mentally before any action.
+> 4. If multi-file: spawn parallel agents in ONE message per the PARALLEL AGENT PROTOCOL.
+> 5. Open a new Claude session, paste this whole file, say:
+>    *"I'm working on Zoobicon. Here is my CLAUDE.md. I have read the bible. Continue from where I left off."*
+> 6. Claude will know everything. No explanation needed.
 
 ---
 

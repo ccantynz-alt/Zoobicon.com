@@ -141,30 +141,19 @@ export async function POST(req: NextRequest) {
           return null;
         });
 
+        // ── Phase 3a: Sequentially deliver raw scaffolds so the user sees
+        // the full skeleton build up (navbar → hero → features → ...) in <2s.
+        const fileNames: string[] = [];
         for (let i = 0; i < components.length; i++) {
           const comp = components[i];
-          const label = SECTION_LABELS[comp.category] || comp.category;
           const stepNumber = i + 1;
 
-          // Progress: "Generating hero section (2/9)..."
-          send({
-            type: "status",
-            message: `Generating ${label} (${stepNumber}/${totalComponents})...`,
-            phase: "building",
-            current: stepNumber,
-            total: totalComponents,
-            section: comp.category,
-          });
-
-          // Add the raw component file immediately so user sees something
           const { fileName, code } = registry.buildComponentFile(comp);
+          fileNames.push(fileName);
           files[fileName] = code;
           addedComponents.push(comp);
-
-          // Update App.tsx to include this component
           files["App.tsx"] = registry.buildAppFile(addedComponents);
 
-          // Send the partial update — preview updates in real-time
           send({
             type: "partial",
             files: { ...files },
@@ -173,55 +162,70 @@ export async function POST(req: NextRequest) {
             latestFile: fileName,
             section: comp.category,
           });
+        }
 
-          // ── AI Customization for this specific component ──
-          try {
-            const customized = await customizeComponent(
-              client,
-              comp,
-              promptTrimmed,
-              i === 0 // first component gets extra brand context
-            );
-            if (customized) {
-              files[fileName] = `import React from "react";\n\n${customized}\n`;
-              files["App.tsx"] = registry.buildAppFile(addedComponents);
+        send({
+          type: "status",
+          message: `Customizing ${totalComponents} sections in parallel...`,
+          phase: "building",
+          current: 0,
+          total: totalComponents,
+        });
 
-              send({
-                type: "partial",
-                files: { ...files },
-                fileCount: stepNumber,
-                totalComponents,
-                latestFile: fileName,
-                section: comp.category,
-                customized: true,
-              });
-            } else {
+        // ── Phase 3b: Customize ALL components in parallel. As each one
+        // resolves, patch the shared files map and emit a partial event.
+        let customizedCount = 0;
+        const customizationPromises = components.map((comp, i) => {
+          const fileName = fileNames[i];
+          const label = SECTION_LABELS[comp.category] || comp.category;
+          return customizeComponent(
+            client,
+            comp,
+            promptTrimmed,
+            i === 0
+          )
+            .then((customized) => {
+              customizedCount++;
+              if (customized) {
+                files[fileName] = `import React from "react";\n\n${customized}\n`;
+                files["App.tsx"] = registry.buildAppFile(addedComponents);
+                send({
+                  type: "partial",
+                  files: { ...files },
+                  fileCount: totalComponents,
+                  totalComponents,
+                  latestFile: fileName,
+                  section: comp.category,
+                  customized: true,
+                });
+              }
               send({
                 type: "status",
-                message: `${label} loaded with default content`,
+                message: `Customizing (${customizedCount}/${totalComponents})...`,
                 phase: "building",
-                current: stepNumber,
+                current: customizedCount,
                 total: totalComponents,
                 section: comp.category,
               });
-            }
-          } catch (err) {
-            // Component customization failed — raw scaffold still works, continue
-            const msg = err instanceof Error ? err.message : "Unknown error";
-            console.error(
-              `[react-stream] Customization failed for ${comp.category}: ${msg}`
-            );
-            send({
-              type: "status",
-              message: `${label} loaded (AI customization unavailable — using template)`,
-              phase: "building",
-              current: stepNumber,
-              total: totalComponents,
-              section: comp.category,
+            })
+            .catch((err) => {
+              customizedCount++;
+              const msg = err instanceof Error ? err.message : "Unknown error";
+              console.error(
+                `[react-stream] Customization failed for ${comp.category}: ${msg}`
+              );
+              send({
+                type: "status",
+                message: `${label} loaded (AI customization unavailable — using template) (${customizedCount}/${totalComponents})`,
+                phase: "building",
+                current: customizedCount,
+                total: totalComponents,
+                section: comp.category,
+              });
             });
-            // Continue to next component — do not abort the whole build
-          }
-        }
+        });
+
+        await Promise.allSettled(customizationPromises);
 
         // ── Phase 4: Apply brand colors (already computed in parallel) ──
         send({
@@ -408,18 +412,33 @@ async function customizeComponent(
   businessPrompt: string,
   isFirstComponent: boolean
 ): Promise<string | null> {
-  const systemPrompt = `You are a website content customizer. You receive a React component with placeholder text and a business description. Your job is to replace ALL placeholder text with content specific to the business.
+  const systemPrompt = `You are a senior product designer + copywriter customizing a premium React component for a specific business. Your output must look like a $100K agency built it — not a template fill.
 
-RULES:
+OUTPUT RULES:
 - Output ONLY the updated React component code. No imports, no markdown fences, no explanation.
-- Keep the EXACT same structure, layout, className, and styling.
-- Replace placeholder text (company names, headlines, descriptions, features, testimonials, etc.) with content specific to the business.
-- Make testimonials sound real with specific metrics ("increased revenue by 40%", "saved 12 hours/week").
-- Keep icon references (lucide-react names) but you may change which icons are used to match the business.
-- Do NOT change className strings, do NOT change layout structure.
 - Do NOT add imports — the caller handles imports.
 - Keep the same default export function name.
-- Be concise. Every word should earn its place.`;
+- You MAY tighten/extend className strings to add the design upgrades below — but never break the layout's responsive grid or remove existing structural divs.
+
+COPY RULES (this is what users actually read — make it world-class):
+- Headlines: punchy, specific, benefit-led. NO marketing fluff like "revolutionary", "cutting-edge", "next-generation", "unleash", "empower". Use concrete nouns + verbs.
+- Subheads: 1 sentence, max 18 words, names a real outcome.
+- Feature copy: lead with the user benefit, not the feature name. "Ship in 30 seconds" not "Ultra-fast deployment".
+- Testimonials: specific person + role + company + quantified result ("cut onboarding from 3 weeks to 2 days", "$1.4M ARR in 90 days"). Real-sounding names, real-sounding companies.
+- CTA buttons: action verbs ("Start free", "See it live", "Book a demo"). Never "Learn more" or "Get started" alone.
+- Stats: precise numbers with context ("99.97% uptime", "47ms median response", "12,400+ teams").
+
+DESIGN UPGRADE RULES (apply where the existing className already supports it):
+- Headlines: prefer text-balance, tracking-tight, gradient text via bg-clip-text where the variant uses dark backgrounds.
+- Buttons: must include hover:scale-[1.02] active:scale-[0.98] transition-transform when they don't already.
+- Cards: must include hover:-translate-y-0.5 transition-all duration-300 when they don't already.
+- Icons: pick the MOST evocative lucide icon for the business (Sparkles, Zap, Rocket, ShieldCheck, TrendingUp, Layers, Workflow, etc.) — never generic Circle/Square.
+- Trust signals: when the component has a logo strip / metrics row / "trusted by" area, fill it with believable enterprise names + real-sounding metrics.
+
+NEVER:
+- Use lorem ipsum, "Lorem", "Acme", "Company Name", "Your Business", or any obvious placeholder.
+- Output empty href="#" without descriptive aria-label.
+- Leave any string in the original placeholder language. Every visible string must be customized for THIS business.`;
 
   const userMessage = `Business: ${businessPrompt}
 
