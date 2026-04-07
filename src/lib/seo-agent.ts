@@ -1,3 +1,225 @@
+export interface SeoAuditRequest {
+  url: string;
+  options?: {
+    checkPerformance?: boolean;
+    checkAccessibility?: boolean;
+    checkSchema?: boolean;
+    checkLinks?: boolean;
+  };
+}
+
+export interface SeoIssue {
+  severity: "critical" | "warning" | "info";
+  category: "meta" | "content" | "performance" | "accessibility" | "schema" | "links" | "mobile";
+  message: string;
+  fix: string;
+  selector?: string;
+}
+
+export interface SeoScore {
+  overall: number;
+  meta: number;
+  content: number;
+  performance: number;
+  accessibility: number;
+  schema: number;
+}
+
+export interface SeoAuditResult {
+  url: string;
+  fetchedAt: number;
+  title?: string;
+  description?: string;
+  h1Count: number;
+  wordCount: number;
+  hasStructuredData: boolean;
+  hasOpenGraph: boolean;
+  hasTwitterCard: boolean;
+  hasViewport: boolean;
+  hasFavicon: boolean;
+  hasCanonical: boolean;
+  hasSitemap: boolean;
+  hasRobotsTxt: boolean;
+  imageCount: number;
+  imagesWithoutAlt: number;
+  internalLinks: number;
+  externalLinks: number;
+  scores: SeoScore;
+  issues: SeoIssue[];
+}
+
+async function fetchWithTimeout(url: string, ms: number, method: "GET" | "HEAD" = "GET"): Promise<Response> {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), ms);
+  try {
+    return await fetch(url, {
+      method,
+      headers: { "User-Agent": "Zoobicon-SEO-Agent/1.0" },
+      signal: ctrl.signal,
+      redirect: "follow",
+    });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function countMatches(html: string, re: RegExp): number {
+  const m = html.match(re);
+  return m ? m.length : 0;
+}
+
+function extract(html: string, re: RegExp): string | undefined {
+  const m = html.match(re);
+  return m ? m[1] : undefined;
+}
+
+export async function auditSite(req: SeoAuditRequest): Promise<SeoAuditResult> {
+  const url = req.url;
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    throw new Error(`Invalid URL: ${url}`);
+  }
+
+  let html = "";
+  try {
+    const res = await fetchWithTimeout(url, 15000);
+    if (!res.ok) throw new Error(`HTTP ${res.status} fetching ${url}`);
+    html = await res.text();
+  } catch (e) {
+    throw new Error(`Failed to fetch ${url}: ${(e as Error).message}`);
+  }
+
+  const origin = parsed.origin;
+
+  const title = extract(html, /<title[^>]*>([^<]+)<\/title>/i);
+  const description = extract(html, /<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i);
+  const h1Count = countMatches(html, /<h1[\s>]/gi);
+  const textOnly = html
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ");
+  const wordCount = textOnly.split(/\s+/).filter(Boolean).length;
+
+  const hasStructuredData = /<script[^>]+type=["']application\/ld\+json["']/i.test(html);
+  const hasOpenGraph = /<meta\s+property=["']og:/i.test(html);
+  const hasTwitterCard = /<meta\s+name=["']twitter:/i.test(html);
+  const hasViewport = /<meta\s+name=["']viewport["']/i.test(html);
+  const hasFavicon = /<link[^>]+rel=["'][^"']*icon[^"']*["']/i.test(html);
+  const hasCanonical = /<link[^>]+rel=["']canonical["']/i.test(html);
+
+  const imgTags = html.match(/<img\s[^>]*>/gi) || [];
+  const imageCount = imgTags.length;
+  const imagesWithoutAlt = imgTags.filter((t) => !/\salt=/i.test(t)).length;
+
+  const aTags = html.match(/<a\s[^>]*href=["']([^"']+)["'][^>]*>/gi) || [];
+  let internalLinks = 0;
+  let externalLinks = 0;
+  for (const tag of aTags) {
+    const href = extract(tag, /href=["']([^"']+)["']/i) || "";
+    if (href.startsWith("/") || href.startsWith(origin) || href.startsWith("#")) internalLinks++;
+    else if (/^https?:\/\//i.test(href)) externalLinks++;
+    else internalLinks++;
+  }
+
+  let hasRobotsTxt = false;
+  let hasSitemap = false;
+  try {
+    const r = await fetchWithTimeout(`${origin}/robots.txt`, 5000, "HEAD");
+    hasRobotsTxt = r.ok;
+  } catch {}
+  try {
+    const r = await fetchWithTimeout(`${origin}/sitemap.xml`, 5000, "HEAD");
+    hasSitemap = r.ok;
+  } catch {}
+
+  const issues: SeoIssue[] = [];
+
+  if (!title || title.length < 30) {
+    issues.push({ severity: "critical", category: "meta", message: "Title tag missing or too short", fix: "Add a 50-60 char title tag" });
+  }
+  if (!description || description.length < 50) {
+    issues.push({ severity: "warning", category: "meta", message: "Meta description missing or too short", fix: "Add a 140-160 char meta description" });
+  }
+  if (h1Count !== 1) {
+    issues.push({ severity: "warning", category: "content", message: `Page has ${h1Count} H1 tags (expected 1)`, fix: "Use exactly one H1 per page" });
+  }
+  if (wordCount < 300) {
+    issues.push({ severity: "warning", category: "content", message: `Thin content (${wordCount} words)`, fix: "Aim for 300+ words of meaningful content" });
+  }
+  if (!hasStructuredData) {
+    issues.push({ severity: "warning", category: "schema", message: "No JSON-LD structured data", fix: "Add JSON-LD schema for rich snippets" });
+  }
+  if (!hasOpenGraph) {
+    issues.push({ severity: "warning", category: "meta", message: "Open Graph tags missing", fix: "Add Open Graph meta tags for social sharing" });
+  }
+  if (!hasTwitterCard) {
+    issues.push({ severity: "info", category: "meta", message: "Twitter Card tags missing", fix: "Add twitter:card meta tags" });
+  }
+  if (!hasViewport) {
+    issues.push({ severity: "critical", category: "mobile", message: "Mobile viewport meta tag missing", fix: 'Add <meta name="viewport" content="width=device-width, initial-scale=1">' });
+  }
+  if (!hasFavicon) {
+    issues.push({ severity: "info", category: "meta", message: "Favicon missing", fix: 'Add a <link rel="icon"> tag' });
+  }
+  if (imagesWithoutAlt > 0) {
+    issues.push({ severity: "warning", category: "accessibility", message: `${imagesWithoutAlt} images missing alt text`, fix: "Add descriptive alt attributes to all images" });
+  }
+  if (!hasCanonical) {
+    issues.push({ severity: "info", category: "meta", message: "Canonical tag missing", fix: 'Add <link rel="canonical"> to prevent duplicate content' });
+  }
+  if (!hasSitemap) {
+    issues.push({ severity: "warning", category: "meta", message: "sitemap.xml not found", fix: "Generate and serve /sitemap.xml" });
+  }
+  if (!hasRobotsTxt) {
+    issues.push({ severity: "info", category: "meta", message: "robots.txt not found", fix: "Add /robots.txt to control crawling" });
+  }
+
+  const scoreFor = (cats: SeoIssue["category"][]): number => {
+    let s = 100;
+    for (const issue of issues) {
+      if (!cats.includes(issue.category)) continue;
+      if (issue.severity === "critical") s -= 30;
+      else if (issue.severity === "warning") s -= 10;
+      else s -= 2;
+    }
+    return Math.max(0, s);
+  };
+
+  const meta = scoreFor(["meta"]);
+  const content = scoreFor(["content"]);
+  const performance = scoreFor(["performance"]);
+  const accessibility = scoreFor(["accessibility"]);
+  const schema = scoreFor(["schema"]);
+  const mobileScore = scoreFor(["mobile"]);
+  const overall = Math.round((meta + content + performance + accessibility + schema + mobileScore) / 6);
+
+  const scores: SeoScore = { overall, meta, content, performance, accessibility, schema };
+
+  return {
+    url,
+    fetchedAt: Date.now(),
+    title,
+    description,
+    h1Count,
+    wordCount,
+    hasStructuredData,
+    hasOpenGraph,
+    hasTwitterCard,
+    hasViewport,
+    hasFavicon,
+    hasCanonical,
+    hasSitemap,
+    hasRobotsTxt,
+    imageCount,
+    imagesWithoutAlt,
+    internalLinks,
+    externalLinks,
+    scores,
+    issues,
+  };
+}
 // ---------------------------------------------------------------------------
 // Autonomous SEO Agent
 //
@@ -54,7 +276,7 @@ export interface SeoAgentRun {
   durationMs: number | null;
 }
 
-export interface SeoIssue {
+export interface SeoAgentIssue {
   id: string;
   runId: string;
   category: string;
@@ -328,7 +550,7 @@ export async function getAuditHistory(siteId: string, limit = 30): Promise<SeoAg
 /**
  * Get issues for a specific run.
  */
-export async function getRunIssues(runId: string): Promise<SeoIssue[]> {
+export async function getRunIssues(runId: string): Promise<SeoAgentIssue[]> {
   const rows = await sql`
     SELECT * FROM seo_agent_issues
     WHERE run_id = ${runId}
