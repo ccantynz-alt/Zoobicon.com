@@ -2248,371 +2248,359 @@ root.render(React.createElement(App));
           </AnimatePresence>
         </div>
 
-        {/* Center panel — Preview / Code */}
-        <div className="flex-1 flex flex-col bg-[#050508]/80 backdrop-blur-sm">
-          {/* Tabs — Premium UI */}
-          <div className="flex items-center border-b border-white/[0.06] px-3 bg-[#0a0a12]/50">
-            <div className="flex items-center gap-1 mr-4">
+        {/* ── Center Panel — Preview / Code / SEO ── */}
+        <div className="flex-1 flex flex-col bg-zinc-950/40 backdrop-blur-sm min-w-0">
+          {/* Tab bar — clean, minimal */}
+          <div className="flex items-center h-10 border-b border-white/[0.06] px-2 bg-zinc-900/30">
+            <div className="flex items-center gap-0.5">
               {(["preview", "code", ...(hasCode ? ["seo"] : [])] as const).map(tab => (
                 <button
                   key={tab}
-                  className={`px-4 py-2.5 text-xs font-medium transition-all rounded-t-lg ${
+                  className={`relative px-3.5 py-2 text-[11px] font-medium transition-all ${
                     activeTab === tab
-                      ? "bg-white/[0.06] text-white border-b-2 border-violet-500"
-                      : "text-white/40 hover:text-white/60 hover:bg-white/[0.03]"
+                      ? "text-white"
+                      : "text-white/35 hover:text-white/55"
                   }`}
                   onClick={() => setActiveTab(tab as typeof activeTab)}
                 >
-                  {tab === "preview" ? "Preview" : tab === "code" ? "Code" : "SEO"}
+                  <span className="flex items-center gap-1.5">
+                    {tab === "preview" ? <Eye size={12} /> : tab === "code" ? <Code2 size={12} /> : <Search size={12} />}
+                    {tab === "preview" ? "Preview" : tab === "code" ? "Code" : "SEO"}
+                  </span>
+                  {activeTab === tab && (
+                    <motion.div
+                      layoutId="activeTab"
+                      className="absolute bottom-0 left-1 right-1 h-[2px] bg-gradient-to-r from-violet-500 to-purple-500 rounded-full"
+                      transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                    />
+                  )}
                 </button>
               ))}
             </div>
 
-            {/* Undo / Redo */}
-            {hasCode && (
-              <div className="flex items-center gap-0.5 ml-3 border-l border-white/[0.10] pl-3">
-                <button
-                  onClick={handleUndo}
-                  disabled={!canUndo}
-                  title="Undo (Ctrl+Z)"
-                  className="p-1.5 rounded text-white/50 hover:text-white/60 hover:bg-white/[0.07] transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
-                >
-                  <Undo2 size={14} />
-                </button>
-                <button
-                  onClick={handleRedo}
-                  disabled={!canRedo}
-                  title="Redo (Ctrl+Shift+Z)"
-                  className="p-1.5 rounded text-white/50 hover:text-white/60 hover:bg-white/[0.07] transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
-                >
-                  <Redo2 size={14} />
-                </button>
-                <button
-                  onClick={() => setShowDiffPanel(true)}
-                  disabled={snapshots.length < 2}
-                  title="Version History"
-                  className="p-1.5 rounded text-white/50 hover:text-white/60 hover:bg-white/[0.07] transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
-                >
-                  <History size={14} />
-                </button>
-              </div>
-            )}
-
-            {/* Deploy button */}
-            {hasCode && (
-              <div className="ml-auto flex items-center gap-2 pr-3">
-                {deployStatus === "deployed" && deployUrl && (
-                  <div className="flex items-center gap-3">
-                    <a
-                      href={deployUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
-                    >
-                      <Check size={14} />
-                      <span>Live</span>
-                      <ExternalLink size={12} />
-                    </a>
-                    {(() => {
-                      try {
-                        const u = localStorage.getItem("zoobicon_user");
-                        const parsed = u ? JSON.parse(u) : null;
-                        const isPaid = parsed?.plan === "unlimited" || parsed?.plan === "pro" || parsed?.plan === "premium" || parsed?.role === "admin";
-                        if (!isPaid) {
-                          return (
-                            <a href="/pricing" className="text-[10px] text-amber-400/60 hover:text-amber-400 transition-colors">
-                              7-day free preview — Upgrade to keep
-                            </a>
-                          );
-                        }
-                      } catch { /* ignore */ }
-                      return null;
-                    })()}
-                  </div>
-                )}
-                <button
-                  onClick={() => {
-                    if (reactFiles && Object.keys(reactFiles).length > 0) {
-                      try {
-                        localStorage.setItem("zoobicon_ide_files", JSON.stringify(reactFiles));
-                      } catch { /* quota */ }
-                    }
-                    window.open("/builder/ide", "_blank");
-                  }}
-                  title="Open full code editor"
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-white/[0.07] text-white/60 hover:text-white/60 hover:bg-white/[0.08]"
-                >
-                  <Code2 size={14} />
-                  IDE
-                </button>
-                <button
-                  onClick={() => setActiveTool(activeTool === "github-sync" ? null : "github-sync")}
-                  title="Push to GitHub"
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                    activeTool === "github-sync"
-                      ? "bg-white/10 text-white/80"
-                      : "bg-white/[0.07] text-white/60 hover:text-white/60 hover:bg-white/[0.08]"
-                  }`}
-                >
-                  <GitBranchPlus size={14} />
-                  GitHub
-                </button>
-                <button
-                  onClick={handleSaveTemplate}
-                  disabled={saveStatus === "saving"}
-                  title="Save as reusable template"
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all bg-white/[0.07] text-white/60 hover:text-white/60 hover:bg-white/[0.08]"
-                >
-                  {saveStatus === "saved" ? <Check size={14} className="text-emerald-400" /> : <Save size={14} />}
-                  {saveStatus === "saving" ? "Saving..." : saveStatus === "saved" ? "Saved" : "Save"}
-                </button>
-                <button
-                  onClick={() => setShowDeployModal(true)}
-                  disabled={isDeploying}
-                  className={`flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                    isDeploying
-                      ? "bg-amber-500/10 text-amber-400/50 cursor-wait"
-                      : "bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-400 hover:to-amber-500 shadow-lg shadow-amber-500/20"
-                  }`}
-                >
-                  <Rocket size={14} className={isDeploying ? "animate-pulse" : ""} />
-                  {isDeploying ? "Deploying..." : "Deploy"}
-                </button>
-              </div>
-            )}
-
+            {/* Error indicator in tab bar */}
             {status === "error" && !hasCode && (
-              <span className="ml-auto text-xs text-red-400 pr-3">
+              <span className="ml-auto text-[11px] text-red-400/80 truncate max-w-[300px] pr-2">
                 {error}
               </span>
             )}
           </div>
 
-          {/* Content */}
+          {/* Content area */}
           <div className="flex-1 overflow-hidden relative">
-            {status === "error" && error && !hasCode ? (
-              <div className="h-full flex items-center justify-center bg-[#050508]">
-                <div className="max-w-md text-center px-6">
-                  <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-6">
-                    <svg className="w-8 h-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
+            <AnimatePresence mode="wait">
+              {status === "error" && error && !hasCode ? (
+                /* ── Error State ── */
+                <motion.div
+                  key="error-state"
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="h-full flex items-center justify-center bg-zinc-950"
+                >
+                  <div className="max-w-md text-center px-8">
+                    <div className="w-14 h-14 rounded-2xl bg-red-500/10 border border-red-500/15 flex items-center justify-center mx-auto mb-5">
+                      <AlertTriangle className="w-7 h-7 text-red-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white/90 mb-2">Something went wrong</h3>
+                    <p className="text-white/35 text-sm mb-6 leading-relaxed">{error}</p>
+                    <button
+                      onClick={() => { setError(""); setStatus("idle"); }}
+                      className="px-6 py-2.5 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white text-sm font-semibold rounded-xl transition-all shadow-lg shadow-violet-500/20"
+                    >
+                      Try Again
+                    </button>
                   </div>
-                  <h3 className="text-lg font-semibold text-red-300 mb-2">Generation Failed</h3>
-                  <p className="text-red-200/50 text-sm mb-6 leading-relaxed">{error}</p>
-                  <button
-                    onClick={() => { setError(""); setStatus("idle"); }}
-                    className="px-6 py-2.5 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white text-sm font-semibold rounded-xl transition-all shadow-lg shadow-violet-500/20"
-                  >
-                    Try Again
-                  </button>
-                </div>
-              </div>
-            ) : status === "generating" ? (
-              <div className="h-full flex flex-col items-center justify-center bg-[#050508] relative overflow-hidden">
-                {/* Animated background */}
-                <div className="absolute inset-0 pointer-events-none">
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-violet-600/5 blur-[120px] animate-pulse" />
-                  <div className="absolute top-1/3 left-1/3 w-[400px] h-[400px] rounded-full bg-blue-600/5 blur-[100px] animate-pulse" style={{ animationDelay: "1s" }} />
-                </div>
-                <div className="relative z-10 text-center px-6">
-                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-600 to-purple-700 mx-auto mb-8 flex items-center justify-center shadow-2xl shadow-violet-500/30">
-                    <Sparkles className="w-10 h-10 text-white animate-pulse" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-3">Building your website</h3>
-                  <p className="text-white/40 text-sm mb-8 max-w-sm">AI is generating production-ready React components with TypeScript and Tailwind CSS</p>
-                  <div className="flex flex-col items-center gap-3">
-                    {pipelineAgents.slice(-3).map((msg, i) => (
-                      <div key={i} className={`flex items-center gap-2 text-xs ${i === pipelineAgents.length - 1 ? "text-violet-400" : "text-white/30"}`}>
-                        {i === pipelineAgents.slice(-3).length - 1 ? (
-                          <div className="w-2 h-2 rounded-full bg-violet-500 animate-pulse" />
-                        ) : (
-                          <Check size={12} className="text-emerald-400" />
-                        )}
-                        {msg}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ) : activeTab === "preview" && !hasCode ? (
-              <div className="h-full relative overflow-hidden bg-[#050508]">
-                {/*
-                  PRE-WARM: Mount Sandpack in the background (hidden behind the welcome screen)
-                  so the bundler, iframe, Tailwind CDN, and react-ts deps all initialize before
-                  the user submits a prompt. When real files arrive the swap is instant instead
-                  of paying a 20-30s cold start. SandpackPreview's own pre-warm path supplies a
-                  minimal placeholder app when files are empty.
-                */}
-                <div className="absolute inset-0 opacity-0 pointer-events-none" aria-hidden="true">
-                  <SandpackPreview
-                    mode="react"
-                    files={{}}
-                    dependencies={reactDeps}
-                    showEditor={false}
-                  />
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  {/* Subtle background glow */}
+                </motion.div>
+
+              ) : status === "generating" && !hasCode ? (
+                /* ── Generating State (no preview yet) ── */
+                <motion.div
+                  key="generating-state"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="h-full flex flex-col items-center justify-center bg-zinc-950 relative overflow-hidden"
+                >
+                  {/* Animated ambient background */}
                   <div className="absolute inset-0 pointer-events-none">
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-violet-600/3 blur-[150px]" />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-violet-600/[0.04] blur-[120px] animate-pulse" />
+                    <div className="absolute top-1/3 left-1/3 w-[350px] h-[350px] rounded-full bg-purple-600/[0.03] blur-[100px] animate-pulse" style={{ animationDelay: "1s" }} />
                   </div>
-                  <div className="relative z-10 text-center px-6 max-w-lg">
-                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-600/20 to-purple-700/20 border border-violet-500/10 mx-auto mb-8 flex items-center justify-center">
-                      <Sparkles className="w-10 h-10 text-violet-400/50" />
-                    </div>
-                    <h2 className="text-2xl font-bold mb-3 bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">Describe your dream website</h2>
-                    <p className="text-white/30 text-sm mb-8 leading-relaxed">
-                      Type a description in the prompt panel and click Build. Our AI will generate a complete, production-ready React application in under 60 seconds.
-                    </p>
-                    <div className="flex flex-wrap justify-center gap-2">
-                      {["SaaS Landing", "Restaurant", "Portfolio", "E-Commerce", "Agency"].map(tag => (
-                        <span key={tag} className="px-3 py-1 rounded-full bg-white/[0.04] border border-white/[0.06] text-[11px] text-white/30">{tag}</span>
-                      ))}
-                    </div>
-                    <div className="mt-6 inline-flex items-center gap-2 text-[10px] uppercase tracking-wider text-emerald-400/60">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      Sandbox pre-warmed · instant preview ready
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : activeTab === "preview" ? (
-              <div ref={previewContainerRef} className="relative h-full">
-                <PreviewSwitcher
-                  useWebContainers={useWebContainers}
-                  onWebContainersFail={handleWebContainersFail}
-                  files={reactFiles || {}}
-                  reactDeps={reactDeps}
-                />
-                {isAdmin && (
-                  <button
-                    type="button"
-                    onClick={() => setUseWebContainers((v) => !v)}
-                    className="absolute top-2 right-2 z-50 px-2 py-1 text-[10px] rounded bg-black/70 text-white border border-white/20"
-                  >
-                    Preview: {useWebContainers ? "WebContainers" : "Sandpack"}
-                  </button>
-                )}
-                {collab.isConnected && (
-                  <CursorOverlay
-                    participants={collab.participants}
-                    containerRect={previewRect}
-                  />
-                )}
-                {status === "generating" && pipelineAgents.length > 0 && (
-                  <div className="absolute bottom-4 left-4 right-4 z-30 pointer-events-none">
-                    <div className="max-w-lg mx-auto px-4 py-3 rounded-xl bg-black/70 backdrop-blur-xl border border-white/[0.08] shadow-2xl pointer-events-auto">
-                      <div className="flex items-center gap-3 mb-1.5">
-                        <div className="w-2 h-2 rounded-full bg-violet-500 animate-pulse flex-shrink-0" />
-                        <span className="text-xs text-white/80 font-medium truncate">
-                          {pipelineAgents[pipelineAgents.length - 1]}
-                        </span>
-                        {buildProgress && buildProgress.total > 0 && (
-                          <span className="text-[10px] text-white/40 ml-auto flex-shrink-0 tabular-nums">
-                            {buildProgress.current}/{buildProgress.total}
-                          </span>
-                        )}
+
+                  <div className="relative z-10 text-center px-6">
+                    {/* Spinning gradient ring */}
+                    <div className="relative w-20 h-20 mx-auto mb-8">
+                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-violet-600 to-purple-700 animate-pulse shadow-2xl shadow-violet-500/30" />
+                      <div className="absolute inset-[3px] rounded-[13px] bg-zinc-950 flex items-center justify-center">
+                        <Loader2 className="w-8 h-8 text-violet-400 animate-spin" />
                       </div>
-                      {buildProgress && buildProgress.total > 0 && (
-                        <div className="w-full h-1 rounded-full bg-white/10 overflow-hidden mb-2">
-                          <div
-                            className="h-full rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 transition-all duration-500 ease-out"
-                            style={{ width: `${Math.round((buildProgress.current / buildProgress.total) * 100)}%` }}
+                      <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-violet-500/20 via-transparent to-purple-500/20 animate-spin" style={{ animationDuration: "3s" }} />
+                    </div>
+
+                    <h3 className="text-xl font-semibold text-white/90 mb-2">Building your website</h3>
+                    <p className="text-white/30 text-sm mb-8 max-w-sm">Generating production-ready React components</p>
+
+                    {/* Pipeline status messages */}
+                    <div className="flex flex-col items-center gap-2.5">
+                      {pipelineAgents.slice(-4).map((msg, i) => {
+                        const isLatest = i === pipelineAgents.slice(-4).length - 1;
+                        return (
+                          <motion.div
+                            key={`${i}-${msg}`}
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className={`flex items-center gap-2 text-xs ${isLatest ? "text-violet-400" : "text-white/25"}`}
+                          >
+                            {isLatest ? (
+                              <div className="w-2 h-2 rounded-full bg-violet-500 animate-pulse flex-shrink-0" />
+                            ) : (
+                              <Check size={12} className="text-emerald-400/60 flex-shrink-0" />
+                            )}
+                            <span className="truncate max-w-[300px]">{msg}</span>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Progress bar */}
+                    {buildProgress && buildProgress.total > 0 && (
+                      <div className="mt-6 w-64 mx-auto">
+                        <div className="flex items-center justify-between text-[10px] text-white/30 mb-1.5">
+                          <span>{buildProgress.section || "Building"}</span>
+                          <span className="tabular-nums">{buildProgress.current}/{buildProgress.total}</span>
+                        </div>
+                        <div className="w-full h-1 rounded-full bg-white/[0.06] overflow-hidden">
+                          <motion.div
+                            className="h-full rounded-full bg-gradient-to-r from-violet-500 to-purple-500"
+                            initial={{ width: 0 }}
+                            animate={{ width: `${Math.round((buildProgress.current / buildProgress.total) * 100)}%` }}
+                            transition={{ duration: 0.5, ease: "easeOut" }}
                           />
                         </div>
-                      )}
-                      {streamWarning && (
-                        <div className="flex items-center gap-2 text-[10px] text-amber-400 mb-2">
-                          <AlertTriangle className="w-3 h-3" />
-                          <span>{streamWarning}</span>
-                        </div>
-                      )}
-                      {sectionTimeline.length > 0 && (
-                        <div ref={timelineScrollRef} className="max-h-32 overflow-y-auto space-y-1 pr-1">
-                          {sectionTimeline.map((s) => {
-                            const elapsed = s.finishedAt ? ((s.finishedAt - s.startedAt) / 1000).toFixed(1) : null;
-                            return (
-                              <div key={s.section} className="flex items-center gap-2 text-[10px]">
-                                {s.status === "done" ? (
-                                  <Check className="w-3 h-3 text-emerald-400 flex-shrink-0" />
-                                ) : s.status === "customizing" || s.status === "scaffolding" ? (
-                                  <span className="w-2 h-2 rounded-full bg-violet-500 animate-pulse flex-shrink-0" />
-                                ) : (
-                                  <span className="w-2 h-2 rounded-full bg-white/30 flex-shrink-0" />
-                                )}
-                                <span className={s.status === "done" ? "text-white/60" : "text-white/90"}>{s.label}</span>
-                                {elapsed && <span className="text-white/30 ml-auto tabular-nums">{elapsed}s</span>}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
-                )}
-                {buildError && (
-                  <div className="absolute top-4 left-4 right-4 z-40">
-                    <div className="max-w-2xl mx-auto px-4 py-3 rounded-xl bg-red-950/90 backdrop-blur-xl border border-red-500/40 shadow-2xl">
-                      <div className="flex items-start gap-3">
-                        <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-                        <div className="flex-1 min-w-0">
-                          <div className="text-sm font-semibold text-red-200">{buildError.message}</div>
-                          <div className="text-xs text-red-300/80 mt-0.5">{buildError.suggestion}</div>
-                        </div>
-                        <button
-                          onClick={() => { setBuildError(null); handleGenerate(); }}
-                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-xs text-red-100 border border-red-500/40 transition"
-                        >
-                          <RotateCcw className="w-3 h-3" /> Retry
-                        </button>
-                        <button
-                          onClick={() => setBuildError(null)}
-                          className="p-1.5 rounded-lg hover:bg-red-500/20 text-red-300 transition"
-                          aria-label="Dismiss"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
+                </motion.div>
+
+              ) : activeTab === "preview" && !hasCode ? (
+                /* ── Welcome / Empty State ── */
+                <motion.div
+                  key="welcome-state"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="h-full relative overflow-hidden bg-zinc-950"
+                >
+                  {/* Pre-warm Sandpack in hidden layer */}
+                  <div className="absolute inset-0 opacity-0 pointer-events-none" aria-hidden="true">
+                    <SandpackPreview mode="react" files={{}} dependencies={reactDeps} showEditor={false} />
+                  </div>
+
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    {/* Subtle ambient glow */}
+                    <div className="absolute inset-0 pointer-events-none">
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-violet-600/[0.025] blur-[150px]" />
+                    </div>
+
+                    <div className="relative z-10 text-center px-6 max-w-xl">
+                      <h1 className="text-4xl sm:text-5xl font-bold mb-4 tracking-tight">
+                        <span className="bg-gradient-to-b from-white via-white/90 to-white/50 bg-clip-text text-transparent">
+                          What do you want to build?
+                        </span>
+                      </h1>
+                      <p className="text-white/30 text-sm mb-10 leading-relaxed max-w-md mx-auto">
+                        Describe your vision and our AI will generate a complete, production-ready React application.
+                      </p>
+
+                      {/* Example prompt chips */}
+                      <div className="flex flex-wrap justify-center gap-2 mb-8">
+                        {[
+                          { label: "SaaS Landing Page", icon: <Zap size={12} /> },
+                          { label: "Restaurant Website", icon: <Globe size={12} /> },
+                          { label: "Portfolio", icon: <Sparkles size={12} /> },
+                          { label: "E-Commerce Store", icon: <ShoppingCart size={12} /> },
+                          { label: "Agency Site", icon: <Users size={12} /> },
+                          { label: "Blog", icon: <FileText size={12} /> },
+                        ].map(chip => (
+                          <button
+                            key={chip.label}
+                            onClick={() => setPrompt(chip.label.toLowerCase())}
+                            className="group flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06] text-[11px] text-white/35 hover:text-white/60 hover:bg-white/[0.06] hover:border-white/[0.10] transition-all"
+                          >
+                            <span className="text-white/20 group-hover:text-violet-400 transition-colors">{chip.icon}</span>
+                            {chip.label}
+                            <ChevronRight size={10} className="text-white/15 group-hover:text-white/30 transition-colors" />
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Pre-warm indicator */}
+                      <div className="inline-flex items-center gap-2 text-[10px] text-white/20">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400/60 animate-pulse" />
+                        Sandbox ready
                       </div>
                     </div>
                   </div>
-                )}
-              </div>
-            ) : activeTab === "seo" ? (
-              <SeoPreview html={generatedCode} />
-            ) : (
-              <CodePanel html={generatedCode} reactSource={reactSource} />
-            )}
+                </motion.div>
+
+              ) : activeTab === "preview" ? (
+                /* ── Live Preview ── */
+                <div ref={previewContainerRef} className="relative h-full bg-zinc-950">
+                  <PreviewSwitcher
+                    useWebContainers={useWebContainers}
+                    onWebContainersFail={handleWebContainersFail}
+                    files={reactFiles || {}}
+                    reactDeps={reactDeps}
+                  />
+                  {isAdmin && (
+                    <button
+                      type="button"
+                      onClick={() => setUseWebContainers((v) => !v)}
+                      className="absolute top-2 right-2 z-50 px-2 py-1 text-[10px] rounded-md bg-zinc-900/90 backdrop-blur-sm text-white/60 border border-white/[0.08] hover:bg-zinc-800/90 transition-colors"
+                    >
+                      {useWebContainers ? "WebContainers" : "Sandpack"}
+                    </button>
+                  )}
+                  {collab.isConnected && (
+                    <CursorOverlay participants={collab.participants} containerRect={previewRect} />
+                  )}
+
+                  {/* Build progress overlay on preview */}
+                  {status === "generating" && pipelineAgents.length > 0 && (
+                    <div className="absolute bottom-4 left-4 right-4 z-30 pointer-events-none">
+                      <div className="max-w-lg mx-auto px-4 py-3 rounded-2xl bg-zinc-950/80 backdrop-blur-2xl border border-white/[0.06] shadow-2xl shadow-black/40 pointer-events-auto">
+                        <div className="flex items-center gap-3 mb-1.5">
+                          <Loader2 className="w-3.5 h-3.5 text-violet-400 animate-spin flex-shrink-0" />
+                          <span className="text-xs text-white/70 font-medium truncate">
+                            {pipelineAgents[pipelineAgents.length - 1]}
+                          </span>
+                          {buildProgress && buildProgress.total > 0 && (
+                            <span className="text-[10px] text-white/30 ml-auto flex-shrink-0 tabular-nums">
+                              {buildProgress.current}/{buildProgress.total}
+                            </span>
+                          )}
+                        </div>
+                        {buildProgress && buildProgress.total > 0 && (
+                          <div className="w-full h-1 rounded-full bg-white/[0.06] overflow-hidden mb-2">
+                            <div
+                              className="h-full rounded-full bg-gradient-to-r from-violet-500 to-purple-500 transition-all duration-500 ease-out"
+                              style={{ width: `${Math.round((buildProgress.current / buildProgress.total) * 100)}%` }}
+                            />
+                          </div>
+                        )}
+                        {streamWarning && (
+                          <div className="flex items-center gap-2 text-[10px] text-amber-400 mb-2">
+                            <AlertTriangle className="w-3 h-3" />
+                            <span>{streamWarning}</span>
+                          </div>
+                        )}
+                        {sectionTimeline.length > 0 && (
+                          <div ref={timelineScrollRef} className="max-h-32 overflow-y-auto space-y-1 pr-1">
+                            {sectionTimeline.map((s) => {
+                              const elapsed = s.finishedAt ? ((s.finishedAt - s.startedAt) / 1000).toFixed(1) : null;
+                              return (
+                                <div key={s.section} className="flex items-center gap-2 text-[10px]">
+                                  {s.status === "done" ? (
+                                    <Check className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                                  ) : s.status === "customizing" || s.status === "scaffolding" ? (
+                                    <Loader2 className="w-3 h-3 text-violet-400 animate-spin flex-shrink-0" />
+                                  ) : (
+                                    <span className="w-2 h-2 rounded-full bg-white/20 flex-shrink-0" />
+                                  )}
+                                  <span className={s.status === "done" ? "text-white/40" : "text-white/70"}>{s.label}</span>
+                                  {elapsed && <span className="text-white/20 ml-auto tabular-nums">{elapsed}s</span>}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Build error banner */}
+                  <AnimatePresence>
+                    {buildError && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="absolute top-3 left-3 right-3 z-40"
+                      >
+                        <div className="max-w-2xl mx-auto px-4 py-3 rounded-xl bg-red-950/90 backdrop-blur-xl border border-red-500/30 shadow-2xl">
+                          <div className="flex items-start gap-3">
+                            <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                            <div className="flex-1 min-w-0">
+                              <div className="text-sm font-medium text-red-200">{buildError.message}</div>
+                              <div className="text-xs text-red-300/60 mt-0.5">{buildError.suggestion}</div>
+                            </div>
+                            <button
+                              onClick={() => { setBuildError(null); handleGenerate(); }}
+                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-500/15 hover:bg-red-500/25 text-xs text-red-200 border border-red-500/30 transition"
+                            >
+                              <RotateCcw className="w-3 h-3" /> Retry
+                            </button>
+                            <button
+                              onClick={() => setBuildError(null)}
+                              className="p-1 rounded-lg hover:bg-red-500/15 text-red-300/60 transition"
+                              aria-label="Dismiss"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+              ) : activeTab === "seo" ? (
+                <SeoPreview html={generatedCode} />
+              ) : (
+                <CodePanel html={generatedCode} reactSource={reactSource} />
+              )}
+            </AnimatePresence>
           </div>
         </div>
 
-        {/* Tool panel (slides open when a tool is active) */}
-        {activeTool && (
-          <div className="w-[380px] flex flex-col border-l border-white/[0.08] bg-[#0a0a0f]/90 backdrop-blur-sm animate-in slide-in-from-right duration-200">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.10]">
-              <span className="text-[11px] uppercase tracking-[2px] text-brand-400/50">
-                {activeToolLabel}
-              </span>
-              <button
-                onClick={() => setActiveTool(null)}
-                className="text-gray-500 hover:text-white transition-colors"
-              >
-                <X size={16} />
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto">{renderToolPanel()}</div>
-          </div>
-        )}
+        {/* ── Tool Panel (slides out) ── */}
+        <AnimatePresence>
+          {activeTool && (
+            <motion.div
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: 380, opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
+              transition={{ duration: 0.2, ease: "easeInOut" }}
+              className="flex flex-col border-l border-white/[0.06] bg-zinc-950/80 backdrop-blur-xl overflow-hidden"
+            >
+              <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.06] min-w-[380px]">
+                <span className="text-[11px] font-medium text-white/40">
+                  {activeToolLabel}
+                </span>
+                <button
+                  onClick={() => setActiveTool(null)}
+                  className="p-1 rounded-md text-white/30 hover:text-white/60 hover:bg-white/[0.05] transition-all"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto min-w-[380px]">{renderToolPanel()}</div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {/* Right toolbar — Tool icons */}
-        <div className="w-12 flex flex-col items-center py-2 gap-1 border-l border-white/[0.08] bg-[#0a0a0f]/90 backdrop-blur-sm">
+        {/* ── Right Toolbar — Tool Icons ── */}
+        <div className="w-11 flex flex-col items-center py-2 gap-0.5 border-l border-white/[0.06] bg-zinc-950/60 backdrop-blur-xl overflow-y-auto">
           {TOOLS.map((tool) => (
             <button
               key={tool.id}
               onClick={() => toggleTool(tool.id)}
               title={tool.label}
-              className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-150 ${
+              className={`w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-150 ${
                 activeTool === tool.id
-                  ? "bg-brand-500/20 text-brand-400 shadow-glow"
-                  : "text-gray-500 hover:text-gray-300 hover:bg-white/5"
+                  ? "bg-violet-500/15 text-violet-400"
+                  : "text-white/25 hover:text-white/50 hover:bg-white/[0.04]"
               }`}
             >
               {tool.icon}
@@ -2621,6 +2609,7 @@ root.render(React.createElement(App));
         </div>
       </div>
 
+      {/* Status bar at bottom — minimal */}
       <StatusBar status={status} pipelineStep={pipelineAgents.length > 0 ? pipelineAgents[pipelineAgents.length - 1] : undefined} />
 
       <OnboardingTooltips active={showTour} />
