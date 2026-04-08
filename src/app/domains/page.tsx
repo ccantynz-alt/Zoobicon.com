@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import {
   Search,
@@ -87,20 +87,9 @@ export default function DomainsPage() {
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [registering, setRegistering] = useState(false);
   const [userEmail, setUserEmail] = useState("");
-  const [showCheckoutForm, setShowCheckoutForm] = useState(false);
-  const [contactInfo, setContactInfo] = useState({
-    firstName: "", lastName: "", email: "", phone: "",
-    address: "", city: "", state: "", zip: "", country: "US",
-  });
-  const [generatedNames, setGeneratedNames] = useState<Array<{ name: string; tagline?: string; domains: Array<DomainResult & { checking?: boolean }> }>>([]);
-  const [genDescription, setGenDescription] = useState("");
-  const [genStyle, setGenStyle] = useState<string>("modern");
   const [generating, setGenerating] = useState(false);
-  const [checkoutError, setCheckoutError] = useState<string | null>(null);
-  const [searchError, setSearchError] = useState<string | null>(null);
-  const [pendingGenerate, setPendingGenerate] = useState(false);
-  const [autoExpandedTlds, setAutoExpandedTlds] = useState(false);
-  const [autoGenerating, setAutoGenerating] = useState(false);
+  const [genDescription, setGenDescription] = useState("");
+  const [generatedNames, setGeneratedNames] = useState<Array<{ name: string; slug: string; domains: Array<{ tld: string; available: boolean | null; checking: boolean }> }>>([]);
   const resultsRef = useRef<HTMLDivElement>(null);
   const genResultsRef = useRef<HTMLDivElement>(null);
 
