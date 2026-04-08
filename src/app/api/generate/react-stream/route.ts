@@ -22,17 +22,14 @@ import { NextRequest } from "next/server";
 import { callClaude, streamClaude } from "@/lib/anthropic-cached";
 import { runQualityLoop } from "@/lib/builder-critique";
 import { callLLMWithFailover, getAvailableProviders } from "@/lib/llm-provider";
-import {
-  REGISTRY,
-  getById,
-  getByCategory,
-  selectComponentsForPrompt,
-  buildStylesFile,
-  buildComponentFile,
-  buildAppFile,
-  type RegistryComponent,
-  type ComponentCategory,
-} from "@/lib/component-registry";
+// Component registry is imported lazily inside POST to avoid circular dependency
+// at module load time (the registry's side-effect imports cause a TDZ error in webpack).
+import type { RegistryComponent, ComponentCategory } from "@/lib/component-registry";
+
+async function getRegistry() {
+  const mod = await import("@/lib/component-registry");
+  return mod;
+}
 
 export const maxDuration = 300;
 
@@ -77,7 +74,8 @@ const MODEL_HAIKU = "claude-haiku-4-5";
 const MODEL_SONNET = "claude-sonnet-4-6";
 
 /** Build the cacheable registry catalog the planner sees. */
-function buildRegistryCatalog(): string {
+async function buildRegistryCatalog(): Promise<string> {
+  const { REGISTRY, getByCategory } = await getRegistry();
   const lines: string[] = [
     "ZOOBICON COMPONENT REGISTRY — pick the best variant per slot.",
     "",
@@ -94,7 +92,7 @@ function buildRegistryCatalog(): string {
 }
 
 let _plannerSystemCache: string | null = null;
-function getPlannerSystemCacheable(): string {
+async function getPlannerSystemCacheable(): Promise<string> {
   if (_plannerSystemCache) return _plannerSystemCache;
   _plannerSystemCache = `You are the section planner for the Zoobicon AI website builder.
 
@@ -119,7 +117,7 @@ Schema:
 }
 
 REGISTRY CATALOG:
-${buildRegistryCatalog()}`;
+${await buildRegistryCatalog()}`;
   return _plannerSystemCache;
 }
 
@@ -161,10 +159,12 @@ function inferBrandName(prompt: string): string {
 }
 
 async function planComponents(prompt: string): Promise<PlanResult> {
+  const { getById, selectComponentsForPrompt } = await getRegistry();
+
   const res = await callClaude({
     model: MODEL_HAIKU,
     system: "Return only JSON matching the schema.",
-    systemCacheable: getPlannerSystemCacheable(),
+    systemCacheable: await getPlannerSystemCacheable(),
     messages: [{ role: "user", content: `User prompt: ${prompt}` }],
     maxTokens: 1500,
     temperature: 0.4,
@@ -361,11 +361,13 @@ export async function POST(req: NextRequest): Promise<Response> {
         const { components, brandName, primaryColor, bgColor } =
           await planComponents(prompt);
 
+        const registry = await getRegistry();
+
         const files: Record<string, string> = {
           "package.json": buildPackageJson(),
           "tailwind.config.js": buildTailwindConfig(),
-          "styles.css": buildStylesFile({ primaryColor, bgColor }),
-          "App.tsx": buildAppFile([]),
+          "styles.css": registry.buildStylesFile({ primaryColor, bgColor }),
+          "App.tsx": registry.buildAppFile([]),
         };
         writer.send("files", { files });
 
@@ -397,10 +399,10 @@ export async function POST(req: NextRequest): Promise<Response> {
             updatedCode = `import React from "react";\n\n${comp.code}\n`;
           }
 
-          const { fileName } = buildComponentFile(comp);
+          const { fileName } = registry.buildComponentFile(comp);
           files[fileName] = updatedCode;
           accumulated.push(comp);
-          files["App.tsx"] = buildAppFile(accumulated);
+          files["App.tsx"] = registry.buildAppFile(accumulated);
 
           writer.send("component", {
             name: comp.id,
