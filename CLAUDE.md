@@ -101,23 +101,46 @@ If Claude is uncertain whether something requires authorization: **default to as
 ## 4. ANNIHILATION TARGETS — WHO WE ARE BEATING
 
 ### A. AI BUILDER COMPETITORS
-| Competitor | ARR/Value | Our edge |
-|---|---|---|
-| Lovable | $400M ARR, $6.6B valuation | 75+ products vs their 1. Ecosystem moat they can't replicate. |
-| Bolt.new | $40M ARR, 5M users | Our domains + email + video are things they will never build. |
-| v0 (Vercel) | 6M devs | Our backend auto-provisioning + real database generation. |
-| Emergent | $100M ARR, 6M signups | Our white-label + agency multiplier. |
+| Competitor | ARR/Value | Latest (April 2026) | Our edge | ALERT |
+|---|---|---|---|---|
+| Lovable | $400M ARR, $6.6B | **Lovable 2.0**: Plan Mode, Prompt Queue (batch 50), Browser Testing (auto QA), expanding beyond apps into data analysis + presentations + marketing | 75+ products vs their expanding-but-still-narrow platform | They're becoming a general-purpose AI work platform |
+| Bolt.new | $40M ARR, 5M users | **Bolt V2**: Plan Mode, auto-DB creation, auto-error-fixing agent, Figma import, Team Templates, Opus 4.6. Handles 1000x larger projects. Native auth + payments + SEO + storage. | Our domains + email + video. But they've CLOSED the full-stack gap with Lovable. | **CRITICAL: Bolt now has full-stack. Our speed must beat theirs.** |
+| v0 (Vercel) | 6M devs, $3.5B+ | **v0.app**: Full agentic builder now. Auto-connects DBs, web search mid-build, multi-step planning, deploys to Vercel, syncs GitHub. No longer frontend-only. | Our ecosystem breadth. But they have Vercel lock-in. | They closed the backend gap too |
+| Emergent | $100M ARR, 6M signups | **MCP integration LIVE** (Notion, GitHub, Figma). Fork Feature for session continuity. Multi-LLM switching. Google Play app. | Our white-label + agency multiplier. | **MCP is live. We have a stub. Ship it.** |
+| **Google Stitch** ⚠️ NEW | FREE (Google Labs) | Natural language → high-fidelity UI. Infinite canvas, voice-driven design critiques, multi-screen gen (5 at once), DESIGN.md export, Figma/React/HTML export. Currently FREE. | Our ecosystem (domains, hosting, email, video). Stitch is UI-only, no backend, no deploy. | **HIGH THREAT: Google distribution + FREE. Monthly comparison mandatory.** |
 
 ### B. AI VIDEO COMPETITORS
 | Competitor | ARR/Value/Users | What they do | Our edge | What to steal |
 |---|---|---|---|---|
-| **Filmora (Wondershare)** | ~$200M rev, $1.75B mkt cap, **100M users** | Desktop video editor + AI Mate copilot. Sora 2 + Veo 3.1 integration. Voice cloning with emotion control. $50/yr. | They EDIT existing footage. We GENERATE from nothing. No API, no white-label, desktop-only. | Voice cloning emotion control, AI Mate UX pattern (NL→execute), auto-captions burned in |
-| **HeyGen** | $100M+ ARR, $500M+ valuation | Avatar IV talking heads, LiveAvatar (real-time), 175 languages, $29-149/mo | Our own pipeline 10-20x cheaper. We bundle video with builder+domains+hosting. They're video-only. | Multi-language dubbing, avatar quality benchmark, instant avatar from photo |
-| **Captions app** | 10M downloads | AI Twins (viral TikTok — upload selfie, AI makes video of "you" talking), $10-70/mo | We can build AI Twins with Fish Speech + FLUX. They're mobile-only, no web, no API. | AI Twins feature (face upload → talking video), viral social distribution model |
-| **CapCut (ByteDance)** | 300M monthly users | Free video editor, Seedance 2.0 integration, auto-captions, $0-8/mo | They're an editor, not a generator. No spokesperson videos. No business ecosystem. | Auto-captions UX, template marketplace model, free tier distribution |
-| **InVideo AI** | Growing fast | Combines Sora 2 + Veo 3.1 for text-to-video, $25-100/mo | We generate spokesperson talking heads. They generate stock-footage compilations. | Text-to-full-video workflow, multi-scene storyboard assembly |
-| **Descript** | 6M users, $65M raised | Text-based video editing (edit words = edit video), Underlord AI editor, $24-65/mo | We generate videos. They edit existing ones. Different product. | Text-based editing UX (edit transcript = edit video) |
-| **Runway** | $4B valuation | Gen-4/Gen-4 Turbo video models, creative tools, $12-76/mo | We use their models via fal.ai as B-roll. They're a tool, we're a platform. | Gen-4 quality as our B-roll standard |
+| **Filmora (Wondershare)** | ~$200M rev, $1.75B mkt cap, **100M users** | Desktop editor + AI Mate copilot. Sora 2 + Veo 3.1. Voice cloning w/ emotion. $50/yr. | They EDIT, we GENERATE. No API, no white-label, desktop-only. | Voice cloning emotion control, AI Mate UX, burned-in captions |
+| **HeyGen** | $100M+ ARR, $500M+ | Avatar IV, LiveAvatar (real-time), 175 languages, $29-149/mo | Our pipeline 10-20x cheaper. We bundle with builder+domains+hosting. | Multi-language dubbing, avatar quality bar |
+| **Hedra** ⚠️ NEW | Growing fast | **Character-3: sub-100ms real-time avatars at $0.05/min** (15x cheaper than HeyGen). Up to 10-min videos. API in private beta (Node.js SDK + REST + LiveKit). | We can USE their API as our primary avatar engine. | **CRITICAL: Evaluate replacing our SadTalker chain with Hedra Character-3. $0.05/min is game-changing.** |
+| **Captions app** | 10M downloads | AI Twins (face upload → talking video). Viral TikTok. $10-70/mo. | We build AI Twins with Fish Speech + FLUX. They're mobile-only. | AI Twins feature, viral social model |
+| **CapCut (ByteDance)** | 300M MAU | Free editor + **Seedance 2.0** (4 input modalities: text/image/audio/video simultaneously, phoneme-level lip-sync 8+ languages, ~$0.05/5s clip via fal.ai). | They're an editor. No spokesperson videos. No ecosystem. | **Seedance 2.0 multi-modal input. Add to our pipeline via fal.ai.** |
+| **InVideo AI** | Growing fast | Sora 2 + Veo 3.1 text-to-video, $25-100/mo | We do spokesperson talking heads. They do stock compilations. | Multi-scene storyboard assembly |
+| **Descript** | 6M users, $65M raised | Text-based editing (edit transcript = edit video), Underlord AI, $24-65/mo | We generate, they edit. Different product. | Text-based editing UX |
+| **Runway** | $4B valuation | Gen-4 up to **60s continuous 4K**. API at $0.01/credit. Enterprise API. $12-76/mo. | We use their models via fal.ai as B-roll. | 60s 4K as our B-roll quality target |
+| ~~Sora (OpenAI)~~ | **DEAD** | ~~Shutting down April 26, 2026. App dead. API dead Sept 24.~~ Burned $15M/day, made $2.1M total. Users dropped from 1M to <500K. Disney killed $150M deal. | **POSITIVE: Major competitor exits. Their users need a new home.** | Capture displaced Sora users |
+
+### B2. AI VIDEO MODELS (what powers the pipeline)
+| Model | Provider | Status April 2026 | Cost | Notes |
+|---|---|---|---|---|
+| **Fish Audio S1** ⚠️ | Fish Audio | **#1 on TTS-Arena2, beats ElevenLabs.** 48 emotion tags, 5 tone tags, 10 special tags. | $15/M chars (80% cheaper than ElevenLabs) | **UPGRADE PATH: Same provider we use. S1 is the new model. Switch immediately.** |
+| **Hedra Character-3** ⚠️ | Hedra | Sub-100ms real-time avatars, 10-min videos, API private beta | $0.05/min (15x cheaper than alternatives) | **Evaluate as primary avatar engine** |
+| **Seedance 2.0** ⚠️ | ByteDance/fal.ai | 4-modality input, phoneme lip-sync, 8+ languages | ~$0.05/5s clip | **Add to video pipeline via fal.ai** |
+| **Wan 2.7** ⚠️ | Alibaba/Replicate | 1080p, 15s, native audio sync, first-and-last-frame control. Open source. **Already on Replicate.** | Free (open source) | **Add to B-roll chain immediately — it's on Replicate already** |
+| **Cartesia Sonic-3** | Cartesia | 90ms TTFA (4x faster), 15s voice cloning | 1/5th ElevenLabs cost | Worth adding as low-latency TTS fallback |
+| ElevenLabs v3 | ElevenLabs | 70+ languages, audio emotion tags | Premium pricing | English leader but Fish S1 now beats on quality |
+| Veo 3.1 | Google/fal.ai | Best B-roll quality | $0.20-0.40/s | Our premium B-roll tier |
+| Runway Gen-4 | Runway/fal.ai | 60s continuous 4K | $0.01/credit | Professional tier |
+| Kling 3.0 | Kuaishou/fal.ai | Native 4K 60fps, cheapest | $0.029-0.10/s | Our budget B-roll tier |
+
+### B3. KEY INTEL
+- **Sora is DEAD (April 26, 2026).** Their displaced users are looking for alternatives. We should capture them.
+- **Fish Audio S1 is now #1 TTS, beating ElevenLabs.** We already use Fish Speech. Upgrade to S1 = same provider, better model, 80% cheaper.
+- **Hedra Character-3 at $0.05/min could replace our entire lip-sync chain.** Evaluate immediately.
+- **Replicate acquired by Cloudflare (Nov 2025).** Our Replicate dependency is now MORE reliable, not less.
+- **Seedance 2.0 + Wan 2.7 are both available via fal.ai/Replicate.** Free models we should add to our pipeline TODAY.
 
 ### C. DOMAIN/HOSTING COMPETITORS
 | Competitor | ARR/Value | Our edge |
