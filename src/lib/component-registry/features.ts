@@ -57,12 +57,17 @@ registerComponent({
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((f, i) => (
-            <div key={i} className="group bg-white rounded-2xl p-8 border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-              <div className={\`w-12 h-12 rounded-xl bg-gradient-to-br \${f.gradient} flex items-center justify-center text-white mb-5 group-hover:scale-110 transition-transform\`}>
+            <div key={i} className={\`group relative bg-white rounded-2xl p-8 border border-gray-100 hover:border-gray-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden \${i === 0 ? "md:col-span-2 lg:col-span-1 ring-1 ring-indigo-100" : ""}\`}>
+              {i === 0 && <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500" />}
+              <div className={\`w-12 h-12 rounded-xl bg-gradient-to-br \${f.gradient} flex items-center justify-center text-white mb-5 group-hover:scale-110 group-hover:shadow-lg transition-all duration-300\`}>
                 {f.icon}
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">{f.title}</h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors">{f.title}</h3>
               <p className="text-gray-500 leading-relaxed text-sm">{f.desc}</p>
+              <div className="mt-5 flex items-center gap-1 text-indigo-600 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                Learn more
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="group-hover:translate-x-1 transition-transform"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+              </div>
             </div>
           ))}
         </div>

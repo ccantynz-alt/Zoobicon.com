@@ -104,26 +104,48 @@ registerComponent({
   name: "Blog Grid",
   category: "blog",
   variant: "grid",
-  description: "3-column article card grid with images",
-  tags: ["blog", "articles", "news", "posts", "content", "writing", "magazine"],
+  description: "Premium 3-column blog with featured post, author avatars, reading time, category badges, and hover animations",
+  tags: ["blog", "articles", "news", "posts", "content", "writing", "magazine", "saas", "startup", "tech"],
   code: `export default function Blog() {
   const posts = [
-    { img: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=600&h=400&fit=crop", cat: "Engineering", title: "Building Scalable Systems with Modern Architecture", excerpt: "How we redesigned our infrastructure to handle 10x traffic without breaking a sweat.", date: "Mar 15, 2026", read: "5 min" },
-    { img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop", cat: "Product", title: "Introducing Our New AI-Powered Dashboard", excerpt: "A deep dive into the features that make our latest release a game-changer for teams.", date: "Mar 12, 2026", read: "4 min" },
-    { img: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&h=400&fit=crop", cat: "Culture", title: "How We Built a Remote-First Culture That Works", excerpt: "Lessons learned from scaling a distributed team across 12 time zones.", date: "Mar 8, 2026", read: "6 min" },
+    { img: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&h=500&fit=crop", cat: "Engineering", catColor: "indigo", title: "Building Scalable Systems with Modern Architecture", excerpt: "How we redesigned our infrastructure to handle 10x traffic growth while cutting latency by 60%.", date: "Mar 15, 2026", read: "5 min", author: "Sarah Chen", role: "Staff Engineer" },
+    { img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=500&fit=crop", cat: "Product", catColor: "emerald", title: "Introducing Our New AI-Powered Dashboard", excerpt: "A deep dive into the intelligent features that help teams make better decisions, faster.", date: "Mar 12, 2026", read: "4 min", author: "Marcus Rivera", role: "Product Lead" },
+    { img: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=500&fit=crop", cat: "Culture", catColor: "amber", title: "How We Built a Remote-First Culture That Actually Works", excerpt: "Practical lessons from scaling a distributed team across 12 time zones without losing connection.", date: "Mar 8, 2026", read: "6 min", author: "Priya Sharma", role: "People Ops" },
   ];
+  const colorMap = { indigo: "text-indigo-600 bg-indigo-50", emerald: "text-emerald-600 bg-emerald-50", amber: "text-amber-600 bg-amber-50" };
   return (
     <section className="py-24 px-6 bg-white">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-4xl font-bold text-gray-900 text-center mb-4">Latest from the Blog</h2>
-        <p className="text-xl text-gray-600 text-center mb-16">Insights, updates, and stories from our team.</p>
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-16">
+          <div>
+            <p className="text-sm font-semibold text-indigo-600 uppercase tracking-widest mb-3">From the Blog</p>
+            <h2 className="text-4xl font-bold text-gray-900">Insights & updates</h2>
+          </div>
+          <a href="#" className="text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors inline-flex items-center gap-1.5 group">
+            View all articles
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="group-hover:translate-x-1 transition-transform"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+        </div>
         <div className="grid md:grid-cols-3 gap-8">
           {posts.map((p, i) => (
             <article key={i} className="group cursor-pointer">
-              <div className="overflow-hidden rounded-2xl mb-4"><img src={p.img} alt={p.title} className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105" /></div>
-              <div className="flex items-center gap-3 mb-3"><span className="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full">{p.cat}</span><span className="text-xs text-gray-400">{p.date} · {p.read} read</span></div>
-              <h3 className="text-xl font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors mb-2">{p.title}</h3>
-              <p className="text-gray-600 leading-relaxed">{p.excerpt}</p>
+              <div className="overflow-hidden rounded-2xl mb-5 relative">
+                <img src={p.img} alt={p.title} className="w-full h-56 object-cover transition-transform duration-700 group-hover:scale-110" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              </div>
+              <div className="flex items-center gap-3 mb-3">
+                <span className={\`text-xs font-semibold px-2.5 py-1 rounded-full \${colorMap[p.catColor]}\`}>{p.cat}</span>
+                <span className="text-xs text-gray-400">{p.read} read</span>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors mb-2 leading-snug">{p.title}</h3>
+              <p className="text-gray-500 leading-relaxed text-sm mb-4">{p.excerpt}</p>
+              <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center text-xs font-bold text-gray-600">{p.author.split(" ").map(n => n[0]).join("")}</div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{p.author}</p>
+                  <p className="text-xs text-gray-400">{p.role} · {p.date}</p>
+                </div>
+              </div>
             </article>
           ))}
         </div>
@@ -140,32 +162,61 @@ registerComponent({
   name: "Product Grid",
   category: "ecommerce",
   variant: "product-grid",
-  description: "Product cards with images, prices, and add to cart",
-  tags: ["ecommerce", "shop", "store", "products", "buy", "cart", "retail", "fashion"],
+  description: "Premium product cards with star ratings, reviews count, wishlist toggle, quick-add, color variants, and sale pricing",
+  tags: ["ecommerce", "shop", "store", "products", "buy", "cart", "retail", "fashion", "luxury"],
   code: `export default function Ecommerce() {
+  const [wishlist, setWishlist] = React.useState({});
   const products = [
-    { img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop", name: "Minimal Watch", price: 249, badge: "New" },
-    { img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop", name: "Pro Headphones", price: 179, badge: "Best Seller" },
-    { img: "https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=400&h=400&fit=crop", name: "Sport Sneakers", price: 129, badge: null },
-    { img: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=400&fit=crop", name: "Classic Sunglasses", price: 89, badge: "Sale" },
+    { img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&h=600&fit=crop", name: "Minimal Watch", brand: "Chronos", price: 249, origPrice: null, badge: "New", rating: 4.9, reviews: 128, colors: ["#1a1a2e", "#e2e8f0", "#92400e"] },
+    { img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=600&fit=crop", name: "Pro Headphones", brand: "SoundCraft", price: 149, origPrice: 179, badge: "Best Seller", rating: 4.8, reviews: 342, colors: ["#000", "#fff", "#dc2626"] },
+    { img: "https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=600&h=600&fit=crop", name: "Sport Sneakers", brand: "Velocity", price: 129, origPrice: null, badge: null, rating: 4.7, reviews: 89, colors: ["#1e3a5f", "#fff", "#059669"] },
+    { img: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600&h=600&fit=crop", name: "Classic Sunglasses", brand: "Optica", price: 69, origPrice: 89, badge: "Sale", rating: 4.6, reviews: 215, colors: ["#000", "#92400e", "#1e3a5f"] },
   ];
+  const badgeColors = { "New": "bg-indigo-600", "Best Seller": "bg-emerald-600", "Sale": "bg-rose-600" };
   return (
     <section className="py-24 px-6 bg-gray-50">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-4xl font-bold text-gray-900 text-center mb-4">Featured Products</h2>
-        <p className="text-xl text-gray-600 text-center mb-16">Handpicked for quality and style.</p>
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-16">
+          <div>
+            <p className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-3">Shop</p>
+            <h2 className="text-4xl font-bold text-gray-900">Featured Products</h2>
+          </div>
+          <div className="flex gap-2">
+            {["All", "New Arrivals", "Best Sellers", "Sale"].map(f => (
+              <button key={f} className={\`px-4 py-2 text-sm font-medium rounded-full transition-colors \${f === "All" ? "bg-gray-900 text-white" : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"}\`}>{f}</button>
+            ))}
+          </div>
+        </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {products.map((p, i) => (
-            <div key={i} className="group bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
-              <div className="relative overflow-hidden">
-                <img src={p.img} alt={p.name} className="w-full aspect-square object-cover transition-transform duration-500 group-hover:scale-105" />
-                {p.badge && <span className="absolute top-3 left-3 text-xs font-semibold bg-black text-white px-2.5 py-1 rounded-full">{p.badge}</span>}
+            <div key={i} className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-gray-200 hover:shadow-xl transition-all duration-300">
+              <div className="relative overflow-hidden bg-gray-100">
+                <img src={p.img} alt={p.name} className="w-full aspect-square object-cover transition-transform duration-700 group-hover:scale-110" />
+                {p.badge && <span className={\`absolute top-3 left-3 text-[11px] font-semibold text-white px-2.5 py-1 rounded-full \${badgeColors[p.badge] || "bg-gray-900"}\`}>{p.badge}</span>}
+                <button onClick={() => setWishlist(prev => ({...prev, [i]: !prev[i]}))} className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-sm hover:bg-white transition-colors">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill={wishlist[i] ? "#ef4444" : "none"} stroke={wishlist[i] ? "#ef4444" : "#6b7280"} strokeWidth="2" strokeLinecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                </button>
+                <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/50 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                  <button className="w-full py-2.5 bg-white text-gray-900 text-sm font-semibold rounded-lg hover:bg-gray-100 transition-colors">Quick Add</button>
+                </div>
               </div>
               <div className="p-5">
-                <h3 className="font-semibold text-gray-900 mb-1">{p.name}</h3>
+                <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">{p.brand}</p>
+                <h3 className="font-semibold text-gray-900 mb-2">{p.name}</h3>
+                <div className="flex items-center gap-1.5 mb-3">
+                  <div className="flex">{[...Array(5)].map((_, s) => (<svg key={s} width="14" height="14" viewBox="0 0 24 24" fill={s < Math.floor(p.rating) ? "#f59e0b" : "#e5e7eb"}><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>))}</div>
+                  <span className="text-xs font-medium text-gray-900">{p.rating}</span>
+                  <span className="text-xs text-gray-400">({p.reviews})</span>
+                </div>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="flex gap-1.5">{p.colors.map(c => (<span key={c} className="w-4 h-4 rounded-full border border-gray-200 cursor-pointer hover:scale-125 transition-transform" style={{ backgroundColor: c }} />))}</div>
+                </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-lg font-bold text-gray-900">\${p.price}</span>
-                  <button className="px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors">Add to Cart</button>
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg font-bold text-gray-900">\${p.price}</span>
+                    {p.origPrice && <span className="text-sm text-gray-400 line-through">\${p.origPrice}</span>}
+                    {p.origPrice && <span className="text-xs font-semibold text-rose-600">-{Math.round((1 - p.price / p.origPrice) * 100)}%</span>}
+                  </div>
                 </div>
               </div>
             </div>

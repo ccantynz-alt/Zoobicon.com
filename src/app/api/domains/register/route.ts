@@ -208,17 +208,45 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const requiredFields: (keyof RegistrantInfo)[] = [
-      "firstName", "lastName", "email", "phone", "address", "city", "state", "zip", "country",
-    ];
-    for (const field of requiredFields) {
-      if (!registrant[field] || String(registrant[field]).trim() === "") {
-        return NextResponse.json(
-          { error: `registrant.${field} is required.` },
-          { status: 400 }
-        );
-      }
+    // ICANN requires real contact info — reject missing/placeholder values
+    // BEFORE taking payment. Cheaper to fail fast than to refund a failed
+    // OpenSRS registration after the customer has been charged.
+    const missing: string[] = [];
+    if (!registrant.email || String(registrant.email).trim() === "") missing.push("email");
+    if (!registrant.firstName || String(registrant.firstName).trim() === "") missing.push("firstName");
+    if (!registrant.lastName || String(registrant.lastName).trim() === "") missing.push("lastName");
+    if (!registrant.phone || String(registrant.phone).trim() === "") missing.push("phone");
+    if (!registrant.address || String(registrant.address).trim() === "") missing.push("address");
+    if (!registrant.city || String(registrant.city).trim() === "") missing.push("city");
+    if (!registrant.zip || String(registrant.zip).trim() === "") missing.push("zip");
+    if (!registrant.country || String(registrant.country).trim() === "") missing.push("country");
+    if (missing.length > 0) {
+      return NextResponse.json(
+        { error: `Missing required contact info: ${missing.join(", ")}` },
+        { status: 400 }
+      );
     }
+
+    // Phone must be in ITU format (+CC.NNNNNNNNNN) with at least 7 real digits.
+    const phoneDigits = String(registrant.phone).replace(/\D/g, "");
+    if (phoneDigits.length < 7 || /^0+$/.test(phoneDigits)) {
+      return NextResponse.json(
+        { error: "Please enter a valid phone number." },
+        { status: 400 }
+      );
+    }
+
+    registrant = {
+      firstName: String(registrant.firstName).trim(),
+      lastName: String(registrant.lastName).trim(),
+      email: registrant.email,
+      phone: registrant.phone,
+      address: registrant.address,
+      city: registrant.city,
+      state: registrant.state || "NA",
+      zip: registrant.zip,
+      country: registrant.country,
+    };
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -375,10 +403,18 @@ export async function POST(req: NextRequest) {
           domains: domainLineItems.map((d) => d.domain).join(","),
           years: String(years),
           registrantEmail: registrant.email,
+          registrantFirstName: registrant.firstName,
+          registrantLastName: registrant.lastName,
+          registrantPhone: registrant.phone,
+          registrantAddress: registrant.address,
+          registrantCity: registrant.city,
+          registrantState: registrant.state,
+          registrantZip: registrant.zip,
+          registrantCountry: registrant.country,
           type: "domain_registration",
         },
-        success_url: `${appUrl}/domains?order=${orderId}&status=success`,
-        cancel_url: `${appUrl}/domains?order=${orderId}&status=cancelled`,
+        success_url: `${appUrl}/my-domains?success=true&order=${orderId}`,
+        cancel_url: `${appUrl}/domains?cancelled=true`,
       });
 
       return NextResponse.json({

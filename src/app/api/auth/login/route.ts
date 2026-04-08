@@ -22,7 +22,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, password } = await request.json();
+    const body = await request.json();
+    const email = typeof body.email === "string" ? body.email.trim() : "";
+    const password = typeof body.password === "string" ? body.password : "";
 
     if (!email || !password) {
       return Response.json({ error: "Email and password required" }, { status: 400 });
@@ -32,19 +34,29 @@ export async function POST(request: NextRequest) {
     const adminEmail = ADMIN_EMAIL;
     const adminPassword = ADMIN_PASSWORD;
 
-    if (
-      email.toLowerCase() === adminEmail.toLowerCase() &&
-      password === adminPassword
-    ) {
-      logAudit({ action: "login", email: adminEmail, ip, metadata: { role: "admin" } }).catch(() => {});
-      return Response.json({
-        user: {
-          email: adminEmail,
-          name: "Admin",
-          role: "admin",
-          plan: "unlimited",
-        },
-      });
+    // If admin env vars aren't set, return a clear error so Craig can tell
+    // the difference between "password wrong" and "server not configured".
+    if (email.toLowerCase() === adminEmail && adminEmail) {
+      if (!adminPassword) {
+        return Response.json(
+          { error: "Admin login is not configured on this server. Set ADMIN_PASSWORD in Vercel env vars." },
+          { status: 503 }
+        );
+      }
+      if (password.trim() === adminPassword) {
+        logAudit({ action: "login", email: adminEmail, ip, metadata: { role: "admin" } }).catch(() => {});
+        return Response.json({
+          user: {
+            email: adminEmail,
+            name: "Admin",
+            role: "admin",
+            plan: "unlimited",
+          },
+        });
+      }
+      // Admin email matched but password did not — log + fall through to 401
+      logAudit({ action: "login_failed", email: adminEmail, ip, metadata: { reason: "admin_wrong_password" } }).catch(() => {});
+      return Response.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
     // ── Regular user login (database) ──

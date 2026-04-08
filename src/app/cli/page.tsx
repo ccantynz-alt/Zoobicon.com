@@ -109,7 +109,7 @@ jobs:
       - name: Deploy to production
         run: zb deploy --domain mysite.com --env production
 
-      - name: Notify Slack
+      - name: Notify Hash
         run: zb notify slack "Deployed successfully 🚀"`;
 
 const FEATURES = [
@@ -272,7 +272,7 @@ export default function CLIPage() {
                   on every commit. Works with GitHub Actions, GitLab CI, and any pipeline runner.
                 </p>
                 <div className="space-y-3">
-                  {["Generate sites from config files in your repo", "Run SEO audits as quality gates", "Auto-deploy to production on merge to main", "Slack/Discord notifications on deploy"].map((item, i) => (
+                  {["Generate sites from config files in your repo", "Run SEO audits as quality gates", "Auto-deploy to production on merge to main", "Hash/MessageSquare notifications on deploy"].map((item, i) => (
                     <div key={i} className="flex items-center gap-3">
                       <Check className="w-4 h-4 text-accent-cyan flex-shrink-0" />
                       <span className="text-sm text-white/65">{item}</span>

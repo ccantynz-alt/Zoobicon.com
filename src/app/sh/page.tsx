@@ -620,13 +620,13 @@ export default function ZoobiconShPage() {
                 <span>Get Started</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
-              <span
-                className="btn-zoo-outline px-8 py-3 rounded-xl text-sm font-medium text-white/50 border border-white/[0.10] flex items-center gap-2 cursor-default"
-                title="GitHub repo coming soon"
+              <Link
+                href="/builder"
+                className="btn-zoo-outline px-8 py-3 rounded-xl text-sm font-medium text-white flex items-center gap-2 border border-white/20 hover:bg-white/5 transition-colors"
               >
                 <GitBranch className="w-4 h-4" />
-                GitHub — Coming Soon
-              </span>
+                Connect GitHub
+              </Link>
             </motion.div>
           </motion.div>
         </div>

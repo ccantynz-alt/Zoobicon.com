@@ -758,6 +758,28 @@ export default function HostingPage() {
           </motion.div>
         </div>
       </section>
+
+      {/* ── Footer ── */}
+      <footer className="border-t border-white/[0.06] py-12 px-6">
+        <div className="max-w-5xl mx-auto text-center">
+          <div className="flex items-center justify-center gap-6 text-sm text-slate-500 mb-6">
+            <Link href="https://zoobicon.com" className="hover:text-slate-300 transition-colors">zoobicon.com</Link>
+            <span className="text-white/10">·</span>
+            <Link href="https://zoobicon.ai" className="hover:text-slate-300 transition-colors">zoobicon.ai</Link>
+            <span className="text-white/10">·</span>
+            <Link href="https://zoobicon.io" className="hover:text-slate-300 transition-colors">zoobicon.io</Link>
+            <span className="text-white/10">·</span>
+            <Link href="https://zoobicon.sh" className="hover:text-slate-300 transition-colors">zoobicon.sh</Link>
+          </div>
+          <div className="flex items-center justify-center gap-6 text-sm text-slate-500 mb-4">
+            <Link href="/privacy" className="hover:text-slate-300 transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-slate-300 transition-colors">Terms</Link>
+            <Link href="/refund-policy" className="hover:text-slate-300 transition-colors">Refunds</Link>
+            <Link href="/disclaimers" className="hover:text-slate-300 transition-colors">Disclaimers</Link>
+          </div>
+          <p className="text-xs text-slate-600">&copy; 2026 Zoobicon. All rights reserved.</p>
+        </div>
+      </footer>
     </div>
   );
 }

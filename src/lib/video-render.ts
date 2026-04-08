@@ -70,7 +70,7 @@ interface ReplicatePrediction {
 const REPLICATE_API = "https://api.replicate.com/v1";
 
 async function replicateHeaders(): Promise<Record<string, string>> {
-  const token = process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY;
+  const token = process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY || process.env.REPLICATE_TOKEN || process.env.REPLICATE_KEY;
   if (!token) throw new Error("REPLICATE_API_TOKEN not configured");
   return {
     Authorization: `Bearer ${token}`,
@@ -548,7 +548,7 @@ export function selectBestProvider(scene: RenderScene): VideoProvider {
   }
 
   // Replicate: Good general purpose, fastest turnaround
-  if (process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY) {
+  if (process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY || process.env.REPLICATE_TOKEN || process.env.REPLICATE_KEY) {
     return "replicate";
   }
 
@@ -625,7 +625,7 @@ export function getAvailableProvider(): VideoProvider | null {
   if (process.env.PIKA_API_KEY) return "pika";
   if (process.env.KLING_API_KEY) return "kling";
   // Replicate last — primarily an image provider, video models rotate frequently
-  if (process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY) return "replicate";
+  if (process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY || process.env.REPLICATE_TOKEN || process.env.REPLICATE_KEY) return "replicate";
   return null;
 }
 
@@ -634,7 +634,7 @@ export function getAvailableProvider(): VideoProvider | null {
  */
 export function getAllConfiguredProviders(): { provider: VideoProvider; configured: boolean; models: string[] }[] {
   return [
-    { provider: "replicate", configured: !!(process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY), models: ["MiniMax Video-01-Live", "FLUX"] },
+    { provider: "replicate", configured: !!(process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY || process.env.REPLICATE_TOKEN || process.env.REPLICATE_KEY), models: ["MiniMax Video-01-Live", "FLUX"] },
     { provider: "runway", configured: !!process.env.RUNWAY_API_KEY, models: ["Gen-3 Alpha Turbo"] },
     { provider: "luma", configured: !!process.env.LUMA_API_KEY, models: ["Dream Machine"] },
     { provider: "pika", configured: !!process.env.PIKA_API_KEY, models: ["Pika 1.5"] },
@@ -703,6 +703,8 @@ export async function startRender(request: RenderRequest): Promise<RenderResult>
           jobId = result.taskId;
           break;
         }
+        default:
+          throw new Error(`[video-render] Unsupported provider: ${provider}`);
       }
 
       jobs.push({
@@ -776,6 +778,8 @@ export async function checkRenderStatus(jobs: RenderJob[]): Promise<RenderJob[]>
         case "kling":
           result = await checkKlingJob(job.id);
           break;
+        default:
+          throw new Error(`[video-render] Unsupported provider for status check: ${job.provider}`);
       }
 
       result.sceneNumber = job.sceneNumber;
@@ -837,11 +841,44 @@ function buildVideoPrompt(scene: RenderScene, style: string, provider?: VideoPro
     : "";
 
   // Scale description length based on provider's prompt limit
-  const descMaxLength = Math.floor(maxLength * 0.6);
+  const descMaxLength = Math.floor(maxLength * 0.55);
   const desc = (scene.visualDescription || "").slice(0, descMaxLength);
   const camera = scene.cameraMovement ? `Camera: ${scene.cameraMovement}.` : "";
 
-  const parts = [desc, camera, motionDir, colorDir, "Cinematic quality. Photorealistic."];
+  // ── Provider-specific cinematography directives ──
+  // Generic "cinematic quality" produces flat, generic output. Each modern
+  // text-to-video model responds best to provider-tuned cinematography hints.
+  let cinema: string;
+  switch (provider) {
+    case "runway":
+      // Runway Gen-3: short, punchy, broadcast-grade. Prefers exact technical terms.
+      cinema = "Cinematic 24fps, anamorphic 2.39:1, shallow depth-of-field 35mm equiv, key light 45°, soft fill, professional color grade, smooth dolly motion, no strobing.";
+      break;
+    case "kling":
+      // Kling 3.0: rich detail, photoreal humans, motion-aware. Big prompt budget.
+      cinema = "Hyper-realistic 4K, natural skin tones, soft volumetric lighting, shallow depth-of-field, smooth gimbal motion, true-to-life physics, sharp eye focus, no morphing, no extra fingers, no warping faces, broadcast color grade.";
+      break;
+    case "luma":
+      // Luma Dream Machine: dreamy, atmospheric, great for cinematic motion.
+      cinema = "Cinematic photoreal, 24fps motion blur, atmospheric haze, golden hour lighting, slow camera push, soft bokeh, film grain, color graded like A24 film.";
+      break;
+    case "pika":
+      // Pika: fast, stylized, social-friendly.
+      cinema = "Vibrant, sharp focus, energetic motion, well-lit, 16:9, no flicker, smooth subject motion.";
+      break;
+    case "replicate":
+      // Replicate-hosted models (varies, but generally people/photoreal-friendly).
+      cinema = "Photorealistic, accurate human faces, soft key light, shallow DOF, sharp eye focus, smooth motion, broadcast color, no morphing, no extra limbs.";
+      break;
+    default:
+      cinema = "Cinematic 24fps, professional lighting, shallow depth-of-field, smooth camera motion, photorealistic, broadcast color grade.";
+  }
+
+  // Universal negative prompt — keeps every model from producing the usual AI tells.
+  const negative =
+    "Avoid: warped faces, extra fingers, morphing limbs, text artifacts, watermarks, low resolution, jittery motion, washed-out color.";
+
+  const parts = [desc, camera, motionDir, colorDir, cinema];
 
   // For providers with larger limits (Kling 2000 chars), add extra detail
   if (maxLength >= 1500) {
@@ -849,7 +886,9 @@ function buildVideoPrompt(scene: RenderScene, style: string, provider?: VideoPro
     if (scene.textOverlay) {
       parts.push(`On-screen text: "${scene.textOverlay}".`);
     }
-    parts.push("High resolution, professional lighting, smooth motion, no artifacts.");
+    parts.push(negative);
+  } else if (maxLength >= 800) {
+    parts.push(negative);
   }
 
   const prompt = parts

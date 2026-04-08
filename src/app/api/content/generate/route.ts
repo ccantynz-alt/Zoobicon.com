@@ -106,8 +106,8 @@ Rules:
       ],
     });
 
-    const content =
-      response.content[0].type === "text" ? response.content[0].text : "";
+    const textBlock = response.content.find((b) => b.type === "text") as { type: "text"; text: string } | undefined;
+    const content = textBlock?.text || "";
 
     const wordCount = content
       .split(/\s+/)

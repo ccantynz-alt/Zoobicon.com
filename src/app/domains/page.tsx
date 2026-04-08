@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import {
   Search,
@@ -39,10 +39,11 @@ interface GeneratedName {
   checkingDomains: boolean;
 }
 
+// NOTE: must match TLD_PRICING in /api/domains/search/route.ts — source of truth is backend.
 const TLD_PRICES: Record<string, number> = {
-  com: 12.99, ai: 79.99, io: 39.99, sh: 24.99, co: 29.99,
-  dev: 14.99, app: 14.99, net: 13.99, org: 11.99, tech: 6.99,
-  xyz: 2.99, me: 8.99, us: 8.99,
+  com: 12.99, ai: 69.99, io: 39.99, sh: 24.99, co: 29.99,
+  dev: 14.99, app: 14.99, net: 13.99, org: 12.99, tech: 6.99,
+  xyz: 2.99, me: 19.99, us: 9.99,
 };
 
 const DEFAULT_TLDS = ["com", "ai", "io", "sh", "co"];
@@ -50,7 +51,7 @@ const DEFAULT_TLDS = ["com", "ai", "io", "sh", "co"];
 /* ── Popular TLD showcase cards ── */
 const FEATURED_TLDS = [
   { tld: "com", price: 12.99, desc: "The gold standard", color: "from-blue-500 to-blue-600", popular: true },
-  { tld: "ai", price: 79.99, desc: "AI & tech brands", color: "from-purple-500 to-violet-600", popular: true },
+  { tld: "ai", price: 69.99, desc: "AI & tech brands", color: "from-purple-500 to-violet-600", popular: true },
   { tld: "io", price: 39.99, desc: "Startups & SaaS", color: "from-emerald-500 to-teal-600", popular: true },
   { tld: "sh", price: 24.99, desc: "Dev tools & hosting", color: "from-amber-500 to-orange-600", popular: false },
   { tld: "dev", price: 14.99, desc: "Developer projects", color: "from-cyan-500 to-blue-600", popular: false },
@@ -84,20 +85,105 @@ export default function DomainsPage() {
   const [searching, setSearching] = useState(false);
   const [cart, setCart] = useState<DomainResult[]>([]);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
-  const resultsRef = useRef<HTMLDivElement>(null);
-
-  // AI Name Generator state
-  const [genDescription, setGenDescription] = useState("");
-  const [genStyle, setGenStyle] = useState("modern");
-  const [generatedNames, setGeneratedNames] = useState<GeneratedName[]>([]);
+  const [registering, setRegistering] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
   const [generating, setGenerating] = useState(false);
+  const [genDescription, setGenDescription] = useState("");
+  const [generatedNames, setGeneratedNames] = useState<Array<{ name: string; slug: string; domains: Array<{ tld: string; available: boolean | null; checking: boolean }> }>>([]);
+  const resultsRef = useRef<HTMLDivElement>(null);
   const genResultsRef = useRef<HTMLDivElement>(null);
 
-  // Checkout state
-  const [checkingOut, setCheckingOut] = useState(false);
-  const [checkoutError, setCheckoutError] = useState("");
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("zoobicon_user");
+      if (raw) {
+        const user = JSON.parse(raw);
+        setUserEmail(user.email || "");
+      }
+    } catch {}
+  }, []);
 
   const allTlds = Object.keys(TLD_PRICES);
+
+  // Auto-expand: when all selected TLDs are taken, try ALL TLDs automatically
+  const handleAutoExpand = useCallback(async (searchName: string) => {
+    const tlds: string[] = Object.keys(TLD_PRICES);
+    setAutoExpandedTlds(true);
+    setSearching(true);
+
+    const initial: DomainResult[] = tlds.map(tld => ({
+      domain: `${searchName}.${tld}`,
+      tld,
+      available: null,
+      price: TLD_PRICES[tld] || 9.99,
+      checking: true,
+    }));
+    setResults(initial);
+
+    try {
+      const res = await fetch(`/api/domains/search?q=${encodeURIComponent(searchName)}&tlds=${encodeURIComponent(tlds.join(","))}`);
+      if (res.ok) {
+        const data = await res.json();
+        const apiResults = data.results || [];
+        setResults(tlds.map(tld => {
+          const match = apiResults.find((r: { domain: string }) => r.domain === `${searchName}.${tld}`);
+          return {
+            domain: `${searchName}.${tld}`,
+            tld,
+            available: match ? match.available : null,
+            price: match?.price || TLD_PRICES[tld] || 9.99,
+            checking: false,
+          };
+        }));
+      } else {
+        setResults(initial.map(r => ({ ...r, checking: false })));
+      }
+    } catch {
+      setResults(initial.map(r => ({ ...r, checking: false })));
+    }
+    setSearching(false);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // When results finish loading and nothing is available — auto-expand or auto-suggest
+  useEffect(() => {
+    if (results.length === 0 || searching) return;
+    const allDone = results.every(r => !r.checking);
+    if (!allDone) return;
+
+    const anyAvailable = results.some(r => r.available === true);
+    if (anyAvailable) return;
+
+    const cleanName = name.trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
+    if (!cleanName) return;
+
+    // Step 1: If we haven't tried all TLDs yet, expand the search
+    if (!autoExpandedTlds && selectedTlds.size < allTlds.length) {
+      handleAutoExpand(cleanName);
+      return;
+    }
+
+    // Step 2: All TLDs checked, still nothing — auto-switch to AI generator
+    if (!autoGenerating) {
+      setAutoGenerating(true);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [results, searching]);
+
+  // Reset auto-expand state when search term changes
+  useEffect(() => {
+    setAutoExpandedTlds(false);
+    setAutoGenerating(false);
+  }, [name]);
+
+  // Trigger generation after genDescription state has been set
+  useEffect(() => {
+    if (pendingGenerate && genDescription.trim().length >= 3) {
+      setPendingGenerate(false);
+      handleGenerate();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingGenerate, genDescription]);
 
   const toggleTld = (tld: string) => {
     setSelectedTlds(prev => {
@@ -106,6 +192,112 @@ export default function DomainsPage() {
       return next;
     });
   };
+
+  // ─── AI Name Generator ───────────────────────────────────────────────────
+  // 1. Ask Claude for ~24 brandable names
+  // 2. Check availability for every name × every selected TLD in parallel
+  // 3. Stream results into state as each name resolves
+  // 4. Names with ZERO available TLDs are auto-filtered out at render time
+  const handleGenerate = useCallback(async () => {
+    const desc = genDescription.trim();
+    if (desc.length < 3 || selectedTlds.size === 0 || generating) return;
+
+    setGenerating(true);
+    setGeneratedNames([]);
+    setResults([]);
+
+    // scroll to results
+    setTimeout(() => genResultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
+
+    const tlds = Array.from(selectedTlds);
+
+    // Step 1 — get names from Claude
+    let names: Array<{ name: string; tagline: string }> = [];
+    try {
+      const res = await fetch("/api/tools/business-names", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: desc, style: genStyle, count: 24 }),
+      });
+      const data = await res.json();
+      names = Array.isArray(data?.names) ? data.names : [];
+    } catch {
+      // network error — bail
+    }
+
+    if (names.length === 0) {
+      setGenerating(false);
+      return;
+    }
+
+    // Sanitize names → dns-safe strings
+    const cleaned = names
+      .map((n) => ({
+        name: n.name,
+        tagline: n.tagline || "",
+        slug: n.name.toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 63),
+      }))
+      .filter((n) => n.slug.length >= 2);
+
+    // Seed the UI immediately with everything in "checking" state
+    setGeneratedNames(
+      cleaned.map((n) => ({
+        name: n.name,
+        tagline: n.tagline,
+        domains: tlds.map((tld) => ({
+          domain: `${n.slug}.${tld}`,
+          tld,
+          available: null,
+          price: TLD_PRICES[tld] || 9.99,
+          checking: true,
+        })),
+      })),
+    );
+
+    // Step 2 — check every name in parallel, stream updates
+    await Promise.all(
+      cleaned.map(async (n) => {
+        try {
+          const r = await fetch(
+            `/api/domains/search?q=${encodeURIComponent(n.slug)}&tlds=${encodeURIComponent(tlds.join(","))}`,
+          );
+          if (!r.ok) throw new Error("search failed");
+          const data = await r.json();
+          const apiResults: Array<{ domain: string; available: boolean | null; price: number }> = data.results || [];
+
+          setGeneratedNames((prev) =>
+            prev.map((gn) =>
+              gn.name !== n.name
+                ? gn
+                : {
+                    ...gn,
+                    domains: tlds.map((tld) => {
+                      const match = apiResults.find((x) => x.domain === `${n.slug}.${tld}`);
+                      return {
+                        domain: `${n.slug}.${tld}`,
+                        tld,
+                        available: match ? match.available : null,
+                        price: match?.price ?? TLD_PRICES[tld] ?? 9.99,
+                        checking: false,
+                      };
+                    }),
+                  },
+            ),
+          );
+        } catch {
+          setGeneratedNames((prev) =>
+            prev.map((gn) =>
+              gn.name !== n.name
+                ? gn
+                : { ...gn, domains: gn.domains.map((d) => ({ ...d, checking: false, available: null })) },
+            ),
+          );
+        }
+      }),
+    );
+
+    setGenerating(false);
+  }, [genDescription, genStyle, selectedTlds, generating]);
 
   const handleSearch = async () => {
     const cleanName = name.trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
@@ -131,6 +323,7 @@ export default function DomainsPage() {
       setSearchHistory(prev => [cleanName, ...prev].slice(0, 10));
     }
 
+    setSearchError(null);
     try {
       const res = await fetch(`/api/domains/search?q=${encodeURIComponent(cleanName)}&tlds=${encodeURIComponent(tlds.join(","))}`);
       if (res.ok) {
@@ -148,9 +341,12 @@ export default function DomainsPage() {
           };
         }));
       } else {
+        const errBody = await res.json().catch(() => ({}));
+        setSearchError(errBody.error || `Search failed (HTTP ${res.status}). Please try again.`);
         setResults(initial.map(r => ({ ...r, checking: false })));
       }
-    } catch {
+    } catch (err) {
+      setSearchError(err instanceof Error ? err.message : "Network error. Check your connection and try again.");
       setResults(initial.map(r => ({ ...r, checking: false })));
     }
 
@@ -167,140 +363,150 @@ export default function DomainsPage() {
     setCart(prev => prev.filter(c => c.domain !== domain));
   };
 
-  // --- Checkout ---
-  const handleCheckout = async () => {
-    if (cart.length === 0) return;
-    setCheckingOut(true);
-    setCheckoutError("");
-
-    try {
-      const res = await fetch("/api/domains/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          domains: cart.map((d) => ({ domain: d.domain, tld: d.tld, price: d.price })),
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setCheckoutError(data.error || "Checkout failed. Please try again.");
-        setCheckingOut(false);
-        return;
-      }
-
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        setCheckoutError("Failed to create checkout session.");
-        setCheckingOut(false);
-      }
-    } catch {
-      setCheckoutError("Connection error. Please try again.");
-      setCheckingOut(false);
-    }
-  };
-
-  // --- AI Name Generator ---
   const handleGenerate = async () => {
-    if (!genDescription.trim() || genDescription.trim().length < 3) return;
+    const desc = genDescription.trim();
+    if (desc.length < 3) return;
     if (selectedTlds.size === 0) return;
 
     setGenerating(true);
+    setCheckoutError(null);
     setGeneratedNames([]);
-    setTimeout(() => genResultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
 
     try {
-      // Step 1: Generate names via AI
-      const nameRes = await fetch("/api/tools/business-names", {
+      const res = await fetch("/api/domains/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          description: genDescription.trim(),
-          style: genStyle,
-          count: 20,
-        }),
+        body: JSON.stringify({ description: desc, style: genStyle, count: 20 }),
       });
 
-      if (!nameRes.ok) {
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Name generation failed" }));
+        setCheckoutError(err.error || "Name generation failed. Please try again.");
         setGenerating(false);
         return;
       }
 
-      const nameData = await nameRes.json();
-      const names: Array<{ name: string; tagline: string }> = nameData.names || [];
-
-      if (names.length === 0) {
-        setGenerating(false);
-        return;
-      }
-
-      // Step 2: Initialize generated names with empty domain results
+      const data: { names: Array<{ name: string; slug: string; tagline: string }> } = await res.json();
       const tlds = Array.from(selectedTlds);
-      const initial: GeneratedName[] = names.map((n) => ({
+
+      // Seed results with "checking" state so the UI can render immediately
+      const seeded = data.names.map((n) => ({
         name: n.name,
         tagline: n.tagline,
         domains: tlds.map((tld) => ({
-          domain: `${n.name.toLowerCase().replace(/[^a-z0-9-]/g, "")}.${tld}`,
+          domain: `${n.slug}.${tld}`,
           tld,
-          available: null,
+          available: null as boolean | null,
           price: TLD_PRICES[tld] || 9.99,
           checking: true,
         })),
-        checkingDomains: true,
       }));
-      setGeneratedNames(initial);
+      setGeneratedNames(seeded);
       setGenerating(false);
 
-      // Step 3: Batch check availability for each name (3 at a time to not overwhelm API)
-      const batchSize = 3;
-      for (let i = 0; i < names.length; i += batchSize) {
-        const batch = names.slice(i, i + batchSize);
-        const checks = batch.map(async (n, batchIdx) => {
-          const cleanName = n.name.toLowerCase().replace(/[^a-z0-9-]/g, "");
-          if (cleanName.length < 2) return;
+      // Scroll to results
+      setTimeout(
+        () => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
+        100
+      );
 
+      // Fire availability checks in parallel (per generated name)
+      await Promise.all(
+        data.names.map(async (n, idx) => {
           try {
-            const res = await fetch(`/api/domains/search?q=${encodeURIComponent(cleanName)}&tlds=${encodeURIComponent(tlds.join(","))}`);
-            if (res.ok) {
-              const data = await res.json();
-              const apiResults = data.results || [];
-
-              setGeneratedNames((prev) =>
-                prev.map((gn) => {
-                  if (gn.name !== n.name) return gn;
-                  return {
-                    ...gn,
-                    checkingDomains: false,
-                    domains: tlds.map((tld) => {
-                      const match = apiResults.find((r: { domain: string }) => r.domain === `${cleanName}.${tld}`);
-                      return {
-                        domain: `${cleanName}.${tld}`,
-                        tld,
-                        available: match ? match.available : null,
-                        price: match?.price || TLD_PRICES[tld] || 9.99,
-                        checking: false,
-                      };
-                    }),
-                  };
-                })
-              );
-            } else {
-              setGeneratedNames((prev) =>
-                prev.map((gn) => gn.name === n.name ? { ...gn, checkingDomains: false, domains: gn.domains.map((d) => ({ ...d, checking: false })) } : gn)
-              );
-            }
-          } catch {
-            setGeneratedNames((prev) =>
-              prev.map((gn) => gn.name === n.name ? { ...gn, checkingDomains: false, domains: gn.domains.map((d) => ({ ...d, checking: false })) } : gn)
+            const r = await fetch(
+              `/api/domains/search?q=${encodeURIComponent(n.slug)}&tlds=${encodeURIComponent(tlds.join(","))}`
             );
+            if (!r.ok) throw new Error("search failed");
+            const payload = await r.json();
+            const apiResults: Array<{ domain: string; available: boolean | null; price?: number }> =
+              payload.results || [];
+
+            setGeneratedNames((prev) => {
+              const next = [...prev];
+              if (!next[idx]) return prev;
+              next[idx] = {
+                ...next[idx],
+                domains: tlds.map((tld) => {
+                  const match = apiResults.find((x) => x.domain === `${n.slug}.${tld}`);
+                  return {
+                    domain: `${n.slug}.${tld}`,
+                    tld,
+                    available: match ? match.available : null,
+                    price: match?.price || TLD_PRICES[tld] || 9.99,
+                    checking: false,
+                  };
+                }),
+              };
+              return next;
+            });
+          } catch {
+            setGeneratedNames((prev) => {
+              const next = [...prev];
+              if (!next[idx]) return prev;
+              next[idx] = {
+                ...next[idx],
+                domains: next[idx].domains.map((d) => ({ ...d, checking: false })),
+              };
+              return next;
+            });
           }
-        });
-        await Promise.all(checks);
+        })
+      );
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Something went wrong generating names.";
+      setCheckoutError(message);
+      setGenerating(false);
+    }
+  };
+
+  const handleRegister = () => {
+    if (cart.length === 0) return;
+    // Pre-fill email from logged-in user
+    if (userEmail && !contactInfo.email) {
+      setContactInfo(prev => ({ ...prev, email: userEmail }));
+    }
+    setShowCheckoutForm(true);
+  };
+
+  const handleSubmitRegistration = async () => {
+    // Validate required fields
+    if (!contactInfo.firstName || !contactInfo.lastName || !contactInfo.email) {
+      alert("Please fill in at least your name and email.");
+      return;
+    }
+
+    setRegistering(true);
+    try {
+      const res = await fetch("/api/domains/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          domains: cart.map(c => {
+            const parts = c.domain.split(".");
+            const tld = parts.pop() || c.tld;
+            const name = parts.join(".");
+            return { name, tld };
+          }),
+          registrant: contactInfo,
+          years: 1,
+        }),
+      });
+      const data = await res.json();
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else if (data.success) {
+        alert("Domains registered successfully! View them in your dashboard.");
+        setCart([]);
+        setShowCheckoutForm(false);
+        window.location.href = "/my-domains";
+      } else {
+        alert(data.error || "Registration failed. Please try again.");
       }
     } catch {
-      setGenerating(false);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setRegistering(false);
     }
   };
 
@@ -311,6 +517,119 @@ export default function DomainsPage() {
 
   return (
     <div className="min-h-screen bg-[#0b0b16] text-white">
+
+      {/* ═══════════════════════════════════════════ */}
+      {/* CHECKOUT FORM MODAL                        */}
+      {/* ═══════════════════════════════════════════ */}
+      {showCheckoutForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="bg-[#131520] border border-slate-700/50 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 sm:p-8 shadow-2xl">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-white">Domain Registration</h2>
+              <button onClick={() => setShowCheckoutForm(false)} className="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+            </div>
+
+            {/* Cart summary */}
+            <div className="mb-6 p-4 rounded-xl bg-slate-800/50 border border-slate-700/30">
+              <p className="text-sm text-slate-400 mb-2">{cart.length} domain{cart.length > 1 ? "s" : ""}</p>
+              {cart.map(c => (
+                <div key={c.domain} className="flex justify-between text-sm py-1">
+                  <span className="text-white font-medium">{c.domain}</span>
+                  <span className="text-emerald-400">${c.price.toFixed(2)}/yr</span>
+                </div>
+              ))}
+              <div className="flex justify-between mt-2 pt-2 border-t border-slate-700/30 font-bold">
+                <span>Total</span>
+                <span className="text-emerald-400">${cartTotal.toFixed(2)}/yr</span>
+              </div>
+            </div>
+
+            {/* Contact info form */}
+            <div className="space-y-4">
+              <p className="text-sm text-slate-400">Required for domain registration (ICANN policy).</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">First Name *</label>
+                  <input type="text" value={contactInfo.firstName} onChange={e => setContactInfo(p => ({ ...p, firstName: e.target.value }))}
+                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Craig" />
+                </div>
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">Last Name *</label>
+                  <input type="text" value={contactInfo.lastName} onChange={e => setContactInfo(p => ({ ...p, lastName: e.target.value }))}
+                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Smith" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Email *</label>
+                <input type="email" value={contactInfo.email} onChange={e => setContactInfo(p => ({ ...p, email: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="you@example.com" />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Phone *</label>
+                <input type="tel" value={contactInfo.phone} onChange={e => setContactInfo(p => ({ ...p, phone: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="+64.211234567" />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Street Address *</label>
+                <input type="text" value={contactInfo.address} onChange={e => setContactInfo(p => ({ ...p, address: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="123 Main Street" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">City *</label>
+                  <input type="text" value={contactInfo.city} onChange={e => setContactInfo(p => ({ ...p, city: e.target.value }))}
+                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Auckland" />
+                </div>
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">State/Region</label>
+                  <input type="text" value={contactInfo.state} onChange={e => setContactInfo(p => ({ ...p, state: e.target.value }))}
+                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Auckland" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">Postal Code *</label>
+                  <input type="text" value={contactInfo.zip} onChange={e => setContactInfo(p => ({ ...p, zip: e.target.value }))}
+                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="1010" />
+                </div>
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">Country *</label>
+                  <select value={contactInfo.country} onChange={e => setContactInfo(p => ({ ...p, country: e.target.value }))}
+                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    <option value="NZ">New Zealand</option>
+                    <option value="AU">Australia</option>
+                    <option value="US">United States</option>
+                    <option value="GB">United Kingdom</option>
+                    <option value="CA">Canada</option>
+                    <option value="DE">Germany</option>
+                    <option value="FR">France</option>
+                    <option value="JP">Japan</option>
+                    <option value="SG">Singapore</option>
+                    <option value="IN">India</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2 text-xs text-slate-500 mt-2">
+                <svg className="w-4 h-4 flex-shrink-0 mt-0.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                <span>WHOIS privacy protection is included free. Your contact details are kept private.</span>
+              </div>
+
+              <button
+                onClick={handleSubmitRegistration}
+                disabled={registering || !contactInfo.firstName || !contactInfo.lastName || !contactInfo.email}
+                className="w-full py-3.5 mt-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-bold text-base transition-colors flex items-center justify-center gap-2"
+              >
+                {registering ? (
+                  <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</>
+                ) : (
+                  <>Pay ${cartTotal.toFixed(2)} &amp; Register</>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ═══════════════════════════════════════════ */}
       {/* HERO — Big, bright, impossible to miss     */}
@@ -356,7 +675,13 @@ export default function DomainsPage() {
               <Search className="w-4 h-4" /> Search Exact Name
             </button>
             <button
-              onClick={() => setMode("generate")}
+              onClick={() => {
+                setMode("generate");
+                // Carry over search term to AI generator if it has a value and generator is empty
+                if (name.trim() && !genDescription.trim()) {
+                  setGenDescription(name.trim());
+                }
+              }}
               className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all ${
                 mode === "generate"
                   ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/20"
@@ -530,19 +855,102 @@ export default function DomainsPage() {
       {/* RESULTS SECTION                             */}
       {/* ═══════════════════════════════════════════ */}
       <div ref={resultsRef} />
+      {(searchError || checkoutError) && (
+        <div className="max-w-4xl mx-auto px-6 -mt-4 mb-6">
+          <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+            {searchError || checkoutError}
+          </div>
+        </div>
+      )}
       {results.length > 0 && (
         <section className="pb-16 px-4 sm:px-6">
           <div className="max-w-3xl mx-auto">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">
                 {searching ? "Checking availability..." :
-                  `${availableResults.length} available, ${takenResults.length} taken`}
+                  results.some(r => r.checking)
+                    ? "Checking availability..."
+                    : availableResults.length > 0
+                    ? `${availableResults.length} domain${availableResults.length > 1 ? "s" : ""} available`
+                    : "No exact matches found"}
               </h2>
               {name && <span className="text-sm text-slate-500">Results for &ldquo;{name.trim().toLowerCase()}&rdquo;</span>}
             </div>
 
             <div className="space-y-3 mb-8">
-              {/* Available — bright green */}
+              {/* Checking — show while still loading */}
+              {results.filter(r => r.checking).map(r => (
+                <div key={r.domain} className="flex items-center justify-between p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05]">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-white/[0.05] flex items-center justify-center">
+                      <Loader2 className="w-5 h-5 text-slate-500 animate-spin" />
+                    </div>
+                    <span className="text-lg text-slate-400">{r.domain}</span>
+                  </div>
+                  <span className="text-sm text-slate-600">Checking...</span>
+                </div>
+              ))}
+
+              {/* No available results — suggest alternatives */}
+              {!searching && !results.some(r => r.checking) && availableResults.length === 0 && results.length > 0 && !autoGenerating && (
+                <div className="rounded-2xl border border-amber-500/20 bg-amber-500/[0.05] p-6 text-center">
+                  <div className="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
+                    <Sparkles className="w-7 h-7 text-amber-400" />
+                  </div>
+                  <h3 className="text-lg font-bold mb-2">
+                    {autoExpandedTlds
+                      ? `"${name.trim().toLowerCase()}" is taken across all 13 extensions`
+                      : `"${name.trim().toLowerCase()}" isn't available on selected extensions`}
+                  </h3>
+                  <p className="text-sm text-slate-400 mb-5">
+                    {autoExpandedTlds
+                      ? "We checked every extension. Let our AI find similar names that ARE available."
+                      : "We're searching all 13 extensions now..."}
+                  </p>
+                  {autoExpandedTlds && (
+                    <button
+                      onClick={() => {
+                        setGenDescription(name.trim());
+                        setMode("generate");
+                        setResults([]);
+                        setPendingGenerate(true);
+                      }}
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-xl font-bold text-base transition-all shadow-lg shadow-purple-500/20"
+                    >
+                      <Wand2 className="w-5 h-5" /> Generate Available Alternatives
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Auto-generating alternatives */}
+              {autoGenerating && (
+                <div className="rounded-2xl border border-purple-500/20 bg-purple-500/[0.05] p-6 text-center">
+                  <div className="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center mx-auto mb-4">
+                    <Wand2 className="w-7 h-7 text-purple-400" />
+                  </div>
+                  <h3 className="text-lg font-bold mb-2">
+                    &ldquo;{name.trim().toLowerCase()}&rdquo; is taken everywhere
+                  </h3>
+                  <p className="text-sm text-slate-400 mb-5">
+                    Let our AI generate similar names with available domains.
+                  </p>
+                  <button
+                    onClick={() => {
+                      setGenDescription(name.trim());
+                      setMode("generate");
+                      setResults([]);
+                      setAutoGenerating(false);
+                      setPendingGenerate(true);
+                    }}
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-xl font-bold text-base transition-all shadow-lg shadow-purple-500/20"
+                  >
+                    <Wand2 className="w-5 h-5" /> Find Available Alternatives
+                  </button>
+                </div>
+              )}
+
+              {/* Available — bright green — ONLY show available domains */}
               {availableResults.map(r => (
                 <div key={r.domain} className="flex items-center justify-between p-5 rounded-2xl bg-emerald-500/[0.08] border border-emerald-500/20 hover:border-emerald-500/30 transition-colors">
                   <div className="flex items-center gap-3">
@@ -571,47 +979,6 @@ export default function DomainsPage() {
                   </div>
                 </div>
               ))}
-
-              {/* Taken */}
-              {takenResults.map(r => (
-                <div key={r.domain} className="flex items-center justify-between p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05]">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center">
-                      <X className="w-5 h-5 text-red-400/50" />
-                    </div>
-                    <div>
-                      <span className="text-lg text-slate-500 line-through">{r.domain}</span>
-                      <span className="block text-sm text-red-400/50">Taken</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              {/* Checking */}
-              {results.filter(r => r.checking).map(r => (
-                <div key={r.domain} className="flex items-center justify-between p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05]">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-white/[0.05] flex items-center justify-center">
-                      <Loader2 className="w-5 h-5 text-slate-500 animate-spin" />
-                    </div>
-                    <span className="text-lg text-slate-400">{r.domain}</span>
-                  </div>
-                  <span className="text-sm text-slate-600">Checking...</span>
-                </div>
-              ))}
-
-              {/* Unknown */}
-              {unknownResults.map(r => (
-                <div key={r.domain} className="flex items-center justify-between p-5 rounded-2xl bg-white/[0.02] border border-white/[0.05]">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-yellow-500/10 flex items-center justify-center">
-                      <Globe className="w-5 h-5 text-yellow-400/50" />
-                    </div>
-                    <span className="text-lg text-slate-400">{r.domain}</span>
-                  </div>
-                  <span className="text-sm text-slate-600">Unable to check</span>
-                </div>
-              ))}
             </div>
 
             {/* Cart */}
@@ -638,11 +1005,11 @@ export default function DomainsPage() {
                   ))}
                 </div>
                 <button
-                  onClick={handleCheckout}
-                  disabled={checkingOut}
+                  onClick={handleRegister}
+                  disabled={registering}
                   className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-lg transition-colors shadow-lg shadow-indigo-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {checkingOut ? <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</> : "Proceed to Registration"}
+                  {registering ? <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</> : "Proceed to Registration"}
                 </button>
                 {checkoutError && <p className="text-center text-sm text-red-400 mt-2">{checkoutError}</p>}
                 <p className="text-center text-xs text-slate-500 mt-3">Includes free WHOIS privacy, SSL, and DNS management</p>
@@ -662,7 +1029,14 @@ export default function DomainsPage() {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold flex items-center gap-2">
                 <Wand2 className="w-5 h-5 text-purple-400" />
-                {generatedNames.length} Name Ideas Generated
+                {(() => {
+                  const withAvailable = generatedNames.filter(gn => gn.domains.some(d => d.available === true)).length;
+                  const stillChecking = generatedNames.some(gn => gn.domains.some(d => d.checking));
+                  if (stillChecking) return `Checking ${generatedNames.length} names...`;
+                  return withAvailable > 0
+                    ? `${withAvailable} name${withAvailable > 1 ? "s" : ""} with available domains`
+                    : "No available domains found";
+                })()}
               </h2>
               <button
                 onClick={handleGenerate}
@@ -677,7 +1051,10 @@ export default function DomainsPage() {
               {generatedNames.map((gn) => {
                 const availableDomains = gn.domains.filter((d) => d.available === true);
                 const hasAvailable = availableDomains.length > 0;
-                const allChecked = gn.domains.every((d) => !d.checking);
+                const stillChecking = gn.domains.some((d) => d.checking);
+
+                // Hide names with zero available domains (unless still checking)
+                if (!hasAvailable && !stillChecking) return null;
 
                 return (
                   <div
@@ -685,8 +1062,6 @@ export default function DomainsPage() {
                     className={`rounded-2xl border p-5 transition-all ${
                       hasAvailable
                         ? "border-emerald-500/20 bg-emerald-500/[0.04]"
-                        : allChecked
-                        ? "border-white/[0.06] bg-white/[0.02]"
                         : "border-white/[0.06] bg-white/[0.02]"
                     }`}
                   >
@@ -701,59 +1076,99 @@ export default function DomainsPage() {
                           {availableDomains.length} available
                         </span>
                       )}
-                      {allChecked && !hasAvailable && (
-                        <span className="text-xs px-2.5 py-1 rounded-full bg-red-500/10 text-red-400/60 font-semibold shrink-0">
-                          All taken
+                      {stillChecking && (
+                        <span className="text-xs px-2.5 py-1 rounded-full bg-white/[0.06] text-slate-400 font-semibold shrink-0 flex items-center gap-1">
+                          <Loader2 className="w-3 h-3 animate-spin" /> Checking...
                         </span>
                       )}
                     </div>
 
-                    {/* Domain results grid */}
-                    <div className="flex flex-wrap gap-2">
-                      {gn.domains.map((d) => (
+                    {/* Domain results — proper register buttons */}
+                    <div className="space-y-2 mb-3">
+                      {gn.domains
+                        .filter((d) => d.checking || d.available === true)
+                        .map((d) => (
                         <div
                           key={d.domain}
-                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all ${
+                          className={`flex items-center justify-between p-3 rounded-xl transition-all ${
                             d.checking
-                              ? "bg-white/[0.04] text-slate-500"
-                              : d.available
-                              ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                              : d.available === false
-                              ? "bg-white/[0.02] text-slate-600 line-through"
-                              : "bg-white/[0.03] text-slate-500"
+                              ? "bg-white/[0.03]"
+                              : "bg-emerald-500/[0.06] border border-emerald-500/15"
                           }`}
                         >
-                          {d.checking ? (
-                            <Loader2 className="w-3 h-3 animate-spin" />
-                          ) : d.available ? (
-                            <Check className="w-3 h-3" />
-                          ) : d.available === false ? (
-                            <X className="w-3 h-3" />
-                          ) : null}
-                          <span>.{d.tld}</span>
+                          <div className="flex items-center gap-2.5">
+                            {d.checking ? (
+                              <Loader2 className="w-4 h-4 text-slate-500 animate-spin" />
+                            ) : (
+                              <Check className="w-4 h-4 text-emerald-400" />
+                            )}
+                            <span className={`font-semibold ${d.checking ? "text-slate-400" : "text-white"}`}>
+                              {d.domain}
+                            </span>
+                          </div>
                           {d.available && (
-                            <>
-                              <span className="text-xs opacity-70">${d.price}</span>
+                            <div className="flex items-center gap-3">
+                              <span className="text-sm font-bold text-white">${d.price}<span className="text-xs text-slate-400 font-normal">/yr</span></span>
                               {cart.some((c) => c.domain === d.domain) ? (
-                                <button onClick={() => removeFromCart(d.domain)} className="ml-1 text-emerald-300">
-                                  <Check className="w-3 h-3" />
+                                <button
+                                  onClick={() => removeFromCart(d.domain)}
+                                  className="px-4 py-2 rounded-lg bg-emerald-600/20 text-emerald-300 text-sm font-semibold flex items-center gap-1.5"
+                                >
+                                  <Check className="w-3.5 h-3.5" /> In Cart
                                 </button>
                               ) : (
                                 <button
                                   onClick={() => addToCart(d)}
-                                  className="ml-1 text-emerald-400 hover:text-emerald-300"
+                                  className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold flex items-center gap-1.5 transition-colors shadow-md shadow-indigo-500/20"
                                 >
-                                  <Plus className="w-3 h-3" />
+                                  <ShoppingCart className="w-3.5 h-3.5" /> Register
                                 </button>
                               )}
-                            </>
+                            </div>
+                          )}
+                          {d.checking && (
+                            <span className="text-xs text-slate-500">Checking...</span>
                           )}
                         </div>
                       ))}
                     </div>
+
+                    {/* Add All button */}
+                    {hasAvailable && availableDomains.length > 1 && (
+                      <button
+                        onClick={() => {
+                          availableDomains.forEach((d) => {
+                            if (!cart.some((c) => c.domain === d.domain)) {
+                              addToCart(d);
+                            }
+                          });
+                        }}
+                        className="w-full py-2.5 rounded-xl border border-emerald-500/20 text-emerald-400 text-sm font-semibold hover:bg-emerald-500/[0.06] transition-colors flex items-center justify-center gap-2"
+                      >
+                        <Plus className="w-4 h-4" /> Add All {availableDomains.length} Domains to Cart
+                      </button>
+                    )}
                   </div>
                 );
               })}
+
+              {/* If all generated names are checked and none have available domains */}
+              {generatedNames.length > 0 &&
+                generatedNames.every((gn) => gn.domains.every((d) => !d.checking)) &&
+                !generatedNames.some((gn) => gn.domains.some((d) => d.available === true)) && (
+                <div className="rounded-2xl border border-amber-500/20 bg-amber-500/[0.05] p-6 text-center">
+                  <Sparkles className="w-8 h-8 text-amber-400 mx-auto mb-3" />
+                  <h3 className="text-lg font-bold mb-2">All names are taken</h3>
+                  <p className="text-sm text-slate-400 mb-4">Try a different description or style to find more options.</p>
+                  <button
+                    onClick={handleGenerate}
+                    disabled={generating}
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-xl font-bold transition-all"
+                  >
+                    <RefreshCw className={`w-4 h-4 ${generating ? "animate-spin" : ""}`} /> Generate More Names
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Cart (shared with search results) */}
@@ -780,11 +1195,11 @@ export default function DomainsPage() {
                   ))}
                 </div>
                 <button
-                  onClick={handleCheckout}
-                  disabled={checkingOut}
+                  onClick={handleRegister}
+                  disabled={registering}
                   className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-lg transition-colors shadow-lg shadow-indigo-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {checkingOut ? <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</> : "Proceed to Registration"}
+                  {registering ? <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</> : "Proceed to Registration"}
                 </button>
                 {checkoutError && <p className="text-center text-sm text-red-400 mt-2">{checkoutError}</p>}
               </div>
@@ -900,58 +1315,12 @@ export default function DomainsPage() {
               <div className="text-sm font-semibold text-slate-500 text-center">GoDaddy</div>
               <div className="text-sm font-semibold text-slate-500 text-center">Namecheap</div>
             </div>
-            {COMPARISON.map((row, i) => (
-              <div key={row.feature} className={`grid grid-cols-4 px-6 py-4 ${i < COMPARISON.length - 1 ? "border-b border-white/[0.04]" : ""}`}>
-                <div className="text-sm text-slate-300">{row.feature}</div>
-                <div className="text-sm font-semibold text-center">
-                  {row.zoobicon === "Free" || row.zoobicon === "Included" ? (
-                    <span className="text-emerald-400">{row.zoobicon}</span>
-                  ) : (
-                    <span className="text-white">{row.zoobicon}</span>
-                  )}
-                </div>
-                <div className="text-sm text-slate-500 text-center">{row.godaddy}</div>
-                <div className="text-sm text-slate-500 text-center">{row.namecheap}</div>
-              </div>
-            ))}
-          </div>
-
-          <p className="text-center text-xs text-slate-600 mt-4">
-            Prices as of March 2026. Competitor prices may vary. See our{" "}
-            <Link href="/disclaimers" className="text-slate-500 underline underline-offset-2 hover:text-slate-400">disclaimers</Link>.
-          </p>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════ */}
-      {/* BUNDLE CTA                                  */}
-      {/* ═══════════════════════════════════════════ */}
-      <section className="py-20 md:py-28 px-4 sm:px-6 border-t border-white/[0.04]">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-sm font-medium mb-8">
-            <Star className="w-4 h-4" />
-            Domain + Website + Hosting — all included
-          </div>
-
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight leading-tight mb-6">
-            Get your domain.<br />
-            Build your site.<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
-              Go live in minutes.
-            </span>
-          </h2>
-          <p className="text-lg text-slate-400 max-w-xl mx-auto mb-10">
-            Every domain includes free hosting on zoobicon.sh, a free SSL certificate,
-            and access to our AI website builder. No extra charges. No gotchas.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <button
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="group inline-flex items-center gap-2.5 px-8 py-4 rounded-full bg-indigo-600 text-white text-lg font-bold hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/20"
+              onClick={handleRegister}
+              disabled={registering}
+              className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-semibold text-base transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              Search Domains
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              {registering ? <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</> : "Proceed to Registration"}
             </button>
             <Link
               href="/builder"
@@ -986,6 +1355,48 @@ export default function DomainsPage() {
           </div>
         </div>
       </section>
+
+      {/* ═══════════════════════════════════════════ */}
+      {/* STICKY CART BAR — always visible at bottom  */}
+      {/* ═══════════════════════════════════════════ */}
+      {cart.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#0d0d1a]/95 backdrop-blur-xl border-t border-indigo-500/20 shadow-2xl shadow-black/50">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center shrink-0">
+                <ShoppingCart className="w-5 h-5 text-indigo-400" />
+              </div>
+              <div className="min-w-0">
+                <span className="text-sm font-bold text-white">{cart.length} domain{cart.length > 1 ? "s" : ""}</span>
+                <span className="text-xs text-slate-400 block truncate">
+                  {cart.map(c => c.domain).join(", ")}
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 shrink-0">
+              <span className="text-xl font-black text-indigo-400">
+                ${cartTotal.toFixed(2)}<span className="text-xs font-normal text-slate-400">/yr</span>
+              </span>
+              <button
+                onClick={handleRegister}
+                disabled={registering}
+                className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-base transition-colors shadow-lg shadow-indigo-500/25 disabled:opacity-50 flex items-center gap-2"
+              >
+                {registering ? (
+                  <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
+                ) : (
+                  <><Lock className="w-4 h-4" /> Register Now</>
+                )}
+              </button>
+            </div>
+          </div>
+          {checkoutError && (
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-2">
+              <p className="text-center text-sm text-red-400">{checkoutError}</p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

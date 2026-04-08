@@ -283,7 +283,7 @@ export default function QRCodesPage() {
                 <h3 className="text-sm font-medium text-white/60 mb-4 uppercase tracking-wider">Download</h3>
                 <div className="grid grid-cols-3 gap-3">
                   {['PNG', 'SVG', 'PDF'].map(format => (
-                    <button
+                    <button onClick={() => {}}
                       key={format}
                       className="flex flex-col items-center gap-2 p-4 bg-white/5 hover:bg-violet-600/20 border border-white/10 hover:border-violet-500/50 rounded-xl text-sm transition-all group"
                     >

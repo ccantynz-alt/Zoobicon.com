@@ -153,7 +153,7 @@ export default function DictationProductPage() {
             ) : (
               <>
                 <Link href="/auth/login" className="text-sm text-white/65 hover:text-white transition-colors px-3 py-2">Sign in</Link>
-                <Link href="/auth/signup" className="btn-gradient px-4 py-2 rounded-xl text-sm font-semibold text-white">Get Started</Link>
+                <Link href={user ? "/dictation" : "/auth/signup"} className="btn-gradient px-4 py-2 rounded-xl text-sm font-semibold text-white">{user ? "Open App" : "Get Started"}</Link>
               </>
             )}
           </div>
@@ -175,7 +175,7 @@ export default function DictationProductPage() {
             AI dictation and transcription in 50+ languages. 95%+ accuracy. Real-time or batch. Speaker labels, summaries, and smart punctuation — all automatic.
           </motion.p>
           <motion.div variants={fadeInUp} className="flex flex-wrap justify-center gap-4">
-            <Link href="/auth/signup" className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-purple-500 to-pink-600 font-semibold hover:from-purple-400 hover:to-pink-500 transition-all flex items-center gap-2">Start Dictating <ArrowRight className="w-4 h-4" /></Link>
+            <Link href={user ? "/dictation" : "/auth/signup"} className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-purple-500 to-pink-600 font-semibold hover:from-purple-400 hover:to-pink-500 transition-all flex items-center gap-2">{user ? "Open Dictation" : "Start Dictating"} <ArrowRight className="w-4 h-4" /></Link>
             <Link href="#pricing" className="px-8 py-3.5 rounded-xl bg-white/[0.05] border border-white/[0.1] font-semibold hover:bg-white/[0.08] transition-all">View Plans</Link>
           </motion.div>
         </motion.div>
@@ -276,7 +276,7 @@ export default function DictationProductPage() {
                     <li key={f} className="flex items-center gap-2 text-xs text-white/50"><Check className="w-3.5 h-3.5 text-purple-400 shrink-0" />{f}</li>
                   ))}
                 </ul>
-                <Link href="/auth/signup" className={`block text-center py-2.5 rounded-xl text-sm font-semibold transition-all ${p.featured ? "bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-400 hover:to-pink-500" : "bg-white/[0.05] border border-white/[0.1] hover:bg-white/[0.08]"}`}>Start Free Trial</Link>
+                <Link href={user ? "/dictation" : "/auth/signup"} className={`block text-center py-2.5 rounded-xl text-sm font-semibold transition-all ${p.featured ? "bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-400 hover:to-pink-500" : "bg-white/[0.05] border border-white/[0.1] hover:bg-white/[0.08]"}`}>{user ? "Open App" : "Start Free Trial"}</Link>
               </div>
             ))}
           </div>
@@ -307,7 +307,7 @@ export default function DictationProductPage() {
           <Mic className="w-12 h-12 text-purple-400 mx-auto mb-6" />
           <h2 className="text-3xl font-bold mb-4">Your voice. Your words. Instantly.</h2>
           <p className="text-white/40 mb-8 max-w-lg mx-auto">Stop typing. Start talking. 50+ languages, 95%+ accuracy, real-time transcription.</p>
-          <Link href="/auth/signup" className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-purple-500 to-pink-600 font-semibold hover:from-purple-400 hover:to-pink-500 transition-all">Start Dictating <ArrowRight className="w-4 h-4" /></Link>
+          <Link href={user ? "/dictation" : "/auth/signup"} className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-purple-500 to-pink-600 font-semibold hover:from-purple-400 hover:to-pink-500 transition-all">{user ? "Open Dictation" : "Start Dictating"} <ArrowRight className="w-4 h-4" /></Link>
         </div>
       </section>
 

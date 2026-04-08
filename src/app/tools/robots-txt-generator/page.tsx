@@ -31,7 +31,7 @@ const BOTS = [
   { id: "ClaudeBot", label: "ClaudeBot", desc: "Claude Web" },
   { id: "Bytespider", label: "Bytespider", desc: "ByteDance / TikTok" },
   { id: "Applebot", label: "Applebot", desc: "Apple / Siri" },
-  { id: "facebookexternalhit", label: "facebookexternalhit", desc: "Facebook" },
+  { id: "facebookexternalhit", label: "facebookexternalhit", desc: "ThumbsUp" },
   { id: "Twitterbot", label: "Twitterbot", desc: "X / MessageCircle" },
 ];
 

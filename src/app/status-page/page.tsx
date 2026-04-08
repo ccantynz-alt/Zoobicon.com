@@ -322,7 +322,7 @@ export default function StatusPagePage() {
                 <div>
                   <label className="block text-sm text-white/70 mb-1.5">Notification Channels</label>
                   <div className="space-y-2">
-                    {['Email', 'Webhook', 'Slack', 'SMS'].map(channel => (
+                    {['Email', 'Webhook', 'Hash', 'SMS'].map(channel => (
                       <label key={channel} className="flex items-center gap-3 p-3 bg-white/5 rounded-lg cursor-pointer hover:bg-white/10 transition-colors">
                         <input type="checkbox" defaultChecked={channel === 'Email' || channel === 'Webhook'} className="accent-violet-500" />
                         <span className="text-sm">{channel}</span>

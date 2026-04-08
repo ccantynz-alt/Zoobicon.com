@@ -22,8 +22,9 @@ interface Domain {
 export default function MyDomainsPage() {
   const [domains, setDomains] = useState<Domain[]>([]);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<{ email: string; name?: string } | null>(null);
+  const [user, setUser] = useState<{ email: string; name?: string; role?: string } | null>(null);
   const [copied, setCopied] = useState("");
+  const [purchaseStatus, setPurchaseStatus] = useState<"" | "verifying" | "success" | "error">("");
 
   useEffect(() => {
     try {
@@ -31,22 +32,51 @@ export default function MyDomainsPage() {
       if (!raw) { window.location.href = "/auth/login"; return; }
       const parsed = JSON.parse(raw);
       setUser(parsed);
-      fetchDomains(parsed.email);
+
+      // If arriving from Stripe checkout, verify the purchase first
+      const params = new URLSearchParams(window.location.search);
+      const sessionId = params.get("session_id");
+      if (sessionId) {
+        setPurchaseStatus("verifying");
+        fetch("/api/domains/verify-purchase", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId, email: parsed.email }),
+        })
+          .then(res => res.json())
+          .then(data => {
+            setPurchaseStatus(data.success ? "success" : "error");
+            fetchDomains(parsed);
+          })
+          .catch(() => {
+            setPurchaseStatus("error");
+            fetchDomains(parsed);
+          });
+      } else {
+        fetchDomains(parsed);
+      }
     } catch {
       window.location.href = "/auth/login";
     }
   }, []);
 
-  const fetchDomains = async (email: string) => {
+  const fetchDomains = async (userData: { email: string; role?: string }) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/domains/register?email=${encodeURIComponent(email)}`);
+      // Admin sees ALL domains, regular users see only their own
+      const url = userData.role === "admin"
+        ? "/api/admin/domains"
+        : `/api/domains/register?email=${encodeURIComponent(userData.email)}`;
+      const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
         setDomains(data.domains || []);
       }
-    } catch { /* show empty state */ }
-    finally { setLoading(false); }
+    } catch {
+      // Silently fail — show empty state
+    } finally {
+      setLoading(false);
+    }
   };
 
   const copyText = (text: string) => {
@@ -55,10 +85,14 @@ export default function MyDomainsPage() {
     setTimeout(() => setCopied(""), 2000);
   };
 
-  const daysUntilExpiry = (date: string) => Math.ceil((new Date(date).getTime() - Date.now()) / 86400000);
+  const daysUntilExpiry = (date: string) => {
+    const diff = new Date(date).getTime() - Date.now();
+    return Math.ceil(diff / 86400000);
+  };
 
   return (
     <div className="min-h-screen bg-[#0a0a12] text-white">
+      {/* Nav */}
       <nav className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
         <div className="max-w-5xl mx-auto px-6 flex items-center justify-between h-14">
           <Link href="/" className="flex items-center gap-2">
@@ -71,8 +105,10 @@ export default function MyDomainsPage() {
             <Link href="/dashboard" className="text-xs text-white/50 hover:text-white/70 flex items-center gap-1.5">
               <LayoutDashboard className="w-3.5 h-3.5" /> Dashboard
             </Link>
-            <button onClick={() => { try { localStorage.removeItem("zoobicon_user"); } catch {} window.location.href = "/auth/login"; }}
-              className="text-xs text-white/50 hover:text-white/70 flex items-center gap-1.5">
+            <button
+              onClick={() => { try { localStorage.removeItem("zoobicon_user"); } catch {} window.location.href = "/auth/login"; }}
+              className="text-xs text-white/50 hover:text-white/70 flex items-center gap-1.5"
+            >
               <LogOut className="w-3.5 h-3.5" /> Sign out
             </button>
           </div>
@@ -80,30 +116,60 @@ export default function MyDomainsPage() {
       </nav>
 
       <div className="max-w-5xl mx-auto px-6 py-10">
+        {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold flex items-center gap-3"><Globe className="w-6 h-6 text-indigo-400" /> My Domains</h1>
+            <h1 className="text-2xl font-bold flex items-center gap-3">
+              <Globe className="w-6 h-6 text-indigo-400" /> My Domains
+            </h1>
             <p className="text-sm text-white/40 mt-1">Manage your registered domains</p>
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={() => user && fetchDomains(user.email)} disabled={loading}
+            <button onClick={() => user && fetchDomains(user)} disabled={loading}
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.08] border border-white/[0.08] text-sm transition-colors">
               <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /> Refresh
             </button>
-            <Link href="/domains" className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-sm font-semibold transition-colors">
+            <Link
+              href="/domains"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-sm font-semibold transition-colors"
+            >
               <Plus className="w-4 h-4" /> Register New
             </Link>
           </div>
         </div>
 
+        {/* Purchase verification status */}
+        {purchaseStatus === "verifying" && (
+          <div className="rounded-xl bg-indigo-500/10 border border-indigo-500/20 p-4 mb-6 flex items-center gap-3 text-sm text-indigo-300">
+            <RefreshCw className="w-4 h-4 animate-spin" /> Verifying your purchase...
+          </div>
+        )}
+        {purchaseStatus === "success" && (
+          <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-4 mb-6 flex items-center gap-3 text-sm text-emerald-300">
+            <Check className="w-4 h-4" /> Purchase verified! Your domains are ready.
+          </div>
+        )}
+        {purchaseStatus === "error" && (
+          <div className="rounded-xl bg-amber-500/10 border border-amber-500/20 p-4 mb-6 flex items-center gap-3 text-sm text-amber-300">
+            <AlertCircle className="w-4 h-4" /> We&apos;re processing your purchase. Domains may take a moment to appear — try refreshing.
+          </div>
+        )}
+
         {loading ? (
-          <div className="flex items-center justify-center h-40"><RefreshCw className="w-5 h-5 text-indigo-400 animate-spin" /></div>
+          <div className="flex items-center justify-center h-40">
+            <RefreshCw className="w-5 h-5 text-indigo-400 animate-spin" />
+          </div>
         ) : domains.length === 0 ? (
           <div className="text-center py-20">
             <Globe className="w-12 h-12 text-white/10 mx-auto mb-4" />
             <h2 className="text-lg font-semibold mb-2">No domains yet</h2>
-            <p className="text-sm text-white/40 mb-6 max-w-md mx-auto">Search for your perfect domain and register it in seconds.</p>
-            <Link href="/domains" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-semibold text-sm transition-colors">
+            <p className="text-sm text-white/40 mb-6 max-w-md mx-auto">
+              Search for your perfect domain and register it in seconds. Your domains will appear here.
+            </p>
+            <Link
+              href="/domains"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-semibold text-sm transition-colors"
+            >
               <Search className="w-4 h-4" /> Search Domains
             </Link>
           </div>
@@ -113,6 +179,7 @@ export default function MyDomainsPage() {
               const days = daysUntilExpiry(d.expires_at);
               const isExpiring = days > 0 && days <= 30;
               const isExpired = days <= 0;
+
               return (
                 <div key={d.id} className="rounded-2xl bg-white/[0.02] border border-white/[0.06] p-5">
                   <div className="flex items-center justify-between mb-3">
@@ -123,14 +190,24 @@ export default function MyDomainsPage() {
                         {copied === d.domain ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                       </button>
                     </div>
-                    <a href={`https://${d.domain}`} target="_blank" rel="noopener noreferrer" className="text-xs text-white/30 hover:text-white/50 flex items-center gap-1">
-                      Visit <ExternalLink className="w-3 h-3" />
-                    </a>
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={`https://${d.domain}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-white/30 hover:text-white/50 flex items-center gap-1"
+                      >
+                        Visit <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
                   </div>
+
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     <div className="rounded-xl bg-white/[0.03] border border-white/[0.04] px-3 py-2">
                       <div className="text-[10px] text-white/30 mb-0.5">Status</div>
-                      <div className={`text-xs font-medium flex items-center gap-1 ${isExpired ? "text-red-400" : isExpiring ? "text-amber-400" : "text-emerald-400"}`}>
+                      <div className={`text-xs font-medium flex items-center gap-1 ${
+                        isExpired ? "text-red-400" : isExpiring ? "text-amber-400" : "text-emerald-400"
+                      }`}>
                         {isExpired ? <AlertCircle className="w-3 h-3" /> : <Check className="w-3 h-3" />}
                         {isExpired ? "Expired" : isExpiring ? `Expires in ${days}d` : "Active"}
                       </div>
@@ -150,17 +227,31 @@ export default function MyDomainsPage() {
                       </div>
                     </div>
                   </div>
+
+                  {/* Auto-renew + Nameservers */}
                   <div className="mt-3 flex items-center justify-between text-xs text-white/30">
-                    <div className="flex items-center gap-1"><Clock className="w-3 h-3" /> Auto-renew: {d.auto_renew ? "On" : "Off"}</div>
-                    <div className="flex items-center gap-1"><Settings className="w-3 h-3" /> NS: {(d.nameservers || []).join(", ") || "Default"}</div>
+                    <div className="flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      Auto-renew: {d.auto_renew ? "On" : "Off"}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Settings className="w-3 h-3" />
+                      NS: {(d.nameservers || []).join(", ") || "Default"}
+                    </div>
                   </div>
+
+                  {/* Actions */}
                   <div className="mt-4 flex flex-wrap gap-2">
-                    <Link href={`/builder?prompt=${encodeURIComponent(`Build a website for ${d.domain}`)}`}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600/20 text-indigo-400 text-xs font-medium hover:bg-indigo-600/30 transition-colors">
+                    <Link
+                      href={`/builder?prompt=${encodeURIComponent(`Build a website for ${d.domain}`)}`}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600/20 text-indigo-400 text-xs font-medium hover:bg-indigo-600/30 transition-colors"
+                    >
                       <Zap className="w-3 h-3" /> Build Website
                     </Link>
-                    <Link href="/products/hosting"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.05] text-white/50 text-xs font-medium hover:bg-white/[0.08] transition-colors">
+                    <Link
+                      href={`/products/hosting`}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.05] text-white/50 text-xs font-medium hover:bg-white/[0.08] transition-colors"
+                    >
                       <Globe className="w-3 h-3" /> Set Up Hosting
                     </Link>
                   </div>
@@ -170,6 +261,7 @@ export default function MyDomainsPage() {
           </div>
         )}
 
+        {/* Footer */}
         <div className="mt-16 text-center">
           <p className="text-[10px] text-white/15">zoobicon.com · zoobicon.ai · zoobicon.io · zoobicon.sh</p>
         </div>
