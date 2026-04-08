@@ -1201,6 +1201,22 @@ Each reseller at $499/mo typically brings 20-50 of their own clients. 10 reselle
 
 **The 80-90% rule applies to EVERY item. If a competitor has it, we must have it better.**
 
+### TIER 0: THE ONLY TWO THINGS THAT MAKE MONEY (do these FIRST or nothing else matters)
+
+> **Craig's words (April 8): "We're chasing the market instead of releasing the product and making money."**
+> **"The current website doesn't feel AI. It feels like a run of the mill website made up as we go along."**
+> **He's right. 200 API routes mean nothing if the 2 revenue products don't work flawlessly.**
+
+| # | Task | Deadline | What "done" looks like | Status |
+|---|------|----------|----------------------|--------|
+| 0A | **FULL SITE REDESIGN — AI-native look and feel** | IMMEDIATE | The entire zoobicon.com feels like a $6.6B AI platform, not a developer project. Homepage, builder, video creator, pricing, domains — every page redesigned with 2026/2027 design patterns. Bento grids, glass morphism, gradient mesh, scroll-linked animations, dark mode, cinematic hero sections. Study Lovable.dev, bolt.new, v0.app, runway.com, hedra.com for reference. The site must make a visitor say "this is the future" within 2 seconds of landing. | NOT STARTED |
+| 0B | **AI BUILDER — works perfectly end-to-end** | IMMEDIATE | User types prompt → sees site in <10s → can edit with chat → can deploy with 1 click. That's the ENTIRE scope. No MCP, no collab, no code formatter. Just: prompt → beautiful site → deploy. Match Bolt V2 speed + Lovable 2.0 quality. | BROKEN (merge damage, UI is "80s") |
+| 0C | **AI VIDEO CREATOR — works perfectly end-to-end** | IMMEDIATE | User types description → gets 30s spokesperson video with professional voice + realistic face + burned-in captions → downloads it. Match HeyGen quality + Hedra Character-3 speed. Pipeline: Fish Audio S1 (TTS) → Hedra Character-3 or fal.ai avatar → Whisper captions → download. | UNTESTED (pipeline rebuilt, never produced a real video) |
+| 0D | **DOMAIN PURCHASE — works end-to-end** | IMMEDIATE | User searches → sees availability → enters payment → domain registers. Currently needs Stripe products + webhook + DB init. | Needs Craig: Stripe products + /api/db/init |
+| 0E | **AUTH — login works** | IMMEDIATE | Admin login, Google OAuth, GitHub OAuth all functional. Currently needs env vars in Vercel. | Needs Craig: env vars (see /api/auth/diagnose) |
+
+**RULE: Nothing in Tier 1/2/3 gets touched until ALL of Tier 0 is GREEN. Revenue first. Features second.**
+
 ### TIER 1: BUILD IMMEDIATELY (blocks revenue and competitiveness)
 
 | # | Task | Why | Competitor reference | Status |
