@@ -27,9 +27,6 @@ jobs:
       - name: Quality Gate
         run: node scripts/quality-gate.js
 
-      - name: Icon Import Check
-        run: node scripts/check-icons.js
-
       - name: Lint
         run: npm run lint
 

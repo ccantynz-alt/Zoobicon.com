@@ -17,43 +17,18 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: process.env.CI ? "github" : "html",
-  timeout: 90000,
+  timeout: 30000,
 
   use: {
     baseURL: process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000",
     trace: "on-first-retry",
     screenshot: "only-on-failure",
-    navigationTimeout: 60000,
   },
 
   projects: [
-    {
-      name: "Desktop Chrome",
-      use: {
-        ...devices["Desktop Chrome"],
-        launchOptions: {
-          executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH || undefined,
-        },
-      },
-    },
-    {
-      name: "Mobile Safari",
-      use: {
-        ...devices["iPhone 13"],
-        launchOptions: {
-          executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH || undefined,
-        },
-      },
-    },
-    {
-      name: "Tablet",
-      use: {
-        ...devices["iPad (gen 7)"],
-        launchOptions: {
-          executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH || undefined,
-        },
-      },
-    },
+    { name: "Desktop Chrome", use: { ...devices["Desktop Chrome"] } },
+    { name: "Mobile Safari", use: { ...devices["iPhone 13"] } },
+    { name: "Tablet", use: { ...devices["iPad (gen 7)"] } },
   ],
 
   webServer: process.env.CI ? undefined : {

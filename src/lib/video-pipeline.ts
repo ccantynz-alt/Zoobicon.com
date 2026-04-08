@@ -57,18 +57,35 @@ export function isCustomPipelineAvailable(): boolean {
   return Boolean(process.env.REPLICATE_API_TOKEN || process.env.FAL_KEY);
 }
 
-export function getVideoPipelineInfo(): {
-  available: boolean;
-  pipeline: string;
-  models: { tts: string[]; avatar: string[]; broll: string[] };
-} {
-  return {
-    available: isCustomPipelineAvailable(),
-    pipeline: "Zoobicon Premium (TTS → Avatar → B-roll → Captions)",
-    models: {
-      tts: ["ElevenLabs", "Fish Speech", "Kokoro", "XTTS v2"],
-      avatar: ["OmniHuman", "SadTalker", "Hallo", "Wav2Lip"],
-      broll: ["Kling 3.0", "Veo 3.1", "Seedance 2", "Luma"],
+// ── Step 1: Voice Generation ──
+
+/**
+ * Generate natural speech from text using Fish Speech 1.5
+ * Returns a URL to the generated audio file
+ */
+export async function generateVoice(
+  text: string,
+  options?: { gender?: "female" | "male"; style?: string; speed?: number }
+): Promise<{ audioUrl: string; duration: number }> {
+  const token = getReplicateToken();
+
+  // Try multiple TTS models in order — first one that works wins
+  // Using model names (not version hashes) so we always get the latest version
+  const ttsModels = [
+    {
+      name: "Kokoro TTS",
+      model: "jaaari/kokoro-82m",
+      input: { text, speed: options?.speed || 1.0 },
+    },
+    {
+      name: "Fish Speech V1.5",
+      model: "fishaudio/fish-speech-1.5",
+      input: { text },
+    },
+    {
+      name: "Coqui XTTS-v2",
+      model: "afiaka87/tortoise-tts",
+      input: { text, preset: "fast" },
     },
   };
 }
@@ -97,23 +114,22 @@ export async function generateSpokespersonVideo(
   };
 }
 
-export async function generateVoice(
-  script: string,
-  opts?: { voiceId?: string; voiceGender?: "female" | "male" }
-): Promise<{ audioUrl: string; durationSec: number; model: string }> {
-  const result = await generatePremiumVideo({
-    script,
-    voiceId: opts?.voiceId ?? (opts?.voiceGender === "male" ? "male-1" : "female-1"),
-    captions: false,
-    tier: "standard",
-  });
-  const seg = result.segments.find((s) => s.kind === "avatar") ?? result.segments[0];
-  return {
-    audioUrl: seg?.url ?? result.finalVideoUrl,
-    durationSec: result.durationSec,
-    model: result.modelsUsed[0] ?? "unknown",
-  };
-}
+  for (const model of ttsModels) {
+    try {
+      console.log(`[video-pipeline] Trying ${model.name} for voice generation...`);
+
+      // Use /models/{owner}/{name}/predictions endpoint (always latest version)
+      const res = await fetch(`${REPLICATE_API}/models/${model.model}/predictions`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Prefer: "wait",
+        },
+        body: JSON.stringify({
+          input: model.input,
+        }),
+      });
 
 export async function generateLipSync(
   audioUrl: string,
@@ -151,6 +167,11 @@ export async function generateVoiceXTTS(
 
 export const generateFullVideo = generateSpokespersonVideo;
 
+  const res = await fetch(`${REPLICATE_API}/models/jaaari/kokoro-82m/predictions`, {
+    method: "POST",
+    headers: { ...replicateHeaders(), Prefer: "wait" },
+    body: JSON.stringify({ input: referenceAudioUrl ? { text, language: "en", speaker: referenceAudioUrl } : { text, language: "en" } }),
+  });
 
 export type VideoTier = "standard" | "premium";
 

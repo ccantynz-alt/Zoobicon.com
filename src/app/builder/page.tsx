@@ -850,23 +850,169 @@ function BuilderPage() {
     return html;
   }, []);
 
-  // Watchdog: warn at 15s of silence, error at 60s
-  const resetWatchdog = useCallback(() => {
-    if (watchdogSlowRef.current) clearTimeout(watchdogSlowRef.current);
-    if (watchdogStuckRef.current) clearTimeout(watchdogStuckRef.current);
-    setStreamWarning(null);
-    watchdogSlowRef.current = setTimeout(() => {
-      setStreamWarning("Connection slow — still working...");
-      console.log("[builder]", "watchdog", "slow", 15000);
-    }, 15000);
-    watchdogStuckRef.current = setTimeout(() => {
-      setBuildError({
-        message: "Build appears stuck — Vercel function may have timed out",
-        suggestion: "Try again, or check the browser console for details",
-      });
-      console.log("[builder]", "watchdog", "stuck", 60000);
-    }, 60000);
-  }, []);
+  // streamGenerate removed — all generation now uses /api/generate/react SSE stream
+  // via handleGenerate (new builds) and handleEdit (edits)
+  const _legacyStreamRemoved = useCallback(
+    async () => {
+      setStatus("generating");
+      setError("");
+      setActiveTab("preview");
+
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+
+      try {
+        const res = await fetch("/api/generate/react", {
+          method: "POST",
+          headers: authHeaders(),
+          body: JSON.stringify({
+            prompt: userPrompt,
+            tier,
+            ...(existingCode ? { existingCode } : {}),
+            ...(selectedModel ? { model: selectedModel } : {}),
+            ...(generatorBanner ? { generator: generatorBanner.id } : {}),
+            ...(agencyBrand ? { agencyBrand } : {}),
+            ...(agencyId ? { agencyId } : {}),
+            ...(mcpContext ? { externalContext: mcpContext } : {}),
+          }),
+          signal: controller.signal,
+        });
+
+        if (!res.ok) {
+          // Check if this is a non-retryable error — don't fallback, surface immediately
+          try {
+            const errData = await res.clone().json();
+            const isNonRetryable = res.status === 401 || res.status === 403 || res.status === 429 ||
+              (errData.error && (errData.error.includes("API_KEY") || errData.error.includes("not configured") || errData.error.includes("API key")));
+            if (isNonRetryable && errData.error) {
+              setError(cleanErrorMessage(errData.error));
+              setStatus("error");
+              return;
+            }
+          } catch { /* not JSON, continue to fallback */ }
+
+          // Fallback to non-streaming endpoint
+          const fallbackRes = await fetch("/api/generate/react", {
+            method: "POST",
+            headers: authHeaders(),
+            body: JSON.stringify({
+              prompt: userPrompt,
+              tier,
+              ...(existingCode ? { existingCode } : {}),
+              ...(selectedModel ? { model: selectedModel } : {}),
+              ...(generatorBanner ? { generator: generatorBanner.id } : {}),
+              ...(agencyBrand ? { agencyBrand } : {}),
+            ...(agencyId ? { agencyId } : {}),
+            }),
+          });
+          if (!fallbackRes.ok) {
+            let fbErrMsg = `Generation returned HTTP ${fallbackRes.status}`;
+            try {
+              const data = await fallbackRes.json();
+              fbErrMsg = data.error || fbErrMsg;
+            } catch {
+              if (fallbackRes.status === 504 || fallbackRes.status === 502) {
+                fbErrMsg = "AI model timed out. Try again with a simpler prompt.";
+              }
+            }
+            throw new Error(fbErrMsg);
+          }
+          const data = await fallbackRes.json();
+          let fbHtml = (data.html || "").trim();
+          fbHtml = fbHtml.replace(/^```(?:html|HTML)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
+          const fbStart = fbHtml.search(/<!doctype\s+html|<html/i);
+          if (fbStart > 0) fbHtml = fbHtml.slice(fbStart);
+          const fbEnd = fbHtml.lastIndexOf("</html>");
+          if (fbEnd !== -1) fbHtml = fbHtml.slice(0, fbEnd + "</html>".length);
+          // Validate body content before accepting fallback
+          const fbBodyM = fbHtml.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+          const fbBodyChars = fbBodyM
+            ? fbBodyM[1].replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().length
+            : 0;
+          if (fbBodyChars < 50) {
+            throw new Error(`Fallback generation produced empty body (${fbBodyChars} chars). The AI model may be unavailable — check /api/health for diagnostics.`);
+          }
+          setGeneratedCode(fbHtml);
+          setStatus("complete");
+          // Auto-replace placeholder images
+          autoReplaceImages(fbHtml).then((improved) => {
+            if (improved !== fbHtml) setGeneratedCode(improved);
+          });
+          return;
+        }
+
+        const reader = res.body?.getReader();
+        if (!reader) throw new Error("No response stream");
+
+        const decoder = new TextDecoder();
+        let accumulated = "";
+        let lineBuffer = ""; // Buffer for incomplete SSE lines split across chunks
+        let streamAborted = false; // Set when edit_failed or error terminates the stream early
+
+        const processStreamLines = (lines: string[]) => {
+          for (const line of lines) {
+            if (streamAborted) return;
+            if (!line.startsWith("data: ")) continue;
+            const jsonStr = line.slice(6).trim();
+            if (!jsonStr) continue;
+
+            try {
+              const event = JSON.parse(jsonStr);
+              if (event.type === "chunk" && event.content) {
+                accumulated += event.content;
+                setGeneratedCode(accumulated);
+              } else if (event.type === "replace" && event.content) {
+                // Server retried due to empty body — replace accumulated HTML entirely
+                accumulated = event.content;
+                setGeneratedCode(accumulated);
+              } else if (event.type === "status") {
+                // Informational status update (e.g., "Retrying...")
+              } else if (event.type === "done") {
+                if (!streamAborted) {
+                  setStatus("complete");
+                  trackEvent("build");
+                }
+              } else if (event.type === "edit_failed") {
+                // Edit produced empty body — preserve original code, show warning
+                streamAborted = true;
+                if (existingCode) {
+                  setGeneratedCode(existingCode);
+                }
+                setError(event.message || "Edit failed — original site preserved.");
+                setStatus("error");
+                return;
+              } else if (event.type === "error") {
+                // Clear empty/partial code so Sandpack shows clean state
+                setGeneratedCode("");
+                setError(cleanErrorMessage(event.message || "Stream error"));
+                setStatus("error");
+                return;
+              }
+            } catch {
+              // Skip malformed SSE lines — non-JSON data lines are harmless
+            }
+          }
+        };
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const text = decoder.decode(value, { stream: true });
+          lineBuffer += text;
+          const lines = lineBuffer.split("\n");
+          // Keep the last (potentially incomplete) line in the buffer
+          lineBuffer = lines.pop() || "";
+          processStreamLines(lines);
+        }
+
+        // Flush any remaining data after stream closes
+        if (lineBuffer.trim()) {
+          const finalText = decoder.decode();
+          lineBuffer += finalText;
+          processStreamLines(lineBuffer.split("\n"));
+        }
 
   const clearWatchdog = useCallback(() => {
     if (watchdogSlowRef.current) clearTimeout(watchdogSlowRef.current);
@@ -876,15 +1022,89 @@ function BuilderPage() {
     setStreamWarning(null);
   }, []);
 
-  // Map raw error message → user suggestion
-  const errorSuggestion = useCallback((raw: string): string => {
-    const m = raw.toLowerCase();
-    if (m.includes("anthropic") || m.includes("api key") || m.includes("api_key")) return "Set ANTHROPIC_API_KEY in Vercel env vars";
-    if (m.includes("rate limit") || m.includes("429")) return "Anthropic rate limit hit — retry in 60s or upgrade plan";
-    if (m.includes("401") || m.includes("403") || m.includes("auth")) return "Sign in required — please log in";
-    if (m.includes("quota")) return "Generation quota exceeded — upgrade your plan";
-    return "Check the browser console for details";
-  }, []);
+        if (accumulated) {
+          // Clean accumulated HTML — strip code fences, JSON preamble
+          let clean = accumulated.trim();
+          clean = clean.replace(/^```(?:html|HTML)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
+          // Strip any leading JSON config that leaked through
+          clean = clean.replace(/^\s*\{[\s\S]*?\}\s*(?=<[a-zA-Z!])/, "");
+          const ds = clean.search(/<!doctype\s+html|<html/i);
+          if (ds > 0) clean = clean.slice(ds);
+          const he = clean.lastIndexOf("</html>");
+          if (he !== -1) clean = clean.slice(0, he + "</html>".length);
+
+          // Client-side body check — last line of defense against empty pages
+          const bodyM = clean.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+          const bodyChars = bodyM
+            ? bodyM[1].replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().length
+            : 0;
+
+          if (existingCode && bodyChars < 50) {
+            // Edit produced empty body — restore original code
+            console.warn(`[Builder] Edit produced empty body (${bodyChars} chars). Restoring original code.`);
+            setGeneratedCode(existingCode);
+            setError("Edit response was incomplete. Your original site has been preserved. Try a simpler edit or try again.");
+            setStatus("error");
+            return;
+          } else if (!existingCode && bodyChars < 50) {
+            // Body is empty even after server retry — do one client-side retry via non-streaming endpoint
+            console.warn(`[Builder] Empty body after stream (${bodyChars} chars). Client-side retry...`);
+            try {
+              const retryRes = await fetch("/api/generate/react", {
+                method: "POST",
+                headers: authHeaders(),
+                body: JSON.stringify({
+                  prompt: userPrompt,
+                  tier,
+                  ...(selectedModel ? { model: selectedModel } : {}),
+                  ...(agencyBrand ? { agencyBrand } : {}),
+            ...(agencyId ? { agencyId } : {}),
+                }),
+                signal: controller.signal,
+              });
+              if (retryRes.ok) {
+                const retryData = await retryRes.json();
+                let retryHtml = (retryData.html || "").trim();
+                retryHtml = retryHtml.replace(/^```(?:html|HTML)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
+                const rds = retryHtml.search(/<!doctype\s+html|<html/i);
+                if (rds > 0) retryHtml = retryHtml.slice(rds);
+                const rhe = retryHtml.lastIndexOf("</html>");
+                if (rhe !== -1) retryHtml = retryHtml.slice(0, rhe + "</html>".length);
+                // Only accept retry if it actually has body content
+                const retryBodyM = retryHtml.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+                const retryBodyChars = retryBodyM
+                  ? retryBodyM[1].replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().length
+                  : 0;
+                if (retryBodyChars >= 50) {
+                  clean = retryHtml;
+                } else {
+                  console.warn(`[Builder] Client-side retry also empty (${retryBodyChars} body chars)`);
+                  // All retries exhausted — clear HTML and show error instead of empty page warning
+                  setGeneratedCode("");
+                  setError("Generation produced empty content after multiple retries. Your API key may be invalid or rate-limited — check /api/health for diagnostics, then try again.");
+                  setStatus("error");
+                  return;
+                }
+              } else {
+                // Retry request failed — read actual error and show it
+                let retryErrMsg = "Generation failed after retries. Please try again.";
+                try {
+                  const retryErrData = await retryRes.json();
+                  if (retryErrData.error) retryErrMsg = retryErrData.error;
+                } catch { /* ignore parse errors */ }
+                setGeneratedCode("");
+                setError(retryErrMsg);
+                setStatus("error");
+                return;
+              }
+            } catch (retryErr) {
+              console.error("[Builder] Client-side retry failed:", retryErr);
+              setGeneratedCode("");
+              setError("Generation failed — please try again.");
+              setStatus("error");
+              return;
+            }
+          }
 
   // Update timeline based on section state transitions
   const upsertSection = useCallback((section: string, status: "scaffolding" | "customizing" | "done") => {

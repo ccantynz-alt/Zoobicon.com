@@ -31,10 +31,8 @@ export async function POST(request: NextRequest) {
     }
 
     // ── Admin login (env-based, no database needed) ──
-    // Trim env vars aggressively — Vercel pastes sometimes include trailing
-    // newlines/spaces which made strict === comparison silently fail.
-    const adminEmail = (ADMIN_EMAIL || "").trim().toLowerCase();
-    const adminPassword = (ADMIN_PASSWORD || "").trim();
+    const adminEmail = ADMIN_EMAIL;
+    const adminPassword = ADMIN_PASSWORD;
 
     // If admin env vars aren't set, return a clear error so Craig can tell
     // the difference between "password wrong" and "server not configured".
