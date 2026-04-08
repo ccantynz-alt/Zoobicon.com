@@ -455,7 +455,8 @@ Output ONLY valid JSON. No markdown, no code fences.`,
     });
 
     let aiAnalysis = null;
-    const aiText = aiResult.content[0].type === "text" ? aiResult.content[0].text : "";
+    const aiTextBlock = aiResult.content.find((b) => b.type === "text") as { type: "text"; text: string } | undefined;
+    const aiText = aiTextBlock?.text || "";
     try {
       // Try to parse JSON from the response
       const jsonMatch = aiText.match(/\{[\s\S]*\}/);

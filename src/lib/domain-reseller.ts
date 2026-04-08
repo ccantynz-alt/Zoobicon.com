@@ -180,7 +180,17 @@ async function callOpenSRS(
         "Content-Length": String(Buffer.byteLength(xml)),
       },
       body: xml,
+      signal: AbortSignal.timeout(10000),
     });
+
+    if (!response.ok) {
+      const body = await response.text().catch(() => "");
+      console.error(`[OpenSRS] HTTP ${response.status}: ${response.statusText}`, body.slice(0, 500));
+      return {
+        success: false,
+        error: `OpenSRS HTTP ${response.status}: ${response.statusText}`,
+      };
+    }
 
     const text = await response.text();
 
@@ -336,7 +346,12 @@ export async function registerDomain(
   });
 
   if (result.success) {
-    return { success: true, orderId: `opensrs-${Date.now()}` };
+    // Parse the real OpenSRS order ID from the XML response if present.
+    const raw: string = (result.data as { raw?: string } | undefined)?.raw || "";
+    const orderIdMatch = raw.match(/<item key="id">(\d+)<\/item>/) ||
+                         raw.match(/<item key="order_id">(\d+)<\/item>/);
+    const orderId = orderIdMatch?.[1] || `opensrs-${Date.now()}`;
+    return { success: true, orderId };
   }
 
   return { success: false, error: result.error };

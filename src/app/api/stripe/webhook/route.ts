@@ -247,10 +247,128 @@ export async function POST(request: NextRequest) {
   let handled = false;
   try {
     switch (event.type) {
-      case "checkout.session.completed":
-        await handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session);
-        handled = true;
-        break;
+      case "checkout.session.completed": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const email = (session.metadata?.email ?? session.customer_email) as string;
+        if (!email) break;
+
+        const customerId = session.customer as string;
+        const subscriptionId = session.subscription as string;
+        const plan = session.metadata?.plan || "pro";
+        if (!session.metadata?.plan) {
+          console.warn(`[webhook] checkout.session.completed: missing plan metadata for session ${session.id}, defaulting to 'pro'`);
+        }
+
+        // Check if this is a marketplace add-on purchase
+        const addonId = session.metadata?.addonId;
+        const addonName = session.metadata?.addonName;
+
+        // Video overage credit pack purchase
+        if (session.metadata?.type === "video_overage") {
+          const packId = session.metadata?.packId;
+          const pack = OVERAGE_PACKS.find((p) => p.id === packId);
+          if (pack) {
+            await addOverageCredits(email, pack, session.id);
+            console.log(`[webhook] Video credits fulfilled: ${pack.name} for ${email}`);
+          }
+          break;
+        }
+
+        // Domain registration purchase — register with OpenSRS + save to DB
+        if (session.metadata?.type === "domain_registration") {
+          const domainList = session.metadata?.domains?.split(",") || [];
+          const registrantEmail = session.metadata?.registrantEmail || email;
+          const years = parseInt(session.metadata?.years || "1", 10);
+          const expiresAt = new Date();
+          expiresAt.setFullYear(expiresAt.getFullYear() + years);
+
+          // Parse registrant contact info from metadata
+          const registrant: ContactInfo = {
+            firstName: session.metadata?.registrantFirstName || "Domain",
+            lastName: session.metadata?.registrantLastName || "Owner",
+            email: registrantEmail,
+            phone: session.metadata?.registrantPhone || "+1.0000000000",
+            address1: session.metadata?.registrantAddress || "TBD",
+            city: session.metadata?.registrantCity || "TBD",
+            state: session.metadata?.registrantState || "NA",
+            postalCode: session.metadata?.registrantZip || "00000",
+            country: session.metadata?.registrantCountry || "US",
+          };
+
+          for (const domain of domainList) {
+            if (!domain.trim()) continue;
+            const trimmedDomain = domain.trim();
+
+            // Step 1: Save to database as "pending_registration"
+            // CRITICAL: never downgrade status on conflict — if a previous
+            // webhook or verify-purchase already marked this domain 'active',
+            // keep it active. Also skip OpenSRS if already active (idempotency).
+            let alreadyActive = false;
+            try {
+              const existing = (await sql`
+                SELECT status FROM registered_domains WHERE domain = ${trimmedDomain} LIMIT 1
+              `) as Array<{ status: string }>;
+              if (existing[0]?.status === "active") {
+                alreadyActive = true;
+                console.log(`[webhook] ${trimmedDomain} already active — skipping duplicate registration`);
+              }
+
+              await sql`
+                INSERT INTO registered_domains (domain, user_email, status, expires_at, auto_renew, privacy_protection)
+                VALUES (${trimmedDomain}, ${registrantEmail}, ${"pending_registration"}, ${expiresAt.toISOString()}, true, true)
+                ON CONFLICT (domain) DO UPDATE SET
+                  status = CASE
+                    WHEN registered_domains.status = 'active' THEN 'active'
+                    ELSE EXCLUDED.status
+                  END,
+                  expires_at = ${expiresAt.toISOString()},
+                  user_email = ${registrantEmail}
+              `;
+            } catch (err) {
+              console.error(`[webhook] Failed to save domain ${trimmedDomain} to DB:`, err);
+            }
+
+            if (alreadyActive) continue;
+
+            // Step 2: Register with OpenSRS
+            try {
+              const result = await registerDomain({
+                domain: trimmedDomain,
+                period: years,
+                registrant,
+                autoRenew: true,
+                privacyProtection: true,
+              });
+
+              if (result.success) {
+                // Update status to active
+                await sql`
+                  UPDATE registered_domains SET status = 'active', opensrs_order_id = ${result.orderId || null}
+                  WHERE domain = ${trimmedDomain}
+                `;
+                console.log(`[webhook] Domain registered with OpenSRS: ${trimmedDomain} (order: ${result.orderId})`);
+              } else {
+                // Registration failed — mark for manual review
+                await sql`
+                  UPDATE registered_domains SET status = 'registration_failed', registration_error = ${result.error || 'Unknown error'}
+                  WHERE domain = ${trimmedDomain}
+                `;
+                console.error(`[webhook] OpenSRS registration failed for ${trimmedDomain}: ${result.error}`);
+              }
+            } catch (err) {
+              const msg = err instanceof Error ? err.message : "Unknown error";
+              console.error(`[webhook] OpenSRS registration error for ${trimmedDomain}:`, msg);
+              try {
+                await sql`
+                  UPDATE registered_domains SET status = 'registration_failed', registration_error = ${msg}
+                  WHERE domain = ${trimmedDomain}
+                `;
+              } catch { /* DB update failed too — logged above */ }
+            }
+          }
+          console.log(`[webhook] Domain registration: ${domainList.length} domains for ${registrantEmail}`);
+          break;
+        }
 
       case "customer.subscription.created":
       case "customer.subscription.updated":

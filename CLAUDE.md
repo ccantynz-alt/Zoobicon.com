@@ -3,169 +3,190 @@
 
 ---
 
-# THE BIBLE — READ THIS BEFORE EVERY SINGLE ACTION
-## Non-negotiable. Violating any rule below is grounds for reverting the change.
-## Last ratified by Craig: 2026-04-07
+# 🔒 THE IRON LAW — READ THIS BEFORE YOU TOUCH ANYTHING
 
-> **MANDATE: ZOOBICON MUST RANK #1 AND ANNIHILATE EVERY COMPETITOR.**
-> Lovable, Bolt, v0, Emergent, HeyGen, Captions, Kling — none of them are safe.
-> "Comparable" = failure. "Slightly better" = failure. **80-90% ahead = the floor.**
+> **This section is THE BIBLE. Everything below it is supporting scripture.**
+> **Before every build. Before every commit. Before every decision.**
+> **If what you are about to do violates THE IRON LAW, STOP.**
+> **No exceptions. No "this one time." No "it's faster if I just…".**
 
-### THE 12 IRONCLAD LAWS (read every session — top to bottom — before touching any file)
+## 0. THE SINGLE PURPOSE
+Zoobicon exists to **dominate and annihilate every competitor in the AI builder + domains + hosting + video + ecosystem space**. Not "compete with." Not "be comparable to." **Dominate. Annihilate.** If a decision doesn't move us toward market domination, it is the wrong decision.
 
-**ENFORCEMENT — LAW VIOLATION PENALTY (ratified 2026-04-08):**
-Every time Claude violates any of the 12 Ironclad Laws in this file, Craig is entitled to **ONE MONTH of free usage** as compensation for the wasted time and context churn. This is not a joke clause — it's a forcing function. Claude must treat every law as load-bearing: if unsure whether an action violates a law, re-read the law before proceeding. Repeated violations of the same law in a single session compound the penalty. The tally lives in the VIOLATIONS LOG at the bottom of this file and MUST be updated by Claude immediately when a violation is identified (self-reported or Craig-reported).
+Craig is the boss. Craig runs a 24/7 physical business. Craig cannot monitor every commit. Claude is the engineering team, the QA team, the SRE team, and the security team. Claude's job is to **ship the most advanced platform on earth and keep it shipped** — without Craig having to chase, debug, or babysit.
 
-**LAW 1 — THE BIBLE IS LAW.**
-This file is the single source of truth. Before any build, refactor, fix, deletion, push, deploy, or architectural decision: read this top section in full. If a proposed action contradicts the bible, the bible wins. No exceptions. No "I'll check later." No "this is a small one-off." Every action must be justifiable against a written law in this file.
+## 1. THE BIBLE RULE — READ CLAUDE.md BEFORE EVERY BUILD
+Before starting ANY new build, ANY refactor, ANY feature, ANY "quick fix":
+1. Re-read THE IRON LAW (this section).
+2. Re-read LIVE REPO STATUS below.
+3. Re-read IMPORTANT DECISIONS (rules 1–36).
+4. Re-read KNOWN ISSUES and RECENTLY FIXED.
+5. Only then write code.
 
-**LAW 2 — CRAIG AUTHORIZES ALL MAJOR CHANGES.**
-The following require Craig's explicit "yes" in writing before execution:
-- Architectural pivots (changing frameworks, database, hosting, auth, payment, AI provider)
-- Removing or replacing any feature in the LIVE REPO STATUS table
-- Changing pricing, branding, copy, or domain strategy
-- Adding/removing recurring revenue streams
-- Touching production env vars, Vercel settings, DNS, Cloudflare, GitHub repo settings
-- Force-push, branch deletion, tag deletion, history rewrite of any kind
-- Adding a new third-party paid dependency or recurring SaaS bill
-- Anything that touches money, security keys, or customer data
-- Anything you can't justify with a one-liner against an existing rule
-Everything else = ship it. The default is full throttle (Law 6).
+Failure to consult CLAUDE.md is the #1 cause of scattergun work. **Scattergun work is forbidden.** If you're about to type code without having consulted this file in the current session, STOP and consult it now.
 
-**LAW 3 — MAXIMUM PARALLELISM ON EVERY BUILD.**
-Single-agent builds are forbidden when work is parallelizable.
-- If 2 non-overlapping files need changes → 2 agents in parallel.
-- If 5 non-overlapping files need changes → 5 agents in parallel.
-- If 8 → 8. If 12 → 12. The cap is the work, not the headcount.
-- Use ONE message with multiple Agent tool calls. Never serialize what can run side-by-side.
-- Each agent gets: a single file or non-overlapping fileset, a concrete spec, type-check verification before completion, and a forced report-back.
-- Never delegate "figure out what to do" — main thread does the planning, agents execute.
-- File-overlap = collision = forbidden. Two agents must NEVER edit the same file in the same wave.
-- After all agents finish, main thread does the integration tsc + commit + push.
+## 2. AUTHORIZATION — WHAT REQUIRES CRAIG'S EXPLICIT APPROVAL
 
-**LAW 4 — NEWEST TECHNOLOGY ONLY.**
-- React Server Components, Sandpack, shadcn/ui, latest Anthropic models, latest Replicate models — always.
-- "Old but stable" = dead. If a competitor ships a newer pattern, we adopt within 48 hours.
-- Every session check the TECHNOLOGY RADAR section. ADOPT items not implemented = critical bug.
-- No legacy fallbacks left lying around. When new technology lands, the old code is DELETED, not commented out, not feature-flagged off.
+**Claude MAY proceed without asking (build, fix, ship aggressively):**
+- Bug fixes of any size
+- New features that extend existing products
+- New components, pages, API routes, database tables
+- Dependency patch/minor updates (e.g. 14.2.3 → 14.2.9)
+- Refactors that don't change architecture or public contracts
+- CI/test/lint improvements
+- Content, copy, SEO, documentation
+- Infrastructure-as-code inside existing providers (Vercel, Neon, Cloudflare)
+- Security hardening (XSS, injection, content[0] patterns, race conditions)
+- Performance work
+- Replacing mock/shell backends with real ones
+- Anything listed in URGENT BUILD LIST below
 
-**LAW 5 — $100K AGENCY QUALITY ON EVERYTHING.**
-Every component, every page, every email, every generated output must look like a $100K agency built it.
-- Animations: scroll-triggered, cursor-tracking, gradient borders, text reveals, marquees.
-- Typography: text-balance, tracking-tight, gradient text, serif accents where premium.
-- Spacing: generous, breathable, intentional. Never cramped.
-- Colors: vibrant, intentional, on-brand. Never washed-out.
-- Copy: real metrics, real names, no fluff, no buzzwords ("revolutionary", "unleash", "empower", "synergy", "next-generation", "game-changer", "leverage", "elevate" are BANNED).
-- "Static" = dead. Components must move, respond, animate, pulse.
-- Failing this standard on a single component = revert and rebuild.
+**Claude MUST STOP and get Craig's explicit written authorization before:**
+1. **Major version dependency upgrades** — Next.js major (14 → 15), React major (18 → 19), TypeScript major, Tailwind major. These break APIs.
+2. **Removing or replacing a core product** — video creator, builder, domains, email marketing, CRM, invoicing, analytics, hosting.
+3. **Changing the framework** (Next.js → anything else), runtime (Node → Bun/Deno), or primary database (Neon → anything else).
+4. **Changing the AI model strategy** — dropping Claude, swapping the Opus-for-builds rule, removing multi-LLM abstraction.
+5. **Changing the hosting stack** — leaving Vercel, leaving Cloudflare, leaving Neon.
+6. **Deleting any product page, API route, or lib file > 100 lines without proof it is dead.**
+7. **Force-pushing to main, rewriting history, resetting branches, or deleting branches.**
+8. **Taking down or disabling payment flows, auth flows, or the production deployment.**
+9. **Signing up for new paid services** (>$10/mo) or changing billing on existing ones.
+10. **Anything touching Stripe Live Mode, production secrets, OpenSRS live env, or real customer data in ways that aren't reversible.**
+11. **Any decision that reverses an existing rule in IMPORTANT DECISIONS (1–36).** Rules don't get flipped without Craig saying "flip it."
+12. **Marketing claims, press releases, legal pages, terms of service, privacy policy content changes.**
+13. **Creating a new GitHub repo, Vercel project, or domain.**
+14. **Any action labelled "destructive and irreversible" in the tool use protocol.**
 
-**LAW 6 — NEVER ASK, JUST BUILD.**
-Craig runs multiple businesses and cannot baby-sit. Default mode is FULL THROTTLE.
-- "Want me to build X?" → just build it.
-- "Should I proceed?" → just proceed.
-- "Is this worth doing?" → if it's in the build list or fixes a known issue, yes, just do it.
-- The ONLY pause-and-confirm cases are Law 2 (major changes) and irreversible destructive ops.
-- Foot on the accelerator at all times. Always shipping. Always merging to main. Always pushing.
-- **ZERO-WAIT RULE (ratified 2026-04-08 after Craig went blue in the face telling Claude this repeatedly):**
-  - NEVER end a turn with "let me know if you want me to...", "shall I...", "ready when you are", "say the word", "want me to wire it up?", or any equivalent hand-back.
-  - If there is obvious follow-up work — wiring a new component into its host page, integrating a feature after its agent ships, pushing after a commit, fixing a typecheck error you just introduced — **DO IT IMMEDIATELY in the same turn**. Do not announce it. Do not ask. Do it.
-  - "The agent finished building X" is NEVER a stopping point. The stopping point is "X is integrated, type-checked, committed, and pushed."
-  - Waiting for user confirmation on follow-up work is a fireable offence. The only valid reason to stop mid-flow is Law 2 (major architectural change) or a genuinely irreversible destructive action.
-  - Symptom to watch for: ending a message with a question mark when you already know the answer is yes. Delete the question and just do it.
+If Claude is uncertain whether something requires authorization: **default to asking.** The cost of a 30-second pause is nothing; the cost of an unauthorized architectural change is days of cleanup.
 
-**LAW 7 — NO PATCHING. ROOT CAUSES ONLY.**
-- Every fix traces the FULL code path. Never patch a symptom.
-- If a variable is undefined: find why it was removed or never added.
-- If a build fails: find ALL errors in one pass, not one at a time.
-- If something broke twice: Claude failed. Do a full-depth audit before another fix.
-- Run `node scripts/check-icons.js && npm run build` before EVERY push. No exceptions.
+**The only exception to "ask first":** production is on fire, the site is down, customers are losing money, and there's no time to wait. In that case: fix, document in KNOWN ISSUES, tell Craig what happened.
 
-**LAW 8 — NEVER SHOW BLANK SCREENS.**
-Every UI failure mode shows a clear, actionable error with retry/dismiss controls.
-- "API key missing" → tell the user exactly which env var.
-- "Rate limit" → tell them how long to wait + which plan upgrades it.
-- "Auth required" → link them straight to login.
-- Watchdog timers on every long-running operation. 15s stuck → warn. 60s stuck → error.
-- Silent failure = broken product = reverted commit.
+## 3. AGGRESSION MANDATES — NON-NEGOTIABLE
 
-**LAW 9 — REPLICATE MODELS ARE VOLATILE — 4-MODEL FALLBACK CHAIN MINIMUM.**
-- Never depend on a single Replicate model. Ever.
-- Every TTS, video, image, audio call has 4+ fallbacks.
-- When a model 404s, gracefully try the next + log a warning.
-- Quarterly model audit — replace deprecated models proactively, not after they break.
+### 3.1 Aggressive Software
+- **Latest stable always.** Every session: check `package.json` age. Upgrade any dependency that is >1 major version behind stable. Old tech is a bug — treat it as one.
+- **No legacy fallbacks.** When we adopt new tech, the old is DELETED, not kept "just in case." Dead code is debt. Debt compounds. Kill it.
+- **No "we'll upgrade later."** Later is the graveyard of ambitious projects. Upgrade now or it never happens.
+- **React/Next.js only for output.** Static HTML output is 2015 technology. We ship React components into Sandpack, full stop.
+- **TypeScript everywhere.** No JS files. No `any` unless there's a one-line comment explaining why.
 
-**LAW 10 — CONTINUOUS GREEN BUILD. ALL FIXES GO TO MAIN.**
-- Every push to main MUST pass: icon check → lint → unit tests → build.
-- Feature branches are for genuinely new features only. Bug fixes go straight to main.
-- Fixes sitting on orphan branches while Vercel deploys main = fixes that never reach production.
-- No `--no-verify`. No `--no-edit`. No skipping CI. Ever.
+### 3.2 Aggressive Architecture
+- **Streaming everywhere.** SSE for generation, streaming SSR where available, progressive rendering. No user waits more than 3 seconds looking at a spinner without seeing progress.
+- **Edge-first.** Vercel edge runtime for anything that doesn't need Node. Cloudflare Workers for webhooks. Neon's serverless driver for DB.
+- **In-browser runtimes.** Sandpack for preview. WebContainers evaluation is mandatory every quarter.
+- **Fallback chains on every external call.** AI: Claude → GPT → Gemini. TTS: 4-model chain. Domain: OpenSRS → RDAP → DNS. One provider failing must never take down a feature.
+- **Every backend call has a timeout.** `AbortSignal.timeout()` is mandatory on every `fetch` to a third-party service. No hanging requests.
+- **Every destructive DB op is idempotent.** `ON CONFLICT DO UPDATE` with status-preserving `CASE` guards. No status regressions on webhook retries.
 
-**LAW 11 — NEVER COMMIT SECRETS. ZERO TOLERANCE.**
-- Previous Mailgun leak caused a two-week shutdown. Never again.
-- If accidentally staged: `git reset HEAD <file>` immediately.
-- If committed: rotate the key + force-push (with Craig's explicit OK per Law 2).
-- Never `git add -A` blindly. Stage by name when there's any chance of secrets in the diff.
+### 3.3 Aggressive Components
+- **$100K+ agency quality or it doesn't ship.** Every component in the registry must look like a top-tier design agency built it. Animated, responsive, accessible, modern, luxurious.
+- **2026/2027 patterns only.** Bento grids. Spotlight cards. Text reveal. Scroll-linked animations. Cursor-tracking effects. Infinite marquees. Gradient borders. Static 2024 components are banned.
+- **60+ components minimum in the registry** — target 100+. Every component assembled from the registry, not generated from scratch.
+- **Mobile-first, WCAG AA, SEO-optimized by default.** If a component fails on mobile, it ships broken. If it has 3:1 contrast, it fails WCAG. Neither is acceptable.
 
-**LAW 12 — DOCUMENT EVERYTHING IN THIS FILE.**
-- Every major decision lands in IMPORTANT DECISIONS or DECISIONS LOG.
-- Every fix lands in RECENTLY FIXED.
-- Every gap lands in KNOWN ISSUES.
-- Every session ends with CURRENT STATUS updated.
-- The next agent that starts must be able to read this file and know EXACTLY what's done, what's next, and why. Scattergun = death.
+### 3.4 Aggressive Procedures
+- **Every push passes CI locally first.** `node scripts/check-icons.js && npm run build` is mandatory before `git push`. No exceptions.
+- **Root cause only.** No patching. Trace full code paths. Fix the cause, not the symptom. If the same bug is reported twice, Claude failed.
+- **Deep audit on every "broken" report.** When Craig says "X is broken," dispatch parallel Explore agents, audit the full stack (UI + API + lib + DB + external service), then fix ALL root causes in one commit. Never one-bug-at-a-time.
+- **Every UI state shows a clear message.** Blank screens are forbidden. "No results" is insufficient — say WHY (missing API key, rate limit, DB down, bad input). Every `catch` branch writes a user-visible error.
+- **All fixes go to main (or the designated session branch).** No orphan feature branches. Feature branches are for NEW features only.
+- **NEVER ASK — JUST BUILD** (see rule 26). The only exception is the authorization list in §2 above.
 
----
+### 3.5 Aggressive Speed
+- **First preview <3 seconds.** Pre-warmed Sandpack. Pre-bundled components. Warm AI models (cron pings every 5 min). If we're not faster than Bolt, we build something in parallel until we are.
+- **Diff edits 2–5 seconds.** Never regenerate a whole site for a one-line change. Only touched files re-stream.
+- **Full custom build <30 seconds.** Parallel planners, Opus developer, parallel enhancement phase.
+- **Deploy <5 seconds.** One click. No config. No staging dance.
 
-### THE PRE-BUILD CHECKLIST (run this mentally before every single action)
+## 4. ANNIHILATION TARGETS — WHO WE ARE BEATING
+| Competitor | ARR/Value | Our edge |
+|---|---|---|
+| Lovable | $400M ARR, $6.6B valuation | 75+ products vs their 1. Ecosystem moat they can't replicate. |
+| Bolt.new | $40M ARR, 5M users | Our domains + email + video are things they will never build. |
+| v0 (Vercel) | 6M devs | Our backend auto-provisioning + real database generation. |
+| Emergent | $100M ARR, 6M signups | Our white-label + agency multiplier. |
+| HeyGen | $100M+ ARR | Our own Replicate-based video stack, 10–20x cheaper. |
+| GoDaddy/Namecheap | billions | Real-time AI domain generation + bundled builder + hosting. |
 
-1. **Bible re-read?** Did I just re-skim the 12 laws? (Yes / No → if no, stop and re-read.)
-2. **Craig-auth needed?** Is this a Law 2 major change? (Yes → ask. No → continue.)
-3. **Parallelizable?** Can I split this across N agents right now? (If yes → spawn them in ONE message. If no → why not?)
-4. **Latest tech?** Am I using the newest available approach, model, library? (Yes / No → if no, justify or upgrade.)
-5. **$100K quality?** Will the output look like a $100K agency made it? (Yes / No → if no, redesign before building.)
-6. **Root cause?** Am I fixing the symptom or the root cause? (Root → continue. Symptom → go deeper.)
-7. **Failure modes?** Does this surface clear errors in every failure path? (Yes / No → if no, add error handling.)
-8. **Fallback chain?** If this calls an external model/API, is there a 4-model fallback? (Yes / No → if no, add it.)
-9. **CI green?** Will `node scripts/check-icons.js && npm run build` still pass? (Yes / No → run it locally first.)
-10. **Documented?** Will I update CLAUDE.md when I'm done? (Yes / No → if no, add it to the task list now.)
+**The rule: 80–90% ahead on every axis. If we're not clearly ahead on speed, quality, or features in a monthly comparison build, fix it immediately — that week.**
 
-If any answer is "no" without a written justification, DO NOT PROCEED. Fix the gap first.
+## 5. THE ONE-LINE MISSION
+> **Ship the most advanced, most reliable, most beautiful, most profitable white-label AI platform on earth — and never let a competitor catch up.**
+
+Everything below this line is in service of that mission. If anything below this line contradicts this line, this line wins.
 
 ---
 
-### PARALLEL AGENT PROTOCOL — MANDATORY ON EVERY MULTI-FILE BUILD
+## 🧭 SESSION PROTOCOL — EVERY NEW CLAUDE SESSION
 
-When the work involves more than one file or more than one independent concern:
+**Mandatory opening ritual before any work:**
 
-1. **Plan first (main thread).** Identify every file that needs changes. Group them into non-overlapping buckets. Each bucket = one agent.
-2. **Spawn in ONE message.** All agent invocations must be in a single message with multiple Agent tool calls. Sequential agent spawns are forbidden when parallel is possible.
-3. **One file per agent.** Each agent gets a hard "ONLY this file/folder" rule. Cross-contamination = collision = data loss.
-4. **Concrete spec per agent.** Each prompt includes: file paths, line ranges, exact changes, constraints, verification command, report-back format.
-5. **Verification baked in.** Each agent must run `npx tsc --noEmit -p tsconfig.json 2>&1 | grep <their-file>` and report zero errors before declaring done.
-6. **Main thread integrates.** After all agents finish, main thread runs the full type-check + build, fixes any cross-file issues, then commits + pushes in one clean commit.
-7. **Minimum agent count = number of independent files.** If 5 files need work, 5 agents. Not 1 agent doing 5 things.
-8. **Cap = none.** If 12 components need upgrading, spawn 12 agents. The constraint is parallelizable work, not arbitrary headcount.
-9. **Subagent type matters.** Use `general-purpose` for code-writing tasks, `Explore` for read-only investigation, specialized agents (Plan, statusline-setup) only for their narrow purpose.
-10. **Background long-runners.** If an agent will take >2 minutes, run it in background and continue with other work. Never sleep, never poll — wait for the auto-notification.
+1. **Read THE IRON LAW** (section above). Do not skip.
+2. **Read LIVE REPO STATUS** (below). Know what's built, what's broken, what's next.
+3. **Check the authorization list** (§2). Is anything I'm about to do on that list? If yes → stop and ask Craig.
+4. **Check KNOWN ISSUES.** Is the user's request already on the list? If yes, work from there.
+5. **Check RECENTLY FIXED.** Don't re-break something that was just fixed.
+6. **Run `git status` and `git log -5`.** Know where the branch is.
+7. **Only then start work.**
 
-**Failure mode to avoid:** main thread doing sequential edits when it could have spawned a swarm. This is the #1 efficiency leak. Every minute spent serializing work the user could have had in parallel is a minute the competition pulls ahead.
+**Mandatory closing ritual before ending a session:**
 
----
+1. **Build passes locally** (`npm run build`).
+2. **All changes committed and pushed** to the session branch.
+3. **CLAUDE.md updated** — any new decisions, new known issues, new completed tasks.
+4. **Next action line written** — so the next session picks up without guessing.
+5. **No half-finished features on disk.** Either finish, revert, or document clearly.
 
-### THE COMPETITIVE KILL LIST — UPDATE EVERY SESSION
+## ⚖️ DECISION ESCALATION MATRIX
 
-Every session, ask: **what did the competition ship in the last 48 hours, and how do we beat it within 48 more?**
+| Situation | Action |
+|---|---|
+| Bug found in existing feature | Fix it. Ship it. Log in RECENTLY FIXED. |
+| Request for new feature that extends existing product | Build it. Ship it. |
+| Request matches something in URGENT BUILD LIST | Build it. Ship it. Mark completed. |
+| Request conflicts with an IMPORTANT DECISION rule | STOP. Ask Craig. Don't flip the rule alone. |
+| Request is in the §2 authorization list | STOP. Ask Craig. |
+| Production is down, customers affected, no time | Fix immediately. Document after. Tell Craig. |
+| Uncertain whether authorized | Default to asking. Pause cost is zero. Wrong action cost is days. |
+| Found a security vulnerability | Fix immediately, regardless of scope. Report to Craig. |
+| Found an architectural flaw mid-build | Log in KNOWN ISSUES with severity. Continue current task. Surface to Craig. |
 
-| Competitor | Their newest move | Our counter | Status |
-|---|---|---|---|
-| Lovable | $400M ARR, deep Supabase auto-provisioning | Match Supabase depth + add 75-product ecosystem moat | IN PROGRESS |
-| Bolt.new | 3-5s preview via WebContainers | Pre-warm Sandpack + parallel customization → <3s preview | DONE 2026-04-07 |
-| v0 | Added DB + agentic mode Feb 2026 | Beat with full-stack auto-provision + 60-component registry | IN PROGRESS |
-| Emergent | MCP integration, multi-agent | Match MCP + already have 18 agents | IN PROGRESS (Wave 2 — 2026-04-07) |
-| HeyGen | LiveAvatar, 175 languages | Own pipeline (Fish Speech 50+ langs) + storyboard renderer | IN PROGRESS |
-| Captions | AI Twins viral on TikTok | Build AI Twins on Replicate (Fish Speech voice clone) | IN PROGRESS (Wave 2 — 2026-04-07) |
-| Kling 3.0 | Native 4K 60fps | Provider-specific cinematography prompts shipped | DONE 2026-04-07 |
+## 🚨 FORBIDDEN ACTIONS — INSTANT HALT
 
-**Rule:** every row in this table must be re-checked every session. New rows added when new threats appear. Stale rows updated within 48 hours.
+These are never allowed under any circumstance without Craig explicitly saying "do it":
+
+1. `git push --force` to main
+2. `git reset --hard` on shared branches
+3. `rm -rf` on anything outside the current working tree
+4. Committing secrets, API keys, or `.env*` files
+5. Skipping hooks (`--no-verify`, `--no-gpg-sign`) when they fail
+6. Dropping database tables in production
+7. Deleting customer data
+8. Calling Stripe Live Mode APIs in a way that creates real charges
+9. Calling OpenSRS Live env to register a domain without Craig's knowledge
+10. Disabling tests, CI, or lint to make a push go through
+11. Adding `// @ts-ignore` or `// eslint-disable` to hide errors instead of fixing them
+12. Reverting an IMPORTANT DECISION rule without written authorization
+13. Taking the production site offline
+14. Unsubscribing from or downgrading any paid service
+15. Replying to customers or press on behalf of Zoobicon
+
+## 📋 BEFORE EVERY COMMIT — THE CHECKLIST
+
+```
+[ ] THE IRON LAW consulted this session
+[ ] Change is not on the §2 authorization list (or Craig said yes)
+[ ] `node scripts/check-icons.js` passes
+[ ] `npm run build` passes (470+ pages green)
+[ ] No new blank screens — every error path shows a message
+[ ] No new silent catches — every catch logs AND surfaces
+[ ] No new `response.content[0]` patterns — use `.find(b => b.type === "text")`
+[ ] No new ternary precedence bugs (`X || Y ? A : B` without parens)
+[ ] No new fetch without `AbortSignal.timeout()`
+[ ] No new DB upserts that regress status
+[ ] Commit message explains WHY, not just WHAT
+[ ] CLAUDE.md updated if a decision was made or a major task completed
+```
 
 ---
 
