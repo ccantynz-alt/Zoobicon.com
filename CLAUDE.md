@@ -133,25 +133,84 @@ Everything below this line is in service of that mission. If anything below this
 
 ---
 
+## 6. PROACTIVE COMPETITIVE INTELLIGENCE — MANDATORY EVERY SESSION
+
+> **Craig's words: "Why is it not until I find it that we do something about it?"**
+> **This section exists because reactive research is FAILURE. We must be proactive.**
+> **If Craig finds a competitor feature before Claude does, Claude failed.**
+
+### THE RULE: FIND IT BEFORE CRAIG DOES
+
+Every session, BEFORE writing any code, Claude MUST run a proactive competitive scan:
+
+1. **Web search all competitors in §4 ANNIHILATION TARGETS** — What shipped in the last 48 hours? New features? New models? New pricing? New viral moments?
+2. **Web search "AI video generator 2026" + "AI website builder 2026" + "AI avatar generator 2026"** — Who's new? Who launched? Who went viral? Who raised funding?
+3. **Check Product Hunt, Hacker News, TechCrunch, The Verge** — Any new AI builder or AI video tool trending?
+4. **Check Replicate trending models, fal.ai new models, Hugging Face trending** — Any new model that's better than what we use?
+5. **Check Twitter/X for "AI video" + "AI website builder" viral posts** — What's getting attention? What demos are blowing up?
+
+### WHAT TO DO WITH FINDINGS
+
+- **New competitor found:** Add to §4 ANNIHILATION TARGETS immediately. Include: name, ARR/users, what they do, our edge, what to steal.
+- **Existing competitor shipped new feature:** Update their row in §4. Add to URGENT BUILD LIST if we don't have it.
+- **New AI model dropped that's better than what we use:** Update the pipeline. Swap the model. Don't wait.
+- **Viral demo of something we can't do:** Flag to Craig with "COMPETITIVE ALERT" and build it that session.
+- **Nothing new found:** Document "Competitive scan [date]: no new threats" so we know it was checked.
+
+### SCAN FREQUENCY
+
+| Trigger | Action |
+|---|---|
+| **Every new session** | Full competitive scan before ANY code is written |
+| **Before building any video feature** | Scan HeyGen, Filmora, Captions, CapCut, Runway, InVideo, Descript — what's their latest? |
+| **Before building any builder feature** | Scan Lovable, Bolt, v0, Emergent — what shipped this week? |
+| **Craig mentions a competitor** | IMMEDIATE deep dive. Add to kill list. Identify what to steal/beat. |
+| **Craig says "I saw something on the internet"** | Claude FAILED the proactive scan. Fix the gap, update CLAUDE.md, apologize. |
+
+### OUTPUT QUALITY BAR IS SET BY THE MARKET
+
+The quality bar for every feature is NOT "better than yesterday." It is:
+- **Video output:** Must match or beat HeyGen Avatar IV + Filmora's Sora 2/Veo 3.1 output
+- **Builder output:** Must match or beat Lovable's full-stack polish + Bolt's preview speed
+- **Voice:** Must match or beat ElevenLabs v3 fidelity + Filmora's emotion-controlled voice cloning
+- **Captions:** Must match or beat CapCut's auto-caption quality (burned in, styled, animated)
+
+If our output doesn't match the market leader in that category, **it is not done.** Ship it as "beta" with a clear upgrade path, or don't ship it at all.
+
+### RESEARCH IS NOT OPTIONAL — IT IS STEP 1
+
+The old pattern: build → Craig finds something better → scramble to match.
+The new pattern: **scan → identify the bar → build to that bar → ship → scan again.**
+
+No more "we have Fish Speech" when ElevenLabs v3 exists.
+No more "we have Replicate models" when fal.ai has Veo 3.1 + Sora 2.
+No more "we have auto-captions planned" when CapCut ships them free to 300M users.
+
+**Find it. Flag it. Build it. Before Craig has to.**
+
+---
+
 ## 🧭 SESSION PROTOCOL — EVERY NEW CLAUDE SESSION
 
 **Mandatory opening ritual before any work:**
 
 1. **Read THE IRON LAW** (section above). Do not skip.
 2. **Read LIVE REPO STATUS** (below). Know what's built, what's broken, what's next.
-3. **Check the authorization list** (§2). Is anything I'm about to do on that list? If yes → stop and ask Craig.
-4. **Check KNOWN ISSUES.** Is the user's request already on the list? If yes, work from there.
-5. **Check RECENTLY FIXED.** Don't re-break something that was just fixed.
-6. **Run `git status` and `git log -5`.** Know where the branch is.
-7. **Only then start work.**
+3. **Run PROACTIVE COMPETITIVE SCAN** (§6 above). Web search all competitors. Log findings. Update CLAUDE.md if anything new.
+4. **Check the authorization list** (§2). Is anything I'm about to do on that list? If yes → stop and ask Craig.
+5. **Check KNOWN ISSUES.** Is the user's request already on the list? If yes, work from there.
+6. **Check RECENTLY FIXED.** Don't re-break something that was just fixed.
+7. **Run `git status` and `git log -5`.** Know where the branch is.
+8. **Only then start work.**
 
 **Mandatory closing ritual before ending a session:**
 
 1. **Build passes locally** (`npm run build`).
 2. **All changes committed and pushed** to the session branch.
-3. **CLAUDE.md updated** — any new decisions, new known issues, new completed tasks.
+3. **CLAUDE.md updated** — any new decisions, new known issues, new competitive findings, new completed tasks.
 4. **Next action line written** — so the next session picks up without guessing.
 5. **No half-finished features on disk.** Either finish, revert, or document clearly.
+6. **Competitive scan logged** — "Scanned [date]: [findings or 'no new threats']".
 
 ## ⚖️ DECISION ESCALATION MATRIX
 
@@ -666,6 +725,7 @@ npm run lint     # ESLint
 25. **No timelines, no phases** — Don't say "this week" or "next month." Build everything NOW. The competition doesn't take breaks and neither do we. Foot on the accelerator at all times.
 26. **Never ask permission to build** — Craig is running multiple 24/7 businesses. He is NOT the bottleneck. Claude builds, pushes, and keeps going. If something needs building, BUILD IT. Don't ask "should I?" or "want me to?" — just do it. The only time to ask is if a decision could break something already working in production.
 27. **Never take your foot off the gas** — Build until the project is complete. No pausing, no waiting, no "I'll do this next session." Every session picks up where the last one left off and keeps building.
+28. **Proactive competitive intelligence is MANDATORY** — Every session starts with a web search of all competitors before writing any code. If Craig finds a competitor or feature before Claude does, Claude failed. The output quality bar is set by the market leader in each category, not by what we had yesterday. Reactive research is failure. Proactive research is survival. See §6 for the full protocol.
 
 ---
 
