@@ -33,7 +33,8 @@ export async function POST(req: NextRequest) {
   if (!isCustomPipelineAvailable()) {
     return Response.json(
       {
-        error: "AI video generation is being configured. Please try again shortly.",
+        error:
+          "REPLICATE_API_TOKEN is not configured on the server. Add it to Vercel → Settings → Environment Variables (or set ZOOBICON_VIDEO_API_URL for self-hosted) and redeploy.",
         info: getVideoPipelineInfo(),
       },
       { status: 503 }

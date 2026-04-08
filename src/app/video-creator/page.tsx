@@ -372,6 +372,9 @@ SCRIPT_2:
     setVideoUrl(null);
     setVideoStatus("Starting video generation...");
 
+    // Track URL locally — React state is async, can't be read mid-loop
+    let receivedVideoUrl: string | null = null;
+
     try {
       const res = await fetch("/api/v1/video/generate", {
         method: "POST",
@@ -388,17 +391,24 @@ SCRIPT_2:
         }),
       });
 
+      // Non-streaming error responses (4xx, 503)
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || `Video generation failed (${res.status})`);
+        throw new Error(
+          data.error ||
+            (res.status === 503
+              ? "Video generation is being configured. REPLICATE_API_TOKEN may be missing in Vercel env. Please contact support."
+              : `Video generation failed (HTTP ${res.status})`)
+        );
       }
 
       // Read SSE stream for progress updates
       const reader = res.body?.getReader();
-      if (!reader) throw new Error("No response stream");
+      if (!reader) throw new Error("No response stream from video API.");
 
       const decoder = new TextDecoder();
       let buf = "";
+      let streamError: Error | null = null;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -409,30 +419,41 @@ SCRIPT_2:
 
         for (const line of lines) {
           if (!line.startsWith("data: ")) continue;
+          let event: { type?: string; message?: string; videoUrl?: string; step?: string; progress?: number };
           try {
-            const event = JSON.parse(line.slice(6));
-            if (event.type === "status") {
-              setVideoStatus(event.message || "Processing...");
-            } else if (event.type === "done" && event.videoUrl) {
-              setVideoUrl(event.videoUrl);
-              setVideoStatus("");
-              setGenerating(false);
-              return;
-            } else if (event.type === "error") {
-              throw new Error(event.message || "Video generation failed.");
-            }
-          } catch (e) {
-            if (e instanceof Error && e.message.includes("failed")) throw e;
+            event = JSON.parse(line.slice(6));
+          } catch {
+            continue; // Ignore unparseable SSE chunks
+          }
+          if (event.type === "status") {
+            setVideoStatus(event.message || "Processing...");
+          } else if (event.type === "done" && event.videoUrl) {
+            receivedVideoUrl = event.videoUrl;
+            setVideoUrl(event.videoUrl);
+            setVideoStatus("");
+            setGenerating(false);
+            return;
+          } else if (event.type === "error") {
+            streamError = new Error(event.message || "Video generation failed.");
+            break;
           }
         }
+
+        if (streamError) break;
       }
 
-      // If we got here without a video URL, something went wrong
-      if (!videoUrl) {
-        throw new Error("Video generation completed but no video was returned. Please try again.");
+      if (streamError) throw streamError;
+
+      // Stream ended without a done event — something silently failed upstream
+      if (!receivedVideoUrl) {
+        throw new Error("Video generation ended without producing a video. Please try again.");
       }
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Video generation failed.";
+      const raw = err instanceof Error ? err.message : "Video generation failed.";
+      // Pass through clear errors verbatim, sanitize fuzzy ones
+      const msg = raw.includes("REPLICATE_API_TOKEN") || raw.includes("HTTP") || raw.includes("model")
+        ? raw
+        : sanitizeError(raw);
       setVideoError(msg);
       setGenerating(false);
       setVideoStatus("");
@@ -521,10 +542,22 @@ SCRIPT_2:
             <div className="w-9 h-9 rounded-xl bg-red-500/15 flex items-center justify-center shrink-0">
               <AlertCircle className="w-4.5 h-4.5 text-red-400" />
             </div>
-            <div className="pt-1">
+            <div className="pt-1 flex-1">
               <div className="text-sm font-semibold text-red-300">Something went wrong</div>
               <div className="text-sm text-red-400/70 mt-1 leading-relaxed">{videoError}</div>
-              <button onClick={() => setVideoError("")} className="text-xs text-red-400/50 hover:text-red-300 mt-2 transition-colors">Dismiss</button>
+              <div className="flex items-center gap-3 mt-3">
+                {step === "produce" && editedScript && (
+                  <button
+                    onClick={() => { setVideoError(""); handleGenerateVideo(); }}
+                    className="text-xs font-semibold text-amber-300 hover:text-amber-200 px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/15 border border-amber-500/20 transition-all flex items-center gap-1.5"
+                  >
+                    <RefreshCw className="w-3 h-3" /> Retry
+                  </button>
+                )}
+                <button onClick={() => setVideoError("")} className="text-xs text-red-400/50 hover:text-red-300 transition-colors">
+                  Dismiss
+                </button>
+              </div>
             </div>
           </div>
         )}
