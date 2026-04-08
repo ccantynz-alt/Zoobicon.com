@@ -26,6 +26,7 @@ import {
   generateBackend,
   generateSchemaPrompt,
 } from "@/lib/backend-generator";
+import { callLLMWithFailover, getAvailableProviders } from "@/lib/llm-provider";
 
 export const maxDuration = 300;
 
@@ -119,18 +120,29 @@ export async function POST(req: NextRequest) {
         });
 
         // ── Phase 3: Stream each component progressively ──
-        // Build AI client — REQUIRED for customization
+        // Build AI client — REQUIRED for customization. We need at least ONE
+        // provider key (Anthropic, OpenAI, or Google). The customizer
+        // prefers Anthropic first via the SDK, then cross-provider failover.
         const apiKey = process.env.ANTHROPIC_API_KEY;
-        if (!apiKey) {
+        const availableProviders = getAvailableProviders();
+        if (!apiKey && availableProviders.length === 0) {
           send({
             type: "error",
-            message: "AI service is not configured. Please contact support or check that ANTHROPIC_API_KEY is set.",
+            message:
+              "AI service is not configured. Set ANTHROPIC_API_KEY (or OPENAI_API_KEY / GOOGLE_AI_API_KEY) in your Vercel environment variables.",
           });
           send({ type: "done", files, dependencies: {} });
           controller.close();
           return;
         }
-        const client = new Anthropic({ apiKey, timeout: 30000 });
+        // The Anthropic client is only used as the primary path. The
+        // failover layer (callLLMWithFailover) handles OpenAI/Gemini.
+        // If Anthropic key is missing we still proceed — Sonnet pass will
+        // immediately fail and the failover layer will try other providers.
+        const client = new Anthropic({
+          apiKey: apiKey || "missing",
+          timeout: 30000,
+        });
 
         // Track which components have been added so far (for incremental App.tsx)
         const addedComponents: typeof components = [];
@@ -174,7 +186,11 @@ export async function POST(req: NextRequest) {
 
         // ── Phase 3b: Customize ALL components in parallel. As each one
         // resolves, patch the shared files map and emit a partial event.
+        // Track per-section results so we can surface partial AI failures
+        // to the user (Law 8 — never silent failures).
         let customizedCount = 0;
+        const failedSections: { category: string; reason: string }[] = [];
+
         const customizationPromises = components.map((comp, i) => {
           const fileName = fileNames[i];
           const label = SECTION_LABELS[comp.category] || comp.category;
@@ -183,49 +199,74 @@ export async function POST(req: NextRequest) {
             comp,
             promptTrimmed,
             i === 0
-          )
-            .then((customized) => {
-              customizedCount++;
-              if (customized) {
-                files[fileName] = `import React from "react";\n\n${customized}\n`;
-                files["App.tsx"] = registry.buildAppFile(addedComponents);
-                send({
-                  type: "partial",
-                  files: { ...files },
-                  fileCount: totalComponents,
-                  totalComponents,
-                  latestFile: fileName,
-                  section: comp.category,
-                  customized: true,
-                });
-              }
+          ).then((result) => {
+            customizedCount++;
+            if (result.ok && result.code) {
+              files[fileName] = `import React from "react";\n\n${result.code}\n`;
+              files["App.tsx"] = registry.buildAppFile(addedComponents);
+              send({
+                type: "partial",
+                files: { ...files },
+                fileCount: totalComponents,
+                totalComponents,
+                latestFile: fileName,
+                section: comp.category,
+                customized: true,
+                modelUsed: result.modelUsed,
+              });
               send({
                 type: "status",
-                message: `Customizing (${customizedCount}/${totalComponents})...`,
+                message: `Customized ${label} (${customizedCount}/${totalComponents})`,
                 phase: "building",
                 current: customizedCount,
                 total: totalComponents,
                 section: comp.category,
               });
-            })
-            .catch((err) => {
-              customizedCount++;
-              const msg = err instanceof Error ? err.message : "Unknown error";
-              console.error(
-                `[react-stream] Customization failed for ${comp.category}: ${msg}`
+            } else {
+              const reason = result.reason || "AI customization unavailable";
+              failedSections.push({ category: comp.category, reason });
+              console.warn(
+                `[react-stream] ${comp.category} fell back to template — ${reason}`
               );
               send({
                 type: "status",
-                message: `${label} loaded (AI customization unavailable — using template) (${customizedCount}/${totalComponents})`,
+                message: `${label} kept as template — ${reason} (${customizedCount}/${totalComponents})`,
                 phase: "building",
                 current: customizedCount,
                 total: totalComponents,
                 section: comp.category,
+                templateFallback: true,
+                reason,
               });
-            });
+            }
+          });
         });
 
         await Promise.allSettled(customizationPromises);
+
+        // If MORE than half the sections fell back to template, this is a
+        // user-visible failure. Surface it as a non-fatal warning so they
+        // know exactly what happened and can retry. The site still renders.
+        if (failedSections.length > 0) {
+          const failureRate = failedSections.length / totalComponents;
+          const unique = Array.from(new Set(failedSections.map((f) => f.reason)));
+          const sample = unique[0] || "AI provider unavailable";
+          const providers = getAvailableProviders();
+          send({
+            type: "warning",
+            severity: failureRate >= 0.5 ? "high" : "low",
+            message:
+              failureRate >= 0.5
+                ? `AI customization failed for ${failedSections.length}/${totalComponents} sections (${sample.slice(0, 80)}). Site rendered with template copy. ${
+                    providers.length === 1
+                      ? "Add OPENAI_API_KEY or GOOGLE_AI_API_KEY for automatic failover."
+                      : "Try again in a moment."
+                  }`
+                : `${failedSections.length}/${totalComponents} sections kept template copy (${sample.slice(0, 60)}).`,
+            failedSections: failedSections.map((f) => f.category),
+            providersAvailable: providers,
+          });
+        }
 
         // ── Phase 4: Apply brand colors (already computed in parallel) ──
         send({
@@ -270,46 +311,70 @@ export async function POST(req: NextRequest) {
           });
 
           try {
-            // Generate schema SQL via AI if we have a client and need a database
+            // Generate schema SQL via AI if we need a database. Tries
+            // Anthropic first, then falls back across providers so the
+            // schema still appears even when Anthropic is rate-limited.
             let schemaSQL: string | undefined;
-            if (client && backendNeeds.database) {
-              try {
-                const schemaResponse = await client.messages.create({
-                  model: "claude-haiku-4-5-20251001",
-                  max_tokens: 4096,
-                  system: "You are a PostgreSQL database architect. Output ONLY valid SQL. No markdown fences, no explanation.",
-                  messages: [
-                    {
-                      role: "user",
-                      content: generateSchemaPrompt(promptTrimmed),
-                    },
-                  ],
-                });
+            if (backendNeeds.database) {
+              const schemaSystem =
+                "You are a PostgreSQL database architect. Output ONLY valid SQL. No markdown fences, no explanation.";
+              const schemaUser = generateSchemaPrompt(promptTrimmed);
 
-                const sqlText =
-                  schemaResponse.content.find(
-                    (b: Anthropic.ContentBlock) => b.type === "text"
-                  )?.text || "";
+              const stripFences = (raw: string): string =>
+                raw.replace(/^```(?:sql)?\n?/, "").replace(/\n?```$/, "").trim();
 
-                // Strip markdown fences if present
-                schemaSQL = sqlText
-                  .replace(/^```(?:sql)?\n?/, "")
-                  .replace(/\n?```$/, "")
-                  .trim();
-
-                if (schemaSQL) {
-                  files["setup/migration.sql"] = schemaSQL;
-                  send({
-                    type: "partial",
-                    files: { ...files },
-                    fileCount: totalComponents,
-                    totalComponents,
-                    latestFile: "setup/migration.sql",
-                    section: "backend",
+              // Pass 1 — direct Anthropic Haiku
+              if (apiKey) {
+                try {
+                  const schemaResponse = await client.messages.create({
+                    model: "claude-haiku-4-5-20251001",
+                    max_tokens: 4096,
+                    system: schemaSystem,
+                    messages: [{ role: "user", content: schemaUser }],
                   });
+                  const sqlText =
+                    schemaResponse.content.find(
+                      (b: Anthropic.ContentBlock) => b.type === "text"
+                    )?.text || "";
+                  schemaSQL = stripFences(sqlText);
+                } catch (schemaErr) {
+                  console.warn(
+                    `[react-stream] Schema generation (Haiku) failed: ${
+                      schemaErr instanceof Error ? schemaErr.message : "unknown"
+                    }`
+                  );
                 }
-              } catch (schemaErr) {
-                console.warn("[react-stream] Schema generation failed:", schemaErr);
+              }
+
+              // Pass 2 — cross-provider failover if pass 1 didn't yield SQL
+              if (!schemaSQL) {
+                try {
+                  const fb = await callLLMWithFailover({
+                    model: "claude-sonnet-4-6",
+                    system: schemaSystem,
+                    userMessage: schemaUser,
+                    maxTokens: 4096,
+                  });
+                  schemaSQL = stripFences(fb.text);
+                } catch (schemaErr) {
+                  console.warn(
+                    `[react-stream] Schema generation failover failed: ${
+                      schemaErr instanceof Error ? schemaErr.message : "unknown"
+                    }`
+                  );
+                }
+              }
+
+              if (schemaSQL) {
+                files["setup/migration.sql"] = schemaSQL;
+                send({
+                  type: "partial",
+                  files: { ...files },
+                  fileCount: totalComponents,
+                  totalComponents,
+                  latestFile: "setup/migration.sql",
+                  section: "backend",
+                });
               }
             }
 
@@ -403,15 +468,28 @@ export async function POST(req: NextRequest) {
 // ── Per-Component AI Customization ──
 
 /**
- * Customize a single component's content using Haiku (fast, cheap).
- * Returns the updated component code, or null if customization fails.
+ * Customize result — either succeeds with the new code, or fails with a reason.
+ * Never silent. The streaming endpoint surfaces the reason to the user.
+ */
+export interface CustomizeResult {
+  ok: boolean;
+  code: string | null;
+  reason?: string;
+  modelUsed?: string;
+}
+
+/**
+ * Customize a single component's content. Tries Haiku first, then falls back
+ * across Anthropic models AND cross-provider (OpenAI/Gemini) via
+ * callLLMWithFailover. Never throws — always returns a CustomizeResult so
+ * callers can surface partial failures to the user (Law 8 — never silent).
  */
 async function customizeComponent(
   client: Anthropic,
   component: { category: string; variant: string; code: string; description: string },
   businessPrompt: string,
   isFirstComponent: boolean
-): Promise<string | null> {
+): Promise<CustomizeResult> {
   const systemPrompt = `You are a senior product designer + copywriter customizing a premium React component for a specific business. Your output must look like a $100K agency built it — not a template fill.
 
 OUTPUT RULES:
@@ -451,6 +529,25 @@ ${component.code}
 
 Return ONLY the updated component code with customized content. Same structure, new text.`;
 
+  // Sanitize/validate AI text into a usable component file
+  const sanitize = (text: string): string | null => {
+    if (!text || !text.trim()) return null;
+    let code = text.trim();
+    if (code.startsWith("```")) {
+      code = code.replace(/^```(?:tsx?|jsx?|javascript|typescript)?\n?/, "").replace(/\n?```$/, "");
+    }
+    code = code
+      .split("\n")
+      .filter((line: string) => !line.trim().startsWith("import "))
+      .join("\n")
+      .trim();
+    if (!code.includes("export default") && !code.includes("function")) {
+      return null;
+    }
+    return code;
+  };
+
+  // Pass 1 — Anthropic Haiku via the direct SDK (fast & cheap)
   try {
     const response = await client.messages.create({
       model: "claude-haiku-4-5-20251001",
@@ -464,46 +561,84 @@ Return ONLY the updated component code with customized content. Same structure, 
         (b: Anthropic.ContentBlock) => b.type === "text"
       )?.text || "";
 
-    if (!text.trim()) return null;
+    const code = sanitize(text);
+    if (code) return { ok: true, code, modelUsed: "claude-haiku-4-5" };
+    console.warn(
+      `[react-stream] Haiku returned unusable output for ${component.category}/${component.variant} (${text.length} chars)`
+    );
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(
+      `[react-stream] Haiku failed for ${component.category}/${component.variant}: ${msg}`
+    );
+  }
 
-    // Strip any markdown fences the model might have added
-    let code = text.trim();
-    if (code.startsWith("```")) {
-      code = code.replace(/^```(?:tsx?|jsx?|javascript|typescript)?\n?/, "").replace(/\n?```$/, "");
+  // Pass 2 — Cross-provider failover (Anthropic Sonnet → OpenAI → Gemini)
+  // callLLMWithFailover handles the chain and skips providers without API keys.
+  try {
+    const fb = await callLLMWithFailover({
+      model: "claude-sonnet-4-6",
+      system: systemPrompt,
+      userMessage,
+      maxTokens: 4096,
+    });
+    const code = sanitize(fb.text);
+    if (code) {
+      console.log(
+        `[react-stream] Customized ${component.category} via fallback ${fb.provider}/${fb.model}`
+      );
+      return { ok: true, code, modelUsed: fb.model };
     }
-
-    // Strip any import lines the model might have added (we handle imports ourselves)
-    code = code
-      .split("\n")
-      .filter((line) => !line.startsWith("import "))
-      .join("\n")
-      .trim();
-
-    // Basic validation: must contain "export default" or "function"
-    if (!code.includes("export default") && !code.includes("function")) {
-      return null;
-    }
-
-    return code;
-  } catch {
-    return null;
+    return {
+      ok: false,
+      code: null,
+      reason: `Fallback model ${fb.model} returned unusable output`,
+    };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error(
+      `[react-stream] All AI providers failed for ${component.category}: ${msg}`
+    );
+    return { ok: false, code: null, reason: msg };
   }
 }
 
 /**
  * Quick AI call to determine appropriate brand colors for the business.
- * Returns { primary, secondary, bg, text } hex colors.
+ * Tries Haiku first then falls back across providers. Returns null only when
+ * every provider has been exhausted (caller falls back to defaults + warns).
  */
 async function determineBrandColors(
   client: Anthropic,
   businessPrompt: string
 ): Promise<{ primary: string; bg: string } | null> {
+  const systemPrompt =
+    'Given a business description, return a JSON object with "primary" (brand accent color hex) and "bg" (background color hex, usually #ffffff or #f9fafb). Tech = blue/indigo, health = green/teal, food = warm/amber, luxury = dark/gold, creative = purple/pink. Output ONLY JSON, no explanation.';
+
+  const parseColors = (text: string): { primary: string; bg: string } | null => {
+    if (!text) return null;
+    const firstBrace = text.indexOf("{");
+    const lastBrace = text.lastIndexOf("}");
+    if (firstBrace === -1 || lastBrace <= firstBrace) return null;
+    try {
+      const colors = JSON.parse(text.slice(firstBrace, lastBrace + 1));
+      if (colors && typeof colors.primary === "string" && typeof colors.bg === "string") {
+        return { primary: colors.primary, bg: colors.bg };
+      }
+    } catch (parseErr) {
+      console.warn(
+        `[react-stream] Brand color JSON parse failed: ${parseErr instanceof Error ? parseErr.message : "unknown"}`
+      );
+    }
+    return null;
+  };
+
+  // Pass 1 — Haiku via direct SDK
   try {
     const response = await client.messages.create({
       model: "claude-haiku-4-5-20251001",
       max_tokens: 200,
-      system:
-        'Given a business description, return a JSON object with "primary" (brand accent color hex) and "bg" (background color hex, usually #ffffff or #f9fafb). Tech = blue/indigo, health = green/teal, food = warm/amber, luxury = dark/gold, creative = purple/pink. Output ONLY JSON, no explanation.',
+      system: systemPrompt,
       messages: [{ role: "user", content: businessPrompt }],
     });
 
@@ -512,16 +647,31 @@ async function determineBrandColors(
         (b: Anthropic.ContentBlock) => b.type === "text"
       )?.text || "";
 
-    const firstBrace = text.indexOf("{");
-    const lastBrace = text.lastIndexOf("}");
-    if (firstBrace === -1 || lastBrace <= firstBrace) return null;
-
-    const colors = JSON.parse(text.slice(firstBrace, lastBrace + 1));
-    if (colors.primary && colors.bg) return colors;
-    return null;
-  } catch {
-    return null;
+    const colors = parseColors(text);
+    if (colors) return colors;
+  } catch (err) {
+    console.warn(
+      `[react-stream] Brand color (Haiku) failed: ${err instanceof Error ? err.message : "unknown"}`
+    );
   }
+
+  // Pass 2 — cross-provider failover
+  try {
+    const fb = await callLLMWithFailover({
+      model: "claude-sonnet-4-6",
+      system: systemPrompt,
+      userMessage: businessPrompt,
+      maxTokens: 200,
+    });
+    const colors = parseColors(fb.text);
+    if (colors) return colors;
+  } catch (err) {
+    console.warn(
+      `[react-stream] Brand color failover failed: ${err instanceof Error ? err.message : "unknown"}`
+    );
+  }
+
+  return null;
 }
 
 /**
