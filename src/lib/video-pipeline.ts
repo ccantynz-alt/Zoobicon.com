@@ -924,7 +924,22 @@ export async function generatePremiumVideo(spec: PipelineSpec): Promise<Pipeline
   };
 }
 
-// Provider check is at line 118 (isCustomPipelineAvailable)
+export function getVideoPipelineInfo(): {
+  available: boolean;
+  provider: "replicate" | "fal" | "self-hosted" | "none";
+  models: string[];
+} {
+  if (process.env.FAL_KEY) {
+    return { available: true, provider: "fal", models: ["veo-3", "sora-2", "runway-gen4", "kling-3", "hedra-character-3"] };
+  }
+  if (process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY || process.env.REPLICATE_TOKEN || process.env.REPLICATE_KEY) {
+    return { available: true, provider: "replicate", models: ["kokoro-82m", "xtts-v2", "bark", "openvoice", "seamless"] };
+  }
+  if (process.env.ZOOBICON_VIDEO_API_URL) {
+    return { available: true, provider: "self-hosted", models: ["fish-speech", "flux", "sadtalker"] };
+  }
+  return { available: false, provider: "none", models: [] };
+}
 
 // ── Helpers ──
 

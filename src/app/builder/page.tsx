@@ -4,7 +4,7 @@ import { useState, useCallback, useRef, useEffect, useMemo, Suspense, Component,
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getGeneratorDef } from "@/lib/generator-prompts";
-import TopBar from "@/components/TopBar";
+// TopBar replaced with inline custom top bar for builder chrome
 import PromptInput from "@/components/PromptInput";
 import type { Tier, AIModel, GenerationMode } from "@/components/PromptInput";
 import DomainHookModal from "@/components/DomainHookModal";
