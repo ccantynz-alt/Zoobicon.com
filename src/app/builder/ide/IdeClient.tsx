@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { ArrowLeft, Save, Play, Github, Download, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Play, GitBranch, Download, Loader2 } from "lucide-react";
 import MonacoEditor from "@/components/MonacoEditor";
 import FileExplorer from "@/components/FileExplorer";
 import SandpackPreview from "@/components/SandpackPreview";
@@ -179,7 +179,7 @@ export default function BuilderIDEPage() {
             disabled={pushingToGithub || fileCount === 0}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
-            {pushingToGithub ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Github className="w-3.5 h-3.5" />}
+            {pushingToGithub ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <GitBranch className="w-3.5 h-3.5" />}
             Push to GitHub
           </button>
           <Link
