@@ -152,43 +152,86 @@ export async function checkMultipleDomains(
  *
  * Strategy (in order, first authoritative answer wins):
  *  1. RDAP (rdap.org) — official registry protocol. 404 = available, 200 = taken.
+ *     Retries once on 429 after a short delay.
  *  2. OpenSRS LOOKUP — ONLY when env=live (test mode returns fake sandbox data
  *     and was the root cause of "available domains" that were actually taken).
- *  3. Google DNS NXDOMAIN — only as a corroborating signal, never alone.
+ *  3. Google DNS NXDOMAIN — final fallback, requires BOTH A and NS to NXDOMAIN.
  *
  * Returns:
  *   true  = definitely available
  *   false = definitely taken
  *   null  = uncertain (UI must NOT show as available)
+ *
+ * Results are memoised for 10 minutes to survive retries and burst checks.
  */
-export async function checkWithFallback(domain: string): Promise<boolean | null> {
-  // ── 1. RDAP (authoritative, free, no auth) ────────────────────────────────
+const AVAILABILITY_CACHE = new Map<string, { result: boolean | null; at: number }>();
+const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+
+function getCached(domain: string): boolean | null | undefined {
+  const hit = AVAILABILITY_CACHE.get(domain);
+  if (!hit) return undefined;
+  if (Date.now() - hit.at > CACHE_TTL_MS) {
+    AVAILABILITY_CACHE.delete(domain);
+    return undefined;
+  }
+  return hit.result;
+}
+
+function setCached(domain: string, result: boolean | null) {
+  AVAILABILITY_CACHE.set(domain, { result, at: Date.now() });
+  // Keep the cache bounded so it can't leak forever
+  if (AVAILABILITY_CACHE.size > 5000) {
+    const firstKey = AVAILABILITY_CACHE.keys().next().value;
+    if (firstKey) AVAILABILITY_CACHE.delete(firstKey);
+  }
+}
+
+async function rdapCheck(domain: string, attempt = 0): Promise<boolean | null> {
   try {
     const rdapRes = await fetch(`https://rdap.org/domain/${domain}`, {
-      signal: AbortSignal.timeout(6000),
+      signal: AbortSignal.timeout(7000),
       headers: { Accept: "application/rdap+json" },
       redirect: "follow",
     });
-    // 404 = registry has no record = domain is available for registration
     if (rdapRes.status === 404) return true;
-    // 200 = registry has a record = domain is taken
     if (rdapRes.status === 200) return false;
-    // 429/5xx fall through to next signal — registry overloaded/unsupported TLD
+    // 429 = rate limited. Retry once with small backoff.
+    if (rdapRes.status === 429 && attempt === 0) {
+      await new Promise((r) => setTimeout(r, 400 + Math.random() * 300));
+      return rdapCheck(domain, 1);
+    }
+    return null; // 5xx / unsupported TLD / unknown — caller will try next signal
   } catch {
-    // network error — fall through
+    return null;
+  }
+}
+
+export async function checkWithFallback(domain: string): Promise<boolean | null> {
+  // ── 0. Cache ─────────────────────────────────────────────────────────────
+  const cached = getCached(domain);
+  if (cached !== undefined) return cached;
+
+  // ── 1. RDAP (authoritative, free, no auth) ────────────────────────────────
+  const rdap = await rdapCheck(domain);
+  if (rdap !== null) {
+    setCached(domain, rdap);
+    return rdap;
   }
 
   // ── 2. OpenSRS (LIVE mode only — test/horizon endpoint lies) ──────────────
   if (isOpenSRSConfigured() && OPENSRS_ENV() === "live") {
     const result = await checkDomainAvailability(domain);
-    if (result.status === "available") return true;
-    if (result.status === "taken") return false;
+    if (result.status === "available") {
+      setCached(domain, true);
+      return true;
+    }
+    if (result.status === "taken") {
+      setCached(domain, false);
+      return false;
+    }
   }
 
   // ── 3. Google DNS — only NXDOMAIN is a useful signal ──────────────────────
-  // A registered domain may have no A record (parked, MX-only) so absence of
-  // an A record does NOT prove availability. We only trust NXDOMAIN, and even
-  // then we additionally check NS to avoid false positives.
   try {
     const [aRes, nsRes] = await Promise.all([
       fetch(`https://dns.google/resolve?name=${domain}&type=A`, {
@@ -200,12 +243,15 @@ export async function checkWithFallback(domain: string): Promise<boolean | null>
     ]);
     const aData = await aRes.json();
     const nsData = await nsRes.json();
-    // Both A and NS return NXDOMAIN → strong signal it's unregistered
-    if (aData.Status === 3 && nsData.Status === 3) return true;
-    // NS resolved → domain has nameservers → definitely registered
+    if (aData.Status === 3 && nsData.Status === 3) {
+      setCached(domain, true);
+      return true;
+    }
     if (nsData.Status === 0 && Array.isArray(nsData.Answer) && nsData.Answer.length > 0) {
+      setCached(domain, false);
       return false;
     }
+    // Don't cache nulls — let the next call retry
     return null;
   } catch {
     return null;
