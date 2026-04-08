@@ -347,11 +347,10 @@ export async function POST(request: NextRequest) {
           for (const domain of registeredDomains) {
             try {
               const existing = (await sql`
-                SELECT status FROM registered_domains WHERE domain = ${trimmedDomain} LIMIT 1
+                SELECT status FROM registered_domains WHERE domain = ${domain} LIMIT 1
               `) as Array<{ status: string }>;
               if (existing[0]?.status === "active") {
-                alreadyActive = true;
-                console.log(`[webhook] ${trimmedDomain} already active — skipping duplicate registration`);
+                console.log(`[webhook] ${domain} already active — skipping duplicate registration`);
               }
 
               await sql`
@@ -381,8 +380,13 @@ export async function POST(request: NextRequest) {
           }
 
           console.log(`[webhook] Domain registration complete: ${registeredDomains.length} succeeded, ${failedDomains.length} failed for ${registrantEmail}`);
+          handled = true;
           break;
         }
+
+        handled = true;
+        break;
+      }
 
       case "customer.subscription.created":
       case "customer.subscription.updated":

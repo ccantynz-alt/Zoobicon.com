@@ -1,5 +1,16 @@
 import Link from "next/link";
+import { motion, type Variants } from "framer-motion";
 import { Code, Key, Zap, Shield, ArrowRight, Check } from "lucide-react";
+
+const staggerContainer: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1 } },
+};
+
+const fadeInUp: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+};
 
 export const metadata = {
   title: "Developers — Zoobicon API",
@@ -293,7 +304,7 @@ export default function DevelopersPage() {
                 </pre>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 

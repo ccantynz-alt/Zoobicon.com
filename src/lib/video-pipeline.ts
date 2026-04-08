@@ -67,10 +67,11 @@ export async function generateVoice(
   text: string,
   options?: { gender?: "female" | "male"; style?: string; speed?: number }
 ): Promise<{ audioUrl: string; duration: number }> {
-  const token = getReplicateToken();
+  const REPLICATE_API_BASE = "https://api.replicate.com/v1";
+  const token = process.env.REPLICATE_API_TOKEN;
+  if (!token) throw new Error("[generateVoice] REPLICATE_API_TOKEN not set");
 
   // Try multiple TTS models in order — first one that works wins
-  // Using model names (not version hashes) so we always get the latest version
   const ttsModels = [
     {
       name: "Kokoro TTS",
@@ -87,7 +88,37 @@ export async function generateVoice(
       model: "afiaka87/tortoise-tts",
       input: { text, preset: "fast" },
     },
-  };
+  ];
+
+  for (const model of ttsModels) {
+    try {
+      console.log(`[generateVoice] Trying ${model.name}...`);
+      const res = await fetch(`${REPLICATE_API_BASE}/models/${model.model}/predictions`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Prefer: "wait",
+        },
+        body: JSON.stringify({ input: model.input }),
+        signal: AbortSignal.timeout(30000),
+      });
+      if (!res.ok) continue;
+      const data = await res.json() as { output?: unknown };
+      const output = data.output;
+      const audioUrl =
+        typeof output === "string" ? output
+        : Array.isArray(output) ? String(output[0])
+        : null;
+      if (audioUrl) {
+        console.log(`[generateVoice] ${model.name} succeeded`);
+        return { audioUrl, duration: Math.max(1, text.length / 15) };
+      }
+    } catch (err) {
+      console.warn(`[generateVoice] ${model.name} failed:`, err instanceof Error ? err.message : err);
+    }
+  }
+  throw new Error("[generateVoice] all TTS models failed");
 }
 
 export async function generateSpokespersonVideo(
@@ -113,23 +144,6 @@ export async function generateSpokespersonVideo(
     pipeline: result.modelsUsed,
   };
 }
-
-  for (const model of ttsModels) {
-    try {
-      console.log(`[video-pipeline] Trying ${model.name} for voice generation...`);
-
-      // Use /models/{owner}/{name}/predictions endpoint (always latest version)
-      const res = await fetch(`${REPLICATE_API}/models/${model.model}/predictions`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-          Prefer: "wait",
-        },
-        body: JSON.stringify({
-          input: model.input,
-        }),
-      });
 
 export async function generateLipSync(
   audioUrl: string,
@@ -166,12 +180,6 @@ export async function generateVoiceXTTS(
 }
 
 export const generateFullVideo = generateSpokespersonVideo;
-
-  const res = await fetch(`${REPLICATE_API}/models/jaaari/kokoro-82m/predictions`, {
-    method: "POST",
-    headers: { ...replicateHeaders(), Prefer: "wait" },
-    body: JSON.stringify({ input: referenceAudioUrl ? { text, language: "en", speaker: referenceAudioUrl } : { text, language: "en" } }),
-  });
 
 export type VideoTier = "standard" | "premium";
 
@@ -542,5 +550,13 @@ export async function generatePremiumVideo(
     costUsd: Number(costUsd.toFixed(4)),
     modelsUsed,
     warnings,
+  };
+}
+
+export function getVideoPipelineInfo(): { available: boolean; provider: string; models: string[] } {
+  return {
+    available: isCustomPipelineAvailable(),
+    provider: "Replicate",
+    models: ["jaaari/kokoro-82m", "fishaudio/fish-speech-1.5", "omnihuman-1"],
   };
 }

@@ -281,3 +281,12 @@ export async function setPreferences(
   `;
   return merged;
 }
+
+/** Simple helper to log a deploy notification. Non-blocking — never throws. */
+export async function notifyDeploy(siteName: string, url: string): Promise<void> {
+  try {
+    console.log(`[notifications] Deploy: "${siteName}" → ${url}`);
+  } catch {
+    // best-effort notification; never throw
+  }
+}
