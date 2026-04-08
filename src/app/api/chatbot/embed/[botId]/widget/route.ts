@@ -104,7 +104,7 @@ export async function GET(
     msgs.appendChild(typing);
     msgs.scrollTop = msgs.scrollHeight;
     try {
-      var res = await fetch('/api/chatbot/' + encodeURIComponent(BOT_ID) + '/message', {
+      var res = await fetch('/api/chatbot/embed/' + encodeURIComponent(BOT_ID) + '/message', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: text, history: history.slice(0, -1) })
