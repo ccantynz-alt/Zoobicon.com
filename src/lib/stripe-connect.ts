@@ -9,7 +9,7 @@ function getStripe(): Stripe {
       "STRIPE_SECRET_KEY missing — set it in Vercel environment variables to enable Stripe Connect payouts"
     );
   }
-  return new Stripe(key, { apiVersion: "2026-02-25.clover" });
+  return new Stripe(key, { apiVersion: "2026-03-25.dahlia" });
 }
 
 export interface ConnectedAccountResult {

@@ -10,7 +10,7 @@ export function getStripe(): Stripe {
       "STRIPE_SECRET_KEY is not set. Add it to your environment variables to enable billing."
     );
   }
-  _stripe = new Stripe(key, { apiVersion: "2026-02-25.clover" });
+  _stripe = new Stripe(key, { apiVersion: "2026-03-25.dahlia" });
   return _stripe;
 }
 
