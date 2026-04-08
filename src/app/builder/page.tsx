@@ -1,15 +1,58 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect, useMemo, Suspense } from "react";
+import { useState, useCallback, useRef, useEffect, useMemo, Suspense, Component, type ErrorInfo, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getGeneratorDef } from "@/lib/generator-prompts";
 import TopBar from "@/components/TopBar";
 import PromptInput from "@/components/PromptInput";
 import type { Tier, AIModel, GenerationMode } from "@/components/PromptInput";
+import DomainHookModal from "@/components/DomainHookModal";
+import VoiceToBuildButton from "@/components/VoiceToBuildButton";
 import dynamic from "next/dynamic";
 
 const SandpackPreview = dynamic(() => import("@/components/SandpackPreview"), { ssr: false });
+const WebContainerPreview = dynamic(() => import("@/components/WebContainerPreview"), { ssr: false });
+
+interface WCErrorBoundaryProps {
+  onError: () => void;
+  fallback: ReactNode;
+  children: ReactNode;
+}
+interface WCErrorBoundaryState {
+  hasError: boolean;
+}
+class WebContainerErrorBoundary extends Component<WCErrorBoundaryProps, WCErrorBoundaryState> {
+  state: WCErrorBoundaryState = { hasError: false };
+  static getDerivedStateFromError(): WCErrorBoundaryState {
+    return { hasError: true };
+  }
+  componentDidCatch(_error: Error, _info: ErrorInfo): void {
+    this.props.onError();
+  }
+  render(): ReactNode {
+    if (this.state.hasError) return this.props.fallback;
+    return this.props.children;
+  }
+}
+
+interface PreviewSwitcherProps {
+  useWebContainers: boolean;
+  onWebContainersFail: () => void;
+  files: Record<string, string>;
+  reactDeps: Record<string, string>;
+}
+function PreviewSwitcher({ useWebContainers, onWebContainersFail, files, reactDeps }: PreviewSwitcherProps): JSX.Element {
+  const sandpack = (
+    <SandpackPreview mode="react" files={files} dependencies={reactDeps} showEditor={false} />
+  );
+  if (!useWebContainers) return sandpack;
+  return (
+    <WebContainerErrorBoundary onError={onWebContainersFail} fallback={sandpack}>
+      <WebContainerPreview files={files} entry="App.tsx" />
+    </WebContainerErrorBoundary>
+  );
+}
 import CodePanel from "@/components/CodePanel";
 import ChatPanel from "@/components/ChatPanel";
 import StatusBar from "@/components/StatusBar";
@@ -86,6 +129,8 @@ import {
   Package,
   Eye,
   Code2,
+  AlertTriangle,
+  RotateCcw,
 } from "lucide-react";
 
 /** Sanitize raw API error messages for user display */
@@ -404,6 +449,19 @@ function BuilderPage() {
   const [activeTool, setActiveTool] = useState<ToolId>(null);
   const [tier, setTier] = useState<Tier>("premium");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [useWebContainers, setUseWebContainers] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (typeof navigator === "undefined") return;
+    const ua = navigator.userAgent;
+    const isSafari = /^((?!chrome|android|crios|fxios).)*safari/i.test(ua);
+    const isIOS = /iPad|iPhone|iPod/.test(ua);
+    if (isSafari || isIOS) setUseWebContainers(false);
+  }, []);
+
+  const handleWebContainersFail = useCallback(() => {
+    setUseWebContainers(false);
+  }, []);
   const [isDeploying, setIsDeploying] = useState(false);
   const [deployUrl, setDeployUrl] = useState("");
   const [deployStatus, setDeployStatus] = useState<"idle" | "deploying" | "deployed" | "error">("idle");
@@ -411,6 +469,9 @@ function BuilderPage() {
   const [showDeployModal, setShowDeployModal] = useState(false);
   const [pipelineAgents, setPipelineAgents] = useState<string[]>([]);
   const [buildProgress, setBuildProgress] = useState<{ current: number; total: number; section: string } | null>(null);
+  const [sectionTimeline, setSectionTimeline] = useState<Array<{ section: string; label: string; status: "pending" | "scaffolding" | "customizing" | "done"; startedAt: number; finishedAt?: number }>>([]);
+  const [buildError, setBuildError] = useState<{ message: string; suggestion: string } | null>(null);
+  const [streamWarning, setStreamWarning] = useState<string | null>(null);
   const [selectedModel, setSelectedModel] = useState("");  // Empty = use pipeline's smart routing (Haiku/Opus/Sonnet)
   const [instantMode, setInstantMode] = useState(true); // Default to fast registry assembly (scaffold <1s + AI customize ~10s)
   const [fullStack, setFullStack] = useState(false); // Full-stack mode: auto-provisions Supabase backend (auth, database, storage)
@@ -419,6 +480,8 @@ function BuilderPage() {
   const [reactFiles, setReactFiles] = useState<Record<string, string> | null>(null);
   const [reactDeps, setReactDeps] = useState<Record<string, string>>({});
   const [generationMode, setGenerationMode] = useState<GenerationMode>("react");
+  const [domainHookOpen, setDomainHookOpen] = useState(false);
+  const [domainHookShownForThisBuild, setDomainHookShownForThisBuild] = useState(false);
   const [mcpContext, setMcpContext] = useState("");
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   // Phase 2: Visual editing
@@ -490,6 +553,9 @@ function BuilderPage() {
 
   const abortRef = useRef<AbortController | null>(null);
   const generationIdRef = useRef(0); // Tracks current generation to prevent stale image replacements
+  const watchdogSlowRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const watchdogStuckRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timelineScrollRef = useRef<HTMLDivElement | null>(null);
   // hasCode must check for REAL content — not just the "<!-- react-app-mode -->" marker
   // which can linger after a failed generation, leaving the builder stuck in "AI Editor" mode
   const hasCode = generatedCode.length > 0 && (
@@ -691,6 +757,31 @@ function BuilderPage() {
     }
   }, [status, generatedCode]);
 
+  // Open the Domain Hook modal once per build when a site finishes generating.
+  // This is the #1 monetization hook: free site → paid domain + deploy + email.
+  useEffect(() => {
+    if (status === "complete" && reactFiles && Object.keys(reactFiles).length > 0 && !domainHookShownForThisBuild) {
+      const t = setTimeout(() => {
+        setDomainHookOpen(true);
+        setDomainHookShownForThisBuild(true);
+      }, 2500);
+      return () => clearTimeout(t);
+    }
+  }, [status, reactFiles, domainHookShownForThisBuild]);
+
+  // Reset the "shown once" flag whenever the user starts a new prompt
+  useEffect(() => {
+    if (status === "idle") setDomainHookShownForThisBuild(false);
+  }, [status]);
+
+  // Derive a site name from the current prompt for the Domain Hook
+  const siteNameForHook = useMemo(() => {
+    const raw = (prompt || "").trim().toLowerCase();
+    if (!raw) return "mysite";
+    const slug = raw.replace(/[^a-z0-9\s-]/g, "").split(/\s+/).slice(0, 3).join("").slice(0, 32);
+    return slug || "mysite";
+  }, [prompt]);
+
   const handleUndo = useCallback(() => {
     if (!canUndo) return;
     isUndoRedoRef.current = true;
@@ -759,6 +850,70 @@ function BuilderPage() {
     return html;
   }, []);
 
+  // Watchdog: warn at 15s of silence, error at 60s
+  const resetWatchdog = useCallback(() => {
+    if (watchdogSlowRef.current) clearTimeout(watchdogSlowRef.current);
+    if (watchdogStuckRef.current) clearTimeout(watchdogStuckRef.current);
+    setStreamWarning(null);
+    watchdogSlowRef.current = setTimeout(() => {
+      setStreamWarning("Connection slow — still working...");
+      console.log("[builder]", "watchdog", "slow", 15000);
+    }, 15000);
+    watchdogStuckRef.current = setTimeout(() => {
+      setBuildError({
+        message: "Build appears stuck — Vercel function may have timed out",
+        suggestion: "Try again, or check the browser console for details",
+      });
+      console.log("[builder]", "watchdog", "stuck", 60000);
+    }, 60000);
+  }, []);
+
+  const clearWatchdog = useCallback(() => {
+    if (watchdogSlowRef.current) clearTimeout(watchdogSlowRef.current);
+    if (watchdogStuckRef.current) clearTimeout(watchdogStuckRef.current);
+    watchdogSlowRef.current = null;
+    watchdogStuckRef.current = null;
+    setStreamWarning(null);
+  }, []);
+
+  // Map raw error message → user suggestion
+  const errorSuggestion = useCallback((raw: string): string => {
+    const m = raw.toLowerCase();
+    if (m.includes("anthropic") || m.includes("api key") || m.includes("api_key")) return "Set ANTHROPIC_API_KEY in Vercel env vars";
+    if (m.includes("rate limit") || m.includes("429")) return "Anthropic rate limit hit — retry in 60s or upgrade plan";
+    if (m.includes("401") || m.includes("403") || m.includes("auth")) return "Sign in required — please log in";
+    if (m.includes("quota")) return "Generation quota exceeded — upgrade your plan";
+    return "Check the browser console for details";
+  }, []);
+
+  // Update timeline based on section state transitions
+  const upsertSection = useCallback((section: string, status: "scaffolding" | "customizing" | "done") => {
+    if (!section) return;
+    const now = Date.now();
+    setSectionTimeline(prev => {
+      const idx = prev.findIndex(s => s.section === section);
+      if (idx === -1) {
+        console.log("[builder]", section, status, 0);
+        return [...prev, { section, label: section, status, startedAt: now }];
+      }
+      const existing = prev[idx];
+      const elapsed = now - existing.startedAt;
+      console.log("[builder]", section, status, elapsed);
+      const next = [...prev];
+      next[idx] = {
+        ...existing,
+        status,
+        finishedAt: status === "done" ? now : existing.finishedAt,
+      };
+      return next;
+    });
+    // Auto-scroll active section into view
+    requestAnimationFrame(() => {
+      const el = timelineScrollRef.current;
+      if (el) el.scrollTop = el.scrollHeight;
+    });
+  }, []);
+
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim()) return;
 
@@ -784,6 +939,10 @@ function BuilderPage() {
     setActiveTab("preview");
     setPipelineAgents([]);
     setBuildProgress(null);
+    setSectionTimeline([]);
+    setBuildError(null);
+    setStreamWarning(null);
+    resetWatchdog();
     pendingLabelRef.current = `Build: ${prompt.trim().slice(0, 50)}`;
 
     abortRef.current?.abort();
@@ -841,6 +1000,7 @@ function BuilderPage() {
           const { done, value } = await Promise.race([readPromise, timeoutPromise]);
           if (done) break;
           lastDataAt = Date.now();
+          resetWatchdog();
           lineBuffer += decoder.decode(value, { stream: true });
           const lines = lineBuffer.split("\n");
           lineBuffer = lines.pop() || "";
@@ -858,6 +1018,9 @@ function BuilderPage() {
                 // Update progress bar if event carries progress numbers
                 if (event.current != null && event.total != null) {
                   setBuildProgress({ current: event.current, total: event.total, section: event.section || "" });
+                }
+                if (event.section && event.phase === "building") {
+                  upsertSection(event.section, "customizing");
                 }
               } else if (event.type === "scaffold" && event.files) {
                 // Legacy scaffold event (full assembly at once) — still supported
@@ -889,6 +1052,11 @@ function BuilderPage() {
                   if (event.fileCount != null && event.totalComponents != null) {
                     setBuildProgress({ current: event.fileCount, total: event.totalComponents, section: event.section || "" });
                   }
+                  if (event.section && event.customized) {
+                    upsertSection(event.section, "done");
+                  } else if (event.section) {
+                    upsertSection(event.section, "scaffolding");
+                  }
                 }
               } else if ((event.type === "done" && event.files) || (event.type === "done")) {
                 // Generation complete
@@ -903,11 +1071,15 @@ function BuilderPage() {
                   setStatus("complete");
                   setBuildProgress(null);
                   receivedDone = true;
+                  clearWatchdog();
+                  setSectionTimeline(prev => prev.map(s => s.status === "done" ? s : { ...s, status: "done", finishedAt: Date.now() }));
                   setPipelineAgents(prev => [...prev, "Build complete"]);
                   trackEvent("build");
                 }
               } else if (event.type === "error") {
-                throw new Error(event.message || "Generation failed");
+                const msg = event.message || "Generation failed";
+                setBuildError({ message: cleanErrorMessage(msg), suggestion: errorSuggestion(msg) });
+                throw new Error(msg);
               }
             } catch (e) {
               if (e instanceof Error && (e.message.includes("failed") || e.message.includes("Generation") || e.message.includes("unavailable") || e.message.includes("busy"))) {
@@ -984,18 +1156,21 @@ function BuilderPage() {
           setPipelineAgents(prev => [...prev, "Build complete (stream ended early — partial results shown)"]);
         }
       } catch (err) {
-        if ((err as Error).name === "AbortError") return;
+        if ((err as Error).name === "AbortError") { clearWatchdog(); return; }
         const errMsg = err instanceof Error ? err.message : String(err);
         console.error("[React Generate] Failed:", errMsg);
         setGeneratedCode("");
         setReactFiles(null);
         setBuildProgress(null);
-        setError(cleanErrorMessage(errMsg));
+        clearWatchdog();
+        const cleaned = cleanErrorMessage(errMsg);
+        setError(cleaned);
+        setBuildError(prev => prev || { message: cleaned, suggestion: errorSuggestion(errMsg) });
         setStatus("error");
       }
       return;
     }
-  }, [prompt, tier, autoReplaceImages, selectedModel, instantMode, generationMode, fullStack]);
+  }, [prompt, tier, autoReplaceImages, selectedModel, instantMode, generationMode, fullStack, resetWatchdog, clearWatchdog, errorSuggestion, upsertSection]);
 
   // Edit existing React files via the same streaming endpoint
   const handleEdit = useCallback(async () => {
@@ -1394,17 +1569,77 @@ root.render(React.createElement(App));
                   />
                 </div>
               )}
+              {streamWarning && (
+                <div className="flex items-center gap-2 text-[10px] text-amber-400 mt-2">
+                  <AlertTriangle className="w-3 h-3" />
+                  <span>{streamWarning}</span>
+                </div>
+              )}
+              {sectionTimeline.length > 0 && (
+                <div className="max-h-32 overflow-y-auto space-y-1 pr-1 mt-2">
+                  {sectionTimeline.map((s) => {
+                    const elapsed = s.finishedAt ? ((s.finishedAt - s.startedAt) / 1000).toFixed(1) : null;
+                    return (
+                      <div key={s.section} className="flex items-center gap-2 text-[10px]">
+                        {s.status === "done" ? (
+                          <Check className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                        ) : (
+                          <span className="w-2 h-2 rounded-full bg-violet-500 animate-pulse flex-shrink-0" />
+                        )}
+                        <span className={s.status === "done" ? "text-white/60" : "text-white/90"}>{s.label}</span>
+                        {elapsed && <span className="text-white/30 ml-auto tabular-nums">{elapsed}s</span>}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {buildError && (
+          <div className="absolute top-16 left-6 right-6 z-50">
+            <div className="max-w-2xl mx-auto px-4 py-3 rounded-xl bg-red-950/90 backdrop-blur-xl border border-red-500/40 shadow-2xl">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-semibold text-red-200">{buildError.message}</div>
+                  <div className="text-xs text-red-300/80 mt-0.5">{buildError.suggestion}</div>
+                </div>
+                <button
+                  onClick={() => { setBuildError(null); handleGenerate(); }}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-xs text-red-100 border border-red-500/40 transition"
+                >
+                  <RotateCcw className="w-3 h-3" /> Retry
+                </button>
+                <button
+                  onClick={() => setBuildError(null)}
+                  className="p-1.5 rounded-lg hover:bg-red-500/20 text-red-300 transition"
+                  aria-label="Dismiss"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
         )}
 
         {/* Fullscreen preview */}
-        <SandpackPreview
-          mode="react"
+        <PreviewSwitcher
+          useWebContainers={useWebContainers}
+          onWebContainersFail={handleWebContainersFail}
           files={reactFiles || {}}
-          dependencies={reactDeps}
-          showEditor={false}
+          reactDeps={reactDeps}
         />
+        {isAdmin && (
+          <button
+            type="button"
+            onClick={() => setUseWebContainers((v) => !v)}
+            className="absolute top-2 right-2 z-50 px-2 py-1 text-[10px] rounded bg-black/70 text-white border border-white/20"
+          >
+            Preview: {useWebContainers ? "WebContainers" : "Sandpack"}
+          </button>
+        )}
 
         {/* Prompt input overlay at bottom — for recording demo sequences */}
         {!hasCode && (
@@ -1560,6 +1795,18 @@ root.render(React.createElement(App));
                   </button>
                 </div>
               )}
+              <div className="px-4 pt-2 flex items-center justify-end">
+                <VoiceToBuildButton
+                  size="sm"
+                  onTranscript={(text) => {
+                    if (hasCode) {
+                      setEditPrompt(text);
+                    } else {
+                      setPrompt(text);
+                    }
+                  }}
+                />
+              </div>
               <div className="flex-1 overflow-hidden">
                 <PromptInput
                   prompt={prompt}
@@ -1802,34 +2049,64 @@ root.render(React.createElement(App));
                 </div>
               </div>
             ) : activeTab === "preview" && !hasCode ? (
-              <div className="h-full flex items-center justify-center bg-[#050508] relative overflow-hidden">
-                {/* Subtle background glow */}
-                <div className="absolute inset-0 pointer-events-none">
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-violet-600/3 blur-[150px]" />
+              <div className="h-full relative overflow-hidden bg-[#050508]">
+                {/*
+                  PRE-WARM: Mount Sandpack in the background (hidden behind the welcome screen)
+                  so the bundler, iframe, Tailwind CDN, and react-ts deps all initialize before
+                  the user submits a prompt. When real files arrive the swap is instant instead
+                  of paying a 20-30s cold start. SandpackPreview's own pre-warm path supplies a
+                  minimal placeholder app when files are empty.
+                */}
+                <div className="absolute inset-0 opacity-0 pointer-events-none" aria-hidden="true">
+                  <SandpackPreview
+                    mode="react"
+                    files={{}}
+                    dependencies={reactDeps}
+                    showEditor={false}
+                  />
                 </div>
-                <div className="relative z-10 text-center px-6 max-w-lg">
-                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-600/20 to-purple-700/20 border border-violet-500/10 mx-auto mb-8 flex items-center justify-center">
-                    <Sparkles className="w-10 h-10 text-violet-400/50" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  {/* Subtle background glow */}
+                  <div className="absolute inset-0 pointer-events-none">
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-violet-600/3 blur-[150px]" />
                   </div>
-                  <h2 className="text-2xl font-bold mb-3 bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">Describe your dream website</h2>
-                  <p className="text-white/30 text-sm mb-8 leading-relaxed">
-                    Type a description in the prompt panel and click Build. Our AI will generate a complete, production-ready React application in under 60 seconds.
-                  </p>
-                  <div className="flex flex-wrap justify-center gap-2">
-                    {["SaaS Landing", "Restaurant", "Portfolio", "E-Commerce", "Agency"].map(tag => (
-                      <span key={tag} className="px-3 py-1 rounded-full bg-white/[0.04] border border-white/[0.06] text-[11px] text-white/30">{tag}</span>
-                    ))}
+                  <div className="relative z-10 text-center px-6 max-w-lg">
+                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-600/20 to-purple-700/20 border border-violet-500/10 mx-auto mb-8 flex items-center justify-center">
+                      <Sparkles className="w-10 h-10 text-violet-400/50" />
+                    </div>
+                    <h2 className="text-2xl font-bold mb-3 bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">Describe your dream website</h2>
+                    <p className="text-white/30 text-sm mb-8 leading-relaxed">
+                      Type a description in the prompt panel and click Build. Our AI will generate a complete, production-ready React application in under 60 seconds.
+                    </p>
+                    <div className="flex flex-wrap justify-center gap-2">
+                      {["SaaS Landing", "Restaurant", "Portfolio", "E-Commerce", "Agency"].map(tag => (
+                        <span key={tag} className="px-3 py-1 rounded-full bg-white/[0.04] border border-white/[0.06] text-[11px] text-white/30">{tag}</span>
+                      ))}
+                    </div>
+                    <div className="mt-6 inline-flex items-center gap-2 text-[10px] uppercase tracking-wider text-emerald-400/60">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      Sandbox pre-warmed · instant preview ready
+                    </div>
                   </div>
                 </div>
               </div>
             ) : activeTab === "preview" ? (
               <div ref={previewContainerRef} className="relative h-full">
-                <SandpackPreview
-                  mode="react"
+                <PreviewSwitcher
+                  useWebContainers={useWebContainers}
+                  onWebContainersFail={handleWebContainersFail}
                   files={reactFiles || {}}
-                  dependencies={reactDeps}
-                  showEditor={false}
+                  reactDeps={reactDeps}
                 />
+                {isAdmin && (
+                  <button
+                    type="button"
+                    onClick={() => setUseWebContainers((v) => !v)}
+                    className="absolute top-2 right-2 z-50 px-2 py-1 text-[10px] rounded bg-black/70 text-white border border-white/20"
+                  >
+                    Preview: {useWebContainers ? "WebContainers" : "Sandpack"}
+                  </button>
+                )}
                 {collab.isConnected && (
                   <CursorOverlay
                     participants={collab.participants}
@@ -1851,13 +2128,65 @@ root.render(React.createElement(App));
                         )}
                       </div>
                       {buildProgress && buildProgress.total > 0 && (
-                        <div className="w-full h-1 rounded-full bg-white/10 overflow-hidden">
+                        <div className="w-full h-1 rounded-full bg-white/10 overflow-hidden mb-2">
                           <div
                             className="h-full rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 transition-all duration-500 ease-out"
                             style={{ width: `${Math.round((buildProgress.current / buildProgress.total) * 100)}%` }}
                           />
                         </div>
                       )}
+                      {streamWarning && (
+                        <div className="flex items-center gap-2 text-[10px] text-amber-400 mb-2">
+                          <AlertTriangle className="w-3 h-3" />
+                          <span>{streamWarning}</span>
+                        </div>
+                      )}
+                      {sectionTimeline.length > 0 && (
+                        <div ref={timelineScrollRef} className="max-h-32 overflow-y-auto space-y-1 pr-1">
+                          {sectionTimeline.map((s) => {
+                            const elapsed = s.finishedAt ? ((s.finishedAt - s.startedAt) / 1000).toFixed(1) : null;
+                            return (
+                              <div key={s.section} className="flex items-center gap-2 text-[10px]">
+                                {s.status === "done" ? (
+                                  <Check className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                                ) : s.status === "customizing" || s.status === "scaffolding" ? (
+                                  <span className="w-2 h-2 rounded-full bg-violet-500 animate-pulse flex-shrink-0" />
+                                ) : (
+                                  <span className="w-2 h-2 rounded-full bg-white/30 flex-shrink-0" />
+                                )}
+                                <span className={s.status === "done" ? "text-white/60" : "text-white/90"}>{s.label}</span>
+                                {elapsed && <span className="text-white/30 ml-auto tabular-nums">{elapsed}s</span>}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                {buildError && (
+                  <div className="absolute top-4 left-4 right-4 z-40">
+                    <div className="max-w-2xl mx-auto px-4 py-3 rounded-xl bg-red-950/90 backdrop-blur-xl border border-red-500/40 shadow-2xl">
+                      <div className="flex items-start gap-3">
+                        <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-semibold text-red-200">{buildError.message}</div>
+                          <div className="text-xs text-red-300/80 mt-0.5">{buildError.suggestion}</div>
+                        </div>
+                        <button
+                          onClick={() => { setBuildError(null); handleGenerate(); }}
+                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-xs text-red-100 border border-red-500/40 transition"
+                        >
+                          <RotateCcw className="w-3 h-3" /> Retry
+                        </button>
+                        <button
+                          onClick={() => setBuildError(null)}
+                          className="p-1.5 rounded-lg hover:bg-red-500/20 text-red-300 transition"
+                          aria-label="Dismiss"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -1910,6 +2239,12 @@ root.render(React.createElement(App));
       <StatusBar status={status} pipelineStep={pipelineAgents.length > 0 ? pipelineAgents[pipelineAgents.length - 1] : undefined} />
 
       <OnboardingTooltips active={showTour} />
+      <DomainHookModal
+        open={domainHookOpen}
+        onClose={() => setDomainHookOpen(false)}
+        siteName={siteNameForHook}
+        generatedFiles={reactFiles || undefined}
+      />
       <BuildSuccessModal
         isOpen={showBuildSuccess}
         onClose={() => { setShowBuildSuccess(false); dismissBuildSuccess(); }}

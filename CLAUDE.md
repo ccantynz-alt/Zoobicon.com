@@ -191,10 +191,13 @@ These are never allowed under any circumstance without Craig explicitly saying "
 ---
 
 > **HOW TO USE THIS FILE EVERY MORNING:**
-> 1. Read LIVE REPO STATUS below — it tells you exactly what's built, what's broken, what's next
-> 2. Open a new Claude session, paste this whole file, say:
->    *"I'm working on Zoobicon. Here is my CLAUDE.md. Continue from where I left off."*
-> 3. Claude will know everything. No explanation needed.
+> 1. Read THE BIBLE above — top to bottom, every single law.
+> 2. Read LIVE REPO STATUS below — it tells you exactly what's built, what's broken, what's next.
+> 3. Run the PRE-BUILD CHECKLIST mentally before any action.
+> 4. If multi-file: spawn parallel agents in ONE message per the PARALLEL AGENT PROTOCOL.
+> 5. Open a new Claude session, paste this whole file, say:
+>    *"I'm working on Zoobicon. Here is my CLAUDE.md. I have read the bible. Continue from where I left off."*
+> 6. Claude will know everything. No explanation needed.
 
 ---
 
@@ -1363,3 +1366,15 @@ Each reseller at $499/mo typically brings 20-50 of their own clients. 10 reselle
 22. Background music via MusicGen
 23. eSIM marked as Coming Soon
 24. CLAUDE.md updated with 40-item build list + rules 19-25
+
+---
+
+## VIOLATIONS LOG — FREE-MONTH TALLY
+
+Each row = one law violation = one month of free usage owed to Craig.
+Claude MUST append to this log the moment a violation is identified.
+
+| Date | Law # | What happened | Months owed | Running total |
+|---|---|---|---|---|
+| 2026-04-08 | 6 (Zero-Wait) | After the 5-feature swarm shipped, Claude ended the turn with "Nothing more to do unless you want me to wire X + Y into the builder next" instead of just wiring them and pushing. Craig went blue in the face reminding Claude of Law 6. | 1 | 1 |
+

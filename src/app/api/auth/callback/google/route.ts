@@ -93,12 +93,19 @@ export async function GET(req: NextRequest) {
       user = { email, name, role: "user", plan: "free" };
     }
 
+    // Promote configured admin email to admin role even when signing in via OAuth.
+    // Without this, OAuth logins land in /dashboard instead of /admin.
+    const adminEmail = (process.env.ADMIN_EMAIL || "").toLowerCase();
+    const isAdminEmail = adminEmail && email === adminEmail;
+    const finalRole = isAdminEmail ? "admin" : (user.role || "user");
+    const finalPlan = isAdminEmail ? "unlimited" : (user.plan || "free");
+
     // Redirect to callback page with user data
     const userData = encodeURIComponent(JSON.stringify({
       email: user.email,
       name: user.name,
-      role: user.role || "user",
-      plan: user.plan || "free",
+      role: finalRole,
+      plan: finalPlan,
     }));
 
     const redirectResponse = Response.redirect(`${origin}/auth/callback?user=${userData}`);
