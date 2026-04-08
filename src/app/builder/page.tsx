@@ -14,6 +14,17 @@ import dynamic from "next/dynamic";
 const SandpackPreview = dynamic(() => import("@/components/SandpackPreview"), { ssr: false });
 const WebContainerPreview = dynamic(() => import("@/components/WebContainerPreview"), { ssr: false });
 
+// Pre-warm WebContainers the moment this module loads (before React mounts).
+// The dynamic import of WebContainerPreview above is async, so we also fire
+// the pre-warm from an effect in BuilderPageInner for safety.
+let prewarmWebContainer: (() => void) | null = null;
+import("@/components/WebContainerPreview").then((mod) => {
+  if (mod.prewarmWebContainer) {
+    prewarmWebContainer = mod.prewarmWebContainer;
+    prewarmWebContainer();
+  }
+}).catch(() => { /* package not installed — Sandpack fallback */ });
+
 interface WCErrorBoundaryProps {
   onError: () => void;
   fallback: ReactNode;
@@ -49,7 +60,7 @@ function PreviewSwitcher({ useWebContainers, onWebContainersFail, files, reactDe
   if (!useWebContainers) return sandpack;
   return (
     <WebContainerErrorBoundary onError={onWebContainersFail} fallback={sandpack}>
-      <WebContainerPreview files={files} entry="App.tsx" />
+      <WebContainerPreview files={files} prewarm onFallback={onWebContainersFail} />
     </WebContainerErrorBoundary>
   );
 }
@@ -457,12 +468,20 @@ function BuilderPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [useWebContainers, setUseWebContainers] = useState<boolean>(true);
 
+  // Detect unsupported browsers and pre-warm WebContainers on supported ones
   useEffect(() => {
     if (typeof navigator === "undefined") return;
     const ua = navigator.userAgent;
     const isSafari = /^((?!chrome|android|crios|fxios).)*safari/i.test(ua);
     const isIOS = /iPad|iPhone|iPod/.test(ua);
-    if (isSafari || isIOS) setUseWebContainers(false);
+    if (isSafari || isIOS) {
+      setUseWebContainers(false);
+    } else {
+      // Pre-warm WebContainers immediately on page mount so the container
+      // is booted and ready by the time the user finishes typing their prompt.
+      // Boot takes ~2-3s; doing it now means near-zero wait when files arrive.
+      if (prewarmWebContainer) prewarmWebContainer();
+    }
   }, []);
 
   const handleWebContainersFail = useCallback(() => {
@@ -2438,7 +2457,7 @@ root.render(React.createElement(App));
                       {/* Pre-warm indicator */}
                       <div className="inline-flex items-center gap-2 text-[10px] text-white/20">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400/60 animate-pulse" />
-                        Sandbox ready
+                        {useWebContainers ? "Runtime pre-warmed" : "Sandbox ready"}
                       </div>
                     </div>
                   </div>
