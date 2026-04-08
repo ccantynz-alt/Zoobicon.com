@@ -99,11 +99,12 @@ export default function DomainsPage() {
   const [pendingGenerate, setPendingGenerate] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [generatedNames, setGeneratedNames] = useState<Array<{ name: string; tagline: string; domains: Array<{ domain: string; tld: string; available: boolean | null; price: number; checking: boolean }> }>>([]);
-  const [pendingGenerate, setPendingGenerate] = useState(false);
   const [autoExpandedTlds, setAutoExpandedTlds] = useState(false);
   const [autoGenerating, setAutoGenerating] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [generatorError, setGeneratorError] = useState<string | null>(null);
+  const [showCheckoutForm, setShowCheckoutForm] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
   const genResultsRef = useRef<HTMLDivElement>(null);
 
