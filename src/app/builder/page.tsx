@@ -2107,131 +2107,145 @@ root.render(React.createElement(App));
         </div>
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left panel — Prompt (before generation) or Chat editor (after) */}
-        <div className="w-[400px] min-w-[340px] flex flex-col border-r border-white/[0.08] bg-[#0a0a0f]">
-          {!hasCode ? (
-            <>
-              <div className="px-4 py-4 border-b border-white/[0.10]">
-                {generatorBanner ? (
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-violet-600 to-purple-700 flex items-center justify-center">
-                        <Sparkles className="w-3 h-3 text-white" />
+      <div className="flex flex-1 overflow-hidden relative z-10">
+        {/* ── Left Panel — Chat / Prompt ── */}
+        <div className="w-[380px] min-w-[320px] flex flex-col border-r border-white/[0.06] bg-zinc-950/60 backdrop-blur-xl">
+          <AnimatePresence mode="wait">
+            {!hasCode ? (
+              <motion.div
+                key="prompt-panel"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="flex flex-col h-full"
+              >
+                {/* Panel header */}
+                <div className="px-4 py-3 border-b border-white/[0.06]">
+                  {generatorBanner ? (
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-violet-600 to-purple-700 flex items-center justify-center">
+                          <Sparkles className="w-3 h-3 text-white" />
+                        </div>
+                        <span className="text-xs font-semibold text-white/80">
+                          {generatorBanner.name}
+                        </span>
                       </div>
-                      <span className="text-xs font-semibold text-white/80">
-                        {generatorBanner.name}
+                      <button
+                        onClick={() => setGeneratorBanner(null)}
+                        className="text-white/30 hover:text-white/50 text-xs transition-colors"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-violet-500/15 to-purple-600/15 border border-violet-500/10 flex items-center justify-center">
+                        <MessageSquare className="w-3 h-3 text-violet-400" />
+                      </div>
+                      <span className="text-xs font-medium text-white/50">
+                        AI Website Builder
                       </span>
                     </div>
-                    <button
-                      onClick={() => setGeneratorBanner(null)}
-                      className="text-white/30 hover:text-white/50 text-xs transition-colors"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-violet-600/20 to-purple-700/20 border border-violet-500/10 flex items-center justify-center">
-                      <Sparkles className="w-3 h-3 text-violet-400" />
-                    </div>
-                    <span className="text-xs font-medium text-white/50">
-                      AI Website Builder
-                    </span>
+                  )}
+                </div>
+
+                {/* Context import strip */}
+                {mcpContext && (
+                  <div className="px-4 py-1.5 border-b border-white/[0.04] flex items-center gap-2 bg-indigo-500/[0.03]">
+                    <span className="text-[10px] text-indigo-400/70">Context imported</span>
+                    <button onClick={() => setActiveTool("mcp")} className="text-[10px] text-indigo-400/50 hover:text-indigo-400 transition-colors">Manage</button>
                   </div>
                 )}
-              </div>
-              {/* Quick import context bar */}
-              {mcpContext && (
-                <div className="px-4 py-1.5 border-b border-white/[0.05] flex items-center gap-2">
-                  <span className="text-[10px] text-indigo-400/70">
-                    Context imported
-                  </span>
+                {!mcpContext && !hasCode && (
+                  <div className="px-4 py-1.5 border-b border-white/[0.04]">
+                    <button onClick={() => setActiveTool("mcp")} className="flex items-center gap-1.5 text-[10px] text-white/25 hover:text-violet-400/70 transition-colors">
+                      <ExternalLink size={10} />
+                      Import from GitHub, Figma, or URL
+                    </button>
+                  </div>
+                )}
+
+                {/* Voice input */}
+                <div className="px-4 pt-2 flex items-center justify-end">
+                  <VoiceToBuildButton
+                    size="sm"
+                    onTranscript={(text) => {
+                      if (hasCode) { setEditPrompt(text); } else { setPrompt(text); }
+                    }}
+                  />
+                </div>
+
+                {/* Prompt input area */}
+                <div className="flex-1 overflow-hidden">
+                  <PromptInput
+                    prompt={prompt}
+                    onPromptChange={setPrompt}
+                    onGenerate={handleGenerate}
+                    isGenerating={status === "generating"}
+                    tier={tier}
+                    onTierChange={setTier}
+                    hasExistingCode={hasCode}
+                    editPrompt={editPrompt}
+                    onEditPromptChange={setEditPrompt}
+                    onEdit={handleEdit}
+                    selectedModel={selectedModel}
+                    onModelChange={setSelectedModel}
+                    availableModels={availableModels}
+                    generationMode={generationMode}
+                    onGenerationModeChange={setGenerationMode}
+                    fullStack={fullStack}
+                    onFullStackChange={setFullStack}
+                  />
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="chat-panel"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="flex flex-col h-full"
+              >
+                {/* Chat header */}
+                <div className="px-4 py-2.5 border-b border-white/[0.06] flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-md bg-violet-500/10 flex items-center justify-center">
+                      <MessageSquare className="w-3 h-3 text-violet-400" />
+                    </div>
+                    <span className="text-xs font-medium text-white/50">Chat</span>
+                  </div>
                   <button
-                    onClick={() => setActiveTool("mcp")}
-                    className="text-[10px] text-indigo-400/50 hover:text-indigo-400 transition-colors"
+                    onClick={handleNewSite}
+                    className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] text-white/30 hover:text-white/60 hover:bg-white/[0.05] transition-all"
                   >
-                    Manage
+                    <Plus size={12} />
+                    New
                   </button>
                 </div>
-              )}
-              {!mcpContext && !hasCode && (
-                <div className="px-4 py-1.5 border-b border-white/[0.05]">
-                  <button
-                    onClick={() => setActiveTool("mcp")}
-                    className="flex items-center gap-1.5 text-[10px] text-white/30 hover:text-indigo-400/70 transition-colors"
-                  >
-                    <ExternalLink size={10} />
-                    Import from GitHub, Figma, or URL
-                  </button>
+
+                {/* Chat messages + edit input */}
+                <div className="flex-1 overflow-hidden">
+                  <ChatPanel
+                    reactFiles={reactFiles}
+                    onFilesUpdate={(changedFiles) => {
+                      setReactFiles(prev => {
+                        const merged = { ...prev, ...changedFiles };
+                        setReactSource(merged);
+                        return merged;
+                      });
+                      setStatus("complete");
+                      pendingLabelRef.current = `Edit: ${Object.keys(changedFiles).join(", ")}`;
+                    }}
+                    isVisible={true}
+                    isGenerating={status === "generating"}
+                  />
                 </div>
-              )}
-              <div className="px-4 pt-2 flex items-center justify-end">
-                <VoiceToBuildButton
-                  size="sm"
-                  onTranscript={(text) => {
-                    if (hasCode) {
-                      setEditPrompt(text);
-                    } else {
-                      setPrompt(text);
-                    }
-                  }}
-                />
-              </div>
-              <div className="flex-1 overflow-hidden">
-                <PromptInput
-                  prompt={prompt}
-                  onPromptChange={setPrompt}
-                  onGenerate={handleGenerate}
-                  isGenerating={status === "generating"}
-                  tier={tier}
-                  onTierChange={setTier}
-                  hasExistingCode={hasCode}
-                  editPrompt={editPrompt}
-                  onEditPromptChange={setEditPrompt}
-                  onEdit={handleEdit}
-                  selectedModel={selectedModel}
-                  onModelChange={setSelectedModel}
-                  availableModels={availableModels}
-                  generationMode={generationMode}
-                  onGenerationModeChange={setGenerationMode}
-                  fullStack={fullStack}
-                  onFullStackChange={setFullStack}
-                />
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="px-4 py-3 border-b border-white/[0.10] flex items-center justify-between">
-                <span className="text-[11px] uppercase tracking-[2px] text-brand-400/50">
-                  AI Editor
-                </span>
-                <button
-                  onClick={handleNewSite}
-                  className="text-[10px] uppercase tracking-wider text-red-400/60 hover:text-red-400 transition-colors"
-                >
-                  New Site
-                </button>
-              </div>
-              <div className="flex-1 overflow-hidden">
-                <ChatPanel
-                  reactFiles={reactFiles}
-                  onFilesUpdate={(changedFiles) => {
-                    // Merge only the changed files into the existing set (diff-based)
-                    setReactFiles(prev => {
-                      const merged = { ...prev, ...changedFiles };
-                      setReactSource(merged);
-                      return merged;
-                    });
-                    setStatus("complete");
-                    pendingLabelRef.current = `Edit: ${Object.keys(changedFiles).join(", ")}`;
-                  }}
-                  isVisible={true}
-                  isGenerating={status === "generating"}
-                />
-              </div>
-            </>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Center panel — Preview / Code */}
