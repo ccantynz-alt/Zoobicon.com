@@ -1,333 +1,403 @@
-"use client";
+'use client';
 
-// DomainHookModal — high-conversion post-build domain capture
-// TODO: wire DomainHookModal into builder (open after successful generation,
-// pass siteName derived from the generated project + generatedFiles for deploy).
-
-import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Globe,
   Check,
-  Sparkles,
-  ArrowRight,
   Loader2,
-  Mail,
-  Rocket,
   X,
-} from "lucide-react";
+  Sparkles,
+  Globe,
+  Rocket,
+  Mail,
+  Send,
+} from 'lucide-react';
 
-interface Suggestion {
+interface DomainSuggestion {
   domain: string;
-  tld: string;
-  available: boolean;
-  unknown?: boolean;
-  price: number;
-  recommended: boolean;
+  available?: boolean;
+  price?: number;
+  tld?: string;
+}
+
+interface SiteFile {
+  path: string;
+  content: string;
+}
+
+export interface DomainHookCompleteResult {
+  success: boolean;
+  steps?: Record<string, unknown>;
+  domain?: string;
+  siteUrl?: string;
+  mailbox?: string;
+  error?: string;
 }
 
 interface DomainHookModalProps {
-  open: boolean;
+  isOpen: boolean;
   onClose: () => void;
-  siteName: string;
-  generatedFiles?: Record<string, string>;
-  onRegister?: (domain: string) => void;
+  businessName: string;
+  industry?: string;
+  siteFiles: Record<string, string> | SiteFile[];
+  contactEmail: string;
+  onComplete: (result: DomainHookCompleteResult) => void;
 }
 
+type StepKey = 'register' | 'deploy' | 'mailbox' | 'email';
+type StepStatus = 'pending' | 'running' | 'done' | 'error';
+
+interface StepDef {
+  key: StepKey;
+  label: string;
+  icon: typeof Globe;
+}
+
+const STEPS: StepDef[] = [
+  { key: 'register', label: 'Register domain', icon: Globe },
+  { key: 'deploy', label: 'Deploy website', icon: Rocket },
+  { key: 'mailbox', label: 'Create mailbox', icon: Mail },
+  { key: 'email', label: 'Send welcome email', icon: Send },
+];
+
 export default function DomainHookModal({
-  open,
+  isOpen,
   onClose,
-  siteName,
-  generatedFiles,
-  onRegister,
+  businessName,
+  industry,
+  siteFiles,
+  contactEmail,
+  onComplete,
 }: DomainHookModalProps) {
-  const [loading, setLoading] = useState(false);
-  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
-  const [registering, setRegistering] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [suggestions, setSuggestions] = useState<DomainSuggestion[]>([]);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+  const [suggestError, setSuggestError] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [running, setRunning] = useState(false);
+  const [stepStatus, setStepStatus] = useState<Record<StepKey, StepStatus>>({
+    register: 'pending',
+    deploy: 'pending',
+    mailbox: 'pending',
+    email: 'pending',
+  });
+  const [finalResult, setFinalResult] = useState<DomainHookCompleteResult | null>(null);
+  const [completeError, setCompleteError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!open || !siteName) return;
+    if (!isOpen) return;
     let cancelled = false;
-    setLoading(true);
-    setError(null);
-    fetch("/api/domain-hook/suggest", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ siteName }),
-    })
-      .then((r) => r.json())
-      .then((data) => {
-        if (cancelled) return;
-        setSuggestions(data?.suggestions || []);
-      })
-      .catch(() => {
-        if (!cancelled) setError("Could not load domain suggestions. Try again.");
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
+    const fetchSuggestions = async (): Promise<void> => {
+      setLoadingSuggestions(true);
+      setSuggestError(null);
+      setSuggestions([]);
+      try {
+        const res = await fetch('/api/domain-hook/suggest', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ businessName, industry }),
+        });
+        const data = (await res.json()) as { suggestions?: DomainSuggestion[]; error?: string };
+        if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+        if (!cancelled) setSuggestions((data.suggestions || []).slice(0, 5));
+      } catch (err) {
+        if (!cancelled) {
+          const message = err instanceof Error ? err.message : 'Unknown error';
+          setSuggestError(message);
+        }
+      } finally {
+        if (!cancelled) setLoadingSuggestions(false);
+      }
+    };
+    void fetchSuggestions();
     return () => {
       cancelled = true;
     };
-  }, [open, siteName]);
+  }, [isOpen, businessName, industry]);
 
-  async function handleRegister(s: Suggestion) {
-    if (!s.available) return;
-    setRegistering(s.domain);
-    setError(null);
+  const runComplete = async (domain: string): Promise<void> => {
+    setSelected(domain);
+    setRunning(true);
+    setCompleteError(null);
+    setFinalResult(null);
+    setStepStatus({
+      register: 'running',
+      deploy: 'pending',
+      mailbox: 'pending',
+      email: 'pending',
+    });
+
+    // Visual progression while real call runs
+    const advance = (key: StepKey, next: StepKey | null): void => {
+      setStepStatus((prev) => ({
+        ...prev,
+        [key]: 'done',
+        ...(next ? { [next]: 'running' as StepStatus } : {}),
+      }));
+    };
+    const t1 = setTimeout(() => advance('register', 'deploy'), 1200);
+    const t2 = setTimeout(() => advance('deploy', 'mailbox'), 2600);
+    const t3 = setTimeout(() => advance('mailbox', 'email'), 4000);
+
     try {
-      let email = "";
-      try {
-        const u = JSON.parse(localStorage.getItem("zoobicon_user") || "{}");
-        email = u?.email || "";
-      } catch {}
-
-      const [name, ...rest] = s.domain.split(".");
-      const tld = rest.join(".");
-
-      const res = await fetch("/api/domains/register", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
+      const res = await fetch('/api/domain-hook/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          domains: [{ name, tld }],
-          registrant: { email },
-          years: 1,
+          userId: contactEmail,
+          chosenDomain: domain,
+          siteFiles,
+          contactEmail,
         }),
       });
-      const data = await res.json();
-      if (data?.checkoutUrl) {
-        onRegister?.(s.domain);
-        window.location.href = data.checkoutUrl;
+      const data = (await res.json()) as DomainHookCompleteResult;
+      [t1, t2, t3].forEach(clearTimeout);
+      if (!res.ok || data.success === false) {
+        const message = data.error || `HTTP ${res.status}`;
+        setStepStatus((prev) => {
+          const next = { ...prev };
+          (Object.keys(next) as StepKey[]).forEach((k) => {
+            if (next[k] === 'running' || next[k] === 'pending') next[k] = 'error';
+          });
+          return next;
+        });
+        setCompleteError(message);
         return;
       }
-      setError(data?.error || "Checkout failed. Please try again.");
-    } catch {
-      setError("Checkout failed. Please try again.");
+      setStepStatus({
+        register: 'done',
+        deploy: 'done',
+        mailbox: 'done',
+        email: 'done',
+      });
+      setFinalResult(data);
+      onComplete(data);
+    } catch (err) {
+      [t1, t2, t3].forEach(clearTimeout);
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      setCompleteError(message);
     } finally {
-      setRegistering(null);
+      setRunning(false);
     }
-  }
+  };
 
-  const recommended = suggestions.find((s) => s.recommended) || suggestions[0];
-  const alternates = suggestions.filter((s) => s !== recommended).slice(0, 7);
+  const handleClose = (): void => {
+    if (running) return;
+    setSelected(null);
+    setFinalResult(null);
+    setCompleteError(null);
+    setStepStatus({
+      register: 'pending',
+      deploy: 'pending',
+      mailbox: 'pending',
+      email: 'pending',
+    });
+    onClose();
+  };
 
   return (
     <AnimatePresence>
-      {open && (
+      {isOpen && (
         <motion.div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          onClick={handleClose}
         >
-          {/* Backdrop */}
           <motion.div
-            className="absolute inset-0 bg-black/80 backdrop-blur-md"
-            onClick={onClose}
-          />
-
-          {/* Animated glow orbs */}
-          <div className="pointer-events-none absolute inset-0 overflow-hidden">
-            <motion.div
-              className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-purple-600/30 blur-3xl"
-              animate={{ x: [0, 40, 0], y: [0, 30, 0] }}
-              transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <motion.div
-              className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-blue-600/30 blur-3xl"
-              animate={{ x: [0, -40, 0], y: [0, -30, 0] }}
-              transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-            />
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.97 }}
-            transition={{ type: "spring", damping: 24, stiffness: 240 }}
-            className="relative w-full max-w-3xl"
+            className="relative w-full max-w-2xl rounded-2xl bg-gradient-to-b from-gray-900 to-gray-950 border border-white/10 shadow-2xl overflow-hidden"
+            initial={{ scale: 0.95, y: 20, opacity: 0 }}
+            animate={{ scale: 1, y: 0, opacity: 1 }}
+            exit={{ scale: 0.95, y: 20, opacity: 0 }}
+            transition={{ type: 'spring', damping: 22, stiffness: 280 }}
+            onClick={(e) => e.stopPropagation()}
           >
-            {/* Gradient border wrapper */}
-            <div className="relative rounded-2xl bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-400 p-[1.5px] shadow-2xl">
-              <div className="relative rounded-2xl bg-[#0b0d14] text-white">
-                {/* Close */}
-                <button
-                  onClick={onClose}
-                  className="absolute right-4 top-4 z-10 rounded-full p-2 text-white/60 transition hover:bg-white/10 hover:text-white"
-                  aria-label="Close"
-                >
-                  <X className="h-5 w-5" />
-                </button>
+            <button
+              onClick={handleClose}
+              disabled={running}
+              className="absolute top-4 right-4 p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition disabled:opacity-30 disabled:cursor-not-allowed"
+              aria-label="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
 
-                {/* Header */}
-                <div className="border-b border-white/10 px-8 pt-8 pb-6">
-                  <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium tracking-wide text-white/80">
-                    <Sparkles className="h-3.5 w-3.5 text-yellow-300" />
-                    Your site is live — claim the domain
+            <div className="p-8">
+              {!finalResult && !selected && (
+                <>
+                  <div className="flex items-center gap-3 mb-2">
+                    <Sparkles className="w-6 h-6 text-purple-400" />
+                    <h2 className="text-2xl font-bold tracking-tight text-white">
+                      Pick your domain
+                    </h2>
                   </div>
-                  <h2 className="text-3xl font-semibold tracking-tight text-balance md:text-4xl">
-                    Lock in{" "}
-                    <span className="bg-gradient-to-r from-purple-300 via-blue-300 to-cyan-300 bg-clip-text text-transparent">
-                      {recommended?.domain || `${siteName}.com`}
-                    </span>
-                  </h2>
-                  <p className="mt-2 max-w-xl text-sm text-white/60">
-                    Register the domain, deploy your site, and turn on business email
-                    in one step. No DNS wrangling. No hosting setup.
+                  <p className="text-white/60 mb-6">
+                    AI-curated domains for{' '}
+                    <span className="text-white font-medium">{businessName}</span>
                   </p>
-                </div>
 
-                {/* Body */}
-                <div className="px-8 py-6">
-                  {loading && (
-                    <div className="flex items-center justify-center py-12 text-white/60">
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Checking availability across 8 TLDs…
-                    </div>
-                  )}
-
-                  {!loading && recommended && (
-                    <div className="mb-6 overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02]">
-                      <div className="flex items-center justify-between gap-4 p-5">
-                        <div className="flex items-center gap-4">
-                          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 text-white shadow-lg">
-                            <Globe className="h-6 w-6" />
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-xl font-semibold">{recommended.domain}</span>
-                              {recommended.available && (
-                                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-medium text-emerald-300">
-                                  <Check className="h-3 w-3" /> Available
-                                </span>
-                              )}
-                            </div>
-                            <div className="mt-0.5 text-sm text-white/50">
-                              ${recommended.price.toFixed(2)}/year · Renews automatically
-                            </div>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => handleRegister(recommended)}
-                          disabled={!recommended.available || registering === recommended.domain}
-                          className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-500 to-blue-500 px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:shadow-purple-500/30 disabled:cursor-not-allowed disabled:opacity-50"
+                  {loadingSuggestions && (
+                    <div className="space-y-3">
+                      {[0, 1, 2, 3, 4].map((i) => (
+                        <div
+                          key={i}
+                          className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/5"
                         >
-                          {registering === recommended.domain ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <>
-                              Register + Deploy + Email
-                              <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-                            </>
+                          <Loader2 className="w-5 h-5 text-purple-400 animate-spin" />
+                          <span className="text-white/40">Checking availability...</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {suggestError && (
+                    <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300">
+                      Couldn&apos;t load suggestions: {suggestError}
+                    </div>
+                  )}
+
+                  {!loadingSuggestions && !suggestError && suggestions.length === 0 && (
+                    <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-white/60">
+                      No suggestions returned. Try a different business name.
+                    </div>
+                  )}
+
+                  <div className="space-y-3">
+                    {suggestions.map((s) => (
+                      <button
+                        key={s.domain}
+                        onClick={() => void runComplete(s.domain)}
+                        className="group w-full flex items-center justify-between gap-3 p-4 rounded-xl bg-white/5 border border-white/10 hover:border-purple-400/60 hover:bg-white/10 transition text-left"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <Globe className="w-5 h-5 text-purple-400 flex-shrink-0" />
+                          <span className="text-white font-medium truncate">
+                            {s.domain}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          {typeof s.price === 'number' && (
+                            <span className="text-white/60 text-sm">${s.price}/yr</span>
                           )}
-                        </button>
-                      </div>
+                          {s.available === true && (
+                            <span className="px-2 py-1 rounded-md text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                              Available
+                            </span>
+                          )}
+                          {s.available === false && (
+                            <span className="px-2 py-1 rounded-md text-xs font-semibold bg-red-500/20 text-red-300 border border-red-500/30">
+                              Taken
+                            </span>
+                          )}
+                          {s.available === undefined && (
+                            <Loader2 className="w-4 h-4 text-white/40 animate-spin" />
+                          )}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
 
-                      {/* 3-step preview */}
-                      <div className="grid grid-cols-3 divide-x divide-white/10 border-t border-white/10 text-xs">
-                        <div className="flex items-center gap-2 p-4 text-white/70">
-                          <Globe className="h-4 w-4 text-purple-300" />
-                          <span>
-                            <span className="font-medium text-white">Register</span>
-                            <span className="block text-white/40">${recommended.price.toFixed(2)}/yr</span>
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2 p-4 text-white/70">
-                          <Rocket className="h-4 w-4 text-blue-300" />
-                          <span>
-                            <span className="font-medium text-white">Deploy</span>
-                            <span className="block text-white/40">Free on zoobicon.sh</span>
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2 p-4 text-white/70">
-                          <Mail className="h-4 w-4 text-cyan-300" />
-                          <span>
-                            <span className="font-medium text-white">Email</span>
-                            <span className="block text-white/40">3 mailboxes free</span>
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+              {selected && !finalResult && (
+                <>
+                  <div className="flex items-center gap-3 mb-2">
+                    <Loader2 className="w-6 h-6 text-purple-400 animate-spin" />
+                    <h2 className="text-2xl font-bold tracking-tight text-white">
+                      Setting up {selected}
+                    </h2>
+                  </div>
+                  <p className="text-white/60 mb-8">
+                    Hang tight — building your business in real time.
+                  </p>
 
-                  {!loading && alternates.length > 0 && (
-                    <div>
-                      <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-white/40">
-                        Other options
-                      </div>
-                      <div className="space-y-2">
-                        {alternates.map((s) => (
-                          <div
-                            key={s.domain}
-                            className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.02] px-4 py-3 transition hover:border-white/20 hover:bg-white/[0.04]"
-                          >
-                            <div className="flex items-center gap-3">
-                              <Globe className="h-4 w-4 text-white/40" />
-                              <span className="font-medium">{s.domain}</span>
-                              {s.available ? (
-                                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-medium text-emerald-300">
-                                  <Check className="h-2.5 w-2.5" /> Available
-                                </span>
-                              ) : s.unknown ? (
-                                <span className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] text-white/40">
-                                  Checking…
-                                </span>
-                              ) : (
-                                <span className="rounded-full bg-red-500/10 px-2 py-0.5 text-[10px] text-red-300">
-                                  Taken
-                                </span>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-4">
-                              <span className="text-sm text-white/60">
-                                ${s.price.toFixed(2)}/yr
-                              </span>
-                              <button
-                                onClick={() => handleRegister(s)}
-                                disabled={!s.available || registering === s.domain}
-                                className="inline-flex items-center gap-1 rounded-lg border border-white/15 px-3 py-1.5 text-xs font-semibold text-white transition hover:border-white/30 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40"
-                              >
-                                {registering === s.domain ? (
-                                  <Loader2 className="h-3 w-3 animate-spin" />
-                                ) : (
-                                  <>
-                                    Register
-                                    <ArrowRight className="h-3 w-3" />
-                                  </>
-                                )}
-                              </button>
-                            </div>
+                  <div className="space-y-3">
+                    {STEPS.map(({ key, label, icon: Icon }) => {
+                      const status = stepStatus[key];
+                      return (
+                        <div
+                          key={key}
+                          className={`flex items-center gap-4 p-4 rounded-xl border transition ${
+                            status === 'done'
+                              ? 'bg-emerald-500/10 border-emerald-500/30'
+                              : status === 'running'
+                              ? 'bg-purple-500/10 border-purple-500/40'
+                              : status === 'error'
+                              ? 'bg-red-500/10 border-red-500/30'
+                              : 'bg-white/5 border-white/10'
+                          }`}
+                        >
+                          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center">
+                            {status === 'done' ? (
+                              <Check className="w-5 h-5 text-emerald-400" />
+                            ) : status === 'running' ? (
+                              <Loader2 className="w-5 h-5 text-purple-400 animate-spin" />
+                            ) : status === 'error' ? (
+                              <X className="w-5 h-5 text-red-400" />
+                            ) : (
+                              <Icon className="w-5 h-5 text-white/40" />
+                            )}
                           </div>
-                        ))}
+                          <span
+                            className={`font-medium ${
+                              status === 'pending' ? 'text-white/40' : 'text-white'
+                            }`}
+                          >
+                            {label}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {completeError && (
+                    <div className="mt-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300">
+                      {completeError}
+                    </div>
+                  )}
+                </>
+              )}
+
+              {finalResult && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="text-center py-6"
+                >
+                  <div className="mx-auto w-20 h-20 rounded-full bg-gradient-to-br from-emerald-400 via-teal-400 to-purple-500 flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/30">
+                    <Check className="w-10 h-10 text-white" />
+                  </div>
+                  <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-white via-emerald-200 to-purple-200 bg-clip-text text-transparent mb-3">
+                    You&apos;re live!
+                  </h2>
+                  <p className="text-white/70 mb-6">
+                    {finalResult.domain || selected} is registered, deployed, and ready.
+                  </p>
+                  <div className="space-y-2 text-left max-w-md mx-auto mb-8">
+                    {finalResult.siteUrl && (
+                      <div className="flex items-center gap-2 p-3 rounded-lg bg-white/5 border border-white/10">
+                        <Globe className="w-4 h-4 text-purple-400" />
+                        <span className="text-white/80 text-sm truncate">
+                          {finalResult.siteUrl}
+                        </span>
                       </div>
-                    </div>
-                  )}
-
-                  {!loading && suggestions.length === 0 && (
-                    <div className="rounded-lg border border-white/10 bg-white/[0.02] p-6 text-center text-sm text-white/60">
-                      No suggestions available right now. Try a different site name.
-                    </div>
-                  )}
-
-                  {error && (
-                    <div className="mt-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-                      {error}
-                    </div>
-                  )}
-                </div>
-
-                {/* Footer */}
-                <div className="flex items-center justify-between border-t border-white/10 px-8 py-4 text-xs text-white/40">
-                  <span>Authoritative RDAP availability · Powered by OpenSRS</span>
+                    )}
+                    {finalResult.mailbox && (
+                      <div className="flex items-center gap-2 p-3 rounded-lg bg-white/5 border border-white/10">
+                        <Mail className="w-4 h-4 text-emerald-400" />
+                        <span className="text-white/80 text-sm truncate">
+                          {finalResult.mailbox}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                   <button
-                    onClick={onClose}
-                    className="font-medium text-white/60 transition hover:text-white"
+                    onClick={handleClose}
+                    className="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-emerald-500 text-white font-semibold hover:opacity-90 transition"
                   >
-                    Maybe later
+                    Done
                   </button>
-                </div>
-              </div>
+                </motion.div>
+              )}
             </div>
           </motion.div>
         </motion.div>

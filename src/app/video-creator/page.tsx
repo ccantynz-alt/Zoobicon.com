@@ -21,15 +21,16 @@ import {
   Square,
   Play,
   AlertCircle,
+  Megaphone,
   BookOpen,
   MessageSquareQuote,
   Briefcase,
   GraduationCap,
-  Zap,
-  Crown,
-  Smile,
   Building2,
   Clapperboard,
+  Crown,
+  Smile,
+  Zap,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */

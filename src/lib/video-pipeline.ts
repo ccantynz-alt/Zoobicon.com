@@ -1,5 +1,5 @@
 /**
- * Zoobicon Video Pipeline — Our Own AI Video Generation Stack
+ * Video Pipeline — Premium Orchestrator
  *
  * NO dependency on HeyGen. We control the entire pipeline.
  *
@@ -18,9 +18,15 @@
  *   ZOOBICON_VIDEO_API_URL — Self-hosted endpoint (future override)
  */
 
-import { assembleScenes, burnInCaptions, mixBackgroundMusic } from "./video-assembler";
+export const runtime = "nodejs";
 
-const REPLICATE_API = "https://api.replicate.com/v1";
+// ─────────────────────────────────────────────────────────────────────────────
+// Legacy compatibility shim
+// ─────────────────────────────────────────────────────────────────────────────
+// The old video-pipeline.ts (deleted 2026-04-07) exposed a flat surface used by
+// callers that pre-date the premium orchestrator. We re-export thin wrappers
+// here so those callers keep working while delegating to the modern pipeline.
+// New code should call generatePremiumVideo directly.
 
 /**
  * Create a prediction on Replicate with automatic version fallback.
@@ -92,45 +98,25 @@ function getReplicateToken(): string {
 
 export interface VideoGenerationRequest {
   script: string;
-  avatarDescription?: string; // "professional woman, mid-30s, dark hair" — we generate the face
-  avatarImageUrl?: string; // OR provide an existing face image
-  voiceStyle?: "professional" | "warm" | "energetic" | "calm" | "authoritative";
+  avatarDescription?: string;
+  avatarImageUrl?: string;
+  voiceStyle?: "professional" | "warm" | "energetic" | "calm";
   voiceGender?: "female" | "male";
-  background?: string; // "modern office" | "gradient blue" | "#1a1a2e" | image URL
+  background?: string;
   format?: "landscape" | "portrait" | "square";
-  speed?: number; // 0.8-1.2
-  /**
-   * Optional storyboard breakdown emitted by the AI Video Director
-   * (see /api/video-creator/chat). When present, the renderer assembles
-   * a multi-shot video instead of a single talking head: each scene drives
-   * a distinct camera/mood/b-roll, then they're concatenated in order.
-   */
-  storyboard?: StoryboardScene[];
 }
 
-export interface StoryboardScene {
-  scene: number;
-  start: number; // seconds into the full script
-  end: number;
-  shot: string; // "tight headshot", "medium-wide walking", "close-up of hands"
-  mood: string; // "confident", "warm", "urgent"
-  broll?: string; // "product UI close-up", "customer logos", "none"
-  onScreenText?: string;
-}
-
-export interface VideoGenerationResult {
+export interface SpokespersonVideoResult {
   videoUrl: string;
   audioUrl: string;
-  avatarUrl?: string;
+  avatarUrl: string;
   duration: number;
   cost: number;
-  pipeline: string;
+  pipeline: string[];
 }
 
-export interface PipelineStatus {
-  step: string;
-  progress: number; // 0-100
-  message: string;
+export function isCustomPipelineAvailable(): boolean {
+  return Boolean(process.env.REPLICATE_API_TOKEN || process.env.FAL_KEY);
 }
 
 // ── Step 1: Voice Generation ──
@@ -208,7 +194,29 @@ export async function generateVoice(
     },
   ];
 
-  let lastError = "";
+export async function generateSpokespersonVideo(
+  req: VideoGenerationRequest,
+  onProgress?: (status: PipelineStatus) => void
+): Promise<SpokespersonVideoResult> {
+  onProgress?.({ step: "starting", progress: 0, message: "Starting pipeline" });
+  const result = await generatePremiumVideo({
+    script: req.script,
+    voiceId: req.voiceGender === "male" ? "male-1" : "female-1",
+    avatarImageUrl: req.avatarImageUrl,
+    captions: true,
+    tier: "standard",
+  });
+  onProgress?.({ step: "done", progress: 100, message: "Video ready" });
+  const avatarSeg = result.segments.find((s) => s.kind === "avatar");
+  return {
+    videoUrl: result.finalVideoUrl,
+    audioUrl: avatarSeg?.url ?? result.finalVideoUrl,
+    avatarUrl: req.avatarImageUrl ?? "",
+    duration: result.durationSec,
+    cost: result.costUsd,
+    pipeline: result.modelsUsed,
+  };
+}
 
   for (const model of ttsModels) {
     options?.onProgress?.(`Trying ${model.name} for voice...`);
@@ -411,7 +419,11 @@ export async function generateAvatar(
   );
 }
 
-// ── Step 3: Lip Sync — The Magic ──
+export interface CaptionCue {
+  start: number;
+  end: number;
+  text: string;
+}
 
 /**
  * Generate a talking-head video by syncing audio to a face image.
@@ -533,7 +545,12 @@ export async function generateLipSync(
   );
 }
 
-// ── Full Pipeline ──
+// ---------- helpers ----------
+interface PipelineError {
+  step: string;
+  model?: string;
+  message: string;
+}
 
 /**
  * Generate a complete spokesperson video from scratch.
@@ -660,8 +677,14 @@ export async function generateCaptions(
   throw new Error(`Caption generation failed. Last error: ${lastError}`);
 }
 
-// ── Background Music (MusicGen) ──
+interface BrollResult {
+  videoUrl: string;
+  durationSec: number;
+  model: string;
+  prompt: string;
+}
 
+// ---------- main orchestrator ----------
 /**
  * Generate background music from a text description.
  * Uses MusicGen on Replicate, with Riffusion + AudioGen as fallbacks.
@@ -721,131 +744,143 @@ export async function generateMusic(
   throw new Error(`Music generation failed. Last error: ${lastError}`);
 }
 
-// ── Full Pipeline with Captions + Music ──
+  const wave1 = await Promise.allSettled([ttsPromise, brollPromise, musicPromise]);
 
-/**
- * Generate a complete video with optional captions and background music.
- */
-export async function generateFullVideo(
-  request: VideoGenerationRequest & { captions?: boolean; music?: string },
-  onProgress?: (status: PipelineStatus) => void
-): Promise<
-  VideoGenerationResult & {
-    captionsSrt?: string;
-    musicUrl?: string;
-    storyboard?: StoryboardScene[];
-    finalVideoUrl?: string;
-    assembledFromScenes?: boolean;
+  // TTS is critical path
+  const ttsSettled = wave1[0];
+  if (ttsSettled.status !== "fulfilled") {
+    const err = pipelineError("tts", (ttsSettled as PromiseRejectedResult).reason);
+    throw new Error(
+      `[video-pipeline] TTS failed (all 4 fallbacks exhausted): ${err.message}`
+    );
   }
-> {
-  // If a storyboard was supplied, enrich the avatarDescription with the
-  // dominant shot + mood from the opening scene so the FLUX avatar generator
-  // produces a face that matches the director's intent (e.g. "tight headshot,
-  // confident expression"). This is a one-line enrichment now and a full
-  // multi-scene assembly path later — but the type contract is locked in so
-  // downstream consumers (front-end preview, future FFmpeg assembler) can
-  // start reading request.storyboard immediately.
-  let enriched = request;
-  if (request.storyboard && request.storyboard.length > 0) {
-    const opener = request.storyboard[0];
-    const shotHint = `${opener.shot}, ${opener.mood} expression`;
-    enriched = {
-      ...request,
-      avatarDescription: request.avatarDescription
-        ? `${request.avatarDescription}, ${shotHint}`
-        : shotHint,
-    };
-    onProgress?.({
-      step: "storyboard",
-      progress: 5,
-      message: `Storyboard loaded — ${request.storyboard.length} scenes`,
-    });
+  const tts = ttsSettled.value;
+  modelsUsed.push(`tts:${tts.model}`);
+  costUsd += spec.script.length * COST.ttsPerChar;
+
+  const brolls =
+    wave1[1].status === "fulfilled" ? (wave1[1] as PromiseFulfilledResult<BrollResult[]>).value : [];
+  brolls.forEach((b) => {
+    segments.push({ kind: "broll", url: b.videoUrl, durationSec: b.durationSec, model: b.model });
+    modelsUsed.push(`broll:${b.model}`);
+    costUsd += b.durationSec * COST.brollPerSec;
+  });
+
+  const music =
+    wave1[2].status === "fulfilled"
+      ? (wave1[2] as PromiseFulfilledResult<{ url: string; model: string } | null>).value
+      : null;
+  if (music) {
+    modelsUsed.push(`music:${music.model}`);
+    costUsd += COST.musicFlat;
   }
 
-  // Generate the base spokesperson video
-  const result = await generateSpokespersonVideo(enriched, onProgress);
-
-  let captionsSrt: string | undefined;
-  let musicUrl: string | undefined;
-
-  // Add captions if requested
-  if (request.captions !== false) {
+  // ---------- WAVE 2: avatar talking head (needs audioUrl) ----------
+  let avatar: AvatarResult | null = null;
+  if (avatarMod && spec.avatarImageUrl) {
     try {
-      onProgress?.({ step: "captions", progress: 92, message: "Generating captions..." });
-      const captions = await generateCaptions(result.audioUrl);
-      captionsSrt = captions.srt;
-    } catch (err) {
-      console.warn("[video-pipeline] Caption generation failed:", err);
-      // Non-fatal — video still works without captions
+      avatar = await (avatarMod as {
+        generateTalkingHead: (args: {
+          imageUrl: string;
+          audioUrl: string;
+        }) => Promise<AvatarResult>;
+      }).generateTalkingHead({
+        imageUrl: spec.avatarImageUrl,
+        audioUrl: tts.audioUrl,
+      });
+      segments.unshift({
+        kind: "avatar",
+        url: avatar.videoUrl,
+        durationSec: avatar.durationSec,
+        model: avatar.model,
+      });
+      modelsUsed.push(`avatar:${avatar.model}`);
+      costUsd += avatar.durationSec * COST.avatarPerSec;
+    } catch (e) {
+      throw new Error(
+        `[video-pipeline] avatar talking-head failed (all 4 fallbacks exhausted): ${errMessage(e)}`
+      );
     }
   }
 
-  // Add background music if requested
-  if (request.music) {
+  // pick the "final" video — avatar if present, else first b-roll, else error
+  const primary = avatar
+    ? avatar.videoUrl
+    : brolls[0]?.videoUrl ?? null;
+  if (!primary) {
+    throw new Error(
+      "[video-pipeline] no video produced — neither avatar nor b-roll succeeded"
+    );
+  }
+
+  const totalDurationSec =
+    (avatar?.durationSec ?? 0) + brolls.reduce((s, b) => s + b.durationSec, 0);
+
+  // ---------- WAVE 3: captions via whisper ----------
+  let captions: CaptionCue[] = [];
+  if (spec.captions && falMod) {
     try {
-      onProgress?.({ step: "music", progress: 95, message: "Creating background music..." });
-      const music = await generateMusic(request.music, result.duration);
-      musicUrl = music.musicUrl;
-    } catch (err) {
-      console.warn("[video-pipeline] Music generation failed:", err);
-      // Non-fatal — video still works without music
+      const out = await (falMod as {
+        runFalWithFallback: <T>(
+          chain: string[],
+          input: Record<string, unknown>
+        ) => Promise<{ data: T; model: string }>;
+      }).runFalWithFallback<{ chunks?: Array<{ timestamp: [number, number]; text: string }> }>(
+        [
+          "fal-ai/whisper",
+          "fal-ai/wizper",
+          "fal-ai/speech-to-text",
+          "fal-ai/whisper-v3",
+        ],
+        { audio_url: tts.audioUrl, task: "transcribe", chunk_level: "segment" }
+      );
+      captions =
+        out.data.chunks?.map((c) => ({
+          start: c.timestamp[0],
+          end: c.timestamp[1],
+          text: c.text,
+        })) ?? [];
+      modelsUsed.push(`captions:${out.model}`);
+      costUsd += (totalDurationSec / 60) * COST.captionsPerMin;
+    } catch (e) {
+      warnings.push(`[captions] all 4 whisper models failed: ${errMessage(e)}`);
     }
   }
 
-  // ── Post-production: assemble scenes, burn captions, mix music ──
-  let finalVideoUrl = result.videoUrl;
-  let assembledFromScenes = false;
-
-  // (Future) Multi-scene assembly: when individual scene clips are produced,
-  // pass them through assembleScenes(). Today generateSpokespersonVideo returns
-  // one clip, so this branch is a no-op — wired for when scene rendering lands.
-  if (request.storyboard && request.storyboard.length > 1) {
+  // ---------- WAVE 4: premium upscale ----------
+  let finalVideoUrl = primary;
+  if (spec.tier === "premium" && falMod) {
     try {
-      onProgress?.({ step: "assemble", progress: 96, message: "Assembling scenes..." });
-      const scenes = request.storyboard.map((s) => ({
-        videoUrl: result.videoUrl,
-        duration: Math.max(1, s.end - s.start),
-        sceneNumber: s.scene,
-      }));
-      // Only call assembler when there are real distinct clips (>1 unique URL).
-      const unique = new Set(scenes.map((s) => s.videoUrl));
-      if (unique.size > 1) {
-        finalVideoUrl = await assembleScenes(scenes);
-        assembledFromScenes = true;
-      }
-    } catch (err) {
-      console.warn("[video-pipeline] Scene assembly failed:", err);
+      const out = await (falMod as {
+        runFalWithFallback: <T>(
+          chain: string[],
+          input: Record<string, unknown>
+        ) => Promise<{ data: T; model: string }>;
+      }).runFalWithFallback<{ video: { url: string } }>(
+        [
+          "fal-ai/topaz-video-upscale",
+          "fal-ai/video-upscaler",
+          "fal-ai/esrgan-video",
+          "fal-ai/realesrgan-video",
+        ],
+        { video_url: primary, scale: 2, target_fps: 60 }
+      );
+      finalVideoUrl = out.data.video.url;
+      modelsUsed.push(`upscale:${out.model}`);
+      costUsd += totalDurationSec * COST.upscalePerSec;
+    } catch (e) {
+      warnings.push(`[upscale] all 4 upscalers failed, returning unscaled: ${errMessage(e)}`);
     }
   }
-
-  if (captionsSrt) {
-    try {
-      onProgress?.({ step: "burn-captions", progress: 97, message: "Burning in captions..." });
-      finalVideoUrl = await burnInCaptions(finalVideoUrl, captionsSrt);
-    } catch (err) {
-      console.warn("[video-pipeline] Caption burn-in failed:", err);
-    }
-  }
-
-  if (musicUrl) {
-    try {
-      onProgress?.({ step: "mix-music", progress: 99, message: "Mixing background music..." });
-      finalVideoUrl = await mixBackgroundMusic(finalVideoUrl, musicUrl);
-    } catch (err) {
-      console.warn("[video-pipeline] Music mix failed:", err);
-    }
-  }
-
-  onProgress?.({ step: "done", progress: 100, message: "Complete" });
 
   return {
-    ...result,
-    videoUrl: finalVideoUrl,
     finalVideoUrl,
-    assembledFromScenes,
-    captionsSrt,
-    musicUrl,
-    storyboard: request.storyboard,
+    segments,
+    captions,
+    durationSec: totalDurationSec || tts.durationSec,
+    costUsd: Number(costUsd.toFixed(4)),
+    modelsUsed,
+    warnings,
   };
 }
 

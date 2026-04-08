@@ -1,56 +1,90 @@
+/**
+ * POST /api/voice/transcribe
+ * multipart/form-data with field "audio" (File).
+ * Returns { text, duration, languageCode, confidence }.
+ *
+ * Bible Law 8: every failure path returns a clear, actionable error.
+ */
+
 import { NextRequest, NextResponse } from "next/server";
+import { transcribeAudio, VoiceBuildError } from "@/lib/voice-build";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+export const maxDuration = 120;
 
-const WHISPER_VERSION =
-  "openai/whisper:4d50797290df275329f202e48c76360b3f22b08d28c196cbc54600319435f8d2";
-
-export async function POST(req: NextRequest) {
-  const token = process.env.REPLICATE_API_TOKEN;
-  if (!token) {
+export async function POST(req: NextRequest): Promise<NextResponse> {
+  if (!process.env.FAL_KEY) {
     return NextResponse.json(
-      { error: "REPLICATE_API_TOKEN not set" },
-      { status: 503 }
+      {
+        error: "FAL_KEY not configured",
+        hint: "Set FAL_KEY in Vercel env vars to enable voice transcription.",
+      },
+      { status: 503 },
     );
   }
-  try {
-    const form = await req.formData();
-    const audio = form.get("audio");
-    if (!audio || typeof audio === "string") {
-      return NextResponse.json({ error: "Missing audio blob" }, { status: 400 });
-    }
-    const buf = Buffer.from(await (audio as Blob).arrayBuffer());
-    const dataUrl = `data:${(audio as Blob).type || "audio/webm"};base64,${buf.toString("base64")}`;
 
-    const startRes = await fetch("https://api.replicate.com/v1/predictions", {
-      method: "POST",
-      headers: {
-        Authorization: `Token ${token}`,
-        "Content-Type": "application/json",
+  let form: FormData;
+  try {
+    form = await req.formData();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "invalid form data";
+    return NextResponse.json(
+      {
+        error: `Invalid multipart payload: ${message}`,
+        hint: "POST multipart/form-data with an 'audio' file field.",
       },
-      body: JSON.stringify({
-        version: WHISPER_VERSION,
-        input: { audio: dataUrl, model: "base" },
-      }),
+      { status: 400 },
+    );
+  }
+
+  const audio = form.get("audio");
+  if (!audio || typeof audio === "string") {
+    return NextResponse.json(
+      {
+        error: "Missing 'audio' file field",
+        hint: "Mic not accessible? Check browser permissions and retry.",
+      },
+      { status: 400 },
+    );
+  }
+
+  const file = audio as File;
+  let buffer: ArrayBuffer;
+  try {
+    buffer = await file.arrayBuffer();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "buffer read failed";
+    return NextResponse.json(
+      {
+        error: `Could not read audio buffer: ${message}`,
+        hint: "Audio file unreadable — try recording again.",
+      },
+      { status: 400 },
+    );
+  }
+
+  try {
+    const result = await transcribeAudio(buffer, file.type || "audio/webm");
+    return NextResponse.json({
+      text: result.text,
+      duration: result.durationSec,
+      languageCode: result.languageCode,
+      confidence: result.confidence,
     });
-    const started = await startRes.json();
-    if (!startRes.ok) {
-      return NextResponse.json({ error: started?.detail || "Replicate error" }, { status: 502 });
+  } catch (err) {
+    if (err instanceof VoiceBuildError) {
+      return NextResponse.json(
+        { error: err.message, hint: err.hint },
+        { status: err.status },
+      );
     }
-    let pred = started;
-    const deadline = Date.now() + 50000;
-    while (pred.status !== "succeeded" && pred.status !== "failed" && Date.now() < deadline) {
-      await new Promise((r) => setTimeout(r, 1500));
-      const poll = await fetch(pred.urls.get, { headers: { Authorization: `Token ${token}` } });
-      pred = await poll.json();
-    }
-    if (pred.status !== "succeeded") {
-      return NextResponse.json({ error: pred.error || "Transcription failed" }, { status: 504 });
-    }
-    const text = pred.output?.transcription || pred.output?.text || "";
-    return NextResponse.json({ text });
-  } catch (err: any) {
-    return NextResponse.json({ error: err?.message || "Unknown error" }, { status: 500 });
+    const message = err instanceof Error ? err.message : "unknown error";
+    return NextResponse.json(
+      {
+        error: `Transcription failed: ${message}`,
+        hint: "Unexpected error — retry once or check server logs.",
+      },
+      { status: 500 },
+    );
   }
 }

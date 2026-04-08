@@ -23,8 +23,21 @@ function sign(xml: string): string {
 /**
  * Check if OpenSRS credentials are configured.
  */
+let _configWarned = false;
 export function isOpenSRSConfigured(): boolean {
-  return !!(OPENSRS_API_KEY() && OPENSRS_USER());
+  const apiKey = OPENSRS_API_KEY();
+  const user = OPENSRS_USER();
+  if (!apiKey && !user) return false;
+  if (!apiKey || !user) {
+    if (!_configWarned) {
+      _configWarned = true;
+      console.error(
+        "[OpenSRS] Configuration incomplete: both OPENSRS_API_KEY and OPENSRS_RESELLER_USER must be set. Falling back to DNS."
+      );
+    }
+    return false;
+  }
+  return true;
 }
 
 /**

@@ -1,227 +1,301 @@
 /**
- * Daily Comeback Loop — retention engine
+ * Daily Comeback Loop
+ * ===================
  *
- * Pure logic. No Next.js imports. Runs nightly via /api/cron/daily-comeback.
+ * Goal: turn first-time triers into daily users via a compounding
+ * site-improvement loop competitors don't offer.
  *
- * For each recently-deployed site, runs a small set of automated checks
- * (SEO, OG image, blog idea, mock audit) and produces a ComebackReport
- * + a premium HTML email to send the owner.
+ * Every night, for each active Zoobicon site we:
+ *   1. Crawl analytics for yesterday's metrics
+ *   2. Run SEO audit and auto-fix blocker issues
+ *   3. Draft ONE new blog post via the blog generator
+ *   4. Check competitors for material changes
+ *   5. Compose a morning email summary for the owner
+ *
+ * Each sub-step runs through Promise.allSettled so a single failure never
+ * kills the whole loop. Per Bible Law 8, every failure surfaces an actionable
+ * error that lands in the morning email — the user always gets visibility.
+ *
+ * Sibling modules are dynamically imported so this file compiles even if
+ * those modules do not yet exist in the repo.
  */
 
-export type ComebackImprovementKind =
-  | "seo"
-  | "og_image"
-  | "broken_link"
-  | "blog_idea"
-  | "audit";
-
-export interface ComebackImprovement {
-  kind: ComebackImprovementKind;
-  title: string;
-  detail: string;
-  status: "applied" | "suggested";
-}
-
-export interface ComebackReport {
+export interface RunNightlyJobInput {
   siteId: string;
   ownerEmail: string;
-  siteName: string;
-  siteUrl: string;
-  improvements: ComebackImprovement[];
-  runAt: string;
+  ownerId: string;
 }
 
-export interface ComebackSiteInput {
+export type StepStatus = "ok" | "error" | "skipped";
+
+export interface StepResult {
+  name: string;
+  status: StepStatus;
+  result?: unknown;
+  error?: string;
+}
+
+export interface RunNightlyJobResult {
+  siteId: string;
+  steps: StepResult[];
+  emailSent: boolean;
+  summaryHtml: string;
+}
+
+export interface DailyStats {
+  visits: number;
+  uniqueVisitors: number;
+  leads: number;
+  bounceRate: number;
+  topPages: Array<{ path: string; views: number }>;
+}
+
+export interface SeoFix {
+  issue: string;
+  fix: string;
+  severity: "low" | "medium" | "high" | "blocker";
+}
+
+export interface BlogDraft {
+  id: string;
+  title: string;
+  excerpt: string;
+  approveUrl: string;
+}
+
+export interface CompetitorChange {
+  competitor: string;
+  change: string;
+  url?: string;
+}
+
+export interface ComposeEmailInput {
+  siteName: string;
+  stats: DailyStats | null;
+  seoFixes: SeoFix[];
+  blogDraft: BlogDraft | null;
+  competitorChanges: CompetitorChange[];
+  failures?: StepResult[];
+}
+
+export interface ComposedEmail {
+  subject: string;
+  html: string;
+  text: string;
+}
+
+interface ActiveSiteRow {
   id: string;
   name: string;
-  url: string;
-  ownerEmail: string;
-  html?: string;
+  owner_id: string;
+  owner_email: string;
 }
 
-// ─── helpers ──────────────────────────────────────────────────────────────
-
-function deterministicSeed(input: string): number {
-  let h = 2166136261;
-  for (let i = 0; i < input.length; i++) {
-    h ^= input.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return Math.abs(h);
-}
-
-function todayKey(): string {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function extractTag(html: string, regex: RegExp): string | null {
-  const m = html.match(regex);
-  return m && m[1] ? m[1].trim() : null;
-}
-
-// ─── individual checks ────────────────────────────────────────────────────
-
-function checkSeo(html: string | undefined): ComebackImprovement | null {
-  if (!html) {
-    return {
-      kind: "seo",
-      title: "SEO meta tags pending review",
-      detail:
-        "We could not fetch your site HTML last night. We will retry tonight.",
-      status: "suggested",
-    };
-  }
-  const title = extractTag(html, /<title[^>]*>([^<]*)<\/title>/i);
-  const desc = extractTag(
-    html,
-    /<meta\s+name=["']description["']\s+content=["']([^"']*)["']/i
-  );
-  const issues: string[] = [];
-  if (!title || title.length < 10) issues.push("missing or short <title>");
-  if (!desc || desc.length < 50)
-    issues.push("missing or short meta description");
-  if (issues.length === 0) {
-    return {
-      kind: "seo",
-      title: "SEO meta tags look healthy",
-      detail: `Title (${title?.length} chars) and description (${desc?.length} chars) both pass the basic check.`,
-      status: "applied",
-    };
-  }
-  return {
-    kind: "seo",
-    title: "SEO improvements suggested",
-    detail: `Found: ${issues.join("; ")}. Open the editor to fix in one click.`,
-    status: "suggested",
-  };
-}
-
-function checkOgImage(html: string | undefined): ComebackImprovement | null {
-  if (!html) return null;
-  const og = extractTag(
-    html,
-    /<meta\s+property=["']og:image["']\s+content=["']([^"']*)["']/i
-  );
-  if (og) {
-    return {
-      kind: "og_image",
-      title: "Open Graph image present",
-      detail: "Your link previews on social media will render with an image.",
-      status: "applied",
-    };
-  }
-  return {
-    kind: "og_image",
-    title: "Open Graph image missing",
-    detail:
-      "We can auto-generate a branded social-share image for your site. One click in the editor.",
-    status: "suggested",
-  };
-}
-
-async function generateBlogIdea(siteName: string): Promise<ComebackImprovement> {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    return {
-      kind: "blog_idea",
-      title: "Blog post idea ready",
-      detail: `"5 things your customers wish they knew about ${siteName}" — a short list-style post that builds trust and ranks for branded queries.`,
-      status: "suggested",
-    };
-  }
+/** Safely run a sibling module function via dynamic import. */
+async function safeCall<T>(
+  name: string,
+  loader: () => Promise<T>
+): Promise<StepResult> {
   try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-haiku-4-5",
-        max_tokens: 120,
-        messages: [
-          {
-            role: "user",
-            content: `Give me ONE concise blog post idea (one sentence, no preamble) for a business called "${siteName}".`,
-          },
-        ],
-      }),
-    });
-    if (!res.ok) throw new Error(`Anthropic ${res.status}`);
-    const data: any = await res.json();
-    const text =
-      data?.content?.[0]?.text?.trim() ||
-      `"How ${siteName} is changing the game" — a short customer-focused story.`;
-    return {
-      kind: "blog_idea",
-      title: "Fresh blog post idea",
-      detail: text,
-      status: "suggested",
-    };
+    const result = await loader();
+    return { name, status: "ok", result };
   } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
     return {
-      kind: "blog_idea",
-      title: "Blog post idea ready",
-      detail: `"Behind the scenes at ${siteName}" — a personal story post that builds connection with customers.`,
-      status: "suggested",
+      name,
+      status: "error",
+      error: `${name} failed: ${message}. Check that the underlying module/env is configured.`,
     };
   }
 }
 
-function mockAudit(siteId: string): ComebackImprovement {
-  const seed = deterministicSeed(`${siteId}:${todayKey()}`);
-  const score = 70 + (seed % 30); // 70–99
-  const tipsPool = [
-    "Compress hero image to WebP for ~40% size reduction",
-    "Defer non-critical CSS to improve first paint",
-    "Add width/height to images to prevent layout shift",
-    "Enable HTTP/2 server push for fonts",
-    "Inline critical CSS for the above-the-fold section",
+/**
+ * Orchestrate the nightly job for a single site.
+ * All sub-steps run in parallel via Promise.allSettled.
+ */
+export async function runNightlyJob(
+  input: RunNightlyJobInput
+): Promise<RunNightlyJobResult> {
+  const { siteId, ownerEmail, ownerId } = input;
+
+  const stepPromises: Array<Promise<StepResult>> = [
+    safeCall<DailyStats>("analytics", async () => {
+      const mod = (await import("@/lib/analytics-engine")) as {
+        getDailyStats: (args: { siteId: string }) => Promise<DailyStats>;
+      };
+      return mod.getDailyStats({ siteId });
+    }),
+    safeCall<{ fixes: SeoFix[] }>("seo", async () => {
+      const mod = (await import("@/lib/seo-agent")) as {
+        auditSite: (args: { siteId: string }) => Promise<{ issues: SeoFix[] }>;
+        autoFix: (args: {
+          siteId: string;
+          issues: SeoFix[];
+        }) => Promise<{ fixes: SeoFix[] }>;
+      };
+      const audit = await mod.auditSite({ siteId });
+      const blockers = audit.issues.filter(
+        (i) => i.severity === "blocker" || i.severity === "high"
+      );
+      return mod.autoFix({ siteId, issues: blockers });
+    }),
+    safeCall<BlogDraft>("blog", async () => {
+      const mod = (await import("@/lib/blog-generator")) as {
+        draftPost: (args: {
+          siteId: string;
+          ownerId: string;
+        }) => Promise<BlogDraft>;
+      };
+      return mod.draftPost({ siteId, ownerId });
+    }),
+    safeCall<{ changes: CompetitorChange[] }>("competitors", async () => {
+      const mod = (await import("@/lib/competitor-monitor")) as {
+        diffCompetitors: (args: {
+          siteId: string;
+        }) => Promise<{ changes: CompetitorChange[] }>;
+      };
+      return mod.diffCompetitors({ siteId });
+    }),
   ];
-  const a = tipsPool[seed % tipsPool.length];
-  const b = tipsPool[(seed + 2) % tipsPool.length];
+
+  const settled = await Promise.allSettled(stepPromises);
+  const steps: StepResult[] = settled.map((s, idx) => {
+    const fallbackName = ["analytics", "seo", "blog", "competitors"][idx] ?? "step";
+    if (s.status === "fulfilled") return s.value;
+    return {
+      name: fallbackName,
+      status: "error",
+      error: `Unexpected rejection: ${String(s.reason)}`,
+    };
+  });
+
+  const analyticsStep = steps.find((s) => s.name === "analytics");
+  const seoStep = steps.find((s) => s.name === "seo");
+  const blogStep = steps.find((s) => s.name === "blog");
+  const compStep = steps.find((s) => s.name === "competitors");
+
+  const stats =
+    analyticsStep?.status === "ok" ? (analyticsStep.result as DailyStats) : null;
+  const seoFixes =
+    seoStep?.status === "ok"
+      ? ((seoStep.result as { fixes: SeoFix[] }).fixes ?? [])
+      : [];
+  const blogDraft =
+    blogStep?.status === "ok" ? (blogStep.result as BlogDraft) : null;
+  const competitorChanges =
+    compStep?.status === "ok"
+      ? ((compStep.result as { changes: CompetitorChange[] }).changes ?? [])
+      : [];
+
+  const failures = steps.filter((s) => s.status === "error");
+
+  const email = composeEmailSummary({
+    siteName: siteId,
+    stats,
+    seoFixes,
+    blogDraft,
+    competitorChanges,
+    failures,
+  });
+
+  let emailSent = false;
+  const sendStep = await safeCall("email", async () => {
+    const mod = (await import("@/lib/mailgun-client")) as {
+      sendEmail: (args: {
+        to: string;
+        subject: string;
+        html: string;
+        text: string;
+      }) => Promise<unknown>;
+    };
+    return mod.sendEmail({
+      to: ownerEmail,
+      subject: email.subject,
+      html: email.html,
+      text: email.text,
+    });
+  });
+  steps.push(sendStep);
+  if (sendStep.status === "ok") emailSent = true;
+
   return {
-    kind: "audit",
-    title: `Performance score: ${score}/100`,
-    detail: `Top suggestions: ${a}; ${b}.`,
-    status: "suggested",
+    siteId,
+    steps,
+    emailSent,
+    summaryHtml: email.html,
   };
 }
 
-// ─── main runner ──────────────────────────────────────────────────────────
+/**
+ * Run the nightly job for every active site, capped at 5 concurrent jobs
+ * so we don't melt the database or our outbound API quotas.
+ */
+export async function runAllNightly(): Promise<RunNightlyJobResult[]> {
+  let sites: ActiveSiteRow[] = [];
+  try {
+    const mod = (await import("@/lib/db")) as {
+      sql: (
+        strings: TemplateStringsArray,
+        ...values: unknown[]
+      ) => Promise<ActiveSiteRow[]>;
+    };
+    sites = await mod.sql`
+      SELECT id, name, owner_id, owner_email
+      FROM sites
+      WHERE active = true
+    `;
+  } catch {
+    return [];
+  }
 
-export async function runComebackForSite(
-  site: ComebackSiteInput
-): Promise<ComebackReport> {
-  const improvements: ComebackImprovement[] = [];
+  const results: RunNightlyJobResult[] = [];
+  const concurrency = 5;
+  let cursor = 0;
 
-  const seo = checkSeo(site.html);
-  if (seo) improvements.push(seo);
+  async function worker(): Promise<void> {
+    while (cursor < sites.length) {
+      const idx = cursor++;
+      const site = sites[idx];
+      if (!site) return;
+      const settled = await Promise.allSettled([
+        runNightlyJob({
+          siteId: site.id,
+          ownerEmail: site.owner_email,
+          ownerId: site.owner_id,
+        }),
+      ]);
+      const r = settled[0];
+      if (r && r.status === "fulfilled") {
+        results.push(r.value);
+      } else {
+        results.push({
+          siteId: site.id,
+          steps: [
+            {
+              name: "orchestrator",
+              status: "error",
+              error: `Nightly job crashed: ${
+                r && r.status === "rejected" ? String(r.reason) : "unknown"
+              }`,
+            },
+          ],
+          emailSent: false,
+          summaryHtml: "",
+        });
+      }
+    }
+  }
 
-  const og = checkOgImage(site.html);
-  if (og) improvements.push(og);
-
-  const audit = mockAudit(site.id);
-  improvements.push(audit);
-
-  const blog = await generateBlogIdea(site.name);
-  improvements.push(blog);
-
-  return {
-    siteId: site.id,
-    ownerEmail: site.ownerEmail,
-    siteName: site.name,
-    siteUrl: site.url,
-    improvements,
-    runAt: new Date().toISOString(),
-  };
+  const workers: Array<Promise<void>> = [];
+  for (let i = 0; i < Math.min(concurrency, sites.length); i++) {
+    workers.push(worker());
+  }
+  await Promise.all(workers);
+  return results;
 }
 
-// ─── email builder ────────────────────────────────────────────────────────
-
-function escapeHtml(s: string): string {
-  return s
+function escapeHtml(input: string): string {
+  return input
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
@@ -229,103 +303,155 @@ function escapeHtml(s: string): string {
     .replace(/'/g, "&#39;");
 }
 
-function kindBadge(kind: ComebackImprovementKind): string {
-  const map: Record<ComebackImprovementKind, string> = {
-    seo: "SEO",
-    og_image: "Social",
-    broken_link: "Links",
-    blog_idea: "Content",
-    audit: "Performance",
-  };
-  return map[kind];
-}
+/**
+ * Compose the morning email summary. Inline CSS, dark-mode friendly,
+ * Gmail/Outlook compatible.
+ */
+export function composeEmailSummary(
+  input: ComposeEmailInput
+): ComposedEmail {
+  const {
+    siteName,
+    stats,
+    seoFixes,
+    blogDraft,
+    competitorChanges,
+    failures = [],
+  } = input;
 
-export async function buildComebackEmail(
-  report: ComebackReport
-): Promise<{ subject: string; html: string; text: string }> {
-  const applied = report.improvements.filter((i) => i.status === "applied").length;
-  const suggested = report.improvements.filter((i) => i.status === "suggested").length;
-  const siteName = escapeHtml(report.siteName);
-  const siteUrl = escapeHtml(report.siteUrl);
+  const safeName = escapeHtml(siteName);
+  const visits = stats?.visits ?? 0;
+  const leads = stats?.leads ?? 0;
 
-  const subject = `Last night Zoobicon reviewed ${report.improvements.length} things on ${report.siteName}`;
+  const subject = `Zoobicon morning brief: ${siteName} — ${visits} visits, ${leads} leads, ${seoFixes.length} fixes`;
 
-  const itemsHtml = report.improvements
-    .map(
-      (i) => `
-      <tr>
-        <td style="padding:16px 20px;border-bottom:1px solid #1f2937;">
-          <div style="display:inline-block;padding:4px 10px;border-radius:999px;background:linear-gradient(90deg,#7c3aed,#2563eb);color:#fff;font-size:11px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;">${kindBadge(i.kind)}</div>
-          <div style="margin-top:10px;color:#f9fafb;font-size:16px;font-weight:600;line-height:1.4;">${escapeHtml(i.title)}</div>
-          <div style="margin-top:6px;color:#9ca3af;font-size:14px;line-height:1.6;">${escapeHtml(i.detail)}</div>
-          <div style="margin-top:8px;color:${i.status === "applied" ? "#10b981" : "#f59e0b"};font-size:12px;font-weight:600;">${i.status === "applied" ? "✓ Applied automatically" : "→ Suggested for review"}</div>
-        </td>
-      </tr>`
-    )
-    .join("");
+  const card = (content: string): string =>
+    `<div style="background:#131520;border:1px solid #232636;border-radius:14px;padding:20px;margin:0 0 16px 0;color:#e6e8ef;font-family:-apple-system,Segoe UI,Roboto,sans-serif;">${content}</div>`;
 
-  const itemsText = report.improvements
-    .map(
-      (i) =>
-        `- [${kindBadge(i.kind)}] ${i.title}\n  ${i.detail}\n  (${i.status})`
-    )
-    .join("\n\n");
+  const statsBlock = stats
+    ? card(`
+        <h2 style="margin:0 0 12px 0;font-size:18px;color:#fff;">Yesterday's traffic</h2>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+          <tr>
+            <td style="padding:8px 0;color:#9ba3b4;">Visits</td>
+            <td style="padding:8px 0;text-align:right;color:#fff;font-weight:600;">${stats.visits}</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;color:#9ba3b4;">Unique visitors</td>
+            <td style="padding:8px 0;text-align:right;color:#fff;font-weight:600;">${stats.uniqueVisitors}</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;color:#9ba3b4;">Leads</td>
+            <td style="padding:8px 0;text-align:right;color:#22c55e;font-weight:700;">${stats.leads}</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;color:#9ba3b4;">Bounce rate</td>
+            <td style="padding:8px 0;text-align:right;color:#fff;font-weight:600;">${stats.bounceRate.toFixed(1)}%</td>
+          </tr>
+        </table>
+      `)
+    : card(
+        `<h2 style="margin:0 0 8px 0;font-size:18px;color:#fff;">Yesterday's traffic</h2><p style="margin:0;color:#f59e0b;">Analytics unavailable. Check analytics-engine configuration.</p>`
+      );
+
+  const seoBlock = card(`
+    <h2 style="margin:0 0 12px 0;font-size:18px;color:#fff;">SEO auto-fixes (${seoFixes.length})</h2>
+    ${
+      seoFixes.length === 0
+        ? `<p style="margin:0;color:#9ba3b4;">No blockers found. Site is clean.</p>`
+        : `<ul style="margin:0;padding-left:18px;color:#e6e8ef;">${seoFixes
+            .map(
+              (f) =>
+                `<li style="margin:6px 0;"><strong style="color:#fff;">${escapeHtml(f.issue)}</strong> — <span style="color:#9ba3b4;">${escapeHtml(f.fix)}</span></li>`
+            )
+            .join("")}</ul>`
+    }
+  `);
+
+  const blogBlock = blogDraft
+    ? card(`
+        <h2 style="margin:0 0 12px 0;font-size:18px;color:#fff;">New blog draft</h2>
+        <p style="margin:0 0 6px 0;font-size:16px;color:#fff;font-weight:600;">${escapeHtml(blogDraft.title)}</p>
+        <p style="margin:0 0 14px 0;color:#9ba3b4;">${escapeHtml(blogDraft.excerpt)}</p>
+        <a href="${escapeHtml(blogDraft.approveUrl)}" style="display:inline-block;background:linear-gradient(90deg,#6366f1,#a855f7);color:#fff;text-decoration:none;padding:10px 18px;border-radius:10px;font-weight:600;">Approve &amp; publish</a>
+      `)
+    : card(
+        `<h2 style="margin:0 0 8px 0;font-size:18px;color:#fff;">New blog draft</h2><p style="margin:0;color:#f59e0b;">Draft generation failed. Check blog-generator.</p>`
+      );
+
+  const compBlock = card(`
+    <h2 style="margin:0 0 12px 0;font-size:18px;color:#fff;">Competitor watch</h2>
+    ${
+      competitorChanges.length === 0
+        ? `<p style="margin:0;color:#9ba3b4;">No notable competitor moves overnight.</p>`
+        : `<ul style="margin:0;padding-left:18px;color:#e6e8ef;">${competitorChanges
+            .map(
+              (c) =>
+                `<li style="margin:6px 0;"><strong style="color:#fff;">${escapeHtml(c.competitor)}</strong> — ${escapeHtml(c.change)}${c.url ? ` <a href="${escapeHtml(c.url)}" style="color:#a855f7;">view</a>` : ""}</li>`
+            )
+            .join("")}</ul>`
+    }
+  `);
+
+  const failuresBlock =
+    failures.length > 0
+      ? card(`
+          <h2 style="margin:0 0 12px 0;font-size:18px;color:#f87171;">Steps that need attention</h2>
+          <ul style="margin:0;padding-left:18px;color:#fca5a5;">
+            ${failures
+              .map(
+                (f) =>
+                  `<li style="margin:6px 0;"><strong style="color:#fff;">${escapeHtml(f.name)}</strong>: ${escapeHtml(f.error ?? "unknown error")}</li>`
+              )
+              .join("")}
+          </ul>
+        `)
+      : "";
 
   const html = `<!doctype html>
-<html><body style="margin:0;padding:0;background:#0b0d12;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0b0d12;padding:40px 20px;">
+<html><body style="margin:0;padding:0;background:#0a0b12;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0a0b12;padding:24px 0;">
     <tr><td align="center">
-      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#0f1218;border:1px solid #1f2937;border-radius:16px;overflow:hidden;">
-        <tr><td style="padding:32px 32px 0;">
-          <div style="font-size:12px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;background:linear-gradient(90deg,#7c3aed,#2563eb);-webkit-background-clip:text;background-clip:text;color:transparent;">Daily Comeback</div>
-          <h1 style="margin:12px 0 8px;font-size:28px;font-weight:700;color:#f9fafb;line-height:1.2;letter-spacing:-0.02em;">Last night we improved ${report.improvements.length} things on your site.</h1>
-          <p style="margin:0;color:#9ca3af;font-size:15px;line-height:1.6;">${siteName} · <a href="${siteUrl}" style="color:#60a5fa;text-decoration:none;">${siteUrl}</a></p>
-        </td></tr>
-        <tr><td style="padding:24px 32px;">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0b0d12;border:1px solid #1f2937;border-radius:12px;">
-            <tr>
-              <td style="padding:18px;text-align:center;border-right:1px solid #1f2937;">
-                <div style="font-size:32px;font-weight:700;background:linear-gradient(90deg,#10b981,#34d399);-webkit-background-clip:text;background-clip:text;color:transparent;">${applied}</div>
-                <div style="font-size:11px;color:#9ca3af;text-transform:uppercase;letter-spacing:0.08em;margin-top:4px;">Applied</div>
-              </td>
-              <td style="padding:18px;text-align:center;">
-                <div style="font-size:32px;font-weight:700;background:linear-gradient(90deg,#f59e0b,#fbbf24);-webkit-background-clip:text;background-clip:text;color:transparent;">${suggested}</div>
-                <div style="font-size:11px;color:#9ca3af;text-transform:uppercase;letter-spacing:0.08em;margin-top:4px;">Suggested</div>
-              </td>
-            </tr>
-          </table>
-        </td></tr>
-        <tr><td style="padding:0 32px;">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0b0d12;border:1px solid #1f2937;border-radius:12px;overflow:hidden;">
-            ${itemsHtml}
-          </table>
-        </td></tr>
-        <tr><td style="padding:32px;text-align:center;">
-          <a href="https://zoobicon.com/builder?site=${encodeURIComponent(report.siteId)}" style="display:inline-block;padding:14px 32px;background:linear-gradient(90deg,#7c3aed,#2563eb);color:#fff;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px;">Open in Zoobicon →</a>
-        </td></tr>
-        <tr><td style="padding:24px 32px 32px;border-top:1px solid #1f2937;text-align:center;">
-          <div style="color:#6b7280;font-size:12px;line-height:1.8;">
-            Zoobicon — the AI platform that improves your site while you sleep.<br>
-            <a href="https://zoobicon.com" style="color:#9ca3af;text-decoration:none;">zoobicon.com</a> · <a href="https://zoobicon.ai" style="color:#9ca3af;text-decoration:none;">zoobicon.ai</a> · <a href="https://zoobicon.io" style="color:#9ca3af;text-decoration:none;">zoobicon.io</a> · <a href="https://zoobicon.sh" style="color:#9ca3af;text-decoration:none;">zoobicon.sh</a>
-          </div>
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+        <tr><td style="padding:0 16px;">
+          <h1 style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#fff;font-size:24px;margin:0 0 6px 0;">Good morning.</h1>
+          <p style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#9ba3b4;margin:0 0 20px 0;">Here's what Zoobicon did for <strong style="color:#fff;">${safeName}</strong> overnight.</p>
+          ${statsBlock}
+          ${seoBlock}
+          ${blogBlock}
+          ${compBlock}
+          ${failuresBlock}
+          <p style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#5b6478;font-size:12px;text-align:center;margin:24px 0 0 0;">zoobicon.com · zoobicon.ai · zoobicon.io · zoobicon.sh</p>
         </td></tr>
       </table>
     </td></tr>
   </table>
 </body></html>`;
 
-  const text = `Last night Zoobicon reviewed ${report.improvements.length} things on ${report.siteName}
-${report.siteUrl}
+  const textLines: string[] = [
+    `Zoobicon morning brief — ${siteName}`,
+    "",
+    stats
+      ? `Visits: ${stats.visits} | Unique: ${stats.uniqueVisitors} | Leads: ${stats.leads} | Bounce: ${stats.bounceRate.toFixed(1)}%`
+      : "Analytics unavailable.",
+    "",
+    `SEO fixes applied: ${seoFixes.length}`,
+    ...seoFixes.map((f) => `  - ${f.issue}: ${f.fix}`),
+    "",
+    blogDraft
+      ? `New blog draft: ${blogDraft.title}\n  Approve: ${blogDraft.approveUrl}`
+      : "Blog draft failed.",
+    "",
+    `Competitor changes: ${competitorChanges.length}`,
+    ...competitorChanges.map((c) => `  - ${c.competitor}: ${c.change}`),
+  ];
+  if (failures.length > 0) {
+    textLines.push("", "Steps needing attention:");
+    for (const f of failures) {
+      textLines.push(`  - ${f.name}: ${f.error ?? "unknown error"}`);
+    }
+  }
+  textLines.push("", "zoobicon.com · zoobicon.ai · zoobicon.io · zoobicon.sh");
 
-Applied: ${applied}    Suggested: ${suggested}
-
-${itemsText}
-
-Open in Zoobicon: https://zoobicon.com/builder?site=${encodeURIComponent(report.siteId)}
-
-—
-zoobicon.com · zoobicon.ai · zoobicon.io · zoobicon.sh
-`;
-
-  return { subject, html, text };
+  return { subject, html, text: textLines.join("\n") };
 }

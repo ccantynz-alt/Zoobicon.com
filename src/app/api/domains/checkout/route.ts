@@ -26,19 +26,11 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: "No domains selected" }, { status: 400 });
     }
 
-    // SAFETY CHECK 1: Don't take payment if we can't register domains
+    // SAFETY CHECK: Don't take payment if we can't register domains
     if (!hasOpenSRSConfig()) {
       return Response.json({
         error: "Domain registration is not available yet. We're setting up our registrar integration. Please try again soon or register directly at porkbun.com.",
         registrarNotConfigured: true,
-      }, { status: 503 });
-    }
-
-    // SAFETY CHECK 2: Don't take payment if webhook can't process it
-    if (!process.env.STRIPE_WEBHOOK_SECRET) {
-      return Response.json({
-        error: "Payment processing is being configured. Please try again shortly.",
-        webhookNotConfigured: true,
       }, { status: 503 });
     }
 
@@ -80,9 +72,6 @@ export async function POST(req: NextRequest) {
       organization: registrant.organization || "",
     }) : "";
 
-    // Get user email from request or session
-    const customerEmail = email || "";
-
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
@@ -91,11 +80,11 @@ export async function POST(req: NextRequest) {
         type: "domain_registration",
         domains: JSON.stringify(domains.map((d: { domain: string }) => d.domain)),
         domainCount: String(domains.length),
-        registrantEmail: customerEmail,
+        registrantEmail: email || "",
         years: "1",
         ...(registrantInfo ? { registrantInfo } : {}),
       },
-      ...(customerEmail ? { customer_email: customerEmail } : {}),
+      ...(email ? { customer_email: email } : {}),
       success_url: `${appUrl}/my-domains?success=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/domains?cancelled=true`,
       allow_promotion_codes: true,

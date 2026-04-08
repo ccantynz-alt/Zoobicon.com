@@ -25,6 +25,8 @@ import {
   Eye,
   Heart,
   Lightbulb,
+  MessageCircle,
+  MessageSquare,
 } from "lucide-react";
 
 const fadeUp = {

@@ -1,136 +1,69 @@
 import { NextRequest, NextResponse } from "next/server";
-import { sql } from "@/lib/db";
-import {
-  runComebackForSite,
-  buildComebackEmail,
-  type ComebackReport,
-} from "@/lib/daily-comeback";
-import { sendViaMailgun } from "@/lib/mailgun";
 
-export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 export const maxDuration = 300;
+export const dynamic = "force-dynamic";
 
-export async function GET(request: NextRequest) {
-  // Auth check — Vercel cron sends Authorization: Bearer ${CRON_SECRET}
-  const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret) {
-    const auth = request.headers.get("authorization");
-    if (auth !== `Bearer ${cronSecret}`) {
-      return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
-    }
-  }
+interface NightlySummary {
+  processed: number;
+  successes: number;
+  failures: number;
+  details?: unknown;
+}
 
-  // Query recently deployed sites — gracefully handle missing table / no DB
-  let sites: Array<{
-    id: string;
-    slug: string;
-    name: string;
-    owner_email: string;
-    html: string | null;
-  }> = [];
-  try {
-    const rows = (await sql`
-      SELECT id, slug, name, owner_email, html
-      FROM sites
-      WHERE created_at > NOW() - INTERVAL '30 days'
-        AND owner_email IS NOT NULL
-      LIMIT 100
-    `) as any[];
-    sites = rows || [];
-  } catch (err: any) {
-    console.warn(
-      "[daily-comeback] DB unavailable or sites table missing:",
-      err?.message || err
+async function authorize(req: NextRequest): Promise<NextResponse | null> {
+  if (req.headers.get("x-vercel-cron")) return null;
+  const secret = process.env.CRON_SECRET;
+  if (!secret) {
+    return NextResponse.json(
+      { error: "CRON_SECRET not configured" },
+      { status: 503 }
     );
+  }
+  const auth = req.headers.get("authorization") || "";
+  const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+  if (token !== secret) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  return null;
+}
+
+async function handle(req: NextRequest): Promise<NextResponse> {
+  if (!process.env.DATABASE_URL) {
+    return NextResponse.json(
+      { error: "DATABASE_URL not set" },
+      { status: 503 }
+    );
+  }
+  const unauth = await authorize(req);
+  if (unauth) return unauth;
+
+  try {
+    const mod = (await import("@/lib/daily-comeback")) as {
+      runAllNightly: () => Promise<NightlySummary>;
+    };
+    const summary = await mod.runAllNightly();
     return NextResponse.json({
       ok: true,
-      processed: 0,
-      note: "DB unavailable",
+      processed: summary.processed,
+      successes: summary.successes,
+      failures: summary.failures,
+      details: summary.details ?? null,
+      ranAt: new Date().toISOString(),
     });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return NextResponse.json(
+      { ok: false, error: `Nightly run failed: ${message}` },
+      { status: 500 }
+    );
   }
+}
 
-  let succeeded = 0;
-  let failed = 0;
-  const reports: Array<{
-    siteId: string;
-    siteName: string;
-    improvementCount: number;
-    emailSent: boolean;
-  }> = [];
+export async function GET(req: NextRequest): Promise<NextResponse> {
+  return handle(req);
+}
 
-  for (const site of sites) {
-    try {
-      const siteUrl = `https://${site.slug}.zoobicon.sh`;
-      const report: ComebackReport = await runComebackForSite({
-        id: site.id,
-        name: site.name || site.slug,
-        url: siteUrl,
-        ownerEmail: site.owner_email,
-        html: site.html || undefined,
-      });
-
-      let emailSent = false;
-      if (process.env.MAILGUN_API_KEY) {
-        try {
-          const email = await buildComebackEmail(report);
-          const result = await sendViaMailgun({
-            from: "Zoobicon Comeback <comeback@zoobicon.com>",
-            to: report.ownerEmail,
-            subject: email.subject,
-            html: email.html,
-            text: email.text,
-            tags: ["daily-comeback"],
-          });
-          emailSent = result.success;
-          if (!result.success) {
-            console.warn(
-              `[daily-comeback] mailgun failed for ${report.ownerEmail}: ${result.error}`
-            );
-          }
-        } catch (mailErr: any) {
-          console.warn(
-            `[daily-comeback] mailgun threw for ${report.ownerEmail}:`,
-            mailErr?.message || mailErr
-          );
-        }
-      } else {
-        console.log(
-          "[daily-comeback] MAILGUN_API_KEY not set — skipping email for",
-          report.ownerEmail
-        );
-      }
-
-      // Best-effort store of the report (table may not exist — ignore)
-      try {
-        await sql`
-          INSERT INTO comeback_reports (site_id, owner_email, improvements, email_sent, run_at)
-          VALUES (${site.id}, ${report.ownerEmail}, ${JSON.stringify(report.improvements)}, ${emailSent}, NOW())
-        `;
-      } catch {
-        /* table may not exist; ignore */
-      }
-
-      succeeded++;
-      reports.push({
-        siteId: site.id,
-        siteName: report.siteName,
-        improvementCount: report.improvements.length,
-        emailSent,
-      });
-    } catch (err: any) {
-      failed++;
-      console.error(
-        `[daily-comeback] failed for site ${site.id}:`,
-        err?.message || err
-      );
-    }
-  }
-
-  return NextResponse.json({
-    ok: true,
-    processed: sites.length,
-    succeeded,
-    failed,
-    reports,
-  });
+export async function POST(req: NextRequest): Promise<NextResponse> {
+  return handle(req);
 }
