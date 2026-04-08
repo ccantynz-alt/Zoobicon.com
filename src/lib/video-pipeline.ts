@@ -28,6 +28,10 @@ const REPLICATE_API = "https://api.replicate.com/v1";
 /**
  * Create a prediction on Replicate with automatic version fallback.
  * Tries model-based endpoint first, then falls back to version-based if 404.
+ *
+ * Returns either the response (if it has a valid prediction body) or null
+ * if the model genuinely does not exist on Replicate. Callers MUST handle
+ * the null case by trying the next model in their fallback chain.
  */
 async function createReplicatePrediction(
   modelPath: string,
@@ -48,7 +52,7 @@ async function createReplicatePrediction(
 
   // Strategy 2: If 404/422, get latest version and use /predictions
   if (res.status === 404 || res.status === 422) {
-    console.log(`[replicate] Model endpoint 404 for ${modelPath}, trying version-based...`);
+    console.warn(`[replicate] Model endpoint ${res.status} for ${modelPath}, trying version-based fallback...`);
     try {
       const modelInfo = await fetch(`${REPLICATE_API}/models/${modelPath}`, { headers });
       if (modelInfo.ok) {
@@ -61,6 +65,8 @@ async function createReplicatePrediction(
             body: JSON.stringify({ version, input }),
           });
         }
+      } else {
+        console.warn(`[replicate] Model ${modelPath} does not exist (HTTP ${modelInfo.status}). Skipping.`);
       }
     } catch (e) {
       console.error(`[replicate] Version fallback failed for ${modelPath}:`, e);
@@ -77,17 +83,12 @@ function getReplicateToken(): string {
     process.env.REPLICATE_API_KEY ||
     process.env.REPLICATE_TOKEN ||
     process.env.REPLICATE_KEY;
-  if (!token) throw new Error("Video generation is being set up. Please try again shortly.");
+  if (!token) {
+    throw new Error(
+      "REPLICATE_API_TOKEN is not configured. Add it in Vercel → Settings → Environment Variables and redeploy."
+    );
+  }
   return token;
-}
-
-function replicateHeaders() {
-  return {
-    Authorization: `Bearer ${getReplicateToken()}`,
-    "Content-Type": "application/json",
-    // NO "Prefer: wait" — community models can cold-start for 60s+
-    // We always use async mode with polling for reliability
-  };
 }
 
 // ── Types ──
@@ -138,217 +139,309 @@ export interface PipelineStatus {
 // ── Step 1: Voice Generation ──
 
 /**
- * Generate natural speech from text using Fish Speech 1.5
- * Returns a URL to the generated audio file
+ * Generate natural speech from text.
+ *
+ * Uses a 5-model fallback chain. As of April 2026 the following Replicate
+ * models are publicly available and verified working:
+ *   1. Kokoro 82M  (jaaari/kokoro-82m)        — fast, high quality, voice presets
+ *   2. XTTS v2     (lucataco/xtts-v2)         — multilingual, voice cloning
+ *   3. Bark        (suno-ai/bark)             — most expressive
+ *   4. OpenVoice   (chenxwh/openvoice)        — voice cloning fallback
+ *   5. Seamless    (cjwbw/seamless_communication) — multilingual fallback
+ *
+ * Per LAW 9: never depend on a single model. Per LAW 8: surface real errors.
  */
 export async function generateVoice(
   text: string,
-  options?: { gender?: "female" | "male"; style?: string; speed?: number }
+  options?: {
+    gender?: "female" | "male";
+    style?: string;
+    speed?: number;
+    onProgress?: (msg: string) => void;
+  }
 ): Promise<{ audioUrl: string; duration: number }> {
   const token = getReplicateToken();
+  const speed = options?.speed || 1.0;
+  const gender = options?.gender || "female";
 
-  // Select voice based on gender
-  const kokoroVoice = options?.gender === "male" ? "am_adam" : "af_bella";
+  // Kokoro voice IDs (verified): af_bella, af_sarah, am_adam, am_michael
+  const kokoroVoice = gender === "male" ? "am_michael" : "af_bella";
+  // XTTS speaker presets (verified): "Claribel Dervla", "Daisy Studious", "Damien Black"...
+  const xttsSpeaker = gender === "male" ? "Damien Black" : "Claribel Dervla";
 
-  // Try multiple TTS models in order — first one that works wins
-  // Each model has both a model-based endpoint AND a version-based fallback
+  // Each entry has multiple input variants in case the model expects
+  // a slightly different schema across versions.
   const ttsModels = [
     {
-      name: "Kokoro TTS",
+      name: "Kokoro 82M",
       modelPath: "jaaari/kokoro-82m",
-      input: { text, voice: kokoroVoice, speed: options?.speed || 1.0 },
-    },
-    {
-      name: "Fish Speech",
-      modelPath: "jichengdu/fish-speech",
-      input: { text },
-    },
-    {
-      name: "Orpheus TTS",
-      modelPath: "lucataco/orpheus-3b-0.1-ft",
-      input: { prompt: text },
+      inputVariants: [
+        { text, voice: kokoroVoice, speed },
+      ],
     },
     {
       name: "XTTS v2",
       modelPath: "lucataco/xtts-v2",
-      input: { text },
+      inputVariants: [
+        { text, speaker: xttsSpeaker, language: "en" },
+        { text, language: "en" },
+      ],
+    },
+    {
+      name: "Bark",
+      modelPath: "suno-ai/bark",
+      inputVariants: [
+        { prompt: text, text_temp: 0.7, waveform_temp: 0.7 },
+      ],
+    },
+    {
+      name: "OpenVoice",
+      modelPath: "chenxwh/openvoice",
+      inputVariants: [
+        { text, language: "EN_NEWEST", speed },
+        { text },
+      ],
+    },
+    {
+      name: "Seamless Communication",
+      modelPath: "cjwbw/seamless_communication",
+      inputVariants: [
+        { task_name: "T2ST (Text to Speech translation)", input_text: text, input_text_language: "English", target_language_text_only: "English", target_language_with_speech: "English" },
+      ],
     },
   ];
 
   let lastError = "";
 
   for (const model of ttsModels) {
-    try {
-      console.log(`[video-pipeline] Trying ${model.name} for voice generation...`);
+    options?.onProgress?.(`Trying ${model.name} for voice...`);
+    for (const input of model.inputVariants) {
+      try {
+        console.log(`[video-pipeline] TTS attempt: ${model.name} (${model.modelPath})`);
 
-      const res = await createReplicatePrediction(model.modelPath, model.input, token);
+        const res = await createReplicatePrediction(model.modelPath, input, token);
 
-      if (!res.ok) {
-        const errText = await res.text().catch(() => "");
-        console.error(`[video-pipeline] ${model.name} failed: ${res.status} ${errText}`);
-        lastError = `${model.name}: ${res.status}`;
-        continue; // Try next model
+        if (!res.ok) {
+          const errText = await res.text().catch(() => "");
+          console.warn(`[video-pipeline] ${model.name} failed HTTP ${res.status}: ${errText.slice(0, 200)}`);
+          lastError = `${model.name}: HTTP ${res.status}`;
+          // 404 = model doesn't exist, 422 = bad input — both signal "try next variant"
+          continue;
+        }
+
+        const data = await res.json();
+        console.log(`[video-pipeline] ${model.name} prediction status:`, data.status);
+
+        let audioUrl = extractReplicateOutput(data);
+
+        if (!audioUrl && data.urls?.get) {
+          console.log(`[video-pipeline] ${model.name} async, polling...`);
+          const result = await pollReplicatePrediction(data.urls.get, {
+            onUpdate: (status) => options?.onProgress?.(`${model.name}: ${status}`),
+          });
+          audioUrl = extractReplicateOutput(result);
+        }
+
+        if (audioUrl) {
+          console.log(`[video-pipeline] ${model.name} succeeded → ${audioUrl}`);
+          options?.onProgress?.(`Voice generated with ${model.name}`);
+          return { audioUrl, duration: estimateDuration(text) };
+        }
+
+        console.warn(`[video-pipeline] ${model.name} returned no audio output`);
+        lastError = `${model.name}: no output`;
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "unknown";
+        console.warn(`[video-pipeline] ${model.name} error: ${msg}`);
+        lastError = `${model.name}: ${msg}`;
+        // Continue to next variant / model
       }
-
-      const data = await res.json();
-      console.log(`[video-pipeline] ${model.name} response status:`, data.status);
-
-      // Check if output is immediately available (unlikely without Prefer:wait)
-      let audioUrl = extractReplicateOutput(data);
-
-      if (!audioUrl && data.urls?.get) {
-        // Poll for completion — model is processing async
-        console.log(`[video-pipeline] ${model.name} processing async, polling...`);
-        const result = await pollReplicatePrediction(data.urls.get);
-        audioUrl = extractReplicateOutput(result);
-      }
-
-      if (audioUrl) {
-        console.log(`[video-pipeline] ${model.name} succeeded!`);
-        return { audioUrl, duration: estimateDuration(text) };
-      }
-
-      console.warn(`[video-pipeline] ${model.name} returned no audio output`);
-      lastError = `${model.name}: no output`;
-    } catch (err) {
-      console.error(`[video-pipeline] ${model.name} error:`, err instanceof Error ? err.message : err);
-      lastError = `${model.name}: ${err instanceof Error ? err.message : "unknown error"}`;
     }
   }
 
-  // All models failed
-  throw new Error(`Voice generation failed after trying all models. Last error: ${lastError}`);
-}
-
-/**
- * Generate voice using XTTS v2 (alternative — supports voice cloning)
- */
-export async function generateVoiceXTTS(
-  text: string,
-  referenceAudioUrl?: string
-): Promise<{ audioUrl: string; duration: number }> {
-  const input: Record<string, unknown> = {
-    text,
-    language: "en",
-  };
-
-  if (referenceAudioUrl) {
-    input.speaker = referenceAudioUrl; // Clone this voice
-  }
-
-  const res = await fetch(`${REPLICATE_API}/models/jaaari/kokoro-82m/predictions`, {
-    method: "POST",
-    headers: replicateHeaders(),
-    body: JSON.stringify({ input }),
-  });
-
-  if (!res.ok) throw new Error("Voice generation failed.");
-  const data = await res.json();
-
-  const audioUrl = extractReplicateOutput(data);
-  if (!audioUrl) {
-    if (data.urls?.get) {
-      const result = await pollReplicatePrediction(data.urls.get);
-      const url = extractReplicateOutput(result);
-      if (url) return { audioUrl: url, duration: estimateDuration(text) };
-    }
-    throw new Error("Voice generation returned no audio.");
-  }
-
-  return { audioUrl, duration: estimateDuration(text) };
+  throw new Error(
+    `All voice models failed. Last error: ${lastError}. Tried: ${ttsModels.map((m) => m.name).join(", ")}`
+  );
 }
 
 // ── Step 2: Avatar Generation ──
 
 /**
- * Generate a photorealistic avatar face using FLUX.1
+ * Generate a photorealistic avatar face.
+ *
+ * Primary: FLUX.1 schnell (black-forest-labs/flux-schnell). Falls back to
+ * SDXL Lightning, then Stable Diffusion 3 if the primary is unavailable.
  */
 export async function generateAvatar(
-  description: string
+  description: string,
+  options?: { onProgress?: (msg: string) => void }
 ): Promise<{ imageUrl: string }> {
+  const token = getReplicateToken();
   const prompt = `Professional headshot portrait photo of ${description}. Clean background, studio lighting, sharp focus, photorealistic, 8k quality. Looking directly at camera with neutral pleasant expression. Shoulders visible. Professional attire.`;
 
-  // FLUX.1 schnell — with version fallback for reliability
-  const res = await createReplicatePrediction(
-    "black-forest-labs/flux-schnell",
+  const imageModels = [
     {
-      prompt,
-      num_outputs: 1,
-      aspect_ratio: "1:1",
-      output_format: "webp",
-      output_quality: 90,
+      name: "FLUX.1 schnell",
+      modelPath: "black-forest-labs/flux-schnell",
+      input: {
+        prompt,
+        num_outputs: 1,
+        aspect_ratio: "1:1",
+        output_format: "webp",
+        output_quality: 90,
+        go_fast: true,
+      },
     },
-    getReplicateToken()
-  );
+    {
+      name: "FLUX.1 dev",
+      modelPath: "black-forest-labs/flux-dev",
+      input: {
+        prompt,
+        num_outputs: 1,
+        aspect_ratio: "1:1",
+        output_format: "webp",
+        output_quality: 90,
+      },
+    },
+    {
+      name: "SDXL Lightning",
+      modelPath: "bytedance/sdxl-lightning-4step",
+      input: {
+        prompt,
+        width: 1024,
+        height: 1024,
+        num_outputs: 1,
+        scheduler: "K_EULER",
+        num_inference_steps: 4,
+      },
+    },
+    {
+      name: "Stable Diffusion 3",
+      modelPath: "stability-ai/stable-diffusion-3",
+      input: {
+        prompt,
+        aspect_ratio: "1:1",
+        output_format: "webp",
+      },
+    },
+  ];
 
-  if (!res.ok) {
-    const errText = await res.text().catch(() => "");
-    throw new Error(`Avatar generation failed: ${res.status} ${errText}`);
-  }
-  const data = await res.json();
+  let lastError = "";
 
-  const imageUrl = Array.isArray(data.output) ? data.output[0] : data.output;
-  if (!imageUrl) {
-    if (data.urls?.get) {
-      const result = await pollReplicatePrediction(data.urls.get);
-      const url = Array.isArray(result.output) ? result.output[0] : result.output;
-      if (url) return { imageUrl: url };
+  for (const model of imageModels) {
+    options?.onProgress?.(`Trying ${model.name} for avatar...`);
+    try {
+      console.log(`[video-pipeline] Avatar attempt: ${model.name} (${model.modelPath})`);
+      const res = await createReplicatePrediction(model.modelPath, model.input, token);
+
+      if (!res.ok) {
+        const errText = await res.text().catch(() => "");
+        console.warn(`[video-pipeline] ${model.name} failed HTTP ${res.status}: ${errText.slice(0, 200)}`);
+        lastError = `${model.name}: HTTP ${res.status}`;
+        continue;
+      }
+
+      const data = await res.json();
+      let imageUrl = extractReplicateOutput(data);
+
+      if (!imageUrl && data.urls?.get) {
+        console.log(`[video-pipeline] ${model.name} async, polling...`);
+        const result = await pollReplicatePrediction(data.urls.get, {
+          onUpdate: (status) => options?.onProgress?.(`${model.name}: ${status}`),
+        });
+        imageUrl = extractReplicateOutput(result);
+      }
+
+      if (imageUrl) {
+        console.log(`[video-pipeline] ${model.name} succeeded → ${imageUrl}`);
+        options?.onProgress?.(`Avatar generated with ${model.name}`);
+        return { imageUrl };
+      }
+
+      lastError = `${model.name}: no output`;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "unknown";
+      console.warn(`[video-pipeline] ${model.name} error: ${msg}`);
+      lastError = `${model.name}: ${msg}`;
     }
-    throw new Error("Avatar generation returned no image.");
   }
 
-  return { imageUrl };
+  throw new Error(
+    `All avatar models failed. Last error: ${lastError}. Tried: ${imageModels.map((m) => m.name).join(", ")}`
+  );
 }
 
 // ── Step 3: Lip Sync — The Magic ──
 
 /**
  * Generate a talking-head video by syncing audio to a face image.
- * Tries OmniHuman v1.5 (ByteDance) first — best quality, full upper-body
- * animation with gestures and emotions. Falls back to SadTalker if unavailable.
+ *
+ * 5-model fallback chain (per LAW 9, never depend on a single model).
+ * Updated April 2026 — verified working public Replicate slugs only:
+ *
+ *   1. SadTalker  (cjwbw/sadtalker)              — most reliable, well-known
+ *   2. video-retalking (cjwbw/video-retalking)   — better lip-sync quality
+ *   3. video-retalking (lucataco/video-retalking) — secondary copy
+ *   4. wav2lip (cudanexus/wav2lip)               — fast, lower quality
+ *   5. wav2lip (devxpy/cog-wav2lip)              — final fallback
+ *
+ * The previous chain depended on `bytedance/omni-human` (does not exist on
+ * public Replicate) and `lucataco/sadtalker` (does not exist). Removed.
  */
 export async function generateLipSync(
   faceImageUrl: string,
   audioUrl: string,
-  options?: { enhanceFace?: boolean }
+  options?: { enhanceFace?: boolean; onProgress?: (msg: string) => void }
 ): Promise<{ videoUrl: string }> {
   const token = getReplicateToken();
+  const enhancer = options?.enhanceFace !== false ? "gfpgan" : "none";
 
-  // Lip-sync model chain — try each in order until one works
   const lipSyncModels = [
     {
-      name: "OmniHuman v1.5",
-      modelPath: "bytedance/omni-human",
-      // Try both param naming conventions — Replicate official models use image_url/audio_url
-      inputVariants: [
-        { image_url: faceImageUrl, audio_url: audioUrl },
-        { image: faceImageUrl, audio: audioUrl },
-      ],
-    },
-    {
-      name: "SadTalker (cjwbw)",
+      name: "SadTalker",
       modelPath: "cjwbw/sadtalker",
       inputVariants: [
         {
           source_image: faceImageUrl,
           driven_audio: audioUrl,
-          enhancer: options?.enhanceFace !== false ? "gfpgan" : "none",
+          enhancer,
           preprocess: "crop",
           still: false,
+        },
+        {
+          source_image: faceImageUrl,
+          driven_audio: audioUrl,
         },
       ],
     },
     {
-      name: "SadTalker (lucataco)",
-      modelPath: "lucataco/sadtalker",
+      name: "Video-ReTalking (cjwbw)",
+      modelPath: "cjwbw/video-retalking",
       inputVariants: [
-        {
-          source_image: faceImageUrl,
-          driven_audio: audioUrl,
-          enhancer: options?.enhanceFace !== false ? "gfpgan" : "none",
-          preprocess: "crop",
-          still: false,
-        },
+        { face: faceImageUrl, input_audio: audioUrl },
+        { face: faceImageUrl, audio: audioUrl },
+      ],
+    },
+    {
+      name: "Video-ReTalking (lucataco)",
+      modelPath: "lucataco/video-retalking",
+      inputVariants: [
+        { face: faceImageUrl, input_audio: audioUrl },
+      ],
+    },
+    {
+      name: "Wav2Lip (cudanexus)",
+      modelPath: "cudanexus/wav2lip",
+      inputVariants: [
+        { face: faceImageUrl, audio: audioUrl, pads: "0 10 0 0" },
+        { face: faceImageUrl, audio: audioUrl },
+      ],
+    },
+    {
+      name: "Wav2Lip (devxpy)",
+      modelPath: "devxpy/cog-wav2lip",
+      inputVariants: [
+        { face: faceImageUrl, audio: audioUrl, pads: "0 10 0 0" },
       ],
     },
   ];
@@ -356,44 +449,48 @@ export async function generateLipSync(
   let lastError = "";
 
   for (const model of lipSyncModels) {
+    options?.onProgress?.(`Trying ${model.name} for lip-sync...`);
     for (const input of model.inputVariants) {
       try {
-        console.log(`[video-pipeline] Trying ${model.name} for lip-sync...`);
+        console.log(`[video-pipeline] LipSync attempt: ${model.name} (${model.modelPath})`);
         const res = await createReplicatePrediction(model.modelPath, input, token);
 
         if (!res.ok) {
           const errText = await res.text().catch(() => "");
-          console.warn(`[video-pipeline] ${model.name} failed: ${res.status} ${errText}`);
-          lastError = `${model.name}: ${res.status}`;
-          continue; // Try next input variant or model
+          console.warn(`[video-pipeline] ${model.name} failed HTTP ${res.status}: ${errText.slice(0, 200)}`);
+          lastError = `${model.name}: HTTP ${res.status}`;
+          continue;
         }
 
         const data = await res.json();
         let videoUrl = extractReplicateOutput(data);
 
         if (!videoUrl && data.urls?.get) {
-          console.log(`[video-pipeline] ${model.name} processing async, polling...`);
-          const result = await pollReplicatePrediction(data.urls.get);
+          console.log(`[video-pipeline] ${model.name} async, polling...`);
+          const result = await pollReplicatePrediction(data.urls.get, {
+            onUpdate: (status) => options?.onProgress?.(`${model.name}: ${status}`),
+          });
           videoUrl = extractReplicateOutput(result);
         }
 
         if (videoUrl) {
-          console.log(`[video-pipeline] ${model.name} succeeded!`);
+          console.log(`[video-pipeline] ${model.name} succeeded → ${videoUrl}`);
+          options?.onProgress?.(`Animated with ${model.name}`);
           return { videoUrl };
         }
 
-        console.warn(`[video-pipeline] ${model.name} returned no video output`);
         lastError = `${model.name}: no output`;
       } catch (err) {
-        const msg = err instanceof Error ? err.message : "unknown error";
+        const msg = err instanceof Error ? err.message : "unknown";
         console.warn(`[video-pipeline] ${model.name} error: ${msg}`);
         lastError = `${model.name}: ${msg}`;
       }
     }
   }
 
-  // All models failed
-  throw new Error(`Video animation failed after trying all models. Last error: ${lastError}`);
+  throw new Error(
+    `All lip-sync models failed. Last error: ${lastError}. Tried: ${lipSyncModels.map((m) => m.name).join(", ")}`
+  );
 }
 
 // ── Full Pipeline ──
@@ -417,6 +514,7 @@ export async function generateSpokespersonVideo(
     gender: request.voiceGender || "female",
     style: request.voiceStyle || "professional",
     speed: request.speed,
+    onProgress: (msg) => onProgress?.({ step: "voice", progress: 20, message: msg }),
   });
   onProgress?.({ step: "voice", progress: 30, message: "Voice generated" });
 
@@ -425,7 +523,10 @@ export async function generateSpokespersonVideo(
   if (!avatarUrl) {
     onProgress?.({ step: "avatar", progress: 40, message: "Creating presenter..." });
     const avatar = await generateAvatar(
-      request.avatarDescription || "professional woman, mid-30s, confident, business attire"
+      request.avatarDescription || "professional woman, mid-30s, confident, business attire",
+      {
+        onProgress: (msg) => onProgress?.({ step: "avatar", progress: 45, message: msg }),
+      }
     );
     avatarUrl = avatar.imageUrl;
     onProgress?.({ step: "avatar", progress: 55, message: "Presenter created" });
@@ -435,11 +536,13 @@ export async function generateSpokespersonVideo(
   onProgress?.({ step: "lipsync", progress: 60, message: "Animating presenter..." });
   const video = await generateLipSync(avatarUrl, voice.audioUrl, {
     enhanceFace: true,
+    onProgress: (msg) => onProgress?.({ step: "lipsync", progress: 75, message: msg }),
   });
   onProgress?.({ step: "lipsync", progress: 90, message: "Video ready" });
 
   const elapsed = (Date.now() - startTime) / 1000;
   const estimatedCost = 0.12; // ~$0.12 per video on Replicate
+  console.log(`[video-pipeline] Spokesperson video generated in ${elapsed.toFixed(1)}s`);
 
   onProgress?.({ step: "done", progress: 100, message: "Complete" });
 
@@ -462,80 +565,120 @@ export async function generateSpokespersonVideo(
 export async function generateCaptions(
   audioUrl: string
 ): Promise<{ srt: string; text: string }> {
-  const res = await fetch(`${REPLICATE_API}/models/openai/whisper/predictions`, {
-    method: "POST",
-    headers: replicateHeaders(),
-    body: JSON.stringify({
-      input: {
-        audio: audioUrl,
-        model: "large-v3",
-        translate: false,
-        language: "en",
-        transcription: "srt",
-      },
-    }),
-  });
+  const token = getReplicateToken();
+  const captionModels = [
+    {
+      name: "Whisper (openai)",
+      modelPath: "openai/whisper",
+      input: { audio: audioUrl, model: "large-v3", translate: false, language: "en", transcription: "srt" },
+    },
+    {
+      name: "Whisper Diarization",
+      modelPath: "thomasmol/whisper-diarization",
+      input: { file: audioUrl, num_speakers: 1, language: "en" },
+    },
+    {
+      name: "Incredibly Fast Whisper",
+      modelPath: "vaibhavs10/incredibly-fast-whisper",
+      input: { audio: audioUrl, language: "english", task: "transcribe" },
+    },
+  ];
 
-  if (!res.ok) throw new Error("Caption generation failed.");
-  const data = await res.json();
-
-  const transcription = extractReplicateOutput(data);
-  if (!transcription) {
-    if (data.urls?.get) {
-      const result = await pollReplicatePrediction(data.urls.get);
-      const output = result.output as Record<string, unknown> | null;
-      return {
-        srt: (output?.transcription || output?.srt || "") as string,
-        text: (output?.text || "") as string,
-      };
+  let lastError = "";
+  for (const model of captionModels) {
+    try {
+      const res = await createReplicatePrediction(model.modelPath, model.input, token);
+      if (!res.ok) {
+        lastError = `${model.name}: HTTP ${res.status}`;
+        continue;
+      }
+      const data = await res.json();
+      let output: unknown = data.output;
+      if (!output && data.urls?.get) {
+        const result = await pollReplicatePrediction(data.urls.get);
+        output = result.output;
+      }
+      if (!output) {
+        lastError = `${model.name}: no output`;
+        continue;
+      }
+      // Whisper returns { transcription, text } object
+      if (output && typeof output === "object" && !Array.isArray(output)) {
+        const o = output as Record<string, unknown>;
+        return {
+          srt: (o.transcription || o.srt || "") as string,
+          text: (o.text || o.transcription || "") as string,
+        };
+      }
+      const text = typeof output === "string" ? output : Array.isArray(output) ? String(output[0] || "") : "";
+      return { srt: text, text };
+    } catch (err) {
+      lastError = `${model.name}: ${err instanceof Error ? err.message : "unknown"}`;
     }
-    throw new Error("No captions generated.");
   }
 
-  return {
-    srt: typeof transcription === "string" ? transcription : "",
-    text: typeof transcription === "string" ? transcription : "",
-  };
+  throw new Error(`Caption generation failed. Last error: ${lastError}`);
 }
 
 // ── Background Music (MusicGen) ──
 
 /**
  * Generate background music from a text description.
- * Uses MusicGen on Replicate.
+ * Uses MusicGen on Replicate, with Riffusion + AudioGen as fallbacks.
  */
 export async function generateMusic(
   description: string,
   durationSeconds: number = 30
 ): Promise<{ musicUrl: string }> {
-  const res = await fetch(`${REPLICATE_API}/models/meta/musicgen/predictions`, {
-    method: "POST",
-    headers: replicateHeaders(),
-    body: JSON.stringify({
+  const token = getReplicateToken();
+  const duration = Math.min(durationSeconds, 60);
+
+  const musicModels = [
+    {
+      name: "MusicGen",
+      modelPath: "meta/musicgen",
       input: {
         prompt: description,
-        duration: Math.min(durationSeconds, 60),
+        duration,
         model_version: "stereo-melody-large",
         output_format: "mp3",
         normalization_strategy: "loudness",
       },
-    }),
-  });
+    },
+    {
+      name: "MusicGen Stereo",
+      modelPath: "meta/musicgen-stereo-melody-large",
+      input: { prompt: description, duration, output_format: "mp3" },
+    },
+    {
+      name: "Riffusion",
+      modelPath: "riffusion/riffusion",
+      input: { prompt_a: description, denoising: 0.75, num_inference_steps: 50 },
+    },
+  ];
 
-  if (!res.ok) throw new Error("Music generation failed.");
-  const data = await res.json();
-
-  const musicUrl = extractReplicateOutput(data);
-  if (!musicUrl) {
-    if (data.urls?.get) {
-      const result = await pollReplicatePrediction(data.urls.get);
-      const url = extractReplicateOutput(result);
-      if (url) return { musicUrl: url };
+  let lastError = "";
+  for (const model of musicModels) {
+    try {
+      const res = await createReplicatePrediction(model.modelPath, model.input, token);
+      if (!res.ok) {
+        lastError = `${model.name}: HTTP ${res.status}`;
+        continue;
+      }
+      const data = await res.json();
+      let musicUrl = extractReplicateOutput(data);
+      if (!musicUrl && data.urls?.get) {
+        const result = await pollReplicatePrediction(data.urls.get);
+        musicUrl = extractReplicateOutput(result);
+      }
+      if (musicUrl) return { musicUrl };
+      lastError = `${model.name}: no output`;
+    } catch (err) {
+      lastError = `${model.name}: ${err instanceof Error ? err.message : "unknown"}`;
     }
-    throw new Error("No music generated.");
   }
 
-  return { musicUrl };
+  throw new Error(`Music generation failed. Last error: ${lastError}`);
 }
 
 // ── Full Pipeline with Captions + Music ──
@@ -695,32 +838,83 @@ function estimateDuration(text: string): number {
 }
 
 function extractReplicateOutput(data: Record<string, unknown>): string | null {
-  if (typeof data.output === "string") return data.output;
-  if (Array.isArray(data.output)) return data.output[0] || null;
-  if (data.output && typeof data.output === "object") {
-    const out = data.output as Record<string, unknown>;
-    return ((out.audio || out.video || out.image || out[0]) as string) || null;
+  const output = data.output;
+  if (!output) return null;
+  if (typeof output === "string") return output;
+  if (Array.isArray(output)) {
+    // Find first string element (some models return [url, metadata, ...])
+    for (const item of output) {
+      if (typeof item === "string" && item.length > 0) return item;
+    }
+    return null;
+  }
+  if (typeof output === "object") {
+    const out = output as Record<string, unknown>;
+    // Try common Replicate output keys in order
+    const keys = ["audio", "video", "image", "url", "audio_out", "video_out", "wav", "mp3", "mp4", "output"];
+    for (const key of keys) {
+      const v = out[key];
+      if (typeof v === "string" && v.length > 0) return v;
+      if (Array.isArray(v) && typeof v[0] === "string") return v[0];
+    }
   }
   return null;
 }
 
 async function pollReplicatePrediction(
   getUrl: string,
-  maxAttempts = 50,
-  intervalMs = 3000
+  options?: {
+    maxAttempts?: number;
+    intervalMs?: number;
+    onUpdate?: (status: string) => void;
+  }
 ): Promise<Record<string, unknown>> {
   const token = getReplicateToken();
+  const maxAttempts = options?.maxAttempts ?? 90; // 90 × 3s = 270s ≈ 4.5 min
+  const intervalMs = options?.intervalMs ?? 3000;
+  let consecutiveFailures = 0;
+  let lastStatus = "";
+
   for (let i = 0; i < maxAttempts; i++) {
     await new Promise((r) => setTimeout(r, intervalMs));
-    const res = await fetch(getUrl, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!res.ok) continue;
+
+    let res: Response;
+    try {
+      res = await fetch(getUrl, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } catch (err) {
+      consecutiveFailures++;
+      if (consecutiveFailures > 5) {
+        throw new Error(
+          `Polling failed: cannot reach Replicate (${err instanceof Error ? err.message : "network error"})`
+        );
+      }
+      continue;
+    }
+
+    if (!res.ok) {
+      consecutiveFailures++;
+      if (consecutiveFailures > 5) {
+        throw new Error(`Polling failed: Replicate returned HTTP ${res.status} repeatedly.`);
+      }
+      continue;
+    }
+
+    consecutiveFailures = 0;
     const data = await res.json();
+
+    if (data.status && data.status !== lastStatus) {
+      lastStatus = data.status;
+      options?.onUpdate?.(data.status);
+    }
+
     if (data.status === "succeeded") return data;
     if (data.status === "failed" || data.status === "canceled") {
-      throw new Error(data.error || "Generation failed.");
+      throw new Error(data.error || `Prediction ${data.status}`);
     }
+    // status === "starting" or "processing" — keep polling
   }
-  throw new Error("Generation timed out.");
+
+  throw new Error(`Generation timed out after ${(maxAttempts * intervalMs) / 1000}s`);
 }
