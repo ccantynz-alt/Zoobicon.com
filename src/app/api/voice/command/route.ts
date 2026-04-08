@@ -1,13 +1,17 @@
 /**
- * POST /api/voice/transcribe
- * multipart/form-data with field "audio" (File).
- * Returns { text, duration, languageCode, confidence }.
+ * POST /api/voice/command
+ * multipart/form-data: { audio: File, currentProjectId?: string }
+ *
+ * Full voice-to-build orchestration:
+ *   transcribe → classify → route to downstream module.
+ *
+ * Returns the full ProcessVoiceCommandResult payload.
  *
  * Bible Law 8: every failure path returns a clear, actionable error.
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { transcribeAudio, VoiceBuildError } from "@/lib/voice-build";
+import { processVoiceCommand, VoiceBuildError } from "@/lib/voice-build";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -17,7 +21,16 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json(
       {
         error: "FAL_KEY not configured",
-        hint: "Set FAL_KEY in Vercel env vars to enable voice transcription.",
+        hint: "Set FAL_KEY in Vercel env vars to enable voice commands.",
+      },
+      { status: 503 },
+    );
+  }
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return NextResponse.json(
+      {
+        error: "ANTHROPIC_API_KEY not configured",
+        hint: "Set ANTHROPIC_API_KEY in Vercel env vars.",
       },
       { status: 503 },
     );
@@ -31,7 +44,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json(
       {
         error: `Invalid multipart payload: ${message}`,
-        hint: "POST multipart/form-data with an 'audio' file field.",
+        hint: "POST multipart/form-data with 'audio' and optional 'currentProjectId'.",
       },
       { status: 400 },
     );
@@ -47,6 +60,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       { status: 400 },
     );
   }
+
+  const projectIdRaw = form.get("currentProjectId");
+  const currentProjectId =
+    typeof projectIdRaw === "string" && projectIdRaw.length > 0
+      ? projectIdRaw
+      : undefined;
 
   const file = audio as File;
   let buffer: ArrayBuffer;
@@ -64,13 +83,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 
   try {
-    const result = await transcribeAudio(buffer, file.type || "audio/webm");
-    return NextResponse.json({
-      text: result.text,
-      duration: result.durationSec,
-      languageCode: result.languageCode,
-      confidence: result.confidence,
+    const payload = await processVoiceCommand({
+      audioBuffer: buffer,
+      mimeType: file.type || "audio/webm",
+      currentProjectId,
     });
+    return NextResponse.json(payload);
   } catch (err) {
     if (err instanceof VoiceBuildError) {
       return NextResponse.json(
@@ -81,7 +99,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const message = err instanceof Error ? err.message : "unknown error";
     return NextResponse.json(
       {
-        error: `Transcription failed: ${message}`,
+        error: `Voice command failed: ${message}`,
         hint: "Unexpected error — retry once or check server logs.",
       },
       { status: 500 },
