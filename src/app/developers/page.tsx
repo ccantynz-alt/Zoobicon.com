@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { Code, Key, Zap, Shield, ArrowRight, Check } from "lucide-react";
 
+// Force dynamic rendering — this page timed out during static generation on Vercel
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Developers — Zoobicon API",
   description:

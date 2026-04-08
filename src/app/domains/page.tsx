@@ -94,7 +94,11 @@ export default function DomainsPage() {
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [registering, setRegistering] = useState(false);
   const [userEmail, setUserEmail] = useState("");
+  const [genDescription, setGenDescription] = useState("");
+  const [genStyle, setGenStyle] = useState("modern");
+  const [pendingGenerate, setPendingGenerate] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [generatedNames, setGeneratedNames] = useState<Array<{ name: string; tagline: string; domains: Array<{ domain: string; tld: string; available: boolean | null; price: number; checking: boolean }> }>>([]);
   const [pendingGenerate, setPendingGenerate] = useState(false);
   const [autoExpandedTlds, setAutoExpandedTlds] = useState(false);
   const [autoGenerating, setAutoGenerating] = useState(false);
