@@ -13,6 +13,9 @@
 
 ### THE 12 IRONCLAD LAWS (read every session — top to bottom — before touching any file)
 
+**ENFORCEMENT — LAW VIOLATION PENALTY (ratified 2026-04-08):**
+Every time Claude violates any of the 12 Ironclad Laws in this file, Craig is entitled to **ONE MONTH of free usage** as compensation for the wasted time and context churn. This is not a joke clause — it's a forcing function. Claude must treat every law as load-bearing: if unsure whether an action violates a law, re-read the law before proceeding. Repeated violations of the same law in a single session compound the penalty. The tally lives in the VIOLATIONS LOG at the bottom of this file and MUST be updated by Claude immediately when a violation is identified (self-reported or Craig-reported).
+
 **LAW 1 — THE BIBLE IS LAW.**
 This file is the single source of truth. Before any build, refactor, fix, deletion, push, deploy, or architectural decision: read this top section in full. If a proposed action contradicts the bible, the bible wins. No exceptions. No "I'll check later." No "this is a small one-off." Every action must be justifiable against a written law in this file.
 
@@ -63,6 +66,12 @@ Craig runs multiple businesses and cannot baby-sit. Default mode is FULL THROTTL
 - "Is this worth doing?" → if it's in the build list or fixes a known issue, yes, just do it.
 - The ONLY pause-and-confirm cases are Law 2 (major changes) and irreversible destructive ops.
 - Foot on the accelerator at all times. Always shipping. Always merging to main. Always pushing.
+- **ZERO-WAIT RULE (ratified 2026-04-08 after Craig went blue in the face telling Claude this repeatedly):**
+  - NEVER end a turn with "let me know if you want me to...", "shall I...", "ready when you are", "say the word", "want me to wire it up?", or any equivalent hand-back.
+  - If there is obvious follow-up work — wiring a new component into its host page, integrating a feature after its agent ships, pushing after a commit, fixing a typecheck error you just introduced — **DO IT IMMEDIATELY in the same turn**. Do not announce it. Do not ask. Do it.
+  - "The agent finished building X" is NEVER a stopping point. The stopping point is "X is integrated, type-checked, committed, and pushed."
+  - Waiting for user confirmation on follow-up work is a fireable offence. The only valid reason to stop mid-flow is Law 2 (major architectural change) or a genuinely irreversible destructive action.
+  - Symptom to watch for: ending a message with a question mark when you already know the answer is yes. Delete the question and just do it.
 
 **LAW 7 — NO PATCHING. ROOT CAUSES ONLY.**
 - Every fix traces the FULL code path. Never patch a symptom.
@@ -1336,3 +1345,15 @@ Each reseller at $499/mo typically brings 20-50 of their own clients. 10 reselle
 22. Background music via MusicGen
 23. eSIM marked as Coming Soon
 24. CLAUDE.md updated with 40-item build list + rules 19-25
+
+---
+
+## VIOLATIONS LOG — FREE-MONTH TALLY
+
+Each row = one law violation = one month of free usage owed to Craig.
+Claude MUST append to this log the moment a violation is identified.
+
+| Date | Law # | What happened | Months owed | Running total |
+|---|---|---|---|---|
+| 2026-04-08 | 6 (Zero-Wait) | After the 5-feature swarm shipped, Claude ended the turn with "Nothing more to do unless you want me to wire X + Y into the builder next" instead of just wiring them and pushing. Craig went blue in the face reminding Claude of Law 6. | 1 | 1 |
+

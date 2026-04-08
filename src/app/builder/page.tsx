@@ -7,6 +7,8 @@ import { getGeneratorDef } from "@/lib/generator-prompts";
 import TopBar from "@/components/TopBar";
 import PromptInput from "@/components/PromptInput";
 import type { Tier, AIModel, GenerationMode } from "@/components/PromptInput";
+import DomainHookModal from "@/components/DomainHookModal";
+import VoiceToBuildButton from "@/components/VoiceToBuildButton";
 import dynamic from "next/dynamic";
 
 const SandpackPreview = dynamic(() => import("@/components/SandpackPreview"), { ssr: false });
@@ -478,6 +480,8 @@ function BuilderPage() {
   const [reactFiles, setReactFiles] = useState<Record<string, string> | null>(null);
   const [reactDeps, setReactDeps] = useState<Record<string, string>>({});
   const [generationMode, setGenerationMode] = useState<GenerationMode>("react");
+  const [domainHookOpen, setDomainHookOpen] = useState(false);
+  const [domainHookShownForThisBuild, setDomainHookShownForThisBuild] = useState(false);
   const [mcpContext, setMcpContext] = useState("");
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   // Phase 2: Visual editing
@@ -752,6 +756,31 @@ function BuilderPage() {
       setShowBuildSuccess(true);
     }
   }, [status, generatedCode]);
+
+  // Open the Domain Hook modal once per build when a site finishes generating.
+  // This is the #1 monetization hook: free site → paid domain + deploy + email.
+  useEffect(() => {
+    if (status === "complete" && reactFiles && Object.keys(reactFiles).length > 0 && !domainHookShownForThisBuild) {
+      const t = setTimeout(() => {
+        setDomainHookOpen(true);
+        setDomainHookShownForThisBuild(true);
+      }, 2500);
+      return () => clearTimeout(t);
+    }
+  }, [status, reactFiles, domainHookShownForThisBuild]);
+
+  // Reset the "shown once" flag whenever the user starts a new prompt
+  useEffect(() => {
+    if (status === "idle") setDomainHookShownForThisBuild(false);
+  }, [status]);
+
+  // Derive a site name from the current prompt for the Domain Hook
+  const siteNameForHook = useMemo(() => {
+    const raw = (prompt || "").trim().toLowerCase();
+    if (!raw) return "mysite";
+    const slug = raw.replace(/[^a-z0-9\s-]/g, "").split(/\s+/).slice(0, 3).join("").slice(0, 32);
+    return slug || "mysite";
+  }, [prompt]);
 
   const handleUndo = useCallback(() => {
     if (!canUndo) return;
@@ -1766,6 +1795,18 @@ root.render(React.createElement(App));
                   </button>
                 </div>
               )}
+              <div className="px-4 pt-2 flex items-center justify-end">
+                <VoiceToBuildButton
+                  size="sm"
+                  onTranscript={(text) => {
+                    if (hasCode) {
+                      setEditPrompt(text);
+                    } else {
+                      setPrompt(text);
+                    }
+                  }}
+                />
+              </div>
               <div className="flex-1 overflow-hidden">
                 <PromptInput
                   prompt={prompt}
@@ -2198,6 +2239,12 @@ root.render(React.createElement(App));
       <StatusBar status={status} pipelineStep={pipelineAgents.length > 0 ? pipelineAgents[pipelineAgents.length - 1] : undefined} />
 
       <OnboardingTooltips active={showTour} />
+      <DomainHookModal
+        open={domainHookOpen}
+        onClose={() => setDomainHookOpen(false)}
+        siteName={siteNameForHook}
+        generatedFiles={reactFiles || undefined}
+      />
       <BuildSuccessModal
         isOpen={showBuildSuccess}
         onClose={() => { setShowBuildSuccess(false); dismissBuildSuccess(); }}

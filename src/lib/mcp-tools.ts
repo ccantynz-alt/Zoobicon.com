@@ -464,9 +464,433 @@ const getPricingTiersTool: MCPTool = {
   },
 };
 
+// ── Helper: generic POST/GET wrappers ─────────────────────────────────────
+
+async function postJson(path: string, body: unknown): Promise<unknown> {
+  const res = await fetch(`${getBaseUrl()}${path}`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const text = await res.text();
+  let data: unknown;
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch {
+    data = { raw: text };
+  }
+  if (!res.ok) {
+    return { ok: false, error: `${path} failed: ${res.status} ${res.statusText}`, data };
+  }
+  return { ok: true, data };
+}
+
+async function getJson(path: string): Promise<unknown> {
+  const res = await fetch(`${getBaseUrl()}${path}`, { cache: "no-store" });
+  const text = await res.text();
+  let data: unknown;
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch {
+    data = { raw: text };
+  }
+  if (!res.ok) {
+    return { ok: false, error: `${path} failed: ${res.status} ${res.statusText}`, data };
+  }
+  return { ok: true, data };
+}
+
+// ── Tool: generate_website ────────────────────────────────────────────────
+
+const generateWebsiteTool: MCPTool = {
+  name: "zoobicon.generate_website",
+  description:
+    "Generate a complete website from a natural-language prompt via the Zoobicon multi-agent pipeline. Returns generated files.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      prompt: { type: "string", description: "Site description" },
+      style: { type: "string", description: "Optional design style hint" },
+    },
+    required: ["prompt"],
+  },
+  handler: async (args) => {
+    const obj = asRecord(args);
+    const prompt = asString(obj.prompt, "prompt");
+    const style = asStringOpt(obj.style, "style");
+    return await postJson("/api/generate", { prompt, style });
+  },
+};
+
+// ── Tool: generate_react_app ──────────────────────────────────────────────
+
+const generateReactAppTool: MCPTool = {
+  name: "zoobicon.generate_react_app",
+  description:
+    "Generate a React/TypeScript app (Sandpack-compatible). Returns { files, dependencies }.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      prompt: { type: "string", description: "App description" },
+    },
+    required: ["prompt"],
+  },
+  handler: async (args) => {
+    const obj = asRecord(args);
+    const prompt = asString(obj.prompt, "prompt");
+    return await postJson("/api/generate/react", { prompt });
+  },
+};
+
+// ── Tool: edit_website ────────────────────────────────────────────────────
+
+const editWebsiteTool: MCPTool = {
+  name: "zoobicon.edit_website",
+  description:
+    "Apply a natural-language edit to an existing set of generated files using the diff editor (fast, ~2-5s).",
+  inputSchema: {
+    type: "object",
+    properties: {
+      files: { type: "object", description: "Map of filepath -> contents" },
+      instruction: { type: "string", description: "What to change" },
+    },
+    required: ["files", "instruction"],
+  },
+  handler: async (args) => {
+    const obj = asRecord(args);
+    const instruction = asString(obj.instruction, "instruction");
+    if (!obj.files || typeof obj.files !== "object") {
+      return { ok: false, error: "'files' must be an object" };
+    }
+    return await postJson("/api/generate/edit", { files: obj.files, instruction });
+  },
+};
+
+// ── Tool: register_domain ─────────────────────────────────────────────────
+
+const registerDomainTool: MCPTool = {
+  name: "zoobicon.register_domain",
+  description:
+    "Register a domain via the Zoobicon OpenSRS-backed registrar. Requires registrant contact info.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      domain: { type: "string", description: "Full domain (e.g. example.com)" },
+      registrant: {
+        type: "object",
+        description:
+          "Registrant contact { firstName, lastName, email, phone, address, city, country, postalCode }",
+      },
+      years: { type: "number", description: "Registration years (default 1)" },
+    },
+    required: ["domain", "registrant"],
+  },
+  handler: async (args) => {
+    const obj = asRecord(args);
+    const domain = asString(obj.domain, "domain");
+    if (!obj.registrant || typeof obj.registrant !== "object") {
+      return { ok: false, error: "'registrant' must be an object" };
+    }
+    const years = typeof obj.years === "number" ? obj.years : 1;
+    return await postJson("/api/domains/register", {
+      domain,
+      registrant: obj.registrant,
+      years,
+    });
+  },
+};
+
+// ── Tool: suggest_business_names ──────────────────────────────────────────
+
+const suggestBusinessNamesTool: MCPTool = {
+  name: "zoobicon.suggest_business_names",
+  description:
+    "Generate AI business name suggestions with domain availability checks.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      description: { type: "string", description: "Business description" },
+      style: { type: "string", description: "Optional naming style (modern, playful, etc)" },
+      count: { type: "number", description: "Number of names (default 20)" },
+    },
+    required: ["description"],
+  },
+  handler: async (args) => {
+    const obj = asRecord(args);
+    const description = asString(obj.description, "description");
+    const style = asStringOpt(obj.style, "style");
+    const count = typeof obj.count === "number" ? obj.count : 20;
+    return await postJson("/api/tools/business-names", { description, style, count });
+  },
+};
+
+// ── Tool: generate_voiceover ──────────────────────────────────────────────
+
+const generateVoiceoverTool: MCPTool = {
+  name: "zoobicon.generate_voiceover",
+  description:
+    "Generate a TTS voiceover via the Zoobicon Replicate fallback chain (Kokoro → Fish Speech → Orpheus → XTTS v2).",
+  inputSchema: {
+    type: "object",
+    properties: {
+      text: { type: "string", description: "Text to speak" },
+      voice: { type: "string", description: "Optional voice id/style" },
+    },
+    required: ["text"],
+  },
+  handler: async (args) => {
+    const obj = asRecord(args);
+    const text = asString(obj.text, "text");
+    const voice = asStringOpt(obj.voice, "voice");
+    return await postJson("/api/video-creator/voiceover", { text, voice });
+  },
+};
+
+// ── Tool: analyze_seo ─────────────────────────────────────────────────────
+
+const analyzeSeoTool: MCPTool = {
+  name: "zoobicon.analyze_seo",
+  description:
+    "Run a full SEO audit on a URL — meta tags, headings, structured data, performance hints.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      url: { type: "string", description: "Target URL" },
+    },
+    required: ["url"],
+  },
+  handler: async (args) => {
+    const obj = asRecord(args);
+    const url = asString(obj.url, "url");
+    return await postJson("/api/tools/seo-analyzer", { url });
+  },
+};
+
+// ── Tool: check_keyword_density ───────────────────────────────────────────
+
+const checkKeywordDensityTool: MCPTool = {
+  name: "zoobicon.check_keyword_density",
+  description: "Compute keyword density for a piece of text or a URL.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      text: { type: "string", description: "Text content (optional if url given)" },
+      url: { type: "string", description: "URL to fetch (optional if text given)" },
+    },
+  },
+  handler: async (args) => {
+    const obj = asRecord(args);
+    return await postJson("/api/tools/keyword-density", {
+      text: asStringOpt(obj.text, "text"),
+      url: asStringOpt(obj.url, "url"),
+    });
+  },
+};
+
+// ── Tool: check_meta_tags ─────────────────────────────────────────────────
+
+const checkMetaTagsTool: MCPTool = {
+  name: "zoobicon.check_meta_tags",
+  description: "Inspect meta tags (title, description, OG, Twitter) for a URL.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      url: { type: "string", description: "Target URL" },
+    },
+    required: ["url"],
+  },
+  handler: async (args) => {
+    const obj = asRecord(args);
+    const url = asString(obj.url, "url");
+    return await postJson("/api/tools/meta-tags", { url });
+  },
+};
+
+// ── Tool: generate_sitemap ────────────────────────────────────────────────
+
+const generateSitemapTool: MCPTool = {
+  name: "zoobicon.generate_sitemap",
+  description: "Crawl a domain and generate an XML sitemap.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      url: { type: "string", description: "Root URL to crawl" },
+    },
+    required: ["url"],
+  },
+  handler: async (args) => {
+    const obj = asRecord(args);
+    const url = asString(obj.url, "url");
+    return await postJson("/api/tools/sitemap-generator", { url });
+  },
+};
+
+// ── Tool: analyze_competitor_seo ──────────────────────────────────────────
+
+const analyzeCompetitorSeoTool: MCPTool = {
+  name: "zoobicon.analyze_competitor_seo",
+  description: "Compare SEO metrics for your URL versus a competitor URL.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      yourUrl: { type: "string", description: "Your site URL" },
+      competitorUrl: { type: "string", description: "Competitor URL" },
+    },
+    required: ["yourUrl", "competitorUrl"],
+  },
+  handler: async (args) => {
+    const obj = asRecord(args);
+    const yourUrl = asString(obj.yourUrl, "yourUrl");
+    const competitorUrl = asString(obj.competitorUrl, "competitorUrl");
+    return await postJson("/api/tools/competitor-seo", { yourUrl, competitorUrl });
+  },
+};
+
+// ── Tool: search_esim_countries ───────────────────────────────────────────
+
+const searchEsimCountriesTool: MCPTool = {
+  name: "zoobicon.search_esim_countries",
+  description:
+    "Look up eSIM data plans for a country via the Celitech-backed Zoobicon eSIM product. (Coming soon — requires CELITECH_API_KEY.)",
+  inputSchema: {
+    type: "object",
+    properties: {
+      country: { type: "string", description: "Country name or ISO code" },
+    },
+    required: ["country"],
+  },
+  handler: async (args) => {
+    const obj = asRecord(args);
+    const country = asString(obj.country, "country");
+    if (!process.env.CELITECH_API_KEY) {
+      return { error: "Endpoint not yet available", coming_soon: true };
+    }
+    return await getJson(`/api/v1/esim/plans?country=${encodeURIComponent(country)}`);
+  },
+};
+
+// ── Tool: lookup_vpn_servers ──────────────────────────────────────────────
+
+const lookupVpnServersTool: MCPTool = {
+  name: "zoobicon.lookup_vpn_servers",
+  description:
+    "List Zoobicon VPN server locations and capacity. (Coming soon — requires WireGuard infrastructure.)",
+  inputSchema: {
+    type: "object",
+    properties: {
+      region: { type: "string", description: "Optional region filter" },
+    },
+  },
+  handler: async (args) => {
+    const obj = asRecord(args);
+    const region = asStringOpt(obj.region, "region");
+    if (!process.env.WIREGUARD_API_URL) {
+      return { error: "Endpoint not yet available", coming_soon: true };
+    }
+    const qs = region ? `?region=${encodeURIComponent(region)}` : "";
+    return await getJson(`/api/v1/vpn/servers${qs}`);
+  },
+};
+
+// ── Tool: book_appointment ────────────────────────────────────────────────
+
+const bookAppointmentTool: MCPTool = {
+  name: "zoobicon.book_appointment",
+  description:
+    "Book an appointment via the Zoobicon Cal.com integration. (Coming soon — requires CALCOM_API_KEY.)",
+  inputSchema: {
+    type: "object",
+    properties: {
+      eventTypeId: { type: "string", description: "Cal.com event type id" },
+      start: { type: "string", description: "ISO start datetime" },
+      attendee: { type: "object", description: "{ name, email, timezone }" },
+    },
+    required: ["eventTypeId", "start", "attendee"],
+  },
+  handler: async (args) => {
+    const obj = asRecord(args);
+    if (!process.env.CALCOM_API_KEY) {
+      return { error: "Endpoint not yet available", coming_soon: true };
+    }
+    return await postJson("/api/v1/booking/create", obj);
+  },
+};
+
+// ── Tool: send_transactional_email ────────────────────────────────────────
+
+const sendTransactionalEmailTool: MCPTool = {
+  name: "zoobicon.send_transactional_email",
+  description:
+    "Send a transactional email via Mailgun (requires MAILGUN_API_KEY). Includes Zoobicon four-domain footer automatically.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      to: { type: "string", description: "Recipient email" },
+      subject: { type: "string", description: "Subject line" },
+      html: { type: "string", description: "HTML body" },
+      text: { type: "string", description: "Optional plain text body" },
+    },
+    required: ["to", "subject", "html"],
+  },
+  handler: async (args) => {
+    const obj = asRecord(args);
+    const to = asString(obj.to, "to");
+    const subject = asString(obj.subject, "subject");
+    const html = asString(obj.html, "html");
+    const text = asStringOpt(obj.text, "text");
+    if (!process.env.MAILGUN_API_KEY) {
+      return { error: "Endpoint not yet available", coming_soon: true };
+    }
+    return await postJson("/api/email/send", { to, subject, html, text });
+  },
+};
+
+// ── Tool: crawl_competitor ────────────────────────────────────────────────
+
+const crawlCompetitorTool: MCPTool = {
+  name: "zoobicon.crawl_competitor",
+  description:
+    "Trigger the Zoobicon market intelligence crawler against a competitor URL — captures features, pricing, copy.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      url: { type: "string", description: "Competitor homepage URL" },
+      name: { type: "string", description: "Competitor display name" },
+    },
+    required: ["url"],
+  },
+  handler: async (args) => {
+    const obj = asRecord(args);
+    const url = asString(obj.url, "url");
+    const name = asStringOpt(obj.name, "name");
+    return await postJson("/api/intel/crawl", { url, name });
+  },
+};
+
+// ── Tool: track_technology_changes ────────────────────────────────────────
+
+const trackTechnologyChangesTool: MCPTool = {
+  name: "zoobicon.track_technology_changes",
+  description:
+    "Return the latest entries from the Zoobicon technology currency agent — new libs, models, framework versions.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      since: { type: "string", description: "Optional ISO date filter" },
+    },
+  },
+  handler: async (args) => {
+    const obj = asRecord(args);
+    const since = asStringOpt(obj.since, "since");
+    const qs = since ? `?since=${encodeURIComponent(since)}` : "";
+    return await getJson(`/api/intel/technology${qs}`);
+  },
+};
+
 // ── Registry ───────────────────────────────────────────────────────────────
 
 export const MCP_TOOLS: MCPTool[] = [
+  // Existing
   searchDomainsTool,
   generateSiteTool,
   generateVideoTool,
@@ -475,6 +899,29 @@ export const MCP_TOOLS: MCPTool[] = [
   getPricingTiersTool,
   transcribeAudioTool,
   generateImageTool,
+  // Site builder & generation
+  generateWebsiteTool,
+  generateReactAppTool,
+  editWebsiteTool,
+  // Domains
+  registerDomainTool,
+  suggestBusinessNamesTool,
+  // Video & media
+  generateVoiceoverTool,
+  // SEO tools
+  analyzeSeoTool,
+  checkKeywordDensityTool,
+  checkMetaTagsTool,
+  generateSitemapTool,
+  analyzeCompetitorSeoTool,
+  // Business products
+  searchEsimCountriesTool,
+  lookupVpnServersTool,
+  bookAppointmentTool,
+  sendTransactionalEmailTool,
+  // Intelligence
+  crawlCompetitorTool,
+  trackTechnologyChangesTool,
 ];
 
 export function getMCPTool(name: string): MCPTool | undefined {
