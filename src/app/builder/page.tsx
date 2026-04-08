@@ -1106,6 +1106,20 @@ function BuilderPage() {
             }
           }
 
+          setGeneratedCode(clean);
+          addSnapshot(clean, prompt?.slice(0, 40) || "Build");
+          setStatus("complete");
+        }
+      } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") return;
+        const msg = err instanceof Error ? err.message : "Generation failed";
+        setError(cleanErrorMessage(msg));
+        setStatus("error");
+      }
+    },
+    [],
+  );
+
   // Update timeline based on section state transitions
   const upsertSection = useCallback((section: string, status: "scaffolding" | "customizing" | "done") => {
     if (!section) return;
