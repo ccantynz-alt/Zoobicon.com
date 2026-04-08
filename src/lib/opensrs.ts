@@ -23,8 +23,21 @@ function sign(xml: string): string {
 /**
  * Check if OpenSRS credentials are configured.
  */
+let _configWarned = false;
 export function isOpenSRSConfigured(): boolean {
-  return !!(OPENSRS_API_KEY() && OPENSRS_USER());
+  const apiKey = OPENSRS_API_KEY();
+  const user = OPENSRS_USER();
+  if (!apiKey && !user) return false;
+  if (!apiKey || !user) {
+    if (!_configWarned) {
+      _configWarned = true;
+      console.error(
+        "[OpenSRS] Configuration incomplete: both OPENSRS_API_KEY and OPENSRS_RESELLER_USER must be set. Falling back to DNS."
+      );
+    }
+    return false;
+  }
+  return true;
 }
 
 /**
@@ -148,38 +161,65 @@ export async function checkMultipleDomains(
 }
 
 /**
- * Check a single full domain (e.g. "mybusiness.com") with DNS fallback.
- * Uses OpenSRS if configured, otherwise falls back to Google DNS.
+ * Authoritative single-domain availability check.
+ *
+ * Strategy (in order, first authoritative answer wins):
+ *  1. RDAP (rdap.org) — official registry protocol. 404 = available, 200 = taken.
+ *  2. OpenSRS LOOKUP — ONLY when env=live (test mode returns fake sandbox data
+ *     and was the root cause of "available domains" that were actually taken).
+ *  3. Google DNS NXDOMAIN — only as a corroborating signal, never alone.
+ *
+ * Returns:
+ *   true  = definitely available
+ *   false = definitely taken
+ *   null  = uncertain (UI must NOT show as available)
  */
 export async function checkWithFallback(domain: string): Promise<boolean | null> {
-  if (isOpenSRSConfigured()) {
-    const result = await checkDomainAvailability(domain);
-    if (result.status !== "error" && result.status !== "unknown") {
-      return result.available;
-    }
-  }
-
-  // Fallback 1: RDAP (Registration Data Access Protocol) — authoritative registry check
-  // RDAP is the official replacement for WHOIS, run by registries themselves
+  // ── 1. RDAP (authoritative, free, no auth) ────────────────────────────────
   try {
     const rdapRes = await fetch(`https://rdap.org/domain/${domain}`, {
       signal: AbortSignal.timeout(6000),
       headers: { Accept: "application/rdap+json" },
+      redirect: "follow",
     });
-    if (rdapRes.status === 404) return true; // Not found in registry = available
-    if (rdapRes.ok) return false; // Found in registry = taken
+    // 404 = registry has no record = domain is available for registration
+    if (rdapRes.status === 404) return true;
+    // 200 = registry has a record = domain is taken
+    if (rdapRes.status === 200) return false;
+    // 429/5xx fall through to next signal — registry overloaded/unsupported TLD
   } catch {
-    // RDAP failed, try DNS
+    // network error — fall through
   }
 
-  // Fallback 2: DNS — only trust NXDOMAIN as "likely available"
+  // ── 2. OpenSRS (LIVE mode only — test/horizon endpoint lies) ──────────────
+  if (isOpenSRSConfigured() && OPENSRS_ENV() === "live") {
+    const result = await checkDomainAvailability(domain);
+    if (result.status === "available") return true;
+    if (result.status === "taken") return false;
+  }
+
+  // ── 3. Google DNS — only NXDOMAIN is a useful signal ──────────────────────
+  // A registered domain may have no A record (parked, MX-only) so absence of
+  // an A record does NOT prove availability. We only trust NXDOMAIN, and even
+  // then we additionally check NS to avoid false positives.
   try {
-    const res = await fetch(`https://dns.google/resolve?name=${domain}&type=A`, {
-      signal: AbortSignal.timeout(5000),
-    });
-    const data = await res.json();
-    if (data.Status === 3) return true; // NXDOMAIN = likely available
-    return null; // Unknown — don't assume taken from DNS alone
+    const [aRes, nsRes] = await Promise.all([
+      fetch(`https://dns.google/resolve?name=${domain}&type=A`, {
+        signal: AbortSignal.timeout(5000),
+      }),
+      fetch(`https://dns.google/resolve?name=${domain}&type=NS`, {
+        signal: AbortSignal.timeout(5000),
+      }),
+    ]);
+    const aData = await aRes.json();
+    const nsData = await nsRes.json();
+    // Both A and NS return NXDOMAIN → strong signal it's unregistered
+    if (aData.Status === 3 && nsData.Status === 3) return true;
+    // NS resolved → domain has nameservers → definitely registered
+    if (nsData.Status === 0 && Array.isArray(nsData.Answer) && nsData.Answer.length > 0) {
+      return false;
+    }
+    return null;
   } catch {
     return null;
   }

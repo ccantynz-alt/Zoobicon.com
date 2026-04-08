@@ -6,7 +6,7 @@
  */
 export default function MaintenanceBanner() {
   // HARDCODED ON — remove this line or set to false to disable
-  const MAINTENANCE_ACTIVE = true;
+  const MAINTENANCE_ACTIVE = false;
 
   if (!MAINTENANCE_ACTIVE) return null;
 

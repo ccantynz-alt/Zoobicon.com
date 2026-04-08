@@ -105,20 +105,52 @@ registerComponent({
   description: "Ultra-clean minimal navbar, just logo and links with subtle CTA",
   tags: ["minimal", "clean", "portfolio", "designer", "creative", "elegant", "simple"],
   code: `export default function Navbar() {
+  const [scrolled, setScrolled] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = React.useState(false);
   const links = ["Work", "About", "Contact"];
+
+  React.useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100">
-      <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
-        <span className="text-base font-semibold text-gray-900 tracking-tight">Studio</span>
-        <div className="flex items-center gap-6">
+    <nav className={\`fixed top-0 left-0 right-0 z-50 transition-all duration-500 \${scrolled ? "bg-white/90 backdrop-blur-xl shadow-[0_1px_0_rgba(0,0,0,0.04)]" : "bg-white"}\`}>
+      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="w-6 h-6 rounded-md bg-gray-900 flex items-center justify-center">
+            <span className="text-white text-[10px] font-bold">S</span>
+          </div>
+          <span className="text-base font-semibold text-gray-900 tracking-tight">Studio</span>
+        </div>
+        <div className="hidden md:flex items-center gap-8">
           {links.map(l => (
-            <a key={l} href={\`#\${l.toLowerCase()}\`} className="text-sm text-gray-500 hover:text-gray-900 transition-colors">{l}</a>
+            <a key={l} href={\`#\${l.toLowerCase()}\`} className="relative text-sm text-gray-400 hover:text-gray-900 transition-colors duration-300 py-1 group">
+              {l}
+              <span className="absolute bottom-0 left-0 w-0 h-px bg-gray-900 group-hover:w-full transition-all duration-300" />
+            </a>
           ))}
-          <button className="text-sm font-medium text-gray-900 underline underline-offset-4 decoration-gray-300 hover:decoration-gray-900 transition-colors">
+          <div className="w-px h-4 bg-gray-200" />
+          <button className="group text-sm font-medium text-gray-900 flex items-center gap-2 hover:gap-3 transition-all duration-300">
             Let&apos;s Talk
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all duration-300"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </button>
         </div>
+        <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 text-gray-400" aria-label="Toggle menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="17" x2="16" y2="17"/></svg>
+        </button>
       </div>
+      {mobileOpen && (
+        <div className="md:hidden bg-white border-t border-gray-50 px-6 py-6 space-y-4">
+          {links.map(l => (
+            <a key={l} href={\`#\${l.toLowerCase()}\`} className="block text-sm text-gray-500 hover:text-gray-900 py-1 transition-colors">{l}</a>
+          ))}
+          <div className="pt-2 border-t border-gray-50">
+            <button className="text-sm font-medium text-gray-900">Let&apos;s Talk &rarr;</button>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }`,
@@ -134,39 +166,62 @@ registerComponent({
   tags: ["centered", "elegant", "fashion", "beauty", "luxury", "brand", "magazine", "editorial", "creative"],
   code: `export default function Navbar() {
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [scrolled, setScrolled] = React.useState(false);
   const leftLinks = ["Collections", "About"];
   const rightLinks = ["Journal", "Contact"];
+
+  React.useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100">
+    <nav className={\`fixed top-0 left-0 right-0 z-50 transition-all duration-500 \${scrolled ? "bg-white/95 backdrop-blur-xl shadow-[0_1px_0_rgba(0,0,0,0.03)]" : "bg-white"}\`}>
+      {/* Top accent line */}
+      <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        <div className="hidden md:flex items-center gap-8 flex-1 justify-end">
+        <div className="hidden md:flex items-center gap-10 flex-1 justify-end">
           {leftLinks.map(l => (
-            <a key={l} href={\`#\${l.toLowerCase()}\`} className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors tracking-wide uppercase">{l}</a>
+            <a key={l} href={\`#\${l.toLowerCase()}\`} className="group relative text-[11px] font-medium text-gray-400 hover:text-gray-900 transition-colors duration-300 tracking-[0.2em] uppercase py-1">
+              {l}
+              <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-gray-900 group-hover:w-full transition-all duration-500 ease-out" />
+            </a>
           ))}
         </div>
-        <div className="flex items-center justify-center md:mx-12 flex-shrink-0">
-          <span className="text-xl font-bold text-gray-900 tracking-[0.15em] uppercase">Maison</span>
+        <div className="flex items-center justify-center md:mx-16 flex-shrink-0">
+          <span className="text-xl font-light text-gray-900 tracking-[0.25em] uppercase" style={{ fontFamily: "Georgia, serif" }}>Maison</span>
         </div>
-        <div className="hidden md:flex items-center gap-8 flex-1">
+        <div className="hidden md:flex items-center gap-10 flex-1">
           {rightLinks.map(l => (
-            <a key={l} href={\`#\${l.toLowerCase()}\`} className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors tracking-wide uppercase">{l}</a>
+            <a key={l} href={\`#\${l.toLowerCase()}\`} className="group relative text-[11px] font-medium text-gray-400 hover:text-gray-900 transition-colors duration-300 tracking-[0.2em] uppercase py-1">
+              {l}
+              <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-gray-900 group-hover:w-full transition-all duration-500 ease-out" />
+            </a>
           ))}
           <div className="ml-auto">
-            <button className="px-5 py-2 bg-gray-900 text-white text-sm font-semibold rounded-full hover:bg-gray-800 transition-colors">
+            <button className="group px-6 py-2 bg-gray-900 text-white text-[11px] font-medium tracking-[0.15em] uppercase rounded-none hover:bg-gray-800 transition-all duration-300 flex items-center gap-2">
               Shop Now
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all duration-300"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </button>
           </div>
         </div>
-        <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 text-gray-600" aria-label="Toggle menu">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 text-gray-400" aria-label="Toggle menu">
+          {mobileOpen ? (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="17" x2="16" y2="17"/></svg>
+          )}
         </button>
       </div>
       {mobileOpen && (
-        <div className="md:hidden bg-white border-t border-gray-100 px-6 py-4 space-y-3">
+        <div className="md:hidden bg-white px-6 py-8 space-y-1 border-t border-gray-50">
           {[...leftLinks, ...rightLinks].map(l => (
-            <a key={l} href={\`#\${l.toLowerCase()}\`} className="block text-sm font-medium text-gray-700 py-2 uppercase tracking-wide">{l}</a>
+            <a key={l} href={\`#\${l.toLowerCase()}\`} className="block text-[11px] font-medium text-gray-500 hover:text-gray-900 py-3 uppercase tracking-[0.2em] border-b border-gray-50 transition-colors">{l}</a>
           ))}
-          <button className="w-full px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-full mt-2">Shop Now</button>
+          <div className="pt-6">
+            <button className="w-full px-6 py-3 bg-gray-900 text-white text-[11px] font-medium tracking-[0.15em] uppercase hover:bg-gray-800 transition-colors">Shop Now</button>
+          </div>
         </div>
       )}
     </nav>

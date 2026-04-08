@@ -1,12 +1,21 @@
 /**
  * AI Image Generation Engine
  *
- * Supports multiple providers:
- * - OpenAI DALL-E 3 (primary)
- * - Stability AI SDXL (fallback)
- * - Unsplash API (free fallback)
+ * Two pipelines exported from this file:
  *
- * Set env vars: OPENAI_API_KEY, STABILITY_API_KEY, UNSPLASH_ACCESS_KEY
+ *   1. Legacy multi-provider pipeline (DALL-E / Stability / Unsplash)
+ *      - export: generateImage(opts: GenerateOptions): Promise<GeneratedImage>
+ *      - Used by /api/generate/images and /api/generate/ai-images
+ *
+ *   2. New Replicate 4-model fallback pipeline (Bible Law 9)
+ *      - export: generateImagePipeline(req: ImageGenRequest): Promise<ImageGenResult>
+ *      - export: isImageGenAvailable()
+ *      - Used by /api/v1/images public API
+ *      - Chain: flux-schnell → flux-dev → sdxl → sdxl-lightning-4step
+ *
+ * NOTE: the new pipeline is exported under the name `generateImagePipeline`
+ * (not `generateImage`) to avoid colliding with the legacy export consumed
+ * by existing routes. The /api/v1/images route imports it aliased.
  */
 
 export interface GeneratedImage {
@@ -359,4 +368,306 @@ export function buildImagePrompts(html: string, industry: string): Array<{
     height: p.height,
     style: "photo" as const,
   }));
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// NEW PIPELINE — Replicate 4-model fallback chain (Bible Law 9)
+// Self-contained: Replicate runner copied inline from src/lib/ai-twins.ts.
+// Exported as `generateImagePipeline` to avoid colliding with legacy export.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface ImageGenRequest {
+  prompt: string;
+  negativePrompt?: string;
+  width?: number;
+  height?: number;
+  steps?: number;
+  numImages?: number;
+  style?: "photo" | "illustration" | "logo" | "icon" | "anime" | "3d";
+  seed?: number;
+}
+
+export interface ImageGenResult {
+  images: string[];
+  cost: number;
+  model: string;
+  durationMs: number;
+  steps: string[];
+}
+
+export type ImageProgressFn = (s: { step: string; message: string }) => void;
+
+interface ImageModelEntry {
+  slug: string;
+  costPerImage: number;
+  buildInput: (req: Required<ImageGenRequest>) => Record<string, unknown>;
+}
+
+const PIPELINE_STYLE_HINTS: Record<NonNullable<ImageGenRequest["style"]>, string> = {
+  photo: "Photorealistic, 8k, professional photography, cinematic lighting, sharp focus",
+  illustration: "Digital illustration, vibrant colors, detailed, artstation",
+  logo: "Vector logo, minimalist, flat design, white background, centered",
+  icon: "Simple icon, line art, monochrome, minimal, pictogram",
+  anime: "Anime style, vibrant, detailed, studio quality",
+  "3d": "3D render, octane, ray-traced, high detail, professional",
+};
+
+const DEFAULT_NEGATIVE_PROMPT =
+  "blurry, low quality, watermark, text artifacts, deformed";
+
+export const PIPELINE_MODELS: ImageModelEntry[] = [
+  {
+    slug: "black-forest-labs/flux-schnell",
+    costPerImage: 0.003,
+    buildInput: (r) => {
+      const input: Record<string, unknown> = {
+        prompt: r.prompt,
+        width: r.width,
+        height: r.height,
+        num_outputs: r.numImages,
+        num_inference_steps: Math.min(Math.max(r.steps, 1), 4),
+        aspect_ratio: "custom",
+        output_format: "webp",
+        output_quality: 90,
+      };
+      if (r.seed >= 0) input.seed = r.seed;
+      return input;
+    },
+  },
+  {
+    slug: "black-forest-labs/flux-dev",
+    costPerImage: 0.025,
+    buildInput: (r) => {
+      const input: Record<string, unknown> = {
+        prompt: r.prompt,
+        width: r.width,
+        height: r.height,
+        num_outputs: r.numImages,
+        num_inference_steps: Math.max(r.steps, 28),
+        guidance: 3.5,
+        output_format: "webp",
+        output_quality: 90,
+      };
+      if (r.seed >= 0) input.seed = r.seed;
+      return input;
+    },
+  },
+  {
+    slug: "stability-ai/sdxl",
+    costPerImage: 0.0095,
+    buildInput: (r) => {
+      const input: Record<string, unknown> = {
+        prompt: r.prompt,
+        negative_prompt: r.negativePrompt,
+        width: r.width,
+        height: r.height,
+        num_outputs: r.numImages,
+        num_inference_steps: Math.max(r.steps, 25),
+        guidance_scale: 7.5,
+        scheduler: "K_EULER",
+      };
+      if (r.seed >= 0) input.seed = r.seed;
+      return input;
+    },
+  },
+  {
+    slug: "bytedance/sdxl-lightning-4step",
+    costPerImage: 0.005,
+    buildInput: (r) => {
+      const input: Record<string, unknown> = {
+        prompt: r.prompt,
+        negative_prompt: r.negativePrompt,
+        width: r.width,
+        height: r.height,
+        num_outputs: r.numImages,
+        num_inference_steps: 4,
+        guidance_scale: 0,
+        scheduler: "K_EULER",
+      };
+      if (r.seed >= 0) input.seed = r.seed;
+      return input;
+    },
+  },
+];
+
+function getReplicateTokenForPipeline(): string {
+  const t =
+    process.env.REPLICATE_API_TOKEN ||
+    process.env.REPLICATE_API_KEY ||
+    process.env.REPLICATE_TOKEN ||
+    process.env.REPLICATE_KEY;
+  if (!t) {
+    throw new Error(
+      "Replicate token missing. Set REPLICATE_API_TOKEN in your environment (Vercel → Settings → Environment Variables)."
+    );
+  }
+  return t;
+}
+
+export function isImageGenAvailable(): boolean {
+  return Boolean(
+    process.env.REPLICATE_API_TOKEN ||
+      process.env.REPLICATE_API_KEY ||
+      process.env.REPLICATE_TOKEN ||
+      process.env.REPLICATE_KEY
+  );
+}
+
+interface PipelineReplicatePrediction {
+  id: string;
+  status: "starting" | "processing" | "succeeded" | "failed" | "canceled";
+  output?: unknown;
+  error?: string | null;
+  urls?: { get?: string };
+}
+
+async function runPipelineReplicateModel(
+  modelSlug: string,
+  input: Record<string, unknown>
+): Promise<unknown> {
+  const token = getReplicateTokenForPipeline();
+  const createRes = await fetch(
+    `https://api.replicate.com/v1/models/${modelSlug}/predictions`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+        Prefer: "wait=5",
+      },
+      body: JSON.stringify({ input }),
+    }
+  );
+
+  if (createRes.status === 404) {
+    throw new Error(`MODEL_404:${modelSlug}`);
+  }
+  if (!createRes.ok) {
+    const text = await createRes.text();
+    throw new Error(`Replicate ${modelSlug} failed (${createRes.status}): ${text}`);
+  }
+
+  let pred = (await createRes.json()) as PipelineReplicatePrediction;
+  const start = Date.now();
+  const timeoutMs = 5 * 60 * 1000;
+
+  while (
+    pred.status !== "succeeded" &&
+    pred.status !== "failed" &&
+    pred.status !== "canceled"
+  ) {
+    if (Date.now() - start > timeoutMs) {
+      throw new Error(`Replicate ${modelSlug} timed out after 5 minutes`);
+    }
+    await new Promise((r) => setTimeout(r, 1500));
+    const pollUrl =
+      pred.urls?.get || `https://api.replicate.com/v1/predictions/${pred.id}`;
+    const pollRes = await fetch(pollUrl, {
+      headers: { Authorization: `Token ${token}` },
+    });
+    if (!pollRes.ok) {
+      throw new Error(`Replicate poll failed (${pollRes.status})`);
+    }
+    pred = (await pollRes.json()) as PipelineReplicatePrediction;
+  }
+
+  if (pred.status !== "succeeded") {
+    throw new Error(
+      `Replicate ${modelSlug} ${pred.status}: ${pred.error || "unknown error"}`
+    );
+  }
+  return pred.output;
+}
+
+function extractPipelineUrls(output: unknown): string[] {
+  if (typeof output === "string") return [output];
+  if (Array.isArray(output)) {
+    const urls: string[] = [];
+    for (const item of output) {
+      if (typeof item === "string") urls.push(item);
+    }
+    if (urls.length > 0) return urls;
+  }
+  if (output && typeof output === "object") {
+    const o = output as Record<string, unknown>;
+    for (const key of ["images", "image", "output", "url"]) {
+      const v = o[key];
+      if (typeof v === "string") return [v];
+      if (Array.isArray(v)) {
+        const urls = v.filter((x): x is string => typeof x === "string");
+        if (urls.length > 0) return urls;
+      }
+    }
+  }
+  throw new Error(
+    `Could not extract image URLs from output: ${JSON.stringify(output).slice(0, 200)}`
+  );
+}
+
+function buildPipelinePrompt(req: ImageGenRequest): string {
+  const base = req.prompt.trim();
+  if (!req.style) return base;
+  const hint = PIPELINE_STYLE_HINTS[req.style];
+  return `${hint}. ${base}`;
+}
+
+/**
+ * New pipeline: 4-model fallback chain via Replicate.
+ * Exported as `generateImagePipeline` (not `generateImage`) to avoid
+ * colliding with the legacy multi-provider export above.
+ */
+export async function generateImagePipeline(
+  req: ImageGenRequest,
+  onProgress?: ImageProgressFn
+): Promise<ImageGenResult> {
+  if (!req.prompt || !req.prompt.trim()) {
+    throw new Error("prompt is required");
+  }
+  if (!isImageGenAvailable()) {
+    throw new Error(
+      "Image generation unavailable. Set REPLICATE_API_TOKEN in your environment (Vercel → Settings → Environment Variables)."
+    );
+  }
+
+  const normalised: Required<ImageGenRequest> = {
+    prompt: buildPipelinePrompt(req),
+    negativePrompt: req.negativePrompt || DEFAULT_NEGATIVE_PROMPT,
+    width: req.width ?? 1024,
+    height: req.height ?? 1024,
+    steps: req.steps ?? 4,
+    numImages: Math.min(Math.max(req.numImages ?? 1, 1), 4),
+    style: req.style ?? "photo",
+    seed: req.seed ?? -1,
+  };
+
+  const stepsLog: string[] = [];
+  const startedAt = Date.now();
+  let lastErr: Error | null = null;
+
+  for (const model of PIPELINE_MODELS) {
+    try {
+      stepsLog.push(`try:${model.slug}`);
+      onProgress?.({ step: model.slug, message: `Generating with ${model.slug}...` });
+      const input = model.buildInput(normalised);
+      const output = await runPipelineReplicateModel(model.slug, input);
+      const images = extractPipelineUrls(output);
+      stepsLog.push(`ok:${model.slug}:${images.length}`);
+      return {
+        images,
+        cost: model.costPerImage * images.length,
+        model: model.slug,
+        durationMs: Date.now() - startedAt,
+        steps: stepsLog,
+      };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      stepsLog.push(`fail:${model.slug}:${msg.slice(0, 80)}`);
+      console.warn(`[image-gen] ${model.slug} failed, trying next:`, msg);
+      lastErr = err instanceof Error ? err : new Error(msg);
+    }
+  }
+
+  throw new Error(
+    `All image generation models failed — last error: ${lastErr?.message || "unknown"}`
+  );
 }

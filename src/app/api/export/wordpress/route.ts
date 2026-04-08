@@ -70,8 +70,8 @@ export async function POST(req: NextRequest) {
       ],
     });
 
-    const responseText =
-      message.content[0].type === "text" ? message.content[0].text : "";
+    const textBlock = message.content.find((b: { type: string }) => b.type === "text") as { type: "text"; text: string } | undefined;
+    const responseText = textBlock?.text || "";
 
     let parsed;
     try {

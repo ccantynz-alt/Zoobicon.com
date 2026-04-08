@@ -124,7 +124,7 @@ interface VideoTemplate {
 /* ------------------------------------------------------------------ */
 
 const PROJECT_TYPES = [
-  { id: "social-ad", label: "Social Media Ad", icon: Megaphone, desc: "Eye-catching ads for social platforms" },
+  { id: "social-ad", label: "Social Media Ad", icon: Sparkles, desc: "Eye-catching ads for social platforms" },
   { id: "product-demo", label: "Product Demo", icon: Play, desc: "Showcase your product in action" },
   { id: "explainer", label: "Explainer", icon: BookOpen, desc: "Break down complex ideas simply" },
   { id: "testimonial", label: "Testimonial", icon: MessageSquareQuote, desc: "Customer stories that convert" },
@@ -722,17 +722,37 @@ SCRIPT_2:
               </div>
             </div>
 
-            <button
-              onClick={handleGenerateVideo}
-              disabled={generating}
-              className="w-full py-5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 rounded-2xl font-bold text-xl disabled:opacity-50 transition-all flex items-center justify-center gap-3 shadow-xl shadow-amber-500/25 hover:shadow-2xl hover:shadow-amber-500/30"
-            >
-              {generating ? (
-                <><Loader2 className="w-6 h-6 animate-spin" /> {videoStatus || "Generating..."}</>
-              ) : (
-                <><Sparkles className="w-6 h-6" /> Generate Video</>
-              )}
-            </button>
+            {generating ? (
+              <div className="rounded-2xl bg-gradient-to-br from-amber-500/5 to-orange-500/5 border border-amber-500/10 p-8">
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 mx-auto mb-4 flex items-center justify-center shadow-xl shadow-amber-500/30">
+                    <Video className="w-8 h-8 text-white animate-pulse" />
+                  </div>
+                  <h3 className="text-lg font-bold mb-1">Generating your video</h3>
+                  <p className="text-sm text-amber-400/70">{videoStatus || "Starting pipeline..."}</p>
+                </div>
+                <div className="space-y-3 max-w-sm mx-auto">
+                  {["FLUX generates presenter", "AI creates voiceover", "OmniHuman animates face", "Final rendering"].map((stage, i) => {
+                    const stageStatus = videoStatus?.toLowerCase() || "";
+                    const isDone = (i === 0 && stageStatus.includes("voice")) || (i === 1 && stageStatus.includes("animat")) || (i === 2 && stageStatus.includes("render"));
+                    const isActive = !isDone && ((i === 0 && stageStatus.includes("present")) || (i === 1 && stageStatus.includes("voice")) || (i === 2 && stageStatus.includes("animat")) || (i === 3 && stageStatus.includes("render")));
+                    return (
+                      <div key={stage} className={`flex items-center gap-3 text-sm ${isDone ? "text-emerald-400" : isActive ? "text-amber-400" : "text-white/20"}`}>
+                        {isDone ? <Check className="w-4 h-4" /> : isActive ? <Loader2 className="w-4 h-4 animate-spin" /> : <div className="w-4 h-4 rounded-full border border-white/10" />}
+                        {stage}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={handleGenerateVideo}
+                className="w-full py-5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 rounded-2xl font-bold text-xl transition-all flex items-center justify-center gap-3 shadow-xl shadow-amber-500/25 hover:shadow-2xl hover:shadow-amber-500/30"
+              >
+                <Sparkles className="w-6 h-6" /> Generate Video
+              </button>
+            )}
           </div>
         )}
 

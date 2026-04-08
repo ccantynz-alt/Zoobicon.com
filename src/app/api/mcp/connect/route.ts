@@ -99,6 +99,9 @@ export async function POST(request: NextRequest) {
             { status: 400 }
           );
         }
+        if (!process.env.NOTION_TOKEN) {
+          return NextResponse.json({ error: "Notion integration not configured. Set NOTION_TOKEN." }, { status: 400 });
+        }
         context = await fetchNotionContext(notionPageId, process.env.NOTION_TOKEN);
         break;
       }

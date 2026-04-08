@@ -384,18 +384,26 @@ export async function initSchema() {
       id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       domain              TEXT UNIQUE NOT NULL,
       user_email          TEXT NOT NULL,
-      status              VARCHAR(20) NOT NULL DEFAULT 'active',
+      status              VARCHAR(30) NOT NULL DEFAULT 'active',
       registered_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       expires_at          TIMESTAMPTZ NOT NULL DEFAULT (NOW() + INTERVAL '1 year'),
       auto_renew          BOOLEAN NOT NULL DEFAULT true,
       privacy_protection  BOOLEAN NOT NULL DEFAULT true,
       nameservers         JSONB DEFAULT '["ns1.zoobicon.io", "ns2.zoobicon.io"]',
       cloudflare_zone_id  TEXT,
-      stripe_session_id   TEXT
+      stripe_session_id   TEXT,
+      opensrs_order_id    TEXT,
+      registration_error  TEXT,
+      registrant_info     JSONB DEFAULT '{}'
     )
   `;
 
   await sql`CREATE INDEX IF NOT EXISTS registered_domains_user_email_idx ON registered_domains (user_email)`;
+
+  // Add columns if they don't exist (for existing databases)
+  await sql`ALTER TABLE registered_domains ADD COLUMN IF NOT EXISTS opensrs_order_id TEXT`.catch(() => {});
+  await sql`ALTER TABLE registered_domains ADD COLUMN IF NOT EXISTS registration_error TEXT`.catch(() => {});
+  await sql`ALTER TABLE registered_domains ADD COLUMN IF NOT EXISTS registrant_info JSONB DEFAULT '{}'`.catch(() => {});
 
   // ---- Support tickets (replaces in-memory demo) ----
 

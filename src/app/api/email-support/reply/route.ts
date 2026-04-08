@@ -83,7 +83,8 @@ Respond in this JSON format:
       messages: [{ role: "user", content: userMessage }],
     });
 
-    const text = response.content[0].type === "text" ? response.content[0].text : "";
+    const textBlock = response.content.find((b) => b.type === "text") as { type: "text"; text: string } | undefined;
+    const text = textBlock?.text || "";
 
     // Try to parse as JSON
     try {

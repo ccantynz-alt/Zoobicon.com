@@ -191,34 +191,67 @@ export default function SandpackPreview(props: SandpackPreviewProps) {
 
   const dependencies = mode === "react" ? (props as SandpackPreviewPropsReact).dependencies : undefined;
 
-  // Empty states
-  if (mode === "html") {
-    const html = (props as SandpackPreviewPropsHTML).html;
-    if (!html || !html.trim()) {
-      return (
-        <div className="absolute inset-0 flex items-center justify-center bg-[#131520] text-white/40 text-sm">
-          <p>No content to preview</p>
-        </div>
-      );
-    }
-  } else if (mode === "react") {
-    const files = (props as SandpackPreviewPropsReact).files;
-    if (!files || Object.keys(files).length === 0) {
-      return (
-        <div className="absolute inset-0 flex items-center justify-center bg-[#131520] text-white/40 text-sm">
-          <p>No React components to preview</p>
-        </div>
-      );
-    }
-  }
+  // PRE-WARM MODE: When there are no files yet, mount Sandpack with a minimal
+  // placeholder template so the bundler, iframe, Tailwind CDN, and dependencies
+  // all initialize in the background. When real content arrives, the swap is
+  // instant instead of waiting 20-30s for a cold Sandpack start.
+  const isPrewarm =
+    mode === "react"
+      ? !(props as SandpackPreviewPropsReact).files ||
+        Object.keys((props as SandpackPreviewPropsReact).files || {}).length === 0
+      : !(props as SandpackPreviewPropsHTML).html ||
+        !(props as SandpackPreviewPropsHTML).html.trim();
+
+  const PREWARM_APP = `export default function App() {
+  return (
+    <div style={{
+      minHeight: "100vh",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      background: "#131520",
+      color: "rgba(255,255,255,0.4)",
+      fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+      fontSize: "14px",
+    }}>
+      <div style={{ textAlign: "center" }}>
+        <div style={{
+          width: "40px",
+          height: "40px",
+          margin: "0 auto 16px",
+          border: "3px solid rgba(109,93,252,0.2)",
+          borderTopColor: "#6d5dfc",
+          borderRadius: "50%",
+          animation: "sp-spin 0.8s linear infinite",
+        }} />
+        <div>Preview ready — describe your site to begin</div>
+        <style>{"@keyframes sp-spin { to { transform: rotate(360deg); } }"}</style>
+      </div>
+    </div>
+  );
+}`;
+
+  const PREWARM_HTML = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    body { margin: 0; background: #131520; color: rgba(255,255,255,0.4); font-family: -apple-system, BlinkMacSystemFont, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-size: 14px; text-align: center; }
+    .spinner { width: 40px; height: 40px; margin: 0 auto 16px; border: 3px solid rgba(109,93,252,0.2); border-top-color: #6d5dfc; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body><div><div class="spinner"></div><div>Preview ready — describe your site to begin</div></div></body>
+</html>`;
 
   if (mode === "react") {
+    const effectiveFiles = isPrewarm ? { "/App.tsx": PREWARM_APP } : reactFiles;
     return (
       <div className="absolute inset-0 flex flex-col overflow-hidden">
         <style dangerouslySetInnerHTML={{ __html: SANDPACK_FULL_HEIGHT_CSS }} />
         <SandpackProvider
           template="react-ts"
-          files={reactFiles}
+          files={effectiveFiles}
           theme={zoobiconTheme}
           customSetup={{
             dependencies: {
@@ -261,12 +294,13 @@ export default function SandpackPreview(props: SandpackPreviewProps) {
   }
 
   // HTML mode
+  const effectiveHtmlFiles = isPrewarm ? { "/index.html": PREWARM_HTML } : htmlFiles;
   return (
     <div className="absolute inset-0 flex flex-col overflow-hidden">
       <style dangerouslySetInnerHTML={{ __html: SANDPACK_FULL_HEIGHT_CSS }} />
       <SandpackProvider
         template="static"
-        files={htmlFiles}
+        files={effectiveHtmlFiles}
         theme={zoobiconTheme}
         options={{
           autorun: true,

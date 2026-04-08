@@ -39,10 +39,11 @@ interface GeneratedName {
   checkingDomains: boolean;
 }
 
+// NOTE: must match TLD_PRICING in /api/domains/search/route.ts — source of truth is backend.
 const TLD_PRICES: Record<string, number> = {
-  com: 12.99, ai: 79.99, io: 39.99, sh: 24.99, co: 29.99,
-  dev: 14.99, app: 14.99, net: 13.99, org: 11.99, tech: 6.99,
-  xyz: 2.99, me: 8.99, us: 8.99,
+  com: 12.99, ai: 69.99, io: 39.99, sh: 24.99, co: 29.99,
+  dev: 14.99, app: 14.99, net: 13.99, org: 12.99, tech: 6.99,
+  xyz: 2.99, me: 19.99, us: 9.99,
 };
 
 const DEFAULT_TLDS = ["com", "ai", "io", "sh", "co"];
@@ -50,7 +51,7 @@ const DEFAULT_TLDS = ["com", "ai", "io", "sh", "co"];
 /* ── Popular TLD showcase cards ── */
 const FEATURED_TLDS = [
   { tld: "com", price: 12.99, desc: "The gold standard", color: "from-blue-500 to-blue-600", popular: true },
-  { tld: "ai", price: 79.99, desc: "AI & tech brands", color: "from-purple-500 to-violet-600", popular: true },
+  { tld: "ai", price: 69.99, desc: "AI & tech brands", color: "from-purple-500 to-violet-600", popular: true },
   { tld: "io", price: 39.99, desc: "Startups & SaaS", color: "from-emerald-500 to-teal-600", popular: true },
   { tld: "sh", price: 24.99, desc: "Dev tools & hosting", color: "from-amber-500 to-orange-600", popular: false },
   { tld: "dev", price: 14.99, desc: "Developer projects", color: "from-cyan-500 to-blue-600", popular: false },
@@ -192,6 +193,112 @@ export default function DomainsPage() {
     });
   };
 
+  // ─── AI Name Generator ───────────────────────────────────────────────────
+  // 1. Ask Claude for ~24 brandable names
+  // 2. Check availability for every name × every selected TLD in parallel
+  // 3. Stream results into state as each name resolves
+  // 4. Names with ZERO available TLDs are auto-filtered out at render time
+  const handleGenerate = useCallback(async () => {
+    const desc = genDescription.trim();
+    if (desc.length < 3 || selectedTlds.size === 0 || generating) return;
+
+    setGenerating(true);
+    setGeneratedNames([]);
+    setResults([]);
+
+    // scroll to results
+    setTimeout(() => genResultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
+
+    const tlds = Array.from(selectedTlds);
+
+    // Step 1 — get names from Claude
+    let names: Array<{ name: string; tagline: string }> = [];
+    try {
+      const res = await fetch("/api/tools/business-names", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: desc, style: genStyle, count: 24 }),
+      });
+      const data = await res.json();
+      names = Array.isArray(data?.names) ? data.names : [];
+    } catch {
+      // network error — bail
+    }
+
+    if (names.length === 0) {
+      setGenerating(false);
+      return;
+    }
+
+    // Sanitize names → dns-safe strings
+    const cleaned = names
+      .map((n) => ({
+        name: n.name,
+        tagline: n.tagline || "",
+        slug: n.name.toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 63),
+      }))
+      .filter((n) => n.slug.length >= 2);
+
+    // Seed the UI immediately with everything in "checking" state
+    setGeneratedNames(
+      cleaned.map((n) => ({
+        name: n.name,
+        tagline: n.tagline,
+        domains: tlds.map((tld) => ({
+          domain: `${n.slug}.${tld}`,
+          tld,
+          available: null,
+          price: TLD_PRICES[tld] || 9.99,
+          checking: true,
+        })),
+      })),
+    );
+
+    // Step 2 — check every name in parallel, stream updates
+    await Promise.all(
+      cleaned.map(async (n) => {
+        try {
+          const r = await fetch(
+            `/api/domains/search?q=${encodeURIComponent(n.slug)}&tlds=${encodeURIComponent(tlds.join(","))}`,
+          );
+          if (!r.ok) throw new Error("search failed");
+          const data = await r.json();
+          const apiResults: Array<{ domain: string; available: boolean | null; price: number }> = data.results || [];
+
+          setGeneratedNames((prev) =>
+            prev.map((gn) =>
+              gn.name !== n.name
+                ? gn
+                : {
+                    ...gn,
+                    domains: tlds.map((tld) => {
+                      const match = apiResults.find((x) => x.domain === `${n.slug}.${tld}`);
+                      return {
+                        domain: `${n.slug}.${tld}`,
+                        tld,
+                        available: match ? match.available : null,
+                        price: match?.price ?? TLD_PRICES[tld] ?? 9.99,
+                        checking: false,
+                      };
+                    }),
+                  },
+            ),
+          );
+        } catch {
+          setGeneratedNames((prev) =>
+            prev.map((gn) =>
+              gn.name !== n.name
+                ? gn
+                : { ...gn, domains: gn.domains.map((d) => ({ ...d, checking: false, available: null })) },
+            ),
+          );
+        }
+      }),
+    );
+
+    setGenerating(false);
+  }, [genDescription, genStyle, selectedTlds, generating]);
+
   const handleSearch = async () => {
     const cleanName = name.trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
     if (!cleanName || cleanName.length < 2) return;
@@ -216,6 +323,7 @@ export default function DomainsPage() {
       setSearchHistory(prev => [cleanName, ...prev].slice(0, 10));
     }
 
+    setSearchError(null);
     try {
       const res = await fetch(`/api/domains/search?q=${encodeURIComponent(cleanName)}&tlds=${encodeURIComponent(tlds.join(","))}`);
       if (res.ok) {
@@ -233,9 +341,12 @@ export default function DomainsPage() {
           };
         }));
       } else {
+        const errBody = await res.json().catch(() => ({}));
+        setSearchError(errBody.error || `Search failed (HTTP ${res.status}). Please try again.`);
         setResults(initial.map(r => ({ ...r, checking: false })));
       }
-    } catch {
+    } catch (err) {
+      setSearchError(err instanceof Error ? err.message : "Network error. Check your connection and try again.");
       setResults(initial.map(r => ({ ...r, checking: false })));
     }
 
@@ -252,10 +363,118 @@ export default function DomainsPage() {
     setCart(prev => prev.filter(c => c.domain !== domain));
   };
 
-  const handleRegister = async () => {
+  const handleGenerate = async () => {
+    const desc = genDescription.trim();
+    if (desc.length < 3) return;
+    if (selectedTlds.size === 0) return;
+
+    setGenerating(true);
+    setCheckoutError(null);
+    setGeneratedNames([]);
+
+    try {
+      const res = await fetch("/api/domains/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: desc, style: genStyle, count: 20 }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Name generation failed" }));
+        setCheckoutError(err.error || "Name generation failed. Please try again.");
+        setGenerating(false);
+        return;
+      }
+
+      const data: { names: Array<{ name: string; slug: string; tagline: string }> } = await res.json();
+      const tlds = Array.from(selectedTlds);
+
+      // Seed results with "checking" state so the UI can render immediately
+      const seeded = data.names.map((n) => ({
+        name: n.name,
+        tagline: n.tagline,
+        domains: tlds.map((tld) => ({
+          domain: `${n.slug}.${tld}`,
+          tld,
+          available: null as boolean | null,
+          price: TLD_PRICES[tld] || 9.99,
+          checking: true,
+        })),
+      }));
+      setGeneratedNames(seeded);
+      setGenerating(false);
+
+      // Scroll to results
+      setTimeout(
+        () => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
+        100
+      );
+
+      // Fire availability checks in parallel (per generated name)
+      await Promise.all(
+        data.names.map(async (n, idx) => {
+          try {
+            const r = await fetch(
+              `/api/domains/search?q=${encodeURIComponent(n.slug)}&tlds=${encodeURIComponent(tlds.join(","))}`
+            );
+            if (!r.ok) throw new Error("search failed");
+            const payload = await r.json();
+            const apiResults: Array<{ domain: string; available: boolean | null; price?: number }> =
+              payload.results || [];
+
+            setGeneratedNames((prev) => {
+              const next = [...prev];
+              if (!next[idx]) return prev;
+              next[idx] = {
+                ...next[idx],
+                domains: tlds.map((tld) => {
+                  const match = apiResults.find((x) => x.domain === `${n.slug}.${tld}`);
+                  return {
+                    domain: `${n.slug}.${tld}`,
+                    tld,
+                    available: match ? match.available : null,
+                    price: match?.price || TLD_PRICES[tld] || 9.99,
+                    checking: false,
+                  };
+                }),
+              };
+              return next;
+            });
+          } catch {
+            setGeneratedNames((prev) => {
+              const next = [...prev];
+              if (!next[idx]) return prev;
+              next[idx] = {
+                ...next[idx],
+                domains: next[idx].domains.map((d) => ({ ...d, checking: false })),
+              };
+              return next;
+            });
+          }
+        })
+      );
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Something went wrong generating names.";
+      setCheckoutError(message);
+      setGenerating(false);
+    }
+  };
+
+  const handleRegister = () => {
     if (cart.length === 0) return;
-    const email = userEmail || window.prompt("Enter your email to register domains:");
-    if (!email) return;
+    // Pre-fill email from logged-in user
+    if (userEmail && !contactInfo.email) {
+      setContactInfo(prev => ({ ...prev, email: userEmail }));
+    }
+    setShowCheckoutForm(true);
+  };
+
+  const handleSubmitRegistration = async () => {
+    // Validate required fields
+    if (!contactInfo.firstName || !contactInfo.lastName || !contactInfo.email) {
+      alert("Please fill in at least your name and email.");
+      return;
+    }
 
     setRegistering(true);
     try {
@@ -263,8 +482,14 @@ export default function DomainsPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          domains: cart.map(c => ({ domain: c.domain, tld: c.tld, years: 1 })),
-          registrant: { email },
+          domains: cart.map(c => {
+            const parts = c.domain.split(".");
+            const tld = parts.pop() || c.tld;
+            const name = parts.join(".");
+            return { name, tld };
+          }),
+          registrant: contactInfo,
+          years: 1,
         }),
       });
       const data = await res.json();
@@ -273,6 +498,7 @@ export default function DomainsPage() {
       } else if (data.success) {
         alert("Domains registered successfully! View them in your dashboard.");
         setCart([]);
+        setShowCheckoutForm(false);
         window.location.href = "/my-domains";
       } else {
         alert(data.error || "Registration failed. Please try again.");
@@ -291,6 +517,119 @@ export default function DomainsPage() {
 
   return (
     <div className="min-h-screen bg-[#0b0b16] text-white">
+
+      {/* ═══════════════════════════════════════════ */}
+      {/* CHECKOUT FORM MODAL                        */}
+      {/* ═══════════════════════════════════════════ */}
+      {showCheckoutForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="bg-[#131520] border border-slate-700/50 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 sm:p-8 shadow-2xl">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-white">Domain Registration</h2>
+              <button onClick={() => setShowCheckoutForm(false)} className="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+            </div>
+
+            {/* Cart summary */}
+            <div className="mb-6 p-4 rounded-xl bg-slate-800/50 border border-slate-700/30">
+              <p className="text-sm text-slate-400 mb-2">{cart.length} domain{cart.length > 1 ? "s" : ""}</p>
+              {cart.map(c => (
+                <div key={c.domain} className="flex justify-between text-sm py-1">
+                  <span className="text-white font-medium">{c.domain}</span>
+                  <span className="text-emerald-400">${c.price.toFixed(2)}/yr</span>
+                </div>
+              ))}
+              <div className="flex justify-between mt-2 pt-2 border-t border-slate-700/30 font-bold">
+                <span>Total</span>
+                <span className="text-emerald-400">${cartTotal.toFixed(2)}/yr</span>
+              </div>
+            </div>
+
+            {/* Contact info form */}
+            <div className="space-y-4">
+              <p className="text-sm text-slate-400">Required for domain registration (ICANN policy).</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">First Name *</label>
+                  <input type="text" value={contactInfo.firstName} onChange={e => setContactInfo(p => ({ ...p, firstName: e.target.value }))}
+                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Craig" />
+                </div>
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">Last Name *</label>
+                  <input type="text" value={contactInfo.lastName} onChange={e => setContactInfo(p => ({ ...p, lastName: e.target.value }))}
+                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Smith" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Email *</label>
+                <input type="email" value={contactInfo.email} onChange={e => setContactInfo(p => ({ ...p, email: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="you@example.com" />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Phone *</label>
+                <input type="tel" value={contactInfo.phone} onChange={e => setContactInfo(p => ({ ...p, phone: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="+64.211234567" />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Street Address *</label>
+                <input type="text" value={contactInfo.address} onChange={e => setContactInfo(p => ({ ...p, address: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="123 Main Street" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">City *</label>
+                  <input type="text" value={contactInfo.city} onChange={e => setContactInfo(p => ({ ...p, city: e.target.value }))}
+                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Auckland" />
+                </div>
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">State/Region</label>
+                  <input type="text" value={contactInfo.state} onChange={e => setContactInfo(p => ({ ...p, state: e.target.value }))}
+                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Auckland" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">Postal Code *</label>
+                  <input type="text" value={contactInfo.zip} onChange={e => setContactInfo(p => ({ ...p, zip: e.target.value }))}
+                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="1010" />
+                </div>
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">Country *</label>
+                  <select value={contactInfo.country} onChange={e => setContactInfo(p => ({ ...p, country: e.target.value }))}
+                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    <option value="NZ">New Zealand</option>
+                    <option value="AU">Australia</option>
+                    <option value="US">United States</option>
+                    <option value="GB">United Kingdom</option>
+                    <option value="CA">Canada</option>
+                    <option value="DE">Germany</option>
+                    <option value="FR">France</option>
+                    <option value="JP">Japan</option>
+                    <option value="SG">Singapore</option>
+                    <option value="IN">India</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2 text-xs text-slate-500 mt-2">
+                <svg className="w-4 h-4 flex-shrink-0 mt-0.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                <span>WHOIS privacy protection is included free. Your contact details are kept private.</span>
+              </div>
+
+              <button
+                onClick={handleSubmitRegistration}
+                disabled={registering || !contactInfo.firstName || !contactInfo.lastName || !contactInfo.email}
+                className="w-full py-3.5 mt-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-bold text-base transition-colors flex items-center justify-center gap-2"
+              >
+                {registering ? (
+                  <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</>
+                ) : (
+                  <>Pay ${cartTotal.toFixed(2)} &amp; Register</>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ═══════════════════════════════════════════ */}
       {/* HERO — Big, bright, impossible to miss     */}
@@ -516,6 +855,13 @@ export default function DomainsPage() {
       {/* RESULTS SECTION                             */}
       {/* ═══════════════════════════════════════════ */}
       <div ref={resultsRef} />
+      {(searchError || checkoutError) && (
+        <div className="max-w-4xl mx-auto px-6 -mt-4 mb-6">
+          <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+            {searchError || checkoutError}
+          </div>
+        </div>
+      )}
       {results.length > 0 && (
         <section className="pb-16 px-4 sm:px-6">
           <div className="max-w-3xl mx-auto">
@@ -659,11 +1005,11 @@ export default function DomainsPage() {
                   ))}
                 </div>
                 <button
-                  onClick={handleCheckout}
-                  disabled={checkingOut}
+                  onClick={handleRegister}
+                  disabled={registering}
                   className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-lg transition-colors shadow-lg shadow-indigo-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {checkingOut ? <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</> : "Proceed to Registration"}
+                  {registering ? <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</> : "Proceed to Registration"}
                 </button>
                 {checkoutError && <p className="text-center text-sm text-red-400 mt-2">{checkoutError}</p>}
                 <p className="text-center text-xs text-slate-500 mt-3">Includes free WHOIS privacy, SSL, and DNS management</p>
@@ -849,11 +1195,11 @@ export default function DomainsPage() {
                   ))}
                 </div>
                 <button
-                  onClick={handleCheckout}
-                  disabled={checkingOut}
+                  onClick={handleRegister}
+                  disabled={registering}
                   className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-lg transition-colors shadow-lg shadow-indigo-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {checkingOut ? <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</> : "Proceed to Registration"}
+                  {registering ? <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</> : "Proceed to Registration"}
                 </button>
                 {checkoutError && <p className="text-center text-sm text-red-400 mt-2">{checkoutError}</p>}
               </div>
@@ -1032,11 +1378,11 @@ export default function DomainsPage() {
                 ${cartTotal.toFixed(2)}<span className="text-xs font-normal text-slate-400">/yr</span>
               </span>
               <button
-                onClick={handleCheckout}
-                disabled={checkingOut}
+                onClick={handleRegister}
+                disabled={registering}
                 className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-base transition-colors shadow-lg shadow-indigo-500/25 disabled:opacity-50 flex items-center gap-2"
               >
-                {checkingOut ? (
+                {registering ? (
                   <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
                 ) : (
                   <><Lock className="w-4 h-4" /> Register Now</>

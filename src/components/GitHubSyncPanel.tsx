@@ -4,12 +4,15 @@ import { useState, useEffect, useCallback } from "react";
 import {
   GitBranchPlus,
   GitBranch,
+  GitCommit,
   Loader2,
   Check,
+  CheckCircle2,
   ExternalLink,
   Lock,
   Unlock,
   RefreshCw,
+  RotateCcw,
   AlertCircle,
   LogOut,
   GitCommitHorizontal,
@@ -44,6 +47,7 @@ interface RepoStatus {
 }
 
 type SyncState = "idle" | "connecting" | "pushing" | "synced" | "error";
+type ConnState = "checking" | "connected" | "disconnected" | "error";
 
 interface GitHubSyncPanelProps {
   /** All files in the current project (path -> content) */
@@ -61,7 +65,8 @@ export default function GitHubSyncPanel({
   suggestedName = "",
 }: GitHubSyncPanelProps) {
   const [ghUser, setGhUser] = useState<GitHubUser | null>(null);
-  const [isCheckingConnection, setIsCheckingConnection] = useState(true);
+  const [connState, setConnState] = useState<ConnState>("checking");
+  const [connError, setConnError] = useState<string>("");
   const [repoName, setRepoName] = useState(sanitizeRepoName(suggestedName));
   const [isPrivate, setIsPrivate] = useState(true);
   const [syncState, setSyncState] = useState<SyncState>("idle");
@@ -69,6 +74,7 @@ export default function GitHubSyncPanel({
   const [result, setResult] = useState<SyncResult | null>(null);
   const [repoStatus, setRepoStatus] = useState<RepoStatus | null>(null);
   const [commitMessage, setCommitMessage] = useState("");
+  const [pushProgress, setPushProgress] = useState<{ current: number; total: number } | null>(null);
 
   // Track the last synced repo so we can show "Update" instead of "Push"
   const [syncedRepo, setSyncedRepo] = useState<string | null>(() => {
@@ -81,19 +87,27 @@ export default function GitHubSyncPanel({
   // -----------------------------------------------------------------------
 
   const checkConnection = useCallback(async () => {
-    setIsCheckingConnection(true);
+    setConnState("checking");
+    setConnError("");
     try {
       const res = await fetch("/api/github/connect");
+      if (!res.ok) {
+        throw new Error(`Connection check failed (${res.status})`);
+      }
       const data = await res.json();
       if (data.connected && data.user) {
         setGhUser(data.user);
+        setConnState("connected");
       } else {
         setGhUser(null);
+        setConnState("disconnected");
       }
-    } catch {
+    } catch (err) {
       setGhUser(null);
-    } finally {
-      setIsCheckingConnection(false);
+      setConnState("error");
+      setConnError(
+        err instanceof Error ? err.message : "Unable to reach GitHub"
+      );
     }
   }, []);
 
@@ -124,6 +138,7 @@ export default function GitHubSyncPanel({
       const res = await fetch(
         `/api/github/sync?repoName=${encodeURIComponent(name)}`
       );
+      if (!res.ok) return;
       const data = await res.json();
       if (data.exists) {
         setRepoStatus(data);
@@ -136,7 +151,8 @@ export default function GitHubSyncPanel({
   const handlePush = async () => {
     if (!repoName.trim() || syncState === "pushing") return;
 
-    const fileCount = Object.keys(files).length;
+    const fileEntries = Object.entries(files);
+    const fileCount = fileEntries.length;
     if (fileCount === 0) {
       setError("No files to push. Generate a site first.");
       setSyncState("error");
@@ -146,6 +162,19 @@ export default function GitHubSyncPanel({
     setSyncState("pushing");
     setError("");
     setResult(null);
+    setPushProgress({ current: 0, total: fileCount });
+
+    // Simulated incremental progress (real upload is one POST; UX needs the indicator)
+    let progressTimer: ReturnType<typeof setInterval> | null = null;
+    let simulated = 0;
+    progressTimer = setInterval(() => {
+      simulated = Math.min(simulated + 1, fileCount - 1);
+      setPushProgress({ current: simulated, total: fileCount });
+      if (simulated >= fileCount - 1 && progressTimer) {
+        clearInterval(progressTimer);
+        progressTimer = null;
+      }
+    }, 180);
 
     try {
       const isUpdate = syncedRepo === repoName.trim();
@@ -175,8 +204,11 @@ export default function GitHubSyncPanel({
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Push failed");
+        throw new Error(data.error || `Push failed (${res.status})`);
       }
+
+      if (progressTimer) clearInterval(progressTimer);
+      setPushProgress({ current: fileCount, total: fileCount });
 
       setResult(data);
       setSyncState("synced");
@@ -189,6 +221,8 @@ export default function GitHubSyncPanel({
       // Refresh repo status
       checkRepoStatus(repoName.trim());
     } catch (err) {
+      if (progressTimer) clearInterval(progressTimer);
+      setPushProgress(null);
       setError(
         err instanceof Error ? err.message : "Failed to push to GitHub"
       );
@@ -203,8 +237,12 @@ export default function GitHubSyncPanel({
       setRepoStatus(null);
       setSyncState("idle");
       setResult(null);
-    } catch {
-      // Best effort
+      setConnState("disconnected");
+    } catch (err) {
+      setConnError(
+        err instanceof Error ? err.message : "Failed to disconnect"
+      );
+      setConnState("error");
     }
   };
 
@@ -220,20 +258,101 @@ export default function GitHubSyncPanel({
 
   const isUpdate = syncedRepo === repoName.trim() && repoStatus?.exists;
   const fileCount = Object.keys(files).length;
+  const isPushing = syncState === "pushing";
 
-  if (isCheckingConnection) {
+  // Connection status pill (shown above all states)
+  const ConnectionPill = () => {
+    if (connState === "checking") {
+      return (
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] text-white/50">
+          <Loader2 className="w-3 h-3 animate-spin" />
+          Checking GitHub...
+        </div>
+      );
+    }
+    if (connState === "connected" && ghUser) {
+      return (
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[10px] text-emerald-300">
+          <CheckCircle2 className="w-3 h-3" />
+          Connected as @{ghUser.login}
+        </div>
+      );
+    }
+    if (connState === "error") {
+      return (
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-[10px] text-red-300">
+          <AlertCircle className="w-3 h-3" />
+          {connError || "Connection error"}
+          <button
+            onClick={checkConnection}
+            className="ml-1 inline-flex items-center gap-0.5 hover:text-red-200"
+            title="Retry connection check"
+          >
+            <RotateCcw className="w-2.5 h-2.5" />
+            Retry
+          </button>
+        </div>
+      );
+    }
     return (
-      <div className="flex flex-col items-center justify-center py-12 gap-3">
-        <Loader2 className="w-5 h-5 text-white/40 animate-spin" />
-        <p className="text-xs text-white/40">Checking GitHub connection...</p>
+      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-[10px] text-amber-300">
+        <AlertCircle className="w-3 h-3" />
+        Not connected
+      </div>
+    );
+  };
+
+  // Loading skeleton during initial OAuth check
+  if (connState === "checking") {
+    return (
+      <div className="flex flex-col gap-4 p-4">
+        <ConnectionPill />
+        <div className="space-y-3 animate-pulse">
+          <div className="h-10 rounded-lg bg-white/5" />
+          <div className="h-20 rounded-lg bg-white/5" />
+          <div className="h-10 rounded-lg bg-white/5" />
+          <div className="h-12 rounded-lg bg-white/5" />
+        </div>
+        <p className="text-[10px] text-white/30 text-center">
+          Verifying your GitHub session...
+        </p>
+      </div>
+    );
+  }
+
+  // Connection error state
+  if (connState === "error") {
+    return (
+      <div className="flex flex-col gap-4 p-4">
+        <ConnectionPill />
+        <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-4 flex items-start gap-2">
+          <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-xs text-red-300 font-medium mb-1">
+              Couldn&apos;t reach GitHub
+            </p>
+            <p className="text-[11px] text-red-300/70 leading-relaxed">
+              {connError ||
+                "We couldn&apos;t verify your GitHub connection. Check your network and try again."}
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={checkConnection}
+          className="w-full flex items-center justify-center gap-2 bg-white/10 hover:bg-white/15 text-white font-medium rounded-lg px-4 py-3 text-sm transition-colors"
+        >
+          <RotateCcw className="w-4 h-4" />
+          Retry
+        </button>
       </div>
     );
   }
 
   // Not connected — show connect button
-  if (!ghUser) {
+  if (connState === "disconnected" || !ghUser) {
     return (
       <div className="flex flex-col gap-5 p-4">
+        <ConnectionPill />
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-white/5">
             <GitBranchPlus className="w-5 h-5 text-white" />
@@ -282,8 +401,14 @@ export default function GitHubSyncPanel({
   }
 
   // Connected — show push UI
+  const progressPct = pushProgress
+    ? Math.round((pushProgress.current / Math.max(pushProgress.total, 1)) * 100)
+    : 0;
+
   return (
     <div className="flex flex-col gap-4 p-4">
+      <ConnectionPill />
+
       {/* Connected user header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -299,8 +424,9 @@ export default function GitHubSyncPanel({
         </div>
         <button
           onClick={handleDisconnect}
+          disabled={isPushing}
           title="Disconnect GitHub"
-          className="p-1.5 rounded text-white/30 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+          className="p-1.5 rounded text-white/30 hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
         >
           <LogOut className="w-3.5 h-3.5" />
         </button>
@@ -349,11 +475,12 @@ export default function GitHubSyncPanel({
               id="gh-repo-name"
               type="text"
               value={repoName}
+              disabled={isPushing}
               onChange={(e) =>
                 setRepoName(sanitizeRepoName(e.target.value))
               }
               placeholder="my-project"
-              className="w-full bg-white/5 border border-white/10 rounded-lg pl-[calc(0.75rem+var(--owner-width,4ch))] pr-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-white/25 transition-colors"
+              className="w-full bg-white/5 border border-white/10 rounded-lg pl-[calc(0.75rem+var(--owner-width,4ch))] pr-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-white/25 transition-colors disabled:opacity-50"
               style={
                 {
                   "--owner-width": `${ghUser.login.length + 1}ch`,
@@ -363,8 +490,9 @@ export default function GitHubSyncPanel({
           </div>
           <button
             onClick={() => setIsPrivate(!isPrivate)}
+            disabled={isPushing}
             title={isPrivate ? "Private repository" : "Public repository"}
-            className={`p-2.5 rounded-lg border transition-colors ${
+            className={`p-2.5 rounded-lg border transition-colors disabled:opacity-50 ${
               isPrivate
                 ? "border-white/10 bg-white/5 text-white/60 hover:text-white/80"
                 : "border-amber-500/30 bg-amber-500/10 text-amber-400"
@@ -396,24 +524,57 @@ export default function GitHubSyncPanel({
             id="gh-commit-msg"
             type="text"
             value={commitMessage}
+            disabled={isPushing}
             onChange={(e) => setCommitMessage(e.target.value)}
             placeholder="Update from Zoobicon builder"
-            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-white/25 transition-colors"
+            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-white/25 transition-colors disabled:opacity-50"
           />
         </div>
       )}
 
       {/* File count indicator */}
       <div className="flex items-center gap-2 text-xs text-white/40">
+        <GitCommit className="w-3 h-3" />
         <span className="font-mono text-white/60">{fileCount}</span>
         file{fileCount !== 1 ? "s" : ""} ready to push
       </div>
 
+      {/* Push progress bar */}
+      {isPushing && pushProgress && (
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between text-[11px] text-white/60">
+            <span className="flex items-center gap-1.5">
+              <Loader2 className="w-3 h-3 animate-spin" />
+              Pushing {pushProgress.current}/{pushProgress.total} files...
+            </span>
+            <span className="font-mono text-white/40">{progressPct}%</span>
+          </div>
+          <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-emerald-400 to-emerald-300 transition-all duration-200 ease-out"
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Error message */}
       {syncState === "error" && error && (
-        <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3 flex items-start gap-2">
-          <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-          <p className="text-xs text-red-300">{error}</p>
+        <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3 space-y-2">
+          <div className="flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-xs text-red-300 font-medium">Push failed</p>
+              <p className="text-[11px] text-red-300/70 mt-0.5">{error}</p>
+            </div>
+          </div>
+          <button
+            onClick={handlePush}
+            className="w-full flex items-center justify-center gap-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-300 text-[11px] font-medium rounded px-3 py-1.5 transition-colors"
+          >
+            <RotateCcw className="w-3 h-3" />
+            Retry push
+          </button>
         </div>
       )}
 
@@ -421,7 +582,7 @@ export default function GitHubSyncPanel({
       {syncState === "synced" && result && (
         <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 space-y-2">
           <div className="flex items-center gap-2 text-xs text-emerald-400">
-            <Check className="w-4 h-4" />
+            <CheckCircle2 className="w-4 h-4" />
             <span className="font-medium">
               {result.isNewRepo ? "Repository created" : "Changes pushed"} — {result.filesCommitted} files
             </span>
@@ -430,12 +591,12 @@ export default function GitHubSyncPanel({
             href={result.repoUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-xs text-emerald-400/80 hover:text-emerald-300 transition-colors"
+            className="w-full flex items-center justify-center gap-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 text-[11px] font-medium rounded px-3 py-2 transition-colors"
           >
             <ExternalLink className="w-3 h-3" />
-            {result.repoUrl}
+            Open on GitHub
           </a>
-          <p className="text-[10px] text-white/30 font-mono truncate">
+          <p className="text-[10px] text-white/30 font-mono truncate text-center">
             {result.commitSha.slice(0, 7)}
           </p>
         </div>
@@ -444,18 +605,16 @@ export default function GitHubSyncPanel({
       {/* Push / Update button */}
       <button
         onClick={handlePush}
-        disabled={
-          syncState === "pushing" || !repoName.trim() || fileCount === 0
-        }
+        disabled={isPushing || !repoName.trim() || fileCount === 0}
         className={`w-full flex items-center justify-center gap-2 font-medium rounded-lg px-4 py-3 text-sm transition-all ${
-          syncState === "pushing"
+          isPushing
             ? "bg-white/10 text-white/40 cursor-wait"
             : fileCount === 0
             ? "bg-white/5 text-white/20 cursor-not-allowed"
             : "bg-white text-black hover:bg-white/90"
         }`}
       >
-        {syncState === "pushing" ? (
+        {isPushing ? (
           <>
             <Loader2 className="w-4 h-4 animate-spin" />
             {isUpdate ? "Syncing..." : "Creating repository..."}

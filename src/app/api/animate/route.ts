@@ -139,8 +139,8 @@ Remember: Output ONLY the complete modified HTML with all animations injected. N
       ],
     });
 
-    const animatedCode =
-      message.content[0].type === "text" ? message.content[0].text : "";
+    const textBlock = message.content.find((b: { type: string }) => b.type === "text") as { type: "text"; text: string } | undefined;
+    const animatedCode = textBlock?.text || "";
 
     return NextResponse.json({
       animatedCode,
