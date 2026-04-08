@@ -212,16 +212,16 @@ export default function DevelopersPage() {
       {/* Pricing */}
       <section className="py-20 border-t border-white/[0.08]">
         <div className="max-w-5xl mx-auto px-6 lg:px-8">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
-            <motion.div variants={fadeInUp} className="text-center mb-12">
+          <div>
+            <div className="text-center mb-12">
               <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
                 API <span className="gradient-text">Pricing</span>
               </h2>
               <p className="text-lg text-white/60">Start free. Pay only for what you use.</p>
-            </motion.div>
+            </div>
 
             <div className="grid md:grid-cols-3 gap-4">
-              <motion.div variants={fadeInUp} className="gradient-border p-6 rounded-xl">
+              <div className="gradient-border p-6 rounded-xl">
                 <div className="text-sm font-semibold text-white/65 mb-2">Free</div>
                 <div className="text-3xl font-black mb-1">$0</div>
                 <div className="text-xs text-white/60 mb-4">10 requests/min</div>
@@ -234,9 +234,9 @@ export default function DevelopersPage() {
                 <Link href="/auth/signup" className="block text-center py-2.5 rounded-xl border border-white/[0.12] text-sm font-semibold text-white/60 hover:border-white/20 transition-all">
                   Get Started
                 </Link>
-              </motion.div>
+              </div>
 
-              <motion.div variants={fadeInUp} className="relative p-6 rounded-xl border border-accent-cyan/30 bg-accent-cyan/[0.02] shadow-glow-cyan">
+              <div className="relative p-6 rounded-xl border border-accent-cyan/30 bg-accent-cyan/[0.02] shadow-glow-cyan">
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-accent-cyan to-emerald-500 text-xs font-bold text-white">
                   Popular
                 </div>
@@ -253,9 +253,9 @@ export default function DevelopersPage() {
                 <button onClick={() => {}} className="w-full py-2.5 rounded-xl bg-gradient-to-r from-accent-cyan to-emerald-500 text-sm font-bold text-white">
                   Start Pro
                 </button>
-              </motion.div>
+              </div>
 
-              <motion.div variants={fadeInUp} className="gradient-border p-6 rounded-xl">
+              <div className="gradient-border p-6 rounded-xl">
                 <div className="text-sm font-semibold text-white/65 mb-2">Enterprise</div>
                 <div className="text-3xl font-black mb-1">Custom</div>
                 <div className="text-xs text-white/60 mb-4">600 requests/min</div>
@@ -269,7 +269,7 @@ export default function DevelopersPage() {
                 <a href="mailto:sales@zoobicon.com?subject=Enterprise API Inquiry" className="block w-full py-2.5 rounded-xl border border-white/[0.12] text-sm font-semibold text-white/60 hover:border-white/20 transition-all text-center">
                   Contact Sales
                 </a>
-              </motion.div>
+              </div>
             </div>
             <div className="relative">
               <div className="absolute -inset-px rounded-2xl bg-gradient-to-br from-emerald-500/30 to-violet-500/30 blur-xl" />

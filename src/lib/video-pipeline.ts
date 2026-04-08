@@ -194,7 +194,27 @@ export async function generateVoice(
     },
   ];
 
-export async function generateSpokespersonVideo(
+  // Try each TTS model in order (Law 9: 4+ model fallback chain)
+  for (const model of ttsModels) {
+    for (const input of model.inputVariants) {
+      try {
+        options?.onProgress?.(`Trying ${model.name}…`);
+        const prediction = await createReplicatePrediction(token, model.modelPath, input);
+        const output = await pollReplicatePrediction(token, prediction.id);
+        const audioUrl = extractReplicateOutput(output);
+        if (audioUrl) {
+          options?.onProgress?.(`Voice generated with ${model.name}`);
+          return { audioUrl, duration: 30 };
+        }
+      } catch (err) {
+        console.warn(`[video-pipeline] TTS ${model.name} failed:`, err instanceof Error ? err.message : err);
+      }
+    }
+  }
+  throw new Error("All TTS models failed. Check REPLICATE_API_TOKEN and model availability.");
+}
+
+export async function generatePremiumSpokespersonVideo(
   req: VideoGenerationRequest,
   onProgress?: (status: PipelineStatus) => void
 ): Promise<SpokespersonVideoResult> {
@@ -216,57 +236,6 @@ export async function generateSpokespersonVideo(
     cost: result.costUsd,
     pipeline: result.modelsUsed,
   };
-}
-
-  for (const model of ttsModels) {
-    options?.onProgress?.(`Trying ${model.name} for voice...`);
-    for (const input of model.inputVariants) {
-      try {
-        console.log(`[video-pipeline] TTS attempt: ${model.name} (${model.modelPath})`);
-
-        const res = await createReplicatePrediction(model.modelPath, input, token);
-
-        if (!res.ok) {
-          const errText = await res.text().catch(() => "");
-          console.warn(`[video-pipeline] ${model.name} failed HTTP ${res.status}: ${errText.slice(0, 200)}`);
-          lastError = `${model.name}: HTTP ${res.status}`;
-          // 404 = model doesn't exist, 422 = bad input — both signal "try next variant"
-          continue;
-        }
-
-        const data = await res.json();
-        console.log(`[video-pipeline] ${model.name} prediction status:`, data.status);
-
-        let audioUrl = extractReplicateOutput(data);
-
-        if (!audioUrl && data.urls?.get) {
-          console.log(`[video-pipeline] ${model.name} async, polling...`);
-          const result = await pollReplicatePrediction(data.urls.get, {
-            onUpdate: (status) => options?.onProgress?.(`${model.name}: ${status}`),
-          });
-          audioUrl = extractReplicateOutput(result);
-        }
-
-        if (audioUrl) {
-          console.log(`[video-pipeline] ${model.name} succeeded → ${audioUrl}`);
-          options?.onProgress?.(`Voice generated with ${model.name}`);
-          return { audioUrl, duration: estimateDuration(text) };
-        }
-
-        console.warn(`[video-pipeline] ${model.name} returned no audio output`);
-        lastError = `${model.name}: no output`;
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : "unknown";
-        console.warn(`[video-pipeline] ${model.name} error: ${msg}`);
-        lastError = `${model.name}: ${msg}`;
-        // Continue to next variant / model
-      }
-    }
-  }
-
-  throw new Error(
-    `All voice models failed. Last error: ${lastError}. Tried: ${ttsModels.map((m) => m.name).join(", ")}`
-  );
 }
 
 /**
@@ -744,6 +713,78 @@ export async function generateMusic(
   throw new Error(`Music generation failed. Last error: ${lastError}`);
 }
 
+// ── Premium Video Orchestrator ──
+// NOTE: This function was reconstructed after merge damage. It contains the
+// multi-wave pipeline assembly logic but requires the fal.ai + ElevenLabs
+// modules to be wired in for the full premium path. Currently falls through
+// to the Replicate-only path for TTS + avatar + lip-sync.
+
+interface PipelineSpec {
+  script: string;
+  voiceId?: string;
+  avatarImageUrl?: string;
+  captions?: boolean;
+  tier?: "standard" | "premium";
+  brollPrompts?: string[];
+  musicDescription?: string;
+}
+
+interface PipelineResult {
+  finalVideoUrl: string;
+  segments: Array<{ kind: string; url: string; durationSec: number; model: string }>;
+  captions: Array<{ start: number; end: number; text: string }>;
+  durationSec: number;
+  costUsd: number;
+  modelsUsed: string[];
+  warnings: string[];
+}
+
+interface AvatarResult {
+  videoUrl: string;
+  durationSec: number;
+  model: string;
+}
+
+const COST = {
+  ttsPerChar: 0.000015,
+  avatarPerSec: 0.16,
+  brollPerSec: 0.05,
+  musicFlat: 0.05,
+  captionsPerMin: 0.006,
+  upscalePerSec: 0.01,
+};
+
+function errMessage(e: unknown): string {
+  return e instanceof Error ? e.message : String(e);
+}
+
+function pipelineError(stage: string, reason: unknown) {
+  return new Error(`[${stage}] ${errMessage(reason)}`);
+}
+
+export async function generatePremiumVideo(spec: PipelineSpec): Promise<PipelineResult> {
+  const modelsUsed: string[] = [];
+  const segments: PipelineResult["segments"] = [];
+  const warnings: string[] = [];
+  let costUsd = 0;
+  let captions: PipelineResult["captions"] = [];
+
+  // Dynamic import of fal + avatar modules (optional — pipeline degrades gracefully without them)
+  let falMod: Record<string, unknown> | null = null;
+  let avatarMod: Record<string, unknown> | null = null;
+  try { falMod = await import("@/lib/fal-client"); } catch { /* fal not available */ }
+  try { avatarMod = await import("@/lib/avatar-talking"); } catch { /* avatar not available */ }
+
+  // Wave 1: TTS + B-roll + Music in parallel
+  const ttsPromise = generateVoice(spec.script, {
+    gender: spec.voiceId?.startsWith("male") ? "male" : "female",
+  }).then(r => ({ ...r, model: "replicate-tts" }));
+
+  const brollPromise = Promise.resolve([] as Array<{ videoUrl: string; durationSec: number; model: string; prompt: string }>);
+  const musicPromise = spec.musicDescription
+    ? generateMusic(spec.musicDescription).then(r => ({ url: r.musicUrl, model: "musicgen" }))
+    : Promise.resolve(null as { url: string; model: string } | null);
+
   const wave1 = await Promise.allSettled([ttsPromise, brollPromise, musicPromise]);
 
   // TTS is critical path
@@ -817,7 +858,6 @@ export async function generateMusic(
     (avatar?.durationSec ?? 0) + brolls.reduce((s, b) => s + b.durationSec, 0);
 
   // ---------- WAVE 3: captions via whisper ----------
-  let captions: CaptionCue[] = [];
   if (spec.captions && falMod) {
     try {
       const out = await (falMod as {
@@ -877,32 +917,14 @@ export async function generateMusic(
     finalVideoUrl,
     segments,
     captions,
-    durationSec: totalDurationSec || tts.durationSec,
+    durationSec: totalDurationSec || tts.duration,
     costUsd: Number(costUsd.toFixed(4)),
     modelsUsed,
     warnings,
   };
 }
 
-// ── Provider Check ──
-
-export function isCustomPipelineAvailable(): boolean {
-  return !!(process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY || process.env.REPLICATE_TOKEN || process.env.REPLICATE_KEY || process.env.ZOOBICON_VIDEO_API_URL);
-}
-
-export function getVideoPipelineInfo(): {
-  available: boolean;
-  provider: "replicate" | "self-hosted" | "none";
-  models: string[];
-} {
-  if (process.env.ZOOBICON_VIDEO_API_URL) {
-    return { available: true, provider: "self-hosted", models: ["fish-speech", "flux", "sadtalker"] };
-  }
-  if (process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY || process.env.REPLICATE_TOKEN || process.env.REPLICATE_KEY) {
-    return { available: true, provider: "replicate", models: ["fish-speech", "flux", "sadtalker"] };
-  }
-  return { available: false, provider: "none", models: [] };
-}
+// Provider check is at line 118 (isCustomPipelineAvailable)
 
 // ── Helpers ──
 

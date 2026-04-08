@@ -94,6 +94,7 @@ import DeployModal from "@/components/DeployModal";
 import { trackEvent } from "@/lib/achievements";
 import { notifyDeploy } from "@/lib/notifications";
 
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Bug,
   GitBranchPlus,
@@ -131,6 +132,11 @@ import {
   Code2,
   AlertTriangle,
   RotateCcw,
+  MessageSquare,
+  Plus,
+  ChevronRight,
+  Zap,
+  Loader2,
 } from "lucide-react";
 
 /** Sanitize raw API error messages for user display */
@@ -1106,6 +1112,20 @@ function BuilderPage() {
             }
           }
 
+          setGeneratedCode(clean);
+          addSnapshot(clean, prompt?.slice(0, 40) || "Build");
+          setStatus("complete");
+        }
+      } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") return;
+        const msg = err instanceof Error ? err.message : "Generation failed";
+        setError(cleanErrorMessage(msg));
+        setStatus("error");
+      }
+    },
+    [],
+  );
+
   // Update timeline based on section state transitions
   const upsertSection = useCallback((section: string, status: "scaffolding" | "customizing" | "done") => {
     if (!section) return;
@@ -1912,7 +1932,7 @@ root.render(React.createElement(App));
   }
 
   return (
-    <div className="flex flex-col h-screen bg-[#050508] relative overflow-hidden">
+    <div className="flex flex-col h-screen bg-zinc-950 relative overflow-hidden">
       {/* Welcome modal for first-time users */}
       {showWelcome && (
         <WelcomeModal onClose={() => { setShowWelcome(false); dismissWelcomeModal(); setTimeout(() => { if (shouldShowTour()) setShowTour(true); }, 500); }} />
@@ -1940,9 +1960,78 @@ root.render(React.createElement(App));
       {/* Interactive particle constellation background */}
       <BuilderBackground isGenerating={status === "generating"} />
 
-      <div className="flex items-center border-b border-white/[0.08]">
-        <div className="flex-1"><TopBar /></div>
-        <div className="px-3">
+      {/* ── Top Bar ── minimal, dark, premium */}
+      <div className="relative z-10 flex items-center h-12 border-b border-white/[0.06] bg-zinc-950/80 backdrop-blur-xl px-3 gap-3">
+        {/* Logo + branding */}
+        <Link href="/" className="flex items-center gap-2 mr-2 group">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/20 group-hover:shadow-violet-500/40 transition-shadow">
+            <Sparkles className="w-3.5 h-3.5 text-white" />
+          </div>
+          <span className="text-sm font-semibold text-white/80 hidden sm:inline">Zoobicon</span>
+        </Link>
+
+        {/* Divider */}
+        <div className="w-px h-5 bg-white/[0.08]" />
+
+        {/* Project name / status */}
+        <div className="flex items-center gap-2 min-w-0">
+          {hasCode && (
+            <span className="text-xs text-white/40 truncate max-w-[200px]">
+              {prompt.trim().slice(0, 40) || "Untitled Project"}
+            </span>
+          )}
+          {status === "generating" && (
+            <div className="flex items-center gap-1.5">
+              <Loader2 className="w-3.5 h-3.5 text-violet-400 animate-spin" />
+              <span className="text-[11px] text-violet-400 font-medium">Building...</span>
+            </div>
+          )}
+          {status === "complete" && hasCode && (
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded-full bg-emerald-400" />
+              <span className="text-[11px] text-emerald-400/70">Ready</span>
+            </div>
+          )}
+          {status === "error" && (
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
+              <span className="text-[11px] text-red-400/70">Error</span>
+            </div>
+          )}
+        </div>
+
+        {/* Undo / Redo — center area */}
+        {hasCode && (
+          <div className="flex items-center gap-0.5 ml-auto mr-auto">
+            <button
+              onClick={handleUndo}
+              disabled={!canUndo}
+              title="Undo (Ctrl+Z)"
+              className="p-1.5 rounded-md text-white/40 hover:text-white/70 hover:bg-white/[0.06] transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+            >
+              <Undo2 size={14} />
+            </button>
+            <button
+              onClick={handleRedo}
+              disabled={!canRedo}
+              title="Redo (Ctrl+Shift+Z)"
+              className="p-1.5 rounded-md text-white/40 hover:text-white/70 hover:bg-white/[0.06] transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+            >
+              <Redo2 size={14} />
+            </button>
+            <button
+              onClick={() => setShowDiffPanel(true)}
+              disabled={snapshots.length < 2}
+              title="Version History"
+              className="p-1.5 rounded-md text-white/40 hover:text-white/70 hover:bg-white/[0.06] transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+            >
+              <History size={14} />
+            </button>
+          </div>
+        )}
+
+        {/* Right side actions */}
+        <div className="flex items-center gap-1.5 ml-auto">
           <CollaborationBar
             room={collab.room}
             participants={collab.participants}
@@ -1953,134 +2042,210 @@ root.render(React.createElement(App));
             onLeaveRoom={collab.leaveRoom}
             userEmail={userEmail}
           />
+          {hasCode && (
+            <>
+              <button
+                onClick={() => {
+                  if (reactFiles && Object.keys(reactFiles).length > 0) {
+                    try { localStorage.setItem("zoobicon_ide_files", JSON.stringify(reactFiles)); } catch { /* quota */ }
+                  }
+                  window.open("/builder/ide", "_blank");
+                }}
+                title="Open full code editor"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all bg-white/[0.05] text-white/50 hover:text-white/70 hover:bg-white/[0.08] border border-white/[0.06]"
+              >
+                <Code2 size={13} />
+                <span className="hidden sm:inline">IDE</span>
+              </button>
+              <button
+                onClick={() => setActiveTool(activeTool === "github-sync" ? null : "github-sync")}
+                title="Push to GitHub"
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all border ${
+                  activeTool === "github-sync"
+                    ? "bg-white/[0.08] text-white/80 border-white/[0.12]"
+                    : "bg-white/[0.05] text-white/50 hover:text-white/70 hover:bg-white/[0.08] border-white/[0.06]"
+                }`}
+              >
+                <GitBranchPlus size={13} />
+                <span className="hidden sm:inline">GitHub</span>
+              </button>
+              <button
+                onClick={handleSaveTemplate}
+                disabled={saveStatus === "saving"}
+                title="Save as reusable template"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all bg-white/[0.05] text-white/50 hover:text-white/70 hover:bg-white/[0.08] border border-white/[0.06]"
+              >
+                {saveStatus === "saved" ? <Check size={13} className="text-emerald-400" /> : <Save size={13} />}
+                <span className="hidden sm:inline">{saveStatus === "saving" ? "Saving..." : saveStatus === "saved" ? "Saved" : "Save"}</span>
+              </button>
+              <button
+                onClick={() => setShowDeployModal(true)}
+                disabled={isDeploying}
+                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${
+                  isDeploying
+                    ? "bg-violet-500/10 text-violet-300/50 cursor-wait border border-violet-500/20"
+                    : "bg-gradient-to-r from-violet-600 to-purple-600 text-white hover:from-violet-500 hover:to-purple-500 shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 border border-violet-400/20"
+                }`}
+              >
+                <Rocket size={13} className={isDeploying ? "animate-pulse" : ""} />
+                {isDeploying ? "Deploying..." : "Deploy"}
+              </button>
+            </>
+          )}
+          {deployStatus === "deployed" && deployUrl && (
+            <a
+              href={deployUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-[11px] text-emerald-400 hover:text-emerald-300 transition-colors px-2"
+            >
+              <Check size={12} />
+              <span>Live</span>
+              <ExternalLink size={10} />
+            </a>
+          )}
         </div>
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left panel — Prompt (before generation) or Chat editor (after) */}
-        <div className="w-[400px] min-w-[340px] flex flex-col border-r border-white/[0.08] bg-[#0a0a0f]">
-          {!hasCode ? (
-            <>
-              <div className="px-4 py-4 border-b border-white/[0.10]">
-                {generatorBanner ? (
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-violet-600 to-purple-700 flex items-center justify-center">
-                        <Sparkles className="w-3 h-3 text-white" />
+      <div className="flex flex-1 overflow-hidden relative z-10">
+        {/* ── Left Panel — Chat / Prompt ── */}
+        <div className="w-[380px] min-w-[320px] flex flex-col border-r border-white/[0.06] bg-zinc-950/60 backdrop-blur-xl">
+          <AnimatePresence mode="wait">
+            {!hasCode ? (
+              <motion.div
+                key="prompt-panel"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="flex flex-col h-full"
+              >
+                {/* Panel header */}
+                <div className="px-4 py-3 border-b border-white/[0.06]">
+                  {generatorBanner ? (
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-violet-600 to-purple-700 flex items-center justify-center">
+                          <Sparkles className="w-3 h-3 text-white" />
+                        </div>
+                        <span className="text-xs font-semibold text-white/80">
+                          {generatorBanner.name}
+                        </span>
                       </div>
-                      <span className="text-xs font-semibold text-white/80">
-                        {generatorBanner.name}
+                      <button
+                        onClick={() => setGeneratorBanner(null)}
+                        className="text-white/30 hover:text-white/50 text-xs transition-colors"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-violet-500/15 to-purple-600/15 border border-violet-500/10 flex items-center justify-center">
+                        <MessageSquare className="w-3 h-3 text-violet-400" />
+                      </div>
+                      <span className="text-xs font-medium text-white/50">
+                        AI Website Builder
                       </span>
                     </div>
-                    <button
-                      onClick={() => setGeneratorBanner(null)}
-                      className="text-white/30 hover:text-white/50 text-xs transition-colors"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-violet-600/20 to-purple-700/20 border border-violet-500/10 flex items-center justify-center">
-                      <Sparkles className="w-3 h-3 text-violet-400" />
-                    </div>
-                    <span className="text-xs font-medium text-white/50">
-                      AI Website Builder
-                    </span>
+                  )}
+                </div>
+
+                {/* Context import strip */}
+                {mcpContext && (
+                  <div className="px-4 py-1.5 border-b border-white/[0.04] flex items-center gap-2 bg-indigo-500/[0.03]">
+                    <span className="text-[10px] text-indigo-400/70">Context imported</span>
+                    <button onClick={() => setActiveTool("mcp")} className="text-[10px] text-indigo-400/50 hover:text-indigo-400 transition-colors">Manage</button>
                   </div>
                 )}
-              </div>
-              {/* Quick import context bar */}
-              {mcpContext && (
-                <div className="px-4 py-1.5 border-b border-white/[0.05] flex items-center gap-2">
-                  <span className="text-[10px] text-indigo-400/70">
-                    Context imported
-                  </span>
+                {!mcpContext && !hasCode && (
+                  <div className="px-4 py-1.5 border-b border-white/[0.04]">
+                    <button onClick={() => setActiveTool("mcp")} className="flex items-center gap-1.5 text-[10px] text-white/25 hover:text-violet-400/70 transition-colors">
+                      <ExternalLink size={10} />
+                      Import from GitHub, Figma, or URL
+                    </button>
+                  </div>
+                )}
+
+                {/* Voice input */}
+                <div className="px-4 pt-2 flex items-center justify-end">
+                  <VoiceToBuildButton
+                    size="sm"
+                    onTranscript={(text) => {
+                      if (hasCode) { setEditPrompt(text); } else { setPrompt(text); }
+                    }}
+                  />
+                </div>
+
+                {/* Prompt input area */}
+                <div className="flex-1 overflow-hidden">
+                  <PromptInput
+                    prompt={prompt}
+                    onPromptChange={setPrompt}
+                    onGenerate={handleGenerate}
+                    isGenerating={status === "generating"}
+                    tier={tier}
+                    onTierChange={setTier}
+                    hasExistingCode={hasCode}
+                    editPrompt={editPrompt}
+                    onEditPromptChange={setEditPrompt}
+                    onEdit={handleEdit}
+                    selectedModel={selectedModel}
+                    onModelChange={setSelectedModel}
+                    availableModels={availableModels}
+                    generationMode={generationMode}
+                    onGenerationModeChange={setGenerationMode}
+                    fullStack={fullStack}
+                    onFullStackChange={setFullStack}
+                  />
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="chat-panel"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="flex flex-col h-full"
+              >
+                {/* Chat header */}
+                <div className="px-4 py-2.5 border-b border-white/[0.06] flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-md bg-violet-500/10 flex items-center justify-center">
+                      <MessageSquare className="w-3 h-3 text-violet-400" />
+                    </div>
+                    <span className="text-xs font-medium text-white/50">Chat</span>
+                  </div>
                   <button
-                    onClick={() => setActiveTool("mcp")}
-                    className="text-[10px] text-indigo-400/50 hover:text-indigo-400 transition-colors"
+                    onClick={handleNewSite}
+                    className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] text-white/30 hover:text-white/60 hover:bg-white/[0.05] transition-all"
                   >
-                    Manage
+                    <Plus size={12} />
+                    New
                   </button>
                 </div>
-              )}
-              {!mcpContext && !hasCode && (
-                <div className="px-4 py-1.5 border-b border-white/[0.05]">
-                  <button
-                    onClick={() => setActiveTool("mcp")}
-                    className="flex items-center gap-1.5 text-[10px] text-white/30 hover:text-indigo-400/70 transition-colors"
-                  >
-                    <ExternalLink size={10} />
-                    Import from GitHub, Figma, or URL
-                  </button>
+
+                {/* Chat messages + edit input */}
+                <div className="flex-1 overflow-hidden">
+                  <ChatPanel
+                    reactFiles={reactFiles}
+                    onFilesUpdate={(changedFiles) => {
+                      setReactFiles(prev => {
+                        const merged = { ...prev, ...changedFiles };
+                        setReactSource(merged);
+                        return merged;
+                      });
+                      setStatus("complete");
+                      pendingLabelRef.current = `Edit: ${Object.keys(changedFiles).join(", ")}`;
+                    }}
+                    isVisible={true}
+                    isGenerating={status === "generating"}
+                  />
                 </div>
-              )}
-              <div className="px-4 pt-2 flex items-center justify-end">
-                <VoiceToBuildButton
-                  size="sm"
-                  onTranscript={(text) => {
-                    if (hasCode) {
-                      setEditPrompt(text);
-                    } else {
-                      setPrompt(text);
-                    }
-                  }}
-                />
-              </div>
-              <div className="flex-1 overflow-hidden">
-                <PromptInput
-                  prompt={prompt}
-                  onPromptChange={setPrompt}
-                  onGenerate={handleGenerate}
-                  isGenerating={status === "generating"}
-                  tier={tier}
-                  onTierChange={setTier}
-                  hasExistingCode={hasCode}
-                  editPrompt={editPrompt}
-                  onEditPromptChange={setEditPrompt}
-                  onEdit={handleEdit}
-                  selectedModel={selectedModel}
-                  onModelChange={setSelectedModel}
-                  availableModels={availableModels}
-                  generationMode={generationMode}
-                  onGenerationModeChange={setGenerationMode}
-                  fullStack={fullStack}
-                  onFullStackChange={setFullStack}
-                />
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="px-4 py-3 border-b border-white/[0.10] flex items-center justify-between">
-                <span className="text-[11px] uppercase tracking-[2px] text-brand-400/50">
-                  AI Editor
-                </span>
-                <button
-                  onClick={handleNewSite}
-                  className="text-[10px] uppercase tracking-wider text-red-400/60 hover:text-red-400 transition-colors"
-                >
-                  New Site
-                </button>
-              </div>
-              <div className="flex-1 overflow-hidden">
-                <ChatPanel
-                  reactFiles={reactFiles}
-                  onFilesUpdate={(changedFiles) => {
-                    // Merge only the changed files into the existing set (diff-based)
-                    setReactFiles(prev => {
-                      const merged = { ...prev, ...changedFiles };
-                      setReactSource(merged);
-                      return merged;
-                    });
-                    setStatus("complete");
-                    pendingLabelRef.current = `Edit: ${Object.keys(changedFiles).join(", ")}`;
-                  }}
-                  isVisible={true}
-                  isGenerating={status === "generating"}
-                />
-              </div>
-            </>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Center panel — Preview / Code */}
