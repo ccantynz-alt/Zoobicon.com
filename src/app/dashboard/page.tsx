@@ -56,8 +56,8 @@ const ADMIN_QUICK_ACTIONS = [
   { icon: Shield, label: "Admin Panel", desc: "System controls", href: "/admin", color: "from-red-500 to-rose-600" },
   { icon: Key, label: "API Keys", desc: "Developer access", href: "/auth/settings", color: "from-cyan-500 to-blue-600" },
   { icon: BarChart3, label: "Analytics", desc: "Site performance", href: "/analytics", color: "from-blue-500 to-fuchsia-600" },
-  { icon: Settings, label: "Settings", desc: "Account config", href: "/auth/settings", color: "from-gray-500 to-slate-600" },
   { icon: Mail, label: "Email Support", desc: "Tickets & inbox", href: "/email-support", color: "from-cyan-500 to-rose-600" },
+  { icon: Settings, label: "Settings", desc: "Account config", href: "/auth/settings", color: "from-gray-500 to-slate-600" },
 ];
 
 const ADMIN_TOOLS = [

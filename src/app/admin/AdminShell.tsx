@@ -45,7 +45,6 @@ const SIDEBAR_SECTIONS = [
   {
     label: "PRODUCTS",
     items: [
-      { name: "Domains", href: "/admin/domains", icon: Globe },
       { name: "My Domains", href: "/my-domains", icon: Globe },
       { name: "Register Domain", href: "/domains", icon: Globe },
       { name: "eSIM", href: "/admin/esim", icon: Wifi },
