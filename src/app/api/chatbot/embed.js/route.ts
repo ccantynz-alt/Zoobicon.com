@@ -23,7 +23,7 @@ const SNIPPET = `(function(){
     var origin = (function(){
       try { return new URL(src).origin; } catch(e){ return ''; }
     })();
-    var widgetUrl = origin + '/api/chatbot/' + encodeURIComponent(botId) + '/widget';
+    var widgetUrl = origin + '/api/chatbot/embed/' + encodeURIComponent(botId) + '/widget';
 
     var reduceMotion = false;
     try { reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch(e) {}
