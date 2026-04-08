@@ -99,13 +99,29 @@ If Claude is uncertain whether something requires authorization: **default to as
 - **Deploy <5 seconds.** One click. No config. No staging dance.
 
 ## 4. ANNIHILATION TARGETS — WHO WE ARE BEATING
+
+### A. AI BUILDER COMPETITORS
 | Competitor | ARR/Value | Our edge |
 |---|---|---|
 | Lovable | $400M ARR, $6.6B valuation | 75+ products vs their 1. Ecosystem moat they can't replicate. |
 | Bolt.new | $40M ARR, 5M users | Our domains + email + video are things they will never build. |
 | v0 (Vercel) | 6M devs | Our backend auto-provisioning + real database generation. |
 | Emergent | $100M ARR, 6M signups | Our white-label + agency multiplier. |
-| HeyGen | $100M+ ARR | Our own Replicate-based video stack, 10–20x cheaper. |
+
+### B. AI VIDEO COMPETITORS
+| Competitor | ARR/Value/Users | What they do | Our edge | What to steal |
+|---|---|---|---|---|
+| **Filmora (Wondershare)** | ~$200M rev, $1.75B mkt cap, **100M users** | Desktop video editor + AI Mate copilot. Sora 2 + Veo 3.1 integration. Voice cloning with emotion control. $50/yr. | They EDIT existing footage. We GENERATE from nothing. No API, no white-label, desktop-only. | Voice cloning emotion control, AI Mate UX pattern (NL→execute), auto-captions burned in |
+| **HeyGen** | $100M+ ARR, $500M+ valuation | Avatar IV talking heads, LiveAvatar (real-time), 175 languages, $29-149/mo | Our own pipeline 10-20x cheaper. We bundle video with builder+domains+hosting. They're video-only. | Multi-language dubbing, avatar quality benchmark, instant avatar from photo |
+| **Captions app** | 10M downloads | AI Twins (viral TikTok — upload selfie, AI makes video of "you" talking), $10-70/mo | We can build AI Twins with Fish Speech + FLUX. They're mobile-only, no web, no API. | AI Twins feature (face upload → talking video), viral social distribution model |
+| **CapCut (ByteDance)** | 300M monthly users | Free video editor, Seedance 2.0 integration, auto-captions, $0-8/mo | They're an editor, not a generator. No spokesperson videos. No business ecosystem. | Auto-captions UX, template marketplace model, free tier distribution |
+| **InVideo AI** | Growing fast | Combines Sora 2 + Veo 3.1 for text-to-video, $25-100/mo | We generate spokesperson talking heads. They generate stock-footage compilations. | Text-to-full-video workflow, multi-scene storyboard assembly |
+| **Descript** | 6M users, $65M raised | Text-based video editing (edit words = edit video), Underlord AI editor, $24-65/mo | We generate videos. They edit existing ones. Different product. | Text-based editing UX (edit transcript = edit video) |
+| **Runway** | $4B valuation | Gen-4/Gen-4 Turbo video models, creative tools, $12-76/mo | We use their models via fal.ai as B-roll. They're a tool, we're a platform. | Gen-4 quality as our B-roll standard |
+
+### C. DOMAIN/HOSTING COMPETITORS
+| Competitor | ARR/Value | Our edge |
+|---|---|---|
 | GoDaddy/Namecheap | billions | Real-time AI domain generation + bundled builder + hosting. |
 
 **The rule: 80–90% ahead on every axis. If we're not clearly ahead on speed, quality, or features in a monthly comparison build, fix it immediately — that week.**
@@ -702,6 +718,11 @@ Plain English always. Never "I refactored the middleware." Say "I fixed the perm
 | **Bolt.new** | WebContainers in-browser runtime, multi-model (Claude/GPT/Gemini) | **$700M** (Series B, Jan 2025, $105.5M raised) | **$40M** (Mar 2025) | 5M+ | $0-20/mo |
 | **Emergent** | Multi-agent (Builder/Quality/Deploy/Ops), MCP integration | Unknown | **$100M** (Feb 2026) | 6M signups, 150K paying | $0-200/mo |
 | **v0 (Vercel)** | React/shadcn/ui, Feb 2026 added DB + agentic mode | Vercel-backed ($3.5B+) | Unknown | 6M+ devs | $0-100/mo |
+| **Filmora** | Desktop editor + AI Mate copilot + Sora 2/Veo 3.1 + voice cloning | **$1.75B** mkt cap (Shenzhen 300624.SZ) | **~$200M** (Wondershare group) | **100M+** | $50/yr |
+| **HeyGen** | Avatar IV talking heads, LiveAvatar, 175 languages | **$500M+** | **$100M+** | Millions | $29-149/mo |
+| **Captions** | AI Twins (face→talking video), mobile-first | Unknown | Growing fast | **10M downloads** | $10-70/mo |
+| **CapCut** | Free editor, Seedance 2.0, ByteDance-backed | ByteDance ($300B+) | Unknown | **300M MAU** | $0-8/mo |
+| **Runway** | Gen-4 Turbo video models, creative suite | **$4B** | Unknown | Growing | $12-76/mo |
 
 **Where Zoobicon dominates:**
 - 75+ products in one ecosystem (competitors have 1)
