@@ -22,6 +22,14 @@ import { NextRequest } from "next/server";
 import { callClaude, streamClaude } from "@/lib/anthropic-cached";
 import { runQualityLoop } from "@/lib/builder-critique";
 import { callLLMWithFailover, getAvailableProviders } from "@/lib/llm-provider";
+import {
+  detectSupabaseNeeds,
+  needsSupabase,
+  generateSupabaseClient,
+  generateAuthProvider,
+} from "@/lib/supabase-detect";
+import type { SupabaseNeeds, SupabaseProvisionResult } from "@/lib/supabase-detect";
+import { isConfigured as isSupabaseConfigured } from "@/lib/supabase-provisioner";
 // Component registry is imported lazily inside POST to avoid circular dependency
 // at module load time (the registry's side-effect imports cause a TDZ error in webpack).
 import type { RegistryComponent, ComponentCategory } from "@/lib/component-registry";
@@ -259,16 +267,20 @@ async function customiseComponent(args: CustomiseArgs): Promise<string> {
   return stripFencesAndWrap(collected);
 }
 
-function buildPackageJson(): string {
+function buildPackageJson(opts?: { withSupabase?: boolean }): string {
+  const deps: Record<string, string> = {
+    react: "^18.3.1",
+    "react-dom": "^18.3.1",
+  };
+  if (opts?.withSupabase) {
+    deps["@supabase/supabase-js"] = "^2.45.0";
+  }
   return JSON.stringify(
     {
       name: "zoobicon-generated-site",
       version: "1.0.0",
       private: true,
-      dependencies: {
-        react: "^18.3.1",
-        "react-dom": "^18.3.1",
-      },
+      dependencies: deps,
     },
     null,
     2,
@@ -353,6 +365,11 @@ export async function POST(req: NextRequest): Promise<Response> {
           message: "Analysing your prompt…",
         });
 
+        // Detect full-stack intent (auth, database, storage needs)
+        const supabaseNeeds = detectSupabaseNeeds(prompt);
+        const wantsSupabase = needsSupabase(supabaseNeeds);
+        const supabaseAvailable = wantsSupabase && isSupabaseConfigured();
+
         // ── PHASE 2: selecting ──
         writer.send("phase", {
           phase: "selecting",
@@ -364,7 +381,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         const registry = await getRegistry();
 
         const files: Record<string, string> = {
-          "package.json": buildPackageJson(),
+          "package.json": buildPackageJson({ withSupabase: wantsSupabase }),
           "tailwind.config.js": buildTailwindConfig(),
           "styles.css": registry.buildStylesFile({ primaryColor, bgColor }),
           "App.tsx": registry.buildAppFile([]),
@@ -412,6 +429,117 @@ export async function POST(req: NextRequest): Promise<Response> {
         }
 
         writer.send("files", { files });
+
+        // ── PHASE 3.5: Supabase auto-provisioning (if full-stack detected) ──
+        let supabaseResult: SupabaseProvisionResult | null = null;
+
+        if (wantsSupabase) {
+          if (supabaseAvailable) {
+            // Supabase env vars are set — provision a real project
+            try {
+              writer.send("phase", {
+                phase: "provisioning",
+                message: "Setting up your database and auth…",
+              });
+
+              // Lazy-import provisioner (only loaded when needed)
+              const provisioner = await import("@/lib/supabase-provisioner");
+
+              const projectName = `zbk-${brandName.toLowerCase().replace(/[^a-z0-9]/g, "-").slice(0, 30)}-${Date.now().toString(36)}`;
+
+              const provision = await provisioner.provisionFullStack({
+                name: projectName,
+                region: "us-east-1",
+                schema: supabaseNeeds.needsDatabase
+                  ? {
+                      profiles: {
+                        columns: [
+                          { name: "id", type: "uuid", primary: true, default: "gen_random_uuid()" },
+                          { name: "user_id", type: "uuid", nullable: false },
+                          { name: "display_name", type: "text" },
+                          { name: "avatar_url", type: "text" },
+                          { name: "created_at", type: "timestamptz", default: "now()" },
+                          { name: "updated_at", type: "timestamptz", default: "now()" },
+                        ],
+                        rls: "owner",
+                      },
+                    }
+                  : undefined,
+                auth: supabaseNeeds.needsAuth ? ["email"] : undefined,
+                buckets: supabaseNeeds.needsStorage
+                  ? [{ name: "uploads", public: true }]
+                  : undefined,
+              });
+
+              const projectUrl = provision.envVars.NEXT_PUBLIC_SUPABASE_URL;
+              const anonKey = provision.envVars.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+              // Inject Supabase client files into the generated project
+              files["lib/supabase.ts"] = generateSupabaseClient(projectUrl, anonKey);
+              if (supabaseNeeds.needsAuth) {
+                files["lib/AuthProvider.tsx"] = generateAuthProvider();
+              }
+              files["package.json"] = buildPackageJson({ withSupabase: true });
+
+              supabaseResult = {
+                projectUrl,
+                anonKey,
+                projectRef: provision.project.projectRef,
+                needsAuth: supabaseNeeds.needsAuth,
+                needsDatabase: supabaseNeeds.needsDatabase,
+                needsStorage: supabaseNeeds.needsStorage,
+                tables: provision.tables,
+                authProviders: provision.auth,
+                buckets: provision.buckets.map((b) => b.name),
+              };
+
+              writer.send("supabase", supabaseResult);
+              writer.send("files", { files });
+
+              writer.send("phase", {
+                phase: "provisioned",
+                message: `Database ready — ${provision.tables.length} table(s), ${provision.auth.length > 0 ? "auth enabled" : "no auth"}, ${provision.buckets.length} bucket(s)`,
+              });
+            } catch (err) {
+              // Supabase provisioning failure is non-fatal — site still works without it
+              const msg = err instanceof Error ? err.message : String(err);
+              writer.send("error", {
+                message: `Supabase provisioning failed: ${msg}`,
+                hint: "The site will still work but without a live database. You can connect Supabase manually later.",
+              });
+
+              // Still inject client stub with placeholder values so the code compiles
+              files["lib/supabase.ts"] = generateSupabaseClient(
+                "https://YOUR_PROJECT.supabase.co",
+                "YOUR_ANON_KEY",
+              );
+              if (supabaseNeeds.needsAuth) {
+                files["lib/AuthProvider.tsx"] = generateAuthProvider();
+              }
+              writer.send("files", { files });
+            }
+          } else {
+            // Supabase env vars not set — inject placeholder client so code compiles
+            writer.send("phase", {
+              phase: "provisioning",
+              message: "Full-stack features detected — injecting Supabase client (connect your project to go live)…",
+            });
+
+            files["lib/supabase.ts"] = generateSupabaseClient(
+              "https://YOUR_PROJECT.supabase.co",
+              "YOUR_ANON_KEY",
+            );
+            if (supabaseNeeds.needsAuth) {
+              files["lib/AuthProvider.tsx"] = generateAuthProvider();
+            }
+            writer.send("files", { files });
+
+            writer.send("phase", {
+              phase: "provisioned",
+              message: "Supabase client injected with placeholders — set SUPABASE_ACCESS_TOKEN to auto-provision real projects.",
+            });
+          }
+        }
 
         // ── PHASE 4: critique loop (premium only) ──
         let finalFiles = files;
@@ -463,6 +591,7 @@ export async function POST(req: NextRequest): Promise<Response> {
           finalFiles,
           score: finalScore,
           durationMs: Date.now() - startedAt,
+          ...(supabaseResult ? { supabase: supabaseResult } : {}),
         });
         writer.close();
       } catch (err) {
