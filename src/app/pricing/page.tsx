@@ -1,816 +1,532 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import BackgroundEffects from "@/components/BackgroundEffects";
-import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
-import {
-  Check,
-  Zap,
-  ArrowRight,
-  HelpCircle,
-  Sparkles,
-  Globe,
-  Video,
-  BarChart3,
-  Mail,
-  Bot,
-  Palette,
-  Code2,
-  Shield,
-  Users,
-  Building2,
-  Loader2,
-  LayoutDashboard,
-  LogOut,
-  Plus,
-  ShoppingCart,
-  Server,
-  AtSign,
-  Lock,
-  Blocks,
-  Languages,
-  TestTube2,
-  Megaphone,
-  Headphones,
-} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Check, Zap, Star, Crown, Building2, ArrowRight } from "lucide-react";
 
-const fadeInUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } },
+/* ─── animation presets ─── */
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.08, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
+  }),
 };
-const staggerContainer = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
 
+/* ─── tier data ─── */
 const PLANS = [
   {
+    id: "starter",
     name: "Starter",
-    price: "Free",
-    period: "Forever",
-    desc: "Full-power AI builds. See exactly what Zoobicon can do — no credit card, no catch.",
-    cta: "Start Building Free",
-    ctaHref: "/builder",
-    featured: false,
-    color: "from-white/5 to-white/0",
+    icon: Zap,
+    monthly: 49,
+    annual: 39,
+    description: "Everything you need to launch your first AI-powered website.",
     features: [
-      "3 AI-generated websites per month",
-      "10 edits per month",
-      "Full 10-agent pipeline (same AI as paid)",
-      "Opus-powered builds — agency quality",
-      "Industry-aware design intelligence",
+      "1 AI-generated website",
+      "AI website builder",
+      "1 custom domain included",
+      "3 email mailboxes",
+      "SSL certificate",
+      "Managed hosting",
       "Basic SEO tools",
-      "7-day hosting preview — then upgrade to keep",
       "Community support",
     ],
-  },
-  {
-    name: "Creator",
-    price: "$19",
-    period: "/month",
-    desc: "For freelancers and small businesses shipping real sites.",
-    cta: "Start Creator Trial",
-    ctaHref: "/auth/signup",
-    planSlug: "creator" as const,
+    cta: "Get Started",
     featured: false,
-    color: "from-emerald-500/5 to-white/0",
-    features: [
-      "15 AI-generated websites per month",
-      "100 edits per month",
-      "10-agent pipeline (premium quality)",
-      "Custom domain support",
-      "React + Next.js export",
-      "GitHub export & WordPress export",
-      "Permanent hosting included",
-      "Basic SEO tools",
-      "Email support",
-      "API access (10K req/mo)",
-    ],
   },
   {
+    id: "pro",
     name: "Pro",
-    price: "$49",
-    period: "/month",
-    desc: "The full arsenal. Every AI tool, high limits, zero compromise.",
+    icon: Star,
+    monthly: 129,
+    annual: 99,
+    description: "For creators and businesses ready to scale with the full AI toolkit.",
+    features: [
+      "3 AI-generated websites",
+      "AI builder + video creator",
+      "3 custom domains included",
+      "10 email mailboxes",
+      "SEO monitor & optimizer",
+      "AI auto-reply on emails",
+      "Priority generation queue",
+      "GitHub & React export",
+      "Email support (24h SLA)",
+    ],
     cta: "Start Pro Trial",
-    ctaHref: "/auth/signup",
-    planSlug: "pro" as const,
     featured: true,
-    color: "from-brand-500/10 to-accent-purple/5",
-    features: [
-      "50 AI-generated websites per month",
-      "500 edits per month",
-      "Everything in Creator, plus:",
-      "AI-generated images (DALL-E)",
-      "Full SEO Campaign Agent",
-      "AI Video Creator",
-      "AI Email Support & Marketing",
-      "AI Brand Kit",
-      "Chatbot Builder",
-      "A/B Testing & Analytics",
-      "Layers Import",
-      "Live Agent support (30 min/mo)",
-      "Priority support",
-      "API access (100K req/mo)",
-    ],
   },
   {
+    id: "agency",
     name: "Agency",
-    price: "$99",
-    period: "/month",
-    desc: "For agencies building sites at scale. White-label and client handoff.",
-    cta: "Start Agency Trial",
-    ctaHref: "/auth/signup",
-    planSlug: "agency" as const,
-    featured: false,
-    color: "from-purple-500/5 to-white/0",
+    icon: Crown,
+    monthly: 299,
+    annual: 249,
+    description: "White-label the platform. Build for clients at scale.",
     features: [
-      "200 AI-generated websites per month",
-      "Unlimited edits",
-      "Everything in Pro, plus:",
-      "White-label platform (your brand)",
-      "Client handoff & management",
-      "Team seats (up to 10)",
-      "Template marketplace access",
-      "Bulk operations & automation",
+      "10 AI-generated websites",
+      "Everything in Pro",
+      "White-label branding",
+      "Client management portal",
+      "Priority support (4h SLA)",
       "API access (500K req/mo)",
-      "Priority Hash support",
+      "Team seats (up to 10)",
+      "Bulk generation tools",
     ],
+    cta: "Start Agency Trial",
+    featured: false,
   },
   {
+    id: "enterprise",
     name: "Enterprise",
-    price: "$299",
-    period: "/month",
-    desc: "Unlimited everything. Custom AI, SSO, SLA, and dedicated support.",
-    cta: "Contact Sales",
-    ctaHref: "mailto:sales@zoobicon.com?subject=Enterprise Inquiry",
-    featured: false,
-    isExternal: true,
-    color: "from-accent-cyan/5 to-white/0",
+    icon: Building2,
+    monthly: 0,
+    annual: 0,
+    description: "Unlimited everything with dedicated infrastructure and SLA.",
     features: [
-      "Unlimited generations & edits",
-      "Everything in Agency, plus:",
-      "Custom AI model training",
-      "Dedicated AI agents",
-      "Unlimited API access",
-      "SSO / SAML authentication",
-      "Custom integrations",
-      "SLA guarantee (99.99%)",
+      "Unlimited websites",
+      "Everything in Agency",
       "Dedicated account manager",
+      "Custom AI model training",
+      "SSO / SAML authentication",
+      "99.99% uptime SLA",
+      "Custom integrations",
       "Invoiced billing (NET 30)",
     ],
+    cta: "Contact Sales",
+    featured: false,
   },
 ];
-
-const PRODUCTS = [
-  { icon: Zap, name: "AI Website Builder", starter: "3/mo", creator: "15/mo", pro: "50/mo", agency: "200/mo", enterprise: "Unlimited" },
-  { icon: Code2, name: "AI Edits", starter: "10/mo", creator: "100/mo", pro: "500/mo", agency: "Unlimited", enterprise: "Unlimited" },
-  { icon: Sparkles, name: "10-Agent Pipeline", starter: true, creator: true, pro: true, agency: true, enterprise: true },
-  { icon: Palette, name: "React + shadcn/ui Export", starter: false, creator: true, pro: true, agency: true, enterprise: true },
-  { icon: BarChart3, name: "SEO Campaign Agent", starter: "Basic", creator: "Basic", pro: "Full", agency: "Full", enterprise: "Full" },
-  { icon: Video, name: "AI Video Creator", starter: false, creator: false, pro: true, agency: true, enterprise: true },
-  { icon: Mail, name: "AI Email Support", starter: false, creator: false, pro: true, agency: true, enterprise: true },
-  { icon: Bot, name: "Chatbot Builder", starter: false, creator: false, pro: true, agency: true, enterprise: true },
-  { icon: Users, name: "White-Label & Teams", starter: false, creator: false, pro: false, agency: "10 seats", enterprise: "Unlimited" },
-  { icon: Headphones, name: "Live Agent Support", starter: false, creator: false, pro: "30 min/mo", agency: false, enterprise: false },
-  { icon: Shield, name: "SLA Guarantee", starter: false, creator: false, pro: false, agency: false, enterprise: "99.99%" },
-  { icon: Code2, name: "API Access", starter: false, creator: "10K/mo", pro: "100K/mo", agency: "500K/mo", enterprise: "Unlimited" },
-];
-
-// Features that are not yet fully built — show a subtle "Soon" badge
-// NOTE: Only mark features here that genuinely DON'T work yet.
-// Built: SEO Agent, Video Creator, Email Support, Custom domains, Agency platform,
-// AI Brand Kit (/brand-kit), A/B Testing (/ab-testing), Booking (/products/booking)
-const SOON_FEATURES = new Set([
-  // Pro tier
-  "Chatbot Builder",
-  // Agency tier
-  "Template marketplace access",
-  // Enterprise tier
-  "Custom AI model training",
-  "Dedicated AI agents",
-  "SSO / SAML authentication",
-  "Custom integrations",
-  "SLA guarantee (99.99%)",
-  "Invoiced billing (NET 30)",
-]);
-
-// Products in the comparison table that are not yet built
-const SOON_PRODUCTS = new Set([
-  "Chatbot Builder",
-]);
-
-const SoonBadge = () => (
-  <span className="ml-1 text-[9px] text-amber-400/60 bg-amber-500/10 px-1.5 py-0.5 rounded-full">Soon</span>
-);
 
 const FAQS = [
   {
-    q: "No credits? No usage tokens? What's the catch?",
-    a: "There is no catch. We don't use a credit system because we think credits are designed to confuse people and drain wallets. You get a flat monthly price with clear generation limits. Starter is free with 3 sites/month and the FULL 10-agent AI pipeline — same Opus-powered quality as paid plans. We want you to see exactly what Zoobicon can do. Free sites are hosted for 7 days so you can share them, then upgrade to keep them permanently.",
+    q: "Is there a free trial?",
+    a: "Yes. Pro and Agency both come with a 14-day free trial. No credit card required to start. You can downgrade or cancel at any time from your dashboard.",
   },
   {
-    q: "Can I cancel anytime?",
-    a: "Yes. Cancel anytime from your dashboard settings. You keep access until the end of your billing period. No cancellation fees, no guilt trips.",
+    q: "What happens when I hit my site limit?",
+    a: "You can upgrade your plan at any time to unlock more sites. Existing sites are never affected when you downgrade, but you won't be able to create new ones beyond your plan's limit.",
   },
   {
-    q: "Is there a free trial for Creator and Pro?",
-    a: "Yes — 14 days free on both Creator and Pro. No credit card required to start the trial. You can downgrade to Starter anytime.",
+    q: "Do I own the code?",
+    a: "Yes, 100%. Every site you generate is yours. Export to GitHub, download as React/Next.js, deploy anywhere. No lock-in, ever.",
   },
   {
-    q: "What's the difference between Creator, Pro, and Agency?",
-    a: "Creator ($19/mo) gives you 15 websites/month with the full 10-agent pipeline, custom domains, React export, and permanent hosting. Pro ($49/mo) bumps to 50/month and adds all 12+ AI tools: Video Creator, DALL-E images, Brand Kit, Email Marketing, Chatbot Builder, and more. Agency ($99/mo) adds 200/month, white-labeling, team seats, and client management — perfect for agencies building sites for clients. Enterprise ($299/mo) is truly unlimited with custom AI training, SSO, and SLA.",
+    q: "Can I cancel at any time?",
+    a: "Absolutely. All plans are month-to-month (or annual). Cancel from your dashboard in one click. You keep access until the end of your billing period.",
   },
   {
-    q: "Do I own the websites I generate?",
-    a: "Yes, 100%. All generated code is yours — export to GitHub, download as HTML, deploy anywhere. No lock-in. Even on the free tier.",
+    q: "What's included in white-label?",
+    a: "Agency and Enterprise plans include full white-label capability. Your logo, your domain, your colors. Your clients never see Zoobicon. Perfect for agencies and resellers.",
   },
   {
-    q: "What happens to my websites if I downgrade?",
-    a: "Your sites are preserved forever. On Starter, you can still view, edit, and export everything. You just can't generate new ones beyond the 3/month limit. Hosted sites stay live as long as you have a paid plan — Starter sites get 7-day previews.",
+    q: "How does annual billing work?",
+    a: "Pay upfront for the year and save up to 23%. Annual plans include the same features as monthly. You can switch between monthly and annual at any time.",
   },
   {
-    q: "What's Live Agent support?",
-    a: "Free users get Zoe, our quick AI assistant (powered by Claude Haiku). Pro includes Live Agent support — a full Claude Sonnet-powered AI that gives deeper, more thorough answers with 30 minutes/month (10 min sessions). Agency and Enterprise don't include it because those users already have Priority Hash and dedicated account managers. Anyone can add Premium Support for $19/month for 60 minutes of live agent time with 20-minute sessions.",
+    q: "What AI models power the builder?",
+    a: "Every plan uses Claude Opus 4.6 for the core developer agent, the most powerful AI model available. We also use Claude Haiku for planning and Sonnet for enhancements. Same quality across all tiers.",
   },
   {
-    q: "How does white-labeling work on Enterprise?",
-    a: "We give you a fully branded version of the platform — your logo, your domain, your colors. Your clients never see Zoobicon. Perfect for agencies serving multiple clients.",
+    q: "Do you offer refunds?",
+    a: "Yes. If you're not satisfied within the first 14 days of a paid plan, we'll refund you in full. No questions asked.",
   },
 ];
 
 export default function PricingPage() {
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const [user, setUser] = useState<{ email: string; name?: string } | null>(null);
+  const [annual, setAnnual] = useState(false);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem("zoobicon_user");
-      if (stored) setUser(JSON.parse(stored));
-    } catch {}
-  }, []);
-
-  async function handleCheckout(plan: "creator" | "pro" | "agency") {
-    setCheckoutLoading(true);
-    const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1);
-    const email = user?.email || window.prompt(`Enter your email to start the ${planLabel} trial:`);
-    if (!email) { setCheckoutLoading(false); return; }
-
-    const res = await fetch("/api/stripe/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, plan }),
-    });
-    const data = await res.json();
-    if (data.url) {
-      window.location.href = data.url;
-    } else {
-      alert(data.error ?? "Something went wrong");
-      setCheckoutLoading(false);
-    }
-  }
-
+  /* ─── structured data ─── */
   const pricingJsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
-    "name": "Zoobicon Plans",
-    "description": "AI Website Builder plans for individuals, creators, professionals, and agencies.",
-    "url": "https://zoobicon.com/pricing",
-    "brand": { "@type": "Brand", "name": "Zoobicon" },
-    "offers": [
-      { "@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "USD", "description": "3 AI-generated websites per month, 10 edits, 7-day hosting preview" },
-      { "@type": "Offer", "name": "Creator", "price": "19", "priceCurrency": "USD", "billingIncrement": "P1M", "description": "15 websites per month, custom domains, React export" },
-      { "@type": "Offer", "name": "Pro", "price": "49", "priceCurrency": "USD", "billingIncrement": "P1M", "description": "50 websites per month, priority generation, all exports" },
-      { "@type": "Offer", "name": "Agency", "price": "99", "priceCurrency": "USD", "billingIncrement": "P1M", "description": "200 websites per month, white-label, client portal, bulk generation" }
-    ]
+    name: "Zoobicon Plans",
+    description: "AI Website Builder plans for individuals, creators, professionals, and agencies.",
+    url: "https://zoobicon.com/pricing",
+    brand: { "@type": "Brand", name: "Zoobicon" },
+    offers: PLANS.filter((p) => p.monthly > 0).map((p) => ({
+      "@type": "Offer",
+      name: p.name,
+      price: String(annual ? p.annual : p.monthly),
+      priceCurrency: "USD",
+      billingIncrement: annual ? "P1Y" : "P1M",
+      description: p.description,
+    })),
   };
-  const breadcrumbLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://zoobicon.com" },
-      { "@type": "ListItem", "position": 2, "name": "Pricing", "item": "https://zoobicon.com/pricing" }
-    ]
-  };
-  const faqLd = {
+
+  const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "Is there a free plan for Zoobicon?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Yes. Zoobicon's free Starter plan includes 3 AI-generated websites per month, 10 edits, and the full 10-agent pipeline with Opus-quality builds. No credit card required. Sites get a 7-day hosting preview before you need to upgrade to keep them live."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "What's the difference between Creator, Pro, and Agency plans?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Creator ($19/month) gives 15 builds, custom domains, and React/WordPress export. Pro ($49/month) gives 50 builds, AI-generated images, full SEO agent, and priority generation. Agency ($99/month) gives 200 builds, white-label branding, client portal, bulk generation, and approval workflows for managing client projects."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Can I cancel my Zoobicon subscription anytime?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Yes. All paid plans are month-to-month with no contracts. You can cancel anytime from your account settings. Your sites remain live until the end of your billing period. Exported code is yours to keep regardless of subscription status."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Do all plans use the same AI quality?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Yes. Every plan, including the free tier, uses the same Claude Opus 4.6 model for the core Developer agent. The difference between plans is the number of monthly builds, available export formats, and advanced features like white-label branding and the SEO campaign agent."
-        }
-      }
-    ]
+    mainEntity: FAQS.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
   };
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen bg-zinc-950 text-white selection:bg-purple-500/30 overflow-hidden">
+      {/* ── structured data ── */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
-      <BackgroundEffects preset="technical" />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
-      {/* Nav */}
-      <nav className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
-              <Zap className="w-4 h-4 text-white" />
+      {/* ── ambient background ── */}
+      <div className="pointer-events-none fixed inset-0 z-0">
+        <div className="absolute top-[-40%] left-1/2 -translate-x-1/2 w-[900px] h-[900px] rounded-full bg-purple-600/[0.07] blur-[160px]" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-blue-600/[0.05] blur-[140px]" />
+      </div>
+
+      <main className="relative z-10">
+        {/* ━━━━━━━━━━ HERO ━━━━━━━━━━ */}
+        <section className="pt-32 pb-16 text-center px-6">
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            className="max-w-3xl mx-auto"
+          >
+            <motion.div
+              custom={0}
+              variants={fadeUp}
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-purple-500/20 bg-purple-500/[0.06] text-purple-300 text-sm font-medium mb-8"
+            >
+              <Star className="w-3.5 h-3.5" />
+              Simple, transparent pricing
+            </motion.div>
+
+            <motion.h1
+              custom={1}
+              variants={fadeUp}
+              className="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-[1.08] mb-6"
+            >
+              Build smarter.{" "}
+              <span className="bg-gradient-to-r from-purple-400 via-violet-400 to-blue-400 bg-clip-text text-transparent">
+                Pay&nbsp;less.
+              </span>
+            </motion.h1>
+
+            <motion.p
+              custom={2}
+              variants={fadeUp}
+              className="text-lg text-zinc-400 max-w-xl mx-auto mb-12"
+            >
+              One platform for AI websites, domains, hosting, email, and video.
+              Start with a 14-day free trial. No credit card required.
+            </motion.p>
+
+            {/* ── billing toggle ── */}
+            <motion.div custom={3} variants={fadeUp} className="flex items-center justify-center gap-4">
+              <span className={`text-sm font-medium transition-colors ${!annual ? "text-white" : "text-zinc-500"}`}>
+                Monthly
+              </span>
+              <button
+                onClick={() => setAnnual(!annual)}
+                className="relative w-14 h-7 rounded-full bg-zinc-800 border border-zinc-700/50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+                aria-label="Toggle annual billing"
+              >
+                <motion.div
+                  className="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-violet-600 shadow-lg"
+                  animate={{ x: annual ? 28 : 0 }}
+                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                />
+              </button>
+              <span className={`text-sm font-medium transition-colors ${annual ? "text-white" : "text-zinc-500"}`}>
+                Annual
+              </span>
+              <AnimatePresence>
+                {annual && (
+                  <motion.span
+                    initial={{ opacity: 0, scale: 0.8, x: -8 }}
+                    animate={{ opacity: 1, scale: 1, x: 0 }}
+                    exit={{ opacity: 0, scale: 0.8, x: -8 }}
+                    className="text-xs font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2.5 py-1 rounded-full"
+                  >
+                    Save up to 23%
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          </motion.div>
+        </section>
+
+        {/* ━━━━━━━━━━ PRICING CARDS ━━━━━━━━━━ */}
+        <section className="pb-24 px-6">
+          <div className="max-w-6xl mx-auto">
+            <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-5">
+              {PLANS.map((plan, index) => {
+                const price = annual ? plan.annual : plan.monthly;
+                const isCustom = price === 0;
+                const Icon = plan.icon;
+
+                return (
+                  <motion.div
+                    key={plan.id}
+                    custom={index}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-40px" }}
+                    variants={fadeUp}
+                    className={`relative group rounded-2xl p-[1px] transition-transform duration-300 hover:-translate-y-1 ${
+                      plan.featured
+                        ? "bg-gradient-to-b from-purple-500/80 via-violet-500/40 to-purple-500/80 shadow-[0_0_40px_-8px_rgba(168,85,247,0.35)]"
+                        : "bg-gradient-to-b from-white/[0.08] to-white/[0.02]"
+                    }`}
+                  >
+                    {/* animated glow ring on featured card */}
+                    {plan.featured && (
+                      <div className="absolute -inset-[1px] rounded-2xl opacity-60 blur-sm bg-gradient-to-b from-purple-500/60 via-violet-500/20 to-purple-500/60 -z-10" />
+                    )}
+
+                    <div
+                      className={`relative h-full rounded-[15px] p-7 flex flex-col backdrop-blur-xl ${
+                        plan.featured
+                          ? "bg-zinc-950/90"
+                          : "bg-white/[0.03] hover:bg-white/[0.05]"
+                      } transition-colors`}
+                    >
+                      {/* popular badge */}
+                      {plan.featured && (
+                        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
+                          <span className="px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-600 to-violet-600 text-[11px] font-bold tracking-wide uppercase text-white shadow-lg shadow-purple-500/25 whitespace-nowrap">
+                            Most Popular
+                          </span>
+                        </div>
+                      )}
+
+                      {/* icon + name */}
+                      <div className="flex items-center gap-2.5 mb-4 mt-1">
+                        <div
+                          className={`w-9 h-9 rounded-xl flex items-center justify-center ${
+                            plan.featured
+                              ? "bg-purple-500/15 text-purple-400"
+                              : "bg-white/[0.06] text-zinc-400"
+                          }`}
+                        >
+                          <Icon className="w-4.5 h-4.5" />
+                        </div>
+                        <h3 className="text-lg font-bold">{plan.name}</h3>
+                      </div>
+
+                      {/* price */}
+                      <div className="mb-4">
+                        {isCustom ? (
+                          <div className="flex items-baseline gap-1">
+                            <span className="text-4xl font-extrabold tracking-tight">Custom</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-baseline gap-1">
+                            <span className="text-4xl font-extrabold tracking-tight">
+                              ${price}
+                            </span>
+                            <span className="text-sm text-zinc-500 font-medium">/mo</span>
+                          </div>
+                        )}
+                        {annual && !isCustom && (
+                          <p className="text-xs text-zinc-500 mt-1">
+                            ${price * 12}/yr &middot;{" "}
+                            <span className="text-emerald-400">
+                              save ${(plan.monthly - plan.annual) * 12}/yr
+                            </span>
+                          </p>
+                        )}
+                      </div>
+
+                      {/* description */}
+                      <p className="text-sm text-zinc-400 leading-relaxed mb-6">
+                        {plan.description}
+                      </p>
+
+                      {/* features */}
+                      <ul className="space-y-3 mb-8 flex-1">
+                        {plan.features.map((feature) => (
+                          <li key={feature} className="flex items-start gap-2.5">
+                            <div
+                              className={`flex-shrink-0 w-4.5 h-4.5 rounded-full flex items-center justify-center mt-0.5 ${
+                                plan.featured
+                                  ? "bg-purple-500/15 text-purple-400"
+                                  : "bg-white/[0.06] text-zinc-500"
+                              }`}
+                            >
+                              <Check className="w-3 h-3" strokeWidth={2.5} />
+                            </div>
+                            <span className="text-sm text-zinc-300">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+
+                      {/* CTA */}
+                      {plan.id === "enterprise" ? (
+                        <a
+                          href="mailto:sales@zoobicon.com?subject=Enterprise%20Inquiry"
+                          className="block w-full py-3.5 rounded-xl text-sm font-semibold text-center border border-white/[0.08] text-zinc-300 hover:text-white hover:border-white/20 hover:bg-white/[0.04] transition-all"
+                        >
+                          {plan.cta}
+                        </a>
+                      ) : (
+                        <Link
+                          href="/auth/signup"
+                          className={`group/btn flex items-center justify-center gap-2 w-full py-3.5 rounded-xl text-sm font-semibold transition-all ${
+                            plan.featured
+                              ? "bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30"
+                              : "border border-white/[0.08] text-zinc-300 hover:text-white hover:border-white/20 hover:bg-white/[0.04]"
+                          }`}
+                        >
+                          {plan.cta}
+                          <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-0.5" />
+                        </Link>
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
-            <span className="text-lg font-bold tracking-tight">Zoobicon</span>
-          </Link>
-          <div className="flex items-center gap-3">
-            {user ? (
-              <>
-                <Link href="/dashboard" className="text-sm text-white/65 hover:text-white transition-colors px-3 py-2 flex items-center gap-1.5">
-                  <LayoutDashboard className="w-3.5 h-3.5" /> Dashboard
-                </Link>
-                <button
-                  onClick={() => { try { localStorage.removeItem("zoobicon_user"); } catch {} setUser(null); }}
-                  className="text-sm text-white/65 hover:text-white transition-colors px-3 py-2 flex items-center gap-1.5"
-                >
-                  <LogOut className="w-3.5 h-3.5" /> Sign out
-                </button>
-              </>
-            ) : (
-              <>
-                <Link href="/auth/login" className="text-sm text-white/65 hover:text-white transition-colors px-3 py-2">Sign in</Link>
-                <Link href="/auth/signup" className="btn-gradient px-4 py-2 rounded-xl text-sm font-semibold text-white">
-                  Get Started
-                </Link>
-              </>
-            )}
           </div>
-        </div>
-      </nav>
-      <CursorGlowTracker />
+        </section>
 
-      <main>
-        {/* Hero */}
-        <section className="relative py-20 lg:py-28 text-center">
-          <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
-          <div className="max-w-3xl mx-auto px-6">
-            <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
-              <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-brand-500/20 bg-brand-500/5 text-brand-400 text-sm font-medium mb-6">
-                <Sparkles className="w-3.5 h-3.5" />
-                Simple, transparent pricing
-              </motion.div>
-              <motion.h1 variants={fadeInUp} className="text-5xl md:text-7xl font-black tracking-tight mb-6">
-                Ready to<br /><span className="gradient-text">Dominate?</span>
-              </motion.h1>
-              <motion.p variants={fadeInUp} className="text-lg text-white/60 max-w-xl mx-auto">
-                Start free. Scale when you&apos;re ready. No credit card required for Starter or the 14-day Pro trial.
-              </motion.p>
+        {/* ━━━━━━━━━━ SOCIAL PROOF STRIP ━━━━━━━━━━ */}
+        <section className="pb-24 px-6">
+          <div className="max-w-3xl mx-auto text-center">
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 text-sm text-zinc-500"
+            >
+              <span className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-emerald-400" />
+                No credit card required
+              </span>
+              <span className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-emerald-400" />
+                14-day free trial on all paid plans
+              </span>
+              <span className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-emerald-400" />
+                Cancel anytime
+              </span>
             </motion.div>
           </div>
         </section>
 
-        {/* Plans */}
-        <section className="pb-20 px-6">
-          <div className="max-w-5xl mx-auto">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer} className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-              {PLANS.map((plan) => (
-                <motion.div
-                  key={plan.name}
-                  variants={fadeInUp}
-                  className={`relative rounded-2xl p-8 flex flex-col ${
-                    plan.featured
-                      ? "border border-brand-500/30 bg-gradient-to-b from-brand-500/10 to-accent-purple/5 shadow-glow"
-                      : "gradient-border"
-                  }`}
-                >
-                  {plan.featured && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-brand-500 to-accent-purple text-xs font-bold text-white whitespace-nowrap">
-                      Most Popular
-                    </div>
-                  )}
+        {/* ━━━━━━━━━━ FAQ ━━━━━━━━━━ */}
+        <section className="pb-32 px-6">
+          <div className="max-w-2xl mx-auto">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-60px" }}
+            >
+              <motion.h2
+                custom={0}
+                variants={fadeUp}
+                className="text-3xl sm:text-4xl font-extrabold tracking-tight text-center mb-4"
+              >
+                Frequently asked questions
+              </motion.h2>
+              <motion.p
+                custom={1}
+                variants={fadeUp}
+                className="text-zinc-400 text-center mb-12"
+              >
+                Everything you need to know about our plans.
+              </motion.p>
 
-                  <div className="mb-6">
-                    <div className={`text-sm font-semibold mb-2 ${plan.featured ? "text-brand-400" : "text-white/65"}`}>{plan.name}</div>
-                    <div className="flex items-baseline gap-1 mb-1">
-                      <span className="text-4xl font-black">{plan.price}</span>
-                      {plan.period && <span className="text-white/60 text-sm">{plan.period}</span>}
-                    </div>
-                    <p className="text-xs text-white/60 leading-relaxed">{plan.desc}</p>
-                  </div>
-
-                  <ul className="space-y-3 mb-8 flex-1">
-                    {plan.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2">
-                        <Check className={`w-3.5 h-3.5 flex-shrink-0 mt-0.5 ${plan.featured ? "text-brand-400" : "text-white/60"}`} />
-                        <span className="text-sm text-white/65">{f}{SOON_FEATURES.has(f) && <SoonBadge />}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  {plan.isExternal ? (
-                    <a
-                      href={plan.ctaHref}
-                      className="block w-full py-3 rounded-xl text-sm font-bold text-center border border-white/[0.1] text-white/70 hover:text-white hover:border-white/20 transition-all"
-                    >
-                      {plan.cta}
-                    </a>
-                  ) : plan.planSlug ? (
-                    <button
-                      onClick={() => handleCheckout(plan.planSlug!)}
-                      disabled={checkoutLoading}
-                      className={`flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold disabled:opacity-60 disabled:cursor-not-allowed ${
-                        plan.featured
-                          ? "btn-gradient text-white shadow-glow"
-                          : "border border-white/[0.1] text-white/70 hover:text-white hover:border-white/20 transition-all"
+              <div className="space-y-3">
+                {FAQS.map((faq, i) => {
+                  const isOpen = openFaq === i;
+                  return (
+                    <motion.div
+                      key={i}
+                      custom={i + 2}
+                      variants={fadeUp}
+                      className={`rounded-xl border transition-colors ${
+                        isOpen
+                          ? "border-purple-500/20 bg-purple-500/[0.03]"
+                          : "border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04]"
                       }`}
                     >
-                      {checkoutLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                      {plan.cta}
-                    </button>
-                  ) : (
-                    <Link
-                      href={plan.ctaHref}
-                      className="block w-full py-3 rounded-xl text-sm font-bold text-center border border-white/[0.1] text-white/70 hover:text-white hover:border-white/20 transition-all"
-                    >
-                      {plan.cta}
-                    </Link>
-                  )}
-                </motion.div>
-              ))}
+                      <button
+                        onClick={() => setOpenFaq(isOpen ? null : i)}
+                        className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left"
+                        aria-expanded={isOpen}
+                      >
+                        <span className="text-sm font-semibold text-zinc-200">{faq.q}</span>
+                        <motion.span
+                          animate={{ rotate: isOpen ? 45 : 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="flex-shrink-0 w-5 h-5 rounded-full border border-white/[0.1] flex items-center justify-center text-zinc-500"
+                        >
+                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                            <path d="M5 1v8M1 5h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                          </svg>
+                        </motion.span>
+                      </button>
+                      <AnimatePresence initial={false}>
+                        {isOpen && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
+                            className="overflow-hidden"
+                          >
+                            <p className="px-6 pb-5 text-sm text-zinc-400 leading-relaxed">
+                              {faq.a}
+                            </p>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  );
+                })}
+              </div>
             </motion.div>
           </div>
         </section>
 
-        {/* Feature comparison */}
-        <section className="py-20 border-t border-white/[0.08] px-6">
-          <div className="max-w-4xl mx-auto">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer}>
-              <motion.h2 variants={fadeInUp} className="text-3xl font-black text-center mb-2">What&apos;s included</motion.h2>
-              <motion.p variants={fadeInUp} className="text-white/60 text-center mb-10">Every AI product, broken down by plan. No credits. No surprises.</motion.p>
-
-              <motion.div variants={fadeInUp} className="gradient-border rounded-2xl overflow-hidden overflow-x-auto">
-                {/* Header */}
-                <div className="grid grid-cols-6 gap-0 border-b border-white/[0.10] min-w-[800px]">
-                  <div className="px-4 py-4 text-xs font-semibold text-white/60 uppercase tracking-wider">Product</div>
-                  <div className="px-3 py-4 text-xs font-semibold text-white/60 uppercase tracking-wider text-center">Starter</div>
-                  <div className="px-3 py-4 text-xs font-semibold text-emerald-400 uppercase tracking-wider text-center bg-emerald-500/[0.03]">Creator</div>
-                  <div className="px-3 py-4 text-xs font-semibold text-brand-400 uppercase tracking-wider text-center bg-brand-500/[0.03]">Pro</div>
-                  <div className="px-3 py-4 text-xs font-semibold text-purple-400 uppercase tracking-wider text-center bg-purple-500/[0.03]">Agency</div>
-                  <div className="px-3 py-4 text-xs font-semibold text-accent-cyan uppercase tracking-wider text-center">Enterprise</div>
-                </div>
-
-                {PRODUCTS.map((p, i) => (
-                  <div key={p.name} className={`grid grid-cols-6 gap-0 border-b border-white/[0.07] min-w-[800px] ${i % 2 === 0 ? "" : "bg-white/[0.04]"}`}>
-                    <div className="px-4 py-3 flex items-center gap-2">
-                      <p.icon className="w-3.5 h-3.5 text-white/60 flex-shrink-0" />
-                      <span className="text-xs text-white/60">{p.name}{SOON_PRODUCTS.has(p.name) && <SoonBadge />}</span>
-                    </div>
-                    {(["starter", "creator", "pro", "agency", "enterprise"] as const).map((tier) => {
-                      const val = p[tier];
-                      const tierColors: Record<string, string> = {
-                        starter: "text-white/60",
-                        creator: "text-emerald-400",
-                        pro: "text-brand-400",
-                        agency: "text-purple-400",
-                        enterprise: "text-accent-cyan",
-                      };
-                      const bgClass = tier === "creator" ? "bg-emerald-500/[0.02]" : tier === "pro" ? "bg-brand-500/[0.02]" : tier === "agency" ? "bg-purple-500/[0.02]" : "";
-                      return (
-                        <div key={tier} className={`px-3 py-3 flex items-center justify-center ${bgClass}`}>
-                          {typeof val === "string" ? (
-                            <span className={`text-[11px] ${tierColors[tier]}`}>{val}</span>
-                          ) : val ? (
-                            <Check className={`w-3.5 h-3.5 ${tierColors[tier]}`} />
-                          ) : (
-                            <span className="w-3.5 h-px bg-white/10 block" />
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                ))}
-              </motion.div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Popular Add-ons */}
-        <section className="py-20 border-t border-white/[0.08] px-6">
-          <div className="max-w-5xl mx-auto">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer}>
-              <motion.div variants={fadeInUp} className="flex items-center gap-2 justify-center mb-2">
-                <Plus className="w-5 h-5 text-brand-400" />
-                <h2 className="text-3xl font-black">Power up your plan</h2>
-              </motion.div>
-              <motion.p variants={fadeInUp} className="text-white/60 text-center mb-4 max-w-xl mx-auto">
-                Add individual AI agents and tools to any plan. Pay only for what you need.
-              </motion.p>
-              <motion.p variants={fadeInUp} className="text-xs text-brand-400/60 text-center mb-10">
-                Pro plan includes all add-ons at no extra cost
-              </motion.p>
-
-              <motion.div variants={staggerContainer} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {[
-                  { icon: BarChart3, name: "SEO Campaign Agent", price: "$29", period: "/mo", desc: "Autonomous SEO: keyword discovery, content gen, rank tracking", color: "text-emerald-400", borderColor: "border-emerald-500/15 hover:border-emerald-500/30", soon: true },
-                  { icon: Video, name: "AI Video Creator", price: "$19", period: "/mo", desc: "Auto-generate social videos for TikTok, Reels, YouTube", color: "text-brand-400", borderColor: "border-brand-500/15 hover:border-brand-500/30", soon: true },
-                  { icon: Mail, name: "AI Email Support", price: "$24", period: "/mo", desc: "AI auto-reply, smart inbox, sentiment analysis, <30s response", color: "text-accent-cyan", borderColor: "border-accent-cyan/15 hover:border-accent-cyan/30", soon: true },
-                  { icon: Megaphone, name: "Email Marketing Suite", price: "$14", period: "/mo", desc: "Campaigns, automations, A/B testing, deliverability tools", color: "text-amber-400", borderColor: "border-amber-500/15 hover:border-amber-500/30", soon: true },
-                  { icon: Bot, name: "AI Chatbot Builder", price: "$14", period: "/mo", desc: "Train on your content, embed anywhere, capture leads", color: "text-purple-400", borderColor: "border-purple-500/15 hover:border-purple-500/30", soon: true },
-                  { icon: Languages, name: "Multi-Language (i18n)", price: "$14", period: "/mo", desc: "Auto-translate your site into 30+ languages", color: "text-cyan-400", borderColor: "border-cyan-500/15 hover:border-cyan-500/30", soon: true },
-                  { icon: TestTube2, name: "A/B Testing Engine", price: "$19", period: "/mo", desc: "Split test pages, CTAs, and layouts with AI recommendations", color: "text-orange-400", borderColor: "border-orange-500/15 hover:border-orange-500/30", soon: true },
-                  { icon: Palette, name: "AI Brand Kit", price: "$19", period: "one-time", desc: "Logo, color palette, typography, brand guidelines — AI generated", color: "text-rose-400", borderColor: "border-rose-500/15 hover:border-rose-500/30", soon: true },
-                  { icon: Headphones, name: "Premium Support", price: "$19", period: "/mo", desc: "+60 min/mo live Claude agent support with 20 min sessions. Real answers, not canned responses", color: "text-emerald-400", borderColor: "border-emerald-500/15 hover:border-emerald-500/30", soon: false },
-                  { icon: Blocks, name: "Component Library", price: "$19", period: "one-time", desc: "500+ premium components: heroes, CTAs, navs, footers, forms", color: "text-teal-400", borderColor: "border-teal-500/15 hover:border-teal-500/30", soon: false },
-                ].map((addon) => (
-                  <motion.div key={addon.name} variants={fadeInUp}>
-                    <Link href="/marketplace" className={`block p-5 rounded-xl border ${addon.borderColor} bg-white/[0.04] transition-all group`}>
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-center gap-2.5">
-                          <addon.icon className={`w-4 h-4 ${addon.color}`} />
-                          <span className="text-sm font-semibold text-white/80">{addon.name}{addon.soon && <SoonBadge />}</span>
-                        </div>
-                        <div className="text-right">
-                          <span className="text-sm font-black text-white">{addon.price}</span>
-                          <span className="text-[10px] text-white/60 ml-0.5">{addon.period}</span>
-                        </div>
-                      </div>
-                      <p className="text-xs text-white/60 leading-relaxed">{addon.desc}</p>
-                      <div className="mt-3 text-[10px] font-semibold text-white/60 group-hover:text-white/60 transition-colors flex items-center gap-1">
-                        Add to plan <ArrowRight className="w-2.5 h-2.5" />
-                      </div>
-                    </Link>
-                  </motion.div>
-                ))}
-              </motion.div>
-
-              <motion.div variants={fadeInUp} className="mt-6 text-center">
-                <Link href="/marketplace" className="inline-flex items-center gap-2 text-sm text-brand-400 hover:text-brand-300 transition-colors font-medium">
-                  <ShoppingCart className="w-3.5 h-3.5" />
-                  View all 20+ add-ons in the Marketplace
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </motion.div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Replace Your Stack */}
-        <section className="py-20 border-t border-white/[0.08] px-6">
-          <div className="max-w-4xl mx-auto">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer}>
-              <motion.div variants={fadeInUp} className="text-center mb-12">
-                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[12px] font-semibold text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 mb-5">
-                  <ShoppingCart className="w-3.5 h-3.5" />
-                  Cancel 6 subscriptions
-                </span>
-                <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-3">
-                  You&apos;re paying <span className="text-red-400 line-through decoration-red-400/50">$200+/mo</span> for tools Zoobicon replaces
+        {/* ━━━━━━━━━━ BOTTOM CTA ━━━━━━━━━━ */}
+        <section className="pb-32 px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="max-w-3xl mx-auto text-center"
+          >
+            <div className="relative rounded-2xl p-[1px] bg-gradient-to-b from-purple-500/30 via-white/[0.06] to-white/[0.02] overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-b from-purple-600/[0.06] to-transparent pointer-events-none" />
+              <div className="relative rounded-[15px] bg-zinc-950/80 backdrop-blur-xl py-16 px-8">
+                <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-4">
+                  Ready to build something{" "}
+                  <span className="bg-gradient-to-r from-purple-400 to-violet-400 bg-clip-text text-transparent">
+                    extraordinary
+                  </span>
+                  ?
                 </h2>
-                <p className="text-white/50 max-w-lg mx-auto">
-                  Most businesses juggle 6-8 separate subscriptions just to run their online presence. Zoobicon bundles everything into one platform.
+                <p className="text-zinc-400 mb-8 max-w-md mx-auto">
+                  Join thousands of creators and agencies building with Zoobicon.
+                  Start your free trial today.
                 </p>
-              </motion.div>
-
-              <motion.div variants={fadeInUp} className="gradient-border rounded-2xl overflow-hidden">
-                <div className="divide-y divide-white/[0.06]">
-                  {[
-                    { tool: "Website Builder", competitor: "Squarespace / Wix", theirPrice: "$16-33/mo", us: "Included", icon: Globe },
-                    { tool: "Hosting + SSL + CDN", competitor: "Vercel / Netlify", theirPrice: "$20/mo", us: "Included", icon: Server },
-                    { tool: "Email Marketing", competitor: "Mailchimp / ConvertKit", theirPrice: "$20-29/mo", us: "Included in Pro", icon: Mail },
-                    { tool: "Forms + CRM", competitor: "Typeform / Jotform", theirPrice: "$25-34/mo", us: "Included in Pro", icon: Blocks },
-                    { tool: "Chat Widget", competitor: "Intercom / Tidio", theirPrice: "$29-74/mo", us: "Included in Pro", icon: Bot },
-                    { tool: "SEO Tools", competitor: "Ahrefs / Surfer", theirPrice: "$89-99/mo", us: "Included in Pro", icon: BarChart3 },
-                    { tool: "Booking / Scheduling", competitor: "Calendly / Acuity", theirPrice: "$16-25/mo", us: "Included in Pro", icon: Users },
-                    { tool: "Link-in-Bio", competitor: "Linktree Pro", theirPrice: "$9-24/mo", us: "Included", icon: AtSign },
-                  ].map((row, i) => (
-                    <div key={i} className={`grid grid-cols-12 items-center px-5 py-3.5 ${i % 2 === 0 ? "" : "bg-white/[0.02]"}`}>
-                      <div className="col-span-5 flex items-center gap-2.5">
-                        <row.icon className="w-3.5 h-3.5 text-white/40 flex-shrink-0" />
-                        <div>
-                          <div className="text-sm font-medium text-white/80">{row.tool}</div>
-                          <div className="text-[10px] text-white/35">{row.competitor}</div>
-                        </div>
-                      </div>
-                      <div className="col-span-3 text-center">
-                        <span className="text-sm text-red-400/80 font-mono">{row.theirPrice}</span>
-                      </div>
-                      <div className="col-span-4 text-right">
-                        <span className="text-sm text-emerald-400 font-semibold">{row.us}</span>
-                      </div>
-                    </div>
-                  ))}
-                  {/* Total row */}
-                  <div className="grid grid-cols-12 items-center px-5 py-4 bg-gradient-to-r from-emerald-500/[0.06] to-brand-500/[0.06]">
-                    <div className="col-span-5">
-                      <span className="text-sm font-black text-white/90">TOTAL</span>
-                    </div>
-                    <div className="col-span-3 text-center">
-                      <span className="text-lg font-black text-red-400 line-through decoration-red-400/50">$224+/mo</span>
-                    </div>
-                    <div className="col-span-4 text-right">
-                      <span className="text-lg font-black text-emerald-400">$49/mo</span>
-                      <span className="text-xs text-emerald-400/60 ml-1">with Pro</span>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div variants={fadeInUp} className="mt-6 text-center">
-                <p className="text-xs text-white/35 mb-4">Competitor prices verified March 2026. Zoobicon pricing based on Pro plan ($49/mo).</p>
-                <Link href="/auth/signup" className="inline-flex items-center gap-2 btn-gradient px-7 py-3 rounded-xl text-sm font-bold text-white shadow-glow">
-                  Start Your Pro Trial — Free for 14 Days
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </motion.div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Domain + Hosting Bundle */}
-        <section className="py-20 border-t border-white/[0.08] px-6">
-          <div className="max-w-5xl mx-auto">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer}>
-              <motion.h2 variants={fadeInUp} className="text-3xl font-black text-center mb-2">Launch the complete stack</motion.h2>
-              <motion.p variants={fadeInUp} className="text-white/60 text-center mb-10 max-w-lg mx-auto">Domain, hosting, SSL, email — everything to go live. Bundle and save.</motion.p>
-
-              <motion.div variants={staggerContainer} className="grid md:grid-cols-3 gap-5">
-                {/* Domain */}
-                <motion.div variants={fadeInUp}>
-                  <Link href="/domains" className="block gradient-border rounded-2xl p-7 h-full hover:bg-white/[0.04] transition-all group">
-                    <Globe className="w-8 h-8 text-brand-400 mb-4" />
-                    <h3 className="text-lg font-bold mb-1">Custom Domain<SoonBadge /></h3>
-                    <div className="flex items-baseline gap-1 mb-3">
-                      <span className="text-2xl font-black">$2.99</span>
-                      <span className="text-sm text-white/60">/year</span>
-                    </div>
-                    <ul className="space-y-2 mb-4">
-                      {[".com from $12.99/yr", ".ai from $69.99/yr", ".io, .dev, .app available", "Free WHOIS privacy included"].map((f) => (
-                        <li key={f} className="flex items-center gap-2 text-xs text-white/60">
-                          <Check className="w-3 h-3 text-brand-400/60 flex-shrink-0" /> {f}
-                        </li>
-                      ))}
-                    </ul>
-                    <span className="text-xs text-white/60 group-hover:text-brand-400 transition-colors flex items-center gap-1 font-medium">
-                      Browse domains <ArrowRight className="w-3 h-3" />
-                    </span>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                  <Link
+                    href="/builder"
+                    className="group inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-sm font-bold text-white shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 transition-all"
+                  >
+                    Try the Builder Free
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                   </Link>
-                </motion.div>
-
-                {/* Hosting */}
-                <motion.div variants={fadeInUp}>
-                  <Link href="/hosting" className="block gradient-border rounded-2xl p-7 h-full hover:bg-white/[0.04] transition-all group">
-                    <Server className="w-8 h-8 text-accent-cyan mb-4" />
-                    <h3 className="text-lg font-bold mb-1">Premium Hosting</h3>
-                    <div className="flex items-baseline gap-1 mb-3">
-                      <span className="text-2xl font-black">$12.99</span>
-                      <span className="text-sm text-white/60">/month</span>
-                    </div>
-                    <ul className="space-y-2 mb-4">
-                      {["Global CDN (300+ edge nodes)", "99.99% uptime SLA", "Auto SSL & DDoS protection", "Instant rollbacks & staging"].map((f) => (
-                        <li key={f} className="flex items-center gap-2 text-xs text-white/60">
-                          <Check className="w-3 h-3 text-accent-cyan/60 flex-shrink-0" /> {f}
-                        </li>
-                      ))}
-                    </ul>
-                    <span className="text-xs text-white/60 group-hover:text-accent-cyan transition-colors flex items-center gap-1 font-medium">
-                      View hosting <ArrowRight className="w-3 h-3" />
-                    </span>
-                  </Link>
-                </motion.div>
-
-                {/* Email + Security bundle */}
-                <motion.div variants={fadeInUp}>
-                  <div className="gradient-border rounded-2xl p-7 h-full">
-                    <AtSign className="w-8 h-8 text-emerald-400 mb-4" />
-                    <h3 className="text-lg font-bold mb-1">Email + Security<SoonBadge /></h3>
-                    <div className="flex items-baseline gap-1 mb-3">
-                      <span className="text-2xl font-black">$14.98</span>
-                      <span className="text-sm text-white/60">/month</span>
-                    </div>
-                    <ul className="space-y-2 mb-4">
-                      {["Professional email (you@domain)", "10GB storage per mailbox", "Wildcard SSL certificate", "Malware scanning & firewall"].map((f) => (
-                        <li key={f} className="flex items-center gap-2 text-xs text-white/60">
-                          <Check className="w-3 h-3 text-emerald-400/60 flex-shrink-0" /> {f}
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="flex items-center gap-1.5 text-[10px] text-white/60">
-                      <Lock className="w-3 h-3" /> Email $4.99/mo + SSL & Security $9.99/mo
-                    </div>
-                  </div>
-                </motion.div>
-              </motion.div>
-
-              {/* Bundle callout */}
-              <motion.div variants={fadeInUp} className="mt-6 gradient-border rounded-xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div>
-                  <span className="text-sm font-bold text-white/80">Full Stack Bundle: </span>
-                  <span className="text-sm text-white/60">Creator plan + domain + hosting + email + SSL</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="text-right">
-                    <div className="text-xs text-white/60 line-through">$51.96/mo + domain</div>
-                    <div className="text-sm font-black text-brand-400">From $46.98/mo + $2.99/yr</div>
-                  </div>
-                  <Link href="/domains" className="btn-gradient px-5 py-2.5 rounded-lg text-xs font-bold text-white whitespace-nowrap flex items-center gap-1.5">
-                    Start with a domain <ArrowRight className="w-3 h-3" />
+                  <Link
+                    href="/auth/signup"
+                    className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-sm font-semibold text-zinc-300 border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.04] transition-all"
+                  >
+                    Create Free Account
                   </Link>
                 </div>
-              </motion.div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* For Agencies */}
-        <section className="py-20 border-t border-white/[0.08] px-6">
-          <div className="max-w-4xl mx-auto">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer}>
-              <motion.div variants={fadeInUp} className="gradient-border rounded-2xl p-10 md:p-16 flex flex-col md:flex-row items-center gap-10">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Building2 className="w-5 h-5 text-accent-cyan" />
-                    <span className="text-sm font-semibold text-accent-cyan">For Agencies</span>
-                  </div>
-                  <h2 className="text-3xl font-black tracking-tight mb-3">Scale your agency with Zoobicon</h2>
-                  <p className="text-white/60 leading-relaxed">
-                    White-label the entire platform. Manage all your clients from one dashboard.
-                    Bulk-generate websites. Custom pricing on request.
-                  </p>
-                </div>
-                <div className="flex flex-col gap-3 flex-shrink-0">
-                  <Link href="/agencies" className="btn-gradient px-8 py-4 rounded-xl text-sm font-bold text-white flex items-center gap-2">
-                    View Agency Plans <ArrowRight className="w-4 h-4" />
-                  </Link>
-                  <a href="mailto:sales@zoobicon.com?subject=Agency Demo Request" className="px-8 py-4 rounded-xl text-sm font-semibold text-white/65 border border-white/[0.12] hover:border-white/20 transition-all text-center flex items-center gap-2 justify-center">
-                    <Users className="w-4 h-4" /> Book a Demo
-                  </a>
-                </div>
-              </motion.div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* FAQ */}
-        <section className="py-20 border-t border-white/[0.08] px-6">
-          <div className="max-w-3xl mx-auto">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer}>
-              <motion.div variants={fadeInUp} className="flex items-center gap-2 justify-center mb-2">
-                <HelpCircle className="w-5 h-5 text-white/60" />
-                <h2 className="text-3xl font-black">FAQ</h2>
-              </motion.div>
-              <motion.p variants={fadeInUp} className="text-white/60 text-center mb-12">Everything you need to know.</motion.p>
-
-              <motion.div variants={staggerContainer} className="space-y-4">
-                {FAQS.map((faq) => (
-                  <motion.div key={faq.q} variants={fadeInUp} className="gradient-border rounded-xl p-6">
-                    <h3 className="text-sm font-bold mb-2">{faq.q}</h3>
-                    <p className="text-sm text-white/60 leading-relaxed">{faq.a}</p>
-                  </motion.div>
-                ))}
-              </motion.div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Footer CTA */}
-        <section className="py-24 text-center border-t border-white/[0.08] px-6">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={staggerContainer}>
-            <motion.h2 variants={fadeInUp} className="text-4xl md:text-6xl font-black tracking-tight mb-6">
-              Start free today.
-            </motion.h2>
-            <motion.p variants={fadeInUp} className="text-white/60 mb-8">No credit card required. Cancel anytime.</motion.p>
-            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/builder" className="group btn-gradient px-8 py-4 rounded-2xl text-base font-bold text-white flex items-center gap-2 shadow-glow">
-                <span>Try the Builder</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link href="/auth/signup" className="px-8 py-4 rounded-2xl text-base font-semibold text-white/65 border border-white/[0.12] hover:border-white/20 transition-all">
-                Create Free Account
-              </Link>
-            </motion.div>
+              </div>
+            </div>
           </motion.div>
         </section>
       </main>
