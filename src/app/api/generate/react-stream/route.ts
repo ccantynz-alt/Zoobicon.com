@@ -11,9 +11,10 @@
  *   phase     { phase, message }
  *   component { name, code, position }
  *   files     { files }
+ *   supabase  { projectUrl, anonKey, projectRef, needsAuth, needsDatabase, needsStorage, tables, authProviders, buckets }
  *   score     { score, issues }
  *   error     { message, hint }
- *   done      { finalFiles, score, durationMs }
+ *   done      { finalFiles, score, durationMs, supabase? }
  *
  * Bible Law 8: every error path emits an "error" SSE event with a clear hint.
  */
