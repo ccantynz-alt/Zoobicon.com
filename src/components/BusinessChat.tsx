@@ -136,13 +136,13 @@ Just tell me the client name and email, and I'll set it up in your invoicing sys
 **MessageCircle/X** (Post at 12:00 PM):
 > "Just shipped a new client site in under 2 minutes with AI. The future of web development isn't code — it's conversation. 🚀"
 
-**Instagram** (Post at 6:00 PM):
+**Camera** (Post at 6:00 PM):
 > Before/After carousel of your latest project. Caption: "From prompt to production in 90 seconds..."
 
 Want me to:
 1. Generate the full content for any of these?
 2. Schedule them in your content calendar?
-3. Create the Instagram carousel images?`;
+3. Create the Camera carousel images?`;
   }
 
   if (lower.includes("email") || lower.includes("campaign") || lower.includes("newsletter")) {

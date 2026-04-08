@@ -135,8 +135,8 @@ Requirements:
       system: SYSTEM_PROMPT,
     });
 
-    const translatedCode =
-      message.content[0].type === "text" ? message.content[0].text : "";
+    const textBlock = message.content.find((b: { type: string }) => b.type === "text") as { type: "text"; text: string } | undefined;
+    const translatedCode = textBlock?.text || "";
 
     if (!translatedCode) {
       return NextResponse.json(

@@ -22,6 +22,7 @@ import {
   Smartphone,
   Wifi,
   Calendar,
+  Link2,
 } from "lucide-react";
 
 const SIDEBAR_SECTIONS = [

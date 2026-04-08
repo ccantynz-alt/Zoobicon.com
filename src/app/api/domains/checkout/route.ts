@@ -80,6 +80,9 @@ export async function POST(req: NextRequest) {
       organization: registrant.organization || "",
     }) : "";
 
+    // Get user email from request or session
+    const customerEmail = email || "";
+
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
@@ -88,11 +91,11 @@ export async function POST(req: NextRequest) {
         type: "domain_registration",
         domains: JSON.stringify(domains.map((d: { domain: string }) => d.domain)),
         domainCount: String(domains.length),
-        registrantEmail: email || "",
+        registrantEmail: customerEmail,
         years: "1",
         ...(registrantInfo ? { registrantInfo } : {}),
       },
-      ...(email ? { customer_email: email } : {}),
+      ...(customerEmail ? { customer_email: customerEmail } : {}),
       success_url: `${appUrl}/my-domains?success=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/domains?cancelled=true`,
       allow_promotion_codes: true,

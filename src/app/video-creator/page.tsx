@@ -21,9 +21,221 @@ import {
   Square,
   Play,
   AlertCircle,
+  Megaphone,
+  BookOpen,
+  MessageSquareQuote,
+  Briefcase,
+  GraduationCap,
+  Building2,
+  Clapperboard,
+  Crown,
+  Smile,
+  Zap,
 } from "lucide-react";
 
-export default function VideoCreator() {
+/* ------------------------------------------------------------------ */
+/*  Types                                                             */
+/* ------------------------------------------------------------------ */
+
+interface Scene {
+  sceneNumber: number;
+  duration: string;
+  visualDescription: string;
+  textOverlay: string;
+  transition: string;
+  cameraMovement: string;
+  colorPalette: string[];
+}
+
+interface Storyboard {
+  storyboard: Scene[];
+  totalDuration: string;
+  estimatedRenderTime: string;
+  script: string;
+  musicCues?: string[];
+}
+
+interface Project {
+  id: string;
+  name: string;
+  createdAt: string;
+  projectType: string;
+  platform: string;
+  storyboard: Storyboard | null;
+}
+
+interface RenderJob {
+  id: string;
+  provider: string;
+  sceneNumber: number;
+  status: "pending" | "processing" | "succeeded" | "failed";
+  videoUrl: string | null;
+  thumbnailUrl: string | null;
+  error: string | null;
+  progress?: number;
+}
+
+interface VoicePreset {
+  id: string;
+  name: string;
+  description: string;
+  category: "male" | "female" | "neutral";
+  tone: string;
+}
+
+interface PipelineCapabilities {
+  videoRender: { available: boolean };
+  voiceover: { available: boolean };
+  imageGen: { available: boolean };
+}
+
+type PipelineStage = "idle" | "images" | "video" | "voiceover" | "subtitles" | "complete";
+
+interface PipelineStageStatus {
+  status: "pending" | "running" | "done" | "failed" | "skipped";
+  error?: string;
+}
+
+interface FullPipelineProgress {
+  running: boolean;
+  images: PipelineStageStatus;
+  video: PipelineStageStatus;
+  voiceover: PipelineStageStatus;
+  subtitles: PipelineStageStatus;
+}
+
+interface VideoTemplate {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  projectType: string;
+  platform: string;
+  duration: number;
+  style: string;
+  music: string;
+  thumbnail: string;
+  script: string;
+  tags: string[];
+}
+
+/* ------------------------------------------------------------------ */
+/*  Constants                                                         */
+/* ------------------------------------------------------------------ */
+
+const PROJECT_TYPES = [
+  { id: "social-ad", label: "Social Media Ad", icon: Sparkles, desc: "Eye-catching ads for social platforms" },
+  { id: "product-demo", label: "Product Demo", icon: Play, desc: "Showcase your product in action" },
+  { id: "explainer", label: "Explainer", icon: BookOpen, desc: "Break down complex ideas simply" },
+  { id: "testimonial", label: "Testimonial", icon: MessageSquareQuote, desc: "Customer stories that convert" },
+  { id: "brand-story", label: "Brand Story", icon: Briefcase, desc: "Tell your brand narrative" },
+  { id: "tutorial", label: "Tutorial", icon: GraduationCap, desc: "Step-by-step how-to content" },
+];
+
+const VISUAL_STYLES = [
+  { id: "modern-minimalist", label: "Modern / Minimalist", icon: Zap, color: "from-slate-400 to-slate-600" },
+  { id: "bold-dynamic", label: "Bold / Dynamic", icon: Sparkles, color: "from-red-500 to-orange-500" },
+  { id: "elegant-luxury", label: "Elegant / Luxury", icon: Crown, color: "from-amber-400 to-yellow-600" },
+  { id: "fun-playful", label: "Fun / Playful", icon: Smile, color: "from-violet-500 to-indigo-500" },
+  { id: "corporate-professional", label: "Corporate / Professional", icon: Building2, color: "from-blue-500 to-indigo-600" },
+  { id: "cinematic", label: "Cinematic", icon: Clapperboard, color: "from-emerald-500 to-teal-600" },
+];
+
+const PLATFORMS = [
+  { id: "tiktok", label: "TikTok", aspect: "9:16", icon: Smartphone },
+  { id: "instagram-reels", label: "Camera Reels", aspect: "9:16", icon: Smartphone },
+  { id: "youtube", label: "YouTube", aspect: "16:9", icon: Monitor },
+  { id: "linkedin", label: "LinkedIn", aspect: "16:9", icon: Monitor },
+  { id: "twitter", label: "MessageCircle / X", aspect: "1:1", icon: Square },
+];
+
+const DURATIONS = [
+  { value: 15, label: "15s", desc: "Quick hook" },
+  { value: 30, label: "30s", desc: "Standard" },
+  { value: 60, label: "60s", desc: "Detailed" },
+  { value: 90, label: "90s", desc: "In-depth" },
+];
+
+const MUSIC_CATEGORIES = [
+  { id: "upbeat", label: "Upbeat", emoji: "~" },
+  { id: "chill", label: "Chill", emoji: "~" },
+  { id: "corporate", label: "Corporate", emoji: "~" },
+  { id: "dramatic", label: "Dramatic", emoji: "~" },
+  { id: "none", label: "None", emoji: "" },
+];
+
+const FONTS = [
+  "Inter", "Montserrat", "Playfair Display", "Poppins", "Space Grotesk", "DM Sans",
+];
+
+const fadeIn = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+};
+
+/* ------------------------------------------------------------------ */
+/*  User-friendly error messages (never show raw API responses)        */
+/* ------------------------------------------------------------------ */
+function sanitizeError(raw: string): string {
+  const lower = raw.toLowerCase();
+  if (lower.includes("authentication failed") || lower.includes("invalid api key") || lower.includes("unauthorized") || lower.includes("auth error"))
+    return "Voice generation encountered an issue. Please try again — if this persists, contact support.";
+  if (lower.includes("all models failed") || lower.includes("voice generation failed"))
+    return "Voice generation is temporarily unavailable. Please try again in a moment.";
+  if (lower.includes("payment_required") || lower.includes("paid_plan") || lower.includes("upgrade your subscription"))
+    return "This voice model is not available on your current plan. The system will try alternative models automatically.";
+  if (lower.includes("requires a scene image") || lower.includes("generate images first"))
+    return "Generate scene images before rendering video.";
+  if (lower.includes("validation of body failed") || lower.includes("too_big"))
+    return "Video render request was too large. Try shorter scenes.";
+  if (lower.includes("base64") || lower.includes("embedded images") || lower.includes("too large for video"))
+    return "Scene images are too large for video rendering. Click 'Regenerate Images' to fix this.";
+  if (lower.includes("rate limit") || lower.includes("429"))
+    return "Rate limited. Please wait a moment and try again.";
+  // Video rendering "coming soon" or provider not configured
+  if (lower.includes("coming soon") || lower.includes("no provider configured") || lower.includes("not configured") || lower.includes("no video rendering"))
+    return "Video rendering is coming soon. Images, voiceover, and subtitles are ready!";
+  // Video rendering failures (provider issues, all scenes failed, etc.)
+  if (lower.includes("render") && (lower.includes("fail") || lower.includes("error") || lower.includes("unavailable")))
+    return "Video rendering is not yet available. Images, voiceover, and subtitles are still ready!";
+  if (lower.includes("provider") && (lower.includes("fail") || lower.includes("unavailable") || lower.includes("error") || lower.includes("not configured")))
+    return "Video rendering provider is not yet available. Other pipeline stages completed successfully.";
+  // Storyboard / AI generation failures
+  if (lower.includes("storyboard") && (lower.includes("fail") || lower.includes("error")))
+    return "Storyboard generation failed. Please try again.";
+  if (lower.includes("all ai providers") || lower.includes("ai service") || lower.includes("temporarily unavailable"))
+    return "AI service is temporarily unavailable. Please try again in a moment.";
+  if (lower.includes("parse") && lower.includes("storyboard"))
+    return "Storyboard generation encountered an issue. Please try again.";
+  if (lower.includes("api error") || lower.includes("api_error"))
+    return "Service temporarily unavailable. Please try again.";
+  if (lower.includes("add api") || lower.includes("environment"))
+    return "This feature is coming soon.";
+  if (lower.includes("timeout") || lower.includes("timed out"))
+    return "Request timed out. Please try again.";
+  if (lower.includes("image generation") && lower.includes("fail"))
+    return "Image generation failed. Please try again.";
+  if (lower.includes("voiceover") && lower.includes("fail"))
+    return "Voiceover generation failed. Please try again.";
+  if (lower.includes("subtitle") && lower.includes("fail"))
+    return "Subtitle generation failed. Please try again.";
+  // Strip any JSON, env var references, and technical details from the message
+  let cleaned = raw.replace(/\{[\s\S]*\}/, "").replace(/\[[\s\S]*\]/, "").trim();
+  cleaned = cleaned.replace(/[A-Z_]{3,}_[A-Z_]+/g, "").trim(); // Strip env var names like ELEVENLABS_API_KEY
+  // If what's left still looks technical, genericize — but keep reasonably short user-friendly messages
+  if (cleaned.includes("error:") || cleaned.includes("Error:") || cleaned.includes("env") || cleaned.includes("key") || cleaned.includes("API") || cleaned.includes("module"))
+    return "Something went wrong. Please try again.";
+  // Keep cleaned messages up to 120 chars (previous limit of 80 was too aggressive)
+  if (cleaned.length > 120)
+    return "Something went wrong. Please try again.";
+  return cleaned || "Something went wrong. Please try again.";
+}
+
+/* ------------------------------------------------------------------ */
+/*  Component                                                         */
+/* ------------------------------------------------------------------ */
+
+export default function VideoCreatorDashboard() {
   const router = useRouter();
   const [user, setUser] = useState<{ email: string } | null>(null);
 
@@ -510,17 +722,37 @@ SCRIPT_2:
               </div>
             </div>
 
-            <button
-              onClick={handleGenerateVideo}
-              disabled={generating}
-              className="w-full py-5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 rounded-2xl font-bold text-xl disabled:opacity-50 transition-all flex items-center justify-center gap-3 shadow-xl shadow-amber-500/25 hover:shadow-2xl hover:shadow-amber-500/30"
-            >
-              {generating ? (
-                <><Loader2 className="w-6 h-6 animate-spin" /> {videoStatus || "Generating..."}</>
-              ) : (
-                <><Sparkles className="w-6 h-6" /> Generate Video</>
-              )}
-            </button>
+            {generating ? (
+              <div className="rounded-2xl bg-gradient-to-br from-amber-500/5 to-orange-500/5 border border-amber-500/10 p-8">
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 mx-auto mb-4 flex items-center justify-center shadow-xl shadow-amber-500/30">
+                    <Video className="w-8 h-8 text-white animate-pulse" />
+                  </div>
+                  <h3 className="text-lg font-bold mb-1">Generating your video</h3>
+                  <p className="text-sm text-amber-400/70">{videoStatus || "Starting pipeline..."}</p>
+                </div>
+                <div className="space-y-3 max-w-sm mx-auto">
+                  {["FLUX generates presenter", "AI creates voiceover", "OmniHuman animates face", "Final rendering"].map((stage, i) => {
+                    const stageStatus = videoStatus?.toLowerCase() || "";
+                    const isDone = (i === 0 && stageStatus.includes("voice")) || (i === 1 && stageStatus.includes("animat")) || (i === 2 && stageStatus.includes("render"));
+                    const isActive = !isDone && ((i === 0 && stageStatus.includes("present")) || (i === 1 && stageStatus.includes("voice")) || (i === 2 && stageStatus.includes("animat")) || (i === 3 && stageStatus.includes("render")));
+                    return (
+                      <div key={stage} className={`flex items-center gap-3 text-sm ${isDone ? "text-emerald-400" : isActive ? "text-amber-400" : "text-white/20"}`}>
+                        {isDone ? <Check className="w-4 h-4" /> : isActive ? <Loader2 className="w-4 h-4 animate-spin" /> : <div className="w-4 h-4 rounded-full border border-white/10" />}
+                        {stage}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={handleGenerateVideo}
+                className="w-full py-5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 rounded-2xl font-bold text-xl transition-all flex items-center justify-center gap-3 shadow-xl shadow-amber-500/25 hover:shadow-2xl hover:shadow-amber-500/30"
+              >
+                <Sparkles className="w-6 h-6" /> Generate Video
+              </button>
+            )}
           </div>
         )}
 

@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  checkDomainAvailability,
-  isOpenSRSConfigured,
-  checkWithFallback,
-} from "@/lib/opensrs";
+import { checkWithFallback } from "@/lib/opensrs";
 
 // ---------------------------------------------------------------------------
 // GET /api/domains/search?q=domainname&tlds=com,io,ai
@@ -69,65 +65,28 @@ export async function GET(req: NextRequest) {
       : DEFAULT_TLDS;
 
     const isShort = sanitized.length <= 3;
-    const useOpenSRS = isOpenSRSConfigured();
+    console.log(`[Domain Search] query="${sanitized}" tlds=${tlds.join(",")} source=rdap-authoritative`);
 
-    // Check all domains in parallel (batch of 4 to avoid rate limiting)
-    const domains = tlds.map((tld) => `${sanitized}.${tld}`);
-    const availabilityResults = new Map<
-      string,
-      { available: boolean | null; status: string; error?: string }
-    >();
+    // Check every TLD in parallel via the authoritative RDAP-first checker.
+    // RDAP is the official IANA-blessed registry protocol — no test-sandbox lies.
+    const checks = await Promise.all(
+      tlds.map(async (tld) => {
+        const domain = `${sanitized}.${tld}`;
+        const available = await checkWithFallback(domain);
+        return { domain, tld, available };
+      }),
+    );
 
-    // Process in batches of 4
-    for (let i = 0; i < domains.length; i += 4) {
-      const batch = domains.slice(i, i + 4);
-
-      // Always try OpenSRS first, then fall back to DNS for any failures
-      const batchResults = await Promise.all(
-        batch.map(async (domain) => {
-          // Try OpenSRS if configured
-          if (useOpenSRS) {
-            const result = await checkDomainAvailability(domain);
-            if (result.status !== "error" && result.status !== "unknown") {
-              return { domain, available: result.available, status: result.status };
-            }
-            // OpenSRS failed for this domain — fall back to DNS
-            console.warn(`[Domain Search] OpenSRS failed for ${domain}: ${result.error || result.status}, trying DNS fallback`);
-          }
-
-          // DNS fallback — check if domain resolves
-          const dnsAvailable = await checkWithFallback(domain);
-          return {
-            domain,
-            available: dnsAvailable,
-            status: dnsAvailable === true ? "available" : dnsAvailable === false ? "taken" : "unknown",
-          };
-        }),
-      );
-
-      for (const result of batchResults) {
-        availabilityResults.set(result.domain, {
-          available: result.available,
-          status: result.status,
-        });
-      }
-    }
-
-    const results = tlds.map((tld) => {
-      const domain = `${sanitized}.${tld}`;
-      const result = availabilityResults.get(domain);
-      const available = result?.available ?? null;
+    const results = checks.map(({ domain, tld, available }) => {
       const basePrice = TLD_PRICING[tld] ?? 14.99;
       const price = isShort ? Math.round(basePrice * 2 * 100) / 100 : basePrice;
-
       return {
         domain,
         tld,
         available,
         price,
         premium: isShort,
-        source: useOpenSRS ? "opensrs" : "dns",
-        ...(result?.error ? { error: result.error } : {}),
+        source: "rdap",
       };
     });
 
@@ -146,7 +105,7 @@ export async function GET(req: NextRequest) {
       available: results.filter((r) => r.available === true).length,
       taken: results.filter((r) => r.available === false).length,
       unknown: results.filter((r) => r.available === null).length,
-      source: useOpenSRS ? "opensrs-live" : "dns-fallback",
+      source: "rdap-authoritative",
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Internal server error";

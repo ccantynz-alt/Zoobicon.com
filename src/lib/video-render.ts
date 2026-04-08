@@ -703,6 +703,8 @@ export async function startRender(request: RenderRequest): Promise<RenderResult>
           jobId = result.taskId;
           break;
         }
+        default:
+          throw new Error(`[video-render] Unsupported provider: ${provider}`);
       }
 
       jobs.push({
@@ -776,6 +778,8 @@ export async function checkRenderStatus(jobs: RenderJob[]): Promise<RenderJob[]>
         case "kling":
           result = await checkKlingJob(job.id);
           break;
+        default:
+          throw new Error(`[video-render] Unsupported provider for status check: ${job.provider}`);
       }
 
       result.sceneNumber = job.sceneNumber;
@@ -837,11 +841,44 @@ function buildVideoPrompt(scene: RenderScene, style: string, provider?: VideoPro
     : "";
 
   // Scale description length based on provider's prompt limit
-  const descMaxLength = Math.floor(maxLength * 0.6);
+  const descMaxLength = Math.floor(maxLength * 0.55);
   const desc = (scene.visualDescription || "").slice(0, descMaxLength);
   const camera = scene.cameraMovement ? `Camera: ${scene.cameraMovement}.` : "";
 
-  const parts = [desc, camera, motionDir, colorDir, "Cinematic quality. Photorealistic."];
+  // ── Provider-specific cinematography directives ──
+  // Generic "cinematic quality" produces flat, generic output. Each modern
+  // text-to-video model responds best to provider-tuned cinematography hints.
+  let cinema: string;
+  switch (provider) {
+    case "runway":
+      // Runway Gen-3: short, punchy, broadcast-grade. Prefers exact technical terms.
+      cinema = "Cinematic 24fps, anamorphic 2.39:1, shallow depth-of-field 35mm equiv, key light 45°, soft fill, professional color grade, smooth dolly motion, no strobing.";
+      break;
+    case "kling":
+      // Kling 3.0: rich detail, photoreal humans, motion-aware. Big prompt budget.
+      cinema = "Hyper-realistic 4K, natural skin tones, soft volumetric lighting, shallow depth-of-field, smooth gimbal motion, true-to-life physics, sharp eye focus, no morphing, no extra fingers, no warping faces, broadcast color grade.";
+      break;
+    case "luma":
+      // Luma Dream Machine: dreamy, atmospheric, great for cinematic motion.
+      cinema = "Cinematic photoreal, 24fps motion blur, atmospheric haze, golden hour lighting, slow camera push, soft bokeh, film grain, color graded like A24 film.";
+      break;
+    case "pika":
+      // Pika: fast, stylized, social-friendly.
+      cinema = "Vibrant, sharp focus, energetic motion, well-lit, 16:9, no flicker, smooth subject motion.";
+      break;
+    case "replicate":
+      // Replicate-hosted models (varies, but generally people/photoreal-friendly).
+      cinema = "Photorealistic, accurate human faces, soft key light, shallow DOF, sharp eye focus, smooth motion, broadcast color, no morphing, no extra limbs.";
+      break;
+    default:
+      cinema = "Cinematic 24fps, professional lighting, shallow depth-of-field, smooth camera motion, photorealistic, broadcast color grade.";
+  }
+
+  // Universal negative prompt — keeps every model from producing the usual AI tells.
+  const negative =
+    "Avoid: warped faces, extra fingers, morphing limbs, text artifacts, watermarks, low resolution, jittery motion, washed-out color.";
+
+  const parts = [desc, camera, motionDir, colorDir, cinema];
 
   // For providers with larger limits (Kling 2000 chars), add extra detail
   if (maxLength >= 1500) {
@@ -849,7 +886,9 @@ function buildVideoPrompt(scene: RenderScene, style: string, provider?: VideoPro
     if (scene.textOverlay) {
       parts.push(`On-screen text: "${scene.textOverlay}".`);
     }
-    parts.push("High resolution, professional lighting, smooth motion, no artifacts.");
+    parts.push(negative);
+  } else if (maxLength >= 800) {
+    parts.push(negative);
   }
 
   const prompt = parts

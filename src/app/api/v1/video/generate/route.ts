@@ -91,10 +91,11 @@ export async function POST(req: NextRequest) {
         });
       } catch (err) {
         const message = err instanceof Error ? err.message : "Video generation failed.";
-        // Never expose raw API errors
-        const safeMessage = message.includes("API") || message.includes("token") || message.includes("key")
-          ? "Video generation failed. Please try again."
-          : message;
+        // Expose pipeline step details but strip sensitive info (tokens, keys)
+        const safeMessage = message
+          .replace(/Bearer\s+\S+/gi, "Bearer [REDACTED]")
+          .replace(/r8_[A-Za-z0-9]+/g, "[REDACTED]")
+          .replace(/sk-[A-Za-z0-9]+/g, "[REDACTED]");
         send({ type: "error", message: safeMessage });
       }
 
