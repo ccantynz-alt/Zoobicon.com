@@ -37,15 +37,22 @@ export async function GET(req: NextRequest) {
     : "***";
 
   // All models used in the video pipeline
+  // Updated April 2026 — verified slugs only.
   const pipelineModels = [
-    { name: "Kokoro TTS", path: "jaaari/kokoro-82m", role: "Voice (primary)" },
-    { name: "Fish Speech", path: "jichengdu/fish-speech", role: "Voice (fallback 1)" },
-    { name: "Orpheus TTS", path: "lucataco/orpheus-3b-0.1-ft", role: "Voice (fallback 2)" },
-    { name: "XTTS v2", path: "lucataco/xtts-v2", role: "Voice (fallback 3)" },
-    { name: "FLUX.1 schnell", path: "black-forest-labs/flux-schnell", role: "Avatar generation" },
-    { name: "OmniHuman", path: "bytedance/omni-human", role: "Lip-sync (primary)" },
-    { name: "SadTalker (cjwbw)", path: "cjwbw/sadtalker", role: "Lip-sync (fallback 1)" },
-    { name: "SadTalker (lucataco)", path: "lucataco/sadtalker", role: "Lip-sync (fallback 2)" },
+    { name: "Kokoro 82M", path: "jaaari/kokoro-82m", role: "Voice (primary)" },
+    { name: "XTTS v2", path: "lucataco/xtts-v2", role: "Voice (fallback 1)" },
+    { name: "Bark", path: "suno-ai/bark", role: "Voice (fallback 2)" },
+    { name: "OpenVoice", path: "chenxwh/openvoice", role: "Voice (fallback 3)" },
+    { name: "Seamless Communication", path: "cjwbw/seamless_communication", role: "Voice (fallback 4)" },
+    { name: "FLUX.1 schnell", path: "black-forest-labs/flux-schnell", role: "Avatar (primary)" },
+    { name: "FLUX.1 dev", path: "black-forest-labs/flux-dev", role: "Avatar (fallback 1)" },
+    { name: "SDXL Lightning", path: "bytedance/sdxl-lightning-4step", role: "Avatar (fallback 2)" },
+    { name: "Stable Diffusion 3", path: "stability-ai/stable-diffusion-3", role: "Avatar (fallback 3)" },
+    { name: "SadTalker", path: "cjwbw/sadtalker", role: "Lip-sync (primary)" },
+    { name: "Video-ReTalking (cjwbw)", path: "cjwbw/video-retalking", role: "Lip-sync (fallback 1)" },
+    { name: "Video-ReTalking (lucataco)", path: "lucataco/video-retalking", role: "Lip-sync (fallback 2)" },
+    { name: "Wav2Lip (cudanexus)", path: "cudanexus/wav2lip", role: "Lip-sync (fallback 3)" },
+    { name: "Wav2Lip (devxpy)", path: "devxpy/cog-wav2lip", role: "Lip-sync (fallback 4)" },
     { name: "Whisper", path: "openai/whisper", role: "Captions (optional)" },
     { name: "MusicGen", path: "meta/musicgen", role: "Music (optional)" },
   ];

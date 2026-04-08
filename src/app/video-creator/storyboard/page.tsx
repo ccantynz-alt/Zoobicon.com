@@ -2589,9 +2589,12 @@ export default function VideoCreatorDashboard() {
                             </div>
                           )}
                           {/* Show any stage errors (user-friendly, never raw API) */}
-                          {Object.entries(fullPipelineProgress).filter(([key, val]) =>
-                            key !== "running" && typeof val === "object" && val.status === "failed" && val.error
-                          ).map(([key, val]) => (
+                          {Object.entries(fullPipelineProgress).filter(([key, val]) => {
+                            if (key === "running") return false;
+                            if (val == null || typeof val !== "object") return false;
+                            const stage = val as PipelineStageStatus;
+                            return stage.status === "failed" && !!stage.error;
+                          }).map(([key, val]) => (
                             <div key={key} className="text-[10px] text-red-400 bg-red-500/10 border border-red-500/20 rounded px-2 py-1">
                               {key}: {sanitizeError((val as PipelineStageStatus).error || "")}
                             </div>

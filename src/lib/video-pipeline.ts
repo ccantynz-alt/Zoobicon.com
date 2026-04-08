@@ -1,24 +1,21 @@
 /**
  * Zoobicon Video Pipeline — Our Own AI Video Generation Stack
  *
- * NO dependency on HeyGen. We control the entire pipeline:
- *   1. Voice Generation — Fish Speech 1.5 (text → natural speech)
- *   2. Avatar Generation — FLUX.1 schnell (text → photorealistic face)
- *   3. Lip Sync — OmniHuman v1.5 (ByteDance, best quality) or SadTalker (fallback)
- *   4. Background — FLUX.1 (text → scene background)
+ * NO dependency on HeyGen. We control the entire pipeline.
  *
- * All models run on Replicate (bridge) or self-hosted GPU (future).
- * Total cost: ~$0.10-0.30 per 30-second video.
+ * Stages (each with a 4-5 model fallback chain per LAW 9):
+ *   1. Voice    — Kokoro 82M → XTTS v2 → Bark → OpenVoice → Seamless
+ *   2. Avatar   — FLUX.1 schnell → FLUX.1 dev → SDXL Lightning → SD3
+ *   3. Lip-sync — SadTalker → Video-ReTalking (×2) → Wav2Lip (×2)
  *
- * Model selection based on March 2026 research:
- *   - OmniHuman v1.5 (ByteDance): Full upper-body animation with gestures + emotions
- *   - FLUX.1 schnell: $0.003/image, fastest high-quality image model
- *   - Fish Speech 1.5: Multilingual TTS with voice cloning from 10s of audio
- *   - SadTalker: Reliable fallback for lip-sync if OmniHuman unavailable
+ * All models run on Replicate. Total cost: ~$0.10-0.30 per 30s video.
+ * Updated April 2026 — verified slugs only. Removed dead refs to
+ * `bytedance/omni-human`, `lucataco/sadtalker`, `jichengdu/fish-speech`,
+ * `lucataco/orpheus-3b-0.1-ft` (none exist on public Replicate).
  *
  * Env vars:
- *   REPLICATE_API_TOKEN — Replicate API token (required for bridge mode)
- *   ZOOBICON_VIDEO_API_URL — Self-hosted endpoint (future, overrides Replicate)
+ *   REPLICATE_API_TOKEN — Replicate API token (required)
+ *   ZOOBICON_VIDEO_API_URL — Self-hosted endpoint (future override)
  */
 
 import { assembleScenes, burnInCaptions, mixBackgroundMusic } from "./video-assembler";
@@ -262,6 +259,49 @@ export async function generateVoice(
   throw new Error(
     `All voice models failed. Last error: ${lastError}. Tried: ${ttsModels.map((m) => m.name).join(", ")}`
   );
+}
+
+/**
+ * Generate voice using XTTS v2 with optional voice cloning.
+ *
+ * If `referenceAudioUrl` is provided, XTTS will clone that voice. Otherwise
+ * it uses a default speaker. Used by the voice-clone feature.
+ *
+ * Falls back to Kokoro 82M if XTTS is unavailable (without cloning, since
+ * Kokoro doesn't support reference-based cloning).
+ */
+export async function generateVoiceXTTS(
+  text: string,
+  referenceAudioUrl?: string
+): Promise<{ audioUrl: string; duration: number }> {
+  const token = getReplicateToken();
+
+  // Try XTTS v2 first — supports voice cloning via `speaker` param
+  const xttsInput: Record<string, unknown> = {
+    text,
+    language: "en",
+  };
+  if (referenceAudioUrl) {
+    xttsInput.speaker = referenceAudioUrl;
+  }
+
+  try {
+    const res = await createReplicatePrediction("lucataco/xtts-v2", xttsInput, token);
+    if (res.ok) {
+      const data = await res.json();
+      let audioUrl = extractReplicateOutput(data);
+      if (!audioUrl && data.urls?.get) {
+        const result = await pollReplicatePrediction(data.urls.get);
+        audioUrl = extractReplicateOutput(result);
+      }
+      if (audioUrl) return { audioUrl, duration: estimateDuration(text) };
+    }
+  } catch (err) {
+    console.warn("[video-pipeline] XTTS v2 failed, falling back to Kokoro:", err);
+  }
+
+  // Fall back to standard voice generation (no cloning)
+  return generateVoice(text);
 }
 
 // ── Step 2: Avatar Generation ──
