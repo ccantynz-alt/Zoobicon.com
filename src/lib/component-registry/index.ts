@@ -58,21 +58,25 @@ export function registerComponent(component: RegistryComponent): void {
 
 /** Get all components in a given category */
 export function getByCategory(category: string): RegistryComponent[] {
+  ensureRegistryLoaded();
   return REGISTRY.filter(c => c.category === category);
 }
 
 /** Get a specific component by ID */
 export function getById(id: string): RegistryComponent | undefined {
+  ensureRegistryLoaded();
   return REGISTRY.find(c => c.id === id);
 }
 
 /** Get all available categories that have at least one component */
 export function getCategories(): string[] {
+  ensureRegistryLoaded();
   return Array.from(new Set(REGISTRY.map(c => c.category)));
 }
 
 /** Get all variants for a given category */
 export function getVariants(category: string): RegistryComponent[] {
+  ensureRegistryLoaded();
   return REGISTRY.filter(c => c.category === category);
 }
 
@@ -161,6 +165,7 @@ function scoreComponent(component: RegistryComponent, promptLower: string): numb
  * Returns an ordered list of components: navbar → hero → features → about → testimonials → stats → faq → cta → footer
  */
 export function selectComponentsForPrompt(prompt: string): RegistryComponent[] {
+  ensureRegistryLoaded();
   const promptLower = prompt.toLowerCase();
 
   // Industry-aware section order. Premium SaaS / startup / agency sites get a
@@ -490,13 +495,23 @@ function capitalize(str: string): string {
 }
 
 // ── Register All Components ──
-// Import category files to trigger their registerComponent() calls.
-// These must come AFTER the REGISTRY and registerComponent are defined.
+// Lazy initialization to prevent circular dependency TDZ errors in webpack.
+// The category files (navbars.ts, heroes.ts, etc.) call registerComponent()
+// which pushes into REGISTRY. We defer these imports to first access.
 
-import "./navbars";
-import "./heroes";
-import "./features";
-import "./testimonials";
-import "./footers";
-import "./extras";
-import "./sections";
+let _initialized = false;
+
+export function ensureRegistryLoaded(): void {
+  if (_initialized) return;
+  _initialized = true;
+
+  // Dynamic requires to avoid webpack hoisting these into the module init phase.
+  // Each file calls registerComponent() as a side effect.
+  try { require("./navbars"); } catch (e) { console.warn("[registry] navbars load failed:", e); }
+  try { require("./heroes"); } catch (e) { console.warn("[registry] heroes load failed:", e); }
+  try { require("./features"); } catch (e) { console.warn("[registry] features load failed:", e); }
+  try { require("./testimonials"); } catch (e) { console.warn("[registry] testimonials load failed:", e); }
+  try { require("./footers"); } catch (e) { console.warn("[registry] footers load failed:", e); }
+  try { require("./extras"); } catch (e) { console.warn("[registry] extras load failed:", e); }
+  try { require("./sections"); } catch (e) { console.warn("[registry] sections load failed:", e); }
+}

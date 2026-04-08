@@ -281,3 +281,131 @@ export async function setPreferences(
   `;
   return merged;
 }
+
+// ---------------------------------------------------------------------------
+// Client-side in-memory / localStorage notification helpers
+//
+// These are used by NotificationInbox.tsx, useEmailNotifications.ts, and the
+// builder page. They work entirely in the browser — no DB, no server call.
+// ---------------------------------------------------------------------------
+
+export type NotificationType =
+  | "site_views"
+  | "deploy_success"
+  | "achievement"
+  | "gallery_comment"
+  | "gallery_upvote"
+  | "quota_warning"
+  | "weekly_report"
+  | "referral"
+  | "challenge"
+  | "system"
+  | "admin_email"
+  | "support_ticket"
+  | "support_reply";
+
+export interface Notification {
+  id: string;
+  type: NotificationType;
+  title: string;
+  description: string;
+  link?: string;
+  read: boolean;
+  timestamp: number;
+  metadata?: Record<string, unknown>;
+}
+
+const STORAGE_KEY = "zoobicon_notifications";
+const MAX_STORED = 200;
+
+function isBrowser(): boolean {
+  return typeof window !== "undefined";
+}
+
+function loadNotifications(): Notification[] {
+  if (!isBrowser()) return [];
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as Notification[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveNotifications(items: Notification[]): void {
+  if (!isBrowser()) return;
+  try {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(items.slice(0, MAX_STORED))
+    );
+  } catch {
+    // Storage full or unavailable — silently ignore
+  }
+}
+
+/** Return all in-app notifications, newest first. */
+export function getNotifications(): Notification[] {
+  return loadNotifications();
+}
+
+/** Return the number of unread in-app notifications. */
+export function getUnreadCount(): number {
+  return loadNotifications().filter((n) => !n.read).length;
+}
+
+/** Mark a single in-app notification as read. */
+export function markAsRead(notificationId: string): void {
+  const items = loadNotifications();
+  const target = items.find((n) => n.id === notificationId);
+  if (target) {
+    target.read = true;
+    saveNotifications(items);
+  }
+}
+
+/** Mark every in-app notification as read. */
+export function markAllAsRead(): void {
+  const items = loadNotifications();
+  for (const n of items) n.read = true;
+  saveNotifications(items);
+}
+
+/** Add a new in-app notification and emit a DOM event so the bell refreshes. */
+export function addNotification(
+  input: Omit<Notification, "id" | "read" | "timestamp"> & {
+    timestamp?: number;
+  }
+): Notification {
+  const notif: Notification = {
+    id: `ntf_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`,
+    type: input.type,
+    title: input.title,
+    description: input.description,
+    link: input.link,
+    read: false,
+    timestamp: input.timestamp ?? Date.now(),
+    metadata: input.metadata,
+  };
+
+  const items = loadNotifications();
+  items.unshift(notif);
+  saveNotifications(items);
+
+  // Emit custom event so NotificationInbox picks it up instantly
+  if (isBrowser()) {
+    window.dispatchEvent(new CustomEvent("zoobicon_notification"));
+  }
+
+  return notif;
+}
+
+/** Convenience helper used by the builder after a successful deploy. */
+export function notifyDeploy(siteName: string, url: string): void {
+  addNotification({
+    type: "deploy_success",
+    title: "Site Deployed",
+    description: `${siteName || "Your site"} is live at ${url}`,
+    link: url,
+  });
+}

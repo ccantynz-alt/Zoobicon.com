@@ -822,7 +822,42 @@ Plain English always. Never "I refactored the middleware." Say "I fixed the perm
 - MCP integration — Emergent has it, others coming
 - User base — Lovable: millions, Bolt: 5M, v0: 6M. We're starting.
 
-**Aggregate position: ~60% advantage on breadth/features. ~40% behind on speed/polish. Target: 80-90% ahead.**
+**AGGREGATE POSITION (April 8 2026, honest): ~40% of where we need to be.**
+**Craig's response: "That's just not acceptable. How many agents can you get us to 110%?"**
+**TARGET: 110%. Not 80%. Not 90%. 110%. Ahead of EVERY competitor on EVERY axis.**
+
+**THE GAP IS NOT FEATURES — IT'S WIRING.**
+We have more features than anyone (75+ products). The gap is: does it work when a customer clicks the button?
+
+| What | Status | Gap to 110% | Fix |
+|---|---|---|---|
+| Builder produces sites | BROKEN (merge damage fixed, untested on Vercel) | CRITICAL | Get build passing, test end-to-end |
+| Video produces videos | NEVER TESTED (pipeline rebuilt, never ran) | CRITICAL | Set FAL_KEY + ELEVENLABS_API_KEY, test end-to-end |
+| Preview speed | 20-30s (Bolt is 3-5s) | HIGH | WebContainers or e2b sandboxing |
+| Supabase wired into builder | Code exists, NOT connected | HIGH | Wire supabase-provisioner into react-stream |
+| MCP integration | Stub only (Emergent has it LIVE) | HIGH | Ship real MCP server with tool connections |
+| Domain purchase | Code exists, needs Stripe + DB init | MED | Craig: create Stripe products + visit /api/db/init |
+| Auth login | Code exists, needs env vars | MED | Craig: set ADMIN_EMAIL/PASSWORD + OAuth secrets |
+| Site design | REDESIGNED this session | DONE | Merge to main |
+| Voice cloning | BUILT this session | DONE (needs ELEVENLABS_API_KEY) | Craig: set key |
+| B-roll via fal.ai | BUILT this session | DONE (needs FAL_KEY) | Craig: set key |
+| Auto-captions | BUILT this session | DONE (needs FAL_KEY or REPLICATE_API_TOKEN) | Already set |
+| Competitive intel | UPDATED this session | DONE | Proactive scan every session (rule 28) |
+| Component registry | 60+ components, $100K quality | DONE | — |
+| White-label agency | Code exists | DONE | — |
+
+**PATH FROM 40% TO 110%:**
+1. Get Vercel build passing (TDZ fix merged) → 50%
+2. Set env vars (FAL_KEY, ELEVENLABS_API_KEY, admin creds, OAuth) → 55%
+3. Builder end-to-end test (prompt → site → deploy) → 65%
+4. Video end-to-end test (prompt → video → download) → 75%
+5. Preview speed upgrade (WebContainers/e2b) → 85%
+6. Supabase wired into builder → 90%
+7. MCP integration live → 95%
+8. Domain purchase working → 100%
+9. All products polished to market-leader quality → 110%
+
+**EVERY SESSION: maximum agents on EVERY task. No single-threaded work. If 5 agents can run, run 5. If 10 can run, run 10. The competition is not waiting.**
 
 **KEY INSIGHT: Lovable added $100M revenue in ONE MONTH (Feb 2026) with 146 employees. This market is massive and growing. Our ecosystem moat (domains + hosting + email + builder + video) is what they can't replicate.**
 
