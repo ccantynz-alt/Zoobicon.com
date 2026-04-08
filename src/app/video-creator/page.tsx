@@ -31,6 +31,12 @@ import {
   Crown,
   Smile,
   Zap,
+  Share2,
+  Wand2,
+  Film,
+  Mic,
+  ImageIcon,
+  ArrowLeft,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
