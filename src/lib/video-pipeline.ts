@@ -20,6 +20,8 @@
 
 export const runtime = "nodejs";
 
+const REPLICATE_API = "https://api.replicate.com/v1";
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Legacy compatibility shim
 // ─────────────────────────────────────────────────────────────────────────────
@@ -115,6 +117,21 @@ export interface SpokespersonVideoResult {
   pipeline: string[];
 }
 
+export interface PipelineStatus {
+  step: string;
+  progress: number;
+  message: string;
+}
+
+export interface VideoGenerationResult {
+  videoUrl: string;
+  audioUrl: string;
+  avatarUrl: string;
+  duration: number;
+  cost: number;
+  pipeline: string;
+}
+
 export function isCustomPipelineAvailable(): boolean {
   return Boolean(process.env.REPLICATE_API_TOKEN || process.env.FAL_KEY);
 }
@@ -199,12 +216,24 @@ export async function generateVoice(
     for (const input of model.inputVariants) {
       try {
         options?.onProgress?.(`Trying ${model.name}…`);
-        const prediction = await createReplicatePrediction(token, model.modelPath, input);
-        const output = await pollReplicatePrediction(token, prediction.id);
-        const audioUrl = extractReplicateOutput(output);
+        const res = await createReplicatePrediction(model.modelPath, input, token);
+        if (!res.ok) {
+          console.warn(`[video-pipeline] ${model.name} HTTP ${res.status}`);
+          continue;
+        }
+        const predData = await res.json();
+        // Check if result is already available (synchronous)
+        let audioUrl = extractReplicateOutput(predData);
+        // If async, poll for completion
+        if (!audioUrl && predData.urls?.get) {
+          const pollResult = await pollReplicatePrediction(predData.urls.get, {
+            onUpdate: (status) => options?.onProgress?.(`${model.name}: ${status}`),
+          });
+          audioUrl = extractReplicateOutput(pollResult);
+        }
         if (audioUrl) {
           options?.onProgress?.(`Voice generated with ${model.name}`);
-          return { audioUrl, duration: 30 };
+          return { audioUrl, duration: estimateDuration(text) };
         }
       } catch (err) {
         console.warn(`[video-pipeline] TTS ${model.name} failed:`, err instanceof Error ? err.message : err);
