@@ -1,11 +1,14 @@
 /**
  * Zoobicon MCP (Model Context Protocol) Server
- * Raw JSON-RPC 2.0 implementation per https://modelcontextprotocol.io
+ * Real JSON-RPC 2.0 implementation per https://modelcontextprotocol.io
  *
- * Exposes Zoobicon's product catalog as MCP tools so that Cursor,
- * Claude Desktop, Windsurf and any other MCP client can call them.
+ * Exposes Zoobicon products as MCP tools so that Claude Desktop,
+ * Cursor, Windsurf, and any other MCP client can call them.
  *
- * No @modelcontextprotocol/sdk dependency — pure TypeScript.
+ * No @modelcontextprotocol/sdk dependency -- pure TypeScript.
+ *
+ * IMPORTANT: This file must NOT import from @/lib/component-registry
+ * at the top level. Use dynamic imports only where needed.
  */
 
 // ---------- JSON-RPC 2.0 types ----------
@@ -59,19 +62,58 @@ export interface McpToolCallResult {
 
 export const MCP_PROTOCOL_VERSION = "2025-06-18";
 export const MCP_SERVER_NAME = "zoobicon";
-export const MCP_SERVER_VERSION = "1.0.0";
+export const MCP_SERVER_VERSION = "1.1.0";
 export const MCP_SERVER_DESCRIPTION =
-  "Zoobicon MCP server — 75+ AI products (websites, video, domains, email, images, docs, utilities) callable as MCP tools.";
+  "Zoobicon MCP server -- generate websites, search domains, create videos, generate images, transcribe audio, and more. 75+ AI products callable as MCP tools.";
 
-// ---------- Tool catalog ----------
+// ---------- Internal helpers ----------
 
-type ToolHandler = (
-  args: Record<string, unknown>,
-) => Promise<unknown>;
+function getBaseUrl(): string {
+  if (process.env.NEXT_PUBLIC_BASE_URL) return process.env.NEXT_PUBLIC_BASE_URL.replace(/\/$/, "");
+  if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return "http://localhost:3000";
+}
 
-interface InternalTool {
-  def: McpToolDefinition;
-  handler: ToolHandler;
+async function internalPost(path: string, body: unknown, timeoutMs = 120_000): Promise<unknown> {
+  const url = `${getBaseUrl()}${path}`;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+    const text = await res.text();
+    let data: unknown;
+    try { data = text ? JSON.parse(text) : {}; } catch { data = { raw: text }; }
+    if (!res.ok) {
+      return { ok: false, error: `${path} returned ${res.status}: ${res.statusText}`, data };
+    }
+    return { ok: true, ...(typeof data === "object" && data !== null ? data : { data }) };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function internalGet(path: string, timeoutMs = 30_000): Promise<unknown> {
+  const url = `${getBaseUrl()}${path}`;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { signal: controller.signal, cache: "no-store" });
+    const text = await res.text();
+    let data: unknown;
+    try { data = text ? JSON.parse(text) : {}; } catch { data = { raw: text }; }
+    if (!res.ok) {
+      return { ok: false, error: `${path} returned ${res.status}: ${res.statusText}`, data };
+    }
+    return { ok: true, ...(typeof data === "object" && data !== null ? data : { data }) };
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 function str(args: Record<string, unknown>, key: string, fallback = ""): string {
@@ -79,617 +121,550 @@ function str(args: Record<string, unknown>, key: string, fallback = ""): string 
   return typeof v === "string" ? v : fallback;
 }
 
-function num(args: Record<string, unknown>, key: string, fallback = 0): number {
-  const v = args[key];
-  return typeof v === "number" ? v : fallback;
-}
+// ---------- Tool catalog ----------
 
-/**
- * Dynamically import a Zoobicon lib module. If the module doesn't exist
- * yet (some products are still being wired), surface a clear error
- * naming the missing module + the tool that requested it.
- */
-async function loadLib<T = Record<string, unknown>>(
-  toolName: string,
-  modulePath: string,
-): Promise<T> {
-  try {
-    const mod = (await import(/* webpackIgnore: true */ modulePath)) as T;
-    return mod;
-  } catch (err) {
-    const message =
-      err instanceof Error ? err.message : String(err);
-    throw new Error(
-      `[mcp:${toolName}] missing implementation '${modulePath}': ${message}`,
-    );
-  }
+type ToolHandler = (args: Record<string, unknown>) => Promise<unknown>;
+
+interface InternalTool {
+  def: McpToolDefinition;
+  handler: ToolHandler;
 }
 
 const TOOLS: InternalTool[] = [
+  // ================================================================
+  // 1. generate_website
+  // ================================================================
   {
     def: {
       name: "generate_website",
       description:
-        "Generate a complete React/Next.js website from a natural-language prompt. Returns Sandpack-ready files + dependencies.",
+        "Generate a complete React/Next.js website from a natural-language prompt using Zoobicon's multi-agent AI pipeline. Returns generated files and dependencies suitable for Sandpack preview or deployment.",
       inputSchema: {
         type: "object",
         properties: {
-          prompt: { type: "string", description: "What the site should be" },
-          style: { type: "string", description: "Optional design style hint" },
+          prompt: {
+            type: "string",
+            description: "Natural-language description of the website to generate (e.g. 'A SaaS landing page for a project management tool with pricing table and testimonials')",
+          },
+          mode: {
+            type: "string",
+            enum: ["fast", "premium"],
+            description: "Generation mode. 'fast' uses Haiku for speed (<15s). 'premium' uses Opus for maximum quality (<60s). Default: fast.",
+          },
         },
         required: ["prompt"],
       },
     },
     handler: async (args) => {
-      const lib = await loadLib<{
-        runAgentPipeline?: (p: string) => Promise<unknown>;
-      }>("generate_website", "@/lib/agents");
-      if (typeof lib.runAgentPipeline !== "function") {
-        throw new Error("agents.runAgentPipeline not exported");
-      }
-      return lib.runAgentPipeline(str(args, "prompt"));
+      const prompt = str(args, "prompt");
+      if (!prompt) return { ok: false, error: "prompt is required" };
+      if (prompt.length > 2000) return { ok: false, error: "prompt must be 1-2000 characters" };
+      const mode = str(args, "mode", "fast");
+      // The react-stream endpoint is SSE-based, so for MCP we use the non-streaming react endpoint
+      // which returns { files, dependencies } as JSON
+      const result = await internalPost("/api/generate/react", { prompt, mode });
+      return result;
     },
   },
-  {
-    def: {
-      name: "generate_video",
-      description:
-        "Generate an AI video using Zoobicon's own pipeline (Fish Speech + FLUX + OmniHuman via Replicate).",
-      inputSchema: {
-        type: "object",
-        properties: {
-          script: { type: "string" },
-          voice: { type: "string" },
-        },
-        required: ["script"],
-      },
-    },
-    handler: async (args) => {
-      const lib = await loadLib<{
-        renderVideo?: (i: unknown) => Promise<unknown>;
-      }>("generate_video", "@/lib/video-pipeline");
-      if (typeof lib.renderVideo !== "function") {
-        throw new Error("video-pipeline.renderVideo not exported");
-      }
-      return lib.renderVideo({
-        script: str(args, "script"),
-        voice: str(args, "voice", "default"),
-      });
-    },
-  },
-  {
-    def: {
-      name: "register_domain",
-      description: "Register a domain via OpenSRS.",
-      inputSchema: {
-        type: "object",
-        properties: { domain: { type: "string" }, years: { type: "number" } },
-        required: ["domain"],
-      },
-    },
-    handler: async (args) => {
-      const lib = await loadLib<{
-        registerDomain?: (d: string, y: number) => Promise<unknown>;
-      }>("register_domain", "@/lib/opensrs");
-      if (typeof lib.registerDomain !== "function") {
-        throw new Error("opensrs.registerDomain not exported");
-      }
-      return lib.registerDomain(str(args, "domain"), num(args, "years", 1));
-    },
-  },
-  {
-    def: {
-      name: "check_domain_availability",
-      description: "Check if a domain is available for registration.",
-      inputSchema: {
-        type: "object",
-        properties: { domain: { type: "string" } },
-        required: ["domain"],
-      },
-    },
-    handler: async (args) => {
-      const lib = await loadLib<{
-        checkAvailability?: (d: string) => Promise<unknown>;
-      }>("check_domain_availability", "@/lib/opensrs");
-      if (typeof lib.checkAvailability !== "function") {
-        throw new Error("opensrs.checkAvailability not exported");
-      }
-      return lib.checkAvailability(str(args, "domain"));
-    },
-  },
+
+  // ================================================================
+  // 2. search_domains
+  // ================================================================
   {
     def: {
       name: "search_domains",
       description:
-        "Search across many TLDs for a base name and return availability + pricing.",
+        "Search domain name availability across multiple TLDs using Zoobicon's OpenSRS-backed registry. Returns availability status and pricing for each TLD.",
       inputSchema: {
         type: "object",
         properties: {
-          query: { type: "string" },
-          tlds: { type: "array", items: { type: "string" } },
+          query: {
+            type: "string",
+            description: "Domain name or keyword to search (e.g. 'mycompany' or 'techstartup')",
+          },
+          tlds: {
+            type: "array",
+            items: { type: "string" },
+            description: "Optional list of TLDs to check (e.g. ['com', 'ai', 'io']). Defaults to popular TLDs if omitted.",
+          },
         },
         required: ["query"],
       },
     },
     handler: async (args) => {
-      const lib = await loadLib<{
-        searchDomains?: (q: string, tlds?: string[]) => Promise<unknown>;
-      }>("search_domains", "@/lib/opensrs");
-      if (typeof lib.searchDomains !== "function") {
-        throw new Error("opensrs.searchDomains not exported");
-      }
-      const tlds = Array.isArray(args.tlds)
-        ? (args.tlds as string[])
-        : undefined;
-      return lib.searchDomains(str(args, "query"), tlds);
+      const query = str(args, "query");
+      if (!query || query.length < 2) return { ok: false, error: "query must be at least 2 characters" };
+      const tlds = Array.isArray(args.tlds) ? (args.tlds as string[]) : undefined;
+      const qs = new URLSearchParams();
+      qs.set("q", query);
+      if (tlds && tlds.length > 0) qs.set("tlds", tlds.join(","));
+      return await internalGet(`/api/domains/search?${qs.toString()}`);
     },
   },
+
+  // ================================================================
+  // 3. generate_video
+  // ================================================================
   {
     def: {
-      name: "deploy_site",
-      description: "Deploy generated site files to zoobicon.sh hosting.",
+      name: "generate_video",
+      description:
+        "Generate an AI spokesperson video using Zoobicon's own pipeline (Fish Speech TTS + FLUX avatar + lip-sync via Replicate). Describe what you want and the AI Video Director will write scripts and produce the video.",
       inputSchema: {
         type: "object",
         properties: {
-          slug: { type: "string" },
-          files: { type: "object" },
+          description: {
+            type: "string",
+            description: "Natural-language description of the video you want (e.g. 'A 30-second product demo video for a fitness app targeting young professionals')",
+          },
         },
-        required: ["slug", "files"],
+        required: ["description"],
       },
     },
     handler: async (args) => {
-      const lib = await loadLib<{
-        deploySite?: (s: string, f: unknown) => Promise<unknown>;
-      }>("deploy_site", "@/lib/hosting");
-      if (typeof lib.deploySite !== "function") {
-        throw new Error("hosting.deploySite not exported");
-      }
-      return lib.deploySite(str(args, "slug"), args.files);
+      const description = str(args, "description");
+      if (!description) return { ok: false, error: "description is required" };
+      if (description.length > 3000) return { ok: false, error: "description must be 1-3000 characters" };
+      // The video-creator/chat endpoint expects messages in chat format
+      const result = await internalPost("/api/video-creator/chat", {
+        messages: [{ role: "user", content: description }],
+      }, 180_000);
+      return result;
     },
   },
+
+  // ================================================================
+  // 4. check_domain_availability
+  // ================================================================
   {
     def: {
-      name: "send_email",
-      description: "Send a transactional email via Mailgun.",
+      name: "check_domain_availability",
+      description:
+        "Check if a specific domain name is available for registration. Returns availability status and pricing.",
       inputSchema: {
         type: "object",
         properties: {
-          to: { type: "string" },
-          subject: { type: "string" },
-          html: { type: "string" },
+          domain: {
+            type: "string",
+            description: "Full domain name to check (e.g. 'example.com', 'myapp.ai')",
+          },
+        },
+        required: ["domain"],
+      },
+    },
+    handler: async (args) => {
+      const domain = str(args, "domain");
+      if (!domain) return { ok: false, error: "domain is required" };
+      // Extract the name and TLD from the domain
+      const parts = domain.split(".");
+      if (parts.length < 2) return { ok: false, error: "domain must include a TLD (e.g. example.com)" };
+      const name = parts.slice(0, -1).join(".");
+      const tld = parts[parts.length - 1];
+      const qs = new URLSearchParams();
+      qs.set("q", name);
+      qs.set("tlds", tld);
+      return await internalGet(`/api/domains/search?${qs.toString()}`);
+    },
+  },
+
+  // ================================================================
+  // 5. transcribe_audio
+  // ================================================================
+  {
+    def: {
+      name: "transcribe_audio",
+      description:
+        "Transcribe an audio file to text using AI speech-to-text. Accepts a public URL to an audio file (MP3, WAV, etc).",
+      inputSchema: {
+        type: "object",
+        properties: {
+          audio_url: {
+            type: "string",
+            description: "Public URL of the audio file to transcribe",
+          },
+        },
+        required: ["audio_url"],
+      },
+    },
+    handler: async (args) => {
+      const audioUrl = str(args, "audio_url");
+      if (!audioUrl) return { ok: false, error: "audio_url is required" };
+      try {
+        new URL(audioUrl);
+      } catch {
+        return { ok: false, error: "audio_url must be a valid URL" };
+      }
+      // Try Deepgram module via dynamic import
+      try {
+        const mod: Record<string, unknown> = await import("@/lib/deepgram");
+        const fn = (mod.transcribeAudio || mod.default) as ((url: string) => Promise<{ text?: string; transcript?: string; confidence?: number }>) | undefined;
+        if (typeof fn === "function") {
+          const result = await fn(audioUrl);
+          return {
+            ok: true,
+            text: result?.text ?? result?.transcript ?? "",
+            confidence: result?.confidence ?? null,
+          };
+        }
+      } catch {
+        // Deepgram not available, try video-captions
+      }
+      // Fallback: try the video-creator voiceover/transcription endpoint
+      try {
+        const result = await internalPost("/api/video-creator/voiceover", {
+          mode: "transcribe",
+          audioUrl,
+        });
+        return result;
+      } catch {
+        return { ok: false, error: "Transcription service not available. Ensure DEEPGRAM_API_KEY is set." };
+      }
+    },
+  },
+
+  // ================================================================
+  // 6. generate_image
+  // ================================================================
+  {
+    def: {
+      name: "generate_image",
+      description:
+        "Generate AI images from a text prompt using FLUX on Replicate (with DALL-E and Stability AI fallbacks).",
+      inputSchema: {
+        type: "object",
+        properties: {
+          prompt: {
+            type: "string",
+            description: "Description of the image to generate (e.g. 'A modern minimalist office space with warm lighting')",
+          },
+          style: {
+            type: "string",
+            enum: ["photo", "illustration", "3d", "artistic"],
+            description: "Image style. Default: photo.",
+          },
+          width: {
+            type: "number",
+            description: "Image width in pixels. Default: 1024.",
+          },
+          height: {
+            type: "number",
+            description: "Image height in pixels. Default: 768.",
+          },
+        },
+        required: ["prompt"],
+      },
+    },
+    handler: async (args) => {
+      const prompt = str(args, "prompt");
+      if (!prompt) return { ok: false, error: "prompt is required" };
+      const style = str(args, "style", "photo");
+      const width = typeof args.width === "number" ? args.width : 1024;
+      const height = typeof args.height === "number" ? args.height : 768;
+      return await internalPost("/api/generate/ai-images", {
+        prompt,
+        style,
+        width,
+        height,
+      });
+    },
+  },
+
+  // ================================================================
+  // 7. edit_website (bonus -- diff-based editing)
+  // ================================================================
+  {
+    def: {
+      name: "edit_website",
+      description:
+        "Apply a natural-language edit to an existing set of generated files. Uses diff-based editing for speed (2-5 seconds). Only changed files are regenerated.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          files: {
+            type: "object",
+            description: "Map of filepath to file contents (the current state of the project)",
+          },
+          instruction: {
+            type: "string",
+            description: "What to change (e.g. 'Make the header blue and add a testimonials section')",
+          },
+        },
+        required: ["files", "instruction"],
+      },
+    },
+    handler: async (args) => {
+      const instruction = str(args, "instruction");
+      if (!instruction) return { ok: false, error: "instruction is required" };
+      if (!args.files || typeof args.files !== "object") {
+        return { ok: false, error: "'files' must be an object mapping filepath to contents" };
+      }
+      return await internalPost("/api/generate/edit", {
+        files: args.files,
+        instruction,
+      });
+    },
+  },
+
+  // ================================================================
+  // 8. deploy_site (bonus -- one-click deploy)
+  // ================================================================
+  {
+    def: {
+      name: "deploy_site",
+      description:
+        "Deploy generated website files to zoobicon.sh hosting. Returns a live URL.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          projectName: {
+            type: "string",
+            description: "Project name (used as subdomain: projectname.zoobicon.sh)",
+          },
+          files: {
+            type: "object",
+            description: "Map of filepath to file contents to deploy",
+          },
+        },
+        required: ["projectName", "files"],
+      },
+    },
+    handler: async (args) => {
+      const projectName = str(args, "projectName");
+      if (!projectName) return { ok: false, error: "projectName is required" };
+      if (!args.files || typeof args.files !== "object") {
+        return { ok: false, error: "'files' must be an object" };
+      }
+      return await internalPost("/api/hosting/deploy", {
+        projectName,
+        files: args.files,
+      });
+    },
+  },
+
+  // ================================================================
+  // 9. suggest_business_names (bonus -- AI name generator)
+  // ================================================================
+  {
+    def: {
+      name: "suggest_business_names",
+      description:
+        "Generate AI business name suggestions with domain availability checks. Great for brainstorming brand names.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          description: {
+            type: "string",
+            description: "Business description to generate names for",
+          },
+          style: {
+            type: "string",
+            description: "Optional naming style (modern, playful, professional, minimal, etc)",
+          },
+          count: {
+            type: "number",
+            description: "Number of name suggestions (default: 12)",
+          },
+        },
+        required: ["description"],
+      },
+    },
+    handler: async (args) => {
+      const description = str(args, "description");
+      if (!description) return { ok: false, error: "description is required" };
+      const style = str(args, "style", "");
+      const count = typeof args.count === "number" ? args.count : 12;
+      return await internalPost("/api/tools/business-names", { description, style, count });
+    },
+  },
+
+  // ================================================================
+  // 10. register_domain (bonus -- domain registration)
+  // ================================================================
+  {
+    def: {
+      name: "register_domain",
+      description:
+        "Register a domain via Zoobicon's OpenSRS-backed registrar. Requires registrant contact information.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          domain: {
+            type: "string",
+            description: "Full domain to register (e.g. example.com)",
+          },
+          registrant: {
+            type: "object",
+            description: "Registrant contact: { firstName, lastName, email, phone, address, city, country, postalCode }",
+          },
+          years: {
+            type: "number",
+            description: "Registration period in years (default: 1)",
+          },
+        },
+        required: ["domain", "registrant"],
+      },
+    },
+    handler: async (args) => {
+      const domain = str(args, "domain");
+      if (!domain) return { ok: false, error: "domain is required" };
+      if (!args.registrant || typeof args.registrant !== "object") {
+        return { ok: false, error: "'registrant' must be a contact object" };
+      }
+      const years = typeof args.years === "number" ? args.years : 1;
+      return await internalPost("/api/domains/register", {
+        domain,
+        registrant: args.registrant,
+        years,
+      });
+    },
+  },
+
+  // ================================================================
+  // 11. generate_voiceover (bonus -- TTS)
+  // ================================================================
+  {
+    def: {
+      name: "generate_voiceover",
+      description:
+        "Generate a text-to-speech voiceover using Zoobicon's Replicate fallback chain (Kokoro, Fish Speech, Orpheus, XTTS v2).",
+      inputSchema: {
+        type: "object",
+        properties: {
+          text: {
+            type: "string",
+            description: "Text to convert to speech",
+          },
+          voice: {
+            type: "string",
+            description: "Optional voice style or ID",
+          },
+        },
+        required: ["text"],
+      },
+    },
+    handler: async (args) => {
+      const text = str(args, "text");
+      if (!text) return { ok: false, error: "text is required" };
+      return await internalPost("/api/video-creator/voiceover", { text, voice: str(args, "voice", "") });
+    },
+  },
+
+  // ================================================================
+  // 12. analyze_seo (bonus -- SEO audit)
+  // ================================================================
+  {
+    def: {
+      name: "analyze_seo",
+      description:
+        "Run a full SEO audit on a URL -- meta tags, headings, structured data, performance hints.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          url: { type: "string", description: "Target URL to audit" },
+        },
+        required: ["url"],
+      },
+    },
+    handler: async (args) => {
+      const url = str(args, "url");
+      if (!url) return { ok: false, error: "url is required" };
+      return await internalPost("/api/tools/seo-analyzer", { url });
+    },
+  },
+
+  // ================================================================
+  // 13. send_email (bonus -- transactional email)
+  // ================================================================
+  {
+    def: {
+      name: "send_email",
+      description:
+        "Send a transactional email via Mailgun. Includes the Zoobicon four-domain footer automatically.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          to: { type: "string", description: "Recipient email address" },
+          subject: { type: "string", description: "Email subject line" },
+          html: { type: "string", description: "HTML body content" },
         },
         required: ["to", "subject", "html"],
       },
     },
     handler: async (args) => {
-      const lib = await loadLib<{
-        sendEmail?: (i: unknown) => Promise<unknown>;
-      }>("send_email", "@/lib/mailgun");
-      if (typeof lib.sendEmail !== "function") {
-        throw new Error("mailgun.sendEmail not exported");
+      const to = str(args, "to");
+      const subject = str(args, "subject");
+      const html = str(args, "html");
+      if (!to || !subject || !html) return { ok: false, error: "to, subject, and html are all required" };
+      if (!process.env.MAILGUN_API_KEY) {
+        return { ok: false, error: "Email service not configured. MAILGUN_API_KEY required." };
       }
-      return lib.sendEmail({
-        to: str(args, "to"),
-        subject: str(args, "subject"),
-        html: str(args, "html"),
-      });
+      return await internalPost("/api/email/send", { to, subject, html });
     },
   },
+
+  // ================================================================
+  // 14. list_components (bonus -- component registry)
+  // ================================================================
   {
     def: {
-      name: "generate_image",
-      description: "Generate an AI image via FLUX on Replicate.",
-      inputSchema: {
-        type: "object",
-        properties: { prompt: { type: "string" } },
-        required: ["prompt"],
-      },
-    },
-    handler: async (args) => {
-      const lib = await loadLib<{
-        generateImage?: (p: string) => Promise<unknown>;
-      }>("generate_image", "@/lib/image-generator");
-      if (typeof lib.generateImage !== "function") {
-        throw new Error("image-generator.generateImage not exported");
-      }
-      return lib.generateImage(str(args, "prompt"));
-    },
-  },
-  {
-    def: {
-      name: "generate_logo",
-      description: "Generate a brand logo from a business name + style.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          businessName: { type: "string" },
-          style: { type: "string" },
-        },
-        required: ["businessName"],
-      },
-    },
-    handler: async (args) => {
-      const lib = await loadLib<{
-        generateLogo?: (n: string, s: string) => Promise<unknown>;
-      }>("generate_logo", "@/lib/logo-generator");
-      if (typeof lib.generateLogo !== "function") {
-        throw new Error("logo-generator.generateLogo not exported");
-      }
-      return lib.generateLogo(
-        str(args, "businessName"),
-        str(args, "style", "modern"),
-      );
-    },
-  },
-  {
-    def: {
-      name: "scan_receipt",
-      description: "OCR a receipt image and return structured line items.",
-      inputSchema: {
-        type: "object",
-        properties: { imageUrl: { type: "string" } },
-        required: ["imageUrl"],
-      },
-    },
-    handler: async (args) => {
-      const lib = await loadLib<{
-        scanReceipt?: (u: string) => Promise<unknown>;
-      }>("scan_receipt", "@/lib/receipt-scanner");
-      if (typeof lib.scanReceipt !== "function") {
-        throw new Error("receipt-scanner.scanReceipt not exported");
-      }
-      return lib.scanReceipt(str(args, "imageUrl"));
-    },
-  },
-  {
-    def: {
-      name: "translate",
-      description: "Translate text into a target language.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          text: { type: "string" },
-          targetLang: { type: "string" },
-        },
-        required: ["text", "targetLang"],
-      },
-    },
-    handler: async (args) => {
-      const lib = await loadLib<{
-        translate?: (t: string, l: string) => Promise<unknown>;
-      }>("translate", "@/lib/translator");
-      if (typeof lib.translate !== "function") {
-        throw new Error("translator.translate not exported");
-      }
-      return lib.translate(str(args, "text"), str(args, "targetLang"));
-    },
-  },
-  {
-    def: {
-      name: "grammar_check",
-      description: "Check grammar + style of text and return suggestions.",
-      inputSchema: {
-        type: "object",
-        properties: { text: { type: "string" } },
-        required: ["text"],
-      },
-    },
-    handler: async (args) => {
-      const lib = await loadLib<{
-        checkGrammar?: (t: string) => Promise<unknown>;
-      }>("grammar_check", "@/lib/grammar");
-      if (typeof lib.checkGrammar !== "function") {
-        throw new Error("grammar.checkGrammar not exported");
-      }
-      return lib.checkGrammar(str(args, "text"));
-    },
-  },
-  {
-    def: {
-      name: "create_invoice",
-      description: "Create a PDF invoice from line items.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          customer: { type: "string" },
-          items: { type: "array" },
-        },
-        required: ["customer", "items"],
-      },
-    },
-    handler: async (args) => {
-      const lib = await loadLib<{
-        createInvoice?: (i: unknown) => Promise<unknown>;
-      }>("create_invoice", "@/lib/invoicing");
-      if (typeof lib.createInvoice !== "function") {
-        throw new Error("invoicing.createInvoice not exported");
-      }
-      return lib.createInvoice({
-        customer: str(args, "customer"),
-        items: args.items,
-      });
-    },
-  },
-  {
-    def: {
-      name: "generate_resume",
-      description: "Generate a polished resume from structured input.",
-      inputSchema: {
-        type: "object",
-        properties: { profile: { type: "object" } },
-        required: ["profile"],
-      },
-    },
-    handler: async (args) => {
-      const lib = await loadLib<{
-        generateResume?: (p: unknown) => Promise<unknown>;
-      }>("generate_resume", "@/lib/resume-generator");
-      if (typeof lib.generateResume !== "function") {
-        throw new Error("resume-generator.generateResume not exported");
-      }
-      return lib.generateResume(args.profile);
-    },
-  },
-  {
-    def: {
-      name: "generate_contract",
-      description: "Generate a legal contract draft from parameters.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          type: { type: "string" },
-          parties: { type: "array", items: { type: "string" } },
-        },
-        required: ["type"],
-      },
-    },
-    handler: async (args) => {
-      const lib = await loadLib<{
-        generateContract?: (i: unknown) => Promise<unknown>;
-      }>("generate_contract", "@/lib/contract-generator");
-      if (typeof lib.generateContract !== "function") {
-        throw new Error("contract-generator.generateContract not exported");
-      }
-      return lib.generateContract({
-        type: str(args, "type"),
-        parties: args.parties,
-      });
-    },
-  },
-  {
-    def: {
-      name: "summarize_url",
-      description: "Fetch a URL and return a concise summary.",
-      inputSchema: {
-        type: "object",
-        properties: { url: { type: "string" } },
-        required: ["url"],
-      },
-    },
-    handler: async (args) => {
-      const lib = await loadLib<{
-        summarizeUrl?: (u: string) => Promise<unknown>;
-      }>("summarize_url", "@/lib/summarizer");
-      if (typeof lib.summarizeUrl !== "function") {
-        throw new Error("summarizer.summarizeUrl not exported");
-      }
-      return lib.summarizeUrl(str(args, "url"));
-    },
-  },
-  {
-    def: {
-      name: "generate_podcast",
-      description: "Generate an AI podcast episode from a topic.",
-      inputSchema: {
-        type: "object",
-        properties: { topic: { type: "string" }, length: { type: "number" } },
-        required: ["topic"],
-      },
-    },
-    handler: async (args) => {
-      const lib = await loadLib<{
-        generatePodcast?: (i: unknown) => Promise<unknown>;
-      }>("generate_podcast", "@/lib/podcast-generator");
-      if (typeof lib.generatePodcast !== "function") {
-        throw new Error("podcast-generator.generatePodcast not exported");
-      }
-      return lib.generatePodcast({
-        topic: str(args, "topic"),
-        length: num(args, "length", 5),
-      });
-    },
-  },
-  {
-    def: {
-      name: "create_quiz",
-      description: "Generate a quiz on a given topic.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          topic: { type: "string" },
-          questions: { type: "number" },
-        },
-        required: ["topic"],
-      },
-    },
-    handler: async (args) => {
-      const lib = await loadLib<{
-        createQuiz?: (i: unknown) => Promise<unknown>;
-      }>("create_quiz", "@/lib/quiz-generator");
-      if (typeof lib.createQuiz !== "function") {
-        throw new Error("quiz-generator.createQuiz not exported");
-      }
-      return lib.createQuiz({
-        topic: str(args, "topic"),
-        questions: num(args, "questions", 10),
-      });
-    },
-  },
-  {
-    def: {
-      name: "lookup_ip",
-      description: "Look up geolocation + ASN for an IP address.",
-      inputSchema: {
-        type: "object",
-        properties: { ip: { type: "string" } },
-        required: ["ip"],
-      },
-    },
-    handler: async (args) => {
-      const lib = await loadLib<{
-        lookupIp?: (ip: string) => Promise<unknown>;
-      }>("lookup_ip", "@/lib/ip-lookup");
-      if (typeof lib.lookupIp !== "function") {
-        throw new Error("ip-lookup.lookupIp not exported");
-      }
-      return lib.lookupIp(str(args, "ip"));
-    },
-  },
-  {
-    def: {
-      name: "geocode_address",
-      description: "Convert a postal address into latitude/longitude.",
-      inputSchema: {
-        type: "object",
-        properties: { address: { type: "string" } },
-        required: ["address"],
-      },
-    },
-    handler: async (args) => {
-      const lib = await loadLib<{
-        geocode?: (a: string) => Promise<unknown>;
-      }>("geocode_address", "@/lib/geocoder");
-      if (typeof lib.geocode !== "function") {
-        throw new Error("geocoder.geocode not exported");
-      }
-      return lib.geocode(str(args, "address"));
-    },
-  },
-  {
-    def: {
-      name: "convert_currency",
-      description: "Convert an amount between two currencies at live rates.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          amount: { type: "number" },
-          from: { type: "string" },
-          to: { type: "string" },
-        },
-        required: ["amount", "from", "to"],
-      },
-    },
-    handler: async (args) => {
-      const lib = await loadLib<{
-        convertCurrency?: (
-          a: number,
-          f: string,
-          t: string,
-        ) => Promise<unknown>;
-      }>("convert_currency", "@/lib/currency");
-      if (typeof lib.convertCurrency !== "function") {
-        throw new Error("currency.convertCurrency not exported");
-      }
-      return lib.convertCurrency(
-        num(args, "amount"),
-        str(args, "from"),
-        str(args, "to"),
-      );
-    },
-  },
-  {
-    def: {
-      name: "qr_code",
-      description: "Generate a QR code PNG/SVG for a given payload.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          data: { type: "string" },
-          format: { type: "string" },
-        },
-        required: ["data"],
-      },
-    },
-    handler: async (args) => {
-      const lib = await loadLib<{
-        generateQr?: (d: string, f: string) => Promise<unknown>;
-      }>("qr_code", "@/lib/qr");
-      if (typeof lib.generateQr !== "function") {
-        throw new Error("qr.generateQr not exported");
-      }
-      return lib.generateQr(str(args, "data"), str(args, "format", "png"));
-    },
-  },
-  {
-    def: {
-      name: "shorten_url",
-      description: "Shorten a long URL via Zoobicon's URL shortener.",
-      inputSchema: {
-        type: "object",
-        properties: { url: { type: "string" } },
-        required: ["url"],
-      },
-    },
-    handler: async (args) => {
-      const lib = await loadLib<{
-        shortenUrl?: (u: string) => Promise<unknown>;
-      }>("shorten_url", "@/lib/url-shortener");
-      if (typeof lib.shortenUrl !== "function") {
-        throw new Error("url-shortener.shortenUrl not exported");
-      }
-      return lib.shortenUrl(str(args, "url"));
-    },
-  },
-  {
-    def: {
-      name: "check_grammar",
+      name: "list_components",
       description:
-        "Alias of grammar_check — kept for client compatibility. Returns inline corrections.",
+        "Return the Zoobicon component registry catalogue (60+ components: navbars, heroes, features, pricing, etc). Use this to see what building blocks are available for site generation.",
       inputSchema: {
         type: "object",
-        properties: { text: { type: "string" } },
-        required: ["text"],
+        properties: {},
       },
     },
-    handler: async (args) => {
-      const lib = await loadLib<{
-        checkGrammar?: (t: string) => Promise<unknown>;
-      }>("check_grammar", "@/lib/grammar");
-      if (typeof lib.checkGrammar !== "function") {
-        throw new Error("grammar.checkGrammar not exported");
+    handler: async () => {
+      // Dynamic import to avoid TDZ issues with component-registry
+      try {
+        const mod = await import("@/lib/component-registry");
+        const REGISTRY = mod.REGISTRY as Array<{ id: string; name: string; category: string; variant: string; description: string; tags: string[] }>;
+        const components = REGISTRY.map((c) => ({
+          id: c.id,
+          name: c.name,
+          category: c.category,
+          variant: c.variant,
+          description: c.description,
+          tags: c.tags,
+        }));
+        const byCategory: Record<string, number> = {};
+        for (const c of components) {
+          byCategory[c.category] = (byCategory[c.category] ?? 0) + 1;
+        }
+        return { ok: true, total: components.length, byCategory, components };
+      } catch {
+        return { ok: false, error: "Component registry unavailable" };
       }
-      return lib.checkGrammar(str(args, "text"));
     },
   },
+
+  // ================================================================
+  // 15. get_pricing (bonus -- pricing info)
+  // ================================================================
   {
     def: {
-      name: "generate_blog_post",
-      description: "Generate a long-form SEO blog post on a given topic.",
+      name: "get_pricing",
+      description: "Return the Zoobicon subscription tiers and pricing.",
       inputSchema: {
         type: "object",
-        properties: {
-          topic: { type: "string" },
-          tone: { type: "string" },
-          words: { type: "number" },
-        },
-        required: ["topic"],
+        properties: {},
       },
     },
-    handler: async (args) => {
-      const lib = await loadLib<{
-        generateBlogPost?: (i: unknown) => Promise<unknown>;
-      }>("generate_blog_post", "@/lib/blog-generator");
-      if (typeof lib.generateBlogPost !== "function") {
-        throw new Error("blog-generator.generateBlogPost not exported");
-      }
-      return lib.generateBlogPost({
-        topic: str(args, "topic"),
-        tone: str(args, "tone", "professional"),
-        words: num(args, "words", 1200),
-      });
-    },
+    handler: async () => ({
+      ok: true,
+      currency: "USD",
+      tiers: [
+        { id: "starter", name: "Starter", price: 49, interval: "month", features: ["Site", "Domain", "Email (3 mailboxes)", "SSL"] },
+        { id: "pro", name: "Pro", price: 129, interval: "month", features: ["Everything in Starter", "AI auto-reply", "SEO monitor"] },
+        { id: "agency", name: "Agency", price: 299, interval: "month", features: ["Everything in Pro", "AI video", "5 sites", "Priority support"] },
+        { id: "white-label", name: "White-label", price: 499, interval: "month", features: ["Full platform reseller licence"] },
+      ],
+    }),
   },
 ];
+
+// ---------- Exported tool list ----------
 
 export const ZOOBICON_MCP_TOOLS: McpToolDefinition[] = TOOLS.map((t) => t.def);
 
@@ -699,7 +674,6 @@ function findTool(name: string): InternalTool | undefined {
 
 // ---------- JSON-RPC error helpers ----------
 
-const ERR_PARSE = -32700;
 const ERR_INVALID_REQUEST = -32600;
 const ERR_METHOD_NOT_FOUND = -32601;
 const ERR_INVALID_PARAMS = -32602;
@@ -734,6 +708,7 @@ async function dispatch(req: JsonRpcRequest): Promise<JsonRpcResponse> {
 
   try {
     switch (req.method) {
+      // MCP lifecycle: initialize
       case "initialize": {
         return makeSuccess(id, {
           protocolVersion: MCP_PROTOCOL_VERSION,
@@ -750,21 +725,28 @@ async function dispatch(req: JsonRpcRequest): Promise<JsonRpcResponse> {
         });
       }
 
+      // MCP: notifications/initialized (client acknowledgement -- no response needed for notifications, but we handle gracefully)
+      case "notifications/initialized": {
+        return makeSuccess(id, {});
+      }
+
+      // List all available tools
       case "tools/list": {
         return makeSuccess(id, { tools: ZOOBICON_MCP_TOOLS });
       }
 
+      // Call a specific tool
       case "tools/call": {
         const params = req.params as McpToolCallParams | undefined;
         if (!params || typeof params.name !== "string") {
-          return makeError(id, ERR_INVALID_PARAMS, "missing tool name");
+          return makeError(id, ERR_INVALID_PARAMS, "params.name is required for tools/call");
         }
         const tool = findTool(params.name);
         if (!tool) {
           return makeError(
             id,
             ERR_METHOD_NOT_FOUND,
-            `unknown tool: ${params.name}`,
+            `Unknown tool: '${params.name}'. Use tools/list to see available tools.`,
           );
         }
         try {
@@ -787,14 +769,17 @@ async function dispatch(req: JsonRpcRequest): Promise<JsonRpcResponse> {
         }
       }
 
+      // Resources (empty for now)
       case "resources/list": {
         return makeSuccess(id, { resources: [] });
       }
 
+      // Prompts (empty for now)
       case "prompts/list": {
         return makeSuccess(id, { prompts: [] });
       }
 
+      // Ping
       case "ping": {
         return makeSuccess(id, {});
       }
@@ -803,7 +788,7 @@ async function dispatch(req: JsonRpcRequest): Promise<JsonRpcResponse> {
         return makeError(
           id,
           ERR_METHOD_NOT_FOUND,
-          `method not found: ${req.method}`,
+          `Method not found: ${req.method}`,
         );
     }
   } catch (err) {
@@ -837,7 +822,7 @@ export async function handleMcpRequest(body: unknown): Promise<unknown> {
 
   // Single
   if (!isJsonRpcRequest(body)) {
-    return makeError(null, ERR_PARSE, "invalid JSON-RPC 2.0 request");
+    return makeError(null, -32700, "Invalid JSON-RPC 2.0 request. Expected { jsonrpc: '2.0', method: string, id, params? }");
   }
   return dispatch(body);
 }
