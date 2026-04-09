@@ -1075,6 +1075,16 @@ function BuilderPage() {
     setStreamWarning(null);
   }, []);
 
+  const resetWatchdog = useCallback(() => {
+    clearWatchdog();
+    watchdogSlowRef.current = setTimeout(() => {
+      setStreamWarning("Generation is taking longer than usual...");
+    }, 30000);
+    watchdogStuckRef.current = setTimeout(() => {
+      setStreamWarning("Generation appears stuck. You can wait or try again.");
+    }, 90000);
+  }, [clearWatchdog]);
+
         if (accumulated) {
           // Clean accumulated HTML — strip code fences, JSON preamble
           let clean = accumulated.trim();
