@@ -389,10 +389,10 @@ export default function HomePage() {
         </div>
       </footer>
 
-      <style jsx global>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes gradient-shift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
-      `}</style>
+      `}} />
     </div>
   );
 }
