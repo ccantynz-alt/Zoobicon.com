@@ -449,11 +449,39 @@ function BuilderBackground({ isGenerating }: { isGenerating: boolean }) {
 }
 
 export default function BuilderPageWrapper() {
+  const [crashed, setCrashed] = useState<string | null>(null);
+
+  if (crashed) {
+    return (
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-8">
+        <div className="max-w-lg text-center">
+          <h1 className="text-2xl font-bold text-white mb-4">Builder Error</h1>
+          <p className="text-white/60 mb-4">The builder hit an error. Details below:</p>
+          <pre className="bg-zinc-900 border border-white/10 rounded-lg p-4 text-left text-sm text-red-400 overflow-auto max-h-60 mb-6">{crashed}</pre>
+          <button onClick={() => { setCrashed(null); window.location.reload(); }} className="px-6 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-500 transition-colors">
+            Reload
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <Suspense>
-      <BuilderPage />
+    <Suspense fallback={<div className="min-h-screen bg-zinc-950 flex items-center justify-center"><div className="text-white/40">Loading builder...</div></div>}>
+      <ErrorCatcher onError={(e) => setCrashed(e)}>
+        <BuilderPage />
+      </ErrorCatcher>
     </Suspense>
   );
+}
+
+class ErrorCatcher extends Component<{ children: ReactNode; onError: (msg: string) => void }, { hasError: boolean }> {
+  state = { hasError: false };
+  static getDerivedStateFromError() { return { hasError: true }; }
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    this.props.onError(`${error.message}\n\nStack: ${error.stack?.slice(0, 500)}\n\nComponent: ${info.componentStack?.slice(0, 300)}`);
+  }
+  render() { return this.state.hasError ? null : this.props.children; }
 }
 
 function BuilderPage() {
