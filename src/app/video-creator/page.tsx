@@ -486,29 +486,36 @@ SCRIPT_2:
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white relative overflow-hidden">
-      {/* Ambient background effects */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-stone-500/[0.04] rounded-full blur-[120px]" />
-        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-stone-500/[0.03] rounded-full blur-[100px]" />
-        <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:32px_32px]" />
+    <div className="min-h-screen bg-[#050508] text-white relative overflow-hidden fs-grain pt-[72px]">
+      {/* Ambient cinematic glow — matches Filmora standard */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden>
+        <div
+          className="absolute left-1/2 top-[10%] h-[720px] w-[1200px] -translate-x-1/2 rounded-full blur-[160px]"
+          style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.09), transparent 70%)" }}
+        />
+        <div
+          className="absolute bottom-0 right-[15%] h-[500px] w-[700px] rounded-full blur-[140px]"
+          style={{ background: "radial-gradient(closest-side, rgba(224,139,176,0.05), transparent 70%)" }}
+        />
+        <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:32px_32px] opacity-60" />
       </div>
 
-      {/* Nav */}
-      <nav className="relative z-50 border-b border-white/[0.06] bg-zinc-950/80 backdrop-blur-2xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-stone-500 to-stone-500 flex items-center justify-center shadow-lg shadow-stone-500/20 group-hover:shadow-stone-500/40 transition-shadow">
-                <Film className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-sm font-semibold text-white tracking-tight">Zoobicon</span>
-            </Link>
-            <ChevronRight className="w-3 h-3 text-white/20" />
-            <span className="text-sm text-white/50 font-medium">Video Studio</span>
+      {/* Step indicator sub-header — below global nav */}
+      <div className="relative z-40 border-b border-white/[0.04] bg-[#050508]/60 backdrop-blur-xl">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14">
+          <div className="flex items-center gap-2.5">
+            <div
+              className="flex h-7 w-7 items-center justify-center rounded-lg"
+              style={{
+                background: "linear-gradient(135deg, #E8D4B0 0%, #F7C8A0 60%, #E08BB0 100%)",
+                boxShadow: "0 8px 20px -10px rgba(232,212,176,0.5)",
+              }}
+            >
+              <Film className="h-3.5 w-3.5 text-black" />
+            </div>
+            <span className="text-[13px] font-medium text-white/80 tracking-tight">Video Studio</span>
           </div>
 
-          {/* Steps indicator - compact in nav */}
           <div className="hidden sm:flex items-center gap-1.5">
             {[
               { key: "describe", label: "Describe", num: "1" },
@@ -519,11 +526,11 @@ SCRIPT_2:
               const isCompleted = (s.key === "describe" && step !== "describe") || (s.key === "scripts" && step === "produce");
               return (
                 <div key={s.key} className="flex items-center gap-1.5">
-                  {i > 0 && <div className={`w-6 h-[1.5px] rounded-full transition-all duration-500 ${isCompleted || isActive ? "bg-gradient-to-r from-stone-500 to-stone-500" : "bg-white/[0.08]"}`} />}
+                  {i > 0 && <div className={`w-6 h-[1.5px] rounded-full transition-all duration-500 ${isCompleted || isActive ? "bg-[#E8D4B0]" : "bg-white/[0.08]"}`} />}
                   <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium tracking-wide transition-all duration-300 ${
-                    isActive ? "bg-gradient-to-r from-stone-500/20 to-stone-500/20 text-white border border-stone-500/30" :
-                    isCompleted ? "text-stone-400" :
-                    "text-white/25"
+                    isActive ? "bg-[#E8D4B0]/[0.08] text-[#E8D4B0] border border-[#E8D4B0]/30" :
+                    isCompleted ? "text-[#E8D4B0]/70" :
+                    "text-white/25 border border-transparent"
                   }`}>
                     {isCompleted ? <Check className="w-3 h-3" /> : <span className="text-[10px] opacity-60">{s.num}</span>}
                     {s.label}
@@ -534,17 +541,17 @@ SCRIPT_2:
           </div>
 
           <div className="flex items-center gap-1">
-            <Link href="/dashboard" className="text-xs text-white/40 hover:text-white/80 px-3 py-1.5 rounded-lg hover:bg-white/[0.04] flex items-center gap-1.5 transition-all">
+            <Link href="/dashboard" className="text-[12px] text-white/50 hover:text-white/90 px-3 py-1.5 rounded-full hover:bg-white/[0.04] flex items-center gap-1.5 transition-all">
               <LayoutDashboard className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Dashboard</span>
             </Link>
-            <button onClick={handleLogout} className="text-xs text-white/40 hover:text-white/80 px-2 py-1.5 rounded-lg hover:bg-white/[0.04] transition-all">
+            <button onClick={handleLogout} className="text-[12px] text-white/50 hover:text-white/90 px-2 py-1.5 rounded-full hover:bg-white/[0.04] transition-all">
               <LogOut className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
-      </nav>
+      </div>
 
-      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 pt-6">
+      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-32 pt-10">
 
         {/* Error display */}
         {videoError && (
@@ -571,50 +578,73 @@ SCRIPT_2:
           </div>
         )}
 
-        {/* ═══ STEP 1: DESCRIBE ═══ */}
+        {/* ═══ STEP 1: DESCRIBE — cinematic hero ═══ */}
         {step === "describe" && (
-          <div className="flex flex-col items-center pt-12 sm:pt-20">
-            {/* Hero area */}
-            <div className="text-center mb-10 max-w-2xl">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.06] text-xs text-white/50 font-medium tracking-wide mb-6">
-                <Sparkles className="w-3 h-3 text-stone-400" />
-                AI-POWERED VIDEO STUDIO
+          <div className="flex flex-col items-center pt-16 sm:pt-24">
+            {/* Hero */}
+            <div className="text-center mb-12 max-w-3xl">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+                <Sparkles className="h-3 w-3" />
+                Cinematic AI video studio
               </div>
-              <h1 className="text-4xl sm:text-5xl font-bold mb-4 leading-[1.1] tracking-tight">
-                <span className="bg-gradient-to-r from-white via-white to-white/60 bg-clip-text text-transparent">Create a video</span>
-                <br />
-                <span className="bg-gradient-to-r from-stone-400 via-stone-400 to-stone-400 bg-clip-text text-transparent">that converts</span>
+              <h1 className="fs-display-lg text-white">
+                Make a video that{" "}
+                <span
+                  className="font-normal"
+                  style={{
+                    fontFamily: "Fraunces, ui-serif, Georgia, serif",
+                    fontStyle: "italic",
+                    color: "#E8D4B0",
+                  }}
+                >
+                  converts.
+                </span>
               </h1>
-              <p className="text-base sm:text-lg text-white/40 max-w-md mx-auto leading-relaxed">
-                Describe your video. Our AI director writes the script, generates the voice, and produces your video.
+              <p className="mt-6 text-[17px] sm:text-lg text-white/55 max-w-xl mx-auto leading-relaxed">
+                Describe the video. Our AI director writes the script, clones the voice, renders the avatar, and burns the captions — all in a single take.
               </p>
             </div>
 
-            {/* Input area */}
+            {/* Input panel — Filmora-tier card */}
             <div className="w-full max-w-2xl">
-              <div className="relative rounded-2xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl overflow-hidden transition-all focus-within:border-stone-500/30 focus-within:bg-white/[0.04] group">
+              <div
+                className="relative overflow-hidden rounded-[28px] border border-white/[0.08] backdrop-blur-xl transition-all focus-within:border-[#E8D4B0]/35"
+                style={{
+                  background: "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(10,10,15,0.7) 100%)",
+                  boxShadow: "0 1px 0 rgba(255,255,255,0.05) inset, 0 24px 60px -28px rgba(0,0,0,0.7)",
+                }}
+              >
+                <div
+                  className="pointer-events-none absolute -right-24 -top-24 h-[300px] w-[300px] rounded-full blur-[100px]"
+                  style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.18), transparent 70%)" }}
+                />
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleGenerateScripts(); } }}
-                  placeholder="Describe your video... e.g. A 30-second promo featuring an excited presenter explaining our AI website builder"
+                  placeholder="A 30-second promo featuring an excited presenter explaining our AI website builder…"
                   rows={4}
-                  className="w-full px-5 py-4 bg-transparent text-white text-[15px] placeholder-white/20 focus:outline-none resize-none leading-relaxed"
+                  className="relative w-full px-6 pt-6 pb-2 bg-transparent text-white text-[15px] placeholder-white/25 focus:outline-none resize-none leading-relaxed"
                   autoFocus
                 />
-                <div className="flex items-center justify-between px-4 pb-3">
-                  <div className="text-[11px] text-white/20 font-medium tracking-wide">
+                <div className="relative flex items-center justify-between px-5 pb-5 pt-2">
+                  <div className="text-[11px] text-white/25 font-medium tracking-wide">
                     {description.length > 0 && <span>{description.length} chars</span>}
                   </div>
                   <button
                     onClick={handleGenerateScripts}
                     disabled={generatingScripts || description.trim().length < 10}
-                    className="flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 text-sm font-semibold disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-lg shadow-stone-500/20 hover:shadow-stone-500/30"
+                    className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-[13px] font-semibold transition-all duration-500 hover:-translate-y-0.5 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                    style={{
+                      background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+                      color: "#0a0a0f",
+                      boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
+                    }}
                   >
                     {generatingScripts ? (
-                      <><Loader2 className="w-4 h-4 animate-spin" /> Writing scripts...</>
+                      <><Loader2 className="w-4 h-4 animate-spin" /> Writing scripts…</>
                     ) : (
-                      <><Wand2 className="w-4 h-4" /> Generate Scripts</>
+                      <><Wand2 className="w-4 h-4" /> Generate scripts</>
                     )}
                   </button>
                 </div>
@@ -623,28 +653,31 @@ SCRIPT_2:
               {/* Quick prompt chips */}
               <div className="flex flex-wrap gap-2 mt-6 justify-center">
                 {[
-                  { label: "Product Demo", prompt: "30-second product demo for Zoobicon showing the AI builder and domain search — professional, confident presenter" },
+                  { label: "Product demo", prompt: "30-second product demo for Zoobicon showing the AI builder and domain search — professional, confident presenter" },
                   { label: "Testimonial", prompt: "Testimonial-style video about how AI is making web development accessible to everyone" },
                   { label: "Explainer", prompt: "Short explainer about Zoobicon for small business owners who need a website fast" },
-                  { label: "Social Ad", prompt: "Product launch video for our free domain search tool — energetic, hook-first opening for social media" },
+                  { label: "Social ad", prompt: "Product launch video for our free domain search tool — energetic, hook-first opening for social media" },
                 ].map((chip) => (
                   <button
                     key={chip.label}
                     onClick={() => setDescription(chip.prompt)}
-                    className="group/chip flex items-center gap-1.5 px-4 py-2 rounded-full border border-white/[0.06] bg-white/[0.02] text-xs text-white/40 font-medium hover:text-white/80 hover:border-stone-500/30 hover:bg-stone-500/[0.06] transition-all"
+                    className="group/chip inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] px-4 py-2 text-[12px] font-medium text-white/55 transition-all hover:-translate-y-0.5 hover:border-[#E8D4B0]/30 hover:bg-[#E8D4B0]/[0.04] hover:text-[#E8D4B0]"
                   >
-                    <Sparkles className="w-3 h-3 text-white/20 group-hover/chip:text-stone-400 transition-colors" />
+                    <Sparkles className="w-3 h-3 text-white/25 group-hover/chip:text-[#E8D4B0] transition-colors" />
                     {chip.label}
                   </button>
                 ))}
               </div>
 
-              {/* Bottom feature badges */}
-              <div className="flex items-center justify-center gap-6 mt-10 text-[11px] text-white/20 font-medium tracking-wide">
-                <span className="flex items-center gap-1.5"><Mic className="w-3 h-3" /> AI Voice</span>
-                <span className="flex items-center gap-1.5"><ImageIcon className="w-3 h-3" /> AI Avatar</span>
-                <span className="flex items-center gap-1.5"><Film className="w-3 h-3" /> Lip Sync</span>
-                <span className="flex items-center gap-1.5"><Sparkles className="w-3 h-3" /> Auto-Edit</span>
+              {/* Pipeline trust strip */}
+              <div className="mt-12 flex items-center justify-center gap-6 text-[11px] text-white/30 font-medium tracking-[0.12em] uppercase">
+                <span className="flex items-center gap-1.5"><Mic className="w-3 h-3" /> Fish Audio S1</span>
+                <span className="h-1 w-1 rounded-full bg-white/15" />
+                <span className="flex items-center gap-1.5"><ImageIcon className="w-3 h-3" /> FLUX avatar</span>
+                <span className="h-1 w-1 rounded-full bg-white/15" />
+                <span className="flex items-center gap-1.5"><Film className="w-3 h-3" /> Lip sync</span>
+                <span className="h-1 w-1 rounded-full bg-white/15" />
+                <span className="flex items-center gap-1.5"><Sparkles className="w-3 h-3" /> Whisper captions</span>
               </div>
             </div>
           </div>
@@ -652,74 +685,101 @@ SCRIPT_2:
 
         {/* ═══ STEP 2: PICK SCRIPT ═══ */}
         {step === "scripts" && (
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-3xl mx-auto pt-6">
             {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <button onClick={() => setStep("describe")} className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/60 transition-colors mb-3">
-                  <ArrowLeft className="w-3 h-3" /> Back
-                </button>
-                <h2 className="text-2xl font-bold tracking-tight">Choose your script</h2>
-                <p className="text-sm text-white/30 mt-1">Our AI director wrote two approaches. Pick one and refine it.</p>
-              </div>
+            <div className="mb-10">
+              <button onClick={() => setStep("describe")} className="flex items-center gap-1.5 text-[11px] text-white/40 hover:text-[#E8D4B0] transition-colors mb-4 uppercase tracking-[0.12em]">
+                <ArrowLeft className="w-3 h-3" /> Back
+              </button>
+              <h2 className="fs-display-sm text-white">
+                Choose your{" "}
+                <span
+                  className="font-normal"
+                  style={{ fontFamily: "Fraunces, ui-serif, Georgia, serif", fontStyle: "italic", color: "#E8D4B0" }}
+                >
+                  script.
+                </span>
+              </h2>
+              <p className="mt-3 text-[15px] text-white/55 max-w-lg">Our AI director wrote two approaches. Pick one and refine it.</p>
             </div>
 
             {/* Script cards */}
-            <div className="grid gap-4 mb-6">
+            <div className="grid gap-5 mb-8">
               {scripts.map((script, i) => (
                 <button
                   key={i}
                   onClick={() => handleSelectScript(i)}
-                  className={`relative p-6 rounded-2xl border text-left transition-all duration-300 group/script ${
+                  className={`relative overflow-hidden p-7 rounded-[24px] border text-left transition-all duration-500 hover:-translate-y-0.5 group/script ${
                     selectedScript === i
-                      ? "border-stone-500/40 bg-stone-500/[0.06] backdrop-blur-xl"
-                      : "border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12] hover:bg-white/[0.04] backdrop-blur-xl"
+                      ? "border-[#E8D4B0]/40"
+                      : "border-white/[0.08] hover:border-white/[0.15]"
                   }`}
+                  style={{
+                    background: selectedScript === i
+                      ? "linear-gradient(135deg, rgba(232,212,176,0.07) 0%, rgba(224,139,176,0.04) 100%)"
+                      : "linear-gradient(135deg, rgba(17,17,24,0.6) 0%, rgba(10,10,15,0.4) 100%)",
+                    boxShadow: selectedScript === i
+                      ? "0 1px 0 rgba(232,212,176,0.15) inset, 0 28px 70px -32px rgba(232,212,176,0.35)"
+                      : "0 1px 0 rgba(255,255,255,0.03) inset, 0 20px 50px -30px rgba(0,0,0,0.6)",
+                  }}
                 >
-                  {/* Gradient top edge when selected */}
                   {selectedScript === i && (
-                    <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-stone-500 via-stone-500 to-stone-500 rounded-t-2xl" />
+                    <div
+                      className="absolute inset-x-0 top-0 h-[2px]"
+                      style={{ background: "linear-gradient(90deg, transparent, #E8D4B0, #E08BB0, transparent)" }}
+                    />
                   )}
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2.5">
-                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold transition-all ${
-                        selectedScript === i ? "bg-gradient-to-br from-stone-500 to-stone-500 text-white" : "bg-white/[0.06] text-white/40"
-                      }`}>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`flex h-8 w-8 items-center justify-center rounded-xl text-[13px] font-bold transition-all ${
+                          selectedScript === i ? "text-black" : "bg-white/[0.06] text-white/40"
+                        }`}
+                        style={selectedScript === i ? {
+                          background: "linear-gradient(135deg, #E8D4B0 0%, #F7C8A0 60%, #E08BB0 100%)",
+                          boxShadow: "0 8px 20px -10px rgba(232,212,176,0.5)",
+                        } : undefined}
+                      >
                         {i + 1}
                       </div>
-                      <span className={`text-xs font-semibold uppercase tracking-wider transition-colors ${selectedScript === i ? "text-stone-400" : "text-white/30"}`}>
-                        {i === 0 ? "Direct Approach" : "Creative Approach"}
+                      <span className={`text-[11px] font-semibold uppercase tracking-[0.18em] transition-colors ${selectedScript === i ? "text-[#E8D4B0]" : "text-white/35"}`}>
+                        {i === 0 ? "Direct approach" : "Creative approach"}
                       </span>
                     </div>
                     {selectedScript === i && (
-                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-stone-500/15 text-[10px] font-semibold text-stone-400 uppercase tracking-widest">
+                      <div className="flex items-center gap-1.5 rounded-full bg-[#E8D4B0]/15 px-2.5 py-1 text-[10px] font-semibold text-[#E8D4B0] uppercase tracking-[0.18em] border border-[#E8D4B0]/25">
                         <Check className="w-3 h-3" /> Selected
                       </div>
                     )}
                   </div>
-                  <div className="text-[14px] text-white/60 leading-relaxed whitespace-pre-wrap group-hover/script:text-white/70 transition-colors">{script}</div>
+                  <div className="text-[14px] text-white/65 leading-[1.7] whitespace-pre-wrap group-hover/script:text-white/80 transition-colors">{script}</div>
                 </button>
               ))}
             </div>
 
             {/* Edit + proceed */}
             {selectedScript !== null && (
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-white/40 uppercase tracking-wider">Refine your script</label>
-                  <span className="text-[11px] text-white/20">{editedScript.length} chars</span>
+                  <label className="text-[11px] font-semibold text-[#E8D4B0]/80 uppercase tracking-[0.18em]">Refine your script</label>
+                  <span className="text-[11px] text-white/25">{editedScript.length} chars</span>
                 </div>
                 <textarea
                   value={editedScript}
                   onChange={(e) => setEditedScript(e.target.value)}
                   rows={6}
-                  className="w-full px-5 py-4 bg-white/[0.03] border border-white/[0.08] rounded-2xl text-white/80 text-[14px] focus:outline-none focus:border-stone-500/30 focus:bg-white/[0.04] resize-none leading-relaxed transition-all backdrop-blur-xl"
+                  className="w-full px-6 py-5 bg-white/[0.03] border border-white/[0.08] rounded-[24px] text-white/85 text-[14px] focus:outline-none focus:border-[#E8D4B0]/35 focus:bg-white/[0.04] resize-none leading-[1.7] transition-all backdrop-blur-xl"
                 />
                 <button
                   onClick={handleProceedToProduction}
-                  className="w-full py-4 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 rounded-2xl font-semibold text-base transition-all flex items-center justify-center gap-2.5 shadow-lg shadow-stone-500/20 hover:shadow-xl hover:shadow-stone-500/30"
+                  className="w-full py-5 rounded-full font-semibold text-[15px] transition-all duration-500 hover:-translate-y-0.5 flex items-center justify-center gap-2.5"
+                  style={{
+                    background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+                    color: "#0a0a0f",
+                    boxShadow: "0 18px 48px -18px rgba(232,212,176,0.55)",
+                  }}
                 >
-                  Continue to Production <ChevronRight className="w-4 h-4" />
+                  Continue to production <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
             )}
@@ -728,16 +788,22 @@ SCRIPT_2:
 
         {/* ═══ STEP 3: PRODUCE ═══ */}
         {step === "produce" && !videoUrl && (
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-4xl mx-auto pt-6">
             {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <button onClick={() => setStep("scripts")} className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/60 transition-colors mb-3">
-                  <ArrowLeft className="w-3 h-3" /> Back to scripts
-                </button>
-                <h2 className="text-2xl font-bold tracking-tight">Production settings</h2>
-                <p className="text-sm text-white/30 mt-1">Configure your presenter and format, then generate.</p>
-              </div>
+            <div className="mb-10">
+              <button onClick={() => setStep("scripts")} className="flex items-center gap-1.5 text-[11px] text-white/40 hover:text-[#E8D4B0] transition-colors mb-4 uppercase tracking-[0.12em]">
+                <ArrowLeft className="w-3 h-3" /> Back to scripts
+              </button>
+              <h2 className="fs-display-sm text-white">
+                Production{" "}
+                <span
+                  className="font-normal"
+                  style={{ fontFamily: "Fraunces, ui-serif, Georgia, serif", fontStyle: "italic", color: "#E8D4B0" }}
+                >
+                  settings.
+                </span>
+              </h2>
+              <p className="mt-3 text-[15px] text-white/55 max-w-lg">Configure your presenter and format, then roll camera.</p>
             </div>
 
             <div className="grid lg:grid-cols-5 gap-6">
@@ -883,9 +949,14 @@ SCRIPT_2:
                 ) : (
                   <button
                     onClick={handleGenerateVideo}
-                    className="w-full py-4 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 rounded-2xl font-semibold text-base transition-all flex items-center justify-center gap-2.5 shadow-xl shadow-stone-500/20 hover:shadow-2xl hover:shadow-stone-500/30 group/gen"
+                    className="w-full py-5 rounded-full font-semibold text-[15px] transition-all duration-500 hover:-translate-y-0.5 flex items-center justify-center gap-2.5 group/gen"
+                    style={{
+                      background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+                      color: "#0a0a0f",
+                      boxShadow: "0 18px 48px -18px rgba(232,212,176,0.55)",
+                    }}
                   >
-                    <Sparkles className="w-5 h-5 group-hover/gen:rotate-12 transition-transform" /> Generate Video
+                    <Sparkles className="w-5 h-5 group-hover/gen:rotate-12 transition-transform" /> Generate video
                   </button>
                 )}
               </div>
@@ -924,16 +995,24 @@ SCRIPT_2:
 
         {/* ═══ VIDEO RESULT ═══ */}
         {videoUrl && (
-          <div className="max-w-3xl mx-auto pt-4">
+          <div className="max-w-3xl mx-auto pt-6">
             {/* Success badge */}
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-stone-500/[0.06] border border-stone-500/20 text-stone-400 text-xs font-semibold uppercase tracking-wider mb-4">
-                <div className="w-4 h-4 rounded-full bg-stone-500/15 flex items-center justify-center">
+            <div className="text-center mb-10">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/25 bg-[#E8D4B0]/[0.06] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#E8D4B0] mb-5">
+                <div className="flex h-4 w-4 items-center justify-center rounded-full bg-[#E8D4B0]/15">
                   <Check className="w-2.5 h-2.5" />
                 </div>
                 Production complete
               </div>
-              <h2 className="text-2xl font-bold tracking-tight">Your video is ready</h2>
+              <h2 className="fs-display-sm text-white">
+                Your video is{" "}
+                <span
+                  className="font-normal"
+                  style={{ fontFamily: "Fraunces, ui-serif, Georgia, serif", fontStyle: "italic", color: "#E8D4B0" }}
+                >
+                  ready.
+                </span>
+              </h2>
             </div>
 
             {/* Cinema-style video frame */}
@@ -959,13 +1038,18 @@ SCRIPT_2:
             </div>
 
             {/* Action buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 mt-6">
+            <div className="flex flex-col sm:flex-row gap-3 mt-8">
               <a
                 href={videoUrl}
                 download
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 text-white font-semibold text-sm transition-all shadow-lg shadow-stone-500/20"
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-full py-4 text-[13px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
+                style={{
+                  background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+                  color: "#0a0a0f",
+                  boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
+                }}
               >
                 <Download className="w-4 h-4" /> Download
               </a>
@@ -977,15 +1061,15 @@ SCRIPT_2:
                     navigator.clipboard.writeText(videoUrl);
                   }
                 }}
-                className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl border border-white/[0.08] bg-white/[0.02] text-white/60 hover:text-white hover:bg-white/[0.04] text-sm font-medium transition-all backdrop-blur-xl"
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] py-4 text-[13px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
               >
                 <Share2 className="w-4 h-4" /> Share
               </button>
               <button
                 onClick={handleStartOver}
-                className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl border border-white/[0.08] bg-white/[0.02] text-white/60 hover:text-white hover:bg-white/[0.04] text-sm font-medium transition-all backdrop-blur-xl"
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] py-4 text-[13px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
               >
-                <RefreshCw className="w-4 h-4" /> New Video
+                <RefreshCw className="w-4 h-4" /> New video
               </button>
             </div>
           </div>

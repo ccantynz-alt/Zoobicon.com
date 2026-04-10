@@ -168,41 +168,54 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-zinc-950 text-white selection:bg-stone-500/30 overflow-hidden">
+    <div className="relative min-h-screen bg-[#050508] text-white selection:bg-[#E8D4B0]/30 overflow-hidden fs-grain pt-[72px]">
       {/* ── structured data ── */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
-      {/* ── ambient background ── */}
-      <div className="pointer-events-none fixed inset-0 z-0">
-        <div className="absolute top-[-40%] left-1/2 -translate-x-1/2 w-[900px] h-[900px] rounded-full bg-stone-600/[0.07] blur-[160px]" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-stone-600/[0.05] blur-[140px]" />
+      {/* ── ambient cinematic background ── */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden>
+        <div
+          className="absolute top-[-30%] left-1/2 h-[900px] w-[1200px] -translate-x-1/2 rounded-full blur-[180px]"
+          style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.09), transparent 70%)" }}
+        />
+        <div
+          className="absolute bottom-[-20%] right-[-10%] h-[600px] w-[800px] rounded-full blur-[160px]"
+          style={{ background: "radial-gradient(closest-side, rgba(224,139,176,0.05), transparent 70%)" }}
+        />
       </div>
 
       <main className="relative z-10">
         {/* ━━━━━━━━━━ HERO ━━━━━━━━━━ */}
-        <section className="pt-32 pb-16 text-center px-6">
+        <section className="pt-24 pb-20 text-center px-6">
           <motion.div
             initial="hidden"
             animate="visible"
-            className="max-w-3xl mx-auto"
+            className="max-w-4xl mx-auto"
           >
             <motion.div
               custom={0}
               variants={fadeUp}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-stone-500/20 bg-stone-500/[0.06] text-stone-300 text-sm font-medium mb-8"
+              className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-8"
             >
-              <Star className="w-3.5 h-3.5" />
+              <Star className="h-3 w-3" />
               Simple, transparent pricing
             </motion.div>
 
             <motion.h1
               custom={1}
               variants={fadeUp}
-              className="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-[1.08] mb-6"
+              className="fs-display-xl text-white"
             >
               Build smarter.{" "}
-              <span className="bg-gradient-to-r from-stone-400 via-stone-400 to-stone-400 bg-clip-text text-transparent">
+              <span
+                className="font-normal"
+                style={{
+                  fontFamily: "Fraunces, ui-serif, Georgia, serif",
+                  fontStyle: "italic",
+                  color: "#E8D4B0",
+                }}
+              >
                 Pay&nbsp;less.
               </span>
             </motion.h1>
@@ -210,29 +223,33 @@ export default function PricingPage() {
             <motion.p
               custom={2}
               variants={fadeUp}
-              className="text-lg text-zinc-400 max-w-xl mx-auto mb-12"
+              className="mt-8 text-[17px] sm:text-lg text-white/55 max-w-2xl mx-auto leading-relaxed"
             >
               One platform for AI websites, domains, hosting, email, and video.
               Start with a 14-day free trial. No credit card required.
             </motion.p>
 
             {/* ── billing toggle ── */}
-            <motion.div custom={3} variants={fadeUp} className="flex items-center justify-center gap-4">
-              <span className={`text-sm font-medium transition-colors ${!annual ? "text-white" : "text-zinc-500"}`}>
+            <motion.div custom={3} variants={fadeUp} className="mt-12 flex items-center justify-center gap-4">
+              <span className={`text-sm font-medium transition-colors ${!annual ? "text-white" : "text-white/35"}`}>
                 Monthly
               </span>
               <button
                 onClick={() => setAnnual(!annual)}
-                className="relative w-14 h-7 rounded-full bg-zinc-800 border border-zinc-700/50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500"
+                className="relative h-7 w-14 rounded-full border border-white/[0.1] bg-white/[0.04] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E8D4B0]"
                 aria-label="Toggle annual billing"
               >
                 <motion.div
-                  className="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-gradient-to-br from-stone-500 to-stone-600 shadow-lg"
+                  className="absolute left-0.5 top-0.5 h-6 w-6 rounded-full shadow-lg"
+                  style={{
+                    background: "linear-gradient(135deg, #E8D4B0 0%, #F7C8A0 60%, #E08BB0 100%)",
+                    boxShadow: "0 6px 14px -4px rgba(232,212,176,0.55)",
+                  }}
                   animate={{ x: annual ? 28 : 0 }}
                   transition={{ type: "spring", stiffness: 500, damping: 30 }}
                 />
               </button>
-              <span className={`text-sm font-medium transition-colors ${annual ? "text-white" : "text-zinc-500"}`}>
+              <span className={`text-sm font-medium transition-colors ${annual ? "text-white" : "text-white/35"}`}>
                 Annual
               </span>
               <AnimatePresence>
@@ -241,7 +258,7 @@ export default function PricingPage() {
                     initial={{ opacity: 0, scale: 0.8, x: -8 }}
                     animate={{ opacity: 1, scale: 1, x: 0 }}
                     exit={{ opacity: 0, scale: 0.8, x: -8 }}
-                    className="text-xs font-bold text-stone-400 bg-stone-400/10 border border-stone-400/20 px-2.5 py-1 rounded-full"
+                    className="rounded-full border border-[#E8D4B0]/25 bg-[#E8D4B0]/10 px-2.5 py-1 text-[11px] font-bold text-[#E8D4B0]"
                   >
                     Save up to 23%
                   </motion.span>
@@ -268,65 +285,79 @@ export default function PricingPage() {
                     whileInView="visible"
                     viewport={{ once: true, margin: "-40px" }}
                     variants={fadeUp}
-                    className={`relative group rounded-2xl p-[1px] transition-transform duration-300 hover:-translate-y-1 ${
-                      plan.featured
-                        ? "bg-gradient-to-b from-stone-500/80 via-stone-500/40 to-stone-500/80 shadow-[0_0_40px_-8px_rgba(168,85,247,0.35)]"
-                        : "bg-gradient-to-b from-white/[0.08] to-white/[0.02]"
-                    }`}
+                    className="relative group"
                   >
                     {/* animated glow ring on featured card */}
                     {plan.featured && (
-                      <div className="absolute -inset-[1px] rounded-2xl opacity-60 blur-sm bg-gradient-to-b from-stone-500/60 via-stone-500/20 to-stone-500/60 -z-10" />
+                      <div
+                        className="absolute -inset-2 rounded-[32px] opacity-70 blur-2xl -z-10"
+                        style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.25), transparent 70%)" }}
+                      />
                     )}
 
                     <div
-                      className={`relative h-full rounded-[15px] p-7 flex flex-col backdrop-blur-xl ${
-                        plan.featured
-                          ? "bg-zinc-950/90"
-                          : "bg-white/[0.03] hover:bg-white/[0.05]"
-                      } transition-colors`}
+                      className="relative h-full rounded-[28px] border p-8 flex flex-col backdrop-blur-xl transition-all duration-500 hover:-translate-y-1"
+                      style={{
+                        borderColor: plan.featured ? "rgba(232,212,176,0.35)" : "rgba(255,255,255,0.08)",
+                        background: plan.featured
+                          ? "linear-gradient(180deg, rgba(232,212,176,0.07) 0%, rgba(17,17,24,0.85) 60%)"
+                          : "linear-gradient(180deg, rgba(17,17,24,0.6) 0%, rgba(10,10,15,0.4) 100%)",
+                        boxShadow: plan.featured
+                          ? "0 1px 0 rgba(232,212,176,0.15) inset, 0 32px 80px -32px rgba(232,212,176,0.45)"
+                          : "0 1px 0 rgba(255,255,255,0.04) inset, 0 20px 50px -30px rgba(0,0,0,0.6)",
+                      }}
                     >
                       {/* popular badge */}
                       {plan.featured && (
                         <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
-                          <span className="px-4 py-1.5 rounded-full bg-gradient-to-r from-stone-600 to-stone-600 text-[11px] font-bold tracking-wide uppercase text-white shadow-lg shadow-stone-500/25 whitespace-nowrap">
-                            Most Popular
+                          <span
+                            className="whitespace-nowrap rounded-full px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.16em]"
+                            style={{
+                              background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+                              color: "#0a0a0f",
+                              boxShadow: "0 10px 24px -10px rgba(232,212,176,0.55)",
+                            }}
+                          >
+                            Most popular
                           </span>
                         </div>
                       )}
 
                       {/* icon + name */}
-                      <div className="flex items-center gap-2.5 mb-4 mt-1">
+                      <div className="flex items-center gap-3 mb-5 mt-1">
                         <div
-                          className={`w-9 h-9 rounded-xl flex items-center justify-center ${
-                            plan.featured
-                              ? "bg-stone-500/15 text-stone-400"
-                              : "bg-white/[0.06] text-zinc-400"
-                          }`}
+                          className="flex h-10 w-10 items-center justify-center rounded-xl"
+                          style={{
+                            background: plan.featured
+                              ? "linear-gradient(135deg, rgba(232,212,176,0.15), rgba(224,139,176,0.08))"
+                              : "rgba(255,255,255,0.04)",
+                            color: plan.featured ? "#E8D4B0" : "rgba(255,255,255,0.55)",
+                            border: plan.featured ? "1px solid rgba(232,212,176,0.25)" : "1px solid rgba(255,255,255,0.06)",
+                          }}
                         >
-                          <Icon className="w-4.5 h-4.5" />
+                          <Icon className="h-4 w-4" />
                         </div>
-                        <h3 className="text-lg font-bold">{plan.name}</h3>
+                        <h3 className="text-[18px] font-semibold text-white tracking-[-0.01em]">{plan.name}</h3>
                       </div>
 
                       {/* price */}
-                      <div className="mb-4">
+                      <div className="mb-5">
                         {isCustom ? (
                           <div className="flex items-baseline gap-1">
-                            <span className="text-4xl font-extrabold tracking-tight">Custom</span>
+                            <span className="text-5xl font-semibold tracking-[-0.03em] text-white">Custom</span>
                           </div>
                         ) : (
                           <div className="flex items-baseline gap-1">
-                            <span className="text-4xl font-extrabold tracking-tight">
+                            <span className="text-5xl font-semibold tracking-[-0.03em] text-white">
                               ${price}
                             </span>
-                            <span className="text-sm text-zinc-500 font-medium">/mo</span>
+                            <span className="text-sm text-white/40 font-medium">/mo</span>
                           </div>
                         )}
                         {annual && !isCustom && (
-                          <p className="text-xs text-zinc-500 mt-1">
+                          <p className="mt-1.5 text-[11px] text-white/45">
                             ${price * 12}/yr &middot;{" "}
-                            <span className="text-stone-400">
+                            <span className="text-[#E8D4B0]">
                               save ${(plan.monthly - plan.annual) * 12}/yr
                             </span>
                           </p>
@@ -334,24 +365,24 @@ export default function PricingPage() {
                       </div>
 
                       {/* description */}
-                      <p className="text-sm text-zinc-400 leading-relaxed mb-6">
+                      <p className="mb-7 text-[13px] text-white/55 leading-relaxed">
                         {plan.description}
                       </p>
 
                       {/* features */}
                       <ul className="space-y-3 mb-8 flex-1">
                         {plan.features.map((feature) => (
-                          <li key={feature} className="flex items-start gap-2.5">
+                          <li key={feature} className="flex items-start gap-3">
                             <div
-                              className={`flex-shrink-0 w-4.5 h-4.5 rounded-full flex items-center justify-center mt-0.5 ${
-                                plan.featured
-                                  ? "bg-stone-500/15 text-stone-400"
-                                  : "bg-white/[0.06] text-zinc-500"
-                              }`}
+                              className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full mt-0.5"
+                              style={{
+                                background: plan.featured ? "rgba(232,212,176,0.15)" : "rgba(255,255,255,0.05)",
+                                color: plan.featured ? "#E8D4B0" : "rgba(255,255,255,0.4)",
+                              }}
                             >
-                              <Check className="w-3 h-3" strokeWidth={2.5} />
+                              <Check className="h-2.5 w-2.5" strokeWidth={3} />
                             </div>
-                            <span className="text-sm text-zinc-300">{feature}</span>
+                            <span className="text-[13px] text-white/70 leading-relaxed">{feature}</span>
                           </li>
                         ))}
                       </ul>
@@ -360,21 +391,27 @@ export default function PricingPage() {
                       {plan.id === "enterprise" ? (
                         <a
                           href="mailto:sales@zoobicon.com?subject=Enterprise%20Inquiry"
-                          className="block w-full py-3.5 rounded-xl text-sm font-semibold text-center border border-white/[0.08] text-zinc-300 hover:text-white hover:border-white/20 hover:bg-white/[0.04] transition-all"
+                          className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] py-3.5 text-[13px] font-semibold text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
                         >
                           {plan.cta}
+                          <ArrowRight className="h-3.5 w-3.5" />
                         </a>
                       ) : (
                         <Link
                           href="/auth/signup"
-                          className={`group/btn flex items-center justify-center gap-2 w-full py-3.5 rounded-xl text-sm font-semibold transition-all ${
-                            plan.featured
-                              ? "bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 text-white shadow-lg shadow-stone-500/20 hover:shadow-stone-500/30"
-                              : "border border-white/[0.08] text-zinc-300 hover:text-white hover:border-white/20 hover:bg-white/[0.04]"
-                          }`}
+                          className="group/btn inline-flex w-full items-center justify-center gap-2 rounded-full py-3.5 text-[13px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
+                          style={plan.featured ? {
+                            background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+                            color: "#0a0a0f",
+                            boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
+                          } : {
+                            background: "rgba(255,255,255,0.03)",
+                            border: "1px solid rgba(255,255,255,0.12)",
+                            color: "rgba(255,255,255,0.85)",
+                          }}
                         >
                           {plan.cta}
-                          <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-0.5" />
+                          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover/btn:translate-x-0.5" />
                         </Link>
                       )}
                     </div>
@@ -393,18 +430,20 @@ export default function PricingPage() {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 text-sm text-zinc-500"
+              className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 text-[13px] text-white/45"
             >
               <span className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-stone-400" />
+                <Check className="h-4 w-4 text-[#E8D4B0]" />
                 No credit card required
               </span>
+              <span className="h-1 w-1 rounded-full bg-white/15 hidden sm:inline-flex" />
               <span className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-stone-400" />
+                <Check className="h-4 w-4 text-[#E8D4B0]" />
                 14-day free trial on all paid plans
               </span>
+              <span className="h-1 w-1 rounded-full bg-white/15 hidden sm:inline-flex" />
               <span className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-stone-400" />
+                <Check className="h-4 w-4 text-[#E8D4B0]" />
                 Cancel anytime
               </span>
             </motion.div>
@@ -413,26 +452,38 @@ export default function PricingPage() {
 
         {/* ━━━━━━━━━━ FAQ ━━━━━━━━━━ */}
         <section className="pb-32 px-6">
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-3xl mx-auto">
             <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-60px" }}
             >
-              <motion.h2
-                custom={0}
-                variants={fadeUp}
-                className="text-3xl sm:text-4xl font-extrabold tracking-tight text-center mb-4"
-              >
-                Frequently asked questions
-              </motion.h2>
-              <motion.p
-                custom={1}
-                variants={fadeUp}
-                className="text-zinc-400 text-center mb-12"
-              >
-                Everything you need to know about our plans.
-              </motion.p>
+              <div className="text-center mb-14">
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+                  <Star className="h-3 w-3" />
+                  Questions
+                </div>
+                <motion.h2
+                  custom={0}
+                  variants={fadeUp}
+                  className="fs-display-md text-white"
+                >
+                  Frequently{" "}
+                  <span
+                    className="font-normal"
+                    style={{ fontFamily: "Fraunces, ui-serif, Georgia, serif", fontStyle: "italic", color: "#E8D4B0" }}
+                  >
+                    asked.
+                  </span>
+                </motion.h2>
+                <motion.p
+                  custom={1}
+                  variants={fadeUp}
+                  className="mt-5 text-[15px] text-white/55 max-w-lg mx-auto"
+                >
+                  Everything you need to know about our plans.
+                </motion.p>
+              </div>
 
               <div className="space-y-3">
                 {FAQS.map((faq, i) => {
@@ -442,22 +493,27 @@ export default function PricingPage() {
                       key={i}
                       custom={i + 2}
                       variants={fadeUp}
-                      className={`rounded-xl border transition-colors ${
-                        isOpen
-                          ? "border-stone-500/20 bg-stone-500/[0.03]"
-                          : "border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04]"
-                      }`}
+                      className="rounded-[20px] border backdrop-blur-xl transition-all duration-500"
+                      style={{
+                        borderColor: isOpen ? "rgba(232,212,176,0.25)" : "rgba(255,255,255,0.08)",
+                        background: isOpen
+                          ? "linear-gradient(135deg, rgba(232,212,176,0.05) 0%, rgba(17,17,24,0.6) 100%)"
+                          : "linear-gradient(135deg, rgba(17,17,24,0.6) 0%, rgba(10,10,15,0.4) 100%)",
+                        boxShadow: isOpen
+                          ? "0 1px 0 rgba(232,212,176,0.12) inset, 0 20px 50px -28px rgba(232,212,176,0.3)"
+                          : "0 1px 0 rgba(255,255,255,0.03) inset",
+                      }}
                     >
                       <button
                         onClick={() => setOpenFaq(isOpen ? null : i)}
-                        className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left"
+                        className="w-full flex items-center justify-between gap-4 px-7 py-5 text-left"
                         aria-expanded={isOpen}
                       >
-                        <span className="text-sm font-semibold text-zinc-200">{faq.q}</span>
+                        <span className={`text-[15px] font-semibold transition-colors ${isOpen ? "text-[#E8D4B0]" : "text-white"}`}>{faq.q}</span>
                         <motion.span
                           animate={{ rotate: isOpen ? 45 : 0 }}
                           transition={{ duration: 0.2 }}
-                          className="flex-shrink-0 w-5 h-5 rounded-full border border-white/[0.1] flex items-center justify-center text-zinc-500"
+                          className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-white/[0.1] text-white/40"
                         >
                           <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
                             <path d="M5 1v8M1 5h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -473,7 +529,7 @@ export default function PricingPage() {
                             transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
                             className="overflow-hidden"
                           >
-                            <p className="px-6 pb-5 text-sm text-zinc-400 leading-relaxed">
+                            <p className="px-7 pb-6 text-[14px] text-white/60 leading-relaxed">
                               {faq.a}
                             </p>
                           </motion.div>
@@ -494,35 +550,51 @@ export default function PricingPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="max-w-3xl mx-auto text-center"
+            className="max-w-4xl mx-auto"
           >
-            <div className="relative rounded-2xl p-[1px] bg-gradient-to-b from-stone-500/30 via-white/[0.06] to-white/[0.02] overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-b from-stone-600/[0.06] to-transparent pointer-events-none" />
-              <div className="relative rounded-[15px] bg-zinc-950/80 backdrop-blur-xl py-16 px-8">
-                <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-4">
-                  Ready to build something{" "}
-                  <span className="bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">
-                    extraordinary
+            <div
+              className="relative overflow-hidden rounded-[40px] border border-white/[0.08] p-12 sm:p-16 text-center"
+              style={{
+                background: "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(26,26,36,0.65) 100%)",
+                boxShadow: "0 1px 0 rgba(255,255,255,0.05) inset, 0 40px 100px -40px rgba(0,0,0,0.8)",
+              }}
+            >
+              <div
+                className="pointer-events-none absolute left-1/2 top-1/2 h-[500px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[140px]"
+                style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.18), transparent 70%)" }}
+              />
+              <div className="relative">
+                <h2 className="fs-display-md text-white">
+                  Build something{" "}
+                  <span
+                    className="font-normal"
+                    style={{ fontFamily: "Fraunces, ui-serif, Georgia, serif", fontStyle: "italic", color: "#E8D4B0" }}
+                  >
+                    extraordinary.
                   </span>
-                  ?
                 </h2>
-                <p className="text-zinc-400 mb-8 max-w-md mx-auto">
+                <p className="mt-6 text-[16px] text-white/55 max-w-md mx-auto leading-relaxed">
                   Join thousands of creators and agencies building with Zoobicon.
                   Start your free trial today.
                 </p>
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
                   <Link
                     href="/builder"
-                    className="group inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 text-sm font-bold text-white shadow-lg shadow-stone-500/20 hover:shadow-stone-500/30 transition-all"
+                    className="group inline-flex items-center gap-2 rounded-full px-7 py-4 text-[14px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
+                    style={{
+                      background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+                      color: "#0a0a0f",
+                      boxShadow: "0 18px 48px -18px rgba(232,212,176,0.55)",
+                    }}
                   >
-                    Try the Builder Free
-                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                    Try the builder free
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                   </Link>
                   <Link
                     href="/auth/signup"
-                    className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-sm font-semibold text-zinc-300 border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.04] transition-all"
+                    className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-7 py-4 text-[14px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
                   >
-                    Create Free Account
+                    Create free account
                   </Link>
                 </div>
               </div>

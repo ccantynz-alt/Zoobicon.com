@@ -1,41 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import BackgroundEffects from "@/components/BackgroundEffects";
-import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
+import { useState } from "react";
 import {
-  Zap,
-  Globe,
   ArrowRight,
   Shield,
-  Lock,
   Check,
   Minus,
   ChevronDown,
   ChevronRight,
-  Wifi,
-  WifiOff,
   Smartphone,
-  Eye,
   EyeOff,
-  Server,
   MapPin,
   Gauge,
-  Binary,
   Split,
   Laptop,
-  Plane,
-  Briefcase,
+  WifiOff,
+  Globe,
+  BadgeCheck,
 } from "lucide-react";
-
-/* ─── animation variants ─── */
-const fadeInUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } },
-};
-const staggerContainer = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
 
 /* ─── data ─── */
 const VPN_STATS = [
@@ -84,21 +67,18 @@ const HOW_IT_WORKS = [
     title: "Choose Your Plan",
     desc: "Pick Basic, Pro, or Annual. All plans include every feature \u2014 no feature-gating.",
     icon: Shield,
-    color: "from-brand-500 to-accent-purple",
   },
   {
     step: "02",
     title: "Download & Configure",
     desc: "One-click install on macOS, Windows, iOS, Android, or Linux. Config files for routers too.",
     icon: Smartphone,
-    color: "from-accent-cyan to-stone-600",
   },
   {
     step: "03",
     title: "Connect & Go",
     desc: "Tap connect. You\u2019re encrypted in under 2 seconds. Travel, work, stream \u2014 safely.",
     icon: Globe,
-    color: "from-stone-500 to-stone-600",
   },
 ];
 
@@ -193,22 +173,20 @@ const FAQ_ITEMS = [
   },
 ];
 
-/* ─── SEO metadata (Next.js App Router) ─── */
-// NOTE: metadata export must live in a server component or layout.
-// For "use client" pages we inject JSON-LD instead and rely on
-// the parent layout or a sibling layout.tsx for <head> meta.
+const CARD_BG = "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(10,10,15,0.7) 100%)";
+const PRIMARY_CTA = {
+  background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+  color: "#0a0a0f",
+  boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
+} as const;
+const SERIF: React.CSSProperties = {
+  fontFamily: "Fraunces, ui-serif, Georgia, serif",
+  fontStyle: "italic",
+  fontWeight: 400,
+  color: "#E8D4B0",
+};
 
 export default function VPNPage() {
-  /* ─── auth-aware nav ─── */
-  const [user, setUser] = useState<{ name?: string } | null>(null);
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem("zoobicon_user");
-      if (raw) setUser(JSON.parse(raw));
-    } catch {}
-  }, []);
-
-  /* ─── FAQ accordion state ─── */
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   /* ─── JSON-LD structured data ─── */
@@ -256,461 +234,405 @@ export default function VPNPage() {
   };
 
   return (
-    <div className="relative min-h-screen">
+    <div className="min-h-screen bg-[#050508] text-white fs-grain pt-[72px]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
-      <BackgroundEffects preset="technical" />
 
-      {/* ============================================ */}
-      {/* NAVIGATION                                   */}
-      {/* ============================================ */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
-                <Zap className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-lg font-bold tracking-tight">Zoobicon</span>
-            </Link>
-            <span className="text-xs text-white/60">/</span>
-            <span className="text-sm text-white/65">VPN</span>
-          </div>
-          <div className="flex items-center gap-4">
-            {user ? (
-              <Link href="/dashboard" className="text-sm text-white/65 hover:text-white transition-colors">
-                {user.name || "Dashboard"}
-              </Link>
-            ) : (
-              <Link href="/auth/login" className="text-sm text-white/65 hover:text-white transition-colors">
-                Sign in
-              </Link>
-            )}
-            <Link href="/auth/signup" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white">
-              <span>Get VPN</span>
-            </Link>
-          </div>
+      {/* Hero */}
+      <section className="relative pt-20 pb-24 md:pt-28 md:pb-32 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+          <div
+            className="absolute left-1/2 top-0 h-[720px] w-[1200px] -translate-x-1/2 rounded-full blur-[160px]"
+            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.09), transparent 70%)" }}
+          />
+          <div
+            className="absolute right-[-10%] top-[30%] h-[420px] w-[520px] rounded-full blur-[140px]"
+            style={{ background: "radial-gradient(closest-side, rgba(224,139,176,0.07), transparent 70%)" }}
+          />
         </div>
-      </nav>
-      <CursorGlowTracker />
 
-      {/* ============================================ */}
-      {/* 1. HERO SECTION                              */}
-      {/* ============================================ */}
-      <section className="relative pt-32 pb-20 lg:pt-44 lg:pb-28">
-        <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
-            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-cyan/20 bg-accent-cyan/5 mb-6">
-              <Shield className="w-3 h-3 text-accent-cyan" />
-              <span className="text-xs font-medium text-accent-cyan">Zoobicon VPN</span>
-            </motion.div>
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-8">
+            <BadgeCheck className="w-3 h-3" />
+            60+ locations · Zero logs · WireGuard
+          </div>
 
-            <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl lg:text-8xl font-black tracking-tight leading-[0.9] mb-6">
-              Secure Everywhere<br />
-              <span className="gradient-text-hero">You Go</span>
-            </motion.h1>
+          <h1 className="fs-display-xl mb-6">
+            Secure everywhere{" "}
+            <span style={SERIF}>you go.</span>
+          </h1>
 
-            <motion.p variants={fadeInUp} className="max-w-3xl text-lg md:text-xl text-white/60 leading-relaxed mb-10">
-              Military-grade encryption for travellers and businesses. Connect to 60+ locations worldwide
-              with Oceania-optimised servers, zero-log policy, and blazing-fast WireGuard protocol.
-              Whether you&apos;re on airport Wi-Fi in Auckland or a hotel in Bangkok &mdash; your data stays yours.
-            </motion.p>
+          <p className="max-w-3xl mx-auto text-[17px] md:text-[19px] leading-relaxed text-white/60 mb-10">
+            Military-grade encryption for travellers and businesses. Connect to 60+ locations
+            worldwide with Oceania-optimised servers, zero-log policy, and blazing-fast WireGuard
+            protocol. Whether you&apos;re on airport Wi-Fi in Auckland or a hotel in Bangkok &mdash;
+            your data stays yours.
+          </p>
 
-            <motion.div variants={fadeInUp} className="flex flex-wrap gap-2 mb-12 max-w-3xl">
-              {["256-bit Encryption", "Zero Logs", "WireGuard", "Kill Switch", "Split Tunneling", "Oceania Servers"].map((pill) => (
-                <span
-                  key={pill}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/[0.12] bg-white/[0.06] text-xs font-medium text-white/65"
-                >
-                  <Check className="w-3 h-3 text-accent-cyan" />
-                  {pill}
-                </span>
-              ))}
-            </motion.div>
-
-            <motion.div variants={fadeInUp} className="flex flex-wrap gap-4">
-              <Link href="/auth/signup" className="group btn-gradient px-8 py-4 rounded-2xl text-base font-bold text-white flex items-center gap-3 shadow-glow">
-                <Shield className="w-5 h-5" />
-                <span>Get VPN &mdash; From $3.99/mo</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link href="#pricing" className="px-8 py-4 rounded-2xl text-base font-medium text-white/65 border border-white/[0.12] hover:border-white/20 transition-all flex items-center gap-3">
-                <Gauge className="w-5 h-5" />
-                <span>View Plans</span>
-              </Link>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ============================================ */}
-      {/* 2. STATS BANNER                              */}
-      {/* ============================================ */}
-      <section className="relative py-16 border-y border-white/[0.08]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8"
-          >
-            {VPN_STATS.map((stat, i) => (
-              <motion.div key={i} variants={fadeInUp} className="text-center">
-                <div className="text-4xl md:text-5xl font-black gradient-text-static mb-2">{stat.value}</div>
-                <div className="text-sm text-white/60">{stat.label}</div>
-              </motion.div>
+          <div className="flex flex-wrap justify-center gap-2 mb-10 max-w-3xl mx-auto">
+            {["256-bit Encryption", "Zero Logs", "WireGuard", "Kill Switch", "Split Tunneling", "Oceania Servers"].map((pill) => (
+              <span
+                key={pill}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1 text-[11px] text-white/60"
+              >
+                <Check className="w-3 h-3" style={{ color: "#E8D4B0" }} />
+                {pill}
+              </span>
             ))}
-          </motion.div>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/auth/signup"
+              className="group inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
+              style={PRIMARY_CTA}
+            >
+              Get VPN &mdash; from $3.99/mo
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+            <Link
+              href="#pricing"
+              className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-7 py-3.5 text-[14px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+            >
+              <Gauge className="w-4 h-4" />
+              View plans
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* ============================================ */}
-      {/* 3. FEATURES GRID                             */}
-      {/* ============================================ */}
-      <section className="py-24 lg:py-32 border-b border-white/[0.06]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                Enterprise Security,<br /><span className="gradient-text">Traveller Simplicity</span>
-              </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/60">
-                Every feature you need to stay safe on the road or in the office. No compromises.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {VPN_FEATURES.map((f, i) => (
-                <motion.div key={i} variants={fadeInUp} className="gradient-border card-hover p-6 rounded-xl group">
-                  <f.icon className="w-8 h-8 text-accent-cyan/50 mb-4 group-hover:text-accent-cyan transition-colors" />
-                  <h3 className="text-lg font-bold mb-2">{f.title}</h3>
-                  <p className="text-sm text-white/60 leading-relaxed">{f.desc}</p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ============================================ */}
-      {/* 4. HOW IT WORKS                              */}
-      {/* ============================================ */}
-      <section className="py-24 lg:py-32 border-b border-white/[0.06]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                Protected in<br /><span className="gradient-text">Three Steps</span>
-              </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/60">
-                From signup to encrypted in under two minutes.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-3 gap-6">
-              {HOW_IT_WORKS.map((step, i) => (
-                <motion.div key={i} variants={fadeInUp} className="relative gradient-border card-hover p-8 rounded-xl group text-center">
-                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${step.color} flex items-center justify-center mx-auto mb-6`}>
-                    <step.icon className="w-7 h-7 text-white" />
-                  </div>
-                  <div className="text-xs font-bold text-white/30 uppercase tracking-widest mb-3">Step {step.step}</div>
-                  <h3 className="text-xl font-bold mb-3">{step.title}</h3>
-                  <p className="text-sm text-white/60 leading-relaxed">{step.desc}</p>
-                  {i < HOW_IT_WORKS.length - 1 && (
-                    <div className="hidden md:block absolute top-1/2 -right-3 -translate-y-1/2 z-10">
-                      <ChevronRight className="w-6 h-6 text-white/20" />
-                    </div>
-                  )}
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ============================================ */}
-      {/* 5. COMPETITOR COMPARISON TABLE                */}
-      {/* ============================================ */}
-      <section className="relative py-24 lg:py-32 border-b border-white/[0.06] overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="glow-orb glow-orb-blue w-[700px] h-[700px] top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 opacity-5" />
-          <div className="glow-orb glow-orb-purple w-[500px] h-[500px] top-1/3 right-0 opacity-5" />
-        </div>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand-500/20 bg-brand-500/5 mb-6">
-                <Eye className="w-3 h-3 text-brand-400" />
-                <span className="text-xs font-medium text-brand-400">VPN Comparison 2026</span>
-              </div>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-6">
-                Zoobicon VPN vs<br />
-                <span className="gradient-text">The Competition</span>
-              </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/60">
-                The only VPN built for travellers, bundled with a website builder and eSIM data.
-                Compare features side-by-side.
-              </p>
-            </motion.div>
-
-            <motion.div variants={fadeInUp} className="overflow-x-auto">
-              <div className="min-w-[800px]">
-                {/* Header Row */}
-                <div className="grid grid-cols-6 gap-0 mb-2">
-                  <div className="p-4" />
-                  <div className="p-4 text-center">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-brand-500/20 to-accent-purple/20 border border-brand-500/30">
-                      <Zap className="w-4 h-4 text-brand-400" />
-                      <span className="text-sm font-bold text-white">Zoobicon</span>
-                    </div>
-                  </div>
-                  <div className="p-4 text-center"><span className="text-sm text-white/60">NordVPN</span></div>
-                  <div className="p-4 text-center"><span className="text-sm text-white/60">Surfshark</span></div>
-                  <div className="p-4 text-center"><span className="text-sm text-white/60">ExpressVPN</span></div>
-                  <div className="p-4 text-center"><span className="text-sm text-white/60">ProtonVPN</span></div>
+      {/* Stats */}
+      <section className="relative py-16 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {VPN_STATS.map((stat) => (
+              <div key={stat.label} className="text-center">
+                <div className="text-4xl md:text-5xl font-semibold tracking-[-0.02em] mb-2" style={{ color: "#E8D4B0" }}>
+                  {stat.value}
                 </div>
-
-                {/* Feature Rows */}
-                {COMPETITOR_ROWS.map((row, i) => (
-                  <motion.div
-                    key={i}
-                    variants={fadeInUp}
-                    className={`grid grid-cols-6 gap-0 ${i % 2 === 0 ? "bg-white/[0.05]" : ""} rounded-lg`}
-                  >
-                    <div className="p-4 flex items-center">
-                      <span className="text-sm text-white/60">{row.feature}</span>
-                    </div>
-                    {(["zoobicon", "nord", "surfshark", "express", "proton"] as const).map((key, j) => {
-                      const val = row[key];
-                      return (
-                        <div key={j} className="p-4 flex items-center justify-center">
-                          {typeof val === "boolean" ? (
-                            val ? (
-                              j === 0 ? (
-                                <div className="w-6 h-6 rounded-full bg-stone-500/20 flex items-center justify-center">
-                                  <Check className="w-3.5 h-3.5 text-stone-400" />
-                                </div>
-                              ) : (
-                                <Check className="w-4 h-4 text-white/60" />
-                              )
-                            ) : (
-                              <Minus className="w-4 h-4 text-white/50" />
-                            )
-                          ) : (
-                            <span className={`text-sm ${j === 0 ? "font-semibold text-white" : "text-white/60"}`}>{val}</span>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </motion.div>
-                ))}
+                <div className="text-[13px] text-white/55">{stat.label}</div>
               </div>
-            </motion.div>
-            <p className="text-[10px] text-white/20 mt-3 text-center">Comparison based on publicly available information as of March 2026. Features and pricing may change. All trademarks belong to their respective owners. See our <a href="/disclaimers" className="underline hover:text-white/30">disclaimers</a>.</p>
-          </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* ============================================ */}
-      {/* 6. PRICING SECTION                           */}
-      {/* ============================================ */}
-      <section id="pricing" className="py-24 lg:py-32 border-b border-white/[0.06]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                Simple, Transparent<br /><span className="gradient-text">VPN Pricing</span>
-              </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/60">
-                Every plan includes military-grade encryption, WireGuard, and zero logs.
-                No hidden fees. Cancel anytime.
-              </p>
-            </motion.div>
+      {/* Features grid */}
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              Security
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              Enterprise security,{" "}
+              <span style={SERIF}>traveller simplicity.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              Every feature you need to stay safe on the road or in the office. No compromises.
+            </p>
+          </div>
 
-            <div className="grid md:grid-cols-3 gap-4 max-w-5xl mx-auto">
-              {PRICING_TIERS.map((tier, i) => (
-                <motion.div
-                  key={i}
-                  variants={fadeInUp}
-                  className={`relative p-6 rounded-2xl ${
-                    tier.highlighted
-                      ? "bg-gradient-to-b from-brand-500/10 to-accent-purple/10 border-2 border-brand-500/30"
-                      : "gradient-border"
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {VPN_FEATURES.map((f) => (
+              <div
+                key={f.title}
+                className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
+                style={{ background: CARD_BG }}
+              >
+                <div
+                  className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }}
+                />
+                <div className="relative">
+                  <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05]">
+                    <f.icon className="h-5 w-5 text-[#E8D4B0]" />
+                  </div>
+                  <h3 className="text-[17px] font-semibold tracking-[-0.01em] mb-2">{f.title}</h3>
+                  <p className="text-[13px] text-white/55 leading-relaxed">{f.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <h2 className="fs-display-lg mb-4">
+              Protected in{" "}
+              <span style={SERIF}>three steps.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              From signup to encrypted in under two minutes.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-5 relative">
+            {HOW_IT_WORKS.map((step, i) => (
+              <div
+                key={step.step}
+                className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
+                style={{ background: CARD_BG }}
+              >
+                <div
+                  className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }}
+                />
+                <div className="relative">
+                  <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05]">
+                    <step.icon className="h-5 w-5 text-[#E8D4B0]" />
+                  </div>
+                  <div className="text-[10px] uppercase tracking-[0.18em] font-semibold mb-2" style={{ color: "rgba(232,212,176,0.75)" }}>
+                    Step {step.step}
+                  </div>
+                  <h3 className="text-[18px] font-semibold tracking-[-0.01em] mb-2">{step.title}</h3>
+                  <p className="text-[13px] text-white/55 leading-relaxed">{step.desc}</p>
+                </div>
+                {i < HOW_IT_WORKS.length - 1 && (
+                  <div className="hidden md:block absolute top-1/2 -right-3 -translate-y-1/2 z-10">
+                    <ChevronRight className="w-5 h-5 text-white/20" />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Competitor comparison */}
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06] overflow-hidden">
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          <div
+            className="absolute left-1/2 top-1/2 h-[520px] w-[900px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[140px]"
+            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }}
+          />
+        </div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              VPN comparison 2026
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              Zoobicon VPN vs{" "}
+              <span style={SERIF}>the competition.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              The only VPN built for travellers, bundled with a website builder and eSIM data.
+              Compare features side-by-side.
+            </p>
+          </div>
+
+          <div className="overflow-x-auto rounded-[28px] border border-white/[0.08]" style={{ background: CARD_BG }}>
+            <div className="min-w-[820px]">
+              <div className="grid grid-cols-6 px-6 py-4 border-b border-white/[0.08] text-[11px] uppercase tracking-[0.15em] font-semibold text-white/55">
+                <div>Feature</div>
+                <div className="text-center" style={{ color: "#E8D4B0" }}>Zoobicon</div>
+                <div className="text-center">NordVPN</div>
+                <div className="text-center">Surfshark</div>
+                <div className="text-center">ExpressVPN</div>
+                <div className="text-center">ProtonVPN</div>
+              </div>
+              {COMPETITOR_ROWS.map((row, i) => (
+                <div
+                  key={row.feature}
+                  className={`grid grid-cols-6 px-6 py-4 text-[13px] ${
+                    i !== COMPETITOR_ROWS.length - 1 ? "border-b border-white/[0.04]" : ""
                   }`}
                 >
-                  {tier.highlighted && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-brand-500 to-accent-purple text-xs font-semibold text-white">
-                      Most Popular
-                    </div>
-                  )}
-                  <h3 className="text-lg font-bold mb-2">{tier.name}</h3>
-                  <div className="flex items-baseline gap-1 mb-3">
-                    <span className="text-4xl font-black">{tier.price}</span>
-                    <span className="text-sm text-white/60">{tier.period}</span>
-                  </div>
-                  <p className="text-sm text-white/60 mb-6">{tier.description}</p>
-                  <ul className="space-y-3 mb-8">
-                    {tier.features.map((feature, j) => (
-                      <li key={j} className="flex items-center gap-2 text-sm text-white/60">
-                        <Check className="w-4 h-4 text-accent-cyan flex-shrink-0" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link
-                    href="/auth/signup"
-                    className={`block text-center py-3 rounded-xl text-sm font-semibold transition-all ${
-                      tier.highlighted
-                        ? "btn-gradient text-white shadow-glow"
-                        : "border border-white/[0.12] text-white/60 hover:text-white hover:border-white/20"
-                    }`}
-                  >
-                    {tier.cta}
-                  </Link>
-                </motion.div>
+                  <div className="text-white/75 font-medium">{row.feature}</div>
+                  {(["zoobicon", "nord", "surfshark", "express", "proton"] as const).map((key, j) => {
+                    const val = row[key];
+                    return (
+                      <div key={j} className="text-center">
+                        {typeof val === "boolean" ? (
+                          val ? (
+                            <Check
+                              className="w-4 h-4 mx-auto"
+                              style={j === 0 ? { color: "#E8D4B0" } : { color: "rgba(255,255,255,0.55)" }}
+                            />
+                          ) : (
+                            <Minus className="w-4 h-4 mx-auto text-white/25" />
+                          )
+                        ) : (
+                          <span
+                            className={j === 0 ? "font-semibold" : "text-white/65"}
+                            style={j === 0 ? { color: "#E8D4B0" } : undefined}
+                          >
+                            {val}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ============================================ */}
-      {/* 7. FAQ SECTION                               */}
-      {/* ============================================ */}
-      <section className="py-24 lg:py-32 border-b border-white/[0.06]">
-        <div className="max-w-3xl mx-auto px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                Frequently Asked<br /><span className="gradient-text">Questions</span>
-              </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/60">
-                Everything you need to know about Zoobicon VPN.
-              </p>
-            </motion.div>
-
-            <div className="space-y-3">
-              {FAQ_ITEMS.map((item, i) => (
-                <motion.div key={i} variants={fadeInUp} className="gradient-border rounded-xl overflow-hidden">
-                  <button
-                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                    className="w-full flex items-center justify-between p-6 text-left"
-                  >
-                    <span className="text-sm font-semibold text-white/80 pr-4">{item.q}</span>
-                    <ChevronDown
-                      className={`w-5 h-5 text-white/40 flex-shrink-0 transition-transform duration-200 ${
-                        openFaq === i ? "rotate-180" : ""
-                      }`}
-                    />
-                  </button>
-                  {openFaq === i && (
-                    <div className="px-6 pb-6">
-                      <p className="text-sm text-white/60 leading-relaxed">{item.a}</p>
-                    </div>
-                  )}
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ============================================ */}
-      {/* 8. FINAL CTA                                 */}
-      {/* ============================================ */}
-      <section className="py-32 lg:py-40 relative overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="glow-orb glow-orb-blue w-[800px] h-[800px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-15" />
-        </div>
-        <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center relative z-10">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.h2
-              variants={fadeInUp}
-              className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight mb-6"
-            >
-              Your Privacy.<br />
-              <span className="gradient-text-hero">Your Rules.</span>
-            </motion.h2>
-
-            <motion.p variants={fadeInUp} className="max-w-2xl mx-auto text-lg text-white/60 mb-10">
-              Join thousands of travellers and businesses who trust Zoobicon VPN
-              to keep their data safe across 60+ countries. Start protecting yourself today.
-            </motion.p>
-
-            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link
-                href="/auth/signup"
-                className="group btn-gradient px-10 py-5 rounded-2xl text-lg font-bold text-white flex items-center gap-3 shadow-glow"
-              >
-                <Shield className="w-6 h-6" />
-                <span>Get VPN &mdash; From $3.99/mo</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </motion.div>
-
-            <motion.div variants={fadeInUp} className="flex flex-wrap items-center justify-center gap-6 mt-8 text-sm text-white/60">
-              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent-cyan" /> 30-day money back</span>
-              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent-cyan" /> Cancel anytime</span>
-              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent-cyan" /> No logs, ever</span>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ============================================ */}
-      {/* FOOTER                                       */}
-      {/* ============================================ */}
-      <footer className="border-t border-white/[0.06] py-12">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-md bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
-                <Zap className="w-3 h-3 text-white" />
-              </div>
-              <span className="text-sm font-semibold">Zoobicon</span>
-            </div>
-            <div className="text-sm text-white/40 text-center">
-              zoobicon.com &middot; zoobicon.ai &middot; zoobicon.io &middot; zoobicon.sh
-            </div>
-            <div className="text-xs text-white/30">
-              &copy; {new Date().getFullYear()} Zoobicon. All rights reserved.
             </div>
           </div>
+          <p className="text-[11px] text-white/30 mt-4 text-center">
+            Comparison based on publicly available information as of March 2026. Features and pricing may change.
+            All trademarks belong to their respective owners. See our{" "}
+            <Link href="/disclaimers" className="underline hover:text-white/55">disclaimers</Link>.
+          </p>
         </div>
-      </footer>
+      </section>
+
+      {/* Pricing */}
+      <section id="pricing" className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              Pricing
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              Simple, transparent{" "}
+              <span style={SERIF}>VPN pricing.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              Every plan includes military-grade encryption, WireGuard, and zero logs.
+              No hidden fees. Cancel anytime.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto">
+            {PRICING_TIERS.map((tier) => (
+              <div
+                key={tier.name}
+                className={`relative rounded-[24px] p-7 transition-all duration-500 hover:-translate-y-1 ${
+                  tier.highlighted ? "border-2 border-[#E8D4B0]/35" : "border border-white/[0.08] hover:border-[#E8D4B0]/25"
+                }`}
+                style={{
+                  background: tier.highlighted
+                    ? "linear-gradient(135deg, rgba(232,212,176,0.08) 0%, rgba(17,17,24,0.85) 100%)"
+                    : CARD_BG,
+                }}
+              >
+                {tier.highlighted && (
+                  <div
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-wide"
+                    style={{ background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)", color: "#0a0a0f" }}
+                  >
+                    Most popular
+                  </div>
+                )}
+                <h3 className="text-[17px] font-semibold tracking-[-0.01em] mb-2">{tier.name}</h3>
+                <div className="flex items-baseline gap-1 mb-3">
+                  <span className="text-4xl font-semibold tracking-[-0.02em]" style={{ color: "#E8D4B0" }}>
+                    {tier.price}
+                  </span>
+                  <span className="text-[13px] text-white/50">{tier.period}</span>
+                </div>
+                <p className="text-[13px] text-white/55 mb-6">{tier.description}</p>
+                <ul className="space-y-2.5 mb-7">
+                  {tier.features.map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-[13px] text-white/65">
+                      <Check className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#E8D4B0" }} />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href="/auth/signup"
+                  className={`block text-center rounded-full py-3 text-[13px] font-semibold transition-all ${
+                    tier.highlighted ? "" : "border border-white/[0.12] bg-white/[0.03] text-white/80 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+                  }`}
+                  style={tier.highlighted ? PRIMARY_CTA : undefined}
+                >
+                  {tier.cta}
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              FAQ
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              Frequently asked{" "}
+              <span style={SERIF}>questions.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              Everything you need to know about Zoobicon VPN.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            {FAQ_ITEMS.map((item, i) => (
+              <div
+                key={item.q}
+                className="overflow-hidden rounded-[20px] border border-white/[0.08] transition-all duration-500 hover:border-[#E8D4B0]/25"
+                style={{ background: CARD_BG }}
+              >
+                <button
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  className="w-full flex items-center justify-between px-6 py-5 text-left"
+                >
+                  <span className="text-[14px] font-semibold text-white/85 pr-4">{item.q}</span>
+                  <ChevronDown
+                    className={`w-4 h-4 flex-shrink-0 transition-transform duration-300 ${
+                      openFaq === i ? "rotate-180" : ""
+                    }`}
+                    style={{ color: "#E8D4B0" }}
+                  />
+                </button>
+                {openFaq === i && (
+                  <div className="px-6 pb-6">
+                    <p className="text-[13px] text-white/60 leading-relaxed">{item.a}</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="relative py-24 md:py-32 border-t border-white/[0.06] overflow-hidden">
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          <div
+            className="absolute left-1/2 top-1/2 h-[560px] w-[1000px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[140px]"
+            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.11), transparent 70%)" }}
+          />
+        </div>
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center">
+          <h2 className="fs-display-lg mb-5">
+            Your privacy.{" "}
+            <span style={SERIF}>Your rules.</span>
+          </h2>
+          <p className="text-[17px] text-white/60 mb-10">
+            Join thousands of travellers and businesses who trust Zoobicon VPN to keep their data
+            safe across 60+ countries. Start protecting yourself today.
+          </p>
+          <Link
+            href="/auth/signup"
+            className="group inline-flex items-center gap-2 rounded-full px-8 py-4 text-[15px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
+            style={PRIMARY_CTA}
+          >
+            Get VPN &mdash; from $3.99/mo
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+          <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-[12px] text-white/55">
+            <span className="flex items-center gap-1.5">
+              <Check className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} /> 30-day money back
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Check className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} /> Cancel anytime
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Check className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} /> No logs, ever
+            </span>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

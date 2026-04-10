@@ -2,11 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import BackgroundEffects from "@/components/BackgroundEffects";
-import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
-  Zap,
   Video,
   ArrowRight,
   Play,
@@ -20,27 +16,17 @@ import {
   BarChart3,
   Scissors,
   Check,
-  Star,
   MonitorPlay,
   Clock,
-  LayoutDashboard,
-  LogOut,
-  User,
 } from "lucide-react";
-
-const fadeInUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } },
-};
-const staggerContainer = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
 
 const PLATFORMS = [
   { name: "TikTok", format: "9:16 vertical", duration: "15-60s", desc: "Hook-driven viral content with trending sounds and effects." },
-  { name: "Camera Reels", format: "9:16 vertical", duration: "15-90s", desc: "Aesthetic, branded content optimized for the Explore page." },
+  { name: "Instagram Reels", format: "9:16 vertical", duration: "15-90s", desc: "Aesthetic, branded content optimized for the Explore page." },
   { name: "YouTube Shorts", format: "9:16 vertical", duration: "15-60s", desc: "Engagement-optimized with thumbnails and end screens." },
-  { name: "ThumbsUp Ads", format: "1:1 & 16:9", duration: "15-120s", desc: "Conversion-focused with dynamic product showcases and CTAs." },
+  { name: "Facebook Ads", format: "1:1 & 16:9", duration: "15-120s", desc: "Conversion-focused with dynamic product showcases and CTAs." },
   { name: "LinkedIn", format: "1:1 & 16:9", duration: "30-120s", desc: "Professional thought leadership and B2B content." },
-  { name: "MessageCircle/X", format: "16:9", duration: "15-140s", desc: "Punchy, attention-grabbing clips optimized for the timeline." },
+  { name: "Twitter/X", format: "16:9", duration: "15-140s", desc: "Punchy, attention-grabbing clips optimized for the timeline." },
 ];
 
 const FEATURES = [
@@ -50,7 +36,7 @@ const FEATURES = [
   { icon: Palette, title: "Brand Consistency", desc: "Set your brand colors and fonts. Every storyboard, scene image, and caption uses your brand kit." },
   { icon: Layers, title: "Scene-by-Scene Images", desc: "AI generates images for each scene using your storyboard. Supports Replicate (FLUX), DALL-E 3, and Stability AI." },
   { icon: Scissors, title: "AI Voiceover", desc: "10 premium voices via ElevenLabs with adjustable speed and clarity. Browser TTS fallback for free plans." },
-  { icon: Share2, title: "Multi-Platform Formats", desc: "TikTok, Camera Reels, YouTube, LinkedIn, MessageCircle — correct aspect ratios and format specs for each." },
+  { icon: Share2, title: "Multi-Platform Formats", desc: "TikTok, Reels, YouTube, LinkedIn, Twitter — correct aspect ratios and format specs for each." },
   { icon: BarChart3, title: "Video Rendering (Coming Soon)", desc: "Scene-by-scene video generation via Runway Gen-3, Luma Dream Machine, Pika, and Kling. Currently in development." },
 ];
 
@@ -60,8 +46,27 @@ const STYLES = [
   "Tech", "Fashion",
 ];
 
+const STEPS = [
+  { num: "01", title: "Describe", desc: "Tell AI what your video should be about. 'Product launch for a fitness app — energetic, TikTok format.'" },
+  { num: "02", title: "Generate", desc: "AI creates a complete video with scenes, transitions, music, captions, and branding. Under 2 minutes." },
+  { num: "03", title: "Publish", desc: "Export platform-optimized versions for every social network. One-click publish to connected accounts." },
+];
+
+const CARD_BG = "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(10,10,15,0.7) 100%)";
+const PRIMARY_CTA = {
+  background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+  color: "#0a0a0f",
+  boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
+} as const;
+const SERIF: React.CSSProperties = {
+  fontFamily: "Fraunces, ui-serif, Georgia, serif",
+  fontStyle: "italic",
+  fontWeight: 400,
+  color: "#E8D4B0",
+};
+
 export default function VideoCreatorPage() {
-  const [user, setUser] = useState<{ email: string; name?: string; role?: string } | null>(null);
+  const [, setUser] = useState<{ email: string; name?: string; role?: string } | null>(null);
   const [waitlistEmail, setWaitlistEmail] = useState("");
   const [waitlistStatus, setWaitlistStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
@@ -71,11 +76,6 @@ export default function VideoCreatorPage() {
       if (stored) setUser(JSON.parse(stored));
     } catch { /* Safari private mode / storage unavailable */ }
   }, []);
-
-  const handleLogout = () => {
-    try { localStorage.removeItem("zoobicon_user"); } catch {}
-    setUser(null);
-  };
 
   const handleWaitlistSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,7 +106,7 @@ export default function VideoCreatorPage() {
       "priceCurrency": "USD",
       "offerCount": "4"
     },
-    "description": "AI-powered video creation pipeline with script generation, storyboarding, scene images, voiceover, and auto-captions for TikTok, Camera Reels, YouTube Shorts, and more.",
+    "description": "AI-powered video creation pipeline with script generation, storyboarding, scene images, voiceover, and auto-captions for TikTok, Instagram Reels, YouTube Shorts, and more.",
     "url": "https://zoobicon.com/products/video-creator",
     "screenshot": "https://zoobicon.com/og-image.png"
   };
@@ -121,255 +121,60 @@ export default function VideoCreatorPage() {
   };
 
   return (
-    <div className="relative min-h-screen">
+    <div className="min-h-screen bg-[#050508] text-white fs-grain pt-[72px]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
-      <BackgroundEffects preset="technical" />
-
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-stone-500 to-stone-600 flex items-center justify-center">
-                <Video className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-lg font-bold tracking-tight">Zoobicon</span>
-            </Link>
-            <span className="text-xs text-white/60">/</span>
-            <span className="text-sm text-white/65">AI Video Creator</span>
-          </div>
-          <div className="flex items-center gap-4">
-            {user ? (
-              <>
-                <Link href="/dashboard" className="text-sm text-white/65 hover:text-white transition-colors px-4 py-2 flex items-center gap-1.5">
-                  <LayoutDashboard className="w-3.5 h-3.5" />
-                  Dashboard
-                </Link>
-                <button onClick={handleLogout} className="text-sm text-white/65 hover:text-white transition-colors px-4 py-2 flex items-center gap-1.5">
-                  <LogOut className="w-3.5 h-3.5" />
-                  Sign out
-                </button>
-                <Link href="/builder" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white flex items-center gap-2">
-                  <User className="w-3.5 h-3.5" />
-                  <span>{user.name || user.email.split("@")[0]}</span>
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link href="/auth/login" className="text-sm text-white/65 hover:text-white transition-colors px-4 py-2">
-                  Sign in
-                </Link>
-                <Link href="/auth/signup" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white">
-                  <span>Get Started</span>
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </nav>
-      <CursorGlowTracker />
 
       {/* Hero */}
-      <section className="relative pt-32 pb-20 lg:pt-44 lg:pb-28">
-        <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
-            <motion.div variants={fadeInUp} className="flex flex-wrap items-center gap-3 mb-6">
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-stone-400/20 bg-stone-400/5">
-                <Video className="w-3 h-3 text-stone-400" />
-                <span className="text-xs font-medium text-stone-400">AI Video Creator</span>
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-500/10 border border-stone-500/20 text-stone-400 text-xs font-medium">
-                <Clock size={12} /> Video Rendering Coming Soon
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-500/10 border border-stone-500/20 text-stone-400 text-xs font-medium">
-                <Sparkles size={12} /> Storyboard & Script AI — Live
-              </span>
-            </motion.div>
-
-            <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl lg:text-8xl font-black tracking-tight leading-[0.9] mb-6">
-              High-End Video.<br />
-              <span className="gradient-text-hero">Zero Effort.</span>
-            </motion.h1>
-
-            <motion.p variants={fadeInUp} className="max-w-2xl text-lg md:text-xl text-white/60 leading-relaxed mb-6">
-              Create scroll-stopping videos for every platform. AI writes your script, builds your storyboard,
-              generates scene images, voiceover, and subtitles — just describe what you want.
-            </motion.p>
-
-            <motion.div variants={fadeInUp} className="flex flex-wrap items-center gap-3 mb-10">
-              <Link href="/video-creator" className="group btn-gradient px-6 py-3.5 rounded-xl text-sm font-bold text-white flex items-center gap-2 shadow-lg shadow-stone-500/20">
-                <Play className="w-4 h-4" />
-                <span>Try Storyboard Creator</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <span className="text-xs text-white/60">AI-powered storyboards & scripts — free to try</span>
-            </motion.div>
-
-            <motion.div variants={fadeInUp} className="max-w-lg mb-16">
-              {waitlistStatus === "success" ? (
-                <div className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-stone-500/10 border border-stone-500/20 text-stone-400">
-                  <Check className="w-5 h-5 flex-shrink-0" />
-                  <span className="text-sm font-medium">You&apos;re on the list! We&apos;ll notify you when AI Video Creator launches.</span>
-                </div>
-              ) : (
-                <form onSubmit={handleWaitlistSubmit} className="flex items-center gap-3">
-                  <input
-                    type="email"
-                    required
-                    value={waitlistEmail}
-                    onChange={(e) => setWaitlistEmail(e.target.value)}
-                    placeholder="Enter your email for early access"
-                    className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-xl px-5 py-4 text-white placeholder:text-white/60 outline-none text-sm focus:border-stone-500/30 transition-colors"
-                  />
-                  <button
-                    type="submit"
-                    disabled={waitlistStatus === "loading"}
-                    className="group btn-gradient px-6 py-4 rounded-xl text-sm font-bold text-white flex items-center gap-2 shadow-lg shadow-stone-500/20 whitespace-nowrap disabled:opacity-50"
-                  >
-                    <span>{waitlistStatus === "loading" ? "Joining..." : "Join Early Access"}</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </button>
-                </form>
-              )}
-            </motion.div>
-
-            {/* Platform cards */}
-            <motion.div variants={fadeInUp} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-              {PLATFORMS.map((p) => (
-                <div key={p.name} className="gradient-border p-4 rounded-xl text-center group card-hover">
-                  <div className="text-sm font-bold mb-1 group-hover:text-white transition-colors">{p.name}</div>
-                  <div className="text-[10px] text-white/60">{p.format}</div>
-                  <div className="text-[10px] text-stone-500/60">{p.duration}</div>
-                </div>
-              ))}
-            </motion.div>
-          </motion.div>
+      <section className="relative pt-20 pb-24 md:pt-28 md:pb-32 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+          <div className="absolute left-1/2 top-0 h-[720px] w-[1200px] -translate-x-1/2 rounded-full blur-[160px]"
+            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.09), transparent 70%)" }} />
+          <div className="absolute right-[-10%] top-[30%] h-[420px] w-[520px] rounded-full blur-[140px]"
+            style={{ background: "radial-gradient(closest-side, rgba(224,139,176,0.07), transparent 70%)" }} />
         </div>
-      </section>
 
-      {/* How It Works */}
-      <section className="py-20 border-t border-white/[0.08]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
-            <motion.div variants={fadeInUp} className="text-center mb-12">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                Three Steps to<br /><span className="gradient-text">Viral Content</span>
-              </h2>
-            </motion.div>
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-8">
+            <Video className="w-3 h-3" />
+            AI Video Creator · Storyboards live · Rendering coming soon
+          </div>
 
-            <div className="grid md:grid-cols-3 gap-6">
-              {[
-                { num: "01", title: "Describe", desc: "Tell AI what your video should be about. 'Product launch for a fitness app — energetic, TikTok format.'" },
-                { num: "02", title: "Generate", desc: "AI creates a complete video with scenes, transitions, music, captions, and branding. Under 2 minutes." },
-                { num: "03", title: "Publish", desc: "Export platform-optimized versions for every social network. One-click publish to connected accounts." },
-              ].map((step, i) => (
-                <motion.div key={i} variants={fadeInUp} className="gradient-border p-8 rounded-2xl relative">
-                  <div className="text-6xl font-black text-white/[0.03] absolute top-4 right-6">{step.num}</div>
-                  <div className="text-sm font-bold text-stone-500 mb-1">{step.num}</div>
-                  <h3 className="text-2xl font-black mb-3">{step.title}</h3>
-                  <p className="text-sm text-white/60 leading-relaxed">{step.desc}</p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
+          <h1 className="fs-display-xl mb-6">
+            High-end video,{" "}
+            <span style={SERIF}>zero effort.</span>
+          </h1>
 
-      {/* Styles */}
-      <section className="py-20 border-t border-white/[0.08]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
-            <motion.div variants={fadeInUp} className="text-center mb-12">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                12+ Video <span className="gradient-text">Styles</span>
-              </h2>
-              <p className="text-lg text-white/60">Pick a vibe or let AI choose the best style for your content.</p>
-            </motion.div>
+          <p className="max-w-3xl mx-auto text-[17px] md:text-[19px] leading-relaxed text-white/60 mb-10">
+            Create scroll-stopping videos for every platform. AI writes your script, builds your storyboard,
+            generates scene images, voiceover, and subtitles — just describe what you want.
+          </p>
 
-            <motion.div variants={fadeInUp} className="flex flex-wrap justify-center gap-2">
-              {STYLES.map((style) => (
-                <div key={style} className="px-5 py-2.5 rounded-full border border-white/[0.10] bg-white/[0.05] text-sm text-white/65 hover:text-stone-500 hover:border-stone-500/30 hover:bg-stone-500/5 transition-all cursor-pointer">
-                  {style}
-                </div>
-              ))}
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section className="py-20 border-t border-white/[0.08]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
-            <motion.div variants={fadeInUp} className="text-center mb-12">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                Every Feature.<br /><span className="gradient-text">No Compromises.</span>
-              </h2>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {FEATURES.map((f, i) => (
-                <motion.div key={i} variants={fadeInUp} className="gradient-border card-hover p-6 rounded-xl group">
-                  <f.icon className="w-7 h-7 text-stone-500/50 mb-3 group-hover:text-stone-500 transition-colors" />
-                  <h3 className="text-base font-bold mb-1.5">{f.title}</h3>
-                  <p className="text-xs text-white/60 leading-relaxed">{f.desc}</p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Platform deep dive */}
-      <section className="py-20 border-t border-white/[0.08]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
-            <motion.div variants={fadeInUp} className="text-center mb-12">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                Optimized for<br /><span className="gradient-text">Every Platform</span>
-              </h2>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {PLATFORMS.map((p, i) => (
-                <motion.div key={i} variants={fadeInUp} className="gradient-border p-6 rounded-xl card-hover">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-lg font-bold">{p.name}</h3>
-                    <span className="text-[10px] font-mono text-stone-500 bg-stone-500/10 px-2 py-0.5 rounded">{p.format}</span>
-                  </div>
-                  <p className="text-sm text-white/60 leading-relaxed mb-2">{p.desc}</p>
-                  <div className="text-xs text-white/60">Duration: {p.duration}</div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-20 border-t border-white/[0.08]">
-        <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
-          <MonitorPlay className="w-12 h-12 text-stone-500/30 mx-auto mb-6" />
-          <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-            Your First Video<br /><span className="gradient-text">In Under 2 Minutes</span>
-          </h2>
-          <p className="text-lg text-white/60 mb-4">No editing skills. No scripts. No templates. Just AI magic.</p>
-          <div className="flex flex-wrap items-center justify-center gap-3 mb-4">
-            <Link href="/video-creator" className="group btn-gradient px-6 py-3.5 rounded-xl text-sm font-bold text-white flex items-center gap-2 shadow-lg shadow-stone-500/20">
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-10">
+            <Link
+              href="/video-creator"
+              className="group inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
+              style={PRIMARY_CTA}
+            >
               <Play className="w-4 h-4" />
-              <span>Try Storyboard Creator</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              Try the storyboard creator
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+            <Link
+              href="#features"
+              className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-7 py-3.5 text-[14px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+            >
+              <Sparkles className="w-4 h-4" />
+              See features
             </Link>
           </div>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-500/10 border border-stone-500/20 text-stone-400 text-xs font-medium mb-8">
-            <Clock size={12} /> Full Video Rendering Coming Soon
-          </span>
-          <div className="max-w-lg mx-auto">
+
+          {/* Waitlist */}
+          <div className="max-w-lg mx-auto mb-14">
             {waitlistStatus === "success" ? (
-              <div className="flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-stone-500/10 border border-stone-500/20 text-stone-400">
+              <div className="flex items-center justify-center gap-3 rounded-2xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-6 py-4 text-[#E8D4B0]">
                 <Check className="w-5 h-5 flex-shrink-0" />
-                <span className="text-sm font-medium">You&apos;re on the list! We&apos;ll notify you when AI Video Creator launches.</span>
+                <span className="text-[13px] font-medium">You&apos;re on the list. We&apos;ll notify you when full rendering ships.</span>
               </div>
             ) : (
               <form onSubmit={handleWaitlistSubmit} className="flex items-center gap-3">
@@ -379,32 +184,255 @@ export default function VideoCreatorPage() {
                   value={waitlistEmail}
                   onChange={(e) => setWaitlistEmail(e.target.value)}
                   placeholder="Enter your email for early access"
-                  className="flex-1 bg-white/[0.07] border border-white/[0.12] rounded-xl px-5 py-4 text-white placeholder:text-white/60 outline-none text-sm focus:border-stone-500/30 transition-colors"
+                  className="flex-1 rounded-full border border-white/[0.12] bg-white/[0.03] px-5 py-3.5 text-[13px] text-white placeholder:text-white/40 outline-none transition-colors focus:border-[#E8D4B0]/35"
                 />
                 <button
                   type="submit"
                   disabled={waitlistStatus === "loading"}
-                  className="group btn-gradient px-6 py-4 rounded-xl text-sm font-bold text-white flex items-center gap-2 shadow-lg shadow-stone-500/20 whitespace-nowrap disabled:opacity-50"
+                  className="group inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-[13px] font-semibold transition-all duration-500 hover:-translate-y-0.5 disabled:opacity-50"
+                  style={PRIMARY_CTA}
                 >
-                  <span>{waitlistStatus === "loading" ? "Joining..." : "Join Waitlist"}</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  <span>{waitlistStatus === "loading" ? "Joining..." : "Join early access"}</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 </button>
               </form>
             )}
           </div>
+
+          {/* Platform pills */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 max-w-5xl mx-auto">
+            {PLATFORMS.map((p) => (
+              <div
+                key={p.name}
+                className="group relative overflow-hidden rounded-[18px] border border-white/[0.08] p-4 text-center transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
+                style={{ background: CARD_BG }}
+              >
+                <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }} />
+                <div className="relative">
+                  <div className="text-[13px] font-semibold tracking-[-0.01em] mb-1">{p.name}</div>
+                  <div className="text-[10px] text-white/50">{p.format}</div>
+                  <div className="text-[10px]" style={{ color: "rgba(232,212,176,0.7)" }}>{p.duration}</div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      <footer className="border-t border-white/[0.06] py-10">
-        <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="text-xs text-white/30">&copy; 2026 Zoobicon. All rights reserved.</div>
-          <div className="text-xs text-white/20">zoobicon.com &middot; zoobicon.ai &middot; zoobicon.io &middot; zoobicon.sh</div>
-          <div className="flex gap-4">
-            <Link href="/privacy" className="text-xs text-white/30 hover:text-white/50 transition-colors">Privacy</Link>
-            <Link href="/terms" className="text-xs text-white/30 hover:text-white/50 transition-colors">Terms</Link>
+      {/* How it works */}
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              The flow
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              Three steps to{" "}
+              <span style={SERIF}>viral content.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              Describe, generate, publish. From a sentence to a finished video — in under two minutes.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-5">
+            {STEPS.map((step) => (
+              <div
+                key={step.num}
+                className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
+                style={{ background: CARD_BG }}
+              >
+                <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }} />
+                <div className="relative">
+                  <div className="text-[11px] uppercase tracking-[0.18em] font-semibold mb-4" style={{ color: "rgba(232,212,176,0.75)" }}>
+                    Step {step.num}
+                  </div>
+                  <h3 className="text-[20px] font-semibold tracking-[-0.01em] mb-3">{step.title}</h3>
+                  <p className="text-[14px] text-white/55 leading-relaxed">{step.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      </footer>
+      </section>
+
+      {/* Styles */}
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              Visual languages
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              Twelve directions,{" "}
+              <span style={SERIF}>one prompt away.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              Pick a vibe or let AI choose the best style for your content.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-2">
+            {STYLES.map((style) => (
+              <div
+                key={style}
+                className="rounded-full border border-white/[0.08] bg-white/[0.03] px-5 py-2.5 text-[13px] text-white/65 transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+              >
+                {style}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section id="features" className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              Capabilities
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              Every feature,{" "}
+              <span style={SERIF}>no compromises.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              Script, storyboard, voice, captions, music, brand kit — the full pipeline in one place.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {FEATURES.map((f) => (
+              <div
+                key={f.title}
+                className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
+                style={{ background: CARD_BG }}
+              >
+                <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }} />
+                <div className="relative">
+                  <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05]">
+                    <f.icon className="h-5 w-5 text-[#E8D4B0]" />
+                  </div>
+                  <h3 className="text-[18px] font-semibold tracking-[-0.01em] mb-2">{f.title}</h3>
+                  <p className="text-[14px] text-white/55 leading-relaxed">{f.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Platform deep dive */}
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              Platform-aware
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              Optimized for{" "}
+              <span style={SERIF}>every platform.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              Correct aspect ratios, durations, and creative specs for the channels that matter.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {PLATFORMS.map((p) => (
+              <div
+                key={p.name}
+                className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
+                style={{ background: CARD_BG }}
+              >
+                <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }} />
+                <div className="relative">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-[18px] font-semibold tracking-[-0.01em]">{p.name}</h3>
+                    <span className="text-[10px] font-mono rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05] px-2 py-0.5" style={{ color: "#E8D4B0" }}>{p.format}</span>
+                  </div>
+                  <p className="text-[14px] text-white/55 leading-relaxed mb-3">{p.desc}</p>
+                  <div className="text-[12px] text-white/45">Duration: {p.duration}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="relative py-24 md:py-32 border-t border-white/[0.06] overflow-hidden">
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          <div className="absolute left-1/2 top-1/2 h-[560px] w-[1000px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[140px]"
+            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.11), transparent 70%)" }} />
+        </div>
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center">
+          <MonitorPlay className="w-10 h-10 mx-auto mb-6" style={{ color: "#E8D4B0" }} />
+          <h2 className="fs-display-lg mb-5">
+            Your first video,{" "}
+            <span style={SERIF}>in under two minutes.</span>
+          </h2>
+          <p className="text-[17px] text-white/60 mb-8">
+            No editing skills. No scripts. No templates. Just describe it.
+          </p>
+
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
+            <Link
+              href="/video-creator"
+              className="group inline-flex items-center gap-2 rounded-full px-8 py-4 text-[15px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
+              style={PRIMARY_CTA}
+            >
+              <Play className="w-4 h-4" />
+              Try the storyboard creator
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+          </div>
+
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-10">
+            <Clock className="w-3 h-3" />
+            Full video rendering coming soon
+          </div>
+
+          <div className="max-w-lg mx-auto">
+            {waitlistStatus === "success" ? (
+              <div className="flex items-center justify-center gap-3 rounded-2xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-6 py-4 text-[#E8D4B0]">
+                <Check className="w-5 h-5 flex-shrink-0" />
+                <span className="text-[13px] font-medium">You&apos;re on the list. We&apos;ll notify you when full rendering ships.</span>
+              </div>
+            ) : (
+              <form onSubmit={handleWaitlistSubmit} className="flex items-center gap-3">
+                <input
+                  type="email"
+                  required
+                  value={waitlistEmail}
+                  onChange={(e) => setWaitlistEmail(e.target.value)}
+                  placeholder="Enter your email for early access"
+                  className="flex-1 rounded-full border border-white/[0.12] bg-white/[0.03] px-5 py-3.5 text-[13px] text-white placeholder:text-white/40 outline-none transition-colors focus:border-[#E8D4B0]/35"
+                />
+                <button
+                  type="submit"
+                  disabled={waitlistStatus === "loading"}
+                  className="group inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-[13px] font-semibold transition-all duration-500 hover:-translate-y-0.5 disabled:opacity-50"
+                  style={PRIMARY_CTA}
+                >
+                  <span>{waitlistStatus === "loading" ? "Joining..." : "Join waitlist"}</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                </button>
+              </form>
+            )}
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-[12px] text-white/55">
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} /> No credit card</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} /> Free to try</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} /> Storyboards in seconds</span>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

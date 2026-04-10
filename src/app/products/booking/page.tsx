@@ -1,22 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import BackgroundEffects from "@/components/BackgroundEffects";
-import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
+import { useState } from "react";
 import {
-  Zap,
   ArrowRight,
   Check,
   Minus,
   ChevronDown,
-  ChevronRight,
   Calendar,
-  Clock,
-  Users,
   Brain,
-  Smartphone,
   Bell,
   Scissors,
   Stethoscope,
@@ -26,25 +18,29 @@ import {
   Briefcase,
   MessageSquare,
   Phone,
-  BarChart3,
   CreditCard,
-  Globe,
   Palette,
-  LayoutDashboard,
-  LogOut,
+  BadgeCheck,
 } from "lucide-react";
 
-const fadeInUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } },
+const CARD_BG = "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(10,10,15,0.7) 100%)";
+const PRIMARY_CTA = {
+  background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+  color: "#0a0a0f",
+  boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
+} as const;
+const SERIF: React.CSSProperties = {
+  fontFamily: "Fraunces, ui-serif, Georgia, serif",
+  fontStyle: "italic",
+  fontWeight: 400,
+  color: "#E8D4B0",
 };
-const staggerContainer = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
 
 const STATS = [
   { value: "Free", label: "Starter plan" },
   { value: "AI", label: "Smart scheduling" },
   { value: "24/7", label: "Online booking" },
-  { value: "0%", label: "No-show reduction" },
+  { value: "75%", label: "No-show reduction" },
 ];
 
 const FEATURES = [
@@ -66,7 +62,6 @@ const INDUSTRIES = [
 ];
 
 const COMPETITORS = [
-  { name: "Feature", zoobicon: "Zoobicon", calendly: "Calendly", acuity: "Acuity", simplybook: "SimplyBook", fresha: "Fresha" },
   { name: "Free plan", zoobicon: "1 staff", calendly: "1 type only", acuity: "7-day trial", simplybook: "50 bookings", fresha: "Yes (salon only)" },
   { name: "AI smart scheduling", zoobicon: true, calendly: false, acuity: false, simplybook: false, fresha: false },
   { name: "AI chat booking", zoobicon: true, calendly: false, acuity: false, simplybook: false, fresha: false },
@@ -98,15 +93,7 @@ const FAQS = [
 ];
 
 export default function BookingProductPage() {
-  const [user, setUser] = useState<{ email?: string } | null>(null);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem("zoobicon_user");
-      if (raw) setUser(JSON.parse(raw));
-    } catch {}
-  }, []);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -134,157 +121,279 @@ export default function BookingProductPage() {
   };
 
   const Cell = ({ val }: { val: unknown }) => {
-    if (val === true) return <Check className="w-4 h-4 text-stone-400 mx-auto" />;
-    if (val === false) return <Minus className="w-4 h-4 text-white/20 mx-auto" />;
-    return <span className="text-sm text-white/70">{String(val)}</span>;
+    if (val === true) return <Check className="w-4 h-4 mx-auto" style={{ color: "#E8D4B0" }} />;
+    if (val === false) return <Minus className="w-4 h-4 mx-auto text-white/25" />;
+    return <span className="text-[13px] text-white/65">{String(val)}</span>;
   };
 
   return (
-    <div className="relative min-h-screen">
+    <div className="min-h-screen bg-[#050508] text-white fs-grain pt-[72px]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
-      <BackgroundEffects preset="technical" />
-
-      <nav className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center"><Zap className="w-4 h-4 text-white" /></div>
-            <span className="text-lg font-bold tracking-tight">Zoobicon</span>
-          </Link>
-          <div className="flex items-center gap-3">
-            {user ? (
-              <>
-                <Link href="/dashboard" className="text-sm text-white/65 hover:text-white transition-colors px-3 py-2 flex items-center gap-1.5"><LayoutDashboard className="w-3.5 h-3.5" /> Dashboard</Link>
-                <button onClick={() => { try { localStorage.removeItem("zoobicon_user"); } catch {} setUser(null); }} className="text-sm text-white/65 hover:text-white transition-colors px-3 py-2 flex items-center gap-1.5"><LogOut className="w-3.5 h-3.5" /> Sign out</button>
-              </>
-            ) : (
-              <>
-                <Link href="/auth/login" className="text-sm text-white/65 hover:text-white transition-colors px-3 py-2">Sign in</Link>
-                <Link href="/auth/signup" className="btn-gradient px-4 py-2 rounded-xl text-sm font-semibold text-white">Get Started Free</Link>
-              </>
-            )}
-          </div>
-        </div>
-      </nav>
 
       {/* Hero */}
-      <section className="relative pt-24 pb-20 overflow-hidden">
-        <HeroEffects variant="green" cursorGlow particles particleCount={25} aurora />
-        <CursorGlowTracker />
-        <motion.div className="relative z-10 max-w-5xl mx-auto px-6 text-center" variants={staggerContainer} initial="hidden" animate="visible">
-          <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-stone-500/10 border border-stone-500/20 mb-8">
-            <Calendar className="w-3.5 h-3.5 text-stone-400" /><span className="text-xs font-medium text-stone-300">AI-Powered Booking</span>
-          </motion.div>
-          <motion.h1 variants={fadeInUp} className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6">
-            Your calendar,{" "}<span className="bg-gradient-to-r from-stone-400 via-stone-400 to-stone-400 bg-clip-text text-transparent">fully booked</span>
-          </motion.h1>
-          <motion.p variants={fadeInUp} className="text-lg sm:text-xl text-white/50 max-w-2xl mx-auto mb-10">
-            AI scheduling that fills every gap. Voice receptionist that books while you sleep. No-show prediction that saves your revenue. Free to start.
-          </motion.p>
-          <motion.div variants={fadeInUp} className="flex flex-wrap justify-center gap-4">
-            <Link href="/auth/signup" className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-stone-500 to-stone-600 font-semibold hover:from-stone-400 hover:to-stone-500 transition-all flex items-center gap-2">Start Free <ArrowRight className="w-4 h-4" /></Link>
-            <Link href="#pricing" className="px-8 py-3.5 rounded-xl bg-white/[0.05] border border-white/[0.1] font-semibold hover:bg-white/[0.08] transition-all">View Plans</Link>
-          </motion.div>
-        </motion.div>
+      <section className="relative pt-20 pb-24 md:pt-28 md:pb-32 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+          <div className="absolute left-1/2 top-0 h-[720px] w-[1200px] -translate-x-1/2 rounded-full blur-[160px]"
+            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.09), transparent 70%)" }} />
+          <div className="absolute right-[-10%] top-[30%] h-[420px] w-[520px] rounded-full blur-[140px]"
+            style={{ background: "radial-gradient(closest-side, rgba(224,139,176,0.07), transparent 70%)" }} />
+        </div>
+
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-8">
+            <BadgeCheck className="w-3 h-3" />
+            AI-Powered Booking · Free plan · 24/7 voice receptionist
+          </div>
+
+          <h1 className="fs-display-xl mb-6">
+            Your calendar,{" "}
+            <span style={SERIF}>fully booked.</span>
+          </h1>
+
+          <p className="max-w-3xl mx-auto text-[17px] md:text-[19px] leading-relaxed text-white/60 mb-10">
+            AI scheduling that fills every gap. Voice receptionist that books while you sleep.
+            No-show prediction that saves your revenue. Free to start.
+          </p>
+
+          <div className="flex flex-wrap justify-center gap-2 mb-10 max-w-3xl mx-auto">
+            {["Smart scheduling", "Voice receptionist", "Chat booking", "SMS reminders", "Deposits", "White-label"].map((pill) => (
+              <span
+                key={pill}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1 text-[11px] text-white/60"
+              >
+                <Check className="w-3 h-3" style={{ color: "#E8D4B0" }} />
+                {pill}
+              </span>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/auth/signup"
+              className="group inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
+              style={PRIMARY_CTA}
+            >
+              Start free
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+            <Link
+              href="#pricing"
+              className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-7 py-3.5 text-[14px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+            >
+              <Calendar className="w-4 h-4" />
+              View plans
+            </Link>
+          </div>
+        </div>
       </section>
 
       {/* Stats */}
-      <section className="border-y border-white/[0.06] py-8">
-        <div className="max-w-5xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6">
-          {STATS.map(s => (
-            <div key={s.label} className="text-center">
-              <div className="text-2xl font-bold text-stone-400">{s.value}</div>
-              <div className="text-xs text-white/40 mt-1">{s.label}</div>
-            </div>
-          ))}
+      <section className="relative py-16 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {STATS.map((stat) => (
+              <div key={stat.label} className="text-center">
+                <div className="text-4xl md:text-5xl font-semibold tracking-[-0.02em] mb-2" style={{ color: "#E8D4B0" }}>
+                  {stat.value}
+                </div>
+                <div className="text-[13px] text-white/55">{stat.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Features */}
-      <section className="py-20">
-        <div className="max-w-5xl mx-auto px-6">
-          <motion.div className="text-center mb-16" variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
-            <motion.h2 variants={fadeInUp} className="text-3xl sm:text-4xl font-bold mb-4">Not just booking. AI booking.</motion.h2>
-            <motion.p variants={fadeInUp} className="text-white/40 max-w-lg mx-auto">Every competitor offers a calendar. We offer an AI that fills it.</motion.p>
-          </motion.div>
-          <motion.div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5" variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
-            {FEATURES.map(f => (
-              <motion.div key={f.title} variants={fadeInUp} className="rounded-2xl bg-white/[0.03] border border-white/[0.08] p-6 hover:border-stone-500/20 transition-all">
-                <f.icon className="w-6 h-6 text-stone-400 mb-4" />
-                <h3 className="font-semibold mb-2">{f.title}</h3>
-                <p className="text-sm text-white/40 leading-relaxed">{f.desc}</p>
-              </motion.div>
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              Features
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              Not just booking.{" "}
+              <span style={SERIF}>AI booking.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              Every competitor offers a calendar. We offer an AI that fills it.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {FEATURES.map((f) => (
+              <div
+                key={f.title}
+                className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
+                style={{ background: CARD_BG }}
+              >
+                <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }} />
+                <div className="relative">
+                  <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05]">
+                    <f.icon className="h-5 w-5 text-[#E8D4B0]" />
+                  </div>
+                  <h3 className="text-[17px] font-semibold tracking-[-0.01em] mb-2">{f.title}</h3>
+                  <p className="text-[13px] text-white/55 leading-relaxed">{f.desc}</p>
+                </div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Industries */}
-      <section className="py-20 border-t border-white/[0.06]">
-        <div className="max-w-5xl mx-auto px-6">
-          <motion.h2 variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-3xl font-bold text-center mb-12">Built for every business that takes appointments</motion.h2>
-          <motion.div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5" variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
-            {INDUSTRIES.map(ind => (
-              <motion.div key={ind.name} variants={fadeInUp} className="rounded-2xl bg-white/[0.03] border border-white/[0.08] p-5">
-                <ind.icon className="w-5 h-5 text-stone-400 mb-3" />
-                <h3 className="font-semibold text-sm mb-1">{ind.name}</h3>
-                <p className="text-xs text-white/40">{ind.examples}</p>
-              </motion.div>
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              Industries
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              Built for every business{" "}
+              <span style={SERIF}>that takes appointments.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              From solo barbers to multi-location clinics, the system adapts to your services, staff, and booking rules.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {INDUSTRIES.map((ind) => (
+              <div
+                key={ind.name}
+                className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
+                style={{ background: CARD_BG }}
+              >
+                <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }} />
+                <div className="relative">
+                  <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05]">
+                    <ind.icon className="h-5 w-5 text-[#E8D4B0]" />
+                  </div>
+                  <h3 className="text-[17px] font-semibold tracking-[-0.01em] mb-2">{ind.name}</h3>
+                  <p className="text-[13px] text-white/55 leading-relaxed">{ind.examples}</p>
+                </div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* Competitor Comparison */}
-      <section className="py-20 border-t border-white/[0.06]">
-        <div className="max-w-5xl mx-auto px-6">
-          <motion.h2 variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-3xl font-bold text-center mb-4">How Zoobicon Booking compares</motion.h2>
-          <motion.p variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-white/40 text-center mb-12 max-w-lg mx-auto">We&apos;re the only booking platform with real AI at an SMB price point.</motion.p>
-          <div className="overflow-x-auto rounded-2xl border border-white/[0.08]">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-white/[0.08]">
-                  {["Feature", "Zoobicon", "Calendly", "Acuity", "SimplyBook", "Fresha"].map((h, i) => (
-                    <th key={h} className={`px-4 py-3 text-left text-xs uppercase tracking-wider ${i === 1 ? "text-stone-400 bg-stone-500/5" : "text-white/40"}`}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/[0.04]">
-                {COMPETITORS.slice(1).map(row => (
-                  <tr key={row.name} className="hover:bg-white/[0.02]">
-                    <td className="px-4 py-3 text-white/60 text-sm">{row.name}</td>
-                    <td className="px-4 py-3 bg-stone-500/5"><Cell val={row.zoobicon} /></td>
-                    <td className="px-4 py-3"><Cell val={row.calendly} /></td>
-                    <td className="px-4 py-3"><Cell val={row.acuity} /></td>
-                    <td className="px-4 py-3"><Cell val={row.simplybook} /></td>
-                    <td className="px-4 py-3"><Cell val={row.fresha} /></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      {/* Competitor comparison */}
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06] overflow-hidden">
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          <div className="absolute left-1/2 top-1/2 h-[520px] w-[900px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[140px]"
+            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }} />
+        </div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              Industry comparison
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              How Zoobicon Booking{" "}
+              <span style={SERIF}>compares.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              We&apos;re the only booking platform with real AI at an SMB price point.
+            </p>
           </div>
-          <p className="text-[10px] text-white/20 mt-3 text-center">Comparison based on publicly available information as of March 2026. Features and pricing may change. All trademarks belong to their respective owners. See our <a href="/disclaimers" className="underline hover:text-white/30">disclaimers</a>.</p>
+
+          <div className="overflow-x-auto rounded-[28px] border border-white/[0.08]" style={{ background: CARD_BG }}>
+            <div className="min-w-[820px]">
+              <div className="grid grid-cols-6 px-6 py-4 border-b border-white/[0.08] text-[11px] uppercase tracking-[0.15em] font-semibold text-white/55">
+                <div>Feature</div>
+                <div className="text-center" style={{ color: "#E8D4B0" }}>Zoobicon</div>
+                <div className="text-center">Calendly</div>
+                <div className="text-center">Acuity</div>
+                <div className="text-center">SimplyBook</div>
+                <div className="text-center">Fresha</div>
+              </div>
+              {COMPETITORS.map((row, i) => (
+                <div
+                  key={row.name}
+                  className={`grid grid-cols-6 px-6 py-4 text-[13px] items-center ${
+                    i !== COMPETITORS.length - 1 ? "border-b border-white/[0.04]" : ""
+                  }`}
+                >
+                  <div className="text-white/75 font-medium">{row.name}</div>
+                  <div className="text-center"><Cell val={row.zoobicon} /></div>
+                  <div className="text-center"><Cell val={row.calendly} /></div>
+                  <div className="text-center"><Cell val={row.acuity} /></div>
+                  <div className="text-center"><Cell val={row.simplybook} /></div>
+                  <div className="text-center"><Cell val={row.fresha} /></div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <p className="text-[11px] text-white/30 mt-4 text-center">
+            Comparison based on publicly available information as of March 2026. Features and pricing may change.
+            All trademarks belong to their respective owners. See our{" "}
+            <Link href="/disclaimers" className="underline hover:text-white/55">disclaimers</Link>.
+          </p>
         </div>
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-20 border-t border-white/[0.06]">
-        <div className="max-w-5xl mx-auto px-6">
-          <motion.h2 variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-3xl font-bold text-center mb-12">Start free. Upgrade when you need AI.</motion.h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {PLANS.map(p => (
-              <div key={p.name} className={`rounded-2xl p-6 border ${p.featured ? "bg-stone-500/5 border-stone-500/20 ring-1 ring-stone-500/10" : "bg-white/[0.02] border-white/[0.08]"}`}>
-                {p.featured && <div className="text-[10px] text-stone-400 bg-stone-500/10 px-3 py-1 rounded-full inline-block mb-3 font-semibold uppercase tracking-wider">Most Popular</div>}
-                <h3 className="text-lg font-bold mb-1">{p.name}</h3>
-                <p className="text-xs text-white/40 mb-4">{p.desc}</p>
-                <div className="flex items-baseline gap-1 mb-6"><span className="text-3xl font-bold">{p.price}</span>{p.period && <span className="text-sm text-white/30">{p.period}</span>}</div>
-                <ul className="space-y-2 mb-6">
-                  {p.features.map(f => (
-                    <li key={f} className="flex items-center gap-2 text-xs text-white/50"><Check className="w-3.5 h-3.5 text-stone-400 shrink-0" />{f}</li>
+      <section id="pricing" className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              Pricing
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              Start free. Upgrade{" "}
+              <span style={SERIF}>when you need AI.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              No credit card required. Cancel anytime.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto">
+            {PLANS.map((p) => (
+              <div
+                key={p.name}
+                className={`relative rounded-[24px] p-7 transition-all duration-500 hover:-translate-y-1 ${
+                  p.featured ? "border-2 border-[#E8D4B0]/35" : "border border-white/[0.08] hover:border-[#E8D4B0]/25"
+                }`}
+                style={{
+                  background: p.featured
+                    ? "linear-gradient(135deg, rgba(232,212,176,0.08) 0%, rgba(17,17,24,0.85) 100%)"
+                    : CARD_BG,
+                }}
+              >
+                {p.featured && (
+                  <div
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-wide"
+                    style={{ background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)", color: "#0a0a0f" }}
+                  >
+                    Most popular
+                  </div>
+                )}
+                <h3 className="text-[17px] font-semibold tracking-[-0.01em] mb-2">{p.name}</h3>
+                <div className="flex items-baseline gap-1 mb-3">
+                  <span className="text-4xl font-semibold tracking-[-0.02em]" style={{ color: "#E8D4B0" }}>{p.price}</span>
+                  {p.period && <span className="text-[13px] text-white/50">{p.period}</span>}
+                </div>
+                <p className="text-[13px] text-white/55 mb-6">{p.desc}</p>
+                <ul className="space-y-2.5 mb-7">
+                  {p.features.map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-[13px] text-white/65">
+                      <Check className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#E8D4B0" }} />
+                      {f}
+                    </li>
                   ))}
                 </ul>
-                <Link href="/auth/signup" className={`block text-center py-2.5 rounded-xl text-sm font-semibold transition-all ${p.featured ? "bg-gradient-to-r from-stone-500 to-stone-600 hover:from-stone-400 hover:to-stone-500" : "bg-white/[0.05] border border-white/[0.1] hover:bg-white/[0.08]"}`}>
+                <Link
+                  href="/auth/signup"
+                  className={`block text-center rounded-full py-3 text-[13px] font-semibold transition-all ${
+                    p.featured ? "" : "border border-white/[0.12] bg-white/[0.03] text-white/80 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+                  }`}
+                  style={p.featured ? PRIMARY_CTA : undefined}
+                >
                   {p.price === "Free" ? "Start Free" : "Start Free Trial"}
                 </Link>
               </div>
@@ -294,17 +403,38 @@ export default function BookingProductPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 border-t border-white/[0.06]">
-        <div className="max-w-3xl mx-auto px-6">
-          <motion.h2 variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-3xl font-bold text-center mb-12">Frequently asked questions</motion.h2>
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              FAQ
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              Frequently asked{" "}
+              <span style={SERIF}>questions.</span>
+            </h2>
+          </div>
+
           <div className="space-y-3">
             {FAQS.map((f, i) => (
-              <div key={i} className="rounded-xl border border-white/[0.08] overflow-hidden">
-                <button onClick={() => setOpenFaq(openFaq === i ? null : i)} className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-white/[0.02] transition-colors">
-                  <span className="text-sm font-medium pr-4">{f.q}</span>
-                  <ChevronDown className={`w-4 h-4 text-white/30 shrink-0 transition-transform ${openFaq === i ? "rotate-180" : ""}`} />
+              <div
+                key={i}
+                className="rounded-[20px] border border-white/[0.08] overflow-hidden transition-all duration-500 hover:border-[#E8D4B0]/25"
+                style={{ background: CARD_BG }}
+              >
+                <button
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  className="w-full flex items-center justify-between px-6 py-5 text-left"
+                >
+                  <span className="text-[15px] font-medium pr-4 text-white/85">{f.q}</span>
+                  <ChevronDown
+                    className={`w-4 h-4 shrink-0 transition-transform duration-300 ${openFaq === i ? "rotate-180" : ""}`}
+                    style={{ color: "#E8D4B0" }}
+                  />
                 </button>
-                {openFaq === i && <div className="px-5 pb-4 text-sm text-white/50 leading-relaxed">{f.a}</div>}
+                {openFaq === i && (
+                  <div className="px-6 pb-5 text-[14px] text-white/60 leading-relaxed">{f.a}</div>
+                )}
               </div>
             ))}
           </div>
@@ -312,25 +442,37 @@ export default function BookingProductPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-24 border-t border-white/[0.06]">
-        <div className="max-w-3xl mx-auto px-6 text-center">
-          <Calendar className="w-12 h-12 text-stone-400 mx-auto mb-6" />
-          <h2 className="text-3xl font-bold mb-4">Stop losing bookings. Start today.</h2>
-          <p className="text-white/40 mb-8 max-w-lg mx-auto">Free forever for solo professionals. AI features from $6.99/mo. No credit card required.</p>
-          <Link href="/auth/signup" className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-stone-500 to-stone-600 font-semibold hover:from-stone-400 hover:to-stone-500 transition-all">Start Free <ArrowRight className="w-4 h-4" /></Link>
+      <section className="relative py-24 md:py-32 border-t border-white/[0.06] overflow-hidden">
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          <div className="absolute left-1/2 top-1/2 h-[560px] w-[1000px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[140px]"
+            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.11), transparent 70%)" }} />
         </div>
-      </section>
-
-      <footer className="border-t border-white/[0.06] py-10">
-        <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="text-xs text-white/30">&copy; 2026 Zoobicon. All rights reserved.</div>
-          <div className="text-xs text-white/20">zoobicon.com &middot; zoobicon.ai &middot; zoobicon.io &middot; zoobicon.sh</div>
-          <div className="flex gap-4">
-            <Link href="/privacy" className="text-xs text-white/30 hover:text-white/50 transition-colors">Privacy</Link>
-            <Link href="/terms" className="text-xs text-white/30 hover:text-white/50 transition-colors">Terms</Link>
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center">
+          <div className="mb-8 inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05]">
+            <Calendar className="h-6 w-6 text-[#E8D4B0]" />
+          </div>
+          <h2 className="fs-display-lg mb-5">
+            Stop losing bookings.{" "}
+            <span style={SERIF}>Start today.</span>
+          </h2>
+          <p className="text-[17px] text-white/60 mb-10">
+            Free forever for solo professionals. AI features from $6.99/mo. No credit card required.
+          </p>
+          <Link
+            href="/auth/signup"
+            className="group inline-flex items-center gap-2 rounded-full px-8 py-4 text-[15px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
+            style={PRIMARY_CTA}
+          >
+            Start free
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+          <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-[12px] text-white/55">
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} /> No credit card</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} /> Free forever plan</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} /> Cancel anytime</span>
           </div>
         </div>
-      </footer>
+      </section>
     </div>
   );
 }
