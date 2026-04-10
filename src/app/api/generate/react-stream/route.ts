@@ -521,6 +521,11 @@ export async function POST(req: NextRequest): Promise<Response> {
           // mountains/watches/dashboards.
           updatedCode = registry.swapImagesForIndustry(updatedCode, industry);
 
+          // Auto-emphasize one word per h1/h2 so the Fraunces italic serif
+          // accent actually renders. Hard guarantee for when the LLM
+          // ignores the editorial system-prompt instruction.
+          updatedCode = registry.emphasizeHeadings(updatedCode);
+
           const { fileName } = registry.buildComponentFile(comp);
           files[fileName] = updatedCode;
           accumulated.push(comp);

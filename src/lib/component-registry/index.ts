@@ -467,6 +467,54 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 }
 
 /**
+ * Auto-wrap one word per h1/h2 in <em>…</em> so the editorial Fraunces
+ * italic serif accent actually lands. The customiser LLM is told to do this
+ * in its system prompt, but LLMs ignore style instructions ~half the time.
+ * This regex pass is the hard guarantee.
+ *
+ * Strategy:
+ *   - Only touch headlines that don't already contain <em>, <i>, or a
+ *     bg-clip-text span (those already have their own accent).
+ *   - Find h1 / h2 elements, extract their plain text content, and wrap
+ *     the LAST non-trivial word (>3 chars) in <em>…</em>.
+ *   - JSX-safe: we only match simple string children, not nested elements.
+ *     Anything more complex is left alone — no false edits.
+ *
+ * Idempotent: running twice is a no-op because the second pass skips any
+ * headline that already contains <em>.
+ */
+export function emphasizeHeadings(code: string): string {
+  return code.replace(
+    // Capture: (opening tag with any className)(text content — no < or >)(closing tag)
+    /<(h1|h2)([^>]*)>([^<>]+)<\/\1>/g,
+    (match, tag, attrs, inner) => {
+      // Skip if text is too short
+      const trimmed = inner.trim();
+      if (trimmed.length < 10) return match;
+
+      // Find the last word that is > 3 chars and not already a stopword
+      const words = trimmed.split(/\s+/);
+      let targetIdx = -1;
+      for (let i = words.length - 1; i >= 0; i--) {
+        const w = words[i].replace(/[.,!?;:"'—–-]+$/g, "");
+        if (w.length > 3 && !/^(the|and|for|with|that|this|from|your|into|over|more|most|ever|just|make|take|only|also|some|like|when|what|will|been|were|they|them|than|then|here|have|back|down|need|than|much|such|very|well|each|even|both)$/i.test(w)) {
+          targetIdx = i;
+          break;
+        }
+      }
+      if (targetIdx === -1) return match;
+
+      // Rebuild the text with the target word wrapped
+      const newInner = words
+        .map((w, i) => (i === targetIdx ? `<em>${w}</em>` : w))
+        .join(" ");
+
+      return `<${tag}${attrs}>${newInner}</${tag}>`;
+    }
+  );
+}
+
+/**
  * Rewrite vibrant Tailwind color utilities (violet/purple/fuchsia/pink/etc.)
  * into a restrained stone palette so every generated site inherits the
  * editorial look without touching any individual component file.
