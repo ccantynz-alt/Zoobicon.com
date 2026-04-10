@@ -15,11 +15,11 @@ import {
   Shield,
   Star,
   ChevronRight,
-  Play,
   Mail,
   Layers,
   Eye,
 } from "lucide-react";
+import AutoplayVideo from "@/components/AutoplayVideo";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -227,15 +227,7 @@ export default function HomePage() {
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <motion.div variants={fadeUp} className="order-2 lg:order-1">
               <div className="rounded-2xl border border-white/[0.08] bg-zinc-900/80 shadow-2xl overflow-hidden">
-                <div className="aspect-video bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 flex items-center justify-center relative">
-                  <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/10 backdrop-blur hover:bg-white/20 hover:scale-105 transition-all cursor-pointer">
-                      <Play className="h-6 w-6 text-white ml-1" />
-                    </div>
-                    <span className="text-xs text-white/40">AI-generated spokesperson video</span>
-                  </div>
-                </div>
+                <AutoplayVideo />
               </div>
             </motion.div>
             <motion.div variants={fadeUp} className="order-1 lg:order-2">
