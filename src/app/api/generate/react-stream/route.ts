@@ -622,10 +622,15 @@ export async function POST(req: NextRequest): Promise<Response> {
                 message: `Database ready — ${provision.tables.length} table(s), ${provision.auth.length > 0 ? "auth enabled" : "no auth"}, ${provision.buckets.length} bucket(s)`,
               });
             } catch (err) {
-              // Supabase provisioning failure is non-fatal — site still works without it
+              // Supabase provisioning failure is non-fatal — site still works without it.
+              // Use fatal:false so the client treats this as a warning, not a build abort.
+              // The JWT / token-expired path lives here (SUPABASE_ACCESS_TOKEN invalid in prod
+              // would otherwise surface as "Something went wrong / JWT could not be decoded"
+              // and kill the entire build even though it's non-fatal).
               const msg = err instanceof Error ? err.message : String(err);
               writer.send("error", {
-                message: `Supabase provisioning failed: ${msg}`,
+                fatal: false,
+                message: `Supabase provisioning skipped: ${msg}`,
                 hint: "The site will still work but without a live database. You can connect Supabase manually later.",
               });
 
@@ -695,9 +700,12 @@ export async function POST(req: NextRequest): Promise<Response> {
             }
             writer.send("files", { files: finalFiles });
           } catch (err) {
+            // Critique loop failure is non-fatal — the unrefined site is still
+            // usable and has already been streamed to the client.
             const { message, hint } = classifyError(err);
             writer.send("error", {
-              message: `Critique loop failed: ${message}`,
+              fatal: false,
+              message: `Critique loop skipped: ${message}`,
               hint: `${hint} The unrefined site is still usable.`,
             });
           }

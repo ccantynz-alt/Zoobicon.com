@@ -201,6 +201,8 @@ export default function ChatPanel({
               )
             );
           } else if (event.type === "error") {
+            // Respect fatal:false — soft warnings should not abort the edit.
+            if (event.fatal === false) return;
             throw new Error(event.message || "Edit failed");
           }
         };

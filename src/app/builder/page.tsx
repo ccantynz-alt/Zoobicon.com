@@ -1158,8 +1158,15 @@ function BuilderPage() {
                 }
               } else if (event.type === "error") {
                 const msg = event.message || "Generation failed";
-                setBuildError({ message: cleanErrorMessage(msg), suggestion: errorSuggestion(msg) });
-                throw new Error(msg);
+                // Soft warnings ship with fatal:false. They mean "this step was
+                // skipped, the build is still running" — do NOT abort the stream.
+                if (event.fatal === false) {
+                  setStreamWarning(cleanErrorMessage(msg));
+                  setPipelineAgents(prev => [...prev, `⚠ ${cleanErrorMessage(msg)}`]);
+                } else {
+                  setBuildError({ message: cleanErrorMessage(msg), suggestion: errorSuggestion(msg) });
+                  throw new Error(msg);
+                }
               }
             } catch (e) {
               if (e instanceof Error && (e.message.includes("failed") || e.message.includes("Generation") || e.message.includes("unavailable") || e.message.includes("busy"))) {
@@ -1213,7 +1220,12 @@ function BuilderPage() {
                 setPipelineAgents(prev => [...prev, "Build complete"]);
                 trackEvent("build");
               } else if (event.type === "error") {
-                throw new Error(event.message || "Generation failed");
+                // Respect fatal:false warnings in the buffer flush too.
+                if (event.fatal === false) {
+                  setStreamWarning(cleanErrorMessage(event.message || ""));
+                } else {
+                  throw new Error(event.message || "Generation failed");
+                }
               }
             } catch (e) {
               if (e instanceof Error && (e.message.includes("failed") || e.message.includes("Generation") || e.message.includes("unavailable") || e.message.includes("busy"))) {
