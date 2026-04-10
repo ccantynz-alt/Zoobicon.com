@@ -253,9 +253,9 @@ export default function DevelopersPage() {
                   <li>Webhook callbacks</li>
                   <li>Priority support</li>
                 </ul>
-                <button onClick={() => {}} className="w-full py-2.5 rounded-xl bg-gradient-to-r from-accent-cyan to-emerald-500 text-sm font-bold text-white">
+                <Link href="/pricing" className="block w-full py-2.5 rounded-xl bg-gradient-to-r from-accent-cyan to-emerald-500 text-sm font-bold text-white text-center">
                   Start Pro
-                </button>
+                </Link>
               </div>
 
               <div className="gradient-border p-6 rounded-xl">
