@@ -21,6 +21,10 @@ export interface RegistryComponent {
   tags: string[];
 }
 
+// Re-export image system so routes can import everything from this module
+export { detectIndustry, swapImagesForIndustry, INDUSTRY_POOLS } from "./images";
+export type { Industry } from "./images";
+
 export type ComponentCategory =
   | "navbar"
   | "hero"
@@ -237,16 +241,26 @@ export function assembleComponents(
     primaryColor?: string;
     bgColor?: string;
     theme?: "editorial" | "raw";
+    /** Drives imagery selection. If omitted, pool is "editorial". */
+    industry?: import("./images").Industry;
   }
 ): Record<string, string> {
   const files: Record<string, string> = {};
   const theme = options?.theme ?? "editorial";
+  const industry = options?.industry ?? "editorial";
 
   // Generate individual component files
   for (const comp of components) {
     const componentName = capitalize(comp.category);
     const fileName = `components/${componentName}.tsx`;
-    const body = theme === "editorial" ? reskinEditorial(comp.code) : comp.code;
+    let body = comp.code;
+    if (theme === "editorial") {
+      body = reskinEditorial(body);
+      // swap Unsplash photo IDs to the industry pool
+      // (import is static at top of file via re-export)
+      const { swapImagesForIndustry } = require("./images") as typeof import("./images");
+      body = swapImagesForIndustry(body, industry);
+    }
     files[fileName] = `import React from "react";\n\n${body}\n`;
   }
 

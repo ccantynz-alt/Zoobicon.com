@@ -471,6 +471,11 @@ export async function POST(req: NextRequest): Promise<Response> {
         const { components, brandName, primaryColor, bgColor } =
           await planComponents(prompt);
 
+        // Detect industry from the prompt once — drives imagery selection
+        // for every component in this build (restaurants get warm hand/craft
+        // imagery, SaaS gets workspace/dashboards, portfolio gets landscape).
+        const industry = registry.detectIndustry(prompt);
+
         // Update styles with the real brand colours now that planning succeeded.
         // Theme stays editorial — Fraunces + Inter + measured motion.
         files["styles.css"] = registry.buildStylesFile({ primaryColor, bgColor, theme: "editorial" });
@@ -509,6 +514,12 @@ export async function POST(req: NextRequest): Promise<Response> {
           // prompt and emits violet/cyan/fuchsia classes anyway. Regex-only;
           // safe on already-reskinned code (idempotent).
           updatedCode = registry.reskinEditorial(updatedCode);
+
+          // Industry image swap — replace every Unsplash photo ID with one
+          // drawn from the detected industry's curated pool, so imagery
+          // matches the prompt instead of the base component's hardcoded
+          // mountains/watches/dashboards.
+          updatedCode = registry.swapImagesForIndustry(updatedCode, industry);
 
           const { fileName } = registry.buildComponentFile(comp);
           files[fileName] = updatedCode;
