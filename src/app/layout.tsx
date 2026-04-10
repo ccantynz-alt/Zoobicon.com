@@ -6,6 +6,7 @@ import SpeculationRules from "@/components/SpeculationRules";
 import AutoIndexNow from "@/components/AutoIndexNow";
 import StagingBanner from "@/components/StagingBanner";
 import MaintenanceBanner from "@/components/MaintenanceBanner";
+import ComingSoonBanner from "@/components/ComingSoonBanner";
 import SiteNavigation from "@/components/SiteNavigation";
 
 
@@ -342,6 +343,7 @@ export default function RootLayout({
         />
       </head>
       <body className="grain">
+        <ComingSoonBanner />
         <MaintenanceBanner />
         <StagingBanner />
         <SiteNavigation />
