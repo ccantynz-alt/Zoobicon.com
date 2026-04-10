@@ -5,16 +5,21 @@
 /* Fonts loaded via <link> in layout.tsx with display=swap to prevent FOIT */
 
 :root {
-  --brand-500: #3b82f6;
-  --brand-600: #2563eb;
-  --accent-cyan: #22d3ee;
-  --accent-purple: #67e8f9;
-  --accent-pink: #38bdf8;
-  /* Signature Zoobicon violet */
-  --zoo-400: #7c5aff;
-  --zoo-500: #6d3bff;
-  --zoo-600: #5a1eff;
-  --zoo-glow: rgba(124, 90, 255, 0.25);
+  /* Editorial palette — retired brand-500/brand-600/accent-cyan/accent-purple/
+     accent-pink/zoo-400/zoo-500/zoo-600 now alias to the warm accent so
+     every derived gradient/border/shadow in this file lands on the editorial
+     register without rewriting 1,700 lines of legacy CSS. */
+  --brand-500: #E8D4B0;
+  --brand-600: #D4B887;
+  --accent-cyan: #E8D4B0;
+  --accent-purple: #E8D4B0;
+  --accent-pink: #E8D4B0;
+  --zoo-400: #E8D4B0;
+  --zoo-500: #D4B887;
+  --zoo-600: #B89B64;
+  --zoo-glow: rgba(232, 212, 176, 0.2);
+  --editorial-ink: #1c1917;
+  --editorial-paper: #FAF9F6;
 }
 
 * {
@@ -187,7 +192,7 @@ pre code {
   position: relative;
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.2));
   border: 1px solid rgba(59, 130, 246, 0.5);
-  color: #93c5fd;
+  color: var(--zoo-400);
   padding: 12px 24px;
   font-family: "Inter", system-ui, sans-serif;
   font-size: 14px;
@@ -303,8 +308,8 @@ pre code {
 }
 
 .cyber-tab.active {
-  color: #93c5fd;
-  border-bottom-color: #3b82f6;
+  color: var(--zoo-400);
+  border-bottom-color: var(--zoo-400);
 }
 
 /* ============================================
@@ -312,14 +317,14 @@ pre code {
    ============================================ */
 
 .gradient-text {
-  background: linear-gradient(135deg, #3b82f6, #93c5fd);
+  background: linear-gradient(135deg, var(--zoo-400), var(--zoo-400));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .gradient-text-hero {
-  background: linear-gradient(135deg, #3b82f6, #6366f1, #818cf8);
+  background: linear-gradient(135deg, var(--zoo-400), var(--zoo-500), var(--zoo-400));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -327,7 +332,7 @@ pre code {
 }
 
 .gradient-text-static {
-  background: linear-gradient(135deg, #3b82f6, #93c5fd);
+  background: linear-gradient(135deg, var(--zoo-400), var(--zoo-400));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -348,14 +353,14 @@ pre code {
 
 /* Signature Zoobicon gradient text */
 .gradient-text-zoo {
-  background: linear-gradient(135deg, #7c5aff, #3b82f6, #22d3ee);
+  background: linear-gradient(135deg, var(--zoo-400), var(--zoo-400), var(--zoo-400));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .gradient-text-zoo-animated {
-  background: linear-gradient(135deg, #7c5aff, #3b82f6, #22d3ee, #7c5aff);
+  background: linear-gradient(135deg, var(--zoo-400), var(--zoo-400), var(--zoo-400), var(--zoo-400));
   background-size: 300% 300%;
   -webkit-background-clip: text;
   background-clip: text;
@@ -366,7 +371,7 @@ pre code {
 /* Signature CTA button — impossible to miss */
 .btn-zoo {
   position: relative;
-  background: linear-gradient(135deg, #7c5aff, #5a1eff);
+  background: linear-gradient(135deg, var(--zoo-400), var(--zoo-600));
   color: #fff;
   font-weight: 700;
   padding: 16px 32px;
@@ -383,7 +388,7 @@ pre code {
   position: absolute;
   inset: -3px;
   border-radius: 16px;
-  background: linear-gradient(135deg, #7c5aff, #3b82f6, #22d3ee, #7c5aff);
+  background: linear-gradient(135deg, var(--zoo-400), var(--zoo-400), var(--zoo-400), var(--zoo-400));
   background-size: 300% 300%;
   animation: gradient-rotate 4s ease infinite;
   z-index: -1;
@@ -445,7 +450,7 @@ pre code {
    ============================================ */
 
 .btn-gradient {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  background: linear-gradient(135deg, var(--zoo-500), var(--zoo-600));
   transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   display: inline-flex;
   align-items: center;
@@ -456,7 +461,7 @@ pre code {
 }
 
 .btn-gradient:hover {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  background: linear-gradient(135deg, var(--zoo-400), var(--zoo-500));
   box-shadow: 0 4px 20px rgba(37, 99, 235, 0.25), 0 0 0 1px rgba(37,99,235,0.3);
   transform: translateY(-1px);
 }
@@ -1515,7 +1520,7 @@ select {
    ============================================ */
 
 .gradient-text-animated {
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6, #22d3ee, #3b82f6);
+  background: linear-gradient(135deg, var(--zoo-400), var(--zoo-500), var(--zoo-400), var(--zoo-400));
   background-size: 300% 300%;
   -webkit-background-clip: text;
   background-clip: text;
