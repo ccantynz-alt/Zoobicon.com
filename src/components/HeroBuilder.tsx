@@ -99,8 +99,6 @@ const AGENTS: Stage[] = [
   },
 ];
 
-const BUILD_DONE_AT = 7400;
-
 const PLACEHOLDERS = [
   "A specialty coffee roaster in Brooklyn",
   "A law firm with fixed-fee contracts",
@@ -149,27 +147,66 @@ type BuildPhase =
   | "footer"
   | "done";
 
-const BUILD_PHASES: { at: number; key: BuildPhase }[] = [
-  { at: 0, key: "start" },
-  { at: 500, key: "frame" },
-  { at: 1500, key: "navbar" },
-  { at: 2600, key: "hero" },
-  { at: 3800, key: "features" },
-  { at: 5000, key: "pricing" },
-  { at: 6200, key: "footer" },
-  { at: 7200, key: "done" },
-];
+
+// Map a real API phase → which agent should be lit up + which
+// visual build stage the morphing canvas should be on. This is how
+// the scripted theatre gets replaced with real progress: we listen
+// to the SSE stream and drive both the agent bar and the preview
+// canvas off the actual events the server emits.
+function phaseToAgentIdx(phase: string): number {
+  switch (phase) {
+    case "planning":
+      return 0; // Strategist
+    case "selecting":
+      return 2; // Architect
+    case "generating":
+      return 4; // Developer (brand + copy folded in visually)
+    case "customizing":
+      return 3; // Copywriter (mid-generation micro-phase)
+    case "supabase":
+      return 4; // Developer
+    case "qa":
+    case "critique":
+      return 5; // SEO / QA
+    default:
+      return -1;
+  }
+}
+
+function phaseToBuildStage(phase: string, componentProgress: number): BuildPhase {
+  if (phase === "planning") return "frame";
+  if (phase === "selecting") return "frame";
+  if (phase === "generating" || phase === "customizing") {
+    // Walk the canvas through navbar → hero → features → pricing
+    // → footer as components come in.
+    if (componentProgress >= 0.95) return "footer";
+    if (componentProgress >= 0.75) return "pricing";
+    if (componentProgress >= 0.5) return "features";
+    if (componentProgress >= 0.25) return "hero";
+    return "navbar";
+  }
+  if (phase === "supabase") return "pricing";
+  if (phase === "qa" || phase === "critique") return "footer";
+  if (phase === "done") return "done";
+  return "start";
+}
 
 export default function HeroBuilder() {
   const router = useRouter();
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const placeholder = usePlaceholder();
+  const abortRef = useRef<AbortController | null>(null);
 
   const [prompt, setPrompt] = useState("");
   const [building, setBuilding] = useState(false);
   const [activeAgentIdx, setActiveAgentIdx] = useState(-1);
   const [phase, setPhase] = useState<BuildPhase>("start");
   const [showClaim, setShowClaim] = useState(false);
+  const [liveMessage, setLiveMessage] = useState<string>("");
+  const [brandName, setBrandName] = useState<string>("");
+  const [componentsDone, setComponentsDone] = useState(0);
+  const [componentsTotal, setComponentsTotal] = useState(0);
+  const [streamError, setStreamError] = useState<string>("");
 
   // Pre-focus on mount so a visitor can just start typing
   useEffect(() => {
@@ -177,24 +214,149 @@ export default function HeroBuilder() {
     return () => clearTimeout(t);
   }, []);
 
-  // Drive the build theatre when submitted
+  // Clean up any in-flight stream on unmount
   useEffect(() => {
-    if (!building) return;
+    return () => abortRef.current?.abort();
+  }, []);
 
-    const timers: ReturnType<typeof setTimeout>[] = [];
+  // Reset back to idle (e.g. on error retry)
+  const resetBuild = () => {
+    abortRef.current?.abort();
+    setBuilding(false);
+    setActiveAgentIdx(-1);
+    setPhase("start");
+    setShowClaim(false);
+    setLiveMessage("");
+    setBrandName("");
+    setComponentsDone(0);
+    setComponentsTotal(0);
+    setStreamError("");
+  };
 
-    AGENTS.forEach((agent, i) => {
-      timers.push(setTimeout(() => setActiveAgentIdx(i), agent.at));
-    });
+  // Fire the real SSE stream and drive the theatre from real events
+  const runRealStream = async (userPrompt: string) => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
 
-    BUILD_PHASES.forEach(({ at, key }) => {
-      timers.push(setTimeout(() => setPhase(key), at));
-    });
+    try {
+      const res = await fetch("/api/generate/react-stream", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: userPrompt, tier: "standard" }),
+        signal: controller.signal,
+      });
 
-    timers.push(setTimeout(() => setShowClaim(true), BUILD_DONE_AT));
+      if (!res.ok || !res.body) {
+        const errData = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+        throw new Error(errData.error || `HTTP ${res.status}`);
+      }
 
-    return () => timers.forEach(clearTimeout);
-  }, [building]);
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let lineBuffer = "";
+      let localTotal = 0;
+      let localDone = 0;
+      let latestFiles: Record<string, string> | null = null;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        lineBuffer += decoder.decode(value, { stream: true });
+        const lines = lineBuffer.split("\n");
+        lineBuffer = lines.pop() || "";
+
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const jsonStr = line.slice(6).trim();
+          if (!jsonStr) continue;
+
+          let event: Record<string, unknown>;
+          try {
+            event = JSON.parse(jsonStr);
+          } catch {
+            continue;
+          }
+
+          const type = event.type as string;
+
+          if (type === "status") {
+            const message = (event.message as string) || "";
+            const phaseKey = (event.phase as string) || "";
+            if (message) setLiveMessage(message);
+
+            const idx = phaseToAgentIdx(phaseKey);
+            if (idx >= 0) {
+              setActiveAgentIdx((prev) => (idx > prev ? idx : prev));
+            }
+
+            const progress = localTotal > 0 ? localDone / localTotal : 0;
+            if (phaseKey) {
+              setPhase(phaseToBuildStage(phaseKey, progress));
+            }
+
+            // Pull brandName out of status messages like
+            // "Customising N components for <Brand>…"
+            const m = message.match(/for (.+?)[…\.]/);
+            if (m && m[1]) setBrandName(m[1].trim());
+          } else if (type === "partial") {
+            const files = event.files as Record<string, string> | undefined;
+            if (files) {
+              latestFiles = files;
+            }
+            if (typeof event.fileCount === "number") {
+              localDone = event.fileCount;
+              setComponentsDone(event.fileCount);
+            }
+            if (typeof event.totalComponents === "number") {
+              localTotal = event.totalComponents;
+              setComponentsTotal(event.totalComponents);
+            }
+            // Drive the morph canvas proportionally through stages
+            const progress = localTotal > 0 ? localDone / localTotal : 0;
+            setPhase(phaseToBuildStage("generating", progress));
+          } else if (type === "done") {
+            const files = (event.files as Record<string, string>) || latestFiles;
+            if (files && typeof window !== "undefined") {
+              try {
+                sessionStorage.setItem(
+                  "zoobicon_hero_build",
+                  JSON.stringify({
+                    prompt: userPrompt,
+                    files,
+                    brandName,
+                    at: Date.now(),
+                  })
+                );
+              } catch {
+                // Storage quota / private mode — safe to ignore;
+                // the builder page will regenerate from the prompt.
+              }
+            }
+            setPhase("done");
+            setActiveAgentIdx(AGENTS.length - 1);
+            setShowClaim(true);
+            setLiveMessage("");
+            return;
+          } else if (type === "error") {
+            throw new Error(
+              (event.message as string) || "Generation failed"
+            );
+          }
+        }
+      }
+
+      // Stream ended without an explicit done event — still show claim
+      setPhase("done");
+      setShowClaim(true);
+    } catch (err) {
+      if ((err as Error).name === "AbortError") return;
+      const msg =
+        err instanceof Error ? err.message : "Something went wrong";
+      setStreamError(msg);
+      setLiveMessage("");
+    }
+  };
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -202,10 +364,12 @@ export default function HeroBuilder() {
     if (!p) return;
     setPrompt(p);
     setBuilding(true);
+    setStreamError("");
+    void runRealStream(p);
   };
 
   const goToBuilder = () => {
-    router.push(`/builder?prompt=${encodeURIComponent(prompt)}`);
+    router.push(`/builder?prompt=${encodeURIComponent(prompt)}&fromHero=1`);
   };
 
   const phaseShown = (key: BuildPhase) => {
@@ -268,17 +432,36 @@ export default function HeroBuilder() {
           })}
         </div>
 
-        {/* Active agent's broadcast line */}
-        <div className="mt-4 h-5 text-center">
+        {/* Live broadcast line — real server message, fallback to fixture */}
+        <div className="mt-4 min-h-[20px] text-center px-4">
           {building && activeAgentIdx >= 0 && (
             <p
-              key={activeAgentIdx}
+              key={`${activeAgentIdx}-${liveMessage}`}
               className="text-[13px] text-white/60 animate-[fadeIn_0.4s_ease-out]"
             >
               <span className="text-white/40">
                 {AGENTS[activeAgentIdx].agent}:
               </span>{" "}
-              <span className="italic">{AGENTS[activeAgentIdx].line}</span>
+              <span className="italic">
+                {liveMessage || AGENTS[activeAgentIdx].line}
+              </span>
+              {componentsTotal > 0 && (
+                <span className="ml-2 font-mono text-[11px] text-white/35">
+                  {componentsDone}/{componentsTotal}
+                </span>
+              )}
+            </p>
+          )}
+          {streamError && (
+            <p className="text-[13px] text-rose-300/80 animate-[fadeIn_0.4s_ease-out]">
+              <span className="text-rose-400/70">Build failed:</span>{" "}
+              <span className="italic">{streamError}</span>{" "}
+              <button
+                onClick={resetBuild}
+                className="ml-2 underline underline-offset-2 hover:text-rose-200"
+              >
+                Try again
+              </button>
             </p>
           )}
         </div>
@@ -298,9 +481,9 @@ export default function HeroBuilder() {
             it build.
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-base sm:text-lg leading-relaxed text-white/55">
-            This page is the product. Type a sentence below and the homepage
-            you're looking at will rebuild itself as whatever you just
-            described — in under eight seconds.
+            This page is the product. Type a sentence below and six AI
+            agents will stream a complete, deployable website into the
+            preview — live, in front of you.
           </p>
         </div>
       )}
@@ -417,7 +600,7 @@ export default function HeroBuilder() {
                   <div className="flex items-center gap-2">
                     <div className="h-5 w-5 rounded-md bg-[#E8D4B0]" />
                     <span className="text-[13px] font-semibold tracking-tight text-white">
-                      Your brand
+                      {brandName || "Your brand"}
                     </span>
                   </div>
                   <div className="hidden items-center gap-5 text-[11px] text-white/50 sm:flex">
@@ -512,8 +695,12 @@ export default function HeroBuilder() {
                     phaseShown("footer") ? "opacity-100" : "opacity-0"
                   }`}
                 >
-                  <span>© Your brand — built with Zoobicon</span>
-                  <span className="font-mono">Live in 8.0s</span>
+                  <span>© {brandName || "Your brand"} — built with Zoobicon</span>
+                  <span className="font-mono">
+                    {componentsTotal > 0
+                      ? `${componentsDone}/${componentsTotal} components`
+                      : "Live streaming"}
+                  </span>
                 </div>
 
                 {/* done badge */}

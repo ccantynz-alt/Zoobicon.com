@@ -684,6 +684,38 @@ function BuilderPage() {
       if (urlPrompt && !prompt) {
         setPrompt(decodeURIComponent(urlPrompt));
       }
+
+      // Hero-to-builder handoff: when the homepage HeroBuilder has
+      // already streamed a full build, it parks {prompt, files, brandName}
+      // in sessionStorage under "zoobicon_hero_build" and routes here with
+      // ?fromHero=1. Pick it up so the builder shows the already-built
+      // site instantly instead of regenerating from scratch.
+      if (params.get("fromHero") === "1") {
+        const raw = sessionStorage.getItem("zoobicon_hero_build");
+        if (raw) {
+          try {
+            const parsed = JSON.parse(raw) as {
+              prompt?: string;
+              files?: Record<string, string>;
+              brandName?: string;
+              at?: number;
+            };
+            // Only accept handoffs younger than 10 minutes to avoid
+            // resurrecting a stale build from a previous session.
+            const fresh =
+              parsed.at && Date.now() - parsed.at < 10 * 60 * 1000;
+            if (fresh && parsed.files && Object.keys(parsed.files).length > 0) {
+              if (parsed.prompt) setPrompt(parsed.prompt);
+              setReactFiles(parsed.files);
+              setGeneratedCode("<!-- react-app-mode -->");
+              setStatus("complete");
+            }
+            sessionStorage.removeItem("zoobicon_hero_build");
+          } catch {
+            // malformed — ignore and fall through to normal flow
+          }
+        }
+      }
     } catch {}
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
