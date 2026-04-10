@@ -609,6 +609,24 @@ function BuilderPage() {
   const watchdogSlowRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const watchdogStuckRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const timelineScrollRef = useRef<HTMLDivElement | null>(null);
+
+  const clearWatchdog = useCallback(() => {
+    if (watchdogSlowRef.current) clearTimeout(watchdogSlowRef.current);
+    if (watchdogStuckRef.current) clearTimeout(watchdogStuckRef.current);
+    watchdogSlowRef.current = null;
+    watchdogStuckRef.current = null;
+    setStreamWarning(null);
+  }, []);
+
+  const resetWatchdog = useCallback(() => {
+    clearWatchdog();
+    watchdogSlowRef.current = setTimeout(() => {
+      setStreamWarning("Generation is taking longer than usual...");
+    }, 30000);
+    watchdogStuckRef.current = setTimeout(() => {
+      setStreamWarning("Generation appears stuck. You can wait or try again.");
+    }, 90000);
+  }, [clearWatchdog]);
   // hasCode must check for REAL content — not just the "<!-- react-app-mode -->" marker
   // which can linger after a failed generation, leaving the builder stuck in "AI Editor" mode
   const hasCode = generatedCode.length > 0 && (
@@ -1066,24 +1084,6 @@ function BuilderPage() {
           lineBuffer += finalText;
           processStreamLines(lineBuffer.split("\n"));
         }
-
-  const clearWatchdog = useCallback(() => {
-    if (watchdogSlowRef.current) clearTimeout(watchdogSlowRef.current);
-    if (watchdogStuckRef.current) clearTimeout(watchdogStuckRef.current);
-    watchdogSlowRef.current = null;
-    watchdogStuckRef.current = null;
-    setStreamWarning(null);
-  }, []);
-
-  const resetWatchdog = useCallback(() => {
-    clearWatchdog();
-    watchdogSlowRef.current = setTimeout(() => {
-      setStreamWarning("Generation is taking longer than usual...");
-    }, 30000);
-    watchdogStuckRef.current = setTimeout(() => {
-      setStreamWarning("Generation appears stuck. You can wait or try again.");
-    }, 90000);
-  }, [clearWatchdog]);
 
         if (accumulated) {
           // Clean accumulated HTML — strip code fences, JSON preamble
