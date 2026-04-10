@@ -174,6 +174,15 @@ export default function LoginPage() {
               Sign up free
             </Link>
           </p>
+
+          <div className="mt-4 pt-4 border-t border-white/[0.04] text-center">
+            <Link
+              href="/admin-recover"
+              className="text-xs text-white/40 hover:text-amber-400/80 transition-colors"
+            >
+              Admin locked out? Use recovery token →
+            </Link>
+          </div>
         </div>
       </div>
 

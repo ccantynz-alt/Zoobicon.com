@@ -54,15 +54,63 @@ interface SSEWriter {
   close: () => void;
 }
 
+/**
+ * Map the route's semantic event names to the legacy event types the builder
+ * client understands. The builder reads `data:` lines and dispatches on
+ * `event.type`, accepting: status | partial | scaffold | scaffold-update |
+ * customization | done | error.
+ *
+ * Previously, this writer emitted `event: NAME\ndata: {...}\n\n` SSE frames
+ * — proper SSE — but the builder client never reads `event:` lines. Every
+ * message was silently dropped and the safety net fired "No components
+ * generated." That's the bug Craig has been hitting.
+ */
+function mapEvent(name: string, data: unknown): Record<string, unknown> {
+  const obj =
+    data && typeof data === "object" && !Array.isArray(data)
+      ? (data as Record<string, unknown>)
+      : { data };
+
+  switch (name) {
+    case "phase":
+      // { phase, message } → status event the builder shows in the pipeline log
+      return { type: "status", message: obj.message || obj.phase || "Working…", ...obj };
+    case "files":
+      // { files } → partial event the builder uses to update Sandpack preview
+      return { type: "partial", ...obj };
+    case "component": {
+      // { name, code, position } → status log entry (partial already carries files)
+      const position = typeof obj.position === "number" ? obj.position + 1 : undefined;
+      return {
+        type: "status",
+        message: position ? `Customising ${obj.name} (#${position})` : `Customising ${obj.name}`,
+        section: obj.name,
+        phase: "building",
+      };
+    }
+    case "supabase":
+      return { type: "status", message: "Backend provisioned", supabase: obj };
+    case "score":
+      return { type: "status", message: `Quality score: ${obj.score ?? "?"}`, ...obj };
+    case "done":
+      return { type: "done", ...obj };
+    case "error":
+      return { type: "error", ...obj };
+    default:
+      return { type: name, ...obj };
+  }
+}
+
 function makeWriter(controller: ReadableStreamDefaultController<Uint8Array>): SSEWriter {
   const encoder = new TextEncoder();
   let closed = false;
   return {
     send(event, data) {
       if (closed) return;
-      const payload = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+      const payload = mapEvent(event, data);
+      const sse = `data: ${JSON.stringify(payload)}\n\n`;
       try {
-        controller.enqueue(encoder.encode(payload));
+        controller.enqueue(encoder.encode(sse));
       } catch {
         closed = true;
       }
@@ -170,17 +218,25 @@ function inferBrandName(prompt: string): string {
 async function planComponents(prompt: string): Promise<PlanResult> {
   const { getById, selectComponentsForPrompt } = await getRegistry();
 
-  const res = await callClaude({
-    model: MODEL_HAIKU,
-    system: "Return only JSON matching the schema.",
-    systemCacheable: await getPlannerSystemCacheable(),
-    messages: [{ role: "user", content: `User prompt: ${prompt}` }],
-    maxTokens: 1500,
-    temperature: 0.4,
-  });
+  // Planning uses callLLMWithFailover so Anthropic outages don't kill builds.
+  // Order: Anthropic Haiku (fastest) → Sonnet → OpenAI → Gemini.
+  let text = "";
+  try {
+    const plannerSystem =
+      "Return only JSON matching the schema.\n\n" + (await getPlannerSystemCacheable());
+    const res = await callLLMWithFailover({
+      model: MODEL_HAIKU,
+      system: plannerSystem,
+      userMessage: `User prompt: ${prompt}`,
+      maxTokens: 1500,
+    });
+    text = res.text || "";
+  } catch (err) {
+    console.warn("[react-stream] planComponents LLM failed, using registry fallback:", err);
+    // Registry fallback will take over below — no throw.
+  }
 
-  const text = res.content.map((c) => c.text ?? "").join("");
-  const parsed = safeParseJson<PlannerOutput>(text);
+  const parsed = text ? safeParseJson<PlannerOutput>(text) : null;
 
   const resolved: RegistryComponent[] = [];
   if (parsed && Array.isArray(parsed.selections)) {
@@ -252,20 +308,36 @@ async function customiseComponent(args: CustomiseArgs): Promise<string> {
     `BASE COMPONENT FILE:\n${args.baseCode}\n\n` +
     `Output the full updated TypeScript file only.`;
 
-  let collected = "";
-  for await (const delta of streamClaude({
-    model: args.model,
-    system: CUSTOMISER_SYSTEM,
-    messages: [{ role: "user", content: userMsg }],
-    maxTokens: 4000,
-    temperature: 0.6,
-  })) {
-    if (delta.type === "text" && delta.text) {
-      collected += delta.text;
+  // Try streaming Claude first (fastest path when Anthropic is healthy).
+  try {
+    let collected = "";
+    for await (const delta of streamClaude({
+      model: args.model,
+      system: CUSTOMISER_SYSTEM,
+      messages: [{ role: "user", content: userMsg }],
+      maxTokens: 4000,
+      temperature: 0.6,
+    })) {
+      if (delta.type === "text" && delta.text) {
+        collected += delta.text;
+      }
     }
+    if (collected.trim().length > 100) {
+      return stripFencesAndWrap(collected);
+    }
+    // Empty / too-short — fall through to cross-provider failover
+  } catch (err) {
+    console.warn(`[react-stream] streamClaude failed for ${args.category}, trying failover:`, err);
   }
 
-  return stripFencesAndWrap(collected);
+  // Failover path — callLLMWithFailover cycles Anthropic → OpenAI → Gemini
+  const fb = await callLLMWithFailover({
+    model: args.model,
+    system: CUSTOMISER_SYSTEM,
+    userMessage: userMsg,
+    maxTokens: 4000,
+  });
+  return stripFencesAndWrap(fb.text || "");
 }
 
 function buildPackageJson(opts?: { withSupabase?: boolean }): string {
@@ -371,6 +443,19 @@ export async function POST(req: NextRequest): Promise<Response> {
         const wantsSupabase = needsSupabase(supabaseNeeds);
         const supabaseAvailable = wantsSupabase && isSupabaseConfigured();
 
+        // ── FLOOR: emit an empty scaffold IMMEDIATELY so the builder always
+        // has `receivedFiles=true` before planning runs. If planning fails,
+        // the real error message survives instead of being overridden by the
+        // client-side "No components generated" safety net.
+        const registry = await getRegistry();
+        const files: Record<string, string> = {
+          "package.json": buildPackageJson({ withSupabase: wantsSupabase }),
+          "tailwind.config.js": buildTailwindConfig(),
+          "styles.css": registry.buildStylesFile({ primaryColor: "#4f46e5", bgColor: "#ffffff" }),
+          "App.tsx": registry.buildAppFile([]),
+        };
+        writer.send("files", { files, fileCount: 0, totalComponents: 0 });
+
         // ── PHASE 2: selecting ──
         writer.send("phase", {
           phase: "selecting",
@@ -379,15 +464,9 @@ export async function POST(req: NextRequest): Promise<Response> {
         const { components, brandName, primaryColor, bgColor } =
           await planComponents(prompt);
 
-        const registry = await getRegistry();
-
-        const files: Record<string, string> = {
-          "package.json": buildPackageJson({ withSupabase: wantsSupabase }),
-          "tailwind.config.js": buildTailwindConfig(),
-          "styles.css": registry.buildStylesFile({ primaryColor, bgColor }),
-          "App.tsx": registry.buildAppFile([]),
-        };
-        writer.send("files", { files });
+        // Update styles with the real brand colours now that planning succeeded
+        files["styles.css"] = registry.buildStylesFile({ primaryColor, bgColor });
+        writer.send("files", { files, fileCount: 0, totalComponents: components.length });
 
         // ── PHASE 3: generating (customise each component) ──
         writer.send("phase", {
@@ -426,6 +505,17 @@ export async function POST(req: NextRequest): Promise<Response> {
             name: comp.id,
             code: updatedCode,
             position: i,
+          });
+
+          // Progressive update — push the current files map so Sandpack
+          // preview rebuilds after every customised component. This is what
+          // makes the site appear to "build itself" in front of the user.
+          writer.send("files", {
+            files,
+            fileCount: i + 1,
+            totalComponents: components.length,
+            section: comp.id,
+            customized: true,
           });
         }
 
