@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { useTemplate } from "@/lib/template-marketplace";
+import { useTemplate as applyTemplate } from "@/lib/template-marketplace";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -10,7 +10,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     if (!body.templateId || !body.buyerId) {
       return NextResponse.json({ error: "templateId and buyerId required" }, { status: 400 });
     }
-    const result = await useTemplate(body.templateId, body.buyerId);
+    const result = await applyTemplate(body.templateId, body.buyerId);
     return NextResponse.json(result);
   } catch (err) {
     const message = err instanceof Error ? err.message : "unknown_error";

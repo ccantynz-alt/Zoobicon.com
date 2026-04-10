@@ -321,7 +321,7 @@ export function validateCode(code: string, language: Language): ValidationResult
 
   if (language === "js") {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-implied-eval, no-new-func
+      // eslint-disable-next-line no-new-func
       new Function(code);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
