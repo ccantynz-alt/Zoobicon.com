@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCircuitState, isCircuitOpen } from "@/lib/resilience";
+import { getCircuitState } from "@/lib/resilience";
 import { isTokenPoisoned as isSupabasePoisoned } from "@/lib/supabase-provisioner";
+import { isReplicatePoisoned } from "@/lib/video-pipeline";
 
 /**
  * GET /api/health/deep
@@ -158,6 +159,21 @@ async function checkGemini(): Promise<ProviderCheck> {
 }
 
 async function checkReplicate(): Promise<ProviderCheck> {
+  // Poison state check first — if we've seen a 401/403 this cold start we
+  // already know the token is bad; don't pay another round-trip to confirm.
+  const poison = isReplicatePoisoned();
+  if (poison.poisoned) {
+    return {
+      name: "Replicate",
+      category: "video",
+      status: "fail",
+      message: `Token poisoned this cold start — ${poison.reason}`,
+      latencyMs: 0,
+      circuitState: "open",
+      envVar: "REPLICATE_API_TOKEN",
+      required: false,
+    };
+  }
   const key = process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY;
   if (!key) return missingEnv("Replicate (video)", "REPLICATE_API_TOKEN", "video", false);
   const { err, ms } = await timed(async () => {
