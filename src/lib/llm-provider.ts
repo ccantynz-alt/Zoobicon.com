@@ -95,6 +95,7 @@ async function callOpenAI(req: LLMRequest): Promise<LLMResponse> {
         { role: "user", content: req.userMessage },
       ],
     }),
+    signal: AbortSignal.timeout(60000),
   });
 
   if (!res.ok) {
@@ -129,6 +130,7 @@ async function callGemini(req: LLMRequest): Promise<LLMResponse> {
         maxOutputTokens: req.maxTokens || 65536,
       },
     }),
+    signal: AbortSignal.timeout(60000),
   });
 
   if (!res.ok) {
