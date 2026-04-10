@@ -236,15 +236,18 @@ export function assembleComponents(
     brandName?: string;
     primaryColor?: string;
     bgColor?: string;
+    theme?: "editorial" | "raw";
   }
 ): Record<string, string> {
   const files: Record<string, string> = {};
+  const theme = options?.theme ?? "editorial";
 
   // Generate individual component files
   for (const comp of components) {
     const componentName = capitalize(comp.category);
     const fileName = `components/${componentName}.tsx`;
-    files[fileName] = `import React from "react";\n\n${comp.code}\n`;
+    const body = theme === "editorial" ? reskinEditorial(comp.code) : comp.code;
+    files[fileName] = `import React from "react";\n\n${body}\n`;
   }
 
   // Generate App.tsx that imports and renders all components in order
@@ -274,89 +277,11 @@ ${renders}
   );
 }`;
 
-  // Generate styles.css with font import and minimal reset
-  const primaryColor = options?.primaryColor || "#4f46e5";
-  const bgColor = options?.bgColor || "#ffffff";
+  // Generate styles.css — editorial design system (default) or raw theme
+  const primaryColor = options?.primaryColor || (theme === "editorial" ? "#1c1917" : "#4f46e5");
+  const bgColor = options?.bgColor || (theme === "editorial" ? "#FAF9F6" : "#ffffff");
 
-  files["styles.css"] = `@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-
-:root {
-  --color-primary: ${primaryColor};
-  --color-bg: ${bgColor};
-  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  font-family: var(--font-body);
-  background: var(--color-bg);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-img {
-  max-width: 100%;
-  height: auto;
-}
-
-/* ── Premium Micro-Interactions ── */
-
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeInScale {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-/* Staggered section reveal */
-section {
-  animation: fadeInUp 0.7s ease-out both;
-}
-section:nth-child(2) { animation-delay: 0.1s; }
-section:nth-child(3) { animation-delay: 0.15s; }
-section:nth-child(4) { animation-delay: 0.2s; }
-section:nth-child(5) { animation-delay: 0.25s; }
-section:nth-child(n+6) { animation-delay: 0.3s; }
-
-/* Card hover lift */
-.group:hover {
-  transform: translateY(-2px);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
-}
-
-/* Focus accessibility */
-a:focus-visible, button:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-/* Button press feedback */
-button:active {
-  transform: scale(0.98);
-}
-
-/* Respect reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-`;
+  files["styles.css"] = buildStylesFile({ primaryColor, bgColor, theme });
 
   return files;
 }
@@ -382,15 +307,20 @@ export function buildFromPrompt(
 
 /**
  * Build the styles.css file with given colors.
+ * Default theme is "editorial" — the world-stage typographic preset that every
+ * Zoobicon-generated site ships with. Use theme "raw" to opt out.
  */
 export function buildStylesFile(options?: {
   primaryColor?: string;
   bgColor?: string;
+  theme?: "editorial" | "raw";
 }): string {
-  const primaryColor = options?.primaryColor || "#4f46e5";
-  const bgColor = options?.bgColor || "#ffffff";
+  const theme = options?.theme ?? "editorial";
+  const primaryColor = options?.primaryColor || (theme === "editorial" ? "#1c1917" : "#4f46e5");
+  const bgColor = options?.bgColor || (theme === "editorial" ? "#FAF9F6" : "#ffffff");
 
-  return `@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  if (theme === "raw") {
+    return `@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
 :root {
   --color-primary: ${primaryColor};
@@ -398,38 +328,169 @@ export function buildStylesFile(options?: {
   --font-body: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 body {
   font-family: var(--font-body);
   background: var(--color-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+img { max-width: 100%; height: auto; }
+`;
+  }
 
-img {
-  max-width: 100%;
-  height: auto;
+  // Editorial — world-stage typography + restrained palette
+  return `@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&display=swap');
+
+:root {
+  --color-primary: ${primaryColor};
+  --color-bg: ${bgColor};
+  --color-ink: #1c1917;
+  --color-ink-soft: #44403c;
+  --color-paper: #FAF9F6;
+  --color-accent: #E8D4B0;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Fraunces', 'Times New Roman', Georgia, serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-feature-settings: "ss01", "cv11", "kern";
+  letter-spacing: -0.003em;
+}
+
+img, video { max-width: 100%; height: auto; }
+
+/* ── Editorial display typography ── */
+h1, h2, h3 {
+  letter-spacing: -0.025em;
+  font-feature-settings: "ss01", "cv11", "kern";
+}
+h1 { line-height: 1.02; }
+h2 { line-height: 1.08; }
+h3 { line-height: 1.15; }
+
+/* <em> inside headlines becomes Fraunces italic — the signature display accent */
+h1 em, h2 em, h3 em, .display-accent {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.035em;
+}
+
+/* Body prose */
+p {
+  line-height: 1.62;
+  font-feature-settings: "ss01", "cv11", "kern";
+}
+
+/* ── Measured motion ── */
+
+@keyframes editorialFadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes editorialFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+section {
+  animation: editorialFadeUp 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+section:nth-of-type(2) { animation-delay: 0.05s; }
+section:nth-of-type(3) { animation-delay: 0.10s; }
+section:nth-of-type(4) { animation-delay: 0.15s; }
+section:nth-of-type(5) { animation-delay: 0.20s; }
+section:nth-of-type(n+6) { animation-delay: 0.25s; }
+
+/* Buttons — restrained */
+button, a[class*="rounded"] {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              background-color 0.25s ease,
+              color 0.25s ease,
+              border-color 0.25s ease,
+              box-shadow 0.35s ease;
+}
+button:active { transform: translateY(0.5px); }
+
+/* Focus — thin, warm */
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+  outline: 1.5px solid var(--color-ink);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Selection */
+::selection {
+  background: var(--color-accent);
+  color: var(--color-ink);
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 `;
 }
 
 /**
- * Build a single component file.
+ * Rewrite vibrant Tailwind color utilities (violet/purple/fuchsia/pink/etc.)
+ * into a restrained stone palette so every generated site inherits the
+ * editorial look without touching any individual component file.
+ *
+ * Matches any Tailwind utility of the form:
+ *    [state:]?<util>-<family>-<shade>[/<opacity>]
+ * where state is hover:, focus:, group-hover:, dark:, md:, etc.
  */
-export function buildComponentFile(component: RegistryComponent): { fileName: string; code: string } {
+export function reskinEditorial(code: string): string {
+  const COLORS =
+    "violet|purple|fuchsia|pink|rose|indigo|blue|sky|cyan|teal|emerald|green|lime|yellow|amber|orange|red";
+  const UTILS =
+    "from|via|to|text|bg|border|shadow|ring|ring-offset|outline|decoration|divide|placeholder|caret|accent|fill|stroke";
+  // (?:[a-z-]+:)* allows arbitrary prefix chains like "md:hover:group-hover:"
+  const re = new RegExp(
+    `((?:[a-z-]+:)*)(${UTILS})-(?:${COLORS})-(\\d{2,3})(\\/\\d+)?`,
+    "g"
+  );
+  return code.replace(re, (_m, prefix, util, shade, opacity) => {
+    return `${prefix}${util}-stone-${shade}${opacity || ""}`;
+  });
+}
+
+/**
+ * Build a single component file.
+ * Applies the editorial reskin by default (theme: "editorial"). Pass
+ * theme: "raw" to emit the original vibrant palette.
+ */
+export function buildComponentFile(
+  component: RegistryComponent,
+  options?: { theme?: "editorial" | "raw" }
+): { fileName: string; code: string } {
+  const theme = options?.theme ?? "editorial";
   const componentName = capitalize(component.category);
+  const body = theme === "editorial" ? reskinEditorial(component.code) : component.code;
   return {
     fileName: `components/${componentName}.tsx`,
-    code: `import React from "react";\n\n${component.code}\n`,
+    code: `import React from "react";\n\n${body}\n`,
   };
 }
 
