@@ -251,8 +251,8 @@ async function planComponents(prompt: string): Promise<PlanResult> {
     return {
       components: fallback,
       brandName: parsed?.brandName ?? inferBrandName(prompt),
-      primaryColor: parsed?.primaryColor ?? "#4f46e5",
-      bgColor: parsed?.bgColor ?? "#ffffff",
+      primaryColor: parsed?.primaryColor ?? "#1c1917",
+      bgColor: parsed?.bgColor ?? "#FAF9F6",
     };
   }
 
@@ -278,7 +278,14 @@ Hard rules:
 - Keep imports identical unless you genuinely need a new one.
 - Replace AI-slop words ("revolutionary", "unleash", "empower", "synergy", "next-generation", "game-changer", "leverage", "elevate", "seamless", "cutting-edge") with specific copy.
 - Use real-sounding metrics, not "10,000+ users".
-- Add aria-labels to icon-only buttons. Add alt text to images. Keep responsive classes.`;
+- Add aria-labels to icon-only buttons. Add alt text to images. Keep responsive classes.
+
+EDITORIAL DESIGN SYSTEM — MANDATORY
+This site ships on the Zoobicon editorial preset. It is a restrained, world-stage typographic aesthetic. You MUST:
+- Use ONLY the stone- color family for every Tailwind color utility (from, via, to, text, bg, border, shadow, ring, outline, divide, etc.). NO violet, purple, fuchsia, pink, rose, indigo, blue, sky, cyan, teal, emerald, green, lime, yellow, amber, orange, red. Gray/slate/neutral/zinc/stone/black/white are fine, but prefer stone.
+- Wrap one word or short phrase in each h1/h2 in <em>…</em> so the editorial Fraunces italic serif accent kicks in. Example: <h1>Design that <em>moves</em> people.</h1>
+- Keep motion measured — subtle transitions only. No neon glows, no vibrant shadows, no arcade colors.
+- Prefer understated copy. Editorial voice, not landing-page hype.`;
 
 interface CustomiseArgs {
   baseCode: string;
@@ -451,7 +458,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         const files: Record<string, string> = {
           "package.json": buildPackageJson({ withSupabase: wantsSupabase }),
           "tailwind.config.js": buildTailwindConfig(),
-          "styles.css": registry.buildStylesFile({ primaryColor: "#4f46e5", bgColor: "#ffffff" }),
+          "styles.css": registry.buildStylesFile({ primaryColor: "#1c1917", bgColor: "#FAF9F6" }),
           "App.tsx": registry.buildAppFile([]),
         };
         writer.send("files", { files, fileCount: 0, totalComponents: 0 });
@@ -464,8 +471,9 @@ export async function POST(req: NextRequest): Promise<Response> {
         const { components, brandName, primaryColor, bgColor } =
           await planComponents(prompt);
 
-        // Update styles with the real brand colours now that planning succeeded
-        files["styles.css"] = registry.buildStylesFile({ primaryColor, bgColor });
+        // Update styles with the real brand colours now that planning succeeded.
+        // Theme stays editorial — Fraunces + Inter + measured motion.
+        files["styles.css"] = registry.buildStylesFile({ primaryColor, bgColor, theme: "editorial" });
         writer.send("files", { files, fileCount: 0, totalComponents: components.length });
 
         // ── PHASE 3: generating (customise each component) ──
@@ -495,6 +503,12 @@ export async function POST(req: NextRequest): Promise<Response> {
             // Fallback: use template code as-is
             updatedCode = `import React from "react";\n\n${comp.code}\n`;
           }
+
+          // Editorial reskin — guarantees every shipped component uses the
+          // restrained stone palette even when the LLM ignores the system
+          // prompt and emits violet/cyan/fuchsia classes anyway. Regex-only;
+          // safe on already-reskinned code (idempotent).
+          updatedCode = registry.reskinEditorial(updatedCode);
 
           const { fileName } = registry.buildComponentFile(comp);
           files[fileName] = updatedCode;
