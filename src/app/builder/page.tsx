@@ -457,8 +457,8 @@ export default function BuilderPageWrapper() {
         <div className="max-w-lg text-center">
           <h1 className="text-2xl font-bold text-white mb-4">Builder Error</h1>
           <p className="text-white/60 mb-4">The builder hit an error. Details below:</p>
-          <pre className="bg-zinc-900 border border-white/10 rounded-lg p-4 text-left text-sm text-red-400 overflow-auto max-h-60 mb-6">{crashed}</pre>
-          <button onClick={() => { setCrashed(null); window.location.reload(); }} className="px-6 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-500 transition-colors">
+          <pre className="bg-zinc-900 border border-white/10 rounded-lg p-4 text-left text-sm text-stone-400 overflow-auto max-h-60 mb-6">{crashed}</pre>
+          <button onClick={() => { setCrashed(null); window.location.reload(); }} className="px-6 py-2 bg-stone-600 text-white rounded-lg hover:bg-stone-500 transition-colors">
             Reload
           </button>
         </div>
@@ -1614,8 +1614,8 @@ root.render(React.createElement(App));
       <div className="h-screen w-screen bg-[#050508] relative overflow-hidden">
         {/* Minimal recording chrome — press Escape to exit */}
         <div className="absolute top-3 right-3 z-50 flex items-center gap-2">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/20 border border-red-500/40 text-red-400 text-xs font-semibold animate-pulse">
-            <span className="w-2 h-2 rounded-full bg-red-500" />
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-500/20 border border-stone-500/40 text-stone-400 text-xs font-semibold animate-pulse">
+            <span className="w-2 h-2 rounded-full bg-stone-500" />
             REC
           </div>
           <button
@@ -1631,7 +1631,7 @@ root.render(React.createElement(App));
           <div className="absolute bottom-6 left-6 right-6 z-40">
             <div className="max-w-xl mx-auto px-5 py-3 rounded-2xl bg-black/70 backdrop-blur-xl border border-white/[0.08] shadow-2xl">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-violet-500 animate-pulse flex-shrink-0" />
+                <div className="w-2.5 h-2.5 rounded-full bg-stone-500 animate-pulse flex-shrink-0" />
                 <span className="text-sm text-white/80 font-medium truncate">
                   {pipelineAgents[pipelineAgents.length - 1]}
                 </span>
@@ -1644,13 +1644,13 @@ root.render(React.createElement(App));
               {buildProgress && buildProgress.total > 0 && (
                 <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 transition-all duration-500 ease-out"
+                    className="h-full rounded-full bg-gradient-to-r from-stone-500 to-stone-500 transition-all duration-500 ease-out"
                     style={{ width: `${Math.round((buildProgress.current / buildProgress.total) * 100)}%` }}
                   />
                 </div>
               )}
               {streamWarning && (
-                <div className="flex items-center gap-2 text-[10px] text-amber-400 mt-2">
+                <div className="flex items-center gap-2 text-[10px] text-stone-400 mt-2">
                   <AlertTriangle className="w-3 h-3" />
                   <span>{streamWarning}</span>
                 </div>
@@ -1662,9 +1662,9 @@ root.render(React.createElement(App));
                     return (
                       <div key={s.section} className="flex items-center gap-2 text-[10px]">
                         {s.status === "done" ? (
-                          <Check className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                          <Check className="w-3 h-3 text-stone-400 flex-shrink-0" />
                         ) : (
-                          <span className="w-2 h-2 rounded-full bg-violet-500 animate-pulse flex-shrink-0" />
+                          <span className="w-2 h-2 rounded-full bg-stone-500 animate-pulse flex-shrink-0" />
                         )}
                         <span className={s.status === "done" ? "text-white/60" : "text-white/90"}>{s.label}</span>
                         {elapsed && <span className="text-white/30 ml-auto tabular-nums">{elapsed}s</span>}
@@ -1679,22 +1679,22 @@ root.render(React.createElement(App));
 
         {buildError && (
           <div className="absolute top-16 left-6 right-6 z-50">
-            <div className="max-w-2xl mx-auto px-4 py-3 rounded-xl bg-red-950/90 backdrop-blur-xl border border-red-500/40 shadow-2xl">
+            <div className="max-w-2xl mx-auto px-4 py-3 rounded-xl bg-stone-950/90 backdrop-blur-xl border border-stone-500/40 shadow-2xl">
               <div className="flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                <AlertTriangle className="w-5 h-5 text-stone-400 flex-shrink-0 mt-0.5" />
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-semibold text-red-200">{buildError.message}</div>
-                  <div className="text-xs text-red-300/80 mt-0.5">{buildError.suggestion}</div>
+                  <div className="text-sm font-semibold text-stone-200">{buildError.message}</div>
+                  <div className="text-xs text-stone-300/80 mt-0.5">{buildError.suggestion}</div>
                 </div>
                 <button
                   onClick={() => { setBuildError(null); handleGenerate(); }}
-                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-xs text-red-100 border border-red-500/40 transition"
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-stone-500/20 hover:bg-stone-500/30 text-xs text-stone-100 border border-stone-500/40 transition"
                 >
                   <RotateCcw className="w-3 h-3" /> Retry
                 </button>
                 <button
                   onClick={() => setBuildError(null)}
-                  className="p-1.5 rounded-lg hover:bg-red-500/20 text-red-300 transition"
+                  className="p-1.5 rounded-lg hover:bg-stone-500/20 text-stone-300 transition"
                   aria-label="Dismiss"
                 >
                   <X className="w-4 h-4" />
@@ -1725,7 +1725,7 @@ root.render(React.createElement(App));
         {!hasCode && (
           <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-40 w-full max-w-2xl px-6">
             <div className="flex items-center gap-3 px-5 py-4 rounded-2xl bg-black/70 backdrop-blur-xl border border-white/[0.1] shadow-2xl">
-              <Sparkles className="w-5 h-5 text-violet-400 flex-shrink-0" />
+              <Sparkles className="w-5 h-5 text-stone-400 flex-shrink-0" />
               <input
                 type="text"
                 value={prompt}
@@ -1738,8 +1738,8 @@ root.render(React.createElement(App));
                 onClick={() => setInstantMode(!instantMode)}
                 className={`px-3 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-wider transition-all border ${
                   instantMode
-                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-                    : "bg-violet-500/10 border-violet-500/30 text-violet-400"
+                    ? "bg-stone-500/10 border-stone-500/30 text-stone-400"
+                    : "bg-stone-500/10 border-stone-500/30 text-stone-400"
                 }`}
                 title={instantMode ? "Instant: <3s preview from component library" : "Deep Build: full AI generation with Opus (~30s)"}
               >
@@ -1749,7 +1749,7 @@ root.render(React.createElement(App));
                 onClick={() => setFullStack(!fullStack)}
                 className={`px-3 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-wider transition-all border ${
                   fullStack
-                    ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-400"
+                    ? "bg-stone-500/10 border-stone-500/30 text-stone-400"
                     : "bg-white/5 border-white/10 text-white/40"
                 }`}
                 title={fullStack ? "Full-Stack: auto-provisions database, auth, and storage" : "Frontend only: no backend services"}
@@ -1760,7 +1760,7 @@ root.render(React.createElement(App));
               <button
                 onClick={handleGenerate}
                 disabled={!prompt.trim() || status === "generating"}
-                className="px-5 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 text-white text-sm font-semibold hover:from-violet-500 hover:to-purple-500 disabled:opacity-40 transition-all"
+                className="px-5 py-2 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 text-white text-sm font-semibold hover:from-stone-500 hover:to-stone-500 disabled:opacity-40 transition-all"
               >
                 {status === "generating" ? "Building..." : "Generate"}
               </button>
@@ -1804,7 +1804,7 @@ root.render(React.createElement(App));
       <div className="relative z-10 flex items-center h-12 border-b border-white/[0.06] bg-zinc-950/80 backdrop-blur-xl px-3 gap-3">
         {/* Logo + branding */}
         <Link href="/" className="flex items-center gap-2 mr-2 group">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/20 group-hover:shadow-violet-500/40 transition-shadow">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-stone-600 to-stone-600 flex items-center justify-center shadow-lg shadow-stone-500/20 group-hover:shadow-stone-500/40 transition-shadow">
             <Sparkles className="w-3.5 h-3.5 text-white" />
           </div>
           <span className="text-sm font-semibold text-white/80 hidden sm:inline">Zoobicon</span>
@@ -1822,20 +1822,20 @@ root.render(React.createElement(App));
           )}
           {status === "generating" && (
             <div className="flex items-center gap-1.5">
-              <Loader2 className="w-3.5 h-3.5 text-violet-400 animate-spin" />
-              <span className="text-[11px] text-violet-400 font-medium">Building...</span>
+              <Loader2 className="w-3.5 h-3.5 text-stone-400 animate-spin" />
+              <span className="text-[11px] text-stone-400 font-medium">Building...</span>
             </div>
           )}
           {status === "complete" && hasCode && (
             <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-full bg-emerald-400" />
-              <span className="text-[11px] text-emerald-400/70">Ready</span>
+              <div className="w-2 h-2 rounded-full bg-stone-400" />
+              <span className="text-[11px] text-stone-400/70">Ready</span>
             </div>
           )}
           {status === "error" && (
             <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
-              <span className="text-[11px] text-red-400/70">Error</span>
+              <div className="w-2 h-2 rounded-full bg-stone-400 animate-pulse" />
+              <span className="text-[11px] text-stone-400/70">Error</span>
             </div>
           )}
         </div>
@@ -1915,7 +1915,7 @@ root.render(React.createElement(App));
                 title="Save as reusable template"
                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all bg-white/[0.05] text-white/50 hover:text-white/70 hover:bg-white/[0.08] border border-white/[0.06]"
               >
-                {saveStatus === "saved" ? <Check size={13} className="text-emerald-400" /> : <Save size={13} />}
+                {saveStatus === "saved" ? <Check size={13} className="text-stone-400" /> : <Save size={13} />}
                 <span className="hidden sm:inline">{saveStatus === "saving" ? "Saving..." : saveStatus === "saved" ? "Saved" : "Save"}</span>
               </button>
               <button
@@ -1923,8 +1923,8 @@ root.render(React.createElement(App));
                 disabled={isDeploying}
                 className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${
                   isDeploying
-                    ? "bg-violet-500/10 text-violet-300/50 cursor-wait border border-violet-500/20"
-                    : "bg-gradient-to-r from-violet-600 to-purple-600 text-white hover:from-violet-500 hover:to-purple-500 shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 border border-violet-400/20"
+                    ? "bg-stone-500/10 text-stone-300/50 cursor-wait border border-stone-500/20"
+                    : "bg-gradient-to-r from-stone-600 to-stone-600 text-white hover:from-stone-500 hover:to-stone-500 shadow-lg shadow-stone-500/25 hover:shadow-stone-500/40 border border-stone-400/20"
                 }`}
               >
                 <Rocket size={13} className={isDeploying ? "animate-pulse" : ""} />
@@ -1937,7 +1937,7 @@ root.render(React.createElement(App));
               href={deployUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-[11px] text-emerald-400 hover:text-emerald-300 transition-colors px-2"
+              className="flex items-center gap-1 text-[11px] text-stone-400 hover:text-stone-300 transition-colors px-2"
             >
               <Check size={12} />
               <span>Live</span>
@@ -1965,7 +1965,7 @@ root.render(React.createElement(App));
                   {generatorBanner ? (
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-violet-600 to-purple-700 flex items-center justify-center">
+                        <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-stone-600 to-stone-700 flex items-center justify-center">
                           <Sparkles className="w-3 h-3 text-white" />
                         </div>
                         <span className="text-xs font-semibold text-white/80">
@@ -1981,8 +1981,8 @@ root.render(React.createElement(App));
                     </div>
                   ) : (
                     <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-violet-500/15 to-purple-600/15 border border-violet-500/10 flex items-center justify-center">
-                        <MessageSquare className="w-3 h-3 text-violet-400" />
+                      <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-stone-500/15 to-stone-600/15 border border-stone-500/10 flex items-center justify-center">
+                        <MessageSquare className="w-3 h-3 text-stone-400" />
                       </div>
                       <span className="text-xs font-medium text-white/50">
                         AI Website Builder
@@ -1993,14 +1993,14 @@ root.render(React.createElement(App));
 
                 {/* Context import strip */}
                 {mcpContext && (
-                  <div className="px-4 py-1.5 border-b border-white/[0.04] flex items-center gap-2 bg-indigo-500/[0.03]">
-                    <span className="text-[10px] text-indigo-400/70">Context imported</span>
-                    <button onClick={() => setActiveTool("mcp")} className="text-[10px] text-indigo-400/50 hover:text-indigo-400 transition-colors">Manage</button>
+                  <div className="px-4 py-1.5 border-b border-white/[0.04] flex items-center gap-2 bg-stone-500/[0.03]">
+                    <span className="text-[10px] text-stone-400/70">Context imported</span>
+                    <button onClick={() => setActiveTool("mcp")} className="text-[10px] text-stone-400/50 hover:text-stone-400 transition-colors">Manage</button>
                   </div>
                 )}
                 {!mcpContext && !hasCode && (
                   <div className="px-4 py-1.5 border-b border-white/[0.04]">
-                    <button onClick={() => setActiveTool("mcp")} className="flex items-center gap-1.5 text-[10px] text-white/25 hover:text-violet-400/70 transition-colors">
+                    <button onClick={() => setActiveTool("mcp")} className="flex items-center gap-1.5 text-[10px] text-white/25 hover:text-stone-400/70 transition-colors">
                       <ExternalLink size={10} />
                       Import from GitHub, Figma, or URL
                     </button>
@@ -2052,8 +2052,8 @@ root.render(React.createElement(App));
                 {/* Chat header */}
                 <div className="px-4 py-2.5 border-b border-white/[0.06] flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 rounded-md bg-violet-500/10 flex items-center justify-center">
-                      <MessageSquare className="w-3 h-3 text-violet-400" />
+                    <div className="w-5 h-5 rounded-md bg-stone-500/10 flex items-center justify-center">
+                      <MessageSquare className="w-3 h-3 text-stone-400" />
                     </div>
                     <span className="text-xs font-medium text-white/50">Chat</span>
                   </div>
@@ -2110,7 +2110,7 @@ root.render(React.createElement(App));
                   {activeTab === tab && (
                     <motion.div
                       layoutId="activeTab"
-                      className="absolute bottom-0 left-1 right-1 h-[2px] bg-gradient-to-r from-violet-500 to-purple-500 rounded-full"
+                      className="absolute bottom-0 left-1 right-1 h-[2px] bg-gradient-to-r from-stone-500 to-stone-500 rounded-full"
                       transition={{ type: "spring", stiffness: 500, damping: 35 }}
                     />
                   )}
@@ -2120,7 +2120,7 @@ root.render(React.createElement(App));
 
             {/* Error indicator in tab bar */}
             {status === "error" && !hasCode && (
-              <span className="ml-auto text-[11px] text-red-400/80 truncate max-w-[300px] pr-2">
+              <span className="ml-auto text-[11px] text-stone-400/80 truncate max-w-[300px] pr-2">
                 {error}
               </span>
             )}
@@ -2139,14 +2139,14 @@ root.render(React.createElement(App));
                   className="h-full flex items-center justify-center bg-zinc-950"
                 >
                   <div className="max-w-md text-center px-8">
-                    <div className="w-14 h-14 rounded-2xl bg-red-500/10 border border-red-500/15 flex items-center justify-center mx-auto mb-5">
-                      <AlertTriangle className="w-7 h-7 text-red-400" />
+                    <div className="w-14 h-14 rounded-2xl bg-stone-500/10 border border-stone-500/15 flex items-center justify-center mx-auto mb-5">
+                      <AlertTriangle className="w-7 h-7 text-stone-400" />
                     </div>
                     <h3 className="text-lg font-semibold text-white/90 mb-2">Something went wrong</h3>
                     <p className="text-white/35 text-sm mb-6 leading-relaxed">{error}</p>
                     <button
                       onClick={() => { setError(""); setStatus("idle"); }}
-                      className="px-6 py-2.5 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white text-sm font-semibold rounded-xl transition-all shadow-lg shadow-violet-500/20"
+                      className="px-6 py-2.5 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 text-white text-sm font-semibold rounded-xl transition-all shadow-lg shadow-stone-500/20"
                     >
                       Try Again
                     </button>
@@ -2164,18 +2164,18 @@ root.render(React.createElement(App));
                 >
                   {/* Animated ambient background */}
                   <div className="absolute inset-0 pointer-events-none">
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-violet-600/[0.04] blur-[120px] animate-pulse" />
-                    <div className="absolute top-1/3 left-1/3 w-[350px] h-[350px] rounded-full bg-purple-600/[0.03] blur-[100px] animate-pulse" style={{ animationDelay: "1s" }} />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-stone-600/[0.04] blur-[120px] animate-pulse" />
+                    <div className="absolute top-1/3 left-1/3 w-[350px] h-[350px] rounded-full bg-stone-600/[0.03] blur-[100px] animate-pulse" style={{ animationDelay: "1s" }} />
                   </div>
 
                   <div className="relative z-10 text-center px-6">
                     {/* Spinning gradient ring */}
                     <div className="relative w-20 h-20 mx-auto mb-8">
-                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-violet-600 to-purple-700 animate-pulse shadow-2xl shadow-violet-500/30" />
+                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-stone-600 to-stone-700 animate-pulse shadow-2xl shadow-stone-500/30" />
                       <div className="absolute inset-[3px] rounded-[13px] bg-zinc-950 flex items-center justify-center">
-                        <Loader2 className="w-8 h-8 text-violet-400 animate-spin" />
+                        <Loader2 className="w-8 h-8 text-stone-400 animate-spin" />
                       </div>
-                      <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-violet-500/20 via-transparent to-purple-500/20 animate-spin" style={{ animationDuration: "3s" }} />
+                      <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-stone-500/20 via-transparent to-stone-500/20 animate-spin" style={{ animationDuration: "3s" }} />
                     </div>
 
                     <h3 className="text-xl font-semibold text-white/90 mb-2">Building your website</h3>
@@ -2190,12 +2190,12 @@ root.render(React.createElement(App));
                             key={`${i}-${msg}`}
                             initial={{ opacity: 0, y: 8 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className={`flex items-center gap-2 text-xs ${isLatest ? "text-violet-400" : "text-white/25"}`}
+                            className={`flex items-center gap-2 text-xs ${isLatest ? "text-stone-400" : "text-white/25"}`}
                           >
                             {isLatest ? (
-                              <div className="w-2 h-2 rounded-full bg-violet-500 animate-pulse flex-shrink-0" />
+                              <div className="w-2 h-2 rounded-full bg-stone-500 animate-pulse flex-shrink-0" />
                             ) : (
-                              <Check size={12} className="text-emerald-400/60 flex-shrink-0" />
+                              <Check size={12} className="text-stone-400/60 flex-shrink-0" />
                             )}
                             <span className="truncate max-w-[300px]">{msg}</span>
                           </motion.div>
@@ -2212,7 +2212,7 @@ root.render(React.createElement(App));
                         </div>
                         <div className="w-full h-1 rounded-full bg-white/[0.06] overflow-hidden">
                           <motion.div
-                            className="h-full rounded-full bg-gradient-to-r from-violet-500 to-purple-500"
+                            className="h-full rounded-full bg-gradient-to-r from-stone-500 to-stone-500"
                             initial={{ width: 0 }}
                             animate={{ width: `${Math.round((buildProgress.current / buildProgress.total) * 100)}%` }}
                             transition={{ duration: 0.5, ease: "easeOut" }}
@@ -2240,7 +2240,7 @@ root.render(React.createElement(App));
                   <div className="absolute inset-0 flex items-center justify-center">
                     {/* Subtle ambient glow */}
                     <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-violet-600/[0.025] blur-[150px]" />
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-stone-600/[0.025] blur-[150px]" />
                     </div>
 
                     <div className="relative z-10 text-center px-6 max-w-xl">
@@ -2268,7 +2268,7 @@ root.render(React.createElement(App));
                             onClick={() => setPrompt(chip.label.toLowerCase())}
                             className="group flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06] text-[11px] text-white/35 hover:text-white/60 hover:bg-white/[0.06] hover:border-white/[0.10] transition-all"
                           >
-                            <span className="text-white/20 group-hover:text-violet-400 transition-colors">{chip.icon}</span>
+                            <span className="text-white/20 group-hover:text-stone-400 transition-colors">{chip.icon}</span>
                             {chip.label}
                             <ChevronRight size={10} className="text-white/15 group-hover:text-white/30 transition-colors" />
                           </button>
@@ -2277,7 +2277,7 @@ root.render(React.createElement(App));
 
                       {/* Pre-warm indicator */}
                       <div className="inline-flex items-center gap-2 text-[10px] text-white/20">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400/60 animate-pulse" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-stone-400/60 animate-pulse" />
                         {useWebContainers ? "Runtime pre-warmed" : "Sandbox ready"}
                       </div>
                     </div>
@@ -2311,7 +2311,7 @@ root.render(React.createElement(App));
                     <div className="absolute bottom-4 left-4 right-4 z-30 pointer-events-none">
                       <div className="max-w-lg mx-auto px-4 py-3 rounded-2xl bg-zinc-950/80 backdrop-blur-2xl border border-white/[0.06] shadow-2xl shadow-black/40 pointer-events-auto">
                         <div className="flex items-center gap-3 mb-1.5">
-                          <Loader2 className="w-3.5 h-3.5 text-violet-400 animate-spin flex-shrink-0" />
+                          <Loader2 className="w-3.5 h-3.5 text-stone-400 animate-spin flex-shrink-0" />
                           <span className="text-xs text-white/70 font-medium truncate">
                             {pipelineAgents[pipelineAgents.length - 1]}
                           </span>
@@ -2324,13 +2324,13 @@ root.render(React.createElement(App));
                         {buildProgress && buildProgress.total > 0 && (
                           <div className="w-full h-1 rounded-full bg-white/[0.06] overflow-hidden mb-2">
                             <div
-                              className="h-full rounded-full bg-gradient-to-r from-violet-500 to-purple-500 transition-all duration-500 ease-out"
+                              className="h-full rounded-full bg-gradient-to-r from-stone-500 to-stone-500 transition-all duration-500 ease-out"
                               style={{ width: `${Math.round((buildProgress.current / buildProgress.total) * 100)}%` }}
                             />
                           </div>
                         )}
                         {streamWarning && (
-                          <div className="flex items-center gap-2 text-[10px] text-amber-400 mb-2">
+                          <div className="flex items-center gap-2 text-[10px] text-stone-400 mb-2">
                             <AlertTriangle className="w-3 h-3" />
                             <span>{streamWarning}</span>
                           </div>
@@ -2342,9 +2342,9 @@ root.render(React.createElement(App));
                               return (
                                 <div key={s.section} className="flex items-center gap-2 text-[10px]">
                                   {s.status === "done" ? (
-                                    <Check className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                                    <Check className="w-3 h-3 text-stone-400 flex-shrink-0" />
                                   ) : s.status === "customizing" || s.status === "scaffolding" ? (
-                                    <Loader2 className="w-3 h-3 text-violet-400 animate-spin flex-shrink-0" />
+                                    <Loader2 className="w-3 h-3 text-stone-400 animate-spin flex-shrink-0" />
                                   ) : (
                                     <span className="w-2 h-2 rounded-full bg-white/20 flex-shrink-0" />
                                   )}
@@ -2368,22 +2368,22 @@ root.render(React.createElement(App));
                         exit={{ opacity: 0, y: -10 }}
                         className="absolute top-3 left-3 right-3 z-40"
                       >
-                        <div className="max-w-2xl mx-auto px-4 py-3 rounded-xl bg-red-950/90 backdrop-blur-xl border border-red-500/30 shadow-2xl">
+                        <div className="max-w-2xl mx-auto px-4 py-3 rounded-xl bg-stone-950/90 backdrop-blur-xl border border-stone-500/30 shadow-2xl">
                           <div className="flex items-start gap-3">
-                            <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                            <AlertTriangle className="w-4 h-4 text-stone-400 flex-shrink-0 mt-0.5" />
                             <div className="flex-1 min-w-0">
-                              <div className="text-sm font-medium text-red-200">{buildError.message}</div>
-                              <div className="text-xs text-red-300/60 mt-0.5">{buildError.suggestion}</div>
+                              <div className="text-sm font-medium text-stone-200">{buildError.message}</div>
+                              <div className="text-xs text-stone-300/60 mt-0.5">{buildError.suggestion}</div>
                             </div>
                             <button
                               onClick={() => { setBuildError(null); handleGenerate(); }}
-                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-500/15 hover:bg-red-500/25 text-xs text-red-200 border border-red-500/30 transition"
+                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-stone-500/15 hover:bg-stone-500/25 text-xs text-stone-200 border border-stone-500/30 transition"
                             >
                               <RotateCcw className="w-3 h-3" /> Retry
                             </button>
                             <button
                               onClick={() => setBuildError(null)}
-                              className="p-1 rounded-lg hover:bg-red-500/15 text-red-300/60 transition"
+                              className="p-1 rounded-lg hover:bg-stone-500/15 text-stone-300/60 transition"
                               aria-label="Dismiss"
                             >
                               <X className="w-3.5 h-3.5" />
@@ -2439,7 +2439,7 @@ root.render(React.createElement(App));
               title={tool.label}
               className={`w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-150 ${
                 activeTool === tool.id
-                  ? "bg-violet-500/15 text-violet-400"
+                  ? "bg-stone-500/15 text-stone-400"
                   : "text-white/25 hover:text-white/50 hover:bg-white/[0.04]"
               }`}
             >
