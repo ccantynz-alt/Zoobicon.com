@@ -111,9 +111,9 @@ export default function SignupPage() {
           </p>
 
           {referralCode && (
-            <div className="mb-6 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-2">
+            <div className="mb-6 p-3 rounded-xl bg-stone-500/10 border border-stone-500/20 flex items-center gap-2">
               <span className="text-lg">🎁</span>
-              <p className="text-sm text-emerald-300">
+              <p className="text-sm text-stone-300">
                 You were referred by a friend! Sign up to get <strong>1 free build credit</strong>.
               </p>
             </div>
@@ -137,7 +137,7 @@ export default function SignupPage() {
             </a>
           </div>
           {oauthNotice && (
-            <p className="text-xs text-amber-400/80 text-center -mt-2 mb-4 px-2">{oauthNotice}</p>
+            <p className="text-xs text-stone-400/80 text-center -mt-2 mb-4 px-2">{oauthNotice}</p>
           )}
 
           <div className="flex items-center gap-4 mb-6">
@@ -170,10 +170,10 @@ export default function SignupPage() {
                 onBlur={() => setEmailError(validateEmail(email))}
                 placeholder="you@company.com"
                 required
-                className={`w-full bg-white/[0.03] border ${emailError ? "border-red-500/50" : "border-white/[0.08]"} rounded-xl px-4 py-3 text-sm
+                className={`w-full bg-white/[0.03] border ${emailError ? "border-stone-500/50" : "border-white/[0.08]"} rounded-xl px-4 py-3 text-sm
                            placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500/30 transition-all`}
               />
-              {emailError && <p className="text-red-400 text-xs mt-1">{emailError}</p>}
+              {emailError && <p className="text-stone-400 text-xs mt-1">{emailError}</p>}
             </div>
 
             <div>
@@ -211,7 +211,7 @@ export default function SignupPage() {
             </div>
 
             {authError && (
-              <p className="text-sm text-red-400/80 text-center py-2">{authError}</p>
+              <p className="text-sm text-stone-400/80 text-center py-2">{authError}</p>
             )}
 
             <button

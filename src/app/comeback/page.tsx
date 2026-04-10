@@ -171,7 +171,7 @@ export default function ComebackDashboard() {
         </motion.header>
 
         {error && (
-          <div className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200">
+          <div className="mb-6 rounded-xl border border-stone-500/30 bg-stone-500/10 p-4 text-sm text-stone-200">
             {error}
           </div>
         )}
@@ -205,7 +205,7 @@ export default function ComebackDashboard() {
                         <span
                           className={
                             run.emailSent
-                              ? "text-emerald-400"
+                              ? "text-stone-400"
                               : "text-white/50"
                           }
                         >
@@ -253,7 +253,7 @@ export default function ComebackDashboard() {
                               type="button"
                               disabled={acting === draft.id}
                               onClick={() => handleAction(draft.id, "approve")}
-                              className="rounded-lg bg-emerald-500 px-3 py-2 text-sm font-medium text-black transition hover:bg-emerald-400 disabled:opacity-50"
+                              className="rounded-lg bg-stone-500 px-3 py-2 text-sm font-medium text-black transition hover:bg-stone-400 disabled:opacity-50"
                             >
                               Approve
                             </button>

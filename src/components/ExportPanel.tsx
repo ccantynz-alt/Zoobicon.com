@@ -177,7 +177,7 @@ export default function ExportPanel({ code, reactSource }: { code: string; react
   if (!isPaidUser) {
     return (
       <div className="p-4 space-y-4">
-        <div className="p-4 rounded-xl bg-gradient-to-br from-brand-500/10 to-purple-500/10 border border-brand-500/20">
+        <div className="p-4 rounded-xl bg-gradient-to-br from-brand-500/10 to-stone-500/10 border border-brand-500/20">
           <div className="flex items-center gap-2 mb-3">
             <Download size={18} className="text-brand-400" />
             <h3 className="text-sm font-semibold text-white">Export Your Site</h3>
@@ -193,7 +193,7 @@ export default function ExportPanel({ code, reactSource }: { code: string; react
               <span className="w-1 h-1 rounded-full bg-brand-400" /> Next.js project scaffold
             </div>
             <div className="flex items-center gap-2 text-xs text-white/50">
-              <span className="w-1 h-1 rounded-full bg-purple-400" /> React + shadcn/ui components
+              <span className="w-1 h-1 rounded-full bg-stone-400" /> React + shadcn/ui components
             </div>
             <div className="flex items-center gap-2 text-xs text-white/50">
               <span className="w-1 h-1 rounded-full bg-brand-400" /> GitHub-ready with configs
@@ -264,7 +264,7 @@ export default function ExportPanel({ code, reactSource }: { code: string; react
             title={canExportReact ? "Export as React + Next.js components" : "Generate a site first to export as React"}
             className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-medium transition-colors ${
               exportType === "react"
-                ? "bg-purple-500/20 text-purple-400 border border-purple-500/30"
+                ? "bg-stone-500/20 text-stone-400 border border-stone-500/30"
                 : canExportReact
                   ? "bg-white/5 text-white/50 border border-white/10 hover:text-white/70"
                   : "bg-white/5 text-white/50 border border-white/10 cursor-not-allowed"

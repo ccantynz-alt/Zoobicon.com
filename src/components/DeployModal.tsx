@@ -163,7 +163,7 @@ export default function DeployModal({
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
           >
             {/* Top accent */}
-            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-500 to-transparent" />
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-stone-500 to-transparent" />
 
             {/* Close button */}
             {state !== "deploying" && (
@@ -181,12 +181,12 @@ export default function DeployModal({
                 <>
                   <div className="text-center mb-5">
                     <motion.div
-                      className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-amber-500/20 to-orange-500/20 ring-1 ring-amber-500/30"
+                      className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-stone-500/20 to-stone-500/20 ring-1 ring-stone-500/30"
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ type: "spring", delay: 0.1, damping: 15 }}
                     >
-                      <Rocket className="h-5 w-5 text-amber-400" />
+                      <Rocket className="h-5 w-5 text-stone-400" />
                     </motion.div>
                     <h2 className="text-xl font-bold text-white">Deploy Your Site</h2>
                     <p className="mt-1 text-sm text-zinc-400">
@@ -207,7 +207,7 @@ export default function DeployModal({
                       onKeyDown={(e) => { if (e.key === "Enter") handleDeploy(); }}
                       placeholder="My Awesome Site"
                       maxLength={100}
-                      className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder-white/30 focus:border-amber-500/50 focus:outline-none focus:ring-1 focus:ring-amber-500/20 transition-all"
+                      className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder-white/30 focus:border-stone-500/50 focus:outline-none focus:ring-1 focus:ring-stone-500/20 transition-all"
                     />
                   </div>
 
@@ -215,14 +215,14 @@ export default function DeployModal({
                   <div className="mb-5 flex items-center gap-2 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2.5">
                     <Globe className="h-4 w-4 text-zinc-500 flex-shrink-0" />
                     <span className="text-xs text-zinc-500 truncate">
-                      https://<span className="text-amber-400/80 font-medium">{previewSlug}</span>.zoobicon.sh
+                      https://<span className="text-stone-400/80 font-medium">{previewSlug}</span>.zoobicon.sh
                     </span>
                   </div>
 
                   {/* Deploy button */}
                   <button
                     onClick={handleDeploy}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-400 hover:to-amber-500 shadow-lg shadow-amber-500/20 active:scale-[0.98]"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all bg-gradient-to-r from-stone-500 to-stone-600 text-white hover:from-stone-400 hover:to-stone-500 shadow-lg shadow-stone-500/20 active:scale-[0.98]"
                   >
                     <Rocket className="h-4 w-4" />
                     Deploy Now
@@ -230,7 +230,7 @@ export default function DeployModal({
 
                   <p className="mt-3 text-center text-[10px] text-zinc-500">
                     Free sites include a &quot;Built with Zoobicon&quot; badge.{" "}
-                    <a href="/pricing" className="text-amber-400/60 hover:text-amber-400 transition-colors">
+                    <a href="/pricing" className="text-stone-400/60 hover:text-stone-400 transition-colors">
                       Upgrade to remove
                     </a>
                   </p>
@@ -241,11 +241,11 @@ export default function DeployModal({
               {state === "deploying" && (
                 <div className="text-center py-8">
                   <motion.div
-                    className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-500/10"
+                    className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-stone-500/10"
                     animate={{ rotate: 360 }}
                     transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                   >
-                    <Loader2 className="h-6 w-6 text-amber-400" />
+                    <Loader2 className="h-6 w-6 text-stone-400" />
                   </motion.div>
                   <h2 className="text-lg font-bold text-white mb-1">Deploying...</h2>
                   <p className="text-sm text-zinc-400">
@@ -261,7 +261,7 @@ export default function DeployModal({
                         transition={{ delay: i * 0.8 }}
                       >
                         <motion.div
-                          className="h-1.5 w-1.5 rounded-full bg-amber-400"
+                          className="h-1.5 w-1.5 rounded-full bg-stone-400"
                           animate={{ scale: [1, 1.3, 1] }}
                           transition={{ duration: 0.8, delay: i * 0.8, repeat: Infinity, repeatDelay: 1.6 }}
                         />
@@ -277,12 +277,12 @@ export default function DeployModal({
                 <>
                   <div className="text-center mb-5">
                     <motion.div
-                      className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/20 ring-1 ring-emerald-500/30"
+                      className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-stone-500/20 ring-1 ring-stone-500/30"
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ type: "spring", damping: 12 }}
                     >
-                      <Check className="h-6 w-6 text-emerald-400" />
+                      <Check className="h-6 w-6 text-stone-400" />
                     </motion.div>
                     <h2 className="text-xl font-bold text-white">Your site is live!</h2>
                     {deployTime !== null && (
@@ -293,9 +293,9 @@ export default function DeployModal({
                   </div>
 
                   {/* Live URL with copy */}
-                  <div className="mb-4 flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3">
+                  <div className="mb-4 flex items-center gap-2 rounded-xl border border-stone-500/20 bg-stone-500/5 p-3">
                     <div className="min-w-0 flex-1">
-                      <p className="truncate font-mono text-sm text-emerald-400">
+                      <p className="truncate font-mono text-sm text-stone-400">
                         {url}
                       </p>
                     </div>
@@ -304,7 +304,7 @@ export default function DeployModal({
                       className="flex shrink-0 items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-xs font-medium text-white transition-all hover:bg-white/15 active:scale-95"
                     >
                       {copied ? (
-                        <span className="flex items-center gap-1 text-emerald-400">
+                        <span className="flex items-center gap-1 text-stone-400">
                           <Check className="h-3.5 w-3.5" />
                           Copied
                         </span>
@@ -331,7 +331,7 @@ export default function DeployModal({
                       href={url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-400 hover:to-emerald-500 transition-all active:scale-[0.98]"
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-gradient-to-r from-stone-500 to-stone-600 text-white hover:from-stone-400 hover:to-stone-500 transition-all active:scale-[0.98]"
                     >
                       <ExternalLink className="h-4 w-4" />
                       Visit Site
@@ -351,15 +351,15 @@ export default function DeployModal({
                 <>
                   <div className="text-center mb-5">
                     <motion.div
-                      className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-red-500/20 ring-1 ring-red-500/30"
+                      className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-stone-500/20 ring-1 ring-stone-500/30"
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ type: "spring", damping: 12 }}
                     >
-                      <AlertCircle className="h-5 w-5 text-red-400" />
+                      <AlertCircle className="h-5 w-5 text-stone-400" />
                     </motion.div>
                     <h2 className="text-xl font-bold text-white">Deploy Failed</h2>
-                    <p className="mt-2 text-sm text-red-300/80 max-w-xs mx-auto">
+                    <p className="mt-2 text-sm text-stone-300/80 max-w-xs mx-auto">
                       {error || "Something went wrong. Please try again."}
                     </p>
                   </div>
@@ -367,7 +367,7 @@ export default function DeployModal({
                   <div className="flex gap-2">
                     <button
                       onClick={() => { setState("naming"); setError(""); }}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-400 hover:to-amber-500 transition-all active:scale-[0.98]"
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-gradient-to-r from-stone-500 to-stone-600 text-white hover:from-stone-400 hover:to-stone-500 transition-all active:scale-[0.98]"
                     >
                       <RefreshCw className="h-4 w-4" />
                       Try Again

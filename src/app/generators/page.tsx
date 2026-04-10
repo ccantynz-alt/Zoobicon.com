@@ -60,7 +60,7 @@ import { endpointToGeneratorId } from "@/lib/generator-prompts";
 const GENERATOR_CATEGORIES = [
   {
     name: "Websites",
-    color: "from-blue-500 to-cyan-500",
+    color: "from-stone-500 to-stone-500",
     generators: [
       { name: "Landing Page", description: "High-converting pages with 12 optimized sections, pricing tables, FAQ accordions", endpoint: "/api/generate/landing", icon: Layout, tag: "Popular" },
       { name: "Portfolio & Case Studies", description: "Awwwards-quality creative portfolios with filterable projects and lightbox galleries", endpoint: "/api/generate/portfolio", icon: Briefcase },
@@ -79,7 +79,7 @@ const GENERATOR_CATEGORIES = [
   },
   {
     name: "Business Applications",
-    color: "from-blue-500 to-blue-500",
+    color: "from-stone-500 to-stone-500",
     generators: [
       { name: "SaaS Dashboard", description: "Full SaaS apps with user management, analytics, billing, settings, and team features", endpoint: "/api/generate/saas", icon: Layout, tag: "Popular" },
       { name: "Booking System", description: "Appointment booking with calendar, time slots, services, staff selection, and confirmations", endpoint: "/api/generate/booking", icon: Calendar },
@@ -96,7 +96,7 @@ const GENERATOR_CATEGORIES = [
   },
   {
     name: "Enhancement Agents",
-    color: "from-emerald-500 to-teal-500",
+    color: "from-stone-500 to-stone-500",
     generators: [
       { name: "Animation Agent", description: "Inject scroll reveals, parallax, animated counters, text animations, and micro-interactions", endpoint: "/api/generate/animations", icon: Sparkles, tag: "Agent" },
       { name: "SEO Markup Agent", description: "Add Open Graph, MessageCircle Cards, JSON-LD schema, heading fixes, image alt text, and performance hints", endpoint: "/api/generate/seo-markup", icon: Search, tag: "Agent" },
@@ -107,7 +107,7 @@ const GENERATOR_CATEGORIES = [
   },
   {
     name: "Marketing & Content",
-    color: "from-orange-500 to-red-500",
+    color: "from-stone-500 to-stone-500",
     generators: [
       { name: "Email Sequence", description: "Multi-email campaigns with HTML templates, send timing, segmentation rules, and KPI benchmarks", endpoint: "/api/generate/email-sequence", icon: Mail },
       { name: "Pitch Deck", description: "Interactive HTML slide decks with SVG charts, keyboard navigation, and print-to-PDF support", endpoint: "/api/generate/pitch-deck", icon: Presentation },
@@ -121,7 +121,7 @@ const GENERATOR_CATEGORIES = [
   },
   {
     name: "Developer Tools",
-    color: "from-cyan-500 to-blue-500",
+    color: "from-stone-500 to-stone-500",
     generators: [
       { name: "REST API Generator", description: "Complete APIs with database schema, endpoint handlers, auth, rate limiting, and interactive docs", endpoint: "/api/generate/api-gen", icon: Code2 },
       { name: "Globe2 Extension", description: "Manifest V3 extensions with popup UI, content scripts, background workers, and options page", endpoint: "/api/generate/chrome-ext", icon: Globe2 },
@@ -131,7 +131,7 @@ const GENERATOR_CATEGORIES = [
   },
   {
     name: "Design Systems",
-    color: "from-cyan-500 to-rose-500",
+    color: "from-stone-500 to-stone-500",
     generators: [
       { name: "Brand Kit", description: "Complete design systems with colors, typography, spacing, components, voice, and style guide page", endpoint: "/api/generate/brand-kit", icon: Palette },
       { name: "Style Guide Extractor", description: "Analyze existing sites to extract and document every color, font, spacing value, and component", endpoint: "/api/generate/style-guide", icon: PaintBucket },
@@ -239,7 +239,7 @@ export default function GeneratorsPage() {
           </div>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
             Generate{" "}
-            <span className="bg-gradient-to-r from-brand-400 to-blue-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-brand-400 to-stone-400 bg-clip-text text-transparent">
               anything
             </span>
           </h1>
@@ -296,7 +296,7 @@ export default function GeneratorsPage() {
       <section className="max-w-7xl mx-auto px-6 pb-16">
         <div className="rounded-2xl border border-white/[0.10] bg-white/[0.08] p-8 mb-16">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-blue-500 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-stone-500 flex items-center justify-center">
               <Workflow size={20} />
             </div>
             <div>
@@ -410,9 +410,9 @@ function GeneratorCard({ gen }: { gen: { name: string; description: string; endp
       {gen.tag && (
         <span className={`absolute top-3 right-3 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
           gen.tag === "Popular"
-            ? "bg-amber-500/20 text-amber-400"
+            ? "bg-stone-500/20 text-stone-400"
             : gen.tag === "Agent"
-              ? "bg-emerald-500/20 text-emerald-400"
+              ? "bg-stone-500/20 text-stone-400"
               : "bg-brand-500/20 text-brand-400"
         }`}>
           {gen.tag}

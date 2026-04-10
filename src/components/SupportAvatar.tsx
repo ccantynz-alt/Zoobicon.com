@@ -34,7 +34,7 @@ export default function SupportAvatar({ isSpeaking, size = "lg" }: SupportAvatar
         {/* Speaking ring */}
         {isSpeaking && (
           <motion.div
-            className="absolute inset-0 rounded-xl border-2 border-emerald-400/60"
+            className="absolute inset-0 rounded-xl border-2 border-stone-400/60"
             animate={{ scale: [1, 1.18, 1], opacity: [0.7, 0, 0.7] }}
             transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
           />
@@ -53,9 +53,9 @@ export default function SupportAvatar({ isSpeaking, size = "lg" }: SupportAvatar
           />
         </div>
         {isSpeaking && (
-          <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-dark-400">
+          <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-stone-500 border-2 border-dark-400">
             <motion.div
-              className="w-full h-full rounded-full bg-emerald-400"
+              className="w-full h-full rounded-full bg-stone-400"
               animate={{ opacity: [1, 0.3, 1] }}
               transition={{ duration: 0.6, repeat: Infinity }}
             />
@@ -82,7 +82,7 @@ export default function SupportAvatar({ isSpeaking, size = "lg" }: SupportAvatar
         <div className="flex items-center justify-between px-4 py-2 border-b border-white/[0.06] bg-dark-400/60">
           <div className="flex items-center gap-2">
             <motion.div
-              className="w-2 h-2 rounded-full bg-emerald-400"
+              className="w-2 h-2 rounded-full bg-stone-400"
               animate={{ opacity: isSpeaking ? [1, 0.5, 1] : 1 }}
               transition={{ duration: 0.8, repeat: Infinity }}
             />
@@ -93,7 +93,7 @@ export default function SupportAvatar({ isSpeaking, size = "lg" }: SupportAvatar
             <span className="text-[10px] text-white/50 font-mono">HD</span>
           </div>
           <div className="flex gap-1">
-            {["bg-red-500/40", "bg-amber-500/40", "bg-emerald-500/40"].map((c) => (
+            {["bg-stone-500/40", "bg-stone-500/40", "bg-stone-500/40"].map((c) => (
               <div key={c} className={`w-2 h-2 rounded-full ${c}`} />
             ))}
           </div>
@@ -103,11 +103,11 @@ export default function SupportAvatar({ isSpeaking, size = "lg" }: SupportAvatar
         <div className="relative flex items-center justify-center py-8 px-6 overflow-hidden">
           {/* Soft bokeh background */}
           <div className="absolute inset-0">
-            <div className="absolute inset-0 bg-gradient-to-br from-amber-950/25 via-dark-300/50 to-indigo-950/30" />
-            <div className="absolute top-0 right-0 w-40 h-full bg-gradient-to-l from-amber-800/10 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-br from-stone-950/25 via-dark-300/50 to-stone-950/30" />
+            <div className="absolute top-0 right-0 w-40 h-full bg-gradient-to-l from-stone-800/10 to-transparent" />
             {/* Soft bokeh blobs */}
-            <div className="absolute top-6 left-6 w-16 h-16 rounded-full bg-amber-600/8 blur-xl" />
-            <div className="absolute bottom-8 right-8 w-20 h-20 rounded-full bg-indigo-600/8 blur-xl" />
+            <div className="absolute top-6 left-6 w-16 h-16 rounded-full bg-stone-600/8 blur-xl" />
+            <div className="absolute bottom-8 right-8 w-20 h-20 rounded-full bg-stone-600/8 blur-xl" />
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full bg-brand-500/5 blur-2xl" />
           </div>
 
@@ -118,7 +118,7 @@ export default function SupportAvatar({ isSpeaking, size = "lg" }: SupportAvatar
               {isSpeaking && (
                 <motion.div
                   key={ripple}
-                  className="absolute inset-0 rounded-full border-2 border-emerald-400/40"
+                  className="absolute inset-0 rounded-full border-2 border-stone-400/40"
                   style={{ width: 148, height: 148, top: "50%", left: "50%", x: "-50%", y: "-50%" }}
                   initial={{ scale: 0.9, opacity: 0.8 }}
                   animate={{ scale: 1.5, opacity: 0 }}
@@ -160,7 +160,7 @@ export default function SupportAvatar({ isSpeaking, size = "lg" }: SupportAvatar
                 style={{ filter: "brightness(1.05) saturate(1.08)" }}
               />
               {/* Subtle warm overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-amber-900/10 to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-900/10 to-transparent pointer-events-none" />
             </motion.div>
 
             {/* Name tag below photo */}
@@ -170,7 +170,7 @@ export default function SupportAvatar({ isSpeaking, size = "lg" }: SupportAvatar
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             >
               <div className="flex items-center gap-2">
-                <div className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${isSpeaking ? "bg-emerald-400" : "bg-emerald-500/50"}`} />
+                <div className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${isSpeaking ? "bg-stone-400" : "bg-stone-500/50"}`} />
                 <span className="text-xs font-semibold text-white/70">Zoe</span>
                 <span className="text-[10px] text-white/50">AI Support</span>
               </div>
@@ -197,7 +197,7 @@ export default function SupportAvatar({ isSpeaking, size = "lg" }: SupportAvatar
                 {[0.5, 1, 0.7, 1.2, 0.6, 1, 0.4].map((delay, i) => (
                   <motion.div
                     key={i}
-                    className="w-0.5 bg-emerald-400 rounded-full"
+                    className="w-0.5 bg-stone-400 rounded-full"
                     animate={{ height: [3, 12 * delay, 3] }}
                     transition={{
                       duration: 0.5,

@@ -178,13 +178,13 @@ export default function WordCounterPage() {
 
   /* ── stat cards data ── */
   const cards = [
-    { label: "Words", value: stats.words.toLocaleString(), icon: Type, color: "text-violet-400" },
-    { label: "Characters", value: stats.characters.toLocaleString(), icon: Hash, color: "text-blue-400", sub: `${stats.charactersNoSpaces.toLocaleString()} without spaces` },
-    { label: "Sentences", value: stats.sentences.toLocaleString(), icon: FileText, color: "text-emerald-400" },
-    { label: "Paragraphs", value: stats.paragraphs.toLocaleString(), icon: BarChart3, color: "text-amber-400" },
-    { label: "Avg Word Length", value: `${stats.avgWordLength}`, icon: Type, color: "text-pink-400", sub: "characters" },
-    { label: "Reading Time", value: formatTime(stats.readingTime), icon: Clock, color: "text-cyan-400", sub: "@ 200 wpm" },
-    { label: "Speaking Time", value: formatTime(stats.speakingTime), icon: Mic, color: "text-orange-400", sub: "@ 130 wpm" },
+    { label: "Words", value: stats.words.toLocaleString(), icon: Type, color: "text-stone-400" },
+    { label: "Characters", value: stats.characters.toLocaleString(), icon: Hash, color: "text-stone-400", sub: `${stats.charactersNoSpaces.toLocaleString()} without spaces` },
+    { label: "Sentences", value: stats.sentences.toLocaleString(), icon: FileText, color: "text-stone-400" },
+    { label: "Paragraphs", value: stats.paragraphs.toLocaleString(), icon: BarChart3, color: "text-stone-400" },
+    { label: "Avg Word Length", value: `${stats.avgWordLength}`, icon: Type, color: "text-stone-400", sub: "characters" },
+    { label: "Reading Time", value: formatTime(stats.readingTime), icon: Clock, color: "text-stone-400", sub: "@ 200 wpm" },
+    { label: "Speaking Time", value: formatTime(stats.speakingTime), icon: Mic, color: "text-stone-400", sub: "@ 130 wpm" },
   ];
 
   const faqs = [
@@ -242,15 +242,15 @@ export default function WordCounterPage() {
       <div className="max-w-4xl mx-auto px-6 py-16">
         {/* Hero */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 mb-6">
-            <Sparkles className="w-3.5 h-3.5 text-violet-400" />
-            <span className="text-xs font-medium text-violet-300">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-stone-500/10 border border-stone-500/20 mb-6">
+            <Sparkles className="w-3.5 h-3.5 text-stone-400" />
+            <span className="text-xs font-medium text-stone-300">
               Free — No Signup Required
             </span>
           </div>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.1] mb-5">
             Free Word{" "}
-            <span className="bg-gradient-to-r from-violet-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-stone-400 via-stone-400 to-stone-400 bg-clip-text text-transparent">
               Counter
             </span>
           </h1>
@@ -320,7 +320,7 @@ export default function WordCounterPage() {
         {topWords.length > 0 && (
           <div className="mt-8 rounded-2xl bg-white/[0.03] border border-white/[0.06] p-6">
             <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
-              <BarChart3 className="w-4 h-4 text-violet-400" />
+              <BarChart3 className="w-4 h-4 text-stone-400" />
               Top 10 Most Frequent Words
             </h2>
             <div className="space-y-2.5">
@@ -334,7 +334,7 @@ export default function WordCounterPage() {
                   </span>
                   <div className="flex-1 h-5 rounded bg-white/[0.04] overflow-hidden">
                     <div
-                      className="h-full rounded bg-gradient-to-r from-violet-500/40 to-purple-500/30 transition-all duration-300"
+                      className="h-full rounded bg-gradient-to-r from-stone-500/40 to-stone-500/30 transition-all duration-300"
                       style={{ width: `${(count / maxFreq) * 100}%` }}
                     />
                   </div>
@@ -348,7 +348,7 @@ export default function WordCounterPage() {
         )}
 
         {/* CTA — upsell to dictation */}
-        <div className="mt-12 rounded-2xl bg-gradient-to-br from-violet-500/10 to-purple-500/5 border border-violet-500/20 p-8 text-center">
+        <div className="mt-12 rounded-2xl bg-gradient-to-br from-stone-500/10 to-stone-500/5 border border-stone-500/20 p-8 text-center">
           <h2 className="text-xl font-bold mb-2">
             Turn Speech Into Text with AI Dictation
           </h2>
@@ -359,7 +359,7 @@ export default function WordCounterPage() {
           <div className="flex flex-wrap justify-center gap-3">
             <Link
               href="/products/dictation"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-violet-600 hover:bg-violet-500 font-semibold text-sm transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-stone-600 hover:bg-stone-500 font-semibold text-sm transition-colors"
             >
               <Mic className="w-4 h-4" /> Try AI Dictation
             </Link>

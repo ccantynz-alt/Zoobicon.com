@@ -129,11 +129,11 @@ export default function ClonePanel({ onClone }: ClonePanelProps) {
 
       {/* Status */}
       {status === "done" && (
-        <div className="flex items-start gap-2 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+        <div className="flex items-start gap-2 p-3 rounded-lg bg-stone-500/10 border border-stone-500/20">
+          <CheckCircle2 className="w-4 h-4 text-stone-400 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-xs text-emerald-400 font-medium">Clone complete</p>
-            <p className="text-[10px] text-emerald-400/60 mt-0.5">
+            <p className="text-xs text-stone-400 font-medium">Clone complete</p>
+            <p className="text-[10px] text-stone-400/60 mt-0.5">
               Rebuilt {analysis} as a premium website. Check the preview.
             </p>
           </div>
@@ -141,11 +141,11 @@ export default function ClonePanel({ onClone }: ClonePanelProps) {
       )}
 
       {status === "error" && (
-        <div className="flex items-start gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-          <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+        <div className="flex items-start gap-2 p-3 rounded-lg bg-stone-500/10 border border-stone-500/20">
+          <AlertCircle className="w-4 h-4 text-stone-400 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-xs text-red-400 font-medium">Clone failed</p>
-            <p className="text-[10px] text-red-400/60 mt-0.5">{error}</p>
+            <p className="text-xs text-stone-400 font-medium">Clone failed</p>
+            <p className="text-[10px] text-stone-400/60 mt-0.5">{error}</p>
           </div>
         </div>
       )}

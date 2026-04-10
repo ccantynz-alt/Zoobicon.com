@@ -176,7 +176,7 @@ export default function KnowledgeBasePage() {
             <Link href="/admin/support" className="p-2 rounded-lg hover:bg-[#111318] transition-colors">
               <ArrowLeft className="w-5 h-5 text-white/70" />
             </Link>
-            <BookOpen className="w-6 h-6 text-amber-400" />
+            <BookOpen className="w-6 h-6 text-stone-400" />
             <h1 className="text-lg font-semibold">Knowledge Base</h1>
             <span className="text-sm text-white/60">
               {articles.length} articles
@@ -185,7 +185,7 @@ export default function KnowledgeBasePage() {
           <div className="flex items-center gap-2">
             <button
               onClick={startCreate}
-              className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+              className="bg-stone-600 hover:bg-stone-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
               New Article
@@ -207,7 +207,7 @@ export default function KnowledgeBasePage() {
             }}
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
               !selectedCategory
-                ? "bg-amber-600/20 text-amber-300"
+                ? "bg-stone-600/20 text-stone-300"
                 : "text-white/70 hover:bg-[#111318]"
             }`}
           >
@@ -225,7 +225,7 @@ export default function KnowledgeBasePage() {
                 }}
                 className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
                   selectedCategory === cat
-                    ? "bg-amber-600/20 text-amber-300"
+                    ? "bg-stone-600/20 text-stone-300"
                     : "text-white/70 hover:bg-[#111318]"
                 }`}
               >
@@ -258,7 +258,7 @@ export default function KnowledgeBasePage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && fetchArticles()}
-                className="w-full bg-[#111318] border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-white/50 focus:outline-none focus:border-amber-500"
+                className="w-full bg-[#111318] border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-white/50 focus:outline-none focus:border-stone-500"
               />
             </div>
           </div>
@@ -290,7 +290,7 @@ export default function KnowledgeBasePage() {
                         setFormData((d) => ({ ...d, title: e.target.value }))
                       }
                       placeholder="e.g., How to deploy a website"
-                      className="w-full bg-[#111318] border border-white/10 rounded-lg px-4 py-2 text-sm text-white placeholder-white/50 focus:outline-none focus:border-amber-500"
+                      className="w-full bg-[#111318] border border-white/10 rounded-lg px-4 py-2 text-sm text-white placeholder-white/50 focus:outline-none focus:border-stone-500"
                     />
                   </div>
 
@@ -301,7 +301,7 @@ export default function KnowledgeBasePage() {
                       onChange={(e) =>
                         setFormData((d) => ({ ...d, category: e.target.value }))
                       }
-                      className="w-full bg-[#111318] border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-amber-500"
+                      className="w-full bg-[#111318] border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-stone-500"
                     >
                       {CATEGORIES.map((cat) => (
                         <option key={cat} value={cat}>
@@ -325,7 +325,7 @@ export default function KnowledgeBasePage() {
                       }
                       placeholder="Write the full answer here. Include step-by-step instructions, URLs, pricing details — anything the AI should know when answering questions about this topic."
                       rows={15}
-                      className="w-full bg-[#111318] border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-white/50 focus:outline-none focus:border-amber-500 resize-none font-mono"
+                      className="w-full bg-[#111318] border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-white/50 focus:outline-none focus:border-stone-500 resize-none font-mono"
                     />
                   </div>
 
@@ -341,7 +341,7 @@ export default function KnowledgeBasePage() {
                         setFormData((d) => ({ ...d, keywords: e.target.value }))
                       }
                       placeholder="deploy, hosting, custom domain, DNS"
-                      className="w-full bg-[#111318] border border-white/10 rounded-lg px-4 py-2 text-sm text-white placeholder-white/50 focus:outline-none focus:border-amber-500"
+                      className="w-full bg-[#111318] border border-white/10 rounded-lg px-4 py-2 text-sm text-white placeholder-white/50 focus:outline-none focus:border-stone-500"
                     />
                   </div>
 
@@ -355,7 +355,7 @@ export default function KnowledgeBasePage() {
                     <button
                       onClick={handleSave}
                       disabled={saving || !formData.title.trim() || !formData.content.trim()}
-                      className="bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                      className="bg-stone-600 hover:bg-stone-500 disabled:opacity-50 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
                     >
                       {saving ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -369,7 +369,7 @@ export default function KnowledgeBasePage() {
               </div>
             ) : loading ? (
               <div className="flex items-center justify-center py-20">
-                <Loader2 className="w-6 h-6 text-amber-400 animate-spin" />
+                <Loader2 className="w-6 h-6 text-stone-400 animate-spin" />
               </div>
             ) : articles.length === 0 ? (
               <div className="text-center py-20 text-white/60">
@@ -381,7 +381,7 @@ export default function KnowledgeBasePage() {
                 </p>
                 <button
                   onClick={startCreate}
-                  className="bg-amber-600 hover:bg-amber-500 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors"
+                  className="bg-stone-600 hover:bg-stone-500 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors"
                 >
                   Create your first article
                 </button>
@@ -407,7 +407,7 @@ export default function KnowledgeBasePage() {
                             {article.category.replace("-", " ")}
                           </span>
                           {!article.is_active && (
-                            <span className="text-xs text-red-400 flex-shrink-0">
+                            <span className="text-xs text-stone-400 flex-shrink-0">
                               Disabled
                             </span>
                           )}
@@ -434,7 +434,7 @@ export default function KnowledgeBasePage() {
                           onClick={() => toggleActive(article)}
                           className={`p-1.5 rounded transition-colors ${
                             article.is_active
-                              ? "text-green-400 hover:bg-green-500/10"
+                              ? "text-stone-400 hover:bg-stone-500/10"
                               : "text-white/50 hover:bg-[#111318]"
                           }`}
                           title={article.is_active ? "Disable" : "Enable"}
@@ -449,7 +449,7 @@ export default function KnowledgeBasePage() {
                         </button>
                         <button
                           onClick={() => deleteArticle(article.id)}
-                          className="p-1.5 rounded text-white/60 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                          className="p-1.5 rounded text-white/60 hover:text-stone-400 hover:bg-stone-500/10 transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>

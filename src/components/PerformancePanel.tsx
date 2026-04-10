@@ -51,10 +51,10 @@ export default function PerformancePanel({ code }: { code: string }) {
   };
 
   const gradeColor = (grade: string) => {
-    if (grade.startsWith("A")) return "text-emerald-400";
-    if (grade === "B") return "text-blue-400";
-    if (grade === "C") return "text-yellow-400";
-    return "text-red-400";
+    if (grade.startsWith("A")) return "text-stone-400";
+    if (grade === "B") return "text-stone-400";
+    if (grade === "C") return "text-stone-400";
+    return "text-stone-400";
   };
 
   const formatBytes = (bytes: number) => {
@@ -64,9 +64,9 @@ export default function PerformancePanel({ code }: { code: string }) {
   };
 
   const severityColor = (s: string) => {
-    if (s === "critical") return "text-red-400";
-    if (s === "warning") return "text-yellow-400";
-    return "text-blue-400";
+    if (s === "critical") return "text-stone-400";
+    if (s === "warning") return "text-stone-400";
+    return "text-stone-400";
   };
 
   return (
@@ -138,7 +138,7 @@ export default function PerformancePanel({ code }: { code: string }) {
             <div className="space-y-1">
               <div className="text-xs text-white/50 uppercase tracking-wider">Optimizations</div>
               {result.optimizations.map((opt, i) => (
-                <div key={i} className="flex items-center gap-2 text-xs text-emerald-400/70">
+                <div key={i} className="flex items-center gap-2 text-xs text-stone-400/70">
                   <Zap size={12} /> {opt}
                 </div>
               ))}

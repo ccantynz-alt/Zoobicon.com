@@ -69,24 +69,24 @@ const TERMINAL_LINES: TerminalLine[] = [
 /* ── CLI Commands ────────────────────────────────────────────── */
 
 const CLI_COMMANDS = [
-  { cmd: "zb init [name]", desc: "Initialize a new project", icon: FolderPlus, color: "text-emerald-400" },
-  { cmd: "zb generate \"[prompt]\"", desc: "Generate a website from prompt", icon: Sparkles, color: "text-amber-400" },
-  { cmd: "zb edit \"[instruction]\"", desc: "Edit with natural language", icon: Pencil, color: "text-sky-400" },
+  { cmd: "zb init [name]", desc: "Initialize a new project", icon: FolderPlus, color: "text-stone-400" },
+  { cmd: "zb generate \"[prompt]\"", desc: "Generate a website from prompt", icon: Sparkles, color: "text-stone-400" },
+  { cmd: "zb edit \"[instruction]\"", desc: "Edit with natural language", icon: Pencil, color: "text-stone-400" },
   { cmd: "zb deploy", desc: "Deploy to zoobicon.sh subdomain", icon: Upload, color: "text-zoo-400" },
-  { cmd: "zb deploy --domain custom.com", desc: "Deploy to custom domain", icon: Globe, color: "text-blue-400" },
-  { cmd: "zb export --wordpress", desc: "Export as WordPress theme", icon: ExternalLink, color: "text-blue-400" },
-  { cmd: "zb translate --lang es,fr,de", desc: "Add translations", icon: Languages, color: "text-cyan-400" },
-  { cmd: "zb seo --analyze", desc: "Run SEO analysis", icon: Search, color: "text-orange-400" },
-  { cmd: "zb debug", desc: "Auto-detect and fix errors", icon: Bug, color: "text-red-400" },
-  { cmd: "zb preview", desc: "Open local preview in browser", icon: Eye, color: "text-cyan-400" },
+  { cmd: "zb deploy --domain custom.com", desc: "Deploy to custom domain", icon: Globe, color: "text-stone-400" },
+  { cmd: "zb export --wordpress", desc: "Export as WordPress theme", icon: ExternalLink, color: "text-stone-400" },
+  { cmd: "zb translate --lang es,fr,de", desc: "Add translations", icon: Languages, color: "text-stone-400" },
+  { cmd: "zb seo --analyze", desc: "Run SEO analysis", icon: Search, color: "text-stone-400" },
+  { cmd: "zb debug", desc: "Auto-detect and fix errors", icon: Bug, color: "text-stone-400" },
+  { cmd: "zb preview", desc: "Open local preview in browser", icon: Eye, color: "text-stone-400" },
 ];
 
 /* ── Deployment Pipeline ─────────────────────────────────────── */
 
 const PIPELINE_STEPS = [
   { label: "Local Dev", icon: Terminal, color: "text-white/60" },
-  { label: "zb generate", icon: Sparkles, color: "text-amber-400" },
-  { label: "Preview", icon: Eye, color: "text-sky-400" },
+  { label: "zb generate", icon: Sparkles, color: "text-stone-400" },
+  { label: "Preview", icon: Eye, color: "text-stone-400" },
   { label: "zb deploy", icon: Upload, color: "text-zoo-400" },
   { label: "Live on zoobicon.sh", icon: Rocket, color: "text-zoo-400" },
 ];
@@ -222,9 +222,9 @@ function AnimatedTerminal() {
         {/* Title bar */}
         <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.10]">
           <div className="flex gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-red-500/60" />
-            <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-            <div className="w-3 h-3 rounded-full bg-green-500/60" />
+            <div className="w-3 h-3 rounded-full bg-stone-500/60" />
+            <div className="w-3 h-3 rounded-full bg-stone-500/60" />
+            <div className="w-3 h-3 rounded-full bg-stone-500/60" />
           </div>
           <div className="flex-1 text-center text-xs text-white/60 font-mono">zsh &mdash; zoobicon</div>
         </div>
@@ -234,25 +234,25 @@ function AnimatedTerminal() {
             if (line.type === "blank") return <div key={i} className="h-4" />;
             if (line.type === "response") {
               return (
-                <div key={i} className="text-green-400">
+                <div key={i} className="text-stone-400">
                   {line.text}
                 </div>
               );
             }
             return (
               <div key={i} className="text-white/70">
-                <span className="text-green-400/80">{line.text.startsWith("$ ") ? "$ " : ""}</span>
+                <span className="text-stone-400/80">{line.text.startsWith("$ ") ? "$ " : ""}</span>
                 <span>{line.text.replace(/^\$ /, "")}</span>
                 {i === renderedLines.length - 1 && isTyping && (
-                  <span className="inline-block w-2 h-4 bg-green-400 ml-0.5 animate-pulse align-middle" />
+                  <span className="inline-block w-2 h-4 bg-stone-400 ml-0.5 animate-pulse align-middle" />
                 )}
               </div>
             );
           })}
           {!isTyping && (
             <div className="mt-2 text-white/70">
-              <span className="text-green-400/80">$ </span>
-              <span className="inline-block w-2 h-4 bg-green-400 animate-pulse align-middle" />
+              <span className="text-stone-400/80">$ </span>
+              <span className="inline-block w-2 h-4 bg-stone-400 animate-pulse align-middle" />
             </div>
           )}
         </div>
@@ -297,7 +297,7 @@ export default function ZoobiconShPage() {
           </div>
           <div className="flex items-center gap-3">
             <div className="hidden md:flex items-center gap-2 bg-dark-200 border border-white/[0.10] rounded-lg px-3 py-1.5 font-mono text-xs text-white/60">
-              <span className="text-green-400">$</span> npm i -g zoobicon-cli
+              <span className="text-stone-400">$</span> npm i -g zoobicon-cli
               <button onClick={() => copyText("npm i -g zoobicon-cli", "nav")} className="text-white/50 hover:text-white/50 ml-1">
                 {copied === "nav" ? <Check className="w-3 h-3 text-accent-cyan" /> : <Copy className="w-3 h-3" />}
               </button>
@@ -336,7 +336,7 @@ export default function ZoobiconShPage() {
                 onClick={() => copyText("npm install -g zoobicon-cli", "hero")}
                 className="group flex items-center gap-3 bg-dark-200 border border-white/[0.12] hover:border-zoo-500/30 rounded-xl px-6 py-3 font-mono text-sm text-white/60 transition-all"
               >
-                <span className="text-green-400">$</span> npm install -g zoobicon-cli
+                <span className="text-stone-400">$</span> npm install -g zoobicon-cli
                 {copied === "hero" ? <Check className="w-4 h-4 text-accent-cyan" /> : <Copy className="w-4 h-4 text-white/50 group-hover:text-white/50" />}
               </button>
               <a
@@ -606,7 +606,7 @@ export default function ZoobiconShPage() {
                 onClick={() => copyText("npm install -g zoobicon-cli", "cta")}
                 className="group inline-flex items-center gap-3 bg-dark-200 border border-zoo-500/20 hover:border-zoo-500/40 rounded-xl px-8 py-4 font-mono text-sm text-white/60 transition-all mb-8"
               >
-                <span className="text-green-400">$</span>
+                <span className="text-stone-400">$</span>
                 npm install -g zoobicon-cli
                 {copied === "cta" ? <Check className="w-4 h-4 text-accent-cyan" /> : <Copy className="w-4 h-4 text-white/50 group-hover:text-white/50" />}
               </button>

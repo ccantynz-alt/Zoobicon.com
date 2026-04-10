@@ -490,15 +490,15 @@ registerComponent({
             <div className="p-6">
               <div className="grid grid-cols-4 gap-4 mb-6">
                 {[
-                  { label: "Revenue", value: "$284K", change: "+23%", color: "emerald" },
-                  { label: "Users", value: "18.2K", change: "+12%", color: "blue" },
-                  { label: "Conversion", value: "4.8%", change: "+0.6%", color: "violet" },
-                  { label: "Retention", value: "94%", change: "+3%", color: "amber" },
+                  { label: "Revenue", value: "$284K", change: "+23%" },
+                  { label: "Users", value: "18.2K", change: "+12%" },
+                  { label: "Conversion", value: "4.8%", change: "+0.6%" },
+                  { label: "Retention", value: "94%", change: "+3%" },
                 ].map(m => (
                   <div key={m.label} className="bg-gray-800/50 rounded-xl p-4 text-left">
                     <div className="text-xs text-gray-500 mb-1">{m.label}</div>
                     <div className="text-xl font-bold text-white">{m.value}</div>
-                    <div className={\`text-xs font-semibold mt-1 text-\${m.color}-400\`}>
+                    <div className="text-xs font-semibold mt-1 text-stone-300">
                       {m.change} vs last month
                     </div>
                   </div>

@@ -93,8 +93,8 @@ export default function AdminRecoverPage() {
 
         <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-2xl p-8 shadow-2xl">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/20 to-red-500/20 border border-amber-500/30 flex items-center justify-center">
-              <ShieldCheck className="w-6 h-6 text-amber-400" />
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-stone-500/20 to-stone-500/20 border border-stone-500/30 flex items-center justify-center">
+              <ShieldCheck className="w-6 h-6 text-stone-400" />
             </div>
             <div>
               <h1 className="text-xl font-bold">Admin Recovery</h1>
@@ -103,28 +103,28 @@ export default function AdminRecoverPage() {
           </div>
 
           {config && !config.configured && (
-            <div className="mb-6 rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-200">
+            <div className="mb-6 rounded-lg border border-stone-500/30 bg-stone-500/10 p-4 text-sm text-stone-200">
               <div className="flex items-start gap-2">
                 <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
                 <div>
                   <div className="font-semibold mb-1">Recovery not configured</div>
-                  <div className="text-amber-100/80 text-xs leading-relaxed">
+                  <div className="text-stone-100/80 text-xs leading-relaxed">
                     To enable recovery, set these in Vercel → Settings → Environment Variables:
                     <ul className="mt-2 space-y-1">
                       <li>
                         <code className="bg-black/30 px-1.5 py-0.5 rounded">ADMIN_EMAIL</code>
                         {config.adminEmailSet ? (
-                          <span className="text-green-400 ml-2">set</span>
+                          <span className="text-stone-400 ml-2">set</span>
                         ) : (
-                          <span className="text-red-400 ml-2">missing</span>
+                          <span className="text-stone-400 ml-2">missing</span>
                         )}
                       </li>
                       <li>
                         <code className="bg-black/30 px-1.5 py-0.5 rounded">ADMIN_RECOVERY_TOKEN</code>
                         {config.recoveryTokenSet ? (
-                          <span className="text-green-400 ml-2">set</span>
+                          <span className="text-stone-400 ml-2">set</span>
                         ) : (
-                          <span className="text-red-400 ml-2">missing</span>
+                          <span className="text-stone-400 ml-2">missing</span>
                         )}
                       </li>
                     </ul>
@@ -138,10 +138,10 @@ export default function AdminRecoverPage() {
           )}
 
           {success ? (
-            <div className="rounded-lg border border-green-500/30 bg-green-500/10 p-6 text-center">
-              <CheckCircle2 className="w-10 h-10 text-green-400 mx-auto mb-3" />
-              <div className="font-semibold text-green-300">Recovery successful</div>
-              <div className="text-sm text-green-200/80 mt-1">Redirecting to admin dashboard…</div>
+            <div className="rounded-lg border border-stone-500/30 bg-stone-500/10 p-6 text-center">
+              <CheckCircle2 className="w-10 h-10 text-stone-400 mx-auto mb-3" />
+              <div className="font-semibold text-stone-300">Recovery successful</div>
+              <div className="text-sm text-stone-200/80 mt-1">Redirecting to admin dashboard…</div>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -156,7 +156,7 @@ export default function AdminRecoverPage() {
                     value={token}
                     onChange={(e) => setToken(e.target.value)}
                     placeholder="Paste your recovery token"
-                    className="w-full bg-slate-950/60 border border-slate-700 rounded-lg pl-10 pr-3 py-2.5 text-sm placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50"
+                    className="w-full bg-slate-950/60 border border-slate-700 rounded-lg pl-10 pr-3 py-2.5 text-sm placeholder:text-slate-600 focus:outline-none focus:border-stone-500 focus:ring-1 focus:ring-stone-500/50"
                     autoComplete="off"
                     spellCheck={false}
                     required
@@ -170,7 +170,7 @@ export default function AdminRecoverPage() {
               </div>
 
               {error && (
-                <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300 flex items-start gap-2">
+                <div className="rounded-lg border border-stone-500/30 bg-stone-500/10 p-3 text-sm text-stone-300 flex items-start gap-2">
                   <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
                   <span>{error}</span>
                 </div>
@@ -179,7 +179,7 @@ export default function AdminRecoverPage() {
               <button
                 type="submit"
                 disabled={loading || !token.trim() || (config !== null && !config.configured)}
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:from-slate-700 disabled:to-slate-700 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-lg transition-all shadow-lg shadow-blue-500/20"
+                className="w-full bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 disabled:from-slate-700 disabled:to-slate-700 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-lg transition-all shadow-lg shadow-stone-500/20"
               >
                 {loading ? "Verifying…" : "Recover admin access"}
               </button>

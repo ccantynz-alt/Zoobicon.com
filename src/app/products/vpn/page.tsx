@@ -91,14 +91,14 @@ const HOW_IT_WORKS = [
     title: "Download & Configure",
     desc: "One-click install on macOS, Windows, iOS, Android, or Linux. Config files for routers too.",
     icon: Smartphone,
-    color: "from-accent-cyan to-blue-600",
+    color: "from-accent-cyan to-stone-600",
   },
   {
     step: "03",
     title: "Connect & Go",
     desc: "Tap connect. You\u2019re encrypted in under 2 seconds. Travel, work, stream \u2014 safely.",
     icon: Globe,
-    color: "from-emerald-500 to-teal-600",
+    color: "from-stone-500 to-stone-600",
   },
 ];
 
@@ -505,8 +505,8 @@ export default function VPNPage() {
                           {typeof val === "boolean" ? (
                             val ? (
                               j === 0 ? (
-                                <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center">
-                                  <Check className="w-3.5 h-3.5 text-green-400" />
+                                <div className="w-6 h-6 rounded-full bg-stone-500/20 flex items-center justify-center">
+                                  <Check className="w-3.5 h-3.5 text-stone-400" />
                                 </div>
                               ) : (
                                 <Check className="w-4 h-4 text-white/60" />

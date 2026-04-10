@@ -34,12 +34,12 @@ import {
 } from 'lucide-react';
 
 const TEMPLATE_LIBRARY = [
-  { id: 'tech-trends', name: 'Technology Trends Report', desc: 'Analyze emerging tech trends with data-driven insights', category: 'Technology', pages: '12-15', color: 'from-violet-500 to-blue-500' },
-  { id: 'market-analysis', name: 'Market Analysis', desc: 'Comprehensive market size, competition, and opportunity mapping', category: 'Business', pages: '15-20', color: 'from-emerald-500 to-teal-500' },
-  { id: 'research-paper', name: 'Research Paper', desc: 'Academic-style research with methodology and findings', category: 'Research', pages: '20-25', color: 'from-blue-500 to-cyan-500' },
-  { id: 'industry-report', name: 'Industry Report', desc: 'State of the industry overview with benchmarks', category: 'Industry', pages: '10-12', color: 'from-amber-500 to-orange-500' },
-  { id: 'best-practices', name: 'Best Practices Guide', desc: 'Actionable guide with expert recommendations', category: 'Strategy', pages: '8-10', color: 'from-pink-500 to-rose-500' },
-  { id: 'roi-analysis', name: 'ROI Analysis', desc: 'Cost-benefit analysis with financial projections', category: 'Finance', pages: '10-15', color: 'from-green-500 to-emerald-500' },
+  { id: 'tech-trends', name: 'Technology Trends Report', desc: 'Analyze emerging tech trends with data-driven insights', category: 'Technology', pages: '12-15', color: 'from-stone-500 to-stone-500' },
+  { id: 'market-analysis', name: 'Market Analysis', desc: 'Comprehensive market size, competition, and opportunity mapping', category: 'Business', pages: '15-20', color: 'from-stone-500 to-stone-500' },
+  { id: 'research-paper', name: 'Research Paper', desc: 'Academic-style research with methodology and findings', category: 'Research', pages: '20-25', color: 'from-stone-500 to-stone-500' },
+  { id: 'industry-report', name: 'Industry Report', desc: 'State of the industry overview with benchmarks', category: 'Industry', pages: '10-12', color: 'from-stone-500 to-stone-500' },
+  { id: 'best-practices', name: 'Best Practices Guide', desc: 'Actionable guide with expert recommendations', category: 'Strategy', pages: '8-10', color: 'from-stone-500 to-stone-500' },
+  { id: 'roi-analysis', name: 'ROI Analysis', desc: 'Cost-benefit analysis with financial projections', category: 'Finance', pages: '10-15', color: 'from-stone-500 to-stone-500' },
 ];
 
 const DEFAULT_SECTIONS = [
@@ -88,7 +88,7 @@ export default function WhitePaperPage() {
       <header className="border-b border-white/10 bg-[#0a0a12]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Zoobicon</Link>
+            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
             <span className="text-white/30">/</span>
             <span className="font-semibold text-white">White Paper Generator</span>
           </div>
@@ -96,7 +96,7 @@ export default function WhitePaperPage() {
             <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition text-sm">
               <Eye className="w-4 h-4" /> Preview
             </button>
-            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:opacity-90 transition text-sm font-medium">
+            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-stone-600 to-stone-600 hover:opacity-90 transition text-sm font-medium">
               <Download className="w-4 h-4" /> Export PDF
             </button>
           </div>
@@ -116,7 +116,7 @@ export default function WhitePaperPage() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition ${
-                activeTab === tab.id ? 'bg-violet-600 text-white' : 'bg-white/5 text-white/60 hover:text-white hover:bg-white/10'
+                activeTab === tab.id ? 'bg-stone-600 text-white' : 'bg-white/5 text-white/60 hover:text-white hover:bg-white/10'
               }`}
             >
               <tab.icon className="w-4 h-4" /> {tab.label}
@@ -127,9 +127,9 @@ export default function WhitePaperPage() {
         {/* AI Generator */}
         {activeTab === 'generator' && (
           <div className="max-w-3xl mx-auto">
-            <div className="p-8 rounded-2xl bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 border border-violet-500/20">
+            <div className="p-8 rounded-2xl bg-gradient-to-r from-stone-500/10 to-stone-500/10 border border-stone-500/20">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 flex items-center justify-center">
                   <Wand2 className="w-6 h-6" />
                 </div>
                 <div>
@@ -145,7 +145,7 @@ export default function WhitePaperPage() {
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
                     placeholder="e.g., How AI-powered website builders are disrupting the $200B web development industry, and why enterprises should adopt them in 2026."
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm resize-none h-28 focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm resize-none h-28 focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -178,7 +178,7 @@ export default function WhitePaperPage() {
                   <label className="text-sm text-white/50 mb-1 block">Tone & Style</label>
                   <div className="flex gap-2">
                     {['Authoritative', 'Data-driven', 'Conversational', 'Academic'].map((tone) => (
-                      <button onClick={() => {}} key={tone} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/30 text-xs transition">{tone}</button>
+                      <button onClick={() => {}} key={tone} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:border-stone-500/30 text-xs transition">{tone}</button>
                     ))}
                   </div>
                 </div>
@@ -186,14 +186,14 @@ export default function WhitePaperPage() {
                   <label className="text-sm text-white/50 mb-1 block">Target Length</label>
                   <div className="flex gap-2">
                     {['5-8 pages', '10-15 pages', '15-20 pages', '20+ pages'].map((len) => (
-                      <button onClick={() => {}} key={len} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:border-violet-500/30 text-xs transition">{len}</button>
+                      <button onClick={() => {}} key={len} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:border-stone-500/30 text-xs transition">{len}</button>
                     ))}
                   </div>
                 </div>
                 <button
                   onClick={handleGenerate}
                   disabled={generating}
-                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 font-medium hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 font-medium hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {generating ? (
                     <><div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Generating White Paper...</>
@@ -214,7 +214,7 @@ export default function WhitePaperPage() {
                 key={t.id}
                 onClick={() => setSelectedTemplate(t.id)}
                 className={`p-6 rounded-2xl border cursor-pointer transition ${
-                  selectedTemplate === t.id ? 'border-violet-500 bg-violet-500/10' : 'border-white/10 bg-white/5 hover:border-violet-500/30'
+                  selectedTemplate === t.id ? 'border-stone-500 bg-stone-500/10' : 'border-white/10 bg-white/5 hover:border-stone-500/30'
                 }`}
               >
                 <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${t.color} flex items-center justify-center mb-4`}>
@@ -237,13 +237,13 @@ export default function WhitePaperPage() {
             <div className="space-y-3">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-semibold">Sections</h3>
-                <button onClick={() => {}} className="flex items-center gap-1 text-sm text-violet-400 hover:text-violet-300"><Plus className="w-4 h-4" /> Add Section</button>
+                <button onClick={() => {}} className="flex items-center gap-1 text-sm text-stone-400 hover:text-stone-300"><Plus className="w-4 h-4" /> Add Section</button>
               </div>
               {sections.map((section, i) => (
                 <div key={section.id} className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
                   <button onClick={() => toggleSection(section.id)} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition">
                     <GripVertical className="w-4 h-4 text-white/20 cursor-grab" />
-                    <span className="w-6 h-6 rounded-full bg-violet-600/20 text-violet-400 text-xs flex items-center justify-center font-medium">{i + 1}</span>
+                    <span className="w-6 h-6 rounded-full bg-stone-600/20 text-stone-400 text-xs flex items-center justify-center font-medium">{i + 1}</span>
                     <span className="text-sm font-medium flex-1 text-left">{section.title}</span>
                     {section.expanded ? <ChevronDown className="w-4 h-4 text-white/30" /> : <ChevronRight className="w-4 h-4 text-white/30" />}
                   </button>
@@ -252,10 +252,10 @@ export default function WhitePaperPage() {
                       <textarea
                         value={section.content}
                         onChange={(e) => setSections(prev => prev.map(s => s.id === section.id ? { ...s, content: e.target.value } : s))}
-                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm resize-none h-24 focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm resize-none h-24 focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                       />
                       <div className="flex items-center gap-2 mt-2">
-                        <button onClick={() => {}} className="flex items-center gap-1 text-xs text-violet-400 hover:text-violet-300"><Sparkles className="w-3 h-3" /> AI Expand</button>
+                        <button onClick={() => {}} className="flex items-center gap-1 text-xs text-stone-400 hover:text-stone-300"><Sparkles className="w-3 h-3" /> AI Expand</button>
                         <button onClick={() => {}} className="flex items-center gap-1 text-xs text-white/40 hover:text-white/60"><Trash2 className="w-3 h-3" /> Remove</button>
                       </div>
                     </div>
@@ -266,10 +266,10 @@ export default function WhitePaperPage() {
 
             {/* Preview */}
             <div className="sticky top-24">
-              <div className="p-1 rounded-2xl bg-gradient-to-r from-violet-500/20 to-fuchsia-500/20">
+              <div className="p-1 rounded-2xl bg-gradient-to-r from-stone-500/20 to-stone-500/20">
                 <div className="bg-white rounded-xl p-8 text-black min-h-[600px]">
                   <div className="text-center mb-8 pb-8 border-b border-gray-200">
-                    <p className="text-violet-600 text-xs font-medium uppercase tracking-widest mb-2">White Paper</p>
+                    <p className="text-stone-600 text-xs font-medium uppercase tracking-widest mb-2">White Paper</p>
                     <h1 className="text-2xl font-bold text-gray-900 mb-2">How AI Website Builders Are Disrupting the $200B Web Development Industry</h1>
                     <p className="text-sm text-gray-500">Published March 2026 | {industry} | {sections.length} sections</p>
                   </div>
@@ -295,10 +295,10 @@ export default function WhitePaperPage() {
               <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <Lock className="w-5 h-5 text-violet-400" />
+                    <Lock className="w-5 h-5 text-stone-400" />
                     <h3 className="font-semibold">Email Gate</h3>
                   </div>
-                  <button onClick={() => setGateEnabled(!gateEnabled)} className={`w-12 h-6 rounded-full transition ${gateEnabled ? 'bg-violet-600' : 'bg-white/20'}`}>
+                  <button onClick={() => setGateEnabled(!gateEnabled)} className={`w-12 h-6 rounded-full transition ${gateEnabled ? 'bg-stone-600' : 'bg-white/20'}`}>
                     <div className={`w-5 h-5 rounded-full bg-white transition-transform ${gateEnabled ? 'translate-x-6' : 'translate-x-0.5'}`} />
                   </button>
                 </div>
@@ -307,25 +307,25 @@ export default function WhitePaperPage() {
                 <div className="space-y-4">
                   <div>
                     <label className="text-xs text-white/40 mb-1 block">Gate Headline</label>
-                    <input type="text" defaultValue="Download the full white paper" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50" />
+                    <input type="text" defaultValue="Download the full white paper" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-stone-500/50" />
                   </div>
                   <div>
                     <label className="text-xs text-white/40 mb-1 block">Gate Description</label>
-                    <input type="text" defaultValue="Enter your email to receive the complete PDF with all data and analysis." className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50" />
+                    <input type="text" defaultValue="Enter your email to receive the complete PDF with all data and analysis." className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-stone-500/50" />
                   </div>
                   <div>
                     <label className="text-xs text-white/40 mb-1 block">Button Text</label>
-                    <input type="text" defaultValue="Get Free Download" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50" />
+                    <input type="text" defaultValue="Get Free Download" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-stone-500/50" />
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-white/60">Show preview (first 2 pages)</span>
-                    <div className="w-12 h-6 rounded-full bg-violet-600 cursor-pointer">
+                    <div className="w-12 h-6 rounded-full bg-stone-600 cursor-pointer">
                       <div className="w-5 h-5 rounded-full bg-white translate-x-6" />
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-white/60">Add to email list</span>
-                    <div className="w-12 h-6 rounded-full bg-violet-600 cursor-pointer">
+                    <div className="w-12 h-6 rounded-full bg-stone-600 cursor-pointer">
                       <div className="w-5 h-5 rounded-full bg-white translate-x-6" />
                     </div>
                   </div>
@@ -334,10 +334,10 @@ export default function WhitePaperPage() {
 
               <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
                 <h3 className="font-semibold mb-3">Embed Code</h3>
-                <div className="bg-black/50 rounded-xl p-3 font-mono text-xs text-green-400 mb-3">
+                <div className="bg-black/50 rounded-xl p-3 font-mono text-xs text-stone-400 mb-3">
                   {`<iframe src="https://zoobicon.com/embed/wp/demo123" width="100%" height="600"></iframe>`}
                 </div>
-                <button onClick={handleCopyEmbed} className="flex items-center gap-2 text-sm text-violet-400 hover:text-violet-300">
+                <button onClick={handleCopyEmbed} className="flex items-center gap-2 text-sm text-stone-400 hover:text-stone-300">
                   {copiedEmbed ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                   {copiedEmbed ? 'Copied!' : 'Copy Embed Code'}
                 </button>
@@ -348,19 +348,19 @@ export default function WhitePaperPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-xs text-white/40">Total Downloads</p>
-                    <p className="text-2xl font-bold text-violet-400">847</p>
+                    <p className="text-2xl font-bold text-stone-400">847</p>
                   </div>
                   <div>
                     <p className="text-xs text-white/40">Email Captures</p>
-                    <p className="text-2xl font-bold text-emerald-400">623</p>
+                    <p className="text-2xl font-bold text-stone-400">623</p>
                   </div>
                   <div>
                     <p className="text-xs text-white/40">Conversion Rate</p>
-                    <p className="text-2xl font-bold text-amber-400">73.6%</p>
+                    <p className="text-2xl font-bold text-stone-400">73.6%</p>
                   </div>
                   <div>
                     <p className="text-xs text-white/40">Shares</p>
-                    <p className="text-2xl font-bold text-blue-400">142</p>
+                    <p className="text-2xl font-bold text-stone-400">142</p>
                   </div>
                 </div>
               </div>
@@ -368,7 +368,7 @@ export default function WhitePaperPage() {
 
             {/* Gate Preview */}
             <div className="sticky top-24">
-              <div className="p-1 rounded-2xl bg-gradient-to-r from-violet-500/20 to-fuchsia-500/20">
+              <div className="p-1 rounded-2xl bg-gradient-to-r from-stone-500/20 to-stone-500/20">
                 <div className="bg-[#0f0f1a] rounded-xl p-8 min-h-[500px] flex items-center justify-center relative">
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f1a] via-transparent to-transparent rounded-xl z-10" />
                   <div className="absolute top-6 left-6 right-6 opacity-30 z-0">
@@ -381,7 +381,7 @@ export default function WhitePaperPage() {
                     <div className="h-3 bg-white/5 rounded mb-1 w-full" />
                   </div>
                   <div className="relative z-20 text-center max-w-sm">
-                    <Lock className="w-12 h-12 mx-auto mb-4 text-violet-400" />
+                    <Lock className="w-12 h-12 mx-auto mb-4 text-stone-400" />
                     <h3 className="text-xl font-bold mb-2">Download the full white paper</h3>
                     <p className="text-sm text-white/50 mb-6">Enter your email to receive the complete PDF with all data and analysis.</p>
                     <div className="space-y-3">
@@ -390,9 +390,9 @@ export default function WhitePaperPage() {
                         value={gateEmail}
                         onChange={(e) => setGateEmail(e.target.value)}
                         placeholder="your@company.com"
-                        className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50 text-center"
+                        className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-stone-500/50 text-center"
                       />
-                      <button onClick={() => {}} className="w-full py-3 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 font-medium text-sm hover:opacity-90 transition flex items-center justify-center gap-2">
+                      <button onClick={() => {}} className="w-full py-3 rounded-lg bg-gradient-to-r from-stone-600 to-stone-600 font-medium text-sm hover:opacity-90 transition flex items-center justify-center gap-2">
                         <Download className="w-4 h-4" /> Get Free Download
                       </button>
                       <p className="text-xs text-white/30">No spam. Unsubscribe anytime.</p>

@@ -180,17 +180,17 @@ export default function QRCodesPage() {
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
               <ArrowLeft className="w-4 h-4" />
-              <span className="font-bold text-lg bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Zoobicon</span>
+              <span className="font-bold text-lg bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</span>
             </Link>
             <ChevronRight className="w-4 h-4 text-white/30" />
             <div className="flex items-center gap-2">
-              <QrCode className="w-5 h-5 text-violet-400" />
+              <QrCode className="w-5 h-5 text-stone-400" />
               <span className="font-semibold">QR Code Generator</span>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/builder" className="px-4 py-2 text-sm text-white/70 hover:text-white transition-colors">Builder</Link>
-            <Link href="/dashboard" className="px-4 py-2 text-sm bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors">Dashboard</Link>
+            <Link href="/dashboard" className="px-4 py-2 text-sm bg-stone-600 hover:bg-stone-500 rounded-lg transition-colors">Dashboard</Link>
           </div>
         </div>
       </header>
@@ -204,7 +204,7 @@ export default function QRCodesPage() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
                 activeTab === tab.id
-                  ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/25'
+                  ? 'bg-stone-600 text-white shadow-lg shadow-stone-600/25'
                   : 'text-white/60 hover:text-white hover:bg-white/5'
               }`}
             >
@@ -228,7 +228,7 @@ export default function QRCodesPage() {
                       onClick={() => handleTypeChange(type.id)}
                       className={`flex flex-col items-center gap-2 p-3 rounded-xl text-xs font-medium transition-all ${
                         config.type === type.id
-                          ? 'bg-violet-600/20 border border-violet-500/50 text-violet-300'
+                          ? 'bg-stone-600/20 border border-stone-500/50 text-stone-300'
                           : 'bg-white/5 border border-white/5 text-white/60 hover:bg-white/10'
                       }`}
                     >
@@ -251,7 +251,7 @@ export default function QRCodesPage() {
                         value={config.data[field.key] || ''}
                         onChange={e => handleFieldChange(field.key, e.target.value)}
                         placeholder={field.placeholder}
-                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/25 transition-all"
+                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-stone-500/50 focus:ring-1 focus:ring-stone-500/25 transition-all"
                       />
                     </div>
                   ))}
@@ -263,12 +263,12 @@ export default function QRCodesPage() {
             <div className="flex flex-col items-center gap-6">
               <div className="bg-white/5 rounded-2xl border border-white/10 p-8 w-full flex flex-col items-center">
                 <h3 className="text-sm font-medium text-white/60 mb-6 uppercase tracking-wider">Preview</h3>
-                <div className="bg-white rounded-2xl p-6 shadow-2xl shadow-violet-500/10">
+                <div className="bg-white rounded-2xl p-6 shadow-2xl shadow-stone-500/10">
                   <SimulatedQR config={config} />
                 </div>
                 <div className="mt-6 flex gap-3">
                   <button onClick={handleCopy} className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/15 rounded-lg text-sm transition-colors">
-                    {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                    {copied ? <Check className="w-4 h-4 text-stone-400" /> : <Copy className="w-4 h-4" />}
                     {copied ? 'Copied!' : 'Copy'}
                   </button>
                   <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/15 rounded-lg text-sm transition-colors">
@@ -285,9 +285,9 @@ export default function QRCodesPage() {
                   {['PNG', 'SVG', 'PDF'].map(format => (
                     <button onClick={() => {}}
                       key={format}
-                      className="flex flex-col items-center gap-2 p-4 bg-white/5 hover:bg-violet-600/20 border border-white/10 hover:border-violet-500/50 rounded-xl text-sm transition-all group"
+                      className="flex flex-col items-center gap-2 p-4 bg-white/5 hover:bg-stone-600/20 border border-white/10 hover:border-stone-500/50 rounded-xl text-sm transition-all group"
                     >
-                      <Download className="w-5 h-5 text-white/40 group-hover:text-violet-400 transition-colors" />
+                      <Download className="w-5 h-5 text-white/40 group-hover:text-stone-400 transition-colors" />
                       <span className="font-medium">{format}</span>
                     </button>
                   ))}
@@ -315,7 +315,7 @@ export default function QRCodesPage() {
                         type="text"
                         value={config.fgColor}
                         onChange={e => setConfig(prev => ({ ...prev, fgColor: e.target.value }))}
-                        className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-violet-500/50"
+                        className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-stone-500/50"
                       />
                     </div>
                   </div>
@@ -332,7 +332,7 @@ export default function QRCodesPage() {
                         type="text"
                         value={config.bgColor}
                         onChange={e => setConfig(prev => ({ ...prev, bgColor: e.target.value }))}
-                        className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-violet-500/50"
+                        className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white font-mono focus:outline-none focus:border-stone-500/50"
                       />
                     </div>
                   </div>
@@ -353,7 +353,7 @@ export default function QRCodesPage() {
                           onClick={() => setConfig(prev => ({ ...prev, cornerStyle: style }))}
                           className={`p-2.5 rounded-lg text-xs font-medium capitalize transition-all ${
                             config.cornerStyle === style
-                              ? 'bg-violet-600/20 border border-violet-500/50 text-violet-300'
+                              ? 'bg-stone-600/20 border border-stone-500/50 text-stone-300'
                               : 'bg-white/5 border border-white/10 text-white/60 hover:bg-white/10'
                           }`}
                         >
@@ -366,7 +366,7 @@ export default function QRCodesPage() {
                     <span className="text-sm text-white/70">Center Logo</span>
                     <button
                       onClick={() => setConfig(prev => ({ ...prev, logoEnabled: !prev.logoEnabled }))}
-                      className={`w-11 h-6 rounded-full transition-colors ${config.logoEnabled ? 'bg-violet-600' : 'bg-white/20'}`}
+                      className={`w-11 h-6 rounded-full transition-colors ${config.logoEnabled ? 'bg-stone-600' : 'bg-white/20'}`}
                     >
                       <div className={`w-5 h-5 rounded-full bg-white shadow-md transition-transform ${config.logoEnabled ? 'translate-x-5.5 ml-[22px]' : 'translate-x-0.5 ml-[2px]'}`} />
                     </button>
@@ -379,13 +379,13 @@ export default function QRCodesPage() {
                       max={400}
                       value={config.size}
                       onChange={e => setConfig(prev => ({ ...prev, size: parseInt(e.target.value) }))}
-                      className="w-full accent-violet-500"
+                      className="w-full accent-stone-500"
                     />
                   </div>
                 </div>
               </div>
 
-              <button onClick={() => {}} className="w-full py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-violet-600/25">
+              <button onClick={() => {}} className="w-full py-3 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-stone-600/25">
                 <Sparkles className="w-4 h-4" />
                 Generate QR Code
               </button>
@@ -399,7 +399,7 @@ export default function QRCodesPage() {
               <button
                 key={i}
                 onClick={() => setConfig(prev => ({ ...prev, type: template.type, fgColor: template.fg, bgColor: template.bg, cornerStyle: template.corner }))}
-                className="bg-white/5 rounded-2xl border border-white/10 hover:border-violet-500/50 p-6 text-left transition-all group"
+                className="bg-white/5 rounded-2xl border border-white/10 hover:border-stone-500/50 p-6 text-left transition-all group"
               >
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold">{template.name}</h3>
@@ -422,7 +422,7 @@ export default function QRCodesPage() {
           <div className="max-w-3xl mx-auto">
             <div className="bg-white/5 rounded-2xl border border-white/10 p-8">
               <div className="flex items-center gap-3 mb-6">
-                <Package className="w-6 h-6 text-violet-400" />
+                <Package className="w-6 h-6 text-stone-400" />
                 <div>
                   <h2 className="text-lg font-semibold">Batch QR Generation</h2>
                   <p className="text-sm text-white/50">Generate multiple QR codes at once. Enter one URL per line.</p>
@@ -432,12 +432,12 @@ export default function QRCodesPage() {
                 value={batchUrls}
                 onChange={e => setBatchUrls(e.target.value)}
                 rows={8}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/25 font-mono transition-all mb-4"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-stone-500/50 focus:ring-1 focus:ring-stone-500/25 font-mono transition-all mb-4"
                 placeholder="https://example.com&#10;https://another-site.com"
               />
               <div className="flex items-center justify-between">
                 <span className="text-sm text-white/50">{batchUrls.split('\n').filter(l => l.trim()).length} URLs detected</span>
-                <button onClick={() => {}} className="flex items-center gap-2 px-6 py-2.5 bg-violet-600 hover:bg-violet-500 rounded-xl text-sm font-medium transition-colors shadow-lg shadow-violet-600/25">
+                <button onClick={() => {}} className="flex items-center gap-2 px-6 py-2.5 bg-stone-600 hover:bg-stone-500 rounded-xl text-sm font-medium transition-colors shadow-lg shadow-stone-600/25">
                   <Zap className="w-4 h-4" />
                   Generate All
                 </button>
@@ -476,15 +476,15 @@ export default function QRCodesPage() {
               <div className="divide-y divide-white/5">
                 {HISTORY.map((item, i) => (
                   <div key={i} className="px-6 py-4 flex items-center gap-4 hover:bg-white/5 transition-colors">
-                    <div className="w-10 h-10 rounded-lg bg-violet-600/20 flex items-center justify-center">
-                      <QrCode className="w-5 h-5 text-violet-400" />
+                    <div className="w-10 h-10 rounded-lg bg-stone-600/20 flex items-center justify-center">
+                      <QrCode className="w-5 h-5 text-stone-400" />
                     </div>
                     <div className="flex-1">
                       <p className="font-medium text-sm">{item.name}</p>
                       <p className="text-xs text-white/40">{item.date} &middot; {item.type.toUpperCase()}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-medium text-violet-400">{item.scans.toLocaleString()}</p>
+                      <p className="text-sm font-medium text-stone-400">{item.scans.toLocaleString()}</p>
                       <p className="text-xs text-white/40">scans</p>
                     </div>
                     <button onClick={() => {}} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
@@ -502,7 +502,7 @@ export default function QRCodesPage() {
       <footer className="border-t border-white/10 mt-20 py-12">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <p className="text-white/40 text-sm">
-            Replaces QR Code Monkey, QR Tiger, and Beaconstac &mdash; <span className="text-violet-400">included free with Zoobicon Pro</span>
+            Replaces QR Code Monkey, QR Tiger, and Beaconstac &mdash; <span className="text-stone-400">included free with Zoobicon Pro</span>
           </p>
           <div className="flex items-center justify-center gap-6 mt-4">
             <Link href="/pricing" className="text-sm text-white/50 hover:text-white transition-colors">Pricing</Link>

@@ -166,9 +166,9 @@ export default function StartPage(): JSX.Element {
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#07070b] text-white">
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute left-1/2 top-0 h-[640px] w-[640px] -translate-x-1/2 rounded-full bg-fuchsia-500/20 blur-3xl" />
-        <div className="absolute right-0 top-40 h-[420px] w-[420px] rounded-full bg-cyan-400/15 blur-3xl" />
-        <div className="absolute bottom-0 left-0 h-[420px] w-[420px] rounded-full bg-amber-400/10 blur-3xl" />
+        <div className="absolute left-1/2 top-0 h-[640px] w-[640px] -translate-x-1/2 rounded-full bg-stone-500/20 blur-3xl" />
+        <div className="absolute right-0 top-40 h-[420px] w-[420px] rounded-full bg-stone-400/15 blur-3xl" />
+        <div className="absolute bottom-0 left-0 h-[420px] w-[420px] rounded-full bg-stone-400/10 blur-3xl" />
       </div>
 
       <section className="mx-auto max-w-4xl px-6 pt-24 pb-16 text-center">
@@ -178,7 +178,7 @@ export default function StartPage(): JSX.Element {
           transition={{ duration: 0.6 }}
           className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-medium tracking-wide text-white/80 backdrop-blur"
         >
-          <Sparkles className="h-3.5 w-3.5 text-fuchsia-300" />
+          <Sparkles className="h-3.5 w-3.5 text-stone-300" />
           From a name to a launched business in under 60 seconds
         </motion.div>
         <motion.h1
@@ -188,7 +188,7 @@ export default function StartPage(): JSX.Element {
           className="text-balance text-5xl font-semibold tracking-tight sm:text-6xl md:text-7xl"
         >
           What&apos;s your business{" "}
-          <span className="bg-gradient-to-r from-fuchsia-300 via-pink-300 to-amber-200 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-stone-300 via-stone-300 to-stone-200 bg-clip-text text-transparent">
             called?
           </span>
         </motion.h1>
@@ -234,7 +234,7 @@ export default function StartPage(): JSX.Element {
               <button
                 type="submit"
                 disabled={submitting || !businessName.trim()}
-                className="group/btn inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-fuchsia-500 via-pink-500 to-amber-400 px-5 py-3.5 text-sm font-semibold tracking-tight text-black shadow-lg shadow-fuchsia-500/20 transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
+                className="group/btn inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-stone-500 via-stone-500 to-stone-400 px-5 py-3.5 text-sm font-semibold tracking-tight text-black shadow-lg shadow-stone-500/20 transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {submitting ? "Generating…" : "Launch it"}
                 <ArrowRight className="h-4 w-4 transition group-hover/btn:translate-x-0.5" />
@@ -247,17 +247,17 @@ export default function StartPage(): JSX.Element {
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mx-auto mt-6 flex max-w-2xl items-start gap-3 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-left text-sm text-red-200"
+            className="mx-auto mt-6 flex max-w-2xl items-start gap-3 rounded-xl border border-stone-500/30 bg-stone-500/10 p-4 text-left text-sm text-stone-200"
             role="alert"
           >
             <AlertTriangle className="mt-0.5 h-4 w-4 flex-none" />
             <div>
               <div className="font-semibold">We hit a snag.</div>
-              <div className="mt-0.5 text-red-200/80">{error}</div>
+              <div className="mt-0.5 text-stone-200/80">{error}</div>
               <button
                 type="button"
                 onClick={() => setError(null)}
-                className="mt-2 text-xs font-medium text-red-100 underline underline-offset-2"
+                className="mt-2 text-xs font-medium text-stone-100 underline underline-offset-2"
               >
                 Dismiss
               </button>
@@ -335,7 +335,7 @@ export default function StartPage(): JSX.Element {
                       <span className="font-mono">{d.domain}</span>
                       <span
                         className={`text-xs ${
-                          d.available === false ? "text-red-300" : "text-emerald-300"
+                          d.available === false ? "text-stone-300" : "text-stone-300"
                         }`}
                       >
                         {d.available === false
@@ -379,7 +379,7 @@ export default function StartPage(): JSX.Element {
               >
                 <a
                   href={signupHref}
-                  className="group inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-fuchsia-500 via-pink-500 to-amber-400 px-8 py-5 text-base font-semibold tracking-tight text-black shadow-2xl shadow-fuchsia-500/30 transition hover:scale-[1.03]"
+                  className="group inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-stone-500 via-stone-500 to-stone-400 px-8 py-5 text-base font-semibold tracking-tight text-black shadow-2xl shadow-stone-500/30 transition hover:scale-[1.03]"
                 >
                   Claim this for $49/mo
                   <ArrowRight className="h-5 w-5 transition group-hover:translate-x-1" />

@@ -123,7 +123,7 @@ export default function EsimProductPage() {
   };
 
   const Cell = ({ val }: { val: unknown }) => {
-    if (val === true) return <Check className="w-4 h-4 text-emerald-400 mx-auto" />;
+    if (val === true) return <Check className="w-4 h-4 text-stone-400 mx-auto" />;
     if (val === false) return <Minus className="w-4 h-4 text-white/20 mx-auto" />;
     return <span className="text-sm text-white/70">{String(val)}</span>;
   };
@@ -163,17 +163,17 @@ export default function EsimProductPage() {
         <HeroEffects variant="cyan" cursorGlow particles particleCount={25} aurora />
         <CursorGlowTracker />
         <motion.div className="relative z-10 max-w-5xl mx-auto px-6 text-center" variants={staggerContainer} initial="hidden" animate="visible">
-          <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 mb-8">
-            <Clock className="w-3.5 h-3.5 text-amber-400" /><span className="text-xs font-medium text-amber-300">Coming Soon — Join the Waitlist</span>
+          <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-stone-500/10 border border-stone-500/20 mb-8">
+            <Clock className="w-3.5 h-3.5 text-stone-400" /><span className="text-xs font-medium text-stone-300">Coming Soon — Join the Waitlist</span>
           </motion.div>
           <motion.h1 variants={fadeInUp} className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6">
-            Stay connected in{" "}<span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">190+ countries</span>
+            Stay connected in{" "}<span className="bg-gradient-to-r from-stone-400 via-stone-400 to-stone-400 bg-clip-text text-transparent">190+ countries</span>
           </motion.h1>
           <motion.p variants={fadeInUp} className="text-lg sm:text-xl text-white/50 max-w-2xl mx-auto mb-10">
             Instant eSIM data plans. No physical SIM card. No store visits. Scan a QR code and you&apos;re online in seconds.
           </motion.p>
           <motion.div variants={fadeInUp} className="flex flex-wrap justify-center gap-4">
-            <Link href="/auth/signup" className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 font-semibold hover:from-cyan-400 hover:to-blue-500 transition-all flex items-center gap-2">Join Waitlist <ArrowRight className="w-4 h-4" /></Link>
+            <Link href="/auth/signup" className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-stone-500 to-stone-600 font-semibold hover:from-stone-400 hover:to-stone-500 transition-all flex items-center gap-2">Join Waitlist <ArrowRight className="w-4 h-4" /></Link>
             <Link href="#pricing" className="px-8 py-3.5 rounded-xl bg-white/[0.05] border border-white/[0.1] font-semibold hover:bg-white/[0.08] transition-all">View Plans</Link>
           </motion.div>
         </motion.div>
@@ -184,7 +184,7 @@ export default function EsimProductPage() {
         <div className="max-w-5xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6">
           {STATS.map(s => (
             <div key={s.label} className="text-center">
-              <div className="text-2xl font-bold text-cyan-400">{s.value}</div>
+              <div className="text-2xl font-bold text-stone-400">{s.value}</div>
               <div className="text-xs text-white/40 mt-1">{s.label}</div>
             </div>
           ))}
@@ -200,8 +200,8 @@ export default function EsimProductPage() {
           </motion.div>
           <motion.div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5" variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
             {FEATURES.map(f => (
-              <motion.div key={f.title} variants={fadeInUp} className="rounded-2xl bg-white/[0.03] border border-white/[0.08] p-6 hover:border-cyan-500/20 transition-all">
-                <f.icon className="w-6 h-6 text-cyan-400 mb-4" />
+              <motion.div key={f.title} variants={fadeInUp} className="rounded-2xl bg-white/[0.03] border border-white/[0.08] p-6 hover:border-stone-500/20 transition-all">
+                <f.icon className="w-6 h-6 text-stone-400 mb-4" />
                 <h3 className="font-semibold mb-2">{f.title}</h3>
                 <p className="text-sm text-white/40 leading-relaxed">{f.desc}</p>
               </motion.div>
@@ -236,8 +236,8 @@ export default function EsimProductPage() {
               { step: "3", icon: Wifi, title: "You're Connected", desc: "eSIM activates instantly. Start using data immediately." },
             ].map((s, i) => (
               <div key={s.step} className="relative text-center">
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-cyan-500/20 flex items-center justify-center mx-auto mb-4">
-                  <s.icon className="w-6 h-6 text-cyan-400" />
+                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-stone-500/20 to-stone-600/20 border border-stone-500/20 flex items-center justify-center mx-auto mb-4">
+                  <s.icon className="w-6 h-6 text-stone-400" />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">{s.title}</h3>
                 <p className="text-sm text-white/40">{s.desc}</p>
@@ -257,7 +257,7 @@ export default function EsimProductPage() {
               <thead>
                 <tr className="border-b border-white/[0.08]">
                   {["Feature", "Zoobicon", "Airalo", "Holafly", "Nomad", "aloSIM"].map((h, i) => (
-                    <th key={h} className={`px-4 py-3 text-left text-xs uppercase tracking-wider ${i === 1 ? "text-cyan-400 bg-cyan-500/5" : "text-white/40"}`}>{h}</th>
+                    <th key={h} className={`px-4 py-3 text-left text-xs uppercase tracking-wider ${i === 1 ? "text-stone-400 bg-stone-500/5" : "text-white/40"}`}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -265,7 +265,7 @@ export default function EsimProductPage() {
                 {COMPETITORS.slice(1).map(row => (
                   <tr key={row.name} className="hover:bg-white/[0.02]">
                     <td className="px-4 py-3 text-white/60 text-sm">{row.name}</td>
-                    <td className="px-4 py-3 bg-cyan-500/5"><Cell val={row.zoobicon} /></td>
+                    <td className="px-4 py-3 bg-stone-500/5"><Cell val={row.zoobicon} /></td>
                     <td className="px-4 py-3"><Cell val={row.airalo} /></td>
                     <td className="px-4 py-3"><Cell val={row.holafly} /></td>
                     <td className="px-4 py-3"><Cell val={row.nomad} /></td>
@@ -285,13 +285,13 @@ export default function EsimProductPage() {
           <motion.h2 variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-3xl font-bold text-center mb-12">Simple, transparent pricing</motion.h2>
           <div className="grid md:grid-cols-3 gap-6">
             {PLANS.map(p => (
-              <div key={p.name} className={`rounded-2xl p-6 border ${p.featured ? "bg-cyan-500/5 border-cyan-500/20 ring-1 ring-cyan-500/10" : "bg-white/[0.02] border-white/[0.08]"}`}>
-                {p.featured && <div className="text-[10px] text-cyan-400 bg-cyan-500/10 px-3 py-1 rounded-full inline-block mb-3 font-semibold uppercase tracking-wider">Most Popular</div>}
+              <div key={p.name} className={`rounded-2xl p-6 border ${p.featured ? "bg-stone-500/5 border-stone-500/20 ring-1 ring-stone-500/10" : "bg-white/[0.02] border-white/[0.08]"}`}>
+                {p.featured && <div className="text-[10px] text-stone-400 bg-stone-500/10 px-3 py-1 rounded-full inline-block mb-3 font-semibold uppercase tracking-wider">Most Popular</div>}
                 <h3 className="text-lg font-bold mb-1">{p.name}</h3>
                 <p className="text-xs text-white/40 mb-4">{p.desc}</p>
                 <div className="flex items-baseline gap-1 mb-1"><span className="text-3xl font-bold">{p.price}</span></div>
                 <p className="text-xs text-white/30 mb-6">{p.data} · {p.validity}</p>
-                <Link href="/auth/signup" className={`block text-center py-2.5 rounded-xl text-sm font-semibold transition-all ${p.featured ? "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500" : "bg-white/[0.05] border border-white/[0.1] hover:bg-white/[0.08]"}`}>Get eSIM</Link>
+                <Link href="/auth/signup" className={`block text-center py-2.5 rounded-xl text-sm font-semibold transition-all ${p.featured ? "bg-gradient-to-r from-stone-500 to-stone-600 hover:from-stone-400 hover:to-stone-500" : "bg-white/[0.05] border border-white/[0.1] hover:bg-white/[0.08]"}`}>Get eSIM</Link>
               </div>
             ))}
           </div>
@@ -319,10 +319,10 @@ export default function EsimProductPage() {
       {/* Final CTA */}
       <section className="py-24 border-t border-white/[0.06]">
         <div className="max-w-3xl mx-auto px-6 text-center">
-          <Wifi className="w-12 h-12 text-cyan-400 mx-auto mb-6" />
+          <Wifi className="w-12 h-12 text-stone-400 mx-auto mb-6" />
           <h2 className="text-3xl font-bold mb-4">Travel connected. Always.</h2>
           <p className="text-white/40 mb-8 max-w-lg mx-auto">190+ countries. Instant activation. No roaming surprises. Get your eSIM in under 60 seconds.</p>
-          <Link href="/auth/signup" className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 font-semibold hover:from-cyan-400 hover:to-blue-500 transition-all">Get eSIM <ArrowRight className="w-4 h-4" /></Link>
+          <Link href="/auth/signup" className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-stone-500 to-stone-600 font-semibold hover:from-stone-400 hover:to-stone-500 transition-all">Get eSIM <ArrowRight className="w-4 h-4" /></Link>
         </div>
       </section>
 

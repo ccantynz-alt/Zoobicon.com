@@ -183,7 +183,7 @@ export default function DomainFinderPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
-            <Sparkles className="w-8 h-8 text-indigo-400" />
+            <Sparkles className="w-8 h-8 text-stone-400" />
             AI Domain Finder
           </h1>
           <p className="text-slate-400">Describe your business and find available domains instantly.</p>
@@ -196,13 +196,13 @@ export default function DomainFinderPage() {
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
             placeholder="e.g., accounting ai automation software"
-            className="flex-1 px-4 py-3 bg-[#1e293b] border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="flex-1 px-4 py-3 bg-[#1e293b] border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-stone-500"
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
           />
           <button
             onClick={handleSearch}
             disabled={checking || !keyword.trim()}
-            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-semibold flex items-center gap-2 disabled:opacity-50 transition-colors"
+            className="px-6 py-3 bg-stone-600 hover:bg-stone-500 rounded-xl font-semibold flex items-center gap-2 disabled:opacity-50 transition-colors"
           >
             {checking ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
             Find Domains
@@ -232,7 +232,7 @@ export default function DomainFinderPage() {
                     key={r.domain}
                     className={`flex items-center justify-between p-3 rounded-xl border ${
                       r.available === true
-                        ? "bg-emerald-500/10 border-emerald-500/20"
+                        ? "bg-stone-500/10 border-stone-500/20"
                         : r.available === false
                         ? "bg-white/[0.02] border-white/5 opacity-50"
                         : "bg-white/[0.02] border-white/5"
@@ -242,13 +242,13 @@ export default function DomainFinderPage() {
                       {r.checking ? (
                         <Loader2 className="w-4 h-4 text-slate-400 animate-spin" />
                       ) : r.available === true ? (
-                        <Check className="w-4 h-4 text-emerald-400" />
+                        <Check className="w-4 h-4 text-stone-400" />
                       ) : r.available === false ? (
-                        <X className="w-4 h-4 text-red-400/50" />
+                        <X className="w-4 h-4 text-stone-400/50" />
                       ) : (
-                        <Globe className="w-4 h-4 text-yellow-400" />
+                        <Globe className="w-4 h-4 text-stone-400" />
                       )}
-                      <span className={`font-mono text-sm ${r.available === true ? "text-emerald-300 font-semibold" : "text-slate-400"}`}>
+                      <span className={`font-mono text-sm ${r.available === true ? "text-stone-300 font-semibold" : "text-slate-400"}`}>
                         {r.domain}
                       </span>
                     </div>
@@ -262,7 +262,7 @@ export default function DomainFinderPage() {
                           className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
                           title="Copy domain"
                         >
-                          {copied === r.domain ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
+                          {copied === r.domain ? <Check className="w-3.5 h-3.5 text-stone-400" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
                         </button>
                       )}
                     </div>

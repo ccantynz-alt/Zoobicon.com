@@ -251,8 +251,8 @@ async function planComponents(prompt: string): Promise<PlanResult> {
     return {
       components: fallback,
       brandName: parsed?.brandName ?? inferBrandName(prompt),
-      primaryColor: parsed?.primaryColor ?? "#4f46e5",
-      bgColor: parsed?.bgColor ?? "#ffffff",
+      primaryColor: parsed?.primaryColor ?? "#1c1917",
+      bgColor: parsed?.bgColor ?? "#FAF9F6",
     };
   }
 
@@ -279,7 +279,14 @@ Hard rules:
 - Replace AI-slop words ("revolutionary", "unleash", "empower", "synergy", "next-generation", "game-changer", "leverage", "elevate", "seamless", "cutting-edge") with specific copy.
 - Use real-sounding metrics, not "10,000+ users".
 - Add aria-labels to icon-only buttons. Add alt text to images. Keep responsive classes.
-- For navbars: anchor links (href="#features", "#pricing", etc.) MUST match real section ids on the page. Only use: features, pricing, faq, about, contact. Never use #docs, #solutions, #markets, or any id that won't exist as a section.`;
+- For navbars: anchor links (href="#features", "#pricing", etc.) MUST match real section ids on the page. Only use: features, pricing, faq, about, contact. Never use #docs, #solutions, #markets, or any id that won't exist as a section.
+
+EDITORIAL DESIGN SYSTEM — MANDATORY
+This site ships on the Zoobicon editorial preset. It is a restrained, world-stage typographic aesthetic. You MUST:
+- Use ONLY the stone- color family for every Tailwind color utility (from, via, to, text, bg, border, shadow, ring, outline, divide, etc.). NO violet, purple, fuchsia, pink, rose, indigo, blue, sky, cyan, teal, emerald, green, lime, yellow, amber, orange, red. Gray/slate/neutral/zinc/stone/black/white are fine, but prefer stone.
+- Wrap one word or short phrase in each h1/h2 in <em>…</em> so the editorial Fraunces italic serif accent kicks in. Example: <h1>Design that <em>moves</em> people.</h1>
+- Keep motion measured — subtle transitions only. No neon glows, no vibrant shadows, no arcade colors.
+- Prefer understated copy. Editorial voice, not landing-page hype.`;
 
 interface CustomiseArgs {
   baseCode: string;
@@ -452,7 +459,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         const files: Record<string, string> = {
           "package.json": buildPackageJson({ withSupabase: wantsSupabase }),
           "tailwind.config.js": buildTailwindConfig(),
-          "styles.css": registry.buildStylesFile({ primaryColor: "#4f46e5", bgColor: "#ffffff" }),
+          "styles.css": registry.buildStylesFile({ primaryColor: "#1c1917", bgColor: "#FAF9F6" }),
           "App.tsx": registry.buildAppFile([]),
         };
         writer.send("files", { files, fileCount: 0, totalComponents: 0 });
@@ -465,8 +472,14 @@ export async function POST(req: NextRequest): Promise<Response> {
         const { components, brandName, primaryColor, bgColor } =
           await planComponents(prompt);
 
-        // Update styles with the real brand colours now that planning succeeded
-        files["styles.css"] = registry.buildStylesFile({ primaryColor, bgColor });
+        // Detect industry from the prompt once — drives imagery selection
+        // for every component in this build (restaurants get warm hand/craft
+        // imagery, SaaS gets workspace/dashboards, portfolio gets landscape).
+        const industry = registry.detectIndustry(prompt);
+
+        // Update styles with the real brand colours now that planning succeeded.
+        // Theme stays editorial — Fraunces + Inter + measured motion.
+        files["styles.css"] = registry.buildStylesFile({ primaryColor, bgColor, theme: "editorial" });
         writer.send("files", { files, fileCount: 0, totalComponents: components.length });
 
         // ── PHASE 3: generating (customise each component) ──
@@ -496,6 +509,23 @@ export async function POST(req: NextRequest): Promise<Response> {
             // Fallback: use template code as-is
             updatedCode = `import React from "react";\n\n${comp.code}\n`;
           }
+
+          // Editorial reskin — guarantees every shipped component uses the
+          // restrained stone palette even when the LLM ignores the system
+          // prompt and emits violet/cyan/fuchsia classes anyway. Regex-only;
+          // safe on already-reskinned code (idempotent).
+          updatedCode = registry.reskinEditorial(updatedCode);
+
+          // Industry image swap — replace every Unsplash photo ID with one
+          // drawn from the detected industry's curated pool, so imagery
+          // matches the prompt instead of the base component's hardcoded
+          // mountains/watches/dashboards.
+          updatedCode = registry.swapImagesForIndustry(updatedCode, industry);
+
+          // Auto-emphasize one word per h1/h2 so the Fraunces italic serif
+          // accent actually renders. Hard guarantee for when the LLM
+          // ignores the editorial system-prompt instruction.
+          updatedCode = registry.emphasizeHeadings(updatedCode);
 
           const { fileName } = registry.buildComponentFile(comp);
           files[fileName] = updatedCode;
@@ -593,10 +623,15 @@ export async function POST(req: NextRequest): Promise<Response> {
                 message: `Database ready — ${provision.tables.length} table(s), ${provision.auth.length > 0 ? "auth enabled" : "no auth"}, ${provision.buckets.length} bucket(s)`,
               });
             } catch (err) {
-              // Supabase provisioning failure is non-fatal — site still works without it
+              // Supabase provisioning failure is non-fatal — site still works without it.
+              // Use fatal:false so the client treats this as a warning, not a build abort.
+              // The JWT / token-expired path lives here (SUPABASE_ACCESS_TOKEN invalid in prod
+              // would otherwise surface as "Something went wrong / JWT could not be decoded"
+              // and kill the entire build even though it's non-fatal).
               const msg = err instanceof Error ? err.message : String(err);
               writer.send("error", {
-                message: `Supabase provisioning failed: ${msg}`,
+                fatal: false,
+                message: `Supabase provisioning skipped: ${msg}`,
                 hint: "The site will still work but without a live database. You can connect Supabase manually later.",
               });
 
@@ -666,9 +701,12 @@ export async function POST(req: NextRequest): Promise<Response> {
             }
             writer.send("files", { files: finalFiles });
           } catch (err) {
+            // Critique loop failure is non-fatal — the unrefined site is still
+            // usable and has already been streamed to the client.
             const { message, hint } = classifyError(err);
             writer.send("error", {
-              message: `Critique loop failed: ${message}`,
+              fatal: false,
+              message: `Critique loop skipped: ${message}`,
               hint: `${hint} The unrefined site is still usable.`,
             });
           }

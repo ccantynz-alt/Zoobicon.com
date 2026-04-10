@@ -122,10 +122,10 @@ export default function InstantOnboardingPage() {
             >
               <div className="text-center mb-12">
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-sm text-white/70 mb-6">
-                  <Sparkles className="w-4 h-4 text-violet-400" />
+                  <Sparkles className="w-4 h-4 text-stone-400" />
                   Instant onboarding
                 </div>
-                <h1 className="text-5xl sm:text-7xl font-bold tracking-tight text-balance bg-gradient-to-br from-white via-white to-violet-300 bg-clip-text text-transparent mb-6">
+                <h1 className="text-5xl sm:text-7xl font-bold tracking-tight text-balance bg-gradient-to-br from-white via-white to-stone-300 bg-clip-text text-transparent mb-6">
                   Your website,<br />already built.
                 </h1>
                 <p className="text-xl text-white/60 max-w-2xl mx-auto text-balance">
@@ -148,7 +148,7 @@ export default function InstantOnboardingPage() {
                       value={businessName}
                       onChange={(e) => setBusinessName(e.target.value)}
                       placeholder="Bob's Plumbing"
-                      className="w-full pl-12 pr-4 py-4 bg-black/40 border border-white/10 rounded-2xl text-lg text-white placeholder:text-white/30 focus:outline-none focus:border-violet-400 transition"
+                      className="w-full pl-12 pr-4 py-4 bg-black/40 border border-white/10 rounded-2xl text-lg text-white placeholder:text-white/30 focus:outline-none focus:border-stone-400 transition"
                       maxLength={80}
                       autoFocus
                     />
@@ -165,7 +165,7 @@ export default function InstantOnboardingPage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="you@example.com"
-                      className="w-full px-4 py-4 bg-black/40 border border-white/10 rounded-2xl text-white placeholder:text-white/30 focus:outline-none focus:border-violet-400 transition"
+                      className="w-full px-4 py-4 bg-black/40 border border-white/10 rounded-2xl text-white placeholder:text-white/30 focus:outline-none focus:border-stone-400 transition"
                     />
                   </div>
                   <div>
@@ -177,13 +177,13 @@ export default function InstantOnboardingPage() {
                       value={location}
                       onChange={(e) => setLocation(e.target.value)}
                       placeholder="Auckland"
-                      className="w-full px-4 py-4 bg-black/40 border border-white/10 rounded-2xl text-white placeholder:text-white/30 focus:outline-none focus:border-violet-400 transition"
+                      className="w-full px-4 py-4 bg-black/40 border border-white/10 rounded-2xl text-white placeholder:text-white/30 focus:outline-none focus:border-stone-400 transition"
                     />
                   </div>
                 </div>
 
                 {formError && (
-                  <div className="text-sm text-rose-300 bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-3">
+                  <div className="text-sm text-stone-300 bg-stone-500/10 border border-stone-500/20 rounded-xl px-4 py-3">
                     {formError}
                   </div>
                 )}
@@ -191,7 +191,7 @@ export default function InstantOnboardingPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full group relative inline-flex items-center justify-center gap-3 px-6 py-5 rounded-2xl bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white font-semibold text-lg shadow-[0_0_40px_rgba(168,85,247,0.4)] hover:shadow-[0_0_60px_rgba(168,85,247,0.6)] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full group relative inline-flex items-center justify-center gap-3 px-6 py-5 rounded-2xl bg-gradient-to-r from-stone-500 to-stone-500 text-white font-semibold text-lg shadow-[0_0_40px_rgba(168,85,247,0.4)] hover:shadow-[0_0_60px_rgba(168,85,247,0.6)] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {submitting ? (
                     <>
@@ -221,10 +221,10 @@ export default function InstantOnboardingPage() {
               exit={{ opacity: 0 }}
               className="max-w-2xl mx-auto text-center"
             >
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 border border-violet-400/30 mb-8">
-                <Loader2 className="w-10 h-10 text-violet-300 animate-spin" />
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-stone-500/20 to-stone-500/20 border border-stone-400/30 mb-8">
+                <Loader2 className="w-10 h-10 text-stone-300 animate-spin" />
               </div>
-              <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-balance mb-4 bg-gradient-to-br from-white to-violet-300 bg-clip-text text-transparent">
+              <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-balance mb-4 bg-gradient-to-br from-white to-stone-300 bg-clip-text text-transparent">
                 Building {businessName}
               </h2>
               <p className="text-white/60 text-lg mb-12">
@@ -250,16 +250,16 @@ export default function InstantOnboardingPage() {
                       <div
                         className={`w-10 h-10 rounded-full flex items-center justify-center border ${
                           isActive
-                            ? "bg-violet-500/20 border-violet-400/50"
+                            ? "bg-stone-500/20 border-stone-400/50"
                             : isPast
-                            ? "bg-emerald-500/10 border-emerald-400/30"
+                            ? "bg-stone-500/10 border-stone-400/30"
                             : "bg-white/5 border-white/10"
                         }`}
                       >
                         {isPast ? (
-                          <Check className="w-5 h-5 text-emerald-400" />
+                          <Check className="w-5 h-5 text-stone-400" />
                         ) : (
-                          <Icon className={`w-5 h-5 ${isActive ? "text-violet-300" : "text-white/40"}`} />
+                          <Icon className={`w-5 h-5 ${isActive ? "text-stone-300" : "text-white/40"}`} />
                         )}
                       </div>
                       <span className={`text-lg ${isActive ? "text-white" : "text-white/60"}`}>
@@ -288,12 +288,12 @@ export default function InstantOnboardingPage() {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.2 }}
-                className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 mb-8 shadow-[0_0_60px_rgba(16,185,129,0.5)]"
+                className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-stone-400 to-stone-500 mb-8 shadow-[0_0_60px_rgba(16,185,129,0.5)]"
               >
                 <Check className="w-12 h-12 text-white" strokeWidth={3} />
               </motion.div>
 
-              <h2 className="text-5xl sm:text-6xl font-bold tracking-tight text-balance mb-4 bg-gradient-to-br from-white to-emerald-300 bg-clip-text text-transparent">
+              <h2 className="text-5xl sm:text-6xl font-bold tracking-tight text-balance mb-4 bg-gradient-to-br from-white to-stone-300 bg-clip-text text-transparent">
                 Your site is ready.
               </h2>
               <p className="text-xl text-white/60 mb-10 text-balance">
@@ -303,7 +303,7 @@ export default function InstantOnboardingPage() {
               <div className="space-y-4">
                 <a
                   href={`/builder?onboarding=${jobId}`}
-                  className="group inline-flex w-full items-center justify-center gap-3 px-8 py-6 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 text-white font-bold text-xl shadow-[0_0_50px_rgba(16,185,129,0.5)] hover:shadow-[0_0_70px_rgba(16,185,129,0.7)] transition-all"
+                  className="group inline-flex w-full items-center justify-center gap-3 px-8 py-6 rounded-2xl bg-gradient-to-r from-stone-400 to-stone-500 text-white font-bold text-xl shadow-[0_0_50px_rgba(16,185,129,0.5)] hover:shadow-[0_0_70px_rgba(16,185,129,0.7)] transition-all"
                 >
                   View my site
                   <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
@@ -328,7 +328,7 @@ export default function InstantOnboardingPage() {
               animate={{ opacity: 1 }}
               className="max-w-2xl mx-auto text-center"
             >
-              <h2 className="text-4xl font-bold tracking-tight mb-4 text-rose-300">
+              <h2 className="text-4xl font-bold tracking-tight mb-4 text-stone-300">
                 Something went wrong.
               </h2>
               <p className="text-white/60 mb-8">{errorMessage}</p>

@@ -23,6 +23,42 @@ export const runtime = "nodejs";
 const REPLICATE_API = "https://api.replicate.com/v1";
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Module-level circuit breaker for a poisoned Replicate token
+// ─────────────────────────────────────────────────────────────────────────────
+// Same pattern as supabase-provisioner.ts — once the Replicate API returns
+// 401 / 403 / "Unauthenticated" in this process, mark the token as poisoned
+// for the rest of the cold start so subsequent video pipelines skip Replicate
+// entirely and surface ONE clear error, instead of burning 60 seconds cycling
+// through 16 fallback models all returning the same auth failure.
+//
+// Before this breaker existed, every bad-key video request would:
+//  - Try TTS model 1 → 401
+//  - Try TTS model 2 → 401
+//  - Try TTS model 3 → 401
+//  - ... etc through all 5 voice models
+//  - ... then all 4 avatar models
+//  - ... then all 3 lip-sync models
+//  - ... then throw at the very end with an unhelpful "all models failed"
+//
+// Now: one 401 → poison → every subsequent call throws immediately with the
+// exact reason. The health/deep endpoint surfaces the poisoned state so Craig
+// sees "Replicate token rotated — update REPLICATE_API_TOKEN" the moment he
+// opens /admin/health, not after 5 failed video renders.
+
+let _replicatePoisoned = false;
+let _replicatePoisonReason = "";
+
+export function markReplicatePoisoned(reason: string): void {
+  _replicatePoisoned = true;
+  _replicatePoisonReason = reason;
+  console.warn(`[video-pipeline] Replicate token poisoned for this cold start: ${reason}`);
+}
+
+export function isReplicatePoisoned(): { poisoned: boolean; reason: string } {
+  return { poisoned: _replicatePoisoned, reason: _replicatePoisonReason };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Legacy compatibility shim
 // ─────────────────────────────────────────────────────────────────────────────
 // The old video-pipeline.ts (deleted 2026-04-07) exposed a flat surface used by
@@ -43,6 +79,15 @@ async function createReplicatePrediction(
   input: Record<string, unknown>,
   token: string
 ): Promise<Response> {
+  // Circuit breaker: if we've already seen a 401/403 this cold start,
+  // skip every Replicate call so we don't burn 60s cycling through 16
+  // models all returning the same auth failure.
+  if (_replicatePoisoned) {
+    throw new Error(
+      `Replicate skipped: ${_replicatePoisonReason}. Rotate REPLICATE_API_TOKEN in Vercel and redeploy.`
+    );
+  }
+
   const headers = {
     Authorization: `Bearer ${token}`,
     "Content-Type": "application/json",
@@ -55,11 +100,31 @@ async function createReplicatePrediction(
     body: JSON.stringify({ input }),
   });
 
+  // Auth failure: poison the token and bail immediately — do NOT cascade
+  // through the rest of the fallback chain or try version-based lookup
+  // because both will return the same 401/403.
+  if (res.status === 401 || res.status === 403) {
+    const body = await res.clone().text().catch(() => "");
+    markReplicatePoisoned(
+      `${res.status} ${res.statusText} on POST /models/${modelPath}/predictions — token appears invalid (${body.slice(0, 200)})`
+    );
+    throw new Error(
+      `Replicate returned ${res.status} — token rejected. ${body.slice(0, 200)}`
+    );
+  }
+
   // Strategy 2: If 404/422, get latest version and use /predictions
   if (res.status === 404 || res.status === 422) {
     console.warn(`[replicate] Model endpoint ${res.status} for ${modelPath}, trying version-based fallback...`);
     try {
       const modelInfo = await fetch(`${REPLICATE_API}/models/${modelPath}`, { headers });
+      if (modelInfo.status === 401 || modelInfo.status === 403) {
+        const body = await modelInfo.text().catch(() => "");
+        markReplicatePoisoned(
+          `${modelInfo.status} on GET /models/${modelPath} — token invalid (${body.slice(0, 200)})`
+        );
+        throw new Error(`Replicate returned ${modelInfo.status} — token rejected.`);
+      }
       if (modelInfo.ok) {
         const info = await modelInfo.json();
         const version = info.latest_version?.id;
@@ -69,11 +134,20 @@ async function createReplicatePrediction(
             headers,
             body: JSON.stringify({ version, input }),
           });
+          if (res.status === 401 || res.status === 403) {
+            const body = await res.clone().text().catch(() => "");
+            markReplicatePoisoned(
+              `${res.status} on POST /predictions — token invalid (${body.slice(0, 200)})`
+            );
+            throw new Error(`Replicate returned ${res.status} — token rejected.`);
+          }
         }
       } else {
         console.warn(`[replicate] Model ${modelPath} does not exist (HTTP ${modelInfo.status}). Skipping.`);
       }
     } catch (e) {
+      // Rethrow auth errors; swallow other version-lookup errors as before
+      if (e instanceof Error && /token rejected|token invalid/i.test(e.message)) throw e;
       console.error(`[replicate] Version fallback failed for ${modelPath}:`, e);
     }
   }

@@ -251,7 +251,7 @@ export default function VideoSeriesPanel({
         className="w-full flex items-center justify-between px-4 py-3 hover:bg-white/[0.03] transition-colors"
       >
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-stone-500 to-stone-600 flex items-center justify-center">
             <Layers className="w-4 h-4 text-white" />
           </div>
           <div className="text-left">
@@ -263,7 +263,7 @@ export default function VideoSeriesPanel({
         </div>
         <div className="flex items-center gap-2">
           {seriesList.length > 0 && (
-            <span className="text-[10px] bg-violet-500/20 text-violet-300 px-1.5 py-0.5 rounded-full">
+            <span className="text-[10px] bg-stone-500/20 text-stone-300 px-1.5 py-0.5 rounded-full">
               {seriesList.length}
             </span>
           )}
@@ -288,7 +288,7 @@ export default function VideoSeriesPanel({
               {!showCreate && (
                 <button
                   onClick={() => setShowCreate(true)}
-                  className="w-full py-2.5 rounded-lg border border-dashed border-violet-500/30 bg-violet-500/5 text-violet-300 text-xs font-medium hover:bg-violet-500/10 hover:border-violet-500/50 transition-all flex items-center justify-center gap-2"
+                  className="w-full py-2.5 rounded-lg border border-dashed border-stone-500/30 bg-stone-500/5 text-stone-300 text-xs font-medium hover:bg-stone-500/10 hover:border-stone-500/50 transition-all flex items-center justify-center gap-2"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Create New Series
@@ -304,10 +304,10 @@ export default function VideoSeriesPanel({
                     exit={{ height: 0, opacity: 0 }}
                     className="overflow-hidden"
                   >
-                    <div className="rounded-xl border border-violet-500/20 bg-violet-500/5 p-3 space-y-3">
+                    <div className="rounded-xl border border-stone-500/20 bg-stone-500/5 p-3 space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="text-xs font-semibold text-white flex items-center gap-1.5">
-                          <Sparkles className="w-3.5 h-3.5 text-violet-400" />
+                          <Sparkles className="w-3.5 h-3.5 text-stone-400" />
                           New Video Series
                         </div>
                         <button
@@ -327,7 +327,7 @@ export default function VideoSeriesPanel({
                           value={seriesName}
                           onChange={(e) => setSeriesName(e.target.value)}
                           placeholder='e.g., "AI Tips for Entrepreneurs"'
-                          className="w-full bg-white/[0.06] border border-white/[0.10] rounded-lg px-3 py-2 text-xs text-white placeholder:text-white/30 outline-none focus:border-violet-500/40"
+                          className="w-full bg-white/[0.06] border border-white/[0.10] rounded-lg px-3 py-2 text-xs text-white placeholder:text-white/30 outline-none focus:border-stone-500/40"
                         />
                       </div>
 
@@ -341,7 +341,7 @@ export default function VideoSeriesPanel({
                           onChange={(e) => setSeriesTopic(e.target.value)}
                           placeholder="What is the series about? The AI will generate unique episode scripts covering different angles of this topic."
                           rows={2}
-                          className="w-full bg-white/[0.06] border border-white/[0.10] rounded-lg px-3 py-2 text-xs text-white placeholder:text-white/30 outline-none focus:border-violet-500/40 resize-none"
+                          className="w-full bg-white/[0.06] border border-white/[0.10] rounded-lg px-3 py-2 text-xs text-white placeholder:text-white/30 outline-none focus:border-stone-500/40 resize-none"
                         />
                       </div>
 
@@ -357,7 +357,7 @@ export default function VideoSeriesPanel({
                               onClick={() => setEpisodeCount(count)}
                               className={`flex-1 py-2 rounded-lg border text-center transition-all ${
                                 episodeCount === count
-                                  ? "border-violet-500/50 bg-violet-500/15 text-violet-300"
+                                  ? "border-stone-500/50 bg-stone-500/15 text-stone-300"
                                   : "border-white/[0.08] bg-white/[0.03] text-white/60 hover:border-white/20"
                               }`}
                             >
@@ -379,7 +379,7 @@ export default function VideoSeriesPanel({
                               onClick={() => setSchedule(s.value)}
                               className={`flex-1 py-2 rounded-lg border text-center transition-all ${
                                 schedule === s.value
-                                  ? "border-violet-500/50 bg-violet-500/15 text-violet-300"
+                                  ? "border-stone-500/50 bg-stone-500/15 text-stone-300"
                                   : "border-white/[0.08] bg-white/[0.03] text-white/60 hover:border-white/20"
                               }`}
                             >
@@ -391,7 +391,7 @@ export default function VideoSeriesPanel({
                       </div>
 
                       {error && (
-                        <div className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                        <div className="text-xs text-stone-400 bg-stone-500/10 border border-stone-500/20 rounded-lg px-3 py-2">
                           {error}
                         </div>
                       )}
@@ -400,7 +400,7 @@ export default function VideoSeriesPanel({
                       <button
                         onClick={handleCreateSeries}
                         disabled={generating || !seriesName.trim() || !seriesTopic.trim()}
-                        className="w-full py-2.5 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-xs font-semibold hover:from-violet-500 hover:to-indigo-500 transition-all disabled:opacity-40 flex items-center justify-center gap-2"
+                        className="w-full py-2.5 rounded-lg bg-gradient-to-r from-stone-600 to-stone-600 text-white text-xs font-semibold hover:from-stone-500 hover:to-stone-500 transition-all disabled:opacity-40 flex items-center justify-center gap-2"
                       >
                         {generating ? (
                           <>
@@ -439,7 +439,7 @@ export default function VideoSeriesPanel({
                       <div className="text-left">
                         <div className="text-xs font-semibold text-white flex items-center gap-2">
                           {series.name}
-                          <span className="text-[9px] bg-violet-500/20 text-violet-300 px-1.5 py-0.5 rounded-full">
+                          <span className="text-[9px] bg-stone-500/20 text-stone-300 px-1.5 py-0.5 rounded-full">
                             {series.episodeCount} eps
                           </span>
                         </div>
@@ -452,7 +452,7 @@ export default function VideoSeriesPanel({
                         <div className="mt-1.5 flex items-center gap-2">
                           <div className="h-1.5 w-24 rounded-full bg-white/[0.08] overflow-hidden">
                             <div
-                              className="h-full rounded-full bg-gradient-to-r from-violet-500 to-indigo-500 transition-all"
+                              className="h-full rounded-full bg-gradient-to-r from-stone-500 to-stone-500 transition-all"
                               style={{
                                 width: `${(stats.scripted / stats.total) * 100}%`,
                               }}
@@ -469,7 +469,7 @@ export default function VideoSeriesPanel({
                             e.stopPropagation();
                             handleDeleteSeries(series.id);
                           }}
-                          className="p-1.5 text-white/30 hover:text-red-400 transition-colors rounded hover:bg-red-500/10"
+                          className="p-1.5 text-white/30 hover:text-stone-400 transition-colors rounded hover:bg-stone-500/10"
                         >
                           <Trash2 className="w-3 h-3" />
                         </button>
@@ -503,7 +503,7 @@ export default function VideoSeriesPanel({
                                     (e) => e.status !== "draft"
                                   )
                                 }
-                                className="flex-1 py-1.5 rounded-lg bg-violet-600/20 text-violet-300 text-[10px] font-medium hover:bg-violet-600/30 transition-all disabled:opacity-30 flex items-center justify-center gap-1"
+                                className="flex-1 py-1.5 rounded-lg bg-stone-600/20 text-stone-300 text-[10px] font-medium hover:bg-stone-600/30 transition-all disabled:opacity-30 flex items-center justify-center gap-1"
                               >
                                 <Sparkles className="w-3 h-3" />
                                 Generate All Remaining
@@ -540,11 +540,11 @@ export default function VideoSeriesPanel({
                                     <div
                                       className={`w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold flex-shrink-0 ${
                                         episode.status === "posted"
-                                          ? "bg-green-500/20 text-green-400"
+                                          ? "bg-stone-500/20 text-stone-400"
                                           : episode.status === "generated"
-                                          ? "bg-cyan-500/20 text-cyan-400"
+                                          ? "bg-stone-500/20 text-stone-400"
                                           : episode.status === "scripted"
-                                          ? "bg-violet-500/20 text-violet-400"
+                                          ? "bg-stone-500/20 text-stone-400"
                                           : "bg-white/[0.06] text-white/40"
                                       }`}
                                     >
@@ -578,7 +578,7 @@ export default function VideoSeriesPanel({
                                             )
                                           }
                                           disabled={isGenerating}
-                                          className="px-2 py-1 rounded text-[9px] text-violet-300 bg-violet-500/15 hover:bg-violet-500/25 transition-all flex items-center gap-1 disabled:opacity-40"
+                                          className="px-2 py-1 rounded text-[9px] text-stone-300 bg-stone-500/15 hover:bg-stone-500/25 transition-all flex items-center gap-1 disabled:opacity-40"
                                         >
                                           {isGenerating ? (
                                             <Loader2 className="w-2.5 h-2.5 animate-spin" />
@@ -595,7 +595,7 @@ export default function VideoSeriesPanel({
                                               series.name
                                             )
                                           }
-                                          className="px-2 py-1 rounded text-[9px] text-cyan-300 bg-cyan-500/15 hover:bg-cyan-500/25 transition-all flex items-center gap-1"
+                                          className="px-2 py-1 rounded text-[9px] text-stone-300 bg-stone-500/15 hover:bg-stone-500/25 transition-all flex items-center gap-1"
                                         >
                                           <Play className="w-2.5 h-2.5" />
                                           Load
@@ -607,11 +607,11 @@ export default function VideoSeriesPanel({
                                     <span
                                       className={`text-[8px] px-1.5 py-0.5 rounded-full flex-shrink-0 ${
                                         episode.status === "posted"
-                                          ? "bg-green-500/20 text-green-400"
+                                          ? "bg-stone-500/20 text-stone-400"
                                           : episode.status === "generated"
-                                          ? "bg-cyan-500/20 text-cyan-400"
+                                          ? "bg-stone-500/20 text-stone-400"
                                           : episode.status === "scripted"
-                                          ? "bg-violet-500/20 text-violet-300"
+                                          ? "bg-stone-500/20 text-stone-300"
                                           : "bg-white/10 text-white/40"
                                       }`}
                                     >

@@ -63,15 +63,15 @@ const MOCK_TICKETS = [
 ];
 
 const sentimentIcon = (s: string) => {
-  if (s === "happy") return <Smile className="w-3.5 h-3.5 text-green-400" />;
-  if (s === "frustrated") return <Frown className="w-3.5 h-3.5 text-red-400" />;
-  return <Meh className="w-3.5 h-3.5 text-amber-400" />;
+  if (s === "happy") return <Smile className="w-3.5 h-3.5 text-stone-400" />;
+  if (s === "frustrated") return <Frown className="w-3.5 h-3.5 text-stone-400" />;
+  return <Meh className="w-3.5 h-3.5 text-stone-400" />;
 };
 
 const statusBadge = (s: string) => {
   if (s === "ai-replied") return <span className="px-2 py-0.5 rounded-full bg-brand-500/15 text-brand-400 text-[9px] font-bold">AI Replied</span>;
   if (s === "resolved") return <span className="px-2 py-0.5 rounded-full bg-accent-cyan/15 text-accent-cyan text-[9px] font-bold">Resolved</span>;
-  if (s === "escalated") return <span className="px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 text-[9px] font-bold">Escalated</span>;
+  if (s === "escalated") return <span className="px-2 py-0.5 rounded-full bg-stone-500/15 text-stone-400 text-[9px] font-bold">Escalated</span>;
   return <span className="px-2 py-0.5 rounded-full bg-white/10 text-white/60 text-[9px] font-bold">Open</span>;
 };
 
@@ -146,7 +146,7 @@ export default function EmailSupportPage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-blue-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-stone-600 flex items-center justify-center">
                 <Mail className="w-4 h-4 text-white" />
               </div>
               <span className="text-lg font-bold tracking-tight">Zoobicon</span>
@@ -195,7 +195,7 @@ export default function EmailSupportPage() {
                 <Bot className="w-3 h-3 text-brand-400" />
                 <span className="text-xs font-medium text-brand-400">AI-Powered Support</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-500/10 border border-stone-500/20 text-stone-400 text-xs font-medium">
                 <Check size={12} /> Available Now
               </span>
             </motion.div>
@@ -220,7 +220,7 @@ export default function EmailSupportPage() {
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
               {waitlistStatus === "success" ? (
-                <div className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                <div className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-stone-500/10 border border-stone-500/20 text-stone-400">
                   <Check className="w-5 h-5 flex-shrink-0" />
                   <span className="text-sm font-medium">You&apos;re on the list! We&apos;ll notify you when AI Email Support launches.</span>
                 </div>
@@ -315,7 +315,7 @@ export default function EmailSupportPage() {
                         <div className="flex items-center justify-between">
                           <h3 className="text-sm font-bold text-white/80">{selectedTicket.subject}</h3>
                           <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
-                            selectedTicket.priority === "high" ? "bg-red-500/15 text-red-400" : selectedTicket.priority === "medium" ? "bg-amber-500/15 text-amber-400" : "bg-white/10 text-white/60"
+                            selectedTicket.priority === "high" ? "bg-stone-500/15 text-stone-400" : selectedTicket.priority === "medium" ? "bg-stone-500/15 text-stone-400" : "bg-white/10 text-white/60"
                           }`}>{selectedTicket.priority}</span>
                         </div>
                         <div className="text-[10px] text-white/60 mt-0.5">From: {selectedTicket.from} • {selectedTicket.time}</div>
@@ -408,7 +408,7 @@ export default function EmailSupportPage() {
           </div>
           <div className="max-w-lg mx-auto">
             {waitlistStatus === "success" ? (
-              <div className="flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+              <div className="flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-stone-500/10 border border-stone-500/20 text-stone-400">
                 <Check className="w-5 h-5 flex-shrink-0" />
                 <span className="text-sm font-medium">You&apos;re on the list! We&apos;ll notify you when AI Email Support launches.</span>
               </div>

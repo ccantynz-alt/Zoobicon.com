@@ -180,7 +180,7 @@ export default function ClientPortal() {
             />
 
             {error && (
-              <p className="mt-3 text-sm text-red-400">{error}</p>
+              <p className="mt-3 text-sm text-stone-400">{error}</p>
             )}
 
             <button
@@ -308,8 +308,8 @@ export default function ClientPortal() {
                   <p className="text-white/50 text-xs mt-1 truncate">{site.slug}.zoobicon.sh</p>
                   <div className="flex items-center justify-between mt-3">
                     <span className={`text-xs px-2 py-0.5 rounded-full ${
-                      site.status === "published" ? "bg-green-500/20 text-green-400" :
-                      site.status === "draft" ? "bg-yellow-500/20 text-yellow-400" :
+                      site.status === "published" ? "bg-stone-500/20 text-stone-400" :
+                      site.status === "draft" ? "bg-stone-500/20 text-stone-400" :
                       "bg-white/10 text-white/50"
                     }`}>
                       {site.status}

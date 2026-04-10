@@ -32,11 +32,11 @@ import {
 
 const TEMPLATES = [
   { id: 'minimal', name: 'Minimal', preview: 'bg-white', accent: '#0a0a12' },
-  { id: 'gradient', name: 'Gradient', preview: 'bg-gradient-to-br from-violet-600 to-fuchsia-600', accent: '#8b5cf6' },
+  { id: 'gradient', name: 'Gradient', preview: 'bg-gradient-to-br from-stone-600 to-stone-600', accent: '#8b5cf6' },
   { id: 'dark', name: 'Dark Pro', preview: 'bg-gray-900', accent: '#f59e0b' },
-  { id: 'nature', name: 'Nature', preview: 'bg-gradient-to-br from-emerald-500 to-teal-600', accent: '#10b981' },
-  { id: 'ocean', name: 'Ocean', preview: 'bg-gradient-to-br from-blue-500 to-cyan-500', accent: '#3b82f6' },
-  { id: 'sunset', name: 'Sunset', preview: 'bg-gradient-to-br from-orange-500 to-pink-500', accent: '#f97316' },
+  { id: 'nature', name: 'Nature', preview: 'bg-gradient-to-br from-stone-500 to-stone-600', accent: '#10b981' },
+  { id: 'ocean', name: 'Ocean', preview: 'bg-gradient-to-br from-stone-500 to-stone-500', accent: '#3b82f6' },
+  { id: 'sunset', name: 'Sunset', preview: 'bg-gradient-to-br from-stone-500 to-stone-500', accent: '#f97316' },
   { id: 'corporate', name: 'Corporate', preview: 'bg-slate-800', accent: '#64748b' },
   { id: 'neon', name: 'Neon', preview: 'bg-black', accent: '#22d3ee' },
 ];
@@ -75,13 +75,13 @@ export default function BusinessCardPage() {
       <header className="border-b border-white/10 bg-[#0a0a12]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Zoobicon</Link>
+            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
             <span className="text-white/30">/</span>
             <span className="font-semibold text-white">Business Card Generator</span>
           </div>
           <div className="flex items-center gap-3">
             <button onClick={handleCopyVCard} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition text-sm">
-              {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+              {copied ? <Check className="w-4 h-4 text-stone-400" /> : <Copy className="w-4 h-4" />}
               {copied ? 'Copied!' : 'Copy vCard'}
             </button>
             <button onClick={() => window.print()} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition text-sm">
@@ -110,7 +110,7 @@ export default function BusinessCardPage() {
               link.download = `${card.name.replace(/\s+/g, '-').toLowerCase()}-business-card.png`;
               link.href = canvas.toDataURL('image/png');
               link.click();
-            }} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:opacity-90 transition text-sm font-medium">
+            }} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-stone-600 to-stone-600 hover:opacity-90 transition text-sm font-medium">
               <Download className="w-4 h-4" /> Export
             </button>
           </div>
@@ -122,7 +122,7 @@ export default function BusinessCardPage() {
         <div className="mb-10 flex flex-col items-center">
           <div className="relative" style={{ perspective: '1000px' }}>
             <div
-              className="w-[420px] h-[252px] rounded-2xl shadow-2xl shadow-violet-500/20 transition-all duration-700 relative cursor-pointer"
+              className="w-[420px] h-[252px] rounded-2xl shadow-2xl shadow-stone-500/20 transition-all duration-700 relative cursor-pointer"
               onClick={() => setShowBack(!showBack)}
               style={{ transformStyle: 'preserve-3d', transform: showBack ? 'rotateY(180deg)' : 'rotateY(0)' }}
             >
@@ -200,7 +200,7 @@ export default function BusinessCardPage() {
                 key={t.id}
                 onClick={() => setSelectedTemplate(t.id)}
                 className={`p-3 rounded-xl border transition text-center ${
-                  selectedTemplate === t.id ? 'border-violet-500 bg-violet-500/10' : 'border-white/10 bg-white/5 hover:bg-white/10'
+                  selectedTemplate === t.id ? 'border-stone-500 bg-stone-500/10' : 'border-white/10 bg-white/5 hover:bg-white/10'
                 }`}
               >
                 <div className={`w-full h-10 rounded-lg mb-2 ${t.preview}`} />
@@ -223,7 +223,7 @@ export default function BusinessCardPage() {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition ${
-                    activeTab === tab.id ? 'bg-violet-600 text-white' : 'bg-white/5 text-white/60 hover:text-white hover:bg-white/10'
+                    activeTab === tab.id ? 'bg-stone-600 text-white' : 'bg-white/5 text-white/60 hover:text-white hover:bg-white/10'
                   }`}
                 >
                   <tab.icon className="w-4 h-4" /> {tab.label}
@@ -247,7 +247,7 @@ export default function BusinessCardPage() {
                 ].map((field) => (
                   <div key={field.key}>
                     <label className="text-xs text-white/40 mb-1 block">{field.label}</label>
-                    <div className="flex items-center gap-2 bg-white/5 rounded-lg px-3 py-2 border border-white/10 focus-within:border-violet-500/50">
+                    <div className="flex items-center gap-2 bg-white/5 rounded-lg px-3 py-2 border border-white/10 focus-within:border-stone-500/50">
                       <field.icon className="w-4 h-4 text-white/30" />
                       <input
                         type="text"
@@ -282,7 +282,7 @@ export default function BusinessCardPage() {
                       <button
                         key={f}
                         onClick={() => setFontFamily(f)}
-                        className={`px-4 py-3 rounded-xl border text-sm transition ${fontFamily === f ? 'border-violet-500 bg-violet-500/10' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}
+                        className={`px-4 py-3 rounded-xl border text-sm transition ${fontFamily === f ? 'border-stone-500 bg-stone-500/10' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}
                       >
                         {f}
                       </button>
@@ -293,7 +293,7 @@ export default function BusinessCardPage() {
                   <label className="text-sm font-medium text-white/60 mb-3 block">Card Shape</label>
                   <div className="grid grid-cols-3 gap-3">
                     {['Standard (3.5" x 2")', 'Square (2.5" x 2.5")', 'Mini (3" x 1.5")'].map((s) => (
-                      <button key={s} onClick={() => setSelectedShape(s)} className={`px-4 py-3 rounded-xl border text-sm transition ${selectedShape === s ? 'border-violet-500 bg-violet-500/10' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>{s}</button>
+                      <button key={s} onClick={() => setSelectedShape(s)} className={`px-4 py-3 rounded-xl border text-sm transition ${selectedShape === s ? 'border-stone-500 bg-stone-500/10' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>{s}</button>
                     ))}
                   </div>
                 </div>
@@ -307,7 +307,7 @@ export default function BusinessCardPage() {
                     <h3 className="font-semibold">QR Code on Back</h3>
                     <p className="text-sm text-white/50">Scan to save contact information</p>
                   </div>
-                  <button onClick={() => setShowQR(!showQR)} className={`w-12 h-6 rounded-full transition ${showQR ? 'bg-violet-600' : 'bg-white/20'}`}>
+                  <button onClick={() => setShowQR(!showQR)} className={`w-12 h-6 rounded-full transition ${showQR ? 'bg-stone-600' : 'bg-white/20'}`}>
                     <div className={`w-5 h-5 rounded-full bg-white transition-transform ${showQR ? 'translate-x-6' : 'translate-x-0.5'}`} />
                   </button>
                 </div>
@@ -346,7 +346,7 @@ export default function BusinessCardPage() {
                   { label: 'vCard (.vcf)', desc: 'Save to contacts', icon: Share2 },
                 ].map((opt) => (
                   <button onClick={() => {}} key={opt.label} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition text-left">
-                    <opt.icon className="w-5 h-5 text-violet-400 shrink-0" />
+                    <opt.icon className="w-5 h-5 text-stone-400 shrink-0" />
                     <div className="flex-1">
                       <p className="text-sm font-medium">{opt.label}</p>
                       <p className="text-xs text-white/40">{opt.desc}</p>
@@ -357,14 +357,14 @@ export default function BusinessCardPage() {
               </div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 border border-violet-500/20">
+            <div className="p-6 rounded-2xl bg-gradient-to-r from-stone-500/10 to-stone-500/10 border border-stone-500/20">
               <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="w-5 h-5 text-violet-400" />
+                <Sparkles className="w-5 h-5 text-stone-400" />
                 <h3 className="font-semibold">AI Generate</h3>
               </div>
               <p className="text-sm text-white/50 mb-4">Describe your brand and AI will design the perfect card</p>
-              <textarea placeholder="e.g., Modern tech startup, clean and bold..." className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm resize-none h-20 focus:outline-none focus:ring-2 focus:ring-violet-500/50 mb-3" />
-              <button onClick={() => alert('AI design generation coming soon')} className="w-full py-3 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 font-medium text-sm hover:opacity-90 transition flex items-center justify-center gap-2">
+              <textarea placeholder="e.g., Modern tech startup, clean and bold..." className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm resize-none h-20 focus:outline-none focus:ring-2 focus:ring-stone-500/50 mb-3" />
+              <button onClick={() => alert('AI design generation coming soon')} className="w-full py-3 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 font-medium text-sm hover:opacity-90 transition flex items-center justify-center gap-2">
                 <Sparkles className="w-4 h-4" /> Generate Design
               </button>
             </div>

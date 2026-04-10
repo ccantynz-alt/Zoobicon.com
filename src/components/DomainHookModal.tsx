@@ -225,7 +225,7 @@ export default function DomainHookModal({
               {!finalResult && !selected && (
                 <>
                   <div className="flex items-center gap-3 mb-2">
-                    <Sparkles className="w-6 h-6 text-purple-400" />
+                    <Sparkles className="w-6 h-6 text-stone-400" />
                     <h2 className="text-2xl font-bold tracking-tight text-white">
                       Pick your domain
                     </h2>
@@ -242,7 +242,7 @@ export default function DomainHookModal({
                           key={i}
                           className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/5"
                         >
-                          <Loader2 className="w-5 h-5 text-purple-400 animate-spin" />
+                          <Loader2 className="w-5 h-5 text-stone-400 animate-spin" />
                           <span className="text-white/40">Checking availability...</span>
                         </div>
                       ))}
@@ -250,7 +250,7 @@ export default function DomainHookModal({
                   )}
 
                   {suggestError && (
-                    <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300">
+                    <div className="p-4 rounded-xl bg-stone-500/10 border border-stone-500/30 text-stone-300">
                       Couldn&apos;t load suggestions: {suggestError}
                     </div>
                   )}
@@ -266,10 +266,10 @@ export default function DomainHookModal({
                       <button
                         key={s.domain}
                         onClick={() => void runComplete(s.domain)}
-                        className="group w-full flex items-center justify-between gap-3 p-4 rounded-xl bg-white/5 border border-white/10 hover:border-purple-400/60 hover:bg-white/10 transition text-left"
+                        className="group w-full flex items-center justify-between gap-3 p-4 rounded-xl bg-white/5 border border-white/10 hover:border-stone-400/60 hover:bg-white/10 transition text-left"
                       >
                         <div className="flex items-center gap-3 min-w-0">
-                          <Globe className="w-5 h-5 text-purple-400 flex-shrink-0" />
+                          <Globe className="w-5 h-5 text-stone-400 flex-shrink-0" />
                           <span className="text-white font-medium truncate">
                             {s.domain}
                           </span>
@@ -279,12 +279,12 @@ export default function DomainHookModal({
                             <span className="text-white/60 text-sm">${s.price}/yr</span>
                           )}
                           {s.available === true && (
-                            <span className="px-2 py-1 rounded-md text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            <span className="px-2 py-1 rounded-md text-xs font-semibold bg-stone-500/20 text-stone-300 border border-stone-500/30">
                               Available
                             </span>
                           )}
                           {s.available === false && (
-                            <span className="px-2 py-1 rounded-md text-xs font-semibold bg-red-500/20 text-red-300 border border-red-500/30">
+                            <span className="px-2 py-1 rounded-md text-xs font-semibold bg-stone-500/20 text-stone-300 border border-stone-500/30">
                               Taken
                             </span>
                           )}
@@ -301,7 +301,7 @@ export default function DomainHookModal({
               {selected && !finalResult && (
                 <>
                   <div className="flex items-center gap-3 mb-2">
-                    <Loader2 className="w-6 h-6 text-purple-400 animate-spin" />
+                    <Loader2 className="w-6 h-6 text-stone-400 animate-spin" />
                     <h2 className="text-2xl font-bold tracking-tight text-white">
                       Setting up {selected}
                     </h2>
@@ -318,21 +318,21 @@ export default function DomainHookModal({
                           key={key}
                           className={`flex items-center gap-4 p-4 rounded-xl border transition ${
                             status === 'done'
-                              ? 'bg-emerald-500/10 border-emerald-500/30'
+                              ? 'bg-stone-500/10 border-stone-500/30'
                               : status === 'running'
-                              ? 'bg-purple-500/10 border-purple-500/40'
+                              ? 'bg-stone-500/10 border-stone-500/40'
                               : status === 'error'
-                              ? 'bg-red-500/10 border-red-500/30'
+                              ? 'bg-stone-500/10 border-stone-500/30'
                               : 'bg-white/5 border-white/10'
                           }`}
                         >
                           <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center">
                             {status === 'done' ? (
-                              <Check className="w-5 h-5 text-emerald-400" />
+                              <Check className="w-5 h-5 text-stone-400" />
                             ) : status === 'running' ? (
-                              <Loader2 className="w-5 h-5 text-purple-400 animate-spin" />
+                              <Loader2 className="w-5 h-5 text-stone-400 animate-spin" />
                             ) : status === 'error' ? (
-                              <X className="w-5 h-5 text-red-400" />
+                              <X className="w-5 h-5 text-stone-400" />
                             ) : (
                               <Icon className="w-5 h-5 text-white/40" />
                             )}
@@ -350,7 +350,7 @@ export default function DomainHookModal({
                   </div>
 
                   {completeError && (
-                    <div className="mt-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300">
+                    <div className="mt-6 p-4 rounded-xl bg-stone-500/10 border border-stone-500/30 text-stone-300">
                       {completeError}
                     </div>
                   )}
@@ -363,10 +363,10 @@ export default function DomainHookModal({
                   animate={{ opacity: 1, scale: 1 }}
                   className="text-center py-6"
                 >
-                  <div className="mx-auto w-20 h-20 rounded-full bg-gradient-to-br from-emerald-400 via-teal-400 to-purple-500 flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/30">
+                  <div className="mx-auto w-20 h-20 rounded-full bg-gradient-to-br from-stone-400 via-stone-400 to-stone-500 flex items-center justify-center mb-6 shadow-lg shadow-stone-500/30">
                     <Check className="w-10 h-10 text-white" />
                   </div>
-                  <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-white via-emerald-200 to-purple-200 bg-clip-text text-transparent mb-3">
+                  <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-white via-stone-200 to-stone-200 bg-clip-text text-transparent mb-3">
                     You&apos;re live!
                   </h2>
                   <p className="text-white/70 mb-6">
@@ -375,7 +375,7 @@ export default function DomainHookModal({
                   <div className="space-y-2 text-left max-w-md mx-auto mb-8">
                     {finalResult.siteUrl && (
                       <div className="flex items-center gap-2 p-3 rounded-lg bg-white/5 border border-white/10">
-                        <Globe className="w-4 h-4 text-purple-400" />
+                        <Globe className="w-4 h-4 text-stone-400" />
                         <span className="text-white/80 text-sm truncate">
                           {finalResult.siteUrl}
                         </span>
@@ -383,7 +383,7 @@ export default function DomainHookModal({
                     )}
                     {finalResult.mailbox && (
                       <div className="flex items-center gap-2 p-3 rounded-lg bg-white/5 border border-white/10">
-                        <Mail className="w-4 h-4 text-emerald-400" />
+                        <Mail className="w-4 h-4 text-stone-400" />
                         <span className="text-white/80 text-sm truncate">
                           {finalResult.mailbox}
                         </span>
@@ -392,7 +392,7 @@ export default function DomainHookModal({
                   </div>
                   <button
                     onClick={handleClose}
-                    className="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-emerald-500 text-white font-semibold hover:opacity-90 transition"
+                    className="px-6 py-3 rounded-xl bg-gradient-to-r from-stone-500 to-stone-500 text-white font-semibold hover:opacity-90 transition"
                   >
                     Done
                   </button>

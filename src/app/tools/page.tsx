@@ -11,17 +11,17 @@ export const metadata: Metadata = {
 };
 
 const TOOLS = [
-  { name: "AI Business Name Generator", desc: "AI generates names + instant domain check", href: "/tools/business-name-generator", icon: Sparkles, color: "from-violet-500 to-purple-600" },
-  { name: "QR Code Generator", desc: "Generate QR codes for URLs, WiFi, email, phone", href: "/tools/qr-code-generator", icon: QrCode, color: "from-fuchsia-500 to-pink-600" },
-  { name: "Password Generator", desc: "Secure random passwords with strength meter", href: "/tools/password-generator", icon: Lock, color: "from-emerald-500 to-green-600" },
-  { name: "Word Counter", desc: "Count words, characters, reading time, top keywords", href: "/tools/word-counter", icon: Type, color: "from-blue-500 to-cyan-600" },
-  { name: "Color Palette Generator", desc: "Random palettes with harmony modes and export", href: "/tools/color-palette-generator", icon: Palette, color: "from-amber-500 to-orange-600" },
-  { name: "JSON Formatter", desc: "Format, validate, and minify JSON", href: "/tools/json-formatter", icon: Braces, color: "from-cyan-500 to-teal-600" },
-  { name: "Privacy Policy Generator", desc: "GDPR/CCPA compliant privacy policy in seconds", href: "/tools/privacy-policy-generator", icon: FileText, color: "from-indigo-500 to-blue-600" },
-  { name: "Meta Tag Generator", desc: "SEO meta tags with Google and social previews", href: "/tools/meta-tag-generator", icon: Tags, color: "from-rose-500 to-red-600" },
-  { name: "Invoice Generator", desc: "Professional invoices with tax calculation", href: "/tools/invoice-generator", icon: Receipt, color: "from-green-500 to-emerald-600" },
+  { name: "AI Business Name Generator", desc: "AI generates names + instant domain check", href: "/tools/business-name-generator", icon: Sparkles, color: "from-stone-500 to-stone-600" },
+  { name: "QR Code Generator", desc: "Generate QR codes for URLs, WiFi, email, phone", href: "/tools/qr-code-generator", icon: QrCode, color: "from-stone-500 to-stone-600" },
+  { name: "Password Generator", desc: "Secure random passwords with strength meter", href: "/tools/password-generator", icon: Lock, color: "from-stone-500 to-stone-600" },
+  { name: "Word Counter", desc: "Count words, characters, reading time, top keywords", href: "/tools/word-counter", icon: Type, color: "from-stone-500 to-stone-600" },
+  { name: "Color Palette Generator", desc: "Random palettes with harmony modes and export", href: "/tools/color-palette-generator", icon: Palette, color: "from-stone-500 to-stone-600" },
+  { name: "JSON Formatter", desc: "Format, validate, and minify JSON", href: "/tools/json-formatter", icon: Braces, color: "from-stone-500 to-stone-600" },
+  { name: "Privacy Policy Generator", desc: "GDPR/CCPA compliant privacy policy in seconds", href: "/tools/privacy-policy-generator", icon: FileText, color: "from-stone-500 to-stone-600" },
+  { name: "Meta Tag Generator", desc: "SEO meta tags with Google and social previews", href: "/tools/meta-tag-generator", icon: Tags, color: "from-stone-500 to-stone-600" },
+  { name: "Invoice Generator", desc: "Professional invoices with tax calculation", href: "/tools/invoice-generator", icon: Receipt, color: "from-stone-500 to-stone-600" },
   { name: "Robots.txt Generator", desc: "Control search engine and AI bot crawling", href: "/tools/robots-txt-generator", icon: FileCode, color: "from-slate-500 to-gray-600" },
-  { name: "Domain Search", desc: "Check availability across 13 extensions instantly", href: "/domains", icon: Globe, color: "from-indigo-500 to-violet-600" },
+  { name: "Domain Search", desc: "Check availability across 13 extensions instantly", href: "/domains", icon: Globe, color: "from-stone-500 to-stone-600" },
 ];
 
 export default function ToolsPage() {

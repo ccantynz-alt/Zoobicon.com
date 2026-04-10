@@ -56,12 +56,12 @@ interface RecentPost {
 }
 
 const PLATFORMS: Platform[] = [
-  { id: "twitter", name: "Twitter / X", icon: Share2, color: "from-sky-500 to-blue-600", connected: true, followers: "2.4K" },
-  { id: "linkedin", name: "LinkedIn", icon: Link2, color: "from-blue-600 to-blue-800", connected: true, followers: "1.8K" },
-  { id: "instagram", name: "Instagram", icon: Camera, color: "from-pink-500 to-purple-600", connected: false, followers: "0" },
-  { id: "tiktok", name: "TikTok", icon: Zap, color: "from-rose-500 to-pink-600", connected: false, followers: "0" },
-  { id: "facebook", name: "Facebook", icon: Users, color: "from-blue-500 to-indigo-600", connected: true, followers: "890" },
-  { id: "reddit", name: "Reddit", icon: MessageSquare, color: "from-orange-500 to-red-600", connected: false, followers: "0" },
+  { id: "twitter", name: "Twitter / X", icon: Share2, color: "from-stone-500 to-stone-600", connected: true, followers: "2.4K" },
+  { id: "linkedin", name: "LinkedIn", icon: Link2, color: "from-stone-600 to-stone-800", connected: true, followers: "1.8K" },
+  { id: "instagram", name: "Instagram", icon: Camera, color: "from-stone-500 to-stone-600", connected: false, followers: "0" },
+  { id: "tiktok", name: "TikTok", icon: Zap, color: "from-stone-500 to-stone-600", connected: false, followers: "0" },
+  { id: "facebook", name: "Facebook", icon: Users, color: "from-stone-500 to-stone-600", connected: true, followers: "890" },
+  { id: "reddit", name: "Reddit", icon: MessageSquare, color: "from-stone-500 to-stone-600", connected: false, followers: "0" },
 ];
 
 const RECENT_POSTS: RecentPost[] = [
@@ -117,16 +117,16 @@ export default function PublisherPage() {
   const publishedCount = RECENT_POSTS.filter((p) => p.status === "published").length;
 
   const statusColor = (s: string) => {
-    if (s === "published") return "bg-emerald-500/20 text-emerald-400";
-    if (s === "scheduled") return "bg-blue-500/20 text-blue-400";
+    if (s === "published") return "bg-stone-500/20 text-stone-400";
+    if (s === "scheduled") return "bg-stone-500/20 text-stone-400";
     return "bg-white/10 text-white/40";
   };
 
   const STAT_CARDS = [
-    { label: "Posts Published", value: String(publishedCount), icon: Send, color: "from-indigo-500 to-purple-600" },
-    { label: "Total Reach", value: totalReach >= 1000 ? `${(totalReach / 1000).toFixed(1)}K` : String(totalReach), icon: Eye, color: "from-emerald-500 to-teal-600" },
-    { label: "Engagement Rate", value: totalReach > 0 ? `${((totalEngagement / totalReach) * 100).toFixed(1)}%` : "0%", icon: Heart, color: "from-rose-500 to-pink-600" },
-    { label: "Platforms", value: String(connectedCount), icon: Globe, color: "from-cyan-500 to-blue-600" },
+    { label: "Posts Published", value: String(publishedCount), icon: Send, color: "from-stone-500 to-stone-600" },
+    { label: "Total Reach", value: totalReach >= 1000 ? `${(totalReach / 1000).toFixed(1)}K` : String(totalReach), icon: Eye, color: "from-stone-500 to-stone-600" },
+    { label: "Engagement Rate", value: totalReach > 0 ? `${((totalEngagement / totalReach) * 100).toFixed(1)}%` : "0%", icon: Heart, color: "from-stone-500 to-stone-600" },
+    { label: "Platforms", value: String(connectedCount), icon: Globe, color: "from-stone-500 to-stone-600" },
   ];
 
   const TABS: { key: Tab; label: string }[] = [
@@ -140,7 +140,7 @@ export default function PublisherPage() {
     <div className="min-h-screen bg-[#0a0a12] text-white">
       <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#0a0a12]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 h-16">
-          <Link href="/" className="text-xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Zoobicon</Link>
+          <Link href="/" className="text-xl font-bold tracking-tight bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
           <div className="flex items-center gap-4">
             <Link href="/dashboard" className="text-sm text-white/60 hover:text-white transition-colors flex items-center gap-1.5"><LayoutDashboard className="w-3.5 h-3.5" /> Dashboard</Link>
             {user ? (
@@ -153,15 +153,15 @@ export default function PublisherPage() {
       </nav>
 
       <header className="relative overflow-hidden border-b border-white/5">
-        <div className="absolute inset-0 bg-gradient-to-br from-violet-600/10 via-fuchsia-600/5 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-br from-stone-600/10 via-stone-600/5 to-transparent pointer-events-none" />
         <div className="max-w-7xl mx-auto px-6 py-16 relative">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2.5 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-600"><Globe className="w-6 h-6" /></div>
+              <div className="p-2.5 rounded-xl bg-gradient-to-br from-stone-500 to-stone-600"><Globe className="w-6 h-6" /></div>
               <span className="text-sm font-medium text-white/50 uppercase tracking-wider">Business OS</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-extrabold mb-3">
-              <span className="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent">Publish Everywhere</span>
+              <span className="bg-gradient-to-r from-stone-400 via-stone-400 to-stone-400 bg-clip-text text-transparent">Publish Everywhere</span>
             </h1>
             <p className="text-lg text-white/50 max-w-2xl">One post. Every platform. AI-optimized. Write once, publish to X, LinkedIn, Instagram, TikTok, Facebook, and Reddit.</p>
           </motion.div>
@@ -201,13 +201,13 @@ export default function PublisherPage() {
               />
               <div className="flex items-center gap-2 mt-2 border-t border-white/5 pt-3">
                 <button onClick={() => enhance("viral")} className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs hover:bg-white/10 transition-colors flex items-center gap-1">
-                  <Sparkles className="w-3.5 h-3.5 text-fuchsia-400" /> Make it viral
+                  <Sparkles className="w-3.5 h-3.5 text-stone-400" /> Make it viral
                 </button>
                 <button onClick={() => enhance("pro")} className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs hover:bg-white/10 transition-colors flex items-center gap-1">
-                  <Smile className="w-3.5 h-3.5 text-blue-400" /> Professional tone
+                  <Smile className="w-3.5 h-3.5 text-stone-400" /> Professional tone
                 </button>
                 <button onClick={() => enhance("hash")} className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs hover:bg-white/10 transition-colors flex items-center gap-1">
-                  <Hash className="w-3.5 h-3.5 text-amber-400" /> Add hashtags
+                  <Hash className="w-3.5 h-3.5 text-stone-400" /> Add hashtags
                 </button>
                 {enhancing && <div className="w-4 h-4 border-2 border-white/30 border-t-fuchsia-400 rounded-full animate-spin" />}
               </div>
@@ -233,7 +233,7 @@ export default function PublisherPage() {
                     <div className="flex items-center gap-2">
                       <div className={`p-1.5 rounded-lg bg-gradient-to-br ${p.color}`}><p.icon className="w-3.5 h-3.5" /></div>
                       <span className="text-sm font-medium">{p.name}</span>
-                      {selectedPlatforms.has(p.id) && <CheckCircle2 className="w-4 h-4 text-emerald-400 ml-auto" />}
+                      {selectedPlatforms.has(p.id) && <CheckCircle2 className="w-4 h-4 text-stone-400 ml-auto" />}
                       {!p.connected && <span className="text-[10px] text-white/30 ml-auto">Not connected</span>}
                     </div>
                   </button>
@@ -243,7 +243,7 @@ export default function PublisherPage() {
 
             {/* Schedule + Publish */}
             <motion.div variants={fadeUp} className="flex items-center gap-3">
-              <button onClick={() => {}} className="px-6 py-3 bg-gradient-to-r from-violet-500 to-fuchsia-600 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity flex items-center gap-2">
+              <button onClick={() => {}} className="px-6 py-3 bg-gradient-to-r from-stone-500 to-stone-600 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity flex items-center gap-2">
                 <Send className="w-4 h-4" /> Publish Now
               </button>
               <button onClick={() => {}} className="px-6 py-3 bg-white/5 border border-white/10 rounded-xl text-sm font-medium hover:bg-white/10 transition-colors flex items-center gap-2">
@@ -302,7 +302,7 @@ export default function PublisherPage() {
                 </div>
                 <button onClick={() => {}} className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
                   p.connected
-                    ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                    ? "bg-stone-500/10 text-stone-400 border border-stone-500/20"
                     : "bg-white/5 border border-white/10 text-white/60 hover:bg-white/10"
                 }`}>
                   {p.connected ? "Connected" : "Connect"}
@@ -317,7 +317,7 @@ export default function PublisherPage() {
           <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-4">
             <motion.div variants={fadeUp} className="bg-white/5 border border-white/10 rounded-2xl p-6">
               <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-                <Lightbulb className="w-5 h-5 text-amber-400" /> AI Content Ideas
+                <Lightbulb className="w-5 h-5 text-stone-400" /> AI Content Ideas
               </h3>
               <p className="text-sm text-white/40 mb-4">Based on your industry and past performance, here are content ideas for this week.</p>
               <div className="space-y-3">

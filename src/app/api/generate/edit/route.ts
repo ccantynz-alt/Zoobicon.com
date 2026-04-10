@@ -225,13 +225,14 @@ RULES:
         const summary = errors.length > 0 ? errors.join(" | ") : "No changes detected";
         send({
           type: "error",
+          fatal: true,
           message: `Edit failed across all providers. ${summary}. Try rephrasing your instruction or being more specific about which file to change.`,
         });
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Unknown error";
         console.error(`[edit] Stream handler crashed: ${msg}`);
         try {
-          send({ type: "error", message: `Edit failed: ${msg}. Please try again.` });
+          send({ type: "error", fatal: true, message: `Edit failed: ${msg}. Please try again.` });
         } catch { /* controller may already be closed */ }
       } finally {
         try { controller.close(); } catch { /* already closed */ }

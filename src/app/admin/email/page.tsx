@@ -364,12 +364,12 @@ support@zoobicon.com`;
               <>
                 <Link href="/dashboard" className="text-sm text-white/60 hover:text-white transition-colors">Dashboard</Link>
                 <button onClick={() => { localStorage.removeItem("zoobicon_user"); setUser(null); }} className="text-sm text-white/50 hover:text-white transition-colors">Sign out</button>
-                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold">{(user.name || user.email || "A").charAt(0).toUpperCase()}</div>
+                <div className="w-8 h-8 rounded-full bg-stone-600 flex items-center justify-center text-xs font-bold">{(user.name || user.email || "A").charAt(0).toUpperCase()}</div>
               </>
             ) : (
               <>
                 <Link href="/auth/login" className="text-sm text-white/60 hover:text-white transition-colors">Sign in</Link>
-                <Link href="/builder" className="text-sm bg-blue-600 hover:bg-blue-500 px-3 py-1.5 rounded-lg transition-colors">Start Building</Link>
+                <Link href="/builder" className="text-sm bg-stone-600 hover:bg-stone-500 px-3 py-1.5 rounded-lg transition-colors">Start Building</Link>
               </>
             )}
           </div>
@@ -378,17 +378,17 @@ support@zoobicon.com`;
 
       {/* Data Source Banner */}
       {usingDemoData ? (
-        <div className="relative z-20 bg-amber-500/10 border-b border-amber-500/20 px-4 py-2.5 flex items-center justify-center gap-2">
-          <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-          <p className="text-xs text-amber-300 text-center">
+        <div className="relative z-20 bg-stone-500/10 border-b border-stone-500/20 px-4 py-2.5 flex items-center justify-center gap-2">
+          <AlertTriangle className="w-4 h-4 text-stone-400 shrink-0" />
+          <p className="text-xs text-stone-300 text-center">
             <strong>DEMO DATA</strong> — {apiError || "Could not connect to email API."}{" "}
-            <Link href="/admin/email-settings" className="underline hover:text-amber-200 transition-colors">Set up email →</Link>
+            <Link href="/admin/email-settings" className="underline hover:text-stone-200 transition-colors">Set up email →</Link>
           </p>
         </div>
       ) : !loading && (
-        <div className="relative z-20 bg-emerald-500/10 border-b border-emerald-500/20 px-4 py-1.5 flex items-center justify-center gap-2">
-          <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-          <p className="text-xs text-emerald-300 text-center">
+        <div className="relative z-20 bg-stone-500/10 border-b border-stone-500/20 px-4 py-1.5 flex items-center justify-center gap-2">
+          <Check className="w-3.5 h-3.5 text-stone-400 shrink-0" />
+          <p className="text-xs text-stone-300 text-center">
             <strong>LIVE</strong> — Connected to database. Emails stored and delivered via Mailgun.
           </p>
         </div>
@@ -398,13 +398,13 @@ support@zoobicon.com`;
       <div className="relative z-10 max-w-[1440px] mx-auto flex" style={{ height: "calc(100vh - 96px)" }}>
         {/* Sidebar */}
         <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 fixed md:static z-30 top-14 left-0 bottom-0 w-56 bg-[#111318]/95 md:bg-transparent border-r border-white/10 flex flex-col p-3 gap-1 transition-transform duration-200`}>
-          <button onClick={() => { setComposing(true); setSidebarOpen(false); }} className="flex items-center justify-center gap-2 w-full bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors mb-3">
+          <button onClick={() => { setComposing(true); setSidebarOpen(false); }} className="flex items-center justify-center gap-2 w-full bg-stone-600 hover:bg-stone-500 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors mb-3">
             <Plus className="w-4 h-4" /> Compose
           </button>
           {FOLDERS.map(({ key, label, icon: Icon }) => (
-            <button key={key} onClick={() => { setFolder(key); setSelectedEmail(null); setSelected(new Set()); setSidebarOpen(false); }} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${folder === key ? "bg-blue-600/15 text-blue-400" : "text-white/60 hover:bg-white/5 hover:text-white/90"}`}>
+            <button key={key} onClick={() => { setFolder(key); setSelectedEmail(null); setSelected(new Set()); setSidebarOpen(false); }} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${folder === key ? "bg-stone-600/15 text-stone-400" : "text-white/60 hover:bg-white/5 hover:text-white/90"}`}>
               <Icon className="w-4 h-4" /><span className="flex-1 text-left">{label}</span>
-              {key === "inbox" && unreadCount > 0 && <span className="text-xs bg-blue-600/25 text-blue-400 px-1.5 py-0.5 rounded-full font-medium">{unreadCount}</span>}
+              {key === "inbox" && unreadCount > 0 && <span className="text-xs bg-stone-600/25 text-stone-400 px-1.5 py-0.5 rounded-full font-medium">{unreadCount}</span>}
             </button>
           ))}
           <div className="mt-auto pt-4 border-t border-white/10">
@@ -423,7 +423,7 @@ support@zoobicon.com`;
               <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg hover:bg-white/5 md:hidden"><Mail className="w-5 h-5 text-white/60" /></button>
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50" />
-                <input type="text" placeholder="Search emails..." value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => e.key === "Enter" && fetchEmails()} className="w-full bg-[#111318]/80 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-white/50 focus:outline-none focus:border-blue-500/50 transition-colors" />
+                <input type="text" placeholder="Search emails..." value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => e.key === "Enter" && fetchEmails()} className="w-full bg-[#111318]/80 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-white/50 focus:outline-none focus:border-stone-500/50 transition-colors" />
               </div>
               <button onClick={fetchEmails} className="p-2 rounded-lg hover:bg-white/5 transition-colors" title="Refresh">
                 <RefreshCw className={`w-4 h-4 text-white/60 ${loading ? "animate-spin" : ""}`} />
@@ -431,15 +431,15 @@ support@zoobicon.com`;
             </div>
             <div className="flex items-center gap-2 text-xs">
               <button onClick={toggleSelectAll} className="p-1 rounded hover:bg-white/5 transition-colors">
-                {selected.size > 0 && selected.size === emails.length ? <CheckSquare className="w-4 h-4 text-blue-400" /> : <Square className="w-4 h-4 text-white/50" />}
+                {selected.size > 0 && selected.size === emails.length ? <CheckSquare className="w-4 h-4 text-stone-400" /> : <Square className="w-4 h-4 text-white/50" />}
               </button>
               {selected.size > 0 ? (
                 <motion.div initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-1">
                   <span className="text-white/60 mr-1">{selected.size} selected</span>
                   <button onClick={() => handleBulkAction("read")} className="px-2 py-1 rounded bg-white/5 text-white/80 hover:bg-white/10 transition-colors">Mark read</button>
                   <button onClick={() => handleBulkAction("unread")} className="px-2 py-1 rounded bg-white/5 text-white/80 hover:bg-white/10 transition-colors">Mark unread</button>
-                  {folder !== "trash" && <button onClick={() => handleBulkAction("trash")} className="px-2 py-1 rounded bg-white/5 text-red-400 hover:bg-red-500/10 transition-colors"><Trash2 className="w-3 h-3" /></button>}
-                  {folder !== "spam" && <button onClick={() => handleBulkAction("spam")} className="px-2 py-1 rounded bg-white/5 text-yellow-400 hover:bg-yellow-500/10 transition-colors"><AlertTriangle className="w-3 h-3" /></button>}
+                  {folder !== "trash" && <button onClick={() => handleBulkAction("trash")} className="px-2 py-1 rounded bg-white/5 text-stone-400 hover:bg-stone-500/10 transition-colors"><Trash2 className="w-3 h-3" /></button>}
+                  {folder !== "spam" && <button onClick={() => handleBulkAction("spam")} className="px-2 py-1 rounded bg-white/5 text-stone-400 hover:bg-stone-500/10 transition-colors"><AlertTriangle className="w-3 h-3" /></button>}
                 </motion.div>
               ) : (
                 <span className="text-white/50">{total > 0 ? `${total} email${total !== 1 ? "s" : ""}` : ""}</span>
@@ -449,7 +449,7 @@ support@zoobicon.com`;
 
           <div className="flex-1 overflow-y-auto">
             {loading ? (
-              <div className="flex items-center justify-center py-24"><Loader2 className="w-6 h-6 text-blue-400 animate-spin" /></div>
+              <div className="flex items-center justify-center py-24"><Loader2 className="w-6 h-6 text-stone-400 animate-spin" /></div>
             ) : folder === "sent" ? (
               <div className="flex flex-col items-center justify-center py-24 text-white/50 px-6">
                 <Send className="w-12 h-12 mb-3 opacity-20" /><p className="font-medium">No sent emails yet</p>
@@ -464,11 +464,11 @@ support@zoobicon.com`;
               <AnimatePresence initial={false}>
                 {emails.map((email) => (
                   <motion.div key={email.id} layout initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.15 }}>
-                    <div className={`flex items-start gap-3 px-4 py-3 border-b border-white/10 cursor-pointer transition-colors ${selectedEmail?.id === email.id ? "bg-blue-600/10" : "hover:bg-white/[0.03]"} ${!email.read ? "bg-white/[0.02]" : ""}`} onClick={() => { setSelectedEmail(email); if (!email.read) markRead(email, true); }}>
+                    <div className={`flex items-start gap-3 px-4 py-3 border-b border-white/10 cursor-pointer transition-colors ${selectedEmail?.id === email.id ? "bg-stone-600/10" : "hover:bg-white/[0.03]"} ${!email.read ? "bg-white/[0.02]" : ""}`} onClick={() => { setSelectedEmail(email); if (!email.read) markRead(email, true); }}>
                       <button onClick={(ev) => { ev.stopPropagation(); toggleSelect(email.id); }} className="mt-0.5 p-0.5 rounded hover:bg-white/10 transition-colors flex-shrink-0">
-                        {selected.has(email.id) ? <CheckSquare className="w-4 h-4 text-blue-400" /> : <Square className="w-4 h-4 text-white/50" />}
+                        {selected.has(email.id) ? <CheckSquare className="w-4 h-4 text-stone-400" /> : <Square className="w-4 h-4 text-white/50" />}
                       </button>
-                      <div className="w-2 mt-2 flex-shrink-0">{!email.read && <div className="w-2 h-2 bg-blue-500 rounded-full" />}</div>
+                      <div className="w-2 mt-2 flex-shrink-0">{!email.read && <div className="w-2 h-2 bg-stone-500 rounded-full" />}</div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">
                           <span className={`text-sm truncate ${email.read ? "text-white/60" : "text-white font-semibold"}`}>{email.from_address}</span>
@@ -516,7 +516,7 @@ support@zoobicon.com`;
               <div className="flex-1 overflow-y-auto p-6">
                 <div className="bg-white rounded-xl p-6 shadow-sm">
                   {selectedEmail.html_body ? (
-                    <div className="prose prose-sm max-w-none prose-p:text-gray-800 prose-a:text-blue-600 prose-headings:text-gray-900" dangerouslySetInnerHTML={{ __html: selectedEmail.html_body }} />
+                    <div className="prose prose-sm max-w-none prose-p:text-gray-800 prose-a:text-stone-600 prose-headings:text-gray-900" dangerouslySetInnerHTML={{ __html: selectedEmail.html_body }} />
                   ) : (
                     <pre className="whitespace-pre-wrap text-sm text-gray-800 font-sans leading-relaxed">{selectedEmail.text_body}</pre>
                   )}
@@ -561,18 +561,18 @@ support@zoobicon.com`;
               <AnimatePresence>
                 {showPolishDiff && polishResult && (
                   <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="border-t border-white/10 overflow-hidden">
-                    <div className="px-4 py-3 bg-blue-500/5">
+                    <div className="px-4 py-3 bg-stone-500/5">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          <Sparkles className="w-4 h-4 text-blue-400" />
-                          <span className="text-xs font-semibold text-blue-300">AI Polish Suggestions</span>
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${polishResult.score >= 90 ? "bg-green-500/20 text-green-400" : polishResult.score >= 70 ? "bg-yellow-500/20 text-yellow-400" : "bg-red-500/20 text-red-400"}`}>
+                          <Sparkles className="w-4 h-4 text-stone-400" />
+                          <span className="text-xs font-semibold text-stone-300">AI Polish Suggestions</span>
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${polishResult.score >= 90 ? "bg-stone-500/20 text-stone-400" : polishResult.score >= 70 ? "bg-stone-500/20 text-stone-400" : "bg-stone-500/20 text-stone-400"}`}>
                             Score: {polishResult.score}/100
                           </span>
                           <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/5 text-white/60">{polishResult.tone}</span>
                         </div>
                         <div className="flex items-center gap-1.5">
-                          <button onClick={acceptPolish} className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-green-600/20 hover:bg-green-600/30 text-green-400 text-xs font-medium transition-colors">
+                          <button onClick={acceptPolish} className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-stone-600/20 hover:bg-stone-600/30 text-stone-400 text-xs font-medium transition-colors">
                             <Check className="w-3 h-3" /> Accept
                           </button>
                           <button onClick={rejectPolish} className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/10 text-white/60 text-xs font-medium transition-colors">
@@ -584,7 +584,7 @@ support@zoobicon.com`;
                         <div className="space-y-1 mb-2">
                           {polishResult.changes.map((change, i) => (
                             <div key={i} className="flex items-start gap-2 text-[11px]">
-                              <Wand2 className="w-3 h-3 text-blue-400 mt-0.5 shrink-0" />
+                              <Wand2 className="w-3 h-3 text-stone-400 mt-0.5 shrink-0" />
                               <span className="text-white/60">{change}</span>
                             </div>
                           ))}
@@ -602,16 +602,16 @@ support@zoobicon.com`;
                   <button onClick={() => {}} className="p-2 rounded-lg hover:bg-white/5 transition-colors" title="Attach file"><Paperclip className="w-4 h-4 text-white/50" /></button>
 
                   {/* AI Polish Button */}
-                  <button onClick={handlePolish} disabled={polishing || !composeData.text.trim()} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-purple-500/10 border border-transparent hover:border-purple-500/20 transition-all disabled:opacity-30 group" title="AI Polish — fix grammar, tone & clarity">
-                    {polishing ? <Loader2 className="w-4 h-4 text-purple-400 animate-spin" /> : <Sparkles className="w-4 h-4 text-white/50 group-hover:text-purple-400" />}
-                    <span className="text-xs text-white/50 group-hover:text-purple-400 hidden sm:inline">Polish</span>
+                  <button onClick={handlePolish} disabled={polishing || !composeData.text.trim()} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-stone-500/10 border border-transparent hover:border-stone-500/20 transition-all disabled:opacity-30 group" title="AI Polish — fix grammar, tone & clarity">
+                    {polishing ? <Loader2 className="w-4 h-4 text-stone-400 animate-spin" /> : <Sparkles className="w-4 h-4 text-white/50 group-hover:text-stone-400" />}
+                    <span className="text-xs text-white/50 group-hover:text-stone-400 hidden sm:inline">Polish</span>
                   </button>
 
                   {/* Templates */}
                   <div className="relative">
                     <button onClick={() => setShowTemplates(!showTemplates)} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-white/5 transition-colors group" title="Email Templates">
-                      <FileText className="w-4 h-4 text-white/50 group-hover:text-cyan-400" />
-                      <span className="text-xs text-white/50 group-hover:text-cyan-400 hidden sm:inline">Templates</span>
+                      <FileText className="w-4 h-4 text-white/50 group-hover:text-stone-400" />
+                      <span className="text-xs text-white/50 group-hover:text-stone-400 hidden sm:inline">Templates</span>
                     </button>
                     <AnimatePresence>
                       {showTemplates && (
@@ -630,28 +630,28 @@ support@zoobicon.com`;
 
                   {/* Signature */}
                   <button onClick={() => setShowSignatureEditor(!showSignatureEditor)} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-white/5 transition-colors group" title="Email Signature">
-                    <PenTool className="w-4 h-4 text-white/50 group-hover:text-green-400" />
-                    <span className="text-xs text-white/50 group-hover:text-green-400 hidden sm:inline">Signature</span>
+                    <PenTool className="w-4 h-4 text-white/50 group-hover:text-stone-400" />
+                    <span className="text-xs text-white/50 group-hover:text-stone-400 hidden sm:inline">Signature</span>
                   </button>
 
                   {/* AI Subject Line */}
                   <button onClick={generateSubject} disabled={generatingSubject || !composeData.text.trim()} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-white/5 transition-colors group disabled:opacity-30" title="AI generate subject line">
-                    {generatingSubject ? <Loader2 className="w-4 h-4 text-amber-400 animate-spin" /> : <Zap className="w-4 h-4 text-white/50 group-hover:text-amber-400" />}
-                    <span className="text-xs text-white/50 group-hover:text-amber-400 hidden sm:inline">Subject</span>
+                    {generatingSubject ? <Loader2 className="w-4 h-4 text-stone-400 animate-spin" /> : <Zap className="w-4 h-4 text-white/50 group-hover:text-stone-400" />}
+                    <span className="text-xs text-white/50 group-hover:text-stone-400 hidden sm:inline">Subject</span>
                   </button>
 
                   {/* Schedule */}
                   <button onClick={() => setScheduling(!scheduling)} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-white/5 transition-colors group" title="Schedule send">
-                    <Clock className="w-4 h-4 text-white/50 group-hover:text-orange-400" />
-                    <span className="text-xs text-white/50 group-hover:text-orange-400 hidden sm:inline">Schedule</span>
+                    <Clock className="w-4 h-4 text-white/50 group-hover:text-stone-400" />
+                    <span className="text-xs text-white/50 group-hover:text-stone-400 hidden sm:inline">Schedule</span>
                   </button>
                 </div>
 
                 <div className="flex items-center gap-2">
                   {grammarIssues.length > 0 && grammarChecked && (
-                    <span className="text-[10px] text-emerald-400 flex items-center gap-1"><Check className="w-3 h-3" /> Grammar fixed</span>
+                    <span className="text-[10px] text-stone-400 flex items-center gap-1"><Check className="w-3 h-3" /> Grammar fixed</span>
                   )}
-                  <button onClick={handleSend} disabled={sending || sendSuccess || grammarChecking || !composeData.to || !composeData.subject || !composeData.text} className={`flex items-center gap-2 ${grammarChecked ? "bg-blue-600 hover:bg-blue-500" : "bg-amber-600 hover:bg-amber-500"} disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors`}>
+                  <button onClick={handleSend} disabled={sending || sendSuccess || grammarChecking || !composeData.to || !composeData.subject || !composeData.text} className={`flex items-center gap-2 ${grammarChecked ? "bg-stone-600 hover:bg-stone-500" : "bg-stone-600 hover:bg-stone-500"} disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors`}>
                     {sendSuccess ? (<><CheckSquare className="w-4 h-4" /> Sent!</>) : sending ? (<><Loader2 className="w-4 h-4 animate-spin" /> Sending...</>) : grammarChecking ? (<><Loader2 className="w-4 h-4 animate-spin" /> Checking grammar...</>) : grammarChecked ? (<><Send className="w-4 h-4" /> Send</>) : (<><Shield className="w-4 h-4" /> Check &amp; Send</>)}
                   </button>
                 </div>
@@ -661,12 +661,12 @@ support@zoobicon.com`;
               <AnimatePresence>
                 {showSignatureEditor && (
                   <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="border-t border-white/10 overflow-hidden">
-                    <div className="px-4 py-3 bg-green-500/5">
+                    <div className="px-4 py-3 bg-stone-500/5">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-semibold text-green-300 flex items-center gap-1.5"><PenTool className="w-3 h-3" /> Email Signature</span>
+                        <span className="text-xs font-semibold text-stone-300 flex items-center gap-1.5"><PenTool className="w-3 h-3" /> Email Signature</span>
                         <div className="flex items-center gap-1.5">
-                          <button onClick={appendSignature} className="text-[10px] px-2 py-1 rounded bg-green-600/20 text-green-400 hover:bg-green-600/30 transition-colors">Insert into email</button>
-                          <button onClick={saveSignature} className="text-[10px] px-2 py-1 rounded bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 transition-colors">Save</button>
+                          <button onClick={appendSignature} className="text-[10px] px-2 py-1 rounded bg-stone-600/20 text-stone-400 hover:bg-stone-600/30 transition-colors">Insert into email</button>
+                          <button onClick={saveSignature} className="text-[10px] px-2 py-1 rounded bg-stone-600/20 text-stone-400 hover:bg-stone-600/30 transition-colors">Save</button>
                         </div>
                       </div>
                       <textarea value={signature} onChange={(e) => setSignature(e.target.value)} className="w-full bg-black/20 rounded-lg px-3 py-2 text-xs text-white/80 placeholder-white/50 focus:outline-none resize-none h-20" placeholder="Your email signature..." />
@@ -679,10 +679,10 @@ support@zoobicon.com`;
               <AnimatePresence>
                 {scheduling && (
                   <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="border-t border-white/10 overflow-hidden">
-                    <div className="px-4 py-3 bg-orange-500/5 flex items-center gap-3">
-                      <Clock className="w-4 h-4 text-orange-400" />
-                      <span className="text-xs text-orange-300 font-medium">Send Later:</span>
-                      <input type="datetime-local" value={scheduleTime} onChange={(e) => setScheduleTime(e.target.value)} className="bg-black/20 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-orange-500/40" />
+                    <div className="px-4 py-3 bg-stone-500/5 flex items-center gap-3">
+                      <Clock className="w-4 h-4 text-stone-400" />
+                      <span className="text-xs text-stone-300 font-medium">Send Later:</span>
+                      <input type="datetime-local" value={scheduleTime} onChange={(e) => setScheduleTime(e.target.value)} className="bg-black/20 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-stone-500/40" />
                       <span className="text-[10px] text-white/60">Email will be queued and sent at the scheduled time</span>
                     </div>
                   </motion.div>

@@ -47,17 +47,17 @@ export default function QAPanel({ code }: { code: string }) {
   };
 
   const gradeColor = (grade: string) => {
-    if (grade === "A") return "text-emerald-400";
-    if (grade === "B") return "text-blue-400";
-    if (grade === "C") return "text-yellow-400";
-    if (grade === "D") return "text-orange-400";
-    return "text-red-400";
+    if (grade === "A") return "text-stone-400";
+    if (grade === "B") return "text-stone-400";
+    if (grade === "C") return "text-stone-400";
+    if (grade === "D") return "text-stone-400";
+    return "text-stone-400";
   };
 
   const severityIcon = (s: string) => {
-    if (s === "error") return <AlertTriangle size={14} className="text-red-400" />;
-    if (s === "warning") return <AlertTriangle size={14} className="text-yellow-400" />;
-    return <Info size={14} className="text-blue-400" />;
+    if (s === "error") return <AlertTriangle size={14} className="text-stone-400" />;
+    if (s === "warning") return <AlertTriangle size={14} className="text-stone-400" />;
+    return <Info size={14} className="text-stone-400" />;
   };
 
   return (
@@ -114,7 +114,7 @@ export default function QAPanel({ code }: { code: string }) {
             <div className="space-y-1">
               <div className="text-xs text-white/50 uppercase tracking-wider">Passed ({result.passed.length})</div>
               {result.passed.map((p, i) => (
-                <div key={i} className="flex items-center gap-2 text-xs text-emerald-400/70">
+                <div key={i} className="flex items-center gap-2 text-xs text-stone-400/70">
                   <CheckCircle size={12} /> {p}
                 </div>
               ))}
