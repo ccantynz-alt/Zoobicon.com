@@ -222,7 +222,8 @@ Hard rules:
 - Keep imports identical unless you genuinely need a new one.
 - Replace AI-slop words ("revolutionary", "unleash", "empower", "synergy", "next-generation", "game-changer", "leverage", "elevate", "seamless", "cutting-edge") with specific copy.
 - Use real-sounding metrics, not "10,000+ users".
-- Add aria-labels to icon-only buttons. Add alt text to images. Keep responsive classes.`;
+- Add aria-labels to icon-only buttons. Add alt text to images. Keep responsive classes.
+- For navbars: anchor links (href="#features", "#pricing", etc.) MUST match real section ids on the page. Only use: features, pricing, faq, about, contact. Never use #docs, #solutions, #markets, or any id that won't exist as a section.`;
 
 interface CustomiseArgs {
   baseCode: string;
