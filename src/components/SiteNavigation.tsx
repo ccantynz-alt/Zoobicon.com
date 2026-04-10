@@ -115,6 +115,7 @@ export default function SiteNavigation() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const megaRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
@@ -129,6 +130,14 @@ export default function SiteNavigation() {
         setIsAdmin(user.role === "admin");
       }
     } catch { /* ignore */ }
+  }, []);
+
+  // Scroll-aware: strengthen backdrop once the user moves off the hero
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   // Close mega menu on route change
@@ -164,15 +173,29 @@ export default function SiteNavigation() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a14]/90 backdrop-blur-xl border-b border-white/[0.06]">
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        scrolled
+          ? "bg-[#050508]/85 backdrop-blur-2xl border-b border-white/[0.08] shadow-[0_8px_32px_-16px_rgba(0,0,0,0.6)]"
+          : "bg-[#050508]/40 backdrop-blur-xl border-b border-white/[0.03]"
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 flex-shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-stone-500 to-stone-600 flex items-center justify-center">
-              <span className="text-white font-black text-sm">Z</span>
+        <div className="flex items-center justify-between h-[72px]">
+          {/* Logo — editorial warm mark + word mark */}
+          <Link href="/" className="group flex items-center gap-2.5 flex-shrink-0">
+            <div
+              className="relative w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-500 group-hover:scale-[1.04]"
+              style={{
+                background: "linear-gradient(135deg, #E8D4B0 0%, #F7C8A0 60%, #E08BB0 100%)",
+                boxShadow: "0 10px 30px -12px rgba(232,212,176,0.55)",
+              }}
+            >
+              <span className="text-black font-black text-[15px] tracking-tight">Z</span>
             </div>
-            <span className="text-white font-bold text-lg tracking-tight hidden sm:block">Zoobicon</span>
+            <span className="hidden sm:block text-white font-semibold text-[17px] tracking-[-0.02em]">
+              Zoobicon
+            </span>
           </Link>
 
           {/* Desktop Nav */}
@@ -181,41 +204,71 @@ export default function SiteNavigation() {
             <div ref={megaRef} className="relative">
               <button
                 onClick={() => setMegaOpen(!megaOpen)}
-                className={`flex items-center gap-1 px-3 py-2 text-sm rounded-lg transition-colors ${
-                  megaOpen ? "text-white bg-white/[0.08]" : "text-white/60 hover:text-white hover:bg-white/[0.04]"
+                className={`flex items-center gap-1.5 px-4 py-2 text-[13px] font-medium rounded-full transition-all duration-300 ${
+                  megaOpen
+                    ? "text-white bg-white/[0.08] border border-white/[0.12]"
+                    : "text-white/70 hover:text-white border border-transparent hover:bg-white/[0.04] hover:border-white/[0.08]"
                 }`}
               >
-                Products <ChevronDown className={`w-3.5 h-3.5 transition-transform ${megaOpen ? "rotate-180" : ""}`} />
+                Products
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${megaOpen ? "rotate-180 text-[#E8D4B0]" : ""}`} />
               </button>
 
-              {/* Mega Menu Panel — FULL WIDTH 6 columns */}
+              {/* Mega Menu Panel — FULL WIDTH 6 columns, cinematic treatment */}
               {megaOpen && (
                 <div
                   data-mega-menu
-                  className="fixed top-[64px] left-0 right-0 bg-[#141420] border-b border-white/[0.08] shadow-2xl shadow-black/50"
+                  className="fixed top-[72px] left-0 right-0 border-b border-white/[0.08] shadow-[0_40px_80px_-24px_rgba(0,0,0,0.8)]"
+                  style={{
+                    background:
+                      "linear-gradient(180deg, rgba(10,10,15,0.98) 0%, rgba(17,17,24,0.98) 100%)",
+                    backdropFilter: "blur(24px)",
+                  }}
                 >
-                  <div className="max-w-7xl mx-auto px-6 py-6">
-                    <div className="grid grid-cols-6 gap-6">
+                  {/* Ambient warm glow */}
+                  <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                    <div
+                      className="absolute left-1/2 top-0 h-[400px] w-[900px] -translate-x-1/2 rounded-full blur-[120px]"
+                      style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.08), transparent 70%)" }}
+                    />
+                  </div>
+
+                  <div className="relative max-w-7xl mx-auto px-6 py-10">
+                    <div className="grid grid-cols-6 gap-8">
                       {PRODUCT_SECTIONS.map((section) => (
                         <div key={section.label}>
-                          <h3 className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mb-3">{section.label}</h3>
-                          <div className="space-y-0.5">
+                          <h3
+                            className="mb-4 text-[10px] uppercase tracking-[0.2em] font-semibold"
+                            style={{ color: "rgba(232,212,176,0.75)" }}
+                          >
+                            {section.label}
+                          </h3>
+                          <div className="space-y-1">
                             {section.items.map((item) => (
                               <Link
                                 key={item.href}
                                 href={item.href}
-                                className="flex items-start gap-2 p-2 rounded-lg hover:bg-white/[0.05] transition-colors group"
+                                className="group flex items-start gap-2.5 p-2.5 rounded-xl transition-all duration-300 hover:bg-white/[0.04] hover:translate-x-0.5"
                                 onClick={() => setMegaOpen(false)}
                               >
-                                <item.icon className="w-4 h-4 text-slate-500 group-hover:text-stone-400 transition-colors mt-0.5 flex-shrink-0" />
+                                <item.icon className="w-4 h-4 text-white/40 group-hover:text-[#E8D4B0] transition-colors mt-0.5 flex-shrink-0" />
                                 <div className="min-w-0">
-                                  <div className="text-[13px] text-white/80 group-hover:text-white font-medium flex items-center gap-1.5 truncate">
-                                    {item.name}
+                                  <div className="text-[13px] text-white/85 group-hover:text-white font-medium flex items-center gap-1.5">
+                                    <span className="truncate">{item.name}</span>
                                     {item.badge && (
-                                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-stone-500/20 text-stone-300 font-semibold flex-shrink-0">{item.badge}</span>
+                                      <span
+                                        className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold flex-shrink-0"
+                                        style={{
+                                          background: "rgba(232,212,176,0.14)",
+                                          color: "#F0DCB8",
+                                          border: "1px solid rgba(232,212,176,0.3)",
+                                        }}
+                                      >
+                                        {item.badge}
+                                      </span>
                                     )}
                                   </div>
-                                  <div className="text-[11px] text-slate-500 mt-0.5 truncate">{item.desc}</div>
+                                  <div className="text-[11px] text-white/40 mt-0.5 leading-relaxed">{item.desc}</div>
                                 </div>
                               </Link>
                             ))}
@@ -223,14 +276,27 @@ export default function SiteNavigation() {
                         </div>
                       ))}
                     </div>
-                    <div className="mt-4 pt-4 border-t border-white/[0.06] flex items-center justify-between">
-                      <span className="text-xs text-slate-500">75+ tools replacing $923/mo in SaaS subscriptions</span>
-                      <div className="flex items-center gap-4">
-                        <Link href="/domains" className="text-xs text-stone-400 hover:text-stone-300 flex items-center gap-1" onClick={() => setMegaOpen(false)}>
-                          Search domains <ArrowRight className="w-3 h-3" />
+                    <div className="mt-8 pt-6 border-t border-white/[0.06] flex items-center justify-between">
+                      <span className="text-[12px] text-white/45">
+                        75+ products bundled.{" "}
+                        <span className="text-white/65">Replaces $923/mo in SaaS subscriptions.</span>
+                      </span>
+                      <div className="flex items-center gap-5">
+                        <Link
+                          href="/domains"
+                          className="group text-[12px] text-white/60 hover:text-[#E8D4B0] flex items-center gap-1.5 transition-colors"
+                          onClick={() => setMegaOpen(false)}
+                        >
+                          Search domains
+                          <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
                         </Link>
-                        <Link href="/generators" className="text-xs text-stone-400 hover:text-stone-300 flex items-center gap-1" onClick={() => setMegaOpen(false)}>
-                          All generators <ArrowRight className="w-3 h-3" />
+                        <Link
+                          href="/generators"
+                          className="group text-[12px] text-white/60 hover:text-[#E8D4B0] flex items-center gap-1.5 transition-colors"
+                          onClick={() => setMegaOpen(false)}
+                        >
+                          All generators
+                          <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
                         </Link>
                       </div>
                     </div>
@@ -240,65 +306,92 @@ export default function SiteNavigation() {
             </div>
 
             {/* Static links — most important pages always visible */}
-            {TOP_NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`px-3 py-2 text-sm rounded-lg transition-colors ${
-                  pathname === link.href
-                    ? "text-white bg-white/[0.08]"
-                    : "text-white/60 hover:text-white hover:bg-white/[0.04]"
-                }`}
-              >
-                {link.name}
-              </Link>
-            ))}
+            {TOP_NAV_LINKS.map((link) => {
+              const active = pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`px-4 py-2 text-[13px] font-medium rounded-full transition-all duration-300 border ${
+                    active
+                      ? "text-white bg-white/[0.08] border-white/[0.12]"
+                      : "text-white/70 hover:text-white hover:bg-white/[0.04] border-transparent hover:border-white/[0.08]"
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
           </div>
 
           {/* Right side: Auth + CTA */}
           <div className="hidden lg:flex items-center gap-2">
             {isLoggedIn ? (
               <>
-                <Link href="/dashboard" className="px-3 py-2 text-sm text-white/60 hover:text-white rounded-lg hover:bg-white/[0.04] transition-colors flex items-center gap-1.5">
+                <Link
+                  href="/dashboard"
+                  className="px-3.5 py-2 text-[13px] text-white/70 hover:text-white rounded-full hover:bg-white/[0.04] transition-colors flex items-center gap-1.5"
+                >
                   <LayoutDashboard className="w-3.5 h-3.5" /> Dashboard
                 </Link>
                 {isAdmin && (
-                  <Link href="/admin" className="px-3 py-2 text-sm text-stone-400/60 hover:text-stone-400 rounded-lg hover:bg-stone-500/[0.06] transition-colors">
+                  <Link
+                    href="/admin"
+                    className="px-3.5 py-2 text-[13px] text-[#E8D4B0]/70 hover:text-[#E8D4B0] rounded-full hover:bg-[#E8D4B0]/[0.06] transition-colors"
+                  >
                     Admin
                   </Link>
                 )}
-                <button onClick={handleLogout} className="px-3 py-2 text-sm text-white/40 hover:text-white/60 rounded-lg transition-colors">
-                  <LogOut className="w-3.5 h-3.5" />
+                <button
+                  onClick={handleLogout}
+                  className="p-2 text-white/40 hover:text-white/70 rounded-full hover:bg-white/[0.04] transition-colors"
+                  aria-label="Sign out"
+                >
+                  <LogOut className="w-4 h-4" />
                 </button>
               </>
             ) : (
-              <>
-                <Link href="/auth/login" className="px-3 py-2 text-sm text-white/60 hover:text-white rounded-lg transition-colors">
-                  Sign in
-                </Link>
-              </>
+              <Link
+                href="/auth/login"
+                className="px-4 py-2 text-[13px] text-white/70 hover:text-white rounded-full transition-colors"
+              >
+                Sign in
+              </Link>
             )}
             <Link
               href="/builder"
-              className="px-4 py-2 text-sm font-semibold bg-stone-600 hover:bg-stone-500 text-white rounded-lg transition-colors flex items-center gap-1.5"
+              className="group inline-flex items-center gap-1.5 px-5 py-2.5 text-[13px] font-semibold rounded-full transition-all duration-500 hover:-translate-y-0.5"
+              style={{
+                background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+                color: "#0a0a0f",
+                boxShadow: "0 10px 30px -12px rgba(232,212,176,0.45)",
+              }}
             >
-              <Rocket className="w-3.5 h-3.5" /> Start Building
+              <Rocket className="w-3.5 h-3.5 transition-transform group-hover:rotate-[-8deg]" />
+              Start Building
             </Link>
           </div>
 
           {/* Mobile/tablet hamburger */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="lg:hidden p-2 text-white/60 hover:text-white rounded-lg"
+            className="lg:hidden p-2 text-white/80 hover:text-[#E8D4B0] rounded-full transition-colors border border-white/[0.08] bg-white/[0.04] backdrop-blur-xl"
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
           >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu — full-screen cinematic overlay */}
       {mobileOpen && (
-        <div className="lg:hidden bg-[#0a0a14] border-t border-white/[0.06] max-h-[85vh] overflow-y-auto">
+        <div
+          className="lg:hidden border-t border-white/[0.06] max-h-[85vh] overflow-y-auto"
+          style={{
+            background: "linear-gradient(180deg, rgba(5,5,8,0.98) 0%, rgba(10,10,15,0.98) 100%)",
+            backdropFilter: "blur(24px)",
+          }}
+        >
           <div className="px-4 py-4 space-y-5">
             {PRODUCT_SECTIONS.map((section) => (
               <div key={section.label}>
