@@ -645,3 +645,210 @@ registerComponent({
   );
 }`,
 });
+
+// ── Hero: Cinematic Product Showcase ──
+registerComponent({
+  id: "hero-cinematic-showcase",
+  name: "Cinematic Product Showcase Hero",
+  category: "hero",
+  variant: "cinematic-showcase",
+  description: "Filmora-grade dark cinematic hero with centered headline, trust badges, and a massive product screenshot/mockup floating below. Purple-dominant gradients, glow effects, scroll-reveal.",
+  tags: ["cinematic", "dark", "showcase", "product", "saas", "premium", "filmora", "video", "creative", "app", "software", "demo", "purple"],
+  code: `export default function Hero() {
+  const [visible, setVisible] = React.useState(false);
+  React.useEffect(() => { setVisible(true); }, []);
+  return (
+    <section className="relative min-h-screen bg-[#09090f] pt-24 pb-0 overflow-hidden">
+      {/* Ambient glow orbs */}
+      <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-[radial-gradient(ellipse,rgba(124,58,237,0.15),transparent_70%)] pointer-events-none" />
+      <div className="absolute bottom-0 left-1/4 w-[600px] h-[400px] bg-[radial-gradient(ellipse,rgba(59,130,246,0.08),transparent_70%)] pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-[600px] h-[400px] bg-[radial-gradient(ellipse,rgba(168,85,247,0.08),transparent_70%)] pointer-events-none" />
+
+      {/* Content */}
+      <div className={\`relative z-10 max-w-5xl mx-auto px-6 text-center transition-all duration-1000 \${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}\`}>
+        {/* Badge */}
+        <div className="inline-flex items-center gap-2 bg-violet-500/10 text-violet-300 text-xs font-semibold px-4 py-2 rounded-full border border-violet-500/20 mb-8 backdrop-blur-sm">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Trusted by 50,000+ creators worldwide
+        </div>
+
+        {/* Headline */}
+        <h1 className="text-5xl sm:text-6xl lg:text-8xl font-extrabold text-white leading-[1.05] tracking-tight mb-6">
+          Create Without
+          <br />
+          <span className="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-purple-400 bg-clip-text text-transparent">Limits</span>
+        </h1>
+
+        <p className="text-lg sm:text-xl text-gray-400 leading-relaxed mb-10 max-w-2xl mx-auto">
+          The all-in-one platform that turns your ideas into polished, professional results — powered by AI, designed for humans.
+        </p>
+
+        {/* CTA buttons */}
+        <div className="flex flex-wrap justify-center gap-4 mb-6">
+          <button className="group px-8 py-3.5 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-sm font-bold rounded-xl hover:shadow-xl hover:shadow-violet-600/25 transition-all duration-300 flex items-center gap-2">
+            Start Free
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="group-hover:translate-x-1 transition-transform"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+          <button className="px-8 py-3.5 bg-white/5 text-white text-sm font-semibold rounded-xl border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 backdrop-blur-sm flex items-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Watch Demo
+          </button>
+        </div>
+
+        {/* Trust row */}
+        <div className="flex items-center justify-center gap-6 text-xs text-gray-500 mb-16">
+          <span className="flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> SOC 2</span>
+          <span className="w-px h-3 bg-gray-700" />
+          <span>No credit card required</span>
+          <span className="w-px h-3 bg-gray-700" />
+          <span>Cancel anytime</span>
+        </div>
+      </div>
+
+      {/* Product mockup — large floating screenshot */}
+      <div className={\`relative z-10 max-w-6xl mx-auto px-6 transition-all duration-1000 delay-300 \${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-16"}\`}>
+        <div className="relative rounded-t-2xl overflow-hidden border border-white/10 bg-gray-900/50 backdrop-blur-sm shadow-2xl shadow-violet-900/20">
+          {/* Browser chrome bar */}
+          <div className="flex items-center gap-2 px-4 py-3 bg-gray-900/80 border-b border-white/5">
+            <div className="flex gap-1.5">
+              <div className="w-3 h-3 rounded-full bg-red-500/60" />
+              <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
+              <div className="w-3 h-3 rounded-full bg-green-500/60" />
+            </div>
+            <div className="flex-1 mx-4">
+              <div className="bg-gray-800 rounded-md px-3 py-1 text-xs text-gray-400 max-w-xs mx-auto text-center">app.acme.com/dashboard</div>
+            </div>
+          </div>
+          {/* Simulated dashboard UI */}
+          <div className="p-6 sm:p-8 bg-gradient-to-b from-gray-900 to-gray-950 min-h-[300px] sm:min-h-[400px]">
+            <div className="grid grid-cols-3 gap-4 mb-6">
+              {[
+                { label: "Total Users", value: "48,294", change: "+12.5%", color: "violet" },
+                { label: "Revenue", value: "$2.4M", change: "+8.3%", color: "fuchsia" },
+                { label: "Growth Rate", value: "156%", change: "+24.1%", color: "purple" },
+              ].map((s, i) => (
+                <div key={i} className="bg-white/[0.03] rounded-xl p-4 border border-white/5">
+                  <div className="text-xs text-gray-500 mb-1">{s.label}</div>
+                  <div className="text-xl sm:text-2xl font-bold text-white">{s.value}</div>
+                  <div className={\`text-xs font-semibold mt-1 text-\${s.color}-400\`}>
+                    <span className="inline-flex items-center gap-0.5">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="18 15 12 9 6 15"/></svg>
+                      {s.change}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Chart placeholder */}
+            <div className="bg-white/[0.02] rounded-xl p-6 border border-white/5">
+              <div className="flex items-end justify-between h-32 gap-2">
+                {[40,65,45,80,60,90,75,95,85,70,88,100].map((h, i) => (
+                  <div key={i} className="flex-1 bg-gradient-to-t from-violet-600/60 to-fuchsia-500/40 rounded-t-sm" style={{ height: h + "%" }} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* Bottom gradient fade */}
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#09090f] to-transparent pointer-events-none" />
+      </div>
+    </section>
+  );
+}`,
+});
+
+// ── Hero: Cinematic Video Dark ──
+registerComponent({
+  id: "hero-cinematic-video",
+  name: "Cinematic Video Hero",
+  category: "hero",
+  variant: "cinematic-video",
+  description: "Full-width dark hero with inline video player mockup, scroll-reveal animation, and purple-to-blue gradient accents. Inspired by Filmora/Runway aesthetic.",
+  tags: ["cinematic", "dark", "video", "filmora", "runway", "creative", "production", "editor", "media", "content", "purple"],
+  code: `export default function Hero() {
+  const [visible, setVisible] = React.useState(false);
+  const [playing, setPlaying] = React.useState(false);
+  React.useEffect(() => { setVisible(true); }, []);
+  return (
+    <section className="relative min-h-screen bg-[#0a0a12] pt-24 pb-16 overflow-hidden">
+      {/* Background grid + glow */}
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSA2MCAwIEwgMCAwIDAgNjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-50" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-[radial-gradient(ellipse,rgba(139,92,246,0.12),transparent_65%)] pointer-events-none" />
+
+      <div className="relative z-10 max-w-6xl mx-auto px-6">
+        {/* Text block */}
+        <div className={\`text-center mb-16 transition-all duration-1000 \${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}\`}>
+          <div className="inline-flex items-center gap-2 bg-purple-500/10 text-purple-300 text-xs font-bold px-4 py-2 rounded-full border border-purple-500/20 mb-8 uppercase tracking-wider">
+            <span className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" />
+            New Release
+          </div>
+          <h1 className="text-5xl sm:text-6xl lg:text-8xl font-black text-white leading-[1.02] tracking-tight mb-6">
+            Your Vision.
+            <br />
+            <span className="bg-gradient-to-r from-purple-400 via-violet-400 to-blue-400 bg-clip-text text-transparent">Our Engine.</span>
+          </h1>
+          <p className="text-lg text-gray-400 leading-relaxed max-w-2xl mx-auto mb-10">
+            Professional-grade tools that make creating effortless. From first draft to final cut — everything you need in one place.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <button className="group px-8 py-4 bg-gradient-to-r from-purple-600 via-violet-600 to-blue-600 text-white text-sm font-bold rounded-2xl hover:shadow-2xl hover:shadow-purple-600/30 transition-all duration-300 flex items-center gap-2">
+              Get Started Free
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="group-hover:translate-x-1 transition-transform"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+            <button className="px-8 py-4 text-white/80 text-sm font-semibold rounded-2xl border border-white/10 hover:bg-white/5 transition-all duration-300">
+              See Pricing
+            </button>
+          </div>
+        </div>
+
+        {/* Video player mockup */}
+        <div className={\`transition-all duration-1000 delay-500 \${visible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-16 scale-95"}\`}>
+          <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-gray-900/60 backdrop-blur-xl shadow-2xl shadow-purple-900/20 group cursor-pointer" onClick={() => setPlaying(!playing)}>
+            {/* Video content area */}
+            <div className="relative aspect-video bg-gradient-to-br from-gray-900 via-[#0f0f1a] to-gray-950 flex items-center justify-center">
+              {/* Decorative timeline bar */}
+              <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                <div className="flex items-center gap-3">
+                  <button className="text-white/80 hover:text-white transition-colors">
+                    {playing ? (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                    ) : (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    )}
+                  </button>
+                  <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
+                    <div className="h-full w-1/3 bg-gradient-to-r from-purple-500 to-violet-500 rounded-full" />
+                  </div>
+                  <span className="text-xs text-white/50 font-mono">1:24 / 3:45</span>
+                </div>
+              </div>
+              {/* Center play icon */}
+              {!playing && (
+                <div className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center group-hover:scale-110 group-hover:bg-purple-600/40 transition-all duration-500">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><polygon points="8 5 19 12 8 19 8 5"/></svg>
+                </div>
+              )}
+              {/* Floating UI mockup elements */}
+              <div className="absolute top-6 left-6 flex gap-2">
+                {["Layers", "Effects", "Audio"].map((t, i) => (
+                  <span key={i} className={\`text-[10px] font-semibold px-3 py-1.5 rounded-lg border backdrop-blur-sm \${i === 0 ? "bg-purple-500/20 text-purple-300 border-purple-500/30" : "bg-white/5 text-white/40 border-white/10"}\`}>{t}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Logo strip */}
+        <div className={\`mt-16 text-center transition-all duration-1000 delay-700 \${visible ? "opacity-100" : "opacity-0"}\`}>
+          <p className="text-xs text-gray-600 uppercase tracking-[0.2em] mb-6 font-medium">Trusted by teams at</p>
+          <div className="flex items-center justify-center gap-10 opacity-30">
+            {["Acme Corp", "Vertex", "Nebula", "Quantum", "Synapse"].map((name, i) => (
+              <span key={i} className="text-sm font-bold text-white tracking-wider uppercase">{name}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}`,
+});

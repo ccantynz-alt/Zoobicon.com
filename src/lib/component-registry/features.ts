@@ -576,3 +576,120 @@ registerComponent({
   );
 }`,
 });
+
+// ── Features: Cinematic Showcase ──
+registerComponent({
+  id: "features-cinematic-showcase",
+  name: "Cinematic Feature Showcase",
+  category: "features",
+  variant: "cinematic-showcase",
+  description: "Filmora-grade alternating feature rows with large mockup screenshots, scroll-reveal animations, purple/violet gradient accents on dark background",
+  tags: ["cinematic", "dark", "showcase", "product", "filmora", "premium", "saas", "creative", "purple", "app", "demo", "video"],
+  code: `export default function Features() {
+  const sectionRef = React.useRef<HTMLDivElement>(null);
+  const [visibleItems, setVisibleItems] = React.useState<Set<number>>(new Set());
+
+  React.useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const idx = Number(entry.target.getAttribute("data-idx"));
+          setVisibleItems(prev => new Set(prev).add(idx));
+        }
+      });
+    }, { threshold: 0.2 });
+    sectionRef.current?.querySelectorAll("[data-idx]").forEach(el => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
+  const features = [
+    {
+      title: "AI-Powered Automation",
+      subtitle: "Work smarter, not harder",
+      description: "Let AI handle the repetitive tasks while you focus on what matters. Smart suggestions, auto-formatting, and one-click optimizations that save hours every week.",
+      stats: [{ label: "Faster workflow", value: "10x" }, { label: "Time saved weekly", value: "12hrs" }],
+      gradient: "from-violet-600 to-purple-600",
+      glow: "violet",
+    },
+    {
+      title: "Real-Time Collaboration",
+      subtitle: "Your team, in perfect sync",
+      description: "Work together seamlessly with live editing, instant comments, and version history. Share projects with a link — no accounts needed for viewers.",
+      stats: [{ label: "Team members", value: "Unlimited" }, { label: "Sync latency", value: "<50ms" }],
+      gradient: "from-blue-600 to-cyan-600",
+      glow: "blue",
+    },
+    {
+      title: "Professional Export",
+      subtitle: "Publish-ready in one click",
+      description: "Export in any format at the highest quality. Built-in presets for every platform — optimized dimensions, compression, and metadata automatically.",
+      stats: [{ label: "Export formats", value: "25+" }, { label: "Quality", value: "4K+" }],
+      gradient: "from-fuchsia-600 to-pink-600",
+      glow: "fuchsia",
+    },
+  ];
+
+  return (
+    <section id="features" className="py-32 bg-[#09090f] overflow-hidden" ref={sectionRef}>
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="text-center mb-20">
+          <span className="text-sm font-bold text-violet-400 uppercase tracking-[0.2em] mb-4 block">Features</span>
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight mb-6">
+            Everything you need.
+            <br />
+            <span className="bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Nothing you don&apos;t.</span>
+          </h2>
+          <p className="text-lg text-gray-400 max-w-2xl mx-auto">Purpose-built tools that work the way you think. No bloat, no learning curve — just results.</p>
+        </div>
+
+        <div className="space-y-32">
+          {features.map((f, i) => {
+            const isVisible = visibleItems.has(i);
+            const isReversed = i % 2 === 1;
+            return (
+              <div
+                key={i}
+                data-idx={i}
+                className={\`grid lg:grid-cols-2 gap-12 lg:gap-20 items-center transition-all duration-1000 \${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}\`}
+              >
+                {/* Text side */}
+                <div className={\`\${isReversed ? "lg:order-2" : ""}\`}>
+                  <span className={\`inline-block text-xs font-bold uppercase tracking-[0.2em] mb-4 bg-gradient-to-r \${f.gradient} bg-clip-text text-transparent\`}>{f.subtitle}</span>
+                  <h3 className="text-3xl sm:text-4xl font-extrabold text-white mb-4 tracking-tight">{f.title}</h3>
+                  <p className="text-gray-400 leading-relaxed mb-8 text-lg">{f.description}</p>
+                  <div className="flex gap-6">
+                    {f.stats.map((s, si) => (
+                      <div key={si} className="bg-white/[0.03] border border-white/5 rounded-xl px-5 py-3">
+                        <div className={\`text-2xl font-extrabold bg-gradient-to-r \${f.gradient} bg-clip-text text-transparent\`}>{s.value}</div>
+                        <div className="text-xs text-gray-500 mt-0.5">{s.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* Mockup side */}
+                <div className={\`relative \${isReversed ? "lg:order-1" : ""}\`}>
+                  <div className={\`absolute inset-0 bg-[radial-gradient(ellipse,rgba(\${f.glow === "violet" ? "139,92,246" : f.glow === "blue" ? "59,130,246" : "217,70,239"},0.1),transparent_70%)] scale-150 pointer-events-none\`} />
+                  <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-gray-900/50 backdrop-blur-sm shadow-xl p-1">
+                    <div className="rounded-xl bg-gradient-to-br from-gray-900 to-gray-950 aspect-[4/3] flex items-center justify-center">
+                      <div className="text-center p-8">
+                        <div className={\`w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br \${f.gradient} flex items-center justify-center shadow-lg\`}>
+                          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            {i === 0 && <><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></>}
+                            {i === 1 && <><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></>}
+                            {i === 2 && <><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></>}
+                          </svg>
+                        </div>
+                        <p className="text-sm text-gray-500">{f.subtitle}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}`,
+});
