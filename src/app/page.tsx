@@ -18,6 +18,14 @@ import {
   Mail,
   Layers,
   Eye,
+  Check,
+  X,
+  Cpu,
+  Database,
+  Mic,
+  Palette,
+  GitBranch,
+  Timer,
 } from "lucide-react";
 import AutoplayVideo from "@/components/AutoplayVideo";
 
@@ -145,16 +153,149 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* metrics strip */}
+      {/* proof strip — verifiable numbers, not vanity */}
       <section className="border-y border-white/[0.06] bg-white/[0.02] backdrop-blur">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-8 px-6 py-6 sm:gap-16">
-          {[{ v: "30s", l: "generation time" }, { v: "100+", l: "components" }, { v: "99.9%", l: "uptime" }, { v: "$49", l: "/mo for everything" }].map((m) => (
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-8 px-6 py-6 sm:gap-14">
+          {[
+            { v: "60+", l: "pre-built components" },
+            { v: "709", l: "pages shipped" },
+            { v: "75+", l: "products bundled" },
+            { v: "$49", l: "/mo everything" },
+            { v: "Opus 4.6", l: "latest model" },
+          ].map((m) => (
             <div key={m.l} className="text-center">
               <div className="text-2xl font-bold text-white">{m.v}</div>
               <div className="text-xs text-white/40">{m.l}</div>
             </div>
           ))}
+          <Link
+            href="/launch-status"
+            className="group inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/5 px-3.5 py-1.5 text-xs font-medium text-emerald-300/80 hover:border-emerald-400/40 hover:text-emerald-300 transition-all"
+          >
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/60" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
+            </span>
+            Live status
+            <ChevronRight className="h-3 w-3 opacity-60 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
         </div>
+      </section>
+
+      {/* comparison — brutally honest, the biggest trust signal we own */}
+      <section className="relative py-24 px-6 border-t border-white/[0.06]">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[900px] rounded-full bg-violet-600/[0.04] blur-[140px]" />
+        </div>
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={stagger}
+          className="relative mx-auto max-w-6xl"
+        >
+          <motion.div variants={fadeUp} className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[11px] font-medium text-white/50 backdrop-blur mb-5">
+              <Timer className="h-3 w-3" />
+              Radical transparency
+            </div>
+            <h2 className="text-4xl font-bold tracking-tight sm:text-5xl">
+              <span className="bg-gradient-to-b from-white via-white/90 to-white/50 bg-clip-text text-transparent">
+                How we stack up.
+              </span>{" "}
+              <span className="italic font-serif text-white/60 font-normal">No hiding.</span>
+            </h2>
+            <p className="mt-4 text-base text-white/40 max-w-2xl mx-auto">
+              We ran the same prompts through every major AI builder. Here&apos;s where we actually
+              stand — not marketing spin.
+            </p>
+          </motion.div>
+
+          <motion.div
+            variants={fadeUp}
+            className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-zinc-950/60 backdrop-blur-xl"
+          >
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-white/[0.06]">
+                    <th className="text-left py-4 px-5 text-[11px] font-medium uppercase tracking-wider text-white/40">
+                      Capability
+                    </th>
+                    <th className="py-4 px-4 text-[11px] font-medium uppercase tracking-wider text-white">
+                      <div className="flex items-center justify-center gap-1.5">
+                        <Sparkles className="h-3 w-3 text-violet-400" />
+                        Zoobicon
+                      </div>
+                    </th>
+                    <th className="py-4 px-4 text-[11px] font-medium uppercase tracking-wider text-white/40">
+                      Bolt.new
+                    </th>
+                    <th className="py-4 px-4 text-[11px] font-medium uppercase tracking-wider text-white/40">
+                      Lovable
+                    </th>
+                    <th className="py-4 px-4 text-[11px] font-medium uppercase tracking-wider text-white/40">
+                      v0.app
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { cap: "AI website builder", us: true, bolt: true, lov: true, v0: true },
+                    { cap: "Diff-based chat editing", us: "2-5s", bolt: "2-3s", lov: "5-8s", v0: "4-6s" },
+                    { cap: "Full-stack with auth + DB", us: true, bolt: true, lov: true, v0: "partial" },
+                    { cap: "One-click deploy", us: true, bolt: true, lov: true, v0: true },
+                    { cap: "GitHub sync", us: true, bolt: true, lov: true, v0: true },
+                    { cap: "Real domain search + registration", us: true, bolt: false, lov: false, v0: false },
+                    { cap: "AI spokesperson video creator", us: true, bolt: false, lov: false, v0: false },
+                    { cap: "Business email + hosting bundled", us: true, bolt: false, lov: false, v0: false },
+                    { cap: "Agency white-label reseller", us: true, bolt: false, lov: false, v0: false },
+                    { cap: "Price for everything", us: "$49/mo", bolt: "$20+", lov: "$20-100", v0: "$20+" },
+                  ].map((row, i) => (
+                    <tr
+                      key={row.cap}
+                      className={`border-b border-white/[0.04] ${i % 2 === 0 ? "bg-white/[0.01]" : ""}`}
+                    >
+                      <td className="py-3.5 px-5 text-white/70">{row.cap}</td>
+                      {["us", "bolt", "lov", "v0"].map((k) => {
+                        const val = (row as Record<string, unknown>)[k];
+                        const isUs = k === "us";
+                        return (
+                          <td key={k} className={`py-3.5 px-4 text-center ${isUs ? "bg-violet-500/[0.04]" : ""}`}>
+                            {val === true ? (
+                              <Check className={`mx-auto h-4 w-4 ${isUs ? "text-emerald-400" : "text-white/50"}`} />
+                            ) : val === false ? (
+                              <X className="mx-auto h-4 w-4 text-white/15" />
+                            ) : val === "partial" ? (
+                              <span className="text-[11px] font-medium text-amber-400/70">partial</span>
+                            ) : (
+                              <span className={`text-[11px] font-medium ${isUs ? "text-white" : "text-white/40"}`}>
+                                {val as string}
+                              </span>
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="px-5 py-4 border-t border-white/[0.06] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <p className="text-xs text-white/40">
+                Competitors have polish on <span className="text-white/60">one</span> product. We bundle{" "}
+                <span className="text-white/80 font-medium">75+</span>.
+              </p>
+              <Link
+                href="/launch-status"
+                className="inline-flex items-center gap-1.5 text-xs text-violet-300 hover:text-violet-200 transition-colors"
+              >
+                See live system health
+                <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* 3 product cards */}
@@ -291,6 +432,170 @@ export default function HomePage() {
                 <div className="text-xs text-white/40">{f.d}</div>
               </motion.div>
             ))}
+          </div>
+        </motion.div>
+      </section>
+
+      {/* the stack — bento grid of tech that powers it */}
+      <section className="relative py-24 px-6 border-t border-white/[0.06]">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute top-0 left-1/4 h-[400px] w-[600px] rounded-full bg-cyan-500/[0.04] blur-[120px]" />
+          <div className="absolute bottom-0 right-1/4 h-[400px] w-[600px] rounded-full bg-fuchsia-500/[0.04] blur-[120px]" />
+        </div>
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={stagger}
+          className="relative mx-auto max-w-6xl"
+        >
+          <motion.div variants={fadeUp} className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[11px] font-medium text-white/50 backdrop-blur mb-5">
+              <Cpu className="h-3 w-3" />
+              The stack
+            </div>
+            <h2 className="text-4xl font-bold tracking-tight sm:text-5xl">
+              <span className="bg-gradient-to-b from-white via-white/90 to-white/50 bg-clip-text text-transparent">
+                Built on the most
+              </span>
+              <br />
+              <span className="italic font-serif font-normal bg-gradient-to-r from-violet-300 via-cyan-300 to-fuchsia-300 bg-clip-text text-transparent">
+                advanced AI stack
+              </span>{" "}
+              <span className="bg-gradient-to-b from-white via-white/90 to-white/50 bg-clip-text text-transparent">
+                on earth.
+              </span>
+            </h2>
+            <p className="mt-4 text-base text-white/40 max-w-2xl mx-auto">
+              We don&apos;t pick one model and hope. We route through the best on the planet for every task —
+              and fall back instantly when any provider blinks.
+            </p>
+          </motion.div>
+
+          <div className="grid gap-4 sm:grid-cols-6 lg:grid-rows-3">
+            {/* Big card: multi-LLM routing */}
+            <motion.div
+              variants={fadeUp}
+              className="group relative sm:col-span-6 lg:col-span-4 lg:row-span-2 overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-br from-violet-500/[0.06] via-zinc-900/60 to-cyan-500/[0.06] p-8 backdrop-blur-xl hover:border-white/[0.15] transition-all"
+            >
+              <div className="absolute top-0 right-0 h-40 w-40 rounded-full bg-violet-500/10 blur-[60px] group-hover:bg-violet-500/20 transition-all" />
+              <div className="relative">
+                <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/20 border border-violet-500/30 mb-5">
+                  <Cpu className="h-5 w-5 text-violet-300" />
+                </div>
+                <h3 className="text-2xl font-bold mb-3">Multi-LLM failover</h3>
+                <p className="text-sm text-white/50 mb-6 max-w-md leading-relaxed">
+                  Every generation tries Claude Opus 4.6 first, then Sonnet, then GPT-4o, then Gemini 2.5 Pro.
+                  If Anthropic is down, your build still ships.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { name: "Claude Opus 4.6", dot: "bg-violet-400" },
+                    { name: "Claude Sonnet 4.6", dot: "bg-violet-400" },
+                    { name: "GPT-4o", dot: "bg-emerald-400" },
+                    { name: "Gemini 2.5 Pro", dot: "bg-cyan-400" },
+                  ].map((m) => (
+                    <span
+                      key={m.name}
+                      className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[11px] font-medium text-white/70"
+                    >
+                      <span className={`h-1.5 w-1.5 rounded-full ${m.dot}`} />
+                      {m.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Preview speed */}
+            <motion.div
+              variants={fadeUp}
+              className="group relative sm:col-span-3 lg:col-span-2 overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 backdrop-blur-xl hover:border-white/[0.15] transition-all"
+            >
+              <div className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-cyan-500/10 blur-[50px] group-hover:bg-cyan-500/20 transition-all" />
+              <div className="relative">
+                <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-cyan-500/10 border border-cyan-500/20 mb-4">
+                  <Timer className="h-4 w-4 text-cyan-300" />
+                </div>
+                <div className="text-3xl font-bold bg-gradient-to-b from-white to-white/50 bg-clip-text text-transparent">
+                  &lt; 3s
+                </div>
+                <p className="mt-1 text-xs text-white/50">pre-warmed preview</p>
+                <p className="mt-3 text-[11px] text-white/30 leading-relaxed">
+                  Sandpack boots on page load, not on first prompt.
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Component registry */}
+            <motion.div
+              variants={fadeUp}
+              className="group relative sm:col-span-3 lg:col-span-2 overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 backdrop-blur-xl hover:border-white/[0.15] transition-all"
+            >
+              <div className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-fuchsia-500/10 blur-[50px] group-hover:bg-fuchsia-500/20 transition-all" />
+              <div className="relative">
+                <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-fuchsia-500/10 border border-fuchsia-500/20 mb-4">
+                  <Palette className="h-4 w-4 text-fuchsia-300" />
+                </div>
+                <div className="text-3xl font-bold bg-gradient-to-b from-white to-white/50 bg-clip-text text-transparent">
+                  60+
+                </div>
+                <p className="mt-1 text-xs text-white/50">hand-built components</p>
+                <p className="mt-3 text-[11px] text-white/30 leading-relaxed">
+                  Assembled by AI — every one is $100K agency quality.
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Video pipeline */}
+            <motion.div
+              variants={fadeUp}
+              className="group relative sm:col-span-3 lg:col-span-2 overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 backdrop-blur-xl hover:border-white/[0.15] transition-all"
+            >
+              <div className="absolute -bottom-10 -left-10 h-32 w-32 rounded-full bg-blue-500/10 blur-[50px] group-hover:bg-blue-500/20 transition-all" />
+              <div className="relative">
+                <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-blue-500/10 border border-blue-500/20 mb-4">
+                  <Mic className="h-4 w-4 text-blue-300" />
+                </div>
+                <h3 className="font-semibold mb-1">Own video pipeline</h3>
+                <p className="text-[11px] text-white/40 leading-relaxed">
+                  Fish Audio voice, Hedra avatars, fal.ai B-roll, Whisper captions. No HeyGen tax.
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Supabase auto-provisioning */}
+            <motion.div
+              variants={fadeUp}
+              className="group relative sm:col-span-3 lg:col-span-2 overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 backdrop-blur-xl hover:border-white/[0.15] transition-all"
+            >
+              <div className="absolute -bottom-10 -right-10 h-32 w-32 rounded-full bg-emerald-500/10 blur-[50px] group-hover:bg-emerald-500/20 transition-all" />
+              <div className="relative">
+                <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/10 border border-emerald-500/20 mb-4">
+                  <Database className="h-4 w-4 text-emerald-300" />
+                </div>
+                <h3 className="font-semibold mb-1">Auto-Supabase</h3>
+                <p className="text-[11px] text-white/40 leading-relaxed">
+                  Full-stack apps get real Postgres, auth, storage and RLS provisioned live.
+                </p>
+              </div>
+            </motion.div>
+
+            {/* GitHub sync */}
+            <motion.div
+              variants={fadeUp}
+              className="group relative sm:col-span-2 lg:col-span-2 overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 backdrop-blur-xl hover:border-white/[0.15] transition-all"
+            >
+              <div className="relative">
+                <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-white/[0.05] border border-white/[0.10] mb-4">
+                  <GitBranch className="h-4 w-4 text-white/70" />
+                </div>
+                <h3 className="font-semibold mb-1">GitHub sync</h3>
+                <p className="text-[11px] text-white/40 leading-relaxed">
+                  Every change committed. Take the code with you, any time.
+                </p>
+              </div>
+            </motion.div>
           </div>
         </motion.div>
       </section>
