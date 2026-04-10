@@ -115,9 +115,14 @@ export default function HomePage() {
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
             AI-powered platform — builder, video, domains, hosting
           </motion.div>
-          <motion.h1 variants={fadeUp} className="text-5xl font-bold tracking-tight sm:text-7xl lg:text-8xl">
+          <motion.h1
+            variants={fadeUp}
+            className="text-6xl font-bold tracking-[-0.04em] sm:text-7xl lg:text-[9rem] lg:leading-[0.9]"
+          >
             Build anything{" "}
-            <span className="bg-gradient-to-r from-violet-400 via-cyan-400 to-fuchsia-400 bg-clip-text text-transparent">with AI</span>
+            <span className="bg-gradient-to-r from-[#53FBD5] via-[#75FF9C] to-[#BDFF89] bg-clip-text text-transparent">
+              with AI
+            </span>
           </motion.h1>
           <motion.p variants={fadeUp} className="mx-auto mt-6 max-w-2xl text-lg text-white/50 sm:text-xl">
             Describe your business. Get a complete website, spokesperson video, custom domain, and hosting — all in under 60 seconds.
@@ -153,6 +158,42 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* infinite prompt marquee — "what people are building" rolling social proof */}
+      <section className="relative overflow-hidden border-y border-white/[0.06] bg-white/[0.02] py-10 backdrop-blur">
+        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-32 bg-gradient-to-r from-zinc-950 to-transparent" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-32 bg-gradient-to-l from-zinc-950 to-transparent" />
+        <div className="flex w-max animate-[marquee_60s_linear_infinite] items-center gap-4">
+          {[
+            ...Array.from({ length: 2 }).flatMap((_, copy) =>
+              [
+                { icon: "🍽️", text: "A restaurant site with reservations" },
+                { icon: "🧘", text: "A yoga studio booking platform" },
+                { icon: "📸", text: "A portfolio for a wedding photographer" },
+                { icon: "🛍️", text: "An online store for handmade ceramics" },
+                { icon: "💼", text: "A SaaS landing page with Stripe" },
+                { icon: "🏋️", text: "A personal trainer coaching site" },
+                { icon: "🎨", text: "An illustrator's print shop" },
+                { icon: "🏥", text: "A dental clinic with online booking" },
+                { icon: "🎸", text: "A band's tour + merch site" },
+                { icon: "☕", text: "A specialty coffee roaster" },
+                { icon: "🏡", text: "A real estate agency with listings" },
+                { icon: "✈️", text: "A travel blog with itineraries" },
+              ].map((item, i) => (
+                <div
+                  key={`${copy}-${i}`}
+                  className="flex shrink-0 items-center gap-3 rounded-full border border-white/[0.08] bg-white/[0.03] px-5 py-2.5 backdrop-blur"
+                >
+                  <span className="text-base">{item.icon}</span>
+                  <span className="whitespace-nowrap text-sm text-white/70">{item.text}</span>
+                  <span className="h-1 w-1 rounded-full bg-emerald-400/60" />
+                  <span className="text-[10px] uppercase tracking-wider text-emerald-400/60">built</span>
+                </div>
+              ))
+            ),
+          ]}
+        </div>
+      </section>
+
       {/* proof strip — verifiable numbers, not vanity */}
       <section className="border-y border-white/[0.06] bg-white/[0.02] backdrop-blur">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-8 px-6 py-6 sm:gap-14">
@@ -179,6 +220,193 @@ export default function HomePage() {
             Live status
             <ChevronRight className="h-3 w-3 opacity-60 group-hover:translate-x-0.5 transition-transform" />
           </Link>
+        </div>
+      </section>
+
+      {/* watch it build — Filmora-inspired split panel with cyan-lime signature */}
+      <section className="relative py-20 px-4 sm:px-6">
+        <div className="mx-auto max-w-7xl">
+          <div className="relative overflow-hidden rounded-[32px] sm:rounded-[40px] border border-white/[0.08] bg-zinc-950">
+            {/* ambient cyan-lime glow */}
+            <div className="pointer-events-none absolute -top-40 -left-40 h-[500px] w-[500px] rounded-full bg-[#53FBD5]/15 blur-[120px]" />
+            <div className="pointer-events-none absolute -bottom-40 -right-40 h-[500px] w-[500px] rounded-full bg-[#BDFF89]/10 blur-[120px]" />
+
+            <div className="relative grid gap-10 lg:grid-cols-[1.1fr,1fr] lg:gap-8 p-8 sm:p-12 lg:p-16">
+              {/* LEFT — huge headline + CTAs */}
+              <div className="flex flex-col justify-center">
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#53FBD5]/30 bg-[#53FBD5]/[0.06] px-3 py-1 text-[11px] font-medium text-[#53FBD5] backdrop-blur self-start mb-6">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#53FBD5]/60" />
+                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#53FBD5]" />
+                  </span>
+                  Live generation
+                </div>
+
+                <h2 className="text-5xl sm:text-6xl lg:text-[5.5rem] font-bold tracking-[-0.04em] leading-[0.92]">
+                  <span className="bg-gradient-to-b from-white via-white to-white/70 bg-clip-text text-transparent">
+                    Watch it
+                  </span>
+                  <br />
+                  <span className="bg-gradient-to-r from-[#53FBD5] via-[#75FF9C] to-[#BDFF89] bg-clip-text text-transparent italic font-serif font-medium">
+                    build itself.
+                  </span>
+                </h2>
+
+                <p className="mt-6 text-base sm:text-lg text-white/50 max-w-lg leading-relaxed">
+                  Type a sentence. Watch 12 components stream into your browser — navbar, hero, features,
+                  pricing, footer — each one customised live. First preview in{" "}
+                  <span className="text-white font-medium">under 3 seconds.</span>
+                </p>
+
+                <div className="mt-8 flex flex-wrap items-center gap-3">
+                  {/* primary CTA — animated gradient border, Filmora style */}
+                  <Link
+                    href="/builder"
+                    className="group relative inline-flex h-12 items-center justify-center rounded-full bg-black px-7 text-sm font-semibold text-white transition-transform hover:-translate-y-0.5"
+                    style={{ minWidth: 216 }}
+                  >
+                    <span
+                      className="absolute -inset-[2px] rounded-full bg-gradient-to-r from-[#53FBD5] via-[#75FF9C] to-[#BDFF89] opacity-80 blur-[2px] animate-[gradient-shift_3s_ease_infinite]"
+                      style={{ backgroundSize: "200% 200%" }}
+                    />
+                    <span className="relative flex items-center gap-2">
+                      Start building — free
+                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </span>
+                  </Link>
+
+                  <Link
+                    href="/launch-status"
+                    className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-6 text-sm font-medium text-white/80 backdrop-blur hover:border-white/30 hover:bg-white/[0.08] transition-all"
+                    style={{ minWidth: 180 }}
+                  >
+                    See it live
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
+                </div>
+
+                {/* build steps ticker */}
+                <div className="mt-10 space-y-2">
+                  {[
+                    { t: "0.8s", label: "Plan components", done: true },
+                    { t: "2.1s", label: "Stream to preview", done: true },
+                    { t: "4.5s", label: "Customise with AI", done: true },
+                    { t: "28s", label: "Deploy to zoobicon.sh", done: false },
+                  ].map((step, i) => (
+                    <div key={step.label} className="flex items-center gap-3 text-xs">
+                      <span
+                        className={`flex h-5 w-5 items-center justify-center rounded-full border ${
+                          step.done
+                            ? "border-[#53FBD5]/40 bg-[#53FBD5]/10"
+                            : "border-white/10 bg-white/[0.02]"
+                        }`}
+                      >
+                        {step.done ? (
+                          <Check className="h-2.5 w-2.5 text-[#53FBD5]" strokeWidth={3} />
+                        ) : (
+                          <span className="h-1 w-1 rounded-full bg-white/30" />
+                        )}
+                      </span>
+                      <span className="font-mono text-[11px] text-white/40 w-10">{step.t}</span>
+                      <span className={step.done ? "text-white/70" : "text-white/30"}>{step.label}</span>
+                      {i === 3 && (
+                        <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-white/[0.04] px-2 py-0.5 text-[9px] uppercase tracking-wider text-white/40">
+                          <span className="h-1 w-1 rounded-full bg-amber-400 animate-pulse" />
+                          running
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* RIGHT — cinematic builder preview frame */}
+              <div className="relative">
+                <div className="relative rounded-2xl border border-white/[0.08] bg-zinc-900/80 shadow-2xl overflow-hidden">
+                  {/* browser chrome */}
+                  <div className="flex items-center gap-1.5 px-4 py-3 border-b border-white/[0.06] bg-zinc-950/50">
+                    <div className="h-2.5 w-2.5 rounded-full bg-red-500/60" />
+                    <div className="h-2.5 w-2.5 rounded-full bg-yellow-500/60" />
+                    <div className="h-2.5 w-2.5 rounded-full bg-green-500/60" />
+                    <span className="ml-3 text-[10px] text-white/30 font-mono">zoobicon.com/builder</span>
+                    <span className="ml-auto inline-flex items-center gap-1 text-[9px] text-[#53FBD5]/80">
+                      <span className="h-1 w-1 rounded-full bg-[#53FBD5] animate-pulse" />
+                      live
+                    </span>
+                  </div>
+
+                  {/* simulated build in progress */}
+                  <div className="p-5 space-y-4 bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-950">
+                    {/* fake navbar */}
+                    <div className="h-8 rounded-lg border border-white/[0.08] bg-white/[0.02] flex items-center px-3 gap-2">
+                      <div className="h-2 w-12 rounded bg-gradient-to-r from-[#53FBD5]/60 to-[#BDFF89]/60" />
+                      <div className="ml-auto h-1.5 w-8 rounded bg-white/10" />
+                      <div className="h-1.5 w-8 rounded bg-white/10" />
+                      <div className="h-1.5 w-10 rounded bg-white/20" />
+                    </div>
+
+                    {/* fake hero */}
+                    <div className="rounded-xl border border-white/[0.08] bg-gradient-to-br from-[#53FBD5]/[0.08] via-transparent to-[#BDFF89]/[0.06] p-4 space-y-2.5">
+                      <div className="h-2 w-20 rounded-full bg-[#53FBD5]/30" />
+                      <div className="h-4 w-4/5 rounded bg-white/[0.10]" />
+                      <div className="h-4 w-3/5 rounded bg-white/[0.10]" />
+                      <div className="flex gap-2 pt-1">
+                        <div className="h-6 w-20 rounded-full bg-white" />
+                        <div className="h-6 w-16 rounded-full border border-white/15" />
+                      </div>
+                    </div>
+
+                    {/* fake 3-col features */}
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="h-16 rounded-lg border border-white/[0.06] bg-white/[0.02] p-2 space-y-1.5">
+                        <div className="h-3 w-3 rounded bg-[#53FBD5]/40" />
+                        <div className="h-1.5 w-full rounded bg-white/[0.08]" />
+                        <div className="h-1 w-2/3 rounded bg-white/[0.06]" />
+                      </div>
+                      <div className="h-16 rounded-lg border border-white/[0.06] bg-white/[0.02] p-2 space-y-1.5">
+                        <div className="h-3 w-3 rounded bg-[#75FF9C]/40" />
+                        <div className="h-1.5 w-full rounded bg-white/[0.08]" />
+                        <div className="h-1 w-2/3 rounded bg-white/[0.06]" />
+                      </div>
+                      <div className="h-16 rounded-lg border border-white/[0.06] bg-white/[0.02] p-2 space-y-1.5">
+                        <div className="h-3 w-3 rounded bg-[#BDFF89]/40" />
+                        <div className="h-1.5 w-full rounded bg-white/[0.08]" />
+                        <div className="h-1 w-2/3 rounded bg-white/[0.06]" />
+                      </div>
+                    </div>
+
+                    {/* currently-building skeleton */}
+                    <div className="rounded-lg border border-dashed border-[#53FBD5]/30 bg-[#53FBD5]/[0.03] p-3 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="h-1.5 w-1.5 rounded-full bg-[#53FBD5] animate-pulse" />
+                        <span className="text-[9px] font-mono text-[#53FBD5]/80 uppercase tracking-wider">
+                          streaming: pricing.tsx
+                        </span>
+                      </div>
+                      <div className="h-1.5 w-3/4 rounded bg-[#53FBD5]/15 animate-pulse" />
+                      <div className="h-1.5 w-1/2 rounded bg-[#53FBD5]/15 animate-pulse" />
+                    </div>
+                  </div>
+
+                  {/* bottom status bar */}
+                  <div className="border-t border-white/[0.06] bg-zinc-950/60 px-4 py-2 flex items-center justify-between text-[9px] font-mono text-white/40">
+                    <span>8 / 12 components</span>
+                    <span className="text-[#53FBD5]/70">2.1s elapsed</span>
+                  </div>
+                </div>
+
+                {/* floating badges */}
+                <div className="absolute -top-4 -right-4 hidden sm:flex items-center gap-1.5 rounded-full border border-white/15 bg-zinc-950/90 px-3 py-1.5 backdrop-blur shadow-xl">
+                  <Cpu className="h-3 w-3 text-[#53FBD5]" />
+                  <span className="text-[10px] font-medium text-white">Opus 4.6</span>
+                </div>
+                <div className="absolute -bottom-4 -left-4 hidden sm:flex items-center gap-1.5 rounded-full border border-white/15 bg-zinc-950/90 px-3 py-1.5 backdrop-blur shadow-xl">
+                  <Zap className="h-3 w-3 text-[#BDFF89]" />
+                  <span className="text-[10px] font-medium text-white">Pre-warmed</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -689,6 +917,7 @@ export default function HomePage() {
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes gradient-shift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
       `}} />
     </div>
   );
