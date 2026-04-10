@@ -138,7 +138,6 @@ export async function POST(req: NextRequest) {
 /**
  * Attempt to register a domain with OpenSRS and update DB status.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function tryRegisterWithOpenSRS(domain: string, email: string, years: number, session: any, sql: any) {
   const registrant: ContactInfo = {
     firstName: session.metadata?.registrantFirstName || "Domain",
