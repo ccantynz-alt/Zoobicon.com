@@ -596,9 +596,20 @@ export async function POST(req: NextRequest): Promise<Response> {
         });
         writer.close();
       } catch (err) {
-        const { message, hint } = classifyError(err);
-        writer.send("error", { message, hint });
-        writer.close();
+        try {
+          const { message, hint } = classifyError(err);
+          writer.send("error", { message, hint });
+        } catch (classifyErr) {
+          console.error("[react-stream] Error classification failed:", classifyErr);
+          try {
+            writer.send("error", {
+              message: err instanceof Error ? err.message : "Unknown error",
+              hint: "Please try again",
+            });
+          } catch { /* writer may already be closed */ }
+        } finally {
+          try { writer.close(); } catch { /* already closed */ }
+        }
       }
     },
   });

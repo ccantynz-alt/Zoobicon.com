@@ -230,10 +230,12 @@ RULES:
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Unknown error";
         console.error(`[edit] Stream handler crashed: ${msg}`);
-        send({ type: "error", message: `Edit failed: ${msg}. Please try again.` });
+        try {
+          send({ type: "error", message: `Edit failed: ${msg}. Please try again.` });
+        } catch { /* controller may already be closed */ }
+      } finally {
+        try { controller.close(); } catch { /* already closed */ }
       }
-
-      controller.close();
     },
   });
 

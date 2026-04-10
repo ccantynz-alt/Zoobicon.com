@@ -105,6 +105,17 @@ export default function DomainsPage() {
   const [generatorError, setGeneratorError] = useState<string | null>(null);
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
+  const [contactInfo, setContactInfo] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    state: "",
+    zip: "",
+    country: "NZ",
+  });
   const resultsRef = useRef<HTMLDivElement>(null);
   const genResultsRef = useRef<HTMLDivElement>(null);
 
