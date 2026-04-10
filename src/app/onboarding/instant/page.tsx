@@ -129,7 +129,7 @@ export default function InstantOnboardingPage() {
                   Your website,<br />already built.
                 </h1>
                 <p className="text-xl text-white/60 max-w-2xl mx-auto text-balance">
-                  Type your business name. By the time you finish reading this sentence, your site is being built. Sign in and it's waiting for you.
+                  Type your business name. By the time you finish reading this sentence, your site is being built. Sign in and it&apos;s waiting for you.
                 </p>
               </div>
 
@@ -139,7 +139,7 @@ export default function InstantOnboardingPage() {
               >
                 <div>
                   <label className="block text-sm font-medium text-white/70 mb-2">
-                    What's your business called?
+                    What&apos;s your business called?
                   </label>
                   <div className="relative">
                     <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
@@ -271,7 +271,7 @@ export default function InstantOnboardingPage() {
               </div>
 
               <p className="text-sm text-white/40 mt-8">
-                We already started. You can close this tab and come back — we'll email you when it's ready.
+                We already started. You can close this tab and come back — we&apos;ll email you when it&apos;s ready.
               </p>
             </motion.div>
           )}
