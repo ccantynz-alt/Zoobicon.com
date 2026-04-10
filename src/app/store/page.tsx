@@ -82,18 +82,18 @@ export default function StorePage() {
   };
 
   const statusColor = (s: string) => {
-    if (s === "completed" || s === "active") return "bg-emerald-500/20 text-emerald-400";
-    if (s === "pending") return "bg-amber-500/20 text-amber-400";
-    if (s === "refunded") return "bg-red-500/20 text-red-400";
+    if (s === "completed" || s === "active") return "bg-stone-500/20 text-stone-400";
+    if (s === "pending") return "bg-stone-500/20 text-stone-400";
+    if (s === "refunded") return "bg-stone-500/20 text-stone-400";
     if (s === "draft") return "bg-white/10 text-white/40";
     return "bg-white/10 text-white/60";
   };
 
   const STAT_CARDS = [
-    { label: "Total Revenue", value: `$${stats.revenue.toLocaleString()}`, icon: DollarSign, color: "from-emerald-500 to-teal-600" },
-    { label: "Products Listed", value: String(stats.products), icon: Package, color: "from-indigo-500 to-purple-600" },
-    { label: "Total Sales", value: String(stats.sales), icon: ShoppingBag, color: "from-cyan-500 to-blue-600" },
-    { label: "This Month", value: `$${stats.monthRevenue.toLocaleString()}`, icon: TrendingUp, color: "from-amber-500 to-orange-600" },
+    { label: "Total Revenue", value: `$${stats.revenue.toLocaleString()}`, icon: DollarSign, color: "from-stone-500 to-stone-600" },
+    { label: "Products Listed", value: String(stats.products), icon: Package, color: "from-stone-500 to-stone-600" },
+    { label: "Total Sales", value: String(stats.sales), icon: ShoppingBag, color: "from-stone-500 to-stone-600" },
+    { label: "This Month", value: `$${stats.monthRevenue.toLocaleString()}`, icon: TrendingUp, color: "from-stone-500 to-stone-600" },
   ];
 
   const TABS: { key: Tab; label: string }[] = [
@@ -107,7 +107,7 @@ export default function StorePage() {
     <div className="min-h-screen bg-[#0a0a12] text-white">
       <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#0a0a12]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 h-16">
-          <Link href="/" className="text-xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Zoobicon</Link>
+          <Link href="/" className="text-xl font-bold tracking-tight bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
           <div className="flex items-center gap-4">
             <Link href="/dashboard" className="text-sm text-white/60 hover:text-white transition-colors flex items-center gap-1.5"><LayoutDashboard className="w-3.5 h-3.5" /> Dashboard</Link>
             {user ? (
@@ -120,15 +120,15 @@ export default function StorePage() {
       </nav>
 
       <header className="relative overflow-hidden border-b border-white/5">
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/10 via-teal-600/5 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-br from-stone-600/10 via-stone-600/5 to-transparent pointer-events-none" />
         <div className="max-w-7xl mx-auto px-6 py-16 relative">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600"><ShoppingBag className="w-6 h-6" /></div>
+              <div className="p-2.5 rounded-xl bg-gradient-to-br from-stone-500 to-stone-600"><ShoppingBag className="w-6 h-6" /></div>
               <span className="text-sm font-medium text-white/50 uppercase tracking-wider">Business OS</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-extrabold mb-3">
-              <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">Digital Product Store</span>
+              <span className="bg-gradient-to-r from-stone-400 via-stone-400 to-stone-400 bg-clip-text text-transparent">Digital Product Store</span>
             </h1>
             <p className="text-lg text-white/50 max-w-2xl">Sell anything digital — PDFs, templates, courses, presets. Zero setup, instant delivery, built-in payments.</p>
           </motion.div>
@@ -160,7 +160,7 @@ export default function StorePage() {
         {tab === "products" && (
           <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-6">
             <div className="flex justify-end">
-              <button onClick={() => {}} className="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity flex items-center gap-2">
+              <button onClick={() => {}} className="px-4 py-2.5 bg-gradient-to-r from-stone-500 to-stone-600 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity flex items-center gap-2">
                 <Plus className="w-4 h-4" /> Add Product
               </button>
             </div>
@@ -226,12 +226,12 @@ export default function StorePage() {
         {tab === "discounts" && (
           <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-4">
             <div className="flex justify-end">
-              <button onClick={() => {}} className="text-sm text-emerald-400 hover:text-emerald-300 flex items-center gap-1"><Plus className="w-4 h-4" /> Create Code</button>
+              <button onClick={() => {}} className="text-sm text-stone-400 hover:text-stone-300 flex items-center gap-1"><Plus className="w-4 h-4" /> Create Code</button>
             </div>
             {discounts.map((d) => (
               <motion.div key={d.code} variants={fadeUp} className="bg-white/5 border border-white/10 rounded-2xl p-5 flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="p-2.5 rounded-lg bg-amber-500/10"><Tag className="w-5 h-5 text-amber-400" /></div>
+                  <div className="p-2.5 rounded-lg bg-stone-500/10"><Tag className="w-5 h-5 text-stone-400" /></div>
                   <div>
                     <p className="font-mono font-bold text-base">{d.code}</p>
                     <p className="text-sm text-white/40">
@@ -257,10 +257,10 @@ export default function StorePage() {
               <div className="bg-[#1a1a2e] border border-white/10 rounded-xl p-4 flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <ExternalLink className="w-4 h-4 text-white/30" />
-                  <span className="text-sm text-emerald-400">{getStorefrontUrl("mystore")}</span>
+                  <span className="text-sm text-stone-400">{getStorefrontUrl("mystore")}</span>
                 </div>
                 <button onClick={copyStorefrontLink} className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-lg text-xs hover:bg-white/10 transition-colors">
-                  {linkCopied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                  {linkCopied ? <Check className="w-3.5 h-3.5 text-stone-400" /> : <Copy className="w-3.5 h-3.5" />}
                   {linkCopied ? "Copied!" : "Copy"}
                 </button>
               </div>
@@ -271,9 +271,9 @@ export default function StorePage() {
               <div className="flex items-center gap-4">
                 <div className="flex-1 bg-white/5 border border-white/10 rounded-xl p-4">
                   <p className="text-xs text-white/40">Available for payout</p>
-                  <p className="text-2xl font-bold text-emerald-400 mt-1">$0.00</p>
+                  <p className="text-2xl font-bold text-stone-400 mt-1">$0.00</p>
                 </div>
-                <button onClick={() => {}} className="px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity">
+                <button onClick={() => {}} className="px-5 py-2.5 bg-gradient-to-r from-stone-500 to-stone-600 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity">
                   Connect Stripe
                 </button>
               </div>

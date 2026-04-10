@@ -87,13 +87,13 @@ function CinematicPreview() {
   return (
     <div className="absolute inset-0">
       {/* ambient orbs */}
-      <div className="absolute -top-20 -left-20 h-72 w-72 rounded-full bg-cyan-500/20 blur-[100px] animate-pulse" />
+      <div className="absolute -top-20 -left-20 h-72 w-72 rounded-full bg-stone-500/20 blur-[100px] animate-pulse" />
       <div
-        className="absolute -bottom-20 -right-20 h-72 w-72 rounded-full bg-violet-500/20 blur-[100px] animate-pulse"
+        className="absolute -bottom-20 -right-20 h-72 w-72 rounded-full bg-stone-500/20 blur-[100px] animate-pulse"
         style={{ animationDelay: "1.2s" }}
       />
       <div
-        className="absolute top-1/2 left-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full bg-fuchsia-500/10 blur-[80px] animate-pulse"
+        className="absolute top-1/2 left-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full bg-stone-500/10 blur-[80px] animate-pulse"
         style={{ animationDelay: "0.6s" }}
       />
 
@@ -111,16 +111,16 @@ function CinematicPreview() {
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="relative">
           {/* pulsing rings */}
-          <div className="absolute inset-0 -m-8 rounded-full border border-cyan-400/20 animate-ping" />
+          <div className="absolute inset-0 -m-8 rounded-full border border-stone-400/20 animate-ping" />
           <div
-            className="absolute inset-0 -m-4 rounded-full border border-cyan-400/30 animate-ping"
+            className="absolute inset-0 -m-4 rounded-full border border-stone-400/30 animate-ping"
             style={{ animationDelay: "0.4s", animationDuration: "2.2s" }}
           />
 
           {/* avatar disc */}
-          <div className="relative h-24 w-24 rounded-full bg-gradient-to-br from-cyan-400/40 via-blue-500/30 to-violet-500/40 p-[1px] shadow-2xl shadow-cyan-500/20">
+          <div className="relative h-24 w-24 rounded-full bg-gradient-to-br from-stone-400/40 via-stone-500/30 to-stone-500/40 p-[1px] shadow-2xl shadow-stone-500/20">
             <div className="flex h-full w-full items-center justify-center rounded-full bg-zinc-900/80 backdrop-blur">
-              <Sparkles className="h-8 w-8 text-cyan-300" />
+              <Sparkles className="h-8 w-8 text-stone-300" />
             </div>
           </div>
         </div>
@@ -131,7 +131,7 @@ function CinematicPreview() {
         {Array.from({ length: 24 }).map((_, i) => (
           <span
             key={i}
-            className="block w-1 origin-bottom rounded-full bg-gradient-to-t from-cyan-400/60 to-violet-400/60"
+            className="block w-1 origin-bottom rounded-full bg-gradient-to-t from-stone-400/60 to-stone-400/60"
             style={{
               height: `${8 + Math.sin(i * 0.6) * 10 + 10}px`,
               animation: `autoplay-waveform 1.4s ease-in-out ${i * 0.05}s infinite`,
@@ -142,7 +142,7 @@ function CinematicPreview() {
 
       {/* label */}
       <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-2 whitespace-nowrap">
-        <span className="inline-flex h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
+        <span className="inline-flex h-1.5 w-1.5 rounded-full bg-stone-500 animate-pulse" />
         <span className="text-[10px] uppercase tracking-[0.2em] text-white/30">
           AI spokesperson preview
         </span>

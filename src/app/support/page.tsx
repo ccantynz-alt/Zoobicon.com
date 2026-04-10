@@ -365,10 +365,10 @@ export default function SupportPage() {
               <div className="flex items-center gap-2">
                 {isLiveAgent ? (
                   <>
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-                      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                      <span className="text-xs text-emerald-300 font-medium">Live Agent</span>
-                      <span className="text-[10px] text-emerald-400/60 ml-1">
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-stone-500/10 border border-stone-500/20">
+                      <div className="w-2 h-2 bg-stone-400 rounded-full animate-pulse" />
+                      <span className="text-xs text-stone-300 font-medium">Live Agent</span>
+                      <span className="text-[10px] text-stone-400/60 ml-1">
                         {Math.max(0, Math.ceil(sessionRemainingMin))}m left
                       </span>
                     </div>
@@ -382,12 +382,12 @@ export default function SupportPage() {
                 ) : (
                   <button
                     onClick={startLiveSession}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-emerald-300 border border-emerald-500/20 hover:bg-emerald-500/10 transition-all"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-stone-300 border border-stone-500/20 hover:bg-stone-500/10 transition-all"
                   >
                     <Sparkles className="w-3 h-3" />
                     Start Live Agent
                     {usage.minutesRemaining > 0 && (
-                      <span className="text-[10px] text-emerald-400/60">
+                      <span className="text-[10px] text-stone-400/60">
                         ({Math.round(usage.minutesRemaining)}m left)
                       </span>
                     )}
@@ -420,16 +420,16 @@ export default function SupportPage() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-16 left-0 right-0 z-40 bg-amber-500/10 border-b border-amber-500/20"
+            className="fixed top-16 left-0 right-0 z-40 bg-stone-500/10 border-b border-stone-500/20"
           >
             <div className="max-w-7xl mx-auto px-6 py-2 flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs text-amber-300">
+              <div className="flex items-center gap-2 text-xs text-stone-300">
                 <AlertTriangle className="w-3.5 h-3.5" />
                 {sessionWarning}
               </div>
               <button
                 onClick={() => setSessionWarning(null)}
-                className="text-amber-400/60 hover:text-amber-300 transition-colors"
+                className="text-stone-400/60 hover:text-stone-300 transition-colors"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -456,7 +456,7 @@ export default function SupportPage() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-brand-500 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-stone-500 to-brand-500 flex items-center justify-center">
                   <Crown className="w-5 h-5 text-white" />
                 </div>
                 <div>
@@ -471,7 +471,7 @@ export default function SupportPage() {
 
               <div className="space-y-3 mb-6">
                 <div className="flex items-center gap-3 text-sm">
-                  <Timer className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                  <Timer className="w-4 h-4 text-stone-400 flex-shrink-0" />
                   <span className="text-white/70">
                     <strong className="text-white">Pro ($49/mo):</strong> 30 min/mo included (10 min sessions)
                   </span>
@@ -538,9 +538,9 @@ export default function SupportPage() {
                     <span className="text-xs text-white/60">Scoped to Zoobicon support only</span>
                   </div>
                   {isLiveAgent ? (
-                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-                      <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
-                      <span className="text-[10px] text-emerald-300 font-medium">Live Agent (Sonnet)</span>
+                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-stone-500/10 border border-stone-500/20">
+                      <div className="w-1.5 h-1.5 bg-stone-400 rounded-full animate-pulse" />
+                      <span className="text-[10px] text-stone-300 font-medium">Live Agent (Sonnet)</span>
                     </div>
                   ) : (
                     <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white/5 border border-white/10">
@@ -554,11 +554,11 @@ export default function SupportPage() {
                 {!isLiveAgent && userEmail && usage?.hasLiveAgent && (
                   <button
                     onClick={startLiveSession}
-                    className="mt-4 flex items-center gap-2 px-4 py-2 rounded-xl text-xs text-emerald-300 border border-emerald-500/20 hover:bg-emerald-500/10 transition-all"
+                    className="mt-4 flex items-center gap-2 px-4 py-2 rounded-xl text-xs text-stone-300 border border-stone-500/20 hover:bg-stone-500/10 transition-all"
                   >
                     <Sparkles className="w-3.5 h-3.5" />
                     Switch to Live Agent for deeper support
-                    <span className="text-emerald-400/60">
+                    <span className="text-stone-400/60">
                       ({Math.round(usage.minutesRemaining)}m remaining)
                     </span>
                   </button>
@@ -681,7 +681,7 @@ export default function SupportPage() {
                           msg.role === "user"
                             ? "bg-brand-500/20 border border-brand-500/20 text-white"
                             : isLiveAgent
-                            ? "bg-emerald-500/[0.07] border border-emerald-500/[0.15] text-white/80"
+                            ? "bg-stone-500/[0.07] border border-stone-500/[0.15] text-white/80"
                             : "bg-white/[0.07] border border-white/[0.10] text-white/80"
                         }`}
                       >
@@ -713,7 +713,7 @@ export default function SupportPage() {
               <div className="max-w-3xl mx-auto px-6 py-4">
                 <div className={`flex items-end rounded-2xl overflow-hidden transition-colors ${
                   isLiveAgent
-                    ? "bg-emerald-500/[0.05] border border-emerald-500/[0.15] focus-within:border-emerald-500/30"
+                    ? "bg-stone-500/[0.05] border border-stone-500/[0.15] focus-within:border-stone-500/30"
                     : "bg-white/[0.07] border border-white/[0.12] focus-within:border-brand-500/30"
                 }`}>
                   <textarea
@@ -756,7 +756,7 @@ export default function SupportPage() {
                       Zoobicon support only
                     </div>
                     {isLiveAgent && usage && (
-                      <div className="flex items-center gap-1.5 text-[10px] text-emerald-400/50">
+                      <div className="flex items-center gap-1.5 text-[10px] text-stone-400/50">
                         <Timer className="w-3 h-3" />
                         Session: {Math.max(0, Math.ceil(sessionRemainingMin))}m remaining
                         &bull; Month: {Math.round(usage.minutesRemaining)}m left
@@ -765,7 +765,7 @@ export default function SupportPage() {
                   </div>
                   <div className="text-[10px] text-white/60">
                     {isLiveAgent ? (
-                      <span className="text-emerald-400/40">Live Agent &bull; Claude Sonnet</span>
+                      <span className="text-stone-400/40">Live Agent &bull; Claude Sonnet</span>
                     ) : (
                       "Quick AI &bull; Claude Haiku"
                     )}

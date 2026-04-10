@@ -186,14 +186,14 @@ export default function MetaTagGeneratorPage() {
       <div className="max-w-5xl mx-auto px-6 py-16">
         {/* Hero */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 mb-6">
-            <span className="text-xs font-medium text-blue-300">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-stone-500/10 border border-stone-500/20 mb-6">
+            <span className="text-xs font-medium text-stone-300">
               Free — No Signup Required
             </span>
           </div>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.1] mb-5">
             Free Meta Tag{" "}
-            <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-violet-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-stone-400 via-stone-400 to-stone-400 bg-clip-text text-transparent">
               Generator
             </span>
           </h1>
@@ -218,7 +218,7 @@ export default function MetaTagGeneratorPage() {
                   </label>
                   <span
                     className={`text-[11px] font-mono ${
-                      titleWarning ? "text-amber-400" : "text-white/20"
+                      titleWarning ? "text-stone-400" : "text-white/20"
                     }`}
                   >
                     {title.length}/60
@@ -231,12 +231,12 @@ export default function MetaTagGeneratorPage() {
                   placeholder="e.g. Best Coffee Roastery in Auckland"
                   className={`w-full px-4 py-2.5 bg-[#0a0a14] border rounded-xl text-sm text-white placeholder-white/15 focus:outline-none focus:ring-2 ${
                     titleWarning
-                      ? "border-amber-500/40 focus:ring-amber-500/30"
-                      : "border-white/[0.08] focus:ring-blue-500/30"
+                      ? "border-stone-500/40 focus:ring-stone-500/30"
+                      : "border-white/[0.08] focus:ring-stone-500/30"
                   }`}
                 />
                 {titleWarning && (
-                  <p className="flex items-center gap-1 mt-1 text-[11px] text-amber-400">
+                  <p className="flex items-center gap-1 mt-1 text-[11px] text-stone-400">
                     <AlertTriangle className="w-3 h-3" /> Title may be truncated
                     in Google results
                   </p>
@@ -251,7 +251,7 @@ export default function MetaTagGeneratorPage() {
                   </label>
                   <span
                     className={`text-[11px] font-mono ${
-                      descWarning ? "text-amber-400" : "text-white/20"
+                      descWarning ? "text-stone-400" : "text-white/20"
                     }`}
                   >
                     {description.length}/160
@@ -264,12 +264,12 @@ export default function MetaTagGeneratorPage() {
                   rows={3}
                   className={`w-full px-4 py-2.5 bg-[#0a0a14] border rounded-xl text-sm text-white placeholder-white/15 focus:outline-none focus:ring-2 resize-none ${
                     descWarning
-                      ? "border-amber-500/40 focus:ring-amber-500/30"
-                      : "border-white/[0.08] focus:ring-blue-500/30"
+                      ? "border-stone-500/40 focus:ring-stone-500/30"
+                      : "border-white/[0.08] focus:ring-stone-500/30"
                   }`}
                 />
                 {descWarning && (
-                  <p className="flex items-center gap-1 mt-1 text-[11px] text-amber-400">
+                  <p className="flex items-center gap-1 mt-1 text-[11px] text-stone-400">
                     <AlertTriangle className="w-3 h-3" /> Description may be
                     truncated in search results
                   </p>
@@ -286,7 +286,7 @@ export default function MetaTagGeneratorPage() {
                   value={keywords}
                   onChange={(e) => setKeywords(e.target.value)}
                   placeholder="coffee, roastery, auckland, beans (comma separated)"
-                  className="w-full px-4 py-2.5 bg-[#0a0a14] border border-white/[0.08] rounded-xl text-sm text-white placeholder-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                  className="w-full px-4 py-2.5 bg-[#0a0a14] border border-white/[0.08] rounded-xl text-sm text-white placeholder-white/15 focus:outline-none focus:ring-2 focus:ring-stone-500/30"
                 />
               </div>
 
@@ -300,7 +300,7 @@ export default function MetaTagGeneratorPage() {
                   value={author}
                   onChange={(e) => setAuthor(e.target.value)}
                   placeholder="Your name or company"
-                  className="w-full px-4 py-2.5 bg-[#0a0a14] border border-white/[0.08] rounded-xl text-sm text-white placeholder-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                  className="w-full px-4 py-2.5 bg-[#0a0a14] border border-white/[0.08] rounded-xl text-sm text-white placeholder-white/15 focus:outline-none focus:ring-2 focus:ring-stone-500/30"
                 />
               </div>
 
@@ -314,7 +314,7 @@ export default function MetaTagGeneratorPage() {
                   value={siteUrl}
                   onChange={(e) => setSiteUrl(e.target.value)}
                   placeholder="https://yoursite.com"
-                  className="w-full px-4 py-2.5 bg-[#0a0a14] border border-white/[0.08] rounded-xl text-sm text-white placeholder-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                  className="w-full px-4 py-2.5 bg-[#0a0a14] border border-white/[0.08] rounded-xl text-sm text-white placeholder-white/15 focus:outline-none focus:ring-2 focus:ring-stone-500/30"
                 />
               </div>
             </div>
@@ -333,7 +333,7 @@ export default function MetaTagGeneratorPage() {
                   value={ogImage}
                   onChange={(e) => setOgImage(e.target.value)}
                   placeholder="https://yoursite.com/og-image.png (1200x630 recommended)"
-                  className="w-full px-4 py-2.5 bg-[#0a0a14] border border-white/[0.08] rounded-xl text-sm text-white placeholder-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                  className="w-full px-4 py-2.5 bg-[#0a0a14] border border-white/[0.08] rounded-xl text-sm text-white placeholder-white/15 focus:outline-none focus:ring-2 focus:ring-stone-500/30"
                 />
               </div>
 
@@ -347,7 +347,7 @@ export default function MetaTagGeneratorPage() {
                   value={twitterHandle}
                   onChange={(e) => setTwitterHandle(e.target.value)}
                   placeholder="@yourhandle"
-                  className="w-full px-4 py-2.5 bg-[#0a0a14] border border-white/[0.08] rounded-xl text-sm text-white placeholder-white/15 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                  className="w-full px-4 py-2.5 bg-[#0a0a14] border border-white/[0.08] rounded-xl text-sm text-white placeholder-white/15 focus:outline-none focus:ring-2 focus:ring-stone-500/30"
                 />
               </div>
             </div>
@@ -384,7 +384,7 @@ export default function MetaTagGeneratorPage() {
               </div>
               <div className="bg-[#1a1a2e] rounded-xl overflow-hidden border border-white/[0.06]">
                 {/* OG Image area */}
-                <div className="h-44 bg-gradient-to-br from-blue-900/40 to-indigo-900/40 flex items-center justify-center overflow-hidden">
+                <div className="h-44 bg-gradient-to-br from-stone-900/40 to-stone-900/40 flex items-center justify-center overflow-hidden">
                   {ogImage ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -421,7 +421,7 @@ export default function MetaTagGeneratorPage() {
                 <h2 className="text-sm font-semibold">Generated Meta Tags</h2>
                 <button
                   onClick={handleCopy}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-xs font-medium transition-colors"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-stone-600 hover:bg-stone-500 text-xs font-medium transition-colors"
                 >
                   {copied ? (
                     <>
@@ -434,7 +434,7 @@ export default function MetaTagGeneratorPage() {
                   )}
                 </button>
               </div>
-              <pre className="bg-[#0a0a14] border border-white/[0.06] rounded-xl p-4 text-[11px] text-blue-300/80 font-mono overflow-x-auto max-h-72 overflow-y-auto leading-relaxed">
+              <pre className="bg-[#0a0a14] border border-white/[0.06] rounded-xl p-4 text-[11px] text-stone-300/80 font-mono overflow-x-auto max-h-72 overflow-y-auto leading-relaxed">
                 {generatedTags}
               </pre>
             </div>
@@ -452,7 +452,7 @@ export default function MetaTagGeneratorPage() {
           </p>
           <Link
             href="/seo"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 font-semibold text-sm transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 font-semibold text-sm transition-colors"
           >
             <Zap className="w-4 h-4" /> Explore SEO Tools
           </Link>

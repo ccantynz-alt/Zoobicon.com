@@ -217,13 +217,13 @@ export default function BusinessNameGeneratorPage() {
 
         {/* Hero */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 mb-6">
-            <Sparkles className="w-3.5 h-3.5 text-violet-400" />
-            <span className="text-xs font-medium text-violet-300">Free — No Signup Required</span>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-stone-500/10 border border-stone-500/20 mb-6">
+            <Sparkles className="w-3.5 h-3.5 text-stone-400" />
+            <span className="text-xs font-medium text-stone-300">Free — No Signup Required</span>
           </div>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.1] mb-5">
             AI Business Name{" "}
-            <span className="bg-gradient-to-r from-violet-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Generator</span>
+            <span className="bg-gradient-to-r from-stone-400 via-stone-400 to-stone-400 bg-clip-text text-transparent">Generator</span>
           </h1>
           <p className="text-lg text-white/50 max-w-2xl mx-auto">
             Describe your business. AI generates 20 creative names. Each one instantly checked for domain availability across 13 extensions.
@@ -240,7 +240,7 @@ export default function BusinessNameGeneratorPage() {
             onChange={(e) => setDescription(e.target.value)}
             placeholder="e.g. A modern coffee roastery in Auckland that delivers fresh beans nationwide..."
             rows={3}
-            className="w-full px-4 py-3 bg-[#0a0a14] border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-violet-500/30 focus:border-violet-500/30 mb-4 resize-none"
+            className="w-full px-4 py-3 bg-[#0a0a14] border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-stone-500/30 focus:border-stone-500/30 mb-4 resize-none"
           />
 
           {/* Industry */}
@@ -252,7 +252,7 @@ export default function BusinessNameGeneratorPage() {
                 onClick={() => setIndustry(industry === ind.id ? "" : ind.id)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   industry === ind.id
-                    ? "bg-violet-600 text-white"
+                    ? "bg-stone-600 text-white"
                     : "bg-white/[0.04] text-white/40 hover:bg-white/[0.08] hover:text-white/60"
                 }`}
               >
@@ -271,7 +271,7 @@ export default function BusinessNameGeneratorPage() {
                 onClick={() => setStyle(s)}
                 className={`px-4 py-2 rounded-lg text-xs font-medium capitalize transition-all ${
                   style === s
-                    ? "bg-violet-600 text-white"
+                    ? "bg-stone-600 text-white"
                     : "bg-white/[0.04] text-white/40 hover:bg-white/[0.08]"
                 }`}
               >
@@ -295,7 +295,7 @@ export default function BusinessNameGeneratorPage() {
                 }}
                 className={`px-3 py-1 rounded-lg text-[11px] font-medium transition-all ${
                   selectedTlds.has(tld)
-                    ? "bg-emerald-600/80 text-white"
+                    ? "bg-stone-600/80 text-white"
                     : "bg-white/[0.04] text-white/30 hover:bg-white/[0.08]"
                 }`}
               >
@@ -308,7 +308,7 @@ export default function BusinessNameGeneratorPage() {
           <button
             onClick={generateNames}
             disabled={generating || !description.trim()}
-            className="w-full py-4 rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 font-semibold text-base hover:from-violet-500 hover:to-purple-500 disabled:opacity-40 transition-all flex items-center justify-center gap-2"
+            className="w-full py-4 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 font-semibold text-base hover:from-stone-500 hover:to-stone-500 disabled:opacity-40 transition-all flex items-center justify-center gap-2"
           >
             {generating ? (
               <><Loader2 className="w-5 h-5 animate-spin" /> Generating names &amp; checking domains...</>
@@ -319,7 +319,7 @@ export default function BusinessNameGeneratorPage() {
         </div>
 
         {error && (
-          <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">{error}</div>
+          <div className="mb-6 p-4 rounded-xl bg-stone-500/10 border border-stone-500/20 text-stone-400 text-sm">{error}</div>
         )}
 
         {/* Results */}
@@ -327,7 +327,7 @@ export default function BusinessNameGeneratorPage() {
           <div className="space-y-3">
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-lg font-semibold">{names.length} names generated</h2>
-              <button onClick={generateNames} disabled={generating} className="text-xs text-violet-400 hover:text-violet-300 flex items-center gap-1">
+              <button onClick={generateNames} disabled={generating} className="text-xs text-stone-400 hover:text-stone-300 flex items-center gap-1">
                 <RefreshCw className="w-3 h-3" /> Regenerate
               </button>
             </div>
@@ -350,7 +350,7 @@ export default function BusinessNameGeneratorPage() {
                         onClick={(e) => { e.stopPropagation(); copyName(n.name); }}
                         className="text-white/20 hover:text-white/40 shrink-0"
                       >
-                        {copied === n.name ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                        {copied === n.name ? <Check className="w-3.5 h-3.5 text-stone-400" /> : <Copy className="w-3.5 h-3.5" />}
                       </button>
                     </div>
                     <div className="flex items-center gap-3 shrink-0">
@@ -358,7 +358,7 @@ export default function BusinessNameGeneratorPage() {
                         <span className="text-xs text-white/30 flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> Checking...</span>
                       ) : hasResults ? (
                         <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                          avail > 0 ? "bg-emerald-500/10 text-emerald-400" : "bg-white/[0.05] text-white/30"
+                          avail > 0 ? "bg-stone-500/10 text-stone-400" : "bg-white/[0.05] text-white/30"
                         }`}>
                           {avail} domain{avail !== 1 ? "s" : ""} available
                         </span>
@@ -382,7 +382,7 @@ export default function BusinessNameGeneratorPage() {
                               key={tld}
                               className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm ${
                                 d?.available === true
-                                  ? "bg-emerald-500/10 border border-emerald-500/20"
+                                  ? "bg-stone-500/10 border border-stone-500/20"
                                   : d?.available === false
                                   ? "bg-white/[0.02] border border-white/[0.04]"
                                   : "bg-white/[0.02] border border-white/[0.04]"
@@ -392,20 +392,20 @@ export default function BusinessNameGeneratorPage() {
                                 {d?.checking ? (
                                   <Loader2 className="w-3 h-3 text-white/30 animate-spin shrink-0" />
                                 ) : d?.available === true ? (
-                                  <Check className="w-3 h-3 text-emerald-400 shrink-0" />
+                                  <Check className="w-3 h-3 text-stone-400 shrink-0" />
                                 ) : d?.available === false ? (
-                                  <X className="w-3 h-3 text-red-400/40 shrink-0" />
+                                  <X className="w-3 h-3 text-stone-400/40 shrink-0" />
                                 ) : (
                                   <Globe className="w-3 h-3 text-white/20 shrink-0" />
                                 )}
-                                <span className={`text-xs truncate ${d?.available === true ? "text-emerald-300 font-medium" : d?.available === false ? "text-white/25 line-through" : "text-white/40"}`}>
+                                <span className={`text-xs truncate ${d?.available === true ? "text-stone-300 font-medium" : d?.available === false ? "text-white/25 line-through" : "text-white/40"}`}>
                                   .{tld}
                                 </span>
                               </div>
                               {d?.available === true && (
                                 <Link
                                   href={`/domains?name=${n.slug}&tld=${tld}`}
-                                  className="text-[10px] text-emerald-400 hover:text-emerald-300 font-medium shrink-0 ml-1"
+                                  className="text-[10px] text-stone-400 hover:text-stone-300 font-medium shrink-0 ml-1"
                                 >
                                   ${TLD_PRICES[tld]}/yr
                                 </Link>
@@ -420,13 +420,13 @@ export default function BusinessNameGeneratorPage() {
                         <div className="mt-4 flex flex-wrap gap-2">
                           <Link
                             href={`/domains?name=${n.slug}`}
-                            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-sm font-medium transition-colors"
+                            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-stone-600 hover:bg-stone-500 text-sm font-medium transition-colors"
                           >
                             <Globe className="w-3.5 h-3.5" /> Register Domain
                           </Link>
                           <Link
                             href={`/builder?prompt=${encodeURIComponent(`Build a website for ${n.name}: ${n.tagline}`)}`}
-                            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-sm font-medium transition-colors"
+                            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-stone-600 hover:bg-stone-500 text-sm font-medium transition-colors"
                           >
                             <Zap className="w-3.5 h-3.5" /> Build Website
                           </Link>
@@ -445,10 +445,10 @@ export default function BusinessNameGeneratorPage() {
           <h2 className="text-2xl font-bold mb-3">Found the perfect name?</h2>
           <p className="text-white/40 mb-6 max-w-lg mx-auto">Register your domain, build a website, set up business email, and launch — all from one platform.</p>
           <div className="flex flex-wrap justify-center gap-3">
-            <Link href="/domains" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-semibold text-sm transition-colors">
+            <Link href="/domains" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-stone-600 hover:bg-stone-500 font-semibold text-sm transition-colors">
               <Globe className="w-4 h-4" /> Register Domain
             </Link>
-            <Link href="/builder" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-violet-600 hover:bg-violet-500 font-semibold text-sm transition-colors">
+            <Link href="/builder" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-stone-600 hover:bg-stone-500 font-semibold text-sm transition-colors">
               <Zap className="w-4 h-4" /> Build Website
             </Link>
             <Link href="/products/booking" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/[0.05] border border-white/[0.1] hover:bg-white/[0.08] font-semibold text-sm transition-colors">

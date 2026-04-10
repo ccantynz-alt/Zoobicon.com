@@ -161,10 +161,10 @@ export default function LiveBuildDemo() {
           </div>
           <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-white/[0.04] px-2 py-0.5">
             <span className="relative flex h-1 w-1">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/60" />
-              <span className="relative inline-flex h-1 w-1 rounded-full bg-emerald-400" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-stone-400/60" />
+              <span className="relative inline-flex h-1 w-1 rounded-full bg-stone-400" />
             </span>
-            <span className="text-[9px] font-medium text-emerald-300/80">live</span>
+            <span className="text-[9px] font-medium text-stone-300/80">live</span>
           </span>
         </div>
 
@@ -283,9 +283,9 @@ export default function LiveBuildDemo() {
             {/* "built!" celebratory badge */}
             {shown("done") && (
               <div className="absolute top-4 right-4 pointer-events-none">
-                <div className="flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1 backdrop-blur animate-[fadeIn_0.4s_ease-out]">
-                  <Check className="h-2.5 w-2.5 text-emerald-300" strokeWidth={3} />
-                  <span className="text-[9px] font-semibold text-emerald-200">built</span>
+                <div className="flex items-center gap-1.5 rounded-full border border-stone-400/30 bg-stone-400/10 px-2.5 py-1 backdrop-blur animate-[fadeIn_0.4s_ease-out]">
+                  <Check className="h-2.5 w-2.5 text-stone-300" strokeWidth={3} />
+                  <span className="text-[9px] font-semibold text-stone-200">built</span>
                 </div>
               </div>
             )}
@@ -319,7 +319,7 @@ export default function LiveBuildDemo() {
       {/* "this is really running" CTA underneath */}
       <div className="mt-4 flex items-center justify-between text-[11px] text-white/40">
         <div className="flex items-center gap-1.5">
-          <span className="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400/60" />
+          <span className="inline-flex h-1.5 w-1.5 rounded-full bg-stone-400/60" />
           <span>Real output. Running on loop.</span>
         </div>
         <a

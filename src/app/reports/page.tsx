@@ -28,11 +28,11 @@ import {
 } from 'lucide-react';
 
 const REPORT_TEMPLATES = [
-  { id: 'performance', name: 'Performance Report', icon: TrendingUp, color: 'from-blue-500 to-cyan-500', description: 'Traffic, conversions, bounce rate, page speed metrics', sections: ['Traffic Overview', 'Top Pages', 'Conversion Funnel', 'Speed Metrics', 'Recommendations'] },
-  { id: 'seo', name: 'SEO Report', icon: Search, color: 'from-green-500 to-emerald-500', description: 'Rankings, backlinks, keyword performance, technical SEO', sections: ['Keyword Rankings', 'Backlink Profile', 'Technical Audit', 'Content Gaps', 'Action Items'] },
-  { id: 'social', name: 'Social Media Report', icon: Globe, color: 'from-purple-500 to-pink-500', description: 'Engagement, reach, follower growth, top posts', sections: ['Platform Overview', 'Engagement Metrics', 'Follower Growth', 'Top Content', 'Competitor Comparison'] },
-  { id: 'ecommerce', name: 'E-Commerce Report', icon: ShoppingCart, color: 'from-orange-500 to-amber-500', description: 'Revenue, AOV, cart abandonment, product performance', sections: ['Revenue Summary', 'Product Performance', 'Cart Analytics', 'Customer Segments', 'Forecast'] },
-  { id: 'client', name: 'Client Report', icon: Users, color: 'from-rose-500 to-red-500', description: 'White-label monthly report for agency clients', sections: ['Executive Summary', 'KPI Dashboard', 'Work Completed', 'Results & ROI', 'Next Month Plan'] },
+  { id: 'performance', name: 'Performance Report', icon: TrendingUp, color: 'from-stone-500 to-stone-500', description: 'Traffic, conversions, bounce rate, page speed metrics', sections: ['Traffic Overview', 'Top Pages', 'Conversion Funnel', 'Speed Metrics', 'Recommendations'] },
+  { id: 'seo', name: 'SEO Report', icon: Search, color: 'from-stone-500 to-stone-500', description: 'Rankings, backlinks, keyword performance, technical SEO', sections: ['Keyword Rankings', 'Backlink Profile', 'Technical Audit', 'Content Gaps', 'Action Items'] },
+  { id: 'social', name: 'Social Media Report', icon: Globe, color: 'from-stone-500 to-stone-500', description: 'Engagement, reach, follower growth, top posts', sections: ['Platform Overview', 'Engagement Metrics', 'Follower Growth', 'Top Content', 'Competitor Comparison'] },
+  { id: 'ecommerce', name: 'E-Commerce Report', icon: ShoppingCart, color: 'from-stone-500 to-stone-500', description: 'Revenue, AOV, cart abandonment, product performance', sections: ['Revenue Summary', 'Product Performance', 'Cart Analytics', 'Customer Segments', 'Forecast'] },
+  { id: 'client', name: 'Client Report', icon: Users, color: 'from-stone-500 to-stone-500', description: 'White-label monthly report for agency clients', sections: ['Executive Summary', 'KPI Dashboard', 'Work Completed', 'Results & ROI', 'Next Month Plan'] },
 ];
 
 const DEMO_INSIGHTS = [
@@ -111,13 +111,13 @@ export default function ReportsPage() {
       <header className="border-b border-white/10 bg-[#0a0a12]/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Zoobicon</Link>
+            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
             <span className="text-white/30">/</span>
             <span className="text-white/70 font-medium">AI Reports</span>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/builder" className="px-4 py-2 text-sm text-white/70 hover:text-white transition-colors">Builder</Link>
-            <Link href="/pricing" className="px-4 py-2 text-sm bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg font-medium hover:opacity-90 transition-opacity">Upgrade to Pro</Link>
+            <Link href="/pricing" className="px-4 py-2 text-sm bg-gradient-to-r from-stone-600 to-stone-600 rounded-lg font-medium hover:opacity-90 transition-opacity">Upgrade to Pro</Link>
           </div>
         </div>
       </header>
@@ -125,11 +125,11 @@ export default function ReportsPage() {
       <main className="max-w-7xl mx-auto px-6 py-12">
         {/* Hero */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-stone-500/10 border border-stone-500/20 text-stone-400 text-sm mb-6">
             <FileText className="w-4 h-4" /> AI-Powered Reporting
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Reports That Write <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Themselves</span>
+            Reports That Write <span className="bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Themselves</span>
           </h1>
           <p className="text-lg text-gray-400 max-w-2xl mx-auto">
             Generate beautiful, data-driven reports in seconds. AI analyzes your metrics, writes insights, and delivers white-labeled reports to clients on schedule.
@@ -139,10 +139,10 @@ export default function ReportsPage() {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Template Selector */}
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2"><FileText className="w-5 h-5 text-blue-400" /> Report Templates</h2>
+            <h2 className="text-lg font-semibold flex items-center gap-2"><FileText className="w-5 h-5 text-stone-400" /> Report Templates</h2>
             {REPORT_TEMPLATES.map(t => (
               <button key={t.id} onClick={() => { setSelectedTemplate(t); setGenerated(false); }}
-                className={`w-full text-left p-4 rounded-xl border transition-all ${selectedTemplate.id === t.id ? 'border-blue-500/50 bg-blue-500/10' : 'border-white/10 bg-white/5 hover:border-white/20'}`}>
+                className={`w-full text-left p-4 rounded-xl border transition-all ${selectedTemplate.id === t.id ? 'border-stone-500/50 bg-stone-500/10' : 'border-white/10 bg-white/5 hover:border-white/20'}`}>
                 <div className="flex items-center gap-3 mb-2">
                   <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${t.color} flex items-center justify-center`}>
                     <t.icon className="w-4 h-4 text-white" />
@@ -194,17 +194,17 @@ export default function ReportsPage() {
               {/* White-label Toggle */}
               <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10">
                 <div className="flex items-center gap-2">
-                  <Palette className="w-4 h-4 text-purple-400" />
+                  <Palette className="w-4 h-4 text-stone-400" />
                   <span className="text-sm">White-label for agency</span>
                 </div>
                 <button onClick={() => setWhiteLabel(!whiteLabel)}
-                  className={`w-10 h-5 rounded-full transition-colors ${whiteLabel ? 'bg-purple-500' : 'bg-white/20'}`}>
+                  className={`w-10 h-5 rounded-full transition-colors ${whiteLabel ? 'bg-stone-500' : 'bg-white/20'}`}>
                   <div className={`w-4 h-4 rounded-full bg-white transition-transform ${whiteLabel ? 'translate-x-5' : 'translate-x-0.5'}`} />
                 </button>
               </div>
 
               {whiteLabel && (
-                <div className="grid sm:grid-cols-2 gap-4 p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                <div className="grid sm:grid-cols-2 gap-4 p-3 rounded-lg bg-stone-500/10 border border-stone-500/20">
                   <input placeholder="Agency name" className="bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-500" />
                   <input placeholder="Logo URL" className="bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-500" />
                 </div>
@@ -213,17 +213,17 @@ export default function ReportsPage() {
               {/* Schedule */}
               <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10">
                 <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-green-400" />
+                  <Calendar className="w-4 h-4 text-stone-400" />
                   <span className="text-sm">Schedule auto-send</span>
                 </div>
                 <button onClick={() => setShowSchedule(!showSchedule)}
-                  className={`w-10 h-5 rounded-full transition-colors ${showSchedule ? 'bg-green-500' : 'bg-white/20'}`}>
+                  className={`w-10 h-5 rounded-full transition-colors ${showSchedule ? 'bg-stone-500' : 'bg-white/20'}`}>
                   <div className={`w-4 h-4 rounded-full bg-white transition-transform ${showSchedule ? 'translate-x-5' : 'translate-x-0.5'}`} />
                 </button>
               </div>
 
               {showSchedule && (
-                <div className="grid sm:grid-cols-2 gap-4 p-3 rounded-lg bg-green-500/10 border border-green-500/20">
+                <div className="grid sm:grid-cols-2 gap-4 p-3 rounded-lg bg-stone-500/10 border border-stone-500/20">
                   <div>
                     <label className="text-xs text-gray-400 mb-1 block">Frequency</label>
                     <select value={schedule} onChange={e => setSchedule(e.target.value)}
@@ -240,7 +240,7 @@ export default function ReportsPage() {
 
               {/* Generate Button */}
               <button onClick={handleGenerate} disabled={generating}
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2">
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2">
                 {generating ? <><RefreshCw className="w-4 h-4 animate-spin" /> AI is writing your report...</> : <><Zap className="w-4 h-4" /> Generate Report</>}
               </button>
             </div>
@@ -273,7 +273,7 @@ export default function ReportsPage() {
                   </div>
                   <div className="p-4 rounded-lg bg-white/5 border border-white/10">
                     <p className="text-xs text-gray-400 mb-2">Conversions by Day</p>
-                    <BarChartWidget data={[12, 18, 15, 22, 28, 24, 31, 19, 26, 33, 29, 35]} color="from-green-500 to-emerald-500" />
+                    <BarChartWidget data={[12, 18, 15, 22, 28, 24, 31, 19, 26, 33, 29, 35]} color="from-stone-500 to-stone-500" />
                   </div>
                   <div className="p-4 rounded-lg bg-white/5 border border-white/10">
                     <p className="text-xs text-gray-400 mb-2">Page Load Time (ms)</p>
@@ -283,17 +283,17 @@ export default function ReportsPage() {
 
                 {/* AI Insights */}
                 <div>
-                  <h4 className="font-medium mb-3 flex items-center gap-2"><Zap className="w-4 h-4 text-yellow-400" /> AI-Generated Insights</h4>
+                  <h4 className="font-medium mb-3 flex items-center gap-2"><Zap className="w-4 h-4 text-stone-400" /> AI-Generated Insights</h4>
                   <div className="space-y-3">
                     {DEMO_INSIGHTS.map((insight, i) => (
                       <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-white/5">
-                        <div className={`mt-0.5 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${insight.trend === 'up' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                        <div className={`mt-0.5 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${insight.trend === 'up' ? 'bg-stone-500/20 text-stone-400' : 'bg-stone-500/20 text-stone-400'}`}>
                           {insight.trend === 'up' ? '↑' : '↓'}
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
                             <span className="font-medium text-sm">{insight.metric}</span>
-                            <span className={`text-sm font-bold ${insight.trend === 'up' ? 'text-green-400' : 'text-red-400'}`}>{insight.value}</span>
+                            <span className={`text-sm font-bold ${insight.trend === 'up' ? 'text-stone-400' : 'text-stone-400'}`}>{insight.value}</span>
                           </div>
                           <p className="text-xs text-gray-400 mt-0.5">{insight.detail}</p>
                         </div>
@@ -315,7 +315,7 @@ export default function ReportsPage() {
             { icon: Download, title: 'Export Anywhere', desc: 'Download as PDF, share via link, or embed in your client portal' },
           ].map((f, i) => (
             <div key={i} className="p-6 rounded-xl border border-white/10 bg-white/5 hover:border-white/20 transition-colors">
-              <f.icon className="w-8 h-8 text-blue-400 mb-3" />
+              <f.icon className="w-8 h-8 text-stone-400 mb-3" />
               <h3 className="font-semibold mb-2">{f.title}</h3>
               <p className="text-sm text-gray-400">{f.desc}</p>
             </div>
@@ -323,10 +323,10 @@ export default function ReportsPage() {
         </div>
 
         {/* CTA */}
-        <div className="mt-20 text-center p-12 rounded-2xl bg-gradient-to-br from-blue-600/20 to-purple-600/20 border border-blue-500/20">
+        <div className="mt-20 text-center p-12 rounded-2xl bg-gradient-to-br from-stone-600/20 to-stone-600/20 border border-stone-500/20">
           <h2 className="text-3xl font-bold mb-4">Stop Writing Reports Manually</h2>
           <p className="text-gray-400 mb-6 max-w-xl mx-auto">AI generates beautiful, data-driven reports in seconds. Included free on Pro and Agency plans.</p>
-          <Link href="/auth/signup" className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 font-semibold hover:opacity-90 transition-opacity">
+          <Link href="/auth/signup" className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 font-semibold hover:opacity-90 transition-opacity">
             Start Free Trial <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

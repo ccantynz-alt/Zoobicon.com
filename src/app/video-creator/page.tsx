@@ -140,11 +140,11 @@ const PROJECT_TYPES = [
 
 const VISUAL_STYLES = [
   { id: "modern-minimalist", label: "Modern / Minimalist", icon: Zap, color: "from-slate-400 to-slate-600" },
-  { id: "bold-dynamic", label: "Bold / Dynamic", icon: Sparkles, color: "from-red-500 to-orange-500" },
-  { id: "elegant-luxury", label: "Elegant / Luxury", icon: Crown, color: "from-amber-400 to-yellow-600" },
-  { id: "fun-playful", label: "Fun / Playful", icon: Smile, color: "from-violet-500 to-indigo-500" },
-  { id: "corporate-professional", label: "Corporate / Professional", icon: Building2, color: "from-blue-500 to-indigo-600" },
-  { id: "cinematic", label: "Cinematic", icon: Clapperboard, color: "from-emerald-500 to-teal-600" },
+  { id: "bold-dynamic", label: "Bold / Dynamic", icon: Sparkles, color: "from-stone-500 to-stone-500" },
+  { id: "elegant-luxury", label: "Elegant / Luxury", icon: Crown, color: "from-stone-400 to-stone-600" },
+  { id: "fun-playful", label: "Fun / Playful", icon: Smile, color: "from-stone-500 to-stone-500" },
+  { id: "corporate-professional", label: "Corporate / Professional", icon: Building2, color: "from-stone-500 to-stone-600" },
+  { id: "cinematic", label: "Cinematic", icon: Clapperboard, color: "from-stone-500 to-stone-600" },
 ];
 
 const PLATFORMS = [
@@ -489,8 +489,8 @@ SCRIPT_2:
     <div className="min-h-screen bg-zinc-950 text-white relative overflow-hidden">
       {/* Ambient background effects */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-purple-500/[0.04] rounded-full blur-[120px]" />
-        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-cyan-500/[0.03] rounded-full blur-[100px]" />
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-stone-500/[0.04] rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-stone-500/[0.03] rounded-full blur-[100px]" />
         <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:32px_32px]" />
       </div>
 
@@ -499,7 +499,7 @@ SCRIPT_2:
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-shadow">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-stone-500 to-stone-500 flex items-center justify-center shadow-lg shadow-stone-500/20 group-hover:shadow-stone-500/40 transition-shadow">
                 <Film className="w-4 h-4 text-white" />
               </div>
               <span className="text-sm font-semibold text-white tracking-tight">Zoobicon</span>
@@ -519,10 +519,10 @@ SCRIPT_2:
               const isCompleted = (s.key === "describe" && step !== "describe") || (s.key === "scripts" && step === "produce");
               return (
                 <div key={s.key} className="flex items-center gap-1.5">
-                  {i > 0 && <div className={`w-6 h-[1.5px] rounded-full transition-all duration-500 ${isCompleted || isActive ? "bg-gradient-to-r from-purple-500 to-cyan-500" : "bg-white/[0.08]"}`} />}
+                  {i > 0 && <div className={`w-6 h-[1.5px] rounded-full transition-all duration-500 ${isCompleted || isActive ? "bg-gradient-to-r from-stone-500 to-stone-500" : "bg-white/[0.08]"}`} />}
                   <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium tracking-wide transition-all duration-300 ${
-                    isActive ? "bg-gradient-to-r from-purple-500/20 to-cyan-500/20 text-white border border-purple-500/30" :
-                    isCompleted ? "text-emerald-400" :
+                    isActive ? "bg-gradient-to-r from-stone-500/20 to-stone-500/20 text-white border border-stone-500/30" :
+                    isCompleted ? "text-stone-400" :
                     "text-white/25"
                   }`}>
                     {isCompleted ? <Check className="w-3 h-3" /> : <span className="text-[10px] opacity-60">{s.num}</span>}
@@ -548,12 +548,12 @@ SCRIPT_2:
 
         {/* Error display */}
         {videoError && (
-          <div className="mb-6 p-4 rounded-2xl bg-red-500/[0.06] border border-red-500/20 backdrop-blur-xl flex items-start gap-3">
-            <div className="w-9 h-9 rounded-xl bg-red-500/10 flex items-center justify-center shrink-0 border border-red-500/20">
-              <AlertCircle className="w-4 h-4 text-red-400" />
+          <div className="mb-6 p-4 rounded-2xl bg-stone-500/[0.06] border border-stone-500/20 backdrop-blur-xl flex items-start gap-3">
+            <div className="w-9 h-9 rounded-xl bg-stone-500/10 flex items-center justify-center shrink-0 border border-stone-500/20">
+              <AlertCircle className="w-4 h-4 text-stone-400" />
             </div>
             <div className="pt-0.5 flex-1">
-              <div className="text-sm font-medium text-red-300">{videoError}</div>
+              <div className="text-sm font-medium text-stone-300">{videoError}</div>
               <div className="flex items-center gap-3 mt-3">
                 {step === "produce" && editedScript && (
                   <button
@@ -577,13 +577,13 @@ SCRIPT_2:
             {/* Hero area */}
             <div className="text-center mb-10 max-w-2xl">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.06] text-xs text-white/50 font-medium tracking-wide mb-6">
-                <Sparkles className="w-3 h-3 text-purple-400" />
+                <Sparkles className="w-3 h-3 text-stone-400" />
                 AI-POWERED VIDEO STUDIO
               </div>
               <h1 className="text-4xl sm:text-5xl font-bold mb-4 leading-[1.1] tracking-tight">
                 <span className="bg-gradient-to-r from-white via-white to-white/60 bg-clip-text text-transparent">Create a video</span>
                 <br />
-                <span className="bg-gradient-to-r from-purple-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent">that converts</span>
+                <span className="bg-gradient-to-r from-stone-400 via-stone-400 to-stone-400 bg-clip-text text-transparent">that converts</span>
               </h1>
               <p className="text-base sm:text-lg text-white/40 max-w-md mx-auto leading-relaxed">
                 Describe your video. Our AI director writes the script, generates the voice, and produces your video.
@@ -592,7 +592,7 @@ SCRIPT_2:
 
             {/* Input area */}
             <div className="w-full max-w-2xl">
-              <div className="relative rounded-2xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl overflow-hidden transition-all focus-within:border-purple-500/30 focus-within:bg-white/[0.04] group">
+              <div className="relative rounded-2xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl overflow-hidden transition-all focus-within:border-stone-500/30 focus-within:bg-white/[0.04] group">
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -609,7 +609,7 @@ SCRIPT_2:
                   <button
                     onClick={handleGenerateScripts}
                     disabled={generatingScripts || description.trim().length < 10}
-                    className="flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-sm font-semibold disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30"
+                    className="flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 text-sm font-semibold disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-lg shadow-stone-500/20 hover:shadow-stone-500/30"
                   >
                     {generatingScripts ? (
                       <><Loader2 className="w-4 h-4 animate-spin" /> Writing scripts...</>
@@ -631,9 +631,9 @@ SCRIPT_2:
                   <button
                     key={chip.label}
                     onClick={() => setDescription(chip.prompt)}
-                    className="group/chip flex items-center gap-1.5 px-4 py-2 rounded-full border border-white/[0.06] bg-white/[0.02] text-xs text-white/40 font-medium hover:text-white/80 hover:border-purple-500/30 hover:bg-purple-500/[0.06] transition-all"
+                    className="group/chip flex items-center gap-1.5 px-4 py-2 rounded-full border border-white/[0.06] bg-white/[0.02] text-xs text-white/40 font-medium hover:text-white/80 hover:border-stone-500/30 hover:bg-stone-500/[0.06] transition-all"
                   >
-                    <Sparkles className="w-3 h-3 text-white/20 group-hover/chip:text-purple-400 transition-colors" />
+                    <Sparkles className="w-3 h-3 text-white/20 group-hover/chip:text-stone-400 transition-colors" />
                     {chip.label}
                   </button>
                 ))}
@@ -672,27 +672,27 @@ SCRIPT_2:
                   onClick={() => handleSelectScript(i)}
                   className={`relative p-6 rounded-2xl border text-left transition-all duration-300 group/script ${
                     selectedScript === i
-                      ? "border-purple-500/40 bg-purple-500/[0.06] backdrop-blur-xl"
+                      ? "border-stone-500/40 bg-stone-500/[0.06] backdrop-blur-xl"
                       : "border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12] hover:bg-white/[0.04] backdrop-blur-xl"
                   }`}
                 >
                   {/* Gradient top edge when selected */}
                   {selectedScript === i && (
-                    <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-purple-500 via-violet-500 to-cyan-500 rounded-t-2xl" />
+                    <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-stone-500 via-stone-500 to-stone-500 rounded-t-2xl" />
                   )}
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2.5">
                       <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold transition-all ${
-                        selectedScript === i ? "bg-gradient-to-br from-purple-500 to-cyan-500 text-white" : "bg-white/[0.06] text-white/40"
+                        selectedScript === i ? "bg-gradient-to-br from-stone-500 to-stone-500 text-white" : "bg-white/[0.06] text-white/40"
                       }`}>
                         {i + 1}
                       </div>
-                      <span className={`text-xs font-semibold uppercase tracking-wider transition-colors ${selectedScript === i ? "text-purple-400" : "text-white/30"}`}>
+                      <span className={`text-xs font-semibold uppercase tracking-wider transition-colors ${selectedScript === i ? "text-stone-400" : "text-white/30"}`}>
                         {i === 0 ? "Direct Approach" : "Creative Approach"}
                       </span>
                     </div>
                     {selectedScript === i && (
-                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-500/15 text-[10px] font-semibold text-purple-400 uppercase tracking-widest">
+                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-stone-500/15 text-[10px] font-semibold text-stone-400 uppercase tracking-widest">
                         <Check className="w-3 h-3" /> Selected
                       </div>
                     )}
@@ -713,11 +713,11 @@ SCRIPT_2:
                   value={editedScript}
                   onChange={(e) => setEditedScript(e.target.value)}
                   rows={6}
-                  className="w-full px-5 py-4 bg-white/[0.03] border border-white/[0.08] rounded-2xl text-white/80 text-[14px] focus:outline-none focus:border-purple-500/30 focus:bg-white/[0.04] resize-none leading-relaxed transition-all backdrop-blur-xl"
+                  className="w-full px-5 py-4 bg-white/[0.03] border border-white/[0.08] rounded-2xl text-white/80 text-[14px] focus:outline-none focus:border-stone-500/30 focus:bg-white/[0.04] resize-none leading-relaxed transition-all backdrop-blur-xl"
                 />
                 <button
                   onClick={handleProceedToProduction}
-                  className="w-full py-4 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 rounded-2xl font-semibold text-base transition-all flex items-center justify-center gap-2.5 shadow-lg shadow-purple-500/20 hover:shadow-xl hover:shadow-purple-500/30"
+                  className="w-full py-4 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 rounded-2xl font-semibold text-base transition-all flex items-center justify-center gap-2.5 shadow-lg shadow-stone-500/20 hover:shadow-xl hover:shadow-stone-500/30"
                 >
                   Continue to Production <ChevronRight className="w-4 h-4" />
                 </button>
@@ -746,8 +746,8 @@ SCRIPT_2:
                 {/* Script preview */}
                 <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06] backdrop-blur-xl">
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="w-5 h-5 rounded-md bg-gradient-to-br from-purple-500/20 to-cyan-500/20 flex items-center justify-center">
-                      <BookOpen className="w-3 h-3 text-purple-400" />
+                    <div className="w-5 h-5 rounded-md bg-gradient-to-br from-stone-500/20 to-stone-500/20 flex items-center justify-center">
+                      <BookOpen className="w-3 h-3 text-stone-400" />
                     </div>
                     <span className="text-xs font-semibold text-white/40 uppercase tracking-wider">Script</span>
                   </div>
@@ -764,7 +764,7 @@ SCRIPT_2:
                         onClick={() => setPresenterGender("female")}
                         className={`p-3 rounded-xl border text-center transition-all duration-300 ${
                           presenterGender === "female"
-                            ? "border-purple-500/40 bg-purple-500/[0.08]"
+                            ? "border-stone-500/40 bg-stone-500/[0.08]"
                             : "border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12]"
                         }`}
                       >
@@ -775,7 +775,7 @@ SCRIPT_2:
                         onClick={() => setPresenterGender("male")}
                         className={`p-3 rounded-xl border text-center transition-all duration-300 ${
                           presenterGender === "male"
-                            ? "border-purple-500/40 bg-purple-500/[0.08]"
+                            ? "border-stone-500/40 bg-stone-500/[0.08]"
                             : "border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12]"
                         }`}
                       >
@@ -799,11 +799,11 @@ SCRIPT_2:
                           onClick={() => setFormat(f.id)}
                           className={`p-2.5 rounded-xl border text-center transition-all duration-300 ${
                             format === f.id
-                              ? "border-purple-500/40 bg-purple-500/[0.08]"
+                              ? "border-stone-500/40 bg-stone-500/[0.08]"
                               : "border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12]"
                           }`}
                         >
-                          <f.icon className={`w-4 h-4 mx-auto mb-1 transition-colors ${format === f.id ? "text-purple-400" : "text-white/30"}`} />
+                          <f.icon className={`w-4 h-4 mx-auto mb-1 transition-colors ${format === f.id ? "text-stone-400" : "text-white/30"}`} />
                           <div className={`text-[11px] font-medium transition-colors ${format === f.id ? "text-white/80" : "text-white/30"}`}>{f.label}</div>
                         </button>
                       ))}
@@ -817,9 +817,9 @@ SCRIPT_2:
                     {/* Cinematic progress */}
                     <div className="text-center mb-8">
                       <div className="relative w-16 h-16 mx-auto mb-5">
-                        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-500/20 to-cyan-500/20 animate-pulse" />
+                        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-stone-500/20 to-stone-500/20 animate-pulse" />
                         <div className="relative w-full h-full rounded-2xl bg-zinc-900/80 flex items-center justify-center border border-white/[0.08]">
-                          <Film className="w-7 h-7 text-purple-400" />
+                          <Film className="w-7 h-7 text-stone-400" />
                         </div>
                       </div>
                       <h3 className="text-lg font-semibold mb-1 tracking-tight">Producing your video</h3>
@@ -828,7 +828,7 @@ SCRIPT_2:
 
                     {/* Animated progress bar */}
                     <div className="relative h-1.5 rounded-full bg-white/[0.04] overflow-hidden mb-8">
-                      <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-violet-500 to-cyan-500 rounded-full animate-pulse" style={{
+                      <div className="absolute inset-0 bg-gradient-to-r from-stone-500 via-stone-500 to-stone-500 rounded-full animate-pulse" style={{
                         width: (() => {
                           const s = videoStatus?.toLowerCase() || "";
                           if (s.includes("render") || s.includes("final")) return "85%";
@@ -865,15 +865,15 @@ SCRIPT_2:
                         const isActive = myKeywordActive;
                         return (
                           <div key={stage.label} className={`flex flex-col items-center gap-2 p-3 rounded-xl transition-all duration-500 ${
-                            isDone ? "bg-emerald-500/[0.06]" : isActive ? "bg-purple-500/[0.06]" : "bg-white/[0.01]"
+                            isDone ? "bg-stone-500/[0.06]" : isActive ? "bg-stone-500/[0.06]" : "bg-white/[0.01]"
                           }`}>
                             <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
-                              isDone ? "bg-emerald-500/15 text-emerald-400" : isActive ? "bg-purple-500/15 text-purple-400" : "bg-white/[0.04] text-white/15"
+                              isDone ? "bg-stone-500/15 text-stone-400" : isActive ? "bg-stone-500/15 text-stone-400" : "bg-white/[0.04] text-white/15"
                             }`}>
                               {isDone ? <Check className="w-4 h-4" /> : isActive ? <Loader2 className="w-4 h-4 animate-spin" /> : <stage.icon className="w-4 h-4" />}
                             </div>
                             <span className={`text-[11px] font-medium transition-colors ${
-                              isDone ? "text-emerald-400" : isActive ? "text-purple-400" : "text-white/20"
+                              isDone ? "text-stone-400" : isActive ? "text-stone-400" : "text-white/20"
                             }`}>{stage.label}</span>
                           </div>
                         );
@@ -883,7 +883,7 @@ SCRIPT_2:
                 ) : (
                   <button
                     onClick={handleGenerateVideo}
-                    className="w-full py-4 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 rounded-2xl font-semibold text-base transition-all flex items-center justify-center gap-2.5 shadow-xl shadow-purple-500/20 hover:shadow-2xl hover:shadow-purple-500/30 group/gen"
+                    className="w-full py-4 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 rounded-2xl font-semibold text-base transition-all flex items-center justify-center gap-2.5 shadow-xl shadow-stone-500/20 hover:shadow-2xl hover:shadow-stone-500/30 group/gen"
                   >
                     <Sparkles className="w-5 h-5 group-hover/gen:rotate-12 transition-transform" /> Generate Video
                   </button>
@@ -912,7 +912,7 @@ SCRIPT_2:
                       <div className="flex items-center justify-between"><span>Lip sync animation</span><span className="text-white/15">~30s</span></div>
                       <div className="flex items-center justify-between pt-1.5 border-t border-white/[0.04]">
                         <span className="font-semibold text-white/40">Total estimated</span>
-                        <span className="font-semibold text-purple-400/70">~60-90s</span>
+                        <span className="font-semibold text-stone-400/70">~60-90s</span>
                       </div>
                     </div>
                   </div>
@@ -927,8 +927,8 @@ SCRIPT_2:
           <div className="max-w-3xl mx-auto pt-4">
             {/* Success badge */}
             <div className="text-center mb-8">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/[0.06] border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-4">
-                <div className="w-4 h-4 rounded-full bg-emerald-500/15 flex items-center justify-center">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-stone-500/[0.06] border border-stone-500/20 text-stone-400 text-xs font-semibold uppercase tracking-wider mb-4">
+                <div className="w-4 h-4 rounded-full bg-stone-500/15 flex items-center justify-center">
                   <Check className="w-2.5 h-2.5" />
                 </div>
                 Production complete
@@ -941,7 +941,7 @@ SCRIPT_2:
               {/* Top bar mimicking a player chrome */}
               <div className="flex items-center justify-between px-4 py-2.5 bg-white/[0.02] border-b border-white/[0.04]">
                 <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/60" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-stone-500/60" />
                   <span className="text-[11px] text-white/30 font-medium">zoobicon-video.mp4</span>
                 </div>
                 <div className="flex items-center gap-1.5">
@@ -965,7 +965,7 @@ SCRIPT_2:
                 download
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-semibold text-sm transition-all shadow-lg shadow-purple-500/20"
+                className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 text-white font-semibold text-sm transition-all shadow-lg shadow-stone-500/20"
               >
                 <Download className="w-4 h-4" /> Download
               </a>

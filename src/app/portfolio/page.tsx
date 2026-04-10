@@ -127,17 +127,17 @@ export default function PortfolioPage() {
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
               <ArrowLeft className="w-4 h-4" />
-              <span className="font-bold text-lg bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Zoobicon</span>
+              <span className="font-bold text-lg bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</span>
             </Link>
             <ChevronRight className="w-4 h-4 text-white/30" />
             <div className="flex items-center gap-2">
-              <Briefcase className="w-5 h-5 text-violet-400" />
+              <Briefcase className="w-5 h-5 text-stone-400" />
               <span className="font-semibold">Portfolio Builder</span>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/builder" className="px-4 py-2 text-sm text-white/70 hover:text-white transition-colors">Builder</Link>
-            <Link href="/dashboard" className="px-4 py-2 text-sm bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors">Dashboard</Link>
+            <Link href="/dashboard" className="px-4 py-2 text-sm bg-stone-600 hover:bg-stone-500 rounded-lg transition-colors">Dashboard</Link>
           </div>
         </div>
       </header>
@@ -146,9 +146,9 @@ export default function PortfolioPage() {
         {/* Template Selector */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
           {TEMPLATES.map(template => (
-            <button key={template.id} onClick={() => setSelectedTemplate(template.id)} className={`p-4 rounded-xl border text-left transition-all ${selectedTemplate === template.id ? 'bg-violet-600/20 border-violet-500/50' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}>
+            <button key={template.id} onClick={() => setSelectedTemplate(template.id)} className={`p-4 rounded-xl border text-left transition-all ${selectedTemplate === template.id ? 'bg-stone-600/20 border-stone-500/50' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}>
               <div className="flex items-center gap-2 mb-1">
-                <span className={selectedTemplate === template.id ? 'text-violet-400' : 'text-white/40'}>{template.icon}</span>
+                <span className={selectedTemplate === template.id ? 'text-stone-400' : 'text-white/40'}>{template.icon}</span>
                 <span className="text-sm font-medium">{template.name}</span>
               </div>
               <p className="text-xs text-white/40">{template.description}</p>
@@ -160,13 +160,13 @@ export default function PortfolioPage() {
         <div className="flex items-center justify-between mb-8">
           <div className="flex gap-1 bg-white/5 rounded-xl p-1">
             {tabs.map(tab => (
-              <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === tab.id ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/25' : 'text-white/60 hover:text-white hover:bg-white/5'}`}>
+              <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === tab.id ? 'bg-stone-600 text-white shadow-lg shadow-stone-600/25' : 'text-white/60 hover:text-white hover:bg-white/5'}`}>
                 {tab.icon}{tab.label}
               </button>
             ))}
           </div>
           {activeTab === 'projects' && (
-            <button onClick={() => setShowAddForm(true)} className="flex items-center gap-2 px-4 py-2.5 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm font-medium transition-colors">
+            <button onClick={() => setShowAddForm(true)} className="flex items-center gap-2 px-4 py-2.5 bg-stone-600 hover:bg-stone-500 rounded-lg text-sm font-medium transition-colors">
               <Plus className="w-4 h-4" /> Add Project
             </button>
           )}
@@ -176,44 +176,44 @@ export default function PortfolioPage() {
           <div>
             <div className="flex gap-2 mb-6">
               {categories.map(cat => (
-                <button key={cat} onClick={() => setFilterCategory(cat)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all capitalize ${filterCategory === cat ? 'bg-violet-600 text-white' : 'bg-white/5 text-white/50 hover:text-white'}`}>{cat}</button>
+                <button key={cat} onClick={() => setFilterCategory(cat)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all capitalize ${filterCategory === cat ? 'bg-stone-600 text-white' : 'bg-white/5 text-white/50 hover:text-white'}`}>{cat}</button>
               ))}
             </div>
 
             {showAddForm && (
-              <div className="bg-white/5 rounded-2xl border border-violet-500/30 p-6 mb-6">
+              <div className="bg-white/5 rounded-2xl border border-stone-500/30 p-6 mb-6">
                 <h3 className="font-semibold mb-4">Add New Project</h3>
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
                     <label className="block text-sm text-white/70 mb-1.5">Project Title</label>
-                    <input type="text" placeholder="Project name" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-violet-500/50" />
+                    <input type="text" placeholder="Project name" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-stone-500/50" />
                   </div>
                   <div>
                     <label className="block text-sm text-white/70 mb-1.5">Category</label>
-                    <input type="text" placeholder="e.g., Website, Mobile, Branding" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-violet-500/50" />
+                    <input type="text" placeholder="e.g., Website, Mobile, Branding" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-stone-500/50" />
                   </div>
                 </div>
                 <div className="mb-4">
                   <label className="block text-sm text-white/70 mb-1.5">Description</label>
-                  <textarea rows={3} placeholder="Describe the project..." className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-violet-500/50 resize-none" />
+                  <textarea rows={3} placeholder="Describe the project..." className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-stone-500/50 resize-none" />
                 </div>
                 <div className="grid grid-cols-3 gap-4 mb-4">
                   <div>
                     <label className="block text-sm text-white/70 mb-1.5">Image URL</label>
-                    <input type="text" placeholder="https://..." className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-violet-500/50" />
+                    <input type="text" placeholder="https://..." className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-stone-500/50" />
                   </div>
                   <div>
                     <label className="block text-sm text-white/70 mb-1.5">Live Link</label>
-                    <input type="text" placeholder="https://..." className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-violet-500/50" />
+                    <input type="text" placeholder="https://..." className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-stone-500/50" />
                   </div>
                   <div>
                     <label className="block text-sm text-white/70 mb-1.5">Tags (comma-separated)</label>
-                    <input type="text" placeholder="React, Next.js, Tailwind" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-violet-500/50" />
+                    <input type="text" placeholder="React, Next.js, Tailwind" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-stone-500/50" />
                   </div>
                 </div>
                 <div className="flex justify-end gap-3">
                   <button onClick={() => setShowAddForm(false)} className="px-4 py-2 text-sm text-white/60 hover:text-white transition-colors">Cancel</button>
-                  <button onClick={() => {}} className="px-6 py-2 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm font-medium transition-colors">Add Project</button>
+                  <button onClick={() => {}} className="px-6 py-2 bg-stone-600 hover:bg-stone-500 rounded-lg text-sm font-medium transition-colors">Add Project</button>
                 </div>
               </div>
             )}
@@ -224,7 +224,7 @@ export default function PortfolioPage() {
                   <div className="relative aspect-[3/2] bg-white/5 overflow-hidden">
                     <NextImage src={project.image} alt={project.title} className="object-cover group-hover:scale-105 transition-transform duration-500" fill unoptimized />
                     {project.featured && (
-                      <div className="absolute top-3 left-3 flex items-center gap-1 px-2 py-1 bg-amber-500/90 rounded-full text-xs font-medium text-black">
+                      <div className="absolute top-3 left-3 flex items-center gap-1 px-2 py-1 bg-stone-500/90 rounded-full text-xs font-medium text-black">
                         <Star className="w-3 h-3" /> Featured
                       </div>
                     )}
@@ -238,7 +238,7 @@ export default function PortfolioPage() {
                   </div>
                   <div className="p-5">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xs px-2 py-0.5 bg-violet-500/20 text-violet-300 rounded-full">{project.category}</span>
+                      <span className="text-xs px-2 py-0.5 bg-stone-500/20 text-stone-300 rounded-full">{project.category}</span>
                       <span className="text-xs text-white/30">{project.year}</span>
                     </div>
                     <h3 className="font-semibold mb-2">{project.title}</h3>
@@ -261,7 +261,7 @@ export default function PortfolioPage() {
           <div className="max-w-3xl mx-auto space-y-6">
             <div className="bg-white/5 rounded-2xl border border-white/10 p-8">
               <div className="flex items-center gap-6 mb-8">
-                <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center text-3xl font-bold">{aboutInfo.avatar}</div>
+                <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-stone-600 to-stone-600 flex items-center justify-center text-3xl font-bold">{aboutInfo.avatar}</div>
                 <div>
                   <input type="text" value={aboutInfo.name} onChange={e => setAboutInfo(prev => ({ ...prev, name: e.target.value }))} className="text-2xl font-bold bg-transparent border-none outline-none w-full" />
                   <input type="text" value={aboutInfo.title} onChange={e => setAboutInfo(prev => ({ ...prev, title: e.target.value }))} className="text-white/50 bg-transparent border-none outline-none w-full mt-1" />
@@ -270,25 +270,25 @@ export default function PortfolioPage() {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm text-white/60 mb-1.5">Bio</label>
-                  <textarea value={aboutInfo.bio} onChange={e => setAboutInfo(prev => ({ ...prev, bio: e.target.value }))} rows={5} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-violet-500/50 resize-none" />
+                  <textarea value={aboutInfo.bio} onChange={e => setAboutInfo(prev => ({ ...prev, bio: e.target.value }))} rows={5} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-stone-500/50 resize-none" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm text-white/60 mb-1.5 flex items-center gap-1"><MapPin className="w-3 h-3" />Location</label>
-                    <input type="text" value={aboutInfo.location} onChange={e => setAboutInfo(prev => ({ ...prev, location: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-violet-500/50" />
+                    <input type="text" value={aboutInfo.location} onChange={e => setAboutInfo(prev => ({ ...prev, location: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-stone-500/50" />
                   </div>
                   <div>
                     <label className="block text-sm text-white/60 mb-1.5 flex items-center gap-1"><Mail className="w-3 h-3" />Email</label>
-                    <input type="email" value={aboutInfo.email} onChange={e => setAboutInfo(prev => ({ ...prev, email: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-violet-500/50" />
+                    <input type="email" value={aboutInfo.email} onChange={e => setAboutInfo(prev => ({ ...prev, email: e.target.value }))} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-stone-500/50" />
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm text-white/60 mb-2">Skills</label>
                   <div className="flex flex-wrap gap-2">
                     {aboutInfo.skills.map((skill, i) => (
-                      <span key={i} className="px-3 py-1.5 bg-violet-600/20 border border-violet-500/30 rounded-lg text-xs text-violet-300">{skill}</span>
+                      <span key={i} className="px-3 py-1.5 bg-stone-600/20 border border-stone-500/30 rounded-lg text-xs text-stone-300">{skill}</span>
                     ))}
-                    <button onClick={() => {}} className="px-3 py-1.5 border border-dashed border-white/20 hover:border-violet-500/50 rounded-lg text-xs text-white/40 hover:text-violet-300 transition-colors flex items-center gap-1"><Plus className="w-3 h-3" />Add</button>
+                    <button onClick={() => {}} className="px-3 py-1.5 border border-dashed border-white/20 hover:border-stone-500/50 rounded-lg text-xs text-white/40 hover:text-stone-300 transition-colors flex items-center gap-1"><Plus className="w-3 h-3" />Add</button>
                   </div>
                 </div>
               </div>
@@ -304,7 +304,7 @@ export default function PortfolioPage() {
                 { id: 'tablet' as ViewportType, icon: <Tablet className="w-4 h-4" />, width: '768px' },
                 { id: 'mobile' as ViewportType, icon: <Smartphone className="w-4 h-4" />, width: '375px' },
               ].map(vp => (
-                <button key={vp.id} onClick={() => setViewport(vp.id)} className={`p-2.5 rounded-lg transition-all ${viewport === vp.id ? 'bg-violet-600 text-white' : 'bg-white/5 text-white/40 hover:text-white'}`}>{vp.icon}</button>
+                <button key={vp.id} onClick={() => setViewport(vp.id)} className={`p-2.5 rounded-lg transition-all ${viewport === vp.id ? 'bg-stone-600 text-white' : 'bg-white/5 text-white/40 hover:text-white'}`}>{vp.icon}</button>
               ))}
             </div>
             <div className="bg-white/5 rounded-2xl border border-white/10 p-8 mx-auto transition-all" style={{ maxWidth: viewport === 'desktop' ? '100%' : viewport === 'tablet' ? '768px' : '375px' }}>
@@ -351,8 +351,8 @@ export default function PortfolioPage() {
                   { label: 'Export as React', desc: 'React components', icon: <Copy className="w-5 h-5" /> },
                   { label: 'Generate PDF', desc: 'Print-ready portfolio', icon: <Briefcase className="w-5 h-5" /> },
                 ].map((opt, i) => (
-                  <button onClick={() => {}} key={i} className="flex items-center gap-3 p-4 bg-white/5 hover:bg-violet-600/20 border border-white/10 hover:border-violet-500/50 rounded-xl text-left transition-all group">
-                    <span className="text-white/40 group-hover:text-violet-400 transition-colors">{opt.icon}</span>
+                  <button onClick={() => {}} key={i} className="flex items-center gap-3 p-4 bg-white/5 hover:bg-stone-600/20 border border-white/10 hover:border-stone-500/50 rounded-xl text-left transition-all group">
+                    <span className="text-white/40 group-hover:text-stone-400 transition-colors">{opt.icon}</span>
                     <div>
                       <p className="text-sm font-medium">{opt.label}</p>
                       <p className="text-xs text-white/40">{opt.desc}</p>
@@ -370,7 +370,7 @@ export default function PortfolioPage() {
                   { name: 'Navy', bg: '#0f172a', fg: '#e2e8f0' },
                   { name: 'Warm', bg: '#1a1412', fg: '#fde8d0' },
                 ].map(theme => (
-                  <button onClick={() => {}} key={theme.name} className="p-3 rounded-xl border border-white/10 hover:border-violet-500/50 transition-all text-center">
+                  <button onClick={() => {}} key={theme.name} className="p-3 rounded-xl border border-white/10 hover:border-stone-500/50 transition-all text-center">
                     <div className="w-full h-12 rounded-lg mb-2" style={{ backgroundColor: theme.bg, border: '1px solid rgba(255,255,255,0.1)' }}>
                       <div className="p-2">
                         <div className="h-1 w-8 rounded-full mx-auto" style={{ backgroundColor: theme.fg }} />
@@ -389,7 +389,7 @@ export default function PortfolioPage() {
       <footer className="border-t border-white/10 mt-20 py-12">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <p className="text-white/40 text-sm">
-            Replaces Squarespace Portfolio ($16/mo), Behance Pro, and Circle Pro ($5/mo) &mdash; <span className="text-violet-400">included free with Zoobicon Pro</span>
+            Replaces Squarespace Portfolio ($16/mo), Behance Pro, and Circle Pro ($5/mo) &mdash; <span className="text-stone-400">included free with Zoobicon Pro</span>
           </p>
           <div className="flex items-center justify-center gap-6 mt-4">
             <Link href="/pricing" className="text-sm text-white/50 hover:text-white transition-colors">Pricing</Link>

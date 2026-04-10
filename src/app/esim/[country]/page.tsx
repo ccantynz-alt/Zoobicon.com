@@ -387,7 +387,7 @@ export default function EsimCountryPage({ params }: { params: { country: string 
       <div className="min-h-screen flex items-center justify-center bg-[#0a0a12] text-white">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-2">Country not found</h1>
-          <p className="text-white/40">Check our <a href="/products/esim" className="text-cyan-400 underline">full eSIM coverage list</a>.</p>
+          <p className="text-white/40">Check our <a href="/products/esim" className="text-stone-400 underline">full eSIM coverage list</a>.</p>
         </div>
       </div>
     );
@@ -413,7 +413,7 @@ export default function EsimCountryPage({ params }: { params: { country: string 
           <a href="/" className="text-sm font-bold">Zoobicon</a>
           <div className="flex gap-4 text-xs text-white/40">
             <a href="/products/esim" className="hover:text-white/60">All eSIM Plans</a>
-            <a href="/auth/signup" className="text-cyan-400 hover:text-cyan-300">Get Started</a>
+            <a href="/auth/signup" className="text-stone-400 hover:text-stone-300">Get Started</a>
           </div>
         </div>
       </nav>
@@ -424,7 +424,7 @@ export default function EsimCountryPage({ params }: { params: { country: string 
           <div className="flex items-center gap-3 mb-4">
             <span className="text-4xl">{data.emoji}</span>
             <div>
-              <p className="text-xs text-cyan-400 font-medium uppercase tracking-wider">{data.region}</p>
+              <p className="text-xs text-stone-400 font-medium uppercase tracking-wider">{data.region}</p>
               <h1 className="text-3xl sm:text-4xl font-bold">eSIM for {data.name}</h1>
             </div>
           </div>
@@ -432,24 +432,24 @@ export default function EsimCountryPage({ params }: { params: { country: string 
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
             <div className="rounded-xl bg-white/[0.03] border border-white/[0.08] p-4 text-center">
-              <div className="text-lg font-bold text-cyan-400">{data.planFrom}</div>
+              <div className="text-lg font-bold text-stone-400">{data.planFrom}</div>
               <div className="text-[10px] text-white/30 mt-1">Plans from</div>
             </div>
             <div className="rounded-xl bg-white/[0.03] border border-white/[0.08] p-4 text-center">
-              <div className="text-lg font-bold text-emerald-400">{data.speed}</div>
+              <div className="text-lg font-bold text-stone-400">{data.speed}</div>
               <div className="text-[10px] text-white/30 mt-1">Network speed</div>
             </div>
             <div className="rounded-xl bg-white/[0.03] border border-white/[0.08] p-4 text-center">
-              <div className="text-lg font-bold text-purple-400">&lt;60s</div>
+              <div className="text-lg font-bold text-stone-400">&lt;60s</div>
               <div className="text-[10px] text-white/30 mt-1">Activation time</div>
             </div>
             <div className="rounded-xl bg-white/[0.03] border border-white/[0.08] p-4 text-center">
-              <div className="text-lg font-bold text-amber-400">QR</div>
+              <div className="text-lg font-bold text-stone-400">QR</div>
               <div className="text-[10px] text-white/30 mt-1">Scan & connect</div>
             </div>
           </div>
 
-          <a href="/auth/signup" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 font-semibold text-sm hover:from-cyan-400 hover:to-blue-500 transition-all">
+          <a href="/auth/signup" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-stone-500 to-stone-600 font-semibold text-sm hover:from-stone-400 hover:to-stone-500 transition-all">
             Get eSIM for {data.name} →
           </a>
         </div>
@@ -465,7 +465,7 @@ export default function EsimCountryPage({ params }: { params: { country: string 
           <ul className="space-y-2">
             {data.tips.map((tip, i) => (
               <li key={i} className="flex items-start gap-2 text-sm text-white/50">
-                <span className="text-cyan-400 mt-0.5">•</span>{tip}
+                <span className="text-stone-400 mt-0.5">•</span>{tip}
               </li>
             ))}
           </ul>
@@ -483,8 +483,8 @@ export default function EsimCountryPage({ params }: { params: { country: string 
               { step: "3", title: "Connect", desc: `Your eSIM activates immediately on ${data.speed} networks. Start using data in ${data.name}.` },
             ].map(s => (
               <div key={s.step} className="rounded-xl bg-white/[0.03] border border-white/[0.08] p-5 text-center">
-                <div className="w-8 h-8 rounded-full bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mx-auto mb-3">
-                  <span className="text-sm font-bold text-cyan-400">{s.step}</span>
+                <div className="w-8 h-8 rounded-full bg-stone-500/10 border border-stone-500/20 flex items-center justify-center mx-auto mb-3">
+                  <span className="text-sm font-bold text-stone-400">{s.step}</span>
                 </div>
                 <h3 className="font-semibold text-sm mb-1">{s.title}</h3>
                 <p className="text-xs text-white/40">{s.desc}</p>
@@ -502,7 +502,7 @@ export default function EsimCountryPage({ params }: { params: { country: string 
             {COUNTRY_SLUGS.filter(s => s !== params.country).map(slug => {
               const c = COUNTRIES[slug];
               return (
-                <a key={slug} href={`/esim/${slug}`} className="text-xs px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06] text-white/50 hover:text-white hover:border-cyan-500/30 transition-all">
+                <a key={slug} href={`/esim/${slug}`} className="text-xs px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06] text-white/50 hover:text-white hover:border-stone-500/30 transition-all">
                   {c.emoji} {c.name}
                 </a>
               );
@@ -516,7 +516,7 @@ export default function EsimCountryPage({ params }: { params: { country: string 
         <div className="max-w-3xl mx-auto px-6 text-center">
           <h2 className="text-2xl font-bold mb-3">Ready for {data.name}?</h2>
           <p className="text-white/40 mb-6 text-sm">Get instant {data.speed} data. No SIM card. No store visits. Active in under 60 seconds.</p>
-          <a href="/auth/signup" className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 font-semibold text-sm hover:from-cyan-400 hover:to-blue-500 transition-all">
+          <a href="/auth/signup" className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-stone-500 to-stone-600 font-semibold text-sm hover:from-stone-400 hover:to-stone-500 transition-all">
             Get eSIM for {data.name} →
           </a>
         </div>

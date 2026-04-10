@@ -293,7 +293,7 @@ export default function AgenciesPage() {
                 <motion.div key={i} variants={fadeInUp} className="gradient-border p-6 rounded-xl">
                   <div className="flex gap-0.5 mb-4">
                     {Array.from({ length: t.stars }).map((_, j) => (
-                      <Star key={j} className="w-4 h-4 text-amber-400 fill-amber-400" />
+                      <Star key={j} className="w-4 h-4 text-stone-400 fill-stone-400" />
                     ))}
                   </div>
                   <p className="text-sm text-white/60 leading-relaxed mb-4">&ldquo;{t.text}&rdquo;</p>

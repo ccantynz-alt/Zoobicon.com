@@ -197,7 +197,7 @@ export default function AnalyticsPage() {
                           <Settings className="w-4 h-4" />
                           Settings
                         </Link>
-                        <button onClick={handleLogout} className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-400/60 hover:text-red-400 hover:bg-white/[0.07] transition-colors">
+                        <button onClick={handleLogout} className="w-full flex items-center gap-2 px-4 py-2 text-sm text-stone-400/60 hover:text-stone-400 hover:bg-white/[0.07] transition-colors">
                           <LogOut className="w-4 h-4" />
                           Sign out
                         </button>
@@ -259,8 +259,8 @@ export default function AnalyticsPage() {
 
           <div className="rounded-xl border border-white/[0.10] bg-white/[0.05] p-5">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                <Shield className="w-4 h-4 text-emerald-400" />
+              <div className="w-8 h-8 rounded-lg bg-stone-500/10 flex items-center justify-center">
+                <Shield className="w-4 h-4 text-stone-400" />
               </div>
               <span className="text-xs text-white/60 font-medium">Current Plan</span>
             </div>
@@ -298,7 +298,7 @@ export default function AnalyticsPage() {
                       className="flex items-center gap-4 px-5 py-3.5 hover:bg-white/[0.05] transition-colors group"
                     >
                       {/* Status dot */}
-                      <div className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0" title="Completed" />
+                      <div className="w-2 h-2 rounded-full bg-stone-400 flex-shrink-0" title="Completed" />
 
                       {/* Prompt + Name */}
                       <div className="flex-1 min-w-0">
@@ -373,10 +373,10 @@ export default function AnalyticsPage() {
                         <div
                           className={`h-full rounded-full transition-all ${
                             entry.score >= 80
-                              ? "bg-emerald-500/60"
+                              ? "bg-stone-500/60"
                               : entry.score >= 50
-                              ? "bg-amber-500/60"
-                              : "bg-red-500/60"
+                              ? "bg-stone-500/60"
+                              : "bg-stone-500/60"
                           }`}
                           style={{ width: `${(entry.score / maxSeo) * 100}%` }}
                         />
@@ -412,7 +412,7 @@ export default function AnalyticsPage() {
                   href="/products/seo-agent"
                   className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/[0.07] transition-colors group"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-cyan to-emerald-600 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-cyan to-stone-600 flex items-center justify-center">
                     <Search className="w-4 h-4 text-white" />
                   </div>
                   <div className="flex-1">
@@ -426,7 +426,7 @@ export default function AnalyticsPage() {
                   href="/dashboard"
                   className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/[0.07] transition-colors group"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-purple to-blue-700 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-purple to-stone-700 flex items-center justify-center">
                     <BarChart3 className="w-4 h-4 text-white" />
                   </div>
                   <div className="flex-1">

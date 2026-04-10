@@ -236,7 +236,7 @@ export default function QRCodeGeneratorPage() {
         <nav className="border-b border-white/10 bg-[#0a0a14]/80 backdrop-blur-md sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-sm font-black">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-stone-500 to-stone-500 flex items-center justify-center text-sm font-black">
                 Z
               </div>
               Zoobicon
@@ -257,11 +257,11 @@ export default function QRCodeGeneratorPage() {
 
         {/* -------- HERO -------- */}
         <header className="pt-16 pb-10 text-center px-4">
-          <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/20 rounded-full px-4 py-1.5 text-sm text-violet-300 mb-6">
+          <div className="inline-flex items-center gap-2 bg-stone-500/10 border border-stone-500/20 rounded-full px-4 py-1.5 text-sm text-stone-300 mb-6">
             <QrCode className="w-4 h-4" />
             Free Tool — No Signup Required
           </div>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight bg-gradient-to-r from-white via-violet-200 to-fuchsia-200 bg-clip-text text-transparent">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight bg-gradient-to-r from-white via-stone-200 to-stone-200 bg-clip-text text-transparent">
             Free QR Code Generator
           </h1>
           <p className="mt-4 text-gray-400 text-lg max-w-2xl mx-auto">
@@ -284,7 +284,7 @@ export default function QRCodeGeneratorPage() {
                       onClick={() => setActiveTab(tab.id)}
                       className={`flex-1 min-w-[80px] flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition ${
                         activeTab === tab.id
-                          ? "bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-lg"
+                          ? "bg-gradient-to-r from-stone-600 to-stone-600 text-white shadow-lg"
                           : "text-gray-400 hover:text-white hover:bg-white/5"
                       }`}
                     >
@@ -308,7 +308,7 @@ export default function QRCodeGeneratorPage() {
                     onChange={(e) => setTextInput(e.target.value)}
                     placeholder={placeholders[activeTab]}
                     rows={4}
-                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500/50 resize-none"
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-stone-500/50 resize-none"
                   />
                 )}
 
@@ -320,21 +320,21 @@ export default function QRCodeGeneratorPage() {
                       value={emailTo}
                       onChange={(e) => setEmailTo(e.target.value)}
                       placeholder="recipient@example.com"
-                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                     />
                     <input
                       type="text"
                       value={emailSubject}
                       onChange={(e) => setEmailSubject(e.target.value)}
                       placeholder="Subject (optional)"
-                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                     />
                     <textarea
                       value={emailBody}
                       onChange={(e) => setEmailBody(e.target.value)}
                       placeholder="Message body (optional)"
                       rows={3}
-                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500/50 resize-none"
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-stone-500/50 resize-none"
                     />
                   </>
                 )}
@@ -346,7 +346,7 @@ export default function QRCodeGeneratorPage() {
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     placeholder="+1 234 567 8900"
-                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                   />
                 )}
 
@@ -358,14 +358,14 @@ export default function QRCodeGeneratorPage() {
                       value={wifiSSID}
                       onChange={(e) => setWifiSSID(e.target.value)}
                       placeholder="Network name (SSID)"
-                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                     />
                     <input
                       type="text"
                       value={wifiPassword}
                       onChange={(e) => setWifiPassword(e.target.value)}
                       placeholder="Password"
-                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                     />
                     <div>
                       <label className="text-xs text-gray-400 mb-1.5 block">Encryption</label>
@@ -376,7 +376,7 @@ export default function QRCodeGeneratorPage() {
                             onClick={() => setWifiEncryption(enc)}
                             className={`flex-1 px-4 py-2 rounded-xl text-sm font-medium border transition ${
                               wifiEncryption === enc
-                                ? "border-violet-500 bg-violet-500/20 text-violet-300"
+                                ? "border-stone-500 bg-stone-500/20 text-stone-300"
                                 : "border-white/10 text-gray-400 hover:border-white/20 hover:text-white"
                             }`}
                           >
@@ -406,7 +406,7 @@ export default function QRCodeGeneratorPage() {
                         onClick={() => setSize(s)}
                         className={`flex-1 px-4 py-2 rounded-xl text-sm font-medium border transition ${
                           size === s
-                            ? "border-violet-500 bg-violet-500/20 text-violet-300"
+                            ? "border-stone-500 bg-stone-500/20 text-stone-300"
                             : "border-white/10 text-gray-400 hover:border-white/20 hover:text-white"
                         }`}
                       >
@@ -426,7 +426,7 @@ export default function QRCodeGeneratorPage() {
                         onClick={() => setEcLevel(ec.value)}
                         className={`px-4 py-2.5 rounded-xl text-sm border transition text-left ${
                           ecLevel === ec.value
-                            ? "border-violet-500 bg-violet-500/20 text-violet-300"
+                            ? "border-stone-500 bg-stone-500/20 text-stone-300"
                             : "border-white/10 text-gray-400 hover:border-white/20 hover:text-white"
                         }`}
                       >
@@ -452,7 +452,7 @@ export default function QRCodeGeneratorPage() {
                         type="text"
                         value={fgColor}
                         onChange={(e) => setFgColor(e.target.value)}
-                        className="flex-1 bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white font-mono focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                        className="flex-1 bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white font-mono focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                       />
                     </div>
                   </div>
@@ -469,7 +469,7 @@ export default function QRCodeGeneratorPage() {
                         type="text"
                         value={bgColor}
                         onChange={(e) => setBgColor(e.target.value)}
-                        className="flex-1 bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white font-mono focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                        className="flex-1 bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white font-mono focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                       />
                     </div>
                   </div>
@@ -492,7 +492,7 @@ export default function QRCodeGeneratorPage() {
                     <div className="flex gap-3 mt-8 w-full max-w-xs">
                       <button
                         onClick={downloadPng}
-                        className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white font-semibold py-3 rounded-xl transition shadow-lg shadow-violet-500/20"
+                        className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 text-white font-semibold py-3 rounded-xl transition shadow-lg shadow-stone-500/20"
                       >
                         <Download className="w-4 h-4" />
                         Download
@@ -501,7 +501,7 @@ export default function QRCodeGeneratorPage() {
                         onClick={copyToClipboard}
                         className="flex-1 flex items-center justify-center gap-2 bg-white/10 hover:bg-white/15 text-white font-semibold py-3 rounded-xl transition border border-white/10"
                       >
-                        {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                        {copied ? <Check className="w-4 h-4 text-stone-400" /> : <Copy className="w-4 h-4" />}
                         {copied ? "Copied!" : "Copy"}
                       </button>
                     </div>
@@ -529,7 +529,7 @@ export default function QRCodeGeneratorPage() {
                       key={feat.label}
                       className="flex items-center gap-2.5 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300"
                     >
-                      <Icon className="w-4 h-4 text-violet-400 flex-shrink-0" />
+                      <Icon className="w-4 h-4 text-stone-400 flex-shrink-0" />
                       {feat.label}
                     </div>
                   );
@@ -580,7 +580,7 @@ export default function QRCodeGeneratorPage() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/30 rounded-xl px-6 py-3 text-sm font-medium text-white transition"
+                  className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-stone-500/30 rounded-xl px-6 py-3 text-sm font-medium text-white transition"
                 >
                   {link.label}
                   <ArrowRight className="w-4 h-4" />

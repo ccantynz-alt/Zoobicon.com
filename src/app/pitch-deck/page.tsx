@@ -247,19 +247,19 @@ export default function PitchDeckPage() {
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
               <ArrowLeft className="w-4 h-4" />
-              <span className="font-bold text-lg bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Zoobicon</span>
+              <span className="font-bold text-lg bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</span>
             </Link>
             <ChevronRight className="w-4 h-4 text-white/30" />
             <div className="flex items-center gap-2">
-              <Presentation className="w-5 h-5 text-violet-400" />
+              <Presentation className="w-5 h-5 text-stone-400" />
               <span className="font-semibold">Pitch Deck</span>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={() => setIsPresenting(true)} className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 rounded-lg text-sm font-medium transition-colors">
+            <button onClick={() => setIsPresenting(true)} className="flex items-center gap-2 px-4 py-2 bg-stone-600 hover:bg-stone-500 rounded-lg text-sm font-medium transition-colors">
               <Play className="w-4 h-4" /> Present
             </button>
-            <Link href="/dashboard" className="px-4 py-2 text-sm bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors">Dashboard</Link>
+            <Link href="/dashboard" className="px-4 py-2 text-sm bg-stone-600 hover:bg-stone-500 rounded-lg transition-colors">Dashboard</Link>
           </div>
         </div>
       </header>
@@ -267,7 +267,7 @@ export default function PitchDeckPage() {
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="flex gap-1 mb-8 bg-white/5 rounded-xl p-1 w-fit">
           {tabs.map(tab => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === tab.id ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/25' : 'text-white/60 hover:text-white hover:bg-white/5'}`}>
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === tab.id ? 'bg-stone-600 text-white shadow-lg shadow-stone-600/25' : 'text-white/60 hover:text-white hover:bg-white/5'}`}>
               {tab.icon}{tab.label}
             </button>
           ))}
@@ -280,7 +280,7 @@ export default function PitchDeckPage() {
               {slides.map((slide, i) => {
                 const cfg = SLIDE_TYPE_CONFIG[slide.type];
                 return (
-                  <button key={slide.id} onClick={() => setCurrentSlide(i)} className={`w-full text-left rounded-xl overflow-hidden border transition-all ${currentSlide === i ? 'border-violet-500/50 ring-2 ring-violet-500/20' : 'border-white/10 hover:border-white/20'}`}>
+                  <button key={slide.id} onClick={() => setCurrentSlide(i)} className={`w-full text-left rounded-xl overflow-hidden border transition-all ${currentSlide === i ? 'border-stone-500/50 ring-2 ring-stone-500/20' : 'border-white/10 hover:border-white/20'}`}>
                     <div className="aspect-[16/9] scale-100">
                       <SlidePreview slide={slide} isActive={currentSlide === i} theme={selectedTheme} />
                     </div>
@@ -294,7 +294,7 @@ export default function PitchDeckPage() {
                   </button>
                 );
               })}
-              <button onClick={() => {}} className="w-full p-4 rounded-xl border-2 border-dashed border-white/20 hover:border-violet-500/50 text-center text-sm text-white/30 hover:text-violet-400 transition-all flex items-center justify-center gap-2">
+              <button onClick={() => {}} className="w-full p-4 rounded-xl border-2 border-dashed border-white/20 hover:border-stone-500/50 text-center text-sm text-white/30 hover:text-stone-400 transition-all flex items-center justify-center gap-2">
                 <Plus className="w-4 h-4" /> Add Slide
               </button>
             </div>
@@ -336,7 +336,7 @@ export default function PitchDeckPage() {
           <div className="max-w-3xl mx-auto">
             <div className="bg-white/5 rounded-2xl border border-white/10 p-8">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-stone-600 to-stone-600 flex items-center justify-center">
                   <Sparkles className="w-5 h-5" />
                 </div>
                 <div>
@@ -348,11 +348,11 @@ export default function PitchDeckPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm text-white/70 mb-1.5">Company Name</label>
-                    <input type="text" placeholder="Your startup" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-violet-500/50" />
+                    <input type="text" placeholder="Your startup" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-stone-500/50" />
                   </div>
                   <div>
                     <label className="block text-sm text-white/70 mb-1.5">Stage</label>
-                    <select className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-violet-500/50">
+                    <select className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-stone-500/50">
                       <option>Pre-Seed</option>
                       <option>Seed</option>
                       <option>Series A</option>
@@ -362,19 +362,19 @@ export default function PitchDeckPage() {
                 </div>
                 <div>
                   <label className="block text-sm text-white/70 mb-1.5">What does your company do?</label>
-                  <textarea value={aiPrompt} onChange={e => setAiPrompt(e.target.value)} rows={5} placeholder="We are building an AI-powered platform that... Our target customers are... We differentiate by..." className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-violet-500/50 resize-none" />
+                  <textarea value={aiPrompt} onChange={e => setAiPrompt(e.target.value)} rows={5} placeholder="We are building an AI-powered platform that... Our target customers are... We differentiate by..." className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-stone-500/50 resize-none" />
                 </div>
                 <div>
                   <label className="block text-sm text-white/70 mb-2">Slide Types to Include</label>
                   <div className="flex flex-wrap gap-2">
                     {Object.entries(SLIDE_TYPE_CONFIG).filter(([k]) => k !== 'custom').map(([key, cfg]) => (
-                      <button onClick={() => {}} key={key} className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-600/20 border border-violet-500/30 rounded-lg text-xs text-violet-300 hover:bg-violet-600/30 transition-colors">
+                      <button onClick={() => {}} key={key} className="flex items-center gap-1.5 px-3 py-1.5 bg-stone-600/20 border border-stone-500/30 rounded-lg text-xs text-stone-300 hover:bg-stone-600/30 transition-colors">
                         {cfg.icon} {cfg.label}
                       </button>
                     ))}
                   </div>
                 </div>
-                <button onClick={handleGenerate} disabled={generating} className="w-full py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-violet-600/25 disabled:opacity-50">
+                <button onClick={handleGenerate} disabled={generating} className="w-full py-3 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-stone-600/25 disabled:opacity-50">
                   {generating ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Generating Deck...</> : <><Sparkles className="w-4 h-4" /> Generate Pitch Deck</>}
                 </button>
               </div>
@@ -385,7 +385,7 @@ export default function PitchDeckPage() {
         {activeTab === 'themes' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {THEMES.map(theme => (
-              <button key={theme.id} onClick={() => setSelectedTheme(theme)} className={`rounded-2xl overflow-hidden border transition-all ${selectedTheme.id === theme.id ? 'border-violet-500/50 ring-2 ring-violet-500/20' : 'border-white/10 hover:border-white/20'}`}>
+              <button key={theme.id} onClick={() => setSelectedTheme(theme)} className={`rounded-2xl overflow-hidden border transition-all ${selectedTheme.id === theme.id ? 'border-stone-500/50 ring-2 ring-stone-500/20' : 'border-white/10 hover:border-white/20'}`}>
                 <div className="aspect-[16/9] p-6 flex flex-col justify-center" style={{ backgroundColor: theme.bg }}>
                   <h3 className="text-xl font-bold mb-1" style={{ color: theme.accent }}>Slide Title</h3>
                   <p className="text-sm opacity-60" style={{ color: theme.text }}>Supporting text and details</p>
@@ -396,7 +396,7 @@ export default function PitchDeckPage() {
                 </div>
                 <div className="p-4 bg-white/5 flex items-center justify-between">
                   <span className="text-sm font-medium">{theme.name}</span>
-                  {selectedTheme.id === theme.id && <Check className="w-4 h-4 text-violet-400" />}
+                  {selectedTheme.id === theme.id && <Check className="w-4 h-4 text-stone-400" />}
                 </div>
               </button>
             ))}
@@ -406,10 +406,10 @@ export default function PitchDeckPage() {
         {activeTab === 'present' && (
           <div className="max-w-3xl mx-auto text-center">
             <div className="bg-white/5 rounded-2xl border border-white/10 p-12">
-              <Presentation className="w-16 h-16 text-violet-400 mx-auto mb-6" />
+              <Presentation className="w-16 h-16 text-stone-400 mx-auto mb-6" />
               <h2 className="text-2xl font-bold mb-3">Ready to Present</h2>
               <p className="text-white/50 mb-8 max-w-md mx-auto">Your deck has {slides.length} slides using the {selectedTheme.name} theme. Press the button below to enter full-screen presentation mode.</p>
-              <button onClick={() => { setCurrentSlide(0); setIsPresenting(true); }} className="px-8 py-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 rounded-xl font-medium text-lg transition-all shadow-lg shadow-violet-600/25 flex items-center gap-3 mx-auto">
+              <button onClick={() => { setCurrentSlide(0); setIsPresenting(true); }} className="px-8 py-4 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 rounded-xl font-medium text-lg transition-all shadow-lg shadow-stone-600/25 flex items-center gap-3 mx-auto">
                 <Play className="w-5 h-5" /> Start Presentation
               </button>
               <p className="text-xs text-white/30 mt-4">Use arrow keys or click to navigate slides. Press Esc to exit.</p>
@@ -421,7 +421,7 @@ export default function PitchDeckPage() {
       <footer className="border-t border-white/10 mt-20 py-12">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <p className="text-white/40 text-sm">
-            Replaces Pitch.com ($8/mo), Beautiful.ai ($12/mo), and Slidebean ($29/mo) &mdash; <span className="text-violet-400">included free with Zoobicon Pro</span>
+            Replaces Pitch.com ($8/mo), Beautiful.ai ($12/mo), and Slidebean ($29/mo) &mdash; <span className="text-stone-400">included free with Zoobicon Pro</span>
           </p>
           <div className="flex items-center justify-center gap-6 mt-4">
             <Link href="/pricing" className="text-sm text-white/50 hover:text-white transition-colors">Pricing</Link>

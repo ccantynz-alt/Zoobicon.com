@@ -81,18 +81,18 @@ export default function StarterKitsPage() {
     <div className="min-h-screen bg-[#0a0a12] text-white">
       {/* Hero */}
       <section className="relative overflow-hidden py-24 md:py-32">
-        <div className="absolute inset-0 bg-gradient-to-b from-violet-500/5 via-transparent to-transparent" />
-        <div className="absolute top-20 left-1/4 w-96 h-96 bg-violet-500/10 rounded-full blur-[128px]" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-[128px]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-stone-500/5 via-transparent to-transparent" />
+        <div className="absolute top-20 left-1/4 w-96 h-96 bg-stone-500/10 rounded-full blur-[128px]" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-stone-500/10 rounded-full blur-[128px]" />
 
         <div className="relative max-w-7xl mx-auto px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-sm mb-8">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-stone-500/10 border border-stone-500/20 text-stone-400 text-sm mb-8">
             <Zap size={14} />
             One click. Everything configured.
           </div>
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6">
             Launch Your Business
-            <span className="block bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
+            <span className="block bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">
               in 5 Minutes
             </span>
           </h1>
@@ -106,7 +106,7 @@ export default function StarterKitsPage() {
       {/* Kit Grid */}
       <section className="py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-sm uppercase tracking-[3px] text-violet-400/60 mb-8 text-center">
+          <h2 className="text-sm uppercase tracking-[3px] text-stone-400/60 mb-8 text-center">
             Choose Your Business
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -115,24 +115,24 @@ export default function StarterKitsPage() {
                 key={kit.id}
                 onMouseEnter={() => setHoveredKit(kit.id)}
                 onMouseLeave={() => setHoveredKit(null)}
-                className={`relative group p-6 rounded-2xl bg-white/[0.03] backdrop-blur-sm border border-white/10 transition-all duration-300 hover:scale-[1.02] hover:border-violet-500/30 hover:bg-white/[0.05] ${
-                  hoveredKit === kit.id ? "shadow-lg shadow-violet-500/10" : ""
+                className={`relative group p-6 rounded-2xl bg-white/[0.03] backdrop-blur-sm border border-white/10 transition-all duration-300 hover:scale-[1.02] hover:border-stone-500/30 hover:bg-white/[0.05] ${
+                  hoveredKit === kit.id ? "shadow-lg shadow-stone-500/10" : ""
                 }`}
               >
                 {/* Icon */}
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500/20 to-purple-500/20 flex items-center justify-center text-violet-400 mb-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-stone-500/20 to-stone-500/20 flex items-center justify-center text-stone-400 mb-4">
                   {ICON_MAP[kit.icon] || <Rocket size={24} />}
                 </div>
 
                 {/* Content */}
                 <h3 className="text-lg font-bold mb-1">{kit.name}</h3>
-                <p className="text-sm text-violet-400/80 mb-3">{kit.tagline}</p>
+                <p className="text-sm text-stone-400/80 mb-3">{kit.tagline}</p>
 
                 {/* Services */}
                 <div className="space-y-2 mb-6">
                   {kit.services.map((service) => (
                     <div key={service.name} className="flex items-center gap-2 text-sm text-gray-400">
-                      <Check size={14} className="text-emerald-400 shrink-0" />
+                      <Check size={14} className="text-stone-400 shrink-0" />
                       <span>{service.name}</span>
                     </div>
                   ))}
@@ -141,7 +141,7 @@ export default function StarterKitsPage() {
                 {/* CTA */}
                 <Link
                   href={`/builder?kit=${kit.id}`}
-                  className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 text-white text-sm font-semibold hover:from-violet-500 hover:to-purple-500 transition-all group-hover:shadow-lg group-hover:shadow-violet-500/20"
+                  className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 text-white text-sm font-semibold hover:from-stone-500 hover:to-stone-500 transition-all group-hover:shadow-lg group-hover:shadow-stone-500/20"
                 >
                   Get Started
                   <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
@@ -158,7 +158,7 @@ export default function StarterKitsPage() {
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Everything You Need,{" "}
-              <span className="bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">
                 Already Set Up
               </span>
             </h2>
@@ -170,9 +170,9 @@ export default function StarterKitsPage() {
             {WHAT_YOU_GET.map((item) => (
               <div
                 key={item.title}
-                className="p-6 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-violet-500/20 transition-colors"
+                className="p-6 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-stone-500/20 transition-colors"
               >
-                <div className="w-10 h-10 rounded-lg bg-violet-500/10 flex items-center justify-center text-violet-400 mb-4">
+                <div className="w-10 h-10 rounded-lg bg-stone-500/10 flex items-center justify-center text-stone-400 mb-4">
                   {item.icon}
                 </div>
                 <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
@@ -203,12 +203,12 @@ export default function StarterKitsPage() {
                   className="flex items-center justify-between py-2 border-b border-white/5 last:border-0"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-red-400/60 line-through text-sm">{tool.name}</span>
+                    <span className="text-stone-400/60 line-through text-sm">{tool.name}</span>
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-white/40">
                       {tool.category}
                     </span>
                   </div>
-                  <span className="text-red-400/60 line-through text-sm">{tool.price}</span>
+                  <span className="text-stone-400/60 line-through text-sm">{tool.price}</span>
                 </div>
               ))}
             </div>
@@ -216,16 +216,16 @@ export default function StarterKitsPage() {
             <div className="flex items-center justify-between pt-4 border-t border-white/10">
               <div>
                 <div className="text-sm text-white/50">Total replaced</div>
-                <div className="text-2xl font-bold text-red-400 line-through">${totalReplaced}/mo</div>
+                <div className="text-2xl font-bold text-stone-400 line-through">${totalReplaced}/mo</div>
               </div>
               <div className="text-right">
-                <div className="text-sm text-emerald-400">Zoobicon Pro</div>
-                <div className="text-2xl font-bold text-emerald-400">$49/mo</div>
+                <div className="text-sm text-stone-400">Zoobicon Pro</div>
+                <div className="text-2xl font-bold text-stone-400">$49/mo</div>
               </div>
             </div>
 
-            <div className="mt-6 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-center">
-              <span className="text-emerald-400 font-semibold">
+            <div className="mt-6 p-4 rounded-xl bg-stone-500/10 border border-stone-500/20 text-center">
+              <span className="text-stone-400 font-semibold">
                 Save ${totalReplaced - 49}/month — that&apos;s ${(totalReplaced - 49) * 12}/year
               </span>
             </div>
@@ -236,7 +236,7 @@ export default function StarterKitsPage() {
       {/* Final CTA */}
       <section className="py-24 border-t border-white/5">
         <div className="max-w-3xl mx-auto px-6 text-center">
-          <Sparkles size={32} className="text-violet-400 mx-auto mb-6" />
+          <Sparkles size={32} className="text-stone-400 mx-auto mb-6" />
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Ready to Launch?
           </h2>
@@ -246,7 +246,7 @@ export default function StarterKitsPage() {
           <div className="flex items-center justify-center gap-4">
             <Link
               href="/builder"
-              className="px-8 py-4 rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 text-white font-semibold hover:from-violet-500 hover:to-purple-500 transition-all shadow-lg shadow-violet-500/20"
+              className="px-8 py-4 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 text-white font-semibold hover:from-stone-500 hover:to-stone-500 transition-all shadow-lg shadow-stone-500/20"
             >
               Open Builder
             </Link>

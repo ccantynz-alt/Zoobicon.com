@@ -175,25 +175,25 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-emerald-400";
-    if (score >= 50) return "text-yellow-400";
-    return "text-red-400";
+    if (score >= 80) return "text-stone-400";
+    if (score >= 50) return "text-stone-400";
+    return "text-stone-400";
   };
 
   const getScoreBgColor = (score: number) => {
-    if (score >= 80) return "bg-emerald-400/10 border-emerald-400/30";
-    if (score >= 50) return "bg-yellow-400/10 border-yellow-400/30";
-    return "bg-red-400/10 border-red-400/30";
+    if (score >= 80) return "bg-stone-400/10 border-stone-400/30";
+    if (score >= 50) return "bg-stone-400/10 border-stone-400/30";
+    return "bg-stone-400/10 border-stone-400/30";
   };
 
   const getSeverityIcon = (severity: string) => {
     switch (severity) {
       case "error":
-        return <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />;
+        return <AlertCircle className="w-4 h-4 text-stone-400 shrink-0" />;
       case "warning":
-        return <AlertTriangle className="w-4 h-4 text-yellow-400 shrink-0" />;
+        return <AlertTriangle className="w-4 h-4 text-stone-400 shrink-0" />;
       case "info":
-        return <Info className="w-4 h-4 text-blue-400 shrink-0" />;
+        return <Info className="w-4 h-4 text-stone-400 shrink-0" />;
       default:
         return <Info className="w-4 h-4 text-gray-400 shrink-0" />;
     }
@@ -202,11 +202,11 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
   const getSeverityBadgeColor = (severity: string) => {
     switch (severity) {
       case "error":
-        return "bg-red-500/20 text-red-400 border-red-500/30";
+        return "bg-stone-500/20 text-stone-400 border-stone-500/30";
       case "warning":
-        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
+        return "bg-stone-500/20 text-stone-400 border-stone-500/30";
       case "info":
-        return "bg-blue-500/20 text-blue-400 border-blue-500/30";
+        return "bg-stone-500/20 text-stone-400 border-stone-500/30";
       default:
         return "bg-gray-500/20 text-gray-400 border-gray-500/30";
     }
@@ -237,14 +237,14 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
         {/* Auto-Fix Toggle */}
         <label className="flex items-center justify-between cursor-pointer">
           <div className="flex items-center gap-2">
-            <RotateCw className="w-4 h-4 text-purple-400" />
+            <RotateCw className="w-4 h-4 text-stone-400" />
             <span className="text-sm font-medium text-white">Auto-Fix Mode</span>
           </div>
           <button
             onClick={() => setAutoFixEnabled(!autoFixEnabled)}
             disabled={isLoading}
             className={`relative w-10 h-5 rounded-full transition-colors ${
-              autoFixEnabled ? "bg-purple-600" : "bg-gray-600"
+              autoFixEnabled ? "bg-stone-600" : "bg-gray-600"
             } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             <span
@@ -265,7 +265,7 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
         {/* Target Score Slider (only visible when auto-fix is on) */}
         {autoFixEnabled && (
           <div className="flex items-center gap-3 mt-1 pl-6">
-            <Target className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+            <Target className="w-3.5 h-3.5 text-stone-400 shrink-0" />
             <span className="text-xs text-gray-400 shrink-0">Target:</span>
             <input
               type="range"
@@ -274,9 +274,9 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
               value={targetScore}
               onChange={(e) => setTargetScore(Number(e.target.value))}
               disabled={isLoading}
-              className="flex-1 h-1.5 bg-gray-700 rounded-full appearance-none cursor-pointer accent-purple-500 disabled:opacity-50"
+              className="flex-1 h-1.5 bg-gray-700 rounded-full appearance-none cursor-pointer accent-stone-500 disabled:opacity-50"
             />
-            <span className="text-xs font-mono font-bold text-purple-300 w-8 text-right">
+            <span className="text-xs font-mono font-bold text-stone-300 w-8 text-right">
               {targetScore}
             </span>
           </div>
@@ -287,7 +287,7 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
       {isAutoRunning ? (
         <button
           onClick={handleStop}
-          className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg bg-red-600 hover:bg-red-500 text-white text-sm font-medium transition-colors"
+          className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg bg-stone-600 hover:bg-stone-500 text-white text-sm font-medium transition-colors"
         >
           <AlertCircle className="w-4 h-4" />
           Stop Auto-Fix
@@ -296,7 +296,7 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
         <button
           onClick={handleDebug}
           disabled={isLoading || !code.trim()}
-          className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:text-gray-500 text-white text-sm font-medium transition-colors"
+          className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg bg-stone-600 hover:bg-stone-500 disabled:bg-gray-700 disabled:text-gray-500 text-white text-sm font-medium transition-colors"
         >
           {isLoading ? (
             <>
@@ -323,7 +323,7 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
 
       {/* Error Message */}
       {error && (
-        <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+        <div className="p-3 rounded-lg bg-stone-500/10 border border-stone-500/30 text-stone-400 text-sm">
           {error}
         </div>
       )}
@@ -332,16 +332,16 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
       {iterations.length > 0 && (
         <div className="rounded-lg border border-white/10 bg-[#0a0a0f] overflow-hidden">
           <div className="flex items-center gap-2 p-3 border-b border-white/5">
-            <RotateCw className="w-4 h-4 text-purple-400" />
+            <RotateCw className="w-4 h-4 text-stone-400" />
             <span className="text-sm font-medium text-white">Iteration History</span>
             {targetReached && (
-              <span className="ml-auto flex items-center gap-1 text-xs text-emerald-400">
+              <span className="ml-auto flex items-center gap-1 text-xs text-stone-400">
                 <CheckCircle className="w-3.5 h-3.5" />
                 Target reached
               </span>
             )}
             {maxIterationsHit && (
-              <span className="ml-auto flex items-center gap-1 text-xs text-yellow-400">
+              <span className="ml-auto flex items-center gap-1 text-xs text-stone-400">
                 <AlertTriangle className="w-3.5 h-3.5" />
                 Max iterations
               </span>
@@ -360,7 +360,7 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
                 </span>
               ))}
               {targetReached && (
-                <CheckCircle className="w-3.5 h-3.5 text-emerald-400 ml-1" />
+                <CheckCircle className="w-3.5 h-3.5 text-stone-400 ml-1" />
               )}
             </div>
           </div>
@@ -376,7 +376,7 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
                 <div
                   className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold shrink-0 ${
                     iter.reachedTarget
-                      ? "bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/30"
+                      ? "bg-stone-500/20 text-stone-400 ring-1 ring-stone-500/30"
                       : "bg-white/5 text-gray-400 ring-1 ring-white/10"
                   }`}
                 >
@@ -387,8 +387,8 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
                 <span
                   className={`px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide shrink-0 ${
                     iter.model === "claude-opus-4-6"
-                      ? "bg-orange-500/20 text-orange-400 border border-orange-500/30"
-                      : "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                      ? "bg-stone-500/20 text-stone-400 border border-stone-500/30"
+                      : "bg-stone-500/20 text-stone-400 border border-stone-500/30"
                   }`}
                 >
                   {getModelLabel(iter.model)}
@@ -396,7 +396,7 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
 
                 {/* Escalation indicator */}
                 {iter.model === "claude-opus-4-6" && iter.pass > 1 && (
-                  <ArrowUp className="w-3 h-3 text-orange-400 shrink-0 -ml-1.5" />
+                  <ArrowUp className="w-3 h-3 text-stone-400 shrink-0 -ml-1.5" />
                 )}
 
                 {/* Score */}
@@ -414,9 +414,9 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
 
                 {/* Status icon */}
                 {iter.reachedTarget ? (
-                  <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <CheckCircle className="w-3.5 h-3.5 text-stone-400 shrink-0" />
                 ) : (
-                  <AlertTriangle className="w-3.5 h-3.5 text-yellow-500 shrink-0" />
+                  <AlertTriangle className="w-3.5 h-3.5 text-stone-500 shrink-0" />
                 )}
               </div>
             ))}
@@ -424,7 +424,7 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
             {/* Loading row for current pass */}
             {isAutoRunning && (
               <div className="flex items-center gap-3 px-3 py-2.5 text-xs animate-pulse">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 ring-1 ring-purple-500/30 shrink-0">
+                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-stone-500/20 text-stone-400 ring-1 ring-stone-500/30 shrink-0">
                   <Loader2 className="w-3 h-3 animate-spin" />
                 </div>
                 <span className="text-gray-400">Pass {currentPass} in progress...</span>
@@ -443,7 +443,7 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
             className="w-full flex items-center justify-between p-3 hover:bg-white/5 transition-colors"
           >
             <div className="flex items-center gap-3">
-              <Shield className="w-5 h-5 text-blue-400" />
+              <Shield className="w-5 h-5 text-stone-400" />
               <span className="text-sm font-medium text-white">Debug Results</span>
 
               {/* Issue count badges */}
@@ -512,7 +512,7 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
                   ))}
                 </div>
               ) : (
-                <div className="flex items-center gap-2 p-4 text-emerald-400">
+                <div className="flex items-center gap-2 p-4 text-stone-400">
                   <CheckCircle className="w-4 h-4" />
                   <span className="text-sm">No issues found! Code looks great.</span>
                 </div>
@@ -524,7 +524,7 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
                   <button
                     onClick={handleApplyFix}
                     disabled={applied}
-                    className="flex items-center justify-center gap-2 w-full px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:bg-gray-700 disabled:text-gray-500 text-white text-sm font-medium transition-colors"
+                    className="flex items-center justify-center gap-2 w-full px-4 py-2 rounded-lg bg-stone-600 hover:bg-stone-500 disabled:bg-gray-700 disabled:text-gray-500 text-white text-sm font-medium transition-colors"
                   >
                     {applied ? (
                       <>

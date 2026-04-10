@@ -90,8 +90,8 @@ const DEPLOY_METHODS = [
         </div>
         <p className="text-sm text-white/65">&quot;Build me a portfolio site with a dark theme and project gallery&quot;</p>
         <div className="mt-3 flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-          <span className="text-xs text-green-400">Deploying to portfolio.zoobicon.sh...</span>
+          <div className="w-2 h-2 rounded-full bg-stone-500 animate-pulse" />
+          <span className="text-xs text-stone-400">Deploying to portfolio.zoobicon.sh...</span>
         </div>
       </div>
     ),
@@ -100,18 +100,18 @@ const DEPLOY_METHODS = [
     icon: Terminal,
     title: "CLI",
     desc: "Deploy from your terminal in one command.",
-    color: "from-emerald-500 to-teal-600",
+    color: "from-stone-500 to-stone-600",
     content: (
       <div className="mt-4 rounded-lg bg-black/60 border border-white/[0.10] p-4 font-mono text-sm">
         <div className="flex items-center gap-2 text-xs text-white/60 mb-3">
-          <div className="w-3 h-3 rounded-full bg-red-500/60" />
-          <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-          <div className="w-3 h-3 rounded-full bg-green-500/60" />
+          <div className="w-3 h-3 rounded-full bg-stone-500/60" />
+          <div className="w-3 h-3 rounded-full bg-stone-500/60" />
+          <div className="w-3 h-3 rounded-full bg-stone-500/60" />
         </div>
         <div className="text-white/60">$ <span className="text-accent-cyan">zb deploy</span></div>
         <div className="text-white/60 mt-1">✓ Building project...</div>
         <div className="text-white/60">✓ Optimizing assets...</div>
-        <div className="text-green-400">✓ Deployed to my-site.zoobicon.sh</div>
+        <div className="text-stone-400">✓ Deployed to my-site.zoobicon.sh</div>
       </div>
     ),
   },
@@ -125,7 +125,7 @@ const DEPLOY_METHODS = [
         <div className="flex items-center gap-2 mb-3">
           <GitBranch className="w-4 h-4 text-white/60" />
           <span className="text-sm text-white/65">main</span>
-          <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20">deployed</span>
+          <span className="text-xs px-2 py-0.5 rounded-full bg-stone-500/10 text-stone-400 border border-stone-500/20">deployed</span>
         </div>
         <div className="text-xs text-white/60">feat: update hero section</div>
         <div className="text-xs text-white/60 mt-1">Deployed 3s ago</div>
@@ -136,7 +136,7 @@ const DEPLOY_METHODS = [
     icon: Upload,
     title: "Drag & Drop",
     desc: "Upload your HTML/CSS/JS files directly.",
-    color: "from-amber-500 to-orange-600",
+    color: "from-stone-500 to-stone-600",
     content: (
       <div className="mt-4 rounded-lg border-2 border-dashed border-white/[0.12] p-6 text-center">
         <Upload className="w-8 h-8 text-white/60 mx-auto mb-2" />
@@ -148,10 +148,10 @@ const DEPLOY_METHODS = [
 ];
 
 const LIGHTHOUSE_SCORES = [
-  { label: "Performance", score: 100, color: "text-green-400" },
-  { label: "Accessibility", score: 100, color: "text-green-400" },
-  { label: "Best Practices", score: 100, color: "text-green-400" },
-  { label: "SEO", score: 100, color: "text-green-400" },
+  { label: "Performance", score: 100, color: "text-stone-400" },
+  { label: "Accessibility", score: 100, color: "text-stone-400" },
+  { label: "Best Practices", score: 100, color: "text-stone-400" },
+  { label: "SEO", score: 100, color: "text-stone-400" },
 ];
 
 const CORE_VITALS = [
@@ -432,8 +432,8 @@ export default function HostingPage() {
                       <span className="text-sm text-white/60">{feature.name}</span>
                     </div>
                     <div className="p-4 flex items-center justify-center">
-                      <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center">
-                        <Check className="w-3.5 h-3.5 text-green-400" />
+                      <div className="w-6 h-6 rounded-full bg-stone-500/20 flex items-center justify-center">
+                        <Check className="w-3.5 h-3.5 text-stone-400" />
                       </div>
                     </div>
                     {[feature.siteground, feature.cloudflare, feature.vercel, feature.netlify].map((has, j) => (
@@ -563,7 +563,7 @@ export default function HostingPage() {
                           <circle
                             cx="50" cy="50" r="42"
                             stroke="currentColor" strokeWidth="6" fill="none"
-                            className="text-green-400"
+                            className="text-stone-400"
                             strokeDasharray={`${2 * Math.PI * 42}`}
                             strokeDashoffset="0"
                             strokeLinecap="round"
@@ -588,18 +588,18 @@ export default function HostingPage() {
                       <div>
                         <div className="flex items-center gap-3 mb-1">
                           <span className="text-lg font-bold text-white">{vital.metric}</span>
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20">{vital.status}</span>
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-stone-500/10 text-stone-400 border border-stone-500/20">{vital.status}</span>
                         </div>
                         <span className="text-sm text-white/60">{vital.label}</span>
                       </div>
-                      <div className="text-2xl font-black text-green-400">{vital.value}</div>
+                      <div className="text-2xl font-black text-stone-400">{vital.value}</div>
                     </div>
                   ))}
                 </div>
 
-                <div className="mt-8 p-4 rounded-xl bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 text-center">
-                  <Gauge className="w-6 h-6 text-green-400 mx-auto mb-2" />
-                  <p className="text-sm font-semibold text-green-400">Faster than 99% of websites</p>
+                <div className="mt-8 p-4 rounded-xl bg-gradient-to-r from-stone-500/10 to-stone-500/10 border border-stone-500/20 text-center">
+                  <Gauge className="w-6 h-6 text-stone-400 mx-auto mb-2" />
+                  <p className="text-sm font-semibold text-stone-400">Faster than 99% of websites</p>
                 </div>
               </motion.div>
             </div>

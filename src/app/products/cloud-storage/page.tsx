@@ -481,10 +481,10 @@ export default function CloudStoragePage() {
                     </div>
                     <div className="p-4 flex items-center justify-center">
                       {typeof feature.zoobicon === "string" ? (
-                        <span className="text-sm font-bold text-green-400">{feature.zoobicon}</span>
+                        <span className="text-sm font-bold text-stone-400">{feature.zoobicon}</span>
                       ) : (
-                        <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center">
-                          <Check className="w-3.5 h-3.5 text-green-400" />
+                        <div className="w-6 h-6 rounded-full bg-stone-500/20 flex items-center justify-center">
+                          <Check className="w-3.5 h-3.5 text-stone-400" />
                         </div>
                       )}
                     </div>

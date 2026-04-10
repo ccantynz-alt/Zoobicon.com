@@ -82,12 +82,12 @@ function PricingCard({
     <div
       className={`relative rounded-2xl p-8 ${
         featured
-          ? 'bg-gradient-to-b from-purple-600/20 to-purple-900/10 border-2 border-purple-500/50 scale-105'
+          ? 'bg-gradient-to-b from-stone-600/20 to-stone-900/10 border-2 border-stone-500/50 scale-105'
           : 'bg-white/5 border border-white/10'
       }`}
     >
       {featured && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-600 text-white text-xs font-bold px-4 py-1 rounded-full">
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-stone-600 text-white text-xs font-bold px-4 py-1 rounded-full">
           Most Popular
         </div>
       )}
@@ -104,7 +104,7 @@ function PricingCard({
         {features.map((f) => (
           <li key={f} className="flex items-start gap-2 text-white/70 text-sm">
             <svg
-              className="w-5 h-5 text-purple-400 shrink-0 mt-0.5"
+              className="w-5 h-5 text-stone-400 shrink-0 mt-0.5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -120,7 +120,7 @@ function PricingCard({
         href="/auth/signup"
         className={`block w-full text-center py-3 rounded-xl font-semibold transition-all ${
           featured
-            ? 'bg-purple-600 hover:bg-purple-500 text-white'
+            ? 'bg-stone-600 hover:bg-stone-500 text-white'
             : 'bg-white/10 hover:bg-white/20 text-white'
         }`}
       >
@@ -215,7 +215,7 @@ export default async function CountryPage({
         {/* Navigation */}
         <nav className="border-b border-white/10 bg-[#0a0a0f]/80 backdrop-blur-xl sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-            <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">
               Zoobicon
             </Link>
             <div className="flex items-center gap-4">
@@ -227,7 +227,7 @@ export default async function CountryPage({
               </Link>
               <Link
                 href="/builder"
-                className="bg-purple-600 hover:bg-purple-500 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-colors"
+                className="bg-stone-600 hover:bg-stone-500 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-colors"
               >
                 Start Building
               </Link>
@@ -237,21 +237,21 @@ export default async function CountryPage({
 
         {/* Hero */}
         <section className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-purple-600/10 via-transparent to-transparent" />
-          <div className="absolute top-20 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl" />
-          <div className="absolute top-40 right-1/4 w-72 h-72 bg-pink-600/10 rounded-full blur-3xl" />
+          <div className="absolute inset-0 bg-gradient-to-b from-stone-600/10 via-transparent to-transparent" />
+          <div className="absolute top-20 left-1/4 w-96 h-96 bg-stone-600/10 rounded-full blur-3xl" />
+          <div className="absolute top-40 right-1/4 w-72 h-72 bg-stone-600/10 rounded-full blur-3xl" />
 
           <div className="relative max-w-7xl mx-auto px-6 pt-24 pb-20">
             <div className="max-w-4xl mx-auto text-center">
-              <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 rounded-full px-4 py-1.5 mb-8">
+              <div className="inline-flex items-center gap-2 bg-stone-500/10 border border-stone-500/20 rounded-full px-4 py-1.5 mb-8">
                 <span className="text-2xl">{getFlagEmoji(data.code)}</span>
-                <span className="text-purple-300 text-sm font-medium">
+                <span className="text-stone-300 text-sm font-medium">
                   Available in {data.name}
                 </span>
               </div>
 
               <h1 className="text-5xl md:text-7xl font-extrabold leading-tight mb-6">
-                <span className="bg-gradient-to-r from-white via-purple-200 to-purple-400 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-white via-stone-200 to-stone-400 bg-clip-text text-transparent">
                   {data.headline}
                 </span>
               </h1>
@@ -263,7 +263,7 @@ export default async function CountryPage({
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link
                   href="/builder"
-                  className="group bg-purple-600 hover:bg-purple-500 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all shadow-lg shadow-purple-600/25 hover:shadow-purple-500/40"
+                  className="group bg-stone-600 hover:bg-stone-500 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all shadow-lg shadow-stone-600/25 hover:shadow-stone-500/40"
                 >
                   Build Your Website Free
                   <span className="inline-block ml-2 group-hover:translate-x-1 transition-transform">
@@ -354,7 +354,7 @@ export default async function CountryPage({
         </section>
 
         {/* Testimonial */}
-        <section className="py-24 bg-gradient-to-b from-purple-900/10 to-transparent border-t border-white/5">
+        <section className="py-24 bg-gradient-to-b from-stone-900/10 to-transparent border-t border-white/5">
           <div className="max-w-4xl mx-auto px-6 text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-12">
               Trusted in {data.name}
@@ -367,7 +367,7 @@ export default async function CountryPage({
                 <div className="text-white font-bold text-lg">
                   {data.testimonial.name}
                 </div>
-                <div className="text-purple-400">
+                <div className="text-stone-400">
                   {data.testimonial.company}
                 </div>
                 <div className="text-white/40 text-sm mt-1">
@@ -446,7 +446,7 @@ export default async function CountryPage({
           <div className="max-w-4xl mx-auto px-6 text-center">
             <h2 className="text-4xl md:text-5xl font-extrabold mb-6">
               Ready to Build in{' '}
-              <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">
                 {data.name}
               </span>
               ?
@@ -456,7 +456,7 @@ export default async function CountryPage({
             </p>
             <Link
               href="/builder"
-              className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white px-10 py-5 rounded-xl text-xl font-bold transition-all shadow-lg shadow-purple-600/25 hover:shadow-purple-500/40"
+              className="inline-flex items-center gap-2 bg-stone-600 hover:bg-stone-500 text-white px-10 py-5 rounded-xl text-xl font-bold transition-all shadow-lg shadow-stone-600/25 hover:shadow-stone-500/40"
             >
               Start Building Free &rarr;
             </Link>

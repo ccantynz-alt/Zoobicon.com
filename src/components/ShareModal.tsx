@@ -333,14 +333,14 @@ export default function ShareModal({
 
           {/* Modal */}
           <motion.div
-            className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a12] shadow-2xl shadow-cyan-500/5"
+            className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a12] shadow-2xl shadow-stone-500/5"
             initial={{ scale: 0.9, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
           >
             {/* Top gradient accent */}
-            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" />
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-stone-500 to-transparent" />
 
             {/* Close button */}
             <button
@@ -355,12 +355,12 @@ export default function ShareModal({
               {/* Header */}
               <div className="mb-6 text-center">
                 <motion.div
-                  className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500/20 to-violet-500/20 ring-1 ring-cyan-500/30"
+                  className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-stone-500/20 to-stone-500/20 ring-1 ring-stone-500/30"
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", delay: 0.1, damping: 15 }}
                 >
-                  <Share2 className="h-5 w-5 text-cyan-400" />
+                  <Share2 className="h-5 w-5 text-stone-400" />
                 </motion.div>
                 <h2 className="text-xl font-bold text-white">
                   Your site is live!
@@ -373,7 +373,7 @@ export default function ShareModal({
               {/* Site URL with copy */}
               <div className="mb-4 flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 p-3">
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-mono text-sm text-cyan-400">
+                  <p className="truncate font-mono text-sm text-stone-400">
                     {siteUrl}
                   </p>
                 </div>
@@ -385,7 +385,7 @@ export default function ShareModal({
                     {copied ? (
                       <motion.span
                         key="check"
-                        className="flex items-center gap-1.5 text-emerald-400"
+                        className="flex items-center gap-1.5 text-stone-400"
                         initial={{ scale: 0.5, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0.5, opacity: 0 }}
@@ -444,7 +444,7 @@ export default function ShareModal({
                     onClick={() => setShowQR(!showQR)}
                     className={`flex h-9 items-center gap-1.5 rounded-lg border px-3 text-xs font-medium transition-all ${
                       showQR
-                        ? "border-cyan-500/30 bg-cyan-500/10 text-cyan-400"
+                        ? "border-stone-500/30 bg-stone-500/10 text-stone-400"
                         : "border-white/10 bg-white/5 text-zinc-400 hover:text-white"
                     }`}
                   >
@@ -470,19 +470,19 @@ export default function ShareModal({
               {/* Stats bar */}
               <div className="mb-5 flex items-center justify-center gap-6 rounded-lg border border-white/5 bg-white/[0.02] py-2.5">
                 <div className="flex items-center gap-1.5 text-xs text-zinc-400">
-                  <Clock className="h-3.5 w-3.5 text-cyan-500/70" />
+                  <Clock className="h-3.5 w-3.5 text-stone-500/70" />
                   <span className="font-medium text-zinc-300">{buildTime ? `${buildTime}s` : "~95s"}</span>
                   <span className="text-zinc-500">build</span>
                 </div>
                 <div className="h-3 w-px bg-white/10" />
                 <div className="flex items-center gap-1.5 text-xs text-zinc-400">
-                  <Layers className="h-3.5 w-3.5 text-violet-500/70" />
+                  <Layers className="h-3.5 w-3.5 text-stone-500/70" />
                   <span className="font-medium text-zinc-300">{pageCount}</span>
                   <span className="text-zinc-500">{pageCount === 1 ? "page" : "pages"}</span>
                 </div>
                 <div className="h-3 w-px bg-white/10" />
                 <div className="flex items-center gap-1.5 text-xs text-zinc-400">
-                  <FileCode className="h-3.5 w-3.5 text-emerald-500/70" />
+                  <FileCode className="h-3.5 w-3.5 text-stone-500/70" />
                   <span className="font-medium text-zinc-300">{formatSize(siteSize)}</span>
                   <span className="text-zinc-500">size</span>
                 </div>

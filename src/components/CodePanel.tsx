@@ -171,7 +171,7 @@ export default function CodePanel({
                 {getTabIcon(file.path)}
                 {getShortName(file.path)}
                 {file.isModified && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 ml-1" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-stone-400 ml-1" />
                 )}
               </button>
             );
@@ -199,7 +199,7 @@ export default function CodePanel({
               onClick={() => setActiveFile(filename)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-t text-[11px] font-medium whitespace-nowrap transition-colors ${
                 activeFile === filename
-                  ? "bg-white/[0.06] text-purple-400 border-b-2 border-purple-400"
+                  ? "bg-white/[0.06] text-stone-400 border-b-2 border-stone-400"
                   : "text-white/50 hover:text-white/60"
               }`}
             >
@@ -218,7 +218,7 @@ export default function CodePanel({
           {displayLabel}
         </span>
         {isProjectMode && currentProjectFile?.isModified && (
-          <span className="flex items-center gap-1 text-[10px] text-amber-400/70">
+          <span className="flex items-center gap-1 text-[10px] text-stone-400/70">
             <Save size={10} />
             Modified
           </span>
@@ -231,7 +231,7 @@ export default function CodePanel({
         </button>
         <button
           onClick={handleDownload}
-          className="text-[11px] text-cyan-400/60 hover:text-cyan-400 transition-colors px-2 py-1 rounded hover:bg-white/[0.03] flex items-center gap-1"
+          className="text-[11px] text-stone-400/60 hover:text-stone-400 transition-colors px-2 py-1 rounded hover:bg-white/[0.03] flex items-center gap-1"
         >
           <Download size={10} />
           Download
@@ -245,10 +245,10 @@ export default function CodePanel({
           value={displayCode}
           onChange={handleContentChange}
           spellCheck={false}
-          className="flex-1 overflow-auto p-4 text-xs leading-relaxed text-green-400/80 bg-transparent resize-none outline-none font-mono"
+          className="flex-1 overflow-auto p-4 text-xs leading-relaxed text-stone-400/80 bg-transparent resize-none outline-none font-mono"
         />
       ) : (
-        <pre className="flex-1 overflow-auto p-4 text-xs leading-relaxed text-green-400/80">
+        <pre className="flex-1 overflow-auto p-4 text-xs leading-relaxed text-stone-400/80">
           <code>{displayCode}</code>
         </pre>
       )}

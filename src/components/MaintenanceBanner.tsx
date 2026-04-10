@@ -11,7 +11,7 @@ export default function MaintenanceBanner() {
   if (!MAINTENANCE_ACTIVE) return null;
 
   return (
-    <div className="bg-gradient-to-r from-amber-600 to-orange-600 text-white text-center py-2.5 px-4 text-sm font-medium z-[9999] relative">
+    <div className="bg-gradient-to-r from-stone-600 to-stone-600 text-white text-center py-2.5 px-4 text-sm font-medium z-[9999] relative">
       <span className="inline-flex items-center gap-2">
         <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
         We&apos;re currently upgrading Zoobicon. Some features may be temporarily unavailable.

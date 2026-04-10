@@ -70,9 +70,9 @@ export default function AdminHealthPage() {
   }, []);
 
   const StatusIcon = ({ status }: { status: string }) => {
-    if (status === "pass") return <CheckCircle className="w-5 h-5 text-emerald-400" />;
-    if (status === "fail") return <XCircle className="w-5 h-5 text-red-400" />;
-    return <AlertTriangle className="w-5 h-5 text-yellow-400" />;
+    if (status === "pass") return <CheckCircle className="w-5 h-5 text-stone-400" />;
+    if (status === "fail") return <XCircle className="w-5 h-5 text-stone-400" />;
+    return <AlertTriangle className="w-5 h-5 text-stone-400" />;
   };
 
   const ResultCard = ({ title, result, isLoading }: { title: string; result: HealthResponse | null; isLoading: boolean }) => (
@@ -82,8 +82,8 @@ export default function AdminHealthPage() {
         {result && (
           <span className={`text-xs font-medium px-3 py-1 rounded-full ${
             result.status === "healthy"
-              ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/25"
-              : "bg-red-500/15 text-red-400 border border-red-500/25"
+              ? "bg-stone-500/15 text-stone-400 border border-stone-500/25"
+              : "bg-stone-500/15 text-stone-400 border border-stone-500/25"
           }`}>
             {result.status.toUpperCase()}
           </span>
@@ -138,8 +138,8 @@ export default function AdminHealthPage() {
         </Link>
 
         <div className="flex items-center gap-4 mb-8">
-          <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
-            <Activity className="w-6 h-6 text-blue-400" />
+          <div className="w-12 h-12 rounded-2xl bg-stone-500/10 border border-stone-500/20 flex items-center justify-center">
+            <Activity className="w-6 h-6 text-stone-400" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-white">System Health</h1>
@@ -148,10 +148,10 @@ export default function AdminHealthPage() {
         </div>
 
         {/* Auto-monitoring info */}
-        <div className="bg-blue-500/[0.06] border border-blue-500/20 rounded-xl p-4 mb-8">
-          <p className="text-sm text-blue-200/80">
-            <strong>Auto-monitoring active.</strong> Vercel Cron runs a deep health check every 2 hours at <code className="text-xs bg-blue-500/10 px-1.5 py-0.5 rounded">/api/health?deep=true</code>.
-            Add <code className="text-xs bg-blue-500/10 px-1.5 py-0.5 rounded">?webhook=YOUR_SLACK_URL</code> to get Hash alerts on failures.
+        <div className="bg-stone-500/[0.06] border border-stone-500/20 rounded-xl p-4 mb-8">
+          <p className="text-sm text-stone-200/80">
+            <strong>Auto-monitoring active.</strong> Vercel Cron runs a deep health check every 2 hours at <code className="text-xs bg-stone-500/10 px-1.5 py-0.5 rounded">/api/health?deep=true</code>.
+            Add <code className="text-xs bg-stone-500/10 px-1.5 py-0.5 rounded">?webhook=YOUR_SLACK_URL</code> to get Hash alerts on failures.
           </p>
         </div>
 
@@ -172,7 +172,7 @@ export default function AdminHealthPage() {
           <button
             onClick={runQuickCheck}
             disabled={loading !== null}
-            className="flex-1 py-3 rounded-xl text-sm font-medium bg-blue-600 hover:bg-blue-500 text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex-1 py-3 rounded-xl text-sm font-medium bg-stone-600 hover:bg-stone-500 text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {loading === "quick" ? "Running..." : "Run Quick Check (~5s)"}
           </button>
@@ -192,13 +192,13 @@ export default function AdminHealthPage() {
           <div className="space-y-3 text-sm text-white/85">
             <div className="bg-white/[0.03] rounded-lg p-3">
               <p className="font-medium text-white mb-1">UptimeRobot (free, 5-min intervals)</p>
-              <p className="text-xs text-white/70">Add HTTP monitor: <code className="text-blue-300">GET https://zoobicon.com/api/health</code></p>
+              <p className="text-xs text-white/70">Add HTTP monitor: <code className="text-stone-300">GET https://zoobicon.com/api/health</code></p>
               <p className="text-xs text-white/70">Alert on non-200 status. Gets you email/SMS on failures.</p>
             </div>
             <div className="bg-white/[0.03] rounded-lg p-3">
               <p className="font-medium text-white mb-1">Hash Webhook Alerts</p>
               <p className="text-xs text-white/70">Create a Hash webhook, then set the cron URL to:</p>
-              <code className="text-xs text-blue-300 break-all">/api/health?deep=true&webhook=https://hooks.slack.com/services/YOUR/WEBHOOK/URL</code>
+              <code className="text-xs text-stone-300 break-all">/api/health?deep=true&webhook=https://hooks.slack.com/services/YOUR/WEBHOOK/URL</code>
             </div>
             <div className="bg-white/[0.03] rounded-lg p-3">
               <p className="font-medium text-white mb-1">Vercel Cron (already configured)</p>

@@ -364,9 +364,9 @@ export default function PromptInput({
                           {model.label}
                         </span>
                         <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${
-                          model.tier === "premium" ? "bg-amber-500/10 text-amber-400/60" :
-                          model.tier === "fast" ? "bg-emerald-500/10 text-emerald-400/60" :
-                          "bg-blue-500/10 text-blue-400/60"
+                          model.tier === "premium" ? "bg-stone-500/10 text-stone-400/60" :
+                          model.tier === "fast" ? "bg-stone-500/10 text-stone-400/60" :
+                          "bg-stone-500/10 text-stone-400/60"
                         }`}>
                           {model.tier}
                         </span>
@@ -421,7 +421,7 @@ export default function PromptInput({
                   disabled={isGenerating}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium transition-all disabled:opacity-40 ${
                     isActive
-                      ? "bg-blue-600 text-white shadow-md shadow-blue-600/20"
+                      ? "bg-stone-600 text-white shadow-md shadow-stone-600/20"
                       : "bg-white/[0.05] text-white/50 hover:bg-white/[0.10] hover:text-white/70"
                   }`}
                 >
@@ -460,7 +460,7 @@ export default function PromptInput({
             disabled={isGenerating}
             className={`absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-lg transition-all ${
               isListening
-                ? "bg-red-500/20 text-red-400 animate-pulse"
+                ? "bg-stone-500/20 text-stone-400 animate-pulse"
                 : "bg-white/[0.04] text-white/50 hover:text-white/50 hover:bg-white/[0.08]"
             }`}
             title={isListening ? "Stop listening" : "Voice input"}
@@ -485,7 +485,7 @@ export default function PromptInput({
           onClick={() => onFullStackChange(!fullStack)}
           className={`w-full py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all border flex items-center justify-center gap-2 ${
             fullStack
-              ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20"
+              ? "bg-stone-500/10 border-stone-500/30 text-stone-400 hover:bg-stone-500/20"
               : "bg-white/[0.03] border-white/[0.08] text-white/40 hover:text-white/60 hover:border-white/20"
           }`}
           title={fullStack
@@ -546,7 +546,7 @@ export default function PromptInput({
                   disabled={isGenerating}
                   className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all ${
                     isListening
-                      ? "bg-red-500/20 text-red-400 animate-pulse"
+                      ? "bg-stone-500/20 text-stone-400 animate-pulse"
                       : "bg-white/[0.04] text-white/50 hover:text-white/50"
                   }`}
                   title={isListening ? "Stop listening" : "Voice input"}

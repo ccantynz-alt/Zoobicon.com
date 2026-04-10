@@ -150,8 +150,8 @@ export default function BuilderIDEPage() {
             {fileCount} {fileCount === 1 ? "file" : "files"}
           </span>
           {dirty && (
-            <span className="text-xs text-amber-400 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+            <span className="text-xs text-stone-400 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-stone-400" />
               Unsaved
             </span>
           )}

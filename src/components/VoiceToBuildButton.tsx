@@ -110,19 +110,19 @@ export default function VoiceToBuildButton({
         aria-label={listening ? "Stop recording" : "Start voice input"}
         className={`relative ${dim} rounded-full flex items-center justify-center text-white shadow-lg transition-all ${
           listening
-            ? "bg-gradient-to-br from-red-500 to-pink-600 shadow-red-500/50"
-            : "bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 hover:shadow-purple-500/50"
+            ? "bg-gradient-to-br from-stone-500 to-stone-600 shadow-stone-500/50"
+            : "bg-gradient-to-br from-stone-500 via-stone-500 to-stone-500 hover:shadow-stone-500/50"
         } ${className}`}
       >
         {listening && (
           <>
             <motion.span
-              className="absolute inset-0 rounded-full bg-red-500/40"
+              className="absolute inset-0 rounded-full bg-stone-500/40"
               animate={{ scale: [1, 1.6], opacity: [0.6, 0] }}
               transition={{ duration: 1.4, repeat: Infinity, ease: "easeOut" }}
             />
             <motion.span
-              className="absolute inset-0 rounded-full bg-red-500/30"
+              className="absolute inset-0 rounded-full bg-stone-500/30"
               animate={{ scale: [1, 1.9], opacity: [0.5, 0] }}
               transition={{
                 duration: 1.4,
@@ -147,14 +147,14 @@ export default function VoiceToBuildButton({
             transition={{ type: "spring", damping: 24, stiffness: 280 }}
             className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] w-[min(640px,calc(100vw-2rem))]"
           >
-            <div className="relative rounded-3xl p-[1.5px] bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-2xl shadow-purple-900/40">
+            <div className="relative rounded-3xl p-[1.5px] bg-gradient-to-r from-stone-500 via-stone-500 to-stone-500 shadow-2xl shadow-stone-900/40">
               <div className="rounded-3xl bg-slate-950/90 backdrop-blur-xl px-6 py-5">
                 <div className="flex items-center gap-4">
                   <div className="flex items-end gap-1 h-10">
                     {[0, 1, 2, 3, 4].map((i) => (
                       <motion.span
                         key={i}
-                        className="w-1.5 rounded-full bg-gradient-to-t from-indigo-400 to-pink-400"
+                        className="w-1.5 rounded-full bg-gradient-to-t from-stone-400 to-stone-400"
                         animate={{
                           height: ["20%", "100%", "40%", "80%", "30%"],
                         }}
@@ -169,7 +169,7 @@ export default function VoiceToBuildButton({
                     ))}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-[11px] uppercase tracking-widest text-purple-300/80 font-semibold mb-1">
+                    <div className="text-[11px] uppercase tracking-widest text-stone-300/80 font-semibold mb-1">
                       Listening
                     </div>
                     <div className="text-white text-lg leading-snug font-medium truncate">
@@ -181,14 +181,14 @@ export default function VoiceToBuildButton({
                   <button
                     type="button"
                     onClick={handleStop}
-                    className="shrink-0 h-11 px-4 rounded-full bg-gradient-to-r from-red-500 to-pink-600 text-white text-sm font-semibold flex items-center gap-2 shadow-lg shadow-red-500/30 hover:shadow-red-500/50 transition-shadow"
+                    className="shrink-0 h-11 px-4 rounded-full bg-gradient-to-r from-stone-500 to-stone-600 text-white text-sm font-semibold flex items-center gap-2 shadow-lg shadow-stone-500/30 hover:shadow-stone-500/50 transition-shadow"
                   >
                     <Square size={14} />
                     Stop
                   </button>
                 </div>
                 {error && (
-                  <div className="mt-3 text-xs text-red-300">{error}</div>
+                  <div className="mt-3 text-xs text-stone-300">{error}</div>
                 )}
               </div>
             </div>
@@ -197,7 +197,7 @@ export default function VoiceToBuildButton({
       </AnimatePresence>
 
       {error && !listening && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] rounded-full bg-red-950/90 border border-red-500/40 text-red-200 text-sm px-4 py-2 backdrop-blur-md flex items-center gap-2">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] rounded-full bg-stone-950/90 border border-stone-500/40 text-stone-200 text-sm px-4 py-2 backdrop-blur-md flex items-center gap-2">
           <Loader2 size={14} className="animate-spin" />
           {error}
         </div>

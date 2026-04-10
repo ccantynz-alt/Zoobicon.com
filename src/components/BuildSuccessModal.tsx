@@ -35,10 +35,10 @@ const NEXT_STEPS = [
     title: "Edit with AI Chat",
     description: "Tell the AI what to change and watch it update live.",
     color: "blue",
-    gradient: "from-blue-500/20 to-blue-600/5",
-    border: "border-blue-500/20 hover:border-blue-500/40",
-    iconBg: "bg-blue-500/15",
-    iconColor: "text-blue-400",
+    gradient: "from-stone-500/20 to-stone-600/5",
+    border: "border-stone-500/20 hover:border-stone-500/40",
+    iconBg: "bg-stone-500/15",
+    iconColor: "text-stone-400",
   },
   {
     action: "visual" as const,
@@ -46,10 +46,10 @@ const NEXT_STEPS = [
     title: "Visual Editor",
     description: "Click any element to edit colors, fonts, spacing, and text.",
     color: "purple",
-    gradient: "from-purple-500/20 to-purple-600/5",
-    border: "border-purple-500/20 hover:border-purple-500/40",
-    iconBg: "bg-purple-500/15",
-    iconColor: "text-purple-400",
+    gradient: "from-stone-500/20 to-stone-600/5",
+    border: "border-stone-500/20 hover:border-stone-500/40",
+    iconBg: "bg-stone-500/15",
+    iconColor: "text-stone-400",
   },
   {
     action: "deploy" as const,
@@ -57,10 +57,10 @@ const NEXT_STEPS = [
     title: "Deploy to Web",
     description: "Publish to a live URL in one click. Edit anytime after.",
     color: "emerald",
-    gradient: "from-emerald-500/20 to-emerald-600/5",
-    border: "border-emerald-500/20 hover:border-emerald-500/40",
-    iconBg: "bg-emerald-500/15",
-    iconColor: "text-emerald-400",
+    gradient: "from-stone-500/20 to-stone-600/5",
+    border: "border-stone-500/20 hover:border-stone-500/40",
+    iconBg: "bg-stone-500/15",
+    iconColor: "text-stone-400",
   },
 ];
 
@@ -187,9 +187,9 @@ export default function BuildSuccessModal({
                   stiffness: 200,
                   delay: 0.15,
                 }}
-                className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-white/10 mb-4"
+                className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-stone-500/20 to-stone-500/20 border border-white/10 mb-4"
               >
-                <PartyPopper size={28} className="text-blue-400" />
+                <PartyPopper size={28} className="text-stone-400" />
               </motion.div>
 
               <motion.h2
@@ -248,7 +248,7 @@ export default function BuildSuccessModal({
                   type="checkbox"
                   checked={dontShowAgain}
                   onChange={(e) => setDontShowAgain(e.target.checked)}
-                  className="w-3.5 h-3.5 rounded border-white/20 bg-white/5 text-blue-500 focus:ring-blue-500/30 focus:ring-offset-0"
+                  className="w-3.5 h-3.5 rounded border-white/20 bg-white/5 text-stone-500 focus:ring-stone-500/30 focus:ring-offset-0"
                 />
                 <span className="text-xs text-white/50">
                   Don&apos;t show again

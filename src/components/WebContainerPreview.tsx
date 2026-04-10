@@ -382,7 +382,7 @@ createRoot(document.getElementById("root")!).render(<App />);
   if (status.kind === "error") {
     return (
       <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-gray-900 p-8 text-center">
-        <div className="text-lg font-semibold text-red-400">{status.message}</div>
+        <div className="text-lg font-semibold text-stone-400">{status.message}</div>
         {status.hint && (
           <div className="max-w-md text-sm text-gray-300">{status.hint}</div>
         )}
@@ -421,12 +421,12 @@ createRoot(document.getElementById("root")!).render(<App />);
       {isLoading && (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-gray-950/90">
           <div className="relative">
-            <div className="w-10 h-10 rounded-full border-2 border-violet-500/20 border-t-violet-500 animate-spin" />
+            <div className="w-10 h-10 rounded-full border-2 border-stone-500/20 border-t-violet-500 animate-spin" />
           </div>
           <span className="text-sm text-gray-300">{statusMessage}</span>
           {(status.kind === "installing" || status.kind === "starting") && (
             <div className="w-48 h-1 bg-white/5 rounded-full overflow-hidden">
-              <div className="h-full bg-violet-500/60 rounded-full animate-pulse" style={{ width: status.kind === "starting" ? "80%" : "40%" }} />
+              <div className="h-full bg-stone-500/60 rounded-full animate-pulse" style={{ width: status.kind === "starting" ? "80%" : "40%" }} />
             </div>
           )}
         </div>

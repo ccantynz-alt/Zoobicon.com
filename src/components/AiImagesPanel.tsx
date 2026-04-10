@@ -148,13 +148,13 @@ export default function AiImagesPanel({ code, onApplyImages }: AiImagesPanelProp
         </button>
 
         {status === "done" && results && (
-          <div className="flex items-start gap-2 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-stone-500/10 border border-stone-500/20">
+            <CheckCircle2 className="w-4 h-4 text-stone-400 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-xs text-emerald-400 font-medium">
+              <p className="text-xs text-stone-400 font-medium">
                 Replaced {results.count} images
               </p>
-              <p className="text-[10px] text-emerald-400/60 mt-0.5">
+              <p className="text-[10px] text-stone-400/60 mt-0.5">
                 Providers: {results.providers.join(", ")}
               </p>
             </div>
@@ -162,9 +162,9 @@ export default function AiImagesPanel({ code, onApplyImages }: AiImagesPanelProp
         )}
 
         {status === "error" && (
-          <div className="flex items-start gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-            <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-red-400">{error}</p>
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-stone-500/10 border border-stone-500/20">
+            <AlertCircle className="w-4 h-4 text-stone-400 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-stone-400">{error}</p>
           </div>
         )}
       </div>
@@ -203,9 +203,9 @@ export default function AiImagesPanel({ code, onApplyImages }: AiImagesPanelProp
         </button>
 
         {singleStatus === "error" && (
-          <div className="flex items-start gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-            <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-red-400">{singleError || "Image generation failed"}</p>
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-stone-500/10 border border-stone-500/20">
+            <AlertCircle className="w-4 h-4 text-stone-400 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-stone-400">{singleError || "Image generation failed"}</p>
           </div>
         )}
 

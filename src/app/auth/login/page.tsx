@@ -104,7 +104,7 @@ export default function LoginPage() {
             </a>
           </div>
           {oauthNotice && (
-            <p className="text-xs text-amber-400/80 text-center -mt-2 mb-4 px-2">{oauthNotice}</p>
+            <p className="text-xs text-stone-400/80 text-center -mt-2 mb-4 px-2">{oauthNotice}</p>
           )}
 
           <div className="flex items-center gap-4 mb-6">
@@ -154,7 +154,7 @@ export default function LoginPage() {
             </div>
 
             {authError && (
-              <p className="text-sm text-red-400/80 text-center py-2">{authError}</p>
+              <p className="text-sm text-stone-400/80 text-center py-2">{authError}</p>
             )}
 
             <button
@@ -178,7 +178,7 @@ export default function LoginPage() {
           <div className="mt-4 pt-4 border-t border-white/[0.04] text-center">
             <Link
               href="/admin-recover"
-              className="text-xs text-white/40 hover:text-amber-400/80 transition-colors"
+              className="text-xs text-white/40 hover:text-stone-400/80 transition-colors"
             >
               Admin locked out? Use recovery token →
             </Link>

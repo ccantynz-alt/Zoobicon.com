@@ -87,13 +87,13 @@ export default function WaitlistPage() {
   };
 
   const sourceColors: Record<string, string> = {
-    twitter: 'bg-blue-500/20 text-blue-400',
-    linkedin: 'bg-sky-500/20 text-sky-400',
-    direct: 'bg-violet-500/20 text-violet-400',
-    referral: 'bg-emerald-500/20 text-emerald-400',
-    producthunt: 'bg-orange-500/20 text-orange-400',
-    reddit: 'bg-red-500/20 text-red-400',
-    google: 'bg-yellow-500/20 text-yellow-400',
+    twitter: 'bg-stone-500/20 text-stone-400',
+    linkedin: 'bg-stone-500/20 text-stone-400',
+    direct: 'bg-stone-500/20 text-stone-400',
+    referral: 'bg-stone-500/20 text-stone-400',
+    producthunt: 'bg-stone-500/20 text-stone-400',
+    reddit: 'bg-stone-500/20 text-stone-400',
+    google: 'bg-stone-500/20 text-stone-400',
   };
 
   return (
@@ -101,7 +101,7 @@ export default function WaitlistPage() {
       <header className="border-b border-white/10 bg-[#0a0a12]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Zoobicon</Link>
+            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
             <span className="text-white/30">/</span>
             <span className="font-semibold text-white">Waitlist Builder</span>
           </div>
@@ -109,7 +109,7 @@ export default function WaitlistPage() {
             <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition text-sm">
               <Download className="w-4 h-4" /> Export CSV
             </button>
-            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:opacity-90 transition text-sm font-medium">
+            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-stone-600 to-stone-600 hover:opacity-90 transition text-sm font-medium">
               <Eye className="w-4 h-4" /> Preview Page
             </button>
           </div>
@@ -121,9 +121,9 @@ export default function WaitlistPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
             { label: 'Total Signups', value: entries.length, icon: Users, color: 'text-white', delta: '+12 this week' },
-            { label: 'Total Referrals', value: totalReferrals, icon: Share2, color: 'text-violet-400', delta: `${((totalReferrals / entries.length) * 100).toFixed(0)}% referral rate` },
-            { label: 'VIP Entries', value: entries.filter(e => e.priority === 'vip').length, icon: Award, color: 'text-amber-400', delta: '5+ referrals each' },
-            { label: 'Avg/Day', value: (entries.length / 30).toFixed(1), icon: TrendingUp, color: 'text-emerald-400', delta: 'Last 30 days' },
+            { label: 'Total Referrals', value: totalReferrals, icon: Share2, color: 'text-stone-400', delta: `${((totalReferrals / entries.length) * 100).toFixed(0)}% referral rate` },
+            { label: 'VIP Entries', value: entries.filter(e => e.priority === 'vip').length, icon: Award, color: 'text-stone-400', delta: '5+ referrals each' },
+            { label: 'Avg/Day', value: (entries.length / 30).toFixed(1), icon: TrendingUp, color: 'text-stone-400', delta: 'Last 30 days' },
           ].map((stat) => (
             <div key={stat.label} className="p-5 rounded-xl bg-white/5 border border-white/10">
               <div className="flex items-center justify-between mb-2">
@@ -148,7 +148,7 @@ export default function WaitlistPage() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition ${
-                activeTab === tab.id ? 'bg-violet-600 text-white' : 'bg-white/5 text-white/60 hover:text-white hover:bg-white/10'
+                activeTab === tab.id ? 'bg-stone-600 text-white' : 'bg-white/5 text-white/60 hover:text-white hover:bg-white/10'
               }`}
             >
               <tab.icon className="w-4 h-4" /> {tab.label}
@@ -167,13 +167,13 @@ export default function WaitlistPage() {
                   placeholder="Search by name or email..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-white/5 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-sm w-80 focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                  className="bg-white/5 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-sm w-80 focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                 />
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-white/40">Sort:</span>
                 {(['position', 'referrals', 'date'] as const).map((s) => (
-                  <button key={s} onClick={() => setSortBy(s)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${sortBy === s ? 'bg-violet-600' : 'bg-white/5 hover:bg-white/10'}`}>
+                  <button key={s} onClick={() => setSortBy(s)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${sortBy === s ? 'bg-stone-600' : 'bg-white/5 hover:bg-white/10'}`}>
                     {s.charAt(0).toUpperCase() + s.slice(1)}
                   </button>
                 ))}
@@ -202,10 +202,10 @@ export default function WaitlistPage() {
                       <td className="px-4 py-3 text-sm text-white/60">{entry.email}</td>
                       <td className="px-4 py-3"><span className={`px-2 py-0.5 rounded-full text-xs ${sourceColors[entry.source] || 'bg-white/10 text-white/60'}`}>{entry.source}</span></td>
                       <td className="px-4 py-3 text-sm">
-                        <span className={entry.referrals > 0 ? 'text-emerald-400 font-medium' : 'text-white/30'}>{entry.referrals}</span>
+                        <span className={entry.referrals > 0 ? 'text-stone-400 font-medium' : 'text-white/30'}>{entry.referrals}</span>
                       </td>
                       <td className="px-4 py-3">
-                        <button onClick={() => handleCopyCode(entry.referralCode)} className="flex items-center gap-1 font-mono text-xs text-violet-400 hover:text-violet-300">
+                        <button onClick={() => handleCopyCode(entry.referralCode)} className="flex items-center gap-1 font-mono text-xs text-stone-400 hover:text-stone-300">
                           {entry.referralCode}
                           {copiedCode === entry.referralCode ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
                         </button>
@@ -213,8 +213,8 @@ export default function WaitlistPage() {
                       <td className="px-4 py-3 text-sm text-white/40">{entry.joinedAt}</td>
                       <td className="px-4 py-3">
                         <span className={`px-2 py-0.5 rounded-full text-xs ${
-                          entry.priority === 'vip' ? 'bg-amber-500/20 text-amber-400' :
-                          entry.priority === 'high' ? 'bg-violet-500/20 text-violet-400' :
+                          entry.priority === 'vip' ? 'bg-stone-500/20 text-stone-400' :
+                          entry.priority === 'high' ? 'bg-stone-500/20 text-stone-400' :
                           'bg-white/10 text-white/40'
                         }`}>
                           {entry.priority}
@@ -234,11 +234,11 @@ export default function WaitlistPage() {
           <div className="max-w-2xl mx-auto">
             <div className="space-y-3">
               {topReferrers.map((entry, i) => (
-                <div key={entry.id} className={`flex items-center gap-4 p-4 rounded-xl border transition ${i < 3 ? 'bg-gradient-to-r from-amber-500/10 to-transparent border-amber-500/20' : 'bg-white/5 border-white/10'}`}>
+                <div key={entry.id} className={`flex items-center gap-4 p-4 rounded-xl border transition ${i < 3 ? 'bg-gradient-to-r from-stone-500/10 to-transparent border-stone-500/20' : 'bg-white/5 border-white/10'}`}>
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
-                    i === 0 ? 'bg-amber-500 text-black' :
+                    i === 0 ? 'bg-stone-500 text-black' :
                     i === 1 ? 'bg-gray-300 text-black' :
-                    i === 2 ? 'bg-amber-700 text-white' :
+                    i === 2 ? 'bg-stone-700 text-white' :
                     'bg-white/10 text-white/40'
                   }`}>
                     {i + 1}
@@ -248,10 +248,10 @@ export default function WaitlistPage() {
                     <p className="text-xs text-white/40">{entry.email}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-bold text-emerald-400">{entry.referrals}</p>
+                    <p className="text-lg font-bold text-stone-400">{entry.referrals}</p>
                     <p className="text-xs text-white/30">referrals</p>
                   </div>
-                  {i < 3 && <Trophy className={`w-5 h-5 ${i === 0 ? 'text-amber-400' : i === 1 ? 'text-gray-300' : 'text-amber-700'}`} />}
+                  {i < 3 && <Trophy className={`w-5 h-5 ${i === 0 ? 'text-stone-400' : i === 1 ? 'text-gray-300' : 'text-stone-700'}`} />}
                 </div>
               ))}
             </div>
@@ -267,7 +267,7 @@ export default function WaitlistPage() {
                 {dailySignups.map(([date, count]) => (
                   <div key={date} className="flex-1 flex flex-col items-center gap-2">
                     <span className="text-xs text-white/60 font-medium">{count}</span>
-                    <div className="w-full bg-gradient-to-t from-violet-600 to-fuchsia-600 rounded-t-lg transition-all" style={{ height: `${Math.max(20, (count / Math.max(...dailySignups.map(d => d[1] as number))) * 120)}px` }} />
+                    <div className="w-full bg-gradient-to-t from-stone-600 to-stone-600 rounded-t-lg transition-all" style={{ height: `${Math.max(20, (count / Math.max(...dailySignups.map(d => d[1] as number))) * 120)}px` }} />
                     <span className="text-xs text-white/30">{(date as string).slice(5)}</span>
                   </div>
                 ))}
@@ -281,7 +281,7 @@ export default function WaitlistPage() {
                     <div key={source} className="flex items-center gap-3">
                       <span className={`px-2 py-0.5 rounded-full text-xs ${sourceColors[source] || 'bg-white/10 text-white/60'}`}>{source}</span>
                       <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-violet-500 rounded-full" style={{ width: `${(count / entries.length) * 100}%` }} />
+                        <div className="h-full bg-stone-500 rounded-full" style={{ width: `${(count / entries.length) * 100}%` }} />
                       </div>
                       <span className="text-sm text-white/60">{count}</span>
                     </div>
@@ -300,7 +300,7 @@ export default function WaitlistPage() {
                     <div key={bucket.label} className="flex items-center gap-3">
                       <span className="text-sm text-white/60 w-36">{bucket.label}</span>
                       <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${(bucket.count / entries.length) * 100}%` }} />
+                        <div className="h-full bg-stone-500 rounded-full" style={{ width: `${(bucket.count / entries.length) * 100}%` }} />
                       </div>
                       <span className="text-sm text-white/60 w-8 text-right">{bucket.count}</span>
                     </div>
@@ -316,18 +316,18 @@ export default function WaitlistPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-6">
               <div className="p-6 rounded-2xl bg-white/5 border border-white/10 space-y-4">
-                <h3 className="font-semibold flex items-center gap-2"><Palette className="w-4 h-4 text-violet-400" /> Customize Page</h3>
+                <h3 className="font-semibold flex items-center gap-2"><Palette className="w-4 h-4 text-stone-400" /> Customize Page</h3>
                 <div>
                   <label className="text-xs text-white/40 mb-1 block">Headline</label>
-                  <input type="text" defaultValue="Something amazing is coming." className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50" />
+                  <input type="text" defaultValue="Something amazing is coming." className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-stone-500/50" />
                 </div>
                 <div>
                   <label className="text-xs text-white/40 mb-1 block">Subheadline</label>
-                  <input type="text" defaultValue="Be the first to experience the future of AI website building." className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50" />
+                  <input type="text" defaultValue="Be the first to experience the future of AI website building." className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-stone-500/50" />
                 </div>
                 <div>
                   <label className="text-xs text-white/40 mb-1 block">CTA Button Text</label>
-                  <input type="text" defaultValue="Join the Waitlist" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50" />
+                  <input type="text" defaultValue="Join the Waitlist" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-stone-500/50" />
                 </div>
                 <div>
                   <label className="text-xs text-white/40 mb-1 block">Brand Color</label>
@@ -339,26 +339,26 @@ export default function WaitlistPage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-white/60">Enable referral system</span>
-                  <div className="w-12 h-6 rounded-full bg-violet-600 cursor-pointer">
+                  <div className="w-12 h-6 rounded-full bg-stone-600 cursor-pointer">
                     <div className="w-5 h-5 rounded-full bg-white translate-x-6 transition" />
                   </div>
                 </div>
               </div>
-              <button onClick={() => {}} className="w-full py-3 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 font-medium text-sm hover:opacity-90 transition flex items-center justify-center gap-2">
+              <button onClick={() => {}} className="w-full py-3 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 font-medium text-sm hover:opacity-90 transition flex items-center justify-center gap-2">
                 <Sparkles className="w-4 h-4" /> Generate Waitlist Page
               </button>
             </div>
-            <div className="p-1 rounded-2xl bg-gradient-to-r from-violet-500/20 to-fuchsia-500/20">
+            <div className="p-1 rounded-2xl bg-gradient-to-r from-stone-500/20 to-stone-500/20">
               <div className="bg-[#0f0f1a] rounded-xl p-8 min-h-[500px] flex items-center justify-center">
                 <div className="text-center max-w-md">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 mx-auto mb-6 flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-stone-600 to-stone-600 mx-auto mb-6 flex items-center justify-center">
                     <Zap className="w-8 h-8" />
                   </div>
                   <h2 className="text-3xl font-bold mb-3">Something amazing is coming.</h2>
                   <p className="text-white/50 mb-6">Be the first to experience the future of AI website building.</p>
                   <div className="flex gap-2 max-w-sm mx-auto">
                     <input type="email" placeholder="your@email.com" className="flex-1 bg-white/10 border border-white/20 rounded-lg px-4 py-2.5 text-sm focus:outline-none" />
-                    <button onClick={() => {}} className="px-6 py-2.5 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 font-medium text-sm whitespace-nowrap">Join the Waitlist</button>
+                    <button onClick={() => {}} className="px-6 py-2.5 rounded-lg bg-gradient-to-r from-stone-600 to-stone-600 font-medium text-sm whitespace-nowrap">Join the Waitlist</button>
                   </div>
                   <p className="text-xs text-white/30 mt-4">53 people already on the list</p>
                 </div>

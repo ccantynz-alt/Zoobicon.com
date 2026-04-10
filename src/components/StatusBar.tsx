@@ -85,10 +85,10 @@ export default function StatusBar({ status, pipelineStep }: StatusBarProps) {
     status === "idle"
       ? "bg-white/20"
       : status === "generating" || status === "editing"
-      ? "bg-blue-400 shadow-[0_0_6px_rgba(0,150,255,0.6)]"
+      ? "bg-stone-400 shadow-[0_0_6px_rgba(0,150,255,0.6)]"
       : status === "complete"
-      ? "bg-green-500 shadow-[0_0_6px_rgba(0,200,100,0.6)]"
-      : "bg-red-500";
+      ? "bg-stone-500 shadow-[0_0_6px_rgba(0,200,100,0.6)]"
+      : "bg-stone-500";
 
   return (
     <footer className="relative flex items-center px-4 py-1.5 border-t border-white/[0.06] bg-[#12121a]/80 text-[10px] tracking-wide overflow-hidden h-8">
@@ -101,7 +101,7 @@ export default function StatusBar({ status, pipelineStep }: StatusBarProps) {
         />
         <span
           className={`truncate ${
-            isActive ? "text-blue-400/70" : isComplete ? "text-green-400/70" : isError ? "text-red-400/70" : "text-white/50"
+            isActive ? "text-stone-400/70" : isComplete ? "text-stone-400/70" : isError ? "text-stone-400/70" : "text-white/50"
           }`}
         >
           {statusLabel}
@@ -116,7 +116,7 @@ export default function StatusBar({ status, pipelineStep }: StatusBarProps) {
             <div className="absolute top-1/2 left-0 right-0 h-px bg-white/[0.06]" />
             {/* Progress fill */}
             <div
-              className="absolute top-1/2 left-0 h-px bg-gradient-to-r from-blue-500/40 to-blue-400/60 transition-all duration-700 ease-out"
+              className="absolute top-1/2 left-0 h-px bg-gradient-to-r from-stone-500/40 to-stone-400/60 transition-all duration-700 ease-out"
               style={{ width: `${progress}%` }}
             />
             {/* Milestone dots */}
@@ -124,14 +124,14 @@ export default function StatusBar({ status, pipelineStep }: StatusBarProps) {
               <div
                 key={pos}
                 className={`absolute top-1/2 -translate-y-1/2 w-1 h-1 rounded-full transition-colors duration-500 ${
-                  progress >= pos ? "bg-blue-400/60" : "bg-white/10"
+                  progress >= pos ? "bg-stone-400/60" : "bg-white/10"
                 }`}
                 style={{ left: `${pos}%` }}
               />
             ))}
             {/* Finish flag at the end */}
             <div className="absolute top-1/2 -translate-y-1/2 right-0 translate-x-1">
-              <svg width="10" height="14" viewBox="0 0 10 14" className={`transition-colors duration-500 ${isComplete ? "text-green-400" : "text-white/50"}`}>
+              <svg width="10" height="14" viewBox="0 0 10 14" className={`transition-colors duration-500 ${isComplete ? "text-stone-400" : "text-white/50"}`}>
                 <line x1="1" y1="0" x2="1" y2="14" stroke="currentColor" strokeWidth="1" />
                 <rect x="1" y="0" width="8" height="5" fill="currentColor" opacity={isComplete ? "0.8" : "0.3"} />
                 <rect x="1" y="0" width="4" height="2.5" fill={isComplete ? "#0a0a0f" : "transparent"} opacity="0.5" />
@@ -151,7 +151,7 @@ export default function StatusBar({ status, pipelineStep }: StatusBarProps) {
                 width="16"
                 height="20"
                 viewBox="0 0 16 20"
-                className={`${isActive ? "runner-animate" : ""} ${isComplete ? "text-green-400" : isError ? "text-red-400" : "text-blue-400"}`}
+                className={`${isActive ? "runner-animate" : ""} ${isComplete ? "text-stone-400" : isError ? "text-stone-400" : "text-stone-400"}`}
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.2"
@@ -170,7 +170,7 @@ export default function StatusBar({ status, pipelineStep }: StatusBarProps) {
                 <line x1="8" y1="12" x2="11" y2="17" className="runner-leg-r" />
               </svg>
               {isComplete && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 text-[8px] text-green-400 font-bold whitespace-nowrap animate-bounce">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 text-[8px] text-stone-400 font-bold whitespace-nowrap animate-bounce">
                   Done!
                 </div>
               )}
@@ -182,12 +182,12 @@ export default function StatusBar({ status, pipelineStep }: StatusBarProps) {
       {/* Right: timer + branding */}
       <div className="ml-auto flex items-center gap-4 text-white/50 z-10">
         {isActive && (
-          <span className="text-blue-400/70 tabular-nums font-mono">
+          <span className="text-stone-400/70 tabular-nums font-mono">
             {formatTime(elapsed)}
           </span>
         )}
         {isComplete && finalTime !== null && (
-          <span className="text-green-400/70 tabular-nums font-mono">
+          <span className="text-stone-400/70 tabular-nums font-mono">
             {formatTime(finalTime)}
           </span>
         )}

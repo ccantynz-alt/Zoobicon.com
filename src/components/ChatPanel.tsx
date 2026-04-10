@@ -319,8 +319,8 @@ export default function ChatPanel({
         {messages.length === 0 && (
           <div className="py-6">
             <div className="flex items-center justify-center mb-4">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-violet-500/20 to-purple-500/20 border border-violet-500/20 flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-violet-400" />
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-stone-500/20 to-stone-500/20 border border-stone-500/20 flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-stone-400" />
               </div>
             </div>
             <p className="text-center text-sm text-white/70 font-medium mb-1">
@@ -343,11 +343,11 @@ export default function ChatPanel({
                     onClick={() => handleSend(suggestion)}
                     disabled={isEditing || isGenerating}
                     className="flex items-center gap-2 w-full text-left text-xs text-white/50
-                               hover:text-violet-300 py-2 px-3 rounded-lg hover:bg-violet-500/[0.06]
+                               hover:text-stone-300 py-2 px-3 rounded-lg hover:bg-stone-500/[0.06]
                                transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed
-                               border border-transparent hover:border-violet-500/10"
+                               border border-transparent hover:border-stone-500/10"
                   >
-                    <Zap className="w-3 h-3 text-violet-500/50 flex-shrink-0" />
+                    <Zap className="w-3 h-3 text-stone-500/50 flex-shrink-0" />
                     {suggestion}
                   </button>
                 ))}
@@ -372,20 +372,20 @@ export default function ChatPanel({
                   <div
                     className={`w-6 h-6 rounded-full flex items-center justify-center ${
                       msg.status === "error"
-                        ? "bg-red-500/15 border border-red-500/20"
+                        ? "bg-stone-500/15 border border-stone-500/20"
                         : msg.status === "complete"
-                        ? "bg-emerald-500/15 border border-emerald-500/20"
-                        : "bg-violet-500/15 border border-violet-500/20"
+                        ? "bg-stone-500/15 border border-stone-500/20"
+                        : "bg-stone-500/15 border border-stone-500/20"
                     }`}
                   >
                     {msg.status === "pending" || msg.status === "streaming" ? (
-                      <Loader2 className="w-3 h-3 text-violet-400 animate-spin" />
+                      <Loader2 className="w-3 h-3 text-stone-400 animate-spin" />
                     ) : msg.status === "error" ? (
-                      <AlertCircle className="w-3 h-3 text-red-400" />
+                      <AlertCircle className="w-3 h-3 text-stone-400" />
                     ) : msg.status === "complete" ? (
-                      <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                      <CheckCircle2 className="w-3 h-3 text-stone-400" />
                     ) : (
-                      <Bot className="w-3 h-3 text-violet-400" />
+                      <Bot className="w-3 h-3 text-stone-400" />
                     )}
                   </div>
                 </div>
@@ -395,21 +395,21 @@ export default function ChatPanel({
               <div
                 className={`max-w-[260px] ${
                   msg.role === "user"
-                    ? "bg-violet-500/15 border border-violet-500/20 text-violet-200 rounded-2xl rounded-tr-md px-3.5 py-2"
+                    ? "bg-stone-500/15 border border-stone-500/20 text-stone-200 rounded-2xl rounded-tr-md px-3.5 py-2"
                     : msg.status === "error"
-                    ? "bg-red-500/8 border border-red-500/15 text-red-300/80 rounded-2xl rounded-tl-md px-3.5 py-2"
+                    ? "bg-stone-500/8 border border-stone-500/15 text-stone-300/80 rounded-2xl rounded-tl-md px-3.5 py-2"
                     : msg.status === "complete"
-                    ? "bg-emerald-500/8 border border-emerald-500/15 rounded-2xl rounded-tl-md px-3.5 py-2"
+                    ? "bg-stone-500/8 border border-stone-500/15 rounded-2xl rounded-tl-md px-3.5 py-2"
                     : "bg-white/[0.04] border border-white/[0.06] rounded-2xl rounded-tl-md px-3.5 py-2"
                 }`}
               >
                 <p className={`text-xs leading-relaxed ${
                   msg.role === "user"
-                    ? "text-violet-200"
+                    ? "text-stone-200"
                     : msg.status === "error"
-                    ? "text-red-300/80"
+                    ? "text-stone-300/80"
                     : msg.status === "complete"
-                    ? "text-emerald-300/90"
+                    ? "text-stone-300/90"
                     : "text-white/60"
                 }`}>
                   {msg.content}
@@ -417,11 +417,11 @@ export default function ChatPanel({
 
                 {/* Changed files list */}
                 {msg.changedFiles && msg.changedFiles.length > 0 && (
-                  <div className="mt-2 pt-2 border-t border-emerald-500/10">
+                  <div className="mt-2 pt-2 border-t border-stone-500/10">
                     {msg.changedFiles.map((file) => (
                       <div
                         key={file}
-                        className="flex items-center gap-1.5 text-[10px] text-emerald-400/70 py-0.5"
+                        className="flex items-center gap-1.5 text-[10px] text-stone-400/70 py-0.5"
                       >
                         <FileEdit className="w-2.5 h-2.5" />
                         <span className="font-mono">{file}</span>
@@ -433,8 +433,8 @@ export default function ChatPanel({
                 {/* Duration badge */}
                 {msg.durationMs != null && msg.status === "complete" && (
                   <div className="mt-1.5 flex items-center gap-1">
-                    <Zap className="w-2.5 h-2.5 text-emerald-500/50" />
-                    <span className="text-[10px] text-emerald-500/50">
+                    <Zap className="w-2.5 h-2.5 text-stone-500/50" />
+                    <span className="text-[10px] text-stone-500/50">
                       {(msg.durationMs / 1000).toFixed(1)}s
                     </span>
                   </div>
@@ -493,17 +493,17 @@ export default function ChatPanel({
             disabled={!hasFiles || isEditing || isGenerating}
             rows={2}
             className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-3.5 py-2.5 pr-12 text-xs
-                       text-white/80 placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-violet-500/20
-                       focus:border-violet-500/30 transition-all resize-none disabled:opacity-30
+                       text-white/80 placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-stone-500/20
+                       focus:border-stone-500/30 transition-all resize-none disabled:opacity-30
                        disabled:cursor-not-allowed"
           />
           <button
             onClick={() => handleSend()}
             disabled={!input.trim() || !hasFiles || isEditing || isGenerating}
-            className="absolute right-2 bottom-2 p-2 rounded-lg bg-gradient-to-r from-violet-600 to-purple-600
+            className="absolute right-2 bottom-2 p-2 rounded-lg bg-gradient-to-r from-stone-600 to-stone-600
                        text-white disabled:opacity-20 disabled:cursor-not-allowed
-                       hover:from-violet-500 hover:to-purple-500 transition-all
-                       shadow-lg shadow-violet-500/20 disabled:shadow-none"
+                       hover:from-stone-500 hover:to-stone-500 transition-all
+                       shadow-lg shadow-stone-500/20 disabled:shadow-none"
           >
             {isEditing ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />

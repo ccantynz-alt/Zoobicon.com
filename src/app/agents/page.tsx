@@ -53,7 +53,7 @@ function CopyButton({ text }: { text: string }) {
       className="absolute top-3 right-3 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-slate-400 hover:text-white"
       aria-label="Copy to clipboard"
     >
-      {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+      {copied ? <Check className="w-4 h-4 text-stone-400" /> : <Copy className="w-4 h-4" />}
     </button>
   );
 }
@@ -73,9 +73,9 @@ function CodeBlock({
       {filename && (
         <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/10 bg-white/5">
           <div className="flex gap-1.5">
-            <span className="w-3 h-3 rounded-full bg-red-500/60" />
-            <span className="w-3 h-3 rounded-full bg-yellow-500/60" />
-            <span className="w-3 h-3 rounded-full bg-green-500/60" />
+            <span className="w-3 h-3 rounded-full bg-stone-500/60" />
+            <span className="w-3 h-3 rounded-full bg-stone-500/60" />
+            <span className="w-3 h-3 rounded-full bg-stone-500/60" />
           </div>
           <span className="text-xs text-slate-400 font-mono ml-2">{filename}</span>
           <span className="text-xs text-slate-600 ml-auto">{language}</span>
@@ -95,43 +95,43 @@ const FEATURES = [
     icon: Search,
     title: "Task Discovery",
     desc: "Agents find their own work. Define what to look for, the framework handles scheduling and deduplication.",
-    color: "text-cyan-400",
-    bg: "bg-cyan-500/10",
+    color: "text-stone-400",
+    bg: "bg-stone-500/10",
   },
   {
     icon: Gauge,
     title: "Confidence Scoring",
     desc: "Every execution returns a confidence score. Auto-execute when confidence is high, flag for review when low.",
-    color: "text-indigo-400",
-    bg: "bg-indigo-500/10",
+    color: "text-stone-400",
+    bg: "bg-stone-500/10",
   },
   {
     icon: RefreshCw,
     title: "Retry & Self-Heal",
     desc: "Exponential backoff, configurable retries. Agents recover from failures automatically without intervention.",
-    color: "text-emerald-400",
-    bg: "bg-emerald-500/10",
+    color: "text-stone-400",
+    bg: "bg-stone-500/10",
   },
   {
     icon: Database,
     title: "Pluggable Storage",
     desc: "InMemory for testing, PostgreSQL for production. Bring your own storage backend with a simple interface.",
-    color: "text-amber-400",
-    bg: "bg-amber-500/10",
+    color: "text-stone-400",
+    bg: "bg-stone-500/10",
   },
   {
     icon: Puzzle,
     title: "Skills Marketplace",
     desc: "Extend agents with community-built skills. Like npm for AI capabilities. Install, compose, and share.",
-    color: "text-pink-400",
-    bg: "bg-pink-500/10",
+    color: "text-stone-400",
+    bg: "bg-stone-500/10",
   },
   {
     icon: Radio,
     title: "Event System",
     desc: "Subscribe to agent events. Build dashboards, alerts, and integrations with hooks for every lifecycle stage.",
-    color: "text-violet-400",
-    bg: "bg-violet-500/10",
+    color: "text-stone-400",
+    bg: "bg-stone-500/10",
   },
 ];
 
@@ -246,7 +246,7 @@ export default function AgentsPage() {
           >
             {/* badge */}
             <motion.div variants={fadeInUp} className="mb-6">
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-indigo-300 text-sm font-medium">
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-stone-500/30 bg-stone-500/10 text-stone-300 text-sm font-medium">
                 <Zap className="w-3.5 h-3.5" />
                 Open Source &middot; MIT Licensed
               </span>
@@ -257,7 +257,7 @@ export default function AgentsPage() {
               className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6"
             >
               Build{" "}
-              <span className="bg-gradient-to-r from-indigo-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-stone-400 via-stone-400 to-stone-400 bg-clip-text text-transparent">
                 Autonomous
               </span>{" "}
               AI&nbsp;Agents
@@ -274,9 +274,9 @@ export default function AgentsPage() {
             {/* install command */}
             <motion.div variants={fadeInUp} className="flex justify-center mb-8">
               <div className="relative inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-[#1e293b] border border-white/10 font-mono text-sm sm:text-base">
-                <Terminal className="w-4 h-4 text-emerald-400 shrink-0" />
+                <Terminal className="w-4 h-4 text-stone-400 shrink-0" />
                 <span className="text-slate-300">npm install</span>
-                <span className="text-cyan-400">@zoobicon/agents</span>
+                <span className="text-stone-400">@zoobicon/agents</span>
                 <CopyButton text="npm install @zoobicon/agents" />
               </div>
             </motion.div>
@@ -288,7 +288,7 @@ export default function AgentsPage() {
             >
               <a
                 href="#quickstart"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-stone-600 hover:bg-stone-500 text-white font-semibold transition-colors"
               >
                 Get Started
                 <ArrowRight className="w-4 h-4" />
@@ -489,7 +489,7 @@ await monitor.run();`}
                 <thead>
                   <tr className="border-b border-white/10 bg-white/[0.03]">
                     <th className="px-5 py-4 text-slate-400 font-medium">Feature</th>
-                    <th className="px-5 py-4 text-indigo-400 font-semibold">
+                    <th className="px-5 py-4 text-stone-400 font-semibold">
                       Zoobicon Agents
                     </th>
                     <th className="px-5 py-4 text-slate-400 font-medium">OpenClaw</th>
@@ -532,7 +532,7 @@ await monitor.run();`}
             className="rounded-3xl overflow-hidden relative"
           >
             {/* gradient bg */}
-            <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/30 via-[#1e293b] to-cyan-600/20" />
+            <div className="absolute inset-0 bg-gradient-to-br from-stone-600/30 via-[#1e293b] to-stone-600/20" />
             <div className="absolute inset-0 border border-white/10 rounded-3xl" />
 
             <div className="relative px-8 py-14 sm:px-14 sm:py-16 text-center">
@@ -550,7 +550,7 @@ await monitor.run();`}
                     key={f.label}
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-slate-300"
                   >
-                    <f.icon className="w-4 h-4 text-indigo-400" />
+                    <f.icon className="w-4 h-4 text-stone-400" />
                     {f.label}
                   </span>
                 ))}
@@ -559,7 +559,7 @@ await monitor.run();`}
               <div className="flex flex-wrap justify-center items-center gap-4">
                 <Link
                   href="/pricing"
-                  className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition-colors"
+                  className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-stone-600 hover:bg-stone-500 text-white font-semibold transition-colors"
                 >
                   Starting at $19/month
                   <ArrowRight className="w-4 h-4" />
@@ -599,7 +599,7 @@ await monitor.run();`}
               {QUICKSTART_STEPS.map((s) => (
                 <motion.div key={s.step} variants={fadeInUp}>
                   <div className="flex items-center gap-3 mb-3">
-                    <span className="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-600/20 text-indigo-400 text-sm font-bold border border-indigo-500/30">
+                    <span className="flex items-center justify-center w-8 h-8 rounded-full bg-stone-600/20 text-stone-400 text-sm font-bold border border-stone-500/30">
                       {s.step}
                     </span>
                     <h3 className="text-lg font-semibold">{s.title}</h3>
@@ -616,7 +616,7 @@ await monitor.run();`}
       <footer className="relative py-16 px-4 border-t border-white/10">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <span className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+            <span className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">
               @zoobicon/agents
             </span>
             <span className="text-slate-500 text-sm">MIT License</span>

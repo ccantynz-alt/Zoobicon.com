@@ -48,8 +48,8 @@ const TLD_DATA: Record<string, TldInfo> = {
     description: "The .ai domain has become the gold standard for AI companies, machine learning startups, and tech innovators. Originally the country code for Anguilla, .ai is now synonymous with artificial intelligence worldwide. Companies like stability.ai, character.ai, and perplexity.ai have made .ai the most prestigious tech domain extension.",
     idealFor: ["AI startups & ML companies", "SaaS platforms", "Tech consultancies", "Research labs", "Developer tools", "Data science firms"],
     keywords: ["buy .ai domain", "register .ai domain", ".ai domain price", "ai domain name", "artificial intelligence domain"],
-    color: "text-purple-400",
-    gradient: "from-purple-500 to-violet-600",
+    color: "text-stone-400",
+    gradient: "from-stone-500 to-stone-600",
     icon: Brain,
     facts: [
       "Over 300,000 .ai domains registered globally",
@@ -66,8 +66,8 @@ const TLD_DATA: Record<string, TldInfo> = {
     description: "The .io domain is the unofficial standard for startups, developer tools, and SaaS products. Originally the country code for British Indian Ocean Territory, .io caught on because developers associate 'I/O' with input/output. It signals 'tech company' instantly and has been adopted by some of the biggest names in tech.",
     idealFor: ["SaaS products", "Developer tools", "Open-source projects", "Tech startups", "APIs & platforms", "Gaming companies"],
     keywords: ["buy .io domain", "register .io domain", ".io domain price", "io domain for startups", "tech domain name"],
-    color: "text-emerald-400",
-    gradient: "from-emerald-500 to-teal-600",
+    color: "text-stone-400",
+    gradient: "from-stone-500 to-stone-600",
     icon: Code2,
     facts: [
       "Over 2 million .io domains registered",
@@ -84,8 +84,8 @@ const TLD_DATA: Record<string, TldInfo> = {
     description: "The .com domain remains the gold standard of the internet. With over 150 million registrations, .com is the most recognized and trusted domain extension globally. If you're building a business, .com gives you instant credibility. Customers expect it, investors value it, and search engines trust it.",
     idealFor: ["Any business", "E-commerce stores", "Professional services", "Global brands", "Portfolio sites", "Blogs & media"],
     keywords: ["buy .com domain", "cheap .com domain", "register .com domain", "domain registration", ".com domain price"],
-    color: "text-blue-400",
-    gradient: "from-blue-500 to-blue-600",
+    color: "text-stone-400",
+    gradient: "from-stone-500 to-stone-600",
     icon: Globe,
     facts: [
       "Over 150 million .com domains registered worldwide",
@@ -102,8 +102,8 @@ const TLD_DATA: Record<string, TldInfo> = {
     description: "The .sh domain is a favorite among developers because 'sh' is the file extension for shell scripts. It signals technical credibility instantly. DevOps tools, hosting platforms, and CLI utilities use .sh to communicate 'this is for developers.' It's short, memorable, and technically cool.",
     idealFor: ["DevOps tools", "Hosting platforms", "CLI utilities", "Developer tools", "Shell scripting resources", "Tech infrastructure"],
     keywords: ["buy .sh domain", "register .sh domain", ".sh domain price", "developer domain", "devops domain name"],
-    color: "text-amber-400",
-    gradient: "from-amber-500 to-orange-600",
+    color: "text-stone-400",
+    gradient: "from-stone-500 to-stone-600",
     icon: Server,
     facts: [
       "Originally the country code for Saint Helena",
@@ -120,8 +120,8 @@ const TLD_DATA: Record<string, TldInfo> = {
     description: "The .dev domain was created by Google specifically for developers and technology. Every .dev domain comes with HTTPS required by default (HSTS preloaded), making it one of the most secure TLDs available. If you're a developer, .dev is your natural home on the internet.",
     idealFor: ["Personal developer portfolios", "Open-source projects", "Developer blogs", "API documentation", "Development agencies", "Code tutorials"],
     keywords: ["buy .dev domain", "register .dev domain", ".dev domain price", "developer portfolio domain", "coding domain name"],
-    color: "text-cyan-400",
-    gradient: "from-cyan-500 to-blue-600",
+    color: "text-stone-400",
+    gradient: "from-stone-500 to-stone-600",
     icon: Code2,
     facts: [
       "Created and managed by Google Registry",
@@ -138,8 +138,8 @@ const TLD_DATA: Record<string, TldInfo> = {
     description: "The .app domain was created by Google for mobile and web applications. Like .dev, it requires HTTPS by default. It's the natural choice for any app — mobile, web, desktop, or SaaS. Short, clear, and instantly communicates 'this is an application.'",
     idealFor: ["Mobile apps", "Web applications", "SaaS products", "App landing pages", "Progressive web apps", "Productivity tools"],
     keywords: ["buy .app domain", "register .app domain", ".app domain price", "mobile app domain", "application domain name"],
-    color: "text-pink-400",
-    gradient: "from-pink-500 to-rose-600",
+    color: "text-stone-400",
+    gradient: "from-stone-500 to-stone-600",
     icon: Smartphone,
     facts: [
       "Created and managed by Google Registry",
@@ -176,7 +176,7 @@ export default function TldPage() {
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h1 className="text-3xl font-bold mb-4">Extension not found</h1>
           <p className="text-slate-400 mb-8">We don&apos;t have information about .{tld} domains yet.</p>
-          <Link href="/domains" className="text-indigo-400 hover:text-indigo-300">
+          <Link href="/domains" className="text-stone-400 hover:text-stone-300">
             &larr; Search all domains
           </Link>
         </div>
@@ -227,8 +227,8 @@ export default function TldPage() {
 
       {/* Hero */}
       <section className="relative pt-24 pb-20 md:pt-32 md:pb-28 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-indigo-950/30 via-[#0b0b16] to-[#0b0b16]" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-indigo-500/[0.06] rounded-full blur-[100px]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-stone-950/30 via-[#0b0b16] to-[#0b0b16]" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-stone-500/[0.06] rounded-full blur-[100px]" />
 
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
@@ -263,14 +263,14 @@ export default function TldPage() {
                   onChange={(e) => setName(e.target.value.replace(/\s/g, ""))}
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                   placeholder={`Search yourname.${tld}...`}
-                  className="w-full pl-12 pr-4 py-4 bg-white/[0.06] border border-white/[0.10] rounded-2xl text-white text-lg placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
+                  className="w-full pl-12 pr-4 py-4 bg-white/[0.06] border border-white/[0.10] rounded-2xl text-white text-lg placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-stone-500 transition-shadow"
                   autoFocus
                 />
               </div>
               <button
                 onClick={handleSearch}
                 disabled={searching || !name.trim()}
-                className="px-8 py-4 bg-indigo-600 hover:bg-indigo-500 rounded-2xl font-bold text-lg flex items-center gap-2 disabled:opacity-40 transition-all shrink-0"
+                className="px-8 py-4 bg-stone-600 hover:bg-stone-500 rounded-2xl font-bold text-lg flex items-center gap-2 disabled:opacity-40 transition-all shrink-0"
               >
                 {searching ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
                 Check
@@ -283,15 +283,15 @@ export default function TldPage() {
                 {results.map((r) => (
                   <div key={r.domain} className={`flex items-center justify-between p-4 rounded-2xl ${
                     r.checking ? "bg-white/[0.03] border border-white/[0.06]" :
-                    r.available ? "bg-emerald-500/[0.08] border border-emerald-500/20" :
-                    r.available === false ? "bg-red-500/[0.05] border border-red-500/10" :
+                    r.available ? "bg-stone-500/[0.08] border border-stone-500/20" :
+                    r.available === false ? "bg-stone-500/[0.05] border border-stone-500/10" :
                     "bg-white/[0.03] border border-white/[0.06]"
                   }`}>
                     <div className="flex items-center gap-3">
                       {r.checking ? <Loader2 className="w-5 h-5 text-slate-500 animate-spin" /> :
-                       r.available ? <Check className="w-5 h-5 text-emerald-400" /> :
-                       r.available === false ? <X className="w-5 h-5 text-red-400/50" /> :
-                       <Globe className="w-5 h-5 text-yellow-400/50" />}
+                       r.available ? <Check className="w-5 h-5 text-stone-400" /> :
+                       r.available === false ? <X className="w-5 h-5 text-stone-400/50" /> :
+                       <Globe className="w-5 h-5 text-stone-400/50" />}
                       <span className={`text-lg font-bold ${r.available ? "text-white" : r.available === false ? "text-slate-500 line-through" : "text-slate-400"}`}>
                         {r.domain}
                       </span>
@@ -302,13 +302,13 @@ export default function TldPage() {
                           <span className="text-xl font-bold text-white">${r.price}<span className="text-sm text-slate-400">/yr</span></span>
                           <Link
                             href={`/domains?search=${name}&tld=${tld}`}
-                            className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold flex items-center gap-1.5 transition-colors"
+                            className="px-5 py-2.5 rounded-xl bg-stone-600 hover:bg-stone-500 text-white text-sm font-semibold flex items-center gap-1.5 transition-colors"
                           >
                             <Plus className="w-4 h-4" /> Register
                           </Link>
                         </>
                       )}
-                      {r.available === false && <span className="text-sm text-red-400/60">Taken</span>}
+                      {r.available === false && <span className="text-sm text-stone-400/60">Taken</span>}
                       {r.checking && <span className="text-sm text-slate-500">Checking...</span>}
                     </div>
                   </div>
@@ -330,7 +330,7 @@ export default function TldPage() {
               <ul className="space-y-2">
                 {info.idealFor.map((item) => (
                   <li key={item} className="flex items-center gap-2 text-base text-slate-400">
-                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <Check className="w-4 h-4 text-stone-400 shrink-0" />
                     {item}
                   </li>
                 ))}
@@ -341,7 +341,7 @@ export default function TldPage() {
               <div className="space-y-3 mb-8">
                 {info.facts.map((fact) => (
                   <div key={fact} className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-                    <BadgeCheck className="w-5 h-5 text-indigo-400 shrink-0 mt-0.5" />
+                    <BadgeCheck className="w-5 h-5 text-stone-400 shrink-0 mt-0.5" />
                     <span className="text-base text-slate-300">{fact}</span>
                   </div>
                 ))}
@@ -378,7 +378,7 @@ export default function TldPage() {
               { icon: Server, title: "Free Hosting", desc: "Deploy to zoobicon.sh — fast, reliable, included in the price" },
             ].map((f) => (
               <div key={f.title} className="p-5 rounded-2xl border border-white/[0.06] bg-white/[0.03] text-left">
-                <f.icon className="w-5 h-5 text-indigo-400 mb-3" />
+                <f.icon className="w-5 h-5 text-stone-400 mb-3" />
                 <div className="text-base font-semibold mb-1">{f.title}</div>
                 <div className="text-sm text-slate-400">{f.desc}</div>
               </div>
@@ -399,7 +399,7 @@ export default function TldPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="group inline-flex items-center gap-2 px-8 py-4 rounded-full bg-indigo-600 text-white text-lg font-bold hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/20"
+              className="group inline-flex items-center gap-2 px-8 py-4 rounded-full bg-stone-600 text-white text-lg font-bold hover:bg-stone-500 transition-all shadow-lg shadow-stone-500/20"
             >
               Search .{info.tld} Domains
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />

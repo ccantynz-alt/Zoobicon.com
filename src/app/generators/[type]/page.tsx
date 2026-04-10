@@ -108,7 +108,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Generate high-converting landing pages with compelling headlines, feature sections, social proof, and clear CTAs optimized for conversions.",
     icon: "Rocket",
     category: "Website",
-    color: "from-blue-600 to-indigo-600",
+    color: "from-stone-600 to-stone-600",
     fields: [
       {
         id: "businessName",
@@ -163,7 +163,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Create stunning portfolio websites to showcase your work, projects, and skills with beautiful galleries and case study layouts.",
     icon: "Palette",
     category: "Website",
-    color: "from-purple-600 to-blue-700",
+    color: "from-stone-600 to-stone-700",
     fields: [
       {
         id: "creatorName",
@@ -219,7 +219,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Generate clean, readable blog layouts with article pages, category navigation, author profiles, and search functionality.",
     icon: "PenTool",
     category: "Website",
-    color: "from-emerald-600 to-teal-600",
+    color: "from-stone-600 to-stone-600",
     fields: [
       {
         id: "blogName",
@@ -274,7 +274,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Build searchable directory listings with filters, categories, map integration, and detailed profile pages for businesses or resources.",
     icon: "FolderSearch",
     category: "Website",
-    color: "from-amber-600 to-orange-600",
+    color: "from-stone-600 to-stone-600",
     fields: [
       {
         id: "directoryName",
@@ -322,7 +322,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Create beautiful event pages with schedules, speaker profiles, ticket sections, countdown timers, and venue information.",
     icon: "CalendarDays",
     category: "Website",
-    color: "from-rose-600 to-red-600",
+    color: "from-stone-600 to-stone-600",
     fields: [
       {
         id: "eventName",
@@ -380,7 +380,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Generate appetizing restaurant websites with menus, reservations, photo galleries, reviews, and online ordering sections.",
     icon: "UtensilsCrossed",
     category: "Website",
-    color: "from-orange-600 to-red-600",
+    color: "from-stone-600 to-stone-600",
     fields: [
       {
         id: "restaurantName",
@@ -498,7 +498,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Create two-sided marketplace platforms with product listings, seller profiles, search and filtering, and transaction flows.",
     icon: "Store",
     category: "Website",
-    color: "from-cyan-600 to-blue-600",
+    color: "from-stone-600 to-stone-600",
     fields: [
       {
         id: "marketplaceName",
@@ -553,7 +553,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Generate polished SaaS marketing sites with feature showcases, pricing tables, integration logos, and conversion-optimized layouts.",
     icon: "Cloud",
     category: "Website",
-    color: "from-violet-600 to-purple-600",
+    color: "from-stone-600 to-stone-600",
     fields: [
       {
         id: "productName",
@@ -609,7 +609,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Build booking and appointment scheduling pages with calendars, service menus, staff profiles, and confirmation flows.",
     icon: "CalendarCheck",
     category: "App",
-    color: "from-green-600 to-emerald-600",
+    color: "from-stone-600 to-stone-600",
     fields: [
       {
         id: "businessName",
@@ -722,7 +722,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Create human resources management interfaces with employee directories, leave management, payroll views, and org charts.",
     icon: "Users",
     category: "App",
-    color: "from-sky-600 to-blue-700",
+    color: "from-stone-600 to-stone-700",
     fields: [
       {
         id: "companyName",
@@ -778,7 +778,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Build project management interfaces with kanban boards, task lists, timelines, team assignment, and progress tracking.",
     icon: "KanbanSquare",
     category: "App",
-    color: "from-indigo-600 to-blue-600",
+    color: "from-stone-600 to-stone-600",
     fields: [
       {
         id: "toolName",
@@ -833,7 +833,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Generate learning management system interfaces with course catalogs, lesson players, progress tracking, and certification.",
     icon: "GraduationCap",
     category: "App",
-    color: "from-yellow-600 to-amber-600",
+    color: "from-stone-600 to-stone-600",
     fields: [
       {
         id: "platformName",
@@ -888,7 +888,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Create inventory management dashboards with stock tracking, low-stock alerts, supplier management, and order fulfillment views.",
     icon: "Package",
     category: "App",
-    color: "from-lime-600 to-green-600",
+    color: "from-stone-600 to-stone-600",
     fields: [
       {
         id: "businessName",
@@ -944,7 +944,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Build data-rich analytics dashboards with charts, KPI cards, date range filters, and real-time metric displays.",
     icon: "BarChart3",
     category: "App",
-    color: "from-teal-600 to-cyan-600",
+    color: "from-stone-600 to-stone-600",
     fields: [
       {
         id: "dashboardName",
@@ -1008,7 +1008,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Enhance any website with scroll animations, parallax effects, micro-interactions, loading transitions, and dynamic visual effects.",
     icon: "Sparkles",
     category: "Enhancement",
-    color: "from-fuchsia-600 to-blue-700",
+    color: "from-stone-600 to-stone-700",
     fields: [
       {
         id: "websiteType",
@@ -1077,7 +1077,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Generate SEO-optimized pages with proper meta tags, schema.org JSON-LD markup, Open Graph tags, and semantic HTML structure.",
     icon: "Search",
     category: "Enhancement",
-    color: "from-green-600 to-lime-600",
+    color: "from-stone-600 to-stone-600",
     fields: [
       {
         id: "businessName",
@@ -1193,7 +1193,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Generate complex forms with validation, multi-step flows, file uploads, and backend processing logic with success/error states.",
     icon: "FileCode",
     category: "Enhancement",
-    color: "from-blue-700 to-indigo-700",
+    color: "from-stone-700 to-stone-700",
     fields: [
       {
         id: "formPurpose",
@@ -1255,7 +1255,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Create integration showcase pages with API documentation, webhook configuration, connection flows, and partner listings.",
     icon: "Plug",
     category: "Enhancement",
-    color: "from-indigo-600 to-violet-600",
+    color: "from-stone-600 to-stone-600",
     fields: [
       {
         id: "productName",
@@ -1304,7 +1304,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Generate email marketing templates with sequences, A/B variants, responsive layouts, and campaign preview functionality.",
     icon: "Mail",
     category: "Marketing",
-    color: "from-cyan-600 to-rose-600",
+    color: "from-stone-600 to-stone-600",
     fields: [
       {
         id: "businessName",
@@ -1362,7 +1362,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Create investor-ready pitch deck pages with slides for problem, solution, market size, traction, team, and financials.",
     icon: "Presentation",
     category: "Marketing",
-    color: "from-amber-600 to-yellow-600",
+    color: "from-stone-600 to-stone-600",
     fields: [
       {
         id: "companyName",
@@ -1417,7 +1417,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Generate persuasive marketing copy for websites, ads, social media, product descriptions, and brand messaging frameworks.",
     icon: "Type",
     category: "Marketing",
-    color: "from-red-600 to-blue-700",
+    color: "from-stone-600 to-stone-700",
     fields: [
       {
         id: "businessName",
@@ -1481,7 +1481,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Create drag-and-drop form builders with field types, conditional logic, calculation fields, and submission management.",
     icon: "ListChecks",
     category: "Tool",
-    color: "from-cyan-600 to-teal-600",
+    color: "from-stone-600 to-stone-600",
     fields: [
       {
         id: "formName",
@@ -1543,7 +1543,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Generate RESTful API endpoint documentation with schemas, authentication, request/response examples, and interactive testing UI.",
     icon: "Server",
     category: "Tool",
-    color: "from-emerald-700 to-green-700",
+    color: "from-stone-700 to-stone-700",
     fields: [
       {
         id: "apiName",
@@ -1605,7 +1605,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Generate Globe2 extension popup UIs, options pages, and content scripts with proper manifest.json configuration.",
     icon: "Globe2",
     category: "Tool",
-    color: "from-yellow-500 to-green-500",
+    color: "from-stone-500 to-stone-500",
     fields: [
       {
         id: "extensionName",
@@ -1666,7 +1666,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Generate reusable UI component libraries with buttons, cards, modals, forms, tables, and navigation — documented with usage examples.",
     icon: "Layers",
     category: "Tool",
-    color: "from-purple-700 to-indigo-700",
+    color: "from-stone-700 to-stone-700",
     fields: [
       {
         id: "libraryName",
@@ -1722,7 +1722,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Generate PWA-ready websites with service workers, app manifests, offline support, install prompts, and push notification setup.",
     icon: "Smartphone",
     category: "Tool",
-    color: "from-blue-600 to-cyan-600",
+    color: "from-stone-600 to-stone-600",
     fields: [
       {
         id: "appName",
@@ -1784,7 +1784,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Generate complete brand identity kits with logos, color palettes, typography systems, iconography, and brand usage guidelines.",
     icon: "Brush",
     category: "Marketing",
-    color: "from-rose-600 to-orange-600",
+    color: "from-stone-600 to-stone-600",
     fields: [
       {
         id: "brandName",
@@ -1840,7 +1840,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Create living style guides with design tokens, component patterns, spacing scales, and interactive documentation pages.",
     icon: "BookOpen",
     category: "Marketing",
-    color: "from-teal-600 to-emerald-600",
+    color: "from-stone-600 to-stone-600",
     fields: [
       {
         id: "projectName",
@@ -1967,7 +1967,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Generate complete e-commerce storefronts with product grids, shopping cart, checkout flow, customer reviews, wishlists, and discount codes.",
     icon: "ShoppingCart",
     category: "Website",
-    color: "from-emerald-600 to-green-600",
+    color: "from-stone-600 to-stone-600",
     fields: [
       {
         id: "storeName",
@@ -2021,11 +2021,11 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Website: "bg-blue-100 text-blue-700",
-  App: "bg-green-100 text-green-700",
-  Enhancement: "bg-purple-100 text-purple-700",
-  Marketing: "bg-cyan-100 text-cyan-700",
-  Tool: "bg-amber-100 text-amber-700",
+  Website: "bg-stone-100 text-stone-700",
+  App: "bg-stone-100 text-stone-700",
+  Enhancement: "bg-stone-100 text-stone-700",
+  Marketing: "bg-stone-100 text-stone-700",
+  Tool: "bg-stone-100 text-stone-700",
 };
 
 function getRelatedGenerators(
@@ -2299,7 +2299,7 @@ export default function GeneratorTypePage() {
                       placeholder={field.placeholder}
                       value={formData[field.id] || ""}
                       onChange={(e) => handleFieldChange(field.id, e.target.value)}
-                      className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                      className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent transition"
                     />
                   )}
                   {field.type === "textarea" && (
@@ -2309,7 +2309,7 @@ export default function GeneratorTypePage() {
                       value={formData[field.id] || ""}
                       onChange={(e) => handleFieldChange(field.id, e.target.value)}
                       rows={4}
-                      className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none"
+                      className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent transition resize-none"
                     />
                   )}
                   {field.type === "select" && field.options && (
@@ -2317,7 +2317,7 @@ export default function GeneratorTypePage() {
                       id={field.id}
                       value={formData[field.id] || ""}
                       onChange={(e) => handleFieldChange(field.id, e.target.value)}
-                      className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition appearance-none"
+                      className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent transition appearance-none"
                     >
                       <option value="" className="text-gray-500">
                         {field.placeholder}
@@ -2343,7 +2343,7 @@ export default function GeneratorTypePage() {
                 <button
                   onClick={handleQuickGenerate}
                   disabled={quickMode === "generating"}
-                  className={`inline-flex items-center justify-center gap-2 bg-gradient-to-r ${generator.color} text-white px-8 py-4 rounded-xl font-semibold text-lg hover:opacity-90 transition shadow-lg shadow-blue-500/20 disabled:opacity-60`}
+                  className={`inline-flex items-center justify-center gap-2 bg-gradient-to-r ${generator.color} text-white px-8 py-4 rounded-xl font-semibold text-lg hover:opacity-90 transition shadow-lg shadow-stone-500/20 disabled:opacity-60`}
                 >
                   {quickMode === "generating" ? (
                     <>
@@ -2367,7 +2367,7 @@ export default function GeneratorTypePage() {
               </div>
 
               {genError && (
-                <div className="bg-red-900/30 border border-red-700/50 rounded-xl px-4 py-3 text-sm text-red-300">
+                <div className="bg-stone-900/30 border border-stone-700/50 rounded-xl px-4 py-3 text-sm text-stone-300">
                   {genError}
                 </div>
               )}
@@ -2383,9 +2383,9 @@ export default function GeneratorTypePage() {
                   <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700/50 bg-gray-900/50">
                     <div className="flex items-center gap-3">
                       <div className="flex gap-1.5">
-                        <div className="w-3 h-3 rounded-full bg-red-500/70" />
-                        <div className="w-3 h-3 rounded-full bg-yellow-500/70" />
-                        <div className="w-3 h-3 rounded-full bg-green-500/70" />
+                        <div className="w-3 h-3 rounded-full bg-stone-500/70" />
+                        <div className="w-3 h-3 rounded-full bg-stone-500/70" />
+                        <div className="w-3 h-3 rounded-full bg-stone-500/70" />
                       </div>
                       <span className="text-xs text-gray-400">
                         {quickMode === "deployed" && deployedUrl
@@ -2398,7 +2398,7 @@ export default function GeneratorTypePage() {
                         <>
                           <button
                             onClick={handleQuickDeploy}
-                            className="inline-flex items-center gap-1.5 bg-green-600 hover:bg-green-500 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition"
+                            className="inline-flex items-center gap-1.5 bg-stone-600 hover:bg-stone-500 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition"
                           >
                             <Rocket className="w-3.5 h-3.5" />
                             Deploy Live
@@ -2415,8 +2415,8 @@ export default function GeneratorTypePage() {
                         </>
                       )}
                       {quickMode === "deploying" && (
-                        <div className="flex items-center gap-2 text-xs text-yellow-400">
-                          <div className="w-3.5 h-3.5 border-2 border-yellow-400/30 border-t-yellow-400 rounded-full animate-spin" />
+                        <div className="flex items-center gap-2 text-xs text-stone-400">
+                          <div className="w-3.5 h-3.5 border-2 border-stone-400/30 border-t-yellow-400 rounded-full animate-spin" />
                           Deploying...
                         </div>
                       )}
@@ -2425,7 +2425,7 @@ export default function GeneratorTypePage() {
                           href={deployedUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition"
+                          className="inline-flex items-center gap-1.5 bg-stone-600 hover:bg-stone-500 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition"
                         >
                           <Globe className="w-3.5 h-3.5" />
                           Visit Site
@@ -2446,9 +2446,9 @@ export default function GeneratorTypePage() {
 
                   {/* Deployed success banner */}
                   {quickMode === "deployed" && deployedUrl && (
-                    <div className="flex items-center gap-3 px-4 py-3 bg-green-900/30 border-t border-green-700/30">
-                      <Check className="w-5 h-5 text-green-400" />
-                      <span className="text-sm text-green-300">
+                    <div className="flex items-center gap-3 px-4 py-3 bg-stone-900/30 border-t border-stone-700/30">
+                      <Check className="w-5 h-5 text-stone-400" />
+                      <span className="text-sm text-stone-300">
                         Deployed to{" "}
                         <a
                           href={deployedUrl}
@@ -2486,7 +2486,7 @@ export default function GeneratorTypePage() {
                     transition={{ duration: 0.3, delay: 0.6 + i * 0.08 }}
                     className="flex items-start gap-3"
                   >
-                    <Check className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                    <Check className="w-4 h-4 text-stone-400 mt-0.5 flex-shrink-0" />
                     <span className="text-sm text-gray-300">{feature}</span>
                   </motion.li>
                 ))}
@@ -2536,13 +2536,13 @@ export default function GeneratorTypePage() {
                         <RelIcon className="w-6 h-6 text-white" />
                       )}
                     </div>
-                    <h3 className="text-lg font-semibold mb-2 group-hover:text-blue-400 transition">
+                    <h3 className="text-lg font-semibold mb-2 group-hover:text-stone-400 transition">
                       {info.name}
                     </h3>
                     <p className="text-sm text-gray-400 line-clamp-2">
                       {info.description}
                     </p>
-                    <div className="mt-4 flex items-center gap-1 text-sm text-gray-500 group-hover:text-blue-400 transition">
+                    <div className="mt-4 flex items-center gap-1 text-sm text-gray-500 group-hover:text-stone-400 transition">
                       Try it
                       <ChevronRight className="w-4 h-4" />
                     </div>

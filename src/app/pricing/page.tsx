@@ -168,15 +168,15 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-zinc-950 text-white selection:bg-purple-500/30 overflow-hidden">
+    <div className="relative min-h-screen bg-zinc-950 text-white selection:bg-stone-500/30 overflow-hidden">
       {/* ── structured data ── */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       {/* ── ambient background ── */}
       <div className="pointer-events-none fixed inset-0 z-0">
-        <div className="absolute top-[-40%] left-1/2 -translate-x-1/2 w-[900px] h-[900px] rounded-full bg-purple-600/[0.07] blur-[160px]" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-blue-600/[0.05] blur-[140px]" />
+        <div className="absolute top-[-40%] left-1/2 -translate-x-1/2 w-[900px] h-[900px] rounded-full bg-stone-600/[0.07] blur-[160px]" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-stone-600/[0.05] blur-[140px]" />
       </div>
 
       <main className="relative z-10">
@@ -190,7 +190,7 @@ export default function PricingPage() {
             <motion.div
               custom={0}
               variants={fadeUp}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-purple-500/20 bg-purple-500/[0.06] text-purple-300 text-sm font-medium mb-8"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-stone-500/20 bg-stone-500/[0.06] text-stone-300 text-sm font-medium mb-8"
             >
               <Star className="w-3.5 h-3.5" />
               Simple, transparent pricing
@@ -202,7 +202,7 @@ export default function PricingPage() {
               className="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-[1.08] mb-6"
             >
               Build smarter.{" "}
-              <span className="bg-gradient-to-r from-purple-400 via-violet-400 to-blue-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-stone-400 via-stone-400 to-stone-400 bg-clip-text text-transparent">
                 Pay&nbsp;less.
               </span>
             </motion.h1>
@@ -223,11 +223,11 @@ export default function PricingPage() {
               </span>
               <button
                 onClick={() => setAnnual(!annual)}
-                className="relative w-14 h-7 rounded-full bg-zinc-800 border border-zinc-700/50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+                className="relative w-14 h-7 rounded-full bg-zinc-800 border border-zinc-700/50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500"
                 aria-label="Toggle annual billing"
               >
                 <motion.div
-                  className="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-violet-600 shadow-lg"
+                  className="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-gradient-to-br from-stone-500 to-stone-600 shadow-lg"
                   animate={{ x: annual ? 28 : 0 }}
                   transition={{ type: "spring", stiffness: 500, damping: 30 }}
                 />
@@ -241,7 +241,7 @@ export default function PricingPage() {
                     initial={{ opacity: 0, scale: 0.8, x: -8 }}
                     animate={{ opacity: 1, scale: 1, x: 0 }}
                     exit={{ opacity: 0, scale: 0.8, x: -8 }}
-                    className="text-xs font-bold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2.5 py-1 rounded-full"
+                    className="text-xs font-bold text-stone-400 bg-stone-400/10 border border-stone-400/20 px-2.5 py-1 rounded-full"
                   >
                     Save up to 23%
                   </motion.span>
@@ -270,13 +270,13 @@ export default function PricingPage() {
                     variants={fadeUp}
                     className={`relative group rounded-2xl p-[1px] transition-transform duration-300 hover:-translate-y-1 ${
                       plan.featured
-                        ? "bg-gradient-to-b from-purple-500/80 via-violet-500/40 to-purple-500/80 shadow-[0_0_40px_-8px_rgba(168,85,247,0.35)]"
+                        ? "bg-gradient-to-b from-stone-500/80 via-stone-500/40 to-stone-500/80 shadow-[0_0_40px_-8px_rgba(168,85,247,0.35)]"
                         : "bg-gradient-to-b from-white/[0.08] to-white/[0.02]"
                     }`}
                   >
                     {/* animated glow ring on featured card */}
                     {plan.featured && (
-                      <div className="absolute -inset-[1px] rounded-2xl opacity-60 blur-sm bg-gradient-to-b from-purple-500/60 via-violet-500/20 to-purple-500/60 -z-10" />
+                      <div className="absolute -inset-[1px] rounded-2xl opacity-60 blur-sm bg-gradient-to-b from-stone-500/60 via-stone-500/20 to-stone-500/60 -z-10" />
                     )}
 
                     <div
@@ -289,7 +289,7 @@ export default function PricingPage() {
                       {/* popular badge */}
                       {plan.featured && (
                         <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
-                          <span className="px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-600 to-violet-600 text-[11px] font-bold tracking-wide uppercase text-white shadow-lg shadow-purple-500/25 whitespace-nowrap">
+                          <span className="px-4 py-1.5 rounded-full bg-gradient-to-r from-stone-600 to-stone-600 text-[11px] font-bold tracking-wide uppercase text-white shadow-lg shadow-stone-500/25 whitespace-nowrap">
                             Most Popular
                           </span>
                         </div>
@@ -300,7 +300,7 @@ export default function PricingPage() {
                         <div
                           className={`w-9 h-9 rounded-xl flex items-center justify-center ${
                             plan.featured
-                              ? "bg-purple-500/15 text-purple-400"
+                              ? "bg-stone-500/15 text-stone-400"
                               : "bg-white/[0.06] text-zinc-400"
                           }`}
                         >
@@ -326,7 +326,7 @@ export default function PricingPage() {
                         {annual && !isCustom && (
                           <p className="text-xs text-zinc-500 mt-1">
                             ${price * 12}/yr &middot;{" "}
-                            <span className="text-emerald-400">
+                            <span className="text-stone-400">
                               save ${(plan.monthly - plan.annual) * 12}/yr
                             </span>
                           </p>
@@ -345,7 +345,7 @@ export default function PricingPage() {
                             <div
                               className={`flex-shrink-0 w-4.5 h-4.5 rounded-full flex items-center justify-center mt-0.5 ${
                                 plan.featured
-                                  ? "bg-purple-500/15 text-purple-400"
+                                  ? "bg-stone-500/15 text-stone-400"
                                   : "bg-white/[0.06] text-zinc-500"
                               }`}
                             >
@@ -369,7 +369,7 @@ export default function PricingPage() {
                           href="/auth/signup"
                           className={`group/btn flex items-center justify-center gap-2 w-full py-3.5 rounded-xl text-sm font-semibold transition-all ${
                             plan.featured
-                              ? "bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30"
+                              ? "bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 text-white shadow-lg shadow-stone-500/20 hover:shadow-stone-500/30"
                               : "border border-white/[0.08] text-zinc-300 hover:text-white hover:border-white/20 hover:bg-white/[0.04]"
                           }`}
                         >
@@ -396,15 +396,15 @@ export default function PricingPage() {
               className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 text-sm text-zinc-500"
             >
               <span className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400" />
+                <Check className="w-4 h-4 text-stone-400" />
                 No credit card required
               </span>
               <span className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400" />
+                <Check className="w-4 h-4 text-stone-400" />
                 14-day free trial on all paid plans
               </span>
               <span className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400" />
+                <Check className="w-4 h-4 text-stone-400" />
                 Cancel anytime
               </span>
             </motion.div>
@@ -444,7 +444,7 @@ export default function PricingPage() {
                       variants={fadeUp}
                       className={`rounded-xl border transition-colors ${
                         isOpen
-                          ? "border-purple-500/20 bg-purple-500/[0.03]"
+                          ? "border-stone-500/20 bg-stone-500/[0.03]"
                           : "border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04]"
                       }`}
                     >
@@ -496,12 +496,12 @@ export default function PricingPage() {
             transition={{ duration: 0.6 }}
             className="max-w-3xl mx-auto text-center"
           >
-            <div className="relative rounded-2xl p-[1px] bg-gradient-to-b from-purple-500/30 via-white/[0.06] to-white/[0.02] overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-b from-purple-600/[0.06] to-transparent pointer-events-none" />
+            <div className="relative rounded-2xl p-[1px] bg-gradient-to-b from-stone-500/30 via-white/[0.06] to-white/[0.02] overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-b from-stone-600/[0.06] to-transparent pointer-events-none" />
               <div className="relative rounded-[15px] bg-zinc-950/80 backdrop-blur-xl py-16 px-8">
                 <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-4">
                   Ready to build something{" "}
-                  <span className="bg-gradient-to-r from-purple-400 to-violet-400 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">
                     extraordinary
                   </span>
                   ?
@@ -513,7 +513,7 @@ export default function PricingPage() {
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                   <Link
                     href="/builder"
-                    className="group inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-sm font-bold text-white shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 transition-all"
+                    className="group inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 text-sm font-bold text-white shadow-lg shadow-stone-500/20 hover:shadow-stone-500/30 transition-all"
                   >
                     Try the Builder Free
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />

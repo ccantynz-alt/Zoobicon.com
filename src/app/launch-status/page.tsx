@@ -294,9 +294,9 @@ export default function LaunchStatusPage() {
     <div className="min-h-screen bg-[#05060a] text-white">
       {/* Ambient background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full bg-indigo-600/10 blur-[120px]" />
-        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] rounded-full bg-fuchsia-600/10 blur-[120px]" />
-        <div className="absolute top-1/3 right-0 w-[400px] h-[400px] rounded-full bg-cyan-500/5 blur-[100px]" />
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full bg-stone-600/10 blur-[120px]" />
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] rounded-full bg-stone-600/10 blur-[120px]" />
+        <div className="absolute top-1/3 right-0 w-[400px] h-[400px] rounded-full bg-stone-500/5 blur-[100px]" />
       </div>
 
       <div className="relative max-w-6xl mx-auto px-6 py-12">
@@ -321,7 +321,7 @@ export default function LaunchStatusPage() {
         {/* Hero */}
         <div className="mb-14">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/[0.03] mb-5">
-            <Sparkles className="w-3 h-3 text-indigo-400" />
+            <Sparkles className="w-3 h-3 text-stone-400" />
             <span className="text-[10px] tracking-widest text-white/60 uppercase">Live Launch Tracker</span>
           </div>
           <h1 className="text-5xl md:text-6xl font-semibold tracking-tight mb-4 bg-gradient-to-br from-white via-white to-white/40 bg-clip-text text-transparent">
@@ -378,7 +378,7 @@ export default function LaunchStatusPage() {
           <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-xl overflow-hidden">
             <div className="grid grid-cols-[1.5fr_1fr_1fr_1fr_1fr] px-5 py-3 border-b border-white/[0.05] text-[10px] tracking-widest text-white/40 uppercase font-medium">
               <div>Metric</div>
-              <div className="text-indigo-300">Zoobicon</div>
+              <div className="text-stone-300">Zoobicon</div>
               <div>Bolt.new</div>
               <div>Lovable</div>
               <div>v0.app</div>
@@ -391,7 +391,7 @@ export default function LaunchStatusPage() {
                 <div className="text-white/80">{row.label}</div>
                 <div
                   className={`font-medium ${
-                    row.weLead ? "text-emerald-400" : "text-amber-400"
+                    row.weLead ? "text-stone-400" : "text-stone-400"
                   } flex items-center gap-2`}
                 >
                   {row.weLead && <Zap className="w-3 h-3" />}
@@ -432,20 +432,20 @@ function CheckRow({ check, isLast }: { check: Check; isLast: boolean }) {
     check.status === "checking" ? (
       <Loader2 className="w-4 h-4 animate-spin text-white/40" />
     ) : check.status === "pass" ? (
-      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+      <CheckCircle2 className="w-4 h-4 text-stone-400" />
     ) : check.status === "warn" ? (
-      <AlertCircle className="w-4 h-4 text-amber-400" />
+      <AlertCircle className="w-4 h-4 text-stone-400" />
     ) : (
-      <XCircle className="w-4 h-4 text-red-400" />
+      <XCircle className="w-4 h-4 text-stone-400" />
     );
 
   const statusDot =
     check.status === "pass"
-      ? "bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.6)]"
+      ? "bg-stone-400 shadow-[0_0_10px_rgba(52,211,153,0.6)]"
       : check.status === "warn"
-      ? "bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.6)]"
+      ? "bg-stone-400 shadow-[0_0_10px_rgba(251,191,36,0.6)]"
       : check.status === "fail"
-      ? "bg-red-400 shadow-[0_0_10px_rgba(248,113,113,0.6)]"
+      ? "bg-stone-400 shadow-[0_0_10px_rgba(248,113,113,0.6)]"
       : "bg-white/20";
 
   return (
@@ -459,7 +459,7 @@ function CheckRow({ check, isLast }: { check: Check; isLast: boolean }) {
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium text-white/90">{check.label}</span>
           {check.revenueCritical && (
-            <span className="text-[9px] tracking-widest text-indigo-300 uppercase px-1.5 py-0.5 rounded border border-indigo-500/20 bg-indigo-500/10">
+            <span className="text-[9px] tracking-widest text-stone-300 uppercase px-1.5 py-0.5 rounded border border-stone-500/20 bg-stone-500/10">
               Revenue
             </span>
           )}
@@ -487,9 +487,9 @@ function SummaryCard({
   icon: React.ReactNode;
 }) {
   const accentMap = {
-    green: "from-emerald-500/20 to-emerald-500/0 border-emerald-500/20 text-emerald-300",
-    yellow: "from-amber-500/20 to-amber-500/0 border-amber-500/20 text-amber-300",
-    red: "from-red-500/20 to-red-500/0 border-red-500/20 text-red-300",
+    green: "from-stone-500/20 to-stone-500/0 border-stone-500/20 text-stone-300",
+    yellow: "from-stone-500/20 to-stone-500/0 border-stone-500/20 text-stone-300",
+    red: "from-stone-500/20 to-stone-500/0 border-stone-500/20 text-stone-300",
   };
   return (
     <div

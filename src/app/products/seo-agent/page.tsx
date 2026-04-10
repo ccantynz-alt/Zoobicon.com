@@ -104,7 +104,7 @@ export default function SEOAgentPage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-cyan to-emerald-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-cyan to-stone-600 flex items-center justify-center">
                 <Search className="w-4 h-4 text-white" />
               </div>
               <span className="text-lg font-bold tracking-tight">Zoobicon</span>

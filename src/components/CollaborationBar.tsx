@@ -104,7 +104,7 @@ export default function CollaborationBar({
             <div className="p-3 space-y-3">
               <button
                 onClick={() => { onCreateRoom(); setShowPanel(false); }}
-                className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20 hover:bg-blue-500/20 text-blue-400 text-sm transition-colors"
+                className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg bg-stone-500/10 border border-stone-500/20 hover:bg-stone-500/20 text-stone-400 text-sm transition-colors"
               >
                 <UserPlus size={14} />
                 <span>Start Collaboration Session</span>
@@ -120,7 +120,7 @@ export default function CollaborationBar({
                   value={joinCode}
                   onChange={(e) => setJoinCode(e.target.value)}
                   placeholder="Invite code..."
-                  className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white/80 placeholder:text-white/50 outline-none focus:border-blue-500/50"
+                  className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white/80 placeholder:text-white/50 outline-none focus:border-stone-500/50"
                   onKeyDown={(e) => e.key === "Enter" && handleJoin()}
                 />
                 <button
@@ -132,7 +132,7 @@ export default function CollaborationBar({
                 </button>
               </div>
               {joinError && (
-                <p className="text-[10px] text-red-400">{joinError}</p>
+                <p className="text-[10px] text-stone-400">{joinError}</p>
               )}
             </div>
           </div>
@@ -151,14 +151,14 @@ export default function CollaborationBar({
   return (
     <div className="relative flex items-center gap-2">
       {/* Live indicator */}
-      <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-green-500/10 border border-green-500/20">
-        <Radio size={10} className="text-green-400 animate-pulse" />
-        <span className="text-[10px] text-green-400 font-medium">LIVE</span>
+      <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-stone-500/10 border border-stone-500/20">
+        <Radio size={10} className="text-stone-400 animate-pulse" />
+        <span className="text-[10px] text-stone-400 font-medium">LIVE</span>
         {transport === "websocket" && (
-          <span className="text-[8px] text-green-400/50 ml-0.5">WS</span>
+          <span className="text-[8px] text-stone-400/50 ml-0.5">WS</span>
         )}
         {transport === "sse" && (
-          <span className="text-[8px] text-green-400/50 ml-0.5">SSE</span>
+          <span className="text-[8px] text-stone-400/50 ml-0.5">SSE</span>
         )}
       </div>
 
@@ -169,14 +169,14 @@ export default function CollaborationBar({
         "Sync error — retrying"
       }>
         <div className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${
-          syncStatus === "synced" ? "bg-green-400" :
-          syncStatus === "syncing" ? "bg-yellow-400 animate-pulse" :
-          "bg-red-400"
+          syncStatus === "synced" ? "bg-stone-400" :
+          syncStatus === "syncing" ? "bg-stone-400 animate-pulse" :
+          "bg-stone-400"
         }`} />
         <span className={`text-[10px] transition-colors duration-300 ${
           syncStatus === "synced" ? "text-white/40" :
-          syncStatus === "syncing" ? "text-yellow-400/70" :
-          "text-red-400/70"
+          syncStatus === "syncing" ? "text-stone-400/70" :
+          "text-stone-400/70"
         }`}>
           {syncStatus === "synced" && lastSyncedAt
             ? `Synced ${formatTimeAgo(lastSyncedAt)}`
@@ -222,7 +222,7 @@ export default function CollaborationBar({
           {/* Header */}
           <div className="flex items-center justify-between p-3 border-b border-white/5">
             <div className="flex items-center gap-2">
-              <Radio size={12} className="text-green-400 animate-pulse" />
+              <Radio size={12} className="text-stone-400 animate-pulse" />
               <h3 className="text-xs font-semibold text-white/70">
                 Live Session
               </h3>
@@ -241,7 +241,7 @@ export default function CollaborationBar({
               </code>
               <button
                 onClick={copyInviteLink}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] hover:bg-blue-500/20 transition-colors"
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded bg-stone-500/10 border border-stone-500/20 text-stone-400 text-[10px] hover:bg-stone-500/20 transition-colors"
               >
                 {copied ? <Check size={11} /> : <Copy size={11} />}
                 {copied ? "Copied" : "Link"}
@@ -271,7 +271,7 @@ export default function CollaborationBar({
                   </p>
                 </div>
                 {!p.isMe && (
-                  <div className="w-1.5 h-1.5 rounded-full bg-green-400" title="Online" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-stone-400" title="Online" />
                 )}
               </div>
             ))}
@@ -281,7 +281,7 @@ export default function CollaborationBar({
           <div className="p-3 border-t border-white/5">
             <button
               onClick={() => { onLeaveRoom(); setShowPanel(false); }}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-red-500/20 text-red-400/70 hover:bg-red-500/10 text-xs transition-colors"
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-stone-500/20 text-stone-400/70 hover:bg-stone-500/10 text-xs transition-colors"
             >
               <LogOut size={12} />
               <span>Leave Session</span>

@@ -57,12 +57,12 @@ const GEN_NAME_COUNT = 12;
 
 /* ── Popular TLD showcase cards ── */
 const FEATURED_TLDS = [
-  { tld: "com", price: 12.99, desc: "The gold standard", color: "from-blue-500 to-blue-600", popular: true },
-  { tld: "ai", price: 69.99, desc: "AI & tech brands", color: "from-purple-500 to-violet-600", popular: true },
-  { tld: "io", price: 39.99, desc: "Startups & SaaS", color: "from-emerald-500 to-teal-600", popular: true },
-  { tld: "sh", price: 24.99, desc: "Dev tools & hosting", color: "from-amber-500 to-orange-600", popular: false },
-  { tld: "dev", price: 14.99, desc: "Developer projects", color: "from-cyan-500 to-blue-600", popular: false },
-  { tld: "app", price: 14.99, desc: "Mobile & web apps", color: "from-pink-500 to-rose-600", popular: false },
+  { tld: "com", price: 12.99, desc: "The gold standard", color: "from-stone-500 to-stone-600", popular: true },
+  { tld: "ai", price: 69.99, desc: "AI & tech brands", color: "from-stone-500 to-stone-600", popular: true },
+  { tld: "io", price: 39.99, desc: "Startups & SaaS", color: "from-stone-500 to-stone-600", popular: true },
+  { tld: "sh", price: 24.99, desc: "Dev tools & hosting", color: "from-stone-500 to-stone-600", popular: false },
+  { tld: "dev", price: 14.99, desc: "Developer projects", color: "from-stone-500 to-stone-600", popular: false },
+  { tld: "app", price: 14.99, desc: "Mobile & web apps", color: "from-stone-500 to-stone-600", popular: false },
 ];
 
 const TRUST_FEATURES = [
@@ -487,12 +487,12 @@ export default function DomainsPage() {
               {cart.map(c => (
                 <div key={c.domain} className="flex justify-between text-sm py-1">
                   <span className="text-white font-medium">{c.domain}</span>
-                  <span className="text-emerald-400">${c.price.toFixed(2)}/yr</span>
+                  <span className="text-stone-400">${c.price.toFixed(2)}/yr</span>
                 </div>
               ))}
               <div className="flex justify-between mt-2 pt-2 border-t border-slate-700/30 font-bold">
                 <span>Total</span>
-                <span className="text-emerald-400">${cartTotal.toFixed(2)}/yr</span>
+                <span className="text-stone-400">${cartTotal.toFixed(2)}/yr</span>
               </div>
             </div>
 
@@ -503,51 +503,51 @@ export default function DomainsPage() {
                 <div>
                   <label className="block text-xs text-slate-400 mb-1">First Name *</label>
                   <input type="text" value={contactInfo.firstName} onChange={e => setContactInfo(p => ({ ...p, firstName: e.target.value }))}
-                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Craig" />
+                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent" placeholder="Craig" />
                 </div>
                 <div>
                   <label className="block text-xs text-slate-400 mb-1">Last Name *</label>
                   <input type="text" value={contactInfo.lastName} onChange={e => setContactInfo(p => ({ ...p, lastName: e.target.value }))}
-                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Smith" />
+                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent" placeholder="Smith" />
                 </div>
               </div>
               <div>
                 <label className="block text-xs text-slate-400 mb-1">Email *</label>
                 <input type="email" value={contactInfo.email} onChange={e => setContactInfo(p => ({ ...p, email: e.target.value }))}
-                  className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="you@example.com" />
+                  className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent" placeholder="you@example.com" />
               </div>
               <div>
                 <label className="block text-xs text-slate-400 mb-1">Phone *</label>
                 <input type="tel" value={contactInfo.phone} onChange={e => setContactInfo(p => ({ ...p, phone: e.target.value }))}
-                  className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="+64.211234567" />
+                  className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent" placeholder="+64.211234567" />
               </div>
               <div>
                 <label className="block text-xs text-slate-400 mb-1">Street Address *</label>
                 <input type="text" value={contactInfo.address} onChange={e => setContactInfo(p => ({ ...p, address: e.target.value }))}
-                  className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="123 Main Street" />
+                  className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent" placeholder="123 Main Street" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs text-slate-400 mb-1">City *</label>
                   <input type="text" value={contactInfo.city} onChange={e => setContactInfo(p => ({ ...p, city: e.target.value }))}
-                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Auckland" />
+                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent" placeholder="Auckland" />
                 </div>
                 <div>
                   <label className="block text-xs text-slate-400 mb-1">State/Region</label>
                   <input type="text" value={contactInfo.state} onChange={e => setContactInfo(p => ({ ...p, state: e.target.value }))}
-                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Auckland" />
+                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent" placeholder="Auckland" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs text-slate-400 mb-1">Postal Code *</label>
                   <input type="text" value={contactInfo.zip} onChange={e => setContactInfo(p => ({ ...p, zip: e.target.value }))}
-                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="1010" />
+                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent" placeholder="1010" />
                 </div>
                 <div>
                   <label className="block text-xs text-slate-400 mb-1">Country *</label>
                   <select value={contactInfo.country} onChange={e => setContactInfo(p => ({ ...p, country: e.target.value }))}
-                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-sm focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent">
                     <option value="NZ">New Zealand</option>
                     <option value="AU">Australia</option>
                     <option value="US">United States</option>
@@ -570,7 +570,7 @@ export default function DomainsPage() {
               <button
                 onClick={handleSubmitRegistration}
                 disabled={registering || !contactInfo.firstName || !contactInfo.lastName || !contactInfo.email}
-                className="w-full py-3.5 mt-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-bold text-base transition-colors flex items-center justify-center gap-2"
+                className="w-full py-3.5 mt-2 bg-stone-600 hover:bg-stone-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-bold text-base transition-colors flex items-center justify-center gap-2"
               >
                 {registering ? (
                   <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</>
@@ -588,19 +588,19 @@ export default function DomainsPage() {
       {/* ═══════════════════════════════════════════ */}
       <section className="relative pt-24 pb-20 md:pt-32 md:pb-28 overflow-hidden">
         {/* Gradient background — lighter than the rest of the site */}
-        <div className="absolute inset-0 bg-gradient-to-b from-indigo-950/40 via-[#0b0b16] to-[#0b0b16]" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-indigo-500/[0.07] rounded-full blur-[120px]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-stone-950/40 via-[#0b0b16] to-[#0b0b16]" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-stone-500/[0.07] rounded-full blur-[120px]" />
 
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center">
           {/* Trust badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium mb-8">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-stone-500/10 border border-stone-500/20 text-stone-400 text-sm font-medium mb-8">
             <BadgeCheck className="w-4 h-4" />
             Real-time registry checks — powered by Tucows/OpenSRS
           </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.05] mb-6">
             Find your perfect{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-stone-400 via-stone-400 to-stone-400">
               domain name
             </span>
           </h1>
@@ -620,7 +620,7 @@ export default function DomainsPage() {
               onClick={() => setMode("search")}
               className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all ${
                 mode === "search"
-                  ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20"
+                  ? "bg-stone-600 text-white shadow-lg shadow-stone-500/20"
                   : "bg-white/[0.06] text-slate-400 hover:text-white border border-white/[0.08]"
               }`}
             >
@@ -636,7 +636,7 @@ export default function DomainsPage() {
               }}
               className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all ${
                 mode === "generate"
-                  ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/20"
+                  ? "bg-gradient-to-r from-stone-600 to-stone-600 text-white shadow-lg shadow-stone-500/20"
                   : "bg-white/[0.06] text-slate-400 hover:text-white border border-white/[0.08]"
               }`}
             >
@@ -646,7 +646,7 @@ export default function DomainsPage() {
 
           {/* ── SEARCH MODE ── */}
           {mode === "search" && (
-            <div className="bg-white/[0.06] backdrop-blur-sm border border-white/[0.10] rounded-3xl p-6 md:p-8 text-left max-w-3xl mx-auto shadow-2xl shadow-indigo-500/[0.05]">
+            <div className="bg-white/[0.06] backdrop-blur-sm border border-white/[0.10] rounded-3xl p-6 md:p-8 text-left max-w-3xl mx-auto shadow-2xl shadow-stone-500/[0.05]">
               <div className="flex flex-col sm:flex-row gap-3 mb-5">
                 <div className="flex-1 relative">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
@@ -656,14 +656,14 @@ export default function DomainsPage() {
                     onChange={(e) => setName(e.target.value.replace(/\s/g, ""))}
                     onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     placeholder="Type your domain name..."
-                    className="w-full pl-12 pr-5 py-4 bg-white/[0.06] border border-white/[0.10] rounded-2xl text-white text-lg placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+                    className="w-full pl-12 pr-5 py-4 bg-white/[0.06] border border-white/[0.10] rounded-2xl text-white text-lg placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent transition-shadow"
                     autoFocus
                   />
                 </div>
                 <button
                   onClick={handleSearch}
                   disabled={searching || !name.trim() || selectedTlds.size === 0}
-                  className="px-8 py-4 bg-indigo-600 hover:bg-indigo-500 rounded-2xl font-bold text-lg flex items-center justify-center gap-2 disabled:opacity-40 transition-all hover:shadow-lg hover:shadow-indigo-500/25 shrink-0"
+                  className="px-8 py-4 bg-stone-600 hover:bg-stone-500 rounded-2xl font-bold text-lg flex items-center justify-center gap-2 disabled:opacity-40 transition-all hover:shadow-lg hover:shadow-stone-500/25 shrink-0"
                 >
                   {searching ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
                   Search
@@ -678,7 +678,7 @@ export default function DomainsPage() {
                     onClick={() => toggleTld(tld)}
                     className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                       selectedTlds.has(tld)
-                        ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/20"
+                        ? "bg-stone-600 text-white shadow-md shadow-stone-500/20"
                         : "bg-white/[0.04] text-slate-400 hover:bg-white/[0.08] hover:text-white border border-white/[0.06]"
                     }`}
                   >
@@ -696,7 +696,7 @@ export default function DomainsPage() {
                     <button
                       key={h}
                       onClick={() => { setName(h); }}
-                      className="mr-3 text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
+                      className="mr-3 text-sm text-stone-400 hover:text-stone-300 transition-colors"
                     >
                       {h}
                     </button>
@@ -708,7 +708,7 @@ export default function DomainsPage() {
 
           {/* ── GENERATE MODE — AI Name Generator ── */}
           {mode === "generate" && (
-            <div className="bg-white/[0.06] backdrop-blur-sm border border-purple-500/[0.15] rounded-3xl p-6 md:p-8 text-left max-w-3xl mx-auto shadow-2xl shadow-purple-500/[0.05]">
+            <div className="bg-white/[0.06] backdrop-blur-sm border border-stone-500/[0.15] rounded-3xl p-6 md:p-8 text-left max-w-3xl mx-auto shadow-2xl shadow-stone-500/[0.05]">
               <div className="mb-5">
                 <label className="block text-sm font-medium text-slate-300 mb-2">Describe your business or idea</label>
                 <textarea
@@ -717,7 +717,7 @@ export default function DomainsPage() {
                   onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleGenerate(); } }}
                   placeholder="e.g. AI-powered accounting software for freelancers, sustainable fashion brand for millennials, premium coffee subscription service..."
                   rows={3}
-                  className="w-full px-5 py-4 bg-white/[0.06] border border-white/[0.10] rounded-2xl text-white text-base placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-shadow resize-none"
+                  className="w-full px-5 py-4 bg-white/[0.06] border border-white/[0.10] rounded-2xl text-white text-base placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent transition-shadow resize-none"
                 />
               </div>
 
@@ -736,7 +736,7 @@ export default function DomainsPage() {
                       onClick={() => setGenStyle(s.id)}
                       className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                         genStyle === s.id
-                          ? "bg-purple-600 text-white shadow-md shadow-purple-500/20"
+                          ? "bg-stone-600 text-white shadow-md shadow-stone-500/20"
                           : "bg-white/[0.04] text-slate-400 hover:bg-white/[0.08] hover:text-white border border-white/[0.06]"
                       }`}
                     >
@@ -756,7 +756,7 @@ export default function DomainsPage() {
                       onClick={() => toggleTld(tld)}
                       className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                         selectedTlds.has(tld)
-                          ? "bg-purple-600 text-white shadow-md shadow-purple-500/20"
+                          ? "bg-stone-600 text-white shadow-md shadow-stone-500/20"
                           : "bg-white/[0.04] text-slate-400 hover:bg-white/[0.08] hover:text-white border border-white/[0.06]"
                       }`}
                     >
@@ -770,7 +770,7 @@ export default function DomainsPage() {
               <button
                 onClick={handleGenerate}
                 disabled={generating || genDescription.trim().length < 3 || selectedTlds.size === 0}
-                className="w-full py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-2xl font-bold text-lg flex items-center justify-center gap-2 disabled:opacity-40 transition-all hover:shadow-lg hover:shadow-purple-500/20"
+                className="w-full py-4 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 rounded-2xl font-bold text-lg flex items-center justify-center gap-2 disabled:opacity-40 transition-all hover:shadow-lg hover:shadow-stone-500/20"
               >
                 {generating ? (
                   <><Loader2 className="w-5 h-5 animate-spin" /> Generating names...</>
@@ -780,7 +780,7 @@ export default function DomainsPage() {
               </button>
 
               {generatorError && (
-                <div className="mt-4 p-3 rounded-xl border border-red-500/20 bg-red-500/[0.05] text-sm text-red-300">
+                <div className="mt-4 p-3 rounded-xl border border-stone-500/20 bg-stone-500/[0.05] text-sm text-stone-300">
                   {generatorError}
                 </div>
               )}
@@ -790,19 +790,19 @@ export default function DomainsPage() {
           {/* Quick trust stats */}
           <div className="flex flex-wrap justify-center gap-6 md:gap-10 mt-10 text-sm text-slate-400">
             <div className="flex items-center gap-2">
-              <Globe className="w-4 h-4 text-indigo-400" />
+              <Globe className="w-4 h-4 text-stone-400" />
               <span>13 extensions</span>
             </div>
             <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4 text-emerald-400" />
+              <Shield className="w-4 h-4 text-stone-400" />
               <span>Free WHOIS privacy</span>
             </div>
             <div className="flex items-center gap-2">
-              <Lock className="w-4 h-4 text-amber-400" />
+              <Lock className="w-4 h-4 text-stone-400" />
               <span>Free SSL included</span>
             </div>
             <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-purple-400" />
+              <Zap className="w-4 h-4 text-stone-400" />
               <span>Instant activation</span>
             </div>
           </div>
@@ -815,7 +815,7 @@ export default function DomainsPage() {
       <div ref={resultsRef} />
       {(searchError || checkoutError) && (
         <div className="max-w-4xl mx-auto px-6 -mt-4 mb-6">
-          <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          <div className="rounded-xl border border-stone-500/30 bg-stone-500/10 px-4 py-3 text-sm text-stone-300">
             {searchError || checkoutError}
           </div>
         </div>
@@ -851,9 +851,9 @@ export default function DomainsPage() {
 
               {/* No available results — suggest alternatives */}
               {!searching && !results.some(r => r.checking) && availableResults.length === 0 && results.length > 0 && !autoGenerating && (
-                <div className="rounded-2xl border border-amber-500/20 bg-amber-500/[0.05] p-6 text-center">
-                  <div className="w-14 h-14 rounded-2xl bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
-                    <Sparkles className="w-7 h-7 text-amber-400" />
+                <div className="rounded-2xl border border-stone-500/20 bg-stone-500/[0.05] p-6 text-center">
+                  <div className="w-14 h-14 rounded-2xl bg-stone-500/10 flex items-center justify-center mx-auto mb-4">
+                    <Sparkles className="w-7 h-7 text-stone-400" />
                   </div>
                   <h3 className="text-lg font-bold mb-2">
                     {autoExpandedTlds
@@ -873,7 +873,7 @@ export default function DomainsPage() {
                         setResults([]);
                         setPendingGenerate(true);
                       }}
-                      className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-xl font-bold text-base transition-all shadow-lg shadow-purple-500/20"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 rounded-xl font-bold text-base transition-all shadow-lg shadow-stone-500/20"
                     >
                       <Wand2 className="w-5 h-5" /> Generate Available Alternatives
                     </button>
@@ -883,9 +883,9 @@ export default function DomainsPage() {
 
               {/* Auto-generating alternatives */}
               {autoGenerating && (
-                <div className="rounded-2xl border border-purple-500/20 bg-purple-500/[0.05] p-6 text-center">
-                  <div className="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center mx-auto mb-4">
-                    <Wand2 className="w-7 h-7 text-purple-400" />
+                <div className="rounded-2xl border border-stone-500/20 bg-stone-500/[0.05] p-6 text-center">
+                  <div className="w-14 h-14 rounded-2xl bg-stone-500/10 flex items-center justify-center mx-auto mb-4">
+                    <Wand2 className="w-7 h-7 text-stone-400" />
                   </div>
                   <h3 className="text-lg font-bold mb-2">
                     &ldquo;{name.trim().toLowerCase()}&rdquo; is taken everywhere
@@ -901,7 +901,7 @@ export default function DomainsPage() {
                       setAutoGenerating(false);
                       setPendingGenerate(true);
                     }}
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-xl font-bold text-base transition-all shadow-lg shadow-purple-500/20"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 rounded-xl font-bold text-base transition-all shadow-lg shadow-stone-500/20"
                   >
                     <Wand2 className="w-5 h-5" /> Find Available Alternatives
                   </button>
@@ -910,14 +910,14 @@ export default function DomainsPage() {
 
               {/* Available — bright green — ONLY show available domains */}
               {availableResults.map(r => (
-                <div key={r.domain} className="flex items-center justify-between p-5 rounded-2xl bg-emerald-500/[0.08] border border-emerald-500/20 hover:border-emerald-500/30 transition-colors">
+                <div key={r.domain} className="flex items-center justify-between p-5 rounded-2xl bg-stone-500/[0.08] border border-stone-500/20 hover:border-stone-500/30 transition-colors">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-                      <Check className="w-5 h-5 text-emerald-400" />
+                    <div className="w-10 h-10 rounded-xl bg-stone-500/20 flex items-center justify-center">
+                      <Check className="w-5 h-5 text-stone-400" />
                     </div>
                     <div>
                       <span className="text-lg font-bold text-white">{r.domain}</span>
-                      <span className="block text-sm text-emerald-400">Available</span>
+                      <span className="block text-sm text-stone-400">Available</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
@@ -926,11 +926,11 @@ export default function DomainsPage() {
                       <span className="text-sm text-slate-400">/yr</span>
                     </div>
                     {cart.some(c => c.domain === r.domain) ? (
-                      <button onClick={() => removeFromCart(r.domain)} className="px-5 py-2.5 rounded-xl bg-emerald-600/20 text-emerald-300 text-sm font-semibold flex items-center gap-1.5">
+                      <button onClick={() => removeFromCart(r.domain)} className="px-5 py-2.5 rounded-xl bg-stone-600/20 text-stone-300 text-sm font-semibold flex items-center gap-1.5">
                         <Check className="w-4 h-4" /> Added
                       </button>
                     ) : (
-                      <button onClick={() => addToCart(r)} className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold flex items-center gap-1.5 transition-colors shadow-lg shadow-indigo-500/20">
+                      <button onClick={() => addToCart(r)} className="px-5 py-2.5 rounded-xl bg-stone-600 hover:bg-stone-500 text-white text-sm font-semibold flex items-center gap-1.5 transition-colors shadow-lg shadow-stone-500/20">
                         <Plus className="w-4 h-4" /> Add to Cart
                       </button>
                     )}
@@ -941,13 +941,13 @@ export default function DomainsPage() {
 
             {/* Cart */}
             {cart.length > 0 && (
-              <div className="bg-indigo-500/[0.06] border border-indigo-500/20 rounded-2xl p-6 mb-8">
+              <div className="bg-stone-500/[0.06] border border-stone-500/20 rounded-2xl p-6 mb-8">
                 <div className="flex items-center justify-between mb-5">
                   <h2 className="text-lg font-bold flex items-center gap-2">
-                    <ShoppingCart className="w-5 h-5 text-indigo-400" />
+                    <ShoppingCart className="w-5 h-5 text-stone-400" />
                     Your domains ({cart.length})
                   </h2>
-                  <span className="text-2xl font-black text-indigo-400">${cartTotal.toFixed(2)}<span className="text-sm font-normal text-slate-400">/yr</span></span>
+                  <span className="text-2xl font-black text-stone-400">${cartTotal.toFixed(2)}<span className="text-sm font-normal text-slate-400">/yr</span></span>
                 </div>
                 <div className="space-y-2 mb-5">
                   {cart.map(item => (
@@ -955,7 +955,7 @@ export default function DomainsPage() {
                       <span className="text-base font-medium">{item.domain}</span>
                       <div className="flex items-center gap-4">
                         <span className="text-sm text-slate-400">${item.price}/yr</span>
-                        <button onClick={() => removeFromCart(item.domain)} className="text-red-400/60 hover:text-red-400 transition-colors">
+                        <button onClick={() => removeFromCart(item.domain)} className="text-stone-400/60 hover:text-stone-400 transition-colors">
                           <Minus className="w-4 h-4" />
                         </button>
                       </div>
@@ -965,11 +965,11 @@ export default function DomainsPage() {
                 <button
                   onClick={handleRegister}
                   disabled={registering}
-                  className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-lg transition-colors shadow-lg shadow-indigo-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full py-4 bg-stone-600 hover:bg-stone-500 rounded-xl font-bold text-lg transition-colors shadow-lg shadow-stone-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {registering ? <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</> : "Proceed to Registration"}
                 </button>
-                {checkoutError && <p className="text-center text-sm text-red-400 mt-2">{checkoutError}</p>}
+                {checkoutError && <p className="text-center text-sm text-stone-400 mt-2">{checkoutError}</p>}
                 <p className="text-center text-xs text-slate-500 mt-3">Includes free WHOIS privacy, SSL, and DNS management</p>
               </div>
             )}
@@ -986,7 +986,7 @@ export default function DomainsPage() {
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold flex items-center gap-2">
-                <Wand2 className="w-5 h-5 text-purple-400" />
+                <Wand2 className="w-5 h-5 text-stone-400" />
                 {(() => {
                   const withAvailable = generatedNames.filter(gn => gn.domains.some(d => d.available === true)).length;
                   const stillChecking = generatedNames.some(gn => gn.domains.some(d => d.checking));
@@ -1001,7 +1001,7 @@ export default function DomainsPage() {
               <button
                 onClick={handleGenerate}
                 disabled={generating}
-                className="text-sm text-purple-400 hover:text-purple-300 flex items-center gap-1 transition-colors"
+                className="text-sm text-stone-400 hover:text-stone-300 flex items-center gap-1 transition-colors"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${generating ? "animate-spin" : ""}`} /> Regenerate
               </button>
@@ -1013,10 +1013,10 @@ export default function DomainsPage() {
               const allUnknown = !stillChecking && generatedNames.every((gn) => gn.domains.every((d) => d.available === null));
               if (!allUnknown || generating) return null;
               return (
-                <div className="rounded-2xl border border-red-500/20 bg-red-500/[0.05] p-5 mb-6">
+                <div className="rounded-2xl border border-stone-500/20 bg-stone-500/[0.05] p-5 mb-6">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center shrink-0">
-                      <X className="w-5 h-5 text-red-400" />
+                    <div className="w-10 h-10 rounded-xl bg-stone-500/10 flex items-center justify-center shrink-0">
+                      <X className="w-5 h-5 text-stone-400" />
                     </div>
                     <div className="flex-1">
                       <h3 className="text-base font-bold text-white mb-1">Couldn&apos;t check availability</h3>
@@ -1026,7 +1026,7 @@ export default function DomainsPage() {
                       <button
                         onClick={handleGenerate}
                         disabled={generating}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 text-red-300 text-sm font-semibold transition-colors"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-stone-600/20 hover:bg-stone-600/30 border border-stone-500/30 text-stone-300 text-sm font-semibold transition-colors"
                       >
                         <RefreshCw className="w-3.5 h-3.5" /> Try again
                       </button>
@@ -1050,7 +1050,7 @@ export default function DomainsPage() {
                     key={gn.name}
                     className={`rounded-2xl border p-5 transition-all ${
                       hasAvailable
-                        ? "border-emerald-500/20 bg-emerald-500/[0.04]"
+                        ? "border-stone-500/20 bg-stone-500/[0.04]"
                         : "border-white/[0.06] bg-white/[0.02]"
                     }`}
                   >
@@ -1061,7 +1061,7 @@ export default function DomainsPage() {
                         <p className="text-sm text-slate-500">{gn.tagline}</p>
                       </div>
                       {hasAvailable && (
-                        <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 font-semibold shrink-0">
+                        <span className="text-xs px-2.5 py-1 rounded-full bg-stone-500/20 text-stone-400 font-semibold shrink-0">
                           {availableDomains.length} available
                         </span>
                       )}
@@ -1082,14 +1082,14 @@ export default function DomainsPage() {
                           className={`flex items-center justify-between p-3 rounded-xl transition-all ${
                             d.checking
                               ? "bg-white/[0.03]"
-                              : "bg-emerald-500/[0.06] border border-emerald-500/15"
+                              : "bg-stone-500/[0.06] border border-stone-500/15"
                           }`}
                         >
                           <div className="flex items-center gap-2.5">
                             {d.checking ? (
                               <Loader2 className="w-4 h-4 text-slate-500 animate-spin" />
                             ) : (
-                              <Check className="w-4 h-4 text-emerald-400" />
+                              <Check className="w-4 h-4 text-stone-400" />
                             )}
                             <span className={`font-semibold ${d.checking ? "text-slate-400" : "text-white"}`}>
                               {d.domain}
@@ -1101,14 +1101,14 @@ export default function DomainsPage() {
                               {cart.some((c) => c.domain === d.domain) ? (
                                 <button
                                   onClick={() => removeFromCart(d.domain)}
-                                  className="px-4 py-2 rounded-lg bg-emerald-600/20 text-emerald-300 text-sm font-semibold flex items-center gap-1.5"
+                                  className="px-4 py-2 rounded-lg bg-stone-600/20 text-stone-300 text-sm font-semibold flex items-center gap-1.5"
                                 >
                                   <Check className="w-3.5 h-3.5" /> In Cart
                                 </button>
                               ) : (
                                 <button
                                   onClick={() => addToCart(d)}
-                                  className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold flex items-center gap-1.5 transition-colors shadow-md shadow-indigo-500/20"
+                                  className="px-4 py-2 rounded-lg bg-stone-600 hover:bg-stone-500 text-white text-sm font-semibold flex items-center gap-1.5 transition-colors shadow-md shadow-stone-500/20"
                                 >
                                   <ShoppingCart className="w-3.5 h-3.5" /> Register
                                 </button>
@@ -1132,7 +1132,7 @@ export default function DomainsPage() {
                             }
                           });
                         }}
-                        className="w-full py-2.5 rounded-xl border border-emerald-500/20 text-emerald-400 text-sm font-semibold hover:bg-emerald-500/[0.06] transition-colors flex items-center justify-center gap-2"
+                        className="w-full py-2.5 rounded-xl border border-stone-500/20 text-stone-400 text-sm font-semibold hover:bg-stone-500/[0.06] transition-colors flex items-center justify-center gap-2"
                       >
                         <Plus className="w-4 h-4" /> Add All {availableDomains.length} Domains to Cart
                       </button>
@@ -1145,14 +1145,14 @@ export default function DomainsPage() {
               {generatedNames.length > 0 &&
                 generatedNames.every((gn) => gn.domains.every((d) => !d.checking)) &&
                 !generatedNames.some((gn) => gn.domains.some((d) => d.available === true)) && (
-                <div className="rounded-2xl border border-amber-500/20 bg-amber-500/[0.05] p-6 text-center">
-                  <Sparkles className="w-8 h-8 text-amber-400 mx-auto mb-3" />
+                <div className="rounded-2xl border border-stone-500/20 bg-stone-500/[0.05] p-6 text-center">
+                  <Sparkles className="w-8 h-8 text-stone-400 mx-auto mb-3" />
                   <h3 className="text-lg font-bold mb-2">All names are taken</h3>
                   <p className="text-sm text-slate-400 mb-4">Try a different description or style to find more options.</p>
                   <button
                     onClick={handleGenerate}
                     disabled={generating}
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-xl font-bold transition-all"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 rounded-xl font-bold transition-all"
                   >
                     <RefreshCw className={`w-4 h-4 ${generating ? "animate-spin" : ""}`} /> Generate More Names
                   </button>
@@ -1162,13 +1162,13 @@ export default function DomainsPage() {
 
             {/* Cart (shared with search results) */}
             {cart.length > 0 && (
-              <div className="bg-indigo-500/[0.06] border border-indigo-500/20 rounded-2xl p-6 mt-8">
+              <div className="bg-stone-500/[0.06] border border-stone-500/20 rounded-2xl p-6 mt-8">
                 <div className="flex items-center justify-between mb-5">
                   <h2 className="text-lg font-bold flex items-center gap-2">
-                    <ShoppingCart className="w-5 h-5 text-indigo-400" />
+                    <ShoppingCart className="w-5 h-5 text-stone-400" />
                     Your domains ({cart.length})
                   </h2>
-                  <span className="text-2xl font-black text-indigo-400">${cartTotal.toFixed(2)}<span className="text-sm font-normal text-slate-400">/yr</span></span>
+                  <span className="text-2xl font-black text-stone-400">${cartTotal.toFixed(2)}<span className="text-sm font-normal text-slate-400">/yr</span></span>
                 </div>
                 <div className="space-y-2 mb-5">
                   {cart.map(item => (
@@ -1176,7 +1176,7 @@ export default function DomainsPage() {
                       <span className="text-base font-medium">{item.domain}</span>
                       <div className="flex items-center gap-4">
                         <span className="text-sm text-slate-400">${item.price}/yr</span>
-                        <button onClick={() => removeFromCart(item.domain)} className="text-red-400/60 hover:text-red-400 transition-colors">
+                        <button onClick={() => removeFromCart(item.domain)} className="text-stone-400/60 hover:text-stone-400 transition-colors">
                           <Minus className="w-4 h-4" />
                         </button>
                       </div>
@@ -1186,11 +1186,11 @@ export default function DomainsPage() {
                 <button
                   onClick={handleRegister}
                   disabled={registering}
-                  className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-lg transition-colors shadow-lg shadow-indigo-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full py-4 bg-stone-600 hover:bg-stone-500 rounded-xl font-bold text-lg transition-colors shadow-lg shadow-stone-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {registering ? <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</> : "Proceed to Registration"}
                 </button>
-                {checkoutError && <p className="text-center text-sm text-red-400 mt-2">{checkoutError}</p>}
+                {checkoutError && <p className="text-center text-sm text-stone-400 mt-2">{checkoutError}</p>}
               </div>
             )}
           </div>
@@ -1220,7 +1220,7 @@ export default function DomainsPage() {
                 className="group relative rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 text-left hover:bg-white/[0.06] hover:border-white/[0.15] transition-all"
               >
                 {t.popular && (
-                  <span className="absolute top-3 right-3 text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-semibold">
+                  <span className="absolute top-3 right-3 text-[10px] px-2 py-0.5 rounded-full bg-stone-500/20 text-stone-300 font-semibold">
                     Popular
                   </span>
                 )}
@@ -1232,7 +1232,7 @@ export default function DomainsPage() {
                   <span className="text-2xl font-bold text-white">${t.price}</span>
                   <span className="text-sm text-slate-500">/year</span>
                 </div>
-                <div className="mt-3 text-xs text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                <div className="mt-3 text-xs text-stone-400 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
                   Search .{t.tld} domains <ArrowRight className="w-3 h-3" />
                 </div>
               </button>
@@ -1242,7 +1242,7 @@ export default function DomainsPage() {
           <div className="text-center mt-8">
             <button
               onClick={() => { setSelectedTlds(new Set(allTlds)); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-              className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
+              className="text-sm text-stone-400 hover:text-stone-300 transition-colors"
             >
               Search all 13 extensions at once &rarr;
             </button>
@@ -1270,8 +1270,8 @@ export default function DomainsPage() {
               const Icon = f.icon;
               return (
                 <div key={f.title} className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 hover:bg-white/[0.05] transition-colors">
-                  <div className="w-11 h-11 rounded-xl bg-indigo-500/10 flex items-center justify-center mb-4">
-                    <Icon className="w-5 h-5 text-indigo-400" />
+                  <div className="w-11 h-11 rounded-xl bg-stone-500/10 flex items-center justify-center mb-4">
+                    <Icon className="w-5 h-5 text-stone-400" />
                   </div>
                   <h3 className="text-lg font-bold mb-2">{f.title}</h3>
                   <p className="text-base text-slate-400 leading-relaxed">{f.desc}</p>
@@ -1300,14 +1300,14 @@ export default function DomainsPage() {
           <div className="rounded-2xl border border-white/[0.08] overflow-hidden">
             <div className="grid grid-cols-4 bg-white/[0.04] px-6 py-4 border-b border-white/[0.06]">
               <div className="text-sm font-semibold text-slate-400">Feature</div>
-              <div className="text-sm font-bold text-indigo-400 text-center">Zoobicon</div>
+              <div className="text-sm font-bold text-stone-400 text-center">Zoobicon</div>
               <div className="text-sm font-semibold text-slate-500 text-center">GoDaddy</div>
               <div className="text-sm font-semibold text-slate-500 text-center">Namecheap</div>
             </div>
             <button
               onClick={handleRegister}
               disabled={registering}
-              className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-semibold text-base transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full py-3 bg-stone-600 hover:bg-stone-500 rounded-xl font-semibold text-base transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {registering ? <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</> : "Proceed to Registration"}
             </button>
@@ -1349,11 +1349,11 @@ export default function DomainsPage() {
       {/* STICKY CART BAR — always visible at bottom  */}
       {/* ═══════════════════════════════════════════ */}
       {cart.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#0d0d1a]/95 backdrop-blur-xl border-t border-indigo-500/20 shadow-2xl shadow-black/50">
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#0d0d1a]/95 backdrop-blur-xl border-t border-stone-500/20 shadow-2xl shadow-black/50">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center shrink-0">
-                <ShoppingCart className="w-5 h-5 text-indigo-400" />
+              <div className="w-10 h-10 rounded-xl bg-stone-500/20 flex items-center justify-center shrink-0">
+                <ShoppingCart className="w-5 h-5 text-stone-400" />
               </div>
               <div className="min-w-0">
                 <span className="text-sm font-bold text-white">{cart.length} domain{cart.length > 1 ? "s" : ""}</span>
@@ -1363,13 +1363,13 @@ export default function DomainsPage() {
               </div>
             </div>
             <div className="flex items-center gap-4 shrink-0">
-              <span className="text-xl font-black text-indigo-400">
+              <span className="text-xl font-black text-stone-400">
                 ${cartTotal.toFixed(2)}<span className="text-xs font-normal text-slate-400">/yr</span>
               </span>
               <button
                 onClick={handleRegister}
                 disabled={registering}
-                className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold text-base transition-colors shadow-lg shadow-indigo-500/25 disabled:opacity-50 flex items-center gap-2"
+                className="px-6 py-3 bg-stone-600 hover:bg-stone-500 rounded-xl font-bold text-base transition-colors shadow-lg shadow-stone-500/25 disabled:opacity-50 flex items-center gap-2"
               >
                 {registering ? (
                   <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
@@ -1381,7 +1381,7 @@ export default function DomainsPage() {
           </div>
           {checkoutError && (
             <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-2">
-              <p className="text-center text-sm text-red-400">{checkoutError}</p>
+              <p className="text-center text-sm text-stone-400">{checkoutError}</p>
             </div>
           )}
         </div>

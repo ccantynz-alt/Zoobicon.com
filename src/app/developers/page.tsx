@@ -52,8 +52,8 @@ const limits = [
 function MethodBadge({ method }: { method: "GET" | "POST" }) {
   const styles =
     method === "GET"
-      ? "bg-emerald-500/10 text-emerald-300 ring-emerald-500/30"
-      : "bg-violet-500/10 text-violet-300 ring-violet-500/30";
+      ? "bg-stone-500/10 text-stone-300 ring-stone-500/30"
+      : "bg-stone-500/10 text-stone-300 ring-stone-500/30";
   return (
     <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-mono font-semibold ring-1 ${styles}`}>
       {method}
@@ -66,16 +66,16 @@ export default function DevelopersPage() {
     <main className="min-h-screen bg-zinc-950 text-zinc-100 antialiased">
       {/* HERO */}
       <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-violet-600/20 via-fuchsia-500/10 to-emerald-500/20 animate-pulse" />
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-stone-600/20 via-stone-500/10 to-stone-500/20 animate-pulse" />
         <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgba(139,92,246,0.25),transparent_60%)]" />
         <div className="mx-auto max-w-6xl px-6 pt-32 pb-24 sm:pt-40 sm:pb-32">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-zinc-300 backdrop-blur">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+            <span className="h-1.5 w-1.5 rounded-full bg-stone-400" />
             Public API v1 — production ready
           </div>
           <h1 className="mt-6 text-balance text-5xl font-semibold tracking-tight sm:text-7xl">
             Build with{" "}
-            <span className="bg-gradient-to-br from-violet-300 via-fuchsia-300 to-emerald-300 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-br from-stone-300 via-stone-300 to-stone-300 bg-clip-text text-transparent">
               Zoobicon
             </span>
           </h1>
@@ -101,7 +101,7 @@ export default function DevelopersPage() {
         <div className="mx-auto max-w-6xl px-6">
           <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
             <div>
-              <p className="text-sm font-medium uppercase tracking-widest text-violet-300">Quick start</p>
+              <p className="text-sm font-medium uppercase tracking-widest text-stone-300">Quick start</p>
               <h2 className="mt-3 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">Generate a site in one curl.</h2>
               <p className="mt-5 max-w-md text-zinc-400">Send a prompt, get back a fully-built React site object with files, dependencies and a deploy URL. Average response: 28 seconds end-to-end.</p>
               <ul className="mt-8 space-y-3 text-sm text-zinc-300">
@@ -112,42 +112,42 @@ export default function DevelopersPage() {
                   "99.95% uptime SLA on Pro and above",
                 ].map((feat) => (
                   <li key={feat} className="flex items-start gap-3">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-stone-400" />
                     {feat}
                   </li>
                 ))}
               </ul>
             </div>
             <div className="relative">
-              <div className="absolute -inset-px rounded-2xl bg-gradient-to-br from-violet-500/30 via-fuchsia-500/20 to-emerald-500/30 blur-xl" />
+              <div className="absolute -inset-px rounded-2xl bg-gradient-to-br from-stone-500/30 via-stone-500/20 to-stone-500/30 blur-xl" />
               <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-zinc-950 shadow-2xl">
                 <div className="flex items-center justify-between border-b border-white/5 bg-white/[0.02] px-4 py-3">
                   <div className="flex items-center gap-2">
-                    <span className="h-2.5 w-2.5 rounded-full bg-red-400/70" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/70" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-stone-400/70" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-stone-400/70" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-stone-400/70" />
                   </div>
                   <span className="font-mono text-[11px] text-zinc-500">POST /api/v1/sites</span>
                 </div>
                 <pre className="overflow-x-auto px-5 py-5 text-[13px] leading-relaxed">
                   <code className="font-mono">
                     <span className="text-zinc-500">{"# Generate a complete React site\n"}</span>
-                    <span className="text-emerald-300">curl</span>
+                    <span className="text-stone-300">curl</span>
                     {" -X "}
-                    <span className="text-violet-300">POST</span>
+                    <span className="text-stone-300">POST</span>
                     {" https://zoobicon.com/api/v1/sites \\\n"}
                     {"  -H "}
-                    <span className="text-emerald-300">{'"Authorization: Bearer zbk_live_••••••"'}</span>
+                    <span className="text-stone-300">{'"Authorization: Bearer zbk_live_••••••"'}</span>
                     {" \\\n"}
                     {"  -H "}
-                    <span className="text-emerald-300">{'"Content-Type: application/json"'}</span>
+                    <span className="text-stone-300">{'"Content-Type: application/json"'}</span>
                     {" \\\n"}
                     {"  -d "}
-                    <span className="text-emerald-300">{"'{\n"}</span>
-                    <span className="text-violet-300">{'    "prompt"'}</span>
-                    <span className="text-emerald-300">{': "saas landing for a dog walking app",\n'}</span>
-                    <span className="text-violet-300">{'    "deploy"'}</span>
-                    <span className="text-emerald-300">{": true\n  }'"}</span>
+                    <span className="text-stone-300">{"'{\n"}</span>
+                    <span className="text-stone-300">{'    "prompt"'}</span>
+                    <span className="text-stone-300">{': "saas landing for a dog walking app",\n'}</span>
+                    <span className="text-stone-300">{'    "deploy"'}</span>
+                    <span className="text-stone-300">{": true\n  }'"}</span>
                   </code>
                 </pre>
               </div>
@@ -161,7 +161,7 @@ export default function DevelopersPage() {
         <div className="mx-auto max-w-6xl px-6">
           <div className="flex items-end justify-between gap-6">
             <div>
-              <p className="text-sm font-medium uppercase tracking-widest text-emerald-300">Endpoints</p>
+              <p className="text-sm font-medium uppercase tracking-widest text-stone-300">Endpoints</p>
               <h2 className="mt-3 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">{endpoints.length} production endpoints. Live today.</h2>
             </div>
             <p className="hidden max-w-xs text-sm text-zinc-400 sm:block">Each endpoint is rate-limited per key, signed with HMAC-SHA256 and returns standard JSON.</p>
@@ -175,7 +175,7 @@ export default function DevelopersPage() {
                 </div>
                 <p className="mt-3 text-sm leading-relaxed text-zinc-400">{ep.description}</p>
                 <div className="mt-4 max-h-0 overflow-hidden opacity-0 transition-all duration-300 group-hover:max-h-32 group-hover:opacity-100">
-                  <pre className="rounded-md border border-white/5 bg-zinc-950 px-3 py-2 font-mono text-[11px] leading-relaxed text-emerald-300">{ep.snippet}</pre>
+                  <pre className="rounded-md border border-white/5 bg-zinc-950 px-3 py-2 font-mono text-[11px] leading-relaxed text-stone-300">{ep.snippet}</pre>
                 </div>
               </div>
             ))}
@@ -186,11 +186,11 @@ export default function DevelopersPage() {
       {/* PRICING STRIP */}
       <section className="border-t border-white/5 py-32">
         <div className="mx-auto max-w-6xl px-6">
-          <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-violet-600/15 via-fuchsia-500/10 to-emerald-500/15 p-10 sm:p-14">
+          <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-stone-600/15 via-stone-500/10 to-stone-500/15 p-10 sm:p-14">
             <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.2),transparent_50%)]" />
             <div className="flex flex-col items-start gap-10 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <p className="text-sm font-medium uppercase tracking-widest text-emerald-300">Usage pricing</p>
+                <p className="text-sm font-medium uppercase tracking-widest text-stone-300">Usage pricing</p>
                 <h2 className="mt-3 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">Pay only for what you call.</h2>
                 <p className="mt-4 max-w-lg text-zinc-300">Bulk pricing kicks in at scale. Annual contracts get up to 60% off list. No idle minimums.</p>
               </div>
@@ -240,7 +240,7 @@ export default function DevelopersPage() {
               </div>
 
               <div className="relative p-6 rounded-xl border border-accent-cyan/30 bg-accent-cyan/[0.02] shadow-glow-cyan">
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-accent-cyan to-emerald-500 text-xs font-bold text-white">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-accent-cyan to-stone-500 text-xs font-bold text-white">
                   Popular
                 </div>
                 <div className="text-sm font-semibold text-accent-cyan mb-2">Pro</div>
@@ -253,7 +253,7 @@ export default function DevelopersPage() {
                   <li>Webhook callbacks</li>
                   <li>Priority support</li>
                 </ul>
-                <Link href="/pricing" className="block w-full py-2.5 rounded-xl bg-gradient-to-r from-accent-cyan to-emerald-500 text-sm font-bold text-white text-center">
+                <Link href="/pricing" className="block w-full py-2.5 rounded-xl bg-gradient-to-r from-accent-cyan to-stone-500 text-sm font-bold text-white text-center">
                   Start Pro
                 </Link>
               </div>
@@ -275,23 +275,23 @@ export default function DevelopersPage() {
               </div>
             </div>
             <div className="relative">
-              <div className="absolute -inset-px rounded-2xl bg-gradient-to-br from-emerald-500/30 to-violet-500/30 blur-xl" />
+              <div className="absolute -inset-px rounded-2xl bg-gradient-to-br from-stone-500/30 to-stone-500/30 blur-xl" />
               <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-zinc-950">
                 <div className="border-b border-white/5 bg-white/[0.02] px-4 py-3 font-mono text-[11px] text-zinc-500">Authorization header</div>
                 <pre className="overflow-x-auto px-5 py-5 text-[13px] leading-relaxed">
                   <code className="font-mono">
                     <span className="text-zinc-500">{"# Every request signs with your key\n"}</span>
-                    <span className="text-violet-300">Authorization</span>
+                    <span className="text-stone-300">Authorization</span>
                     {": "}
-                    <span className="text-emerald-300">Bearer zbk_live_a3f9c2e8b1d4...</span>
+                    <span className="text-stone-300">Bearer zbk_live_a3f9c2e8b1d4...</span>
                     {"\n"}
-                    <span className="text-violet-300">Content-Type</span>
+                    <span className="text-stone-300">Content-Type</span>
                     {": "}
-                    <span className="text-emerald-300">application/json</span>
+                    <span className="text-stone-300">application/json</span>
                     {"\n"}
-                    <span className="text-violet-300">X-Zoobicon-Signature</span>
+                    <span className="text-stone-300">X-Zoobicon-Signature</span>
                     {": "}
-                    <span className="text-emerald-300">sha256=••••••</span>
+                    <span className="text-stone-300">sha256=••••••</span>
                   </code>
                 </pre>
               </div>
@@ -304,7 +304,7 @@ export default function DevelopersPage() {
       <section className="border-t border-white/5 py-32">
         <div className="mx-auto max-w-6xl px-6">
           <div>
-            <p className="inline-flex items-center gap-2 text-sm font-medium uppercase tracking-widest text-emerald-300">
+            <p className="inline-flex items-center gap-2 text-sm font-medium uppercase tracking-widest text-stone-300">
               <Zap className="h-4 w-4" /> Rate limits
             </p>
             <h2 className="mt-3 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">Built for scale from request one.</h2>

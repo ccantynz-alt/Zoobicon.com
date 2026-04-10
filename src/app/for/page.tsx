@@ -24,7 +24,7 @@ export default function IndustriesHubPage() {
       <section className="pt-24 pb-16 px-4">
         <div className="max-w-5xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
-            Built for <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">Your Industry</span>
+            Built for <span className="bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Your Industry</span>
           </h1>
           <p className="text-xl text-slate-400 max-w-3xl mx-auto mb-16">
             Every industry has unique needs. Our AI doesn&apos;t just build websites — it builds websites that understand your business, your customers, and your conversion goals.
@@ -41,13 +41,13 @@ export default function IndustriesHubPage() {
                   className="w-3 h-3 rounded-full mb-4"
                   style={{ backgroundColor: ind.primaryColor }}
                 />
-                <h2 className="text-lg font-semibold mb-2 group-hover:text-indigo-300 transition-colors">
+                <h2 className="text-lg font-semibold mb-2 group-hover:text-stone-300 transition-colors">
                   {ind.name}
                 </h2>
                 <p className="text-sm text-slate-400 mb-4 line-clamp-2">
                   {ind.subheadline}
                 </p>
-                <span className="inline-flex items-center gap-1 text-sm text-indigo-400 group-hover:gap-2 transition-all">
+                <span className="inline-flex items-center gap-1 text-sm text-stone-400 group-hover:gap-2 transition-all">
                   Learn more <ArrowRight className="w-4 h-4" />
                 </span>
               </Link>

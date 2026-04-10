@@ -134,7 +134,7 @@ export default function TranslatePanel({
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/70 transition-all hover:border-blue-500/50 hover:bg-blue-500/10 hover:text-white"
+        className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/70 transition-all hover:border-stone-500/50 hover:bg-stone-500/10 hover:text-white"
         title="Translate to multiple languages"
       >
         <Globe className="h-4 w-4" />
@@ -142,11 +142,11 @@ export default function TranslatePanel({
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-[540px] rounded-xl border border-white/10 bg-[#0a0a0f] shadow-2xl shadow-blue-500/5">
+        <div className="absolute right-0 top-full z-50 mt-2 w-[540px] rounded-xl border border-white/10 bg-[#0a0a0f] shadow-2xl shadow-stone-500/5">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
             <div className="flex items-center gap-2">
-              <Languages className="h-5 w-5 text-blue-400" />
+              <Languages className="h-5 w-5 text-stone-400" />
               <h3 className="text-sm font-semibold text-white">
                 One-Click Translation
               </h3>
@@ -163,13 +163,13 @@ export default function TranslatePanel({
             {/* Success State */}
             {translatedCode && !isLoading && (
               <div className="space-y-4">
-                <div className="flex items-center gap-3 rounded-lg border border-green-500/20 bg-green-500/10 p-4">
-                  <Check className="h-5 w-5 text-green-400" />
+                <div className="flex items-center gap-3 rounded-lg border border-stone-500/20 bg-stone-500/10 p-4">
+                  <Check className="h-5 w-5 text-stone-400" />
                   <div>
-                    <p className="text-sm font-medium text-green-300">
+                    <p className="text-sm font-medium text-stone-300">
                       Translation Complete
                     </p>
-                    <p className="text-xs text-green-300/70">
+                    <p className="text-xs text-stone-300/70">
                       Successfully translated to {languageCount} languages with
                       built-in language switcher
                     </p>
@@ -181,7 +181,7 @@ export default function TranslatePanel({
                     Preview
                   </p>
                   <div className="flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-3 py-2">
-                    <Globe className="h-4 w-4 text-blue-400" />
+                    <Globe className="h-4 w-4 text-stone-400" />
                     <span className="text-sm text-white/70">
                       Language Switcher
                     </span>
@@ -198,7 +198,7 @@ export default function TranslatePanel({
 
                 <button
                   onClick={handleApply}
-                  className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-blue-500"
+                  className="w-full rounded-lg bg-stone-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-stone-500"
                 >
                   Apply Translation
                 </button>
@@ -208,7 +208,7 @@ export default function TranslatePanel({
             {/* Loading State */}
             {isLoading && (
               <div className="flex flex-col items-center justify-center py-12">
-                <Loader2 className="mb-4 h-8 w-8 animate-spin text-blue-400" />
+                <Loader2 className="mb-4 h-8 w-8 animate-spin text-stone-400" />
                 <p className="text-sm font-medium text-white/70">
                   Translating to {selectedLanguages.size} languages...
                 </p>
@@ -220,8 +220,8 @@ export default function TranslatePanel({
 
             {/* Error State */}
             {error && !isLoading && (
-              <div className="mb-4 rounded-lg border border-red-500/20 bg-red-500/10 p-4">
-                <p className="text-sm text-red-300">{error}</p>
+              <div className="mb-4 rounded-lg border border-stone-500/20 bg-stone-500/10 p-4">
+                <p className="text-sm text-stone-300">{error}</p>
               </div>
             )}
 
@@ -235,14 +235,14 @@ export default function TranslatePanel({
                   <div className="flex gap-2">
                     <button
                       onClick={selectAll}
-                      className="text-xs text-blue-400 transition-colors hover:text-blue-300"
+                      className="text-xs text-stone-400 transition-colors hover:text-stone-300"
                     >
                       Select All
                     </button>
                     <span className="text-white/50">|</span>
                     <button
                       onClick={deselectAll}
-                      className="text-xs text-blue-400 transition-colors hover:text-blue-300"
+                      className="text-xs text-stone-400 transition-colors hover:text-stone-300"
                     >
                       Deselect All
                     </button>
@@ -256,14 +256,14 @@ export default function TranslatePanel({
                       onClick={() => toggleLanguage(lang.code)}
                       className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-all ${
                         selectedLanguages.has(lang.code)
-                          ? "border-blue-500/50 bg-blue-500/15 text-white"
+                          ? "border-stone-500/50 bg-stone-500/15 text-white"
                           : "border-white/5 bg-white/[0.02] text-white/50 hover:border-white/10 hover:bg-white/5 hover:text-white/70"
                       }`}
                     >
                       <span className="text-base">{lang.flag}</span>
                       <span className="truncate">{lang.name}</span>
                       {selectedLanguages.has(lang.code) && (
-                        <Check className="ml-auto h-3.5 w-3.5 flex-shrink-0 text-blue-400" />
+                        <Check className="ml-auto h-3.5 w-3.5 flex-shrink-0 text-stone-400" />
                       )}
                     </button>
                   ))}
@@ -272,7 +272,7 @@ export default function TranslatePanel({
                 <button
                   onClick={handleTranslate}
                   disabled={selectedLanguages.size === 0}
-                  className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="w-full rounded-lg bg-stone-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-stone-500 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   {selectedLanguages.size > 0
                     ? `Translate Now (${selectedLanguages.size} languages)`

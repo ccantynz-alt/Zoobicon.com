@@ -63,10 +63,10 @@ interface Automation {
 }
 
 const CHANNEL_CONFIG = {
-  sms: { name: 'SMS', icon: Phone, color: 'text-green-400', bg: 'bg-green-500/20', gradient: 'from-green-500 to-emerald-500' },
-  whatsapp: { name: 'WhatsApp', icon: MessageSquare, color: 'text-emerald-400', bg: 'bg-emerald-500/20', gradient: 'from-emerald-500 to-teal-500' },
-  push: { name: 'Push', icon: Bell, color: 'text-blue-400', bg: 'bg-blue-500/20', gradient: 'from-blue-500 to-indigo-500' },
-  telegram: { name: 'Send', icon: Send, color: 'text-cyan-400', bg: 'bg-cyan-500/20', gradient: 'from-cyan-500 to-blue-500' },
+  sms: { name: 'SMS', icon: Phone, color: 'text-stone-400', bg: 'bg-stone-500/20', gradient: 'from-stone-500 to-stone-500' },
+  whatsapp: { name: 'WhatsApp', icon: MessageSquare, color: 'text-stone-400', bg: 'bg-stone-500/20', gradient: 'from-stone-500 to-stone-500' },
+  push: { name: 'Push', icon: Bell, color: 'text-stone-400', bg: 'bg-stone-500/20', gradient: 'from-stone-500 to-stone-500' },
+  telegram: { name: 'Send', icon: Send, color: 'text-stone-400', bg: 'bg-stone-500/20', gradient: 'from-stone-500 to-stone-500' },
 };
 
 const DEMO_MESSAGES: Message[] = [
@@ -114,24 +114,24 @@ export default function MessagingPage() {
       <header className="border-b border-white/10 bg-[#0a0a12]/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-green-400 to-teal-400 bg-clip-text text-transparent">Zoobicon</Link>
+            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
             <span className="text-white/30">/</span>
             <span className="text-white/70 font-medium">Messaging</span>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/builder" className="px-4 py-2 text-sm text-white/70 hover:text-white transition-colors">Builder</Link>
-            <Link href="/pricing" className="px-4 py-2 text-sm bg-gradient-to-r from-green-600 to-teal-600 rounded-lg font-medium hover:opacity-90 transition-opacity">Get Started</Link>
+            <Link href="/pricing" className="px-4 py-2 text-sm bg-gradient-to-r from-stone-600 to-stone-600 rounded-lg font-medium hover:opacity-90 transition-opacity">Get Started</Link>
           </div>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-12">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-sm mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-stone-500/10 border border-stone-500/20 text-stone-400 text-sm mb-6">
             <MessageSquare className="w-4 h-4" /> Unified Messaging
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            SMS, WhatsApp, Push & Send — <span className="bg-gradient-to-r from-green-400 to-teal-400 bg-clip-text text-transparent">One Inbox</span>
+            SMS, WhatsApp, Push & Send — <span className="bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">One Inbox</span>
           </h1>
           <p className="text-lg text-gray-400 max-w-2xl mx-auto">
             Reach customers on every channel. Unified inbox, broadcast messaging, automation sequences, and AI-powered responses.
@@ -163,9 +163,9 @@ export default function MessagingPage() {
             { id: 'analytics' as const, label: 'Analytics', icon: BarChart3 },
           ].map(t => (
             <button key={t.id} onClick={() => setActiveTab(t.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${activeTab === t.id ? 'bg-green-500/20 text-green-400' : 'text-gray-400 hover:text-white'}`}>
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${activeTab === t.id ? 'bg-stone-500/20 text-stone-400' : 'text-gray-400 hover:text-white'}`}>
               <t.icon className="w-4 h-4" /> {t.label}
-              {t.badge && <span className="px-1.5 py-0.5 rounded-full bg-green-500 text-white text-xs">{t.badge}</span>}
+              {t.badge && <span className="px-1.5 py-0.5 rounded-full bg-stone-500 text-white text-xs">{t.badge}</span>}
             </button>
           ))}
         </div>
@@ -186,7 +186,7 @@ export default function MessagingPage() {
                 const ch = CHANNEL_CONFIG[msg.channel];
                 return (
                   <button key={msg.id} onClick={() => setSelectedMessage(msg)}
-                    className={`w-full text-left p-3 rounded-xl border transition-all ${selectedMessage?.id === msg.id ? 'border-green-500/50 bg-green-500/10' : 'border-white/10 bg-white/5 hover:border-white/20'}`}>
+                    className={`w-full text-left p-3 rounded-xl border transition-all ${selectedMessage?.id === msg.id ? 'border-stone-500/50 bg-stone-500/10' : 'border-white/10 bg-white/5 hover:border-white/20'}`}>
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-full bg-gradient-to-br from-white/20 to-white/5 flex items-center justify-center text-xs font-bold flex-shrink-0">{msg.avatar}</div>
                       <div className="flex-1 min-w-0">
@@ -199,7 +199,7 @@ export default function MessagingPage() {
                           <p className="text-xs text-gray-400 truncate">{msg.preview}</p>
                         </div>
                       </div>
-                      {msg.unread && <div className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />}
+                      {msg.unread && <div className="w-2 h-2 rounded-full bg-stone-500 flex-shrink-0" />}
                     </div>
                   </button>
                 );
@@ -227,8 +227,8 @@ export default function MessagingPage() {
                   </div>
                   <div className="flex gap-2">
                     <input value={replyText} onChange={e => setReplyText(e.target.value)} placeholder="Type a reply..." className="flex-1 bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-500" />
-                    <button onClick={() => {}} className="px-4 py-2 rounded-lg bg-green-600 text-sm font-medium hover:bg-green-500 transition-colors flex items-center gap-1"><Send className="w-4 h-4" /></button>
-                    <button onClick={() => {}} className="px-4 py-2 rounded-lg bg-white/10 text-sm hover:bg-white/20 transition-colors flex items-center gap-1"><Zap className="w-4 h-4 text-yellow-400" /> AI</button>
+                    <button onClick={() => {}} className="px-4 py-2 rounded-lg bg-stone-600 text-sm font-medium hover:bg-stone-500 transition-colors flex items-center gap-1"><Send className="w-4 h-4" /></button>
+                    <button onClick={() => {}} className="px-4 py-2 rounded-lg bg-white/10 text-sm hover:bg-white/20 transition-colors flex items-center gap-1"><Zap className="w-4 h-4 text-stone-400" /> AI</button>
                   </div>
                 </div>
               ) : (
@@ -244,13 +244,13 @@ export default function MessagingPage() {
         {activeTab === 'broadcast' && (
           <div className="max-w-2xl space-y-6">
             <div className="p-6 rounded-xl border border-white/10 bg-white/5 space-y-4">
-              <h3 className="font-semibold flex items-center gap-2"><Megaphone className="w-5 h-5 text-green-400" /> Send Broadcast</h3>
+              <h3 className="font-semibold flex items-center gap-2"><Megaphone className="w-5 h-5 text-stone-400" /> Send Broadcast</h3>
               <div>
                 <label className="text-sm text-gray-400 mb-1 block">Channel</label>
                 <div className="grid grid-cols-4 gap-2">
                   {(Object.entries(CHANNEL_CONFIG) as [string, typeof CHANNEL_CONFIG.sms][]).map(([key, ch]) => (
                     <button key={key} onClick={() => setBroadcastChannel(key as any)}
-                      className={`p-3 rounded-lg border text-center transition-all ${broadcastChannel === key ? `border-green-500/50 ${ch.bg}` : 'border-white/10 bg-white/5'}`}>
+                      className={`p-3 rounded-lg border text-center transition-all ${broadcastChannel === key ? `border-stone-500/50 ${ch.bg}` : 'border-white/10 bg-white/5'}`}>
                       <ch.icon className={`w-5 h-5 mx-auto mb-1 ${ch.color}`} />
                       <span className="text-xs">{ch.name}</span>
                     </button>
@@ -271,11 +271,11 @@ export default function MessagingPage() {
                   className="w-full bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-500 resize-none" />
                 <div className="flex items-center justify-between mt-1">
                   <span className="text-xs text-gray-500">{broadcastMessage.length} characters</span>
-                  <button onClick={() => {}} className="text-xs text-green-400 hover:text-green-300 flex items-center gap-1"><Zap className="w-3 h-3" /> AI Write</button>
+                  <button onClick={() => {}} className="text-xs text-stone-400 hover:text-stone-300 flex items-center gap-1"><Zap className="w-3 h-3" /> AI Write</button>
                 </div>
               </div>
               <button onClick={() => { setBroadcastSent(true); setTimeout(() => setBroadcastSent(false), 3000); }}
-                className="w-full py-2.5 rounded-lg bg-gradient-to-r from-green-600 to-teal-600 font-medium text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+                className="w-full py-2.5 rounded-lg bg-gradient-to-r from-stone-600 to-stone-600 font-medium text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
                 {broadcastSent ? <><Check className="w-4 h-4" /> Broadcast Sent!</> : <><Send className="w-4 h-4" /> Send Broadcast</>}
               </button>
             </div>
@@ -287,13 +287,13 @@ export default function MessagingPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-semibold">Automation Sequences</h3>
-              <button onClick={() => {}} className="px-4 py-2 rounded-lg bg-green-600 text-sm font-medium hover:bg-green-500 transition-colors flex items-center gap-1"><Plus className="w-4 h-4" /> New Automation</button>
+              <button onClick={() => {}} className="px-4 py-2 rounded-lg bg-stone-600 text-sm font-medium hover:bg-stone-500 transition-colors flex items-center gap-1"><Plus className="w-4 h-4" /> New Automation</button>
             </div>
             {DEMO_AUTOMATIONS.map(auto => (
               <div key={auto.id} className="p-4 rounded-xl border border-white/10 bg-white/5">
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-medium">{auto.name}</h4>
-                  <span className={`px-2 py-0.5 rounded text-xs ${auto.status === 'active' ? 'bg-green-500/20 text-green-400' : auto.status === 'paused' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-gray-500/20 text-gray-400'}`}>{auto.status}</span>
+                  <span className={`px-2 py-0.5 rounded text-xs ${auto.status === 'active' ? 'bg-stone-500/20 text-stone-400' : auto.status === 'paused' ? 'bg-stone-500/20 text-stone-400' : 'bg-gray-500/20 text-gray-400'}`}>{auto.status}</span>
                 </div>
                 <div className="flex items-center gap-4 text-xs text-gray-400">
                   <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {auto.trigger}</span>
@@ -311,7 +311,7 @@ export default function MessagingPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-semibold">{DEMO_CONTACTS.length} Contacts</h3>
-              <button onClick={() => {}} className="px-4 py-2 rounded-lg bg-green-600 text-sm font-medium hover:bg-green-500 transition-colors flex items-center gap-1"><Plus className="w-4 h-4" /> Add Contact</button>
+              <button onClick={() => {}} className="px-4 py-2 rounded-lg bg-stone-600 text-sm font-medium hover:bg-stone-500 transition-colors flex items-center gap-1"><Plus className="w-4 h-4" /> Add Contact</button>
             </div>
             {DEMO_CONTACTS.map(contact => (
               <div key={contact.id} className="p-4 rounded-xl border border-white/10 bg-white/5 flex items-center gap-4">
@@ -362,10 +362,10 @@ export default function MessagingPage() {
         )}
 
         {/* CTA */}
-        <div className="mt-20 text-center p-12 rounded-2xl bg-gradient-to-br from-green-600/20 to-teal-600/20 border border-green-500/20">
+        <div className="mt-20 text-center p-12 rounded-2xl bg-gradient-to-br from-stone-600/20 to-stone-600/20 border border-stone-500/20">
           <h2 className="text-3xl font-bold mb-4">Reach Every Customer, Every Channel</h2>
           <p className="text-gray-400 mb-6 max-w-xl mx-auto">SMS, WhatsApp, Push, and Send in one unified inbox. Automate sequences, broadcast updates, and manage contacts.</p>
-          <Link href="/auth/signup" className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-green-600 to-teal-600 font-semibold hover:opacity-90 transition-opacity">
+          <Link href="/auth/signup" className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 font-semibold hover:opacity-90 transition-opacity">
             Start Messaging Free <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
