@@ -55,6 +55,12 @@ export async function initSchema() {
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS auth_provider_id       TEXT`;
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified         BOOLEAN DEFAULT false`;
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified_at      TIMESTAMPTZ`;
+  // Password reset TTL + single-use guard. The reset link contains an HMAC
+  // token (tamper-proof) but the DB row is the single source of truth for
+  // "can this token still be redeemed?" — lets us invalidate on first use
+  // and enforce TTL even if clocks drift.
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token_hash       TEXT`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token_expires_at TIMESTAMPTZ`;
 
   await sql`
     CREATE TABLE IF NOT EXISTS projects (
