@@ -2140,15 +2140,147 @@ root.render(React.createElement(App));
 
           {/* Content area */}
           <div className="flex-1 overflow-hidden relative">
-            <AnimatePresence mode="wait">
-              {status === "error" && error && !hasCode ? (
-                /* ── Error State ── */
+            {/*
+              PERSISTENT PREVIEW LAYER — ALWAYS MOUNTED.
+              This is the speed fix: the Sandpack iframe must never unmount
+              between welcome → generating → preview states, otherwise every
+              prompt triggers a 20-30s cold start of the bundler + Tailwind CDN.
+              By keeping PreviewSwitcher mounted at the base layer, the first
+              time files arrive it's a hot prop update — sub-second.
+            */}
+            <div
+              ref={previewContainerRef}
+              className="absolute inset-0 bg-zinc-950"
+              style={{
+                visibility: activeTab === "preview" ? "visible" : "hidden",
+                zIndex: activeTab === "preview" ? 1 : 0,
+              }}
+              aria-hidden={activeTab !== "preview"}
+            >
+              <PreviewSwitcher
+                useWebContainers={useWebContainers}
+                onWebContainersFail={handleWebContainersFail}
+                files={reactFiles || {}}
+                reactDeps={reactDeps}
+              />
+              {activeTab === "preview" && isAdmin && (
+                <button
+                  type="button"
+                  onClick={() => setUseWebContainers((v) => !v)}
+                  className="absolute top-2 right-2 z-50 px-2 py-1 text-[10px] rounded-md bg-zinc-900/90 backdrop-blur-sm text-white/60 border border-white/[0.08] hover:bg-zinc-800/90 transition-colors"
+                >
+                  {useWebContainers ? "WebContainers" : "Sandpack"}
+                </button>
+              )}
+              {activeTab === "preview" && collab.isConnected && (
+                <CursorOverlay participants={collab.participants} containerRect={previewRect} />
+              )}
+
+              {/* Build progress overlay on preview */}
+              {activeTab === "preview" && status === "generating" && hasCode && pipelineAgents.length > 0 && (
+                <div className="absolute bottom-4 left-4 right-4 z-30 pointer-events-none">
+                  <div className="max-w-lg mx-auto px-4 py-3 rounded-2xl bg-zinc-950/80 backdrop-blur-2xl border border-white/[0.06] shadow-2xl shadow-black/40 pointer-events-auto">
+                    <div className="flex items-center gap-3 mb-1.5">
+                      <Loader2 className="w-3.5 h-3.5 text-stone-400 animate-spin flex-shrink-0" />
+                      <span className="text-xs text-white/70 font-medium truncate">
+                        {pipelineAgents[pipelineAgents.length - 1]}
+                      </span>
+                      {buildProgress && buildProgress.total > 0 && (
+                        <span className="text-[10px] text-white/30 ml-auto flex-shrink-0 tabular-nums">
+                          {buildProgress.current}/{buildProgress.total}
+                        </span>
+                      )}
+                    </div>
+                    {buildProgress && buildProgress.total > 0 && (
+                      <div className="w-full h-1 rounded-full bg-white/[0.06] overflow-hidden mb-2">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-stone-500 to-stone-500 transition-all duration-500 ease-out"
+                          style={{ width: `${Math.round((buildProgress.current / buildProgress.total) * 100)}%` }}
+                        />
+                      </div>
+                    )}
+                    {streamWarning && (
+                      <div className="flex items-center gap-2 text-[10px] text-stone-400 mb-2">
+                        <AlertTriangle className="w-3 h-3" />
+                        <span>{streamWarning}</span>
+                      </div>
+                    )}
+                    {sectionTimeline.length > 0 && (
+                      <div ref={timelineScrollRef} className="max-h-32 overflow-y-auto space-y-1 pr-1">
+                        {sectionTimeline.map((s) => {
+                          const elapsed = s.finishedAt ? ((s.finishedAt - s.startedAt) / 1000).toFixed(1) : null;
+                          return (
+                            <div key={s.section} className="flex items-center gap-2 text-[10px]">
+                              {s.status === "done" ? (
+                                <Check className="w-3 h-3 text-stone-400 flex-shrink-0" />
+                              ) : s.status === "customizing" || s.status === "scaffolding" ? (
+                                <Loader2 className="w-3 h-3 text-stone-400 animate-spin flex-shrink-0" />
+                              ) : (
+                                <span className="w-2 h-2 rounded-full bg-white/20 flex-shrink-0" />
+                              )}
+                              <span className={s.status === "done" ? "text-white/40" : "text-white/70"}>{s.label}</span>
+                              {elapsed && <span className="text-white/20 ml-auto tabular-nums">{elapsed}s</span>}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Build error banner */}
+              {activeTab === "preview" && (
+                <AnimatePresence>
+                  {buildError && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="absolute top-3 left-3 right-3 z-40"
+                    >
+                      <div className="max-w-2xl mx-auto px-4 py-3 rounded-xl bg-stone-950/90 backdrop-blur-xl border border-stone-500/30 shadow-2xl">
+                        <div className="flex items-start gap-3">
+                          <AlertTriangle className="w-4 h-4 text-stone-400 flex-shrink-0 mt-0.5" />
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium text-stone-200">{buildError.message}</div>
+                            <div className="text-xs text-stone-300/60 mt-0.5">{buildError.suggestion}</div>
+                          </div>
+                          <button
+                            onClick={() => { setBuildError(null); handleGenerate(); }}
+                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-stone-500/15 hover:bg-stone-500/25 text-xs text-stone-200 border border-stone-500/30 transition"
+                          >
+                            <RotateCcw className="w-3 h-3" /> Retry
+                          </button>
+                          <button
+                            onClick={() => setBuildError(null)}
+                            className="p-1 rounded-lg hover:bg-stone-500/15 text-stone-300/60 transition"
+                            aria-label="Dismiss"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              )}
+            </div>
+
+            {/*
+              OVERLAY STATES — error / generating / welcome.
+              These sit on top of the persistent Sandpack iframe. When they
+              exit, Sandpack is already warm and files just stream in as a
+              live prop update — no remount, no cold start.
+            */}
+            <AnimatePresence>
+              {activeTab === "preview" && status === "error" && error && !hasCode && (
                 <motion.div
-                  key="error-state"
+                  key="error-overlay"
                   initial={{ opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
-                  className="h-full flex items-center justify-center bg-zinc-950"
+                  className="absolute inset-0 z-20 flex items-center justify-center bg-zinc-950"
                 >
                   <div className="max-w-md text-center px-8">
                     <div className="w-14 h-14 rounded-2xl bg-stone-500/10 border border-stone-500/15 flex items-center justify-center mx-auto mb-5">
@@ -2164,24 +2296,22 @@ root.render(React.createElement(App));
                     </button>
                   </div>
                 </motion.div>
+              )}
 
-              ) : status === "generating" && !hasCode ? (
-                /* ── Generating State (no preview yet) ── */
+              {activeTab === "preview" && status === "generating" && !hasCode && (
                 <motion.div
-                  key="generating-state"
+                  key="generating-overlay"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="h-full flex flex-col items-center justify-center bg-zinc-950 relative overflow-hidden"
+                  className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-zinc-950/95 backdrop-blur-sm overflow-hidden"
                 >
-                  {/* Animated ambient background */}
                   <div className="absolute inset-0 pointer-events-none">
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-stone-600/[0.04] blur-[120px] animate-pulse" />
                     <div className="absolute top-1/3 left-1/3 w-[350px] h-[350px] rounded-full bg-stone-600/[0.03] blur-[100px] animate-pulse" style={{ animationDelay: "1s" }} />
                   </div>
 
                   <div className="relative z-10 text-center px-6">
-                    {/* Spinning gradient ring */}
                     <div className="relative w-20 h-20 mx-auto mb-8">
                       <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-stone-600 to-stone-700 animate-pulse shadow-2xl shadow-stone-500/30" />
                       <div className="absolute inset-[3px] rounded-[13px] bg-zinc-950 flex items-center justify-center">
@@ -2193,7 +2323,6 @@ root.render(React.createElement(App));
                     <h3 className="text-xl font-semibold text-white/90 mb-2">Building your website</h3>
                     <p className="text-white/30 text-sm mb-8 max-w-sm">Generating production-ready React components</p>
 
-                    {/* Pipeline status messages */}
                     <div className="flex flex-col items-center gap-2.5">
                       {pipelineAgents.slice(-4).map((msg, i) => {
                         const isLatest = i === pipelineAgents.slice(-4).length - 1;
@@ -2215,7 +2344,6 @@ root.render(React.createElement(App));
                       })}
                     </div>
 
-                    {/* Progress bar */}
                     {buildProgress && buildProgress.total > 0 && (
                       <div className="mt-6 w-64 mx-auto">
                         <div className="flex items-center justify-between text-[10px] text-white/30 mb-1.5">
@@ -2234,23 +2362,17 @@ root.render(React.createElement(App));
                     )}
                   </div>
                 </motion.div>
+              )}
 
-              ) : activeTab === "preview" && !hasCode ? (
-                /* ── Welcome / Empty State ── */
+              {activeTab === "preview" && !hasCode && status !== "generating" && !(status === "error" && error) && (
                 <motion.div
-                  key="welcome-state"
+                  key="welcome-overlay"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="h-full relative overflow-hidden bg-zinc-950"
+                  className="absolute inset-0 z-10 overflow-hidden bg-zinc-950/95 backdrop-blur-sm"
                 >
-                  {/* Pre-warm Sandpack in hidden layer */}
-                  <div className="absolute inset-0 opacity-0 pointer-events-none" aria-hidden="true">
-                    <SandpackPreview mode="react" files={{}} dependencies={reactDeps} showEditor={false} />
-                  </div>
-
                   <div className="absolute inset-0 flex items-center justify-center">
-                    {/* Subtle ambient glow */}
                     <div className="absolute inset-0 pointer-events-none">
                       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-stone-600/[0.025] blur-[150px]" />
                     </div>
@@ -2265,7 +2387,6 @@ root.render(React.createElement(App));
                         Describe your vision and our AI will generate a complete, production-ready React application.
                       </p>
 
-                      {/* Example prompt chips */}
                       <div className="flex flex-wrap justify-center gap-2 mb-8">
                         {[
                           { label: "SaaS Landing Page", icon: <Zap size={12} /> },
@@ -2287,7 +2408,6 @@ root.render(React.createElement(App));
                         ))}
                       </div>
 
-                      {/* Pre-warm indicator */}
                       <div className="inline-flex items-center gap-2 text-[10px] text-white/20">
                         <span className="w-1.5 h-1.5 rounded-full bg-stone-400/60 animate-pulse" />
                         {useWebContainers ? "Runtime pre-warmed" : "Sandbox ready"}
@@ -2295,124 +2415,20 @@ root.render(React.createElement(App));
                     </div>
                   </div>
                 </motion.div>
-
-              ) : activeTab === "preview" ? (
-                /* ── Live Preview ── */
-                <div ref={previewContainerRef} className="relative h-full bg-zinc-950">
-                  <PreviewSwitcher
-                    useWebContainers={useWebContainers}
-                    onWebContainersFail={handleWebContainersFail}
-                    files={reactFiles || {}}
-                    reactDeps={reactDeps}
-                  />
-                  {isAdmin && (
-                    <button
-                      type="button"
-                      onClick={() => setUseWebContainers((v) => !v)}
-                      className="absolute top-2 right-2 z-50 px-2 py-1 text-[10px] rounded-md bg-zinc-900/90 backdrop-blur-sm text-white/60 border border-white/[0.08] hover:bg-zinc-800/90 transition-colors"
-                    >
-                      {useWebContainers ? "WebContainers" : "Sandpack"}
-                    </button>
-                  )}
-                  {collab.isConnected && (
-                    <CursorOverlay participants={collab.participants} containerRect={previewRect} />
-                  )}
-
-                  {/* Build progress overlay on preview */}
-                  {status === "generating" && pipelineAgents.length > 0 && (
-                    <div className="absolute bottom-4 left-4 right-4 z-30 pointer-events-none">
-                      <div className="max-w-lg mx-auto px-4 py-3 rounded-2xl bg-zinc-950/80 backdrop-blur-2xl border border-white/[0.06] shadow-2xl shadow-black/40 pointer-events-auto">
-                        <div className="flex items-center gap-3 mb-1.5">
-                          <Loader2 className="w-3.5 h-3.5 text-stone-400 animate-spin flex-shrink-0" />
-                          <span className="text-xs text-white/70 font-medium truncate">
-                            {pipelineAgents[pipelineAgents.length - 1]}
-                          </span>
-                          {buildProgress && buildProgress.total > 0 && (
-                            <span className="text-[10px] text-white/30 ml-auto flex-shrink-0 tabular-nums">
-                              {buildProgress.current}/{buildProgress.total}
-                            </span>
-                          )}
-                        </div>
-                        {buildProgress && buildProgress.total > 0 && (
-                          <div className="w-full h-1 rounded-full bg-white/[0.06] overflow-hidden mb-2">
-                            <div
-                              className="h-full rounded-full bg-gradient-to-r from-stone-500 to-stone-500 transition-all duration-500 ease-out"
-                              style={{ width: `${Math.round((buildProgress.current / buildProgress.total) * 100)}%` }}
-                            />
-                          </div>
-                        )}
-                        {streamWarning && (
-                          <div className="flex items-center gap-2 text-[10px] text-stone-400 mb-2">
-                            <AlertTriangle className="w-3 h-3" />
-                            <span>{streamWarning}</span>
-                          </div>
-                        )}
-                        {sectionTimeline.length > 0 && (
-                          <div ref={timelineScrollRef} className="max-h-32 overflow-y-auto space-y-1 pr-1">
-                            {sectionTimeline.map((s) => {
-                              const elapsed = s.finishedAt ? ((s.finishedAt - s.startedAt) / 1000).toFixed(1) : null;
-                              return (
-                                <div key={s.section} className="flex items-center gap-2 text-[10px]">
-                                  {s.status === "done" ? (
-                                    <Check className="w-3 h-3 text-stone-400 flex-shrink-0" />
-                                  ) : s.status === "customizing" || s.status === "scaffolding" ? (
-                                    <Loader2 className="w-3 h-3 text-stone-400 animate-spin flex-shrink-0" />
-                                  ) : (
-                                    <span className="w-2 h-2 rounded-full bg-white/20 flex-shrink-0" />
-                                  )}
-                                  <span className={s.status === "done" ? "text-white/40" : "text-white/70"}>{s.label}</span>
-                                  {elapsed && <span className="text-white/20 ml-auto tabular-nums">{elapsed}s</span>}
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Build error banner */}
-                  <AnimatePresence>
-                    {buildError && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="absolute top-3 left-3 right-3 z-40"
-                      >
-                        <div className="max-w-2xl mx-auto px-4 py-3 rounded-xl bg-stone-950/90 backdrop-blur-xl border border-stone-500/30 shadow-2xl">
-                          <div className="flex items-start gap-3">
-                            <AlertTriangle className="w-4 h-4 text-stone-400 flex-shrink-0 mt-0.5" />
-                            <div className="flex-1 min-w-0">
-                              <div className="text-sm font-medium text-stone-200">{buildError.message}</div>
-                              <div className="text-xs text-stone-300/60 mt-0.5">{buildError.suggestion}</div>
-                            </div>
-                            <button
-                              onClick={() => { setBuildError(null); handleGenerate(); }}
-                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-stone-500/15 hover:bg-stone-500/25 text-xs text-stone-200 border border-stone-500/30 transition"
-                            >
-                              <RotateCcw className="w-3 h-3" /> Retry
-                            </button>
-                            <button
-                              onClick={() => setBuildError(null)}
-                              className="p-1 rounded-lg hover:bg-stone-500/15 text-stone-300/60 transition"
-                              aria-label="Dismiss"
-                            >
-                              <X className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-              ) : activeTab === "seo" ? (
-                <SeoPreview html={generatedCode} />
-              ) : (
-                <CodePanel html={generatedCode} reactSource={reactSource} />
               )}
             </AnimatePresence>
+
+            {/* SEO / Code tabs render above the hidden preview layer */}
+            {activeTab === "seo" && (
+              <div className="absolute inset-0 z-30">
+                <SeoPreview html={generatedCode} />
+              </div>
+            )}
+            {activeTab === "code" && (
+              <div className="absolute inset-0 z-30">
+                <CodePanel html={generatedCode} reactSource={reactSource} />
+              </div>
+            )}
           </div>
         </div>
 
