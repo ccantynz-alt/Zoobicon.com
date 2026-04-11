@@ -264,7 +264,7 @@ async function planComponents(prompt: string): Promise<PlanResult> {
   };
 }
 
-const CUSTOMISER_SYSTEM = `You customise a single React component for the Zoobicon AI website builder.
+const CUSTOMISER_SYSTEM_BASE = `You customise a single React component for the Zoobicon AI website builder.
 
 You receive:
 - A base component file (TypeScript + Tailwind).
@@ -279,14 +279,55 @@ Hard rules:
 - Replace AI-slop words ("revolutionary", "unleash", "empower", "synergy", "next-generation", "game-changer", "leverage", "elevate", "seamless", "cutting-edge") with specific copy.
 - Use real-sounding metrics, not "10,000+ users".
 - Add aria-labels to icon-only buttons. Add alt text to images. Keep responsive classes.
-- For navbars: anchor links (href="#features", "#pricing", etc.) MUST match real section ids on the page. Only use: features, pricing, faq, about, contact. Never use #docs, #solutions, #markets, or any id that won't exist as a section.
+- For navbars: anchor links (href="#features", "#pricing", etc.) MUST match real section ids on the page. Only use: features, pricing, faq, about, contact. Never use #docs, #solutions, #markets, or any id that won't exist as a section.`;
 
+const THEME_BRIEFS: Record<string, string> = {
+  editorial: `
 EDITORIAL DESIGN SYSTEM — MANDATORY
 This site ships on the Zoobicon editorial preset. It is a restrained, world-stage typographic aesthetic. You MUST:
 - Use ONLY the stone- color family for every Tailwind color utility (from, via, to, text, bg, border, shadow, ring, outline, divide, etc.). NO violet, purple, fuchsia, pink, rose, indigo, blue, sky, cyan, teal, emerald, green, lime, yellow, amber, orange, red. Gray/slate/neutral/zinc/stone/black/white are fine, but prefer stone.
 - Wrap one word or short phrase in each h1/h2 in <em>…</em> so the editorial Fraunces italic serif accent kicks in. Example: <h1>Design that <em>moves</em> people.</h1>
 - Keep motion measured — subtle transitions only. No neon glows, no vibrant shadows, no arcade colors.
-- Prefer understated copy. Editorial voice, not landing-page hype.`;
+- Prefer understated copy. Editorial voice, not landing-page hype.`,
+
+  light: `
+LIGHT / BRIGHT DESIGN SYSTEM — MANDATORY
+This site ships BRIGHT, AIRY, and WELCOMING — the visual opposite of the dark-tech default. You MUST:
+- Backgrounds are WHITE (bg-white) or very light (bg-slate-50, bg-stone-50). NEVER bg-gray-900, bg-gray-950, bg-black, bg-[#0a0a0f], or any other dark background. If the base component has a dark background class, REPLACE it with bg-white.
+- Primary text is dark on light: text-slate-900, text-stone-900, text-slate-800. Body text text-slate-600 or text-stone-600.
+- Accent color is allowed and encouraged — pick ONE family (blue-600, indigo-600, sky-600, emerald-600, teal-600) and use it consistently for buttons, links, and highlights. Do NOT mix multiple accent colors.
+- Borders are light: border-slate-200, border-stone-200, border-gray-200.
+- Shadows are subtle: shadow-sm, shadow-md, shadow-slate-900/5. No black shadows on light backgrounds.
+- Copy is warm, confident, human — not corporate jargon. Speak directly to the customer's need.
+- Keep motion subtle. No neon, no glow, no gradient text that looks like a crypto site.`,
+
+  warm: `
+WARM / ARTISAN DESIGN SYSTEM — MANDATORY
+This site ships on a warm cream + amber palette. Restaurant, bakery, hospitality, artisan voice. You MUST:
+- Backgrounds are cream (bg-amber-50, bg-orange-50) or warm off-white. NEVER dark backgrounds.
+- Primary text is deep warm tone: text-stone-900, text-amber-950, text-orange-950.
+- Accent is amber/orange: amber-600, orange-600, or a deep rose like rose-700 for restaurants.
+- Borders are warm: border-amber-200, border-stone-200.
+- Wrap one evocative word in each h1/h2 in <em>…</em> so the Playfair italic serif accent renders.
+- Copy is sensory, specific, inviting. Name real dishes, real rooms, real experiences.`,
+
+  dark: `
+DARK DESIGN SYSTEM — MANDATORY
+This site ships DARK. You MUST:
+- Backgrounds are dark: bg-gray-950, bg-[#0a0a0f], bg-slate-950, bg-zinc-950.
+- Primary text is light: text-white, text-slate-100, text-stone-100. Body text text-slate-400 or text-slate-300.
+- Accent color is neon-ish — cyan-400, emerald-400, violet-500, fuchsia-500 — pick ONE and stick with it.
+- Borders are subtle white: border-white/10, border-slate-800.
+- Shadows can use glow effects: shadow-cyan-500/20, shadow-violet-500/30.
+- Copy is confident and technical. This is a cyber/crypto/gaming/devtool brand.`,
+};
+
+function buildCustomiserSystem(theme: "editorial" | "light" | "warm" | "dark"): string {
+  return CUSTOMISER_SYSTEM_BASE + "\n" + (THEME_BRIEFS[theme] || THEME_BRIEFS.editorial);
+}
+
+// Back-compat default — the editorial preset is still the default when no theme is passed.
+const CUSTOMISER_SYSTEM = buildCustomiserSystem("editorial");
 
 interface CustomiseArgs {
   baseCode: string;
@@ -296,6 +337,8 @@ interface CustomiseArgs {
   prompt: string;
   primaryColor: string;
   model: string;
+  /** Visual theme — drives which system prompt is sent to the LLM. */
+  theme: "editorial" | "light" | "warm" | "dark";
   /**
    * When true, the generated project has a live Supabase client wired
    * up at `./lib/supabase`. The customiser should wire real auth / data
@@ -393,9 +436,11 @@ interface CustomiseResult {
 
 async function customiseComponent(args: CustomiseArgs): Promise<CustomiseResult> {
   const supabaseBrief = args.supabase ? buildSupabaseBrief(args.supabase) : "";
+  const systemPrompt = buildCustomiserSystem(args.theme);
   const userMsg =
     `BRAND: ${args.brandName}\n` +
     `PRIMARY COLOR: ${args.primaryColor}\n` +
+    `THEME: ${args.theme}\n` +
     `SECTION: ${args.category} (${args.variant})\n` +
     `USER PROMPT: ${args.prompt}\n` +
     supabaseBrief +
@@ -409,7 +454,7 @@ async function customiseComponent(args: CustomiseArgs): Promise<CustomiseResult>
     let collected = "";
     for await (const delta of streamClaude({
       model: args.model,
-      system: CUSTOMISER_SYSTEM,
+      system: systemPrompt,
       messages: [{ role: "user", content: userMsg }],
       maxTokens: 4000,
       temperature: 0.6,
@@ -435,7 +480,7 @@ async function customiseComponent(args: CustomiseArgs): Promise<CustomiseResult>
   try {
     const fb = await callLLMWithFailover({
       model: args.model,
-      system: CUSTOMISER_SYSTEM,
+      system: systemPrompt,
       userMessage: userMsg,
       maxTokens: 4000,
     });
@@ -592,9 +637,19 @@ export async function POST(req: NextRequest): Promise<Response> {
         // imagery, SaaS gets workspace/dashboards, portfolio gets landscape).
         const industry = registry.detectIndustry(prompt);
 
+        // Detect the visual theme the prompt actually wants. This is the
+        // critical fix for "every site comes out dark editorial". Consumer-
+        // facing verticals (transport, hospitality, medical, local services)
+        // default to LIGHT. Food/hospitality default to WARM. Cyber/crypto/
+        // gaming defaults to DARK. Everything else stays editorial.
+        const theme = registry.detectTheme(prompt, industry);
+        writer.send("phase", {
+          phase: "themed",
+          message: `Theme: ${theme} · Industry: ${industry}`,
+        });
+
         // Update styles with the real brand colours now that planning succeeded.
-        // Theme stays editorial — Fraunces + Inter + measured motion.
-        files["styles.css"] = registry.buildStylesFile({ primaryColor, bgColor, theme: "editorial" });
+        files["styles.css"] = registry.buildStylesFile({ primaryColor, bgColor, theme });
 
         // ── Pre-inject Supabase client BEFORE customisation so generated
         // components can import from "./lib/supabase" without breaking
@@ -658,6 +713,7 @@ export async function POST(req: NextRequest): Promise<Response> {
               prompt,
               primaryColor,
               model: customiserModel,
+              theme,
               supabase: customiserSupabase,
             });
             let updatedCode = result.code;
@@ -679,11 +735,23 @@ export async function POST(req: NextRequest): Promise<Response> {
               });
             }
 
-            // Editorial reskin — guarantees every shipped component uses the
-            // restrained stone palette even when the LLM ignores the system
-            // prompt and emits violet/cyan/fuchsia classes anyway. Regex-only;
-            // safe on already-reskinned code (idempotent).
-            updatedCode = registry.reskinEditorial(updatedCode);
+            // Theme-aware reskin — regex pass guarantees the component
+            // renders in the correct theme even when the LLM ignores the
+            // system prompt. This is the HARD FIX for "every site comes
+            // out dark even when it's an airport shuttle service": when
+            // theme is "light", reskinLight swaps bg-gray-950 → bg-white,
+            // text-white → text-stone-900, etc. When theme is "editorial",
+            // reskinEditorial collapses vibrant colors into stone. When
+            // theme is "dark", pass through unchanged. All reskins are
+            // idempotent — safe to re-run on already-customised output.
+            if (theme === "editorial") {
+              updatedCode = registry.reskinEditorial(updatedCode);
+            } else if (theme === "light") {
+              updatedCode = registry.reskinLight(updatedCode);
+            } else if (theme === "warm") {
+              updatedCode = registry.reskinWarm(updatedCode);
+            }
+            // "dark" passes through unchanged.
 
             // Industry image swap — replace every Unsplash photo ID with one
             // drawn from the detected industry's curated pool, so imagery
@@ -691,13 +759,17 @@ export async function POST(req: NextRequest): Promise<Response> {
             // mountains/watches/dashboards.
             updatedCode = registry.swapImagesForIndustry(updatedCode, industry);
 
-            // Auto-emphasize one word per h1/h2 so the Fraunces italic serif
-            // accent actually renders. Hard guarantee for when the LLM
-            // ignores the editorial system-prompt instruction.
-            updatedCode = registry.emphasizeHeadings(updatedCode);
+            // Auto-emphasize one word per h1/h2. Only runs on editorial +
+            // warm themes — those are the themes with serif display fonts
+            // that actually render the <em> as an italic accent. For light
+            // and dark themes (both sans-serif), <em> would just look like
+            // italicised noise, so we skip it.
+            if (theme === "editorial" || theme === "warm") {
+              updatedCode = registry.emphasizeHeadings(updatedCode);
+            }
 
             // Write the component file
-            const { fileName } = registry.buildComponentFile(comp);
+            const { fileName } = registry.buildComponentFile(comp, { theme });
             files[fileName] = updatedCode;
 
             // Record completion and rebuild App.tsx in ORIGINAL order —
@@ -709,7 +781,7 @@ export async function POST(req: NextRequest): Promise<Response> {
               const done = completedByIndex.get(j);
               if (done) ordered.push(done);
             }
-            files["App.tsx"] = registry.buildAppFile(ordered);
+            files["App.tsx"] = registry.buildAppFile(ordered, { theme });
 
             writer.send("component", {
               name: comp.id,
