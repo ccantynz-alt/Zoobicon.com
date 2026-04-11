@@ -1173,8 +1173,27 @@ function BuilderPage() {
                   receivedDone = true;
                   clearWatchdog();
                   setSectionTimeline(prev => prev.map(s => s.status === "done" ? s : { ...s, status: "done", finishedAt: Date.now() }));
+                  // Surface partial-fallback summary in the final pipeline log so the
+                  // user knows some sections shipped as base templates (Law 8).
+                  if (Array.isArray(event.failedSections) && event.failedSections.length > 0) {
+                    const count = event.failedSections.length;
+                    setStreamWarning(`${count} section${count > 1 ? "s" : ""} fell back to base template (LLM provider unavailable). Edit or regenerate to retry.`);
+                    setPipelineAgents(prev => [...prev, `⚠ ${count} section${count > 1 ? "s" : ""} used base template fallback`]);
+                  }
                   setPipelineAgents(prev => [...prev, "Build complete"]);
                   trackEvent("build");
+                }
+              } else if (event.type === "warning") {
+                // Non-fatal in-flight warning (section-fallback, etc.) — show it
+                // in the pipeline log so the user sees which sections dropped to
+                // base templates while the build is still running.
+                const kind = event.kind || "warning";
+                const section = event.section || "";
+                const reason = event.reason || "";
+                const label = section ? `${kind}: ${section}` : kind;
+                setPipelineAgents(prev => [...prev, `⚠ ${label}${reason ? ` — ${reason.slice(0, 80)}` : ""}`]);
+                if (kind === "section-fallback") {
+                  setStreamWarning(`One or more sections fell back to base templates — the LLM provider couldn't customise them.`);
                 }
               } else if (event.type === "error") {
                 const msg = event.message || "Generation failed";
@@ -1189,10 +1208,11 @@ function BuilderPage() {
                 }
               }
             } catch (e) {
-              if (e instanceof Error && (e.message.includes("failed") || e.message.includes("Generation") || e.message.includes("unavailable") || e.message.includes("busy"))) {
-                throw e;
-              }
-              // Skip JSON parse errors from partial chunks
+              // Malformed JSON = partial SSE chunk, skip. Anything else
+              // (application errors thrown above) must propagate — silent
+              // swallow was the Law 8 violation Craig has been hitting.
+              if (e instanceof SyntaxError) continue;
+              throw e;
             }
           }
         }
@@ -1239,6 +1259,11 @@ function BuilderPage() {
                 setBuildProgress(null);
                 setPipelineAgents(prev => [...prev, "Build complete"]);
                 trackEvent("build");
+              } else if (event.type === "warning") {
+                const kind = event.kind || "warning";
+                const section = event.section || "";
+                const label = section ? `${kind}: ${section}` : kind;
+                setPipelineAgents(prev => [...prev, `⚠ ${label}`]);
               } else if (event.type === "error") {
                 // Respect fatal:false warnings in the buffer flush too.
                 if (event.fatal === false) {
@@ -1248,10 +1273,10 @@ function BuilderPage() {
                 }
               }
             } catch (e) {
-              if (e instanceof Error && (e.message.includes("failed") || e.message.includes("Generation") || e.message.includes("unavailable") || e.message.includes("busy"))) {
-                throw e;
-              }
-              // Skip JSON parse errors from partial chunks
+              // Same Law 8 discipline — only silence JSON parse errors from
+              // partial chunks, propagate everything else.
+              if (e instanceof SyntaxError) continue;
+              throw e;
             }
           }
         }
@@ -1351,7 +1376,13 @@ function BuilderPage() {
               throw new Error(event.message);
             }
           } catch (e) {
-            if (e instanceof Error && (e.message.includes("failed") || e.message.includes("unavailable"))) throw e;
+            // Malformed JSON = partial SSE chunk or heartbeat line, skip.
+            // Anything else (including our own "throw new Error(event.message)"
+            // above and legitimate application errors) must propagate — otherwise
+            // the user stares at an unchanging Sandpack preview and never learns
+            // the edit failed (Law 8: no silent catches).
+            if (e instanceof SyntaxError) continue;
+            throw e;
           }
         }
       }
