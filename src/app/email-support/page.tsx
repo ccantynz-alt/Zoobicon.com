@@ -301,17 +301,17 @@ const folderConfig: { key: Folder; label: string; icon: React.ElementType }[] = 
 ];
 
 const priorityColors: Record<string, string> = {
-  urgent: "bg-red-500/15 text-red-400 border-red-500/20",
-  high: "bg-orange-500/15 text-orange-400 border-orange-500/20",
-  medium: "bg-amber-500/15 text-amber-400 border-amber-500/20",
+  urgent: "bg-stone-500/15 text-stone-400 border-stone-500/20",
+  high: "bg-stone-500/15 text-stone-400 border-stone-500/20",
+  medium: "bg-stone-500/15 text-stone-400 border-stone-500/20",
   low: "bg-gray-500/15 text-gray-400 border-gray-500/20",
 };
 
 const statusColors: Record<string, string> = {
-  open: "bg-blue-500/15 text-blue-400",
-  pending: "bg-amber-500/15 text-amber-400",
-  resolved: "bg-emerald-500/15 text-emerald-400",
-  spam: "bg-red-500/15 text-red-400",
+  open: "bg-stone-500/15 text-stone-400",
+  pending: "bg-stone-500/15 text-stone-400",
+  resolved: "bg-stone-500/15 text-stone-400",
+  spam: "bg-stone-500/15 text-stone-400",
 };
 
 // ---------- SLA Helpers ----------
@@ -333,12 +333,12 @@ function computeSla(priority: string, createdAt: string): Ticket["sla"] {
 
 function slaTimeLeft(deadline: string): { label: string; color: string } {
   const diff = new Date(deadline).getTime() - Date.now();
-  if (diff <= 0) return { label: "SLA BREACHED", color: "bg-red-500/20 text-red-400 border-red-500/30" };
+  if (diff <= 0) return { label: "SLA BREACHED", color: "bg-stone-500/20 text-stone-400 border-stone-500/30" };
   const mins = Math.floor(diff / 60000);
-  if (mins < 60) return { label: `SLA: ${mins}m left`, color: mins <= 45 ? "bg-amber-500/20 text-amber-400 border-amber-500/30" : "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" };
+  if (mins < 60) return { label: `SLA: ${mins}m left`, color: mins <= 45 ? "bg-stone-500/20 text-stone-400 border-stone-500/30" : "bg-stone-500/20 text-stone-400 border-stone-500/30" };
   const hrs = Math.floor(mins / 60);
-  if (hrs < 4) return { label: `SLA: ${hrs}h ${mins % 60}m left`, color: "bg-amber-500/20 text-amber-400 border-amber-500/30" };
-  return { label: `SLA: ${hrs}h left`, color: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" };
+  if (hrs < 4) return { label: `SLA: ${hrs}h ${mins % 60}m left`, color: "bg-stone-500/20 text-stone-400 border-stone-500/30" };
+  return { label: `SLA: ${hrs}h left`, color: "bg-stone-500/20 text-stone-400 border-stone-500/30" };
 }
 
 // ---------- Canned Responses (15+ organized by category) ----------
@@ -978,7 +978,7 @@ export default function EmailSupportDashboard() {
   if (!authChecked) {
     return (
       <div className="min-h-screen bg-[#09090f] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+        <Loader2 className="w-8 h-8 text-stone-500 animate-spin" />
       </div>
     );
   }
@@ -992,7 +992,7 @@ export default function EmailSupportDashboard() {
       <nav className="h-14 border-b border-white/[0.08] bg-gray-900/80 backdrop-blur-xl flex items-center justify-between px-4 shrink-0 z-50">
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-stone-500 to-stone-600 flex items-center justify-center">
               <Mail className="w-3.5 h-3.5 text-white" />
             </div>
             <span className="text-sm font-bold tracking-tight hidden sm:block">Zoobicon</span>
@@ -1014,7 +1014,7 @@ export default function EmailSupportDashboard() {
             <span className="hidden sm:inline">Sign out</span>
           </button>
           {user && (
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-[10px] font-bold ml-1">
+            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-stone-500 to-stone-600 flex items-center justify-center text-[10px] font-bold ml-1">
               {(user.name || user.email || "U").charAt(0).toUpperCase()}
             </div>
           )}
@@ -1025,18 +1025,18 @@ export default function EmailSupportDashboard() {
 
       {/* Data Source Banner */}
       {dataSource === "demo" && (
-        <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2.5 flex items-center justify-center gap-2 shrink-0 z-40">
-          <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-          <p className="text-xs text-amber-300 text-center">
+        <div className="bg-stone-500/10 border-b border-stone-500/20 px-4 py-2.5 flex items-center justify-center gap-2 shrink-0 z-40">
+          <AlertTriangle className="w-4 h-4 text-stone-400 shrink-0" />
+          <p className="text-xs text-stone-300 text-center">
             <strong>DEMO DATA</strong> — Database not connected. Connect Mailgun + Neon to receive real support emails.{" "}
-            <Link href="/admin/email-settings" className="underline hover:text-amber-200 transition-colors">Set up email →</Link>
+            <Link href="/admin/email-settings" className="underline hover:text-stone-200 transition-colors">Set up email →</Link>
           </p>
         </div>
       )}
       {dataSource === "database" && (
-        <div className="bg-emerald-500/10 border-b border-emerald-500/20 px-4 py-1.5 flex items-center justify-center gap-2 shrink-0 z-40">
-          <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-          <p className="text-xs text-emerald-300 text-center">
+        <div className="bg-stone-500/10 border-b border-stone-500/20 px-4 py-1.5 flex items-center justify-center gap-2 shrink-0 z-40">
+          <Check className="w-3.5 h-3.5 text-stone-400 shrink-0" />
+          <p className="text-xs text-stone-300 text-center">
             <strong>LIVE</strong> — Connected to database. Tickets are persisted and emails routed via Mailgun.
           </p>
         </div>
@@ -1046,28 +1046,28 @@ export default function EmailSupportDashboard() {
       <div className="border-b border-white/[0.06] bg-gray-900/50 shrink-0 overflow-x-auto">
         <div className="flex items-center px-4 py-2.5 gap-1">
           {/* Open Tickets */}
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500/[0.06] border border-blue-500/10">
-            <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-stone-500/[0.06] border border-stone-500/10">
+            <div className="w-2 h-2 rounded-full bg-stone-500 animate-pulse" />
             <span className="text-[10px] text-white/60">Open</span>
-            <span className="text-xs font-bold text-blue-400">{stats.open}</span>
+            <span className="text-xs font-bold text-stone-400">{stats.open}</span>
           </div>
           {/* Avg Response Time */}
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06]">
-            <Clock className="w-3 h-3 text-cyan-400" />
+            <Clock className="w-3 h-3 text-stone-400" />
             <span className="text-[10px] text-white/60">Avg Response</span>
-            <span className="text-xs font-bold text-cyan-400">{metrics.avgResponseLabel}</span>
+            <span className="text-xs font-bold text-stone-400">{metrics.avgResponseLabel}</span>
           </div>
           {/* Avg Resolution Time */}
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06]">
-            <Timer className="w-3 h-3 text-amber-400" />
+            <Timer className="w-3 h-3 text-stone-400" />
             <span className="text-[10px] text-white/60">Avg Resolution</span>
-            <span className="text-xs font-bold text-amber-400">{metrics.avgResolutionLabel}</span>
+            <span className="text-xs font-bold text-stone-400">{metrics.avgResolutionLabel}</span>
           </div>
           {/* CSAT Score */}
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06]">
-            <Star className="w-3 h-3 text-yellow-400" />
+            <Star className="w-3 h-3 text-stone-400" />
             <span className="text-[10px] text-white/60">CSAT</span>
-            <span className="text-xs font-bold text-yellow-400">
+            <span className="text-xs font-bold text-stone-400">
               {metrics.csatAvg > 0 ? `${metrics.csatAvg.toFixed(1)}/5` : "N/A"}
             </span>
             {metrics.csatCount > 0 && (
@@ -1076,27 +1076,27 @@ export default function EmailSupportDashboard() {
           </div>
           {/* First Contact Resolution */}
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06]">
-            <ThumbsUp className="w-3 h-3 text-emerald-400" />
+            <ThumbsUp className="w-3 h-3 text-stone-400" />
             <span className="text-[10px] text-white/60">FCR</span>
-            <span className="text-xs font-bold text-emerald-400">{metrics.fcrRate}%</span>
+            <span className="text-xs font-bold text-stone-400">{metrics.fcrRate}%</span>
           </div>
           {/* Tickets per Day */}
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06]">
-            <Activity className="w-3 h-3 text-purple-400" />
+            <Activity className="w-3 h-3 text-stone-400" />
             <span className="text-[10px] text-white/60">Tickets/Day</span>
-            <span className="text-xs font-bold text-purple-400">{metrics.ticketsPerDay}</span>
+            <span className="text-xs font-bold text-stone-400">{metrics.ticketsPerDay}</span>
           </div>
           {/* Resolution Rate */}
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06]">
-            <TrendingUp className="w-3 h-3 text-emerald-400" />
+            <TrendingUp className="w-3 h-3 text-stone-400" />
             <span className="text-[10px] text-white/60">Resolved</span>
-            <span className="text-xs font-bold text-emerald-400">{stats.resolutionRate}%</span>
+            <span className="text-xs font-bold text-stone-400">{stats.resolutionRate}%</span>
           </div>
           {/* AI Replies */}
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-500/[0.06] border border-purple-500/10">
-            <Bot className="w-3 h-3 text-purple-400" />
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-stone-500/[0.06] border border-stone-500/10">
+            <Bot className="w-3 h-3 text-stone-400" />
             <span className="text-[10px] text-white/60">AI Replies</span>
-            <span className="text-xs font-bold text-purple-400">{stats.aiReplies}</span>
+            <span className="text-xs font-bold text-stone-400">{stats.aiReplies}</span>
           </div>
         </div>
       </div>
@@ -1109,7 +1109,7 @@ export default function EmailSupportDashboard() {
           <div className="p-3">
             <button
               onClick={() => setShowNewTicket(true)}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-xs font-semibold transition-all"
+              className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 text-xs font-semibold transition-all"
             >
               <Plus className="w-3.5 h-3.5" />
               New Ticket
@@ -1159,7 +1159,7 @@ export default function EmailSupportDashboard() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search tickets..."
-                className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg pl-9 pr-3 py-2 text-xs text-white placeholder:text-white/50 outline-none focus:border-blue-500/30 transition-colors"
+                className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg pl-9 pr-3 py-2 text-xs text-white placeholder:text-white/50 outline-none focus:border-stone-500/30 transition-colors"
               />
             </div>
             <div className="flex items-center gap-2">
@@ -1195,7 +1195,7 @@ export default function EmailSupportDashboard() {
                         onClick={() => setFilterPriority(p)}
                         className={`px-2.5 py-1 rounded-full text-[10px] font-medium border transition-all ${
                           filterPriority === p
-                            ? "bg-blue-500/15 border-blue-500/30 text-blue-400"
+                            ? "bg-stone-500/15 border-stone-500/30 text-stone-400"
                             : "border-white/[0.08] text-white/60 hover:text-white/60"
                         }`}
                       >
@@ -1222,7 +1222,7 @@ export default function EmailSupportDashboard() {
                   onClick={() => setSelectedId(ticket.id)}
                   className={`w-full text-left px-4 py-3 border-b border-white/[0.05] transition-all ${
                     selectedId === ticket.id
-                      ? "bg-blue-500/[0.06] border-l-2 border-l-blue-500"
+                      ? "bg-stone-500/[0.06] border-l-2 border-l-blue-500"
                       : "hover:bg-white/[0.03] border-l-2 border-l-transparent"
                   }`}
                 >
@@ -1262,8 +1262,8 @@ export default function EmailSupportDashboard() {
                     )}
                     {ticket.messages.length > 1 && (
                       <>
-                        <Bot className="w-2.5 h-2.5 text-purple-400/60" />
-                        <span className="text-[9px] text-purple-400/60">
+                        <Bot className="w-2.5 h-2.5 text-stone-400/60" />
+                        <span className="text-[9px] text-stone-400/60">
                           {ticket.messages.filter((m) => m.from === "ai").length} AI {ticket.messages.filter((m) => m.from === "ai").length === 1 ? "reply" : "replies"}
                         </span>
                       </>
@@ -1308,7 +1308,7 @@ export default function EmailSupportDashboard() {
                     <button
                       onClick={() => handleAiReply(selectedTicket)}
                       disabled={aiLoading === selectedTicket.id}
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-gradient-to-r from-purple-600/20 to-blue-600/20 border border-purple-500/20 text-[11px] font-medium text-purple-300 hover:from-purple-600/30 hover:to-blue-600/30 transition-all disabled:opacity-50"
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-gradient-to-r from-stone-600/20 to-stone-600/20 border border-stone-500/20 text-[11px] font-medium text-stone-300 hover:from-stone-600/30 hover:to-stone-600/30 transition-all disabled:opacity-50"
                     >
                       {aiLoading === selectedTicket.id ? (
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -1343,7 +1343,7 @@ export default function EmailSupportDashboard() {
                                 }}
                                 className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-xs transition-all ${
                                   selectedTicket.assignee === member || (member === "Unassigned" && !selectedTicket.assignee)
-                                    ? "text-blue-400 bg-blue-500/[0.08]"
+                                    ? "text-stone-400 bg-stone-500/[0.08]"
                                     : "text-white/60 hover:bg-white/[0.06] hover:text-white/80"
                                 }`}
                               >
@@ -1389,13 +1389,13 @@ export default function EmailSupportDashboard() {
                             </button>
                             <button
                               onClick={() => { updateTicket(selectedTicket.id, { status: "resolved" }); setShowActions(false); }}
-                              className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs text-emerald-400/70 hover:bg-emerald-500/[0.06] hover:text-emerald-400 transition-all"
+                              className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs text-stone-400/70 hover:bg-stone-500/[0.06] hover:text-stone-400 transition-all"
                             >
                               <CheckCircle2 className="w-3.5 h-3.5" /> Mark Resolved
                             </button>
                             <button
                               onClick={() => { updateTicket(selectedTicket.id, { status: "spam" }); setShowActions(false); }}
-                              className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs text-red-400/70 hover:bg-red-500/[0.06] hover:text-red-400 transition-all"
+                              className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs text-stone-400/70 hover:bg-stone-500/[0.06] hover:text-stone-400 transition-all"
                             >
                               <Trash2 className="w-3.5 h-3.5" /> Mark Spam
                             </button>
@@ -1445,7 +1445,7 @@ export default function EmailSupportDashboard() {
                 {getAutomationRules(selectedTicket).length > 0 && (
                   <div className="mt-2.5 flex flex-wrap gap-1.5">
                     {getAutomationRules(selectedTicket).map((rule, i) => (
-                      <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-cyan-500/[0.08] border border-cyan-500/15 text-[9px] text-cyan-400/80">
+                      <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-stone-500/[0.08] border border-stone-500/15 text-[9px] text-stone-400/80">
                         <Zap className="w-2.5 h-2.5" />
                         {rule}
                       </span>
@@ -1461,18 +1461,18 @@ export default function EmailSupportDashboard() {
                   animate={{ height: "auto", opacity: 1 }}
                   className="px-6 py-0 shrink-0"
                 >
-                  <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-orange-500/10 border border-orange-500/20 mt-3">
-                    <Eye className="w-4 h-4 text-orange-400 shrink-0" />
+                  <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-stone-500/10 border border-stone-500/20 mt-3">
+                    <Eye className="w-4 h-4 text-stone-400 shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <span className="text-xs text-orange-300 font-medium">
+                      <span className="text-xs text-stone-300 font-medium">
                         <span className="font-bold">{collisionWarning.agentName}</span>
                         {" "}is currently {collisionWarning.action === "replying" ? "drafting a reply to" : "viewing"} this ticket
                       </span>
-                      <span className="text-[10px] text-orange-400/60 ml-2">
+                      <span className="text-[10px] text-stone-400/60 ml-2">
                         ({Math.round((Date.now() - collisionWarning.lockedAt) / 1000)}s ago)
                       </span>
                     </div>
-                    <AlertCircle className="w-3.5 h-3.5 text-orange-400/60 shrink-0" />
+                    <AlertCircle className="w-3.5 h-3.5 text-stone-400/60 shrink-0" />
                   </div>
                 </motion.div>
               )}
@@ -1480,20 +1480,20 @@ export default function EmailSupportDashboard() {
               {/* CSAT Survey for Resolved Tickets */}
               {selectedTicket.status === "resolved" && (
                 <div className="px-6 pt-3 shrink-0">
-                  <div className={`rounded-xl border p-4 ${csatSubmitted ? "bg-emerald-500/[0.06] border-emerald-500/15" : "bg-yellow-500/[0.06] border-yellow-500/15"}`}>
+                  <div className={`rounded-xl border p-4 ${csatSubmitted ? "bg-stone-500/[0.06] border-stone-500/15" : "bg-stone-500/[0.06] border-stone-500/15"}`}>
                     {csatSubmitted ? (
                       <div className="flex items-center gap-3">
                         <div className="flex items-center gap-0.5">
                           {[1, 2, 3, 4, 5].map((star) => (
-                            <Star key={star} className={`w-4 h-4 ${star <= csatRating ? "text-yellow-400 fill-yellow-400" : "text-white/20"}`} />
+                            <Star key={star} className={`w-4 h-4 ${star <= csatRating ? "text-stone-400 fill-stone-400" : "text-white/20"}`} />
                           ))}
                         </div>
-                        <span className="text-xs text-emerald-400 font-medium">CSAT rating submitted - Thank you!</span>
+                        <span className="text-xs text-stone-400 font-medium">CSAT rating submitted - Thank you!</span>
                       </div>
                     ) : (
                       <div>
                         <div className="flex items-center gap-2 mb-2">
-                          <Star className="w-3.5 h-3.5 text-yellow-400" />
+                          <Star className="w-3.5 h-3.5 text-stone-400" />
                           <span className="text-xs font-semibold text-white/80">Customer Satisfaction Survey</span>
                         </div>
                         <p className="text-[10px] text-white/60 mb-3">Rate the resolution quality for this ticket:</p>
@@ -1510,7 +1510,7 @@ export default function EmailSupportDashboard() {
                                 <Star
                                   className={`w-5 h-5 transition-colors ${
                                     star <= (csatHover || csatRating)
-                                      ? "text-yellow-400 fill-yellow-400"
+                                      ? "text-stone-400 fill-stone-400"
                                       : "text-white/20"
                                   }`}
                                 />
@@ -1521,12 +1521,12 @@ export default function EmailSupportDashboard() {
                             value={csatComment}
                             onChange={(e) => setCsatComment(e.target.value)}
                             placeholder="Optional comment..."
-                            className="flex-1 bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-1.5 text-[10px] text-white placeholder:text-white/40 outline-none focus:border-yellow-500/30 transition-colors"
+                            className="flex-1 bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-1.5 text-[10px] text-white placeholder:text-white/40 outline-none focus:border-stone-500/30 transition-colors"
                           />
                           <button
                             onClick={handleCSATSubmit}
                             disabled={csatRating === 0}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-yellow-600 to-amber-600 text-[10px] font-semibold text-white transition-all disabled:opacity-30 hover:from-yellow-500 hover:to-amber-500"
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-stone-600 to-stone-600 text-[10px] font-semibold text-white transition-all disabled:opacity-30 hover:from-stone-500 hover:to-stone-500"
                           >
                             <Send className="w-3 h-3" />
                             Submit
@@ -1557,29 +1557,29 @@ export default function EmailSupportDashboard() {
                         msg.from === "customer"
                           ? "bg-white text-gray-800 border border-gray-200"
                           : msg.from === "ai"
-                          ? "bg-purple-500/[0.08] border border-purple-500/20"
+                          ? "bg-stone-500/[0.08] border border-stone-500/20"
                           : msg.from === "internal"
-                          ? "bg-amber-500/[0.08] border border-amber-500/20 border-dashed"
-                          : "bg-blue-500/[0.08] border border-blue-500/20"
+                          ? "bg-stone-500/[0.08] border border-stone-500/20 border-dashed"
+                          : "bg-stone-500/[0.08] border border-stone-500/20"
                       }`}
                     >
                       {msg.from !== "customer" && (
                         <div className="flex items-center gap-1.5 mb-1.5">
                           {msg.from === "ai" ? (
                             <>
-                              <Sparkles className="w-3 h-3 text-purple-400" />
-                              <span className="text-[9px] font-bold text-purple-400">AI Draft</span>
+                              <Sparkles className="w-3 h-3 text-stone-400" />
+                              <span className="text-[9px] font-bold text-stone-400">AI Draft</span>
                             </>
                           ) : msg.from === "internal" ? (
                             <>
-                              <Lock className="w-3 h-3 text-amber-400" />
-                              <span className="text-[9px] font-bold text-amber-400">Internal Note</span>
-                              <span className="text-[8px] text-amber-400/50 ml-1">Not visible to customer</span>
+                              <Lock className="w-3 h-3 text-stone-400" />
+                              <span className="text-[9px] font-bold text-stone-400">Internal Note</span>
+                              <span className="text-[8px] text-stone-400/50 ml-1">Not visible to customer</span>
                             </>
                           ) : (
                             <>
-                              <Zap className="w-3 h-3 text-blue-400" />
-                              <span className="text-[9px] font-bold text-blue-400">Agent Reply</span>
+                              <Zap className="w-3 h-3 text-stone-400" />
+                              <span className="text-[9px] font-bold text-stone-400">Agent Reply</span>
                             </>
                           )}
                         </div>
@@ -1589,14 +1589,14 @@ export default function EmailSupportDashboard() {
                     </div>
                     {msg.from !== "customer" && (
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                        msg.from === "ai" ? "bg-purple-500/20" : msg.from === "internal" ? "bg-amber-500/20" : "bg-blue-500/20"
+                        msg.from === "ai" ? "bg-stone-500/20" : msg.from === "internal" ? "bg-stone-500/20" : "bg-stone-500/20"
                       }`}>
                         {msg.from === "ai" ? (
-                          <Bot className="w-4 h-4 text-purple-400" />
+                          <Bot className="w-4 h-4 text-stone-400" />
                         ) : msg.from === "internal" ? (
-                          <Lock className="w-4 h-4 text-amber-400" />
+                          <Lock className="w-4 h-4 text-stone-400" />
                         ) : (
-                          <UserCircle className="w-4 h-4 text-blue-400" />
+                          <UserCircle className="w-4 h-4 text-stone-400" />
                         )}
                       </div>
                     )}
@@ -1604,14 +1604,14 @@ export default function EmailSupportDashboard() {
                 ))}
                 {aiLoading === selectedTicket.id && (
                   <div className="flex gap-3 justify-end">
-                    <div className="max-w-[70%] rounded-2xl px-4 py-3 bg-purple-500/[0.08] border border-purple-500/20">
+                    <div className="max-w-[70%] rounded-2xl px-4 py-3 bg-stone-500/[0.08] border border-stone-500/20">
                       <div className="flex items-center gap-2">
-                        <Loader2 className="w-3.5 h-3.5 text-purple-400 animate-spin" />
-                        <span className="text-xs text-purple-400/70">AI is drafting a reply...</span>
+                        <Loader2 className="w-3.5 h-3.5 text-stone-400 animate-spin" />
+                        <span className="text-xs text-stone-400/70">AI is drafting a reply...</span>
                       </div>
                     </div>
-                    <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center shrink-0">
-                      <Bot className="w-4 h-4 text-purple-400" />
+                    <div className="w-8 h-8 rounded-full bg-stone-500/20 flex items-center justify-center shrink-0">
+                      <Bot className="w-4 h-4 text-stone-400" />
                     </div>
                   </div>
                 )}
@@ -1625,7 +1625,7 @@ export default function EmailSupportDashboard() {
                     <button
                       onClick={() => setShowCannedResponses(!showCannedResponses)}
                       className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] border transition-all ${
-                        showCannedResponses ? "bg-amber-500/10 border-amber-500/20 text-amber-400" : "border-white/[0.06] text-white/60 hover:text-white/60"
+                        showCannedResponses ? "bg-stone-500/10 border-stone-500/20 text-stone-400" : "border-white/[0.06] text-white/60 hover:text-white/60"
                       }`}
                     >
                       <Zap className="w-3 h-3" />
@@ -1649,7 +1649,7 @@ export default function EmailSupportDashboard() {
                             <button
                               onClick={() => setCannedCategory("all")}
                               className={`px-2 py-1 rounded text-[9px] font-medium whitespace-nowrap transition-all ${
-                                cannedCategory === "all" ? "bg-blue-500/15 text-blue-400" : "text-white/50 hover:text-white/60"
+                                cannedCategory === "all" ? "bg-stone-500/15 text-stone-400" : "text-white/50 hover:text-white/60"
                               }`}
                             >
                               All
@@ -1659,7 +1659,7 @@ export default function EmailSupportDashboard() {
                                 key={cat.category}
                                 onClick={() => setCannedCategory(cat.category)}
                                 className={`flex items-center gap-1 px-2 py-1 rounded text-[9px] font-medium whitespace-nowrap transition-all ${
-                                  cannedCategory === cat.category ? "bg-blue-500/15 text-blue-400" : "text-white/50 hover:text-white/60"
+                                  cannedCategory === cat.category ? "bg-stone-500/15 text-stone-400" : "text-white/50 hover:text-white/60"
                                 }`}
                               >
                                 <cat.icon className="w-2.5 h-2.5" />
@@ -1701,7 +1701,7 @@ export default function EmailSupportDashboard() {
                   <button
                     onClick={() => setIsInternalNote(!isInternalNote)}
                     className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] border transition-all ${
-                      isInternalNote ? "bg-amber-500/15 border-amber-500/25 text-amber-400" : "border-white/[0.06] text-white/60 hover:text-white/60"
+                      isInternalNote ? "bg-stone-500/15 border-stone-500/25 text-stone-400" : "border-white/[0.06] text-white/60 hover:text-white/60"
                     }`}
                   >
                     <Lock className="w-3 h-3" />
@@ -1712,24 +1712,24 @@ export default function EmailSupportDashboard() {
                 <AnimatePresence>
                   {polishResult && (
                     <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                      <div className="bg-purple-500/5 border border-purple-500/10 rounded-xl p-3 mb-2">
+                      <div className="bg-stone-500/5 border border-stone-500/10 rounded-xl p-3 mb-2">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
-                            <Sparkles className="w-3 h-3 text-purple-400" />
-                            <span className="text-[10px] font-semibold text-purple-300">AI Polish</span>
-                            <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${polishResult.score >= 90 ? "bg-green-500/20 text-green-400" : "bg-yellow-500/20 text-yellow-400"}`}>
+                            <Sparkles className="w-3 h-3 text-stone-400" />
+                            <span className="text-[10px] font-semibold text-stone-300">AI Polish</span>
+                            <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${polishResult.score >= 90 ? "bg-stone-500/20 text-stone-400" : "bg-stone-500/20 text-stone-400"}`}>
                               {polishResult.score}/100
                             </span>
                           </div>
                           <div className="flex items-center gap-1">
-                            <button onClick={acceptReplyPolish} className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-green-600/20 text-green-400 text-[10px] hover:bg-green-600/30 transition-colors"><Check className="w-2.5 h-2.5" /> Accept</button>
+                            <button onClick={acceptReplyPolish} className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-stone-600/20 text-stone-400 text-[10px] hover:bg-stone-600/30 transition-colors"><Check className="w-2.5 h-2.5" /> Accept</button>
                             <button onClick={() => setPolishResult(null)} className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-zinc-700/50 text-zinc-400 text-[10px] hover:bg-zinc-700 transition-colors"><X className="w-2.5 h-2.5" /> Dismiss</button>
                           </div>
                         </div>
                         {polishResult.changes.length > 0 && (
                           <div className="space-y-0.5 mb-1.5">
                             {polishResult.changes.slice(0, 3).map((c, i) => (
-                              <div key={i} className="flex items-start gap-1.5 text-[10px] text-zinc-400"><Wand2 className="w-2.5 h-2.5 text-purple-400 mt-0.5 shrink-0" />{c}</div>
+                              <div key={i} className="flex items-start gap-1.5 text-[10px] text-zinc-400"><Wand2 className="w-2.5 h-2.5 text-stone-400 mt-0.5 shrink-0" />{c}</div>
                             ))}
                           </div>
                         )}
@@ -1747,15 +1747,15 @@ export default function EmailSupportDashboard() {
                     placeholder={isInternalNote ? "Add an internal note (not visible to customer)..." : "Type a reply..."}
                     className={`flex-1 rounded-xl px-4 py-2.5 text-xs text-white placeholder:text-white/50 outline-none transition-colors ${
                       isInternalNote
-                        ? "bg-amber-500/[0.06] border border-amber-500/20 focus:border-amber-500/40"
-                        : "bg-white/[0.05] border border-white/[0.08] focus:border-blue-500/30"
+                        ? "bg-stone-500/[0.06] border border-stone-500/20 focus:border-stone-500/40"
+                        : "bg-white/[0.05] border border-white/[0.08] focus:border-stone-500/30"
                     }`}
                   />
                   {/* AI Polish Button */}
                   <button
                     onClick={handlePolishReply}
                     disabled={polishing || !replyText.trim()}
-                    className="p-2.5 rounded-xl text-purple-400 hover:bg-purple-500/10 border border-transparent hover:border-purple-500/20 transition-all disabled:opacity-30"
+                    className="p-2.5 rounded-xl text-stone-400 hover:bg-stone-500/10 border border-transparent hover:border-stone-500/20 transition-all disabled:opacity-30"
                     title="AI Polish — fix grammar & tone"
                   >
                     {polishing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
@@ -1765,10 +1765,10 @@ export default function EmailSupportDashboard() {
                     disabled={grammarChecking || !replyText.trim()}
                     className={`p-2.5 rounded-xl text-white transition-all disabled:opacity-30 ${
                       isInternalNote
-                        ? "bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500"
+                        ? "bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500"
                         : !grammarChecked && !isInternalNote
-                        ? "bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500"
-                        : "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500"
+                        ? "bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500"
+                        : "bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500"
                     }`}
                     title={!grammarChecked && !isInternalNote ? "Click to grammar-check before sending" : "Send reply"}
                   >
@@ -1789,7 +1789,7 @@ export default function EmailSupportDashboard() {
                   </div>
                   {/* Avatar & Name */}
                   <div className="flex flex-col items-center mb-4">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-lg font-bold mb-2">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-stone-500 to-stone-600 flex items-center justify-center text-lg font-bold mb-2">
                       {selectedTicket.customerName.charAt(0)}
                     </div>
                     <span className="text-xs font-semibold text-white/80">{selectedTicket.customerName}</span>
@@ -1811,11 +1811,11 @@ export default function EmailSupportDashboard() {
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] text-white/60 flex items-center gap-1.5"><Crown className="w-3 h-3" /> Plan</span>
-                      <span className="text-[10px] font-bold text-purple-400 bg-purple-500/10 px-1.5 py-0.5 rounded">Pro</span>
+                      <span className="text-[10px] font-bold text-stone-400 bg-stone-500/10 px-1.5 py-0.5 rounded">Pro</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] text-white/60 flex items-center gap-1.5"><CreditCard className="w-3 h-3" /> MRR</span>
-                      <span className="text-[10px] font-bold text-emerald-400">$49/mo</span>
+                      <span className="text-[10px] font-bold text-stone-400">$49/mo</span>
                     </div>
                   </div>
                   {/* Previous Tickets */}
@@ -1892,7 +1892,7 @@ export default function EmailSupportDashboard() {
                     value={newFrom}
                     onChange={(e) => setNewFrom(e.target.value)}
                     placeholder="customer@example.com"
-                    className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-4 py-2.5 text-xs text-white placeholder:text-white/50 outline-none focus:border-blue-500/30 transition-colors"
+                    className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-4 py-2.5 text-xs text-white placeholder:text-white/50 outline-none focus:border-stone-500/30 transition-colors"
                   />
                 </div>
                 <div>
@@ -1901,7 +1901,7 @@ export default function EmailSupportDashboard() {
                     value={newSubject}
                     onChange={(e) => setNewSubject(e.target.value)}
                     placeholder="Brief description of the issue"
-                    className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-4 py-2.5 text-xs text-white placeholder:text-white/50 outline-none focus:border-blue-500/30 transition-colors"
+                    className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-4 py-2.5 text-xs text-white placeholder:text-white/50 outline-none focus:border-stone-500/30 transition-colors"
                   />
                 </div>
                 <div>
@@ -1911,7 +1911,7 @@ export default function EmailSupportDashboard() {
                     onChange={(e) => setNewBody(e.target.value)}
                     placeholder="Describe the issue in detail..."
                     rows={4}
-                    className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-4 py-2.5 text-xs text-white placeholder:text-white/50 outline-none focus:border-blue-500/30 transition-colors resize-none"
+                    className="w-full bg-white/[0.05] border border-white/[0.08] rounded-lg px-4 py-2.5 text-xs text-white placeholder:text-white/50 outline-none focus:border-stone-500/30 transition-colors resize-none"
                   />
                 </div>
                 <div>
@@ -1943,7 +1943,7 @@ export default function EmailSupportDashboard() {
                 <button
                   onClick={handleCreateTicket}
                   disabled={!newSubject.trim() || !newBody.trim() || !newFrom.trim()}
-                  className="flex items-center gap-2 px-5 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-xs font-semibold text-white transition-all disabled:opacity-30 hover:from-blue-500 hover:to-purple-500"
+                  className="flex items-center gap-2 px-5 py-2 rounded-lg bg-gradient-to-r from-stone-600 to-stone-600 text-xs font-semibold text-white transition-all disabled:opacity-30 hover:from-stone-500 hover:to-stone-500"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Create Ticket
@@ -1973,7 +1973,7 @@ export default function EmailSupportDashboard() {
             >
               <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.08]">
                 <div className="flex items-center gap-2">
-                  <GitMerge className="w-4 h-4 text-blue-400" />
+                  <GitMerge className="w-4 h-4 text-stone-400" />
                   <h3 className="text-sm font-bold">Merge Ticket</h3>
                 </div>
                 <button onClick={() => { setShowMergeModal(false); setMergeTargetId(null); }} className="p-1 rounded-lg hover:bg-white/[0.06] text-white/60 hover:text-white/60 transition-all">
@@ -1993,7 +1993,7 @@ export default function EmailSupportDashboard() {
                         onClick={() => setMergeTargetId(t.id)}
                         className={`w-full text-left p-3 rounded-lg border transition-all ${
                           mergeTargetId === t.id
-                            ? "bg-blue-500/[0.08] border-blue-500/25 ring-1 ring-blue-500/20"
+                            ? "bg-stone-500/[0.08] border-stone-500/25 ring-1 ring-stone-500/20"
                             : "border-white/[0.06] hover:bg-white/[0.04]"
                         }`}
                       >
@@ -2038,7 +2038,7 @@ export default function EmailSupportDashboard() {
                     setMergeTargetId(null);
                   }}
                   disabled={!mergeTargetId}
-                  className="flex items-center gap-2 px-5 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-xs font-semibold text-white transition-all disabled:opacity-30 hover:from-blue-500 hover:to-purple-500"
+                  className="flex items-center gap-2 px-5 py-2 rounded-lg bg-gradient-to-r from-stone-600 to-stone-600 text-xs font-semibold text-white transition-all disabled:opacity-30 hover:from-stone-500 hover:to-stone-500"
                 >
                   <GitMerge className="w-3.5 h-3.5" />
                   Merge Tickets

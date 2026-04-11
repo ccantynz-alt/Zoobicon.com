@@ -41,7 +41,127 @@ async function safeDb<T>(label: string, fn: () => Promise<T>): Promise<T | null>
 
 // ─── Handlers ──────────────────────────────────────────────────────────────
 
+/**
+ * Handle domain registration after successful Stripe payment.
+ * Separated from handleCheckoutCompleted so it doesn't depend on the
+ * generic email extraction (domain registrations carry registrantEmail
+ * in metadata instead).
+ */
+async function handleDomainRegistration(session: Stripe.Checkout.Session) {
+  // Parse domain list — handle both comma-separated ("a.com,b.io") and
+  // JSON array ('["a.com","b.io"]') formats for backwards compatibility.
+  let domainList: string[] = [];
+  const rawDomains = session.metadata?.domains || "";
+  if (rawDomains.startsWith("[")) {
+    try {
+      const parsed = JSON.parse(rawDomains);
+      if (Array.isArray(parsed)) domainList = parsed.map(String);
+    } catch {
+      console.error(`[stripe-webhook] Failed to parse domains JSON: ${rawDomains}`);
+    }
+  }
+  if (domainList.length === 0 && rawDomains) {
+    domainList = rawDomains.split(",").map((d: string) => d.trim()).filter(Boolean);
+  }
+
+  if (domainList.length === 0) {
+    console.error(`[stripe-webhook] domain_registration event with EMPTY domain list. session=${session.id} raw="${rawDomains}". Customer was charged but no domains to register!`);
+    return;
+  }
+
+  // Email: prefer registrantEmail metadata, fall back to customer_email on the session
+  const registrantEmail = session.metadata?.registrantEmail || (session.customer_email as string) || "";
+  const years = parseInt(session.metadata?.years || "1", 10);
+  const expiresAt = new Date();
+  expiresAt.setFullYear(expiresAt.getFullYear() + years);
+
+  // Build registrant from individual metadata fields.
+  // If registrant info is missing, we still insert the DB row (customer paid!)
+  // but OpenSRS will likely reject. We log the error so it can be fixed manually.
+  const registrant: ContactInfo = {
+    firstName: session.metadata?.registrantFirstName || "Domain",
+    lastName: session.metadata?.registrantLastName || "Owner",
+    email: registrantEmail || "unknown@zoobicon.com",
+    phone: session.metadata?.registrantPhone || "+1.0000000000",
+    address1: session.metadata?.registrantAddress || "TBD",
+    city: session.metadata?.registrantCity || "TBD",
+    state: session.metadata?.registrantState || "NA",
+    postalCode: session.metadata?.registrantZip || "00000",
+    country: session.metadata?.registrantCountry || "US",
+  };
+
+  const hasMissingContact = registrant.firstName === "Domain" || registrant.address1 === "TBD";
+  if (hasMissingContact) {
+    console.warn(`[stripe-webhook] Domain registration has placeholder contact info. session=${session.id} email=${registrantEmail}. OpenSRS may reject.`);
+  }
+
+  let successCount = 0;
+  let failCount = 0;
+
+  for (const domain of domainList) {
+    if (!domain.trim()) continue;
+    const trimmedDomain = domain.trim();
+
+    // Insert as pending_registration BEFORE calling OpenSRS.
+    // If OpenSRS fails, we still have a record that the customer paid.
+    await safeDb("insert registered_domains", () => sql`
+      INSERT INTO registered_domains (domain, user_email, status, expires_at, auto_renew, privacy_protection, stripe_session_id, registrant_info)
+      VALUES (${trimmedDomain}, ${registrantEmail || "unknown"}, ${"pending_registration"}, ${expiresAt.toISOString()}, true, true, ${session.id}, ${JSON.stringify(registrant)})
+      ON CONFLICT (domain) DO UPDATE SET
+        status = ${"pending_registration"},
+        expires_at = ${expiresAt.toISOString()},
+        user_email = ${registrantEmail || "unknown"},
+        stripe_session_id = ${session.id},
+        registrant_info = ${JSON.stringify(registrant)}
+    `);
+
+    try {
+      const result = await registerDomain({
+        domain: trimmedDomain,
+        period: years,
+        registrant,
+        autoRenew: true,
+        privacyProtection: true,
+      });
+
+      if (result.success) {
+        await safeDb("update domain active", () => sql`
+          UPDATE registered_domains SET status = 'active', opensrs_order_id = ${result.orderId || null}, registration_error = NULL
+          WHERE domain = ${trimmedDomain}
+        `);
+        console.log(`[stripe-webhook] Domain registered: ${trimmedDomain} (order: ${result.orderId})`);
+        successCount++;
+      } else {
+        await safeDb("update domain failed", () => sql`
+          UPDATE registered_domains SET status = 'registration_failed', registration_error = ${result.error || "Unknown error"}
+          WHERE domain = ${trimmedDomain}
+        `);
+        console.error(`[stripe-webhook] OpenSRS registration FAILED for ${trimmedDomain}: ${result.error}`);
+        failCount++;
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Unknown error";
+      console.error(`[stripe-webhook] OpenSRS registration ERROR for ${trimmedDomain}:`, msg);
+      await safeDb("update domain error", () => sql`
+        UPDATE registered_domains SET status = 'registration_failed', registration_error = ${msg}
+        WHERE domain = ${trimmedDomain}
+      `);
+      failCount++;
+    }
+  }
+  console.log(`[stripe-webhook] Domain registration complete: ${successCount} succeeded, ${failCount} failed, ${domainList.length} total for ${registrantEmail}`);
+}
+
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
+  // Domain registration — check FIRST because it has its own email field
+  // (registrantEmail) and must not be blocked by the generic email guard below.
+  // A customer who paid for domains MUST have their registration attempted
+  // even if the generic email extraction fails.
+  if (session.metadata?.type === "domain_registration") {
+    await handleDomainRegistration(session);
+    return;
+  }
+
   const email = (session.metadata?.email ?? session.customer_email) as string | undefined;
   if (!email) {
     console.warn(`[stripe-webhook] checkout.session.completed missing email for session ${session.id}`);
@@ -66,74 +186,6 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       await safeDb("addOverageCredits", () => addOverageCredits(email, pack, session.id));
       console.log(`[stripe-webhook] Video credits fulfilled: ${pack.name} for ${email}`);
     }
-    return;
-  }
-
-  // Domain registration purchase
-  if (session.metadata?.type === "domain_registration") {
-    const domainList = session.metadata?.domains?.split(",") || [];
-    const registrantEmail = session.metadata?.registrantEmail || email;
-    const years = parseInt(session.metadata?.years || "1", 10);
-    const expiresAt = new Date();
-    expiresAt.setFullYear(expiresAt.getFullYear() + years);
-
-    const registrant: ContactInfo = {
-      firstName: session.metadata?.registrantFirstName || "Domain",
-      lastName: session.metadata?.registrantLastName || "Owner",
-      email: registrantEmail,
-      phone: session.metadata?.registrantPhone || "+1.0000000000",
-      address1: session.metadata?.registrantAddress || "TBD",
-      city: session.metadata?.registrantCity || "TBD",
-      state: session.metadata?.registrantState || "NA",
-      postalCode: session.metadata?.registrantZip || "00000",
-      country: session.metadata?.registrantCountry || "US",
-    };
-
-    for (const domain of domainList) {
-      if (!domain.trim()) continue;
-      const trimmedDomain = domain.trim();
-
-      await safeDb("insert registered_domains", () => sql`
-        INSERT INTO registered_domains (domain, user_email, status, expires_at, auto_renew, privacy_protection)
-        VALUES (${trimmedDomain}, ${registrantEmail}, ${"pending_registration"}, ${expiresAt.toISOString()}, true, true)
-        ON CONFLICT (domain) DO UPDATE SET
-          status = ${"pending_registration"},
-          expires_at = ${expiresAt.toISOString()},
-          user_email = ${registrantEmail}
-      `);
-
-      try {
-        const result = await registerDomain({
-          domain: trimmedDomain,
-          period: years,
-          registrant,
-          autoRenew: true,
-          privacyProtection: true,
-        });
-
-        if (result.success) {
-          await safeDb("update domain active", () => sql`
-            UPDATE registered_domains SET status = 'active', opensrs_order_id = ${result.orderId || null}
-            WHERE domain = ${trimmedDomain}
-          `);
-          console.log(`[stripe-webhook] Domain registered: ${trimmedDomain} (order: ${result.orderId})`);
-        } else {
-          await safeDb("update domain failed", () => sql`
-            UPDATE registered_domains SET status = 'registration_failed', registration_error = ${result.error || 'Unknown error'}
-            WHERE domain = ${trimmedDomain}
-          `);
-          console.error(`[stripe-webhook] OpenSRS registration failed for ${trimmedDomain}: ${result.error}`);
-        }
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : "Unknown error";
-        console.error(`[stripe-webhook] OpenSRS registration error for ${trimmedDomain}:`, msg);
-        await safeDb("update domain error", () => sql`
-          UPDATE registered_domains SET status = 'registration_failed', registration_error = ${msg}
-          WHERE domain = ${trimmedDomain}
-        `);
-      }
-    }
-    console.log(`[stripe-webhook] Domain registration: ${domainList.length} domains for ${registrantEmail}`);
     return;
   }
 

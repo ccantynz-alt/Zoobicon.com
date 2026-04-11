@@ -10,11 +10,23 @@
  *   - fal-ai/bytedance/omnihuman
  *   - fal-ai/musicgen
  *   - fal-ai/whisper
+ *   - fal-ai/runway/gen4-turbo
+ *   - fal-ai/wan-2.5/text-to-video
+ *   - fal-ai/hailuo/video-01
+ *   - fal-ai/pixverse/v4
+ *
+ * Every external fetch uses AbortSignal.timeout() per Bible Law 9.
  */
 
 export const RUNTIME_HINT = "nodejs";
 
 const FAL_BASE = "https://queue.fal.run";
+
+/** Default timeout for the initial submit POST (30 seconds). */
+const SUBMIT_TIMEOUT_MS = 30_000;
+
+/** Default timeout for each individual poll/result GET (15 seconds). */
+const POLL_FETCH_TIMEOUT_MS = 15_000;
 
 export class FalError extends Error {
   status: number;
@@ -75,16 +87,23 @@ export interface RunFalOptions<TInput> {
   input: TInput;
   pollMs?: number;
   maxWaitMs?: number;
+  /** Timeout for the initial submit POST in ms. Default 30s. */
+  submitTimeoutMs?: number;
+  /** Timeout for each poll/result GET in ms. Default 15s. */
+  pollFetchTimeoutMs?: number;
 }
 
 export async function runFal<TResult, TInput = unknown>(
   opts: RunFalOptions<TInput>,
 ): Promise<TResult> {
   const { model, input } = opts;
-  const pollMs = opts.pollMs ?? 1500;
+  const pollMs = opts.pollMs ?? 1_500;
   const maxWaitMs = opts.maxWaitMs ?? 180_000;
+  const submitTimeout = opts.submitTimeoutMs ?? SUBMIT_TIMEOUT_MS;
+  const pollFetchTimeout = opts.pollFetchTimeoutMs ?? POLL_FETCH_TIMEOUT_MS;
   const key = getKey(model);
 
+  // ── Submit ──
   const submitRes = await fetch(`${FAL_BASE}/${model}`, {
     method: "POST",
     headers: {
@@ -92,6 +111,7 @@ export async function runFal<TResult, TInput = unknown>(
       "Content-Type": "application/json",
     },
     body: JSON.stringify(input),
+    signal: AbortSignal.timeout(submitTimeout),
   });
 
   const submitBody = await parseJson(submitRes);
@@ -121,6 +141,7 @@ export async function runFal<TResult, TInput = unknown>(
     });
   }
 
+  // ── Poll ──
   const started = Date.now();
   while (true) {
     if (Date.now() - started > maxWaitMs) {
@@ -132,6 +153,7 @@ export async function runFal<TResult, TInput = unknown>(
 
     const statusRes = await fetch(statusUrl, {
       headers: { Authorization: `Key ${key}` },
+      signal: AbortSignal.timeout(pollFetchTimeout),
     });
     const statusBody = await parseJson(statusRes);
 
@@ -144,7 +166,7 @@ export async function runFal<TResult, TInput = unknown>(
     }
 
     if (isRecord(statusBody)) {
-      const status = asString((statusBody as QueueStatusResponse).status);
+      const status = asString((statusBody as unknown as QueueStatusResponse).status);
       if (status === "COMPLETED") break;
       if (status === "FAILED" || status === "CANCELLED" || status === "ERROR") {
         throw new FalError(`fal job ${status}`, {
@@ -158,8 +180,10 @@ export async function runFal<TResult, TInput = unknown>(
     await new Promise((r) => setTimeout(r, pollMs));
   }
 
+  // ── Result ──
   const resultRes = await fetch(responseUrl, {
     headers: { Authorization: `Key ${key}` },
+    signal: AbortSignal.timeout(pollFetchTimeout),
   });
   const resultBody = await parseJson(resultRes);
   if (!resultRes.ok) {
@@ -178,6 +202,8 @@ export interface RunFalWithFallbackOptions<TInput> {
   input: TInput;
   pollMs?: number;
   maxWaitMs?: number;
+  submitTimeoutMs?: number;
+  pollFetchTimeoutMs?: number;
 }
 
 export async function runFalWithFallback<TResult, TInput = unknown>(
@@ -191,6 +217,8 @@ export async function runFalWithFallback<TResult, TInput = unknown>(
         input: opts.input,
         pollMs: opts.pollMs,
         maxWaitMs: opts.maxWaitMs,
+        submitTimeoutMs: opts.submitTimeoutMs,
+        pollFetchTimeoutMs: opts.pollFetchTimeoutMs,
       });
     } catch (err) {
       const falErr =

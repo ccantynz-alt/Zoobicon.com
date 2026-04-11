@@ -124,7 +124,7 @@ export default function EmailTemplatePanel({
               onClick={copyHtml}
               className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs bg-white/5 text-white/60 hover:text-white hover:bg-white/10 transition-colors border border-white/10"
             >
-              {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+              {copied ? <Check size={14} className="text-stone-400" /> : <Copy size={14} />}
               {copied ? "Copied!" : "Copy HTML"}
             </button>
             <button

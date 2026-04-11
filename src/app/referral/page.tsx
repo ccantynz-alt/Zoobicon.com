@@ -180,7 +180,7 @@ function TierProgress({ tier, signups }: { tier: ReferralTier; signups: number }
           initial={{ width: 0 }}
           animate={{ width: `${progress}%` }}
           transition={{ duration: 1, ease: "easeOut", delay: 0.3 }}
-          className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500"
+          className="h-full rounded-full bg-gradient-to-r from-stone-500 to-stone-500"
         />
       </div>
       {tier.nextTier && (
@@ -268,9 +268,9 @@ export default function ReferralPage() {
   /* --- Status badge color --- */
   function statusColor(status: string) {
     switch (status) {
-      case "active": return "text-emerald-400 bg-emerald-500/10";
-      case "built_first_site": return "text-cyan-400 bg-cyan-500/10";
-      case "signed_up": return "text-amber-400 bg-amber-500/10";
+      case "active": return "text-stone-400 bg-stone-500/10";
+      case "built_first_site": return "text-stone-400 bg-stone-500/10";
+      case "signed_up": return "text-stone-400 bg-stone-500/10";
       default: return "text-white/50 bg-white/5";
     }
   }
@@ -332,13 +332,13 @@ export default function ReferralPage() {
           <HeroEffects variant="cyan" cursorGlow particles particleCount={35} aurora />
           <div className="max-w-3xl mx-auto px-6">
             <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
-              <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 text-emerald-400 text-sm font-medium mb-6">
+              <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-stone-500/20 bg-stone-500/5 text-stone-400 text-sm font-medium mb-6">
                 <Gift className="w-3.5 h-3.5" />
                 Referral Program
               </motion.div>
               <motion.h1 variants={fadeInUp} className="text-5xl md:text-7xl font-black tracking-tight mb-6">
                 Share Zoobicon,<br />
-                <span className="bg-gradient-to-r from-cyan-400 via-emerald-400 to-green-400 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-stone-400 via-stone-400 to-stone-400 bg-clip-text text-transparent">
                   Earn Free Builds
                 </span>
               </motion.h1>
@@ -349,7 +349,7 @@ export default function ReferralPage() {
                 <motion.div variants={fadeInUp}>
                   <Link
                     href="/auth/signup"
-                    className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl font-bold text-white bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 transition-all shadow-lg shadow-emerald-500/20"
+                    className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl font-bold text-white bg-gradient-to-r from-stone-500 to-stone-500 hover:from-stone-400 hover:to-stone-400 transition-all shadow-lg shadow-stone-500/20"
                   >
                     Sign Up to Get Your Referral Link
                     <ArrowRight className="w-5 h-5" />
@@ -373,7 +373,7 @@ export default function ReferralPage() {
               className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-8"
             >
               <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                <Share2 className="w-5 h-5 text-cyan-400" />
+                <Share2 className="w-5 h-5 text-stone-400" />
                 Your Referral Link
               </h2>
               <div className="flex flex-col md:flex-row gap-8 items-center">
@@ -388,8 +388,8 @@ export default function ReferralPage() {
                       onClick={copyLink}
                       className={`px-4 py-3 rounded-xl font-semibold text-sm flex items-center gap-2 transition-all ${
                         copied
-                          ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                          : "bg-gradient-to-r from-cyan-500 to-emerald-500 text-white"
+                          ? "bg-stone-500/20 text-stone-400 border border-stone-500/30"
+                          : "bg-gradient-to-r from-stone-500 to-stone-500 text-white"
                       }`}
                     >
                       {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
@@ -400,10 +400,10 @@ export default function ReferralPage() {
                   {/* Share buttons */}
                   <div className="flex flex-wrap gap-2">
                     <ShareButton icon={Copy} label="Copy Link" color="bg-white/[0.06] hover:bg-white/[0.1] text-white/80" onClick={copyLink} />
-                    <ShareButton icon={ExternalLink} label="MessageCircle" color="bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 border border-sky-500/20" onClick={shareTwitter} />
-                    <ShareButton icon={TrendingUp} label="LinkedIn" color="bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/20" onClick={shareLinkedIn} />
-                    <ShareButton icon={Mail} label="Email" color="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20" onClick={shareEmail} />
-                    <ShareButton icon={MessageSquare} label="WhatsApp" color="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20" onClick={shareWhatsApp} />
+                    <ShareButton icon={ExternalLink} label="MessageCircle" color="bg-stone-500/10 hover:bg-stone-500/20 text-stone-400 border border-stone-500/20" onClick={shareTwitter} />
+                    <ShareButton icon={TrendingUp} label="LinkedIn" color="bg-stone-500/10 hover:bg-stone-500/20 text-stone-400 border border-stone-500/20" onClick={shareLinkedIn} />
+                    <ShareButton icon={Mail} label="Email" color="bg-stone-500/10 hover:bg-stone-500/20 text-stone-400 border border-stone-500/20" onClick={shareEmail} />
+                    <ShareButton icon={MessageSquare} label="WhatsApp" color="bg-stone-500/10 hover:bg-stone-500/20 text-stone-400 border border-stone-500/20" onClick={shareWhatsApp} />
                   </div>
                 </div>
 
@@ -426,10 +426,10 @@ export default function ReferralPage() {
               className="grid grid-cols-2 lg:grid-cols-4 gap-4"
             >
               {[
-                { label: "Referrals Sent", value: stats.linkCopied, icon: Share2, color: "text-cyan-400", bg: "from-cyan-500/10 to-cyan-500/5", border: "border-cyan-500/20" },
-                { label: "Friends Signed Up", value: stats.signups, icon: Users, color: "text-emerald-400", bg: "from-emerald-500/10 to-emerald-500/5", border: "border-emerald-500/20" },
-                { label: "Builds Earned", value: stats.buildsEarned, icon: Gift, color: "text-green-400", bg: "from-green-500/10 to-green-500/5", border: "border-green-500/20" },
-                { label: "Total Savings", value: savings, icon: TrendingUp, color: "text-emerald-400", bg: "from-emerald-500/10 to-emerald-500/5", border: "border-emerald-500/20", prefix: "$" },
+                { label: "Referrals Sent", value: stats.linkCopied, icon: Share2, color: "text-stone-400", bg: "from-stone-500/10 to-stone-500/5", border: "border-stone-500/20" },
+                { label: "Friends Signed Up", value: stats.signups, icon: Users, color: "text-stone-400", bg: "from-stone-500/10 to-stone-500/5", border: "border-stone-500/20" },
+                { label: "Builds Earned", value: stats.buildsEarned, icon: Gift, color: "text-stone-400", bg: "from-stone-500/10 to-stone-500/5", border: "border-stone-500/20" },
+                { label: "Total Savings", value: savings, icon: TrendingUp, color: "text-stone-400", bg: "from-stone-500/10 to-stone-500/5", border: "border-stone-500/20", prefix: "$" },
               ].map((card) => (
                 <motion.div
                   key={card.label}
@@ -452,7 +452,7 @@ export default function ReferralPage() {
               className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-8"
             >
               <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                <Crown className="w-5 h-5 text-yellow-400" />
+                <Crown className="w-5 h-5 text-stone-400" />
                 Your Referral Tier
               </h2>
               <TierProgress tier={tier} signups={stats.signups} />
@@ -460,10 +460,10 @@ export default function ReferralPage() {
               {/* All tiers */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-8">
                 {[
-                  { name: "Recruiter", badge: "🎯", range: "1-4 referrals", color: "border-cyan-500/20 bg-cyan-500/5" },
-                  { name: "Ambassador", badge: "⭐", range: "5-19 referrals", color: "border-yellow-500/20 bg-yellow-500/5" },
-                  { name: "Champion", badge: "🏆", range: "20+ referrals", color: "border-emerald-500/20 bg-emerald-500/5" },
-                  { name: "Legend", badge: "💎", range: "50+ referrals", color: "border-purple-500/20 bg-purple-500/5" },
+                  { name: "Recruiter", badge: "🎯", range: "1-4 referrals", color: "border-stone-500/20 bg-stone-500/5" },
+                  { name: "Ambassador", badge: "⭐", range: "5-19 referrals", color: "border-stone-500/20 bg-stone-500/5" },
+                  { name: "Champion", badge: "🏆", range: "20+ referrals", color: "border-stone-500/20 bg-stone-500/5" },
+                  { name: "Legend", badge: "💎", range: "50+ referrals", color: "border-stone-500/20 bg-stone-500/5" },
                 ].map((t) => (
                   <div key={t.name} className={`border ${t.color} rounded-xl p-4 text-center`}>
                     <span className="text-2xl">{t.badge}</span>
@@ -481,7 +481,7 @@ export default function ReferralPage() {
               className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-8"
             >
               <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                <Users className="w-5 h-5 text-cyan-400" />
+                <Users className="w-5 h-5 text-stone-400" />
                 Referral History
               </h2>
               {stats.history.length === 0 ? (
@@ -490,7 +490,7 @@ export default function ReferralPage() {
                   <p className="text-white/40 text-sm">No referrals yet. Share your link to get started!</p>
                   <button
                     onClick={copyLink}
-                    className="mt-4 inline-flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
+                    className="mt-4 inline-flex items-center gap-2 text-sm text-stone-400 hover:text-stone-300 transition-colors"
                   >
                     <Copy className="w-4 h-4" /> Copy your referral link
                   </button>
@@ -530,7 +530,7 @@ export default function ReferralPage() {
               className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-8"
             >
               <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-yellow-400" />
+                <Trophy className="w-5 h-5 text-stone-400" />
                 Top Referrers
               </h2>
               <div className="space-y-2">
@@ -539,14 +539,14 @@ export default function ReferralPage() {
                     key={entry.rank}
                     className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
                       entry.rank <= 3
-                        ? "bg-gradient-to-r from-yellow-500/5 to-transparent border border-yellow-500/10"
+                        ? "bg-gradient-to-r from-stone-500/5 to-transparent border border-stone-500/10"
                         : "bg-white/[0.02] hover:bg-white/[0.04]"
                     }`}
                   >
                     <span className={`w-8 text-center font-black text-lg ${
-                      entry.rank === 1 ? "text-yellow-400" :
+                      entry.rank === 1 ? "text-stone-400" :
                       entry.rank === 2 ? "text-gray-300" :
-                      entry.rank === 3 ? "text-amber-600" :
+                      entry.rank === 3 ? "text-stone-600" :
                       "text-white/30"
                     }`}>
                       {entry.rank <= 3 ? ["", "🥇", "🥈", "🥉"][entry.rank] : `#${entry.rank}`}
@@ -555,7 +555,7 @@ export default function ReferralPage() {
                       <span className="font-semibold text-sm">{entry.username}</span>
                       <span className="ml-2 text-xs text-white/40">{entry.badge} {entry.tier}</span>
                     </div>
-                    <div className="text-sm font-bold text-emerald-400">
+                    <div className="text-sm font-bold text-stone-400">
                       {entry.referrals} referrals
                     </div>
                   </div>
@@ -594,24 +594,24 @@ export default function ReferralPage() {
                   icon: Share2,
                   title: "Share Your Link",
                   desc: "Copy your unique referral link and share it with friends, on social media, or in your community.",
-                  color: "from-cyan-500 to-blue-500",
-                  iconColor: "text-cyan-400",
+                  color: "from-stone-500 to-stone-500",
+                  iconColor: "text-stone-400",
                 },
                 {
                   step: "2",
                   icon: Users,
                   title: "Friend Signs Up",
                   desc: "When your friend creates an account through your link, they immediately get 5 free AI website builds.",
-                  color: "from-emerald-500 to-green-500",
-                  iconColor: "text-emerald-400",
+                  color: "from-stone-500 to-stone-500",
+                  iconColor: "text-stone-400",
                 },
                 {
                   step: "3",
                   icon: Gift,
                   title: "You Earn Builds",
                   desc: "Once your friend builds their first website, you get 5 free builds credited to your account. No cap.",
-                  color: "from-green-500 to-lime-500",
-                  iconColor: "text-green-400",
+                  color: "from-stone-500 to-stone-500",
+                  iconColor: "text-stone-400",
                 },
               ].map((item) => (
                 <motion.div
@@ -642,7 +642,7 @@ export default function ReferralPage() {
               className="text-center mb-16"
             >
               <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl font-black mb-4">
-                Unlock <span className="bg-gradient-to-r from-yellow-400 to-amber-400 bg-clip-text text-transparent">Referral Tiers</span>
+                Unlock <span className="bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Referral Tiers</span>
               </motion.h2>
               <motion.p variants={fadeInUp} className="text-white/50 text-lg">
                 The more you refer, the higher you climb. Top referrers get exclusive perks.
@@ -655,10 +655,10 @@ export default function ReferralPage() {
               className="grid md:grid-cols-4 gap-4"
             >
               {[
-                { name: "Recruiter", badge: "🎯", range: "1-4 referrals", reward: "5 builds per referral", color: "border-cyan-500/20", bg: "bg-cyan-500/5", glow: "shadow-cyan-500/10" },
-                { name: "Ambassador", badge: "⭐", range: "5-19 referrals", reward: "5 builds + priority support", color: "border-yellow-500/20", bg: "bg-yellow-500/5", glow: "shadow-yellow-500/10" },
-                { name: "Champion", badge: "🏆", range: "20-49 referrals", reward: "5 builds + 1 month Pro free", color: "border-emerald-500/20", bg: "bg-emerald-500/5", glow: "shadow-emerald-500/10" },
-                { name: "Legend", badge: "💎", range: "50+ referrals", reward: "5 builds + lifetime Pro", color: "border-purple-500/20", bg: "bg-purple-500/5", glow: "shadow-purple-500/10" },
+                { name: "Recruiter", badge: "🎯", range: "1-4 referrals", reward: "5 builds per referral", color: "border-stone-500/20", bg: "bg-stone-500/5", glow: "shadow-stone-500/10" },
+                { name: "Ambassador", badge: "⭐", range: "5-19 referrals", reward: "5 builds + priority support", color: "border-stone-500/20", bg: "bg-stone-500/5", glow: "shadow-stone-500/10" },
+                { name: "Champion", badge: "🏆", range: "20-49 referrals", reward: "5 builds + 1 month Pro free", color: "border-stone-500/20", bg: "bg-stone-500/5", glow: "shadow-stone-500/10" },
+                { name: "Legend", badge: "💎", range: "50+ referrals", reward: "5 builds + lifetime Pro", color: "border-stone-500/20", bg: "bg-stone-500/5", glow: "shadow-stone-500/10" },
               ].map((t, i) => (
                 <motion.div
                   key={t.name}
@@ -687,7 +687,7 @@ export default function ReferralPage() {
               variants={staggerContainer}
             >
               <motion.div variants={fadeInUp}>
-                <Sparkles className="w-10 h-10 text-emerald-400 mx-auto mb-6" />
+                <Sparkles className="w-10 h-10 text-stone-400 mx-auto mb-6" />
               </motion.div>
               <motion.h2 variants={fadeInUp} className="text-3xl md:text-4xl font-black mb-4">
                 Start Earning Free Builds Today
@@ -699,7 +699,7 @@ export default function ReferralPage() {
                 {user ? (
                   <button
                     onClick={copyLink}
-                    className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl font-bold text-white bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 transition-all shadow-lg shadow-emerald-500/20"
+                    className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl font-bold text-white bg-gradient-to-r from-stone-500 to-stone-500 hover:from-stone-400 hover:to-stone-400 transition-all shadow-lg shadow-stone-500/20"
                   >
                     {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
                     {copied ? "Link Copied!" : "Copy Your Referral Link"}
@@ -707,7 +707,7 @@ export default function ReferralPage() {
                 ) : (
                   <Link
                     href="/auth/signup"
-                    className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl font-bold text-white bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 transition-all shadow-lg shadow-emerald-500/20"
+                    className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl font-bold text-white bg-gradient-to-r from-stone-500 to-stone-500 hover:from-stone-400 hover:to-stone-400 transition-all shadow-lg shadow-stone-500/20"
                   >
                     Sign Up to Start Referring
                     <ArrowRight className="w-5 h-5" />

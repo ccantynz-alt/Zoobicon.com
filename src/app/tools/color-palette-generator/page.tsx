@@ -271,14 +271,14 @@ export default function ColorPaletteGeneratorPage() {
       <div className="max-w-5xl mx-auto px-6 py-16">
         {/* Hero */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-pink-500/10 border border-pink-500/20 mb-6">
-            <span className="text-xs font-medium text-pink-300">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-stone-500/10 border border-stone-500/20 mb-6">
+            <span className="text-xs font-medium text-stone-300">
               Free — No Signup Required
             </span>
           </div>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.1] mb-5">
             Free Color Palette{" "}
-            <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-stone-400 via-stone-400 to-stone-400 bg-clip-text text-transparent">
               Generator
             </span>
           </h1>
@@ -299,7 +299,7 @@ export default function ColorPaletteGeneratorPage() {
               onClick={() => setMode(m.value)}
               className={`px-4 py-2 rounded-lg text-xs font-medium transition-all ${
                 mode === m.value
-                  ? "bg-pink-600 text-white"
+                  ? "bg-stone-600 text-white"
                   : "bg-white/[0.04] text-white/40 hover:bg-white/[0.08]"
               }`}
             >
@@ -308,7 +308,7 @@ export default function ColorPaletteGeneratorPage() {
           ))}
           <button
             onClick={generate}
-            className="ml-auto inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-sm font-semibold transition-colors"
+            className="ml-auto inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 text-sm font-semibold transition-colors"
           >
             <RefreshCw className="w-3.5 h-3.5" /> Generate New Palette
           </button>
@@ -397,7 +397,7 @@ export default function ColorPaletteGeneratorPage() {
                 onClick={() => setExportMode("css")}
                 className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   exportMode === "css"
-                    ? "bg-pink-600 text-white"
+                    ? "bg-stone-600 text-white"
                     : "bg-white/[0.04] text-white/40 hover:bg-white/[0.08]"
                 }`}
               >
@@ -407,7 +407,7 @@ export default function ColorPaletteGeneratorPage() {
                 onClick={() => setExportMode("tailwind")}
                 className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   exportMode === "tailwind"
-                    ? "bg-pink-600 text-white"
+                    ? "bg-stone-600 text-white"
                     : "bg-white/[0.04] text-white/40 hover:bg-white/[0.08]"
                 }`}
               >
@@ -418,7 +418,7 @@ export default function ColorPaletteGeneratorPage() {
 
           {exportMode && (
             <div className="relative">
-              <pre className="bg-[#0a0a14] border border-white/[0.06] rounded-xl p-4 text-xs text-emerald-300/80 font-mono overflow-x-auto">
+              <pre className="bg-[#0a0a14] border border-white/[0.06] rounded-xl p-4 text-xs text-stone-300/80 font-mono overflow-x-auto">
                 {exportMode === "tailwind"
                   ? getTailwindExport()
                   : getCssExport()}
@@ -429,7 +429,7 @@ export default function ColorPaletteGeneratorPage() {
               >
                 {exportCopied ? (
                   <>
-                    <Check className="w-3 h-3 text-emerald-400" /> Copied
+                    <Check className="w-3 h-3 text-stone-400" /> Copied
                   </>
                 ) : (
                   <>
@@ -458,7 +458,7 @@ export default function ColorPaletteGeneratorPage() {
           </p>
           <Link
             href="/builder"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 font-semibold text-sm transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 font-semibold text-sm transition-colors"
           >
             <Zap className="w-4 h-4" /> Design Your Website Free
           </Link>

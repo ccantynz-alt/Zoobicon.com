@@ -148,7 +148,7 @@ function HighlightedScript({ text }: { text: string }) {
     <span>
       {parts.map((part, i) =>
         VARIABLE_PATTERN.test(part) ? (
-          <span key={i} className="bg-cyan-500/20 text-cyan-300 rounded px-1 font-mono text-xs">
+          <span key={i} className="bg-stone-500/20 text-stone-300 rounded px-1 font-mono text-xs">
             {part}
           </span>
         ) : (
@@ -339,8 +339,8 @@ export default function BatchVideosPanel({
         className="w-full flex items-center justify-between p-3 hover:bg-white/[0.03] transition-colors"
       >
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600/30 to-purple-600/30 flex items-center justify-center">
-            <Users className="w-3.5 h-3.5 text-violet-400" />
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-stone-600/30 to-stone-600/30 flex items-center justify-center">
+            <Users className="w-3.5 h-3.5 text-stone-400" />
           </div>
           <div className="text-left">
             <div className="text-xs font-semibold text-white/90">Batch Personalized Videos</div>
@@ -378,7 +378,7 @@ export default function BatchVideosPanel({
                     <button
                       key={v.name}
                       onClick={() => insertVariable(v.name)}
-                      className="text-[10px] px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 transition-colors border border-cyan-500/20"
+                      className="text-[10px] px-2 py-0.5 rounded bg-stone-500/10 text-stone-400 hover:bg-stone-500/20 transition-colors border border-stone-500/20"
                     >
                       {`{{${v.name}}}`}
                     </button>
@@ -395,7 +395,7 @@ export default function BatchVideosPanel({
                   onChange={(e) => setScriptTemplate(e.target.value)}
                   placeholder={`Hi {{name}}, I noticed {{company}} is doing incredible things. As {{role}}, you know how important...`}
                   rows={4}
-                  className="w-full rounded-lg bg-white/[0.05] border border-white/[0.08] px-3 py-2 text-sm text-white/90 placeholder:text-white/30 focus:outline-none focus:border-violet-500/50 resize-none"
+                  className="w-full rounded-lg bg-white/[0.05] border border-white/[0.08] px-3 py-2 text-sm text-white/90 placeholder:text-white/30 focus:outline-none focus:border-stone-500/50 resize-none"
                 />
                 {variables.length > 0 && (
                   <div className="flex items-center gap-1.5 text-[10px] text-white/50">
@@ -458,7 +458,7 @@ export default function BatchVideosPanel({
                     </button>
                     <button
                       onClick={() => setShowAddManual(true)}
-                      className="text-[10px] px-2 py-0.5 rounded bg-violet-500/10 text-violet-400 hover:bg-violet-500/20 transition-colors flex items-center gap-1 border border-violet-500/20"
+                      className="text-[10px] px-2 py-0.5 rounded bg-stone-500/10 text-stone-400 hover:bg-stone-500/20 transition-colors flex items-center gap-1 border border-stone-500/20"
                     >
                       <Plus className="w-3 h-3" /> Add
                     </button>
@@ -484,20 +484,20 @@ export default function BatchVideosPanel({
                           value={manualName}
                           onChange={(e) => setManualName(e.target.value)}
                           placeholder="Name (required)"
-                          className="w-full rounded bg-white/[0.05] border border-white/[0.08] px-2 py-1 text-xs text-white/90 placeholder:text-white/30 focus:outline-none focus:border-violet-500/50"
+                          className="w-full rounded bg-white/[0.05] border border-white/[0.08] px-2 py-1 text-xs text-white/90 placeholder:text-white/30 focus:outline-none focus:border-stone-500/50"
                         />
                         <div className="flex gap-1.5">
                           <input
                             value={manualCompany}
                             onChange={(e) => setManualCompany(e.target.value)}
                             placeholder="Company"
-                            className="flex-1 rounded bg-white/[0.05] border border-white/[0.08] px-2 py-1 text-xs text-white/90 placeholder:text-white/30 focus:outline-none focus:border-violet-500/50"
+                            className="flex-1 rounded bg-white/[0.05] border border-white/[0.08] px-2 py-1 text-xs text-white/90 placeholder:text-white/30 focus:outline-none focus:border-stone-500/50"
                           />
                           <input
                             value={manualRole}
                             onChange={(e) => setManualRole(e.target.value)}
                             placeholder="Role"
-                            className="flex-1 rounded bg-white/[0.05] border border-white/[0.08] px-2 py-1 text-xs text-white/90 placeholder:text-white/30 focus:outline-none focus:border-violet-500/50"
+                            className="flex-1 rounded bg-white/[0.05] border border-white/[0.08] px-2 py-1 text-xs text-white/90 placeholder:text-white/30 focus:outline-none focus:border-stone-500/50"
                           />
                         </div>
                         <div className="flex justify-end gap-1.5">
@@ -510,7 +510,7 @@ export default function BatchVideosPanel({
                           <button
                             onClick={addManualRecipient}
                             disabled={!manualName.trim()}
-                            className="text-[10px] px-2 py-0.5 rounded bg-violet-600 text-white hover:bg-violet-500 disabled:opacity-30 disabled:cursor-not-allowed"
+                            className="text-[10px] px-2 py-0.5 rounded bg-stone-600 text-white hover:bg-stone-500 disabled:opacity-30 disabled:cursor-not-allowed"
                           >
                             Add Recipient
                           </button>
@@ -529,7 +529,7 @@ export default function BatchVideosPanel({
                         className="flex items-center justify-between py-0.5 px-1.5 rounded hover:bg-white/[0.03] group"
                       >
                         <div className="flex items-center gap-2 min-w-0">
-                          <div className="w-5 h-5 rounded-full bg-gradient-to-br from-violet-500/30 to-purple-500/30 flex items-center justify-center text-[9px] text-violet-300 font-bold flex-shrink-0">
+                          <div className="w-5 h-5 rounded-full bg-gradient-to-br from-stone-500/30 to-stone-500/30 flex items-center justify-center text-[9px] text-stone-300 font-bold flex-shrink-0">
                             {r.name.charAt(0).toUpperCase()}
                           </div>
                           <div className="min-w-0">
@@ -543,7 +543,7 @@ export default function BatchVideosPanel({
                         </div>
                         <button
                           onClick={() => removeRecipient(idx)}
-                          className="opacity-0 group-hover:opacity-100 text-white/30 hover:text-red-400 transition-all p-0.5"
+                          className="opacity-0 group-hover:opacity-100 text-white/30 hover:text-stone-400 transition-all p-0.5"
                         >
                           <X className="w-3 h-3" />
                         </button>
@@ -564,7 +564,7 @@ export default function BatchVideosPanel({
 
               {/* Error */}
               {error && (
-                <div className="flex items-start gap-2 rounded-lg bg-red-500/10 border border-red-500/20 p-2 text-[11px] text-red-300">
+                <div className="flex items-start gap-2 rounded-lg bg-stone-500/10 border border-stone-500/20 p-2 text-[11px] text-stone-300">
                   <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
                   {error}
                 </div>
@@ -575,7 +575,7 @@ export default function BatchVideosPanel({
                 <button
                   onClick={handleGenerate}
                   disabled={generating || recipients.length === 0 || variables.length === 0}
-                  className="w-full py-2 rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white text-xs font-semibold transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full py-2 rounded-lg bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 text-white text-xs font-semibold transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {generating ? (
                     <>
@@ -612,10 +612,10 @@ export default function BatchVideosPanel({
                       <div
                         className={`h-full rounded-full transition-all duration-500 ${
                           batchStatus.status === "failed"
-                            ? "bg-red-500"
+                            ? "bg-stone-500"
                             : batchStatus.status === "completed"
-                            ? "bg-green-500"
-                            : "bg-violet-500"
+                            ? "bg-stone-500"
+                            : "bg-stone-500"
                         }`}
                         style={{
                           width: `${Math.round(
@@ -625,11 +625,11 @@ export default function BatchVideosPanel({
                       />
                     </div>
                     <div className="flex gap-3 text-[10px]">
-                      <span className="text-green-400">
+                      <span className="text-stone-400">
                         {batchStatus.completed} completed
                       </span>
                       {batchStatus.failed > 0 && (
-                        <span className="text-red-400">{batchStatus.failed} failed</span>
+                        <span className="text-stone-400">{batchStatus.failed} failed</span>
                       )}
                       <span className="text-white/30">
                         {batchStatus.total - batchStatus.completed - batchStatus.failed} remaining
@@ -646,11 +646,11 @@ export default function BatchVideosPanel({
                       >
                         <div className="flex items-center gap-2 min-w-0">
                           {v.status === "completed" ? (
-                            <CheckCircle2 className="w-3.5 h-3.5 text-green-500 flex-shrink-0" />
+                            <CheckCircle2 className="w-3.5 h-3.5 text-stone-500 flex-shrink-0" />
                           ) : v.status === "failed" ? (
-                            <AlertCircle className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />
+                            <AlertCircle className="w-3.5 h-3.5 text-stone-500 flex-shrink-0" />
                           ) : v.status === "processing" ? (
-                            <Loader2 className="w-3.5 h-3.5 text-violet-400 animate-spin flex-shrink-0" />
+                            <Loader2 className="w-3.5 h-3.5 text-stone-400 animate-spin flex-shrink-0" />
                           ) : (
                             <div className="w-3.5 h-3.5 rounded-full border border-white/20 flex-shrink-0" />
                           )}
@@ -667,13 +667,13 @@ export default function BatchVideosPanel({
                               href={v.videoUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-[10px] px-1.5 py-0.5 rounded bg-green-500/10 text-green-400 hover:bg-green-500/20 flex items-center gap-0.5"
+                              className="text-[10px] px-1.5 py-0.5 rounded bg-stone-500/10 text-stone-400 hover:bg-stone-500/20 flex items-center gap-0.5"
                             >
                               <Download className="w-3 h-3" /> Download
                             </a>
                           )}
                           {v.status === "failed" && v.error && (
-                            <span className="text-[9px] text-red-400 truncate max-w-[120px]">{v.error}</span>
+                            <span className="text-[9px] text-stone-400 truncate max-w-[120px]">{v.error}</span>
                           )}
                         </div>
                       </div>

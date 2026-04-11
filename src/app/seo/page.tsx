@@ -86,9 +86,9 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
 const STORAGE_KEY = "zoobicon_seo_history";
 
 function scoreColor(score: number): string {
-  if (score >= 80) return "text-emerald-400";
-  if (score >= 50) return "text-yellow-400";
-  return "text-red-400";
+  if (score >= 80) return "text-stone-400";
+  if (score >= 50) return "text-stone-400";
+  return "text-stone-400";
 }
 
 function scoreRingColor(score: number): string {
@@ -98,16 +98,16 @@ function scoreRingColor(score: number): string {
 }
 
 function scoreBg(score: number): string {
-  if (score >= 80) return "bg-emerald-500/10 border-emerald-500/30";
-  if (score >= 50) return "bg-yellow-500/10 border-yellow-500/30";
-  return "bg-red-500/10 border-red-500/30";
+  if (score >= 80) return "bg-stone-500/10 border-stone-500/30";
+  if (score >= 50) return "bg-stone-500/10 border-stone-500/30";
+  return "bg-stone-500/10 border-stone-500/30";
 }
 
 function priorityBadge(priority: "high" | "medium" | "low") {
   const styles = {
-    high: "bg-red-500/20 text-red-300 border-red-500/30",
-    medium: "bg-yellow-500/20 text-yellow-300 border-yellow-500/30",
-    low: "bg-blue-500/20 text-blue-300 border-blue-500/30",
+    high: "bg-stone-500/20 text-stone-300 border-stone-500/30",
+    medium: "bg-stone-500/20 text-stone-300 border-stone-500/30",
+    low: "bg-stone-500/20 text-stone-300 border-stone-500/30",
   };
   return (
     <span
@@ -426,7 +426,7 @@ export default function SeoAgentPage() {
   if (authed === null) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-indigo-400 animate-spin" />
+        <Loader2 className="w-8 h-8 text-stone-400 animate-spin" />
       </div>
     );
   }
@@ -440,7 +440,7 @@ export default function SeoAgentPage() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-8">
               <Link href="/" className="flex items-center gap-2 group">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-stone-500 to-stone-600 flex items-center justify-center">
                   <Sparkles className="w-4 h-4 text-white" />
                 </div>
                 <span className="font-bold text-lg">Zoobicon</span>
@@ -454,7 +454,7 @@ export default function SeoAgentPage() {
                   Dashboard
                 </Link>
                 <div className="px-3 py-2 rounded-lg text-sm text-white bg-white/10 flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4 text-indigo-400" />
+                  <BarChart3 className="w-4 h-4 text-stone-400" />
                   SEO Agent
                 </div>
                 <Link
@@ -496,7 +496,7 @@ export default function SeoAgentPage() {
                       saveHistory([]);
                       setSelectedHistory(null);
                     }}
-                    className="text-xs text-gray-500 hover:text-red-400 transition-colors"
+                    className="text-xs text-gray-500 hover:text-stone-400 transition-colors"
                   >
                     Clear all
                   </button>
@@ -514,7 +514,7 @@ export default function SeoAgentPage() {
                       onClick={() => loadHistoryEntry(entry)}
                       className={`w-full text-left p-3 rounded-xl border transition-all group ${
                         selectedHistory === entry.id
-                          ? "bg-indigo-500/10 border-indigo-500/30"
+                          ? "bg-stone-500/10 border-stone-500/30"
                           : "bg-white/[0.02] border-white/5 hover:bg-white/5 hover:border-white/10"
                       }`}
                     >
@@ -542,7 +542,7 @@ export default function SeoAgentPage() {
                               e.stopPropagation();
                               deleteHistoryEntry(entry.id);
                             }}
-                            className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-red-400 transition-all"
+                            className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-stone-400 transition-all"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -560,7 +560,7 @@ export default function SeoAgentPage() {
             {/* header */}
             <div className="mb-8">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-stone-500 to-stone-600 flex items-center justify-center">
                   <BarChart3 className="w-5 h-5" />
                 </div>
                 <div>
@@ -631,7 +631,7 @@ export default function SeoAgentPage() {
                   onClick={() => setInputMode("url")}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                     inputMode === "url"
-                      ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/30"
+                      ? "bg-stone-500/20 text-stone-300 border border-stone-500/30"
                       : "text-gray-400 hover:text-white hover:bg-white/5 border border-transparent"
                   }`}
                 >
@@ -642,7 +642,7 @@ export default function SeoAgentPage() {
                   onClick={() => setInputMode("html")}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                     inputMode === "html"
-                      ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/30"
+                      ? "bg-stone-500/20 text-stone-300 border border-stone-500/30"
                       : "text-gray-400 hover:text-white hover:bg-white/5 border border-transparent"
                   }`}
                 >
@@ -660,7 +660,7 @@ export default function SeoAgentPage() {
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
                     placeholder="https://example.com"
-                    className="w-full pl-12 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                    className="w-full pl-12 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-stone-500/50 focus:border-stone-500/50 transition-all"
                     onKeyDown={(e) => {
                       if (e.key === "Enter" && !analyzing) handleAnalyze();
                     }}
@@ -673,7 +673,7 @@ export default function SeoAgentPage() {
                   onChange={(e) => setHtmlInput(e.target.value)}
                   placeholder="Paste your HTML code here..."
                   rows={6}
-                  className="w-full p-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all resize-y"
+                  className="w-full p-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-stone-500/50 focus:border-stone-500/50 transition-all resize-y"
                 />
               )}
 
@@ -686,13 +686,13 @@ export default function SeoAgentPage() {
                     value={keyword}
                     onChange={(e) => setKeyword(e.target.value)}
                     placeholder="Target keyword (optional)"
-                    className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all"
+                    className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-stone-500/50 focus:border-stone-500/50 transition-all"
                   />
                 </div>
                 <button
                   onClick={handleAnalyze}
                   disabled={analyzing}
-                  className="flex items-center justify-center gap-2 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+                  className="flex items-center justify-center gap-2 px-6 py-2.5 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 text-white font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
                 >
                   {analyzing ? (
                     <>
@@ -715,15 +715,15 @@ export default function SeoAgentPage() {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="mt-4 flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-xl"
+                    className="mt-4 flex items-start gap-3 p-4 bg-stone-500/10 border border-stone-500/20 rounded-xl"
                   >
-                    <AlertTriangle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+                    <AlertTriangle className="w-5 h-5 text-stone-400 shrink-0 mt-0.5" />
                     <div className="flex-1">
-                      <p className="text-sm text-red-300">{error}</p>
+                      <p className="text-sm text-stone-300">{error}</p>
                     </div>
                     <button
                       onClick={() => setError("")}
-                      className="text-red-400 hover:text-red-300"
+                      className="text-stone-400 hover:text-stone-300"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -783,7 +783,7 @@ export default function SeoAgentPage() {
                         <button
                           onClick={handleAutoFix}
                           disabled={fixing || result.suggestions.length === 0}
-                          className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 text-white font-medium rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {fixing ? (
                             <>
@@ -817,8 +817,8 @@ export default function SeoAgentPage() {
                         exit={{ opacity: 0, height: 0 }}
                         className="mb-8 overflow-hidden"
                       >
-                        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-6">
-                          <h3 className="text-lg font-semibold text-emerald-300 flex items-center gap-2 mb-3">
+                        <div className="bg-stone-500/10 border border-stone-500/20 rounded-2xl p-6">
+                          <h3 className="text-lg font-semibold text-stone-300 flex items-center gap-2 mb-3">
                             <CheckCircle2 className="w-5 h-5" />
                             Auto-Fix Applied
                           </h3>
@@ -826,14 +826,14 @@ export default function SeoAgentPage() {
                             {fixChanges.map((change, i) => (
                               <li
                                 key={i}
-                                className="flex items-start gap-2 text-sm text-emerald-200"
+                                className="flex items-start gap-2 text-sm text-stone-200"
                               >
-                                <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-400" />
+                                <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-stone-400" />
                                 {change}
                               </li>
                             ))}
                           </ul>
-                          <p className="text-xs text-emerald-400/60 mt-3">
+                          <p className="text-xs text-stone-400/60 mt-3">
                             The scores above reflect the fixed HTML. You can
                             download it via Export Report.
                           </p>
@@ -858,7 +858,7 @@ export default function SeoAgentPage() {
                           }
                           className={`text-left p-4 rounded-xl border transition-all ${
                             isExpanded
-                              ? "bg-indigo-500/10 border-indigo-500/30 col-span-1 sm:col-span-2 lg:col-span-4"
+                              ? "bg-stone-500/10 border-stone-500/30 col-span-1 sm:col-span-2 lg:col-span-4"
                               : `${scoreBg(pct)} hover:scale-[1.02]`
                           }`}
                           layout
@@ -906,14 +906,14 @@ export default function SeoAgentPage() {
                                     key={i}
                                     className={`flex items-start gap-3 p-3 rounded-lg ${
                                       check.passed
-                                        ? "bg-emerald-500/5"
-                                        : "bg-red-500/5"
+                                        ? "bg-stone-500/5"
+                                        : "bg-stone-500/5"
                                     }`}
                                   >
                                     {check.passed ? (
-                                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                                      <CheckCircle2 className="w-4 h-4 text-stone-400 shrink-0 mt-0.5" />
                                     ) : (
-                                      <XCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                                      <XCircle className="w-4 h-4 text-stone-400 shrink-0 mt-0.5" />
                                     )}
                                     <div className="flex-1 min-w-0">
                                       <p className="text-sm font-medium text-gray-200">
@@ -938,7 +938,7 @@ export default function SeoAgentPage() {
                   {result.suggestions.length > 0 && (
                     <div className="bg-white/[0.02] rounded-2xl border border-white/5 p-6">
                       <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                        <AlertTriangle className="w-5 h-5 text-yellow-400" />
+                        <AlertTriangle className="w-5 h-5 text-stone-400" />
                         Actionable Suggestions
                         <span className="text-sm font-normal text-gray-500">
                           ({result.suggestions.length})
@@ -971,12 +971,12 @@ export default function SeoAgentPage() {
                   )}
 
                   {result.suggestions.length === 0 && (
-                    <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-8 text-center">
-                      <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
-                      <h3 className="text-lg font-semibold text-emerald-300">
+                    <div className="bg-stone-500/10 border border-stone-500/20 rounded-2xl p-8 text-center">
+                      <CheckCircle2 className="w-12 h-12 text-stone-400 mx-auto mb-3" />
+                      <h3 className="text-lg font-semibold text-stone-300">
                         No Issues Found
                       </h3>
-                      <p className="text-sm text-emerald-400/70 mt-1">
+                      <p className="text-sm text-stone-400/70 mt-1">
                         This page passes all SEO checks. Great work!
                       </p>
                     </div>
@@ -988,8 +988,8 @@ export default function SeoAgentPage() {
             {/* empty state */}
             {!result && !analyzing && (
               <div className="text-center py-20">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/10 flex items-center justify-center mx-auto mb-6">
-                  <BarChart3 className="w-10 h-10 text-indigo-400" />
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-stone-500/20 to-stone-500/20 border border-stone-500/10 flex items-center justify-center mx-auto mb-6">
+                  <BarChart3 className="w-10 h-10 text-stone-400" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">
                   Analyze Your First Page
@@ -1023,7 +1023,7 @@ export default function SeoAgentPage() {
             {/* analyzing spinner */}
             {analyzing && (
               <div className="text-center py-20">
-                <Loader2 className="w-12 h-12 text-indigo-400 animate-spin mx-auto mb-4" />
+                <Loader2 className="w-12 h-12 text-stone-400 animate-spin mx-auto mb-4" />
                 <h3 className="text-lg font-semibold">Analyzing SEO...</h3>
                 <p className="text-sm text-gray-500 mt-1">
                   Checking 8 categories across 30+ signals

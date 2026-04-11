@@ -319,7 +319,7 @@ export default function PrivacyPolicyGeneratorPage() {
       <nav className="border-b border-white/5 px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <Link href="/" className="text-xl font-bold tracking-tight">
-            <span className="text-indigo-400">Zoo</span>bicon
+            <span className="text-stone-400">Zoo</span>bicon
           </Link>
           <Link href="/tools" className="text-sm text-white/50 hover:text-white transition-colors">
             All Tools
@@ -330,7 +330,7 @@ export default function PrivacyPolicyGeneratorPage() {
       <div className="max-w-6xl mx-auto px-6 py-12">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-xs font-medium mb-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-500/10 text-stone-400 text-xs font-medium mb-4">
             <Shield className="w-3 h-3" /> Free Tool
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -348,7 +348,7 @@ export default function PrivacyPolicyGeneratorPage() {
             {/* Company Info */}
             <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
               <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <Globe className="w-5 h-5 text-indigo-400" />
+                <Globe className="w-5 h-5 text-stone-400" />
                 Company Information
               </h2>
               <div className="space-y-4">
@@ -359,7 +359,7 @@ export default function PrivacyPolicyGeneratorPage() {
                     value={companyName}
                     onChange={e => setCompanyName(e.target.value)}
                     placeholder="Acme Inc."
-                    className="w-full bg-white/[0.05] border border-white/[0.08] rounded-xl px-4 py-3 text-sm placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                    className="w-full bg-white/[0.05] border border-white/[0.08] rounded-xl px-4 py-3 text-sm placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-stone-500/40"
                   />
                 </div>
                 <div>
@@ -369,7 +369,7 @@ export default function PrivacyPolicyGeneratorPage() {
                     value={websiteUrl}
                     onChange={e => setWebsiteUrl(e.target.value)}
                     placeholder="https://example.com"
-                    className="w-full bg-white/[0.05] border border-white/[0.08] rounded-xl px-4 py-3 text-sm placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                    className="w-full bg-white/[0.05] border border-white/[0.08] rounded-xl px-4 py-3 text-sm placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-stone-500/40"
                   />
                 </div>
                 <div>
@@ -379,7 +379,7 @@ export default function PrivacyPolicyGeneratorPage() {
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     placeholder="privacy@example.com"
-                    className="w-full bg-white/[0.05] border border-white/[0.08] rounded-xl px-4 py-3 text-sm placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                    className="w-full bg-white/[0.05] border border-white/[0.08] rounded-xl px-4 py-3 text-sm placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-stone-500/40"
                   />
                 </div>
                 <div>
@@ -389,7 +389,7 @@ export default function PrivacyPolicyGeneratorPage() {
                     value={country}
                     onChange={e => setCountry(e.target.value)}
                     placeholder="New Zealand"
-                    className="w-full bg-white/[0.05] border border-white/[0.08] rounded-xl px-4 py-3 text-sm placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                    className="w-full bg-white/[0.05] border border-white/[0.08] rounded-xl px-4 py-3 text-sm placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-stone-500/40"
                   />
                 </div>
               </div>
@@ -398,7 +398,7 @@ export default function PrivacyPolicyGeneratorPage() {
             {/* Data Collected */}
             <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
               <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <Eye className="w-5 h-5 text-indigo-400" />
+                <Eye className="w-5 h-5 text-stone-400" />
                 Data You Collect
               </h2>
               <div className="grid grid-cols-2 gap-3">
@@ -411,7 +411,7 @@ export default function PrivacyPolicyGeneratorPage() {
                       onClick={() => toggleData(opt.id)}
                       className={`flex items-center gap-3 p-3 rounded-xl border text-left text-sm transition-all ${
                         active
-                          ? "bg-indigo-500/10 border-indigo-500/30 text-indigo-300"
+                          ? "bg-stone-500/10 border-stone-500/30 text-stone-300"
                           : "bg-white/[0.02] border-white/[0.06] text-white/50 hover:border-white/10"
                       }`}
                     >
@@ -427,7 +427,7 @@ export default function PrivacyPolicyGeneratorPage() {
             {/* Compliance Toggles */}
             <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
               <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <Lock className="w-5 h-5 text-indigo-400" />
+                <Lock className="w-5 h-5 text-stone-400" />
                 Compliance Options
               </h2>
               <div className="space-y-4">
@@ -444,7 +444,7 @@ export default function PrivacyPolicyGeneratorPage() {
                     <button
                       onClick={() => toggle.set(!toggle.value)}
                       className={`w-12 h-7 rounded-full transition-colors relative ${
-                        toggle.value ? "bg-indigo-500" : "bg-white/10"
+                        toggle.value ? "bg-stone-500" : "bg-white/10"
                       }`}
                     >
                       <div
@@ -460,7 +460,7 @@ export default function PrivacyPolicyGeneratorPage() {
 
             <button
               onClick={handleGenerate}
-              className="w-full py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-lg transition-colors flex items-center justify-center gap-2"
+              className="w-full py-4 rounded-2xl bg-stone-600 hover:bg-stone-500 text-white font-semibold text-lg transition-colors flex items-center justify-center gap-2"
             >
               <FileText className="w-5 h-5" />
               Generate Privacy Policy
@@ -484,7 +484,7 @@ export default function PrivacyPolicyGeneratorPage() {
                       onClick={handleCopy}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.05] hover:bg-white/10 text-xs transition-colors"
                     >
-                      {copied ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3" />}
+                      {copied ? <Check className="w-3 h-3 text-stone-400" /> : <Copy className="w-3 h-3" />}
                       {copied ? "Copied" : "Copy"}
                     </button>
                     <button
@@ -535,14 +535,14 @@ export default function PrivacyPolicyGeneratorPage() {
         </div>
 
         {/* CTA */}
-        <div className="mt-20 text-center bg-gradient-to-br from-indigo-600/10 to-purple-600/10 border border-indigo-500/10 rounded-2xl p-10">
+        <div className="mt-20 text-center bg-gradient-to-br from-stone-600/10 to-stone-600/10 border border-stone-500/10 rounded-2xl p-10">
           <h2 className="text-2xl font-bold mb-3">Need a website to go with that policy?</h2>
           <p className="text-white/50 mb-6 max-w-lg mx-auto">
             Build a complete, professional website with AI in under 60 seconds. Privacy policy included.
           </p>
           <Link
             href="/builder"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-semibold transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-stone-600 hover:bg-stone-500 font-semibold transition-colors"
           >
             Try the AI Website Builder <ArrowRight className="w-4 h-4" />
           </Link>

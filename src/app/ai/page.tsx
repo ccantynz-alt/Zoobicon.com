@@ -77,16 +77,16 @@ const AI_TOOLS = [
     icon: Palette,
     name: "AI Brand Kit Generator",
     description: "Logo, colors, typography, brand guidelines — generated instantly.",
-    color: "from-cyan-500 to-rose-600",
-    glowColor: "shadow-cyan-500/25",
+    color: "from-stone-500 to-stone-600",
+    glowColor: "shadow-stone-500/25",
     tag: "Design",
   },
   {
     icon: Bot,
     name: "AI Chatbot Builder",
     description: "Deploy intelligent chatbots that understand your business.",
-    color: "from-blue-500 to-indigo-600",
-    glowColor: "shadow-blue-500/25",
+    color: "from-stone-500 to-stone-600",
+    glowColor: "shadow-stone-500/25",
     tag: "Agent",
     href: "/chatbot-widget",
   },
@@ -94,40 +94,40 @@ const AI_TOOLS = [
     icon: Video,
     name: "AI Video Creator",
     description: "Transform text scripts into professional marketing videos in minutes.",
-    color: "from-accent-purple to-blue-700",
-    glowColor: "shadow-blue-500/25",
+    color: "from-accent-purple to-stone-700",
+    glowColor: "shadow-stone-500/25",
     tag: "Video",
   },
   {
     icon: Mail,
     name: "AI Email Writer",
     description: "Campaigns, sequences, newsletters — written by AI.",
-    color: "from-rose-500 to-red-600",
-    glowColor: "shadow-rose-500/25",
+    color: "from-stone-500 to-stone-600",
+    glowColor: "shadow-stone-500/25",
     tag: "Marketing",
   },
   {
     icon: Search,
     name: "AI SEO Agent",
     description: "Autonomous SEO that ranks your content automatically.",
-    color: "from-accent-cyan to-emerald-600",
-    glowColor: "shadow-cyan-500/25",
+    color: "from-accent-cyan to-stone-600",
+    glowColor: "shadow-stone-500/25",
     tag: "Agent",
   },
   {
     icon: Bug,
     name: "AI Code Debugger",
     description: "Paste broken code. Get fixed, optimized code back.",
-    color: "from-red-500 to-orange-500",
-    glowColor: "shadow-red-500/25",
+    color: "from-stone-500 to-stone-500",
+    glowColor: "shadow-stone-500/25",
     tag: "Developer",
   },
   {
     icon: Languages,
     name: "AI Translation",
     description: "Translate your entire site to 30+ languages in one click.",
-    color: "from-emerald-500 to-teal-500",
-    glowColor: "shadow-emerald-500/25",
+    color: "from-stone-500 to-stone-500",
+    glowColor: "shadow-stone-500/25",
     tag: "Global",
   },
 ];
@@ -155,8 +155,8 @@ const HOW_IT_WORKS = [
     title: "Generate",
     subtitle: "AI builds it in seconds with auto-debugging",
     description: "Our AI writes production-grade code, designs responsive layouts, and auto-debugs every error — all in under 60 seconds.",
-    color: "from-accent-purple to-blue-700",
-    glowColor: "shadow-blue-500/30",
+    color: "from-accent-purple to-stone-700",
+    glowColor: "shadow-stone-500/30",
   },
   {
     step: "03",
@@ -164,8 +164,8 @@ const HOW_IT_WORKS = [
     title: "Deploy",
     subtitle: "One-click publish to your.zoobicon.sh or custom domain",
     description: "Hit deploy and your site goes live instantly. Free hosting on zoobicon.sh, or connect your own domain in one click.",
-    color: "from-accent-cyan to-emerald-600",
-    glowColor: "shadow-cyan-500/30",
+    color: "from-accent-cyan to-stone-600",
+    glowColor: "shadow-stone-500/30",
   },
 ];
 
@@ -510,7 +510,7 @@ export default function AiPage() {
             viewport={{ once: true, amount: 0.2 }}
             className="text-center mb-16"
           >
-            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 text-sm font-medium mb-4">
+            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-stone-500/30 bg-stone-500/5 text-stone-400 text-sm font-medium mb-4">
               <Zap className="w-4 h-4" />
               Simple as 1-2-3
             </motion.div>
@@ -628,7 +628,7 @@ export default function AiPage() {
                   {/* Orbiting dots */}
                   {["top-0 left-1/2 -translate-x-1/2 -translate-y-2", "bottom-0 left-1/2 -translate-x-1/2 translate-y-2", "left-0 top-1/2 -translate-y-1/2 -translate-x-2", "right-0 top-1/2 -translate-y-1/2 translate-x-2"].map((pos, i) => (
                     <div key={i} className={`absolute ${pos}`}>
-                      <div className={`w-3 h-3 rounded-full ${["bg-zoo-500", "bg-accent-purple", "bg-accent-cyan", "bg-cyan-500"][i]} shadow-lg`} />
+                      <div className={`w-3 h-3 rounded-full ${["bg-zoo-500", "bg-accent-purple", "bg-accent-cyan", "bg-stone-500"][i]} shadow-lg`} />
                     </div>
                   ))}
                 </div>

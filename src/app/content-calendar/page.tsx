@@ -61,11 +61,11 @@ interface Insight {
 
 /* ─── constants ─── */
 const PLATFORM_COLORS: Record<Platform, string> = {
-  twitter: "bg-sky-500",
-  linkedin: "bg-blue-600",
-  instagram: "bg-gradient-to-br from-purple-500 to-pink-500",
+  twitter: "bg-stone-500",
+  linkedin: "bg-stone-600",
+  instagram: "bg-gradient-to-br from-stone-500 to-stone-500",
   tiktok: "bg-black ring-1 ring-white/20",
-  facebook: "bg-blue-500",
+  facebook: "bg-stone-500",
 };
 
 const PLATFORM_LABELS: Record<Platform, string> = {
@@ -85,10 +85,10 @@ const PLATFORM_ICONS: Record<Platform, string> = {
 };
 
 const STATUS_STYLES: Record<PostStatus, { bg: string; text: string; label: string }> = {
-  scheduled: { bg: "bg-blue-500/15", text: "text-blue-400", label: "Scheduled" },
-  published: { bg: "bg-emerald-500/15", text: "text-emerald-400", label: "Published" },
+  scheduled: { bg: "bg-stone-500/15", text: "text-stone-400", label: "Scheduled" },
+  published: { bg: "bg-stone-500/15", text: "text-stone-400", label: "Published" },
   draft: { bg: "bg-white/10", text: "text-white/60", label: "Draft" },
-  failed: { bg: "bg-red-500/15", text: "text-red-400", label: "Failed" },
+  failed: { bg: "bg-stone-500/15", text: "text-stone-400", label: "Failed" },
 };
 
 const CONNECTED_PLATFORMS: { platform: Platform; connected: boolean }[] = [
@@ -257,10 +257,10 @@ export default function ContentCalendarPage() {
         {/* Hero */}
         <motion.section className="pt-16 pb-12 text-center" initial="hidden" animate="visible" variants={staggerContainer}>
           <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.08] text-sm text-white/60 mb-6">
-            <Calendar className="w-4 h-4 text-cyan-400" /> Replaces Buffer & Later
+            <Calendar className="w-4 h-4 text-stone-400" /> Replaces Buffer & Later
           </motion.div>
           <motion.h1 variants={fadeInUp} className="text-4xl md:text-6xl font-bold tracking-tight mb-4">
-            Content <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Calendar</span>
+            Content <span className="bg-gradient-to-r from-stone-400 to-stone-500 bg-clip-text text-transparent">Calendar</span>
           </motion.h1>
           <motion.p variants={fadeInUp} className="text-lg text-white/50 max-w-2xl mx-auto">
             Plan 30 days of social media content in 30 seconds. AI generates platform-specific posts with optimal timing, hashtags, and image prompts.
@@ -270,10 +270,10 @@ export default function ContentCalendarPage() {
         {/* Stats */}
         <motion.section className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer}>
           {[
-            { label: "Scheduled This Month", value: stats.scheduledThisMonth, icon: <Send className="w-5 h-5 text-blue-400" />, color: "from-blue-500/10 to-blue-500/0" },
-            { label: "Published", value: stats.published, icon: <CheckCircle2 className="w-5 h-5 text-emerald-400" />, color: "from-emerald-500/10 to-emerald-500/0" },
-            { label: "Total Engagement", value: stats.totalEngagement.toLocaleString(), icon: <TrendingUp className="w-5 h-5 text-purple-400" />, color: "from-purple-500/10 to-purple-500/0" },
-            { label: "Content Score", value: `${stats.contentScore}/100`, icon: <BarChart3 className="w-5 h-5 text-cyan-400" />, color: "from-cyan-500/10 to-cyan-500/0" },
+            { label: "Scheduled This Month", value: stats.scheduledThisMonth, icon: <Send className="w-5 h-5 text-stone-400" />, color: "from-stone-500/10 to-stone-500/0" },
+            { label: "Published", value: stats.published, icon: <CheckCircle2 className="w-5 h-5 text-stone-400" />, color: "from-stone-500/10 to-stone-500/0" },
+            { label: "Total Engagement", value: stats.totalEngagement.toLocaleString(), icon: <TrendingUp className="w-5 h-5 text-stone-400" />, color: "from-stone-500/10 to-stone-500/0" },
+            { label: "Content Score", value: `${stats.contentScore}/100`, icon: <BarChart3 className="w-5 h-5 text-stone-400" />, color: "from-stone-500/10 to-stone-500/0" },
           ].map((s) => (
             <motion.div key={s.label} variants={fadeInUp} className={`rounded-2xl border border-white/[0.06] bg-gradient-to-b ${s.color} p-5`}>
               <div className="flex items-center gap-3 mb-2">{s.icon}<span className="text-xs text-white/40 uppercase tracking-wider">{s.label}</span></div>
@@ -317,14 +317,14 @@ export default function ContentCalendarPage() {
                     key={day}
                     onClick={() => setSelectedDay(isSelected ? null : day)}
                     className={`min-h-[90px] border-b border-r border-white/[0.04] p-2 text-left transition-colors relative group
-                      ${isToday ? "bg-cyan-500/[0.06]" : "hover:bg-white/[0.04]"}
-                      ${isSelected ? "bg-white/[0.06] ring-1 ring-cyan-500/40" : ""}
+                      ${isToday ? "bg-stone-500/[0.06]" : "hover:bg-white/[0.04]"}
+                      ${isSelected ? "bg-white/[0.06] ring-1 ring-stone-500/40" : ""}
                       ${dayPosts.length > 0 ? "bg-white/[0.02]" : ""}
                     `}
                   >
-                    <span className={`text-sm font-medium ${isToday ? "text-cyan-400" : "text-white/70"}`}>
+                    <span className={`text-sm font-medium ${isToday ? "text-stone-400" : "text-white/70"}`}>
                       {day}
-                      {isToday && <span className="ml-1 w-1.5 h-1.5 rounded-full bg-cyan-400 inline-block" />}
+                      {isToday && <span className="ml-1 w-1.5 h-1.5 rounded-full bg-stone-400 inline-block" />}
                     </span>
                     {dayPosts.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-1.5">
@@ -391,14 +391,14 @@ export default function ContentCalendarPage() {
             {/* AI Content Planner */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5">
               <div className="flex items-center gap-2 mb-4">
-                <Sparkles className="w-5 h-5 text-cyan-400" />
+                <Sparkles className="w-5 h-5 text-stone-400" />
                 <h3 className="font-semibold">AI Content Planner</h3>
               </div>
               <textarea
                 value={businessDesc}
                 onChange={(e) => setBusinessDesc(e.target.value)}
                 placeholder="Describe your business and goals... e.g. 'Boutique yoga studio in Austin, TX. Goal: attract new students and promote our online membership.'"
-                className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl p-3 text-sm text-white placeholder:text-white/30 resize-none h-28 focus:outline-none focus:ring-1 focus:ring-cyan-500/40 transition-all"
+                className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl p-3 text-sm text-white placeholder:text-white/30 resize-none h-28 focus:outline-none focus:ring-1 focus:ring-stone-500/40 transition-all"
               />
               <button
                 onClick={handleGeneratePlan}
@@ -412,8 +412,8 @@ export default function ContentCalendarPage() {
               <AnimatePresence>
                 {generatedPlan && (
                   <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
-                    <div className="mt-4 p-3 rounded-xl bg-cyan-500/[0.06] border border-cyan-500/20">
-                      <p className="text-sm text-cyan-400 font-medium mb-2">{generatedPlan.length} posts generated</p>
+                    <div className="mt-4 p-3 rounded-xl bg-stone-500/[0.06] border border-stone-500/20">
+                      <p className="text-sm text-stone-400 font-medium mb-2">{generatedPlan.length} posts generated</p>
                       <div className="flex flex-wrap gap-1.5 mb-3">
                         {(["twitter", "linkedin", "instagram", "tiktok", "facebook"] as Platform[]).map((p) => {
                           const count = generatedPlan.filter((post) => post.platform === p).length;
@@ -425,7 +425,7 @@ export default function ContentCalendarPage() {
                         })}
                       </div>
                       <div className="flex gap-2">
-                        <button onClick={acceptPlan} className="flex-1 bg-cyan-500 hover:bg-cyan-400 text-black text-sm font-semibold py-2 rounded-lg transition-colors">
+                        <button onClick={acceptPlan} className="flex-1 bg-stone-500 hover:bg-stone-400 text-black text-sm font-semibold py-2 rounded-lg transition-colors">
                           Accept Plan
                         </button>
                         <button onClick={() => { setGeneratedPlan(null); handleGeneratePlan(); }} className="flex-1 bg-white/10 hover:bg-white/15 text-sm font-medium py-2 rounded-lg transition-colors flex items-center justify-center gap-1.5">
@@ -451,7 +451,7 @@ export default function ContentCalendarPage() {
                       <span className="text-sm font-medium">{PLATFORM_LABELS[platform]}</span>
                     </div>
                     {connected ? (
-                      <span className="text-xs text-emerald-400 bg-emerald-500/15 px-2.5 py-1 rounded-full">Connected</span>
+                      <span className="text-xs text-stone-400 bg-stone-500/15 px-2.5 py-1 rounded-full">Connected</span>
                     ) : (
                       <button onClick={() => {}} className="text-xs text-white/60 bg-white/[0.06] hover:bg-white/10 px-3 py-1.5 rounded-lg transition-colors">
                         Connect
@@ -469,7 +469,7 @@ export default function ContentCalendarPage() {
               <div className="space-y-3">
                 {insights.map((insight) => (
                   <div key={insight.label} className="flex items-start gap-3 text-sm">
-                    <div className="w-8 h-8 rounded-lg bg-white/[0.04] flex items-center justify-center text-cyan-400 flex-shrink-0">
+                    <div className="w-8 h-8 rounded-lg bg-white/[0.04] flex items-center justify-center text-stone-400 flex-shrink-0">
                       {insightIcons[insight.icon] || <BarChart3 className="w-4 h-4" />}
                     </div>
                     <div>
@@ -536,7 +536,7 @@ export default function ContentCalendarPage() {
                     <button onClick={() => setViewingPost(post)} className="p-2 rounded-lg hover:bg-white/10 transition-colors text-white/40 hover:text-white" title="View">
                       <Eye className="w-4 h-4" />
                     </button>
-                    <button onClick={() => deletePost(post.id)} className="p-2 rounded-lg hover:bg-red-500/20 transition-colors text-white/40 hover:text-red-400" title="Delete">
+                    <button onClick={() => deletePost(post.id)} className="p-2 rounded-lg hover:bg-stone-500/20 transition-colors text-white/40 hover:text-stone-400" title="Delete">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -547,7 +547,7 @@ export default function ContentCalendarPage() {
         </motion.section>
 
         {/* Pricing CTA */}
-        <motion.section initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mt-16 text-center rounded-3xl border border-white/[0.06] bg-gradient-to-b from-cyan-500/[0.06] to-transparent p-12">
+        <motion.section initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mt-16 text-center rounded-3xl border border-white/[0.06] bg-gradient-to-b from-stone-500/[0.06] to-transparent p-12">
           <h2 className="text-2xl font-bold mb-3">Replace Buffer & Later</h2>
           <p className="text-white/50 max-w-lg mx-auto mb-6">
             AI-powered content planning, scheduling, and cross-platform publishing — included free with Pro ($49/mo).
@@ -607,7 +607,7 @@ export default function ContentCalendarPage() {
               {viewingPost.hashtags.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mb-4">
                   {viewingPost.hashtags.map((tag) => (
-                    <span key={tag} className="text-xs bg-cyan-500/10 text-cyan-400 rounded-full px-2.5 py-1">{tag}</span>
+                    <span key={tag} className="text-xs bg-stone-500/10 text-stone-400 rounded-full px-2.5 py-1">{tag}</span>
                   ))}
                 </div>
               )}

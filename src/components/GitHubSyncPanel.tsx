@@ -272,7 +272,7 @@ export default function GitHubSyncPanel({
     }
     if (connState === "connected" && ghUser) {
       return (
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[10px] text-emerald-300">
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-stone-500/10 border border-stone-500/30 text-[10px] text-stone-300">
           <CheckCircle2 className="w-3 h-3" />
           Connected as @{ghUser.login}
         </div>
@@ -280,12 +280,12 @@ export default function GitHubSyncPanel({
     }
     if (connState === "error") {
       return (
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-[10px] text-red-300">
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-stone-500/10 border border-stone-500/30 text-[10px] text-stone-300">
           <AlertCircle className="w-3 h-3" />
           {connError || "Connection error"}
           <button
             onClick={checkConnection}
-            className="ml-1 inline-flex items-center gap-0.5 hover:text-red-200"
+            className="ml-1 inline-flex items-center gap-0.5 hover:text-stone-200"
             title="Retry connection check"
           >
             <RotateCcw className="w-2.5 h-2.5" />
@@ -295,7 +295,7 @@ export default function GitHubSyncPanel({
       );
     }
     return (
-      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-[10px] text-amber-300">
+      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-stone-500/10 border border-stone-500/30 text-[10px] text-stone-300">
         <AlertCircle className="w-3 h-3" />
         Not connected
       </div>
@@ -325,13 +325,13 @@ export default function GitHubSyncPanel({
     return (
       <div className="flex flex-col gap-4 p-4">
         <ConnectionPill />
-        <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-4 flex items-start gap-2">
-          <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+        <div className="rounded-lg border border-stone-500/20 bg-stone-500/5 p-4 flex items-start gap-2">
+          <AlertCircle className="w-4 h-4 text-stone-400 shrink-0 mt-0.5" />
           <div className="flex-1">
-            <p className="text-xs text-red-300 font-medium mb-1">
+            <p className="text-xs text-stone-300 font-medium mb-1">
               Couldn&apos;t reach GitHub
             </p>
-            <p className="text-[11px] text-red-300/70 leading-relaxed">
+            <p className="text-[11px] text-stone-300/70 leading-relaxed">
               {connError ||
                 "We couldn&apos;t verify your GitHub connection. Check your network and try again."}
             </p>
@@ -375,15 +375,15 @@ export default function GitHubSyncPanel({
           </p>
           <ul className="text-xs text-white/50 space-y-1.5">
             <li className="flex items-center gap-2">
-              <Check className="w-3 h-3 text-emerald-400/60 shrink-0" />
+              <Check className="w-3 h-3 text-stone-400/60 shrink-0" />
               Create new repos or push to existing ones
             </li>
             <li className="flex items-center gap-2">
-              <Check className="w-3 h-3 text-emerald-400/60 shrink-0" />
+              <Check className="w-3 h-3 text-stone-400/60 shrink-0" />
               Auto-commit on every change
             </li>
             <li className="flex items-center gap-2">
-              <Check className="w-3 h-3 text-emerald-400/60 shrink-0" />
+              <Check className="w-3 h-3 text-stone-400/60 shrink-0" />
               Deploy to Vercel or Netlify from GitHub
             </li>
           </ul>
@@ -426,7 +426,7 @@ export default function GitHubSyncPanel({
           onClick={handleDisconnect}
           disabled={isPushing}
           title="Disconnect GitHub"
-          className="p-1.5 rounded text-white/30 hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          className="p-1.5 rounded text-white/30 hover:text-stone-400 hover:bg-stone-500/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
         >
           <LogOut className="w-3.5 h-3.5" />
         </button>
@@ -434,11 +434,11 @@ export default function GitHubSyncPanel({
 
       {/* Repo status (if previously synced) */}
       {repoStatus && (
-        <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 space-y-2">
-          <div className="flex items-center gap-2 text-xs text-emerald-400">
+        <div className="rounded-lg border border-stone-500/20 bg-stone-500/5 p-3 space-y-2">
+          <div className="flex items-center gap-2 text-xs text-stone-400">
             <GitBranch className="w-3.5 h-3.5" />
             <span className="font-medium">Synced</span>
-            <span className="text-emerald-400/60">
+            <span className="text-stone-400/60">
               {repoStatus.defaultBranch}
             </span>
           </div>
@@ -495,7 +495,7 @@ export default function GitHubSyncPanel({
             className={`p-2.5 rounded-lg border transition-colors disabled:opacity-50 ${
               isPrivate
                 ? "border-white/10 bg-white/5 text-white/60 hover:text-white/80"
-                : "border-amber-500/30 bg-amber-500/10 text-amber-400"
+                : "border-stone-500/30 bg-stone-500/10 text-stone-400"
             }`}
           >
             {isPrivate ? (
@@ -551,7 +551,7 @@ export default function GitHubSyncPanel({
           </div>
           <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-emerald-400 to-emerald-300 transition-all duration-200 ease-out"
+              className="h-full bg-gradient-to-r from-stone-400 to-stone-300 transition-all duration-200 ease-out"
               style={{ width: `${progressPct}%` }}
             />
           </div>
@@ -560,17 +560,17 @@ export default function GitHubSyncPanel({
 
       {/* Error message */}
       {syncState === "error" && error && (
-        <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3 space-y-2">
+        <div className="rounded-lg border border-stone-500/20 bg-stone-500/5 p-3 space-y-2">
           <div className="flex items-start gap-2">
-            <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+            <AlertCircle className="w-4 h-4 text-stone-400 shrink-0 mt-0.5" />
             <div className="flex-1">
-              <p className="text-xs text-red-300 font-medium">Push failed</p>
-              <p className="text-[11px] text-red-300/70 mt-0.5">{error}</p>
+              <p className="text-xs text-stone-300 font-medium">Push failed</p>
+              <p className="text-[11px] text-stone-300/70 mt-0.5">{error}</p>
             </div>
           </div>
           <button
             onClick={handlePush}
-            className="w-full flex items-center justify-center gap-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-300 text-[11px] font-medium rounded px-3 py-1.5 transition-colors"
+            className="w-full flex items-center justify-center gap-1.5 bg-stone-500/10 hover:bg-stone-500/20 text-stone-300 text-[11px] font-medium rounded px-3 py-1.5 transition-colors"
           >
             <RotateCcw className="w-3 h-3" />
             Retry push
@@ -580,8 +580,8 @@ export default function GitHubSyncPanel({
 
       {/* Success message */}
       {syncState === "synced" && result && (
-        <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 space-y-2">
-          <div className="flex items-center gap-2 text-xs text-emerald-400">
+        <div className="rounded-lg border border-stone-500/20 bg-stone-500/5 p-3 space-y-2">
+          <div className="flex items-center gap-2 text-xs text-stone-400">
             <CheckCircle2 className="w-4 h-4" />
             <span className="font-medium">
               {result.isNewRepo ? "Repository created" : "Changes pushed"} — {result.filesCommitted} files
@@ -591,7 +591,7 @@ export default function GitHubSyncPanel({
             href={result.repoUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full flex items-center justify-center gap-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 text-[11px] font-medium rounded px-3 py-2 transition-colors"
+            className="w-full flex items-center justify-center gap-1.5 bg-stone-500/10 hover:bg-stone-500/20 text-stone-300 text-[11px] font-medium rounded px-3 py-2 transition-colors"
           >
             <ExternalLink className="w-3 h-3" />
             Open on GitHub

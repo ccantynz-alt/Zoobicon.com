@@ -1,13 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import BackgroundEffects from "@/components/BackgroundEffects";
-import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
-  Zap,
-  Search,
   ArrowRight,
   Bot,
   TrendingUp,
@@ -18,19 +12,9 @@ import {
   Brain,
   Clock,
   Shield,
-  Check,
-  Cpu,
   Globe,
-  LayoutDashboard,
-  LogOut,
-  User,
+  BadgeCheck,
 } from "lucide-react";
-
-const fadeInUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } },
-};
-const staggerContainer = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
 
 const CAPABILITIES = [
   { icon: Brain, title: "Keyword Discovery", desc: "AI analyzes your niche, competitors, and market gaps to find the highest-value keywords you should own." },
@@ -52,34 +36,34 @@ const AGENT_WORKFLOW = [
   { phase: "Scaling", desc: "Expands keyword targets, scales content production, increases backlink velocity as authority grows.", time: "Month 2+" },
 ];
 
+const STATS = [
+  { value: "24/7", label: "Autonomous operation" },
+  { value: "300%", label: "Avg. traffic increase" },
+  { value: "30+", label: "Languages supported" },
+  { value: "0", label: "Manual work required" },
+];
+
+const CARD_BG = "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(10,10,15,0.7) 100%)";
+const PRIMARY_CTA = {
+  background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+  color: "#0a0a0f",
+  boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
+} as const;
+const SERIF: React.CSSProperties = {
+  fontFamily: "Fraunces, ui-serif, Georgia, serif",
+  fontStyle: "italic",
+  fontWeight: 400,
+  color: "#E8D4B0",
+};
+
 export default function SEOAgentPage() {
-  const [user, setUser] = useState<{ email: string; name?: string; role?: string } | null>(null);
-
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem("zoobicon_user");
-      if (stored) setUser(JSON.parse(stored));
-    } catch { /* Safari private mode / storage unavailable */ }
-  }, []);
-
-  const handleLogout = () => {
-    try { localStorage.removeItem("zoobicon_user"); } catch {}
-    setUser(null);
-  };
-
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "name": "Zoobicon AI SEO Agent",
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Web",
-    "offers": {
-      "@type": "AggregateOffer",
-      "lowPrice": "0",
-      "highPrice": "99",
-      "priceCurrency": "USD",
-      "offerCount": "4"
-    },
+    "offers": { "@type": "AggregateOffer", "lowPrice": "0", "highPrice": "99", "priceCurrency": "USD", "offerCount": "4" },
     "description": "Autonomous AI SEO agent that discovers keywords, writes content, builds backlinks, and tracks rankings 24/7.",
     "url": "https://zoobicon.com/products/seo-agent",
     "screenshot": "https://zoobicon.com/og-image.png"
@@ -95,175 +79,171 @@ export default function SEOAgentPage() {
   };
 
   return (
-    <div className="relative min-h-screen">
+    <div className="min-h-screen bg-[#050508] text-white fs-grain pt-[72px]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
-      <BackgroundEffects preset="technical" />
-
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-cyan to-emerald-600 flex items-center justify-center">
-                <Search className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-lg font-bold tracking-tight">Zoobicon</span>
-            </Link>
-            <span className="text-xs text-white/60">/</span>
-            <span className="text-sm text-white/65">SEO Agent</span>
-          </div>
-          <div className="flex items-center gap-4">
-            {user ? (
-              <>
-                <Link href="/dashboard" className="text-sm text-white/65 hover:text-white transition-colors px-4 py-2 flex items-center gap-1.5">
-                  <LayoutDashboard className="w-3.5 h-3.5" />
-                  Dashboard
-                </Link>
-                <button onClick={handleLogout} className="text-sm text-white/65 hover:text-white transition-colors px-4 py-2 flex items-center gap-1.5">
-                  <LogOut className="w-3.5 h-3.5" />
-                  Sign out
-                </button>
-                <Link href="/builder" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white flex items-center gap-2">
-                  <User className="w-3.5 h-3.5" />
-                  <span>{user.name || user.email.split("@")[0]}</span>
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link href="/auth/login" className="text-sm text-white/65 hover:text-white transition-colors px-4 py-2">
-                  Sign in
-                </Link>
-                <Link href="/auth/signup" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white">
-                  <span>Launch Agent</span>
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </nav>
-      <CursorGlowTracker />
 
       {/* Hero */}
-      <section className="relative pt-32 pb-20 lg:pt-44 lg:pb-28">
-        <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
-            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-cyan/20 bg-accent-cyan/5 mb-6">
-              <Bot className="w-3 h-3 text-accent-cyan" />
-              <span className="text-xs font-medium text-accent-cyan">Autonomous AI Agent</span>
-            </motion.div>
+      <section className="relative pt-20 pb-24 md:pt-28 md:pb-32 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+          <div className="absolute left-1/2 top-0 h-[720px] w-[1200px] -translate-x-1/2 rounded-full blur-[160px]"
+            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.09), transparent 70%)" }} />
+          <div className="absolute right-[-10%] top-[30%] h-[420px] w-[520px] rounded-full blur-[140px]"
+            style={{ background: "radial-gradient(closest-side, rgba(224,139,176,0.07), transparent 70%)" }} />
+        </div>
 
-            <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl lg:text-8xl font-black tracking-tight leading-[0.9] mb-6">
-              SEO on<br />
-              <span className="gradient-text-hero">Autopilot.</span>
-            </motion.h1>
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-8">
+            <Bot className="w-3 h-3" />
+            Autonomous AI agent · Runs 24/7
+          </div>
 
-            <motion.p variants={fadeInUp} className="max-w-2xl text-lg md:text-xl text-white/60 leading-relaxed mb-10">
-              An autonomous AI agent that researches, plans, and executes your entire SEO strategy
-              24/7. Content creation, backlink outreach, technical audits — all handled while you sleep.
-            </motion.p>
+          <h1 className="fs-display-xl mb-6">
+            SEO on{" "}
+            <span style={SERIF}>autopilot.</span>
+          </h1>
 
-            <motion.div variants={fadeInUp} className="flex flex-wrap gap-4 mb-16">
-              <Link href="/seo" className="group btn-gradient px-8 py-4 rounded-2xl text-base font-bold text-white flex items-center gap-3 shadow-glow-cyan">
-                <span>Launch SEO Dashboard</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </motion.div>
+          <p className="max-w-2xl mx-auto text-[17px] md:text-[19px] leading-relaxed text-white/60 mb-10">
+            An autonomous AI agent that researches, plans, and executes your entire SEO strategy
+            24/7. Content creation, backlink outreach, technical audits — all handled while you sleep.
+          </p>
 
-            {/* Stats */}
-            <motion.div variants={fadeInUp} className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[
-                { value: "24/7", label: "Autonomous operation" },
-                { value: "300%", label: "Avg. traffic increase" },
-                { value: "30+", label: "Languages supported" },
-                { value: "0", label: "Manual work required" },
-              ].map((stat) => (
-                <div key={stat.label} className="gradient-border p-4 rounded-xl text-center">
-                  <div className="text-2xl font-black gradient-text-static">{stat.value}</div>
-                  <div className="text-xs text-white/60 mt-1">{stat.label}</div>
-                </div>
-              ))}
-            </motion.div>
-          </motion.div>
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-14">
+            <Link
+              href="/seo"
+              className="group inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
+              style={PRIMARY_CTA}
+            >
+              Launch SEO dashboard
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+            <Link
+              href="/pricing"
+              className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-7 py-3.5 text-[14px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+            >
+              See pricing
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
+            {STATS.map((stat) => (
+              <div
+                key={stat.label}
+                className="rounded-[20px] border border-white/[0.08] p-5 text-center"
+                style={{ background: CARD_BG }}
+              >
+                <div className="text-[28px] font-semibold tracking-[-0.02em]" style={{ color: "#E8D4B0" }}>{stat.value}</div>
+                <div className="text-[12px] text-white/55 mt-1">{stat.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Workflow */}
-      <section className="py-20 border-t border-white/[0.08]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
-            <motion.div variants={fadeInUp} className="text-center mb-12">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                How the Agent <span className="gradient-text">Works</span>
-              </h2>
-              <p className="text-lg text-white/60">Set it and forget it. The agent handles everything.</p>
-            </motion.div>
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              The loop
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              How the agent{" "}
+              <span style={SERIF}>works.</span>
+            </h2>
+            <p className="text-[15px] text-white/55">Set it and forget it. The agent handles everything.</p>
+          </div>
 
-            <div className="space-y-3">
-              {AGENT_WORKFLOW.map((step, i) => (
-                <motion.div key={i} variants={fadeInUp} className="gradient-border p-6 rounded-xl flex items-start gap-6">
-                  <div className="flex-shrink-0">
-                    <div className="text-xs font-bold text-accent-cyan bg-accent-cyan/10 px-3 py-1.5 rounded-lg">{step.time}</div>
+          <div className="space-y-4">
+            {AGENT_WORKFLOW.map((step) => (
+              <div
+                key={step.phase}
+                className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/25"
+                style={{ background: CARD_BG }}
+              >
+                <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.06), transparent 70%)" }} />
+                <div className="relative flex items-start gap-6">
+                  <div
+                    className="flex-shrink-0 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05] px-3 py-1.5 text-[10px] uppercase tracking-[0.15em] font-semibold"
+                    style={{ color: "#E8D4B0" }}
+                  >
+                    {step.time}
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold mb-1">{step.phase}</h3>
-                    <p className="text-sm text-white/60 leading-relaxed">{step.desc}</p>
+                    <h3 className="text-[18px] font-semibold tracking-[-0.01em] mb-1.5">{step.phase}</h3>
+                    <p className="text-[14px] text-white/55 leading-relaxed">{step.desc}</p>
                   </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Capabilities */}
-      <section className="py-20 border-t border-white/[0.08]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
-            <motion.div variants={fadeInUp} className="text-center mb-12">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                Full <span className="gradient-text">Capabilities</span>
-              </h2>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {CAPABILITIES.map((c, i) => (
-                <motion.div key={i} variants={fadeInUp} className="gradient-border card-hover p-6 rounded-xl group">
-                  <c.icon className="w-8 h-8 text-accent-cyan/50 mb-4 group-hover:text-accent-cyan transition-colors" />
-                  <h3 className="text-lg font-bold mb-2">{c.title}</h3>
-                  <p className="text-sm text-white/60 leading-relaxed">{c.desc}</p>
-                </motion.div>
-              ))}
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              Full capabilities
             </div>
-          </motion.div>
+            <h2 className="fs-display-lg mb-4">
+              Nine disciplines.{" "}
+              <span style={SERIF}>One agent.</span>
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {CAPABILITIES.map((c) => (
+              <div
+                key={c.title}
+                className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
+                style={{ background: CARD_BG }}
+              >
+                <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }} />
+                <div className="relative">
+                  <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05]">
+                    <c.icon className="h-5 w-5 text-[#E8D4B0]" />
+                  </div>
+                  <h3 className="text-[18px] font-semibold tracking-[-0.01em] mb-2">{c.title}</h3>
+                  <p className="text-[14px] text-white/55 leading-relaxed">{c.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-20 border-t border-white/[0.08]">
-        <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
-          <Cpu className="w-12 h-12 text-accent-cyan/30 mx-auto mb-6" />
-          <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-            Stop Doing SEO.<br /><span className="gradient-text">Let AI Do It.</span>
+      <section className="relative py-24 md:py-32 border-t border-white/[0.06] overflow-hidden">
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          <div className="absolute left-1/2 top-1/2 h-[520px] w-[900px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[140px]"
+            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.1), transparent 70%)" }} />
+        </div>
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+            <BadgeCheck className="w-3 h-3" />
+            2 minutes to launch
+          </div>
+          <h2 className="fs-display-lg mb-5">
+            Stop doing SEO.{" "}
+            <span style={SERIF}>Let AI do it.</span>
           </h2>
-          <p className="text-lg text-white/60 mb-8">Launch your first autonomous SEO campaign in under 2 minutes.</p>
-          <Link href="/seo" className="inline-flex group btn-gradient px-10 py-4 rounded-2xl text-lg font-bold text-white items-center gap-3 shadow-glow-lg">
-            <span>Launch SEO Dashboard</span>
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          <p className="text-[17px] text-white/60 mb-10">
+            Launch your first autonomous SEO campaign in under two minutes.
+          </p>
+          <Link
+            href="/seo"
+            className="group inline-flex items-center gap-2 rounded-full px-8 py-4 text-[15px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
+            style={PRIMARY_CTA}
+          >
+            Launch SEO dashboard
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </Link>
         </div>
       </section>
-
-      <footer className="border-t border-white/[0.06] py-10">
-        <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="text-xs text-white/30">&copy; 2026 Zoobicon. All rights reserved.</div>
-          <div className="text-xs text-white/20">zoobicon.com &middot; zoobicon.ai &middot; zoobicon.io &middot; zoobicon.sh</div>
-          <div className="flex gap-4">
-            <Link href="/privacy" className="text-xs text-white/30 hover:text-white/50 transition-colors">Privacy</Link>
-            <Link href="/terms" className="text-xs text-white/30 hover:text-white/50 transition-colors">Terms</Link>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

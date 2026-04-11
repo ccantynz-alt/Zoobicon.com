@@ -112,7 +112,7 @@ export default function TopBar() {
         <span className="text-[10px] text-brand-400/60 tracking-wider">
           v0.1.0
         </span>
-        <div className="w-2 h-2 rounded-full bg-green-500 animate-glow-pulse" />
+        <div className="w-2 h-2 rounded-full bg-stone-500 animate-glow-pulse" />
       </div>
     </header>
   );

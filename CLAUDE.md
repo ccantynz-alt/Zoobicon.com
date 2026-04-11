@@ -99,13 +99,52 @@ If Claude is uncertain whether something requires authorization: **default to as
 - **Deploy <5 seconds.** One click. No config. No staging dance.
 
 ## 4. ANNIHILATION TARGETS — WHO WE ARE BEATING
+
+### A. AI BUILDER COMPETITORS
+| Competitor | ARR/Value | Latest (April 2026) | Our edge | ALERT |
+|---|---|---|---|---|
+| Lovable | $400M ARR, $6.6B | **Lovable 2.0**: Plan Mode, Prompt Queue (batch 50), Browser Testing (auto QA), expanding beyond apps into data analysis + presentations + marketing | 75+ products vs their expanding-but-still-narrow platform | They're becoming a general-purpose AI work platform |
+| Bolt.new | $40M ARR, 5M users | **Bolt V2**: Plan Mode, auto-DB creation, auto-error-fixing agent, Figma import, Team Templates, Opus 4.6. Handles 1000x larger projects. Native auth + payments + SEO + storage. | Our domains + email + video. But they've CLOSED the full-stack gap with Lovable. | **CRITICAL: Bolt now has full-stack. Our speed must beat theirs.** |
+| v0 (Vercel) | 6M devs, $3.5B+ | **v0.app**: Full agentic builder now. Auto-connects DBs, web search mid-build, multi-step planning, deploys to Vercel, syncs GitHub. No longer frontend-only. | Our ecosystem breadth. But they have Vercel lock-in. | They closed the backend gap too |
+| Emergent | $100M ARR, 6M signups | **MCP integration LIVE** (Notion, GitHub, Figma). Fork Feature for session continuity. Multi-LLM switching. Google Play app. | Our white-label + agency multiplier. | **MCP is live. We have a stub. Ship it.** |
+| **Google Stitch** ⚠️ NEW | FREE (Google Labs) | Natural language → high-fidelity UI. Infinite canvas, voice-driven design critiques, multi-screen gen (5 at once), DESIGN.md export, Figma/React/HTML export. Currently FREE. | Our ecosystem (domains, hosting, email, video). Stitch is UI-only, no backend, no deploy. | **HIGH THREAT: Google distribution + FREE. Monthly comparison mandatory.** |
+
+### B. AI VIDEO COMPETITORS
+| Competitor | ARR/Value/Users | What they do | Our edge | What to steal |
+|---|---|---|---|---|
+| **Filmora (Wondershare)** | ~$200M rev, $1.75B mkt cap, **100M users** | Desktop editor + AI Mate copilot. Sora 2 + Veo 3.1. Voice cloning w/ emotion. $50/yr. | They EDIT, we GENERATE. No API, no white-label, desktop-only. | Voice cloning emotion control, AI Mate UX, burned-in captions |
+| **HeyGen** | $100M+ ARR, $500M+ | Avatar IV, LiveAvatar (real-time), 175 languages, $29-149/mo | Our pipeline 10-20x cheaper. We bundle with builder+domains+hosting. | Multi-language dubbing, avatar quality bar |
+| **Hedra** ⚠️ NEW | Growing fast | **Character-3: sub-100ms real-time avatars at $0.05/min** (15x cheaper than HeyGen). Up to 10-min videos. API in private beta (Node.js SDK + REST + LiveKit). | We can USE their API as our primary avatar engine. | **CRITICAL: Evaluate replacing our SadTalker chain with Hedra Character-3. $0.05/min is game-changing.** |
+| **Captions app** | 10M downloads | AI Twins (face upload → talking video). Viral TikTok. $10-70/mo. | We build AI Twins with Fish Speech + FLUX. They're mobile-only. | AI Twins feature, viral social model |
+| **CapCut (ByteDance)** | 300M MAU | Free editor + **Seedance 2.0** (4 input modalities: text/image/audio/video simultaneously, phoneme-level lip-sync 8+ languages, ~$0.05/5s clip via fal.ai). | They're an editor. No spokesperson videos. No ecosystem. | **Seedance 2.0 multi-modal input. Add to our pipeline via fal.ai.** |
+| **InVideo AI** | Growing fast | Sora 2 + Veo 3.1 text-to-video, $25-100/mo | We do spokesperson talking heads. They do stock compilations. | Multi-scene storyboard assembly |
+| **Descript** | 6M users, $65M raised | Text-based editing (edit transcript = edit video), Underlord AI, $24-65/mo | We generate, they edit. Different product. | Text-based editing UX |
+| **Runway** | $4B valuation | Gen-4 up to **60s continuous 4K**. API at $0.01/credit. Enterprise API. $12-76/mo. | We use their models via fal.ai as B-roll. | 60s 4K as our B-roll quality target |
+| ~~Sora (OpenAI)~~ | **DEAD** | ~~Shutting down April 26, 2026. App dead. API dead Sept 24.~~ Burned $15M/day, made $2.1M total. Users dropped from 1M to <500K. Disney killed $150M deal. | **POSITIVE: Major competitor exits. Their users need a new home.** | Capture displaced Sora users |
+
+### B2. AI VIDEO MODELS (what powers the pipeline)
+| Model | Provider | Status April 2026 | Cost | Notes |
+|---|---|---|---|---|
+| **Fish Audio S1** ⚠️ | Fish Audio | **#1 on TTS-Arena2, beats ElevenLabs.** 48 emotion tags, 5 tone tags, 10 special tags. | $15/M chars (80% cheaper than ElevenLabs) | **UPGRADE PATH: Same provider we use. S1 is the new model. Switch immediately.** |
+| **Hedra Character-3** ⚠️ | Hedra | Sub-100ms real-time avatars, 10-min videos, API private beta | $0.05/min (15x cheaper than alternatives) | **Evaluate as primary avatar engine** |
+| **Seedance 2.0** ⚠️ | ByteDance/fal.ai | 4-modality input, phoneme lip-sync, 8+ languages | ~$0.05/5s clip | **Add to video pipeline via fal.ai** |
+| **Wan 2.7** ⚠️ | Alibaba/Replicate | 1080p, 15s, native audio sync, first-and-last-frame control. Open source. **Already on Replicate.** | Free (open source) | **Add to B-roll chain immediately — it's on Replicate already** |
+| **Cartesia Sonic-3** | Cartesia | 90ms TTFA (4x faster), 15s voice cloning | 1/5th ElevenLabs cost | Worth adding as low-latency TTS fallback |
+| ElevenLabs v3 | ElevenLabs | 70+ languages, audio emotion tags | Premium pricing | English leader but Fish S1 now beats on quality |
+| Veo 3.1 | Google/fal.ai | Best B-roll quality | $0.20-0.40/s | Our premium B-roll tier |
+| Runway Gen-4 | Runway/fal.ai | 60s continuous 4K | $0.01/credit | Professional tier |
+| Kling 3.0 | Kuaishou/fal.ai | Native 4K 60fps, cheapest | $0.029-0.10/s | Our budget B-roll tier |
+
+### B3. KEY INTEL
+- **Sora is DEAD (April 26, 2026).** Their displaced users are looking for alternatives. We should capture them.
+- **Fish Audio S1 is now #1 TTS, beating ElevenLabs.** We already use Fish Speech. Upgrade to S1 = same provider, better model, 80% cheaper.
+- **Hedra Character-3 at $0.05/min could replace our entire lip-sync chain.** Evaluate immediately.
+- **Replicate acquired by Cloudflare (Nov 2025).** Our Replicate dependency is now MORE reliable, not less.
+- **Seedance 2.0 + Wan 2.7 are both available via fal.ai/Replicate.** Free models we should add to our pipeline TODAY.
+
+### C. DOMAIN/HOSTING COMPETITORS
 | Competitor | ARR/Value | Our edge |
 |---|---|---|
-| Lovable | $400M ARR, $6.6B valuation | 75+ products vs their 1. Ecosystem moat they can't replicate. |
-| Bolt.new | $40M ARR, 5M users | Our domains + email + video are things they will never build. |
-| v0 (Vercel) | 6M devs | Our backend auto-provisioning + real database generation. |
-| Emergent | $100M ARR, 6M signups | Our white-label + agency multiplier. |
-| HeyGen | $100M+ ARR | Our own Replicate-based video stack, 10–20x cheaper. |
 | GoDaddy/Namecheap | billions | Real-time AI domain generation + bundled builder + hosting. |
 
 **The rule: 80–90% ahead on every axis. If we're not clearly ahead on speed, quality, or features in a monthly comparison build, fix it immediately — that week.**
@@ -117,25 +156,84 @@ Everything below this line is in service of that mission. If anything below this
 
 ---
 
+## 6. PROACTIVE COMPETITIVE INTELLIGENCE — MANDATORY EVERY SESSION
+
+> **Craig's words: "Why is it not until I find it that we do something about it?"**
+> **This section exists because reactive research is FAILURE. We must be proactive.**
+> **If Craig finds a competitor feature before Claude does, Claude failed.**
+
+### THE RULE: FIND IT BEFORE CRAIG DOES
+
+Every session, BEFORE writing any code, Claude MUST run a proactive competitive scan:
+
+1. **Web search all competitors in §4 ANNIHILATION TARGETS** — What shipped in the last 48 hours? New features? New models? New pricing? New viral moments?
+2. **Web search "AI video generator 2026" + "AI website builder 2026" + "AI avatar generator 2026"** — Who's new? Who launched? Who went viral? Who raised funding?
+3. **Check Product Hunt, Hacker News, TechCrunch, The Verge** — Any new AI builder or AI video tool trending?
+4. **Check Replicate trending models, fal.ai new models, Hugging Face trending** — Any new model that's better than what we use?
+5. **Check Twitter/X for "AI video" + "AI website builder" viral posts** — What's getting attention? What demos are blowing up?
+
+### WHAT TO DO WITH FINDINGS
+
+- **New competitor found:** Add to §4 ANNIHILATION TARGETS immediately. Include: name, ARR/users, what they do, our edge, what to steal.
+- **Existing competitor shipped new feature:** Update their row in §4. Add to URGENT BUILD LIST if we don't have it.
+- **New AI model dropped that's better than what we use:** Update the pipeline. Swap the model. Don't wait.
+- **Viral demo of something we can't do:** Flag to Craig with "COMPETITIVE ALERT" and build it that session.
+- **Nothing new found:** Document "Competitive scan [date]: no new threats" so we know it was checked.
+
+### SCAN FREQUENCY
+
+| Trigger | Action |
+|---|---|
+| **Every new session** | Full competitive scan before ANY code is written |
+| **Before building any video feature** | Scan HeyGen, Filmora, Captions, CapCut, Runway, InVideo, Descript — what's their latest? |
+| **Before building any builder feature** | Scan Lovable, Bolt, v0, Emergent — what shipped this week? |
+| **Craig mentions a competitor** | IMMEDIATE deep dive. Add to kill list. Identify what to steal/beat. |
+| **Craig says "I saw something on the internet"** | Claude FAILED the proactive scan. Fix the gap, update CLAUDE.md, apologize. |
+
+### OUTPUT QUALITY BAR IS SET BY THE MARKET
+
+The quality bar for every feature is NOT "better than yesterday." It is:
+- **Video output:** Must match or beat HeyGen Avatar IV + Filmora's Sora 2/Veo 3.1 output
+- **Builder output:** Must match or beat Lovable's full-stack polish + Bolt's preview speed
+- **Voice:** Must match or beat ElevenLabs v3 fidelity + Filmora's emotion-controlled voice cloning
+- **Captions:** Must match or beat CapCut's auto-caption quality (burned in, styled, animated)
+
+If our output doesn't match the market leader in that category, **it is not done.** Ship it as "beta" with a clear upgrade path, or don't ship it at all.
+
+### RESEARCH IS NOT OPTIONAL — IT IS STEP 1
+
+The old pattern: build → Craig finds something better → scramble to match.
+The new pattern: **scan → identify the bar → build to that bar → ship → scan again.**
+
+No more "we have Fish Speech" when ElevenLabs v3 exists.
+No more "we have Replicate models" when fal.ai has Veo 3.1 + Sora 2.
+No more "we have auto-captions planned" when CapCut ships them free to 300M users.
+
+**Find it. Flag it. Build it. Before Craig has to.**
+
+---
+
 ## 🧭 SESSION PROTOCOL — EVERY NEW CLAUDE SESSION
 
 **Mandatory opening ritual before any work:**
 
 1. **Read THE IRON LAW** (section above). Do not skip.
 2. **Read LIVE REPO STATUS** (below). Know what's built, what's broken, what's next.
-3. **Check the authorization list** (§2). Is anything I'm about to do on that list? If yes → stop and ask Craig.
-4. **Check KNOWN ISSUES.** Is the user's request already on the list? If yes, work from there.
-5. **Check RECENTLY FIXED.** Don't re-break something that was just fixed.
-6. **Run `git status` and `git log -5`.** Know where the branch is.
-7. **Only then start work.**
+3. **Run PROACTIVE COMPETITIVE SCAN** (§6 above). Web search all competitors. Log findings. Update CLAUDE.md if anything new.
+4. **Check the authorization list** (§2). Is anything I'm about to do on that list? If yes → stop and ask Craig.
+5. **Check KNOWN ISSUES.** Is the user's request already on the list? If yes, work from there.
+6. **Check RECENTLY FIXED.** Don't re-break something that was just fixed.
+7. **Run `git status` and `git log -5`.** Know where the branch is.
+8. **Only then start work.**
 
 **Mandatory closing ritual before ending a session:**
 
 1. **Build passes locally** (`npm run build`).
 2. **All changes committed and pushed** to the session branch.
-3. **CLAUDE.md updated** — any new decisions, new known issues, new completed tasks.
+3. **CLAUDE.md updated** — any new decisions, new known issues, new competitive findings, new completed tasks.
 4. **Next action line written** — so the next session picks up without guessing.
 5. **No half-finished features on disk.** Either finish, revert, or document clearly.
+6. **Competitive scan logged** — "Scanned [date]: [findings or 'no new threats']".
 
 ## ⚖️ DECISION ESCALATION MATRIX
 
@@ -650,6 +748,8 @@ npm run lint     # ESLint
 25. **No timelines, no phases** — Don't say "this week" or "next month." Build everything NOW. The competition doesn't take breaks and neither do we. Foot on the accelerator at all times.
 26. **Never ask permission to build** — Craig is running multiple 24/7 businesses. He is NOT the bottleneck. Claude builds, pushes, and keeps going. If something needs building, BUILD IT. Don't ask "should I?" or "want me to?" — just do it. The only time to ask is if a decision could break something already working in production.
 27. **Never take your foot off the gas** — Build until the project is complete. No pausing, no waiting, no "I'll do this next session." Every session picks up where the last one left off and keeps building.
+28. **Proactive competitive intelligence is MANDATORY** — Every session starts with a web search of all competitors before writing any code. If Craig finds a competitor or feature before Claude does, Claude failed. The output quality bar is set by the market leader in each category, not by what we had yesterday. Reactive research is failure. Proactive research is survival. See §6 for the full protocol.
+29. **THE FILMORA STANDARD — SERIOUS BUSINESS FLOOR (locked 2026-04-10)** — Craig's directive: *"We want people to take it seriously, engage, and spend money. We need to look like we know what we're doing. This standard needs to be set from the beginning."* The reference is **filmora.wondershare.com** — cinematic hero video, infinite-scroll trust strip, 2×2 AI feature grid with hover video reveals, platform showcase, testimonial carousel, 204px gradient display type, neon gradient CTAs, 40-60px border-radius panels. **Every single page on zoobicon.com** — homepage, builder, video-creator, pricing, domains, tools, auth, products, admin-public-facing, every SEO page, every blog, every legal page — must clear this bar. **No page ships below it.** No "we'll polish this later." No "this is just a utility page so it can be plain." Every surface a paying visitor touches must look like it was built by a team that knows what they're doing. If a page is below the standard, it does not exist. Take it down, ship "Coming Soon" in the editorial-Filmora hybrid chrome, or rebuild it before merge. This rule is the floor — it cannot be lowered without Craig's explicit written override.
 
 ---
 
@@ -702,6 +802,11 @@ Plain English always. Never "I refactored the middleware." Say "I fixed the perm
 | **Bolt.new** | WebContainers in-browser runtime, multi-model (Claude/GPT/Gemini) | **$700M** (Series B, Jan 2025, $105.5M raised) | **$40M** (Mar 2025) | 5M+ | $0-20/mo |
 | **Emergent** | Multi-agent (Builder/Quality/Deploy/Ops), MCP integration | Unknown | **$100M** (Feb 2026) | 6M signups, 150K paying | $0-200/mo |
 | **v0 (Vercel)** | React/shadcn/ui, Feb 2026 added DB + agentic mode | Vercel-backed ($3.5B+) | Unknown | 6M+ devs | $0-100/mo |
+| **Filmora** | Desktop editor + AI Mate copilot + Sora 2/Veo 3.1 + voice cloning | **$1.75B** mkt cap (Shenzhen 300624.SZ) | **~$200M** (Wondershare group) | **100M+** | $50/yr |
+| **HeyGen** | Avatar IV talking heads, LiveAvatar, 175 languages | **$500M+** | **$100M+** | Millions | $29-149/mo |
+| **Captions** | AI Twins (face→talking video), mobile-first | Unknown | Growing fast | **10M downloads** | $10-70/mo |
+| **CapCut** | Free editor, Seedance 2.0, ByteDance-backed | ByteDance ($300B+) | Unknown | **300M MAU** | $0-8/mo |
+| **Runway** | Gen-4 Turbo video models, creative suite | **$4B** | Unknown | Growing | $12-76/mo |
 
 **Where Zoobicon dominates:**
 - 75+ products in one ecosystem (competitors have 1)
@@ -718,7 +823,42 @@ Plain English always. Never "I refactored the middleware." Say "I fixed the perm
 - MCP integration — Emergent has it, others coming
 - User base — Lovable: millions, Bolt: 5M, v0: 6M. We're starting.
 
-**Aggregate position: ~60% advantage on breadth/features. ~40% behind on speed/polish. Target: 80-90% ahead.**
+**AGGREGATE POSITION (April 8 2026, honest): ~40% of where we need to be.**
+**Craig's response: "That's just not acceptable. How many agents can you get us to 110%?"**
+**TARGET: 110%. Not 80%. Not 90%. 110%. Ahead of EVERY competitor on EVERY axis.**
+
+**THE GAP IS NOT FEATURES — IT'S WIRING.**
+We have more features than anyone (75+ products). The gap is: does it work when a customer clicks the button?
+
+| What | Status | Gap to 110% | Fix |
+|---|---|---|---|
+| Builder produces sites | BROKEN (merge damage fixed, untested on Vercel) | CRITICAL | Get build passing, test end-to-end |
+| Video produces videos | NEVER TESTED (pipeline rebuilt, never ran) | CRITICAL | Set FAL_KEY + ELEVENLABS_API_KEY, test end-to-end |
+| Preview speed | 20-30s (Bolt is 3-5s) | HIGH | WebContainers or e2b sandboxing |
+| Supabase wired into builder | Code exists, NOT connected | HIGH | Wire supabase-provisioner into react-stream |
+| MCP integration | Stub only (Emergent has it LIVE) | HIGH | Ship real MCP server with tool connections |
+| Domain purchase | Code exists, needs Stripe + DB init | MED | Craig: create Stripe products + visit /api/db/init |
+| Auth login | Code exists, needs env vars | MED | Craig: set ADMIN_EMAIL/PASSWORD + OAuth secrets |
+| Site design | REDESIGNED this session | DONE | Merge to main |
+| Voice cloning | BUILT this session | DONE (needs ELEVENLABS_API_KEY) | Craig: set key |
+| B-roll via fal.ai | BUILT this session | DONE (needs FAL_KEY) | Craig: set key |
+| Auto-captions | BUILT this session | DONE (needs FAL_KEY or REPLICATE_API_TOKEN) | Already set |
+| Competitive intel | UPDATED this session | DONE | Proactive scan every session (rule 28) |
+| Component registry | 60+ components, $100K quality | DONE | — |
+| White-label agency | Code exists | DONE | — |
+
+**PATH FROM 40% TO 110%:**
+1. Get Vercel build passing (TDZ fix merged) → 50%
+2. Set env vars (FAL_KEY, ELEVENLABS_API_KEY, admin creds, OAuth) → 55%
+3. Builder end-to-end test (prompt → site → deploy) → 65%
+4. Video end-to-end test (prompt → video → download) → 75%
+5. Preview speed upgrade (WebContainers/e2b) → 85%
+6. Supabase wired into builder → 90%
+7. MCP integration live → 95%
+8. Domain purchase working → 100%
+9. All products polished to market-leader quality → 110%
+
+**EVERY SESSION: maximum agents on EVERY task. No single-threaded work. If 5 agents can run, run 5. If 10 can run, run 10. The competition is not waiting.**
 
 **KEY INSIGHT: Lovable added $100M revenue in ONE MONTH (Feb 2026) with 146 employees. This market is massive and growing. Our ecosystem moat (domains + hosting + email + builder + video) is what they can't replicate.**
 
@@ -728,6 +868,9 @@ Plain English always. Never "I refactored the middleware." Say "I fixed the perm
 
 | # | Issue | Severity | Found | Proposed Fix | Est. Effort |
 |---|-------|----------|-------|-------------|-------------|
+| 4 | **Builder + edit have no failover provider** | HIGH | 2026-04-08 | Craig must add `OPENAI_API_KEY` (~$5-50/mo) and `GOOGLE_AI_API_KEY` (FREE 1500/day) to Vercel. Code is already wired through `callLLMWithFailover`. The moment they exist, builder + edit get instant cross-provider redundancy. Without them the new error surfacing tells the user clearly when Anthropic is down — but they still can't generate. | Craig task |
+| 5 | **Video model slugs need post-deploy verification** | MED | 2026-04-08 | After deploy, hit `/api/video-creator/health?admin=true&deep=1` to verify all 16 Replicate model slugs return `ok`. If any return `missing`, swap them via the health endpoint output (Replicate slugs change occasionally — 4-5 per stage is the safety margin). | Craig task |
+| 6 | **`src/lib/agents.ts` is dead code** | LOW | 2026-04-08 | The 51KB 7-agent pipeline is never called by the builder UI — only by `/api/generate/pipeline` which `PipelinePanel.tsx` references. Either delete both, or revive `PipelinePanel`. Decision needed. | Cleanup |
 | ~~1~~ | ~~REPLICATE_API_TOKEN~~ | ~~FIXED~~ | 2026-04-05 | ✅ SET in Vercel | Done |
 | 2 | Database tables may not exist | HIGH | 2026-04-05 | Craig must visit /api/db/init after deploy | Craig task |
 | 3 | Text corruption across codebase | LOW | 2026-04-05 | ~60 files have "MessageCircle" instead of "Twitter", "ThumbsUp" instead of "Facebook" from bad find/replace | Batch fix |
@@ -736,6 +879,11 @@ Plain English always. Never "I refactored the middleware." Say "I fixed the perm
 
 | # | Issue | Fixed | What Was Done |
 |---|-------|-------|---------------|
+| 20 | **AI Builder silently returned template scaffolds with placeholder copy ("Acme")** when Anthropic Haiku rate-limited or 529'd. customizeComponent and determineBrandColors swallowed errors with `.catch(() => null)`. Edit endpoint had no failover. Direct Law 8/9 violation. | 2026-04-08 | Wired both react-stream + edit endpoints into existing `callLLMWithFailover`. customizeComponent now returns typed `{ok, code, reason, modelUsed}`, falls back Anthropic Haiku → Sonnet → OpenAI → Gemini, surfaces failedSections + warning events. Edit endpoint gets 3-pass chain with detailed failure messages ("Haiku: rate limit \| Sonnet: 529 \| gpt-4o: invalid JSON"). Removed hard-fail when ANTHROPIC_API_KEY missing — runs as long as ANY provider key exists. |
+| 21 | **AI Name Generator returned hardcoded garbage names** ("Novahub" / "Apexlab" with identical taglines) whenever ANTHROPIC_API_KEY was missing, the Anthropic call failed, or JSON parsing failed. Frontend saw non-empty array, ran RDAP checks against synthetic strings, Craig saw garbage results unrelated to his description. Direct Law 8 violation. | 2026-04-08 | Full rewrite of `/api/tools/business-names`: hard-fail with 503 + exact env var name when key missing, 25s AbortController timeout, 2-model fallback Haiku 4.5 → Sonnet 4.5, depth-aware bracket-matching JSON extractor (handles markdown fences + preamble), server-side sanitize/dedupe, structured prompt forcing JSON-only output, full request logging. |
+| 22 | **Video Creator pipeline 100% dead** — every Replicate model slug referenced was either deprecated or didn't exist (`jichengdu/fish-speech`, `lucataco/orpheus-3b-0.1-ft`, `bytedance/omni-human`, `lucataco/sadtalker`). Each call 404'd, "fell back" to the next 404, whole pipeline died. UI froze on a single status because pollReplicatePrediction silently `continue`d on non-200 polls. React page checked stale-closure videoUrl mid-stream and threw "no video returned" even on success. captions/music bypassed the 404 safety net. | 2026-04-08 | New 5-slug TTS chain (kokoro-82m → xtts-v2 → bark → openvoice → seamless), 4-slug avatar chain (flux-schnell → flux-dev → sdxl-lightning → sd3), 5-slug lip-sync chain (sadtalker → video-retalking ×2 → wav2lip ×2), per-model input variants, real onProgress callback wired through every stage, pollReplicatePrediction rewritten with 5-retry consecutive-failure tracking + 4.5min cap, captions/music routed through createReplicatePrediction safety net, hardened extractReplicateOutput, fixed page.tsx stale-closure bug with local receivedVideoUrl tracker, added 503 handling + Retry button, deep health endpoint updated to match new slugs. |
+| 23 | **AI Name Generator UX dead-end** — client fired 24 names × 5 TLDs = 120 simultaneous RDAP requests, public RDAP rate-limited the burst, every check came back null, "No available domains" silent display (Law 8 violation). | 2026-04-08 | Server-side concurrency limit (4 parallel RDAP calls per /api/domains/search batch). Client-side worker pool (4 concurrent search calls). Default 12 names × 3 TLDs (com/ai/io) = 36 checks instead of 120. RDAP cache (10 min TTL) + 429 retry with jitter. Visible red error banner with Try Again button when all checks come back unknown. |
+| 24 | **Homepage build broken** — stray mobile-menu code in `src/app/page.tsx` referencing undefined `mobileMenuOpen`/`user`/`handleLogout`, plus unclosed `motion.div` and `grid lg:grid-cols-2` wrappers in hero. | 2026-04-08 | Deleted stray nav block, closed unbalanced JSX wrappers. |
 | 10 | Build failing — 5 undeclared state vars in domains page | 2026-04-05 | Added generatedNames, genDescription, pendingGenerate, autoExpandedTlds, autoGenerating |
 | 11 | Build failing — 9 missing lucide icons in video-creator | 2026-04-05 | Added BookOpen, Briefcase, GraduationCap, etc. to imports |
 | 12 | Build failing — missing `replicate` npm package | 2026-04-05 | Replaced SDK with direct Replicate API fetch |
@@ -1088,6 +1236,22 @@ Each reseller at $499/mo typically brings 20-50 of their own clients. 10 reselle
 **Status: CRITICAL PRIORITY. Competition is moving. Every day we don't build this, we fall further behind.**
 
 **The 80-90% rule applies to EVERY item. If a competitor has it, we must have it better.**
+
+### TIER 0: THE ONLY TWO THINGS THAT MAKE MONEY (do these FIRST or nothing else matters)
+
+> **Craig's words (April 8): "We're chasing the market instead of releasing the product and making money."**
+> **"The current website doesn't feel AI. It feels like a run of the mill website made up as we go along."**
+> **He's right. 200 API routes mean nothing if the 2 revenue products don't work flawlessly.**
+
+| # | Task | Deadline | What "done" looks like | Status |
+|---|------|----------|----------------------|--------|
+| 0A | **FULL SITE REDESIGN — AI-native look and feel** | IMMEDIATE | The entire zoobicon.com feels like a $6.6B AI platform, not a developer project. Homepage, builder, video creator, pricing, domains — every page redesigned with 2026/2027 design patterns. Bento grids, glass morphism, gradient mesh, scroll-linked animations, dark mode, cinematic hero sections. Study Lovable.dev, bolt.new, v0.app, runway.com, hedra.com for reference. The site must make a visitor say "this is the future" within 2 seconds of landing. | NOT STARTED |
+| 0B | **AI BUILDER — works perfectly end-to-end** | IMMEDIATE | User types prompt → sees site in <10s → can edit with chat → can deploy with 1 click. That's the ENTIRE scope. No MCP, no collab, no code formatter. Just: prompt → beautiful site → deploy. Match Bolt V2 speed + Lovable 2.0 quality. | BROKEN (merge damage, UI is "80s") |
+| 0C | **AI VIDEO CREATOR — works perfectly end-to-end** | IMMEDIATE | User types description → gets 30s spokesperson video with professional voice + realistic face + burned-in captions → downloads it. Match HeyGen quality + Hedra Character-3 speed. Pipeline: Fish Audio S1 (TTS) → Hedra Character-3 or fal.ai avatar → Whisper captions → download. | UNTESTED (pipeline rebuilt, never produced a real video) |
+| 0D | **DOMAIN PURCHASE — works end-to-end** | IMMEDIATE | User searches → sees availability → enters payment → domain registers. Currently needs Stripe products + webhook + DB init. | Needs Craig: Stripe products + /api/db/init |
+| 0E | **AUTH — login works** | IMMEDIATE | Admin login, Google OAuth, GitHub OAuth all functional. Currently needs env vars in Vercel. | Needs Craig: env vars (see /api/auth/diagnose) |
+
+**RULE: Nothing in Tier 1/2/3 gets touched until ALL of Tier 0 is GREEN. Revenue first. Features second.**
 
 ### TIER 1: BUILD IMMEDIATELY (blocks revenue and competitiveness)
 

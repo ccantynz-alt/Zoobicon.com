@@ -125,13 +125,13 @@ export default function AdminEsimPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-3">
-            <Wifi className="w-6 h-6 text-cyan-400" />
+            <Wifi className="w-6 h-6 text-stone-400" />
             eSIM Management
           </h1>
           <p className="text-sm text-white/40 mt-1">
-            Provider: <span className={`font-mono ${provider === "mock" ? "text-amber-400" : "text-emerald-400"}`}>{provider}</span>
+            Provider: <span className={`font-mono ${provider === "mock" ? "text-stone-400" : "text-stone-400"}`}>{provider}</span>
             {provider === "mock" && (
-              <span className="ml-2 text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded-full">
+              <span className="ml-2 text-[10px] bg-stone-500/10 text-stone-400 px-2 py-0.5 rounded-full">
                 Mock Mode — add CELITECH_API_KEY to go live
               </span>
             )}
@@ -164,14 +164,14 @@ export default function AdminEsimPage() {
           onChange={(e) => setSearchFilter(e.target.value)}
           placeholder="Search destinations..."
           className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl pl-10 pr-4 py-3 text-sm
-                     placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500/30 transition-all"
+                     placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-stone-500/20 focus:border-stone-500/30 transition-all"
         />
       </div>
 
       {/* Plans by Region */}
       {loading ? (
         <div className="flex items-center justify-center h-40">
-          <RefreshCw className="w-5 h-5 text-cyan-400 animate-spin" />
+          <RefreshCw className="w-5 h-5 text-stone-400 animate-spin" />
         </div>
       ) : filteredRegions.length === 0 ? (
         <div className="text-center py-12 text-white/30">
@@ -187,7 +187,7 @@ export default function AdminEsimPage() {
                 className="w-full flex items-center justify-between px-5 py-4 hover:bg-white/[0.02] transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <Globe className="w-4 h-4 text-cyan-400" />
+                  <Globe className="w-4 h-4 text-stone-400" />
                   <span className="font-medium">{region}</span>
                   <span className="text-xs text-white/30 bg-white/[0.05] px-2 py-0.5 rounded-full">
                     {regionPlans.length} plan{regionPlans.length !== 1 ? "s" : ""}
@@ -224,18 +224,18 @@ export default function AdminEsimPage() {
                           <td className="px-3 py-3">
                             <span className={`text-[10px] px-2 py-0.5 rounded-full ${
                               plan.networkType.includes("5G")
-                                ? "bg-cyan-500/10 text-cyan-400"
+                                ? "bg-stone-500/10 text-stone-400"
                                 : "bg-white/[0.05] text-white/40"
                             }`}>{plan.networkType}</span>
                           </td>
-                          <td className="px-3 py-3 text-sm text-right font-mono text-emerald-400">
+                          <td className="px-3 py-3 text-sm text-right font-mono text-stone-400">
                             ${plan.price.toFixed(2)}
                           </td>
                           <td className="px-5 py-3 text-right">
                             <button
                               onClick={() => handleTestPurchase(plan.id)}
                               disabled={testPurchase.status === "loading"}
-                              className="text-[10px] px-3 py-1 rounded-lg bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 transition-colors disabled:opacity-50"
+                              className="text-[10px] px-3 py-1 rounded-lg bg-stone-500/10 text-stone-400 hover:bg-stone-500/20 transition-colors disabled:opacity-50"
                             >
                               Test Purchase
                             </button>
@@ -255,15 +255,15 @@ export default function AdminEsimPage() {
       {testPurchase.status !== "idle" && (
         <div className={`mt-6 rounded-2xl border p-5 ${
           testPurchase.status === "success"
-            ? "bg-emerald-500/5 border-emerald-500/20"
+            ? "bg-stone-500/5 border-stone-500/20"
             : testPurchase.status === "error"
-            ? "bg-red-500/5 border-red-500/20"
+            ? "bg-stone-500/5 border-stone-500/20"
             : "bg-white/[0.02] border-white/[0.08]"
         }`}>
           <div className="flex items-center gap-2 mb-3">
-            {testPurchase.status === "loading" && <Loader2 className="w-4 h-4 text-cyan-400 animate-spin" />}
-            {testPurchase.status === "success" && <CheckCircle2 className="w-4 h-4 text-emerald-400" />}
-            {testPurchase.status === "error" && <AlertCircle className="w-4 h-4 text-red-400" />}
+            {testPurchase.status === "loading" && <Loader2 className="w-4 h-4 text-stone-400 animate-spin" />}
+            {testPurchase.status === "success" && <CheckCircle2 className="w-4 h-4 text-stone-400" />}
+            {testPurchase.status === "error" && <AlertCircle className="w-4 h-4 text-stone-400" />}
             <span className="text-sm font-semibold">
               {testPurchase.status === "loading" ? "Processing..." :
                testPurchase.status === "success" ? "Test Purchase Successful" :
@@ -276,7 +276,7 @@ export default function AdminEsimPage() {
             </pre>
           )}
           {testPurchase.error && (
-            <p className="text-xs text-red-400">{testPurchase.error}</p>
+            <p className="text-xs text-stone-400">{testPurchase.error}</p>
           )}
           <button
             onClick={() => setTestPurchase({ status: "idle" })}
@@ -294,16 +294,16 @@ function StatCard({ icon: Icon, label, value, color }: {
   icon: React.ElementType; label: string; value: string | number; color: string;
 }) {
   const colorMap: Record<string, string> = {
-    cyan: "from-cyan-500/10 to-cyan-500/5 border-cyan-500/15",
-    purple: "from-purple-500/10 to-purple-500/5 border-purple-500/15",
-    emerald: "from-emerald-500/10 to-emerald-500/5 border-emerald-500/15",
-    amber: "from-amber-500/10 to-amber-500/5 border-amber-500/15",
+    cyan: "from-stone-500/10 to-stone-500/5 border-stone-500/15",
+    purple: "from-stone-500/10 to-stone-500/5 border-stone-500/15",
+    emerald: "from-stone-500/10 to-stone-500/5 border-stone-500/15",
+    amber: "from-stone-500/10 to-stone-500/5 border-stone-500/15",
   };
   const iconMap: Record<string, string> = {
-    cyan: "text-cyan-400",
-    purple: "text-purple-400",
-    emerald: "text-emerald-400",
-    amber: "text-amber-400",
+    cyan: "text-stone-400",
+    purple: "text-stone-400",
+    emerald: "text-stone-400",
+    amber: "text-stone-400",
   };
   return (
     <div className={`rounded-2xl bg-gradient-to-br ${colorMap[color]} border p-4`}>

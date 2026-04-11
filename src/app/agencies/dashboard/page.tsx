@@ -122,9 +122,9 @@ const ROLE_ICONS: Record<string, React.ReactNode> = {
 };
 
 const ROLE_COLORS: Record<string, string> = {
-  owner: "bg-yellow-500/20 text-yellow-400",
-  admin: "bg-blue-500/20 text-blue-400",
-  designer: "bg-purple-500/20 text-purple-400",
+  owner: "bg-stone-500/20 text-stone-400",
+  admin: "bg-stone-500/20 text-stone-400",
+  designer: "bg-stone-500/20 text-stone-400",
   viewer: "bg-gray-500/20 text-gray-400",
 };
 
@@ -421,7 +421,7 @@ export default function AgencyDashboard() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0a0a12] flex items-center justify-center">
-        <Loader2 className="animate-spin text-blue-500" size={32} />
+        <Loader2 className="animate-spin text-stone-500" size={32} />
       </div>
     );
   }
@@ -430,7 +430,7 @@ export default function AgencyDashboard() {
     return (
       <div className="min-h-screen bg-[#0a0a12] flex items-center justify-center">
         <div className="bg-[#1a1a2e] border border-white/10 rounded-xl p-8 max-w-md w-full text-center">
-          <Building2 className="text-blue-500 mx-auto mb-4" size={48} />
+          <Building2 className="text-stone-500 mx-auto mb-4" size={48} />
           <h1 className="text-2xl font-bold text-white mb-2">Create Your Agency</h1>
           <p className="text-white/60 mb-6">
             Set up your agency workspace to manage clients, sites, and team members.
@@ -441,12 +441,12 @@ export default function AgencyDashboard() {
             value={newAgencyName}
             onChange={(e) => setNewAgencyName(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && createAgency()}
-            className="w-full bg-[#0a0a12] border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/50 mb-4 focus:outline-none focus:border-blue-500"
+            className="w-full bg-[#0a0a12] border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/50 mb-4 focus:outline-none focus:border-stone-500"
           />
           <button
             onClick={createAgency}
             disabled={!newAgencyName.trim()}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-medium py-3 rounded-lg transition-colors"
+            className="w-full bg-stone-600 hover:bg-stone-700 disabled:opacity-50 text-white font-medium py-3 rounded-lg transition-colors"
           >
             Create Agency
           </button>
@@ -470,18 +470,18 @@ export default function AgencyDashboard() {
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         {[
-          { label: "Total Clients", value: activeAgency?.client_count ?? clients.length, color: "text-blue-400" },
-          { label: "Total Sites", value: activeAgency?.site_count ?? sites.length, color: "text-green-400" },
-          { label: "Team Members", value: activeAgency?.member_count ?? members.length, color: "text-purple-400" },
+          { label: "Total Clients", value: activeAgency?.client_count ?? clients.length, color: "text-stone-400" },
+          { label: "Total Sites", value: activeAgency?.site_count ?? sites.length, color: "text-stone-400" },
+          { label: "Team Members", value: activeAgency?.member_count ?? members.length, color: "text-stone-400" },
           {
             label: "Active Deployments",
             value: sites.filter((s) => s.status === "active").length,
-            color: "text-yellow-400",
+            color: "text-stone-400",
           },
           {
             label: "Generations This Month",
             value: generationQuota ? `${generationQuota.current}/${generationQuota.limit === Infinity ? "∞" : generationQuota.limit}` : "—",
-            color: generationQuota && generationQuota.remaining <= 5 ? "text-red-400" : "text-cyan-400",
+            color: generationQuota && generationQuota.remaining <= 5 ? "text-stone-400" : "text-stone-400",
           },
         ].map((stat) => (
           <div
@@ -501,23 +501,23 @@ export default function AgencyDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
         <button
           onClick={() => { setActiveTab("clients"); setShowAddClient(true); }}
-          className="flex items-center gap-3 bg-[#1a1a2e] border border-white/10 hover:border-blue-500/50 rounded-xl p-4 text-white transition-colors"
+          className="flex items-center gap-3 bg-[#1a1a2e] border border-white/10 hover:border-stone-500/50 rounded-xl p-4 text-white transition-colors"
         >
-          <Plus size={18} className="text-blue-400" />
+          <Plus size={18} className="text-stone-400" />
           <span>Add Client</span>
         </button>
         <button
           onClick={() => router.push("/builder")}
-          className="flex items-center gap-3 bg-[#1a1a2e] border border-white/10 hover:border-green-500/50 rounded-xl p-4 text-white transition-colors"
+          className="flex items-center gap-3 bg-[#1a1a2e] border border-white/10 hover:border-stone-500/50 rounded-xl p-4 text-white transition-colors"
         >
-          <Globe size={18} className="text-green-400" />
+          <Globe size={18} className="text-stone-400" />
           <span>Generate Site</span>
         </button>
         <button
           onClick={() => { setActiveTab("team"); setShowInviteMember(true); }}
-          className="flex items-center gap-3 bg-[#1a1a2e] border border-white/10 hover:border-purple-500/50 rounded-xl p-4 text-white transition-colors"
+          className="flex items-center gap-3 bg-[#1a1a2e] border border-white/10 hover:border-stone-500/50 rounded-xl p-4 text-white transition-colors"
         >
-          <UserPlus size={18} className="text-purple-400" />
+          <UserPlus size={18} className="text-stone-400" />
           <span>Invite Member</span>
         </button>
       </div>
@@ -535,7 +535,7 @@ export default function AgencyDashboard() {
           <>
             {clients.slice(0, 3).map((c) => (
               <div key={c.id} className="flex items-center gap-3 p-4">
-                <Users size={16} className="text-blue-400 shrink-0" />
+                <Users size={16} className="text-stone-400 shrink-0" />
                 <span className="text-white/80 text-sm">
                   Client <span className="text-white font-medium">{c.name}</span> added
                 </span>
@@ -546,7 +546,7 @@ export default function AgencyDashboard() {
             ))}
             {sites.slice(0, 3).map((s) => (
               <div key={s.id} className="flex items-center gap-3 p-4">
-                <Globe size={16} className="text-green-400 shrink-0" />
+                <Globe size={16} className="text-stone-400 shrink-0" />
                 <span className="text-white/80 text-sm">
                   Site <span className="text-white font-medium">{s.name}</span> assigned to{" "}
                   <span className="text-white font-medium">{s.client_name}</span>
@@ -568,7 +568,7 @@ export default function AgencyDashboard() {
         <h2 className="text-xl font-bold text-white">Clients</h2>
         <button
           onClick={() => setShowAddClient(true)}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+          className="flex items-center gap-2 bg-stone-600 hover:bg-stone-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
         >
           <Plus size={16} /> Add Client
         </button>
@@ -576,7 +576,7 @@ export default function AgencyDashboard() {
 
       {/* Add client form */}
       {showAddClient && (
-        <div className="bg-[#1a1a2e] border border-blue-500/30 rounded-xl p-5 mb-6">
+        <div className="bg-[#1a1a2e] border border-stone-500/30 rounded-xl p-5 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-white font-semibold">New Client</h3>
             <button onClick={() => setShowAddClient(false)} className="text-white/50 hover:text-white">
@@ -589,34 +589,34 @@ export default function AgencyDashboard() {
               placeholder="Client name *"
               value={newClient.name}
               onChange={(e) => setNewClient({ ...newClient, name: e.target.value })}
-              className="bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-blue-500"
+              className="bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-stone-500"
             />
             <input
               type="email"
               placeholder="Email"
               value={newClient.email}
               onChange={(e) => setNewClient({ ...newClient, email: e.target.value })}
-              className="bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-blue-500"
+              className="bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-stone-500"
             />
             <input
               type="text"
               placeholder="Company"
               value={newClient.company}
               onChange={(e) => setNewClient({ ...newClient, company: e.target.value })}
-              className="bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-blue-500"
+              className="bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-stone-500"
             />
             <input
               type="text"
               placeholder="Notes"
               value={newClient.notes}
               onChange={(e) => setNewClient({ ...newClient, notes: e.target.value })}
-              className="bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-blue-500"
+              className="bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-stone-500"
             />
           </div>
           <button
             onClick={addClient}
             disabled={!newClient.name.trim()}
-            className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+            className="bg-stone-600 hover:bg-stone-700 disabled:opacity-50 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
           >
             Add Client
           </button>
@@ -651,12 +651,12 @@ export default function AgencyDashboard() {
                 <span className="text-white/50 text-sm shrink-0">
                   {client.site_count} site{client.site_count !== 1 ? "s" : ""}
                 </span>
-                <span className="bg-green-500/20 text-green-400 text-xs px-2 py-0.5 rounded-full">
+                <span className="bg-stone-500/20 text-stone-400 text-xs px-2 py-0.5 rounded-full">
                   {client.status}
                 </span>
                 <button
                   onClick={(e) => { e.stopPropagation(); deleteClient(client.id); }}
-                  className="text-white/50 hover:text-red-400 transition-colors"
+                  className="text-white/50 hover:text-stone-400 transition-colors"
                 >
                   <Trash2 size={16} />
                 </button>
@@ -685,11 +685,11 @@ export default function AgencyDashboard() {
                             key={site.id}
                             className="flex items-center gap-3 bg-[#0a0a12] rounded-lg p-3"
                           >
-                            <Globe size={14} className="text-blue-400" />
+                            <Globe size={14} className="text-stone-400" />
                             <span className="text-white/80 text-sm flex-1">{site.name}</span>
                             <Link
                               href={`/edit/${site.slug}`}
-                              className="text-blue-400 hover:text-blue-300 text-xs"
+                              className="text-stone-400 hover:text-stone-300 text-xs"
                             >
                               <Pencil size={14} />
                             </Link>
@@ -697,7 +697,7 @@ export default function AgencyDashboard() {
                               href={`https://${site.slug}.zoobicon.sh`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-blue-400 hover:text-blue-300 text-xs"
+                              className="text-stone-400 hover:text-stone-300 text-xs"
                             >
                               <ExternalLink size={14} />
                             </a>
@@ -720,7 +720,7 @@ export default function AgencyDashboard() {
         <h2 className="text-xl font-bold text-white">All Sites</h2>
         <button
           onClick={() => router.push("/builder")}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+          className="flex items-center gap-2 bg-stone-600 hover:bg-stone-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
         >
           <Plus size={16} /> Generate New Site
         </button>
@@ -752,13 +752,13 @@ export default function AgencyDashboard() {
                 <span
                   className={`absolute top-2 right-2 text-xs px-2 py-0.5 rounded-full ${
                     (site as AgencySite & { approval_status?: string }).approval_status === "published"
-                      ? "bg-green-500/20 text-green-400"
+                      ? "bg-stone-500/20 text-stone-400"
                       : (site as AgencySite & { approval_status?: string }).approval_status === "approved"
-                      ? "bg-blue-500/20 text-blue-400"
+                      ? "bg-stone-500/20 text-stone-400"
                       : (site as AgencySite & { approval_status?: string }).approval_status === "pending_review"
-                      ? "bg-yellow-500/20 text-yellow-400"
+                      ? "bg-stone-500/20 text-stone-400"
                       : (site as AgencySite & { approval_status?: string }).approval_status === "rejected"
-                      ? "bg-red-500/20 text-red-400"
+                      ? "bg-stone-500/20 text-stone-400"
                       : "bg-gray-500/20 text-gray-400"
                   }`}
                 >
@@ -780,7 +780,7 @@ export default function AgencyDashboard() {
                     (site as AgencySite & { approval_status?: string }).approval_status === "rejected") && (
                     <button
                       onClick={() => updateSiteApproval(site.id, "pending_review")}
-                      className="text-xs px-2.5 py-1 rounded-md bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 transition-colors"
+                      className="text-xs px-2.5 py-1 rounded-md bg-stone-500/10 text-stone-400 hover:bg-stone-500/20 transition-colors"
                     >
                       Submit for Review
                     </button>
@@ -789,13 +789,13 @@ export default function AgencyDashboard() {
                     <>
                       <button
                         onClick={() => updateSiteApproval(site.id, "approved")}
-                        className="text-xs px-2.5 py-1 rounded-md bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors"
+                        className="text-xs px-2.5 py-1 rounded-md bg-stone-500/10 text-stone-400 hover:bg-stone-500/20 transition-colors"
                       >
                         Approve
                       </button>
                       <button
                         onClick={() => updateSiteApproval(site.id, "rejected")}
-                        className="text-xs px-2.5 py-1 rounded-md bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
+                        className="text-xs px-2.5 py-1 rounded-md bg-stone-500/10 text-stone-400 hover:bg-stone-500/20 transition-colors"
                       >
                         Reject
                       </button>
@@ -804,7 +804,7 @@ export default function AgencyDashboard() {
                   {(site as AgencySite & { approval_status?: string }).approval_status === "approved" && (
                     <button
                       onClick={() => updateSiteApproval(site.id, "published")}
-                      className="text-xs px-2.5 py-1 rounded-md bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors"
+                      className="text-xs px-2.5 py-1 rounded-md bg-stone-500/10 text-stone-400 hover:bg-stone-500/20 transition-colors"
                     >
                       Publish
                     </button>
@@ -841,7 +841,7 @@ export default function AgencyDashboard() {
         <h2 className="text-xl font-bold text-white">Team Members</h2>
         <button
           onClick={() => setShowInviteMember(true)}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+          className="flex items-center gap-2 bg-stone-600 hover:bg-stone-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
         >
           <UserPlus size={16} /> Invite Member
         </button>
@@ -849,7 +849,7 @@ export default function AgencyDashboard() {
 
       {/* Invite form */}
       {showInviteMember && (
-        <div className="bg-[#1a1a2e] border border-blue-500/30 rounded-xl p-5 mb-6">
+        <div className="bg-[#1a1a2e] border border-stone-500/30 rounded-xl p-5 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-white font-semibold">Invite Team Member</h3>
             <button onClick={() => setShowInviteMember(false)} className="text-white/50 hover:text-white">
@@ -862,19 +862,19 @@ export default function AgencyDashboard() {
               placeholder="Email *"
               value={newMember.email}
               onChange={(e) => setNewMember({ ...newMember, email: e.target.value })}
-              className="bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-blue-500"
+              className="bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-stone-500"
             />
             <input
               type="text"
               placeholder="Name"
               value={newMember.name}
               onChange={(e) => setNewMember({ ...newMember, name: e.target.value })}
-              className="bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-blue-500"
+              className="bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-stone-500"
             />
             <select
               value={newMember.role}
               onChange={(e) => setNewMember({ ...newMember, role: e.target.value })}
-              className="bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+              className="bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-stone-500"
             >
               <option value="admin">Admin</option>
               <option value="designer">Designer</option>
@@ -884,7 +884,7 @@ export default function AgencyDashboard() {
           <button
             onClick={inviteMember}
             disabled={!newMember.email.trim()}
-            className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+            className="bg-stone-600 hover:bg-stone-700 disabled:opacity-50 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
           >
             Send Invite
           </button>
@@ -895,7 +895,7 @@ export default function AgencyDashboard() {
       <div className="bg-[#1a1a2e] border border-white/10 rounded-xl divide-y divide-white/5">
         {members.map((member) => (
           <div key={member.id} className="flex items-center gap-4 p-4">
-            <div className="w-9 h-9 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-sm font-bold shrink-0">
+            <div className="w-9 h-9 rounded-full bg-stone-500/20 flex items-center justify-center text-stone-400 text-sm font-bold shrink-0">
               {(member.name || member.email)[0].toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
@@ -919,7 +919,7 @@ export default function AgencyDashboard() {
             {member.role !== "owner" && (
               <button
                 onClick={() => removeMember(member.email)}
-                className="text-white/50 hover:text-red-400 transition-colors"
+                className="text-white/50 hover:text-stone-400 transition-colors"
               >
                 <Trash2 size={16} />
               </button>
@@ -938,7 +938,7 @@ export default function AgencyDashboard() {
         <h3 className="text-white font-semibold mb-2">Paste Business List</h3>
         <p className="text-white/50 text-sm mb-4">
           Enter one business per line in the format:{" "}
-          <code className="bg-white/5 px-1.5 py-0.5 rounded text-blue-400">
+          <code className="bg-white/5 px-1.5 py-0.5 rounded text-stone-400">
             name, industry, description
           </code>
         </p>
@@ -947,7 +947,7 @@ export default function AgencyDashboard() {
           onChange={(e) => setBulkInput(e.target.value)}
           placeholder={`Acme Coffee, Coffee Shop, Artisan coffee shop in downtown Portland\nBright Dental, Dentistry, Family dental practice with modern equipment\nPeak Fitness, Gym, 24/7 fitness center with personal training`}
           rows={8}
-          className="w-full bg-[#0a0a12] border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/50 text-sm font-mono focus:outline-none focus:border-blue-500 resize-y"
+          className="w-full bg-[#0a0a12] border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/50 text-sm font-mono focus:outline-none focus:border-stone-500 resize-y"
         />
         <div className="flex items-center justify-between mt-4">
           <span className="text-white/50 text-sm">
@@ -956,7 +956,7 @@ export default function AgencyDashboard() {
           <button
             onClick={startBulkGeneration}
             disabled={!bulkInput.trim()}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-medium px-5 py-2.5 rounded-lg transition-colors"
+            className="flex items-center gap-2 bg-stone-600 hover:bg-stone-700 disabled:opacity-50 text-white text-sm font-medium px-5 py-2.5 rounded-lg transition-colors"
           >
             <Play size={16} /> Generate All
           </button>
@@ -974,11 +974,11 @@ export default function AgencyDashboard() {
               <div key={job.id} className="bg-[#1a1a2e] border border-white/10 rounded-xl p-4">
                 <div className="flex items-center gap-3 mb-2">
                   {job.status === "completed" ? (
-                    <CheckCircle2 size={18} className="text-green-400" />
+                    <CheckCircle2 size={18} className="text-stone-400" />
                   ) : job.status === "failed" ? (
-                    <XCircle size={18} className="text-red-400" />
+                    <XCircle size={18} className="text-stone-400" />
                   ) : job.status === "processing" ? (
-                    <Loader2 size={18} className="text-blue-400 animate-spin" />
+                    <Loader2 size={18} className="text-stone-400 animate-spin" />
                   ) : (
                     <Upload size={18} className="text-white/50" />
                   )}
@@ -991,12 +991,12 @@ export default function AgencyDashboard() {
                   <span className="text-white/50">
                     Total: <span className="text-white">{job.total_count}</span>
                   </span>
-                  <span className="text-green-400/70">
-                    Completed: <span className="text-green-400">{job.completed_count}</span>
+                  <span className="text-stone-400/70">
+                    Completed: <span className="text-stone-400">{job.completed_count}</span>
                   </span>
                   {job.failed_count > 0 && (
-                    <span className="text-red-400/70">
-                      Failed: <span className="text-red-400">{job.failed_count}</span>
+                    <span className="text-stone-400/70">
+                      Failed: <span className="text-stone-400">{job.failed_count}</span>
                     </span>
                   )}
                 </div>
@@ -1004,7 +1004,7 @@ export default function AgencyDashboard() {
                 {job.status === "processing" && (
                   <div className="mt-3 h-1.5 bg-white/5 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-blue-500 rounded-full transition-all duration-500"
+                      className="h-full bg-stone-500 rounded-full transition-all duration-500"
                       style={{
                         width: `${job.total_count > 0 ? ((job.completed_count + job.failed_count) / job.total_count) * 100 : 0}%`,
                       }}
@@ -1032,7 +1032,7 @@ export default function AgencyDashboard() {
               value={brandConfig.agencyName}
               onChange={(e) => setBrandConfig({ ...brandConfig, agencyName: e.target.value })}
               placeholder="Your Agency Name"
-              className="w-full bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-blue-500"
+              className="w-full bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-stone-500"
             />
           </div>
           <div>
@@ -1042,7 +1042,7 @@ export default function AgencyDashboard() {
               value={brandConfig.logoUrl}
               onChange={(e) => setBrandConfig({ ...brandConfig, logoUrl: e.target.value })}
               placeholder="https://example.com/logo.png"
-              className="w-full bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-blue-500"
+              className="w-full bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-stone-500"
             />
           </div>
           <div className="grid grid-cols-3 gap-4">
@@ -1059,7 +1059,7 @@ export default function AgencyDashboard() {
                   type="text"
                   value={brandConfig.primaryColor}
                   onChange={(e) => setBrandConfig({ ...brandConfig, primaryColor: e.target.value })}
-                  className="flex-1 bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                  className="flex-1 bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-stone-500"
                 />
               </div>
             </div>
@@ -1076,7 +1076,7 @@ export default function AgencyDashboard() {
                   type="text"
                   value={brandConfig.secondaryColor}
                   onChange={(e) => setBrandConfig({ ...brandConfig, secondaryColor: e.target.value })}
-                  className="flex-1 bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                  className="flex-1 bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-stone-500"
                 />
               </div>
             </div>
@@ -1093,7 +1093,7 @@ export default function AgencyDashboard() {
                   type="text"
                   value={brandConfig.accentColor}
                   onChange={(e) => setBrandConfig({ ...brandConfig, accentColor: e.target.value })}
-                  className="flex-1 bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                  className="flex-1 bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-stone-500"
                 />
               </div>
             </div>
@@ -1101,7 +1101,7 @@ export default function AgencyDashboard() {
         </div>
         <button
           onClick={saveBranding}
-          className="mt-6 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-5 py-2.5 rounded-lg transition-colors"
+          className="mt-6 bg-stone-600 hover:bg-stone-700 text-white text-sm font-medium px-5 py-2.5 rounded-lg transition-colors"
         >
           Save Branding
         </button>
@@ -1148,7 +1148,7 @@ export default function AgencyDashboard() {
           </button>
         </div>
         <div className="mt-4 flex items-center gap-2">
-          <span className="bg-yellow-500/20 text-yellow-400 text-xs px-2 py-0.5 rounded-full">
+          <span className="bg-stone-500/20 text-stone-400 text-xs px-2 py-0.5 rounded-full">
             Coming Soon
           </span>
           <span className="text-white/50 text-sm">Custom domain builder branding</span>
@@ -1184,7 +1184,7 @@ export default function AgencyDashboard() {
           </div>
           <div>
             <label className="block text-white/60 text-sm mb-1">Plan</label>
-            <span className="inline-block bg-blue-500/20 text-blue-400 text-sm px-3 py-1 rounded-full capitalize">
+            <span className="inline-block bg-stone-500/20 text-stone-400 text-sm px-3 py-1 rounded-full capitalize">
               {activeAgency?.plan || "starter"}
             </span>
           </div>
@@ -1196,14 +1196,14 @@ export default function AgencyDashboard() {
       </div>
 
       {/* Danger zone */}
-      <div className="bg-[#1a1a2e] border border-red-500/20 rounded-xl p-5">
-        <h3 className="text-red-400 font-semibold mb-2">Danger Zone</h3>
+      <div className="bg-[#1a1a2e] border border-stone-500/20 rounded-xl p-5">
+        <h3 className="text-stone-400 font-semibold mb-2">Danger Zone</h3>
         <p className="text-white/50 text-sm mb-4">
           Deleting your agency will remove all client associations and team members. Sites themselves will not be deleted.
         </p>
         <button
           onClick={deleteAgency}
-          className="flex items-center gap-2 bg-red-600/20 hover:bg-red-600/40 text-red-400 text-sm font-medium px-4 py-2 rounded-lg transition-colors border border-red-500/30"
+          className="flex items-center gap-2 bg-stone-600/20 hover:bg-stone-600/40 text-stone-400 text-sm font-medium px-4 py-2 rounded-lg transition-colors border border-stone-500/30"
         >
           <Trash2 size={16} /> Delete Agency
         </button>
@@ -1239,7 +1239,7 @@ export default function AgencyDashboard() {
                 const id = e.target.value;
                 if (id) loadAgencyDetails(id);
               }}
-              className="w-full bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+              className="w-full bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-stone-500"
             >
               {agencies.map((a) => (
                 <option key={a.id} value={a.id}>
@@ -1249,7 +1249,7 @@ export default function AgencyDashboard() {
             </select>
           ) : (
             <div className="flex items-center gap-2">
-              <Building2 size={18} className="text-blue-400" />
+              <Building2 size={18} className="text-stone-400" />
               <span className="text-white font-semibold truncate">
                 {activeAgency?.name}
               </span>
@@ -1264,7 +1264,7 @@ export default function AgencyDashboard() {
               onClick={() => setActiveTab(tab.key)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 activeTab === tab.key
-                  ? "bg-blue-600/20 text-blue-400"
+                  ? "bg-stone-600/20 text-stone-400"
                   : "text-white/50 hover:text-white hover:bg-white/5"
               }`}
             >
@@ -1300,7 +1300,7 @@ export default function AgencyDashboard() {
               value={newAgencyName}
               onChange={(e) => setNewAgencyName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && createAgency()}
-              className="w-full bg-[#0a0a12] border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/50 mb-4 focus:outline-none focus:border-blue-500"
+              className="w-full bg-[#0a0a12] border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/50 mb-4 focus:outline-none focus:border-stone-500"
               autoFocus
             />
             <div className="flex justify-end gap-3">
@@ -1313,7 +1313,7 @@ export default function AgencyDashboard() {
               <button
                 onClick={createAgency}
                 disabled={!newAgencyName.trim()}
-                className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-medium px-5 py-2 rounded-lg transition-colors"
+                className="bg-stone-600 hover:bg-stone-700 disabled:opacity-50 text-white text-sm font-medium px-5 py-2 rounded-lg transition-colors"
               >
                 Create
               </button>

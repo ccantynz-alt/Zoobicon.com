@@ -174,12 +174,12 @@ export default function GitHubImport({ onImport }: GitHubImportProps) {
             return (
               <div key={step.key} className="flex items-center gap-3">
                 {status === "done" ? (
-                  <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center">
-                    <Check className="w-3.5 h-3.5 text-green-400" />
+                  <div className="w-6 h-6 rounded-full bg-stone-500/20 flex items-center justify-center">
+                    <Check className="w-3.5 h-3.5 text-stone-400" />
                   </div>
                 ) : status === "active" ? (
-                  <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center">
-                    <Loader2 className="w-3.5 h-3.5 text-blue-400 animate-spin" />
+                  <div className="w-6 h-6 rounded-full bg-stone-500/20 flex items-center justify-center">
+                    <Loader2 className="w-3.5 h-3.5 text-stone-400 animate-spin" />
                   </div>
                 ) : (
                   <div className="w-6 h-6 rounded-full bg-white/5 border border-white/10" />
@@ -203,8 +203,8 @@ export default function GitHubImport({ onImport }: GitHubImportProps) {
 
       {/* Error */}
       {error && (
-        <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-4">
-          <p className="text-sm text-red-400">{error}</p>
+        <div className="rounded-xl border border-stone-500/20 bg-stone-500/5 p-4">
+          <p className="text-sm text-stone-400">{error}</p>
         </div>
       )}
 

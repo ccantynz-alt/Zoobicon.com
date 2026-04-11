@@ -167,11 +167,11 @@ const PROJECT_TYPES = [
 
 const VISUAL_STYLES = [
   { id: "modern-minimalist", label: "Modern / Minimalist", icon: Zap, color: "from-slate-400 to-slate-600" },
-  { id: "bold-dynamic", label: "Bold / Dynamic", icon: Sparkles, color: "from-red-500 to-orange-500" },
-  { id: "elegant-luxury", label: "Elegant / Luxury", icon: Crown, color: "from-amber-400 to-yellow-600" },
-  { id: "fun-playful", label: "Fun / Playful", icon: Smile, color: "from-violet-500 to-indigo-500" },
-  { id: "corporate-professional", label: "Corporate / Professional", icon: Building2, color: "from-blue-500 to-indigo-600" },
-  { id: "cinematic", label: "Cinematic", icon: Clapperboard, color: "from-emerald-500 to-teal-600" },
+  { id: "bold-dynamic", label: "Bold / Dynamic", icon: Sparkles, color: "from-stone-500 to-stone-500" },
+  { id: "elegant-luxury", label: "Elegant / Luxury", icon: Crown, color: "from-stone-400 to-stone-600" },
+  { id: "fun-playful", label: "Fun / Playful", icon: Smile, color: "from-stone-500 to-stone-500" },
+  { id: "corporate-professional", label: "Corporate / Professional", icon: Building2, color: "from-stone-500 to-stone-600" },
+  { id: "cinematic", label: "Cinematic", icon: Clapperboard, color: "from-stone-500 to-stone-600" },
 ];
 
 const PLATFORMS = [
@@ -1448,7 +1448,7 @@ export default function VideoCreatorDashboard() {
   if (!authChecked) {
     return (
       <div className="min-h-screen bg-[#06080f] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-cyan-500 animate-spin" />
+        <Loader2 className="w-8 h-8 text-stone-500 animate-spin" />
       </div>
     );
   }
@@ -1461,7 +1461,7 @@ export default function VideoCreatorDashboard() {
         <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 flex items-center justify-between h-14">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/25">
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-stone-500 to-stone-600 flex items-center justify-center shadow-lg shadow-stone-500/25">
                 <Video className="w-3.5 h-3.5 text-white" />
               </div>
               <span className="text-[15px] font-semibold tracking-tight text-white">Zoobicon</span>
@@ -1482,7 +1482,7 @@ export default function VideoCreatorDashboard() {
               <History className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">History</span>
               {projects.length > 0 && (
-                <span className="bg-cyan-500/20 text-cyan-400 text-[10px] px-1.5 py-0.5 rounded-full">{projects.length}</span>
+                <span className="bg-stone-500/20 text-stone-400 text-[10px] px-1.5 py-0.5 rounded-full">{projects.length}</span>
               )}
             </button>
             <button onClick={handleLogout} className="text-sm text-white/60 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5 flex items-center gap-1.5">
@@ -1531,7 +1531,7 @@ export default function VideoCreatorDashboard() {
                           {new Date(project.createdAt).toLocaleDateString()} {new Date(project.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                         </div>
                       </button>
-                      <button onClick={() => deleteProject(project.id)} className="p-1.5 text-white/50 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity rounded hover:bg-red-500/10">
+                      <button onClick={() => deleteProject(project.id)} className="p-1.5 text-white/50 hover:text-stone-400 opacity-0 group-hover:opacity-100 transition-opacity rounded hover:bg-stone-500/10">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -1580,7 +1580,7 @@ export default function VideoCreatorDashboard() {
                           <button
                             key={t.id}
                             onClick={() => handleApplyTemplate(t)}
-                            className="p-2 rounded-lg border border-white/[0.06] bg-white/[0.02] hover:border-cyan-500/30 hover:bg-cyan-500/5 transition-all text-left group"
+                            className="p-2 rounded-lg border border-white/[0.06] bg-white/[0.02] hover:border-stone-500/30 hover:bg-stone-500/5 transition-all text-left group"
                           >
                             <div className={`w-full h-6 rounded bg-gradient-to-r ${t.thumbnail} mb-1.5`} />
                             <div className="text-[10px] font-semibold text-white/80 group-hover:text-white truncate">{t.name}</div>
@@ -1607,11 +1607,11 @@ export default function VideoCreatorDashboard() {
                       onClick={() => setProjectType(type.id)}
                       className={`p-3 rounded-xl border text-left transition-all ${
                         projectType === type.id
-                          ? "border-cyan-500/50 bg-cyan-500/10 ring-1 ring-cyan-500/20"
+                          ? "border-stone-500/50 bg-stone-500/10 ring-1 ring-stone-500/20"
                           : "border-white/[0.10] bg-white/[0.04] hover:border-white/25 hover:bg-white/[0.07]"
                       }`}
                     >
-                      <type.icon className={`w-4 h-4 mb-1.5 ${projectType === type.id ? "text-cyan-400" : "text-white/50"}`} />
+                      <type.icon className={`w-4 h-4 mb-1.5 ${projectType === type.id ? "text-stone-400" : "text-white/50"}`} />
                       <div className="text-xs font-semibold">{type.label}</div>
                     </button>
                   ))}
@@ -1642,7 +1642,7 @@ export default function VideoCreatorDashboard() {
                   <button
                     onClick={handleGenerateScript}
                     disabled={generatingScript}
-                    className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors flex items-center gap-1 disabled:opacity-50"
+                    className="text-xs text-stone-400 hover:text-stone-300 transition-colors flex items-center gap-1 disabled:opacity-50"
                   >
                     {generatingScript ? (
                       <>
@@ -1663,14 +1663,14 @@ export default function VideoCreatorDashboard() {
                     onChange={(e) => setScript(e.target.value)}
                     placeholder="Describe your video or paste a script... Or tap the mic to speak."
                     rows={4}
-                    className="w-full bg-white/[0.04] border border-white/[0.10] rounded-xl px-4 py-3 pr-12 text-sm text-white placeholder:text-white/35 outline-none focus:border-cyan-500/40 focus:bg-white/[0.06] transition-all duration-150 resize-none"
+                    className="w-full bg-white/[0.04] border border-white/[0.10] rounded-xl px-4 py-3 pr-12 text-sm text-white placeholder:text-white/35 outline-none focus:border-stone-500/40 focus:bg-white/[0.06] transition-all duration-150 resize-none"
                   />
                   <button
                     onClick={toggleVoiceInput}
                     type="button"
                     className={`absolute right-3 bottom-3 p-2 rounded-lg transition-all ${
                       isRecording
-                        ? "bg-red-500/20 text-red-400 animate-pulse border border-red-500/30"
+                        ? "bg-stone-500/20 text-stone-400 animate-pulse border border-stone-500/30"
                         : "bg-white/[0.05] text-white/50 hover:text-white hover:bg-white/[0.10] border border-white/[0.10]"
                     }`}
                     title={isRecording ? "Stop recording" : "Describe your video with voice"}
@@ -1679,8 +1679,8 @@ export default function VideoCreatorDashboard() {
                   </button>
                 </div>
                 {isRecording && (
-                  <p className="text-xs text-red-400 flex items-center gap-1.5 mt-1">
-                    <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                  <p className="text-xs text-stone-400 flex items-center gap-1.5 mt-1">
+                    <span className="w-2 h-2 rounded-full bg-stone-500 animate-pulse" />
                     Listening... speak your video description
                   </p>
                 )}
@@ -1696,7 +1696,7 @@ export default function VideoCreatorDashboard() {
                       onClick={() => setStyle(s.id)}
                       className={`p-3 rounded-xl border text-left transition-all ${
                         style === s.id
-                          ? "border-cyan-500/50 bg-cyan-500/10 ring-1 ring-cyan-500/20"
+                          ? "border-stone-500/50 bg-stone-500/10 ring-1 ring-stone-500/20"
                           : "border-white/[0.10] bg-white/[0.04] hover:border-white/25 hover:bg-white/[0.07]"
                       }`}
                     >
@@ -1719,7 +1719,7 @@ export default function VideoCreatorDashboard() {
                       onClick={() => setPlatform(p.id)}
                       className={`px-3 py-2 rounded-lg border text-xs font-medium transition-all flex items-center gap-1.5 ${
                         platform === p.id
-                          ? "border-cyan-500/50 bg-cyan-500/10 text-cyan-300"
+                          ? "border-stone-500/50 bg-stone-500/10 text-stone-300"
                           : "border-white/[0.08] bg-white/[0.03] text-white/60 hover:border-white/20"
                       }`}
                     >
@@ -1741,11 +1741,11 @@ export default function VideoCreatorDashboard() {
                       onClick={() => setDuration(d.value)}
                       className={`flex-1 py-2.5 rounded-lg border text-center transition-all ${
                         duration === d.value
-                          ? "border-cyan-500/50 bg-cyan-500/10 ring-1 ring-cyan-500/20"
+                          ? "border-stone-500/50 bg-stone-500/10 ring-1 ring-stone-500/20"
                           : "border-white/[0.08] bg-white/[0.03] hover:border-white/20"
                       }`}
                     >
-                      <div className={`text-sm font-bold ${duration === d.value ? "text-cyan-300" : "text-white/80"}`}>{d.label}</div>
+                      <div className={`text-sm font-bold ${duration === d.value ? "text-stone-300" : "text-white/80"}`}>{d.label}</div>
                       <div className="text-[10px] text-white/50">{d.desc}</div>
                     </button>
                   ))}
@@ -1764,7 +1764,7 @@ export default function VideoCreatorDashboard() {
                       onClick={() => setMusic(m.id)}
                       className={`px-3 py-1.5 rounded-full border text-xs font-medium transition-all ${
                         music === m.id
-                          ? "border-cyan-500/50 bg-cyan-500/10 text-cyan-300"
+                          ? "border-stone-500/50 bg-stone-500/10 text-stone-300"
                           : "border-white/[0.08] bg-white/[0.03] text-white/60 hover:border-white/20"
                       }`}
                     >
@@ -1812,7 +1812,7 @@ export default function VideoCreatorDashboard() {
                     <select
                       value={brandFont}
                       onChange={(e) => setBrandFont(e.target.value)}
-                      className="w-full bg-white/[0.07] border border-white/[0.10] rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-cyan-500/30 transition-colors"
+                      className="w-full bg-white/[0.07] border border-white/[0.10] rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-stone-500/30 transition-colors"
                     >
                       {FONTS.map((f) => (
                         <option key={f} value={f} className="bg-gray-900">{f}</option>
@@ -1826,15 +1826,15 @@ export default function VideoCreatorDashboard() {
               <motion.div initial="hidden" animate="visible" variants={fadeIn} className="space-y-2">
                 <button
                   onClick={() => { setShowSpokesperson(!showSpokesperson); if (!showSpokesperson) loadHeygenVoices(); }}
-                  className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-purple-500/20 bg-purple-500/5 hover:bg-purple-500/10 transition-all text-left"
+                  className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-stone-500/20 bg-stone-500/5 hover:bg-stone-500/10 transition-all text-left"
                 >
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                    <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-stone-500 to-stone-500 flex items-center justify-center">
                       <Smile className="w-3.5 h-3.5 text-white" />
                     </div>
                     <div>
                       <span className="text-xs font-semibold text-white">AI Spokesperson</span>
-                      <span className="text-[10px] text-purple-300/60 block">Real-looking presenter reads your script</span>
+                      <span className="text-[10px] text-stone-300/60 block">Real-looking presenter reads your script</span>
                     </div>
                   </div>
                   <ChevronDown className={`w-4 h-4 text-white/40 transition-transform ${showSpokesperson ? "rotate-180" : ""}`} />
@@ -1848,7 +1848,7 @@ export default function VideoCreatorDashboard() {
                       exit={{ height: 0, opacity: 0 }}
                       className="overflow-hidden"
                     >
-                      <div className="rounded-xl border border-purple-500/15 bg-white/[0.03] p-3 space-y-3">
+                      <div className="rounded-xl border border-stone-500/15 bg-white/[0.03] p-3 space-y-3">
                         {/* Avatar Selection */}
                         <div>
                           <label className="text-[10px] font-semibold text-white/70 uppercase tracking-wider mb-1.5 block">Choose Presenter</label>
@@ -1859,14 +1859,14 @@ export default function VideoCreatorDashboard() {
                                 onClick={() => setSpokespersonAvatarId(avatar.id)}
                                 className={`p-2 rounded-lg border text-center transition-all ${
                                   spokespersonAvatarId === avatar.id
-                                    ? "border-purple-500/50 bg-purple-500/10 ring-1 ring-purple-500/20"
+                                    ? "border-stone-500/50 bg-stone-500/10 ring-1 ring-stone-500/20"
                                     : "border-white/[0.08] bg-white/[0.02] hover:border-white/20"
                                 }`}
                               >
                                 {avatar.preview_image_url ? (
                                   <img src={avatar.preview_image_url} alt={avatar.name} className="w-8 h-8 rounded-full mx-auto mb-1 object-cover" />
                                 ) : (
-                                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 mx-auto mb-1 flex items-center justify-center text-white text-[10px] font-bold">
+                                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-stone-400 to-stone-400 mx-auto mb-1 flex items-center justify-center text-white text-[10px] font-bold">
                                     {avatar.name[0]}
                                   </div>
                                 )}
@@ -1884,7 +1884,7 @@ export default function VideoCreatorDashboard() {
                             <select
                               value={spokespersonVoiceId}
                               onChange={(e) => setSpokespersonVoiceId(e.target.value)}
-                              className="w-full bg-white/[0.05] border border-white/[0.10] rounded-lg px-3 py-2 text-xs text-white/80 focus:border-purple-500/50 focus:outline-none"
+                              className="w-full bg-white/[0.05] border border-white/[0.10] rounded-lg px-3 py-2 text-xs text-white/80 focus:border-stone-500/50 focus:outline-none"
                             >
                               <option value="">Default Voice</option>
                               {heygenVoices.map((v) => (
@@ -1907,7 +1907,7 @@ export default function VideoCreatorDashboard() {
                                   onClick={() => setSpokespersonFormat(fmt)}
                                   className={`flex-1 p-1.5 rounded-lg border text-center transition-all ${
                                     spokespersonFormat === fmt
-                                      ? "border-purple-500/50 bg-purple-500/10"
+                                      ? "border-stone-500/50 bg-stone-500/10"
                                       : "border-white/[0.08] bg-white/[0.02] hover:border-white/20"
                                   }`}
                                 >
@@ -1935,7 +1935,7 @@ export default function VideoCreatorDashboard() {
                         <button
                           onClick={handleSpokespersonGenerate}
                           disabled={spokespersonGenerating || !script.trim()}
-                          className="w-full py-2.5 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-[0.98]"
+                          className="w-full py-2.5 rounded-lg bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 text-white font-semibold text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-[0.98]"
                         >
                           {spokespersonGenerating ? (
                             <>
@@ -1952,14 +1952,14 @@ export default function VideoCreatorDashboard() {
 
                         {/* Status / Video Result */}
                         {spokespersonError && (
-                          <div className="text-[10px] text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-2.5 py-2">
+                          <div className="text-[10px] text-stone-400 bg-stone-500/10 border border-stone-500/20 rounded-lg px-2.5 py-2">
                             {spokespersonError}
                           </div>
                         )}
 
                         {spokespersonVideoUrl && (
                           <div className="space-y-2">
-                            <div className="text-[10px] font-semibold text-green-400 flex items-center gap-1">
+                            <div className="text-[10px] font-semibold text-stone-400 flex items-center gap-1">
                               <Check className="w-3 h-3" /> Video Ready!
                             </div>
                             <video
@@ -1981,7 +1981,7 @@ export default function VideoCreatorDashboard() {
                         )}
 
                         {heygenAvailable === false && (
-                          <div className="text-[10px] text-amber-400/80 bg-amber-500/10 border border-amber-500/15 rounded-lg px-2.5 py-2 flex items-start gap-1.5">
+                          <div className="text-[10px] text-stone-400/80 bg-stone-500/10 border border-stone-500/15 rounded-lg px-2.5 py-2 flex items-start gap-1.5">
                             <AlertCircle className="w-3 h-3 mt-0.5 flex-shrink-0" />
                             <span>AI spokesperson videos are coming soon. The script you write here will also be used for the storyboard pipeline below.</span>
                           </div>
@@ -1997,15 +1997,15 @@ export default function VideoCreatorDashboard() {
                 <motion.div initial="hidden" animate="visible" variants={fadeIn} className="space-y-2">
                   <button
                     onClick={() => setShowTranslate(!showTranslate)}
-                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10 transition-all text-left"
+                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-stone-500/20 bg-stone-500/5 hover:bg-stone-500/10 transition-all text-left"
                   >
                     <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+                      <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-stone-500 to-stone-500 flex items-center justify-center">
                         <Globe className="w-3.5 h-3.5 text-white" />
                       </div>
                       <div>
                         <span className="text-xs font-semibold text-white">Translate Video</span>
-                        <span className="text-[10px] text-emerald-300/60 block">Lip-synced translations in 20 languages</span>
+                        <span className="text-[10px] text-stone-300/60 block">Lip-synced translations in 20 languages</span>
                       </div>
                     </div>
                     <ChevronDown className={`w-4 h-4 text-white/40 transition-transform ${showTranslate ? "rotate-180" : ""}`} />
@@ -2020,7 +2020,7 @@ export default function VideoCreatorDashboard() {
                         transition={{ duration: 0.2 }}
                         className="overflow-hidden"
                       >
-                        <div className="border border-emerald-500/10 rounded-xl bg-emerald-500/[0.03] p-3 space-y-3">
+                        <div className="border border-stone-500/10 rounded-xl bg-stone-500/[0.03] p-3 space-y-3">
                           {/* Language grid */}
                           <div>
                             <label className="text-[10px] font-semibold text-white/60 uppercase tracking-wider mb-1.5 block">
@@ -2034,14 +2034,14 @@ export default function VideoCreatorDashboard() {
                                   disabled={translating}
                                   className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg border text-left transition-all text-[11px] ${
                                     selectedTranslateLangs.has(lang.code)
-                                      ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-300"
+                                      ? "border-stone-500/40 bg-stone-500/15 text-stone-300"
                                       : "border-white/[0.06] bg-white/[0.02] text-white/60 hover:text-white/80 hover:bg-white/[0.05]"
                                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                                 >
                                   <span className="text-sm">{lang.flag}</span>
                                   <span className="truncate">{lang.name}</span>
                                   {selectedTranslateLangs.has(lang.code) && (
-                                    <Check className="w-3 h-3 ml-auto flex-shrink-0 text-emerald-400" />
+                                    <Check className="w-3 h-3 ml-auto flex-shrink-0 text-stone-400" />
                                   )}
                                 </button>
                               ))}
@@ -2089,7 +2089,7 @@ export default function VideoCreatorDashboard() {
                           <button
                             onClick={handleTranslate}
                             disabled={translating || selectedTranslateLangs.size === 0}
-                            className="w-full py-2.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+                            className="w-full py-2.5 rounded-lg bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 text-white font-semibold text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
                           >
                             {translating ? (
                               <>
@@ -2106,7 +2106,7 @@ export default function VideoCreatorDashboard() {
 
                           {/* Error */}
                           {translateError && (
-                            <div className="text-[10px] text-red-400 bg-red-500/10 border border-red-500/15 rounded-lg px-2.5 py-2">
+                            <div className="text-[10px] text-stone-400 bg-stone-500/10 border border-stone-500/15 rounded-lg px-2.5 py-2">
                               {translateError}
                             </div>
                           )}
@@ -2130,7 +2130,7 @@ export default function VideoCreatorDashboard() {
                                   </div>
                                   <div className="flex items-center gap-1.5">
                                     {result.status === "processing" && (
-                                      <span className="flex items-center gap-1 text-[10px] text-amber-400">
+                                      <span className="flex items-center gap-1 text-[10px] text-stone-400">
                                         <Loader2 className="w-3 h-3 animate-spin" /> Processing
                                       </span>
                                     )}
@@ -2140,18 +2140,18 @@ export default function VideoCreatorDashboard() {
                                         download
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex items-center gap-1 text-[10px] text-emerald-400 hover:text-emerald-300 transition-colors"
+                                        className="flex items-center gap-1 text-[10px] text-stone-400 hover:text-stone-300 transition-colors"
                                       >
                                         <Check className="w-3 h-3" /> Download
                                       </a>
                                     )}
                                     {result.status === "completed" && !result.videoUrl && (
-                                      <span className="flex items-center gap-1 text-[10px] text-emerald-400">
+                                      <span className="flex items-center gap-1 text-[10px] text-stone-400">
                                         <Check className="w-3 h-3" /> Done
                                       </span>
                                     )}
                                     {result.status === "failed" && (
-                                      <span className="text-[10px] text-red-400" title={result.error || "Failed"}>
+                                      <span className="text-[10px] text-stone-400" title={result.error || "Failed"}>
                                         Failed
                                       </span>
                                     )}
@@ -2177,7 +2177,7 @@ export default function VideoCreatorDashboard() {
                 <button
                   onClick={handleGenerate}
                   disabled={generating}
-                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-500 hover:to-blue-600 text-white font-semibold text-sm tracking-tight transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 active:scale-[0.98]"
+                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-stone-600 to-stone-700 hover:from-stone-500 hover:to-stone-600 text-white font-semibold text-sm tracking-tight transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-stone-500/20 active:scale-[0.98]"
                 >
                   {generating ? (
                     <>
@@ -2192,10 +2192,10 @@ export default function VideoCreatorDashboard() {
                   )}
                 </button>
                 {error && (
-                  <div className="mt-2 text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                  <div className="mt-2 text-xs text-stone-400 bg-stone-500/10 border border-stone-500/20 rounded-lg px-3 py-2">
                     {sanitizeError(error)}
                     {error.includes("add-on") && (
-                      <Link href="/marketplace?search=video" className="ml-2 text-amber-400 underline hover:text-amber-300">
+                      <Link href="/marketplace?search=video" className="ml-2 text-stone-400 underline hover:text-stone-300">
                         Get the add-on
                       </Link>
                     )}
@@ -2216,7 +2216,7 @@ export default function VideoCreatorDashboard() {
                         <div className="flex items-center gap-3 text-xs text-white/50 mt-0.5">
                           <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {storyboard.totalDuration}</span>
                           <span>{storyboard.storyboard.length} scenes</span>
-                          <span className="text-amber-400 flex items-center gap-1">
+                          <span className="text-stone-400 flex items-center gap-1">
                             <Clock className="w-3 h-3" />
                             Est. render: {storyboard.estimatedRenderTime}
                           </span>
@@ -2240,7 +2240,7 @@ export default function VideoCreatorDashboard() {
                           onClick={() => setActiveScene(i)}
                           className={`flex-shrink-0 w-24 h-16 rounded-lg border-2 transition-all relative overflow-hidden ${
                             activeScene === i
-                              ? "border-cyan-500 ring-2 ring-cyan-500/30"
+                              ? "border-stone-500 ring-2 ring-stone-500/30"
                               : "border-white/10 hover:border-white/30"
                           }`}
                         >
@@ -2370,7 +2370,7 @@ export default function VideoCreatorDashboard() {
                         <div className="space-y-1">
                           {storyboard.musicCues.map((cue, i) => (
                             <div key={i} className="text-xs text-white/60 flex items-start gap-2">
-                              <span className="text-cyan-400 mt-0.5">-</span>
+                              <span className="text-stone-400 mt-0.5">-</span>
                               {cue}
                             </div>
                           ))}
@@ -2379,14 +2379,14 @@ export default function VideoCreatorDashboard() {
                     )}
 
                     {/* ---- Video Production Pipeline ---- */}
-                    <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-4 space-y-3">
+                    <div className="rounded-xl border border-stone-500/20 bg-stone-500/5 p-4 space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center">
-                            <Wand2 className="w-4 h-4 text-cyan-400" />
+                          <div className="w-8 h-8 rounded-lg bg-stone-500/10 flex items-center justify-center">
+                            <Wand2 className="w-4 h-4 text-stone-400" />
                           </div>
                           <div>
-                            <div className="text-sm font-semibold text-cyan-300">Video Production Pipeline</div>
+                            <div className="text-sm font-semibold text-stone-300">Video Production Pipeline</div>
                             <div className="text-[10px] text-white/50">Generate images, render video, add voiceover & subtitles</div>
                           </div>
                         </div>
@@ -2400,17 +2400,17 @@ export default function VideoCreatorDashboard() {
 
                       {/* Upgrade prompt for free users */}
                       {!hasVideoAddon && (
-                        <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-3 flex items-start gap-2.5">
-                          <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                        <div className="rounded-lg border border-stone-500/20 bg-stone-500/5 p-3 flex items-start gap-2.5">
+                          <AlertCircle className="w-4 h-4 text-stone-400 flex-shrink-0 mt-0.5" />
                           <div className="flex-1">
-                            <div className="text-xs font-semibold text-amber-300 mb-0.5">Add-on required for full pipeline</div>
+                            <div className="text-xs font-semibold text-stone-300 mb-0.5">Add-on required for full pipeline</div>
                             <div className="text-[10px] text-white/50 mb-2">
                               Storyboard and script generation are free. Video rendering, voiceover, image generation, and subtitles require the AI Video Creator add-on ($19/mo) or a paid plan.
                             </div>
                             <div className="flex gap-2">
                               <Link
                                 href="/marketplace?search=video"
-                                className="px-3 py-1.5 rounded-md bg-amber-500/20 text-amber-300 text-[10px] font-semibold hover:bg-amber-500/30 transition-colors"
+                                className="px-3 py-1.5 rounded-md bg-stone-500/20 text-stone-300 text-[10px] font-semibold hover:bg-stone-500/30 transition-colors"
                               >
                                 Get Video Add-on — $19/mo
                               </Link>
@@ -2432,7 +2432,7 @@ export default function VideoCreatorDashboard() {
                             <div className="text-[10px] font-semibold text-white/50 uppercase tracking-wider">Monthly Usage</div>
                             <button
                               onClick={() => setShowBuyCredits(!showBuyCredits)}
-                              className="text-[10px] font-medium text-cyan-400 hover:text-cyan-300 transition-colors"
+                              className="text-[10px] font-medium text-stone-400 hover:text-stone-300 transition-colors"
                             >
                               Buy More Credits
                             </button>
@@ -2450,13 +2450,13 @@ export default function VideoCreatorDashboard() {
                                   <span className="text-[10px] text-white/60">
                                     {item.data.used}/{item.data.limit}
                                     {item.data.overage > 0 && (
-                                      <span className="text-emerald-400"> +{item.data.overage}</span>
+                                      <span className="text-stone-400"> +{item.data.overage}</span>
                                     )}
                                   </span>
                                 </div>
                                 <div className="h-1 rounded-full bg-white/[0.06] overflow-hidden">
                                   <div
-                                    className={`h-full rounded-full transition-all ${item.data.pct >= 90 ? "bg-red-500" : item.data.pct >= 70 ? "bg-amber-500" : "bg-cyan-500"}`}
+                                    className={`h-full rounded-full transition-all ${item.data.pct >= 90 ? "bg-stone-500" : item.data.pct >= 70 ? "bg-stone-500" : "bg-stone-500"}`}
                                     style={{ width: `${Math.min(100, item.data.pct)}%` }}
                                   />
                                 </div>
@@ -2485,10 +2485,10 @@ export default function VideoCreatorDashboard() {
                                       <div>
                                         <div className="text-[11px] font-medium text-white/80">{pack.name}</div>
                                         {pack.savings && (
-                                          <div className="text-[9px] text-emerald-400 font-medium">{pack.savings}</div>
+                                          <div className="text-[9px] text-stone-400 font-medium">{pack.savings}</div>
                                         )}
                                       </div>
-                                      <div className="text-xs font-bold text-cyan-400">{pack.priceDisplay}</div>
+                                      <div className="text-xs font-bold text-stone-400">{pack.priceDisplay}</div>
                                     </button>
                                   ))}
                                 </div>
@@ -2500,13 +2500,13 @@ export default function VideoCreatorDashboard() {
 
                       {/* Quota exceeded prompt */}
                       {error && error.includes("limit reached") && (
-                        <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3 space-y-2">
-                          <div className="text-xs font-semibold text-red-300">Usage Limit Reached</div>
+                        <div className="rounded-lg border border-stone-500/20 bg-stone-500/5 p-3 space-y-2">
+                          <div className="text-xs font-semibold text-stone-300">Usage Limit Reached</div>
                           <div className="text-[10px] text-white/50">{error}</div>
                           <div className="flex gap-2">
                             <button
                               onClick={() => setShowBuyCredits(true)}
-                              className="px-3 py-1.5 rounded-md bg-cyan-600 text-white text-[10px] font-semibold hover:bg-cyan-500 transition-colors"
+                              className="px-3 py-1.5 rounded-md bg-stone-600 text-white text-[10px] font-semibold hover:bg-stone-500 transition-colors"
                             >
                               Buy More Credits
                             </button>
@@ -2554,10 +2554,10 @@ export default function VideoCreatorDashboard() {
                           },
                         ].map((s) => (
                           <div key={s.label} className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-[10px] font-medium ${
-                            s.active ? "bg-cyan-500/20 text-cyan-300" :
-                            s.failed ? "bg-red-500/10 text-red-400" :
-                            s.skipped ? "bg-amber-500/10 text-amber-400" :
-                            s.done ? "bg-green-500/10 text-green-400" :
+                            s.active ? "bg-stone-500/20 text-stone-300" :
+                            s.failed ? "bg-stone-500/10 text-stone-400" :
+                            s.skipped ? "bg-stone-500/10 text-stone-400" :
+                            s.done ? "bg-stone-500/10 text-stone-400" :
                             "bg-white/[0.03] text-white/50"
                           }`}>
                             {s.active ? <Loader2 className="w-3 h-3 animate-spin" /> :
@@ -2574,7 +2574,7 @@ export default function VideoCreatorDashboard() {
                       {fullPipelineProgress && (
                         <div className="space-y-1.5">
                           {fullPipelineProgress.running && (
-                            <div className="flex items-center gap-2 text-[10px] text-cyan-300">
+                            <div className="flex items-center gap-2 text-[10px] text-stone-300">
                               <Loader2 className="w-3 h-3 animate-spin" />
                               Pipeline running — generating your video assets...
                             </div>
@@ -2589,10 +2589,13 @@ export default function VideoCreatorDashboard() {
                             </div>
                           )}
                           {/* Show any stage errors (user-friendly, never raw API) */}
-                          {Object.entries(fullPipelineProgress).filter(([key, val]) =>
-                            key !== "running" && typeof val === "object" && val.status === "failed" && val.error
-                          ).map(([key, val]) => (
-                            <div key={key} className="text-[10px] text-red-400 bg-red-500/10 border border-red-500/20 rounded px-2 py-1">
+                          {Object.entries(fullPipelineProgress).filter(([key, val]) => {
+                            if (key === "running") return false;
+                            if (val == null || typeof val !== "object") return false;
+                            const stage = val as PipelineStageStatus;
+                            return stage.status === "failed" && !!stage.error;
+                          }).map(([key, val]) => (
+                            <div key={key} className="text-[10px] text-stone-400 bg-stone-500/10 border border-stone-500/20 rounded px-2 py-1">
                               {key}: {sanitizeError((val as PipelineStageStatus).error || "")}
                             </div>
                           ))}
@@ -2603,7 +2606,7 @@ export default function VideoCreatorDashboard() {
                       <button
                         onClick={handleFullPipeline}
                         disabled={pipelineStage !== "idle" || (fullPipelineProgress?.running ?? false)}
-                        className="w-full py-2.5 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-500 hover:to-blue-600 text-white font-bold text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        className="w-full py-2.5 rounded-lg bg-gradient-to-r from-stone-600 to-stone-700 hover:from-stone-500 hover:to-stone-600 text-white font-bold text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                       >
                         {fullPipelineProgress?.running ? (
                           <>
@@ -2649,7 +2652,7 @@ export default function VideoCreatorDashboard() {
                                     onClick={() => setSelectedVoice(v.id)}
                                     className={`px-2.5 py-1 rounded-md border text-[10px] font-medium transition-all ${
                                       selectedVoice === v.id
-                                        ? "border-cyan-500/50 bg-cyan-500/10 text-cyan-300"
+                                        ? "border-stone-500/50 bg-stone-500/10 text-stone-300"
                                         : "border-white/[0.08] text-white/50 hover:border-white/20"
                                     }`}
                                   >
@@ -2704,7 +2707,7 @@ export default function VideoCreatorDashboard() {
                                 </div>
                                 <div className="w-full h-1.5 bg-white/[0.08] rounded-full overflow-hidden">
                                   <motion.div
-                                    className="h-full bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full"
+                                    className="h-full bg-gradient-to-r from-stone-500 to-stone-600 rounded-full"
                                     initial={{ width: 0 }}
                                     animate={{ width: `${renderProgress}%` }}
                                     transition={{ duration: 0.5 }}
@@ -2713,9 +2716,9 @@ export default function VideoCreatorDashboard() {
                                 <div className="grid grid-cols-5 gap-1">
                                   {renderJobs.map((job) => (
                                     <div key={job.id} className={`text-center py-1 rounded text-[9px] font-medium ${
-                                      job.status === "succeeded" ? "bg-green-500/10 text-green-400" :
-                                      job.status === "failed" ? "bg-red-500/10 text-red-400" :
-                                      job.status === "processing" ? "bg-blue-500/10 text-blue-400" :
+                                      job.status === "succeeded" ? "bg-stone-500/10 text-stone-400" :
+                                      job.status === "failed" ? "bg-stone-500/10 text-stone-400" :
+                                      job.status === "processing" ? "bg-stone-500/10 text-stone-400" :
                                       "bg-white/[0.03] text-white/50"
                                     }`} title={job.error ? sanitizeError(job.error) : undefined}>
                                       S{job.sceneNumber}
@@ -2723,7 +2726,7 @@ export default function VideoCreatorDashboard() {
                                   ))}
                                 </div>
                                 {renderJobs.some((j) => j.status === "failed" && j.error) && (
-                                  <div className="mt-2 p-2 rounded-lg bg-red-500/10 border border-red-500/20 text-[10px] text-red-300 space-y-0.5">
+                                  <div className="mt-2 p-2 rounded-lg bg-stone-500/10 border border-stone-500/20 text-[10px] text-stone-300 space-y-0.5">
                                     <span className="font-medium">Render issues:</span>
                                     {renderJobs.filter((j) => j.status === "failed" && j.error).slice(0, 3).map((j) => (
                                       <div key={j.id} className="truncate">Scene {j.sceneNumber}: {sanitizeError(j.error || "")}</div>
@@ -2760,7 +2763,7 @@ export default function VideoCreatorDashboard() {
                                     >
                                       <Square className="w-3 h-3" /> Stop
                                     </button>
-                                    <span className="text-[9px] text-amber-400/60">Browser TTS — free preview mode</span>
+                                    <span className="text-[9px] text-stone-400/60">Browser TTS — free preview mode</span>
                                   </div>
                                 ) : (
                                   <audio controls src={voiceoverUrl} className="w-full h-8 [&::-webkit-media-controls-panel]:bg-white/5 rounded" />
@@ -2791,8 +2794,8 @@ export default function VideoCreatorDashboard() {
                                     {tiktokUser?.avatar_url && (
                                       <NextImage src={tiktokUser.avatar_url} alt="" width={20} height={20} unoptimized className="rounded-full" />
                                     )}
-                                    <span className="text-green-400">{tiktokUser?.display_name || "Connected"}</span>
-                                    <button onClick={handleDisconnectTikTok} className="ml-auto text-white/30 hover:text-red-400 transition-colors text-[9px]">
+                                    <span className="text-stone-400">{tiktokUser?.display_name || "Connected"}</span>
+                                    <button onClick={handleDisconnectTikTok} className="ml-auto text-white/30 hover:text-stone-400 transition-colors text-[9px]">
                                       Disconnect
                                     </button>
                                   </div>
@@ -2808,7 +2811,7 @@ export default function VideoCreatorDashboard() {
                                     <p className="text-[9px] text-white/30">Render a video first to enable TikTok upload</p>
                                   )}
                                   {tiktokStatus && (
-                                    <p className="text-[9px] text-green-400">{tiktokStatus}</p>
+                                    <p className="text-[9px] text-stone-400">{tiktokStatus}</p>
                                   )}
                                 </div>
                               ) : (
@@ -2835,25 +2838,25 @@ export default function VideoCreatorDashboard() {
                             {capabilities && (
                               <div className="text-[10px] text-white/50 space-y-0.5 pt-1 border-t border-white/[0.06]">
                                 <div className="flex items-center gap-1">
-                                  <CheckCircle2 className="w-3 h-3 text-green-500" />
+                                  <CheckCircle2 className="w-3 h-3 text-stone-500" />
                                   Storyboard & Script: Ready
                                 </div>
                                 <div className="flex items-center gap-1">
-                                  {capabilities.imageGen.available ? <CheckCircle2 className="w-3 h-3 text-green-500" /> : <AlertCircle className="w-3 h-3 text-amber-500" />}
+                                  {capabilities.imageGen.available ? <CheckCircle2 className="w-3 h-3 text-stone-500" /> : <AlertCircle className="w-3 h-3 text-stone-500" />}
                                   AI Image Generation: {capabilities.imageGen.available ? "Ready" : "Coming Soon"}
                                 </div>
                                 <div className="flex items-center gap-1">
-                                  {capabilities.videoRender.available ? <CheckCircle2 className="w-3 h-3 text-green-500" /> : <AlertCircle className="w-3 h-3 text-amber-500" />}
+                                  {capabilities.videoRender.available ? <CheckCircle2 className="w-3 h-3 text-stone-500" /> : <AlertCircle className="w-3 h-3 text-stone-500" />}
                                   Video Rendering: {capabilities.videoRender.available ? "Ready" : "Coming Soon"}
                                 </div>
                                 <div className="flex items-center gap-1">
                                   {capabilities.voiceover.available && (capabilities.voiceover as { premium?: boolean }).premium
-                                    ? <CheckCircle2 className="w-3 h-3 text-green-500" />
-                                    : <AlertCircle className="w-3 h-3 text-amber-500" />}
+                                    ? <CheckCircle2 className="w-3 h-3 text-stone-500" />
+                                    : <AlertCircle className="w-3 h-3 text-stone-500" />}
                                   Voiceover: {capabilities.voiceover.available && (capabilities.voiceover as { premium?: boolean }).premium ? "Ready (ElevenLabs)" : "Browser TTS (upgrade for premium voices)"}
                                 </div>
                                 <div className="flex items-center gap-1">
-                                  <CheckCircle2 className="w-3 h-3 text-green-500" />
+                                  <CheckCircle2 className="w-3 h-3 text-stone-500" />
                                   Subtitles & Captions: Ready (SRT/VTT)
                                 </div>
                               </div>
@@ -2867,8 +2870,8 @@ export default function VideoCreatorDashboard() {
                   /* Empty state */
                   <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] h-[600px] flex items-center justify-center">
                     <div className="text-center px-8">
-                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-600/20 to-blue-700/20 flex items-center justify-center mx-auto mb-4">
-                        <Film className="w-8 h-8 text-cyan-400/60" />
+                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-stone-600/20 to-stone-700/20 flex items-center justify-center mx-auto mb-4">
+                        <Film className="w-8 h-8 text-stone-400/60" />
                       </div>
                       <h3 className="text-lg font-bold mb-2 text-white/80">Your storyboard will appear here</h3>
                       <p className="text-sm text-white/60 max-w-sm">

@@ -83,12 +83,12 @@ export default function ChatbotsPage() {
       <header className="border-b border-white/10 bg-[#0a0a12]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">
               Zoobicon
             </Link>
             <span className="text-white/30">/</span>
             <div className="flex items-center gap-2">
-              <Bot className="w-5 h-5 text-violet-400" />
+              <Bot className="w-5 h-5 text-stone-400" />
               <span className="font-semibold">AI Chatbots</span>
             </div>
           </div>
@@ -98,7 +98,7 @@ export default function ChatbotsPage() {
             </Link>
             <button
               onClick={() => setView('create')}
-              className="px-4 py-2 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
+              className="px-4 py-2 bg-stone-600 hover:bg-stone-500 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
             >
               <Plus className="w-4 h-4" /> New Chatbot
             </button>
@@ -117,10 +117,10 @@ export default function ChatbotsPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
               {[
-                { label: 'Total Conversations', value: totalConversations.toLocaleString(), icon: MessageCircle, change: '+18% this week', color: 'text-violet-400' },
-                { label: 'Leads Captured', value: totalLeads.toLocaleString(), icon: Users, change: '+34% this week', color: 'text-blue-400' },
-                { label: 'Avg Satisfaction', value: `${avgSatisfaction}/5`, icon: Star, change: '+0.2 this month', color: 'text-yellow-400' },
-                { label: 'Escalations', value: totalEscalations.toString(), icon: AlertTriangle, change: '-12% this week', color: 'text-orange-400' },
+                { label: 'Total Conversations', value: totalConversations.toLocaleString(), icon: MessageCircle, change: '+18% this week', color: 'text-stone-400' },
+                { label: 'Leads Captured', value: totalLeads.toLocaleString(), icon: Users, change: '+34% this week', color: 'text-stone-400' },
+                { label: 'Avg Satisfaction', value: `${avgSatisfaction}/5`, icon: Star, change: '+0.2 this month', color: 'text-stone-400' },
+                { label: 'Escalations', value: totalEscalations.toString(), icon: AlertTriangle, change: '-12% this week', color: 'text-stone-400' },
               ].map((stat, i) => {
                 const Icon = stat.icon;
                 return (
@@ -130,7 +130,7 @@ export default function ChatbotsPage() {
                       <Icon className={`w-5 h-5 ${stat.color}`} />
                     </div>
                     <div className="text-2xl font-bold mb-1">{stat.value}</div>
-                    <div className="text-xs text-green-400">{stat.change}</div>
+                    <div className="text-xs text-stone-400">{stat.change}</div>
                   </div>
                 );
               })}
@@ -142,7 +142,7 @@ export default function ChatbotsPage() {
                 <div
                   key={bot.id}
                   className={`bg-white/5 border rounded-xl p-5 transition-all cursor-pointer hover:-translate-y-0.5 ${
-                    selectedBot === bot.id ? 'border-violet-500/50 bg-violet-500/5' : 'border-white/10 hover:border-white/20'
+                    selectedBot === bot.id ? 'border-stone-500/50 bg-stone-500/5' : 'border-white/10 hover:border-white/20'
                   }`}
                   onClick={() => setSelectedBot(selectedBot === bot.id ? null : bot.id)}
                 >
@@ -155,7 +155,7 @@ export default function ChatbotsPage() {
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold">{bot.name}</h3>
                           <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${
-                            bot.status === 'active' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'
+                            bot.status === 'active' ? 'bg-stone-500/20 text-stone-400' : 'bg-stone-500/20 text-stone-400'
                           }`}>
                             {bot.status}
                           </span>
@@ -169,15 +169,15 @@ export default function ChatbotsPage() {
                         <div className="text-[10px] text-white/40">Conversations</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-sm font-bold text-blue-400">{bot.leads}</div>
+                        <div className="text-sm font-bold text-stone-400">{bot.leads}</div>
                         <div className="text-[10px] text-white/40">Leads</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-sm font-bold text-yellow-400">{bot.satisfaction}</div>
+                        <div className="text-sm font-bold text-stone-400">{bot.satisfaction}</div>
                         <div className="text-[10px] text-white/40">Rating</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-sm font-bold text-orange-400">{bot.escalations}</div>
+                        <div className="text-sm font-bold text-stone-400">{bot.escalations}</div>
                         <div className="text-[10px] text-white/40">Escalations</div>
                       </div>
                       <ChevronRight className={`w-5 h-5 text-white/30 transition-transform ${selectedBot === bot.id ? 'rotate-90' : ''}`} />
@@ -190,7 +190,7 @@ export default function ChatbotsPage() {
                       {/* Embed Code */}
                       <div className="bg-black/20 rounded-lg p-4">
                         <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
-                          <Code className="w-4 h-4 text-violet-400" /> Embed Code
+                          <Code className="w-4 h-4 text-stone-400" /> Embed Code
                         </h4>
                         <pre className="text-[11px] text-white/60 bg-black/30 rounded p-2 overflow-x-auto mb-2">
                           {embedCode(bot.id)}
@@ -204,7 +204,7 @@ export default function ChatbotsPage() {
                           }}
                           className="text-xs px-3 py-1.5 bg-white/10 rounded hover:bg-white/20 flex items-center gap-1 transition-colors"
                         >
-                          {copied ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3" />}
+                          {copied ? <Check className="w-3 h-3 text-stone-400" /> : <Copy className="w-3 h-3" />}
                           {copied ? 'Copied!' : 'Copy Code'}
                         </button>
                       </div>
@@ -212,26 +212,26 @@ export default function ChatbotsPage() {
                       {/* Quick Actions */}
                       <div className="bg-black/20 rounded-lg p-4">
                         <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
-                          <Settings className="w-4 h-4 text-violet-400" /> Quick Actions
+                          <Settings className="w-4 h-4 text-stone-400" /> Quick Actions
                         </h4>
                         <div className="space-y-2">
                           <button
                             onClick={(e) => e.stopPropagation()}
                             className="w-full text-left px-3 py-2 bg-white/5 rounded-lg text-sm hover:bg-white/10 flex items-center gap-2 transition-colors"
                           >
-                            <Brain className="w-4 h-4 text-blue-400" /> Edit Knowledge Base
+                            <Brain className="w-4 h-4 text-stone-400" /> Edit Knowledge Base
                           </button>
                           <button
                             onClick={(e) => e.stopPropagation()}
                             className="w-full text-left px-3 py-2 bg-white/5 rounded-lg text-sm hover:bg-white/10 flex items-center gap-2 transition-colors"
                           >
-                            <Shield className="w-4 h-4 text-orange-400" /> Escalation Rules
+                            <Shield className="w-4 h-4 text-stone-400" /> Escalation Rules
                           </button>
                           <button
                             onClick={(e) => e.stopPropagation()}
                             className="w-full text-left px-3 py-2 bg-white/5 rounded-lg text-sm hover:bg-white/10 flex items-center gap-2 transition-colors"
                           >
-                            {bot.status === 'active' ? <Pause className="w-4 h-4 text-yellow-400" /> : <Play className="w-4 h-4 text-green-400" />}
+                            {bot.status === 'active' ? <Pause className="w-4 h-4 text-stone-400" /> : <Play className="w-4 h-4 text-stone-400" />}
                             {bot.status === 'active' ? 'Pause Bot' : 'Activate Bot'}
                           </button>
                         </div>
@@ -240,7 +240,7 @@ export default function ChatbotsPage() {
                       {/* Recent Activity */}
                       <div className="bg-black/20 rounded-lg p-4">
                         <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
-                          <TrendingUp className="w-4 h-4 text-violet-400" /> This Week
+                          <TrendingUp className="w-4 h-4 text-stone-400" /> This Week
                         </h4>
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between">
@@ -249,15 +249,15 @@ export default function ChatbotsPage() {
                           </div>
                           <div className="flex justify-between">
                             <span className="text-white/50">New leads</span>
-                            <span className="font-medium text-blue-400">{Math.round(bot.leads * 0.25)}</span>
+                            <span className="font-medium text-stone-400">{Math.round(bot.leads * 0.25)}</span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-white/50">Escalations</span>
-                            <span className="font-medium text-orange-400">{Math.round(bot.escalations * 0.3)}</span>
+                            <span className="font-medium text-stone-400">{Math.round(bot.escalations * 0.3)}</span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-white/50">Satisfaction</span>
-                            <span className="font-medium text-yellow-400">{bot.satisfaction}/5</span>
+                            <span className="font-medium text-stone-400">{bot.satisfaction}/5</span>
                           </div>
                         </div>
                       </div>
@@ -268,15 +268,15 @@ export default function ChatbotsPage() {
             </div>
 
             {/* Pricing CTA */}
-            <div className="mt-12 bg-gradient-to-r from-violet-900/30 to-fuchsia-900/30 border border-violet-500/20 rounded-2xl p-8 text-center">
-              <Sparkles className="w-8 h-8 text-violet-400 mx-auto mb-3" />
+            <div className="mt-12 bg-gradient-to-r from-stone-900/30 to-stone-900/30 border border-stone-500/20 rounded-2xl p-8 text-center">
+              <Sparkles className="w-8 h-8 text-stone-400 mx-auto mb-3" />
               <h2 className="text-2xl font-bold mb-2">Replace Intercom, Drift, and Tidio</h2>
               <p className="text-white/60 max-w-xl mx-auto mb-6">
                 Zoobicon AI Chatbots are included in Pro ($49/mo) and Agency ($129/mo) plans.
                 Competitors charge $50-74/month for a single chatbot.
               </p>
               <div className="flex gap-3 justify-center">
-                <Link href="/pricing" className="px-6 py-3 bg-violet-600 hover:bg-violet-500 rounded-lg font-medium transition-colors">
+                <Link href="/pricing" className="px-6 py-3 bg-stone-600 hover:bg-stone-500 rounded-lg font-medium transition-colors">
                   View Plans
                 </Link>
                 <Link href="/ai-chat" className="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-lg font-medium transition-colors">
@@ -298,7 +298,7 @@ export default function ChatbotsPage() {
             <div className="space-y-6">
               <div className="bg-white/5 border border-white/10 rounded-xl p-6 space-y-4">
                 <h3 className="font-semibold flex items-center gap-2">
-                  <Bot className="w-5 h-5 text-violet-400" /> Basic Info
+                  <Bot className="w-5 h-5 text-stone-400" /> Basic Info
                 </h3>
                 <div>
                   <label className="block text-sm text-white/60 mb-1">Business Name *</label>
@@ -306,7 +306,7 @@ export default function ChatbotsPage() {
                     value={formName}
                     onChange={e => setFormName(e.target.value)}
                     placeholder="e.g., Acme Corp"
-                    className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-violet-500"
+                    className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-stone-500"
                   />
                 </div>
                 <div>
@@ -316,7 +316,7 @@ export default function ChatbotsPage() {
                     onChange={e => setFormDesc(e.target.value)}
                     placeholder="What does your business do? What products/services do you offer?"
                     rows={3}
-                    className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2.5 text-sm resize-none focus:outline-none focus:border-violet-500"
+                    className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2.5 text-sm resize-none focus:outline-none focus:border-stone-500"
                   />
                 </div>
                 <div>
@@ -325,14 +325,14 @@ export default function ChatbotsPage() {
                     value={formGreeting}
                     onChange={e => setFormGreeting(e.target.value)}
                     placeholder="Hi! How can I help you today?"
-                    className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-violet-500"
+                    className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-stone-500"
                   />
                 </div>
               </div>
 
               <div className="bg-white/5 border border-white/10 rounded-xl p-6 space-y-4">
                 <h3 className="font-semibold flex items-center gap-2">
-                  <Settings className="w-5 h-5 text-violet-400" /> Configuration
+                  <Settings className="w-5 h-5 text-stone-400" /> Configuration
                 </h3>
                 <div>
                   <label className="block text-sm text-white/60 mb-2">Widget Color</label>
@@ -356,7 +356,7 @@ export default function ChatbotsPage() {
                   </div>
                   <button
                     onClick={() => setFormCollectEmail(!formCollectEmail)}
-                    className={`w-11 h-6 rounded-full transition-colors ${formCollectEmail ? 'bg-violet-600' : 'bg-white/20'}`}
+                    className={`w-11 h-6 rounded-full transition-colors ${formCollectEmail ? 'bg-stone-600' : 'bg-white/20'}`}
                   >
                     <div className={`w-5 h-5 rounded-full bg-white transition-transform ${formCollectEmail ? 'translate-x-5' : 'translate-x-0.5'}`} />
                   </button>
@@ -367,7 +367,7 @@ export default function ChatbotsPage() {
                     value={formEscalationEmail}
                     onChange={e => setFormEscalationEmail(e.target.value)}
                     placeholder="support@yourcompany.com"
-                    className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-violet-500"
+                    className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-stone-500"
                   />
                   <p className="text-xs text-white/40 mt-1">When the AI can&apos;t help, the conversation is forwarded here</p>
                 </div>
@@ -376,7 +376,7 @@ export default function ChatbotsPage() {
               <button
                 onClick={handleCreate}
                 disabled={!formName || !formDesc}
-                className="w-full py-3 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-colors"
+                className="w-full py-3 bg-stone-600 hover:bg-stone-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-colors"
               >
                 <Zap className="w-4 h-4" /> Create Chatbot
               </button>

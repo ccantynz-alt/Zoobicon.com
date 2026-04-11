@@ -114,9 +114,9 @@ export default function AdminBookingPage() {
   );
 
   const statusColor = (s: string) => {
-    if (s === "confirmed" || s === "completed") return "bg-emerald-500/20 text-emerald-400";
-    if (s === "pending") return "bg-amber-500/20 text-amber-400";
-    if (s === "cancelled") return "bg-red-500/20 text-red-400";
+    if (s === "confirmed" || s === "completed") return "bg-stone-500/20 text-stone-400";
+    if (s === "pending") return "bg-stone-500/20 text-stone-400";
+    if (s === "cancelled") return "bg-stone-500/20 text-stone-400";
     return "bg-white/10 text-white/60";
   };
 
@@ -126,20 +126,20 @@ export default function AdminBookingPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-3">
-            <Calendar className="w-6 h-6 text-indigo-400" />
+            <Calendar className="w-6 h-6 text-stone-400" />
             Booking Management
           </h1>
           <p className="text-sm text-white/40 mt-1">
             Provider:{" "}
             <span
               className={`font-mono ${
-                provider === "mock" ? "text-amber-400" : "text-emerald-400"
+                provider === "mock" ? "text-stone-400" : "text-stone-400"
               }`}
             >
               {provider || "detecting..."}
             </span>
             {provider === "mock" && (
-              <span className="ml-2 text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded-full">
+              <span className="ml-2 text-[10px] bg-stone-500/10 text-stone-400 px-2 py-0.5 rounded-full">
                 Mock Mode — add CALCOM_API_KEY to go live
               </span>
             )}
@@ -192,20 +192,20 @@ export default function AdminBookingPage() {
           onChange={(e) => setSearchFilter(e.target.value)}
           placeholder="Search by client name or email..."
           className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl pl-10 pr-4 py-3 text-sm
-                     placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/30 transition-all"
+                     placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-stone-500/20 focus:border-stone-500/30 transition-all"
         />
       </div>
 
       {loading ? (
         <div className="flex items-center justify-center h-40">
-          <Loader2 className="w-5 h-5 text-indigo-400 animate-spin" />
+          <Loader2 className="w-5 h-5 text-stone-400 animate-spin" />
         </div>
       ) : (
         <>
           {/* Appointments Table */}
           <div className="mb-8">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-indigo-400" />
+              <Calendar className="w-5 h-5 text-stone-400" />
               Appointments
               <span className="text-xs text-white/30 bg-white/[0.05] px-2 py-0.5 rounded-full ml-2">
                 {filteredAppointments.length} total
@@ -277,7 +277,7 @@ export default function AdminBookingPage() {
           {/* Services List */}
           <div>
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <DollarSign className="w-5 h-5 text-emerald-400" />
+              <DollarSign className="w-5 h-5 text-stone-400" />
               Services
               <span className="text-xs text-white/30 bg-white/[0.05] px-2 py-0.5 rounded-full ml-2">
                 {services.length} total
@@ -313,7 +313,7 @@ export default function AdminBookingPage() {
                         <span
                           className={`text-[10px] px-2 py-0.5 rounded-full ${
                             svc.enabled
-                              ? "bg-emerald-500/10 text-emerald-400"
+                              ? "bg-stone-500/10 text-stone-400"
                               : "bg-white/[0.05] text-white/40"
                           }`}
                         >
@@ -324,7 +324,7 @@ export default function AdminBookingPage() {
                         <span className="text-sm text-white/40">
                           {svc.duration} min
                         </span>
-                        <span className="text-sm font-mono text-emerald-400">
+                        <span className="text-sm font-mono text-stone-400">
                           {svc.price === 0 ? "Free" : `$${svc.price}`}
                         </span>
                         {expandedService === svc.id ? (
@@ -392,16 +392,16 @@ function StatCard({
   color: string;
 }) {
   const colorMap: Record<string, string> = {
-    indigo: "from-indigo-500/10 to-indigo-500/5 border-indigo-500/15",
-    cyan: "from-cyan-500/10 to-cyan-500/5 border-cyan-500/15",
-    emerald: "from-emerald-500/10 to-emerald-500/5 border-emerald-500/15",
-    amber: "from-amber-500/10 to-amber-500/5 border-amber-500/15",
+    indigo: "from-stone-500/10 to-stone-500/5 border-stone-500/15",
+    cyan: "from-stone-500/10 to-stone-500/5 border-stone-500/15",
+    emerald: "from-stone-500/10 to-stone-500/5 border-stone-500/15",
+    amber: "from-stone-500/10 to-stone-500/5 border-stone-500/15",
   };
   const iconMap: Record<string, string> = {
-    indigo: "text-indigo-400",
-    cyan: "text-cyan-400",
-    emerald: "text-emerald-400",
-    amber: "text-amber-400",
+    indigo: "text-stone-400",
+    cyan: "text-stone-400",
+    emerald: "text-stone-400",
+    amber: "text-stone-400",
   };
   return (
     <div className={`rounded-2xl bg-gradient-to-br ${colorMap[color]} border p-4`}>
