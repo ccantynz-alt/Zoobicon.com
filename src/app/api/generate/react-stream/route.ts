@@ -384,7 +384,14 @@ function buildSupabaseBrief(needs: {
   return lines.join("\n");
 }
 
-async function customiseComponent(args: CustomiseArgs): Promise<string> {
+interface CustomiseResult {
+  ok: boolean;
+  code: string;           // Either the customised file, or the raw base component as a last-resort fallback
+  reason?: string;        // Why we fell back — always populated when ok === false
+  modelUsed?: string;     // The model that actually produced the code (for telemetry)
+}
+
+async function customiseComponent(args: CustomiseArgs): Promise<CustomiseResult> {
   const supabaseBrief = args.supabase ? buildSupabaseBrief(args.supabase) : "";
   const userMsg =
     `BRAND: ${args.brandName}\n` +
@@ -394,6 +401,8 @@ async function customiseComponent(args: CustomiseArgs): Promise<string> {
     supabaseBrief +
     `\nBASE COMPONENT FILE:\n${args.baseCode}\n\n` +
     `Output the full updated TypeScript file only.`;
+
+  const attemptLog: string[] = [];
 
   // Try streaming Claude first (fastest path when Anthropic is healthy).
   try {
@@ -410,21 +419,42 @@ async function customiseComponent(args: CustomiseArgs): Promise<string> {
       }
     }
     if (collected.trim().length > 100) {
-      return stripFencesAndWrap(collected);
+      return { ok: true, code: stripFencesAndWrap(collected), modelUsed: args.model };
     }
-    // Empty / too-short — fall through to cross-provider failover
+    attemptLog.push(`${args.model}: empty/short output`);
   } catch (err) {
-    console.warn(`[react-stream] streamClaude failed for ${args.category}, trying failover:`, err);
+    const msg = err instanceof Error ? err.message : String(err);
+    attemptLog.push(`${args.model}: ${msg.slice(0, 120)}`);
+    console.warn(`[react-stream] streamClaude failed for ${args.category}:`, msg);
   }
 
-  // Failover path — callLLMWithFailover cycles Anthropic → OpenAI → Gemini
-  const fb = await callLLMWithFailover({
-    model: args.model,
-    system: CUSTOMISER_SYSTEM,
-    userMessage: userMsg,
-    maxTokens: 4000,
-  });
-  return stripFencesAndWrap(fb.text || "");
+  // Failover path — callLLMWithFailover cycles Anthropic → OpenAI → Gemini.
+  // Any provider returning usable text wins. If they all fail, we return ok=false
+  // with the raw base component as last-resort code so the build still completes,
+  // and the caller surfaces a warning event to the UI (Law 8: never silent).
+  try {
+    const fb = await callLLMWithFailover({
+      model: args.model,
+      system: CUSTOMISER_SYSTEM,
+      userMessage: userMsg,
+      maxTokens: 4000,
+    });
+    const text = (fb.text || "").trim();
+    if (text.length > 100) {
+      return { ok: true, code: stripFencesAndWrap(text), modelUsed: fb.model || args.model };
+    }
+    attemptLog.push(`failover: empty/short output`);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    attemptLog.push(`failover: ${msg.slice(0, 120)}`);
+    console.warn(`[react-stream] callLLMWithFailover failed for ${args.category}:`, msg);
+  }
+
+  return {
+    ok: false,
+    code: `import React from "react";\n\n${args.baseCode}\n`,
+    reason: attemptLog.join(" | "),
+  };
 }
 
 function buildPackageJson(opts?: { withSupabase?: boolean }): string {
@@ -616,24 +646,37 @@ export async function POST(req: NextRequest): Promise<Response> {
         // in the right order as they arrive.
         const completedByIndex = new Map<number, RegistryComponent>();
         let completedCount = 0;
+        const failedSections: Array<{ id: string; category: string; variant: string; reason: string }> = [];
 
         await Promise.all(
           components.map(async (comp, i) => {
-            let updatedCode: string;
-            try {
-              updatedCode = await customiseComponent({
-                baseCode: comp.code,
-                brandName,
+            const result = await customiseComponent({
+              baseCode: comp.code,
+              brandName,
+              category: comp.category,
+              variant: comp.variant,
+              prompt,
+              primaryColor,
+              model: customiserModel,
+              supabase: customiserSupabase,
+            });
+            let updatedCode = result.code;
+            if (!result.ok) {
+              failedSections.push({
+                id: comp.id,
                 category: comp.category,
                 variant: comp.variant,
-                prompt,
-                primaryColor,
-                model: customiserModel,
-                supabase: customiserSupabase,
+                reason: result.reason || "unknown",
               });
-            } catch {
-              // Fallback: use template code as-is
-              updatedCode = `import React from "react";\n\n${comp.code}\n`;
+              // Surface the failure to the client the moment it happens so the
+              // UI can render a "this section used the base template" badge
+              // instead of silently shipping placeholder copy (Law 8).
+              writer.send("warning", {
+                kind: "section-fallback",
+                section: comp.id,
+                category: comp.category,
+                reason: result.reason,
+              });
             }
 
             // Editorial reskin — guarantees every shipped component uses the
@@ -686,6 +729,20 @@ export async function POST(req: NextRequest): Promise<Response> {
             });
           })
         );
+
+        // Hard fail when every single component had to fall back to base
+        // template code — that means no provider produced any customised
+        // output and the entire build is a placeholder scaffold, which
+        // directly violates the Filmora standard + Law 8. Better to tell
+        // the user the real reason than ship a generic "Acme" site.
+        if (failedSections.length === components.length && components.length > 0) {
+          const providers = getAvailableProviders();
+          const reasons = failedSections.slice(0, 3).map((f) => `${f.id}: ${f.reason}`).join(" / ");
+          throw new Error(
+            `Every section fell back to base template — no LLM provider produced customised output. ` +
+            `Providers available: [${providers.join(", ") || "none"}]. Last reasons: ${reasons}`,
+          );
+        }
 
         writer.send("files", { files });
 
@@ -858,6 +915,7 @@ export async function POST(req: NextRequest): Promise<Response> {
           finalFiles,
           score: finalScore,
           durationMs: Date.now() - startedAt,
+          failedSections,
           ...(supabaseResult ? { supabase: supabaseResult } : {}),
         });
         writer.close();
