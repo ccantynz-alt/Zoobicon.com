@@ -966,27 +966,6 @@ function BuilderPage() {
     return html;
   }, []);
 
-  const clearWatchdog = useCallback(() => {
-    if (watchdogSlowRef.current) clearTimeout(watchdogSlowRef.current);
-    if (watchdogStuckRef.current) clearTimeout(watchdogStuckRef.current);
-    watchdogSlowRef.current = null;
-    watchdogStuckRef.current = null;
-    setStreamWarning(null);
-  }, []);
-
-  const resetWatchdog = useCallback(() => {
-    clearWatchdog();
-  }, [clearWatchdog]);
-
-  const errorSuggestion = useCallback((msg: string): string | undefined => {
-    if (msg.includes("API key") || msg.includes("API_KEY") || msg.includes("not configured")) return "Check your API key is set correctly in the settings.";
-    if (msg.includes("rate limit") || msg.includes("429")) return "You've hit the rate limit. Wait a moment and try again.";
-    if (msg.includes("timeout") || msg.includes("504") || msg.includes("502")) return "The AI model timed out. Try again with a simpler prompt.";
-    if (msg.includes("empty") || msg.includes("no content")) return "Generation produced empty content. Try a more specific prompt.";
-    return undefined;
-  }, []);
-
-
   const upsertSection = useCallback((section: string, status: "scaffolding" | "customizing" | "done") => {
     if (!section) return;
     const now = Date.now();

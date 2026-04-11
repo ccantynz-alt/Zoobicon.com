@@ -234,11 +234,17 @@ export async function generateVoice(
     onProgress?: (msg: string) => void;
   }
 ): Promise<{ audioUrl: string; duration: number }> {
-  const REPLICATE_API_BASE = "https://api.replicate.com/v1";
-  const token = process.env.REPLICATE_API_TOKEN;
-  if (!token) throw new Error("[generateVoice] REPLICATE_API_TOKEN not set");
+  const token = getReplicateToken();
+  const speed = options?.speed || 1.0;
+  const gender = options?.gender || "female";
 
-  // Try multiple TTS models in order — first one that works wins
+  // Kokoro voice IDs (verified): af_bella, af_sarah, am_adam, am_michael
+  const kokoroVoice = gender === "male" ? "am_michael" : "af_bella";
+  // XTTS speaker presets (verified): "Claribel Dervla", "Daisy Studious", "Damien Black"...
+  const xttsSpeaker = gender === "male" ? "Damien Black" : "Claribel Dervla";
+
+  // Each entry has multiple input variants in case the model expects
+  // a slightly different schema across versions.
   const ttsModels = [
     {
       name: "Kokoro 82M",
@@ -262,37 +268,53 @@ export async function generateVoice(
         { prompt: text, text_temp: 0.7, waveform_temp: 0.7 },
       ],
     },
+    {
+      name: "OpenVoice",
+      modelPath: "chenxwh/openvoice",
+      inputVariants: [
+        { text, language: "EN_NEWEST", speed },
+        { text },
+      ],
+    },
+    {
+      name: "Seamless Communication",
+      modelPath: "cjwbw/seamless_communication",
+      inputVariants: [
+        { task_name: "T2ST (Text to Speech translation)", input_text: text, input_text_language: "English", target_language_text_only: "English", target_language_with_speech: "English" },
+      ],
+    },
   ];
 
+  // Try each TTS model in order (Law 9: 4+ model fallback chain)
   for (const model of ttsModels) {
-    try {
-      console.log(`[generateVoice] Trying ${model.name}...`);
-      const res = await fetch(`${REPLICATE_API_BASE}/models/${model.model}/predictions`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-          Prefer: "wait",
-        },
-        body: JSON.stringify({ input: model.input }),
-        signal: AbortSignal.timeout(30000),
-      });
-      if (!res.ok) continue;
-      const data = await res.json() as { output?: unknown };
-      const output = data.output;
-      const audioUrl =
-        typeof output === "string" ? output
-        : Array.isArray(output) ? String(output[0])
-        : null;
-      if (audioUrl) {
-        console.log(`[generateVoice] ${model.name} succeeded`);
-        return { audioUrl, duration: Math.max(1, text.length / 15) };
+    for (const input of model.inputVariants) {
+      try {
+        options?.onProgress?.(`Trying ${model.name}…`);
+        const res = await createReplicatePrediction(model.modelPath, input, token);
+        if (!res.ok) {
+          console.warn(`[video-pipeline] ${model.name} HTTP ${res.status}`);
+          continue;
+        }
+        const predData = await res.json();
+        // Check if result is already available (synchronous)
+        let audioUrl = extractReplicateOutput(predData);
+        // If async, poll for completion
+        if (!audioUrl && predData.urls?.get) {
+          const pollResult = await pollReplicatePrediction(predData.urls.get, {
+            onUpdate: (status) => options?.onProgress?.(`${model.name}: ${status}`),
+          });
+          audioUrl = extractReplicateOutput(pollResult);
+        }
+        if (audioUrl) {
+          options?.onProgress?.(`Voice generated with ${model.name}`);
+          return { audioUrl, duration: estimateDuration(text) };
+        }
+      } catch (err) {
+        console.warn(`[video-pipeline] TTS ${model.name} failed:`, err instanceof Error ? err.message : err);
       }
-    } catch (err) {
-      console.warn(`[generateVoice] ${model.name} failed:`, err instanceof Error ? err.message : err);
     }
   }
-  throw new Error("[generateVoice] all TTS models failed");
+  throw new Error("All TTS models failed. Check REPLICATE_API_TOKEN and model availability.");
 }
 
 export async function generatePremiumSpokespersonVideo(
@@ -319,22 +341,25 @@ export async function generatePremiumSpokespersonVideo(
   };
 }
 
-export async function generateLipSync(
-  audioUrl: string,
-  avatarImageUrl: string
-): Promise<{ videoUrl: string; durationSec: number; model: string }> {
-  const result = await generatePremiumVideo({
-    script: "",
-    voiceId: "female-1",
-    avatarImageUrl,
-    captions: false,
-    tier: "standard",
-  });
-  void audioUrl;
-  return {
-    videoUrl: result.finalVideoUrl,
-    durationSec: result.durationSec,
-    model: result.modelsUsed[0] ?? "unknown",
+/**
+ * Generate voice using XTTS v2 with optional voice cloning.
+ *
+ * If `referenceAudioUrl` is provided, XTTS will clone that voice. Otherwise
+ * it uses a default speaker. Used by the voice-clone feature.
+ *
+ * Falls back to Kokoro 82M if XTTS is unavailable (without cloning, since
+ * Kokoro doesn't support reference-based cloning).
+ */
+export async function generateVoiceXTTS(
+  text: string,
+  referenceAudioUrl?: string
+): Promise<{ audioUrl: string; duration: number }> {
+  const token = getReplicateToken();
+
+  // Try XTTS v2 first — supports voice cloning via `speaker` param
+  const xttsInput: Record<string, unknown> = {
+    text,
+    language: "en",
   };
   if (referenceAudioUrl) {
     xttsInput.speaker = referenceAudioUrl;
@@ -361,7 +386,65 @@ export async function generateLipSync(
 
 // ── Step 2: Avatar Generation ──
 
-export type VideoTier = "standard" | "premium";
+/**
+ * Generate a photorealistic avatar face.
+ *
+ * Primary: FLUX.1 schnell (black-forest-labs/flux-schnell). Falls back to
+ * SDXL Lightning, then Stable Diffusion 3 if the primary is unavailable.
+ */
+export async function generateAvatar(
+  description: string,
+  options?: { onProgress?: (msg: string) => void }
+): Promise<{ imageUrl: string }> {
+  const token = getReplicateToken();
+  const prompt = `Professional headshot portrait photo of ${description}. Clean background, studio lighting, sharp focus, photorealistic, 8k quality. Looking directly at camera with neutral pleasant expression. Shoulders visible. Professional attire.`;
+
+  const imageModels = [
+    {
+      name: "FLUX.1 schnell",
+      modelPath: "black-forest-labs/flux-schnell",
+      input: {
+        prompt,
+        num_outputs: 1,
+        aspect_ratio: "1:1",
+        output_format: "webp",
+        output_quality: 90,
+        go_fast: true,
+      },
+    },
+    {
+      name: "FLUX.1 dev",
+      modelPath: "black-forest-labs/flux-dev",
+      input: {
+        prompt,
+        num_outputs: 1,
+        aspect_ratio: "1:1",
+        output_format: "webp",
+        output_quality: 90,
+      },
+    },
+    {
+      name: "SDXL Lightning",
+      modelPath: "bytedance/sdxl-lightning-4step",
+      input: {
+        prompt,
+        width: 1024,
+        height: 1024,
+        num_outputs: 1,
+        scheduler: "K_EULER",
+        num_inference_steps: 4,
+      },
+    },
+    {
+      name: "Stable Diffusion 3",
+      modelPath: "stability-ai/stable-diffusion-3",
+      input: {
+        prompt,
+        aspect_ratio: "1:1",
+        output_format: "webp",
+      },
+    },
+  ];
 
   let lastError = "";
 
@@ -944,10 +1027,109 @@ export async function generatePremiumVideo(spec: PipelineSpec): Promise<Pipeline
   };
 }
 
-export function getVideoPipelineInfo(): { available: boolean; provider: string; models: string[] } {
-  return {
-    available: isCustomPipelineAvailable(),
-    provider: "Replicate",
-    models: ["jaaari/kokoro-82m", "fishaudio/fish-speech-1.5", "omnihuman-1"],
-  };
+export function getVideoPipelineInfo(): {
+  available: boolean;
+  provider: "replicate" | "fal" | "self-hosted" | "none";
+  models: string[];
+} {
+  if (process.env.FAL_KEY) {
+    return { available: true, provider: "fal", models: ["veo-3", "sora-2", "runway-gen4", "kling-3", "hedra-character-3"] };
+  }
+  if (process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY || process.env.REPLICATE_TOKEN || process.env.REPLICATE_KEY) {
+    return { available: true, provider: "replicate", models: ["kokoro-82m", "xtts-v2", "bark", "openvoice", "seamless"] };
+  }
+  if (process.env.ZOOBICON_VIDEO_API_URL) {
+    return { available: true, provider: "self-hosted", models: ["fish-speech", "flux", "sadtalker"] };
+  }
+  return { available: false, provider: "none", models: [] };
+}
+
+// ── Helpers ──
+
+function estimateDuration(text: string): number {
+  // Average speaking rate: ~150 words per minute
+  const words = text.split(/\s+/).length;
+  return Math.ceil((words / 150) * 60);
+}
+
+function extractReplicateOutput(data: Record<string, unknown>): string | null {
+  const output = data.output;
+  if (!output) return null;
+  if (typeof output === "string") return output;
+  if (Array.isArray(output)) {
+    // Find first string element (some models return [url, metadata, ...])
+    for (const item of output) {
+      if (typeof item === "string" && item.length > 0) return item;
+    }
+    return null;
+  }
+  if (typeof output === "object") {
+    const out = output as Record<string, unknown>;
+    // Try common Replicate output keys in order
+    const keys = ["audio", "video", "image", "url", "audio_out", "video_out", "wav", "mp3", "mp4", "output"];
+    for (const key of keys) {
+      const v = out[key];
+      if (typeof v === "string" && v.length > 0) return v;
+      if (Array.isArray(v) && typeof v[0] === "string") return v[0];
+    }
+  }
+  return null;
+}
+
+async function pollReplicatePrediction(
+  getUrl: string,
+  options?: {
+    maxAttempts?: number;
+    intervalMs?: number;
+    onUpdate?: (status: string) => void;
+  }
+): Promise<Record<string, unknown>> {
+  const token = getReplicateToken();
+  const maxAttempts = options?.maxAttempts ?? 90; // 90 × 3s = 270s ≈ 4.5 min
+  const intervalMs = options?.intervalMs ?? 3000;
+  let consecutiveFailures = 0;
+  let lastStatus = "";
+
+  for (let i = 0; i < maxAttempts; i++) {
+    await new Promise((r) => setTimeout(r, intervalMs));
+
+    let res: Response;
+    try {
+      res = await fetch(getUrl, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } catch (err) {
+      consecutiveFailures++;
+      if (consecutiveFailures > 5) {
+        throw new Error(
+          `Polling failed: cannot reach Replicate (${err instanceof Error ? err.message : "network error"})`
+        );
+      }
+      continue;
+    }
+
+    if (!res.ok) {
+      consecutiveFailures++;
+      if (consecutiveFailures > 5) {
+        throw new Error(`Polling failed: Replicate returned HTTP ${res.status} repeatedly.`);
+      }
+      continue;
+    }
+
+    consecutiveFailures = 0;
+    const data = await res.json();
+
+    if (data.status && data.status !== lastStatus) {
+      lastStatus = data.status;
+      options?.onUpdate?.(data.status);
+    }
+
+    if (data.status === "succeeded") return data;
+    if (data.status === "failed" || data.status === "canceled") {
+      throw new Error(data.error || `Prediction ${data.status}`);
+    }
+    // status === "starting" or "processing" — keep polling
+  }
+
+  throw new Error(`Generation timed out after ${(maxAttempts * intervalMs) / 1000}s`);
 }
