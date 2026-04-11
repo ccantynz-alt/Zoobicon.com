@@ -296,6 +296,17 @@ interface CustomiseArgs {
   prompt: string;
   primaryColor: string;
   model: string;
+  /**
+   * When true, the generated project has a live Supabase client wired
+   * up at `./lib/supabase`. The customiser should wire real auth / data
+   * calls into interactive elements (sign-in, sign-up, contact forms,
+   * bookings) so the site actually works end-to-end.
+   */
+  supabase?: {
+    needsAuth: boolean;
+    needsDatabase: boolean;
+    needsStorage: boolean;
+  };
 }
 
 function stripFencesAndWrap(raw: string): string {
@@ -307,13 +318,81 @@ function stripFencesAndWrap(raw: string): string {
   return `${code}\n`;
 }
 
+/**
+ * When Supabase is provisioned, every interactive component (navbars with
+ * Sign In, heroes with Sign Up, contact forms, auth pages) should wire
+ * into the real client instead of shipping dead buttons. This block is
+ * appended to the customiser's user message so the LLM knows the exact
+ * imports and call patterns to use.
+ */
+function buildSupabaseBrief(needs: {
+  needsAuth: boolean;
+  needsDatabase: boolean;
+  needsStorage: boolean;
+}): string {
+  const lines: string[] = [
+    "",
+    "BACKEND — SUPABASE IS WIRED",
+    "This project has a live Supabase client at ./lib/supabase.ts. If this",
+    "component has ANY interactive elements, wire them to the real client",
+    "using the patterns below. Do NOT leave dead buttons.",
+    "",
+    'Import the client with: import { supabase } from "./lib/supabase";',
+  ];
+
+  if (needs.needsAuth) {
+    lines.push(
+      "",
+      "AUTH (available):",
+      "- Sign In buttons → onClick: await supabase.auth.signInWithPassword({ email, password })",
+      "- Sign Up buttons → onClick: await supabase.auth.signUp({ email, password })",
+      "- Sign Out → onClick: await supabase.auth.signOut()",
+      "- OAuth (Google/GitHub) → await supabase.auth.signInWithOAuth({ provider: \"google\" })",
+      "- Use React useState for email/password inputs. Show error messages on failure.",
+      "- For navbars: show 'Sign In' / 'Sign Up' when signed out, 'Sign Out' when signed in",
+      "  (use useEffect + supabase.auth.getSession() + supabase.auth.onAuthStateChange).",
+    );
+  }
+
+  if (needs.needsDatabase) {
+    lines.push(
+      "",
+      "DATABASE (available):",
+      "- Contact forms → await supabase.from(\"messages\").insert({ name, email, message })",
+      "- Bookings → await supabase.from(\"bookings\").insert({ ... })",
+      "- Profile reads → await supabase.from(\"profiles\").select(\"*\").eq(\"user_id\", userId).single()",
+      "- Wire real submit handlers. Show success / error states with useState.",
+    );
+  }
+
+  if (needs.needsStorage) {
+    lines.push(
+      "",
+      "STORAGE (available):",
+      "- File uploads → await supabase.storage.from(\"uploads\").upload(path, file)",
+      "- Public URLs → supabase.storage.from(\"uploads\").getPublicUrl(path)",
+    );
+  }
+
+  lines.push(
+    "",
+    "Still keep imports minimal. Only add `import { supabase } from \"./lib/supabase\"`",
+    "if this component actually needs it. Preserve the editorial design system.",
+    "",
+  );
+
+  return lines.join("\n");
+}
+
 async function customiseComponent(args: CustomiseArgs): Promise<string> {
+  const supabaseBrief = args.supabase ? buildSupabaseBrief(args.supabase) : "";
   const userMsg =
     `BRAND: ${args.brandName}\n` +
     `PRIMARY COLOR: ${args.primaryColor}\n` +
     `SECTION: ${args.category} (${args.variant})\n` +
-    `USER PROMPT: ${args.prompt}\n\n` +
-    `BASE COMPONENT FILE:\n${args.baseCode}\n\n` +
+    `USER PROMPT: ${args.prompt}\n` +
+    supabaseBrief +
+    `\nBASE COMPONENT FILE:\n${args.baseCode}\n\n` +
     `Output the full updated TypeScript file only.`;
 
   // Try streaming Claude first (fastest path when Anthropic is healthy).
@@ -451,16 +530,22 @@ export async function POST(req: NextRequest): Promise<Response> {
         const wantsSupabase = needsSupabase(supabaseNeeds);
         const supabaseAvailable = wantsSupabase && isSupabaseConfigured();
 
-        // ── FLOOR: emit an empty scaffold IMMEDIATELY so the builder always
-        // has `receivedFiles=true` before planning runs. If planning fails,
-        // the real error message survives instead of being overridden by the
-        // client-side "No components generated" safety net.
+        // ── FLOOR: emit a CINEMATIC INSTANT SHELL immediately. The shell is
+        // a self-contained animated skeleton (hero + nav + features strip)
+        // that mounts in Sandpack within ~1s of the POST, echoing the user's
+        // prompt back to them. It's replaced live by real registry components
+        // as each customisation finishes. This is the perceived-speed layer —
+        // without it the user stares at a blank pre-warm spinner for the
+        // 5-8s TTFB of the Haiku planning call.
+        //
+        // Law 8 bonus: if planning fails, the real error message surfaces
+        // instead of being overridden by "No components generated".
         const registry = await getRegistry();
         const files: Record<string, string> = {
           "package.json": buildPackageJson({ withSupabase: wantsSupabase }),
           "tailwind.config.js": buildTailwindConfig(),
           "styles.css": registry.buildStylesFile({ primaryColor: "#1c1917", bgColor: "#FAF9F6" }),
-          "App.tsx": registry.buildAppFile([]),
+          "App.tsx": registry.buildShellAppFile(prompt),
         };
         writer.send("files", { files, fileCount: 0, totalComponents: 0 });
 
@@ -480,6 +565,22 @@ export async function POST(req: NextRequest): Promise<Response> {
         // Update styles with the real brand colours now that planning succeeded.
         // Theme stays editorial — Fraunces + Inter + measured motion.
         files["styles.css"] = registry.buildStylesFile({ primaryColor, bgColor, theme: "editorial" });
+
+        // ── Pre-inject Supabase client BEFORE customisation so generated
+        // components can import from "./lib/supabase" without breaking
+        // Sandpack while Phase 3.5 provisioning is still running. The
+        // placeholder is overwritten with real credentials after provision.
+        if (wantsSupabase) {
+          files["lib/supabase.ts"] = generateSupabaseClient(
+            "https://YOUR_PROJECT.supabase.co",
+            "YOUR_ANON_KEY",
+          );
+          if (supabaseNeeds.needsAuth) {
+            files["lib/AuthProvider.tsx"] = generateAuthProvider();
+          }
+          files["package.json"] = buildPackageJson({ withSupabase: true });
+        }
+
         writer.send("files", { files, fileCount: 0, totalComponents: components.length });
 
         // ── PHASE 3: generating (customise each component) ──
@@ -490,65 +591,101 @@ export async function POST(req: NextRequest): Promise<Response> {
 
         const customiserModel =
           mode === "premium" ? MODEL_SONNET : MODEL_HAIKU;
-        const accumulated: RegistryComponent[] = [];
 
-        for (let i = 0; i < components.length; i++) {
-          const comp = components[i];
-          let updatedCode: string;
-          try {
-            updatedCode = await customiseComponent({
-              baseCode: comp.code,
-              brandName,
-              category: comp.category,
-              variant: comp.variant,
-              prompt,
-              primaryColor,
-              model: customiserModel,
+        // Supabase brief passed to customiser when the project has
+        // full-stack needs — we include it whether provisioning has
+        // actually run yet or not. If provisioning later fails the
+        // placeholder client is still injected and the code still
+        // compiles (the calls will error at runtime with a clear
+        // message, not fail the build).
+        const customiserSupabase = wantsSupabase
+          ? {
+              needsAuth: supabaseNeeds.needsAuth,
+              needsDatabase: supabaseNeeds.needsDatabase,
+              needsStorage: supabaseNeeds.needsStorage,
+            }
+          : undefined;
+
+        // PARALLEL CUSTOMISATION — fire every Haiku call at once.
+        // Previously sequential: ~12 components × ~2-3s = 24-36s wall time.
+        // Now concurrent: total ≈ max single call ≈ 2-3s (plus whichever
+        // finishes last). App.tsx is rebuilt in the ORIGINAL component
+        // order each time one completes, so navbar always lands at the
+        // top even if hero finishes customising first. Preview looks
+        // coherent throughout the stream — components slot into place
+        // in the right order as they arrive.
+        const completedByIndex = new Map<number, RegistryComponent>();
+        let completedCount = 0;
+
+        await Promise.all(
+          components.map(async (comp, i) => {
+            let updatedCode: string;
+            try {
+              updatedCode = await customiseComponent({
+                baseCode: comp.code,
+                brandName,
+                category: comp.category,
+                variant: comp.variant,
+                prompt,
+                primaryColor,
+                model: customiserModel,
+                supabase: customiserSupabase,
+              });
+            } catch {
+              // Fallback: use template code as-is
+              updatedCode = `import React from "react";\n\n${comp.code}\n`;
+            }
+
+            // Editorial reskin — guarantees every shipped component uses the
+            // restrained stone palette even when the LLM ignores the system
+            // prompt and emits violet/cyan/fuchsia classes anyway. Regex-only;
+            // safe on already-reskinned code (idempotent).
+            updatedCode = registry.reskinEditorial(updatedCode);
+
+            // Industry image swap — replace every Unsplash photo ID with one
+            // drawn from the detected industry's curated pool, so imagery
+            // matches the prompt instead of the base component's hardcoded
+            // mountains/watches/dashboards.
+            updatedCode = registry.swapImagesForIndustry(updatedCode, industry);
+
+            // Auto-emphasize one word per h1/h2 so the Fraunces italic serif
+            // accent actually renders. Hard guarantee for when the LLM
+            // ignores the editorial system-prompt instruction.
+            updatedCode = registry.emphasizeHeadings(updatedCode);
+
+            // Write the component file
+            const { fileName } = registry.buildComponentFile(comp);
+            files[fileName] = updatedCode;
+
+            // Record completion and rebuild App.tsx in ORIGINAL order —
+            // skipping any holes from components still in-flight.
+            completedByIndex.set(i, comp);
+            completedCount++;
+            const ordered: RegistryComponent[] = [];
+            for (let j = 0; j < components.length; j++) {
+              const done = completedByIndex.get(j);
+              if (done) ordered.push(done);
+            }
+            files["App.tsx"] = registry.buildAppFile(ordered);
+
+            writer.send("component", {
+              name: comp.id,
+              code: updatedCode,
+              position: i,
             });
-          } catch {
-            // Fallback: use template code as-is
-            updatedCode = `import React from "react";\n\n${comp.code}\n`;
-          }
 
-          // Editorial reskin — guarantees every shipped component uses the
-          // restrained stone palette even when the LLM ignores the system
-          // prompt and emits violet/cyan/fuchsia classes anyway. Regex-only;
-          // safe on already-reskinned code (idempotent).
-          updatedCode = registry.reskinEditorial(updatedCode);
-
-          // Industry image swap — replace every Unsplash photo ID with one
-          // drawn from the detected industry's curated pool, so imagery
-          // matches the prompt instead of the base component's hardcoded
-          // mountains/watches/dashboards.
-          updatedCode = registry.swapImagesForIndustry(updatedCode, industry);
-
-          // Auto-emphasize one word per h1/h2 so the Fraunces italic serif
-          // accent actually renders. Hard guarantee for when the LLM
-          // ignores the editorial system-prompt instruction.
-          updatedCode = registry.emphasizeHeadings(updatedCode);
-
-          const { fileName } = registry.buildComponentFile(comp);
-          files[fileName] = updatedCode;
-          accumulated.push(comp);
-          files["App.tsx"] = registry.buildAppFile(accumulated);
-
-          writer.send("component", {
-            name: comp.id,
-            code: updatedCode,
-            position: i,
-          });
-
-          // Progressive update — push the current files map so Sandpack
-          // preview rebuilds after every customised component. This is what
-          // makes the site appear to "build itself" in front of the user.
-          writer.send("files", {
-            files,
-            fileCount: i + 1,
-            totalComponents: components.length,
-            section: comp.id,
-            customized: true,
-          });
-        }
+            // Progressive update — push the current files map so Sandpack
+            // preview rebuilds as each component slots into place. This is
+            // what makes the site appear to "build itself" live.
+            writer.send("files", {
+              files,
+              fileCount: completedCount,
+              totalComponents: components.length,
+              section: comp.id,
+              customized: true,
+            });
+          })
+        );
 
         writer.send("files", { files });
 
