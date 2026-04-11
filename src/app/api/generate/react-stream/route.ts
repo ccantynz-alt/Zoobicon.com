@@ -296,6 +296,17 @@ interface CustomiseArgs {
   prompt: string;
   primaryColor: string;
   model: string;
+  /**
+   * When true, the generated project has a live Supabase client wired
+   * up at `./lib/supabase`. The customiser should wire real auth / data
+   * calls into interactive elements (sign-in, sign-up, contact forms,
+   * bookings) so the site actually works end-to-end.
+   */
+  supabase?: {
+    needsAuth: boolean;
+    needsDatabase: boolean;
+    needsStorage: boolean;
+  };
 }
 
 function stripFencesAndWrap(raw: string): string {
@@ -307,13 +318,81 @@ function stripFencesAndWrap(raw: string): string {
   return `${code}\n`;
 }
 
+/**
+ * When Supabase is provisioned, every interactive component (navbars with
+ * Sign In, heroes with Sign Up, contact forms, auth pages) should wire
+ * into the real client instead of shipping dead buttons. This block is
+ * appended to the customiser's user message so the LLM knows the exact
+ * imports and call patterns to use.
+ */
+function buildSupabaseBrief(needs: {
+  needsAuth: boolean;
+  needsDatabase: boolean;
+  needsStorage: boolean;
+}): string {
+  const lines: string[] = [
+    "",
+    "BACKEND — SUPABASE IS WIRED",
+    "This project has a live Supabase client at ./lib/supabase.ts. If this",
+    "component has ANY interactive elements, wire them to the real client",
+    "using the patterns below. Do NOT leave dead buttons.",
+    "",
+    'Import the client with: import { supabase } from "./lib/supabase";',
+  ];
+
+  if (needs.needsAuth) {
+    lines.push(
+      "",
+      "AUTH (available):",
+      "- Sign In buttons → onClick: await supabase.auth.signInWithPassword({ email, password })",
+      "- Sign Up buttons → onClick: await supabase.auth.signUp({ email, password })",
+      "- Sign Out → onClick: await supabase.auth.signOut()",
+      "- OAuth (Google/GitHub) → await supabase.auth.signInWithOAuth({ provider: \"google\" })",
+      "- Use React useState for email/password inputs. Show error messages on failure.",
+      "- For navbars: show 'Sign In' / 'Sign Up' when signed out, 'Sign Out' when signed in",
+      "  (use useEffect + supabase.auth.getSession() + supabase.auth.onAuthStateChange).",
+    );
+  }
+
+  if (needs.needsDatabase) {
+    lines.push(
+      "",
+      "DATABASE (available):",
+      "- Contact forms → await supabase.from(\"messages\").insert({ name, email, message })",
+      "- Bookings → await supabase.from(\"bookings\").insert({ ... })",
+      "- Profile reads → await supabase.from(\"profiles\").select(\"*\").eq(\"user_id\", userId).single()",
+      "- Wire real submit handlers. Show success / error states with useState.",
+    );
+  }
+
+  if (needs.needsStorage) {
+    lines.push(
+      "",
+      "STORAGE (available):",
+      "- File uploads → await supabase.storage.from(\"uploads\").upload(path, file)",
+      "- Public URLs → supabase.storage.from(\"uploads\").getPublicUrl(path)",
+    );
+  }
+
+  lines.push(
+    "",
+    "Still keep imports minimal. Only add `import { supabase } from \"./lib/supabase\"`",
+    "if this component actually needs it. Preserve the editorial design system.",
+    "",
+  );
+
+  return lines.join("\n");
+}
+
 async function customiseComponent(args: CustomiseArgs): Promise<string> {
+  const supabaseBrief = args.supabase ? buildSupabaseBrief(args.supabase) : "";
   const userMsg =
     `BRAND: ${args.brandName}\n` +
     `PRIMARY COLOR: ${args.primaryColor}\n` +
     `SECTION: ${args.category} (${args.variant})\n` +
-    `USER PROMPT: ${args.prompt}\n\n` +
-    `BASE COMPONENT FILE:\n${args.baseCode}\n\n` +
+    `USER PROMPT: ${args.prompt}\n` +
+    supabaseBrief +
+    `\nBASE COMPONENT FILE:\n${args.baseCode}\n\n` +
     `Output the full updated TypeScript file only.`;
 
   // Try streaming Claude first (fastest path when Anthropic is healthy).
@@ -486,6 +565,22 @@ export async function POST(req: NextRequest): Promise<Response> {
         // Update styles with the real brand colours now that planning succeeded.
         // Theme stays editorial — Fraunces + Inter + measured motion.
         files["styles.css"] = registry.buildStylesFile({ primaryColor, bgColor, theme: "editorial" });
+
+        // ── Pre-inject Supabase client BEFORE customisation so generated
+        // components can import from "./lib/supabase" without breaking
+        // Sandpack while Phase 3.5 provisioning is still running. The
+        // placeholder is overwritten with real credentials after provision.
+        if (wantsSupabase) {
+          files["lib/supabase.ts"] = generateSupabaseClient(
+            "https://YOUR_PROJECT.supabase.co",
+            "YOUR_ANON_KEY",
+          );
+          if (supabaseNeeds.needsAuth) {
+            files["lib/AuthProvider.tsx"] = generateAuthProvider();
+          }
+          files["package.json"] = buildPackageJson({ withSupabase: true });
+        }
+
         writer.send("files", { files, fileCount: 0, totalComponents: components.length });
 
         // ── PHASE 3: generating (customise each component) ──
@@ -496,6 +591,20 @@ export async function POST(req: NextRequest): Promise<Response> {
 
         const customiserModel =
           mode === "premium" ? MODEL_SONNET : MODEL_HAIKU;
+
+        // Supabase brief passed to customiser when the project has
+        // full-stack needs — we include it whether provisioning has
+        // actually run yet or not. If provisioning later fails the
+        // placeholder client is still injected and the code still
+        // compiles (the calls will error at runtime with a clear
+        // message, not fail the build).
+        const customiserSupabase = wantsSupabase
+          ? {
+              needsAuth: supabaseNeeds.needsAuth,
+              needsDatabase: supabaseNeeds.needsDatabase,
+              needsStorage: supabaseNeeds.needsStorage,
+            }
+          : undefined;
 
         // PARALLEL CUSTOMISATION — fire every Haiku call at once.
         // Previously sequential: ~12 components × ~2-3s = 24-36s wall time.
@@ -520,6 +629,7 @@ export async function POST(req: NextRequest): Promise<Response> {
                 prompt,
                 primaryColor,
                 model: customiserModel,
+                supabase: customiserSupabase,
               });
             } catch {
               // Fallback: use template code as-is
