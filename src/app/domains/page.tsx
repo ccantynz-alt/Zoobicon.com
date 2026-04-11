@@ -147,7 +147,10 @@ export default function DomainsPage() {
     setResults(initial);
 
     try {
-      const res = await fetch(`/api/domains/search?q=${encodeURIComponent(searchName)}&tlds=${encodeURIComponent(tlds.join(","))}`);
+      const res = await fetch(
+        `/api/domains/search?q=${encodeURIComponent(searchName)}&tlds=${encodeURIComponent(tlds.join(","))}`,
+        { signal: AbortSignal.timeout(12000) },
+      );
       if (res.ok) {
         const data = await res.json();
         const apiResults = data.results || [];
@@ -298,6 +301,7 @@ export default function DomainsPage() {
       try {
         const r = await fetch(
           `/api/domains/search?q=${encodeURIComponent(n.slug)}&tlds=${encodeURIComponent(finalTlds.join(","))}`,
+          { signal: AbortSignal.timeout(12000) },
         );
         if (!r.ok) throw new Error("search failed");
         const data = await r.json();
@@ -374,7 +378,10 @@ export default function DomainsPage() {
 
     setSearchError(null);
     try {
-      const res = await fetch(`/api/domains/search?q=${encodeURIComponent(cleanName)}&tlds=${encodeURIComponent(tlds.join(","))}`);
+      const res = await fetch(
+        `/api/domains/search?q=${encodeURIComponent(cleanName)}&tlds=${encodeURIComponent(tlds.join(","))}`,
+        { signal: AbortSignal.timeout(12000) },
+      );
       if (res.ok) {
         const data = await res.json();
         const apiResults = data.results || [];
@@ -395,7 +402,16 @@ export default function DomainsPage() {
         setResults(initial.map(r => ({ ...r, checking: false })));
       }
     } catch (err) {
-      setSearchError(err instanceof Error ? err.message : "Network error. Check your connection and try again.");
+      const isAbort =
+        err instanceof DOMException && err.name === "TimeoutError" ||
+        (err instanceof Error && (err.name === "AbortError" || err.name === "TimeoutError"));
+      setSearchError(
+        isAbort
+          ? "The registry took too long to respond. Some TLDs will show as unknown — try the search again for fresh results."
+          : err instanceof Error
+          ? err.message
+          : "Network error. Check your connection and try again.",
+      );
       setResults(initial.map(r => ({ ...r, checking: false })));
     }
 
