@@ -14,7 +14,7 @@
  *   supabase  { projectUrl, anonKey, projectRef, needsAuth, needsDatabase, needsStorage, tables, authProviders, buckets }
  *   score     { score, issues }
  *   error     { message, hint }
- *   done      { finalFiles, score, durationMs, supabase? }
+ *   done      { files, score, durationMs, supabase? }
  *
  * Bible Law 8: every error path emits an "error" SSE event with a clear hint.
  */
@@ -912,7 +912,12 @@ export async function POST(req: NextRequest): Promise<Response> {
           message: "Build complete.",
         });
         writer.send("done", {
-          finalFiles,
+          // Client listens for `event.files` on the done event — it sets
+          // receivedFiles = true and updates Sandpack's source. The previous
+          // name `finalFiles` silently skipped both, leaving the preview on
+          // the last progressive partial (usually fine) but also preventing
+          // the post-build file replacement in premium critique mode.
+          files: finalFiles,
           score: finalScore,
           durationMs: Date.now() - startedAt,
           failedSections,

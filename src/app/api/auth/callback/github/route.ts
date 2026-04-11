@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 
 export async function GET(req: NextRequest) {
@@ -9,18 +9,18 @@ export async function GET(req: NextRequest) {
   // Validate OAuth state parameter to prevent CSRF
   const storedState = req.cookies.get("zoobicon_oauth_state")?.value;
   if (!state || !storedState || state !== storedState) {
-    return Response.redirect(`${origin}/auth/login?error=invalid_state`);
+    return NextResponse.redirect(`${origin}/auth/login?error=invalid_state`);
   }
 
   if (!code) {
-    return Response.redirect(`${origin}/auth/login?error=no_code`);
+    return NextResponse.redirect(`${origin}/auth/login?error=no_code`);
   }
 
   const clientId = process.env.GITHUB_OAUTH_CLIENT_ID;
   const clientSecret = process.env.GITHUB_OAUTH_CLIENT_SECRET;
 
   if (!clientId || !clientSecret) {
-    return Response.redirect(`${origin}/auth/login?error=oauth_not_configured`);
+    return NextResponse.redirect(`${origin}/auth/login?error=oauth_not_configured`);
   }
 
   try {
@@ -40,13 +40,13 @@ export async function GET(req: NextRequest) {
 
     if (!tokenRes.ok) {
       console.error("GitHub token exchange failed:", await tokenRes.text());
-      return Response.redirect(`${origin}/auth/login?error=token_exchange_failed`);
+      return NextResponse.redirect(`${origin}/auth/login?error=token_exchange_failed`);
     }
 
     const tokenData = await tokenRes.json();
     if (tokenData.error) {
       console.error("GitHub token error:", tokenData.error_description);
-      return Response.redirect(`${origin}/auth/login?error=token_exchange_failed`);
+      return NextResponse.redirect(`${origin}/auth/login?error=token_exchange_failed`);
     }
 
     // Get user profile
@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
     });
 
     if (!userRes.ok) {
-      return Response.redirect(`${origin}/auth/login?error=user_info_failed`);
+      return NextResponse.redirect(`${origin}/auth/login?error=user_info_failed`);
     }
 
     const ghUser = await userRes.json();
@@ -80,7 +80,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (!email) {
-      return Response.redirect(`${origin}/auth/login?error=no_email`);
+      return NextResponse.redirect(`${origin}/auth/login?error=no_email`);
     }
 
     email = email.toLowerCase();
@@ -129,35 +129,43 @@ export async function GET(req: NextRequest) {
       githubLogin: ghUser.login,
     }));
 
-    // Store the GitHub access token in a secure HttpOnly cookie so the builder
-    // can use it for repo sync without the client ever reading the raw token.
-    // Also pass the GitHub username to localStorage via the redirect URL.
-    const redirectResponse = Response.redirect(
-      `${origin}/auth/callback?user=${userData}&github_login=${encodeURIComponent(ghUser.login)}`
+    // Use NextResponse.redirect so .cookies.set() actually mutates headers.
+    // Previous code used Response.redirect then headers.append, which silently
+    // dropped cookies because the Response from Response.redirect is frozen.
+    const redirectResponse = NextResponse.redirect(
+      `${origin}/auth/callback?user=${userData}&github_login=${encodeURIComponent(ghUser.login)}`,
     );
 
-    // Clear the state cookie
-    redirectResponse.headers.append(
-      "Set-Cookie",
-      "zoobicon_oauth_state=; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=0"
-    );
+    // Clear the state cookie (CSRF nonce already consumed)
+    redirectResponse.cookies.set("zoobicon_oauth_state", "", {
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+      secure: true,
+      maxAge: 0,
+    });
 
     // Store GitHub token in a secure HttpOnly cookie (30 day expiry)
     // The /api/github/sync routes read this cookie server-side.
-    redirectResponse.headers.append(
-      "Set-Cookie",
-      `zoobicon_github_token=${tokenData.access_token}; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=${30 * 24 * 60 * 60}`
-    );
+    redirectResponse.cookies.set("zoobicon_github_token", tokenData.access_token, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+      secure: true,
+      maxAge: 30 * 24 * 60 * 60,
+    });
 
     // Also store the GitHub login in a readable cookie for the UI
-    redirectResponse.headers.append(
-      "Set-Cookie",
-      `zoobicon_github_login=${ghUser.login}; Path=/; SameSite=Lax; Secure; Max-Age=${30 * 24 * 60 * 60}`
-    );
+    redirectResponse.cookies.set("zoobicon_github_login", ghUser.login, {
+      path: "/",
+      sameSite: "lax",
+      secure: true,
+      maxAge: 30 * 24 * 60 * 60,
+    });
 
     return redirectResponse;
   } catch (err) {
     console.error("GitHub OAuth callback error:", err);
-    return Response.redirect(`${origin}/auth/login?error=oauth_failed`);
+    return NextResponse.redirect(`${origin}/auth/login?error=oauth_failed`);
   }
 }
