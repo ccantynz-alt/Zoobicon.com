@@ -15,6 +15,9 @@ import {
 const OAUTH_ERRORS: Record<string, string> = {
   no_code: "Authentication was cancelled. Please try again.",
   oauth_not_configured: "OAuth is not configured yet. Please use email & password.",
+  github_oauth_not_configured: "GitHub sign-in is not set up yet. Please use email & password or contact support.",
+  google_oauth_not_configured: "Google sign-in is not set up yet. Please use email & password or contact support.",
+  invalid_state: "Your sign-in session expired or was tampered with. Please try again.",
   token_exchange_failed: "Authentication failed. Please try again.",
   user_info_failed: "Could not retrieve your profile. Please try again.",
   no_email: "No email found on your account. Please use email & password.",
