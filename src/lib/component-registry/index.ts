@@ -557,6 +557,173 @@ export function buildComponentFile(
 }
 
 /**
+ * INSTANT SHELL — cinematic skeleton shown for the first ~1-8 seconds
+ * while Haiku plans + customises the real components. This is the
+ * "perceived speed" layer: the user sees a beautiful animated hero
+ * with their prompt echoed back within ~1s of hitting Generate,
+ * instead of staring at a blank pre-warm spinner for 5-8s of TTFB.
+ *
+ * It's fully self-contained React+Tailwind — no imports of registry
+ * components, no styles.css dependency (inline animations only),
+ * so it mounts in Sandpack the moment the first SSE frame arrives.
+ * Each real component then replaces a skeleton block via subsequent
+ * partial events, and buildAppFile(accumulated) takes over the
+ * moment `accumulated.length > 0`.
+ *
+ * @param prompt - The user's original prompt (first 140 chars echoed
+ *   into the hero so they see their intent immediately).
+ * @param brandName - Optional brand hint for the navbar placeholder.
+ */
+export function buildShellAppFile(prompt?: string, brandName?: string): string {
+  const safePrompt = (prompt || "")
+    .slice(0, 140)
+    .replace(/[`$\\]/g, "")
+    .replace(/"/g, "\\\"")
+    .replace(/\n/g, " ")
+    .trim();
+  const safeBrand = (brandName || "Your brand")
+    .slice(0, 40)
+    .replace(/[`$\\]/g, "")
+    .replace(/"/g, "\\\"");
+
+  return `import React from "react";
+
+/**
+ * Zoobicon instant shell — rendered in <1s while the real components
+ * are still being customised by the LLM. Replaced live as soon as the
+ * first registry component finishes streaming.
+ */
+export default function App() {
+  return (
+    <div className="min-h-screen bg-[#FAF9F6] text-stone-900 overflow-hidden">
+      <style>{\`
+        @keyframes zbk-shimmer {
+          0% { background-position: -500px 0; }
+          100% { background-position: 500px 0; }
+        }
+        @keyframes zbk-float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-8px); }
+        }
+        @keyframes zbk-fade-in {
+          0% { opacity: 0; transform: translateY(16px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes zbk-pulse-soft {
+          0%, 100% { opacity: 0.4; }
+          50% { opacity: 0.7; }
+        }
+        .zbk-shimmer {
+          background: linear-gradient(90deg, #ece9e3 0%, #f5f3ee 50%, #ece9e3 100%);
+          background-size: 500px 100%;
+          animation: zbk-shimmer 1.6s linear infinite;
+        }
+        .zbk-fade { animation: zbk-fade-in 0.6s ease-out both; }
+        .zbk-pulse { animation: zbk-pulse-soft 2.4s ease-in-out infinite; }
+        .zbk-float { animation: zbk-float 4s ease-in-out infinite; }
+        .zbk-serif { font-family: Georgia, "Times New Roman", serif; }
+      \`}</style>
+
+      {/* Navbar skeleton */}
+      <nav className="w-full border-b border-stone-200/70 bg-[#FAF9F6]/90 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+          <div className="flex items-center gap-3 zbk-fade">
+            <div className="w-8 h-8 rounded-lg bg-stone-900" />
+            <span className="zbk-serif text-xl font-semibold text-stone-900">${safeBrand}</span>
+          </div>
+          <div className="hidden md:flex items-center gap-8 zbk-fade" style={{ animationDelay: "0.1s" }}>
+            <div className="h-3 w-14 rounded zbk-shimmer" />
+            <div className="h-3 w-16 rounded zbk-shimmer" />
+            <div className="h-3 w-12 rounded zbk-shimmer" />
+            <div className="h-3 w-14 rounded zbk-shimmer" />
+          </div>
+          <div className="h-9 w-24 rounded-full zbk-shimmer zbk-fade" style={{ animationDelay: "0.2s" }} />
+        </div>
+      </nav>
+
+      {/* Hero skeleton */}
+      <section className="relative max-w-7xl mx-auto px-6 pt-24 pb-32">
+        <div className="absolute top-10 right-10 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-stone-200/60 to-transparent blur-3xl zbk-pulse pointer-events-none" />
+        <div className="absolute top-1/2 left-0 w-[300px] h-[300px] rounded-full bg-gradient-to-br from-amber-100/40 to-transparent blur-3xl zbk-pulse pointer-events-none" style={{ animationDelay: "1s" }} />
+
+        <div className="relative z-10 max-w-3xl">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-stone-300/70 bg-white/60 backdrop-blur-sm mb-8 zbk-fade">
+            <div className="w-1.5 h-1.5 rounded-full bg-stone-900 animate-pulse" />
+            <span className="text-[11px] uppercase tracking-widest text-stone-600 font-medium">
+              Building your site
+            </span>
+          </div>
+
+          <h1 className="zbk-serif text-6xl md:text-7xl font-semibold text-stone-900 leading-[1.05] tracking-tight mb-8 zbk-fade" style={{ animationDelay: "0.1s" }}>
+            Crafting something
+            <br />
+            <em className="font-normal text-stone-500">extraordinary</em> for you
+          </h1>
+
+          {${safePrompt ? "true" : "false"} && (
+            <p className="text-xl text-stone-600 leading-relaxed mb-10 max-w-2xl zbk-fade" style={{ animationDelay: "0.2s" }}>
+              &ldquo;${safePrompt}&rdquo;
+            </p>
+          )}
+
+          <div className="flex flex-wrap items-center gap-4 zbk-fade" style={{ animationDelay: "0.3s" }}>
+            <div className="h-12 w-40 rounded-full zbk-shimmer" />
+            <div className="h-12 w-32 rounded-full border border-stone-300/70 zbk-pulse" />
+          </div>
+
+          <div className="mt-16 grid grid-cols-3 gap-8 max-w-xl zbk-fade" style={{ animationDelay: "0.4s" }}>
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="space-y-2">
+                <div className="h-10 w-20 rounded zbk-shimmer" />
+                <div className="h-3 w-full rounded zbk-shimmer" />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Floating preview card */}
+        <div className="absolute right-8 top-32 w-80 hidden lg:block zbk-float">
+          <div className="rounded-2xl border border-stone-200 bg-white shadow-2xl shadow-stone-900/5 p-6 space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl zbk-shimmer" />
+              <div className="flex-1 space-y-2">
+                <div className="h-3 w-3/4 rounded zbk-shimmer" />
+                <div className="h-2 w-1/2 rounded zbk-shimmer" />
+              </div>
+            </div>
+            <div className="h-32 rounded-xl zbk-shimmer" />
+            <div className="space-y-2">
+              <div className="h-2 w-full rounded zbk-shimmer" />
+              <div className="h-2 w-5/6 rounded zbk-shimmer" />
+              <div className="h-2 w-4/6 rounded zbk-shimmer" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features skeleton strip */}
+      <section className="max-w-7xl mx-auto px-6 py-20 border-t border-stone-200/70">
+        <div className="grid md:grid-cols-3 gap-10">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="space-y-4 zbk-fade" style={{ animationDelay: \`\${0.5 + i * 0.1}s\` }}>
+              <div className="w-12 h-12 rounded-xl zbk-shimmer" />
+              <div className="h-5 w-3/4 rounded zbk-shimmer" />
+              <div className="space-y-2">
+                <div className="h-3 w-full rounded zbk-shimmer" />
+                <div className="h-3 w-5/6 rounded zbk-shimmer" />
+                <div className="h-3 w-4/6 rounded zbk-shimmer" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+`;
+}
+
+/**
  * Build App.tsx that imports and renders the given components in order.
  * Called incrementally as each component is added.
  */

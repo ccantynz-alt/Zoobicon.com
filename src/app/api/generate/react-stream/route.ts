@@ -451,16 +451,22 @@ export async function POST(req: NextRequest): Promise<Response> {
         const wantsSupabase = needsSupabase(supabaseNeeds);
         const supabaseAvailable = wantsSupabase && isSupabaseConfigured();
 
-        // ── FLOOR: emit an empty scaffold IMMEDIATELY so the builder always
-        // has `receivedFiles=true` before planning runs. If planning fails,
-        // the real error message survives instead of being overridden by the
-        // client-side "No components generated" safety net.
+        // ── FLOOR: emit a CINEMATIC INSTANT SHELL immediately. The shell is
+        // a self-contained animated skeleton (hero + nav + features strip)
+        // that mounts in Sandpack within ~1s of the POST, echoing the user's
+        // prompt back to them. It's replaced live by real registry components
+        // as each customisation finishes. This is the perceived-speed layer —
+        // without it the user stares at a blank pre-warm spinner for the
+        // 5-8s TTFB of the Haiku planning call.
+        //
+        // Law 8 bonus: if planning fails, the real error message surfaces
+        // instead of being overridden by "No components generated".
         const registry = await getRegistry();
         const files: Record<string, string> = {
           "package.json": buildPackageJson({ withSupabase: wantsSupabase }),
           "tailwind.config.js": buildTailwindConfig(),
           "styles.css": registry.buildStylesFile({ primaryColor: "#1c1917", bgColor: "#FAF9F6" }),
-          "App.tsx": registry.buildAppFile([]),
+          "App.tsx": registry.buildShellAppFile(prompt),
         };
         writer.send("files", { files, fileCount: 0, totalComponents: 0 });
 
