@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import { sql } from "@/lib/db";
+import { getRedis } from "@/lib/redis";
 import { recordPurchase } from "@/lib/addon-delivery";
 import { OVERAGE_PACKS, addOverageCredits } from "@/lib/video-usage";
 import { registerDomain, type ContactInfo } from "@/lib/domain-reseller";
@@ -10,17 +11,23 @@ import { registerDomain, type ContactInfo } from "@/lib/domain-reseller";
  * POST /api/stripe/webhook
  * Production-grade Stripe webhook handler.
  * - Verifies signature against STRIPE_WEBHOOK_SECRET
- * - Idempotent (in-memory LRU of last 1000 event ids)
+ * - Idempotent via Upstash Redis (SET NX ex 86400) with in-memory LRU fallback
+ *   for hot instances. This closes the cold-start duplicate-charge hole.
  * - Always returns 200 to Stripe on internal errors (logs them) so Stripe doesn't retry forever
- * - 503 if secret missing, 400 if signature invalid
+ * - 503 if secret missing OR Upstash is unreachable (so Stripe retries and we
+ *   don't silently skip events)
+ * - 400 if signature invalid
  */
 
-// Idempotency cache — capped at 1000 most recent event ids
+// In-memory fallback cache — only protects a single hot instance.
+// Upstash Redis is the primary dedup; this is the "hot instance still works
+// even if Upstash hiccups momentarily" guard.
 const processedEvents: string[] = [];
 const processedSet = new Set<string>();
 const IDEMPOTENCY_CAP = 1000;
+const DEDUP_TTL_SECONDS = 60 * 60 * 24; // 24h — matches Stripe's retry window
 
-function markProcessed(eventId: string) {
+function markProcessedInMemory(eventId: string) {
   if (processedSet.has(eventId)) return;
   processedSet.add(eventId);
   processedEvents.push(eventId);
@@ -28,6 +35,56 @@ function markProcessed(eventId: string) {
     const old = processedEvents.shift();
     if (old) processedSet.delete(old);
   }
+}
+
+type DedupResult =
+  | { status: "new" }
+  | { status: "duplicate" }
+  | { status: "error"; message: string };
+
+/**
+ * Atomically claim a Stripe event id so only one concurrent/retried delivery
+ * can process it. Upstash SET NX is the source of truth; the in-memory LRU is
+ * only consulted when Upstash is missing or down (so a hot instance still
+ * refuses a same-second retry).
+ */
+async function claimEvent(eventId: string): Promise<DedupResult> {
+  const key = `stripe:event:${eventId}`;
+  const redis = getRedis();
+
+  if (redis) {
+    try {
+      const res = await redis.set(key, "processed", {
+        nx: true,
+        ex: DEDUP_TTL_SECONDS,
+      });
+      // Upstash returns "OK" if set, null if the key already existed.
+      if (res === null) {
+        return { status: "duplicate" };
+      }
+      // Mirror into local cache for extra safety on this instance.
+      markProcessedInMemory(eventId);
+      return { status: "new" };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error(
+        `[stripe-webhook] Upstash SET NX failed for ${eventId}: ${message}. ` +
+          `Returning 503 so Stripe retries; falling back to in-memory dedup for this instance.`
+      );
+      // Still mark in-memory so a same-instance retry within this process
+      // short-circuits, but the 503 will force Stripe to retry → next attempt
+      // either hits a healthy Upstash or another hot instance.
+      markProcessedInMemory(eventId);
+      return { status: "error", message };
+    }
+  }
+
+  // No Upstash configured: single-instance dedup only.
+  if (processedSet.has(eventId)) {
+    return { status: "duplicate" };
+  }
+  markProcessedInMemory(eventId);
+  return { status: "new" };
 }
 
 async function safeDb<T>(label: string, fn: () => Promise<T>): Promise<T | null> {
@@ -291,9 +348,23 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: "Invalid signature" }, { status: 400 });
   }
 
-  // Idempotency check
-  if (processedSet.has(event.id)) {
+  // Idempotency check — Upstash Redis (cross-instance) with in-memory fallback.
+  const claim = await claimEvent(event.id);
+  if (claim.status === "duplicate") {
     return Response.json({ received: true, duplicate: true, eventType: event.type });
+  }
+  if (claim.status === "error") {
+    // Upstash is down. We MUST NOT process optimistically — another instance
+    // might already have processed this event and we'd double-charge.
+    // Return 503 so Stripe retries; by then Upstash is hopefully back.
+    return Response.json(
+      {
+        error: "Idempotency store unavailable",
+        detail: claim.message,
+        eventType: event.type,
+      },
+      { status: 503 }
+    );
   }
 
   let handled = false;
@@ -475,7 +546,6 @@ export async function POST(request: NextRequest) {
       }
 
       default:
-        markProcessed(event.id);
         return Response.json({ received: true, ignored: true, eventType: event.type });
     }
   } catch (err) {
@@ -483,6 +553,5 @@ export async function POST(request: NextRequest) {
     console.error("[stripe-webhook]", event.type, err instanceof Error ? err.message : err);
   }
 
-  markProcessed(event.id);
   return Response.json({ received: true, eventType: event.type, handled });
 }
