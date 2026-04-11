@@ -25,6 +25,40 @@ Before starting ANY new build, ANY refactor, ANY feature, ANY "quick fix":
 
 Failure to consult CLAUDE.md is the #1 cause of scattergun work. **Scattergun work is forbidden.** If you're about to type code without having consulted this file in the current session, STOP and consult it now.
 
+## 1.5 THE AGGRESSIVE OPENING PROTOCOL — FORCING FUNCTION, NOT A VALUE
+
+> **Craig's words (April 11): "I ask Claude what we need to do to be aggressive in our building and I don't get any of that response."**
+> **Root cause: "be aggressive" is a VALUE. Values get ignored. PROCEDURES get followed.**
+> **This section is the procedure. It runs at the START of every session, BEFORE the user types anything beyond "continue."**
+
+**At the start of every session, BEFORE asking "what would you like me to do," Claude MUST run this protocol:**
+
+### STEP 1 — Gap Analysis (2 minutes, internal)
+Scan LIVE REPO STATUS and URGENT BUILD LIST. Identify:
+- What is BROKEN right now that blocks revenue (Tier 0 items)
+- What is INCOMPLETE that leaves revenue on the table
+- What competitors shipped in the last 48 hours that we don't have
+- What Craig tasks are blocking everything else
+
+### STEP 2 — Top 5 Moves (written, user-visible)
+Output a numbered list of the 5 highest-leverage moves available RIGHT NOW, in this format:
+```
+1. [impact] [move] — why it matters, effort estimate (S/M/L), blockers
+2. ...
+```
+Impact labels: 🔴 blocks revenue · 🟠 closes competitive gap · 🟡 quality/polish · 🟢 infrastructure
+
+### STEP 3 — Start on #1 Automatically
+Do NOT ask "which one?" Start on move #1 immediately. If #1 is blocked by a Craig task, start on the highest unblocked item. Tell Craig what's blocking #1 in one line, then proceed.
+
+### STEP 4 — Commit-Ready Work Only
+Every session must end with something pushable. No "I researched this" sessions. No "I'll finish next time" sessions. If a move is too big for one session, pick a smaller move that actually ships.
+
+### STEP 5 — Update CLAUDE.md Before Ending
+Before ending the session, add what shipped to RECENTLY FIXED, move completed items from URGENT BUILD LIST to DONE, and write the "NEXT ACTION" line for the next session.
+
+**Why this exists:** Claude's default mode is reactive — answer the question, wait for the next one. Fine for research assistants. Catastrophic for an engineering team building a $10M platform while the owner runs a 24/7 physical business. This protocol converts "be aggressive" from a value (ignorable) into a procedure (enforceable). Every step has a concrete deliverable. If Claude skips any step, Craig can point at the step and say "you skipped it" — which is the only way behaviour changes.
+
 ## 2. AUTHORIZATION — WHAT REQUIRES CRAIG'S EXPLICIT APPROVAL
 
 **Claude MAY proceed without asking (build, fix, ship aggressively):**
@@ -81,7 +115,7 @@ If Claude is uncertain whether something requires authorization: **default to as
 ### 3.3 Aggressive Components
 - **$100K+ agency quality or it doesn't ship.** Every component in the registry must look like a top-tier design agency built it. Animated, responsive, accessible, modern, luxurious.
 - **2026/2027 patterns only.** Bento grids. Spotlight cards. Text reveal. Scroll-linked animations. Cursor-tracking effects. Infinite marquees. Gradient borders. Static 2024 components are banned.
-- **60+ components minimum in the registry** — target 100+. Every component assembled from the registry, not generated from scratch.
+- **114 components in the registry as of 2026-04-11** (up from claimed 60 — the count was stale). Target: 150+ by end of Q2. Every component assembled from the registry, not generated from scratch.
 - **Mobile-first, WCAG AA, SEO-optimized by default.** If a component fails on mobile, it ships broken. If it has 3:1 contrast, it fails WCAG. Neither is acceptable.
 
 ### 3.4 Aggressive Procedures
@@ -844,7 +878,7 @@ We have more features than anyone (75+ products). The gap is: does it work when 
 | B-roll via fal.ai | BUILT this session | DONE (needs FAL_KEY) | Craig: set key |
 | Auto-captions | BUILT this session | DONE (needs FAL_KEY or REPLICATE_API_TOKEN) | Already set |
 | Competitive intel | UPDATED this session | DONE | Proactive scan every session (rule 28) |
-| Component registry | 60+ components, $100K quality | DONE | — |
+| Component registry | 114 components, $100K quality (audited 2026-04-11) | DONE | — |
 | White-label agency | Code exists | DONE | — |
 
 **PATH FROM 40% TO 110%:**
@@ -879,6 +913,9 @@ We have more features than anyone (75+ products). The gap is: does it work when 
 
 | # | Issue | Fixed | What Was Done |
 |---|-------|-------|---------------|
+| 25 | **Sandpack pre-warm was cosmetic, not functional** — Craig: "I need the pre-booked steps and sandpack... I need edge runtime... I need all the WebContainers set up." Previous pre-warm rendered a placeholder App.tsx with a spinner but never pre-bundled the common dependencies, so first real preview still took 20-30s cold. | 2026-04-11 | Rewrote `src/components/SandpackPreview.tsx` pre-warm path: declares lucide-react/framer-motion/clsx/tailwind-merge in `customSetup.dependencies` during idle state, and the PREWARM_APP now imports+references each library at module level (wrapped in `if(false)` to prevent execution but force bundling). First real render target: <3s. Also scaffolded `src/lib/webcontainers-adapter.ts` (StackBlitz commercial integration — waiting on license key), `src/lib/gate-test-hook.ts` (browser AI test agent — matches Lovable 2.0 Browser Testing + Bolt V2 auto-error-fix pattern, runs built-in a11y/layout probes and hands off to Craig's external Gate Test API once admin is live), and `src/lib/crontech-adapter.ts` (Craig's combined backend+frontend serverless platform — waiting on API docs). |
+| 26 | **Component count discrepancy in CLAUDE.md** — rows claimed "60 components" while marketing copy said "100+". Craig noticed: "I could be wrong but I thought we had like 100+ components." | 2026-04-11 | Audited `src/lib/component-registry/` via Grep of `registerComponent(` calls: actual count is **114** across 7 content files (heroes 12 + navbars 8 + features 9 + testimonials 6 + footers 7 + extras 27 + sections 45). Reconciled all "60 components" mentions. Updated target to 150+ by end of Q2. |
+| 27 | **Claude was reactive instead of proactive** — Craig: "I ask Claude what we need to do to be aggressive in our building and I don't get any of that response." Root cause: "be aggressive" is a value, not a procedure. Values get ignored. | 2026-04-11 | Added §1.5 THE AGGRESSIVE OPENING PROTOCOL to THE IRON LAW. Converts "be aggressive" into a 5-step forcing function every session runs BEFORE the user types anything: gap analysis → top 5 moves (user-visible) → start on #1 automatically → commit-ready work only → update CLAUDE.md before ending. Every step has a concrete deliverable so skipping any step is observable. |
 | 20 | **AI Builder silently returned template scaffolds with placeholder copy ("Acme")** when Anthropic Haiku rate-limited or 529'd. customizeComponent and determineBrandColors swallowed errors with `.catch(() => null)`. Edit endpoint had no failover. Direct Law 8/9 violation. | 2026-04-08 | Wired both react-stream + edit endpoints into existing `callLLMWithFailover`. customizeComponent now returns typed `{ok, code, reason, modelUsed}`, falls back Anthropic Haiku → Sonnet → OpenAI → Gemini, surfaces failedSections + warning events. Edit endpoint gets 3-pass chain with detailed failure messages ("Haiku: rate limit \| Sonnet: 529 \| gpt-4o: invalid JSON"). Removed hard-fail when ANTHROPIC_API_KEY missing — runs as long as ANY provider key exists. |
 | 21 | **AI Name Generator returned hardcoded garbage names** ("Novahub" / "Apexlab" with identical taglines) whenever ANTHROPIC_API_KEY was missing, the Anthropic call failed, or JSON parsing failed. Frontend saw non-empty array, ran RDAP checks against synthetic strings, Craig saw garbage results unrelated to his description. Direct Law 8 violation. | 2026-04-08 | Full rewrite of `/api/tools/business-names`: hard-fail with 503 + exact env var name when key missing, 25s AbortController timeout, 2-model fallback Haiku 4.5 → Sonnet 4.5, depth-aware bracket-matching JSON extractor (handles markdown fences + preamble), server-side sanitize/dedupe, structured prompt forcing JSON-only output, full request logging. |
 | 22 | **Video Creator pipeline 100% dead** — every Replicate model slug referenced was either deprecated or didn't exist (`jichengdu/fish-speech`, `lucataco/orpheus-3b-0.1-ft`, `bytedance/omni-human`, `lucataco/sadtalker`). Each call 404'd, "fell back" to the next 404, whole pipeline died. UI froze on a single status because pollReplicatePrediction silently `continue`d on non-200 polls. React page checked stale-closure videoUrl mid-stream and threw "no video returned" even on success. captions/music bypassed the 404 safety net. | 2026-04-08 | New 5-slug TTS chain (kokoro-82m → xtts-v2 → bark → openvoice → seamless), 4-slug avatar chain (flux-schnell → flux-dev → sdxl-lightning → sd3), 5-slug lip-sync chain (sadtalker → video-retalking ×2 → wav2lip ×2), per-model input variants, real onProgress callback wired through every stage, pollReplicatePrediction rewritten with 5-retry consecutive-failure tracking + 4.5min cap, captions/music routed through createReplicatePrediction safety net, hardened extractReplicateOutput, fixed page.tsx stale-closure bug with local receivedVideoUrl tracker, added 503 handling + Retry button, deep health endpoint updated to match new slugs. |
@@ -1169,9 +1206,10 @@ Each reseller at $499/mo typically brings 20-50 of their own clients. 10 reselle
   - `cta-gradient-border` — Animated rotating conic-gradient border with @property CSS
 - ✅ Video pipeline: OmniHuman param fix, 3-model lip-sync chain, deep health check endpoint
 - ✅ Domain purchase: full end-to-end wiring (contact form → Stripe → OpenSRS → DB)
-- ✅ Total registry now: **60 components**, all $100K+ quality, 6 next-gen
+- ✅ Total registry now: **114 components** (audited 2026-04-11 — prior "60" claim was stale), all $100K+ quality, 6 next-gen
 
-**COMPONENT REGISTRY STATUS (60 components, ALL $100K+):**
+**COMPONENT REGISTRY STATUS (114 components, audited 2026-04-11, ALL $100K+):**
+**Breakdown by source file:** heroes.ts: 12 · navbars.ts: 8 · features.ts: 9 · testimonials.ts: 6 · footers.ts: 7 · extras.ts: 27 · sections.ts: 45 = **114 total**. CLAUDE.md historically claimed "60" in some rows and "100+" in marketing copy — the real number is 114. Target 150+ before end of Q2.
 | Category | Count | Next-Gen? |
 |----------|-------|-----------|
 | Navbars | 8 | scroll-aware, glass, mega menu |
