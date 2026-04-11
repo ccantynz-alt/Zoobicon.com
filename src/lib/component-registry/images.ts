@@ -33,6 +33,15 @@ export type Industry =
   | "ecommerce"
   | "food"
   | "wellness"
+  | "transport"
+  | "hospitality"
+  | "local_service"
+  | "trades"
+  | "medical"
+  | "legal"
+  | "realestate"
+  | "automotive"
+  | "education"
   | "editorial";
 
 /**
@@ -139,6 +148,115 @@ const POOLS: Record<Industry, string[]> = {
     "1472214103451-9374bd1c798e",
   ],
 
+  // Transport / shuttle / taxi / rideshare / airport — roads, vehicles,
+  // airports, travellers. Uses Unsplash IDs already proven in the codebase
+  // plus a targeted set of transport-appropriate photos.
+  transport: [
+    "1544620347-c4fd4a3d5957", // highway at dusk
+    "1502877338535-766e1452684a", // airport terminal
+    "1540962351504-03099e0a754b", // car headlights night
+    "1559416523-140ddc3d238c", // minivan road trip
+    "1558981806-ec527fa84c39", // airplane window seat
+    "1494515843206-f3117d3f51b7", // city road aerial
+    "1506521781263-d8422e82f27a", // taxi street view
+    "1486325212027-8081e485255e", // airport sunset
+  ],
+
+  // Hospitality / hotels / resorts / events — welcoming interiors + vistas
+  hospitality: [
+    "1566073771259-6a8506099945", // hotel lobby
+    "1551882547-ff40c63fe5fa", // resort pool
+    "1520250497591-112f2f40a3f4", // elegant dining
+    "1582719478250-c89cae4dc85b", // hotel suite
+    "1564501049412-61c2a3083791", // hotel bed
+    "1542314831-068cd1dbfeeb", // lounge bar
+    "1611892440504-42a792e24d32", // luxury suite
+    "1551918120-9739cb430c6d", // resort beach
+  ],
+
+  // Local service / trades / home services — clean modern homes, vans,
+  // toolboxes, trusted tradespeople.
+  local_service: [
+    "1581578731548-c64695cc6952", // electrician hands
+    "1558618666-fcd25c85cd64", // contractor on site
+    "1503387762-592deb58ef4e", // plumber tools
+    "1600585154340-be6161a56a0c", // modern home exterior
+    "1505691938895-1758d7feb511", // suburban house
+    "1600607687939-ce8a6c25118c", // interior living room
+    "1503174971373-b1f69850bded", // moving van
+    "1600585154526-990dced4db0d", // kitchen renovation
+  ],
+  trades: [
+    "1581578731548-c64695cc6952",
+    "1558618666-fcd25c85cd64",
+    "1503387762-592deb58ef4e",
+    "1600585154340-be6161a56a0c",
+    "1505691938895-1758d7feb511",
+    "1600607687939-ce8a6c25118c",
+    "1503174971373-b1f69850bded",
+    "1600585154526-990dced4db0d",
+  ],
+
+  // Medical / clinic / dental / health practitioners
+  medical: [
+    "1576091160399-112ba8d25d1d", // doctor with stethoscope
+    "1584515933487-779824d29309", // dental clinic
+    "1579684385127-1ef15d508118", // medical office
+    "1571772996211-2f02c9727629", // clinic reception
+    "1559757148-5c350d0d3c56", // nurse portrait
+    "1582750433449-648ed127bb54", // lab coat professional
+    "1504813184591-01572f98c85f", // hospital corridor
+    "1530026405186-ed1f139313f8", // prescription desk
+  ],
+
+  // Legal / lawyers / accountants / professional services
+  legal: [
+    "1589829545856-d10d557cf95f", // law books on desk
+    "1450101499163-c8848c66ca85", // lawyer handshake
+    "1521791136064-7986c2920216", // meeting room
+    "1507679799987-c73779587ccf", // professional portrait suit
+    "1521737604893-d14cc237f11d", // office consultation
+    "1556761175-5973dc0f32e7", // business meeting
+    "1528747045269-390fe33c19f2", // legal books detail
+    "1551836022-d5d88e9218df", // signing contract
+  ],
+
+  // Real estate — property exteriors, interiors, keys
+  realestate: [
+    "1600585154340-be6161a56a0c", // modern home exterior
+    "1505691938895-1758d7feb511", // suburban house
+    "1600607687939-ce8a6c25118c", // living room interior
+    "1600585154526-990dced4db0d", // kitchen
+    "1560518883-ce09059eeffa", // front door
+    "1512917774080-9991f1c4c750", // aerial neighbourhood
+    "1564013799919-ab600027ffc6", // luxury house
+    "1600566753376-12c8ab7fb75b", // modern interior
+  ],
+
+  // Automotive / car dealerships / repair shops
+  automotive: [
+    "1494976388531-d1058494cdd8", // sports car
+    "1544620347-c4fd4a3d5957", // highway
+    "1503376780353-7e6692767b70", // classic car
+    "1492144534655-ae79c964c9d7", // car detail
+    "1553440569-bcc63803a83d", // car repair
+    "1542362567-b07e54358753", // showroom
+    "1583121274602-3e2820c69888", // mechanic
+    "1549317661-bd32c8ce0db2", // garage tools
+  ],
+
+  // Education / training / schools / courses
+  education: [
+    "1523240795612-9a054b0db644", // classroom
+    "1503676260728-1c00da094a0b", // library
+    "1524178232363-1fb2b075b655", // university campus
+    "1503676260728-1c00da094a0b", // study desk
+    "1509062522246-3755977927d7", // books shelf
+    "1513475382585-d06e58bcb0e0", // student laptop
+    "1571260899304-425eee4c7efc", // graduation
+    "1434030216411-0b793f4b4173", // focused study
+  ],
+
   // Editorial / default — the restrained mix, anchors every fallback
   editorial: [
     "1522071820081-009f0129c71c",
@@ -168,6 +286,15 @@ export function detectIndustry(prompt: string): Industry {
     ecommerce: 0,
     food: 0,
     wellness: 0,
+    transport: 0,
+    hospitality: 0,
+    local_service: 0,
+    trades: 0,
+    medical: 0,
+    legal: 0,
+    realestate: 0,
+    automotive: 0,
+    education: 0,
     editorial: 0,
   };
 
@@ -178,19 +305,80 @@ export function detectIndustry(prompt: string): Industry {
   hits("saas", ["saas", "platform", "dashboard", "b2b", "subscription", "analytics"], 2);
   hits("saas", ["software", "tool", "product", "startup"], 1);
 
-  hits("tech", ["ai", "ml", "developer", "devtool", "api", "cli", "infrastructure", "cyber", "security"], 2);
+  hits("tech", ["ai ", " ai", "ml ", "developer", "devtool", "api", "cli", "infrastructure", "cyber", "security"], 2);
   hits("tech", ["tech", "code", "engineer"], 1);
 
   hits("agency", ["agency", "consulting", "marketing", "branding", "firm", "studio"], 2);
 
   hits("portfolio", ["portfolio", "photographer", "illustrator", "designer"], 2);
-  hits("creative", ["creative", "art", "gallery", "exhibition"], 2);
+  hits("creative", ["creative", "art ", "gallery", "exhibition"], 2);
 
-  hits("ecommerce", ["shop", "store", "ecommerce", "retail", "fashion", "boutique", "product", "sell", "buy"], 2);
+  hits("ecommerce", ["shop", "store", "ecommerce", "retail", "fashion", "boutique", "sell", "buy", "cart"], 2);
 
   hits("food", ["restaurant", "cafe", "bakery", "bistro", "dining", "menu", "chef", "kitchen", "cuisine", "food"], 2);
 
-  hits("wellness", ["wellness", "yoga", "meditation", "fitness", "gym", "health", "therapy", "retreat"], 2);
+  hits("wellness", ["wellness", "yoga", "meditation", "fitness", "gym", "spa", "therapy", "retreat", "massage"], 2);
+
+  // NEW — Transport: shuttles, taxis, rideshare, airport transfers, limo, driver
+  hits("transport", [
+    "shuttle", "transfer", "transport", "airport", "taxi", "uber", "rideshare", "ride share",
+    "limo", "limousine", "chauffeur", "driver", "bus", "coach", "van", "minivan",
+    "transit", "commute", "pickup", "drop-off", "fleet", "tour",
+  ], 3);
+
+  // NEW — Hospitality: hotels, resorts, motels, events, venues
+  hits("hospitality", [
+    "hotel", "resort", "motel", "inn", "lodge", "accommodation", "bnb", "b&b",
+    "airbnb", "villa", "suite", "booking", "reservation", "venue", "wedding", "event",
+    "conference", "banquet", "catering", "hospitality",
+  ], 3);
+
+  // NEW — Local service + trades: plumbers, electricians, builders, cleaners
+  hits("local_service", [
+    "cleaning", "cleaner", "maid", "janitorial", "lawn", "landscap", "gardening",
+    "handyman", "pest", "moving", "mover", "removal", "locksmith",
+  ], 3);
+  hits("trades", [
+    "plumber", "plumbing", "electrician", "electrical", "builder", "construction",
+    "contractor", "roofing", "roofer", "painter", "painting", "carpenter", "carpentry",
+    "hvac", "heating", "cooling", "concrete", "tiler", "tiling", "renovation",
+    "remodel", "trades", "tradesperson",
+  ], 3);
+
+  // NEW — Medical / dental / health practitioners
+  hits("medical", [
+    "doctor", "clinic", "medical", "dentist", "dental", "orthodontist",
+    "physio", "physiotherapy", "chiropractor", "optometrist", "pediatric",
+    "veterinarian", "vet clinic", "nurse", "hospital", "pharmacy", "healthcare",
+  ], 3);
+
+  // NEW — Legal / accountants / professional services
+  hits("legal", [
+    "lawyer", "attorney", "law firm", "legal", "solicitor", "barrister",
+    "accountant", "accounting", "bookkeeping", "tax", "cpa", "notary",
+    "paralegal", "litigation", "mediation",
+  ], 3);
+
+  // NEW — Real estate
+  hits("realestate", [
+    "real estate", "realtor", "property", "properties", "homes for sale",
+    "mortgage", "broker", "listing", "rental", "lease", "landlord",
+    "property management", "realty",
+  ], 3);
+
+  // NEW — Automotive
+  hits("automotive", [
+    "car dealer", "dealership", "auto repair", "mechanic", "garage",
+    "tire", "tyre", "oil change", "body shop", "detailing", "car wash",
+    "automotive", "vehicle", "used cars",
+  ], 3);
+
+  // NEW — Education / training / schools
+  hits("education", [
+    "school", "university", "college", "tutor", "tutoring", "course",
+    "class", "lesson", "training", "academy", "workshop", "curriculum",
+    "student", "teacher", "educator",
+  ], 2);
 
   // Pick the winner
   let best: Industry = "editorial";
@@ -202,6 +390,49 @@ export function detectIndustry(prompt: string): Industry {
     }
   }
   return best;
+}
+
+/**
+ * Theme classifier — reads the prompt's INTENT (not just industry keyword)
+ * and picks the appropriate visual mood. This is the single most important
+ * fix for "every site comes out dark" — consumer-facing local services
+ * need bright/airy/optimistic, not editorial-stone-dark.
+ *
+ * Priority order when multiple signals fire:
+ *   1. Explicit user request ("dark theme", "light theme")
+ *   2. Industry vertical default (transport/hospitality/medical/local_service → light)
+ *   3. Keyword mood (tech/cyber/gaming/crypto → dark)
+ *   4. Warm verticals (food/hospitality → warm)
+ *   5. Editorial (default fallback — the restrained stone palette)
+ */
+export type Theme = "light" | "dark" | "warm" | "editorial";
+
+export function detectTheme(prompt: string, industry?: Industry): Theme {
+  const p = prompt.toLowerCase();
+
+  // Explicit user override wins everything
+  if (/\b(dark theme|dark mode|black theme|night mode)\b/.test(p)) return "dark";
+  if (/\b(light theme|light mode|bright theme|white theme|airy)\b/.test(p)) return "light";
+  if (/\b(warm|cozy|artisan|rustic|handmade)\b/.test(p)) return "warm";
+  if (/\b(editorial|magazine|typographic|serif)\b/.test(p)) return "editorial";
+
+  // Industry defaults — consumer-facing services want light + bright
+  const lightIndustries: Industry[] = [
+    "transport", "hospitality", "local_service", "trades",
+    "medical", "realestate", "automotive", "education", "wellness",
+  ];
+  if (industry && lightIndustries.includes(industry)) return "light";
+
+  // Warm verticals
+  if (industry === "food") return "warm";
+
+  // Tech / cyber / crypto / gaming → dark is their natural mood
+  if (/\b(cyber|security|hacker|crypto|web3|defi|blockchain|gaming|esports|terminal|devops|infrastructure)\b/.test(p)) {
+    return "dark";
+  }
+
+  // Legal / agency / portfolio / saas / creative → editorial reads "serious + premium"
+  return "editorial";
 }
 
 /**
