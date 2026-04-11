@@ -121,45 +121,31 @@ const TESTIMONIALS = [
 
 export default function HomePage() {
   return (
-    <div className="relative min-h-screen bg-[#050508] text-white antialiased overflow-x-hidden selection:bg-[#E8D4B0] selection:text-black">
-      {/* Ambient cinematic glow — one warm orb, never cyberpunk */}
-      <div className="pointer-events-none fixed inset-0 -z-10" aria-hidden>
-        <div
-          className="absolute left-1/2 top-[14%] h-[720px] w-[1200px] -translate-x-1/2 rounded-full blur-[160px]"
-          style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }}
-        />
-        <div
-          className="absolute right-[-10%] top-[60%] h-[600px] w-[600px] rounded-full blur-[140px]"
-          style={{ background: "radial-gradient(closest-side, rgba(83,251,213,0.04), transparent 70%)" }}
-        />
-        <div
-          className="absolute inset-0 opacity-[0.022]"
-          style={{
-            backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)",
-            backgroundSize: "44px 44px",
-          }}
-        />
-      </div>
+    <div className="bg-[#0a0a14] text-white selection:bg-indigo-500/30 selection:text-white">
 
-      {/* Clear the fixed 72px nav */}
-      <div className="pt-[72px]">
-        {/* ── THE HERO IS THE PRODUCT ── */}
-        <HeroBuilder />
+      {/* ── HERO SLIDESHOW ── */}
+      <HeroShowcase />
 
-        {/* ── Trust strip — infinite marquee, Filmora pattern ── */}
-        <section
-          className="relative border-y border-white/[0.05]"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(255,255,255,0.012) 0%, rgba(255,255,255,0.002) 100%)",
-          }}
-        >
-          <div className="relative py-8 overflow-hidden fs-marquee-paused">
-            <div className="fs-marquee">
-              {[...TRUST_ITEMS, ...TRUST_ITEMS].map((item, i) => (
-                <div
-                  key={`${item.label}-${i}`}
-                  className="flex items-center gap-3 px-5 py-2 rounded-full border border-white/[0.06] bg-white/[0.02] backdrop-blur flex-shrink-0"
+      {/* ── FOUR DOMAINS ── */}
+      <section className="py-28 md:py-36 px-4 sm:px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-sm font-semibold tracking-widest uppercase text-indigo-400 mb-4">
+              One Platform, Four Domains
+            </p>
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
+              Every domain, a different superpower
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {DOMAINS.map((d) => {
+              const c = DOMAIN_COLORS[d.color];
+              const Icon = d.icon;
+              return (
+                <Link
+                  key={d.name}
+                  href={d.href}
+                  className={`group rounded-2xl border border-white/[0.06] bg-white/[0.03] p-7 transition-all duration-200 hover:bg-white/[0.06] ${c.border}`}
                 >
                   <div className="flex items-center gap-1">
                     {[0, 1, 2, 3, 4].map((j) => (

@@ -1,0 +1,210 @@
+src/agents/auto-healer.ts(124,30): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/agents/auto-healer.ts(182,30): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/agents/daily-todo-sender.ts(13,7): error TS2515: Non-abstract class 'DailyTodoSender' does not implement inherited abstract member execute from class 'BaseAgent<unknown, unknown>'.
+src/agents/daily-todo-sender.ts(15,5): error TS2554: Expected 2 arguments, but got 1.
+src/agents/daily-todo-sender.ts(44,12): error TS2352: Conversion of type 'typeof globalThis' to type 'Record<string, string>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/agents/daily-todo-sender.ts(80,8): error TS2352: Conversion of type 'typeof globalThis' to type 'Record<string, string>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/agents/daily-todo-sender.ts(97,1): error TS2554: Expected 2 arguments, but got 1.
+src/agents/deployment-guardian.ts(130,96): error TS7006: Parameter 'f' implicitly has an 'any' type.
+src/agents/deployment-guardian.ts(134,32): error TS7006: Parameter 'f' implicitly has an 'any' type.
+src/agents/deployment-guardian.ts(142,55): error TS7006: Parameter 'f' implicitly has an 'any' type.
+src/agents/intel-monitor.ts(188,17): error TS2339: Property 'notifyCompetitorAlert' does not exist on type 'typeof import("/home/runner/work/Zoobicon.com/Zoobicon.com/src/lib/notifications")'.
+src/agents/onboarding-watchdog.ts(217,46): error TS7006: Parameter 'u' implicitly has an 'any' type.
+src/agents/onboarding-watchdog.ts(224,19): error TS7006: Parameter 'u' implicitly has an 'any' type.
+src/agents/revenue-monitor.ts(296,42): error TS7006: Parameter 'sum' implicitly has an 'any' type.
+src/agents/revenue-monitor.ts(296,47): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/agents/revenue-monitor.ts(304,84): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/agents/revenue-monitor.ts(370,12): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/agents/revenue-monitor.ts(379,87): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/agents/revenue-monitor.ts(389,32): error TS7006: Parameter 'u' implicitly has an 'any' type.
+src/agents/seo-auto-fix.ts(83,25): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/agents/tech-currency.ts(105,3): error TS2561: Object literal may only specify known properties, but 'retryDelayMs' does not exist in type 'AgentConfig'. Did you mean to write 'retryBaseDelayMs'?
+src/agents/tech-currency.ts(118,9): error TS2416: Property 'execute' in type 'TechCurrencyAgent' is not assignable to the same property in base type 'BaseAgent<unknown, unknown>'.
+src/agents/tech-currency.ts(131,35): error TS2339: Property 'fileSystem' does not exist on type 'TaskContext'.
+src/agents/tech-currency.ts(159,17): error TS2353: Object literal may only specify known properties, and 'type' does not exist in type 'AgentFinding'.
+src/agents/tech-currency.ts(177,9): error TS2353: Object literal may only specify known properties, and 'type' does not exist in type 'AgentFinding'.
+src/agents/tech-currency.ts(196,33): error TS2339: Property 'fileSystem' does not exist on type 'TaskContext'.
+src/agents/tech-currency.ts(218,15): error TS2353: Object literal may only specify known properties, and 'type' does not exist in type 'AgentFinding'.
+src/agents/tech-currency.ts(273,7): error TS2322: Type 'TechAuditResult' is not assignable to type 'Record<string, unknown>'.
+src/agents/tech-currency.ts(351,15): error TS2345: Argument of type 'string' is not assignable to parameter of type 'AgentConfig'.
+src/app/admin/usage/page.tsx(305,15): error TS2322: Type '{ hidden: { opacity: number; y: number; }; visible: (i: number) => { opacity: number; y: number; transition: { delay: number; duration: number; ease: string; }; }; }' is not assignable to type 'Variants'.
+src/app/api/agencies/portal/route.ts(38,35): error TS7006: Parameter 'c' implicitly has an 'any' type.
+src/app/api/agencies/portal/route.ts(57,24): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/app/api/collab/ws/route.ts(32,5): error TS2578: Unused '@ts-expect-error' directive.
+src/app/api/comeback/approve/route.ts(76,21): error TS2352: Conversion of type 'typeof import("/home/runner/work/Zoobicon.com/Zoobicon.com/src/lib/blog-generator")' to type '{ publishDraft: (draftId: string, opts?: { content?: string | undefined; } | undefined) => Promise<unknown>; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/app/api/cron/daily-comeback/route.ts(42,17): error TS2352: Conversion of type 'typeof import("/home/runner/work/Zoobicon.com/Zoobicon.com/src/lib/daily-comeback")' to type '{ runAllNightly: () => Promise<NightlySummary>; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/app/api/email/ai-support/route.ts(30,10): error TS7006: Parameter 'a' implicitly has an 'any' type.
+src/app/api/health/builder/route.ts(48,39): error TS2345: Argument of type '{ model: string; maxTokens: number; temperature: number; messages: { role: "user"; content: string; }[]; }' is not assignable to parameter of type 'CallClaudeOptions'.
+src/app/api/slack/events/route.ts(57,25): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'BodyInit | null | undefined'.
+src/app/api/slack/events/route.ts(68,16): error TS2339: Property 'bot_id' does not exist on type '{}'.
+src/app/api/slack/events/route.ts(68,33): error TS2339: Property 'subtype' does not exist on type '{}'.
+src/app/api/slack/events/route.ts(72,20): error TS2339: Property 'type' does not exist on type '{}'.
+src/app/api/slack/events/route.ts(74,17): error TS2339: Property 'channel' does not exist on type 'unknown'.
+src/app/api/slack/events/route.ts(74,26): error TS2339: Property 'user' does not exist on type 'unknown'.
+src/app/api/slack/events/route.ts(74,32): error TS2339: Property 'text' does not exist on type 'unknown'.
+src/app/api/slack/events/route.ts(74,38): error TS2339: Property 'ts' does not exist on type 'unknown'.
+src/app/api/slack/events/route.ts(81,17): error TS2339: Property 'channel' does not exist on type 'unknown'.
+src/app/api/slack/events/route.ts(81,26): error TS2339: Property 'user' does not exist on type 'unknown'.
+src/app/api/slack/events/route.ts(81,32): error TS2339: Property 'text' does not exist on type 'unknown'.
+src/app/api/slack/events/route.ts(81,38): error TS2339: Property 'ts' does not exist on type 'unknown'.
+src/app/api/slack/events/route.ts(88,17): error TS2339: Property 'reaction' does not exist on type 'unknown'.
+src/app/api/slack/events/route.ts(88,27): error TS2339: Property 'user' does not exist on type 'unknown'.
+src/app/api/slack/events/route.ts(88,33): error TS2339: Property 'item' does not exist on type 'unknown'.
+src/app/api/slack/events/route.ts(95,61): error TS2339: Property 'type' does not exist on type '{}'.
+src/app/api/v1/generate/route.ts(122,35): error TS2677: A type predicate's type must be assignable to its parameter's type.
+src/app/api/v1/generate/route.ts(123,31): error TS2339: Property 'text' does not exist on type 'ContentBlock'.
+src/app/api/v1/wordpress/chatbot/route.ts(32,51): error TS2345: Argument of type '{ businessName: any; businessDescription: any; greeting: any; primaryColor: any; siteUrl: any; knowledgeBase: any; }' is not assignable to parameter of type 'ChatbotConfig'.
+src/app/api/v1/wordpress/generate/route.ts(15,25): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ short: string; medium: string; long: string; }'.
+src/app/booking/page.tsx(271,29): error TS2345: Argument of type '(prev: BookingType[]) => (BookingType | { id: string; name: string; description: string; duration: number; price: number; currency: string; color: string; location: "video"; enabled: true; })[]' is not assignable to parameter of type 'SetStateAction<BookingType[]>'.
+src/app/builder/ide/IdeClient.tsx(5,33): error TS2305: Module '"lucide-react"' has no exported member 'Github'.
+src/app/builder/page.tsx(1065,66): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+src/app/builder/page.tsx(1152,23): error TS2345: Argument of type '(prev: { message: string; suggestion: string; } | null) => { message: string; suggestion: string | undefined; }' is not assignable to parameter of type 'SetStateAction<{ message: string; suggestion: string; } | null>'.
+src/app/builder/page.tsx(147,53): error TS1501: This regular expression flag is only available when targeting 'es2018' or later.
+src/app/builder/page.tsx(148,52): error TS1501: This regular expression flag is only available when targeting 'es2018' or later.
+src/app/builder/page.tsx(2100,18): error TS2367: This comparison appears to be unintentional because the types '"idle" | "error" | "complete" | "editing"' and '"generating"' have no overlap.
+src/app/builder/page.tsx(2227,9): error TS2322: Type '{ open: boolean; onClose: () => void; siteName: string; generatedFiles: Record<string, string> | undefined; }' is not assignable to type 'IntrinsicAttributes & DomainHookModalProps'.
+src/app/dictation/page.tsx(184,36): error TS2552: Cannot find name 'SpeechRecognitionEvent'. Did you mean 'SpeechRecognitionResult'?
+src/app/dictation/page.tsx(237,35): error TS2552: Cannot find name 'SpeechRecognitionErrorEvent'. Did you mean 'SpeechRecognitionResult'?
+src/app/dictation/page.tsx(92,33): error TS2304: Cannot find name 'SpeechRecognition'.
+src/app/domains/page.tsx(1014,18): error TS2304: Cannot find name 'checkoutError'.
+src/app/domains/page.tsx(1014,89): error TS2304: Cannot find name 'checkoutError'.
+src/app/domains/page.tsx(1072,67): error TS2339: Property 'tagline' does not exist on type '{ name: string; slug: string; domains: { tld: string; available: boolean | null; checking: boolean; }[]; }'.
+src/app/domains/page.tsx(1092,34): error TS2339: Property 'domain' does not exist on type '{ tld: string; available: boolean | null; checking: boolean; }'.
+src/app/domains/page.tsx(1106,34): error TS2339: Property 'domain' does not exist on type '{ tld: string; available: boolean | null; checking: boolean; }'.
+src/app/domains/page.tsx(111,5): error TS2304: Cannot find name 'setAutoExpandedTlds'.
+src/app/domains/page.tsx(1111,82): error TS2339: Property 'price' does not exist on type '{ tld: string; available: boolean | null; checking: boolean; }'.
+src/app/domains/page.tsx(1112,64): error TS2339: Property 'domain' does not exist on type '{ tld: string; available: boolean | null; checking: boolean; }'.
+src/app/domains/page.tsx(1114,67): error TS2339: Property 'domain' does not exist on type '{ tld: string; available: boolean | null; checking: boolean; }'.
+src/app/domains/page.tsx(1121,60): error TS2345: Argument of type '{ tld: string; available: boolean | null; checking: boolean; }' is not assignable to parameter of type 'DomainResult'.
+src/app/domains/page.tsx(1141,66): error TS2339: Property 'domain' does not exist on type '{ tld: string; available: boolean | null; checking: boolean; }'.
+src/app/domains/page.tsx(1142,41): error TS2345: Argument of type '{ tld: string; available: boolean | null; checking: boolean; }' is not assignable to parameter of type 'DomainResult'.
+src/app/domains/page.tsx(1204,18): error TS2304: Cannot find name 'checkoutError'.
+src/app/domains/page.tsx(1204,89): error TS2304: Cannot find name 'checkoutError'.
+src/app/domains/page.tsx(1393,12): error TS2304: Cannot find name 'checkoutError'.
+src/app/domains/page.tsx(1395,64): error TS2304: Cannot find name 'checkoutError'.
+src/app/domains/page.tsx(161,10): error TS2304: Cannot find name 'autoExpandedTlds'.
+src/app/domains/page.tsx(167,10): error TS2304: Cannot find name 'autoGenerating'.
+src/app/domains/page.tsx(168,7): error TS2552: Cannot find name 'setAutoGenerating'. Did you mean 'setGenerating'?
+src/app/domains/page.tsx(175,5): error TS2304: Cannot find name 'setAutoExpandedTlds'.
+src/app/domains/page.tsx(176,5): error TS2552: Cannot find name 'setAutoGenerating'. Did you mean 'setGenerating'?
+src/app/domains/page.tsx(181,9): error TS2304: Cannot find name 'pendingGenerate'.
+src/app/domains/page.tsx(182,7): error TS2304: Cannot find name 'setPendingGenerate'.
+src/app/domains/page.tsx(186,7): error TS2304: Cannot find name 'pendingGenerate'.
+src/app/domains/page.tsx(201,9): error TS2451: Cannot redeclare block-scoped variable 'handleGenerate'.
+src/app/domains/page.tsx(220,58): error TS2304: Cannot find name 'genStyle'.
+src/app/domains/page.tsx(244,7): error TS2345: Argument of type '{ name: string; tagline: string; domains: { domain: string; tld: string; available: null; price: number; checking: true; }[]; }[]' is not assignable to parameter of type 'SetStateAction<{ name: string; slug: string; domains: { tld: string; available: boolean | null; checking: boolean; }[]; }[]>'.
+src/app/domains/page.tsx(300,23): error TS2304: Cannot find name 'genStyle'.
+src/app/domains/page.tsx(326,5): error TS2304: Cannot find name 'setSearchError'.
+src/app/domains/page.tsx(345,9): error TS2304: Cannot find name 'setSearchError'.
+src/app/domains/page.tsx(349,7): error TS2304: Cannot find name 'setSearchError'.
+src/app/domains/page.tsx(366,9): error TS2451: Cannot redeclare block-scoped variable 'handleGenerate'.
+src/app/domains/page.tsx(372,5): error TS2304: Cannot find name 'setCheckoutError'.
+src/app/domains/page.tsx(379,58): error TS2304: Cannot find name 'genStyle'.
+src/app/domains/page.tsx(384,9): error TS2304: Cannot find name 'setCheckoutError'.
+src/app/domains/page.tsx(404,25): error TS2345: Argument of type '{ name: string; tagline: string; domains: { domain: string; tld: string; available: boolean | null; price: number; checking: boolean; }[]; }[]' is not assignable to parameter of type 'SetStateAction<{ name: string; slug: string; domains: { tld: string; available: boolean | null; checking: boolean; }[]; }[]>'.
+src/app/domains/page.tsx(458,7): error TS2304: Cannot find name 'setCheckoutError'.
+src/app/domains/page.tsx(466,23): error TS2304: Cannot find name 'contactInfo'.
+src/app/domains/page.tsx(467,22): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+src/app/domains/page.tsx(467,7): error TS2304: Cannot find name 'setContactInfo'.
+src/app/domains/page.tsx(469,5): error TS2304: Cannot find name 'setShowCheckoutForm'.
+src/app/domains/page.tsx(474,10): error TS2304: Cannot find name 'contactInfo'.
+src/app/domains/page.tsx(474,36): error TS2304: Cannot find name 'contactInfo'.
+src/app/domains/page.tsx(474,61): error TS2304: Cannot find name 'contactInfo'.
+src/app/domains/page.tsx(491,23): error TS2304: Cannot find name 'contactInfo'.
+src/app/domains/page.tsx(501,9): error TS2304: Cannot find name 'setShowCheckoutForm'.
+src/app/domains/page.tsx(524,8): error TS2304: Cannot find name 'showCheckoutForm'.
+src/app/domains/page.tsx(529,38): error TS2304: Cannot find name 'setShowCheckoutForm'.
+src/app/domains/page.tsx(553,45): error TS2304: Cannot find name 'contactInfo'.
+src/app/domains/page.tsx(553,83): error TS2304: Cannot find name 'setContactInfo'.
+src/app/domains/page.tsx(553,98): error TS7006: Parameter 'p' implicitly has an 'any' type.
+src/app/domains/page.tsx(558,45): error TS2304: Cannot find name 'contactInfo'.
+src/app/domains/page.tsx(558,82): error TS2304: Cannot find name 'setContactInfo'.
+src/app/domains/page.tsx(558,97): error TS7006: Parameter 'p' implicitly has an 'any' type.
+src/app/domains/page.tsx(564,44): error TS2304: Cannot find name 'contactInfo'.
+src/app/domains/page.tsx(564,78): error TS2304: Cannot find name 'setContactInfo'.
+src/app/domains/page.tsx(564,93): error TS7006: Parameter 'p' implicitly has an 'any' type.
+src/app/domains/page.tsx(569,42): error TS2304: Cannot find name 'contactInfo'.
+src/app/domains/page.tsx(569,76): error TS2304: Cannot find name 'setContactInfo'.
+src/app/domains/page.tsx(569,91): error TS7006: Parameter 'p' implicitly has an 'any' type.
+src/app/domains/page.tsx(574,43): error TS2304: Cannot find name 'contactInfo'.
+src/app/domains/page.tsx(574,79): error TS2304: Cannot find name 'setContactInfo'.
+src/app/domains/page.tsx(574,94): error TS7006: Parameter 'p' implicitly has an 'any' type.
+src/app/domains/page.tsx(580,45): error TS2304: Cannot find name 'contactInfo'.
+src/app/domains/page.tsx(580,78): error TS2304: Cannot find name 'setContactInfo'.
+src/app/domains/page.tsx(580,93): error TS7006: Parameter 'p' implicitly has an 'any' type.
+src/app/domains/page.tsx(585,45): error TS2304: Cannot find name 'contactInfo'.
+src/app/domains/page.tsx(585,79): error TS2304: Cannot find name 'setContactInfo'.
+src/app/domains/page.tsx(585,94): error TS7006: Parameter 'p' implicitly has an 'any' type.
+src/app/domains/page.tsx(592,45): error TS2304: Cannot find name 'contactInfo'.
+src/app/domains/page.tsx(592,77): error TS2304: Cannot find name 'setContactInfo'.
+src/app/domains/page.tsx(592,92): error TS7006: Parameter 'p' implicitly has an 'any' type.
+src/app/domains/page.tsx(597,34): error TS2304: Cannot find name 'contactInfo'.
+src/app/domains/page.tsx(597,70): error TS2304: Cannot find name 'setContactInfo'.
+src/app/domains/page.tsx(597,85): error TS7006: Parameter 'p' implicitly has an 'any' type.
+src/app/domains/page.tsx(620,43): error TS2304: Cannot find name 'contactInfo'.
+src/app/domains/page.tsx(620,69): error TS2304: Cannot find name 'contactInfo'.
+src/app/domains/page.tsx(620,94): error TS2304: Cannot find name 'contactInfo'.
+src/app/domains/page.tsx(784,38): error TS2304: Cannot find name 'setGenStyle'.
+src/app/domains/page.tsx(786,25): error TS2304: Cannot find name 'genStyle'.
+src/app/domains/page.tsx(858,24): error TS2304: Cannot find name 'checkoutError'.
+src/app/domains/page.tsx(858,9): error TS2304: Cannot find name 'searchError'.
+src/app/domains/page.tsx(861,14): error TS2304: Cannot find name 'searchError'.
+src/app/domains/page.tsx(861,29): error TS2304: Cannot find name 'checkoutError'.
+src/app/domains/page.tsx(895,120): error TS2304: Cannot find name 'autoGenerating'.
+src/app/domains/page.tsx(901,22): error TS2304: Cannot find name 'autoExpandedTlds'.
+src/app/domains/page.tsx(906,22): error TS2304: Cannot find name 'autoExpandedTlds'.
+src/app/domains/page.tsx(910,20): error TS2304: Cannot find name 'autoExpandedTlds'.
+src/app/domains/page.tsx(916,25): error TS2304: Cannot find name 'setPendingGenerate'.
+src/app/domains/page.tsx(927,16): error TS2304: Cannot find name 'autoGenerating'.
+src/app/domains/page.tsx(943,23): error TS2304: Cannot find name 'setAutoGenerating'.
+src/app/domains/page.tsx(944,23): error TS2304: Cannot find name 'setPendingGenerate'.
+src/app/io/page.tsx(1025,69): error TS2339: Property 'generations' does not exist on type '{ name: string; price: string; period: string; description: string; features: string[]; cta: string; highlight: boolean; }'.
+src/app/io/page.tsx(1029,69): error TS2339: Property 'rateLimit' does not exist on type '{ name: string; price: string; period: string; description: string; features: string[]; cta: string; highlight: boolean; }'.
+src/app/publisher/page.tsx(24,3): error TS2300: Duplicate identifier 'MessageSquare'.
+src/app/publisher/page.tsx(29,3): error TS2300: Duplicate identifier 'MessageSquare'.
+src/app/sitemap.ts(15,22): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/components/NotificationInbox.tsx(25,3): error TS2724: '"@/lib/notifications"' has no exported member named 'getNotifications'. Did you mean 'listNotifications'?
+src/components/NotificationInbox.tsx(26,3): error TS2724: '"@/lib/notifications"' has no exported member named 'markAsRead'. Did you mean 'markRead'?
+src/components/NotificationInbox.tsx(27,3): error TS2724: '"@/lib/notifications"' has no exported member named 'markAllAsRead'. Did you mean 'markAllRead'?
+src/components/NotificationInbox.tsx(28,3): error TS2305: Module '"@/lib/notifications"' has no exported member 'getUnreadCount'.
+src/components/NotificationInbox.tsx(29,8): error TS2724: '"@/lib/notifications"' has no exported member named 'Notification'. Did you mean 'NotificationRow'?
+src/components/NotificationInbox.tsx(30,8): error TS2305: Module '"@/lib/notifications"' has no exported member 'NotificationType'.
+src/hooks/useEmailNotifications.ts(4,10): error TS2724: '"@/lib/notifications"' has no exported member named 'addNotification'. Did you mean 'NotificationRow'?
+src/lib/addon-delivery.ts(85,20): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/lib/agency-dashboard.ts(92,26): error TS7006: Parameter 'c' implicitly has an 'any' type.
+src/lib/api-keys.ts(400,39): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/lib/billing-plans.ts(13,31): error TS2322: Type '"2026-02-25.clover"' is not assignable to type '"2026-03-25.dahlia"'.
+src/lib/builder-critique.ts(88,3): error TS2578: Unused '@ts-expect-error' directive.
+src/lib/chatbot-builder.ts(155,39): error TS7006: Parameter 'k' implicitly has an 'any' type.
+src/lib/chatbot-builder.ts(250,19): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/lib/collab-engine.ts(197,37): error TS7006: Parameter 'p' implicitly has an 'any' type.
+src/lib/cron-scheduler.ts(152,17): error TS2352: Conversion of type 'typeof import("/home/runner/work/Zoobicon.com/Zoobicon.com/src/lib/webhook-delivery")' to type '{ deliverWebhook?: ((url: string, body: unknown) => Promise<unknown>) | undefined; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/lib/daily-comeback.ts(123,19): error TS2352: Conversion of type 'typeof import("/home/runner/work/Zoobicon.com/Zoobicon.com/src/lib/analytics-engine")' to type '{ getDailyStats: (args: { siteId: string; }) => Promise<DailyStats>; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/lib/daily-comeback.ts(129,19): error TS2352: Conversion of type 'typeof import("/home/runner/work/Zoobicon.com/Zoobicon.com/src/lib/seo-agent")' to type '{ auditSite: (args: { siteId: string; }) => Promise<{ issues: SeoFix[]; }>; autoFix: (args: { siteId: string; issues: SeoFix[]; }) => Promise<{ fixes: SeoFix[]; }>; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/lib/daily-comeback.ts(143,19): error TS2352: Conversion of type 'typeof import("/home/runner/work/Zoobicon.com/Zoobicon.com/src/lib/blog-generator")' to type '{ draftPost: (args: { siteId: string; ownerId: string; }) => Promise<BlogDraft>; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/lib/daily-comeback.ts(152,19): error TS2352: Conversion of type 'typeof import("/home/runner/work/Zoobicon.com/Zoobicon.com/src/lib/competitor-monitor")' to type '{ diffCompetitors: (args: { siteId: string; }) => Promise<{ changes: CompetitorChange[]; }>; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/lib/daily-comeback.ts(203,31): error TS2307: Cannot find module '@/lib/mailgun-client' or its corresponding type declarations.
+src/lib/discord-bot.ts(76,7): error TS2769: No overload matches this call.
+src/lib/discord-bot.ts(82,54): error TS2345: Argument of type 'Uint8Array<ArrayBufferLike>' is not assignable to parameter of type 'BufferSource'.
+src/lib/fal-client.ts(147,32): error TS2352: Conversion of type 'Record<string, unknown>' to type 'QueueStatusResponse' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/lib/html-to-react.ts(65,62): error TS1501: This regular expression flag is only available when targeting 'es2018' or later.
+src/lib/html-to-react.ts(66,91): error TS1501: This regular expression flag is only available when targeting 'es2018' or later.
+src/lib/imap-provider.ts(155,71): error TS2345: Argument of type 'MessageStructureObject' is not assignable to parameter of type 'Record<string, unknown>'.
+src/lib/seo-agent.ts(535,20): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/lib/seo-agent.ts(560,20): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/lib/seo-agent.ts(584,20): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/lib/seo-agent.ts(793,66): error TS1501: This regular expression flag is only available when targeting 'es2018' or later.
+src/lib/storage-provider.ts(181,7): error TS2769: No overload matches this call.
+src/lib/stripe-connect.ts(12,28): error TS2322: Type '"2026-02-25.clover"' is not assignable to type '"2026-03-25.dahlia"'.
+src/lib/stripe.ts(11,7): error TS2322: Type '"2026-02-25.clover"' is not assignable to type '"2026-03-25.dahlia"'.
+src/lib/transcription-provider.ts(115,7): error TS2769: No overload matches this call.
+src/lib/video-pipeline.ts(179,3): error TS2739: Type '{ audioUrl: string; duration: number; }' is missing the following properties from type '{ audioUrl: string; durationSec: number; model: string; }': durationSec, model
+src/lib/video-pipeline.ts(356,24): error TS2352: Conversion of type 'typeof import("/home/runner/work/Zoobicon.com/Zoobicon.com/src/lib/tts-elevenlabs")' to type '{ synthesizeWithFallback: (args: { text: string; voiceId: string; }) => Promise<{ audioUrl: string; durationSec: number; model: string; }>; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/lib/video-pipeline.ts(395,26): error TS2352: Conversion of type 'typeof import("/home/runner/work/Zoobicon.com/Zoobicon.com/src/lib/fal-client")' to type '{ runFalWithFallback: <T>(chain: string[], input: Record<string, unknown>) => Promise<{ data: T; model: string; }>; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/lib/video-pipeline.ts(492,26): error TS2352: Conversion of type 'typeof import("/home/runner/work/Zoobicon.com/Zoobicon.com/src/lib/fal-client")' to type '{ runFalWithFallback: <T>(chain: string[], input: Record<string, unknown>) => Promise<{ data: T; model: string; }>; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/lib/video-pipeline.ts(523,26): error TS2352: Conversion of type 'typeof import("/home/runner/work/Zoobicon.com/Zoobicon.com/src/lib/fal-client")' to type '{ runFalWithFallback: <T>(chain: string[], input: Record<string, unknown>) => Promise<{ data: T; model: string; }>; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/lib/video-twins.ts(74,5): error TS2554: Expected 2 arguments, but got 3.
+src/lib/video-twins.ts(83,30): error TS2551: Property 'srt' does not exist on type 'CaptionCue[]'. Did you mean 'sort'?
+src/lib/voice-clone.ts(75,3): error TS2741: Property 'duration' is missing in type '{ audioUrl: string; durationSec: number; model: string; }' but required in type '{ audioUrl: string; duration: number; }'.
+src/lib/web-push.ts(265,5): error TS2769: No overload matches this call.
+src/lib/wordpress-plugin.ts(208,13): error TS2339: Property 'generateAvatar' does not exist on type 'typeof import("/home/runner/work/Zoobicon.com/Zoobicon.com/src/lib/video-pipeline")'.

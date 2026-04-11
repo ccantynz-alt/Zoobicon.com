@@ -1,25 +1,16 @@
 import Link from "next/link";
-import {
-  Code,
-  Key,
-  Zap,
-  ArrowRight,
-  Check,
-  Terminal,
-  Rocket,
-  Video,
-  Globe,
-  Database,
-  Signal,
-  Wifi,
-  Calendar,
-  FileText,
-  Activity,
-  ShieldCheck,
-} from "lucide-react";
+import { motion, type Variants } from "framer-motion";
+import { Code, Key, Zap, Shield, ArrowRight, Check } from "lucide-react";
 
-// Force dynamic rendering — this page timed out during static generation on Vercel
-export const dynamic = "force-dynamic";
+const staggerContainer: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1 } },
+};
+
+const fadeInUp: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+};
 
 export const metadata = {
   title: "Developers — Zoobicon API",
@@ -486,23 +477,7 @@ export default function DevelopersPage() {
               </div>
               <span className="font-mono text-[11px] text-white/45">HMAC-SHA256</span>
             </div>
-            <pre className="overflow-x-auto px-5 py-5 font-mono text-[12px] leading-relaxed text-white/80 bg-black/40">
-              <code>
-                <span className="text-white/35">{"# Every request signs with your key\n"}</span>
-                <span style={{ color: "#E8D4B0" }}>Authorization</span>
-                {": "}
-                <span className="text-white/90">Bearer zbk_live_a3f9c2e8b1d4...</span>
-                {"\n"}
-                <span style={{ color: "#E8D4B0" }}>Content-Type</span>
-                {": "}
-                <span className="text-white/90">application/json</span>
-                {"\n"}
-                <span style={{ color: "#E8D4B0" }}>X-Zoobicon-Signature</span>
-                {": "}
-                <span className="text-white/90">sha256=••••••</span>
-              </code>
-            </pre>
-          </div>
+          </motion.div>
         </div>
       </section>
 
