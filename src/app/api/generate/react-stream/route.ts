@@ -496,65 +496,86 @@ export async function POST(req: NextRequest): Promise<Response> {
 
         const customiserModel =
           mode === "premium" ? MODEL_SONNET : MODEL_HAIKU;
-        const accumulated: RegistryComponent[] = [];
 
-        for (let i = 0; i < components.length; i++) {
-          const comp = components[i];
-          let updatedCode: string;
-          try {
-            updatedCode = await customiseComponent({
-              baseCode: comp.code,
-              brandName,
-              category: comp.category,
-              variant: comp.variant,
-              prompt,
-              primaryColor,
-              model: customiserModel,
+        // PARALLEL CUSTOMISATION — fire every Haiku call at once.
+        // Previously sequential: ~12 components × ~2-3s = 24-36s wall time.
+        // Now concurrent: total ≈ max single call ≈ 2-3s (plus whichever
+        // finishes last). App.tsx is rebuilt in the ORIGINAL component
+        // order each time one completes, so navbar always lands at the
+        // top even if hero finishes customising first. Preview looks
+        // coherent throughout the stream — components slot into place
+        // in the right order as they arrive.
+        const completedByIndex = new Map<number, RegistryComponent>();
+        let completedCount = 0;
+
+        await Promise.all(
+          components.map(async (comp, i) => {
+            let updatedCode: string;
+            try {
+              updatedCode = await customiseComponent({
+                baseCode: comp.code,
+                brandName,
+                category: comp.category,
+                variant: comp.variant,
+                prompt,
+                primaryColor,
+                model: customiserModel,
+              });
+            } catch {
+              // Fallback: use template code as-is
+              updatedCode = `import React from "react";\n\n${comp.code}\n`;
+            }
+
+            // Editorial reskin — guarantees every shipped component uses the
+            // restrained stone palette even when the LLM ignores the system
+            // prompt and emits violet/cyan/fuchsia classes anyway. Regex-only;
+            // safe on already-reskinned code (idempotent).
+            updatedCode = registry.reskinEditorial(updatedCode);
+
+            // Industry image swap — replace every Unsplash photo ID with one
+            // drawn from the detected industry's curated pool, so imagery
+            // matches the prompt instead of the base component's hardcoded
+            // mountains/watches/dashboards.
+            updatedCode = registry.swapImagesForIndustry(updatedCode, industry);
+
+            // Auto-emphasize one word per h1/h2 so the Fraunces italic serif
+            // accent actually renders. Hard guarantee for when the LLM
+            // ignores the editorial system-prompt instruction.
+            updatedCode = registry.emphasizeHeadings(updatedCode);
+
+            // Write the component file
+            const { fileName } = registry.buildComponentFile(comp);
+            files[fileName] = updatedCode;
+
+            // Record completion and rebuild App.tsx in ORIGINAL order —
+            // skipping any holes from components still in-flight.
+            completedByIndex.set(i, comp);
+            completedCount++;
+            const ordered: RegistryComponent[] = [];
+            for (let j = 0; j < components.length; j++) {
+              const done = completedByIndex.get(j);
+              if (done) ordered.push(done);
+            }
+            files["App.tsx"] = registry.buildAppFile(ordered);
+
+            writer.send("component", {
+              name: comp.id,
+              code: updatedCode,
+              position: i,
             });
-          } catch {
-            // Fallback: use template code as-is
-            updatedCode = `import React from "react";\n\n${comp.code}\n`;
-          }
 
-          // Editorial reskin — guarantees every shipped component uses the
-          // restrained stone palette even when the LLM ignores the system
-          // prompt and emits violet/cyan/fuchsia classes anyway. Regex-only;
-          // safe on already-reskinned code (idempotent).
-          updatedCode = registry.reskinEditorial(updatedCode);
-
-          // Industry image swap — replace every Unsplash photo ID with one
-          // drawn from the detected industry's curated pool, so imagery
-          // matches the prompt instead of the base component's hardcoded
-          // mountains/watches/dashboards.
-          updatedCode = registry.swapImagesForIndustry(updatedCode, industry);
-
-          // Auto-emphasize one word per h1/h2 so the Fraunces italic serif
-          // accent actually renders. Hard guarantee for when the LLM
-          // ignores the editorial system-prompt instruction.
-          updatedCode = registry.emphasizeHeadings(updatedCode);
-
-          const { fileName } = registry.buildComponentFile(comp);
-          files[fileName] = updatedCode;
-          accumulated.push(comp);
-          files["App.tsx"] = registry.buildAppFile(accumulated);
-
-          writer.send("component", {
-            name: comp.id,
-            code: updatedCode,
-            position: i,
-          });
-
-          // Progressive update — push the current files map so Sandpack
-          // preview rebuilds after every customised component. This is what
-          // makes the site appear to "build itself" in front of the user.
-          writer.send("files", {
-            files,
-            fileCount: i + 1,
-            totalComponents: components.length,
-            section: comp.id,
-            customized: true,
-          });
-        }
+            // Progressive update — push the current files map so Sandpack
+            // preview rebuilds as each component slots into place. This is
+            // what makes the site appear to "build itself" live.
+            writer.send("files", {
+              files,
+              fileCount: completedCount,
+              totalComponents: components.length,
+              section: comp.id,
+              customized: true,
+            });
+          })
+        );
 
         writer.send("files", { files });
 
