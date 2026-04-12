@@ -26,6 +26,65 @@ export const sql = new Proxy(
   }
 );
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Row-Level Security helpers
+// ─────────────────────────────────────────────────────────────────────────────
+// Postgres RLS policies (see src/lib/migrations/add-rls.sql) filter rows by
+// comparing a column (user_email / email / owner_id) against the session
+// variable `app.current_user_email`.
+//
+// `withUserContext` sets that variable in a transaction-local scope, then
+// executes the callback. All queries inside the callback automatically see
+// only that user's rows — even if application code forgets a WHERE clause.
+//
+// `withAdminContext` sets the Postgres role to `zoobicon_admin` which has
+// BYPASSRLS, allowing full table access for admin dashboards, cron jobs, etc.
+
+/**
+ * Execute a function with RLS scoped to a specific user.
+ *
+ * Sets `app.current_user_email` as a transaction-local GUC so that all
+ * RLS policies filter rows for this user. The `true` arg to `set_config`
+ * means the setting is automatically reset when the transaction ends,
+ * which is safe for serverless / connection-pooled environments.
+ *
+ * @example
+ * const projects = await withUserContext(userEmail, async (db) => {
+ *   return db`SELECT * FROM projects`; // RLS filters automatically
+ * });
+ */
+export async function withUserContext<T>(
+  userEmail: string,
+  fn: (db: typeof sql) => Promise<T>
+): Promise<T> {
+  await sql`SELECT set_config('app.current_user_email', ${userEmail}, true)`;
+  return fn(sql);
+}
+
+/**
+ * Execute a function with admin privileges that bypass RLS.
+ *
+ * Uses SET ROLE to switch to the zoobicon_admin role (which has BYPASSRLS).
+ * After the callback completes, the role is reset to the default.
+ *
+ * Use this for admin dashboards, cron jobs, and cross-tenant operations.
+ *
+ * @example
+ * const allSites = await withAdminContext(async (db) => {
+ *   return db`SELECT * FROM sites`; // sees ALL rows, no RLS
+ * });
+ */
+export async function withAdminContext<T>(
+  fn: (db: typeof sql) => Promise<T>
+): Promise<T> {
+  try {
+    await sql`SET ROLE zoobicon_admin`;
+    return await fn(sql);
+  } finally {
+    await sql`RESET ROLE`;
+  }
+}
+
 /**
  * Initialize database schema. Call this from /api/db/init or at startup.
  * Safe to run multiple times (CREATE TABLE IF NOT EXISTS).

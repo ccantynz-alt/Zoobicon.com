@@ -1,8 +1,9 @@
 import { NextRequest } from "next/server";
-import { sql } from "@/lib/db";
+import { sql, withUserContext } from "@/lib/db";
 import { notifySiteDeployed } from "@/lib/admin-notify";
 import { getCreatorBadgeHTML } from "@/components/CreatorBadge";
 import { submitDeployedSite } from "@/lib/search-engine-submit";
+import { uploadSite, isBlobConfigured } from "@/lib/site-storage";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -89,12 +90,15 @@ export async function POST(req: NextRequest) {
     let siteRow: Record<string, unknown> | undefined;
 
     // If an existing site slug was provided, look it up
+    // RLS: withUserContext ensures tenant isolation at the DB level
     if (existingSiteSlug) {
-      const [found] = await sql`
-        SELECT id, slug, name, plan FROM sites
-        WHERE slug = ${existingSiteSlug} AND email = ${email} AND status != 'deleted'
-        LIMIT 1
-      `;
+      const [found] = await withUserContext(email, (db) =>
+        db`
+          SELECT id, slug, name, plan FROM sites
+          WHERE slug = ${existingSiteSlug} AND email = ${email} AND status != 'deleted'
+          LIMIT 1
+        `
+      );
       siteRow = found;
     }
 
@@ -157,6 +161,15 @@ export async function POST(req: NextRequest) {
 
     // Update site timestamp
     await sql`UPDATE sites SET updated_at = NOW() WHERE id = ${siteId}`;
+
+    // ---- Upload to Vercel Blob for CDN-cached serving ----
+    // Fire-and-forget: Blob upload is not blocking. If it fails, the serve
+    // endpoint falls back to reading code from Postgres (the deployment row).
+    if (isBlobConfigured()) {
+      uploadSite(slug, { html: finalCode }).catch((err) => {
+        console.error(`[deploy] Blob upload failed for ${slug}:`, err);
+      });
+    }
 
     // ---- Fire-and-forget notifications ----
     notifySiteDeployed({ siteName, slug, email }).catch(() => {});
