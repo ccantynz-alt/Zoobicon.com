@@ -69,13 +69,35 @@ export async function POST(req: NextRequest) {
         { status: 403 }
       );
     }
-    const registrantEmail = sessionEmail || callerEmail;
+    const registrantEmail = (sessionEmail || callerEmail).toLowerCase();
     const years = parseInt(session.metadata?.years || "1", 10);
     const expiresAt = new Date();
     expiresAt.setFullYear(expiresAt.getFullYear() + years);
 
     // Save to database — INSERT OR UPDATE to handle both webhook-first and verify-first cases
     const { sql } = await import("@/lib/db");
+
+    // Auto-create table if it doesn't exist (no more dependency on /api/db/init)
+    await sql`
+      CREATE TABLE IF NOT EXISTS registered_domains (
+        id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        domain              TEXT UNIQUE NOT NULL,
+        user_email          TEXT NOT NULL,
+        status              VARCHAR(30) NOT NULL DEFAULT 'active',
+        registered_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        expires_at          TIMESTAMPTZ NOT NULL DEFAULT (NOW() + INTERVAL '1 year'),
+        auto_renew          BOOLEAN NOT NULL DEFAULT true,
+        privacy_protection  BOOLEAN NOT NULL DEFAULT true,
+        nameservers         JSONB DEFAULT '["ns1.zoobicon.io", "ns2.zoobicon.io"]',
+        cloudflare_zone_id  TEXT,
+        stripe_session_id   TEXT,
+        opensrs_order_id    TEXT,
+        registration_error  TEXT,
+        registrant_info     JSONB DEFAULT '{}'
+      )
+    `.catch((e: unknown) => console.warn("[verify-purchase] table ensure:", e instanceof Error ? e.message : e));
+    await sql`CREATE INDEX IF NOT EXISTS registered_domains_user_email_idx ON registered_domains (user_email)`.catch(() => {});
+
     const saved: string[] = [];
     const alreadyExists: string[] = [];
 

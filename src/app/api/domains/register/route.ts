@@ -100,14 +100,43 @@ export async function GET(req: NextRequest) {
     // Try database first
     try {
       const { sql } = await import("@/lib/db");
+
+      // Auto-create table if it doesn't exist
+      await sql`
+        CREATE TABLE IF NOT EXISTS registered_domains (
+          id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+          domain              TEXT UNIQUE NOT NULL,
+          user_email          TEXT NOT NULL,
+          status              VARCHAR(30) NOT NULL DEFAULT 'active',
+          registered_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          expires_at          TIMESTAMPTZ NOT NULL DEFAULT (NOW() + INTERVAL '1 year'),
+          auto_renew          BOOLEAN NOT NULL DEFAULT true,
+          privacy_protection  BOOLEAN NOT NULL DEFAULT true,
+          nameservers         JSONB DEFAULT '["ns1.zoobicon.io", "ns2.zoobicon.io"]',
+          cloudflare_zone_id  TEXT,
+          stripe_session_id   TEXT,
+          opensrs_order_id    TEXT,
+          registration_error  TEXT,
+          registrant_info     JSONB DEFAULT '{}'
+        )
+      `.catch(() => {});
+
+      // Normalize email to lowercase for consistent matching
+      const normalizedEmail = userEmail.toLowerCase();
       const rows = await sql`
-        SELECT * FROM registered_domains WHERE user_email = ${userEmail}
+        SELECT * FROM registered_domains WHERE LOWER(user_email) = ${normalizedEmail}
         ORDER BY registered_at DESC
       `;
       return NextResponse.json({ domains: rows, source: "database" });
-    } catch {
-      // Database not available — return empty
-      return NextResponse.json({ domains: [], source: "memory" });
+    } catch (dbErr) {
+      // Database not available — return error so the UI shows a real message
+      const msg = dbErr instanceof Error ? dbErr.message : "Unknown database error";
+      console.error("[domains/register GET] Database error:", msg);
+      return NextResponse.json({
+        domains: [],
+        source: "error",
+        error: "Could not connect to database. Your domains are safe but cannot be displayed right now. Please try again or contact support.",
+      });
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : "Internal server error";
@@ -445,7 +474,7 @@ export async function POST(req: NextRequest) {
         registrantZip: registrant.zip,
         registrantCountry: registrant.country,
       },
-      success_url: `${appUrl}/my-domains?success=true&order=${orderId}`,
+      success_url: `${appUrl}/my-domains?session_id={CHECKOUT_SESSION_ID}&success=true&order=${orderId}`,
       cancel_url: `${appUrl}/domains?cancelled=true`,
       allow_promotion_codes: true,
     });

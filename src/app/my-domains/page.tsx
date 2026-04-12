@@ -25,6 +25,7 @@ export default function MyDomainsPage() {
   const [user, setUser] = useState<{ email: string; name?: string; role?: string } | null>(null);
   const [copied, setCopied] = useState("");
   const [purchaseStatus, setPurchaseStatus] = useState<"" | "verifying" | "success" | "error">("");
+  const [fetchError, setFetchError] = useState("");
 
   useEffect(() => {
     try {
@@ -62,18 +63,21 @@ export default function MyDomainsPage() {
 
   const fetchDomains = async (userData: { email: string; role?: string }) => {
     setLoading(true);
+    setFetchError("");
     try {
       // Admin sees ALL domains, regular users see only their own
       const url = userData.role === "admin"
         ? "/api/admin/domains"
         : `/api/domains/register?email=${encodeURIComponent(userData.email)}`;
       const res = await fetch(url);
-      if (res.ok) {
-        const data = await res.json();
-        setDomains(data.domains || []);
+      const data = await res.json();
+      setDomains(data.domains || []);
+      if (data.error) {
+        setFetchError(data.error);
       }
-    } catch {
-      // Silently fail — show empty state
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Failed to load domains";
+      setFetchError(msg);
     } finally {
       setLoading(false);
     }
@@ -155,6 +159,13 @@ export default function MyDomainsPage() {
           </div>
         )}
 
+        {/* Database / fetch error */}
+        {fetchError && (
+          <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-4 mb-6 flex items-center gap-3 text-sm text-red-300">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" /> {fetchError}
+          </div>
+        )}
+
         {loading ? (
           <div className="flex items-center justify-center h-40">
             <RefreshCw className="w-5 h-5 text-stone-400 animate-spin" />
@@ -184,7 +195,11 @@ export default function MyDomainsPage() {
                 <div key={d.id} className="rounded-2xl bg-white/[0.02] border border-white/[0.06] p-5">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <div className={`w-2 h-2 rounded-full ${isExpired ? "bg-stone-500" : isExpiring ? "bg-stone-500" : "bg-stone-500"}`} />
+                      <div className={`w-2 h-2 rounded-full ${
+                        d.status === "registration_failed" || d.status === "failed" ? "bg-red-500" :
+                        d.status === "pending_registration" ? "bg-yellow-500" :
+                        isExpired ? "bg-stone-500" : isExpiring ? "bg-amber-500" : "bg-emerald-500"
+                      }`} />
                       <h3 className="text-lg font-semibold">{d.domain}</h3>
                       <button onClick={() => copyText(d.domain)} className="text-white/20 hover:text-white/40">
                         {copied === d.domain ? <Check className="w-3.5 h-3.5 text-stone-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -206,10 +221,21 @@ export default function MyDomainsPage() {
                     <div className="rounded-xl bg-white/[0.03] border border-white/[0.04] px-3 py-2">
                       <div className="text-[10px] text-white/30 mb-0.5">Status</div>
                       <div className={`text-xs font-medium flex items-center gap-1 ${
-                        isExpired ? "text-stone-400" : isExpiring ? "text-stone-400" : "text-stone-400"
+                        d.status === "registration_failed" || d.status === "failed" ? "text-red-400" :
+                        d.status === "pending_registration" ? "text-yellow-400" :
+                        isExpired ? "text-stone-400" : isExpiring ? "text-amber-400" : "text-emerald-400"
                       }`}>
-                        {isExpired ? <AlertCircle className="w-3 h-3" /> : <Check className="w-3 h-3" />}
-                        {isExpired ? "Expired" : isExpiring ? `Expires in ${days}d` : "Active"}
+                        {d.status === "registration_failed" || d.status === "failed" ? (
+                          <><AlertCircle className="w-3 h-3" /> Registration Failed</>
+                        ) : d.status === "pending_registration" ? (
+                          <><RefreshCw className="w-3 h-3 animate-spin" /> Registering...</>
+                        ) : isExpired ? (
+                          <><AlertCircle className="w-3 h-3" /> Expired</>
+                        ) : isExpiring ? (
+                          <><Clock className="w-3 h-3" /> Expires in {days}d</>
+                        ) : (
+                          <><Check className="w-3 h-3" /> Active</>
+                        )}
                       </div>
                     </div>
                     <div className="rounded-xl bg-white/[0.03] border border-white/[0.04] px-3 py-2">
