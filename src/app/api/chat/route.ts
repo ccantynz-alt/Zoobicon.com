@@ -169,7 +169,7 @@ export async function POST(request: NextRequest) {
   const ip = getClientIp(request);
   const rateLimitId = isApiKeyRequest ? `chat:key:${bearerKey.slice(-8)}` : `chat:${ip}`;
   const rateLimit = isApiKeyRequest ? { limit: 120, windowMs: 60_000 } : { limit: 20, windowMs: 60_000 };
-  const rl = isAdminRequest ? checkRateLimitAdmin() : checkRateLimit(rateLimitId, rateLimit);
+  const rl = isAdminRequest ? checkRateLimitAdmin() : await checkRateLimit(rateLimitId, rateLimit);
   if (!rl.allowed) {
     return new Response(
       JSON.stringify({ error: "Too many requests. Please wait a moment and try again." }),

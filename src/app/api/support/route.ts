@@ -51,7 +51,7 @@ ZOOBICON QUICK FACTS:
 export async function POST(request: NextRequest) {
   // Rate limit: 30 support messages per minute per IP
   const ip = getClientIp(request);
-  const rl = checkRateLimit(`support:${ip}`, { limit: 30, windowMs: 60_000 });
+  const rl = await checkRateLimit(`support:${ip}`, { limit: 30, windowMs: 60_000 });
   if (!rl.allowed) {
     return new Response(
       JSON.stringify({ error: "Too many requests. Please wait a moment and try again." }),

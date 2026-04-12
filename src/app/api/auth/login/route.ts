@@ -39,7 +39,7 @@ const ADMIN_RECOVERY_TOKEN = sanitizeEnv(process.env.ADMIN_RECOVERY_TOKEN);
 export async function POST(request: NextRequest) {
   try {
     const ip = getClientIp(request);
-    const { allowed, resetAt } = checkRateLimit(`login:${ip}`, loginLimiter);
+    const { allowed, resetAt } = await checkRateLimit(`login:${ip}`, loginLimiter);
     if (!allowed) {
       const retryAfter = Math.ceil((resetAt - Date.now()) / 1000);
       return Response.json(

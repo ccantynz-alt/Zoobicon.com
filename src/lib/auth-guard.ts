@@ -8,7 +8,7 @@
  */
 
 import { sql } from "@/lib/db";
-import { checkRateLimit, getClientIp, type RateLimitConfig } from "@/lib/rateLimit";
+import { checkRateLimitSync, getClientIp, type RateLimitConfig } from "@/lib/rateLimit";
 
 export interface AuthUser {
   email: string;
@@ -80,7 +80,7 @@ export async function authenticateRequest(
     }
 
     // Anonymous user — apply strict IP-based rate limit
-    const rl = checkRateLimit(`anon:${ip}`, RATE_LIMITS.free);
+    const rl = checkRateLimitSync(`anon:${ip}`, RATE_LIMITS.free);
     if (!rl.allowed) {
       return {
         user: null,
@@ -166,7 +166,7 @@ export async function authenticateRequest(
 
     // Apply rate limit for this user's plan
     const planKey = user.plan in RATE_LIMITS ? user.plan : "free";
-    const rl = checkRateLimit(`user:${user.email}`, RATE_LIMITS[planKey]);
+    const rl = checkRateLimitSync(`user:${user.email}`, RATE_LIMITS[planKey]);
     if (!rl.allowed) {
       return {
         user: null,
@@ -180,7 +180,7 @@ export async function authenticateRequest(
     return { user, error: null };
   } catch {
     // DB unavailable — fall back to free tier with rate limit
-    const rl = checkRateLimit(`fallback:${ip}`, RATE_LIMITS.free);
+    const rl = checkRateLimitSync(`fallback:${ip}`, RATE_LIMITS.free);
     if (!rl.allowed) {
       return {
         user: null,

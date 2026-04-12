@@ -46,7 +46,7 @@ async function stampResetToken(email: string, token: string): Promise<void> {
 export async function POST(request: NextRequest) {
   try {
     const ip = getClientIp(request);
-    const { allowed, resetAt } = checkRateLimit(`reset:${ip}`, resetLimiter);
+    const { allowed, resetAt } = await checkRateLimit(`reset:${ip}`, resetLimiter);
     if (!allowed) {
       const retryAfter = Math.ceil((resetAt - Date.now()) / 1000);
       return new Response(

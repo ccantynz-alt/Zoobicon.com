@@ -53,7 +53,7 @@ function safeEqual(a: string, b: string): boolean {
 export async function POST(request: NextRequest) {
   try {
     const ip = getClientIp(request);
-    const { allowed, resetAt } = checkRateLimit(`admin-recover:${ip}`, recoverLimiter);
+    const { allowed, resetAt } = await checkRateLimit(`admin-recover:${ip}`, recoverLimiter);
     if (!allowed) {
       const retryAfter = Math.ceil((resetAt - Date.now()) / 1000);
       return Response.json(
