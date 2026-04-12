@@ -3,6 +3,18 @@ import { NextRequest, NextResponse } from 'next/server';
 export const maxDuration = 30;
 export const dynamic = 'force-dynamic';
 
+// QStash sends POST — reuse the GET handler
+export async function POST(req: NextRequest): Promise<NextResponse> {
+  if (process.env.QSTASH_CURRENT_SIGNING_KEY) {
+    try {
+      const { verifySignatureAppRouter } = await import("@upstash/qstash/nextjs");
+      const verified = verifySignatureAppRouter((r: Request) => GET(r as NextRequest));
+      return verified(req) as Promise<NextResponse>;
+    } catch { /* fall through */ }
+  }
+  return GET(req);
+}
+
 const URLS = [
   'https://cdn.tailwindcss.com',
   'https://unpkg.com/react@18/umd/react.production.min.js',

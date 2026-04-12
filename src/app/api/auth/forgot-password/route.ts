@@ -5,6 +5,7 @@ import { sql } from "@/lib/db";
 import { sendViaMailgun } from "@/lib/mailgun";
 import { checkRateLimit, getClientIp } from "@/lib/rateLimit";
 import { emailTemplate } from "@/lib/email-template";
+import { auditLog } from "@/lib/audit-middleware";
 
 const resetLimiter = { limit: 2, windowMs: 60000 };
 
@@ -86,6 +87,15 @@ export async function POST(request: NextRequest) {
         footerNote: "This link expires in 1 hour. If you didn't request this, you can safely ignore this email.",
       }),
       tags: ["password-reset"],
+    });
+
+    auditLog({
+      action: "password_reset",
+      actor: normalizedEmail,
+      resourceType: "auth",
+      ip,
+      result: "success",
+      detail: "Password reset email sent",
     });
 
     // Always return 200 — never reveal whether the email exists

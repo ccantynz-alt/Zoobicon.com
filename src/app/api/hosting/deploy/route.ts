@@ -4,6 +4,7 @@ import { notifySiteDeployed } from "@/lib/admin-notify";
 import { getCreatorBadgeHTML } from "@/components/CreatorBadge";
 import { submitDeployedSite } from "@/lib/search-engine-submit";
 import { uploadSite, isBlobConfigured } from "@/lib/site-storage";
+import { auditLog } from "@/lib/audit-middleware";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -171,9 +172,17 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // ---- Fire-and-forget notifications ----
+    // ---- Fire-and-forget notifications + audit ----
     notifySiteDeployed({ siteName, slug, email }).catch(() => {});
     submitDeployedSite(slug).catch(() => {});
+    auditLog({
+      action: "deploy.publish",
+      actor: email,
+      resourceType: "deploy",
+      resourceId: slug,
+      result: "success",
+      detail: `Deployed ${siteName} to ${url}`,
+    });
 
     const deployTimeMs = Date.now() - startMs;
 

@@ -526,7 +526,8 @@ function BuilderPage() {
   const [buildError, setBuildError] = useState<{ message: string; suggestion: string } | null>(null);
   const [streamWarning, setStreamWarning] = useState<string | null>(null);
   const [selectedModel, setSelectedModel] = useState("");  // Empty = use pipeline's smart routing (Haiku/Opus/Sonnet)
-  const [instantMode, setInstantMode] = useState(true); // Default to fast registry assembly (scaffold <1s + AI customize ~10s)
+  const [buildMode, setBuildMode] = useState<"instant" | "deep" | "pipeline">("instant"); // instant=registry, deep=Opus, pipeline=7-agent
+  const instantMode = buildMode === "instant"; // back-compat
   const [fullStack, setFullStack] = useState(false); // Full-stack mode: auto-provisions Supabase backend (auth, database, storage)
   const [availableModels, setAvailableModels] = useState<AIModel[]>([]);
   const [reactSource, setReactSource] = useState<Record<string, string> | null>(null);
@@ -1032,12 +1033,18 @@ function BuilderPage() {
     if (generationMode === "react") {
       setStatus("generating");
 
-      // TWO PATHS:
-      // 1. Fast path (instantMode=true, DEFAULT): Registry scaffold (<1s) + AI customization (~10s)
-      // 2. Full path (instantMode=false): Opus generates everything from scratch (~30s)
+      // THREE PATHS:
+      // 1. Quick Build (buildMode="instant", DEFAULT): Registry scaffold (<1s) + AI customization (~10s)
+      // 2. Deep Build (buildMode="deep"): Opus generates everything from scratch (~30s)
+      // 3. Full Build (buildMode="pipeline"): 7-agent pipeline — Strategist, Brand, Copy, Architect, Developer, SEO, Animation (~90s, Pro+)
       const useFastPath = instantMode;
-      const endpoint = useFastPath ? "/api/generate/react-stream" : "/api/generate/react";
-      setPipelineAgents([useFastPath ? "Assembling components from registry..." : "AI generating full application..."]);
+      const endpoint = buildMode === "pipeline"
+        ? "/api/generate/pipeline-stream"
+        : useFastPath ? "/api/generate/react-stream" : "/api/generate/react";
+      setPipelineAgents([
+        buildMode === "pipeline" ? "Running 7-agent pipeline: Strategist, Brand, Copy, Architect, Developer, SEO, Animation..." :
+        useFastPath ? "Assembling components from registry..." : "AI generating full application...",
+      ]);
 
       try {
         const res = await fetch(endpoint, {
@@ -1286,7 +1293,7 @@ function BuilderPage() {
       }
       return;
     }
-  }, [prompt, tier, autoReplaceImages, selectedModel, instantMode, generationMode, fullStack, resetWatchdog, clearWatchdog, errorSuggestion, upsertSection]);
+  }, [prompt, tier, autoReplaceImages, selectedModel, buildMode, instantMode, generationMode, fullStack, resetWatchdog, clearWatchdog, errorSuggestion, upsertSection]);
 
   // Edit existing React files via the same streaming endpoint
   const handleEdit = useCallback(async () => {
@@ -1777,15 +1784,21 @@ root.render(React.createElement(App));
                 className="flex-1 bg-transparent text-white text-base placeholder-white/50 outline-none"
               />
               <button
-                onClick={() => setInstantMode(!instantMode)}
+                onClick={() => setBuildMode(buildMode === "instant" ? "deep" : buildMode === "deep" ? "pipeline" : "instant")}
                 className={`px-3 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-wider transition-all border ${
-                  instantMode
+                  buildMode === "pipeline"
+                    ? "bg-violet-500/20 border-violet-500/40 text-violet-300"
+                    : buildMode === "deep"
                     ? "bg-stone-500/10 border-stone-500/30 text-stone-400"
                     : "bg-stone-500/10 border-stone-500/30 text-stone-400"
                 }`}
-                title={instantMode ? "Instant: <3s preview from component library" : "Deep Build: full AI generation with Opus (~30s)"}
+                title={
+                  buildMode === "instant" ? "Quick Build: <3s preview from component library (free tier)" :
+                  buildMode === "deep" ? "Deep Build: full AI generation with Opus (~30s)" :
+                  "Full Build: 7-agent pipeline — Strategist, Brand, Copy, Architect, Developer, SEO, Animation (~90s, Pro+)"
+                }
               >
-                {instantMode ? "Instant" : "Deep Build"}
+                {buildMode === "instant" ? "Quick" : buildMode === "deep" ? "Deep" : "Full Build"}
               </button>
               <button
                 onClick={() => setFullStack(!fullStack)}

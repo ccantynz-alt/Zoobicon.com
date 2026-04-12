@@ -6,6 +6,7 @@ import { getRedis } from "@/lib/redis";
 import { recordPurchase } from "@/lib/addon-delivery";
 import { OVERAGE_PACKS, addOverageCredits } from "@/lib/video-usage";
 import { registerDomain, type ContactInfo } from "@/lib/domain-reseller";
+import { auditLog } from "@/lib/audit-middleware";
 
 /**
  * POST /api/stripe/webhook
@@ -551,6 +552,22 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     // Per Bible Law 8: log clearly. Return 200 so Stripe doesn't retry forever — we logged it.
     console.error("[stripe-webhook]", event.type, err instanceof Error ? err.message : err);
+  }
+
+  // Audit log the webhook event
+  if (handled) {
+    const email =
+      (event.type === "checkout.session.completed"
+        ? ((event.data.object as Stripe.Checkout.Session).metadata?.email ??
+           (event.data.object as Stripe.Checkout.Session).customer_email)
+        : "system") || "system";
+    auditLog({
+      action: `stripe.${event.type}`,
+      actor: typeof email === "string" ? email : "system",
+      resourceType: "billing",
+      resourceId: event.id,
+      result: "success",
+    });
   }
 
   return Response.json({ received: true, eventType: event.type, handled });
