@@ -118,6 +118,14 @@ export async function GET(): Promise<NextResponse<WarmupBody>> {
   }
 }
 
-export async function POST(): Promise<NextResponse<WarmupBody>> {
+export async function POST(req?: Request): Promise<NextResponse<WarmupBody>> {
+  // QStash signature verification when signing keys are configured
+  if (req && process.env.QSTASH_CURRENT_SIGNING_KEY) {
+    try {
+      const { verifySignatureAppRouter } = await import("@upstash/qstash/nextjs");
+      const verified = verifySignatureAppRouter(() => GET());
+      return verified(req) as Promise<NextResponse<WarmupBody>>;
+    } catch { /* fall through to normal handler */ }
+  }
   return GET();
 }

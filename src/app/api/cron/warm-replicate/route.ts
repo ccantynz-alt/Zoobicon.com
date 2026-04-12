@@ -3,6 +3,21 @@ import { NextRequest, NextResponse } from 'next/server';
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
+// QStash sends POST — reuse the GET handler
+export async function POST(req: NextRequest): Promise<NextResponse> {
+  // If QStash signing keys are configured, verify the signature
+  if (process.env.QSTASH_CURRENT_SIGNING_KEY) {
+    try {
+      const { verifySignatureAppRouter } = await import("@upstash/qstash/nextjs");
+      const verified = verifySignatureAppRouter((r: Request) => GET(r as NextRequest));
+      return verified(req) as Promise<NextResponse>;
+    } catch {
+      // fall through to normal handler
+    }
+  }
+  return GET(req);
+}
+
 const MODELS = [
   'jaaari/kokoro-82m',
   'lucataco/xtts-v2',

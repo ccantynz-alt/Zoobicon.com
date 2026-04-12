@@ -14,7 +14,7 @@ const signupLimiter = { limit: 3, windowMs: 60000 };
 export async function POST(request: NextRequest) {
   try {
     const ip = getClientIp(request);
-    const { allowed, resetAt } = checkRateLimit(`signup:${ip}`, signupLimiter);
+    const { allowed, resetAt } = await checkRateLimit(`signup:${ip}`, signupLimiter);
     if (!allowed) {
       const retryAfter = Math.ceil((resetAt - Date.now()) / 1000);
       return Response.json(

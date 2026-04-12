@@ -8,7 +8,7 @@ import { emailTemplate } from "@/lib/email-template";
 export async function POST(request: NextRequest) {
   try {
     const ip = getClientIp(request);
-    const { allowed } = checkRateLimit(`resend-verify:${ip}`, { limit: 1, windowMs: 120_000 });
+    const { allowed } = await checkRateLimit(`resend-verify:${ip}`, { limit: 1, windowMs: 120_000 });
     if (!allowed) {
       return Response.json(
         { error: "Please wait 2 minutes before requesting another verification email." },

@@ -31,7 +31,7 @@ Write ONLY the reply text — no subject line, no "Dear X" unless it flows natur
 
 export async function POST(request: NextRequest) {
   const ip = getClientIp(request);
-  const rl = checkRateLimit(`email-support-reply:${ip}`, { limit: 20, windowMs: 60_000 });
+  const rl = await checkRateLimit(`email-support-reply:${ip}`, { limit: 20, windowMs: 60_000 });
   if (!rl.allowed) {
     return new Response(
       JSON.stringify({ error: "Too many requests. Please wait a moment." }),
