@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { ArrowLeft, Save, Play, Github, Download, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Play, GitBranch, Download, Loader2 } from "lucide-react";
 import MonacoEditor from "@/components/MonacoEditor";
 import FileExplorer from "@/components/FileExplorer";
 import SandpackPreview from "@/components/SandpackPreview";
@@ -16,7 +16,7 @@ export default function BuilderIDEPage() {
   const [activePath, setActivePath] = useState<string>("");
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [pushingToGithub, setPushingToGithub] = useState(false);
+  const [pushingToGitBranch, setPushingToGitBranch] = useState(false);
 
   // Load files from localStorage (saved by builder page)
   useEffect(() => {
@@ -86,12 +86,12 @@ export default function BuilderIDEPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [files]);
 
-  const handlePushToGithub = async () => {
-    setPushingToGithub(true);
+  const handlePushToGitBranch = async () => {
+    setPushingToGitBranch(true);
     try {
       const repoName = prompt("Repository name:", "zoobicon-project");
       if (!repoName) {
-        setPushingToGithub(false);
+        setPushingToGitBranch(false);
         return;
       }
       const res = await fetch("/api/github/sync", {
@@ -114,7 +114,7 @@ export default function BuilderIDEPage() {
     } catch (err) {
       alert(`Failed to push: ${err instanceof Error ? err.message : "Unknown error"}`);
     } finally {
-      setPushingToGithub(false);
+      setPushingToGitBranch(false);
     }
   };
 
@@ -175,11 +175,11 @@ export default function BuilderIDEPage() {
             Download
           </button>
           <button
-            onClick={handlePushToGithub}
-            disabled={pushingToGithub || fileCount === 0}
+            onClick={handlePushToGitBranch}
+            disabled={pushingToGitBranch || fileCount === 0}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md bg-white/5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
-            {pushingToGithub ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Github className="w-3.5 h-3.5" />}
+            {pushingToGitBranch ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <GitBranch className="w-3.5 h-3.5" />}
             Push to GitHub
           </button>
           <Link

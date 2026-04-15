@@ -92,7 +92,7 @@ import ShareModal from "@/components/ShareModal";
 import GitHubSyncPanel from "@/components/GitHubSyncPanel";
 import DeployModal from "@/components/DeployModal";
 import { trackEvent } from "@/lib/achievements";
-import { notifyDeploy } from "@/lib/notifications";
+import { notifyDeploy } from "@/lib/notifications-client";
 
 import {
   Bug,
@@ -850,23 +850,8 @@ function BuilderPage() {
     return html;
   }, []);
 
-  // Watchdog: warn at 15s of silence, error at 60s
-  const resetWatchdog = useCallback(() => {
-    if (watchdogSlowRef.current) clearTimeout(watchdogSlowRef.current);
-    if (watchdogStuckRef.current) clearTimeout(watchdogStuckRef.current);
-    setStreamWarning(null);
-    watchdogSlowRef.current = setTimeout(() => {
-      setStreamWarning("Connection slow — still working...");
-      console.log("[builder]", "watchdog", "slow", 15000);
-    }, 15000);
-    watchdogStuckRef.current = setTimeout(() => {
-      setBuildError({
-        message: "Build appears stuck — Vercel function may have timed out",
-        suggestion: "Try again, or check the browser console for details",
-      });
-      console.log("[builder]", "watchdog", "stuck", 60000);
-    }, 60000);
-  }, []);
+  // streamGenerate removed — all generation now uses /api/generate/react SSE stream
+  // via handleGenerate (new builds) and handleEdit (edits)
 
   const clearWatchdog = useCallback(() => {
     if (watchdogSlowRef.current) clearTimeout(watchdogSlowRef.current);
@@ -874,16 +859,6 @@ function BuilderPage() {
     watchdogSlowRef.current = null;
     watchdogStuckRef.current = null;
     setStreamWarning(null);
-  }, []);
-
-  // Map raw error message → user suggestion
-  const errorSuggestion = useCallback((raw: string): string => {
-    const m = raw.toLowerCase();
-    if (m.includes("anthropic") || m.includes("api key") || m.includes("api_key")) return "Set ANTHROPIC_API_KEY in Vercel env vars";
-    if (m.includes("rate limit") || m.includes("429")) return "Anthropic rate limit hit — retry in 60s or upgrade plan";
-    if (m.includes("401") || m.includes("403") || m.includes("auth")) return "Sign in required — please log in";
-    if (m.includes("quota")) return "Generation quota exceeded — upgrade your plan";
-    return "Check the browser console for details";
   }, []);
 
   // Update timeline based on section state transitions

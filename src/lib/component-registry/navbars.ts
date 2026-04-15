@@ -1,4 +1,4 @@
-import { registerComponent } from "./index";
+import { registerComponent } from "./store";
 
 // ── Navbar: Transparent Glass ──
 registerComponent({

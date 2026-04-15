@@ -2,7 +2,7 @@
  * Gallery, Contact, Blog, E-commerce, Forms, and Misc components
  * for the Zoobicon Component Registry.
  */
-import { registerComponent } from "./index";
+import { registerComponent } from "./store";
 
 // ── GALLERY ──
 

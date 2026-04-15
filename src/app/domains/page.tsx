@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import {
   Search,
@@ -39,18 +39,26 @@ interface GeneratedName {
   checkingDomains: boolean;
 }
 
+// NOTE: must match TLD_PRICING in /api/domains/search/route.ts — source of truth is backend.
 const TLD_PRICES: Record<string, number> = {
-  com: 12.99, ai: 79.99, io: 39.99, sh: 24.99, co: 29.99,
-  dev: 14.99, app: 14.99, net: 13.99, org: 11.99, tech: 6.99,
-  xyz: 2.99, me: 8.99, us: 8.99,
+  com: 12.99, ai: 69.99, io: 39.99, sh: 24.99, co: 29.99,
+  dev: 14.99, app: 14.99, net: 13.99, org: 12.99, tech: 6.99,
+  xyz: 2.99, me: 19.99, us: 9.99,
 };
 
 const DEFAULT_TLDS = ["com", "ai", "io", "sh", "co"];
+// Generator mode hits the TLD list for EVERY name — keep it small to stay
+// inside RDAP rate limits. Users can tick more TLDs manually if they want.
+const GENERATOR_DEFAULT_TLDS = ["com", "ai", "io"];
+// Max concurrent /api/domains/search calls the client will make at once.
+const GEN_CLIENT_CONCURRENCY = 4;
+// Haiku is asked for this many names — smaller = faster + less RDAP pressure.
+const GEN_NAME_COUNT = 12;
 
 /* ── Popular TLD showcase cards ── */
 const FEATURED_TLDS = [
   { tld: "com", price: 12.99, desc: "The gold standard", color: "from-blue-500 to-blue-600", popular: true },
-  { tld: "ai", price: 79.99, desc: "AI & tech brands", color: "from-purple-500 to-violet-600", popular: true },
+  { tld: "ai", price: 69.99, desc: "AI & tech brands", color: "from-purple-500 to-violet-600", popular: true },
   { tld: "io", price: 39.99, desc: "Startups & SaaS", color: "from-emerald-500 to-teal-600", popular: true },
   { tld: "sh", price: 24.99, desc: "Dev tools & hosting", color: "from-amber-500 to-orange-600", popular: false },
   { tld: "dev", price: 14.99, desc: "Developer projects", color: "from-cyan-500 to-blue-600", popular: false },
@@ -86,18 +94,28 @@ export default function DomainsPage() {
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [registering, setRegistering] = useState(false);
   const [userEmail, setUserEmail] = useState("");
-  const [showCheckoutForm, setShowCheckoutForm] = useState(false);
-  const [contactInfo, setContactInfo] = useState({
-    firstName: "", lastName: "", email: "", phone: "",
-    address: "", city: "", state: "", zip: "", country: "US",
-  });
-  const [generatedNames, setGeneratedNames] = useState<Array<{ name: string; tagline: string; domains: DomainResult[] }>>([]);
-  const [genDescription, setGenDescription] = useState("");
-  const [genStyle, setGenStyle] = useState("modern");
   const [generating, setGenerating] = useState(false);
   const [pendingGenerate, setPendingGenerate] = useState(false);
   const [autoExpandedTlds, setAutoExpandedTlds] = useState(false);
   const [autoGenerating, setAutoGenerating] = useState(false);
+  const [genDescription, setGenDescription] = useState("");
+  const [genStyle, setGenStyle] = useState<string>("modern");
+  const [generatedNames, setGeneratedNames] = useState<GeneratedName[]>([]);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const [showCheckoutForm, setShowCheckoutForm] = useState(false);
+  const [contactInfo, setContactInfo] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    state: "",
+    zip: "",
+    country: "NZ",
+  });
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [generatorError, setGeneratorError] = useState<string | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
   const genResultsRef = useRef<HTMLDivElement>(null);
 
@@ -202,8 +220,9 @@ export default function DomainsPage() {
   };
 
   // ─── AI Name Generator ───────────────────────────────────────────────────
-  // 1. Ask Claude for ~24 brandable names
-  // 2. Check availability for every name × every selected TLD in parallel
+  // 1. Ask Claude for ~12 brandable names
+  // 2. Check availability for every name × selected TLDs — BATCHED client-side
+  //    (max 4 concurrent requests) so RDAP doesn't rate-limit us into oblivion
   // 3. Stream results into state as each name resolves
   // 4. Names with ZERO available TLDs are auto-filtered out at render time
   const handleGenerate = useCallback(async () => {
@@ -213,11 +232,19 @@ export default function DomainsPage() {
     setGenerating(true);
     setGeneratedNames([]);
     setResults([]);
+    setGeneratorError(null);
 
     // scroll to results
     setTimeout(() => genResultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
 
-    const tlds = Array.from(selectedTlds);
+    // Use a small TLD set for the generator to keep us under RDAP rate limits.
+    // If the user has manually ticked TLDs beyond the defaults, honour them;
+    // otherwise use the smaller GENERATOR_DEFAULT_TLDS list.
+    const userSelection = Array.from(selectedTlds);
+    const tlds = userSelection.length > 0 && userSelection.length <= GENERATOR_DEFAULT_TLDS.length + 1
+      ? userSelection
+      : GENERATOR_DEFAULT_TLDS.filter((t) => selectedTlds.has(t) || selectedTlds.size === 0);
+    const finalTlds = tlds.length > 0 ? tlds : GENERATOR_DEFAULT_TLDS;
 
     // Step 1 — get names from Claude
     let names: Array<{ name: string; tagline: string }> = [];
@@ -225,15 +252,18 @@ export default function DomainsPage() {
       const res = await fetch("/api/tools/business-names", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description: desc, style: genStyle, count: 24 }),
+        body: JSON.stringify({ description: desc, style: genStyle, count: GEN_NAME_COUNT }),
       });
       const data = await res.json();
       names = Array.isArray(data?.names) ? data.names : [];
     } catch {
-      // network error — bail
+      setGeneratorError("Couldn't reach the name generator. Check your connection and try again.");
+      setGenerating(false);
+      return;
     }
 
     if (names.length === 0) {
+      setGeneratorError("The name generator didn't return any suggestions. Try a more specific description.");
       setGenerating(false);
       return;
     }
@@ -252,7 +282,7 @@ export default function DomainsPage() {
       cleaned.map((n) => ({
         name: n.name,
         tagline: n.tagline,
-        domains: tlds.map((tld) => ({
+        domains: finalTlds.map((tld) => ({
           domain: `${n.slug}.${tld}`,
           tld,
           available: null,
@@ -262,44 +292,55 @@ export default function DomainsPage() {
       })),
     );
 
-    // Step 2 — check every name in parallel, stream updates
-    await Promise.all(
-      cleaned.map(async (n) => {
-        try {
-          const r = await fetch(
-            `/api/domains/search?q=${encodeURIComponent(n.slug)}&tlds=${encodeURIComponent(tlds.join(","))}`,
-          );
-          if (!r.ok) throw new Error("search failed");
-          const data = await r.json();
-          const apiResults: Array<{ domain: string; available: boolean | null; price: number }> = data.results || [];
+    // Step 2 — check names in batches of GEN_CLIENT_CONCURRENCY so RDAP
+    // doesn't rate-limit us into returning all-null.
+    const checkOne = async (n: { name: string; tagline: string; slug: string }) => {
+      try {
+        const r = await fetch(
+          `/api/domains/search?q=${encodeURIComponent(n.slug)}&tlds=${encodeURIComponent(finalTlds.join(","))}`,
+        );
+        if (!r.ok) throw new Error("search failed");
+        const data = await r.json();
+        const apiResults: Array<{ domain: string; available: boolean | null; price: number }> = data.results || [];
 
-          setGeneratedNames((prev) =>
-            prev.map((gn) =>
-              gn.name !== n.name
-                ? gn
-                : {
-                    ...gn,
-                    domains: tlds.map((tld) => {
-                      const match = apiResults.find((x) => x.domain === `${n.slug}.${tld}`);
-                      return {
-                        domain: `${n.slug}.${tld}`,
-                        tld,
-                        available: match ? match.available : null,
-                        price: match?.price ?? TLD_PRICES[tld] ?? 9.99,
-                        checking: false,
-                      };
-                    }),
-                  },
-            ),
-          );
-        } catch {
-          setGeneratedNames((prev) =>
-            prev.map((gn) =>
-              gn.name !== n.name
-                ? gn
-                : { ...gn, domains: gn.domains.map((d) => ({ ...d, checking: false, available: null })) },
-            ),
-          );
+        setGeneratedNames((prev) =>
+          prev.map((gn) =>
+            gn.name !== n.name
+              ? gn
+              : {
+                  ...gn,
+                  domains: finalTlds.map((tld) => {
+                    const match = apiResults.find((x) => x.domain === `${n.slug}.${tld}`);
+                    return {
+                      domain: `${n.slug}.${tld}`,
+                      tld,
+                      available: match ? match.available : null,
+                      price: match?.price ?? TLD_PRICES[tld] ?? 9.99,
+                      checking: false,
+                    };
+                  }),
+                },
+          ),
+        );
+      } catch {
+        setGeneratedNames((prev) =>
+          prev.map((gn) =>
+            gn.name !== n.name
+              ? gn
+              : { ...gn, domains: gn.domains.map((d) => ({ ...d, checking: false, available: null })) },
+          ),
+        );
+      }
+    };
+
+    // Run GEN_CLIENT_CONCURRENCY workers pulling from a shared queue
+    const queue = [...cleaned];
+    await Promise.all(
+      Array.from({ length: Math.min(GEN_CLIENT_CONCURRENCY, queue.length) }, async () => {
+        while (queue.length) {
+          const next = queue.shift();
+          if (!next) return;
+          await checkOne(next);
         }
       }),
     );
@@ -331,6 +372,7 @@ export default function DomainsPage() {
       setSearchHistory(prev => [cleanName, ...prev].slice(0, 10));
     }
 
+    setSearchError(null);
     try {
       const res = await fetch(`/api/domains/search?q=${encodeURIComponent(cleanName)}&tlds=${encodeURIComponent(tlds.join(","))}`);
       if (res.ok) {
@@ -348,9 +390,12 @@ export default function DomainsPage() {
           };
         }));
       } else {
+        const errBody = await res.json().catch(() => ({}));
+        setSearchError(errBody.error || `Search failed (HTTP ${res.status}). Please try again.`);
         setResults(initial.map(r => ({ ...r, checking: false })));
       }
-    } catch {
+    } catch (err) {
+      setSearchError(err instanceof Error ? err.message : "Network error. Check your connection and try again.");
       setResults(initial.map(r => ({ ...r, checking: false })));
     }
 
@@ -730,9 +775,15 @@ export default function DomainsPage() {
                 {generating ? (
                   <><Loader2 className="w-5 h-5 animate-spin" /> Generating names...</>
                 ) : (
-                  <><Wand2 className="w-5 h-5" /> Generate 20 Name Ideas</>
+                  <><Wand2 className="w-5 h-5" /> Generate {GEN_NAME_COUNT} Name Ideas</>
                 )}
               </button>
+
+              {generatorError && (
+                <div className="mt-4 p-3 rounded-xl border border-red-500/20 bg-red-500/[0.05] text-sm text-red-300">
+                  {generatorError}
+                </div>
+              )}
             </div>
           )}
 
@@ -762,6 +813,13 @@ export default function DomainsPage() {
       {/* RESULTS SECTION                             */}
       {/* ═══════════════════════════════════════════ */}
       <div ref={resultsRef} />
+      {(searchError || checkoutError) && (
+        <div className="max-w-4xl mx-auto px-6 -mt-4 mb-6">
+          <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+            {searchError || checkoutError}
+          </div>
+        </div>
+      )}
       {results.length > 0 && (
         <section className="pb-16 px-4 sm:px-6">
           <div className="max-w-3xl mx-auto">
@@ -932,7 +990,9 @@ export default function DomainsPage() {
                 {(() => {
                   const withAvailable = generatedNames.filter(gn => gn.domains.some(d => d.available === true)).length;
                   const stillChecking = generatedNames.some(gn => gn.domains.some(d => d.checking));
+                  const allUnknown = !stillChecking && generatedNames.every(gn => gn.domains.every(d => d.available === null));
                   if (stillChecking) return `Checking ${generatedNames.length} names...`;
+                  if (allUnknown) return "Availability check failed";
                   return withAvailable > 0
                     ? `${withAvailable} name${withAvailable > 1 ? "s" : ""} with available domains`
                     : "No available domains found";
@@ -946,6 +1006,35 @@ export default function DomainsPage() {
                 <RefreshCw className={`w-3.5 h-3.5 ${generating ? "animate-spin" : ""}`} /> Regenerate
               </button>
             </div>
+
+            {/* Rate-limited / network failure banner */}
+            {(() => {
+              const stillChecking = generatedNames.some((gn) => gn.domains.some((d) => d.checking));
+              const allUnknown = !stillChecking && generatedNames.every((gn) => gn.domains.every((d) => d.available === null));
+              if (!allUnknown || generating) return null;
+              return (
+                <div className="rounded-2xl border border-red-500/20 bg-red-500/[0.05] p-5 mb-6">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center shrink-0">
+                      <X className="w-5 h-5 text-red-400" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-base font-bold text-white mb-1">Couldn&apos;t check availability</h3>
+                      <p className="text-sm text-slate-400 mb-3">
+                        The registry rate-limited or timed out for every name. This usually clears in a few seconds.
+                      </p>
+                      <button
+                        onClick={handleGenerate}
+                        disabled={generating}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 text-red-300 text-sm font-semibold transition-colors"
+                      >
+                        <RefreshCw className="w-3.5 h-3.5" /> Try again
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
 
             <div className="space-y-4">
               {generatedNames.map((gn) => {

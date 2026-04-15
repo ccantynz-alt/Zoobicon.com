@@ -400,36 +400,7 @@ export default function LandingPage() {
             </h2>
           </div>
         </div>
-        {/* Mobile menu */}
-        {mobileMenuOpen && (
-          <nav className="md:hidden border-t border-white/[0.06] bg-[#050507]/95 backdrop-blur-2xl px-6 py-6 space-y-4" aria-label="Mobile navigation">
-            <a href="#products" className="block text-sm text-white/60 hover:text-white">Products</a>
-            <Link href="/marketplace" className="block text-sm text-white/60 hover:text-white">Marketplace</Link>
-            <Link href="/domains" className="block text-sm text-white/60 hover:text-white">Domains</Link>
-            <Link href="/developers" className="block text-sm text-white/60 hover:text-white">Developers</Link>
-            <Link href="/agencies" className="block text-sm text-white/60 hover:text-white">Agencies</Link>
-            <Link href="/support" className="block text-sm text-white/60 hover:text-white">Support</Link>
-            <Link href="/pricing" className="block text-sm text-white/60 hover:text-white">Pricing</Link>
-            {user ? (
-              <>
-                <Link href="/dashboard" className="block text-sm text-white/60 hover:text-white flex items-center gap-2">
-                  <LayoutDashboard className="w-4 h-4" /> Dashboard
-                </Link>
-                <button onClick={handleLogout} className="block text-sm text-white/60 hover:text-white flex items-center gap-2 w-full text-left">
-                  <LogOut className="w-4 h-4" /> Sign out
-                </button>
-                <Link href="/builder" className="block btn-gradient px-5 py-2.5 rounded-xl text-sm font-semibold text-white text-center mt-4">
-                  <span>{user.name || user.email.split("@")[0]}&apos;s Builder</span>
-                </Link>
-              </>
-            ) : (
-              <Link href="/builder" className="block btn-gradient px-5 py-2.5 rounded-xl text-sm font-semibold text-white text-center mt-4">
-                <span>Start Building</span>
-              </Link>
-            )}
-          </nav>
-        )}
-      </nav>
+      </section>
 
       {/* Hero Section */}
       <section className="relative overflow-hidden min-h-screen flex items-center pt-16">
@@ -475,6 +446,7 @@ export default function LandingPage() {
                 Your all-in-one AI platform for building websites, marketing, and scaling online.
                 10 AI agents work together to create production-ready sites in seconds.
               </p>
+            </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {DOMAINS.map((d) => {
@@ -498,6 +470,7 @@ export default function LandingPage() {
                 </Link>
               );
             })}
+          </div>
           </div>
         </div>
       </section>
