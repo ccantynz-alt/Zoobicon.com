@@ -36,6 +36,8 @@ interface RequestBody {
   industry?: string;
   style?: string;
   count?: number;
+  excludeNames?: string[];
+  refinement?: string;
 }
 
 export async function POST(req: NextRequest) {
@@ -51,7 +53,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { description, industry, style, count } = body;
+    const { description, industry, style, count, excludeNames, refinement } = body;
 
     if (!description || typeof description !== "string" || description.trim().length < 3) {
       return NextResponse.json(
@@ -59,6 +61,11 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
+
+    const userExclusions = Array.isArray(excludeNames)
+      ? excludeNames.filter((s) => typeof s === "string").map((s) => s.trim()).filter(Boolean).slice(0, 50)
+      : [];
+    const refinementClean = typeof refinement === "string" ? refinement.trim().slice(0, 200) : "";
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
@@ -72,31 +79,57 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const requestedCount = Number.isFinite(count as number) ? Math.floor(count as number) : 12;
-    const nameCount = Math.max(1, Math.min(requestedCount, 24));
+    const requestedCount = Number.isFinite(count as number) ? Math.floor(count as number) : 18;
+    const nameCount = Math.max(1, Math.min(requestedCount, 30));
 
     const styleDesc = describeStyle(style);
     const industryContext = industry ? ` in the ${industry} industry` : "";
-    const cleanDescription = description.trim().slice(0, 500);
+    const cleanDescription = description.trim().slice(0, 800);
 
-    const prompt = buildPrompt(cleanDescription, industryContext, styleDesc, nameCount);
+    const themes = detectThemes(cleanDescription);
+    const inlineExclusions = extractInlineExclusions(cleanDescription);
+    const allExclusions = Array.from(
+      new Set([...inlineExclusions, ...userExclusions].map((s) => s.toLowerCase())),
+    ).slice(0, 60);
 
-    // ---- Primary attempt: Haiku 4.5 ------------------------------------
+    const isComplex =
+      cleanDescription.length > 160 ||
+      cleanDescription.split(/\s+/).length > 28 ||
+      allExclusions.length > 0 ||
+      themes.length > 0 ||
+      refinementClean.length > 0;
+
+    const prompt = buildPrompt({
+      description: cleanDescription,
+      industryContext,
+      styleDesc,
+      nameCount,
+      themes,
+      exclusions: allExclusions,
+      refinement: refinementClean,
+    });
+
+    // For complex prompts, Sonnet 4.5 leads (better creative reasoning, themes,
+    // exclusions). For simple prompts, Haiku 4.5 leads (10x cheaper, fast).
+    const primaryModel = isComplex ? FALLBACK_MODEL : PRIMARY_MODEL;
+    const secondaryModel = isComplex ? PRIMARY_MODEL : FALLBACK_MODEL;
+
+    // ---- Primary attempt ------------------------------------------------
     let rawText = "";
-    let modelUsed = PRIMARY_MODEL;
+    let modelUsed = primaryModel;
     let lastError: string | null = null;
 
     try {
-      rawText = await callAnthropic(apiKey, PRIMARY_MODEL, prompt);
+      rawText = await callAnthropic(apiKey, primaryModel, prompt);
     } catch (err) {
       lastError = err instanceof Error ? err.message : String(err);
       console.warn(
-        `[business-names] Primary model ${PRIMARY_MODEL} failed: ${lastError}. Falling back to ${FALLBACK_MODEL}`,
+        `[business-names] Primary model ${primaryModel} failed: ${lastError}. Falling back to ${secondaryModel}`,
       );
-      // ---- Fallback: Sonnet 4.5 ----------------------------------------
+      // ---- Fallback ----------------------------------------------------
       try {
-        rawText = await callAnthropic(apiKey, FALLBACK_MODEL, prompt);
-        modelUsed = FALLBACK_MODEL;
+        rawText = await callAnthropic(apiKey, secondaryModel, prompt);
+        modelUsed = secondaryModel;
       } catch (err2) {
         const fallbackError = err2 instanceof Error ? err2.message : String(err2);
         console.error(
@@ -136,26 +169,41 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ---- Sanitize + dedupe ---------------------------------------------
-    const sanitized = sanitizeNames(parsed, nameCount);
+    // ---- Sanitize + dedupe + apply exclusions ---------------------------
+    const sanitized = sanitizeNames(parsed, nameCount, allExclusions);
 
     if (sanitized.length === 0) {
       console.error(
         "[business-names] All names were filtered out as invalid. Raw count:",
         parsed.length,
+        "exclusions:",
+        allExclusions.length,
       );
       return NextResponse.json(
-        { error: "AI returned names but none were valid. Please try a different description." },
+        {
+          error:
+            allExclusions.length > 0
+              ? "AI couldn't find names that avoid your exclusions. Try removing one or rephrasing."
+              : "AI returned names but none were valid. Please try a different description.",
+        },
         { status: 500 },
       );
     }
 
     const elapsed = Date.now() - startedAt;
     console.log(
-      `[business-names] OK model=${modelUsed} requested=${nameCount} returned=${sanitized.length} elapsed=${elapsed}ms`,
+      `[business-names] OK model=${modelUsed} complex=${isComplex} themes=${themes.join("|") || "none"} exclusions=${allExclusions.length} requested=${nameCount} returned=${sanitized.length} elapsed=${elapsed}ms`,
     );
 
-    return NextResponse.json({ names: sanitized });
+    return NextResponse.json({
+      names: sanitized,
+      meta: {
+        model: modelUsed,
+        themesDetected: themes,
+        exclusionsApplied: allExclusions,
+        elapsedMs: elapsed,
+      },
+    });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error("[business-names] Unexpected error:", message);
@@ -184,32 +232,188 @@ function describeStyle(style: string | undefined): string {
   }
 }
 
-function buildPrompt(
-  description: string,
-  industryContext: string,
-  styleDesc: string,
-  nameCount: number,
-): string {
-  return `Generate exactly ${nameCount} creative, brandable business names for: "${description}"${industryContext}.
+const THEME_LIBRARY: Array<{
+  match: RegExp;
+  label: string;
+  guidance: string;
+}> = [
+  {
+    match: /\b(ancient|antiquity|antique|old[- ]?world|historic(al)?)\b/i,
+    label: "ancient",
+    guidance:
+      "Lean on antiquity. Borrow from Latin, Greek, Egyptian, Sumerian, Norse, Sanskrit, Persian, Aztec roots — emperors, gods, oracles, ruins, dynasties.",
+  },
+  {
+    match: /\b(roman|latin|caesar|julius|augustus|imperial|empire|legion|senate)\b/i,
+    label: "roman/latin",
+    guidance:
+      "Roman / Latin tradition: emperors, generals, gods, virtues, classical Latin words. Avoid the literal name 'Julius' — find peers like Cato, Brutus, Octavian, Trajan, Maximus, Aurelius, Lucius, Cassius, Vesper, Veritas, Imperium, Solarium, Vox.",
+  },
+  {
+    match: /\b(greek|hellenic|olympus|olympian|athena|apollo|zeus|hermes)\b/i,
+    label: "greek",
+    guidance:
+      "Greek mythology: gods, titans, heroes, abstract Greek nouns. Examples: Helios, Kairos, Arete, Atlas, Theseus, Selene, Hyperion.",
+  },
+  {
+    match: /\b(norse|viking|odin|thor|valhalla|ragnarok|asgard)\b/i,
+    label: "norse",
+    guidance:
+      "Norse mythology: gods, ravens, runes, sagas. Examples: Odin, Bragi, Hugin, Fenrir, Skadi, Saga, Mjolnir.",
+  },
+  {
+    match: /\b(mythical|mythology|legendary|legend|gods?|deity|divine)\b/i,
+    label: "mythological",
+    guidance:
+      "Mythological figures and divine concepts across cultures. Avoid clichés (no Phoenix, Apollo, Atlas alone — find rarer ones).",
+  },
+  {
+    match: /\b(powerful|mighty|strong|fierce|warrior|titan|colossal|sovereign)\b/i,
+    label: "powerful",
+    guidance:
+      "Convey strength and authority. Hard consonants (K, T, X, Z), short syllables, references to scale (Atlas, Titan, Forge, Iron, Onyx, Vex).",
+  },
+  {
+    match: /\b(elegant|luxury|premium|refined|sophisticated|prestige)\b/i,
+    label: "luxury",
+    guidance:
+      "Luxury feel: French/Italian phonetics, soft sibilants, words evoking craftsmanship (Maison, Atelier, Soir, Velour, Ardent).",
+  },
+  {
+    match: /\b(voice|speak|speech|dictation|audio|sound|talk|narrat|listen)\b/i,
+    label: "voice/audio",
+    guidance:
+      "Reference speech, sound, listening, breath. Latin/Greek roots: Vox, Loqui, Fonema, Audire, Sonus, Echo, Aural, Vocem, Cantus, Phoneme.",
+  },
+  {
+    match: /\b(ai|artificial intelligence|machine learning|neural|gpt|llm|smart|intelligent)\b/i,
+    label: "ai-native",
+    guidance:
+      "AI-native feel without using 'AI' in the name. Suggest cognition (Cog, Neura, Mens, Sapiens), foresight (Oracle, Augur, Vates), or computation (Compute, Lex, Cipher).",
+  },
+  {
+    match: /\b(fast|speed|instant|quick|rapid|velocity)\b/i,
+    label: "speed",
+    guidance: "Convey speed: short, sharp names. Roman: Velox, Tachys, Celer, Veloce, Rapid, Bolt, Flash.",
+  },
+  {
+    match: /\b(secure|security|safe|protect|encrypt|privacy|trust)\b/i,
+    label: "security",
+    guidance:
+      "Security/trust: Latin Aegis, Vault, Bastion, Sigil, Castel, Fort, Sentinel, Wardens. Avoid 'Secure' / 'Safe' literals.",
+  },
+];
 
-Style: ${styleDesc}
+function detectThemes(description: string): string[] {
+  const found: string[] = [];
+  for (const { match, label } of THEME_LIBRARY) {
+    if (match.test(description)) found.push(label);
+  }
+  return found;
+}
 
-Rules:
-- Each name must be 1-2 words, 3-15 characters total
-- Must be easy to spell and pronounce
-- Must work as a domain name (letters and digits only — no spaces, no hyphens, no punctuation)
-- Mix invented words, compound words, metaphors, abbreviations
-- Each name gets a short tagline (5-10 words) explaining the vibe
-- Do NOT suggest generic names like "TechSolutions", "BestService", "ProBuilder"
-- Be creative — Spotify, Airbnb, Canva, Stripe, Notion, Figma, Vercel level naming
-- Names must be unique within your response
+/**
+ * Extract names the user said are taken / to avoid from a free-text description.
+ * Catches patterns like:
+ *   "Julius is already taken"
+ *   "but Julius has been taken — need another"
+ *   "we already tried X, Y and Z"
+ *   "not Foo or Bar"
+ *   "exclude Foo, Bar, Baz"
+ *   "avoid Foo and Bar"
+ *   "anything but Foo"
+ */
+function extractInlineExclusions(description: string): string[] {
+  const out = new Set<string>();
+  const text = description;
+
+  const patterns: RegExp[] = [
+    // "X is/has (already/been) taken"
+    /\b([A-Z][a-zA-Z]{2,}|[a-z]{3,})\s+(?:is|has been|was|'s)\s+(?:already\s+)?(?:been\s+)?taken\b/g,
+    // "X is unavailable / not available / gone"
+    /\b([A-Z][a-zA-Z]{2,}|[a-z]{3,})\s+(?:is|are)\s+(?:already\s+)?(?:unavailable|not available|gone|registered)\b/g,
+    // "exclude X, Y and Z" / "avoid X, Y" / "without X" / "anything but X"
+    /(?:exclud(?:e|ing)|avoid(?:ing)?|without|except|anything but|not)\s+([A-Za-z][\w, ]{2,80})/gi,
+    // "we tried X / already tried X"
+    /(?:tried|tested|attempted)\s+([A-Za-z][\w, ]{2,80})/gi,
+    // "no X" / "no Foo or Bar"
+    /\bno\s+([A-Z][a-zA-Z]{2,}(?:\s*(?:,|or|and)\s*[A-Z][a-zA-Z]{2,}){0,5})\b/g,
+  ];
+
+  const splitWords = (chunk: string): string[] =>
+    chunk
+      .split(/[,\s]+|\band\b|\bor\b/i)
+      .map((s) => s.trim().replace(/[^A-Za-z0-9]/g, ""))
+      .filter((s) => s.length >= 3 && s.length <= 30);
+
+  for (const re of patterns) {
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(text)) !== null) {
+      for (const word of splitWords(m[1])) {
+        // Skip pure-stopword captures
+        if (/^(the|and|but|for|our|app|name|domain|something|similar|else)$/i.test(word)) continue;
+        out.add(word);
+      }
+    }
+  }
+
+  return Array.from(out);
+}
+
+interface PromptArgs {
+  description: string;
+  industryContext: string;
+  styleDesc: string;
+  nameCount: number;
+  themes: string[];
+  exclusions: string[];
+  refinement: string;
+}
+
+function buildPrompt(args: PromptArgs): string {
+  const { description, industryContext, styleDesc, nameCount, themes, exclusions, refinement } = args;
+
+  const themeBlock = themes.length
+    ? `\nDETECTED THEMES — honor these aggressively:\n${themes
+        .map((label) => {
+          const def = THEME_LIBRARY.find((t) => t.label === label);
+          return def ? `• ${label}: ${def.guidance}` : `• ${label}`;
+        })
+        .join("\n")}`
+    : "";
+
+  const exclusionBlock = exclusions.length
+    ? `\nFORBIDDEN NAMES — the user explicitly told us these are taken or off-limits. DO NOT suggest these or close phonetic variants (e.g. Juliana, Julien if Julius is forbidden):\n${exclusions
+        .map((e) => `• ${e}`)
+        .join("\n")}`
+    : "";
+
+  const refinementBlock = refinement
+    ? `\nREFINEMENT REQUEST from a previous round — apply this on top:\n"${refinement}"`
+    : "";
+
+  return `You are a senior naming consultant — same tier as the team that named Stripe, Anthropic, Vercel, Figma, Linear.
+
+Generate exactly ${nameCount} creative, brandable business names for: "${description}"${industryContext}.
+
+Style baseline: ${styleDesc}
+${themeBlock}${exclusionBlock}${refinementBlock}
+
+CORE RULES:
+- 1-2 words, 3-15 characters total, letters and digits only (no spaces, hyphens, or punctuation — must be a valid domain label).
+- Mix patterns for variety: invented words, Latin/Greek roots, mythological figures, compound words, metaphors, abstract concepts, single evocative nouns.
+- Each name MUST be unique within your response.
+- Each name gets a short tagline (5-12 words) that captures the brand vibe AND nods to the theme/meaning.
+- AVAILABILITY BIAS: Common dictionary words (Solar, Apex, Phoenix, Atlas, Nova, Lumen, Vertex, Pulse, Forge, Spark, Edge, Flux, Sage, Echo, Lyra) are almost certainly taken on .com — avoid the obvious ones. Lean toward invented coinages, less-common Latin/Greek/Norse words, or compounds (e.g. "Vexion", "Quorum", "Lumeris", "Octavus", "Sophora", "Calidus") that have a real chance of being free.
+- NEVER suggest generic names ("TechSolutions", "BestService", "ProBuilder", "AIvoice", "SmartApp").
+- NEVER reuse a forbidden name or its near-phonetic siblings.
 
 CRITICAL OUTPUT FORMAT:
 Output ONLY a valid JSON array. No markdown code fences. No preamble. No explanation text. No trailing commentary.
 Start your response with [ and end with ]. Nothing else.
 
-Example of the EXACT format required:
-[{"name":"Lumio","tagline":"Brilliant ideas, instantly delivered"},{"name":"Hexa","tagline":"Six sides of pure innovation"}]
+Example of the EXACT shape required:
+[{"name":"Octavus","tagline":"The eighth voice — clarity from the imperial chorus"},{"name":"Vocem","tagline":"Latin for 'voice' — speak with authority"}]
 
 Now generate ${nameCount} names for "${description}":`;
 }
@@ -349,20 +553,20 @@ function extractJsonArray(text: string): Array<{ name?: unknown; tagline?: unkno
 function sanitizeNames(
   raw: Array<{ name?: unknown; tagline?: unknown }>,
   nameCount: number,
+  exclusions: string[] = [],
 ): GeneratedName[] {
   const out: GeneratedName[] = [];
   const seen = new Set<string>();
+  const blocked = new Set(exclusions.map((e) => e.toLowerCase().replace(/[^a-z0-9]/g, "")));
 
   for (const item of raw) {
     if (!item || typeof item !== "object") continue;
     const rawName = typeof item.name === "string" ? item.name : "";
     const rawTagline = typeof item.tagline === "string" ? item.tagline : "";
 
-    // Strip everything that wouldn't be a valid domain label
     const nameClean = rawName.trim().replace(/\s+/g, "");
     if (!nameClean) continue;
 
-    // Slug form for dedupe and domain safety
     const slug = nameClean
       .toLowerCase()
       .replace(/[^a-z0-9-]/g, "")
@@ -371,9 +575,20 @@ function sanitizeNames(
 
     if (slug.length < 2 || slug.length > 63) continue;
     if (seen.has(slug)) continue;
+
+    // Hard-block exact exclusion matches AND obvious phonetic siblings
+    // (sibling = slug starts with or contains the exclusion stem ≥4 chars)
+    let excluded = false;
+    for (const blockedSlug of blocked) {
+      if (!blockedSlug) continue;
+      if (slug === blockedSlug) { excluded = true; break; }
+      if (blockedSlug.length >= 4 && slug.startsWith(blockedSlug)) { excluded = true; break; }
+      if (blockedSlug.length >= 5 && slug.includes(blockedSlug)) { excluded = true; break; }
+    }
+    if (excluded) continue;
+
     seen.add(slug);
 
-    // Capitalise first letter for display
     const display = nameClean.charAt(0).toUpperCase() + nameClean.slice(1);
 
     out.push({
