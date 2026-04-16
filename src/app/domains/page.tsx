@@ -697,6 +697,18 @@ export default function DomainsPage() {
         </div>
 
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
+          {/* Coinage Engine announcement — flagship feature surface */}
+          <Link
+            href="/domains/ai-search"
+            className="group inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/30 bg-gradient-to-r from-[#E8D4B0]/[0.06] via-[#E08BB0]/[0.05] to-[#E8D4B0]/[0.06] px-4 py-1.5 text-[11px] font-medium text-white/90 mb-5 hover:border-[#E8D4B0]/60 hover:text-white transition-all"
+          >
+            <span className="inline-flex h-1.5 w-1.5 rounded-full bg-[#E8D4B0] shadow-[0_0_12px_2px_rgba(232,212,176,0.6)]" />
+            <span className="font-semibold tracking-widest uppercase text-[#E8D4B0]">New</span>
+            <span className="text-white/60">·</span>
+            <span>AI Coinage Engine — six-phase live pipeline</span>
+            <ArrowRight className="w-3 h-3 text-[#E8D4B0] transition group-hover:translate-x-0.5" />
+          </Link>
+
           {/* Eyebrow */}
           <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-8">
             <BadgeCheck className="w-3 h-3" />
@@ -761,6 +773,15 @@ export default function DomainsPage() {
             >
               <Wand2 className="w-4 h-4" /> AI name generator
             </button>
+            <Link
+              href="/domains/ai-search"
+              className="group flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] font-semibold border border-[#E8D4B0]/35 bg-gradient-to-r from-[#E8D4B0]/[0.06] via-[#E08BB0]/[0.05] to-[#E8D4B0]/[0.06] text-[#E8D4B0] backdrop-blur hover:border-[#E8D4B0]/70 hover:text-white transition-all"
+              title="The flagship engine — 6-phase coinage pipeline with trademark, 18-language, and live registry screening"
+            >
+              <Sparkles className="w-4 h-4" />
+              Coinage Engine
+              <span className="inline-flex items-center rounded-full bg-[#E8D4B0]/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-[#E8D4B0]">New</span>
+            </Link>
           </div>
 
           {/* ── SEARCH MODE ── */}
