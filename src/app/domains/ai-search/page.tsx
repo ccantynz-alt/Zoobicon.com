@@ -68,7 +68,7 @@ interface PhaseStatus {
 }
 
 const INITIAL_PHASES: PhaseStatus[] = [
-  { id: "patterns", label: "Coinage Inference", description: "Pattern selection from the 10-pattern catalog", status: "pending", icon: Brain },
+  { id: "patterns", label: "Naming Strategy", description: "AI picks the best naming styles for your mission", status: "pending", icon: Brain },
   { id: "candidates", label: "Name Generation", description: "20-30 candidates across chosen patterns", status: "pending", icon: Wand2 },
   { id: "trademark", label: "Trademark Screen", description: "150+ brand collision check", status: "pending", icon: Shield },
   { id: "linguistic", label: "Linguistic Safety", description: "18 languages — English → Japanese", status: "pending", icon: Languages },
@@ -286,23 +286,23 @@ export default function AiSearchPage() {
               className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 backdrop-blur-sm px-4 py-1.5 text-xs font-medium text-white/80 hover:border-white/25 hover:text-white transition"
             >
               <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
-              World-First AI Coinage Engine
+              World-First Advanced AI Brand Search
               <ChevronRight className="h-3.5 w-3.5" />
             </Link>
           </div>
 
           <h1 className="text-center font-serif text-5xl leading-[1.02] tracking-[-0.02em] sm:text-7xl lg:text-[96px]">
-            <span className="block">Brand names</span>
+            <span className="block">Brand names,</span>
             <span className="block bg-gradient-to-r from-emerald-300 via-cyan-200 to-violet-300 bg-clip-text text-transparent italic">
-              coined, not guessed.
+              invented for you.
             </span>
           </h1>
 
           <p className="mx-auto mt-8 max-w-2xl text-center text-lg leading-relaxed text-white/70 sm:text-xl">
-            The most advanced domain search engine on earth. A six-phase intellectual
-            pipeline — pattern inference, candidate generation, trademark screening,
-            linguistic safety across 18 languages, live registry availability, and a
-            ranked shortlist — streamed live.
+            The most advanced domain search on the internet. Describe your business —
+            the AI invents original brand names, screens for trademark conflicts,
+            checks 18 languages for bad meanings, and verifies live availability with
+            the registry. All streamed live as it works.
           </p>
 
           {/* ── Prompt ── */}
@@ -357,7 +357,7 @@ export default function AiSearchPage() {
           {/* ── Capability strip ── */}
           <div className="mx-auto mt-16 grid max-w-4xl grid-cols-2 gap-3 sm:grid-cols-4">
             {[
-              { k: "10", l: "Coinage patterns" },
+              { k: "10", l: "Naming strategies" },
               { k: "150+", l: "Brand blocklist" },
               { k: "18", l: "Languages screened" },
               { k: "6", l: "Live pipeline phases" },
@@ -451,7 +451,7 @@ export default function AiSearchPage() {
             <div className="mt-16 rounded-3xl border border-white/10 bg-white/[0.02] p-8">
               <div className="mb-6 flex items-center gap-3">
                 <Brain className="h-5 w-5 text-emerald-300" />
-                <h3 className="text-xl font-semibold">Inferred coinage patterns</h3>
+                <h3 className="text-xl font-semibold">Chosen naming strategies</h3>
                 {phoneticTarget && (
                   <span className="ml-auto rounded-full border border-cyan-400/30 bg-cyan-400/5 px-3 py-1 text-xs font-medium text-cyan-200">
                     {phoneticTarget}
@@ -685,7 +685,7 @@ export default function AiSearchPage() {
       <section className="relative border-t border-white/5 py-16">
         <div className="mx-auto max-w-4xl px-6 text-center">
           <p className="font-serif text-2xl text-white/80 italic">
-            &ldquo;Names aren&apos;t generated. They&apos;re coined.&rdquo;
+            &ldquo;Names aren&apos;t generated. They&apos;re invented for you.&rdquo;
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-4">
             <Link
