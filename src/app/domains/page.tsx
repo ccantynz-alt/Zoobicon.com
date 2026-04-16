@@ -103,6 +103,11 @@ export default function DomainsPage() {
   const [autoGenerating, setAutoGenerating] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [generatorError, setGeneratorError] = useState<string | null>(null);
+  const [genThemes, setGenThemes] = useState<string[]>([]);
+  const [genExclusions, setGenExclusions] = useState<string[]>([]);
+  const [genRefinement, setGenRefinement] = useState<string>("");
+  const [genIndustry, setGenIndustry] = useState<string | null>(null);
+  const [genRecommendedTlds, setGenRecommendedTlds] = useState<Array<{ tld: string; reason: string }>>([]);
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [contactInfo, setContactInfo] = useState({
@@ -205,6 +210,16 @@ export default function DomainsPage() {
     setAutoGenerating(false);
   }, [name]);
 
+  // Reset AI-generator context (themes, exclusions, refinement) when the user
+  // edits the description — those only make sense for the current prompt.
+  useEffect(() => {
+    setGenThemes([]);
+    setGenExclusions([]);
+    setGenRefinement("");
+    setGenIndustry(null);
+    setGenRecommendedTlds([]);
+  }, [genDescription]);
+
   // Trigger generation after genDescription state has been set
   useEffect(() => {
     if (pendingGenerate && genDescription.trim().length >= 3) {
@@ -228,7 +243,7 @@ export default function DomainsPage() {
   //    (max 4 concurrent requests) so RDAP doesn't rate-limit us into oblivion
   // 3. Stream results into state as each name resolves
   // 4. Names with ZERO available TLDs are auto-filtered out at render time
-  const handleGenerate = useCallback(async () => {
+  const handleGenerate = useCallback(async (opts?: { refinement?: string; addToExclusions?: string[] }) => {
     const desc = genDescription.trim();
     if (desc.length < 3 || selectedTlds.size === 0 || generating) return;
 
@@ -236,6 +251,16 @@ export default function DomainsPage() {
     setGeneratedNames([]);
     setResults([]);
     setGeneratorError(null);
+
+    // If a refinement was passed in, store it so we can show the active chip
+    if (opts?.refinement !== undefined) setGenRefinement(opts.refinement);
+
+    // Merge any extra exclusions (e.g. names that came back fully taken on the
+    // previous round) into the running exclusion list so we don't suggest them again.
+    const exclusionsToSend = Array.from(
+      new Set([...(genExclusions || []), ...(opts?.addToExclusions || [])]),
+    ).slice(0, 50);
+    if (opts?.addToExclusions?.length) setGenExclusions(exclusionsToSend);
 
     // scroll to results
     setTimeout(() => genResultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
@@ -247,26 +272,59 @@ export default function DomainsPage() {
     const tlds = userSelection.length > 0 && userSelection.length <= GENERATOR_DEFAULT_TLDS.length + 1
       ? userSelection
       : GENERATOR_DEFAULT_TLDS.filter((t) => selectedTlds.has(t) || selectedTlds.size === 0);
-    const finalTlds = tlds.length > 0 ? tlds : GENERATOR_DEFAULT_TLDS;
+    let finalTlds = tlds.length > 0 ? tlds : GENERATOR_DEFAULT_TLDS;
 
     // Step 1 — get names from Claude
     let names: Array<{ name: string; tagline: string }> = [];
+    let apiError: string | null = null;
     try {
       const res = await fetch("/api/tools/business-names", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description: desc, style: genStyle, count: GEN_NAME_COUNT }),
+        body: JSON.stringify({
+          description: desc,
+          style: genStyle,
+          count: GEN_NAME_COUNT,
+          excludeNames: exclusionsToSend,
+          refinement: opts?.refinement ?? genRefinement,
+        }),
       });
-      const data = await res.json();
-      names = Array.isArray(data?.names) ? data.names : [];
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        apiError = (data && typeof data.error === "string" ? data.error : `Name generator returned ${res.status}.`);
+      } else {
+        names = Array.isArray(data?.names) ? data.names : [];
+        if (data?.meta?.themesDetected) setGenThemes(data.meta.themesDetected);
+        if (typeof data?.meta?.industryDetected === "string") setGenIndustry(data.meta.industryDetected);
+        else setGenIndustry(null);
+        if (Array.isArray(data?.meta?.recommendedTlds)) setGenRecommendedTlds(data.meta.recommendedTlds);
+        else setGenRecommendedTlds([]);
+
+        // If the AI detected a specific industry with a "critical" TLD (e.g.
+        // .ai for AI apps), fold the top 2 recommended TLDs into the check
+        // set so we surface them even when the user stuck to defaults.
+        const recTldsRaw = Array.isArray(data?.meta?.recommendedTlds) ? data.meta.recommendedTlds : [];
+        const topRecTlds = recTldsRaw.slice(0, 2).map((r: { tld: string }) => r.tld).filter(Boolean);
+        if (topRecTlds.length) {
+          const merged = Array.from(new Set([...finalTlds, ...topRecTlds]));
+          // Cap at 5 TLDs per name to stay inside RDAP rate limits.
+          finalTlds = merged.slice(0, 5);
+        }
+      }
     } catch {
       setGeneratorError("Couldn't reach the name generator. Check your connection and try again.");
       setGenerating(false);
       return;
     }
 
+    if (apiError) {
+      setGeneratorError(apiError);
+      setGenerating(false);
+      return;
+    }
+
     if (names.length === 0) {
-      setGeneratorError("The name generator didn't return any suggestions. Try a more specific description.");
+      setGeneratorError("The name generator didn't return any suggestions. Try a more specific description, or remove an exclusion.");
       setGenerating(false);
       return;
     }
@@ -350,7 +408,7 @@ export default function DomainsPage() {
     );
 
     setGenerating(false);
-  }, [genDescription, genStyle, selectedTlds, generating]);
+  }, [genDescription, genStyle, selectedTlds, generating, genExclusions, genRefinement]);
 
   const handleSearch = async () => {
     const cleanName = name.trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
@@ -639,6 +697,18 @@ export default function DomainsPage() {
         </div>
 
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
+          {/* Coinage Engine announcement — flagship feature surface */}
+          <Link
+            href="/domains/ai-search"
+            className="group inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/30 bg-gradient-to-r from-[#E8D4B0]/[0.06] via-[#E08BB0]/[0.05] to-[#E8D4B0]/[0.06] px-4 py-1.5 text-[11px] font-medium text-white/90 mb-5 hover:border-[#E8D4B0]/60 hover:text-white transition-all"
+          >
+            <span className="inline-flex h-1.5 w-1.5 rounded-full bg-[#E8D4B0] shadow-[0_0_12px_2px_rgba(232,212,176,0.6)]" />
+            <span className="font-semibold tracking-widest uppercase text-[#E8D4B0]">New</span>
+            <span className="text-white/60">·</span>
+            <span>AI Coinage Engine — six-phase live pipeline</span>
+            <ArrowRight className="w-3 h-3 text-[#E8D4B0] transition group-hover:translate-x-0.5" />
+          </Link>
+
           {/* Eyebrow */}
           <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-8">
             <BadgeCheck className="w-3 h-3" />
@@ -703,6 +773,15 @@ export default function DomainsPage() {
             >
               <Wand2 className="w-4 h-4" /> AI name generator
             </button>
+            <Link
+              href="/domains/ai-search"
+              className="group flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] font-semibold border border-[#E8D4B0]/35 bg-gradient-to-r from-[#E8D4B0]/[0.06] via-[#E08BB0]/[0.05] to-[#E8D4B0]/[0.06] text-[#E8D4B0] backdrop-blur hover:border-[#E8D4B0]/70 hover:text-white transition-all"
+              title="The flagship engine — 6-phase coinage pipeline with trademark, 18-language, and live registry screening"
+            >
+              <Sparkles className="w-4 h-4" />
+              Coinage Engine
+              <span className="inline-flex items-center rounded-full bg-[#E8D4B0]/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-[#E8D4B0]">New</span>
+            </Link>
           </div>
 
           {/* ── SEARCH MODE ── */}
@@ -871,7 +950,7 @@ export default function DomainsPage() {
 
                 {/* Generate button */}
                 <button
-                  onClick={handleGenerate}
+                  onClick={() => handleGenerate()}
                   disabled={generating || genDescription.trim().length < 3 || selectedTlds.size === 0}
                   className="w-full py-4 rounded-2xl font-semibold text-[14px] flex items-center justify-center gap-2 disabled:opacity-40 transition-all duration-500 hover:-translate-y-0.5"
                   style={{
@@ -1166,21 +1245,110 @@ export default function DomainsPage() {
                   const withAvailable = generatedNames.filter(gn => gn.domains.some(d => d.available === true)).length;
                   const stillChecking = generatedNames.some(gn => gn.domains.some(d => d.checking));
                   const allUnknown = !stillChecking && generatedNames.every(gn => gn.domains.every(d => d.available === null));
-                  if (stillChecking) return `Checking ${generatedNames.length} names...`;
+                  if (stillChecking) return `Checking ${generatedNames.length} AI-generated names...`;
                   if (allUnknown) return "Availability check failed";
-                  return withAvailable > 0
-                    ? `${withAvailable} name${withAvailable > 1 ? "s" : ""} with available domains`
-                    : "No available domains found";
+                  if (withAvailable > 0) {
+                    return `${withAvailable} of ${generatedNames.length} names have an available domain`;
+                  }
+                  return `${generatedNames.length} names generated — every TLD already taken`;
                 })()}
               </h2>
               <button
-                onClick={handleGenerate}
+                onClick={() => handleGenerate()}
                 disabled={generating}
                 className="text-[12px] text-[#E8D4B0]/75 hover:text-[#E8D4B0] flex items-center gap-1 transition-colors uppercase tracking-[0.15em] font-semibold"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${generating ? "animate-spin" : ""}`} /> Regenerate
               </button>
             </div>
+
+            {/* Industry + recommended TLD intelligence panel.
+                This is the "AI actually thinks" layer — tells the user what
+                category their prompt landed in and which TLDs matter for it. */}
+            {(genIndustry || genRecommendedTlds.length > 0) && (
+              <div
+                className="rounded-[20px] border border-[#E8D4B0]/15 p-5 mb-5 backdrop-blur-xl"
+                style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.03) 0%, rgba(17,17,24,0.65) 100%)" }}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-[#E8D4B0]/[0.08] flex items-center justify-center shrink-0">
+                    <Sparkles className="w-4.5 h-4.5 text-[#E8D4B0]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[11px] uppercase tracking-[0.15em] font-semibold text-white/50">
+                        AI categorised this as
+                      </span>
+                      {genIndustry && (
+                        <span className="text-[13px] font-semibold text-white">{genIndustry}</span>
+                      )}
+                    </div>
+                    {genRecommendedTlds.length > 0 && (
+                      <div className="mt-3 space-y-1.5">
+                        <div className="text-[11px] uppercase tracking-[0.15em] font-semibold text-white/40">
+                          Recommended TLDs for your space
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {genRecommendedTlds.slice(0, 4).map((r) => (
+                            <div
+                              key={r.tld}
+                              className="group px-3 py-1.5 rounded-full border border-[#E8D4B0]/25 bg-[#E8D4B0]/[0.05] text-[12px] text-white/80 flex items-center gap-2"
+                              title={r.reason}
+                            >
+                              <span className="text-[#E8D4B0] font-semibold">.{r.tld}</span>
+                              <span className="text-white/45 hidden sm:inline">— {r.reason}</span>
+                              <span className="text-white/45 inline sm:hidden text-[11px]">— {r.reason.slice(0, 30)}…</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Detected themes + active exclusions chips */}
+            {(genThemes.length > 0 || genExclusions.length > 0 || genRefinement) && (
+              <div className="flex flex-wrap items-center gap-2 mb-5 text-[11px]">
+                {genThemes.length > 0 && (
+                  <>
+                    <span className="text-white/40 uppercase tracking-[0.15em] font-semibold">AI detected</span>
+                    {genThemes.map((t) => (
+                      <span key={t} className="px-2.5 py-1 rounded-full border border-[#E8D4B0]/30 bg-[#E8D4B0]/[0.08] text-[#E8D4B0]">
+                        {t}
+                      </span>
+                    ))}
+                  </>
+                )}
+                {genRefinement && (
+                  <>
+                    <span className="text-white/40 uppercase tracking-[0.15em] font-semibold ml-2">refinement</span>
+                    <span className="px-2.5 py-1 rounded-full border border-white/15 bg-white/[0.04] text-white/70 flex items-center gap-1.5">
+                      {genRefinement}
+                      <button
+                        onClick={() => { setGenRefinement(""); handleGenerate({ refinement: "" }); }}
+                        className="text-white/40 hover:text-white"
+                        aria-label="Clear refinement"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  </>
+                )}
+                {genExclusions.length > 0 && (
+                  <>
+                    <span className="text-white/40 uppercase tracking-[0.15em] font-semibold ml-2">excluding {genExclusions.length}</span>
+                    <button
+                      onClick={() => { setGenExclusions([]); handleGenerate(); }}
+                      className="text-white/50 hover:text-white underline-offset-2 hover:underline"
+                    >
+                      reset exclusions
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
 
             {/* Rate-limited / network failure banner */}
             {(() => {
@@ -1202,7 +1370,7 @@ export default function DomainsPage() {
                         The registry rate-limited or timed out for every name. This usually clears in a few seconds.
                       </p>
                       <button
-                        onClick={handleGenerate}
+                        onClick={() => handleGenerate()}
                         disabled={generating}
                         className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-[#E8D4B0]/25 bg-[#E8D4B0]/[0.06] text-[#E8D4B0] text-[12px] font-semibold transition-all hover:border-[#E8D4B0]/40"
                       >
@@ -1214,14 +1382,76 @@ export default function DomainsPage() {
               );
             })()}
 
+            {/* "All taken" panel — names came back, all TLDs taken. Show
+                refinement chips so user has a path forward (was: silent empty). */}
+            {(() => {
+              const stillChecking = generatedNames.some((gn) => gn.domains.some((d) => d.checking));
+              if (stillChecking || generating) return null;
+              const withAvailable = generatedNames.filter((gn) => gn.domains.some((d) => d.available === true)).length;
+              const allUnknown = generatedNames.every((gn) => gn.domains.every((d) => d.available === null));
+              if (withAvailable > 0 || allUnknown) return null;
+
+              const takenNames = generatedNames
+                .filter((gn) => gn.domains.every((d) => d.available === false))
+                .map((gn) => gn.name);
+
+              const refineChips: Array<{ label: string; refinement: string }> = [
+                { label: "Even more rare / invented", refinement: "Only invented coinages — no dictionary words. Lean Latin, Greek, Norse, Sanskrit roots." },
+                { label: "Shorter (4-6 letters)", refinement: "Strict 4-6 letter names only. Punchy, memorable, single-word." },
+                { label: "More ancient / classical", refinement: "Push harder into Roman, Greek, Egyptian antiquity. Emperors, gods, mythology." },
+                { label: "More powerful / heroic", refinement: "Bigger, harder, more imposing. Hard consonants. Imperial scale." },
+                { label: "Latin only", refinement: "Latin words and Latin-root coinages only." },
+                { label: "Mythological", refinement: "Lesser-known mythological figures from any tradition. Avoid clichés like Apollo, Atlas, Phoenix." },
+              ];
+
+              return (
+                <div
+                  className="rounded-[24px] border border-[#E8D4B0]/20 p-6 mb-6 backdrop-blur-xl"
+                  style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.05) 0%, rgba(17,17,24,0.75) 100%)" }}
+                >
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-[#E8D4B0]/[0.08] flex items-center justify-center shrink-0">
+                      <Sparkles className="w-5 h-5 text-[#E8D4B0]" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-[16px] font-semibold text-white mb-1">All {generatedNames.length} names came back taken</h3>
+                      <p className="text-[13px] text-white/60 leading-relaxed">
+                        Every TLD we checked was registered. The names are real registry results — not a bug.
+                        Click a refinement below and the AI will try a different angle, automatically excluding the {takenNames.length} names already shown.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {refineChips.map((chip) => (
+                      <button
+                        key={chip.label}
+                        onClick={() => handleGenerate({ refinement: chip.refinement, addToExclusions: takenNames })}
+                        disabled={generating}
+                        className="px-3.5 py-2 rounded-full border border-[#E8D4B0]/25 bg-[#E8D4B0]/[0.04] text-[#E8D4B0] text-[12px] font-semibold transition-all hover:border-[#E8D4B0]/45 hover:bg-[#E8D4B0]/[0.10] disabled:opacity-40"
+                      >
+                        {chip.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => handleGenerate({ addToExclusions: takenNames })}
+                    disabled={generating}
+                    className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#E8D4B0] text-[#0a0a0f] text-[12px] font-semibold transition-all hover:-translate-y-0.5 disabled:opacity-40"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" /> Generate fresh batch (skip these {takenNames.length})
+                  </button>
+                </div>
+              );
+            })()}
+
             <div className="space-y-4">
               {generatedNames.map((gn) => {
                 const availableDomains = gn.domains.filter((d) => d.available === true);
                 const hasAvailable = availableDomains.length > 0;
                 const stillChecking = gn.domains.some((d) => d.checking);
-
-                // Hide names with zero available domains (unless still checking)
-                if (!hasAvailable && !stillChecking) return null;
+                const allTaken = !stillChecking && !hasAvailable && gn.domains.every((d) => d.available === false);
 
                 return (
                   <div
@@ -1230,7 +1460,7 @@ export default function DomainsPage() {
                       hasAvailable
                         ? "border-[#E8D4B0]/15 hover:border-[#E8D4B0]/25 hover:-translate-y-0.5"
                         : "border-white/[0.06]"
-                    }`}
+                    } ${allTaken ? "opacity-55" : ""}`}
                     style={{
                       background: hasAvailable
                         ? "linear-gradient(135deg, rgba(232,212,176,0.04) 0%, rgba(17,17,24,0.7) 100%)"
@@ -1253,30 +1483,45 @@ export default function DomainsPage() {
                           <Loader2 className="w-3 h-3 animate-spin" /> Checking
                         </span>
                       )}
+                      {allTaken && (
+                        <span className="text-[11px] px-2.5 py-1 rounded-full bg-white/[0.03] border border-white/10 text-white/45 font-semibold shrink-0 uppercase tracking-[0.1em]">
+                          All TLDs taken
+                        </span>
+                      )}
                     </div>
 
-                    {/* Domain results */}
+                    {/* Domain results — show available + checking always.
+                        For taken-only cards, show the taken TLDs too so the
+                        user can SEE the registry result instead of staring at
+                        an empty card (Law 8 — never hide failures silently). */}
                     <div className="space-y-2 mb-3">
                       {gn.domains
-                        .filter((d) => d.checking || d.available === true)
+                        .filter((d) => d.checking || d.available === true || allTaken)
                         .map((d) => (
                         <div
                           key={d.domain}
                           className={`flex items-center justify-between p-3 rounded-xl transition-all ${
                             d.checking
                               ? "bg-white/[0.02]"
-                              : "border border-[#E8D4B0]/10 bg-[#E8D4B0]/[0.03]"
+                              : d.available === true
+                                ? "border border-[#E8D4B0]/10 bg-[#E8D4B0]/[0.03]"
+                                : "bg-white/[0.02] border border-white/[0.04]"
                           }`}
                         >
                           <div className="flex items-center gap-2.5">
                             {d.checking ? (
                               <Loader2 className="w-4 h-4 text-white/40 animate-spin" />
-                            ) : (
+                            ) : d.available === true ? (
                               <Check className="w-4 h-4 text-[#E8D4B0]" />
+                            ) : (
+                              <X className="w-4 h-4 text-white/30" />
                             )}
-                            <span className={`text-[14px] font-medium ${d.checking ? "text-white/45" : "text-white"}`}>
+                            <span className={`text-[14px] font-medium ${d.checking || d.available === false ? "text-white/45" : "text-white"}`}>
                               {d.domain}
                             </span>
+                            {d.available === false && (
+                              <span className="text-[10px] uppercase tracking-[0.12em] text-white/30 font-semibold">taken</span>
+                            )}
                           </div>
                           {d.available && (
                             <div className="flex items-center gap-3">
@@ -1341,7 +1586,7 @@ export default function DomainsPage() {
                   <h3 className="text-[18px] font-semibold text-white mb-2 tracking-[-0.01em]">All names are taken</h3>
                   <p className="text-[13px] text-white/55 mb-5">Try a different description or style to find more options.</p>
                   <button
-                    onClick={handleGenerate}
+                    onClick={() => handleGenerate()}
                     disabled={generating}
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-[14px] transition-all duration-500 hover:-translate-y-0.5"
                     style={{
