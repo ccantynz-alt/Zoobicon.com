@@ -106,6 +106,8 @@ export default function DomainsPage() {
   const [genThemes, setGenThemes] = useState<string[]>([]);
   const [genExclusions, setGenExclusions] = useState<string[]>([]);
   const [genRefinement, setGenRefinement] = useState<string>("");
+  const [genIndustry, setGenIndustry] = useState<string | null>(null);
+  const [genRecommendedTlds, setGenRecommendedTlds] = useState<Array<{ tld: string; reason: string }>>([]);
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [contactInfo, setContactInfo] = useState({
@@ -214,6 +216,8 @@ export default function DomainsPage() {
     setGenThemes([]);
     setGenExclusions([]);
     setGenRefinement("");
+    setGenIndustry(null);
+    setGenRecommendedTlds([]);
   }, [genDescription]);
 
   // Trigger generation after genDescription state has been set
@@ -268,7 +272,7 @@ export default function DomainsPage() {
     const tlds = userSelection.length > 0 && userSelection.length <= GENERATOR_DEFAULT_TLDS.length + 1
       ? userSelection
       : GENERATOR_DEFAULT_TLDS.filter((t) => selectedTlds.has(t) || selectedTlds.size === 0);
-    const finalTlds = tlds.length > 0 ? tlds : GENERATOR_DEFAULT_TLDS;
+    let finalTlds = tlds.length > 0 ? tlds : GENERATOR_DEFAULT_TLDS;
 
     // Step 1 — get names from Claude
     let names: Array<{ name: string; tagline: string }> = [];
@@ -291,6 +295,21 @@ export default function DomainsPage() {
       } else {
         names = Array.isArray(data?.names) ? data.names : [];
         if (data?.meta?.themesDetected) setGenThemes(data.meta.themesDetected);
+        if (typeof data?.meta?.industryDetected === "string") setGenIndustry(data.meta.industryDetected);
+        else setGenIndustry(null);
+        if (Array.isArray(data?.meta?.recommendedTlds)) setGenRecommendedTlds(data.meta.recommendedTlds);
+        else setGenRecommendedTlds([]);
+
+        // If the AI detected a specific industry with a "critical" TLD (e.g.
+        // .ai for AI apps), fold the top 2 recommended TLDs into the check
+        // set so we surface them even when the user stuck to defaults.
+        const recTldsRaw = Array.isArray(data?.meta?.recommendedTlds) ? data.meta.recommendedTlds : [];
+        const topRecTlds = recTldsRaw.slice(0, 2).map((r: { tld: string }) => r.tld).filter(Boolean);
+        if (topRecTlds.length) {
+          const merged = Array.from(new Set([...finalTlds, ...topRecTlds]));
+          // Cap at 5 TLDs per name to stay inside RDAP rate limits.
+          finalTlds = merged.slice(0, 5);
+        }
       }
     } catch {
       setGeneratorError("Couldn't reach the name generator. Check your connection and try again.");
@@ -1221,6 +1240,52 @@ export default function DomainsPage() {
                 <RefreshCw className={`w-3.5 h-3.5 ${generating ? "animate-spin" : ""}`} /> Regenerate
               </button>
             </div>
+
+            {/* Industry + recommended TLD intelligence panel.
+                This is the "AI actually thinks" layer — tells the user what
+                category their prompt landed in and which TLDs matter for it. */}
+            {(genIndustry || genRecommendedTlds.length > 0) && (
+              <div
+                className="rounded-[20px] border border-[#E8D4B0]/15 p-5 mb-5 backdrop-blur-xl"
+                style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.03) 0%, rgba(17,17,24,0.65) 100%)" }}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-[#E8D4B0]/[0.08] flex items-center justify-center shrink-0">
+                    <Sparkles className="w-4.5 h-4.5 text-[#E8D4B0]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[11px] uppercase tracking-[0.15em] font-semibold text-white/50">
+                        AI categorised this as
+                      </span>
+                      {genIndustry && (
+                        <span className="text-[13px] font-semibold text-white">{genIndustry}</span>
+                      )}
+                    </div>
+                    {genRecommendedTlds.length > 0 && (
+                      <div className="mt-3 space-y-1.5">
+                        <div className="text-[11px] uppercase tracking-[0.15em] font-semibold text-white/40">
+                          Recommended TLDs for your space
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {genRecommendedTlds.slice(0, 4).map((r) => (
+                            <div
+                              key={r.tld}
+                              className="group px-3 py-1.5 rounded-full border border-[#E8D4B0]/25 bg-[#E8D4B0]/[0.05] text-[12px] text-white/80 flex items-center gap-2"
+                              title={r.reason}
+                            >
+                              <span className="text-[#E8D4B0] font-semibold">.{r.tld}</span>
+                              <span className="text-white/45 hidden sm:inline">— {r.reason}</span>
+                              <span className="text-white/45 inline sm:hidden text-[11px]">— {r.reason.slice(0, 30)}…</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Detected themes + active exclusions chips */}
             {(genThemes.length > 0 || genExclusions.length > 0 || genRefinement) && (

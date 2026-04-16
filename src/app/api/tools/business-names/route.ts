@@ -87,6 +87,9 @@ export async function POST(req: NextRequest) {
     const cleanDescription = description.trim().slice(0, 800);
 
     const themes = detectThemes(cleanDescription);
+    const industryMatch = detectIndustry(
+      industry ? `${cleanDescription} ${industry}` : cleanDescription,
+    );
     const inlineExclusions = extractInlineExclusions(cleanDescription);
     const allExclusions = Array.from(
       new Set([...inlineExclusions, ...userExclusions].map((s) => s.toLowerCase())),
@@ -195,11 +198,24 @@ export async function POST(req: NextRequest) {
       `[business-names] OK model=${modelUsed} complex=${isComplex} themes=${themes.join("|") || "none"} exclusions=${allExclusions.length} requested=${nameCount} returned=${sanitized.length} elapsed=${elapsed}ms`,
     );
 
+    // Attach per-name TLD recommendations so the UI can show
+    // "we recommend .ai for your space" badges next to each suggestion.
+    const recommendedTlds = industryMatch
+      ? industryMatch.tlds
+          .slice()
+          .sort((a, b) => b.priority - a.priority)
+          .map(({ tld, reason }) => ({ tld, reason }))
+      : [];
+
+    const namesWithTldRec = sanitized.map((n) => ({ ...n, recommendedTlds }));
+
     return NextResponse.json({
-      names: sanitized,
+      names: namesWithTldRec,
       meta: {
         model: modelUsed,
         themesDetected: themes,
+        industryDetected: industryMatch ? industryMatch.industry : null,
+        recommendedTlds,
         exclusionsApplied: allExclusions,
         elapsedMs: elapsed,
       },
@@ -310,6 +326,98 @@ function detectThemes(description: string): string[] {
     if (match.test(description)) found.push(label);
   }
   return found;
+}
+
+/**
+ * Industry → ranked TLD recommendation. Every name in the result gets a
+ * recommendedTlds array so the UI can badge ".ai is critical for your space"
+ * or ".io is the startup default". This is the kind of domain-intelligence
+ * Namecheap Beast Mode and Squarespace AI ship — we match it here.
+ */
+const INDUSTRY_TLD_RULES: Array<{
+  match: RegExp;
+  industry: string;
+  tlds: Array<{ tld: string; reason: string; priority: number }>;
+}> = [
+  {
+    match: /\b(ai|artificial intelligence|machine learning|neural|llm|gpt|agent|copilot|chatbot|voice|dictation|intelligent)\b/i,
+    industry: "AI / ML",
+    tlds: [
+      { tld: "ai", reason: "Signals AI-native — highest brand authority in your space", priority: 10 },
+      { tld: "com", reason: "Universal credibility fallback", priority: 9 },
+      { tld: "io", reason: "Developer-friendly alternative if .ai is taken", priority: 7 },
+    ],
+  },
+  {
+    match: /\b(saas|platform|api|developer|startup|launch|build|deploy|dev tool|cli|sdk)\b/i,
+    industry: "Developer / SaaS",
+    tlds: [
+      { tld: "com", reason: "Gold standard for B2B SaaS", priority: 10 },
+      { tld: "io", reason: "Startup / developer default", priority: 9 },
+      { tld: "dev", reason: "Dev-tool authenticity", priority: 8 },
+      { tld: "sh", reason: "Infrastructure / CLI vibes", priority: 6 },
+    ],
+  },
+  {
+    match: /\b(app|mobile|ios|android|phone)\b/i,
+    industry: "Mobile / App",
+    tlds: [
+      { tld: "app", reason: "HTTPS-enforced, app-category signal", priority: 10 },
+      { tld: "com", reason: "Universal credibility", priority: 9 },
+      { tld: "io", reason: "Tech-forward alternative", priority: 7 },
+    ],
+  },
+  {
+    match: /\b(commerce|shop|store|retail|ecommerce|marketplace|sell|buy)\b/i,
+    industry: "Commerce",
+    tlds: [
+      { tld: "com", reason: "The commerce gold standard — essential", priority: 10 },
+      { tld: "store", reason: "Direct commerce signal", priority: 7 },
+      { tld: "co", reason: "Premium commerce alternative", priority: 6 },
+    ],
+  },
+  {
+    match: /\b(agency|consult|service|freelance|studio|creative)\b/i,
+    industry: "Agency / Service",
+    tlds: [
+      { tld: "com", reason: "Client-facing credibility", priority: 10 },
+      { tld: "co", reason: "Modern agency shorthand", priority: 7 },
+      { tld: "studio", reason: "Creative studio signal", priority: 6 },
+    ],
+  },
+  {
+    match: /\b(media|blog|news|magazine|publication|content)\b/i,
+    industry: "Media / Publishing",
+    tlds: [
+      { tld: "com", reason: "Publishing default", priority: 10 },
+      { tld: "news", reason: "News-category signal", priority: 7 },
+      { tld: "media", reason: "Media-category signal", priority: 7 },
+    ],
+  },
+  {
+    match: /\b(hosting|server|infrastructure|cloud|backend|devops|kubernetes|docker)\b/i,
+    industry: "Infrastructure",
+    tlds: [
+      { tld: "sh", reason: "Shell / infra authenticity", priority: 10 },
+      { tld: "cloud", reason: "Explicit cloud-category signal", priority: 8 },
+      { tld: "io", reason: "Infra / dev default", priority: 8 },
+      { tld: "com", reason: "Enterprise credibility", priority: 7 },
+    ],
+  },
+];
+
+interface IndustryMatch {
+  industry: string;
+  tlds: Array<{ tld: string; reason: string; priority: number }>;
+}
+
+function detectIndustry(description: string): IndustryMatch | null {
+  for (const rule of INDUSTRY_TLD_RULES) {
+    if (rule.match.test(description)) {
+      return { industry: rule.industry, tlds: rule.tlds };
+    }
+  }
+  return null;
 }
 
 /**
