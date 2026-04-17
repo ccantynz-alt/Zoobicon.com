@@ -52,8 +52,10 @@ const DEFAULT_TLDS = ["com", "ai", "io", "sh", "co"];
 const GENERATOR_DEFAULT_TLDS = ["com", "ai", "io"];
 // Max concurrent /api/domains/search calls the client will make at once.
 const GEN_CLIENT_CONCURRENCY = 4;
-// Haiku is asked for this many names — smaller = faster + less RDAP pressure.
-const GEN_NAME_COUNT = 12;
+// The AI is asked for this many names. 24 gives enough headroom that a
+// handful will land on a free .com even when most are taken — .com is
+// saturated, so 12 names meant ~zero available results for common themes.
+const GEN_NAME_COUNT = 24;
 
 /* ── Popular TLD showcase cards ── */
 const FEATURED_TLDS = [
@@ -771,6 +773,27 @@ export default function DomainsPage() {
             </Link>
           </div>
 
+          {/* Plain-English explainer for whichever tab is active. Stops people
+              from staring at three buttons wondering which one to press. */}
+          <p className="text-[12.5px] text-white/45 mb-6 max-w-2xl mx-auto leading-relaxed">
+            {mode === "search" && (
+              <>
+                <span className="text-white/70 font-semibold">Search exact name:</span>{" "}
+                you type the name, we check registry availability across the extensions you select. Fastest path if you already know what you want.
+              </>
+            )}
+            {mode === "generate" && (
+              <>
+                <span className="text-white/70 font-semibold">AI name generator:</span>{" "}
+                describe your business, the AI invents {GEN_NAME_COUNT} brandable names, then checks each one against your selected extensions in real time. Best when you need ideas.
+              </>
+            )}
+          </p>
+          <p className="text-[12px] text-[#E8D4B0]/55 mb-10 max-w-2xl mx-auto leading-relaxed">
+            <Sparkles className="inline w-3 h-3 -mt-0.5 mr-1" />
+            <span className="text-[#E8D4B0]/75 font-semibold">Advanced AI Search</span> (the third button) runs a deeper 6-phase pipeline — trademark screening, 18-language meaning check, and availability — for a pre-vetted shortlist. Slower but pro-grade.
+          </p>
+
           {/* ── SEARCH MODE ── */}
           {mode === "search" && (
             <div
@@ -1275,7 +1298,7 @@ export default function DomainsPage() {
       {generatedNames.length > 0 && (
         <section className="pb-20 px-4 sm:px-6">
           <div className="max-w-4xl mx-auto">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-3">
               <h2 className="text-[22px] font-semibold tracking-[-0.02em] text-white flex items-center gap-2">
                 <Wand2 className="w-5 h-5 text-[#E8D4B0]" />
                 {(() => {
@@ -1298,6 +1321,51 @@ export default function DomainsPage() {
                 <RefreshCw className={`w-3.5 h-3.5 ${generating ? "animate-spin" : ""}`} /> Regenerate
               </button>
             </div>
+
+            {/* Per-TLD availability breakdown. Craig's exact feedback: "should
+                be millions of .com names available" — if all 24 .com slots come
+                back taken, show that explicitly so he can SEE it's the AI's
+                suggestions that are saturated, not a bug in the search. */}
+            {(() => {
+              const stillChecking = generatedNames.some(gn => gn.domains.some(d => d.checking));
+              if (stillChecking || generatedNames.length === 0) return null;
+              const tldsInPlay = Array.from(
+                new Set(generatedNames.flatMap(gn => gn.domains.map(d => d.tld))),
+              );
+              if (tldsInPlay.length === 0) return null;
+              const breakdown = tldsInPlay.map(tld => {
+                let available = 0;
+                let taken = 0;
+                let unknown = 0;
+                for (const gn of generatedNames) {
+                  for (const d of gn.domains) {
+                    if (d.tld !== tld) continue;
+                    if (d.available === true) available++;
+                    else if (d.available === false) taken++;
+                    else unknown++;
+                  }
+                }
+                return { tld, available, taken, unknown };
+              });
+              return (
+                <div className="mb-6 flex flex-wrap gap-2">
+                  {breakdown.map(b => (
+                    <div
+                      key={b.tld}
+                      className={`text-[11px] px-3 py-1.5 rounded-full border font-mono tracking-tight flex items-center gap-2 ${
+                        b.available > 0
+                          ? "border-[#E8D4B0]/30 bg-[#E8D4B0]/[0.06] text-[#E8D4B0]"
+                          : "border-white/[0.08] bg-white/[0.02] text-white/45"
+                      }`}
+                      title={`.${b.tld}: ${b.available} available · ${b.taken} taken${b.unknown > 0 ? ` · ${b.unknown} unknown` : ""}`}
+                    >
+                      <span className="font-semibold">.{b.tld}</span>
+                      <span>{b.available}/{generatedNames.length} available</span>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
 
             {/* Industry + recommended TLD intelligence panel.
                 This is the "AI actually thinks" layer — tells the user what
