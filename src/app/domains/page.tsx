@@ -57,12 +57,12 @@ const GEN_NAME_COUNT = 12;
 
 /* ── Popular TLD showcase cards ── */
 const FEATURED_TLDS = [
-  { tld: "com", price: 12.99, desc: "The gold standard", color: "from-stone-500 to-stone-600", popular: true },
-  { tld: "ai", price: 69.99, desc: "AI & tech brands", color: "from-stone-500 to-stone-600", popular: true },
-  { tld: "io", price: 39.99, desc: "Startups & SaaS", color: "from-stone-500 to-stone-600", popular: true },
-  { tld: "sh", price: 24.99, desc: "Dev tools & hosting", color: "from-stone-500 to-stone-600", popular: false },
-  { tld: "dev", price: 14.99, desc: "Developer projects", color: "from-stone-500 to-stone-600", popular: false },
-  { tld: "app", price: 14.99, desc: "Mobile & web apps", color: "from-stone-500 to-stone-600", popular: false },
+  { tld: "com", price: 12.99, desc: "The gold standard", color: "from-blue-500 to-blue-600", popular: true },
+  { tld: "ai", price: 69.99, desc: "AI & tech brands", color: "from-purple-500 to-violet-600", popular: true },
+  { tld: "io", price: 39.99, desc: "Startups & SaaS", color: "from-emerald-500 to-teal-600", popular: true },
+  { tld: "sh", price: 24.99, desc: "Dev tools & hosting", color: "from-amber-500 to-orange-600", popular: false },
+  { tld: "dev", price: 14.99, desc: "Developer projects", color: "from-cyan-500 to-blue-600", popular: false },
+  { tld: "app", price: 14.99, desc: "Mobile & web apps", color: "from-pink-500 to-rose-600", popular: false },
 ];
 
 const TRUST_FEATURES = [
@@ -94,22 +94,17 @@ export default function DomainsPage() {
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [registering, setRegistering] = useState(false);
   const [userEmail, setUserEmail] = useState("");
-  const [genDescription, setGenDescription] = useState("");
-  const [genStyle, setGenStyle] = useState("modern");
+  const [generating, setGenerating] = useState(false);
   const [pendingGenerate, setPendingGenerate] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [generatedNames, setGeneratedNames] = useState<Array<{ name: string; tagline: string; domains: Array<{ domain: string; tld: string; available: boolean | null; price: number; checking: boolean }> }>>([]);
   const [autoExpandedTlds, setAutoExpandedTlds] = useState(false);
   const [autoGenerating, setAutoGenerating] = useState(false);
-  const [checkoutError, setCheckoutError] = useState<string | null>(null);
-  const [generatorError, setGeneratorError] = useState<string | null>(null);
-  const [genThemes, setGenThemes] = useState<string[]>([]);
-  const [genExclusions, setGenExclusions] = useState<string[]>([]);
-  const [genRefinement, setGenRefinement] = useState<string>("");
-  const [genIndustry, setGenIndustry] = useState<string | null>(null);
-  const [genRecommendedTlds, setGenRecommendedTlds] = useState<Array<{ tld: string; reason: string }>>([]);
-  const [showCheckoutForm, setShowCheckoutForm] = useState(false);
+  const [genDescription, setGenDescription] = useState("");
+  const [genStyle, setGenStyle] = useState<string>("modern");
+  const [generatedNames, setGeneratedNames] = useState<GeneratedName[]>([]);
   const [searchError, setSearchError] = useState<string | null>(null);
+  const [showCheckoutForm, setShowCheckoutForm] = useState(false);
   const [contactInfo, setContactInfo] = useState({
     firstName: "",
     lastName: "",
@@ -121,6 +116,8 @@ export default function DomainsPage() {
     zip: "",
     country: "NZ",
   });
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [generatorError, setGeneratorError] = useState<string | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
   const genResultsRef = useRef<HTMLDivElement>(null);
 
@@ -252,25 +249,17 @@ export default function DomainsPage() {
     setResults([]);
     setGeneratorError(null);
 
-    // If a refinement was passed in, store it so we can show the active chip
-    if (opts?.refinement !== undefined) setGenRefinement(opts.refinement);
-
-    // Merge any extra exclusions (e.g. names that came back fully taken on the
-    // previous round) into the running exclusion list so we don't suggest them again.
-    const exclusionsToSend = Array.from(
-      new Set([...(genExclusions || []), ...(opts?.addToExclusions || [])]),
-    ).slice(0, 50);
-    if (opts?.addToExclusions?.length) setGenExclusions(exclusionsToSend);
-
     // scroll to results
     setTimeout(() => genResultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
 
-    // Honour the user's TLD selection exactly. Whatever they ticked is
-    // what we check — no silent narrowing, no silent widening. The AI's
-    // industry recommendations show up as guidance in the UI but never
-    // override what the user chose.
-    let finalTlds = Array.from(selectedTlds);
-    if (finalTlds.length === 0) finalTlds = GENERATOR_DEFAULT_TLDS;
+    // Use a small TLD set for the generator to keep us under RDAP rate limits.
+    // If the user has manually ticked TLDs beyond the defaults, honour them;
+    // otherwise use the smaller GENERATOR_DEFAULT_TLDS list.
+    const userSelection = Array.from(selectedTlds);
+    const tlds = userSelection.length > 0 && userSelection.length <= GENERATOR_DEFAULT_TLDS.length + 1
+      ? userSelection
+      : GENERATOR_DEFAULT_TLDS.filter((t) => selectedTlds.has(t) || selectedTlds.size === 0);
+    const finalTlds = tlds.length > 0 ? tlds : GENERATOR_DEFAULT_TLDS;
 
     // Step 1 — get names from Claude
     let names: Array<{ name: string; tagline: string }> = [];
@@ -279,13 +268,7 @@ export default function DomainsPage() {
       const res = await fetch("/api/tools/business-names", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          description: desc,
-          style: genStyle,
-          count: GEN_NAME_COUNT,
-          excludeNames: exclusionsToSend,
-          refinement: opts?.refinement ?? genRefinement,
-        }),
+        body: JSON.stringify({ description: desc, style: genStyle, count: GEN_NAME_COUNT }),
       });
       const data = await res.json().catch(() => null);
       if (!res.ok) {
@@ -304,14 +287,8 @@ export default function DomainsPage() {
       return;
     }
 
-    if (apiError) {
-      setGeneratorError(apiError);
-      setGenerating(false);
-      return;
-    }
-
     if (names.length === 0) {
-      setGeneratorError("The name generator didn't return any suggestions. Try a more specific description, or remove an exclusion.");
+      setGeneratorError("The name generator didn't return any suggestions. Try a more specific description.");
       setGenerating(false);
       return;
     }
@@ -346,7 +323,6 @@ export default function DomainsPage() {
       try {
         const r = await fetch(
           `/api/domains/search?q=${encodeURIComponent(n.slug)}&tlds=${encodeURIComponent(finalTlds.join(","))}`,
-          { signal: AbortSignal.timeout(12000) },
         );
         if (!r.ok) throw new Error("search failed");
         const data = await r.json();
@@ -447,16 +423,7 @@ export default function DomainsPage() {
         setResults(initial.map(r => ({ ...r, checking: false })));
       }
     } catch (err) {
-      const isAbort =
-        err instanceof DOMException && err.name === "TimeoutError" ||
-        (err instanceof Error && (err.name === "AbortError" || err.name === "TimeoutError"));
-      setSearchError(
-        isAbort
-          ? "The registry took too long to respond. Some TLDs will show as unknown — try the search again for fresh results."
-          : err instanceof Error
-          ? err.message
-          : "Network error. Check your connection and try again.",
-      );
+      setSearchError(err instanceof Error ? err.message : "Network error. Check your connection and try again.");
       setResults(initial.map(r => ({ ...r, checking: false })));
     }
 
@@ -880,135 +847,24 @@ export default function DomainsPage() {
             </div>
           )}
 
-          {/* ── GENERATE MODE — AI Name Generator ── */}
-          {mode === "generate" && (
-            <div
-              className="relative rounded-[28px] border border-[#E8D4B0]/15 p-6 md:p-8 text-left max-w-3xl mx-auto backdrop-blur-xl"
-              style={{
-                background: "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(10,10,15,0.7) 100%)",
-                boxShadow: "0 1px 0 rgba(232,212,176,0.08) inset, 0 40px 120px -40px rgba(232,212,176,0.2)",
-              }}
-            >
-              <div
-                className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-[260px] w-[520px] rounded-full blur-[110px]"
-                style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.18), transparent 70%)" }}
-                aria-hidden
-              />
-              <div className="relative">
-                <div className="mb-5">
-                  <label className="block text-[11px] uppercase tracking-[0.2em] font-semibold text-[#E8D4B0]/75 mb-3">Describe your business</label>
-                  <textarea
-                    value={genDescription}
-                    onChange={(e) => setGenDescription(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleGenerate(); } }}
-                    placeholder="e.g. AI-powered accounting software for freelancers, sustainable fashion brand for millennials, premium coffee subscription service..."
-                    rows={3}
-                    className="w-full px-5 py-4 rounded-2xl border border-white/[0.08] bg-white/[0.03] text-white text-base placeholder-white/30 focus:outline-none focus:border-[#E8D4B0]/40 focus:bg-white/[0.05] transition-all resize-none"
-                  />
-                </div>
-
-                {/* Style selector */}
-                <div className="mb-5">
-                  <label className="block text-[11px] uppercase tracking-[0.2em] font-semibold text-[#E8D4B0]/75 mb-3">Name style</label>
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      { id: "modern", label: "Modern & Tech" },
-                      { id: "classic", label: "Classic & Professional" },
-                      { id: "playful", label: "Fun & Playful" },
-                      { id: "minimal", label: "Short & Minimal" },
-                    ].map((s) => (
-                      <button
-                        key={s.id}
-                        onClick={() => setGenStyle(s.id)}
-                        className={`px-4 py-2 rounded-xl text-[13px] font-medium transition-all duration-300 ${
-                          genStyle === s.id
-                            ? "text-[#0a0a0f]"
-                            : "border border-white/[0.08] bg-white/[0.03] text-white/60 hover:border-[#E8D4B0]/30 hover:text-[#E8D4B0]"
-                        }`}
-                        style={genStyle === s.id ? {
-                          background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                          boxShadow: "0 8px 24px -12px rgba(232,212,176,0.4)",
-                        } : undefined}
-                      >
-                        {s.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Extension pills (shared) */}
-                <div className="mb-6">
-                  <div className="flex items-center justify-between flex-wrap gap-3 mb-3">
-                    <label className="block text-[11px] uppercase tracking-[0.2em] font-semibold text-[#E8D4B0]/75">Check availability on</label>
-                    <div className="flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        onClick={() => { setSelectedTlds(new Set(allTlds)); setAutoExpandedTlds(true); }}
-                        className="px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-widest border border-[#E8D4B0]/30 bg-[#E8D4B0]/[0.04] text-[#E8D4B0] hover:border-[#E8D4B0]/60 hover:bg-[#E8D4B0]/[0.08] transition"
-                      >
-                        All {allTlds.length}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => { setSelectedTlds(new Set(["com"])); setAutoExpandedTlds(true); }}
-                        className="px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-widest border border-white/[0.10] bg-white/[0.03] text-white/70 hover:border-white/25 hover:text-white transition"
-                      >
-                        .com only
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => { setSelectedTlds(new Set(DEFAULT_TLDS)); setAutoExpandedTlds(true); }}
-                        className="px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-widest border border-white/[0.10] bg-white/[0.03] text-white/70 hover:border-white/25 hover:text-white transition"
-                      >
-                        Popular {DEFAULT_TLDS.length}
-                      </button>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {allTlds.map(tld => (
-                      <button
-                        key={tld}
-                        onClick={() => toggleTld(tld)}
-                        className={`px-4 py-2 rounded-xl text-[13px] font-medium transition-all duration-300 ${
-                          selectedTlds.has(tld)
-                            ? "text-[#0a0a0f]"
-                            : "border border-white/[0.08] bg-white/[0.03] text-white/60 hover:border-[#E8D4B0]/30 hover:text-[#E8D4B0]"
-                        }`}
-                        style={selectedTlds.has(tld) ? {
-                          background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                          boxShadow: "0 8px 24px -12px rgba(232,212,176,0.4)",
-                        } : undefined}
-                      >
-                        .{tld}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Generate button */}
-                <button
-                  onClick={() => handleGenerate()}
-                  disabled={generating || genDescription.trim().length < 3 || selectedTlds.size === 0}
-                  className="w-full py-4 rounded-2xl font-semibold text-[14px] flex items-center justify-center gap-2 disabled:opacity-40 transition-all duration-500 hover:-translate-y-0.5"
-                  style={{
-                    background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                    color: "#0a0a0f",
-                    boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
-                  }}
-                >
-                  {generating ? (
-                    <><Loader2 className="w-5 h-5 animate-spin" /> Generating names...</>
-                  ) : (
-                    <><Wand2 className="w-5 h-5" /> Generate {GEN_NAME_COUNT} name ideas</>
-                  )}
-                </button>
-
-                {generatorError && (
-                  <div className="mt-4 p-3 rounded-xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] text-[13px] text-[#E8D4B0]/85">
-                    {generatorError}
-                  </div>
+              {/* Generate button */}
+              <button
+                onClick={handleGenerate}
+                disabled={generating || genDescription.trim().length < 3 || selectedTlds.size === 0}
+                className="w-full py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-2xl font-bold text-lg flex items-center justify-center gap-2 disabled:opacity-40 transition-all hover:shadow-lg hover:shadow-purple-500/20"
+              >
+                {generating ? (
+                  <><Loader2 className="w-5 h-5 animate-spin" /> Generating names...</>
+                ) : (
+                  <><Wand2 className="w-5 h-5" /> Generate {GEN_NAME_COUNT} Name Ideas</>
                 )}
-              </div>
+              </button>
+
+              {generatorError && (
+                <div className="mt-4 p-3 rounded-xl border border-red-500/20 bg-red-500/[0.05] text-sm text-red-300">
+                  {generatorError}
+                </div>
+              )}
             </div>
           )}
 
@@ -1043,7 +899,7 @@ export default function DomainsPage() {
       <div ref={resultsRef} />
       {(searchError || checkoutError) && (
         <div className="max-w-4xl mx-auto px-6 -mt-4 mb-6">
-          <div className="rounded-xl border border-[#E8D4B0]/25 bg-[#E8D4B0]/[0.04] px-4 py-3 text-[13px] text-[#E8D4B0]/85">
+          <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
             {searchError || checkoutError}
           </div>
         </div>
@@ -1282,12 +1138,11 @@ export default function DomainsPage() {
                   const withAvailable = generatedNames.filter(gn => gn.domains.some(d => d.available === true)).length;
                   const stillChecking = generatedNames.some(gn => gn.domains.some(d => d.checking));
                   const allUnknown = !stillChecking && generatedNames.every(gn => gn.domains.every(d => d.available === null));
-                  if (stillChecking) return `Checking ${generatedNames.length} AI-generated names...`;
+                  if (stillChecking) return `Checking ${generatedNames.length} names...`;
                   if (allUnknown) return "Availability check failed";
-                  if (withAvailable > 0) {
-                    return `${withAvailable} of ${generatedNames.length} names have an available domain`;
-                  }
-                  return `${generatedNames.length} names generated — every TLD already taken`;
+                  return withAvailable > 0
+                    ? `${withAvailable} name${withAvailable > 1 ? "s" : ""} with available domains`
+                    : "No available domains found";
                 })()}
               </h2>
               <button
@@ -1299,196 +1154,31 @@ export default function DomainsPage() {
               </button>
             </div>
 
-            {/* Industry + recommended TLD intelligence panel.
-                This is the "AI actually thinks" layer — tells the user what
-                category their prompt landed in and which TLDs matter for it. */}
-            {(genIndustry || genRecommendedTlds.length > 0) && (
-              <div
-                className="rounded-[20px] border border-[#E8D4B0]/15 p-5 mb-5 backdrop-blur-xl"
-                style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.03) 0%, rgba(17,17,24,0.65) 100%)" }}
-              >
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-[#E8D4B0]/[0.08] flex items-center justify-center shrink-0">
-                    <Sparkles className="w-4.5 h-4.5 text-[#E8D4B0]" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-[11px] uppercase tracking-[0.15em] font-semibold text-white/50">
-                        AI categorised this as
-                      </span>
-                      {genIndustry && (
-                        <span className="text-[13px] font-semibold text-white">{genIndustry}</span>
-                      )}
-                    </div>
-                    {genRecommendedTlds.length > 0 && (
-                      <div className="mt-3 space-y-1.5">
-                        <div className="text-[11px] uppercase tracking-[0.15em] font-semibold text-white/40">
-                          Suggested TLDs — tap to add to your search
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          {genRecommendedTlds.slice(0, 4).map((r) => {
-                            const active = selectedTlds.has(r.tld);
-                            return (
-                              <button
-                                key={r.tld}
-                                type="button"
-                                onClick={() => toggleTld(r.tld)}
-                                title={`${r.reason} — click to ${active ? "remove" : "add"}`}
-                                className={`group px-3 py-1.5 rounded-full text-[12px] flex items-center gap-2 transition-all ${
-                                  active
-                                    ? "border border-[#E8D4B0]/60 bg-[#E8D4B0]/[0.12] text-white"
-                                    : "border border-[#E8D4B0]/25 bg-[#E8D4B0]/[0.04] text-white/80 hover:border-[#E8D4B0]/50 hover:bg-[#E8D4B0]/[0.08]"
-                                }`}
-                              >
-                                <span className="text-[#E8D4B0] font-semibold">.{r.tld}</span>
-                                <span className="text-white/45 hidden sm:inline">— {r.reason}</span>
-                                <span className="text-white/45 inline sm:hidden text-[11px]">— {r.reason.slice(0, 30)}…</span>
-                                {active && <Check className="w-3 h-3 text-[#E8D4B0]" />}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Detected themes + active exclusions chips */}
-            {(genThemes.length > 0 || genExclusions.length > 0 || genRefinement) && (
-              <div className="flex flex-wrap items-center gap-2 mb-5 text-[11px]">
-                {genThemes.length > 0 && (
-                  <>
-                    <span className="text-white/40 uppercase tracking-[0.15em] font-semibold">AI detected</span>
-                    {genThemes.map((t) => (
-                      <span key={t} className="px-2.5 py-1 rounded-full border border-[#E8D4B0]/30 bg-[#E8D4B0]/[0.08] text-[#E8D4B0]">
-                        {t}
-                      </span>
-                    ))}
-                  </>
-                )}
-                {genRefinement && (
-                  <>
-                    <span className="text-white/40 uppercase tracking-[0.15em] font-semibold ml-2">refinement</span>
-                    <span className="px-2.5 py-1 rounded-full border border-white/15 bg-white/[0.04] text-white/70 flex items-center gap-1.5">
-                      {genRefinement}
-                      <button
-                        onClick={() => { setGenRefinement(""); handleGenerate({ refinement: "" }); }}
-                        className="text-white/40 hover:text-white"
-                        aria-label="Clear refinement"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  </>
-                )}
-                {genExclusions.length > 0 && (
-                  <>
-                    <span className="text-white/40 uppercase tracking-[0.15em] font-semibold ml-2">excluding {genExclusions.length}</span>
-                    <button
-                      onClick={() => { setGenExclusions([]); handleGenerate(); }}
-                      className="text-white/50 hover:text-white underline-offset-2 hover:underline"
-                    >
-                      reset exclusions
-                    </button>
-                  </>
-                )}
-              </div>
-            )}
-
             {/* Rate-limited / network failure banner */}
             {(() => {
               const stillChecking = generatedNames.some((gn) => gn.domains.some((d) => d.checking));
               const allUnknown = !stillChecking && generatedNames.every((gn) => gn.domains.every((d) => d.available === null));
               if (!allUnknown || generating) return null;
               return (
-                <div
-                  className="rounded-[20px] border border-[#E8D4B0]/20 p-5 mb-6 backdrop-blur-xl"
-                  style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.04) 0%, rgba(17,17,24,0.7) 100%)" }}
-                >
+                <div className="rounded-2xl border border-red-500/20 bg-red-500/[0.05] p-5 mb-6">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#E8D4B0]/[0.08] flex items-center justify-center shrink-0">
-                      <X className="w-5 h-5 text-[#E8D4B0]" />
+                    <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center shrink-0">
+                      <X className="w-5 h-5 text-red-400" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-[15px] font-semibold text-white mb-1">Couldn&apos;t check availability</h3>
-                      <p className="text-[13px] text-white/55 mb-3 leading-relaxed">
+                      <h3 className="text-base font-bold text-white mb-1">Couldn&apos;t check availability</h3>
+                      <p className="text-sm text-slate-400 mb-3">
                         The registry rate-limited or timed out for every name. This usually clears in a few seconds.
                       </p>
                       <button
-                        onClick={() => handleGenerate()}
+                        onClick={handleGenerate}
                         disabled={generating}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-[#E8D4B0]/25 bg-[#E8D4B0]/[0.06] text-[#E8D4B0] text-[12px] font-semibold transition-all hover:border-[#E8D4B0]/40"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 text-red-300 text-sm font-semibold transition-colors"
                       >
                         <RefreshCw className="w-3.5 h-3.5" /> Try again
                       </button>
                     </div>
                   </div>
-                </div>
-              );
-            })()}
-
-            {/* "All taken" panel — names came back, all TLDs taken. Show
-                refinement chips so user has a path forward (was: silent empty). */}
-            {(() => {
-              const stillChecking = generatedNames.some((gn) => gn.domains.some((d) => d.checking));
-              if (stillChecking || generating) return null;
-              const withAvailable = generatedNames.filter((gn) => gn.domains.some((d) => d.available === true)).length;
-              const allUnknown = generatedNames.every((gn) => gn.domains.every((d) => d.available === null));
-              if (withAvailable > 0 || allUnknown) return null;
-
-              const takenNames = generatedNames
-                .filter((gn) => gn.domains.every((d) => d.available === false))
-                .map((gn) => gn.name);
-
-              const refineChips: Array<{ label: string; refinement: string }> = [
-                { label: "Even more rare / invented", refinement: "Only invented coinages — no dictionary words. Lean Latin, Greek, Norse, Sanskrit roots." },
-                { label: "Shorter (4-6 letters)", refinement: "Strict 4-6 letter names only. Punchy, memorable, single-word." },
-                { label: "More ancient / classical", refinement: "Push harder into Roman, Greek, Egyptian antiquity. Emperors, gods, mythology." },
-                { label: "More powerful / heroic", refinement: "Bigger, harder, more imposing. Hard consonants. Imperial scale." },
-                { label: "Latin only", refinement: "Latin words and Latin-root coinages only." },
-                { label: "Mythological", refinement: "Lesser-known mythological figures from any tradition. Avoid clichés like Apollo, Atlas, Phoenix." },
-              ];
-
-              return (
-                <div
-                  className="rounded-[24px] border border-[#E8D4B0]/20 p-6 mb-6 backdrop-blur-xl"
-                  style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.05) 0%, rgba(17,17,24,0.75) 100%)" }}
-                >
-                  <div className="flex items-start gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-xl bg-[#E8D4B0]/[0.08] flex items-center justify-center shrink-0">
-                      <Sparkles className="w-5 h-5 text-[#E8D4B0]" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-[16px] font-semibold text-white mb-1">All {generatedNames.length} names came back taken</h3>
-                      <p className="text-[13px] text-white/60 leading-relaxed">
-                        Every TLD we checked was registered. The names are real registry results — not a bug.
-                        Click a refinement below and the AI will try a different angle, automatically excluding the {takenNames.length} names already shown.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    {refineChips.map((chip) => (
-                      <button
-                        key={chip.label}
-                        onClick={() => handleGenerate({ refinement: chip.refinement, addToExclusions: takenNames })}
-                        disabled={generating}
-                        className="px-3.5 py-2 rounded-full border border-[#E8D4B0]/25 bg-[#E8D4B0]/[0.04] text-[#E8D4B0] text-[12px] font-semibold transition-all hover:border-[#E8D4B0]/45 hover:bg-[#E8D4B0]/[0.10] disabled:opacity-40"
-                      >
-                        {chip.label}
-                      </button>
-                    ))}
-                  </div>
-
-                  <button
-                    onClick={() => handleGenerate({ addToExclusions: takenNames })}
-                    disabled={generating}
-                    className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#E8D4B0] text-[#0a0a0f] text-[12px] font-semibold transition-all hover:-translate-y-0.5 disabled:opacity-40"
-                  >
-                    <RefreshCw className="w-3.5 h-3.5" /> Generate fresh batch (skip these {takenNames.length})
-                  </button>
                 </div>
               );
             })()}

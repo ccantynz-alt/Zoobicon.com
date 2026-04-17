@@ -28,7 +28,7 @@ import {
   getUnreadCount,
   type Notification,
   type NotificationType,
-} from "@/lib/notifications";
+} from "@/lib/notifications-client";
 
 // ── Icon mapping ──
 

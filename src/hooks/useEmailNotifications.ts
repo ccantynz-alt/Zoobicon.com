@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useCallback } from "react";
-import { addNotification } from "@/lib/notifications";
+import { addNotification } from "@/lib/notifications-client";
 import type { EmailNotificationEvent } from "@/lib/email-notifications";
 
 // ---------------------------------------------------------------------------

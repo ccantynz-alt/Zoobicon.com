@@ -121,25 +121,70 @@ const TESTIMONIALS = [
 
 export default function HomePage() {
   return (
-    <div className="relative min-h-screen bg-[#050508] text-white antialiased overflow-x-hidden selection:bg-[#E8D4B0] selection:text-black">
-      {/* Ambient cinematic glow — one warm orb, never cyberpunk */}
-      <div className="pointer-events-none fixed inset-0 -z-10" aria-hidden>
-        <div
-          className="absolute left-1/2 top-[14%] h-[720px] w-[1200px] -translate-x-1/2 rounded-full blur-[160px]"
-          style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }}
-        />
-        <div
-          className="absolute right-[-10%] top-[60%] h-[600px] w-[600px] rounded-full blur-[140px]"
-          style={{ background: "radial-gradient(closest-side, rgba(83,251,213,0.04), transparent 70%)" }}
-        />
-        <div
-          className="absolute inset-0 opacity-[0.022]"
-          style={{
-            backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)",
-            backgroundSize: "44px 44px",
-          }}
-        />
-      </div>
+    <div className="bg-[#0a0a14] text-white selection:bg-indigo-500/30 selection:text-white">
+
+      {/* ── HERO SLIDESHOW ── */}
+      <HeroShowcase />
+
+      {/* ── FOUR DOMAINS ── */}
+      <section className="py-28 md:py-36 px-4 sm:px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-sm font-semibold tracking-widest uppercase text-indigo-400 mb-4">
+              One Platform, Four Domains
+            </p>
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
+              Every domain, a different superpower
+            </h2>
+          </div>
+        </div>
+      </section>
+
+      {/* Hero Section */}
+      <section className="relative overflow-hidden min-h-screen flex items-center pt-16">
+        {/* Rich gradient mesh background */}
+        <div className="absolute inset-0 pointer-events-none">
+          {/* Primary gradient blobs — layered for depth */}
+          <div className="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] rounded-full bg-blue-600/[0.07] blur-[120px]" />
+          <div className="absolute top-[10%] right-[-5%] w-[50%] h-[60%] rounded-full bg-indigo-600/[0.06] blur-[100px]" />
+          <div className="absolute bottom-[-10%] left-[20%] w-[45%] h-[50%] rounded-full bg-cyan-600/[0.04] blur-[120px]" />
+          <div className="absolute top-[40%] left-[40%] w-[30%] h-[30%] rounded-full bg-blue-500/[0.05] blur-[80px]" />
+          {/* Subtle dot pattern overlay with radial fade */}
+          <div
+            className="absolute inset-0 opacity-[0.35]"
+            style={{
+              backgroundImage: "radial-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 1px)",
+              backgroundSize: "32px 32px",
+              maskImage: "radial-gradient(ellipse 70% 60% at 50% 40%, black 10%, transparent 70%)",
+              WebkitMaskImage: "radial-gradient(ellipse 70% 60% at 50% 40%, black 10%, transparent 70%)",
+            }}
+          />
+          {/* Top edge highlight — subtle light bleed from above */}
+          <div className="absolute top-0 left-[15%] right-[15%] h-[1px] bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 w-full relative z-10 py-20 lg:py-28">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Left — Text */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-bold uppercase tracking-wider mb-8">
+                AI-POWERED PLATFORM
+              </div>
+
+              <h1 className="text-[2.75rem] sm:text-[3.5rem] lg:text-[4.5rem] font-black tracking-[-0.03em] leading-[1.05] mb-6 text-white">
+                Build, deploy, grow{" "}
+                <span className="block text-white/50">your online presence</span>
+              </h1>
+
+              <p className="text-lg text-white/45 leading-relaxed mb-8 max-w-lg">
+                Your all-in-one AI platform for building websites, marketing, and scaling online.
+                10 AI agents work together to create production-ready sites in seconds.
+              </p>
+            </motion.div>
 
       {/* Clear the fixed 72px nav */}
       <div className="pt-[72px]">
@@ -166,11 +211,42 @@ export default function HomePage() {
                       <Star key={j} className="h-3 w-3 fill-[#E8D4B0] text-[#E8D4B0]" />
                     ))}
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[12px] font-semibold text-white tracking-tight">
-                      {item.label}
-                    </span>
-                    <span className="text-[11px] text-white/40">· {item.sub}</span>
+                  <h3 className="text-xl font-bold text-white mb-1">{d.name}</h3>
+                  <p className={`text-sm font-semibold ${c.text} mb-3`}>{d.role}</p>
+                  <p className="text-[15px] text-slate-400 leading-relaxed mb-5">{d.desc}</p>
+                  <span className={`text-sm font-semibold ${c.text} inline-flex items-center gap-1 group-hover:gap-2 transition-all`}>
+                    {d.cta} <ArrowRight className="w-3 h-3" />
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── HOW IT WORKS — lighter background band ── */}
+      <section className="relative py-28 md:py-36 px-4 sm:px-6">
+        <div className="absolute inset-0 bg-gradient-to-b from-indigo-950/20 via-slate-900/30 to-transparent" />
+        <div className="relative max-w-5xl mx-auto">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-5">
+              Describe it. We build it.
+            </h2>
+            <p className="text-xl text-slate-300 max-w-lg mx-auto">
+              Three steps. No code. No templates. No compromise.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-12">
+            {STEPS.map((step, i) => (
+              <div key={step.num} className="relative">
+                <div className="text-[80px] font-black text-white/[0.04] leading-none absolute -top-4 -left-2 select-none pointer-events-none">
+                  {step.num}
+                </div>
+                <div className="relative pt-6">
+                  <div className="text-xs font-bold text-indigo-400 mb-3 tracking-widest uppercase">
+                    Step {step.num}
                   </div>
                 </div>
               ))}

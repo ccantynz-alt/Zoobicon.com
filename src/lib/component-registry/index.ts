@@ -9,54 +9,16 @@
  * This gives us sub-1-second scaffold assembly via Sandpack.
  */
 
-// ── Types ──
+// ── Types & Store (re-exported from ./store to avoid circular-import TDZ) ──
 
-export interface RegistryComponent {
-  id: string;
-  name: string;
-  category: ComponentCategory;
-  variant: string;
-  description: string;
-  code: string;
-  tags: string[];
-}
+export {
+  REGISTRY,
+  registerComponent,
+  type RegistryComponent,
+  type ComponentCategory,
+} from "./store";
 
-// Re-export image system so routes can import everything from this module
-export { detectIndustry, detectTheme, swapImagesForIndustry, INDUSTRY_POOLS } from "./images";
-export type { Industry, Theme } from "./images";
-
-export type ComponentCategory =
-  | "navbar"
-  | "hero"
-  | "features"
-  | "testimonials"
-  | "pricing"
-  | "stats"
-  | "faq"
-  | "cta"
-  | "footer"
-  | "about"
-  | "contact"
-  | "gallery"
-  | "blog"
-  | "ecommerce"
-  | "forms"
-  | "misc";
-
-// ── Registry Store ──
-
-export const REGISTRY: RegistryComponent[] = [];
-
-/**
- * Register a component into the global registry.
- * Called by each category file (navbars.ts, heroes.ts, etc.) at import time.
- */
-export function registerComponent(component: RegistryComponent): void {
-  // Prevent duplicate registration
-  if (!REGISTRY.find(c => c.id === component.id)) {
-    REGISTRY.push(component);
-  }
-}
+import { REGISTRY, type RegistryComponent, type ComponentCategory } from "./store";
 
 // ── Query Functions ──
 
