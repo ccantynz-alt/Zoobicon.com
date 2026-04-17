@@ -222,7 +222,7 @@ export default function ChatbotWidgetPage() {
                 >
                   {copied ? (
                     <>
-                      <Check className="w-3 h-3 text-emerald-400" />
+                      <Check className="w-3 h-3 text-stone-400" />
                       Copied
                     </>
                   ) : (

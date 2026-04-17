@@ -6,7 +6,9 @@ import SpeculationRules from "@/components/SpeculationRules";
 import AutoIndexNow from "@/components/AutoIndexNow";
 import StagingBanner from "@/components/StagingBanner";
 import MaintenanceBanner from "@/components/MaintenanceBanner";
+import ComingSoonBanner from "@/components/ComingSoonBanner";
 import SiteNavigation from "@/components/SiteNavigation";
+import SiteFooter from "@/components/SiteFooter";
 
 
 const BRAND_META: Record<string, {
@@ -341,11 +343,13 @@ export default function RootLayout({
           }) }}
         />
       </head>
-      <body className="grain">
+      <body className="grain fs-grain">
+        <ComingSoonBanner />
         <MaintenanceBanner />
         <StagingBanner />
         <SiteNavigation />
         {children}
+        <SiteFooter />
         <CookieConsent />
         <AutoIndexNow />
         <SpeculationRules />

@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { validateApiKey, type ApiKeyPlan } from "@/lib/apiKey";
-import { checkRateLimit } from "@/lib/rateLimit";
+import { checkRateLimitSync } from "@/lib/rateLimit";
 
 export interface AuthenticatedRequest {
   plan: ApiKeyPlan;
@@ -46,7 +46,7 @@ export async function authenticateApiKey(
 
   // Rate limit check
   const rateConfig = RATE_LIMITS[plan];
-  const rateCheck = checkRateLimit(keyPrefix, rateConfig);
+  const rateCheck = checkRateLimitSync(keyPrefix, rateConfig);
   if (!rateCheck.allowed) {
     return errorResponse(429, "rate_limit_exceeded", `Rate limit exceeded. Resets at ${new Date(rateCheck.resetAt).toISOString()}`, {
       "X-RateLimit-Limit": String(rateConfig.limit),

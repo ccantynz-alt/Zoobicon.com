@@ -1,9 +1,7 @@
+import crypto from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
-import {
-  verifyWebhookSignature,
-  parseInboundEmail,
-} from "@/lib/mailgun";
+import { parseInboundEmail } from "@/lib/mailgun";
 import { notifyNewTicket } from "@/lib/admin-notify";
 import { emitEmailNotification } from "@/lib/email-notifications";
 
@@ -59,6 +57,80 @@ async function nextTicketNumber(): Promise<string> {
   return `TK-${10001 + count}`;
 }
 
+/**
+ * Verify a Mailgun inbound webhook payload.
+ * Mailgun wraps fields under `signature.*` in Routes, and flattens them as
+ * top-level `timestamp`/`token`/`signature` in some webhook shapes — we
+ * accept either.
+ *
+ * Uses constant-time comparison. 5-minute replay window.
+ *
+ * @returns null if valid, or a short reason string if rejected.
+ */
+function verifyMailgunSignature(fields: Record<string, unknown>): string | null {
+  const signingKey = process.env.MAILGUN_WEBHOOK_SIGNING_KEY;
+  if (!signingKey) {
+    console.error(
+      "[email-webhook] MAILGUN_WEBHOOK_SIGNING_KEY is NOT SET — rejecting ALL " +
+        "inbound webhooks. Set it from Mailgun dashboard → Settings → API " +
+        "Security → Webhook signing key to accept legitimate emails."
+    );
+    return "signing key not configured";
+  }
+
+  // Mailgun Routes send { signature: { timestamp, token, signature } }.
+  // Flat webhooks send top-level timestamp/token/signature.
+  let timestamp = "";
+  let token = "";
+  let signature = "";
+
+  const sigObj = fields["signature"];
+  if (sigObj && typeof sigObj === "object") {
+    const s = sigObj as Record<string, unknown>;
+    timestamp = typeof s.timestamp === "string" ? s.timestamp : String(s.timestamp ?? "");
+    token = typeof s.token === "string" ? s.token : String(s.token ?? "");
+    signature = typeof s.signature === "string" ? s.signature : String(s.signature ?? "");
+  }
+
+  if (!timestamp) timestamp = String(fields["timestamp"] ?? "");
+  if (!token) token = String(fields["token"] ?? "");
+  if (!signature || typeof sigObj === "string") {
+    // If `signature` was a string at the top level, use it directly.
+    signature = typeof sigObj === "string" ? sigObj : String(fields["signature"] ?? "");
+  }
+
+  if (!timestamp || !token || !signature) {
+    return "missing timestamp/token/signature";
+  }
+
+  // Replay guard: reject anything more than 5 minutes old or from the future.
+  const tsNum = parseInt(timestamp, 10);
+  if (!Number.isFinite(tsNum)) {
+    return "invalid timestamp";
+  }
+  if (Math.abs(Date.now() / 1000 - tsNum) >= 300) {
+    return "timestamp outside 5-minute replay window";
+  }
+
+  // HMAC-SHA256(timestamp + token) keyed with the Mailgun webhook signing key.
+  const expected = crypto
+    .createHmac("sha256", signingKey)
+    .update(timestamp + token)
+    .digest("hex");
+
+  // Constant-time comparison. timingSafeEqual throws on length mismatch.
+  const expectedBuf = Buffer.from(expected, "hex");
+  const providedBuf = Buffer.from(signature, "hex");
+  if (expectedBuf.length !== providedBuf.length) {
+    return "signature length mismatch";
+  }
+  if (!crypto.timingSafeEqual(expectedBuf, providedBuf)) {
+    return "signature mismatch";
+  }
+
+  return null;
+}
+
 export async function POST(req: NextRequest) {
   const contentType = req.headers.get("content-type") || "";
 
@@ -98,32 +170,30 @@ export async function POST(req: NextRequest) {
 
     lastWebhookAttempt.fields = Object.keys(formFields);
 
-    // If this is a Mailgun "Store and notify" event (JSON with event-data),
-    // acknowledge it but don't process — we only need the Forward action data.
-    if (formFields["event-data"] || formFields["signature"]) {
-      // This is a Mailgun event webhook, not an inbound email forward
-      const eventData = formFields["event-data"];
-      if (typeof eventData === "string" || typeof eventData === "object") {
-        lastWebhookAttempt.result = "acknowledged_event";
-        return NextResponse.json({ ok: true, note: "Event acknowledged" });
-      }
+    // STRICT signature verification. Every inbound Mailgun webhook MUST be
+    // signed with our webhook signing key, must be within 5 minutes, and must
+    // pass HMAC-SHA256(timestamp + token). Unsigned requests are rejected —
+    // this closes the audit-log / auto-reply poisoning vector.
+    const sigReason = verifyMailgunSignature(
+      formFields as unknown as Record<string, unknown>
+    );
+    if (sigReason !== null) {
+      console.error(
+        `[email-webhook] REJECTED unsigned/invalid inbound webhook: ${sigReason}`
+      );
+      lastWebhookAttempt.result = "rejected_invalid_signature";
+      lastWebhookAttempt.error = sigReason;
+      return NextResponse.json(
+        { error: "invalid signature", detail: sigReason },
+        { status: 401 }
+      );
     }
 
-    // Verify Mailgun signature — be lenient: log warning but don't reject
-    // during initial setup. This prevents losing emails due to key mismatch.
-    const sigTimestamp = formFields["timestamp"] || "";
-    const sigToken = formFields["token"] || "";
-    const sigSignature = formFields["signature"] || "";
-
-    if (sigTimestamp && sigToken && sigSignature) {
-      const valid = verifyWebhookSignature(sigTimestamp, sigToken, sigSignature);
-      if (!valid) {
-        console.warn(
-          "[Webhook] Signature verification FAILED — processing anyway.",
-          "Check MAILGUN_WEBHOOK_SIGNING_KEY. timestamp:", sigTimestamp
-        );
-        // Don't reject — log and continue. Admin can check /api/email/webhook (GET).
-      }
+    // "Store and notify" event webhooks are signed too — acknowledge them
+    // without doing ticket work (we only act on inbound Forward payloads).
+    if (formFields["event-data"]) {
+      lastWebhookAttempt.result = "acknowledged_event";
+      return NextResponse.json({ ok: true, note: "Event acknowledged" });
     }
 
     // Parse the inbound email

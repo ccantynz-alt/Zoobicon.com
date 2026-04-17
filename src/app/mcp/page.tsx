@@ -117,11 +117,11 @@ export default function McpLandingPage(): JSX.Element {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-purple-500/40 bg-purple-500/10 text-purple-200 text-xs font-medium mb-6">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-stone-500/40 bg-stone-500/10 text-stone-200 text-xs font-medium mb-6">
+            <span className="w-1.5 h-1.5 rounded-full bg-stone-400 animate-pulse" />
             Model Context Protocol · v2025-06-18
           </div>
-          <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 bg-gradient-to-br from-white via-purple-200 to-purple-400 bg-clip-text text-transparent">
+          <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 bg-gradient-to-br from-white via-stone-200 to-stone-400 bg-clip-text text-transparent">
             Zoobicon = 75 AI tools<br />for Claude, Cursor & Windsurf
           </h1>
           <p className="text-lg text-gray-400 max-w-2xl mx-auto">
@@ -131,13 +131,13 @@ export default function McpLandingPage(): JSX.Element {
           <div className="mt-8 flex flex-wrap gap-3 justify-center">
             <a
               href="/api/mcp/install"
-              className="px-5 py-2.5 rounded-lg bg-purple-500 hover:bg-purple-400 transition text-white font-medium"
+              className="px-5 py-2.5 rounded-lg bg-stone-500 hover:bg-stone-400 transition text-white font-medium"
             >
               Install Guide
             </a>
             <a
               href="/dashboard/api-keys"
-              className="px-5 py-2.5 rounded-lg border border-purple-500/40 hover:bg-purple-500/10 transition text-purple-200 font-medium"
+              className="px-5 py-2.5 rounded-lg border border-stone-500/40 hover:bg-stone-500/10 transition text-stone-200 font-medium"
             >
               Get API Key
             </a>
@@ -164,9 +164,9 @@ export default function McpLandingPage(): JSX.Element {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.35, delay: i * 0.02 }}
-                className="rounded-xl border border-purple-500/20 bg-purple-500/[0.03] p-4 hover:border-purple-500/40 hover:bg-purple-500/[0.06] transition"
+                className="rounded-xl border border-stone-500/20 bg-stone-500/[0.03] p-4 hover:border-stone-500/40 hover:bg-stone-500/[0.06] transition"
               >
-                <code className="text-purple-300 text-sm font-mono">{t.name}</code>
+                <code className="text-stone-300 text-sm font-mono">{t.name}</code>
                 <p className="text-gray-400 text-xs mt-1.5 leading-relaxed">{t.description}</p>
               </motion.div>
             ))}
@@ -189,25 +189,25 @@ export default function McpLandingPage(): JSX.Element {
                 onClick={() => setTab(key)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
                   tab === key
-                    ? "bg-purple-500 text-white"
-                    : "bg-purple-500/10 text-purple-200 hover:bg-purple-500/20"
+                    ? "bg-stone-500 text-white"
+                    : "bg-stone-500/10 text-stone-200 hover:bg-stone-500/20"
                 }`}
               >
                 {CONFIGS[key].label}
               </button>
             ))}
           </div>
-          <div className="rounded-xl border border-purple-500/25 bg-[#0a0a14] overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-2.5 border-b border-purple-500/20 bg-purple-500/5">
-              <code className="text-xs text-purple-300">{CONFIGS[tab].path}</code>
+          <div className="rounded-xl border border-stone-500/25 bg-[#0a0a14] overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-stone-500/20 bg-stone-500/5">
+              <code className="text-xs text-stone-300">{CONFIGS[tab].path}</code>
               <button
                 onClick={() => void copy(tab, CONFIGS[tab].body)}
-                className="text-xs px-2.5 py-1 rounded border border-purple-500/30 text-purple-200 hover:bg-purple-500/20 transition"
+                className="text-xs px-2.5 py-1 rounded border border-stone-500/30 text-stone-200 hover:bg-stone-500/20 transition"
               >
                 {copied === tab ? "Copied!" : "Copy"}
               </button>
             </div>
-            <pre className="p-5 text-sm text-purple-100 overflow-x-auto font-mono leading-relaxed">
+            <pre className="p-5 text-sm text-stone-100 overflow-x-auto font-mono leading-relaxed">
               {CONFIGS[tab].body}
             </pre>
           </div>
@@ -225,23 +225,23 @@ export default function McpLandingPage(): JSX.Element {
           <p className="text-sm text-gray-500 mb-6">
             The MCP endpoint speaks JSON-RPC 2.0 over HTTP. Test directly from your terminal.
           </p>
-          <div className="rounded-xl border border-purple-500/25 bg-[#0a0a14] overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-2.5 border-b border-purple-500/20 bg-purple-500/5">
-              <span className="text-xs text-purple-300">shell</span>
+          <div className="rounded-xl border border-stone-500/25 bg-[#0a0a14] overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-stone-500/20 bg-stone-500/5">
+              <span className="text-xs text-stone-300">shell</span>
               <button
                 onClick={() => void copy("curl", CURL_DEMO)}
-                className="text-xs px-2.5 py-1 rounded border border-purple-500/30 text-purple-200 hover:bg-purple-500/20 transition"
+                className="text-xs px-2.5 py-1 rounded border border-stone-500/30 text-stone-200 hover:bg-stone-500/20 transition"
               >
                 {copied === "curl" ? "Copied!" : "Copy"}
               </button>
             </div>
-            <pre className="p-5 text-sm text-green-300 overflow-x-auto font-mono leading-relaxed">
+            <pre className="p-5 text-sm text-stone-300 overflow-x-auto font-mono leading-relaxed">
               {CURL_DEMO}
             </pre>
           </div>
         </motion.section>
 
-        <footer className="pt-10 border-t border-purple-500/15 text-center text-sm text-gray-500">
+        <footer className="pt-10 border-t border-stone-500/15 text-center text-sm text-gray-500">
           zoobicon.com · zoobicon.ai · zoobicon.io · zoobicon.sh
         </footer>
       </div>

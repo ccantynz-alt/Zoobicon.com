@@ -96,10 +96,10 @@ export default function EmailMarketingPage() {
   };
 
   const STAT_CARDS = [
-    { label: "Total Subscribers", value: stats.totalSubscribers.toLocaleString(), icon: Users, color: "from-indigo-500 to-purple-600" },
-    { label: "Open Rate", value: `${stats.avgOpenRate}%`, icon: Eye, color: "from-emerald-500 to-teal-600" },
-    { label: "Click Rate", value: `${stats.avgClickRate}%`, icon: MousePointerClick, color: "from-cyan-500 to-blue-600" },
-    { label: "Campaigns Sent", value: String(stats.totalCampaignsSent), icon: Send, color: "from-rose-500 to-pink-600" },
+    { label: "Total Subscribers", value: stats.totalSubscribers.toLocaleString(), icon: Users, color: "from-stone-500 to-stone-600" },
+    { label: "Open Rate", value: `${stats.avgOpenRate}%`, icon: Eye, color: "from-stone-500 to-stone-600" },
+    { label: "Click Rate", value: `${stats.avgClickRate}%`, icon: MousePointerClick, color: "from-stone-500 to-stone-600" },
+    { label: "Campaigns Sent", value: String(stats.totalCampaignsSent), icon: Send, color: "from-stone-500 to-stone-600" },
   ];
 
   const TABS: { key: Tab; label: string }[] = [
@@ -110,9 +110,9 @@ export default function EmailMarketingPage() {
   ];
 
   const statusColor = (s: string) => {
-    if (s === "sent" || s === "active") return "bg-emerald-500/20 text-emerald-400";
-    if (s === "scheduled") return "bg-blue-500/20 text-blue-400";
-    if (s === "unsubscribed") return "bg-red-500/20 text-red-400";
+    if (s === "sent" || s === "active") return "bg-stone-500/20 text-stone-400";
+    if (s === "scheduled") return "bg-stone-500/20 text-stone-400";
+    if (s === "unsubscribed") return "bg-stone-500/20 text-stone-400";
     return "bg-white/10 text-white/60";
   };
 
@@ -121,7 +121,7 @@ export default function EmailMarketingPage() {
       {/* ── Navbar ── */}
       <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#0a0a12]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 h-16">
-          <Link href="/" className="text-xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+          <Link href="/" className="text-xl font-bold tracking-tight bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">
             Zoobicon
           </Link>
           <div className="flex items-center gap-4">
@@ -144,17 +144,17 @@ export default function EmailMarketingPage() {
 
       {/* ── Hero ── */}
       <header className="relative overflow-hidden border-b border-white/5">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/10 via-purple-600/5 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-br from-stone-600/10 via-stone-600/5 to-transparent pointer-events-none" />
         <div className="max-w-7xl mx-auto px-6 py-16 relative">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2.5 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600">
+              <div className="p-2.5 rounded-xl bg-gradient-to-br from-stone-500 to-stone-600">
                 <Mail className="w-6 h-6" />
               </div>
               <span className="text-sm font-medium text-white/50 uppercase tracking-wider">Business OS</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-extrabold mb-3">
-              <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-stone-400 via-stone-400 to-stone-400 bg-clip-text text-transparent">
                 AI Email Marketing
               </span>
             </h1>
@@ -192,7 +192,7 @@ export default function EmailMarketingPage() {
                 <div key={i} className="flex-1 flex flex-col items-center gap-1">
                   <span className="text-[10px] text-white/40">{d.count}</span>
                   <div
-                    className="w-full rounded-t bg-gradient-to-t from-indigo-600 to-purple-500 transition-all"
+                    className="w-full rounded-t bg-gradient-to-t from-stone-600 to-stone-500 transition-all"
                     style={{ height: `${h}%` }}
                   />
                   <span className="text-[10px] text-white/30 truncate w-full text-center">{d.month.slice(0, 3)}</span>
@@ -223,19 +223,19 @@ export default function EmailMarketingPage() {
             {/* AI Campaign Writer */}
             <motion.div variants={fadeUp} className="bg-white/5 border border-white/10 rounded-2xl p-6">
               <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-purple-400" /> AI Campaign Writer
+                <Sparkles className="w-5 h-5 text-stone-400" /> AI Campaign Writer
               </h3>
               <textarea
                 value={aiPrompt}
                 onChange={(e) => setAiPrompt(e.target.value)}
                 placeholder="Describe your campaign... e.g. 'Announce our spring sale with 30% off all plans'"
-                className="w-full h-28 bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-white placeholder:text-white/30 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                className="w-full h-28 bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-white placeholder:text-white/30 resize-none focus:outline-none focus:ring-2 focus:ring-stone-500/50"
               />
               <div className="flex justify-end mt-3">
                 <button
                   onClick={handleGenerate}
                   disabled={generating || !aiPrompt.trim()}
-                  className="px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 flex items-center gap-2"
+                  className="px-5 py-2.5 bg-gradient-to-r from-stone-500 to-stone-600 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 flex items-center gap-2"
                 >
                   {generating ? (
                     <>
@@ -255,7 +255,7 @@ export default function EmailMarketingPage() {
             <motion.div variants={fadeUp} className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
               <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
                 <h3 className="text-lg font-semibold">Recent Campaigns</h3>
-                <button onClick={() => {}} className="text-sm text-indigo-400 hover:text-indigo-300 flex items-center gap-1">
+                <button onClick={() => {}} className="text-sm text-stone-400 hover:text-stone-300 flex items-center gap-1">
                   <Plus className="w-4 h-4" /> New Campaign
                 </button>
               </div>
@@ -350,13 +350,13 @@ export default function EmailMarketingPage() {
                 <div className="flex items-start justify-between mb-3">
                   <div>
                     <h4 className="font-semibold text-base flex items-center gap-2">
-                      <Zap className="w-4 h-4 text-amber-400" />
+                      <Zap className="w-4 h-4 text-stone-400" />
                       {a.name}
                     </h4>
                     <p className="text-sm text-white/50 mt-1">{a.description}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${a.active ? "bg-emerald-500/20 text-emerald-400" : "bg-white/10 text-white/40"}`}>
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${a.active ? "bg-stone-500/20 text-stone-400" : "bg-white/10 text-white/40"}`}>
                       {a.active ? "Active" : "Paused"}
                     </span>
                     <button onClick={() => {}} className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
@@ -370,7 +370,7 @@ export default function EmailMarketingPage() {
                 <div className="flex gap-2 flex-wrap">
                   {a.emails.map((e, i) => (
                     <div key={i} className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs">
-                      <Mail className="w-3.5 h-3.5 text-indigo-400" />
+                      <Mail className="w-3.5 h-3.5 text-stone-400" />
                       <span className="text-white/70">{e.subject}</span>
                       <span className="text-white/30">&middot; {e.delay}</span>
                     </div>
@@ -392,7 +392,7 @@ export default function EmailMarketingPage() {
                     key={s}
                     onClick={() => setFormStyle(s)}
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium capitalize transition-colors ${
-                      formStyle === s ? "bg-indigo-500/20 text-indigo-400 border border-indigo-500/30" : "bg-white/5 text-white/50 border border-white/10 hover:text-white/70"
+                      formStyle === s ? "bg-stone-500/20 text-stone-400 border border-stone-500/30" : "bg-white/5 text-white/50 border border-white/10 hover:text-white/70"
                     }`}
                   >
                     {s.replace("-", " ")}
@@ -409,14 +409,14 @@ export default function EmailMarketingPage() {
                     placeholder="your@email.com"
                     className="flex-1 px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white/50"
                   />
-                  <button onClick={() => {}} className="px-5 py-2.5 bg-indigo-500 rounded-lg text-sm font-semibold">Subscribe</button>
+                  <button onClick={() => {}} className="px-5 py-2.5 bg-stone-500 rounded-lg text-sm font-semibold">Subscribe</button>
                 </div>
               </div>
               <button
                 onClick={copyEmbed}
                 className="flex items-center gap-2 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm font-medium hover:bg-white/10 transition-colors"
               >
-                {embedCopied ? <Check className="w-4 h-4 text-emerald-400" /> : <Code2 className="w-4 h-4 text-white/50" />}
+                {embedCopied ? <Check className="w-4 h-4 text-stone-400" /> : <Code2 className="w-4 h-4 text-white/50" />}
                 {embedCopied ? "Copied!" : "Copy Embed Code"}
               </button>
             </motion.div>

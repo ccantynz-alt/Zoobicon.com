@@ -151,17 +151,17 @@ export default function MobileAdminDashboard() {
           {/* Health Status Banner */}
           <div className={`rounded-2xl p-4 border ${
             overallHealth === "healthy"
-              ? "bg-emerald-500/5 border-emerald-500/20"
+              ? "bg-stone-500/5 border-stone-500/20"
               : overallHealth === "degraded"
-              ? "bg-amber-500/5 border-amber-500/20"
+              ? "bg-stone-500/5 border-stone-500/20"
               : "bg-white/[0.03] border-white/[0.08]"
           }`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 {overallHealth === "healthy" ? (
-                  <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                  <CheckCircle2 className="w-5 h-5 text-stone-400" />
                 ) : overallHealth === "degraded" ? (
-                  <AlertCircle className="w-5 h-5 text-amber-400" />
+                  <AlertCircle className="w-5 h-5 text-stone-400" />
                 ) : (
                   <Activity className="w-5 h-5 text-white/40" />
                 )}
@@ -189,8 +189,8 @@ export default function MobileAdminDashboard() {
                     key={name}
                     className={`text-[10px] px-2 py-0.5 rounded-full ${
                       check.status === "healthy"
-                        ? "bg-emerald-500/10 text-emerald-400"
-                        : "bg-red-500/10 text-red-400"
+                        ? "bg-stone-500/10 text-stone-400"
+                        : "bg-stone-500/10 text-stone-400"
                     }`}
                   >
                     {name}
@@ -231,7 +231,7 @@ export default function MobileAdminDashboard() {
             <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] overflow-hidden">
               <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
                 <div className="flex items-center gap-2">
-                  <UserPlus className="w-4 h-4 text-emerald-400" />
+                  <UserPlus className="w-4 h-4 text-stone-400" />
                   <span className="text-xs font-semibold">Recent Signups</span>
                 </div>
                 <Link href="/admin" className="text-[10px] text-brand-400 active:opacity-70">
@@ -248,8 +248,8 @@ export default function MobileAdminDashboard() {
                     <div className="text-right ml-3 shrink-0">
                       <span className={`text-[10px] px-2 py-0.5 rounded-full ${
                         user.plan === "pro" ? "bg-brand-500/15 text-brand-400" :
-                        user.plan === "agency" ? "bg-purple-500/15 text-purple-400" :
-                        user.plan === "creator" ? "bg-emerald-500/15 text-emerald-400" :
+                        user.plan === "agency" ? "bg-stone-500/15 text-stone-400" :
+                        user.plan === "creator" ? "bg-stone-500/15 text-stone-400" :
                         "bg-white/[0.05] text-white/40"
                       }`}>{user.plan || "free"}</span>
                       <p className="text-[10px] text-white/30 mt-0.5">{timeAgo(user.created_at)}</p>
@@ -306,7 +306,7 @@ export default function MobileAdminDashboard() {
                 try { localStorage.removeItem("zoobicon_user"); } catch {}
                 window.location.href = "/auth/login";
               }}
-              className="mt-3 text-xs text-red-400/60 active:text-red-400 flex items-center gap-1 mx-auto"
+              className="mt-3 text-xs text-stone-400/60 active:text-stone-400 flex items-center gap-1 mx-auto"
             >
               <LogOut className="w-3 h-3" /> Sign out
             </button>
@@ -322,15 +322,15 @@ function StatCard({ icon: Icon, label, value, color }: {
 }) {
   const colorMap: Record<string, string> = {
     brand: "from-brand-500/10 to-brand-500/5 border-brand-500/15",
-    purple: "from-purple-500/10 to-purple-500/5 border-purple-500/15",
-    emerald: "from-emerald-500/10 to-emerald-500/5 border-emerald-500/15",
-    cyan: "from-cyan-500/10 to-cyan-500/5 border-cyan-500/15",
+    purple: "from-stone-500/10 to-stone-500/5 border-stone-500/15",
+    emerald: "from-stone-500/10 to-stone-500/5 border-stone-500/15",
+    cyan: "from-stone-500/10 to-stone-500/5 border-stone-500/15",
   };
   const iconMap: Record<string, string> = {
     brand: "text-brand-400",
-    purple: "text-purple-400",
-    emerald: "text-emerald-400",
-    cyan: "text-cyan-400",
+    purple: "text-stone-400",
+    emerald: "text-stone-400",
+    cyan: "text-stone-400",
   };
 
   return (

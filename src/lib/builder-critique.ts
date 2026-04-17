@@ -22,8 +22,6 @@
  * expected to throw a 503 — we let that propagate untouched.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 export type CritiqueSeverity = "blocker" | "high" | "medium" | "low";
 
 export type CritiqueCategory =

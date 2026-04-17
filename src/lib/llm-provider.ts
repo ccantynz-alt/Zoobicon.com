@@ -95,6 +95,7 @@ async function callOpenAI(req: LLMRequest): Promise<LLMResponse> {
         { role: "user", content: req.userMessage },
       ],
     }),
+    signal: AbortSignal.timeout(60000),
   });
 
   if (!res.ok) {
@@ -129,6 +130,7 @@ async function callGemini(req: LLMRequest): Promise<LLMResponse> {
         maxOutputTokens: req.maxTokens || 65536,
       },
     }),
+    signal: AbortSignal.timeout(60000),
   });
 
   if (!res.ok) {
@@ -176,12 +178,21 @@ export async function callLLMWithFailover(
 ): Promise<LLMResponse> {
   const primaryProvider = getProviderForModel(req.model);
 
+  // Check that at least one provider is configured
+  const available = getAvailableProviders();
+  if (available.length === 0) {
+    throw new Error(
+      "No AI providers configured. Set at least one of: ANTHROPIC_API_KEY, OPENAI_API_KEY, GOOGLE_AI_API_KEY"
+    );
+  }
+
   // Try primary model first
   try {
     return await callLLM(req);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    const isRetryable = /rate.limit|overloaded|529|too many|503|500/i.test(msg);
+    const isRetryable =
+      /rate.limit|overloaded|529|too many|503|500|timeout|timed?\s*out|ECONNRESET|ENOTFOUND|fetch failed|AbortError/i.test(msg);
     if (!isRetryable) throw err; // Non-retryable errors (auth, bad request) — don't failover
 
     console.warn(`[LLM Failover] ${req.model} failed: ${msg}`);
@@ -189,9 +200,9 @@ export async function callLLMWithFailover(
 
   // Build fallback order: try other providers with their best available model
   const fallbacks: { provider: LLMProvider; model: string; maxTokens: number }[] = [];
-  const available = getAvailableProviders().filter((p) => p !== primaryProvider);
+  const otherProviders = getAvailableProviders().filter((p) => p !== primaryProvider);
 
-  for (const provider of available) {
+  for (const provider of otherProviders) {
     const models = getModelsForProvider(provider);
     // Prefer balanced tier, then premium, then fast
     const best = models.find((m) => m.tier === "balanced")
@@ -241,4 +252,55 @@ export function getAvailableProviders(): LLMProvider[] {
  */
 export function getModelsForProvider(provider: LLMProvider): LLMModel[] {
   return AVAILABLE_MODELS.filter((m) => m.provider === provider);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Provider health check — logs available providers at startup / on demand
+// ��────────────────────────────────────────────────────���───────────────────────
+
+export interface ProviderHealth {
+  provider: LLMProvider;
+  available: boolean;
+  envVar: string;
+}
+
+/**
+ * Check which AI providers are configured and return a health report.
+ * Logs the result so operators can see at a glance which providers are live.
+ *
+ * If NO providers are available, throws with a clear error message listing
+ * the required env vars.
+ */
+export function checkProviderHealth(options?: { log?: boolean; throwIfNone?: boolean }): ProviderHealth[] {
+  const health: ProviderHealth[] = [
+    { provider: "claude", available: Boolean(process.env.ANTHROPIC_API_KEY), envVar: "ANTHROPIC_API_KEY" },
+    { provider: "openai", available: Boolean(process.env.OPENAI_API_KEY), envVar: "OPENAI_API_KEY" },
+    { provider: "gemini", available: Boolean(process.env.GOOGLE_AI_API_KEY), envVar: "GOOGLE_AI_API_KEY" },
+  ];
+
+  const shouldLog = options?.log ?? true;
+  const shouldThrow = options?.throwIfNone ?? false;
+
+  if (shouldLog) {
+    const available = health.filter((h) => h.available);
+    const missing = health.filter((h) => !h.available);
+    if (available.length > 0) {
+      console.log(
+        `[LLM Health] ${available.length}/3 providers available: ${available.map((h) => h.provider).join(", ")}`
+      );
+    }
+    if (missing.length > 0) {
+      console.warn(
+        `[LLM Health] ${missing.length}/3 providers missing: ${missing.map((h) => `${h.provider} (${h.envVar})`).join(", ")}`
+      );
+    }
+  }
+
+  if (shouldThrow && health.every((h) => !h.available)) {
+    throw new Error(
+      `No AI providers configured. Set at least one of: ${health.map((h) => h.envVar).join(", ")} in your environment variables.`
+    );
+  }
+
+  return health;
 }

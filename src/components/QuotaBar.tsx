@@ -21,15 +21,15 @@ const PLAN_LIMITS: Record<string, number> = {
 };
 
 function getBarColor(percent: number): { bg: string; glow: string; text: string } {
-  if (percent >= 85) return { bg: "bg-red-500", glow: "shadow-red-500/40", text: "text-red-400" };
-  if (percent >= 60) return { bg: "bg-amber-500", glow: "shadow-amber-500/40", text: "text-amber-400" };
-  return { bg: "bg-emerald-500", glow: "shadow-emerald-500/40", text: "text-emerald-400" };
+  if (percent >= 85) return { bg: "bg-stone-500", glow: "shadow-stone-500/40", text: "text-stone-400" };
+  if (percent >= 60) return { bg: "bg-stone-500", glow: "shadow-stone-500/40", text: "text-stone-400" };
+  return { bg: "bg-stone-500", glow: "shadow-stone-500/40", text: "text-stone-400" };
 }
 
 function getGradient(percent: number): string {
-  if (percent >= 85) return "from-red-500 to-red-400";
-  if (percent >= 60) return "from-amber-500 to-amber-400";
-  return "from-emerald-500 to-emerald-400";
+  if (percent >= 85) return "from-stone-500 to-stone-400";
+  if (percent >= 60) return "from-stone-500 to-stone-400";
+  return "from-stone-500 to-stone-400";
 }
 
 export default function QuotaBar({ mode = "full", className = "" }: QuotaBarProps) {
@@ -97,7 +97,7 @@ export default function QuotaBar({ mode = "full", className = "" }: QuotaBarProp
         {showUpgrade && (
           <Link
             href="/pricing"
-            className="text-[10px] font-medium text-violet-400 hover:text-violet-300 transition-colors whitespace-nowrap"
+            className="text-[10px] font-medium text-stone-400 hover:text-stone-300 transition-colors whitespace-nowrap"
           >
             Upgrade
           </Link>
@@ -121,7 +121,7 @@ export default function QuotaBar({ mode = "full", className = "" }: QuotaBarProp
         </div>
         <div className="text-right">
           {isAdmin ? (
-            <p className="text-sm font-semibold text-emerald-400">Unlimited</p>
+            <p className="text-sm font-semibold text-stone-400">Unlimited</p>
           ) : (
             <>
               <p className="text-sm font-semibold text-white/90">
@@ -156,7 +156,7 @@ export default function QuotaBar({ mode = "full", className = "" }: QuotaBarProp
         >
           <Link
             href="/pricing"
-            className="flex items-center justify-center gap-1.5 w-full py-2 rounded-lg bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-violet-400 text-white text-xs font-medium transition-all shadow-lg shadow-violet-600/20 hover:shadow-violet-500/30"
+            className="flex items-center justify-center gap-1.5 w-full py-2 rounded-lg bg-gradient-to-r from-stone-600 to-stone-500 hover:from-stone-500 hover:to-stone-400 text-white text-xs font-medium transition-all shadow-lg shadow-stone-600/20 hover:shadow-stone-500/30"
           >
             Upgrade Plan
             <ArrowUpRight className="w-3.5 h-3.5" />
@@ -167,7 +167,7 @@ export default function QuotaBar({ mode = "full", className = "" }: QuotaBarProp
       {/* At limit warning */}
       {!isAdmin && used >= limit && (
         <motion.p
-          className="text-[11px] text-red-400/80 text-center mt-2"
+          className="text-[11px] text-stone-400/80 text-center mt-2"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}

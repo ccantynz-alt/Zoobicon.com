@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { sql } from "@/lib/db";
+import { getSite, isBlobConfigured } from "@/lib/site-storage";
 
 /** Escape HTML entities to prevent XSS */
 function escapeHtml(str: string): string {
@@ -34,7 +35,18 @@ export async function GET(
       return new Response("Invalid site slug", { status: 400 });
     }
 
-    // Single query: get latest deployment + site info in one go
+    // ---- Try Vercel Blob first (CDN-cached, no DB query needed) ----
+    let blobSite: Awaited<ReturnType<typeof getSite>> = null;
+    if (isBlobConfigured()) {
+      try {
+        blobSite = await getSite(slug);
+      } catch (err) {
+        console.warn(`[serve] Blob lookup failed for ${slug}, falling back to Postgres:`, err);
+      }
+    }
+
+    // ---- Fall back to Postgres (migration period / Blob not configured) ----
+    // We still need site metadata (name, plan) from Postgres for OG tags + badge
     const [result] = await sql`
       SELECT d.code, d.created_at, s.name, s.plan
       FROM deployments d
@@ -48,7 +60,10 @@ export async function GET(
       LIMIT 1
     `;
 
-    if (!result || !result.code) {
+    // Use Blob HTML if available, otherwise fall back to Postgres code
+    const siteCode = blobSite?.html ?? result?.code;
+
+    if (!siteCode) {
       const notFoundHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -88,12 +103,12 @@ export async function GET(
       });
     }
 
-    const rawSiteName = (result.name || slug) as string;
+    const rawSiteName = (result?.name || slug) as string;
     const siteName = escapeHtml(rawSiteName);
     const siteUrl = `https://${slug}.zoobicon.sh`;
     const ogImageUrl = `https://zoobicon.sh/api/og/${encodeURIComponent(slug)}`;
 
-    let html = result.code as string;
+    let html = siteCode as string;
 
     // ---- Ensure viewport meta tag exists (mobile responsive) ----
     if (!html.includes("name=\"viewport\"") && !html.includes("name='viewport'")) {

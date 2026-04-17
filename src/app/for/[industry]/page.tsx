@@ -92,7 +92,7 @@ export default async function IndustryPage({ params }: Props) {
       <section className="pt-24 pb-16 px-4">
         <div className="max-w-5xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 text-sm text-slate-300 mb-6">
-            <Star className="w-4 h-4 text-yellow-400" /> Built for {data.name}
+            <Star className="w-4 h-4 text-stone-400" /> Built for {data.name}
           </div>
           <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
             {data.headline}
@@ -127,8 +127,8 @@ export default async function IndustryPage({ params }: Props) {
           <h2 className="text-2xl font-bold text-center mb-10">The Problem with {data.name} Websites</h2>
           <div className="grid md:grid-cols-2 gap-4">
             {data.painPoints.map((point, i) => (
-              <div key={i} className="flex items-start gap-3 p-4 bg-red-500/5 border border-red-500/10 rounded-xl">
-                <span className="text-red-400 font-bold text-lg mt-0.5">✕</span>
+              <div key={i} className="flex items-start gap-3 p-4 bg-stone-500/5 border border-stone-500/10 rounded-xl">
+                <span className="text-stone-400 font-bold text-lg mt-0.5">✕</span>
                 <p className="text-slate-300">{point}</p>
               </div>
             ))}
@@ -170,7 +170,7 @@ export default async function IndustryPage({ params }: Props) {
             <p className="font-semibold">{data.testimonial.name}</p>
             <p className="text-sm text-slate-400">{data.testimonial.role}, {data.testimonial.company}</p>
           </div>
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-sm text-emerald-400">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-stone-500/10 border border-stone-500/20 rounded-full text-sm text-stone-400">
             <TrendingUp className="w-4 h-4" />
             {data.testimonial.metric}
           </div>

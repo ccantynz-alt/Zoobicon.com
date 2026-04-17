@@ -74,7 +74,31 @@ interface SupabaseProjectListItem {
   created_at: string;
 }
 
+/**
+ * Module-level circuit breaker. Once the Supabase Management API has
+ * returned 401 / 403 / "JWT could not be decoded" in this process, mark
+ * the token as poisoned for the rest of the cold start so subsequent
+ * builds skip provisioning entirely instead of paying the round-trip
+ * and surfacing the same error to users over and over.
+ *
+ * Resets naturally on the next cold start (Vercel typically recycles
+ * lambdas within minutes of idle).
+ */
+let _tokenPoisoned = false;
+let _tokenPoisonReason = "";
+
+export function markTokenPoisoned(reason: string): void {
+  _tokenPoisoned = true;
+  _tokenPoisonReason = reason;
+  console.warn(`[supabase-provisioner] token poisoned for this cold start: ${reason}`);
+}
+
+export function isTokenPoisoned(): { poisoned: boolean; reason: string } {
+  return { poisoned: _tokenPoisoned, reason: _tokenPoisonReason };
+}
+
 export function isConfigured(): boolean {
+  if (_tokenPoisoned) return false;
   return Boolean(process.env.SUPABASE_ACCESS_TOKEN && process.env.SUPABASE_ORG_ID);
 }
 
@@ -123,6 +147,19 @@ async function sbFetch<T>(
   });
   const text = await res.text();
   if (!res.ok) {
+    // Trip the circuit breaker on auth failures so subsequent builds in
+    // this cold start skip Supabase entirely. The Management API returns
+    // "JWT could not be decoded" (literal string) for expired / invalid
+    // personal access tokens — catch that explicitly too.
+    if (
+      res.status === 401 ||
+      res.status === 403 ||
+      /JWT could not be decoded/i.test(text)
+    ) {
+      markTokenPoisoned(
+        `${res.status} ${res.statusText} on ${init.method} ${path} — token appears invalid. Set a fresh SUPABASE_ACCESS_TOKEN in Vercel.`
+      );
+    }
     const err = new Error(
       `Supabase API ${init.method} ${path} failed: ${res.status} ${res.statusText} — ${text}`
     ) as ProvisionerError;

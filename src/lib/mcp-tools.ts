@@ -6,7 +6,10 @@
  * invoke these to drive the Zoobicon platform.
  */
 
-import { REGISTRY, type RegistryComponent } from "@/lib/component-registry";
+// Lazy import to avoid circular dependency TDZ during webpack module init.
+// The component-registry's side-effect imports cause a temporal dead zone
+// when statically imported at module scope.
+import type { RegistryComponent } from "@/lib/component-registry";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -216,6 +219,7 @@ const listComponentsTool: MCPTool = {
     properties: {},
   },
   handler: async () => {
+    const { REGISTRY } = await import("@/lib/component-registry");
     const components = REGISTRY.map((c: RegistryComponent) => ({
       id: c.id,
       name: c.name,

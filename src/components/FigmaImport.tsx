@@ -217,8 +217,8 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
 
       {/* Error Message */}
       {error && (
-        <div className="mt-4 bg-red-500/10 border border-red-500/20 rounded-xl p-4">
-          <p className="text-sm text-red-400">{error}</p>
+        <div className="mt-4 bg-stone-500/10 border border-stone-500/20 rounded-xl p-4">
+          <p className="text-sm text-stone-400">{error}</p>
         </div>
       )}
 
@@ -229,7 +229,7 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
           disabled={!canSubmit || loading}
           className={`mt-6 w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl text-sm font-semibold transition-all duration-200 ${
             canSubmit && !loading
-              ? "bg-gradient-to-r from-[#3b82f6] to-[#3b82f6] text-white hover:shadow-lg hover:shadow-blue-500/20 cursor-pointer"
+              ? "bg-gradient-to-r from-[#3b82f6] to-[#3b82f6] text-white hover:shadow-lg hover:shadow-stone-500/20 cursor-pointer"
               : "bg-[#1a1a2e] text-[#444] cursor-not-allowed"
           }`}
         >
@@ -253,8 +253,8 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
           {LOADING_STEPS.map((step, i) => (
             <div key={step} className="flex items-center gap-3">
               {i < loadingStep ? (
-                <div className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center">
-                  <Check className="w-3 h-3 text-green-400" />
+                <div className="w-5 h-5 rounded-full bg-stone-500/20 flex items-center justify-center">
+                  <Check className="w-3 h-3 text-stone-400" />
                 </div>
               ) : i === loadingStep ? (
                 <Loader2 className="w-5 h-5 text-[#3b82f6] animate-spin" />
@@ -277,7 +277,7 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
       {result && (
         <div className="mt-6 space-y-4">
           <div className="bg-[#12121a] border border-[#1e1e2e] rounded-xl p-5 space-y-5">
-            <div className="flex items-center gap-2 text-green-400">
+            <div className="flex items-center gap-2 text-stone-400">
               <Check className="w-5 h-5" />
               <span className="text-sm font-semibold">
                 Design imported successfully
@@ -365,7 +365,7 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
           {/* Use This Design Button */}
           <button
             onClick={() => onImport(result.html)}
-            className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl text-sm font-semibold bg-gradient-to-r from-[#3b82f6] to-[#3b82f6] text-white hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-200 cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl text-sm font-semibold bg-gradient-to-r from-[#3b82f6] to-[#3b82f6] text-white hover:shadow-lg hover:shadow-stone-500/20 transition-all duration-200 cursor-pointer"
           >
             Use This Design
             <ArrowRight className="w-4 h-4" />

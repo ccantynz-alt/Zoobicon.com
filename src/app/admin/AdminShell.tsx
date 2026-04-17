@@ -45,7 +45,6 @@ const SIDEBAR_SECTIONS = [
   {
     label: "PRODUCTS",
     items: [
-      { name: "Domains", href: "/admin/domains", icon: Globe },
       { name: "My Domains", href: "/my-domains", icon: Globe },
       { name: "Register Domain", href: "/domains", icon: Globe },
       { name: "eSIM", href: "/admin/esim", icon: Wifi },
@@ -103,10 +102,11 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
     setChecking(false);
   }, []);
 
+  // Don't render anything until auth check completes
   if (checking || !isAdmin) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50/30 flex items-center justify-center">
-        <div className="text-slate-400 text-sm">Checking permissions...</div>
+      <div className="min-h-screen bg-[#131520] flex items-center justify-center">
+        <div className="text-white/30 text-sm">Checking permissions...</div>
       </div>
     );
   }
@@ -128,12 +128,12 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       {/* Logo */}
       <div className="flex items-center gap-2.5 px-5 py-5 border-b border-slate-200/80">
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/25 group-hover:shadow-amber-500/40 transition-shadow">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-stone-500 to-stone-600 flex items-center justify-center shadow-lg shadow-stone-500/25 group-hover:shadow-stone-500/40 transition-shadow">
             <Zap className="w-4 h-4 text-white" />
           </div>
           <span className="text-sm font-bold tracking-tight text-slate-800">ZOOBICON</span>
         </Link>
-        <span className="text-[9px] font-semibold uppercase tracking-wider text-amber-700 bg-amber-100 border border-amber-200 rounded px-1.5 py-0.5">
+        <span className="text-[9px] font-semibold uppercase tracking-wider text-stone-700 bg-stone-100 border border-stone-200 rounded px-1.5 py-0.5">
           Admin
         </span>
       </div>
@@ -155,11 +155,11 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
                     onClick={() => setSidebarOpen(false)}
                     className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all duration-150 ${
                       active
-                        ? "text-amber-800 bg-amber-100/80 font-medium shadow-sm"
+                        ? "text-stone-800 bg-stone-100/80 font-medium shadow-sm"
                         : "text-slate-500 hover:text-slate-700 hover:bg-slate-100/80"
                     }`}
                   >
-                    <item.icon className={`w-4 h-4 flex-shrink-0 ${active ? "text-amber-600" : ""}`} />
+                    <item.icon className={`w-4 h-4 flex-shrink-0 ${active ? "text-stone-600" : ""}`} />
                     <span>{item.name}</span>
                   </Link>
                 );
@@ -172,7 +172,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       {/* User / Logout */}
       <div className="border-t border-slate-200/80 px-3 py-3">
         <div className="flex items-center gap-2.5 px-2.5 py-2 mb-1">
-          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center text-xs font-bold text-white shadow-sm">
+          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-stone-400 to-stone-500 flex items-center justify-center text-xs font-bold text-white shadow-sm">
             {userName ? userName.charAt(0).toUpperCase() : "A"}
           </div>
           <div className="min-w-0 flex-1">
@@ -182,7 +182,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         </div>
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2.5 w-full px-2.5 py-2 rounded-lg text-sm text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all duration-150"
+          className="flex items-center gap-2.5 w-full px-2.5 py-2 rounded-lg text-sm text-slate-400 hover:text-stone-500 hover:bg-stone-50 transition-all duration-150"
         >
           <LogOut className="w-4 h-4" />
           <span>Sign out</span>
@@ -192,7 +192,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50/30 text-slate-800 flex">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-stone-50/30 text-slate-800 flex">
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex lg:flex-col lg:w-60 lg:fixed lg:inset-y-0 bg-white/80 backdrop-blur-xl border-r border-slate-200/80 z-40 shadow-xl shadow-slate-200/50">
         {sidebarContent}
@@ -232,12 +232,12 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
             <Menu className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2">
-            <Zap className="w-4 h-4 text-amber-500" />
+            <Zap className="w-4 h-4 text-stone-500" />
             <span className="text-sm font-semibold text-slate-700">Admin</span>
           </div>
           <button
             onClick={handleLogout}
-            className="p-2 rounded-lg text-slate-400 hover:text-red-500 transition-colors"
+            className="p-2 rounded-lg text-slate-400 hover:text-stone-500 transition-colors"
           >
             <LogOut className="w-4 h-4" />
           </button>

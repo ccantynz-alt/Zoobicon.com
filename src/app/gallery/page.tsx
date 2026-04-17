@@ -70,14 +70,14 @@ const CATEGORIES = [
 
 /* ---------- gradient map for placeholder cards ---------- */
 const GRADIENT_MAP: Record<string, string> = {
-  Business: "from-blue-600 to-cyan-500",
-  Portfolio: "from-purple-600 to-pink-500",
-  "E-Commerce": "from-emerald-600 to-teal-400",
-  SaaS: "from-indigo-600 to-blue-400",
-  Restaurant: "from-orange-600 to-amber-400",
-  Blog: "from-rose-600 to-pink-400",
-  Agency: "from-violet-600 to-purple-400",
-  "Landing Page": "from-cyan-600 to-blue-400",
+  Business: "from-stone-600 to-stone-500",
+  Portfolio: "from-stone-600 to-stone-500",
+  "E-Commerce": "from-stone-600 to-stone-400",
+  SaaS: "from-stone-600 to-stone-400",
+  Restaurant: "from-stone-600 to-stone-400",
+  Blog: "from-stone-600 to-stone-400",
+  Agency: "from-stone-600 to-stone-400",
+  "Landing Page": "from-stone-600 to-stone-400",
 };
 
 /* ---------- time ago helper ---------- */
@@ -123,11 +123,11 @@ function GalleryCard({ item, index }: { item: GalleryItem; index: number }) {
     <motion.div
       variants={fadeInUp}
       whileHover={{ y: -4, transition: { duration: 0.2 } }}
-      className="group relative rounded-2xl bg-white/[0.03] border border-white/[0.06] overflow-hidden hover:border-cyan-500/30 hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300"
+      className="group relative rounded-2xl bg-white/[0.03] border border-white/[0.06] overflow-hidden hover:border-stone-500/30 hover:shadow-lg hover:shadow-stone-500/10 transition-all duration-300"
     >
       {/* Staff pick badge */}
       {item.staffPick && (
-        <div className="absolute top-3 left-3 z-10 flex items-center gap-1 px-2 py-1 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs font-medium backdrop-blur-sm">
+        <div className="absolute top-3 left-3 z-10 flex items-center gap-1 px-2 py-1 rounded-full bg-stone-500/20 border border-stone-500/30 text-stone-400 text-xs font-medium backdrop-blur-sm">
           <Award className="w-3 h-3" />
           Staff Pick
         </div>
@@ -163,7 +163,7 @@ function GalleryCard({ item, index }: { item: GalleryItem; index: number }) {
         {/* Creator + time */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-[10px] font-bold text-white">
+            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-stone-500 to-stone-600 flex items-center justify-center text-[10px] font-bold text-white">
               {item.creator.charAt(0)}
             </div>
             <span className="text-xs text-gray-400">{item.creator}</span>
@@ -194,8 +194,8 @@ function GalleryCard({ item, index }: { item: GalleryItem; index: number }) {
               onClick={handleUpvote}
               className={`flex items-center gap-1.5 text-xs transition-colors ${
                 upvoted
-                  ? "text-pink-400"
-                  : "text-gray-500 hover:text-pink-400"
+                  ? "text-stone-400"
+                  : "text-gray-500 hover:text-stone-400"
               }`}
             >
               <motion.div
@@ -221,7 +221,7 @@ function GalleryCard({ item, index }: { item: GalleryItem; index: number }) {
             {/* Remix */}
             <Link
               href={`/builder?remix=${item.id}`}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs text-gray-400 hover:text-cyan-400 hover:bg-cyan-500/10 transition-colors"
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs text-gray-400 hover:text-stone-400 hover:bg-stone-500/10 transition-colors"
             >
               <GitFork className="w-3.5 h-3.5" />
               Remix
@@ -374,7 +374,7 @@ export default function GalleryPage() {
                 </Link>
                 <Link
                   href="/builder"
-                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-medium rounded-lg transition-colors"
+                  className="px-4 py-2 bg-stone-600 hover:bg-stone-500 text-white text-sm font-medium rounded-lg transition-colors"
                 >
                   Start Building
                 </Link>
@@ -387,7 +387,7 @@ export default function GalleryPage() {
       {/* ===== HERO ===== */}
       <div className="pt-32 pb-6 px-6 text-center relative overflow-hidden">
         {/* Background glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-cyan-500/10 via-blue-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-stone-500/10 via-stone-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -395,13 +395,13 @@ export default function GalleryPage() {
           transition={{ duration: 0.6 }}
           className="relative"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-sm font-medium mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-stone-500/10 border border-stone-500/20 text-stone-400 text-sm font-medium mb-6">
             <Sparkles className="w-4 h-4" />
             Community Builds
           </div>
           <h1 className="text-5xl sm:text-6xl font-black tracking-tight mb-4">
             Prompt{" "}
-            <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">
               Gallery
             </span>
           </h1>
@@ -413,7 +413,7 @@ export default function GalleryPage() {
           {/* Share CTA */}
           <Link
             href="/builder?share=true"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-stone-500/20 hover:shadow-stone-500/30"
           >
             <Rocket className="w-4 h-4" />
             Share Your Build
@@ -438,7 +438,7 @@ export default function GalleryPage() {
                 placeholder="Search prompts, sites, creators..."
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                className="w-full pl-10 pr-10 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500/40 focus:ring-1 focus:ring-cyan-500/20 transition-all"
+                className="w-full pl-10 pr-10 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-stone-500/40 focus:ring-1 focus:ring-stone-500/20 transition-all"
               />
               {searchInput && (
                 <button
@@ -461,7 +461,7 @@ export default function GalleryPage() {
                     onClick={() => setSort(opt.key)}
                     className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                       isActive
-                        ? "bg-cyan-500/15 text-cyan-400 border border-cyan-500/20"
+                        ? "bg-stone-500/15 text-stone-400 border border-stone-500/20"
                         : "text-gray-400 hover:text-white hover:bg-white/[0.04]"
                     }`}
                   >
@@ -503,7 +503,7 @@ export default function GalleryPage() {
                         onClick={() => { setSort(opt.key); setShowFilters(false); }}
                         className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                           sort === opt.key
-                            ? "bg-cyan-500/15 text-cyan-400 border border-cyan-500/20"
+                            ? "bg-stone-500/15 text-stone-400 border border-stone-500/20"
                             : "bg-white/[0.03] text-gray-400 border border-white/[0.06]"
                         }`}
                       >
@@ -525,7 +525,7 @@ export default function GalleryPage() {
                 onClick={() => setCategory(cat)}
                 className={`flex-shrink-0 px-4 py-2 rounded-full text-xs font-medium transition-all ${
                   category === cat
-                    ? "bg-cyan-500/15 text-cyan-400 border border-cyan-500/25"
+                    ? "bg-stone-500/15 text-stone-400 border border-stone-500/25"
                     : "bg-white/[0.03] text-gray-400 border border-white/[0.06] hover:bg-white/[0.06] hover:text-white"
                 }`}
               >
@@ -540,7 +540,7 @@ export default function GalleryPage() {
       <div className="max-w-7xl mx-auto px-6 pb-20">
         {loading ? (
           <div className="flex items-center justify-center py-32">
-            <Loader2 className="w-8 h-8 text-cyan-500 animate-spin" />
+            <Loader2 className="w-8 h-8 text-stone-500 animate-spin" />
           </div>
         ) : items.length === 0 ? (
           /* Empty state */
@@ -560,7 +560,7 @@ export default function GalleryPage() {
             </p>
             <Link
               href="/builder?share=true"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-medium rounded-xl transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-stone-600 hover:bg-stone-500 text-white text-sm font-medium rounded-xl transition-colors"
             >
               <Sparkles className="w-4 h-4" />
               Create Something
@@ -618,7 +618,7 @@ export default function GalleryPage() {
           >
             <h2 className="text-3xl font-bold mb-4">
               Ready to build something{" "}
-              <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">
                 amazing
               </span>
               ?
@@ -630,7 +630,7 @@ export default function GalleryPage() {
             <div className="flex items-center justify-center gap-4 flex-wrap">
               <Link
                 href="/builder"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-cyan-500/20"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-stone-500/20"
               >
                 <Sparkles className="w-4 h-4" />
                 Open the Builder

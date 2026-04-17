@@ -1409,15 +1409,16 @@ registerComponent({
   };
 
   const features = [
-    { title: "Intelligent Routing", desc: "AI analyzes every request and routes it to the optimal server in under 10ms. Zero config, zero latency.", icon: "M13 10V3L4 14h7v7l9-11h-7z", color: "violet" },
-    { title: "Adaptive Scaling", desc: "From 10 to 10 million requests. Infrastructure that scales itself based on real-time demand patterns.", icon: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15", color: "cyan" },
-    { title: "Predictive Caching", desc: "ML models predict what users need next and pre-cache it. 94% cache hit rate out of the box.", icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z", color: "emerald" },
-    { title: "Zero-Trust Security", desc: "Every request verified. Every connection encrypted. Every access logged. Enterprise-grade by default.", icon: "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z", color: "amber" },
-    { title: "Real-Time Sync", desc: "Changes propagate globally in under 50ms. Conflict resolution that actually works.", icon: "M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4", color: "rose" },
-    { title: "Deep Observability", desc: "Traces, metrics, and logs unified in one view. Find the needle in the haystack in seconds.", icon: "M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z", color: "fuchsia" },
+    { title: "Intelligent Routing", desc: "AI analyzes every request and routes it to the optimal server in under 10ms. Zero config, zero latency.", icon: "M13 10V3L4 14h7v7l9-11h-7z" },
+    { title: "Adaptive Scaling", desc: "From 10 to 10 million requests. Infrastructure that scales itself based on real-time demand patterns.", icon: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" },
+    { title: "Predictive Caching", desc: "ML models predict what users need next and pre-cache it. 94% cache hit rate out of the box.", icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" },
+    { title: "Zero-Trust Security", desc: "Every request verified. Every connection encrypted. Every access logged. Enterprise-grade by default.", icon: "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" },
+    { title: "Real-Time Sync", desc: "Changes propagate globally in under 50ms. Conflict resolution that actually works.", icon: "M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" },
+    { title: "Deep Observability", desc: "Traces, metrics, and logs unified in one view. Find the needle in the haystack in seconds.", icon: "M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" },
   ];
 
-  const colorMap = { violet: "139,92,246", cyan: "6,182,212", emerald: "16,185,129", amber: "245,158,11", rose: "244,63,94", fuchsia: "217,70,239" };
+  // Editorial warm accent for all spotlights — 232,212,176 = #E8D4B0
+  const accentRgb = "232,212,176";
 
   return (
     <section className="py-24 px-6 bg-gray-950" id="features">
@@ -1442,15 +1443,15 @@ registerComponent({
                 <div
                   className="absolute pointer-events-none w-[300px] h-[300px] rounded-full opacity-20 transition-opacity"
                   style={{
-                    background: \`radial-gradient(circle, rgba(\${colorMap[f.color]},0.15) 0%, transparent 70%)\`,
+                    background: \`radial-gradient(circle, rgba(\${accentRgb},0.18) 0%, transparent 70%)\`,
                     left: mousePos.x - 150,
                     top: mousePos.y - 150,
                   }}
                 />
               )}
               <div className="relative">
-                <div className={\`w-10 h-10 rounded-lg bg-\${f.color}-500/10 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300\`}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={\`rgb(\${colorMap[f.color]})\`} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d={f.icon}/></svg>
+                <div className="w-10 h-10 rounded-lg bg-stone-500/10 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={\`rgb(\${accentRgb})\`} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d={f.icon}/></svg>
                 </div>
                 <h3 className="text-lg font-bold text-white mb-2">{f.title}</h3>
                 <p className="text-sm text-gray-500 leading-relaxed">{f.desc}</p>

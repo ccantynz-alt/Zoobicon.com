@@ -347,7 +347,7 @@ export default function WordPressExport({ code }: WordPressExportProps) {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-700">
           <div className="flex items-center gap-3">
-            <FileArchive className="w-5 h-5 text-blue-400" />
+            <FileArchive className="w-5 h-5 text-stone-400" />
             <h2 className="text-lg font-semibold text-zinc-100">
               Zoobicon Connect
             </h2>
@@ -366,7 +366,7 @@ export default function WordPressExport({ code }: WordPressExportProps) {
             onClick={() => setMode("deploy")}
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
               mode === "deploy"
-                ? "text-blue-400 border-b-2 border-blue-400 bg-blue-400/5"
+                ? "text-stone-400 border-b-2 border-stone-400 bg-stone-400/5"
                 : "text-zinc-400 hover:text-zinc-300"
             }`}
           >
@@ -377,7 +377,7 @@ export default function WordPressExport({ code }: WordPressExportProps) {
             onClick={() => setMode("theme")}
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
               mode === "theme"
-                ? "text-blue-400 border-b-2 border-blue-400 bg-blue-400/5"
+                ? "text-stone-400 border-b-2 border-stone-400 bg-stone-400/5"
                 : "text-zinc-400 hover:text-zinc-300"
             }`}
           >
@@ -392,11 +392,11 @@ export default function WordPressExport({ code }: WordPressExportProps) {
           {/* ===================== DEPLOY MODE ===================== */}
           {mode === "deploy" && !deployResult && (
             <div className="space-y-4">
-              <div className="p-3 bg-blue-900/20 border border-blue-700/30 rounded-lg">
-                <p className="text-xs text-blue-300 leading-relaxed">
+              <div className="p-3 bg-stone-900/20 border border-stone-700/30 rounded-lg">
+                <p className="text-xs text-stone-300 leading-relaxed">
                   Deploy directly to your WordPress site. Requires the{" "}
                   <strong>Zoobicon Connect</strong> plugin installed on your WordPress site.{" "}
-                  <a href="/wordpress" target="_blank" className="underline hover:text-blue-200">
+                  <a href="/wordpress" target="_blank" className="underline hover:text-stone-200">
                     Download plugin &rarr;
                   </a>
                 </p>
@@ -405,14 +405,14 @@ export default function WordPressExport({ code }: WordPressExportProps) {
               <div>
                 <label className="block text-sm font-medium text-zinc-300 mb-1.5">
                   <Globe className="w-3.5 h-3.5 inline mr-1.5" />
-                  WordPress Site URL <span className="text-red-400">*</span>
+                  WordPress Site URL <span className="text-stone-400">*</span>
                 </label>
                 <input
                   type="url"
                   value={wpUrl}
                   onChange={(e) => { setWpUrl(e.target.value); setConnectionStatus(null); }}
                   placeholder="https://yoursite.com"
-                  className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent text-sm"
                   disabled={isDeploying}
                 />
               </div>
@@ -420,14 +420,14 @@ export default function WordPressExport({ code }: WordPressExportProps) {
               <div>
                 <label className="block text-sm font-medium text-zinc-300 mb-1.5">
                   <Key className="w-3.5 h-3.5 inline mr-1.5" />
-                  Connect Key <span className="text-red-400">*</span>
+                  Connect Key <span className="text-stone-400">*</span>
                 </label>
                 <input
                   type="password"
                   value={connectKey}
                   onChange={(e) => { setConnectKey(e.target.value); setConnectionStatus(null); }}
                   placeholder="zbc_..."
-                  className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm font-mono"
+                  className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent text-sm font-mono"
                   disabled={isDeploying}
                 />
                 <p className="text-xs text-zinc-500 mt-1">
@@ -451,8 +451,8 @@ export default function WordPressExport({ code }: WordPressExportProps) {
               {connectionStatus && (
                 <div className={`p-3 rounded-lg border text-sm ${
                   connectionStatus.connected
-                    ? "bg-green-900/20 border-green-700/30 text-green-300"
-                    : "bg-red-900/20 border-red-700/30 text-red-300"
+                    ? "bg-stone-900/20 border-stone-700/30 text-stone-300"
+                    : "bg-stone-900/20 border-stone-700/30 text-stone-300"
                 }`}>
                   {connectionStatus.connected ? (
                     <div className="space-y-1">
@@ -477,14 +477,14 @@ export default function WordPressExport({ code }: WordPressExportProps) {
 
               <div>
                 <label className="block text-sm font-medium text-zinc-300 mb-1.5">
-                  Page Title <span className="text-red-400">*</span>
+                  Page Title <span className="text-stone-400">*</span>
                 </label>
                 <input
                   type="text"
                   value={deployTitle}
                   onChange={(e) => setDeployTitle(e.target.value)}
                   placeholder="My Landing Page"
-                  className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent text-sm"
                   disabled={isDeploying}
                 />
               </div>
@@ -499,7 +499,7 @@ export default function WordPressExport({ code }: WordPressExportProps) {
                     value={deploySlug}
                     onChange={(e) => setDeploySlug(e.target.value)}
                     placeholder="my-landing-page"
-                    className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent text-sm"
                     disabled={isDeploying}
                   />
                 </div>
@@ -510,7 +510,7 @@ export default function WordPressExport({ code }: WordPressExportProps) {
                   <select
                     value={deployStatus}
                     onChange={(e) => setDeployStatus(e.target.value as "draft" | "publish")}
-                    className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent text-sm"
                     disabled={isDeploying}
                   >
                     <option value="draft">Draft</option>
@@ -520,7 +520,7 @@ export default function WordPressExport({ code }: WordPressExportProps) {
               </div>
 
               {deployError && (
-                <div className="p-3 bg-red-900/30 border border-red-700 rounded-lg text-red-300 text-sm">
+                <div className="p-3 bg-stone-900/30 border border-stone-700 rounded-lg text-stone-300 text-sm">
                   {deployError}
                 </div>
               )}
@@ -528,7 +528,7 @@ export default function WordPressExport({ code }: WordPressExportProps) {
               <button
                 onClick={handleDeploy}
                 disabled={isDeploying || !wpUrl || !connectKey || !deployTitle.trim()}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 disabled:bg-zinc-700 disabled:text-zinc-500 text-white rounded-lg font-medium text-sm transition-colors"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-stone-600 hover:bg-stone-500 disabled:bg-zinc-700 disabled:text-zinc-500 text-white rounded-lg font-medium text-sm transition-colors"
               >
                 {isDeploying ? (
                   <><Loader2 className="w-4 h-4 animate-spin" /> Deploying to WordPress...</>
@@ -542,12 +542,12 @@ export default function WordPressExport({ code }: WordPressExportProps) {
           {/* Deploy success */}
           {mode === "deploy" && deployResult && (
             <div className="space-y-4">
-              <div className="p-4 bg-green-900/20 border border-green-700/30 rounded-lg">
-                <div className="flex items-center gap-2 text-green-300 font-semibold mb-2">
+              <div className="p-4 bg-stone-900/20 border border-stone-700/30 rounded-lg">
+                <div className="flex items-center gap-2 text-stone-300 font-semibold mb-2">
                   <CheckCircle2 className="w-5 h-5" />
                   Deployed Successfully!
                 </div>
-                <div className="space-y-2 text-sm text-green-200/80">
+                <div className="space-y-2 text-sm text-stone-200/80">
                   <div><strong>Title:</strong> {deployResult.title}</div>
                   <div><strong>Status:</strong> {deployResult.status}</div>
                   <div><strong>Version:</strong> {deployResult.version}</div>
@@ -560,7 +560,7 @@ export default function WordPressExport({ code }: WordPressExportProps) {
                   href={deployResult.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium text-sm transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-stone-600 hover:bg-stone-500 text-white rounded-lg font-medium text-sm transition-colors"
                 >
                   <ExternalLink className="w-4 h-4" />
                   View Page
@@ -592,14 +592,14 @@ export default function WordPressExport({ code }: WordPressExportProps) {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-zinc-300 mb-1.5">
-                  Site Name <span className="text-red-400">*</span>
+                  Site Name <span className="text-stone-400">*</span>
                 </label>
                 <input
                   type="text"
                   value={siteName}
                   onChange={(e) => setSiteName(e.target.value)}
                   placeholder="My Awesome Website"
-                  className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent text-sm"
                   disabled={isLoading}
                 />
               </div>
@@ -613,7 +613,7 @@ export default function WordPressExport({ code }: WordPressExportProps) {
                   onChange={(e) => setSiteDescription(e.target.value)}
                   placeholder="A brief description of your website..."
                   rows={3}
-                  className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm resize-none"
+                  className="w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent text-sm resize-none"
                   disabled={isLoading}
                 />
               </div>
@@ -634,7 +634,7 @@ export default function WordPressExport({ code }: WordPressExportProps) {
               </div>
 
               {error && (
-                <div className="p-3 bg-red-900/30 border border-red-700 rounded-lg text-red-300 text-sm">
+                <div className="p-3 bg-stone-900/30 border border-stone-700 rounded-lg text-stone-300 text-sm">
                   {error}
                 </div>
               )}
@@ -642,7 +642,7 @@ export default function WordPressExport({ code }: WordPressExportProps) {
               <button
                 onClick={handleGenerate}
                 disabled={isLoading || !siteName.trim()}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 disabled:bg-zinc-700 disabled:text-zinc-500 text-white rounded-lg font-medium text-sm transition-colors"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-stone-600 hover:bg-stone-500 disabled:bg-zinc-700 disabled:text-zinc-500 text-white rounded-lg font-medium text-sm transition-colors"
               >
                 {isLoading ? (
                   <>
@@ -666,7 +666,7 @@ export default function WordPressExport({ code }: WordPressExportProps) {
               <div className="flex gap-3">
                 <button
                   onClick={downloadAllAsZip}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-500 text-white rounded-lg font-medium text-sm transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-stone-600 hover:bg-stone-500 text-white rounded-lg font-medium text-sm transition-colors"
                 >
                   <Download className="w-4 h-4" />
                   Download Theme ZIP
@@ -677,7 +677,7 @@ export default function WordPressExport({ code }: WordPressExportProps) {
                 >
                   {copiedWxr ? (
                     <>
-                      <Check className="w-4 h-4 text-green-400" />
+                      <Check className="w-4 h-4 text-stone-400" />
                       Copied!
                     </>
                   ) : (
@@ -692,7 +692,7 @@ export default function WordPressExport({ code }: WordPressExportProps) {
               {/* File tree */}
               <div>
                 <h3 className="text-sm font-medium text-zinc-300 mb-2 flex items-center gap-2">
-                  <FolderTree className="w-4 h-4 text-blue-400" />
+                  <FolderTree className="w-4 h-4 text-stone-400" />
                   Theme Files
                 </h3>
                 <div className="bg-zinc-800 border border-zinc-700 rounded-lg divide-y divide-zinc-700">
@@ -708,7 +708,7 @@ export default function WordPressExport({ code }: WordPressExportProps) {
                           ) : (
                             <ChevronRight className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
                           )}
-                          <FileCode className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                          <FileCode className="w-3.5 h-3.5 text-stone-400 shrink-0" />
                           <span className="text-sm text-zinc-200 font-mono">
                             {filename}
                           </span>
@@ -724,7 +724,7 @@ export default function WordPressExport({ code }: WordPressExportProps) {
                             title="Copy file content"
                           >
                             {copiedFile === filename ? (
-                              <Check className="w-3 h-3 text-green-400" />
+                              <Check className="w-3 h-3 text-stone-400" />
                             ) : (
                               <Copy className="w-3 h-3 text-zinc-400" />
                             )}

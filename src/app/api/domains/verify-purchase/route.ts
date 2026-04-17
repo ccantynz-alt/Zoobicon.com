@@ -58,8 +58,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No domains found in session" }, { status: 400 });
     }
 
-    // Use the email from session metadata, or the provided email
-    const registrantEmail = session.metadata?.registrantEmail || session.customer_email || email;
+    // Use the email from session metadata, or the provided email.
+    // SECURITY: reject requests where the caller's email doesn't match the
+    // session's registrant — prevents attackers from claiming arbitrary domains.
+    const sessionEmail = (session.metadata?.registrantEmail || session.customer_email || "").toLowerCase();
+    const callerEmail = String(email).toLowerCase();
+    if (sessionEmail && sessionEmail !== callerEmail) {
+      return NextResponse.json(
+        { error: "Email does not match purchase" },
+        { status: 403 }
+      );
+    }
+    const registrantEmail = sessionEmail || callerEmail;
     const years = parseInt(session.metadata?.years || "1", 10);
     const expiresAt = new Date();
     expiresAt.setFullYear(expiresAt.getFullYear() + years);
@@ -76,13 +86,23 @@ export async function POST(req: NextRequest) {
       try {
         // Check if already saved by webhook
         const existing = await sql`
-          SELECT domain, status FROM registered_domains WHERE domain = ${trimmed}
+          SELECT domain, status, created_at FROM registered_domains WHERE domain = ${trimmed}
         `;
 
         if (existing.length > 0) {
           alreadyExists.push(trimmed);
-          // If status is pending/failed but payment is confirmed, retry OpenSRS registration
-          if (existing[0].status === "pending_registration" || existing[0].status === "registration_failed") {
+          const row = existing[0] as { status: string; created_at: string };
+          // Already registered — nothing to do
+          if (row.status === "active") continue;
+          // Webhook may be mid-flight. If row is very fresh, give webhook
+          // a chance to finish before we double-register with OpenSRS.
+          const ageMs = Date.now() - new Date(row.created_at).getTime();
+          if (row.status === "pending_registration" && ageMs < 30_000) {
+            console.log(`[verify-purchase] ${trimmed} pending for ${ageMs}ms — letting webhook finish`);
+            continue;
+          }
+          // Pending >30s or failed: safe to retry
+          if (row.status === "pending_registration" || row.status === "registration_failed") {
             await tryRegisterWithOpenSRS(trimmed, registrantEmail, years, session, sql);
           }
         } else {
@@ -118,7 +138,6 @@ export async function POST(req: NextRequest) {
 /**
  * Attempt to register a domain with OpenSRS and update DB status.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function tryRegisterWithOpenSRS(domain: string, email: string, years: number, session: any, sql: any) {
   const registrant: ContactInfo = {
     firstName: session.metadata?.registrantFirstName || "Domain",

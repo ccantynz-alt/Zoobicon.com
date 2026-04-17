@@ -56,9 +56,9 @@ interface ContextSource {
 const PROVIDER_META: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
   github: { icon: <GitFork className="w-4 h-4" />, label: "GitHub", color: "text-white" },
   notion: { icon: <BookOpen className="w-4 h-4" />, label: "Notion", color: "text-white" },
-  figma: { icon: <Layers className="w-4 h-4" />, label: "Layers", color: "text-purple-400" },
-  "google-sheets": { icon: <Sheet className="w-4 h-4" />, label: "Google Sheets", color: "text-green-400" },
-  custom: { icon: <Database className="w-4 h-4" />, label: "Custom", color: "text-blue-400" },
+  figma: { icon: <Layers className="w-4 h-4" />, label: "Layers", color: "text-stone-400" },
+  "google-sheets": { icon: <Sheet className="w-4 h-4" />, label: "Google Sheets", color: "text-stone-400" },
+  custom: { icon: <Database className="w-4 h-4" />, label: "Custom", color: "text-stone-400" },
 };
 
 // ---------------------------------------------------------------------------
@@ -310,11 +310,11 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
       <div className="px-4 py-3 border-b border-white/10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Link className="w-4 h-4 text-indigo-400" />
+            <Link className="w-4 h-4 text-stone-400" />
             <h3 className="text-sm font-semibold">External Context (MCP)</h3>
           </div>
           {includedCount > 0 && (
-            <span className="text-xs bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full">
+            <span className="text-xs bg-stone-500/20 text-stone-300 px-2 py-0.5 rounded-full">
               {includedCount} source{includedCount !== 1 ? "s" : ""} active
             </span>
           )}
@@ -333,12 +333,12 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
             onChange={(e) => { setQuickUrl(e.target.value); setQuickError(""); }}
             onKeyDown={(e) => { if (e.key === "Enter") handleQuickImport(); }}
             placeholder="Paste GitHub, Notion, Figma, or any URL..."
-            className="flex-1 px-2.5 py-1.5 text-xs bg-white/5 border border-white/10 rounded-lg focus:border-indigo-500/50 focus:outline-none text-white placeholder-white/30"
+            className="flex-1 px-2.5 py-1.5 text-xs bg-white/5 border border-white/10 rounded-lg focus:border-stone-500/50 focus:outline-none text-white placeholder-white/30"
           />
           <button
             onClick={handleQuickImport}
             disabled={quickLoading || !quickUrl.trim()}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-indigo-500/20 text-indigo-300 rounded-lg hover:bg-indigo-500/30 transition-colors disabled:opacity-40"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-stone-500/20 text-stone-300 rounded-lg hover:bg-stone-500/30 transition-colors disabled:opacity-40"
           >
             {quickLoading ? (
               <Loader2 className="w-3 h-3 animate-spin" />
@@ -349,7 +349,7 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
           </button>
         </div>
         {quickError && (
-          <p className="mt-1.5 text-[10px] text-red-400">{quickError}</p>
+          <p className="mt-1.5 text-[10px] text-stone-400">{quickError}</p>
         )}
         <p className="mt-1.5 text-[10px] text-white/30">
           Auto-detects GitHub repos, Notion pages, Figma files, or crawls any website.
@@ -378,7 +378,7 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
                   <span className={meta.color}>{meta.icon}</span>
                   <span className="text-white/60">{meta.label}</span>
                   {isConnected ? (
-                    <Check className="w-3 h-3 text-green-400" />
+                    <Check className="w-3 h-3 text-stone-400" />
                   ) : (
                     <span className="text-[10px] text-white/50 bg-white/5 px-1 rounded">demo</span>
                   )}
@@ -421,7 +421,7 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
                         title={source.included ? "Included in generation" : "Excluded from generation"}
                       >
                         {source.included ? (
-                          <ToggleRight className="w-4 h-4 text-indigo-400" />
+                          <ToggleRight className="w-4 h-4 text-stone-400" />
                         ) : (
                           <ToggleLeft className="w-4 h-4 text-white/50" />
                         )}
@@ -440,9 +440,9 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
                       {/* Remove */}
                       <button
                         onClick={() => removeSource(source.id)}
-                        className="p-1 rounded hover:bg-red-500/20 transition-colors"
+                        className="p-1 rounded hover:bg-stone-500/20 transition-colors"
                       >
-                        <X className="w-3.5 h-3.5 text-white/50 hover:text-red-400" />
+                        <X className="w-3.5 h-3.5 text-white/50 hover:text-stone-400" />
                       </button>
                     </div>
                   </div>
@@ -461,7 +461,7 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
                               value={source.params[field.key] || ""}
                               onChange={(e) => updateParam(source.id, field.key, e.target.value)}
                               placeholder={field.placeholder}
-                              className="w-full mt-0.5 px-2 py-1.5 text-xs bg-white/5 border border-white/10 rounded focus:border-indigo-500/50 focus:outline-none text-white placeholder-white/50"
+                              className="w-full mt-0.5 px-2 py-1.5 text-xs bg-white/5 border border-white/10 rounded focus:border-stone-500/50 focus:outline-none text-white placeholder-white/50"
                             />
                           </div>
                         ))}
@@ -471,7 +471,7 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
                       <button
                         onClick={() => fetchSource(source.id)}
                         disabled={source.loading}
-                        className="w-full flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-medium bg-indigo-500/20 text-indigo-300 rounded hover:bg-indigo-500/30 transition-colors disabled:opacity-50"
+                        className="w-full flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-medium bg-stone-500/20 text-stone-300 rounded hover:bg-stone-500/30 transition-colors disabled:opacity-50"
                       >
                         {source.loading ? (
                           <>
@@ -491,19 +491,19 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
                         <div
                           className={`mt-2 p-2 rounded border text-xs ${
                             source.result.success
-                              ? "bg-green-500/5 border-green-500/20"
-                              : "bg-red-500/5 border-red-500/20"
+                              ? "bg-stone-500/5 border-stone-500/20"
+                              : "bg-stone-500/5 border-stone-500/20"
                           }`}
                         >
                           <div className="flex items-start gap-2">
                             {source.result.success ? (
-                              <Check className="w-3 h-3 text-green-400 mt-0.5 flex-shrink-0" />
+                              <Check className="w-3 h-3 text-stone-400 mt-0.5 flex-shrink-0" />
                             ) : (
-                              <X className="w-3 h-3 text-red-400 mt-0.5 flex-shrink-0" />
+                              <X className="w-3 h-3 text-stone-400 mt-0.5 flex-shrink-0" />
                             )}
                             <p
                               className={`leading-relaxed ${
-                                source.result.success ? "text-green-300/80" : "text-red-300/80"
+                                source.result.success ? "text-stone-300/80" : "text-stone-300/80"
                               }`}
                             >
                               {source.result.summary}
@@ -571,7 +571,7 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
         ) : (
           <button
             onClick={() => setShowAddMenu(true)}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium border border-dashed border-white/20 rounded hover:border-indigo-500/40 hover:bg-indigo-500/5 text-white/50 hover:text-indigo-300 transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium border border-dashed border-white/20 rounded hover:border-stone-500/40 hover:bg-stone-500/5 text-white/50 hover:text-stone-300 transition-colors"
           >
             <Link className="w-3.5 h-3.5" />
             Add Context Source

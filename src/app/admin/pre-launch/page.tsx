@@ -50,18 +50,18 @@ interface ChecklistItem {
 }
 
 const CATEGORIES = [
-  { key: "infrastructure", label: "Infrastructure & DevOps", icon: Server, color: "text-blue-400" },
-  { key: "security", label: "Security & Auth", icon: Shield, color: "text-red-400" },
-  { key: "email", label: "Email & Notifications", icon: Mail, color: "text-amber-400" },
-  { key: "payments", label: "Payments & Billing", icon: CreditCard, color: "text-green-400" },
-  { key: "seo", label: "SEO & Marketing", icon: Search, color: "text-purple-400" },
-  { key: "performance", label: "Performance & Speed", icon: Zap, color: "text-yellow-400" },
-  { key: "quality", label: "Quality & Testing", icon: Bug, color: "text-orange-400" },
-  { key: "ux", label: "UX & Accessibility", icon: Accessibility, color: "text-cyan-400" },
-  { key: "ai", label: "AI Pipeline & Models", icon: Bot, color: "text-violet-400" },
-  { key: "competitive", label: "Competitive Edge", icon: Trophy, color: "text-rose-400" },
+  { key: "infrastructure", label: "Infrastructure & DevOps", icon: Server, color: "text-stone-400" },
+  { key: "security", label: "Security & Auth", icon: Shield, color: "text-stone-400" },
+  { key: "email", label: "Email & Notifications", icon: Mail, color: "text-stone-400" },
+  { key: "payments", label: "Payments & Billing", icon: CreditCard, color: "text-stone-400" },
+  { key: "seo", label: "SEO & Marketing", icon: Search, color: "text-stone-400" },
+  { key: "performance", label: "Performance & Speed", icon: Zap, color: "text-stone-400" },
+  { key: "quality", label: "Quality & Testing", icon: Bug, color: "text-stone-400" },
+  { key: "ux", label: "UX & Accessibility", icon: Accessibility, color: "text-stone-400" },
+  { key: "ai", label: "AI Pipeline & Models", icon: Bot, color: "text-stone-400" },
+  { key: "competitive", label: "Competitive Edge", icon: Trophy, color: "text-stone-400" },
   { key: "legal", label: "Legal & Compliance", icon: FileText, color: "text-slate-400" },
-  { key: "monitoring", label: "Monitoring & Analytics", icon: BarChart3, color: "text-emerald-400" },
+  { key: "monitoring", label: "Monitoring & Analytics", icon: BarChart3, color: "text-stone-400" },
 ];
 
 const CHECKLIST: ChecklistItem[] = [
@@ -211,10 +211,10 @@ export default function PreLaunchChecklistPage() {
   const highRemaining = CHECKLIST.filter((i) => i.priority === "high" && !checked.has(i.id)).length;
 
   const priorityColor: Record<string, string> = {
-    critical: "text-red-400 bg-red-500/10 border-red-500/20",
-    high: "text-orange-400 bg-orange-500/10 border-orange-500/20",
-    medium: "text-yellow-400 bg-yellow-500/10 border-yellow-500/20",
-    low: "text-blue-400 bg-blue-500/10 border-blue-500/20",
+    critical: "text-stone-400 bg-stone-500/10 border-stone-500/20",
+    high: "text-stone-400 bg-stone-500/10 border-stone-500/20",
+    medium: "text-stone-400 bg-stone-500/10 border-stone-500/20",
+    low: "text-stone-400 bg-stone-500/10 border-stone-500/20",
   };
 
   return (
@@ -234,7 +234,7 @@ export default function PreLaunchChecklistPage() {
           </div>
           <div className="flex items-center gap-3 text-sm">
             <span className="text-white/70">{checkedItems}/{totalItems} complete</span>
-            <span className={`font-bold ${progress === 100 ? "text-green-400" : progress > 70 ? "text-yellow-400" : "text-red-400"}`}>{progress}%</span>
+            <span className={`font-bold ${progress === 100 ? "text-stone-400" : progress > 70 ? "text-stone-400" : "text-stone-400"}`}>{progress}%</span>
           </div>
         </div>
       </nav>
@@ -242,7 +242,7 @@ export default function PreLaunchChecklistPage() {
       <div className="relative z-10 max-w-5xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-start gap-4 mb-8">
-          <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 via-purple-500 to-blue-500 flex items-center justify-center shrink-0">
+          <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-stone-500 via-stone-500 to-stone-500 flex items-center justify-center shrink-0">
             <Rocket className="w-7 h-7 text-white" />
           </div>
           <div>
@@ -261,7 +261,7 @@ export default function PreLaunchChecklistPage() {
           </div>
           <div className="w-full h-3 bg-white/10 rounded-full overflow-hidden mb-4">
             <motion.div
-              className={`h-full rounded-full ${progress === 100 ? "bg-green-500" : progress > 70 ? "bg-blue-500" : progress > 40 ? "bg-yellow-500" : "bg-red-500"}`}
+              className={`h-full rounded-full ${progress === 100 ? "bg-stone-500" : progress > 70 ? "bg-stone-500" : progress > 40 ? "bg-stone-500" : "bg-stone-500"}`}
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.8, ease: "easeOut" }}
@@ -269,17 +269,17 @@ export default function PreLaunchChecklistPage() {
           </div>
           <div className="flex gap-4 text-sm">
             {criticalRemaining > 0 && (
-              <span className="flex items-center gap-1.5 text-red-400">
+              <span className="flex items-center gap-1.5 text-stone-400">
                 <AlertTriangle className="w-4 h-4" /> {criticalRemaining} critical remaining
               </span>
             )}
             {highRemaining > 0 && (
-              <span className="flex items-center gap-1.5 text-orange-400">
+              <span className="flex items-center gap-1.5 text-stone-400">
                 <AlertTriangle className="w-4 h-4" /> {highRemaining} high priority remaining
               </span>
             )}
             {criticalRemaining === 0 && highRemaining === 0 && (
-              <span className="flex items-center gap-1.5 text-green-400">
+              <span className="flex items-center gap-1.5 text-stone-400">
                 <CheckCircle2 className="w-4 h-4" /> All critical and high priority items complete!
               </span>
             )}
@@ -287,26 +287,26 @@ export default function PreLaunchChecklistPage() {
         </div>
 
         {/* Competitive Landscape Summary */}
-        <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/20 rounded-xl p-6 mb-6">
+        <div className="bg-gradient-to-r from-stone-500/10 to-stone-500/10 border border-stone-500/20 rounded-xl p-6 mb-6">
           <div className="flex items-center gap-3 mb-3">
-            <Target className="w-5 h-5 text-purple-400" />
+            <Target className="w-5 h-5 text-stone-400" />
             <h2 className="font-semibold">Competitive Position at Launch</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
             <div className="bg-white/[0.06] rounded-lg p-3">
-              <div className="text-green-400 font-medium mb-1">We Beat</div>
+              <div className="text-stone-400 font-medium mb-1">We Beat</div>
               <div className="text-white/85">White-label agency, 43 generators, multi-LLM, full-stack gen, e-commerce gen, 21+ tools</div>
             </div>
             <div className="bg-white/[0.06] rounded-lg p-3">
-              <div className="text-blue-400 font-medium mb-1">We Match</div>
+              <div className="text-stone-400 font-medium mb-1">We Match</div>
               <div className="text-white/85">Visual editing, project mode, templates, multi-page sites, GitHub export</div>
             </div>
             <div className="bg-white/[0.06] rounded-lg p-3">
-              <div className="text-yellow-400 font-medium mb-1">Gap to Close</div>
+              <div className="text-stone-400 font-medium mb-1">Gap to Close</div>
               <div className="text-white/85">Build speed (95s vs Bolt 3-5s), in-browser runtime, real-time collab</div>
             </div>
             <div className="bg-white/[0.06] rounded-lg p-3">
-              <div className="text-purple-400 font-medium mb-1">Unique Moat</div>
+              <div className="text-stone-400 font-medium mb-1">Unique Moat</div>
               <div className="text-white/85">Agency platform, 43 specialized generators, Opus quality, WordPress plugin</div>
             </div>
           </div>
@@ -321,7 +321,7 @@ export default function PreLaunchChecklistPage() {
               onClick={() => setFilterPriority(p)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 filterPriority === p
-                  ? "bg-blue-600 text-white"
+                  ? "bg-stone-600 text-white"
                   : "bg-white/5 text-white/70 hover:bg-white/10"
               }`}
             >
@@ -336,7 +336,7 @@ export default function PreLaunchChecklistPage() {
           <button
             onClick={() => setShowCompetitorNotes(!showCompetitorNotes)}
             className={`ml-auto px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-              showCompetitorNotes ? "bg-purple-600/20 text-purple-300" : "bg-white/5 text-white/60"
+              showCompetitorNotes ? "bg-stone-600/20 text-stone-300" : "bg-white/5 text-white/60"
             }`}
           >
             <Trophy className="w-3 h-3 inline mr-1" />
@@ -364,7 +364,7 @@ export default function PreLaunchChecklistPage() {
                   <span className="text-sm text-white/70">{catChecked}/{items.length}</span>
                   <div className="w-24 h-1.5 bg-white/10 rounded-full overflow-hidden mx-2">
                     <div
-                      className={`h-full rounded-full transition-all duration-500 ${catChecked === items.length ? "bg-green-500" : "bg-blue-500"}`}
+                      className={`h-full rounded-full transition-all duration-500 ${catChecked === items.length ? "bg-stone-500" : "bg-stone-500"}`}
                       style={{ width: `${items.length > 0 ? (catChecked / items.length) * 100 : 0}%` }}
                     />
                   </div>
@@ -377,7 +377,7 @@ export default function PreLaunchChecklistPage() {
                       <div
                         key={item.id}
                         className={`flex items-start gap-3 px-5 py-3 border-b border-white/10 last:border-0 transition-colors ${
-                          checked.has(item.id) ? "bg-green-500/[0.03]" : "hover:bg-white/[0.02]"
+                          checked.has(item.id) ? "bg-stone-500/[0.03]" : "hover:bg-white/[0.02]"
                         }`}
                       >
                         <button
@@ -385,7 +385,7 @@ export default function PreLaunchChecklistPage() {
                           className="mt-0.5 shrink-0"
                         >
                           {checked.has(item.id) ? (
-                            <CheckCircle2 className="w-5 h-5 text-green-400" />
+                            <CheckCircle2 className="w-5 h-5 text-stone-400" />
                           ) : (
                             <Circle className="w-5 h-5 text-white/50 hover:text-white/70 transition-colors" />
                           )}
@@ -399,7 +399,7 @@ export default function PreLaunchChecklistPage() {
                               {item.priority}
                             </span>
                             {item.link && (
-                              <Link href={item.link} className="text-[10px] text-blue-400 hover:text-blue-300 transition-colors">
+                              <Link href={item.link} className="text-[10px] text-stone-400 hover:text-stone-300 transition-colors">
                                 Open →
                               </Link>
                             )}
@@ -408,8 +408,8 @@ export default function PreLaunchChecklistPage() {
                             {item.description}
                           </p>
                           {showCompetitorNotes && item.competitorNote && (
-                            <div className="mt-2 text-[11px] text-purple-300/70 bg-purple-500/[0.06] border border-purple-500/10 rounded px-2.5 py-1.5">
-                              <Trophy className="w-3 h-3 inline mr-1 text-purple-400" />
+                            <div className="mt-2 text-[11px] text-stone-300/70 bg-stone-500/[0.06] border border-stone-500/10 rounded px-2.5 py-1.5">
+                              <Trophy className="w-3 h-3 inline mr-1 text-stone-400" />
                               {item.competitorNote}
                             </div>
                           )}
@@ -432,7 +432,7 @@ export default function PreLaunchChecklistPage() {
               const done = CHECKLIST.filter((i) => i.priority === p && checked.has(i.id)).length;
               return (
                 <div key={p} className="bg-white/[0.04] rounded-lg p-3">
-                  <div className={`text-lg font-bold ${done === total ? "text-green-400" : priorityColor[p].split(" ")[0]}`}>
+                  <div className={`text-lg font-bold ${done === total ? "text-stone-400" : priorityColor[p].split(" ")[0]}`}>
                     {done}/{total}
                   </div>
                   <div className="text-xs text-white/60 capitalize mt-0.5">{p}</div>
@@ -449,7 +449,7 @@ export default function PreLaunchChecklistPage() {
                 : `${highRemaining} high priority items remaining. Critical items are done — launch is possible but not recommended.`}
             </p>
             {progress === 100 && (
-              <div className="flex items-center gap-2 text-green-400 font-bold">
+              <div className="flex items-center gap-2 text-stone-400 font-bold">
                 <Rocket className="w-5 h-5" /> READY TO LAUNCH
               </div>
             )}

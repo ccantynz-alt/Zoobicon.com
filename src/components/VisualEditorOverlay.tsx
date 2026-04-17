@@ -107,7 +107,7 @@ export default function VisualEditor({ active, onEdit, files, onToggle }: Visual
               onClick={() => setTool(t.id)}
               className={`p-1.5 rounded-lg transition-all ${
                 tool === t.id
-                  ? "bg-indigo-600 text-white"
+                  ? "bg-stone-600 text-white"
                   : "text-white/50 hover:text-white hover:bg-white/10"
               }`}
               title={t.label}

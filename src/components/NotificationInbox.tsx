@@ -165,7 +165,7 @@ export default function NotificationInbox() {
 
         {/* Unread badge */}
         {unreadCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-[10px] font-semibold text-white leading-none">
+          <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-stone-500 text-[10px] font-semibold text-white leading-none">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
@@ -190,7 +190,7 @@ export default function NotificationInbox() {
                 {unreadCount > 0 && (
                   <button
                     onClick={handleMarkAllRead}
-                    className="flex items-center gap-1 text-[11px] text-cyan-400 hover:text-cyan-300 transition-colors"
+                    className="flex items-center gap-1 text-[11px] text-stone-400 hover:text-stone-300 transition-colors"
                   >
                     <Check size={12} />
                     Mark all read
@@ -271,7 +271,7 @@ export default function NotificationInbox() {
 
                       {/* Unread dot */}
                       {!notif.read && (
-                        <div className="flex-shrink-0 w-2 h-2 rounded-full bg-cyan-400 mt-2" />
+                        <div className="flex-shrink-0 w-2 h-2 rounded-full bg-stone-400 mt-2" />
                       )}
                     </div>
                   );
@@ -301,7 +301,7 @@ export default function NotificationInbox() {
                 <Link
                   href="/notifications"
                   onClick={() => setOpen(false)}
-                  className="text-[12px] text-cyan-400 hover:text-cyan-300 transition-colors"
+                  className="text-[12px] text-stone-400 hover:text-stone-300 transition-colors"
                 >
                   See all notifications
                 </Link>

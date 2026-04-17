@@ -1,12 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import BackgroundEffects from "@/components/BackgroundEffects";
-import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
-  Zap,
   ArrowRight,
   Shield,
   Lock,
@@ -16,25 +12,15 @@ import {
   Users,
   Code,
   FolderSync,
-  Upload,
   Globe,
   Check,
   Minus,
   ChevronDown,
   ChevronRight,
-  Cloud,
-  FileText,
-  Image,
+  Image as ImageIcon,
   Briefcase,
-  MonitorSmartphone,
   Database,
 } from "lucide-react";
-
-const fadeInUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } },
-};
-const staggerContainer = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
 
 const STORAGE_STATS = [
   { value: "AES-256", label: "End-to-end encryption" },
@@ -54,7 +40,7 @@ const STORAGE_FEATURES = [
 
 const USE_CASES = [
   { icon: Globe, title: "Website Backups", desc: "Automatic nightly snapshots of your Zoobicon sites. One-click restore if anything goes wrong." },
-  { icon: Image, title: "Media Assets", desc: "Store images, videos, and design files with CDN delivery. Serve assets globally at edge speed." },
+  { icon: ImageIcon, title: "Media Assets", desc: "Store images, videos, and design files with CDN delivery. Serve assets globally at edge speed." },
   { icon: Briefcase, title: "Business Documents", desc: "Invoices, contracts, and records stored securely with audit trails and compliance-ready encryption." },
   { icon: Users, title: "Team Collaboration", desc: "Shared folders with real-time sync. Everyone works from the same source of truth." },
 ];
@@ -65,7 +51,14 @@ const HOW_IT_WORKS = [
   { step: "03", title: "Access Anywhere", desc: "Your files available on any device, any browser. Encrypted end-to-end." },
 ];
 
-const COMPETITOR_FEATURES = [
+const COMPETITOR_FEATURES: Array<{
+  name: string;
+  zoobicon: boolean | string;
+  dropbox: boolean | string;
+  google: boolean | string;
+  icloud: boolean | string;
+  backblaze: boolean | string;
+}> = [
   { name: "Price per GB/mo", zoobicon: "$0.20", dropbox: "$0.42", google: "$0.33", icloud: "$0.33", backblaze: "$0.50" },
   { name: "End-to-End Encryption", zoobicon: true, dropbox: false, google: false, icloud: true, backblaze: false },
   { name: "S3-Compatible API", zoobicon: true, dropbox: false, google: false, icloud: false, backblaze: true },
@@ -93,7 +86,7 @@ const PRICING_TIERS = [
       "Web & mobile access",
       "Email support",
     ],
-    cta: "Start Storing",
+    cta: "Start storing",
     highlighted: false,
   },
   {
@@ -112,7 +105,7 @@ const PRICING_TIERS = [
       "Team sharing (3 members)",
       "Priority support",
     ],
-    cta: "Start Pro Trial",
+    cta: "Start Pro trial",
     highlighted: true,
   },
   {
@@ -133,7 +126,7 @@ const PRICING_TIERS = [
       "Audit logs",
       "24/7 priority support",
     ],
-    cta: "Start Business Trial",
+    cta: "Start Business trial",
     highlighted: false,
   },
 ];
@@ -161,16 +154,21 @@ const FAQ_ITEMS = [
   },
 ];
 
-export default function CloudStoragePage() {
-  const [user, setUser] = useState<{ name?: string } | null>(null);
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
+const CARD_BG = "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(10,10,15,0.7) 100%)";
+const PRIMARY_CTA = {
+  background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+  color: "#0a0a0f",
+  boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
+} as const;
+const SERIF: React.CSSProperties = {
+  fontFamily: "Fraunces, ui-serif, Georgia, serif",
+  fontStyle: "italic",
+  fontWeight: 400,
+  color: "#E8D4B0",
+};
 
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem("zoobicon_user");
-      if (stored) setUser(JSON.parse(stored));
-    } catch {}
-  }, []);
+export default function CloudStoragePage() {
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -202,493 +200,406 @@ export default function CloudStoragePage() {
   };
 
   return (
-    <div className="relative min-h-screen">
+    <div className="min-h-screen bg-[#050508] text-white fs-grain pt-[72px]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
-      <BackgroundEffects preset="technical" />
 
-      {/* Navigation — Auth-aware */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
-                <Zap className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-lg font-bold tracking-tight">Zoobicon</span>
-            </Link>
-            <span className="text-xs text-white/60">/</span>
-            <span className="text-sm text-white/65">Cloud Storage</span>
-          </div>
-          {user ? (
-            <Link href="/dashboard" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white">
-              <span>Dashboard</span>
-            </Link>
-          ) : (
-            <Link href="/auth/signup" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white">
-              <span>Get Started</span>
-            </Link>
-          )}
+      {/* Hero */}
+      <section className="relative pt-20 pb-24 md:pt-28 md:pb-32 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+          <div className="absolute left-1/2 top-0 h-[720px] w-[1200px] -translate-x-1/2 rounded-full blur-[160px]"
+            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.09), transparent 70%)" }} />
+          <div className="absolute right-[-10%] top-[30%] h-[420px] w-[520px] rounded-full blur-[140px]"
+            style={{ background: "radial-gradient(closest-side, rgba(224,139,176,0.07), transparent 70%)" }} />
         </div>
-      </nav>
-      <CursorGlowTracker />
 
-      {/* ============================================ */}
-      {/* 1. HERO SECTION                              */}
-      {/* ============================================ */}
-      <section className="relative pt-32 pb-20 lg:pt-44 lg:pb-28">
-        <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
-            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-cyan/20 bg-accent-cyan/5 mb-6">
-              <Cloud className="w-3 h-3 text-accent-cyan" />
-              <span className="text-xs font-medium text-accent-cyan">Zoobicon Cloud Storage</span>
-            </motion.div>
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-8">
+            <Lock className="w-3 h-3" />
+            AES-256 · 99.99% durability · Zero-knowledge buckets
+          </div>
 
-            <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl lg:text-8xl font-black tracking-tight leading-[0.9] mb-6">
-              Your Files. Everywhere.<br />
-              <span className="gradient-text-hero">Encrypted.</span>
-            </motion.h1>
+          <h1 className="fs-display-xl mb-6">
+            Your files, everywhere,{" "}
+            <span style={SERIF}>encrypted.</span>
+          </h1>
 
-            <motion.p variants={fadeInUp} className="max-w-3xl text-lg md:text-xl text-white/60 leading-relaxed mb-10">
-              Secure cloud storage with AES-256 encryption, automatic backups, and instant access
-              from any device. Your data stays yours — always encrypted, always available.
-            </motion.p>
+          <p className="max-w-3xl mx-auto text-[17px] md:text-[19px] leading-relaxed text-white/60 mb-10">
+            Secure cloud storage with AES-256 encryption, automatic backups, and instant access
+            from any device. Your data stays yours — always encrypted, always available.
+          </p>
 
-            <motion.div variants={fadeInUp} className="flex flex-wrap gap-2 mb-12 max-w-3xl">
-              {["AES-256 Encrypted", "Auto-Backup", "Version History", "Team Sharing", "S3-Compatible API", "CDN Delivery"].map((pill) => (
-                <span
-                  key={pill}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/[0.12] bg-white/[0.06] text-xs font-medium text-white/65"
-                >
-                  <Check className="w-3 h-3 text-accent-cyan" />
-                  {pill}
-                </span>
-              ))}
-            </motion.div>
+          <div className="flex flex-wrap justify-center gap-2 mb-10 max-w-3xl mx-auto">
+            {["AES-256 Encrypted", "Auto-Backup", "Version History", "Team Sharing", "S3-Compatible API", "CDN Delivery"].map((pill) => (
+              <span
+                key={pill}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1 text-[11px] text-white/60"
+              >
+                <Check className="w-3 h-3" style={{ color: "#E8D4B0" }} />
+                {pill}
+              </span>
+            ))}
+          </div>
 
-            <motion.div variants={fadeInUp} className="flex flex-wrap gap-4">
-              <Link href="/auth/signup" className="group btn-gradient px-8 py-4 rounded-2xl text-base font-bold text-white flex items-center gap-3 shadow-glow">
-                <span>Start Storing Free</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link href="#pricing" className="px-8 py-4 rounded-2xl text-base font-medium text-white/65 border border-white/[0.12] hover:border-white/20 transition-all flex items-center gap-3">
-                <HardDrive className="w-5 h-5" />
-                <span>View Plans</span>
-              </Link>
-            </motion.div>
-          </motion.div>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/auth/signup"
+              className="group inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
+              style={PRIMARY_CTA}
+            >
+              Start storing free
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+            <Link
+              href="#pricing"
+              className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-7 py-3.5 text-[14px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+            >
+              <HardDrive className="w-4 h-4" />
+              View plans
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* ============================================ */}
-      {/* 2. STATS BAR                                 */}
-      {/* ============================================ */}
-      <section className="relative py-16 border-y border-white/[0.08]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8"
-          >
-            {STORAGE_STATS.map((stat, i) => (
-              <motion.div key={i} variants={fadeInUp} className="text-center">
-                <div className="text-4xl md:text-5xl font-black gradient-text-static mb-2">
+      {/* Stats */}
+      <section className="relative py-16 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {STORAGE_STATS.map((stat) => (
+              <div key={stat.label} className="text-center">
+                <div className="text-4xl md:text-5xl font-semibold tracking-[-0.02em] mb-2" style={{ color: "#E8D4B0" }}>
                   {stat.value}
                 </div>
-                <div className="text-sm text-white/60">{stat.label}</div>
-              </motion.div>
+                <div className="text-[13px] text-white/55">{stat.label}</div>
+              </div>
             ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ============================================ */}
-      {/* 3. FEATURES GRID                             */}
-      {/* ============================================ */}
-      <section className="py-24 lg:py-32 border-b border-white/[0.06]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                Storage That<br /><span className="gradient-text">Protects Everything</span>
-              </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/60">
-                Enterprise-grade security and features on every plan. No compromises on your data.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {STORAGE_FEATURES.map((f, i) => (
-                <motion.div key={i} variants={fadeInUp} className="gradient-border card-hover p-6 rounded-xl group">
-                  <f.icon className="w-8 h-8 text-accent-cyan/50 mb-4 group-hover:text-accent-cyan transition-colors" />
-                  <h3 className="text-lg font-bold mb-2">{f.title}</h3>
-                  <p className="text-sm text-white/60 leading-relaxed">{f.desc}</p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ============================================ */}
-      {/* 4. USE CASES                                 */}
-      {/* ============================================ */}
-      <section className="py-24 lg:py-32 border-b border-white/[0.06]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand-500/20 bg-brand-500/5 mb-6">
-                <Database className="w-3 h-3 text-brand-400" />
-                <span className="text-xs font-medium text-brand-400">Use Cases</span>
-              </div>
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                Built for How<br /><span className="gradient-text">You Actually Work</span>
-              </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/60">
-                From website backups to team collaboration, secure storage for every workflow.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {USE_CASES.map((uc, i) => (
-                <motion.div key={i} variants={fadeInUp} className="gradient-border card-hover p-6 rounded-xl group text-center">
-                  <div className="w-12 h-12 rounded-xl bg-accent-cyan/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-accent-cyan/20 transition-colors">
-                    <uc.icon className="w-6 h-6 text-accent-cyan" />
-                  </div>
-                  <h3 className="text-lg font-bold mb-2">{uc.title}</h3>
-                  <p className="text-sm text-white/60 leading-relaxed">{uc.desc}</p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ============================================ */}
-      {/* 5. HOW IT WORKS                              */}
-      {/* ============================================ */}
-      <section className="py-24 lg:py-32 border-b border-white/[0.06]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                Three Steps to<br /><span className="gradient-text">Secure Storage</span>
-              </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/60">
-                From signup to storing files in under a minute.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-3 gap-8">
-              {HOW_IT_WORKS.map((step, i) => (
-                <motion.div key={i} variants={fadeInUp} className="relative gradient-border p-8 rounded-2xl text-center">
-                  <div className="text-6xl font-black gradient-text-static opacity-20 mb-4">{step.step}</div>
-                  <h3 className="text-xl font-bold mb-3">{step.title}</h3>
-                  <p className="text-sm text-white/60 leading-relaxed">{step.desc}</p>
-                  {i < HOW_IT_WORKS.length - 1 && (
-                    <div className="hidden md:block absolute top-1/2 -right-6 -translate-y-1/2 z-10">
-                      <ChevronRight className="w-8 h-8 text-white/20" />
-                    </div>
-                  )}
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ============================================ */}
-      {/* 6. COMPETITOR COMPARISON                      */}
-      {/* ============================================ */}
-      <section className="relative py-24 lg:py-32 border-b border-white/[0.06] overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="glow-orb glow-orb-blue w-[700px] h-[700px] top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 opacity-5" />
-          <div className="glow-orb glow-orb-purple w-[500px] h-[500px] top-1/3 right-0 opacity-5" />
-        </div>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand-500/20 bg-brand-500/5 mb-6">
-                <Shield className="w-3 h-3 text-brand-400" />
-                <span className="text-xs font-medium text-brand-400">Industry Comparison</span>
-              </div>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-6">
-                See How We<br />
-                <span className="gradient-text">Stack Up</span>
-              </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/60">
-                More features, better encryption, lower price. The only cloud storage bundled with your website and VPN.
-              </p>
-            </motion.div>
-
-            <motion.div variants={fadeInUp} className="overflow-x-auto">
-              <div className="min-w-[800px]">
-                {/* Header Row */}
-                <div className="grid grid-cols-6 gap-0 mb-2">
-                  <div className="p-4" />
-                  <div className="p-4 text-center">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-brand-500/20 to-accent-purple/20 border border-brand-500/30">
-                      <Zap className="w-4 h-4 text-brand-400" />
-                      <span className="text-sm font-bold text-white">Zoobicon</span>
-                    </div>
-                  </div>
-                  <div className="p-4 text-center">
-                    <span className="text-sm text-white/60">Dropbox</span>
-                  </div>
-                  <div className="p-4 text-center">
-                    <span className="text-sm text-white/60">Google Drive</span>
-                  </div>
-                  <div className="p-4 text-center">
-                    <span className="text-sm text-white/60">iCloud</span>
-                  </div>
-                  <div className="p-4 text-center">
-                    <span className="text-sm text-white/60">Backblaze</span>
-                  </div>
-                </div>
-
-                {/* Feature Rows */}
-                {COMPETITOR_FEATURES.map((feature, i) => (
-                  <motion.div
-                    key={i}
-                    variants={fadeInUp}
-                    className={`grid grid-cols-6 gap-0 ${i % 2 === 0 ? "bg-white/[0.05]" : ""} rounded-lg`}
-                  >
-                    <div className="p-4 flex items-center">
-                      <span className="text-sm text-white/60">{feature.name}</span>
-                    </div>
-                    <div className="p-4 flex items-center justify-center">
-                      {typeof feature.zoobicon === "string" ? (
-                        <span className="text-sm font-bold text-green-400">{feature.zoobicon}</span>
-                      ) : (
-                        <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center">
-                          <Check className="w-3.5 h-3.5 text-green-400" />
-                        </div>
-                      )}
-                    </div>
-                    {[feature.dropbox, feature.google, feature.icloud, feature.backblaze].map((val, j) => (
-                      <div key={j} className="p-4 flex items-center justify-center">
-                        {typeof val === "string" ? (
-                          <span className="text-sm text-white/60">{val}</span>
-                        ) : val ? (
-                          <Check className="w-4 h-4 text-white/60" />
-                        ) : (
-                          <Minus className="w-4 h-4 text-white/50" />
-                        )}
-                      </div>
-                    ))}
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-            <p className="text-[10px] text-white/20 mt-3 text-center">Comparison based on publicly available information as of March 2026. Features and pricing may change. All trademarks belong to their respective owners. See our <a href="/disclaimers" className="underline hover:text-white/30">disclaimers</a>.</p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ============================================ */}
-      {/* 7. PRICING SECTION                           */}
-      {/* ============================================ */}
-      <section id="pricing" className="py-24 lg:py-32 border-b border-white/[0.06]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                Simple, Transparent<br /><span className="gradient-text">Storage Pricing</span>
-              </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/60">
-                No hidden fees. No surprise overages. Pick your plan and start storing.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-3 gap-4 max-w-5xl mx-auto">
-              {PRICING_TIERS.map((tier, i) => (
-                <motion.div
-                  key={i}
-                  variants={fadeInUp}
-                  className={`relative p-6 rounded-2xl ${
-                    tier.highlighted
-                      ? "bg-gradient-to-b from-brand-500/10 to-accent-purple/10 border-2 border-brand-500/30"
-                      : "gradient-border"
-                  }`}
-                >
-                  {tier.highlighted && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-brand-500 to-accent-purple text-xs font-semibold text-white">
-                      Most Popular
-                    </div>
-                  )}
-                  <h3 className="text-lg font-bold mb-2">{tier.name}</h3>
-                  <div className="flex items-baseline gap-1 mb-1">
-                    <span className="text-4xl font-black">{tier.price}</span>
-                    <span className="text-sm text-white/60">{tier.period}</span>
-                  </div>
-                  <div className="text-sm font-medium text-accent-cyan mb-3">{tier.storage}</div>
-                  <p className="text-sm text-white/60 mb-6">{tier.description}</p>
-                  <ul className="space-y-3 mb-8">
-                    {tier.features.map((feature, j) => (
-                      <li key={j} className="flex items-center gap-2 text-sm text-white/60">
-                        <Check className="w-4 h-4 text-accent-cyan flex-shrink-0" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link
-                    href="/auth/signup"
-                    className={`block text-center py-3 rounded-xl text-sm font-semibold transition-all ${
-                      tier.highlighted
-                        ? "btn-gradient text-white shadow-glow"
-                        : "border border-white/[0.12] text-white/60 hover:text-white hover:border-white/20"
-                    }`}
-                  >
-                    {tier.cta}
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ============================================ */}
-      {/* 8. FAQ SECTION                               */}
-      {/* ============================================ */}
-      <section className="py-24 lg:py-32 border-b border-white/[0.06]">
-        <div className="max-w-3xl mx-auto px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                Frequently Asked<br /><span className="gradient-text">Questions</span>
-              </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/60">
-                Everything you need to know about Zoobicon Cloud Storage.
-              </p>
-            </motion.div>
-
-            <div className="space-y-3">
-              {FAQ_ITEMS.map((faq, i) => (
-                <motion.div key={i} variants={fadeInUp} className="gradient-border rounded-xl overflow-hidden">
-                  <button
-                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                    className="w-full p-6 text-left flex items-center justify-between gap-4 hover:bg-white/[0.02] transition-colors"
-                  >
-                    <span className="text-base font-semibold">{faq.q}</span>
-                    <ChevronDown className={`w-5 h-5 text-white/60 flex-shrink-0 transition-transform ${openFaq === i ? "rotate-180" : ""}`} />
-                  </button>
-                  {openFaq === i && (
-                    <div className="px-6 pb-6">
-                      <p className="text-sm text-white/60 leading-relaxed">{faq.a}</p>
-                    </div>
-                  )}
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ============================================ */}
-      {/* 9. FINAL CTA                                 */}
-      {/* ============================================ */}
-      <section className="py-32 lg:py-40 relative overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="glow-orb glow-orb-blue w-[800px] h-[800px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-15" />
-        </div>
-        <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center relative z-10">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.h2
-              variants={fadeInUp}
-              className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight mb-6"
-            >
-              Your Files Deserve<br />
-              <span className="gradient-text-hero">Better Storage</span>
-            </motion.h2>
-
-            <motion.p variants={fadeInUp} className="max-w-2xl mx-auto text-lg text-white/60 mb-10">
-              AES-256 encrypted. Auto-backed up. Accessible anywhere.
-              Start with 10 GB for just $1.99/mo.
-            </motion.p>
-
-            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link
-                href="/auth/signup"
-                className="group btn-gradient px-10 py-5 rounded-2xl text-lg font-bold text-white flex items-center gap-3 shadow-glow"
-              >
-                <span>Start Storing Securely</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </motion.div>
-
-            <motion.div variants={fadeInUp} className="flex flex-wrap items-center justify-center gap-6 mt-8 text-sm text-white/60">
-              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent-cyan" /> AES-256 encrypted</span>
-              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent-cyan" /> Auto-backup</span>
-              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent-cyan" /> S3-compatible API</span>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ============================================ */}
-      {/* 10. 4-DOMAIN FOOTER                          */}
-      {/* ============================================ */}
-      <footer className="border-t border-white/[0.06] py-12">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex flex-col items-center gap-6">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-md bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
-                <Zap className="w-3 h-3 text-white" />
-              </div>
-              <span className="text-sm font-bold">Zoobicon</span>
-            </div>
-            <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-white/50">
-              <a href="https://zoobicon.com" className="hover:text-white/80 transition-colors">zoobicon.com</a>
-              <span className="text-white/25">&middot;</span>
-              <a href="https://zoobicon.ai" className="hover:text-white/80 transition-colors">zoobicon.ai</a>
-              <span className="text-white/25">&middot;</span>
-              <a href="https://zoobicon.io" className="hover:text-white/80 transition-colors">zoobicon.io</a>
-              <span className="text-white/25">&middot;</span>
-              <a href="https://zoobicon.sh" className="hover:text-white/80 transition-colors">zoobicon.sh</a>
-            </div>
-            <p className="text-xs text-white/30">&copy; {new Date().getFullYear()} Zoobicon. All rights reserved.</p>
           </div>
         </div>
-      </footer>
+      </section>
+
+      {/* Features grid */}
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              Storage features
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              Storage that protects{" "}
+              <span style={SERIF}>everything.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              Enterprise-grade security and features on every plan. No compromises on your data.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {STORAGE_FEATURES.map((f) => (
+              <div
+                key={f.title}
+                className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
+                style={{ background: CARD_BG }}
+              >
+                <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }} />
+                <div className="relative">
+                  <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05]">
+                    <f.icon className="h-5 w-5 text-[#E8D4B0]" />
+                  </div>
+                  <h3 className="text-[17px] font-semibold tracking-[-0.01em] mb-2">{f.title}</h3>
+                  <p className="text-[13px] text-white/55 leading-relaxed">{f.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Use cases */}
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              <Database className="w-3 h-3" />
+              Use cases
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              Built for how{" "}
+              <span style={SERIF}>you actually work.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              From website backups to team collaboration, secure storage for every workflow.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {USE_CASES.map((uc) => (
+              <div
+                key={uc.title}
+                className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 text-center transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
+                style={{ background: CARD_BG }}
+              >
+                <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }} />
+                <div className="relative">
+                  <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05]">
+                    <uc.icon className="h-5 w-5 text-[#E8D4B0]" />
+                  </div>
+                  <h3 className="text-[17px] font-semibold tracking-[-0.01em] mb-2">{uc.title}</h3>
+                  <p className="text-[13px] text-white/55 leading-relaxed">{uc.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <h2 className="fs-display-lg mb-4">
+              Three steps to{" "}
+              <span style={SERIF}>secure storage.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              From signup to storing files in under a minute.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-5">
+            {HOW_IT_WORKS.map((step, i) => (
+              <div
+                key={step.step}
+                className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-8 text-center transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
+                style={{ background: CARD_BG }}
+              >
+                <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }} />
+                <div className="relative">
+                  <div className="text-5xl font-semibold tracking-[-0.02em] mb-4 opacity-80" style={{ color: "#E8D4B0" }}>{step.step}</div>
+                  <h3 className="text-[18px] font-semibold tracking-[-0.01em] mb-2">{step.title}</h3>
+                  <p className="text-[13px] text-white/55 leading-relaxed">{step.desc}</p>
+                </div>
+                {i < HOW_IT_WORKS.length - 1 && (
+                  <div className="hidden md:block absolute top-1/2 -right-3 -translate-y-1/2 z-10">
+                    <ChevronRight className="w-6 h-6 text-white/15" />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Competitor comparison */}
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06] overflow-hidden">
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          <div className="absolute left-1/2 top-1/2 h-[520px] w-[900px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[140px]"
+            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }} />
+        </div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              <Shield className="w-3 h-3" />
+              Industry comparison
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              See how we{" "}
+              <span style={SERIF}>stack up.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              More features, better encryption, lower price. The only cloud storage bundled with your website and VPN.
+            </p>
+          </div>
+
+          <div className="overflow-x-auto rounded-[28px] border border-white/[0.08]" style={{ background: CARD_BG }}>
+            <div className="min-w-[820px]">
+              <div className="grid grid-cols-6 px-6 py-4 border-b border-white/[0.08] text-[11px] uppercase tracking-[0.15em] font-semibold text-white/55">
+                <div>Feature</div>
+                <div className="text-center" style={{ color: "#E8D4B0" }}>Zoobicon</div>
+                <div className="text-center">Dropbox</div>
+                <div className="text-center">Google Drive</div>
+                <div className="text-center">iCloud</div>
+                <div className="text-center">Backblaze</div>
+              </div>
+              {COMPETITOR_FEATURES.map((feature, i) => (
+                <div
+                  key={feature.name}
+                  className={`grid grid-cols-6 px-6 py-4 text-[13px] ${
+                    i !== COMPETITOR_FEATURES.length - 1 ? "border-b border-white/[0.04]" : ""
+                  }`}
+                >
+                  <div className="text-white/75 font-medium">{feature.name}</div>
+                  <div className="text-center">
+                    {typeof feature.zoobicon === "string" ? (
+                      <span className="font-semibold" style={{ color: "#E8D4B0" }}>{feature.zoobicon}</span>
+                    ) : feature.zoobicon ? (
+                      <Check className="w-4 h-4 mx-auto" style={{ color: "#E8D4B0" }} />
+                    ) : (
+                      <Minus className="w-4 h-4 mx-auto text-white/25" />
+                    )}
+                  </div>
+                  {[feature.dropbox, feature.google, feature.icloud, feature.backblaze].map((val, j) => (
+                    <div key={j} className="text-center">
+                      {typeof val === "string" ? (
+                        <span className="text-white/55">{val}</span>
+                      ) : val ? (
+                        <Check className="w-4 h-4 mx-auto text-white/55" />
+                      ) : (
+                        <Minus className="w-4 h-4 mx-auto text-white/25" />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+          <p className="text-[11px] text-white/30 mt-4 text-center">
+            Comparison based on publicly available information. Features and pricing may change.
+            All trademarks belong to their respective owners. See our{" "}
+            <Link href="/disclaimers" className="underline hover:text-white/55">disclaimers</Link>.
+          </p>
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section id="pricing" className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              Pricing
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              Simple, transparent storage{" "}
+              <span style={SERIF}>pricing.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              No hidden fees. No surprise overages. Pick your plan and start storing.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto">
+            {PRICING_TIERS.map((tier) => (
+              <div
+                key={tier.name}
+                className={`relative rounded-[24px] p-7 transition-all duration-500 hover:-translate-y-1 ${
+                  tier.highlighted ? "border-2 border-[#E8D4B0]/35" : "border border-white/[0.08] hover:border-[#E8D4B0]/25"
+                }`}
+                style={{
+                  background: tier.highlighted
+                    ? "linear-gradient(135deg, rgba(232,212,176,0.08) 0%, rgba(17,17,24,0.85) 100%)"
+                    : CARD_BG,
+                }}
+              >
+                {tier.highlighted && (
+                  <div
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-wide"
+                    style={{ background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)", color: "#0a0a0f" }}
+                  >
+                    Most popular
+                  </div>
+                )}
+                <h3 className="text-[17px] font-semibold tracking-[-0.01em] mb-2">{tier.name}</h3>
+                <div className="flex items-baseline gap-1 mb-1">
+                  <span className="text-4xl font-semibold tracking-[-0.02em]" style={{ color: "#E8D4B0" }}>{tier.price}</span>
+                  <span className="text-[13px] text-white/50">{tier.period}</span>
+                </div>
+                <div className="text-[12px] uppercase tracking-[0.12em] font-semibold mb-3" style={{ color: "rgba(232,212,176,0.75)" }}>{tier.storage}</div>
+                <p className="text-[13px] text-white/55 mb-6">{tier.description}</p>
+                <ul className="space-y-2.5 mb-7">
+                  {tier.features.map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-[13px] text-white/65">
+                      <Check className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#E8D4B0" }} />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href="/auth/signup"
+                  className={`block text-center rounded-full py-3 text-[13px] font-semibold transition-all ${
+                    tier.highlighted ? "" : "border border-white/[0.12] bg-white/[0.03] text-white/80 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+                  }`}
+                  style={tier.highlighted ? PRIMARY_CTA : undefined}
+                >
+                  {tier.cta}
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <h2 className="fs-display-lg mb-4">
+              Frequently asked{" "}
+              <span style={SERIF}>questions.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              Everything you need to know about Zoobicon Cloud Storage.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            {FAQ_ITEMS.map((faq, i) => (
+              <div
+                key={faq.q}
+                className="overflow-hidden rounded-[20px] border border-white/[0.08]"
+                style={{ background: CARD_BG }}
+              >
+                <button
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  className="w-full px-6 py-5 text-left flex items-center justify-between gap-4 hover:bg-white/[0.02] transition-colors"
+                >
+                  <span className="text-[15px] font-semibold text-white/85">{faq.q}</span>
+                  <ChevronDown
+                    className={`w-5 h-5 flex-shrink-0 transition-transform duration-300 ${openFaq === i ? "rotate-180" : ""}`}
+                    style={{ color: "#E8D4B0" }}
+                  />
+                </button>
+                {openFaq === i && (
+                  <div className="px-6 pb-6">
+                    <p className="text-[13px] text-white/55 leading-relaxed">{faq.a}</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="relative py-24 md:py-32 border-t border-white/[0.06] overflow-hidden">
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          <div className="absolute left-1/2 top-1/2 h-[560px] w-[1000px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[140px]"
+            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.11), transparent 70%)" }} />
+        </div>
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center">
+          <h2 className="fs-display-lg mb-5">
+            Your files deserve{" "}
+            <span style={SERIF}>better storage.</span>
+          </h2>
+          <p className="text-[17px] text-white/60 mb-10">
+            AES-256 encrypted. Auto-backed up. Accessible anywhere. Start with 10 GB for just $1.99/mo.
+          </p>
+          <Link
+            href="/auth/signup"
+            className="group inline-flex items-center gap-2 rounded-full px-8 py-4 text-[15px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
+            style={PRIMARY_CTA}
+          >
+            Start storing securely
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+          <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-[12px] text-white/55">
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} /> AES-256 encrypted</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} /> Auto-backup</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} /> S3-compatible API</span>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

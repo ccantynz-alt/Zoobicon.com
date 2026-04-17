@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { authenticateRequest } from "@/lib/auth-guard";
+import { callLLMWithFailover, getAvailableProviders } from "@/lib/llm-provider";
 
 export const maxDuration = 120;
 
@@ -23,8 +24,15 @@ export async function POST(req: NextRequest) {
   if (auth.error) return auth.error;
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    return Response.json({ error: "AI service unavailable — API key not configured" }, { status: 503 });
+  const availableProviders = getAvailableProviders();
+  if (!apiKey && availableProviders.length === 0) {
+    return Response.json(
+      {
+        error:
+          "AI service unavailable — set ANTHROPIC_API_KEY (or OPENAI_API_KEY / GOOGLE_AI_API_KEY) in your Vercel environment variables.",
+      },
+      { status: 503 }
+    );
   }
 
   let body: { instruction?: string; files?: Record<string, string>; targetFile?: string };
@@ -40,7 +48,9 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: "Instruction and files required" }, { status: 400 });
   }
 
-  const client = new Anthropic({ apiKey, timeout: 60000 });
+  // The Anthropic SDK is the primary path. The failover layer
+  // (callLLMWithFailover) handles OpenAI/Gemini if Anthropic is down.
+  const client = new Anthropic({ apiKey: apiKey || "missing", timeout: 60000 });
 
   // Build context: show the AI which files exist and their content
   const fileList = Object.keys(files);
@@ -91,72 +101,142 @@ RULES:
       try {
         send({ type: "status", message: "Applying changes..." });
 
-        // Try up to 2 attempts — retry once if JSON parsing fails
-        let parsed: { files?: Record<string, string> } | null = null;
-        let lastError = "";
+        const userMessage = `INSTRUCTION: ${instruction}\n\nEXISTING FILES:\n${fileContext}\n\nOutput only the changed files as JSON. Start with { and end with }.`;
 
-        for (let attempt = 0; attempt < 2; attempt++) {
+        // Validate parsed AI output. Returns the validated file map or
+        // { reason } when the response is missing/empty/invalid.
+        const validate = (
+          text: string
+        ):
+          | { ok: true; files: Record<string, string> }
+          | { ok: false; reason: string } => {
+          if (!text || !text.trim()) {
+            return { ok: false, reason: "AI returned empty response" };
+          }
+          const parsed = extractJSON(text);
+          if (!parsed) {
+            return { ok: false, reason: "AI response was not valid JSON" };
+          }
+          if (!parsed.files) {
+            return { ok: false, reason: "AI response missing 'files' key" };
+          }
+          const validFiles: Record<string, string> = {};
+          for (const [path, code] of Object.entries(parsed.files)) {
+            if (typeof code === "string" && code.trim().length > 10) {
+              validFiles[path] = code;
+            }
+          }
+          if (Object.keys(validFiles).length === 0) {
+            return { ok: false, reason: "AI returned empty or invalid file contents" };
+          }
+          return { ok: true, files: validFiles };
+        };
+
+        const errors: string[] = [];
+
+        // Pass 1 — Anthropic Haiku via direct SDK (fastest, cheapest)
+        if (apiKey) {
           try {
             const response = await client.messages.create({
               model: "claude-haiku-4-5-20251001",
               max_tokens: 16384,
               system: systemPrompt,
-              messages: [{
-                role: "user",
-                content: `INSTRUCTION: ${instruction}\n\nEXISTING FILES:\n${fileContext}\n\nOutput only the changed files as JSON. Start with { and end with }.`,
-              }],
+              messages: [{ role: "user", content: userMessage }],
             });
-
-            const text = response.content.find(b => b.type === "text")?.text || "";
-
-            // Robust JSON extraction — handles markdown fences, preamble text, etc.
-            parsed = extractJSON(text);
-
-            if (parsed?.files && Object.keys(parsed.files).length > 0) {
-              // Validate returned files — each must contain valid-looking code
-              const validFiles: Record<string, string> = {};
-              for (const [path, code] of Object.entries(parsed.files)) {
-                if (typeof code === "string" && code.trim().length > 10) {
-                  validFiles[path] = code;
-                }
-              }
-
-              if (Object.keys(validFiles).length > 0) {
-                send({
-                  type: "done",
-                  files: validFiles,
-                  changedCount: Object.keys(validFiles).length,
-                });
-                controller.close();
-                return;
-              }
-              lastError = "AI returned empty or invalid file contents";
-            } else if (parsed && !parsed.files) {
-              lastError = "AI response missing 'files' key";
-            } else {
-              lastError = "No changes detected";
+            const text = response.content.find((b: Anthropic.ContentBlock) => b.type === "text")?.text || "";
+            const result = validate(text);
+            if (result.ok) {
+              send({
+                type: "done",
+                files: result.files,
+                changedCount: Object.keys(result.files).length,
+                modelUsed: "claude-haiku-4-5",
+              });
+              controller.close();
+              return;
             }
+            errors.push(`Haiku: ${result.reason}`);
+            send({ type: "status", message: "Retrying with stronger model..." });
           } catch (err) {
-            lastError = err instanceof Error ? err.message : "Unknown error";
-          }
-
-          // Before retry, add context about the failure
-          if (attempt === 0) {
-            send({ type: "status", message: "Retrying edit..." });
+            const msg = err instanceof Error ? err.message : "Unknown error";
+            errors.push(`Haiku: ${msg}`);
+            console.warn(`[edit] Haiku call failed: ${msg}`);
+            send({ type: "status", message: "Retrying with fallback provider..." });
           }
         }
 
-        // Both attempts failed
+        // Pass 2 — Anthropic Sonnet (smarter model, retry path)
+        if (apiKey) {
+          try {
+            const response = await client.messages.create({
+              model: "claude-sonnet-4-6",
+              max_tokens: 16384,
+              system: systemPrompt,
+              messages: [{ role: "user", content: userMessage }],
+            });
+            const text = response.content.find((b: Anthropic.ContentBlock) => b.type === "text")?.text || "";
+            const result = validate(text);
+            if (result.ok) {
+              send({
+                type: "done",
+                files: result.files,
+                changedCount: Object.keys(result.files).length,
+                modelUsed: "claude-sonnet-4-6",
+              });
+              controller.close();
+              return;
+            }
+            errors.push(`Sonnet: ${result.reason}`);
+          } catch (err) {
+            const msg = err instanceof Error ? err.message : "Unknown error";
+            errors.push(`Sonnet: ${msg}`);
+            console.warn(`[edit] Sonnet call failed: ${msg}`);
+          }
+        }
+
+        // Pass 3 — cross-provider failover (OpenAI, Gemini)
+        try {
+          send({ type: "status", message: "Trying alternate AI provider..." });
+          const fb = await callLLMWithFailover({
+            model: "claude-sonnet-4-6",
+            system: systemPrompt,
+            userMessage,
+            maxTokens: 16384,
+          });
+          const result = validate(fb.text);
+          if (result.ok) {
+            send({
+              type: "done",
+              files: result.files,
+              changedCount: Object.keys(result.files).length,
+              modelUsed: fb.model,
+            });
+            controller.close();
+            return;
+          }
+          errors.push(`${fb.model}: ${result.reason}`);
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : "Unknown error";
+          errors.push(`Failover: ${msg}`);
+          console.error(`[edit] Cross-provider failover failed: ${msg}`);
+        }
+
+        // Every attempt failed — surface the truth, with the actual reasons
+        const summary = errors.length > 0 ? errors.join(" | ") : "No changes detected";
         send({
           type: "error",
-          message: `Edit failed: ${lastError}. Try rephrasing your instruction or being more specific about which file to change.`,
+          fatal: true,
+          message: `Edit failed across all providers. ${summary}. Try rephrasing your instruction or being more specific about which file to change.`,
         });
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Unknown error";
-        send({ type: "error", message: `Edit failed: ${msg}. Please try again.` });
+        console.error(`[edit] Stream handler crashed: ${msg}`);
+        try {
+          send({ type: "error", fatal: true, message: `Edit failed: ${msg}. Please try again.` });
+        } catch { /* controller may already be closed */ }
+      } finally {
+        try { controller.close(); } catch { /* already closed */ }
       }
-
-      controller.close();
     },
   });
 

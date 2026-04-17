@@ -15,6 +15,9 @@ import {
 const OAUTH_ERRORS: Record<string, string> = {
   no_code: "Authentication was cancelled. Please try again.",
   oauth_not_configured: "OAuth is not configured yet. Please use email & password.",
+  github_oauth_not_configured: "GitHub sign-in is not set up yet. Please use email & password or contact support.",
+  google_oauth_not_configured: "Google sign-in is not set up yet. Please use email & password or contact support.",
+  invalid_state: "Your sign-in session expired or was tampered with. Please try again.",
   token_exchange_failed: "Authentication failed. Please try again.",
   user_info_failed: "Could not retrieve your profile. Please try again.",
   no_email: "No email found on your account. Please use email & password.",
@@ -104,7 +107,7 @@ export default function LoginPage() {
             </a>
           </div>
           {oauthNotice && (
-            <p className="text-xs text-amber-400/80 text-center -mt-2 mb-4 px-2">{oauthNotice}</p>
+            <p className="text-xs text-stone-400/80 text-center -mt-2 mb-4 px-2">{oauthNotice}</p>
           )}
 
           <div className="flex items-center gap-4 mb-6">
@@ -154,7 +157,7 @@ export default function LoginPage() {
             </div>
 
             {authError && (
-              <p className="text-sm text-red-400/80 text-center py-2">{authError}</p>
+              <p className="text-sm text-stone-400/80 text-center py-2">{authError}</p>
             )}
 
             <button
@@ -174,6 +177,15 @@ export default function LoginPage() {
               Sign up free
             </Link>
           </p>
+
+          <div className="mt-4 pt-4 border-t border-white/[0.04] text-center">
+            <Link
+              href="/admin-recover"
+              className="text-xs text-white/40 hover:text-stone-400/80 transition-colors"
+            >
+              Admin locked out? Use recovery token →
+            </Link>
+          </div>
         </div>
       </div>
 

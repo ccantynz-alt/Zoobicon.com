@@ -67,15 +67,39 @@ export async function GET(req: NextRequest) {
     const isShort = sanitized.length <= 3;
     console.log(`[Domain Search] query="${sanitized}" tlds=${tlds.join(",")} source=rdap-authoritative`);
 
-    // Check every TLD in parallel via the authoritative RDAP-first checker.
-    // RDAP is the official IANA-blessed registry protocol — no test-sandbox lies.
-    const checks = await Promise.all(
-      tlds.map(async (tld) => {
-        const domain = `${sanitized}.${tld}`;
-        const available = await checkWithFallback(domain);
-        return { domain, tld, available };
+    // Check TLDs with bounded concurrency. RDAP rate-limits aggressively and
+    // the AI name generator fires one of these per name — if we blasted the
+    // public RDAP endpoint with 12 names × 5 TLDs unbounded, every request
+    // would 429 and the UI would silently show "No available domains."
+    //
+    // HARD TIME BUDGET: we cap the entire batch at 9s so a single stuck probe
+    // can never hang the whole response. Any TLD still in-flight at the cap
+    // is returned as `null` (uncertain) — the UI renders those as "unknown"
+    // rather than silently timing out.
+    const MAX_CONCURRENT = 6;
+    const TOTAL_BUDGET_MS = 9000;
+    const checks: Array<{ domain: string; tld: string; available: boolean | null }> = tlds.map(
+      (tld) => ({ domain: `${sanitized}.${tld}`, tld, available: null }),
+    );
+    let cursor = 0;
+    const runPool = Promise.all(
+      Array.from({ length: Math.min(MAX_CONCURRENT, tlds.length) }, async () => {
+        while (true) {
+          const idx = cursor++;
+          if (idx >= tlds.length) return;
+          const tld = tlds[idx];
+          const domain = `${sanitized}.${tld}`;
+          try {
+            const available = await checkWithFallback(domain);
+            checks[idx] = { domain, tld, available };
+          } catch {
+            checks[idx] = { domain, tld, available: null };
+          }
+        }
       }),
     );
+    const budget = new Promise<void>((resolve) => setTimeout(resolve, TOTAL_BUDGET_MS));
+    await Promise.race([runPool, budget]);
 
     const results = checks.map(({ domain, tld, available }) => {
       const basePrice = TLD_PRICING[tld] ?? 14.99;

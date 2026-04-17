@@ -84,10 +84,10 @@ export default function TestimonialsWallPage() {
 
   const sourceIcon = (source: string) => {
     switch (source) {
-      case 'twitter': return <MessageCircle className="w-3.5 h-3.5 text-blue-400" />;
-      case 'g2': return <Star className="w-3.5 h-3.5 text-orange-400" />;
-      case 'linkedin': return <Globe className="w-3.5 h-3.5 text-blue-500" />;
-      default: return <MessageSquareQuote className="w-3.5 h-3.5 text-violet-400" />;
+      case 'twitter': return <MessageCircle className="w-3.5 h-3.5 text-stone-400" />;
+      case 'g2': return <Star className="w-3.5 h-3.5 text-stone-400" />;
+      case 'linkedin': return <Globe className="w-3.5 h-3.5 text-stone-500" />;
+      default: return <MessageSquareQuote className="w-3.5 h-3.5 text-stone-400" />;
     }
   };
 
@@ -96,7 +96,7 @@ export default function TestimonialsWallPage() {
       <header className="border-b border-white/10 bg-[#0a0a12]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Zoobicon</Link>
+            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
             <span className="text-white/30">/</span>
             <span className="font-semibold text-white">Testimonial Wall</span>
           </div>
@@ -104,7 +104,7 @@ export default function TestimonialsWallPage() {
             <button onClick={() => setShowCollectForm(!showCollectForm)} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition text-sm">
               <Plus className="w-4 h-4" /> Collect
             </button>
-            <button onClick={() => setShowEmbedCode(!showEmbedCode)} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:opacity-90 transition text-sm font-medium">
+            <button onClick={() => setShowEmbedCode(!showEmbedCode)} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-stone-600 to-stone-600 hover:opacity-90 transition text-sm font-medium">
               <Code className="w-4 h-4" /> Embed Code
             </button>
           </div>
@@ -116,9 +116,9 @@ export default function TestimonialsWallPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
             { label: 'Total Testimonials', value: testimonials.length, color: 'text-white' },
-            { label: 'Approved', value: testimonials.filter(t => t.approved).length, color: 'text-emerald-400' },
-            { label: 'Pending Review', value: testimonials.filter(t => !t.approved).length, color: 'text-yellow-400' },
-            { label: 'Avg Rating', value: (testimonials.filter(t => t.approved).reduce((a, t) => a + t.rating, 0) / approvedTestimonials.length).toFixed(1), color: 'text-amber-400' },
+            { label: 'Approved', value: testimonials.filter(t => t.approved).length, color: 'text-stone-400' },
+            { label: 'Pending Review', value: testimonials.filter(t => !t.approved).length, color: 'text-stone-400' },
+            { label: 'Avg Rating', value: (testimonials.filter(t => t.approved).reduce((a, t) => a + t.rating, 0) / approvedTestimonials.length).toFixed(1), color: 'text-stone-400' },
           ].map((stat) => (
             <div key={stat.label} className="p-4 rounded-xl bg-white/5 border border-white/10">
               <p className="text-xs text-white/40">{stat.label}</p>
@@ -134,10 +134,10 @@ export default function TestimonialsWallPage() {
               <h3 className="font-semibold">Embed Code</h3>
               <button onClick={() => setShowEmbedCode(false)}><X className="w-5 h-5 text-white/40" /></button>
             </div>
-            <div className="bg-black/50 rounded-xl p-4 font-mono text-sm text-green-400 mb-3 overflow-x-auto">
+            <div className="bg-black/50 rounded-xl p-4 font-mono text-sm text-stone-400 mb-3 overflow-x-auto">
               {`<script src="https://zoobicon.com/embed/testimonials.js" data-wall-id="tw_demo_12345" data-theme="dark"></script>`}
             </div>
-            <button onClick={copyEmbedCode} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-violet-600 text-sm font-medium hover:bg-violet-500 transition">
+            <button onClick={copyEmbedCode} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-stone-600 text-sm font-medium hover:bg-stone-500 transition">
               {copiedEmbed ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
               {copiedEmbed ? 'Copied!' : 'Copy Code'}
             </button>
@@ -146,10 +146,10 @@ export default function TestimonialsWallPage() {
 
         {/* Collection Form */}
         {showCollectForm && (
-          <div className="mb-8 p-6 rounded-2xl bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 border border-violet-500/20">
+          <div className="mb-8 p-6 rounded-2xl bg-gradient-to-r from-stone-500/10 to-stone-500/10 border border-stone-500/20">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-violet-400" />
+                <Sparkles className="w-5 h-5 text-stone-400" />
                 <h3 className="font-semibold">Collection Form Link</h3>
               </div>
               <button onClick={() => setShowCollectForm(false)}><X className="w-5 h-5 text-white/40" /></button>
@@ -159,17 +159,17 @@ export default function TestimonialsWallPage() {
               <div className="flex-1 bg-white/5 rounded-lg px-4 py-2.5 border border-white/10 text-sm text-white/70">
                 https://zoobicon.com/collect/tw_demo_12345
               </div>
-              <button onClick={() => {}} className="px-4 py-2.5 rounded-lg bg-violet-600 text-sm font-medium hover:bg-violet-500 transition"><Copy className="w-4 h-4" /></button>
+              <button onClick={() => {}} className="px-4 py-2.5 rounded-lg bg-stone-600 text-sm font-medium hover:bg-stone-500 transition"><Copy className="w-4 h-4" /></button>
             </div>
             <div className="grid grid-cols-3 gap-3 mt-4">
               <button onClick={() => {}} className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition text-sm text-center">
-                <Upload className="w-5 h-5 mx-auto mb-1 text-violet-400" /> Import CSV
+                <Upload className="w-5 h-5 mx-auto mb-1 text-stone-400" /> Import CSV
               </button>
               <button onClick={() => {}} className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition text-sm text-center">
-                <MessageCircle className="w-5 h-5 mx-auto mb-1 text-blue-400" /> Import MessageCircle
+                <MessageCircle className="w-5 h-5 mx-auto mb-1 text-stone-400" /> Import MessageCircle
               </button>
               <button onClick={() => {}} className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition text-sm text-center">
-                <Star className="w-5 h-5 mx-auto mb-1 text-orange-400" /> Import G2
+                <Star className="w-5 h-5 mx-auto mb-1 text-stone-400" /> Import G2
               </button>
             </div>
           </div>
@@ -188,7 +188,7 @@ export default function TestimonialsWallPage() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                  activeTab === tab.id ? 'bg-violet-600 text-white' : 'bg-white/5 text-white/60 hover:text-white hover:bg-white/10'
+                  activeTab === tab.id ? 'bg-stone-600 text-white' : 'bg-white/5 text-white/60 hover:text-white hover:bg-white/10'
                 }`}
               >
                 {tab.label} <span className="ml-1 text-xs opacity-60">{tab.count}</span>
@@ -203,7 +203,7 @@ export default function TestimonialsWallPage() {
                 placeholder="Search testimonials..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-white/5 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                className="bg-white/5 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-stone-500/50"
               />
             </div>
             <div className="flex rounded-lg overflow-hidden border border-white/10">
@@ -215,7 +215,7 @@ export default function TestimonialsWallPage() {
                 <button
                   key={m.id}
                   onClick={() => setDisplayMode(m.id)}
-                  className={`px-3 py-2 transition ${displayMode === m.id ? 'bg-violet-600' : 'bg-white/5 hover:bg-white/10'}`}
+                  className={`px-3 py-2 transition ${displayMode === m.id ? 'bg-stone-600' : 'bg-white/5 hover:bg-white/10'}`}
                 >
                   <m.icon className="w-4 h-4" />
                 </button>
@@ -228,10 +228,10 @@ export default function TestimonialsWallPage() {
         {displayMode === 'wall' && (
           <div className="columns-1 md:columns-2 lg:columns-3 gap-4 space-y-4">
             {filtered.map((t) => (
-              <div key={t.id} className={`break-inside-avoid p-5 rounded-2xl border transition ${t.featured ? 'bg-violet-500/10 border-violet-500/30' : 'bg-white/5 border-white/10'}`}>
+              <div key={t.id} className={`break-inside-avoid p-5 rounded-2xl border transition ${t.featured ? 'bg-stone-500/10 border-stone-500/30' : 'bg-white/5 border-white/10'}`}>
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 flex items-center justify-center text-sm font-bold">{t.avatar}</div>
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-stone-600 to-stone-600 flex items-center justify-center text-sm font-bold">{t.avatar}</div>
                     <div>
                       <p className="font-medium text-sm">{t.name}</p>
                       <p className="text-xs text-white/40">{t.role}</p>
@@ -239,12 +239,12 @@ export default function TestimonialsWallPage() {
                   </div>
                   <div className="flex items-center gap-1">
                     {sourceIcon(t.source)}
-                    {t.featured && <Award className="w-4 h-4 text-amber-400" />}
+                    {t.featured && <Award className="w-4 h-4 text-stone-400" />}
                   </div>
                 </div>
                 <div className="flex gap-0.5 mb-2">
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className={`w-3.5 h-3.5 ${i < t.rating ? 'text-amber-400 fill-amber-400' : 'text-white/20'}`} />
+                    <Star key={i} className={`w-3.5 h-3.5 ${i < t.rating ? 'text-stone-400 fill-stone-400' : 'text-white/20'}`} />
                   ))}
                 </div>
                 <p className="text-sm text-white/70 leading-relaxed mb-3">{t.text}</p>
@@ -253,12 +253,12 @@ export default function TestimonialsWallPage() {
                   <div className="flex items-center gap-1">
                     {!t.approved && (
                       <>
-                        <button onClick={() => handleApprove(t.id)} className="p-1.5 rounded-lg hover:bg-emerald-500/20 transition"><Check className="w-4 h-4 text-emerald-400" /></button>
-                        <button onClick={() => handleReject(t.id)} className="p-1.5 rounded-lg hover:bg-red-500/20 transition"><X className="w-4 h-4 text-red-400" /></button>
+                        <button onClick={() => handleApprove(t.id)} className="p-1.5 rounded-lg hover:bg-stone-500/20 transition"><Check className="w-4 h-4 text-stone-400" /></button>
+                        <button onClick={() => handleReject(t.id)} className="p-1.5 rounded-lg hover:bg-stone-500/20 transition"><X className="w-4 h-4 text-stone-400" /></button>
                       </>
                     )}
-                    <button onClick={() => handleToggleFeatured(t.id)} className="p-1.5 rounded-lg hover:bg-amber-500/20 transition">
-                      <Award className={`w-4 h-4 ${t.featured ? 'text-amber-400' : 'text-white/30'}`} />
+                    <button onClick={() => handleToggleFeatured(t.id)} className="p-1.5 rounded-lg hover:bg-stone-500/20 transition">
+                      <Award className={`w-4 h-4 ${t.featured ? 'text-stone-400' : 'text-white/30'}`} />
                     </button>
                   </div>
                 </div>
@@ -272,12 +272,12 @@ export default function TestimonialsWallPage() {
           <div className="relative">
             {approvedTestimonials.length > 0 && (
               <div className="max-w-2xl mx-auto p-8 rounded-2xl bg-white/5 border border-white/10 text-center">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-r from-stone-600 to-stone-600 flex items-center justify-center text-xl font-bold mx-auto mb-4">
                   {approvedTestimonials[carouselIdx % approvedTestimonials.length].avatar}
                 </div>
                 <div className="flex gap-0.5 justify-center mb-4">
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className={`w-5 h-5 ${i < approvedTestimonials[carouselIdx % approvedTestimonials.length].rating ? 'text-amber-400 fill-amber-400' : 'text-white/20'}`} />
+                    <Star key={i} className={`w-5 h-5 ${i < approvedTestimonials[carouselIdx % approvedTestimonials.length].rating ? 'text-stone-400 fill-stone-400' : 'text-white/20'}`} />
                   ))}
                 </div>
                 <p className="text-lg text-white/80 leading-relaxed mb-6 italic">&ldquo;{approvedTestimonials[carouselIdx % approvedTestimonials.length].text}&rdquo;</p>
@@ -285,7 +285,7 @@ export default function TestimonialsWallPage() {
                 <p className="text-sm text-white/40">{approvedTestimonials[carouselIdx % approvedTestimonials.length].role}</p>
                 <div className="flex justify-center gap-2 mt-6">
                   {approvedTestimonials.map((_, i) => (
-                    <button key={i} onClick={() => setCarouselIdx(i)} className={`w-2.5 h-2.5 rounded-full transition ${i === carouselIdx % approvedTestimonials.length ? 'bg-violet-500' : 'bg-white/20'}`} />
+                    <button key={i} onClick={() => setCarouselIdx(i)} className={`w-2.5 h-2.5 rounded-full transition ${i === carouselIdx % approvedTestimonials.length ? 'bg-stone-500' : 'bg-white/20'}`} />
                   ))}
                 </div>
               </div>
@@ -298,10 +298,10 @@ export default function TestimonialsWallPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {filtered.filter(t => t.approved).map((t) => (
               <div key={t.id} className="p-6 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 relative overflow-hidden">
-                <MessageSquareQuote className="absolute top-4 right-4 w-12 h-12 text-violet-500/10" />
+                <MessageSquareQuote className="absolute top-4 right-4 w-12 h-12 text-stone-500/10" />
                 <p className="text-white/70 leading-relaxed mb-4 relative z-10">&ldquo;{t.text}&rdquo;</p>
                 <div className="flex items-center gap-3 relative z-10">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 flex items-center justify-center text-sm font-bold">{t.avatar}</div>
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-stone-600 to-stone-600 flex items-center justify-center text-sm font-bold">{t.avatar}</div>
                   <div>
                     <p className="font-medium text-sm">{t.name}</p>
                     <p className="text-xs text-white/40">{t.role}</p>

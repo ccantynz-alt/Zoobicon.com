@@ -26,7 +26,7 @@ export default function InstantRevealStage({
         <div
           className={`flex h-8 w-8 items-center justify-center rounded-full ${
             done
-              ? "bg-gradient-to-br from-emerald-400 to-emerald-600"
+              ? "bg-gradient-to-br from-stone-400 to-stone-600"
               : "bg-white/5 border border-white/10"
           }`}
         >

@@ -43,16 +43,16 @@ interface FeatureRequest {
 }
 
 const STATUS_CONFIG: Record<Status, { label: string; color: string; icon: typeof Lightbulb }> = {
-  'new': { label: 'New', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30', icon: Lightbulb },
-  'planned': { label: 'Planned', color: 'bg-purple-500/20 text-purple-400 border-purple-500/30', icon: Clock },
-  'in-progress': { label: 'In Progress', color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30', icon: Zap },
-  'completed': { label: 'Completed', color: 'bg-green-500/20 text-green-400 border-green-500/30', icon: Check },
+  'new': { label: 'New', color: 'bg-stone-500/20 text-stone-400 border-stone-500/30', icon: Lightbulb },
+  'planned': { label: 'Planned', color: 'bg-stone-500/20 text-stone-400 border-stone-500/30', icon: Clock },
+  'in-progress': { label: 'In Progress', color: 'bg-stone-500/20 text-stone-400 border-stone-500/30', icon: Zap },
+  'completed': { label: 'Completed', color: 'bg-stone-500/20 text-stone-400 border-stone-500/30', icon: Check },
 };
 
 const PRIORITY_CONFIG: Record<Priority, { label: string; color: string }> = {
-  'critical': { label: 'Critical', color: 'bg-red-500/20 text-red-400' },
-  'high': { label: 'High', color: 'bg-orange-500/20 text-orange-400' },
-  'medium': { label: 'BookOpen', color: 'bg-yellow-500/20 text-yellow-400' },
+  'critical': { label: 'Critical', color: 'bg-stone-500/20 text-stone-400' },
+  'high': { label: 'High', color: 'bg-stone-500/20 text-stone-400' },
+  'medium': { label: 'BookOpen', color: 'bg-stone-500/20 text-stone-400' },
   'low': { label: 'Low', color: 'bg-gray-500/20 text-gray-400' },
 };
 
@@ -118,14 +118,14 @@ export default function FeatureRequestsPage() {
       <header className="border-b border-white/10 bg-[#0a0a12]/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Zoobicon</Link>
+            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
             <span className="text-white/30">/</span>
             <span className="text-white/70 font-medium">Feature Requests</span>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/changelog" className="px-4 py-2 text-sm text-white/70 hover:text-white transition-colors">Changelog</Link>
             <Link href="/roadmap" className="px-4 py-2 text-sm text-white/70 hover:text-white transition-colors">Roadmap</Link>
-            <button onClick={() => setShowSubmit(true)} className="px-4 py-2 text-sm bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-medium hover:opacity-90 transition-opacity flex items-center gap-1">
+            <button onClick={() => setShowSubmit(true)} className="px-4 py-2 text-sm bg-gradient-to-r from-stone-600 to-stone-600 rounded-lg font-medium hover:opacity-90 transition-opacity flex items-center gap-1">
               <Plus className="w-4 h-4" /> Submit Request
             </button>
           </div>
@@ -134,7 +134,7 @@ export default function FeatureRequestsPage() {
 
       <main className="max-w-4xl mx-auto px-6 py-12">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-sm mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-stone-500/10 border border-stone-500/20 text-stone-400 text-sm mb-6">
             <Lightbulb className="w-4 h-4" /> Community Driven
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Feature Requests</h1>
@@ -143,14 +143,14 @@ export default function FeatureRequestsPage() {
 
         {/* Submit Form */}
         {showSubmit && (
-          <div className="p-6 rounded-xl border border-purple-500/20 bg-purple-500/5 mb-8 space-y-4">
+          <div className="p-6 rounded-xl border border-stone-500/20 bg-stone-500/5 mb-8 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold flex items-center gap-2"><Plus className="w-5 h-5 text-purple-400" /> Submit a Feature Request</h3>
+              <h3 className="font-semibold flex items-center gap-2"><Plus className="w-5 h-5 text-stone-400" /> Submit a Feature Request</h3>
               <button onClick={() => setShowSubmit(false)}><X className="w-5 h-5 text-gray-400 hover:text-white" /></button>
             </div>
             <input value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="Feature title" className="w-full bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-500" />
             <textarea value={newDesc} onChange={e => setNewDesc(e.target.value)} placeholder="Describe the feature and why it's valuable..." rows={3} className="w-full bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-500 resize-none" />
-            <button onClick={handleSubmit} className="px-4 py-2 rounded-lg bg-purple-600 text-sm font-medium hover:bg-purple-500 transition-colors">Submit</button>
+            <button onClick={handleSubmit} className="px-4 py-2 rounded-lg bg-stone-600 text-sm font-medium hover:bg-stone-500 transition-colors">Submit</button>
           </div>
         )}
 
@@ -169,7 +169,7 @@ export default function FeatureRequestsPage() {
         <div className="flex gap-1 p-1 bg-white/5 rounded-xl border border-white/10 mb-6 overflow-x-auto">
           {(['all', 'new', 'planned', 'in-progress', 'completed'] as const).map(s => (
             <button key={s} onClick={() => setStatusFilter(s)}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${statusFilter === s ? 'bg-purple-500/20 text-purple-400' : 'text-gray-400 hover:text-white'}`}>
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${statusFilter === s ? 'bg-stone-500/20 text-stone-400' : 'text-gray-400 hover:text-white'}`}>
               {s === 'all' ? 'All' : STATUS_CONFIG[s].label}
               <span className="px-1.5 py-0.5 rounded bg-white/10 text-xs">{counts[s]}</span>
             </button>
@@ -186,7 +186,7 @@ export default function FeatureRequestsPage() {
               <div key={req.id} className="flex gap-4 p-4 rounded-xl border border-white/10 bg-white/5 hover:border-white/20 transition-colors">
                 {/* Vote button */}
                 <button onClick={() => handleVote(req.id)}
-                  className={`flex flex-col items-center gap-0.5 px-3 py-2 rounded-lg border transition-all flex-shrink-0 ${voted ? 'border-purple-500/50 bg-purple-500/20 text-purple-400' : 'border-white/10 bg-white/5 text-gray-400 hover:border-purple-500/30 hover:text-purple-400'}`}>
+                  className={`flex flex-col items-center gap-0.5 px-3 py-2 rounded-lg border transition-all flex-shrink-0 ${voted ? 'border-stone-500/50 bg-stone-500/20 text-stone-400' : 'border-white/10 bg-white/5 text-gray-400 hover:border-stone-500/30 hover:text-stone-400'}`}>
                   <ChevronUp className="w-4 h-4" />
                   <span className="text-sm font-bold">{req.votes}</span>
                 </button>
@@ -202,7 +202,7 @@ export default function FeatureRequestsPage() {
                     {req.tags.map(t => <span key={t} className="px-2 py-0.5 rounded bg-white/10 text-xs text-gray-400">{t}</span>)}
                     <span className="text-xs text-gray-500 flex items-center gap-1"><MessageSquare className="w-3 h-3" />{req.comments}</span>
                     <span className="text-xs text-gray-500">by {req.author} &middot; {req.date}</span>
-                    {req.assignee && <span className="text-xs text-blue-400 flex items-center gap-1"><UserPlus className="w-3 h-3" />{req.assignee}</span>}
+                    {req.assignee && <span className="text-xs text-stone-400 flex items-center gap-1"><UserPlus className="w-3 h-3" />{req.assignee}</span>}
                   </div>
                 </div>
               </div>
@@ -213,7 +213,7 @@ export default function FeatureRequestsPage() {
         {/* Admin Tools Panel */}
         <div className="mt-12 p-6 rounded-xl border border-white/10 bg-white/5">
           <button onClick={() => setShowAdmin(!showAdmin)} className="flex items-center justify-between w-full">
-            <h3 className="font-semibold flex items-center gap-2"><Flag className="w-5 h-5 text-purple-400" /> Admin Tools</h3>
+            <h3 className="font-semibold flex items-center gap-2"><Flag className="w-5 h-5 text-stone-400" /> Admin Tools</h3>
             <span className="text-sm text-gray-400">{showAdmin ? 'Hide' : 'Show'}</span>
           </button>
           {showAdmin && (
@@ -224,8 +224,8 @@ export default function FeatureRequestsPage() {
                 { icon: Tag, label: 'Bulk Tag', desc: 'Add tags to multiple requests' },
                 { icon: AlertCircle, label: 'Flag for Review', desc: 'Mark requests needing moderation' },
               ].map((tool, i) => (
-                <button onClick={() => {}} key={i} className="p-3 rounded-lg border border-white/10 bg-white/5 text-left hover:border-purple-500/30 transition-colors">
-                  <tool.icon className="w-4 h-4 text-purple-400 mb-1" />
+                <button onClick={() => {}} key={i} className="p-3 rounded-lg border border-white/10 bg-white/5 text-left hover:border-stone-500/30 transition-colors">
+                  <tool.icon className="w-4 h-4 text-stone-400 mb-1" />
                   <div className="text-sm font-medium">{tool.label}</div>
                   <div className="text-xs text-gray-500">{tool.desc}</div>
                 </button>
@@ -237,10 +237,10 @@ export default function FeatureRequestsPage() {
         {/* Stats Summary */}
         <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: 'Total Requests', value: requests.length.toString(), icon: Lightbulb, color: 'text-purple-400' },
-            { label: 'Total Votes', value: requests.reduce((a, r) => a + r.votes, 0).toLocaleString(), icon: ChevronUp, color: 'text-pink-400' },
-            { label: 'Completed', value: requests.filter(r => r.status === 'completed').length.toString(), icon: Check, color: 'text-green-400' },
-            { label: 'In Progress', value: requests.filter(r => r.status === 'in-progress').length.toString(), icon: Zap, color: 'text-yellow-400' },
+            { label: 'Total Requests', value: requests.length.toString(), icon: Lightbulb, color: 'text-stone-400' },
+            { label: 'Total Votes', value: requests.reduce((a, r) => a + r.votes, 0).toLocaleString(), icon: ChevronUp, color: 'text-stone-400' },
+            { label: 'Completed', value: requests.filter(r => r.status === 'completed').length.toString(), icon: Check, color: 'text-stone-400' },
+            { label: 'In Progress', value: requests.filter(r => r.status === 'in-progress').length.toString(), icon: Zap, color: 'text-stone-400' },
           ].map((s, i) => (
             <div key={i} className="p-4 rounded-xl border border-white/10 bg-white/5">
               <s.icon className={`w-5 h-5 ${s.color} mb-2`} />
@@ -261,7 +261,7 @@ export default function FeatureRequestsPage() {
               { step: '4', title: 'Ship', desc: 'Completed features are announced in our changelog with your name credited.' },
             ].map((s, i) => (
               <div key={i} className="p-4 rounded-xl border border-white/10 bg-white/5 text-center">
-                <div className="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-sm font-bold mx-auto mb-2">{s.step}</div>
+                <div className="w-8 h-8 rounded-full bg-stone-500/20 text-stone-400 flex items-center justify-center text-sm font-bold mx-auto mb-2">{s.step}</div>
                 <h4 className="font-medium text-sm mb-1">{s.title}</h4>
                 <p className="text-xs text-gray-400">{s.desc}</p>
               </div>
@@ -270,11 +270,11 @@ export default function FeatureRequestsPage() {
         </div>
 
         {/* CTA */}
-        <div className="mt-16 text-center p-12 rounded-2xl bg-gradient-to-br from-purple-600/20 to-pink-600/20 border border-purple-500/20">
+        <div className="mt-16 text-center p-12 rounded-2xl bg-gradient-to-br from-stone-600/20 to-stone-600/20 border border-stone-500/20">
           <h2 className="text-3xl font-bold mb-4">Shape the Future of Zoobicon</h2>
           <p className="text-gray-400 mb-6">Submit your ideas, vote on what matters, and watch them come to life.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <button onClick={() => setShowSubmit(true)} className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 font-semibold hover:opacity-90 transition-opacity">
+            <button onClick={() => setShowSubmit(true)} className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 font-semibold hover:opacity-90 transition-opacity">
               Submit a Request <ArrowRight className="w-4 h-4" />
             </button>
             <Link href="/roadmap" className="inline-flex items-center gap-2 px-8 py-3 rounded-xl border border-white/20 font-semibold hover:bg-white/5 transition-colors">View Roadmap</Link>

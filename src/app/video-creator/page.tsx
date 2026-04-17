@@ -21,15 +21,22 @@ import {
   Square,
   Play,
   AlertCircle,
+  Megaphone,
   BookOpen,
   MessageSquareQuote,
   Briefcase,
   GraduationCap,
-  Zap,
-  Crown,
-  Smile,
   Building2,
   Clapperboard,
+  Crown,
+  Smile,
+  Zap,
+  Share2,
+  Wand2,
+  Film,
+  Mic,
+  ImageIcon,
+  ArrowLeft,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -133,11 +140,11 @@ const PROJECT_TYPES = [
 
 const VISUAL_STYLES = [
   { id: "modern-minimalist", label: "Modern / Minimalist", icon: Zap, color: "from-slate-400 to-slate-600" },
-  { id: "bold-dynamic", label: "Bold / Dynamic", icon: Sparkles, color: "from-red-500 to-orange-500" },
-  { id: "elegant-luxury", label: "Elegant / Luxury", icon: Crown, color: "from-amber-400 to-yellow-600" },
-  { id: "fun-playful", label: "Fun / Playful", icon: Smile, color: "from-violet-500 to-indigo-500" },
-  { id: "corporate-professional", label: "Corporate / Professional", icon: Building2, color: "from-blue-500 to-indigo-600" },
-  { id: "cinematic", label: "Cinematic", icon: Clapperboard, color: "from-emerald-500 to-teal-600" },
+  { id: "bold-dynamic", label: "Bold / Dynamic", icon: Sparkles, color: "from-stone-500 to-stone-500" },
+  { id: "elegant-luxury", label: "Elegant / Luxury", icon: Crown, color: "from-stone-400 to-stone-600" },
+  { id: "fun-playful", label: "Fun / Playful", icon: Smile, color: "from-stone-500 to-stone-500" },
+  { id: "corporate-professional", label: "Corporate / Professional", icon: Building2, color: "from-stone-500 to-stone-600" },
+  { id: "cinematic", label: "Cinematic", icon: Clapperboard, color: "from-stone-500 to-stone-600" },
 ];
 
 const PLATFORMS = [
@@ -371,6 +378,9 @@ SCRIPT_2:
     setVideoUrl(null);
     setVideoStatus("Starting video generation...");
 
+    // Track URL locally — React state is async, can't be read mid-loop
+    let receivedVideoUrl: string | null = null;
+
     try {
       const res = await fetch("/api/v1/video/generate", {
         method: "POST",
@@ -387,17 +397,24 @@ SCRIPT_2:
         }),
       });
 
+      // Non-streaming error responses (4xx, 503)
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || `Video generation failed (${res.status})`);
+        throw new Error(
+          data.error ||
+            (res.status === 503
+              ? "Video generation is being configured. REPLICATE_API_TOKEN may be missing in Vercel env. Please contact support."
+              : `Video generation failed (HTTP ${res.status})`)
+        );
       }
 
       // Read SSE stream for progress updates
       const reader = res.body?.getReader();
-      if (!reader) throw new Error("No response stream");
+      if (!reader) throw new Error("No response stream from video API.");
 
       const decoder = new TextDecoder();
       let buf = "";
+      let streamError: Error | null = null;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -408,30 +425,41 @@ SCRIPT_2:
 
         for (const line of lines) {
           if (!line.startsWith("data: ")) continue;
+          let event: { type?: string; message?: string; videoUrl?: string; step?: string; progress?: number };
           try {
-            const event = JSON.parse(line.slice(6));
-            if (event.type === "status") {
-              setVideoStatus(event.message || "Processing...");
-            } else if (event.type === "done" && event.videoUrl) {
-              setVideoUrl(event.videoUrl);
-              setVideoStatus("");
-              setGenerating(false);
-              return;
-            } else if (event.type === "error") {
-              throw new Error(event.message || "Video generation failed.");
-            }
-          } catch (e) {
-            if (e instanceof Error && e.message.includes("failed")) throw e;
+            event = JSON.parse(line.slice(6));
+          } catch {
+            continue; // Ignore unparseable SSE chunks
+          }
+          if (event.type === "status") {
+            setVideoStatus(event.message || "Processing...");
+          } else if (event.type === "done" && event.videoUrl) {
+            receivedVideoUrl = event.videoUrl;
+            setVideoUrl(event.videoUrl);
+            setVideoStatus("");
+            setGenerating(false);
+            return;
+          } else if (event.type === "error") {
+            streamError = new Error(event.message || "Video generation failed.");
+            break;
           }
         }
+
+        if (streamError) break;
       }
 
-      // If we got here without a video URL, something went wrong
-      if (!videoUrl) {
-        throw new Error("Video generation completed but no video was returned. Please try again.");
+      if (streamError) throw streamError;
+
+      // Stream ended without a done event — something silently failed upstream
+      if (!receivedVideoUrl) {
+        throw new Error("Video generation ended without producing a video. Please try again.");
       }
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Video generation failed.";
+      const raw = err instanceof Error ? err.message : "Video generation failed.";
+      // Pass through clear errors verbatim, sanitize fuzzy ones
+      const msg = raw.includes("REPLICATE_API_TOKEN") || raw.includes("HTTP") || raw.includes("model")
+        ? raw
+        : sanitizeError(raw);
       setVideoError(msg);
       setGenerating(false);
       setVideoStatus("");
@@ -458,128 +486,198 @@ SCRIPT_2:
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-[#0a0a14] text-white">
-      {/* Nav */}
-      <nav className="border-b border-amber-500/[0.08] bg-[#0a0a14]/95 backdrop-blur-2xl">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 flex items-center justify-between h-14">
+    <div className="min-h-screen bg-[#050508] text-white relative overflow-hidden fs-grain pt-[72px]">
+      {/* Ambient cinematic glow — matches Filmora standard */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden>
+        <div
+          className="absolute left-1/2 top-[10%] h-[720px] w-[1200px] -translate-x-1/2 rounded-full blur-[160px]"
+          style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.09), transparent 70%)" }}
+        />
+        <div
+          className="absolute bottom-0 right-[15%] h-[500px] w-[700px] rounded-full blur-[140px]"
+          style={{ background: "radial-gradient(closest-side, rgba(224,139,176,0.05), transparent 70%)" }}
+        />
+        <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:32px_32px] opacity-60" />
+      </div>
+
+      {/* Step indicator sub-header — below global nav */}
+      <div className="relative z-40 border-b border-white/[0.04] bg-[#050508]/60 backdrop-blur-xl">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14">
           <div className="flex items-center gap-2.5">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
-                <Video className="w-3.5 h-3.5 text-white" />
-              </div>
-              <span className="text-sm font-semibold text-white">Zoobicon</span>
-            </Link>
-            <ChevronRight className="w-3 h-3 text-amber-500/30" />
-            <span className="text-sm text-amber-200/70 font-medium">AI Video Creator</span>
+            <div
+              className="flex h-7 w-7 items-center justify-center rounded-lg"
+              style={{
+                background: "linear-gradient(135deg, #E8D4B0 0%, #F7C8A0 60%, #E08BB0 100%)",
+                boxShadow: "0 8px 20px -10px rgba(232,212,176,0.5)",
+              }}
+            >
+              <Film className="h-3.5 w-3.5 text-black" />
+            </div>
+            <span className="text-[13px] font-medium text-white/80 tracking-tight">Video Studio</span>
           </div>
+
+          <div className="hidden sm:flex items-center gap-1.5">
+            {[
+              { key: "describe", label: "Describe", num: "1" },
+              { key: "scripts", label: "Script", num: "2" },
+              { key: "produce", label: "Generate", num: "3" },
+            ].map((s, i) => {
+              const isActive = step === s.key;
+              const isCompleted = (s.key === "describe" && step !== "describe") || (s.key === "scripts" && step === "produce");
+              return (
+                <div key={s.key} className="flex items-center gap-1.5">
+                  {i > 0 && <div className={`w-6 h-[1.5px] rounded-full transition-all duration-500 ${isCompleted || isActive ? "bg-[#E8D4B0]" : "bg-white/[0.08]"}`} />}
+                  <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium tracking-wide transition-all duration-300 ${
+                    isActive ? "bg-[#E8D4B0]/[0.08] text-[#E8D4B0] border border-[#E8D4B0]/30" :
+                    isCompleted ? "text-[#E8D4B0]/70" :
+                    "text-white/25 border border-transparent"
+                  }`}>
+                    {isCompleted ? <Check className="w-3 h-3" /> : <span className="text-[10px] opacity-60">{s.num}</span>}
+                    {s.label}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
           <div className="flex items-center gap-1">
-            <Link href="/dashboard" className="text-xs text-white/50 hover:text-amber-300 px-3 py-1.5 rounded-lg hover:bg-amber-500/5 flex items-center gap-1.5 transition-colors">
-              <LayoutDashboard className="w-3.5 h-3.5" /> Dashboard
+            <Link href="/dashboard" className="text-[12px] text-white/50 hover:text-white/90 px-3 py-1.5 rounded-full hover:bg-white/[0.04] flex items-center gap-1.5 transition-all">
+              <LayoutDashboard className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Dashboard</span>
             </Link>
-            <button onClick={handleLogout} className="text-xs text-white/50 hover:text-amber-300 px-3 py-1.5 rounded-lg hover:bg-amber-500/5 transition-colors">
+            <button onClick={handleLogout} className="text-[12px] text-white/50 hover:text-white/90 px-2 py-1.5 rounded-full hover:bg-white/[0.04] transition-all">
               <LogOut className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
-      </nav>
-
-      {/* Steps indicator */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-8 pb-4">
-        <div className="flex items-center gap-2">
-          {[
-            { key: "describe", label: "1. Describe", icon: Sparkles },
-            { key: "scripts", label: "2. Pick Script", icon: Bot },
-            { key: "produce", label: "3. Generate Video", icon: Video },
-          ].map((s, i) => {
-            const isActive = step === s.key;
-            const isCompleted = (s.key === "describe" && step !== "describe") || (s.key === "scripts" && step === "produce");
-            const isReachable = isActive || isCompleted;
-            return (
-              <div key={s.key} className="flex items-center gap-2">
-                {i > 0 && <div className={`w-10 h-[2px] rounded-full transition-all ${isReachable ? "bg-gradient-to-r from-amber-500 to-amber-400" : "bg-white/[0.08]"}`} />}
-                <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all ${
-                  isActive ? "bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-lg shadow-amber-500/25" :
-                  isCompleted ? "bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/20" :
-                  "bg-white/[0.04] text-white/30 ring-1 ring-white/[0.06]"
-                }`}>
-                  {isCompleted ? <Check className="w-3.5 h-3.5" /> : <s.icon className="w-3.5 h-3.5" />}
-                  <span className="hidden sm:inline">{s.label}</span>
-                  <span className="sm:hidden">{s.label.split(". ")[0]}.</span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-20">
+      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-32 pt-10">
 
         {/* Error display */}
         {videoError && (
-          <div className="mb-6 p-4 rounded-2xl bg-red-500/[0.08] border border-red-500/20 backdrop-blur-sm flex items-start gap-3 shadow-lg shadow-red-500/5">
-            <div className="w-9 h-9 rounded-xl bg-red-500/15 flex items-center justify-center shrink-0">
-              <AlertCircle className="w-4.5 h-4.5 text-red-400" />
+          <div className="mb-6 p-4 rounded-2xl bg-stone-500/[0.06] border border-stone-500/20 backdrop-blur-xl flex items-start gap-3">
+            <div className="w-9 h-9 rounded-xl bg-stone-500/10 flex items-center justify-center shrink-0 border border-stone-500/20">
+              <AlertCircle className="w-4 h-4 text-stone-400" />
             </div>
-            <div className="pt-1">
-              <div className="text-sm font-semibold text-red-300">Something went wrong</div>
-              <div className="text-sm text-red-400/70 mt-1 leading-relaxed">{videoError}</div>
-              <button onClick={() => setVideoError("")} className="text-xs text-red-400/50 hover:text-red-300 mt-2 transition-colors">Dismiss</button>
+            <div className="pt-0.5 flex-1">
+              <div className="text-sm font-medium text-stone-300">{videoError}</div>
+              <div className="flex items-center gap-3 mt-3">
+                {step === "produce" && editedScript && (
+                  <button
+                    onClick={() => { setVideoError(""); handleGenerateVideo(); }}
+                    className="text-xs font-medium text-white hover:text-white px-3.5 py-1.5 rounded-lg bg-white/[0.06] hover:bg-white/[0.10] border border-white/[0.08] transition-all flex items-center gap-1.5"
+                  >
+                    <RefreshCw className="w-3 h-3" /> Retry
+                  </button>
+                )}
+                <button onClick={() => setVideoError("")} className="text-xs text-white/30 hover:text-white/60 transition-colors">
+                  Dismiss
+                </button>
+              </div>
             </div>
           </div>
         )}
 
-        {/* ═══ STEP 1: DESCRIBE ═══ */}
+        {/* ═══ STEP 1: DESCRIBE — cinematic hero ═══ */}
         {step === "describe" && (
-          <div className="space-y-6">
-            <div className="text-center pt-8 pb-4">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center mx-auto mb-6 shadow-xl shadow-amber-500/20">
-                <Video className="w-8 h-8 text-white" />
+          <div className="flex flex-col items-center pt-16 sm:pt-24">
+            {/* Hero */}
+            <div className="text-center mb-12 max-w-3xl">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+                <Sparkles className="h-3 w-3" />
+                Cinematic AI video studio
               </div>
-              <h1 className="text-3xl font-bold mb-3 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">What video do you want to create?</h1>
-              <p className="text-lg text-slate-400 max-w-md mx-auto">
-                Describe it in plain English. We&apos;ll write the script and generate a professional AI spokesperson video.
+              <h1 className="fs-display-lg text-white">
+                Make a video that{" "}
+                <span
+                  className="font-normal"
+                  style={{
+                    fontFamily: "Fraunces, ui-serif, Georgia, serif",
+                    fontStyle: "italic",
+                    color: "#E8D4B0",
+                  }}
+                >
+                  converts.
+                </span>
+              </h1>
+              <p className="mt-6 text-[17px] sm:text-lg text-white/55 max-w-xl mx-auto leading-relaxed">
+                Describe the video. Our AI director writes the script, clones the voice, renders the avatar, and burns the captions — all in a single take.
               </p>
             </div>
 
-            <div className="max-w-2xl mx-auto">
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleGenerateScripts(); } }}
-                placeholder="e.g. A 30-second promo video for Zoobicon featuring an excited female presenter explaining our AI website builder and domain search tools..."
-                rows={4}
-                className="w-full px-5 py-4 bg-white/[0.05] border border-white/[0.10] rounded-2xl text-white text-base placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/30 resize-none transition-all"
-                autoFocus
-              />
-
-              <button
-                onClick={handleGenerateScripts}
-                disabled={generatingScripts || description.trim().length < 10}
-                className="w-full mt-4 py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 rounded-2xl font-bold text-lg disabled:opacity-40 transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 hover:shadow-xl hover:shadow-amber-500/30"
+            {/* Input panel — Filmora-tier card */}
+            <div className="w-full max-w-2xl">
+              <div
+                className="relative overflow-hidden rounded-[28px] border border-white/[0.08] backdrop-blur-xl transition-all focus-within:border-[#E8D4B0]/35"
+                style={{
+                  background: "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(10,10,15,0.7) 100%)",
+                  boxShadow: "0 1px 0 rgba(255,255,255,0.05) inset, 0 24px 60px -28px rgba(0,0,0,0.7)",
+                }}
               >
-                {generatingScripts ? (
-                  <><Loader2 className="w-5 h-5 animate-spin" /> Writing scripts...</>
-                ) : (
-                  <><Sparkles className="w-5 h-5" /> Write 2 Script Options</>
-                )}
-              </button>
-
-              {/* Quick suggestions */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-8">
-                {[
-                  "30-second promo for Zoobicon — excited female presenter showing off the AI builder and domain search",
-                  "Product launch video for our free domain search tool — professional, confident tone",
-                  "Short explainer about Zoobicon for small business owners who need a website fast",
-                  "Testimonial-style video about how AI is making web development accessible to everyone",
-                ].map((suggestion) => (
+                <div
+                  className="pointer-events-none absolute -right-24 -top-24 h-[300px] w-[300px] rounded-full blur-[100px]"
+                  style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.18), transparent 70%)" }}
+                />
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleGenerateScripts(); } }}
+                  placeholder="A 30-second promo featuring an excited presenter explaining our AI website builder…"
+                  rows={4}
+                  className="relative w-full px-6 pt-6 pb-2 bg-transparent text-white text-[15px] placeholder-white/25 focus:outline-none resize-none leading-relaxed"
+                  autoFocus
+                />
+                <div className="relative flex items-center justify-between px-5 pb-5 pt-2">
+                  <div className="text-[11px] text-white/25 font-medium tracking-wide">
+                    {description.length > 0 && <span>{description.length} chars</span>}
+                  </div>
                   <button
-                    key={suggestion}
-                    onClick={() => setDescription(suggestion)}
-                    className="p-3 rounded-xl border border-white/[0.08] bg-white/[0.03] text-left text-sm text-slate-400 hover:text-white hover:border-amber-500/30 hover:bg-amber-500/5 transition-all"
+                    onClick={handleGenerateScripts}
+                    disabled={generatingScripts || description.trim().length < 10}
+                    className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-[13px] font-semibold transition-all duration-500 hover:-translate-y-0.5 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                    style={{
+                      background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+                      color: "#0a0a0f",
+                      boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
+                    }}
                   >
-                    {suggestion}
+                    {generatingScripts ? (
+                      <><Loader2 className="w-4 h-4 animate-spin" /> Writing scripts…</>
+                    ) : (
+                      <><Wand2 className="w-4 h-4" /> Generate scripts</>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Quick prompt chips */}
+              <div className="flex flex-wrap gap-2 mt-6 justify-center">
+                {[
+                  { label: "Product demo", prompt: "30-second product demo for Zoobicon showing the AI builder and domain search — professional, confident presenter" },
+                  { label: "Testimonial", prompt: "Testimonial-style video about how AI is making web development accessible to everyone" },
+                  { label: "Explainer", prompt: "Short explainer about Zoobicon for small business owners who need a website fast" },
+                  { label: "Social ad", prompt: "Product launch video for our free domain search tool — energetic, hook-first opening for social media" },
+                ].map((chip) => (
+                  <button
+                    key={chip.label}
+                    onClick={() => setDescription(chip.prompt)}
+                    className="group/chip inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.02] px-4 py-2 text-[12px] font-medium text-white/55 transition-all hover:-translate-y-0.5 hover:border-[#E8D4B0]/30 hover:bg-[#E8D4B0]/[0.04] hover:text-[#E8D4B0]"
+                  >
+                    <Sparkles className="w-3 h-3 text-white/25 group-hover/chip:text-[#E8D4B0] transition-colors" />
+                    {chip.label}
                   </button>
                 ))}
+              </div>
+
+              {/* Pipeline trust strip */}
+              <div className="mt-12 flex items-center justify-center gap-6 text-[11px] text-white/30 font-medium tracking-[0.12em] uppercase">
+                <span className="flex items-center gap-1.5"><Mic className="w-3 h-3" /> Fish Audio S1</span>
+                <span className="h-1 w-1 rounded-full bg-white/15" />
+                <span className="flex items-center gap-1.5"><ImageIcon className="w-3 h-3" /> FLUX avatar</span>
+                <span className="h-1 w-1 rounded-full bg-white/15" />
+                <span className="flex items-center gap-1.5"><Film className="w-3 h-3" /> Lip sync</span>
+                <span className="h-1 w-1 rounded-full bg-white/15" />
+                <span className="flex items-center gap-1.5"><Sparkles className="w-3 h-3" /> Whisper captions</span>
               </div>
             </div>
           </div>
@@ -587,48 +685,101 @@ SCRIPT_2:
 
         {/* ═══ STEP 2: PICK SCRIPT ═══ */}
         {step === "scripts" && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold">Pick your script</h2>
-                <p className="text-sm text-slate-400 mt-1">Select one, edit it if needed, then proceed.</p>
-              </div>
-              <button onClick={() => setStep("describe")} className="text-sm text-amber-400 hover:text-amber-300 transition-colors">
-                &larr; Back
+          <div className="max-w-3xl mx-auto pt-6">
+            {/* Header */}
+            <div className="mb-10">
+              <button onClick={() => setStep("describe")} className="flex items-center gap-1.5 text-[11px] text-white/40 hover:text-[#E8D4B0] transition-colors mb-4 uppercase tracking-[0.12em]">
+                <ArrowLeft className="w-3 h-3" /> Back
               </button>
+              <h2 className="fs-display-sm text-white">
+                Choose your{" "}
+                <span
+                  className="font-normal"
+                  style={{ fontFamily: "Fraunces, ui-serif, Georgia, serif", fontStyle: "italic", color: "#E8D4B0" }}
+                >
+                  script.
+                </span>
+              </h2>
+              <p className="mt-3 text-[15px] text-white/55 max-w-lg">Our AI director wrote two approaches. Pick one and refine it.</p>
             </div>
 
-            <div className="grid gap-4">
+            {/* Script cards */}
+            <div className="grid gap-5 mb-8">
               {scripts.map((script, i) => (
                 <button
                   key={i}
                   onClick={() => handleSelectScript(i)}
-                  className={`p-5 rounded-2xl border text-left transition-all ${
+                  className={`relative overflow-hidden p-7 rounded-[24px] border text-left transition-all duration-500 hover:-translate-y-0.5 group/script ${
                     selectedScript === i
-                      ? "border-amber-500/40 bg-amber-500/[0.08] ring-1 ring-amber-500/20 shadow-lg shadow-amber-500/5"
-                      : "border-white/[0.08] bg-white/[0.03] hover:border-amber-500/20 hover:bg-amber-500/[0.03]"
+                      ? "border-[#E8D4B0]/40"
+                      : "border-white/[0.08] hover:border-white/[0.15]"
                   }`}
+                  style={{
+                    background: selectedScript === i
+                      ? "linear-gradient(135deg, rgba(232,212,176,0.07) 0%, rgba(224,139,176,0.04) 100%)"
+                      : "linear-gradient(135deg, rgba(17,17,24,0.6) 0%, rgba(10,10,15,0.4) 100%)",
+                    boxShadow: selectedScript === i
+                      ? "0 1px 0 rgba(232,212,176,0.15) inset, 0 28px 70px -32px rgba(232,212,176,0.35)"
+                      : "0 1px 0 rgba(255,255,255,0.03) inset, 0 20px 50px -30px rgba(0,0,0,0.6)",
+                  }}
                 >
-                  <div className="text-xs font-semibold text-amber-400 mb-2">Draft {i + 1}</div>
-                  <div className="text-[15px] text-slate-300 leading-relaxed whitespace-pre-wrap">{script}</div>
+                  {selectedScript === i && (
+                    <div
+                      className="absolute inset-x-0 top-0 h-[2px]"
+                      style={{ background: "linear-gradient(90deg, transparent, #E8D4B0, #E08BB0, transparent)" }}
+                    />
+                  )}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`flex h-8 w-8 items-center justify-center rounded-xl text-[13px] font-bold transition-all ${
+                          selectedScript === i ? "text-black" : "bg-white/[0.06] text-white/40"
+                        }`}
+                        style={selectedScript === i ? {
+                          background: "linear-gradient(135deg, #E8D4B0 0%, #F7C8A0 60%, #E08BB0 100%)",
+                          boxShadow: "0 8px 20px -10px rgba(232,212,176,0.5)",
+                        } : undefined}
+                      >
+                        {i + 1}
+                      </div>
+                      <span className={`text-[11px] font-semibold uppercase tracking-[0.18em] transition-colors ${selectedScript === i ? "text-[#E8D4B0]" : "text-white/35"}`}>
+                        {i === 0 ? "Direct approach" : "Creative approach"}
+                      </span>
+                    </div>
+                    {selectedScript === i && (
+                      <div className="flex items-center gap-1.5 rounded-full bg-[#E8D4B0]/15 px-2.5 py-1 text-[10px] font-semibold text-[#E8D4B0] uppercase tracking-[0.18em] border border-[#E8D4B0]/25">
+                        <Check className="w-3 h-3" /> Selected
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-[14px] text-white/65 leading-[1.7] whitespace-pre-wrap group-hover/script:text-white/80 transition-colors">{script}</div>
                 </button>
               ))}
             </div>
 
+            {/* Edit + proceed */}
             {selectedScript !== null && (
-              <div className="space-y-4">
-                <label className="text-sm font-semibold text-white/70">Edit your script (optional)</label>
+              <div className="space-y-5">
+                <div className="flex items-center justify-between">
+                  <label className="text-[11px] font-semibold text-[#E8D4B0]/80 uppercase tracking-[0.18em]">Refine your script</label>
+                  <span className="text-[11px] text-white/25">{editedScript.length} chars</span>
+                </div>
                 <textarea
                   value={editedScript}
                   onChange={(e) => setEditedScript(e.target.value)}
                   rows={6}
-                  className="w-full px-5 py-4 bg-white/[0.05] border border-white/[0.10] rounded-2xl text-white text-[15px] focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/30 resize-none leading-relaxed transition-all"
+                  className="w-full px-6 py-5 bg-white/[0.03] border border-white/[0.08] rounded-[24px] text-white/85 text-[14px] focus:outline-none focus:border-[#E8D4B0]/35 focus:bg-white/[0.04] resize-none leading-[1.7] transition-all backdrop-blur-xl"
                 />
                 <button
                   onClick={handleProceedToProduction}
-                  className="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-500/25 hover:shadow-xl hover:shadow-amber-500/30"
+                  className="w-full py-5 rounded-full font-semibold text-[15px] transition-all duration-500 hover:-translate-y-0.5 flex items-center justify-center gap-2.5"
+                  style={{
+                    background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+                    color: "#0a0a0f",
+                    boxShadow: "0 18px 48px -18px rgba(232,212,176,0.55)",
+                  }}
                 >
-                  <Play className="w-5 h-5" /> Proceed to Generate Video
+                  Continue to production <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
             )}
@@ -637,137 +788,247 @@ SCRIPT_2:
 
         {/* ═══ STEP 3: PRODUCE ═══ */}
         {step === "produce" && !videoUrl && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold">Generate your video</h2>
-                <p className="text-sm text-slate-400 mt-1">Choose your presenter style, then hit generate.</p>
-              </div>
-              <button onClick={() => setStep("scripts")} className="text-sm text-amber-400 hover:text-amber-300 transition-colors">
-                &larr; Back to scripts
+          <div className="max-w-4xl mx-auto pt-6">
+            {/* Header */}
+            <div className="mb-10">
+              <button onClick={() => setStep("scripts")} className="flex items-center gap-1.5 text-[11px] text-white/40 hover:text-[#E8D4B0] transition-colors mb-4 uppercase tracking-[0.12em]">
+                <ArrowLeft className="w-3 h-3" /> Back to scripts
               </button>
+              <h2 className="fs-display-sm text-white">
+                Production{" "}
+                <span
+                  className="font-normal"
+                  style={{ fontFamily: "Fraunces, ui-serif, Georgia, serif", fontStyle: "italic", color: "#E8D4B0" }}
+                >
+                  settings.
+                </span>
+              </h2>
+              <p className="mt-3 text-[15px] text-white/55 max-w-lg">Configure your presenter and format, then roll camera.</p>
             </div>
 
-            {/* Script preview */}
-            <div className="p-4 rounded-2xl bg-white/[0.04] border border-amber-500/10">
-              <div className="text-xs font-semibold text-amber-400/70 uppercase tracking-wider mb-2">Your Script</div>
-              <div className="text-[15px] text-slate-300 leading-relaxed whitespace-pre-wrap max-h-32 overflow-y-auto">{editedScript}</div>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-4">
-              {/* Presenter gender */}
-              <div>
-                <label className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-3 block">Presenter</label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={() => setPresenterGender("female")}
-                    className={`p-4 rounded-xl border text-center transition-all ${
-                      presenterGender === "female"
-                        ? "border-pink-500/50 bg-pink-500/10 ring-1 ring-pink-500/20"
-                        : "border-white/[0.08] bg-white/[0.02] hover:border-white/20"
-                    }`}
-                  >
-                    <div className="text-base font-semibold">Female</div>
-                    <div className="text-xs text-slate-500">Warm, professional</div>
-                  </button>
-                  <button
-                    onClick={() => setPresenterGender("male")}
-                    className={`p-4 rounded-xl border text-center transition-all ${
-                      presenterGender === "male"
-                        ? "border-blue-500/50 bg-blue-500/10 ring-1 ring-blue-500/20"
-                        : "border-white/[0.08] bg-white/[0.02] hover:border-white/20"
-                    }`}
-                  >
-                    <div className="text-base font-semibold">Male</div>
-                    <div className="text-xs text-slate-500">Confident, clear</div>
-                  </button>
-                </div>
-              </div>
-
-              {/* Format */}
-              <div>
-                <label className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-3 block">Format</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {([
-                    { id: "landscape" as const, icon: Monitor, label: "16:9" },
-                    { id: "portrait" as const, icon: Smartphone, label: "9:16" },
-                    { id: "square" as const, icon: Square, label: "1:1" },
-                  ]).map((f) => (
-                    <button
-                      key={f.id}
-                      onClick={() => setFormat(f.id)}
-                      className={`p-3 rounded-xl border text-center transition-all ${
-                        format === f.id
-                          ? "border-amber-500/40 bg-amber-500/10 shadow-sm shadow-amber-500/10"
-                          : "border-white/[0.08] bg-white/[0.02] hover:border-amber-500/20"
-                      }`}
-                    >
-                      <f.icon className="w-5 h-5 mx-auto mb-1 text-white/60" />
-                      <div className="text-xs text-white/60">{f.label}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* How it works */}
-              <div>
-                <label className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-3 block">Pipeline</label>
-                <div className="p-3 rounded-xl bg-white/[0.04] border border-amber-500/[0.08] text-xs text-slate-500 space-y-1.5">
-                  <div>1. FLUX generates your presenter</div>
-                  <div>2. Fish Speech creates the voice</div>
-                  <div>3. OmniHuman animates the face</div>
-                  <div className="text-amber-400 font-medium pt-1">~60-90 seconds total</div>
-                </div>
-              </div>
-            </div>
-
-            {generating ? (
-              <div className="rounded-2xl bg-gradient-to-br from-amber-500/5 to-orange-500/5 border border-amber-500/10 p-8">
-                <div className="text-center mb-6">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 mx-auto mb-4 flex items-center justify-center shadow-xl shadow-amber-500/30">
-                    <Video className="w-8 h-8 text-white animate-pulse" />
+            <div className="grid lg:grid-cols-5 gap-6">
+              {/* Left: Settings (3 cols) */}
+              <div className="lg:col-span-3 space-y-5">
+                {/* Script preview */}
+                <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06] backdrop-blur-xl">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-5 h-5 rounded-md bg-gradient-to-br from-stone-500/20 to-stone-500/20 flex items-center justify-center">
+                      <BookOpen className="w-3 h-3 text-stone-400" />
+                    </div>
+                    <span className="text-xs font-semibold text-white/40 uppercase tracking-wider">Script</span>
                   </div>
-                  <h3 className="text-lg font-bold mb-1">Generating your video</h3>
-                  <p className="text-sm text-amber-400/70">{videoStatus || "Starting pipeline..."}</p>
+                  <div className="text-[13px] text-white/50 leading-relaxed whitespace-pre-wrap max-h-24 overflow-y-auto">{editedScript}</div>
                 </div>
-                <div className="space-y-3 max-w-sm mx-auto">
-                  {["FLUX generates presenter", "AI creates voiceover", "OmniHuman animates face", "Final rendering"].map((stage, i) => {
-                    const stageStatus = videoStatus?.toLowerCase() || "";
-                    const isDone = (i === 0 && stageStatus.includes("voice")) || (i === 1 && stageStatus.includes("animat")) || (i === 2 && stageStatus.includes("render"));
-                    const isActive = !isDone && ((i === 0 && stageStatus.includes("present")) || (i === 1 && stageStatus.includes("voice")) || (i === 2 && stageStatus.includes("animat")) || (i === 3 && stageStatus.includes("render")));
-                    return (
-                      <div key={stage} className={`flex items-center gap-3 text-sm ${isDone ? "text-emerald-400" : isActive ? "text-amber-400" : "text-white/20"}`}>
-                        {isDone ? <Check className="w-4 h-4" /> : isActive ? <Loader2 className="w-4 h-4 animate-spin" /> : <div className="w-4 h-4 rounded-full border border-white/10" />}
-                        {stage}
+
+                {/* Presenter + Format row */}
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {/* Presenter */}
+                  <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06] backdrop-blur-xl">
+                    <label className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-3 block">Presenter</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={() => setPresenterGender("female")}
+                        className={`p-3 rounded-xl border text-center transition-all duration-300 ${
+                          presenterGender === "female"
+                            ? "border-stone-500/40 bg-stone-500/[0.08]"
+                            : "border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12]"
+                        }`}
+                      >
+                        <div className={`text-sm font-semibold transition-colors ${presenterGender === "female" ? "text-white" : "text-white/50"}`}>Female</div>
+                        <div className="text-[11px] text-white/25 mt-0.5">Warm, professional</div>
+                      </button>
+                      <button
+                        onClick={() => setPresenterGender("male")}
+                        className={`p-3 rounded-xl border text-center transition-all duration-300 ${
+                          presenterGender === "male"
+                            ? "border-stone-500/40 bg-stone-500/[0.08]"
+                            : "border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12]"
+                        }`}
+                      >
+                        <div className={`text-sm font-semibold transition-colors ${presenterGender === "male" ? "text-white" : "text-white/50"}`}>Male</div>
+                        <div className="text-[11px] text-white/25 mt-0.5">Confident, clear</div>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Format */}
+                  <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06] backdrop-blur-xl">
+                    <label className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-3 block">Format</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {([
+                        { id: "landscape" as const, icon: Monitor, label: "16:9" },
+                        { id: "portrait" as const, icon: Smartphone, label: "9:16" },
+                        { id: "square" as const, icon: Square, label: "1:1" },
+                      ]).map((f) => (
+                        <button
+                          key={f.id}
+                          onClick={() => setFormat(f.id)}
+                          className={`p-2.5 rounded-xl border text-center transition-all duration-300 ${
+                            format === f.id
+                              ? "border-stone-500/40 bg-stone-500/[0.08]"
+                              : "border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12]"
+                          }`}
+                        >
+                          <f.icon className={`w-4 h-4 mx-auto mb-1 transition-colors ${format === f.id ? "text-stone-400" : "text-white/30"}`} />
+                          <div className={`text-[11px] font-medium transition-colors ${format === f.id ? "text-white/80" : "text-white/30"}`}>{f.label}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Generate button or progress */}
+                {generating ? (
+                  <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] backdrop-blur-xl p-8">
+                    {/* Cinematic progress */}
+                    <div className="text-center mb-8">
+                      <div className="relative w-16 h-16 mx-auto mb-5">
+                        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-stone-500/20 to-stone-500/20 animate-pulse" />
+                        <div className="relative w-full h-full rounded-2xl bg-zinc-900/80 flex items-center justify-center border border-white/[0.08]">
+                          <Film className="w-7 h-7 text-stone-400" />
+                        </div>
                       </div>
-                    );
-                  })}
+                      <h3 className="text-lg font-semibold mb-1 tracking-tight">Producing your video</h3>
+                      <p className="text-sm text-white/30">{videoStatus || "Initializing pipeline..."}</p>
+                    </div>
+
+                    {/* Animated progress bar */}
+                    <div className="relative h-1.5 rounded-full bg-white/[0.04] overflow-hidden mb-8">
+                      <div className="absolute inset-0 bg-gradient-to-r from-stone-500 via-stone-500 to-stone-500 rounded-full animate-pulse" style={{
+                        width: (() => {
+                          const s = videoStatus?.toLowerCase() || "";
+                          if (s.includes("render") || s.includes("final")) return "85%";
+                          if (s.includes("animat") || s.includes("lip")) return "65%";
+                          if (s.includes("voice") || s.includes("speech")) return "40%";
+                          if (s.includes("present") || s.includes("avatar") || s.includes("image") || s.includes("flux")) return "20%";
+                          return "5%";
+                        })(),
+                        transition: "width 1.5s ease-in-out",
+                      }} />
+                    </div>
+
+                    {/* Stage list */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      {[
+                        { label: "Avatar", icon: ImageIcon, keywords: ["present", "avatar", "image", "flux"] },
+                        { label: "Voice", icon: Mic, keywords: ["voice", "speech", "audio"] },
+                        { label: "Lip Sync", icon: Film, keywords: ["animat", "lip", "omni", "sync"] },
+                        { label: "Render", icon: Video, keywords: ["render", "final", "compos"] },
+                      ].map((stage, i) => {
+                        const stageStatus = videoStatus?.toLowerCase() || "";
+                        const myKeywordActive = stage.keywords.some(k => stageStatus.includes(k));
+                        // A stage is done if a LATER stage is active
+                        const laterActive = [1,2,3].slice(i).some(j => {
+                          const later = [
+                            { label: "Avatar", keywords: ["present", "avatar", "image", "flux"] },
+                            { label: "Voice", keywords: ["voice", "speech", "audio"] },
+                            { label: "Lip Sync", keywords: ["animat", "lip", "omni", "sync"] },
+                            { label: "Render", keywords: ["render", "final", "compos"] },
+                          ][j];
+                          return later && later.keywords.some(k => stageStatus.includes(k));
+                        });
+                        const isDone = laterActive && !myKeywordActive;
+                        const isActive = myKeywordActive;
+                        return (
+                          <div key={stage.label} className={`flex flex-col items-center gap-2 p-3 rounded-xl transition-all duration-500 ${
+                            isDone ? "bg-stone-500/[0.06]" : isActive ? "bg-stone-500/[0.06]" : "bg-white/[0.01]"
+                          }`}>
+                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
+                              isDone ? "bg-stone-500/15 text-stone-400" : isActive ? "bg-stone-500/15 text-stone-400" : "bg-white/[0.04] text-white/15"
+                            }`}>
+                              {isDone ? <Check className="w-4 h-4" /> : isActive ? <Loader2 className="w-4 h-4 animate-spin" /> : <stage.icon className="w-4 h-4" />}
+                            </div>
+                            <span className={`text-[11px] font-medium transition-colors ${
+                              isDone ? "text-stone-400" : isActive ? "text-stone-400" : "text-white/20"
+                            }`}>{stage.label}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={handleGenerateVideo}
+                    className="w-full py-5 rounded-full font-semibold text-[15px] transition-all duration-500 hover:-translate-y-0.5 flex items-center justify-center gap-2.5 group/gen"
+                    style={{
+                      background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+                      color: "#0a0a0f",
+                      boxShadow: "0 18px 48px -18px rgba(232,212,176,0.55)",
+                    }}
+                  >
+                    <Sparkles className="w-5 h-5 group-hover/gen:rotate-12 transition-transform" /> Generate video
+                  </button>
+                )}
+              </div>
+
+              {/* Right: Preview area (2 cols) */}
+              <div className="lg:col-span-2">
+                <div className="sticky top-20">
+                  {/* Cinema-style preview frame */}
+                  <div className="rounded-2xl bg-black/40 border border-white/[0.06] backdrop-blur-xl overflow-hidden aspect-video flex items-center justify-center relative">
+                    {/* Subtle grid pattern */}
+                    <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:20px_20px]" />
+                    <div className="relative text-center p-6">
+                      <div className="w-12 h-12 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center mx-auto mb-3">
+                        <Play className="w-5 h-5 text-white/15" />
+                      </div>
+                      <p className="text-xs text-white/20 font-medium">Video preview will appear here</p>
+                    </div>
+                  </div>
+                  {/* Pipeline info */}
+                  <div className="mt-4 p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                    <div className="text-[11px] text-white/30 space-y-1.5">
+                      <div className="flex items-center justify-between"><span>FLUX avatar generation</span><span className="text-white/15">~15s</span></div>
+                      <div className="flex items-center justify-between"><span>Fish Speech voiceover</span><span className="text-white/15">~10s</span></div>
+                      <div className="flex items-center justify-between"><span>Lip sync animation</span><span className="text-white/15">~30s</span></div>
+                      <div className="flex items-center justify-between pt-1.5 border-t border-white/[0.04]">
+                        <span className="font-semibold text-white/40">Total estimated</span>
+                        <span className="font-semibold text-stone-400/70">~60-90s</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            ) : (
-              <button
-                onClick={handleGenerateVideo}
-                className="w-full py-5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 rounded-2xl font-bold text-xl transition-all flex items-center justify-center gap-3 shadow-xl shadow-amber-500/25 hover:shadow-2xl hover:shadow-amber-500/30"
-              >
-                <Sparkles className="w-6 h-6" /> Generate Video
-              </button>
-            )}
+            </div>
           </div>
         )}
 
         {/* ═══ VIDEO RESULT ═══ */}
         {videoUrl && (
-          <div className="space-y-6 pt-4">
-            <div className="text-center">
-              <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-semibold text-base mb-6">
-                <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                  <Check className="w-3.5 h-3.5" />
+          <div className="max-w-3xl mx-auto pt-6">
+            {/* Success badge */}
+            <div className="text-center mb-10">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/25 bg-[#E8D4B0]/[0.06] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#E8D4B0] mb-5">
+                <div className="flex h-4 w-4 items-center justify-center rounded-full bg-[#E8D4B0]/15">
+                  <Check className="w-2.5 h-2.5" />
                 </div>
-                Your video is ready!
+                Production complete
               </div>
+              <h2 className="fs-display-sm text-white">
+                Your video is{" "}
+                <span
+                  className="font-normal"
+                  style={{ fontFamily: "Fraunces, ui-serif, Georgia, serif", fontStyle: "italic", color: "#E8D4B0" }}
+                >
+                  ready.
+                </span>
+              </h2>
             </div>
 
-            <div className="max-w-2xl mx-auto rounded-2xl overflow-hidden border border-white/[0.08] shadow-2xl shadow-black/40 bg-black/40">
+            {/* Cinema-style video frame */}
+            <div className="rounded-2xl overflow-hidden border border-white/[0.08] shadow-2xl shadow-black/50 bg-black/60 backdrop-blur-xl">
+              {/* Top bar mimicking a player chrome */}
+              <div className="flex items-center justify-between px-4 py-2.5 bg-white/[0.02] border-b border-white/[0.04]">
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-stone-500/60" />
+                  <span className="text-[11px] text-white/30 font-medium">zoobicon-video.mp4</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2 h-2 rounded-full bg-white/10" />
+                  <div className="w-2 h-2 rounded-full bg-white/10" />
+                  <div className="w-2 h-2 rounded-full bg-white/10" />
+                </div>
+              </div>
               <video
                 src={videoUrl}
                 controls
@@ -776,21 +1037,39 @@ SCRIPT_2:
               />
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto">
+            {/* Action buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 mt-8">
               <a
                 href={videoUrl}
                 download
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-semibold transition-all shadow-lg shadow-amber-500/20"
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-full py-4 text-[13px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
+                style={{
+                  background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+                  color: "#0a0a0f",
+                  boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
+                }}
               >
-                <Download className="w-4 h-4" /> Download Video
+                <Download className="w-4 h-4" /> Download
               </a>
               <button
-                onClick={handleStartOver}
-                className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl border border-white/[0.10] text-white/70 hover:text-white hover:bg-white/[0.05] transition-all"
+                onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({ title: "Zoobicon Video", url: videoUrl ?? "" }).catch(() => {});
+                  } else if (videoUrl) {
+                    navigator.clipboard.writeText(videoUrl);
+                  }
+                }}
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] py-4 text-[13px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
               >
-                <RefreshCw className="w-4 h-4" /> Create Another
+                <Share2 className="w-4 h-4" /> Share
+              </button>
+              <button
+                onClick={handleStartOver}
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] py-4 text-[13px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+              >
+                <RefreshCw className="w-4 h-4" /> New video
               </button>
             </div>
           </div>

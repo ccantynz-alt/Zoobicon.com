@@ -163,14 +163,14 @@ export default function JsonFormatterPage() {
       <div className="max-w-6xl mx-auto px-6 py-16">
         {/* Hero */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-6">
-            <span className="text-xs font-medium text-emerald-300">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-stone-500/10 border border-stone-500/20 mb-6">
+            <span className="text-xs font-medium text-stone-300">
               Free — No Signup Required
             </span>
           </div>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.1] mb-5">
             Free JSON{" "}
-            <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-stone-400 via-stone-400 to-stone-400 bg-clip-text text-transparent">
               Formatter
             </span>
           </h1>
@@ -186,7 +186,7 @@ export default function JsonFormatterPage() {
             onClick={handleBeautify}
             className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium transition-all ${
               !minified
-                ? "bg-emerald-600 text-white"
+                ? "bg-stone-600 text-white"
                 : "bg-white/[0.04] text-white/40 hover:bg-white/[0.08]"
             }`}
           >
@@ -196,7 +196,7 @@ export default function JsonFormatterPage() {
             onClick={handleMinify}
             className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium transition-all ${
               minified
-                ? "bg-emerald-600 text-white"
+                ? "bg-stone-600 text-white"
                 : "bg-white/[0.04] text-white/40 hover:bg-white/[0.08]"
             }`}
           >
@@ -209,7 +209,7 @@ export default function JsonFormatterPage() {
           >
             {copied ? (
               <>
-                <Check className="w-3 h-3 text-emerald-400" /> Copied
+                <Check className="w-3 h-3 text-stone-400" /> Copied
               </>
             ) : (
               <>
@@ -239,8 +239,8 @@ export default function JsonFormatterPage() {
               spellCheck={false}
               className={`w-full h-[420px] px-4 py-3 bg-[#0e0e1a] border rounded-2xl text-sm text-white/90 font-mono placeholder-white/15 focus:outline-none focus:ring-2 resize-none ${
                 error && input.trim()
-                  ? "border-red-500/60 focus:ring-red-500/30"
-                  : "border-white/[0.08] focus:ring-emerald-500/30 focus:border-emerald-500/30"
+                  ? "border-stone-500/60 focus:ring-stone-500/30"
+                  : "border-white/[0.08] focus:ring-stone-500/30 focus:border-stone-500/30"
               }`}
             />
             {input.trim() && (
@@ -260,7 +260,7 @@ export default function JsonFormatterPage() {
               readOnly
               placeholder="Formatted JSON will appear here..."
               spellCheck={false}
-              className="w-full h-[420px] px-4 py-3 bg-[#0e0e1a] border border-white/[0.08] rounded-2xl text-sm text-emerald-300/90 font-mono placeholder-white/15 focus:outline-none resize-none"
+              className="w-full h-[420px] px-4 py-3 bg-[#0e0e1a] border border-white/[0.08] rounded-2xl text-sm text-stone-300/90 font-mono placeholder-white/15 focus:outline-none resize-none"
             />
             {output && (
               <span className="absolute top-8 right-3 text-[10px] text-white/20">
@@ -272,11 +272,11 @@ export default function JsonFormatterPage() {
 
         {/* Error message */}
         {error && input.trim() && (
-          <div className="flex items-start gap-2 p-4 rounded-xl bg-red-500/10 border border-red-500/20 mb-8">
-            <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+          <div className="flex items-start gap-2 p-4 rounded-xl bg-stone-500/10 border border-stone-500/20 mb-8">
+            <AlertCircle className="w-4 h-4 text-stone-400 shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-medium text-red-400">Invalid JSON</p>
-              <p className="text-xs text-red-400/70 mt-0.5 font-mono">
+              <p className="text-sm font-medium text-stone-400">Invalid JSON</p>
+              <p className="text-xs text-stone-400/70 mt-0.5 font-mono">
                 {error}
               </p>
             </div>
@@ -294,7 +294,7 @@ export default function JsonFormatterPage() {
           </p>
           <Link
             href="/builder"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 font-semibold text-sm transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 font-semibold text-sm transition-colors"
           >
             <Zap className="w-4 h-4" /> Build Your Website Free
           </Link>

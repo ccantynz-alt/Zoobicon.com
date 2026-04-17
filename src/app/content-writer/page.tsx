@@ -220,7 +220,7 @@ export default function ContentWriterPage() {
             </Link>
             <div className="h-5 w-px bg-gray-700" />
             <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-blue-500" />
+              <FileText className="h-5 w-5 text-stone-500" />
               <h1 className="text-lg font-semibold">Content Writer</h1>
             </div>
           </div>
@@ -232,14 +232,14 @@ export default function ContentWriterPage() {
               <Clock className="h-4 w-4" />
               <span className="hidden sm:inline">History</span>
               {history.length > 0 && (
-                <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-blue-500 px-1 text-xs font-medium text-white">
+                <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-stone-500 px-1 text-xs font-medium text-white">
                   {history.length}
                 </span>
               )}
             </button>
             <button
               onClick={handleNewContent}
-              className="flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-blue-500"
+              className="flex items-center gap-2 rounded-lg bg-stone-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-stone-500"
             >
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">New</span>
@@ -271,7 +271,7 @@ export default function ContentWriterPage() {
                   {history.length > 0 && (
                     <button
                       onClick={handleClearHistory}
-                      className="text-xs text-red-400 transition-colors hover:text-red-300"
+                      className="text-xs text-stone-400 transition-colors hover:text-stone-300"
                     >
                       Clear All
                     </button>
@@ -298,7 +298,7 @@ export default function ContentWriterPage() {
                       onClick={() => handleLoadHistory(item)}
                     >
                       <div className="mb-1 flex items-center justify-between">
-                        <span className="rounded bg-blue-500/20 px-1.5 py-0.5 text-xs text-blue-400">
+                        <span className="rounded bg-stone-500/20 px-1.5 py-0.5 text-xs text-stone-400">
                           {item.contentType}
                         </span>
                         <button
@@ -306,7 +306,7 @@ export default function ContentWriterPage() {
                             e.stopPropagation();
                             handleDeleteHistory(item.id);
                           }}
-                          className="text-gray-600 opacity-0 transition-all hover:text-red-400 group-hover:opacity-100"
+                          className="text-gray-600 opacity-0 transition-all hover:text-stone-400 group-hover:opacity-100"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
@@ -348,7 +348,7 @@ export default function ContentWriterPage() {
                       onClick={() => setContentType(type)}
                       className={`rounded-lg border px-3 py-1.5 text-sm transition-all ${
                         contentType === type
-                          ? "border-blue-500 bg-blue-500/10 text-blue-400"
+                          ? "border-stone-500 bg-stone-500/10 text-stone-400"
                           : "border-gray-700 text-gray-400 hover:border-gray-600 hover:text-gray-200"
                       }`}
                     >
@@ -370,7 +370,7 @@ export default function ContentWriterPage() {
                       onClick={() => setTone(t)}
                       className={`rounded-lg border px-3 py-1.5 text-sm transition-all ${
                         tone === t
-                          ? "border-blue-500 bg-blue-500/10 text-blue-400"
+                          ? "border-stone-500 bg-stone-500/10 text-stone-400"
                           : "border-gray-700 text-gray-400 hover:border-gray-600 hover:text-gray-200"
                       }`}
                     >
@@ -392,7 +392,7 @@ export default function ContentWriterPage() {
                       onClick={() => setLength(l.label)}
                       className={`rounded-lg border px-3 py-1.5 text-sm transition-all ${
                         length === l.label
-                          ? "border-blue-500 bg-blue-500/10 text-blue-400"
+                          ? "border-stone-500 bg-stone-500/10 text-stone-400"
                           : "border-gray-700 text-gray-400 hover:border-gray-600 hover:text-gray-200"
                       }`}
                     >
@@ -406,14 +406,14 @@ export default function ContentWriterPage() {
               {/* Topic */}
               <div className="mb-5">
                 <label className="mb-2 block text-sm font-medium text-gray-400">
-                  Topic / Prompt <span className="text-red-400">*</span>
+                  Topic / Prompt <span className="text-stone-400">*</span>
                 </label>
                 <textarea
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
                   placeholder="e.g. Write a blog post about the benefits of AI-powered website builders for small businesses..."
                   rows={3}
-                  className="w-full resize-none rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-sm text-white placeholder-gray-500 transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full resize-none rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-sm text-white placeholder-gray-500 transition-colors focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
                 />
               </div>
 
@@ -429,7 +429,7 @@ export default function ContentWriterPage() {
                     value={audience}
                     onChange={(e) => setAudience(e.target.value)}
                     placeholder="e.g. Small business owners"
-                    className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-sm text-white placeholder-gray-500 transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-sm text-white placeholder-gray-500 transition-colors focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
                   />
                 </div>
                 <div>
@@ -442,7 +442,7 @@ export default function ContentWriterPage() {
                     value={keywords}
                     onChange={(e) => setKeywords(e.target.value)}
                     placeholder="e.g. AI, website builder, automation"
-                    className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-sm text-white placeholder-gray-500 transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-sm text-white placeholder-gray-500 transition-colors focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
                   />
                 </div>
               </div>
@@ -451,7 +451,7 @@ export default function ContentWriterPage() {
               <button
                 onClick={handleGenerate}
                 disabled={isGenerating || !topic.trim()}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-stone-600 px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-stone-500 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
               >
                 {isGenerating ? (
                   <>
@@ -469,7 +469,7 @@ export default function ContentWriterPage() {
 
             {/* Error */}
             {error && (
-              <div className="mb-6 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+              <div className="mb-6 rounded-lg border border-stone-500/30 bg-stone-500/10 px-4 py-3 text-sm text-stone-400">
                 {error}
               </div>
             )}
@@ -492,8 +492,8 @@ export default function ContentWriterPage() {
                     >
                       {copied ? (
                         <>
-                          <Check className="h-3.5 w-3.5 text-green-400" />
-                          <span className="text-green-400">Copied</span>
+                          <Check className="h-3.5 w-3.5 text-stone-400" />
+                          <span className="text-stone-400">Copied</span>
                         </>
                       ) : (
                         <>
@@ -548,7 +548,7 @@ export default function ContentWriterPage() {
             {/* Loading State */}
             {isGenerating && !generatedContent && (
               <div className="flex flex-col items-center justify-center rounded-xl border border-gray-800 bg-gray-900 py-16 text-center">
-                <RefreshCw className="mb-4 h-10 w-10 animate-spin text-blue-500" />
+                <RefreshCw className="mb-4 h-10 w-10 animate-spin text-stone-500" />
                 <h3 className="mb-2 text-lg font-medium text-gray-300">
                   Generating your {contentType.toLowerCase()}...
                 </h3>

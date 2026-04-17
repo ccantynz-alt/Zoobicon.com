@@ -24,12 +24,24 @@ function checkFile(filePath) {
   );
   if (!importMatch) return;
 
-  const imported = importMatch[1]
-    .split(",")
-    .map((s) => s.trim().split(/\s+as\s+/)[0].trim())
-    .filter(Boolean);
+  // Parse each "Foo" or "Foo as Bar" entry. Track both the real export
+  // name (for "does this exist in lucide?" check) and the local alias
+  // (for "is the JSX usage imported?" check). Previously we stripped the
+  // alias and got false positives on every `Image as ImageIcon` in the
+  // codebase.
+  const importedOriginal = []; // names we resolve against lucide-react
+  const importedLocal = []; // names we resolve against JSX usage
+  for (const raw of importMatch[1].split(",")) {
+    const piece = raw.trim();
+    if (!piece) continue;
+    const asMatch = piece.split(/\s+as\s+/);
+    const original = asMatch[0].trim();
+    const local = (asMatch[1] || asMatch[0]).trim();
+    if (original) importedOriginal.push(original);
+    if (local) importedLocal.push(local);
+  }
 
-  for (const icon of imported) {
+  for (const icon of importedOriginal) {
     if (!lucideExports.has(icon)) {
       issues.push({ file: filePath, icon });
     }
@@ -41,7 +53,7 @@ function checkFile(filePath) {
   let match;
   while ((match = iconUsagePattern.exec(content)) !== null) {
     const iconName = match[1];
-    if (!imported.includes(iconName) && lucideExports.has(iconName)) {
+    if (!importedLocal.includes(iconName) && lucideExports.has(iconName)) {
       issues.push({
         file: filePath,
         icon: iconName,

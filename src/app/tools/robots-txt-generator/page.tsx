@@ -214,7 +214,7 @@ export default function RobotsTxtGeneratorPage() {
       <nav className="border-b border-white/5 px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <Link href="/" className="text-xl font-bold tracking-tight">
-            <span className="text-indigo-400">Zoo</span>bicon
+            <span className="text-stone-400">Zoo</span>bicon
           </Link>
           <Link href="/tools" className="text-sm text-white/50 hover:text-white transition-colors">
             All Tools
@@ -225,7 +225,7 @@ export default function RobotsTxtGeneratorPage() {
       <div className="max-w-6xl mx-auto px-6 py-12">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-medium mb-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-500/10 text-stone-400 text-xs font-medium mb-4">
             <Bot className="w-3 h-3" /> Free Tool
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -242,10 +242,10 @@ export default function RobotsTxtGeneratorPage() {
             <button
               key={key}
               onClick={() => applyPreset(key)}
-              className="bg-white/[0.03] border border-white/[0.06] hover:border-emerald-500/30 rounded-2xl p-4 text-left transition-all group"
+              className="bg-white/[0.03] border border-white/[0.06] hover:border-stone-500/30 rounded-2xl p-4 text-left transition-all group"
             >
               <div className="flex items-center gap-2 mb-1">
-                <Zap className="w-3.5 h-3.5 text-emerald-400" />
+                <Zap className="w-3.5 h-3.5 text-stone-400" />
                 <span className="text-sm font-semibold">{preset.name}</span>
               </div>
               <p className="text-xs text-white/40">{preset.desc}</p>
@@ -259,7 +259,7 @@ export default function RobotsTxtGeneratorPage() {
             {/* Bots */}
             <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
               <h2 className="text-lg font-semibold mb-1 flex items-center gap-2">
-                <Bot className="w-5 h-5 text-emerald-400" />
+                <Bot className="w-5 h-5 text-stone-400" />
                 Block Specific Bots
               </h2>
               <p className="text-xs text-white/40 mb-4">Selected bots will be blocked from crawling your site</p>
@@ -272,12 +272,12 @@ export default function RobotsTxtGeneratorPage() {
                       onClick={() => toggleBot(bot.id)}
                       className={`flex items-center gap-2 p-2.5 rounded-xl border text-left text-xs transition-all ${
                         active
-                          ? "bg-red-500/10 border-red-500/30 text-red-300"
+                          ? "bg-stone-500/10 border-stone-500/30 text-stone-300"
                           : "bg-white/[0.02] border-white/[0.06] text-white/50 hover:border-white/10"
                       }`}
                     >
                       <div className={`w-3 h-3 rounded border flex items-center justify-center flex-shrink-0 ${
-                        active ? "bg-red-500 border-red-500" : "border-white/20"
+                        active ? "bg-stone-500 border-stone-500" : "border-white/20"
                       }`}>
                         {active && <Check className="w-2 h-2 text-white" />}
                       </div>
@@ -295,12 +295,12 @@ export default function RobotsTxtGeneratorPage() {
             <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold flex items-center gap-2">
-                  <FileCode className="w-5 h-5 text-emerald-400" />
+                  <FileCode className="w-5 h-5 text-stone-400" />
                   Path Rules
                 </h2>
                 <button
                   onClick={addPathRule}
-                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs hover:bg-emerald-500/20 transition-colors"
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-stone-500/10 text-stone-400 text-xs hover:bg-stone-500/20 transition-colors"
                 >
                   <Plus className="w-3 h-3" /> Add Path
                 </button>
@@ -314,7 +314,7 @@ export default function RobotsTxtGeneratorPage() {
                       <select
                         value={rule.action}
                         onChange={e => updatePathRule(rule.id, "action", e.target.value)}
-                        className="bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500/40 appearance-none"
+                        className="bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-stone-500/40 appearance-none"
                       >
                         <option value="Allow">Allow</option>
                         <option value="Disallow">Disallow</option>
@@ -324,11 +324,11 @@ export default function RobotsTxtGeneratorPage() {
                         value={rule.path}
                         onChange={e => updatePathRule(rule.id, "path", e.target.value)}
                         placeholder="/path/"
-                        className="flex-1 bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-xs placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                        className="flex-1 bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-2 text-xs placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-stone-500/40"
                       />
                       <button
                         onClick={() => removePathRule(rule.id)}
-                        className="p-2 text-white/30 hover:text-red-400 transition-colors"
+                        className="p-2 text-white/30 hover:text-stone-400 transition-colors"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -349,7 +349,7 @@ export default function RobotsTxtGeneratorPage() {
                     value={sitemapUrl}
                     onChange={e => setSitemapUrl(e.target.value)}
                     placeholder="https://example.com/sitemap.xml"
-                    className="w-full bg-white/[0.05] border border-white/[0.08] rounded-xl px-4 py-3 text-sm placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                    className="w-full bg-white/[0.05] border border-white/[0.08] rounded-xl px-4 py-3 text-sm placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-stone-500/40"
                   />
                 </div>
                 <div>
@@ -361,7 +361,7 @@ export default function RobotsTxtGeneratorPage() {
                     placeholder="0"
                     min="0"
                     max="60"
-                    className="w-full bg-white/[0.05] border border-white/[0.08] rounded-xl px-4 py-3 text-sm placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                    className="w-full bg-white/[0.05] border border-white/[0.08] rounded-xl px-4 py-3 text-sm placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-stone-500/40"
                   />
                   <p className="text-[10px] text-white/30 mt-1">Optional. Sets minimum seconds between crawler requests. Not supported by all bots.</p>
                 </div>
@@ -374,7 +374,7 @@ export default function RobotsTxtGeneratorPage() {
             <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden">
               <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <div className="w-2 h-2 rounded-full bg-stone-400 animate-pulse" />
                   <h2 className="font-semibold text-sm">robots.txt Preview</h2>
                 </div>
                 <div className="flex gap-2">
@@ -382,7 +382,7 @@ export default function RobotsTxtGeneratorPage() {
                     onClick={handleCopy}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.05] hover:bg-white/10 text-xs transition-colors"
                   >
-                    {copied ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3" />}
+                    {copied ? <Check className="w-3 h-3 text-stone-400" /> : <Copy className="w-3 h-3" />}
                     {copied ? "Copied" : "Copy"}
                   </button>
                   <button
@@ -394,7 +394,7 @@ export default function RobotsTxtGeneratorPage() {
                   </button>
                 </div>
               </div>
-              <pre className="p-6 text-sm text-emerald-300/80 whitespace-pre-wrap font-mono leading-relaxed min-h-[200px]">
+              <pre className="p-6 text-sm text-stone-300/80 whitespace-pre-wrap font-mono leading-relaxed min-h-[200px]">
                 {robotsTxt}
               </pre>
             </div>
@@ -404,8 +404,8 @@ export default function RobotsTxtGeneratorPage() {
               <ol className="text-xs text-white/40 space-y-1.5 list-decimal list-inside">
                 <li>Configure your settings above or use a preset</li>
                 <li>Click &quot;Copy&quot; or &quot;Download&quot; to get the file</li>
-                <li>Save it as <code className="text-emerald-400/60 bg-white/[0.04] px-1 py-0.5 rounded">robots.txt</code> at your website root</li>
-                <li>Verify at <code className="text-emerald-400/60 bg-white/[0.04] px-1 py-0.5 rounded">yourdomain.com/robots.txt</code></li>
+                <li>Save it as <code className="text-stone-400/60 bg-white/[0.04] px-1 py-0.5 rounded">robots.txt</code> at your website root</li>
+                <li>Verify at <code className="text-stone-400/60 bg-white/[0.04] px-1 py-0.5 rounded">yourdomain.com/robots.txt</code></li>
               </ol>
             </div>
           </div>
@@ -442,14 +442,14 @@ export default function RobotsTxtGeneratorPage() {
         </div>
 
         {/* CTA */}
-        <div className="mt-20 text-center bg-gradient-to-br from-emerald-600/10 to-teal-600/10 border border-emerald-500/10 rounded-2xl p-10">
+        <div className="mt-20 text-center bg-gradient-to-br from-stone-600/10 to-stone-600/10 border border-stone-500/10 rounded-2xl p-10">
           <h2 className="text-2xl font-bold mb-3">Want to dominate search rankings?</h2>
           <p className="text-white/50 mb-6 max-w-lg mx-auto">
             A robots.txt file is just the start. Our AI SEO tools analyze your entire site and give you actionable improvements.
           </p>
           <Link
             href="/seo"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-semibold transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-stone-600 hover:bg-stone-500 font-semibold transition-colors"
           >
             Explore SEO Tools <ArrowRight className="w-4 h-4" />
           </Link>

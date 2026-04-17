@@ -85,10 +85,10 @@ function getStrength(
 
   const entropy = length * Math.log2(poolSize);
 
-  if (entropy < 36) return { label: "weak", score: 25, color: "text-red-400", bg: "bg-red-500" };
-  if (entropy < 60) return { label: "medium", score: 50, color: "text-yellow-400", bg: "bg-yellow-500" };
-  if (entropy < 80) return { label: "strong", score: 75, color: "text-emerald-400", bg: "bg-emerald-500" };
-  return { label: "very strong", score: 100, color: "text-cyan-400", bg: "bg-cyan-400" };
+  if (entropy < 36) return { label: "weak", score: 25, color: "text-stone-400", bg: "bg-stone-500" };
+  if (entropy < 60) return { label: "medium", score: 50, color: "text-stone-400", bg: "bg-stone-500" };
+  if (entropy < 80) return { label: "strong", score: 75, color: "text-stone-400", bg: "bg-stone-500" };
+  return { label: "very strong", score: 100, color: "text-stone-400", bg: "bg-stone-400" };
 }
 
 /* ─── JSON-LD ─── */
@@ -220,7 +220,7 @@ export default function PasswordGeneratorPage() {
         <nav className="border-b border-white/10 bg-[#0a0a14]/80 backdrop-blur-md sticky top-0 z-50">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2 text-xl font-bold tracking-tight">
-              <Shield className="w-7 h-7 text-cyan-400" />
+              <Shield className="w-7 h-7 text-stone-400" />
               <span>Zoobicon</span>
             </Link>
             <div className="flex items-center gap-4">
@@ -232,7 +232,7 @@ export default function PasswordGeneratorPage() {
               </Link>
               <Link
                 href="/auth/signup"
-                className="text-sm bg-cyan-500 hover:bg-cyan-400 text-black font-semibold px-4 py-2 rounded-lg transition-colors"
+                className="text-sm bg-stone-500 hover:bg-stone-400 text-black font-semibold px-4 py-2 rounded-lg transition-colors"
               >
                 Sign Up Free
               </Link>
@@ -242,9 +242,9 @@ export default function PasswordGeneratorPage() {
 
         {/* Hero */}
         <header className="pt-16 pb-10 text-center px-4">
-          <div className="inline-flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full px-4 py-1.5 mb-6">
-            <Lock className="w-4 h-4 text-cyan-400" />
-            <span className="text-sm text-cyan-300 font-medium">
+          <div className="inline-flex items-center gap-2 bg-stone-500/10 border border-stone-500/20 rounded-full px-4 py-1.5 mb-6">
+            <Lock className="w-4 h-4 text-stone-400" />
+            <span className="text-sm text-stone-300 font-medium">
               100% Client-Side &middot; No Data Leaves Your Browser
             </span>
           </div>
@@ -264,7 +264,7 @@ export default function PasswordGeneratorPage() {
             {/* Top password display */}
             <div className="relative group">
               <div className="bg-[#0a0a14] border border-white/10 rounded-xl p-4 sm:p-5 flex items-center justify-between gap-3">
-                <code className="flex-1 text-lg sm:text-xl font-mono break-all select-all text-cyan-100">
+                <code className="flex-1 text-lg sm:text-xl font-mono break-all select-all text-stone-100">
                   {passwords[0]
                     ? showPasswords
                       ? passwords[0]
@@ -285,7 +285,7 @@ export default function PasswordGeneratorPage() {
                     title="Copy to clipboard"
                   >
                     {copiedIdx === 0 ? (
-                      <Check className="w-5 h-5 text-emerald-400" />
+                      <Check className="w-5 h-5 text-stone-400" />
                     ) : (
                       <Copy className="w-5 h-5" />
                     )}
@@ -293,7 +293,7 @@ export default function PasswordGeneratorPage() {
                 </div>
               </div>
               {copiedIdx === 0 && (
-                <span className="absolute -top-8 right-2 text-sm text-emerald-400 font-medium animate-fade-in">
+                <span className="absolute -top-8 right-2 text-sm text-stone-400 font-medium animate-fade-in">
                   Copied!
                 </span>
               )}
@@ -319,7 +319,7 @@ export default function PasswordGeneratorPage() {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                  <Sliders className="w-4 h-4 text-cyan-400" />
+                  <Sliders className="w-4 h-4 text-stone-400" />
                   Length
                 </label>
                 <div className="flex items-center gap-2">
@@ -332,7 +332,7 @@ export default function PasswordGeneratorPage() {
                       const v = Math.max(8, Math.min(128, Number(e.target.value) || 8));
                       setLength(v);
                     }}
-                    className="w-16 bg-[#0a0a14] border border-white/10 rounded-lg px-2 py-1 text-center text-sm text-white focus:outline-none focus:border-cyan-500"
+                    className="w-16 bg-[#0a0a14] border border-white/10 rounded-lg px-2 py-1 text-center text-sm text-white focus:outline-none focus:border-stone-500"
                   />
                   <span className="text-sm text-gray-500">chars</span>
                 </div>
@@ -343,7 +343,7 @@ export default function PasswordGeneratorPage() {
                 max={128}
                 value={length}
                 onChange={(e) => setLength(Number(e.target.value))}
-                className="w-full accent-cyan-500 cursor-pointer"
+                className="w-full accent-stone-500 cursor-pointer"
               />
               <div className="flex justify-between text-xs text-gray-600">
                 <span>8</span>
@@ -369,7 +369,7 @@ export default function PasswordGeneratorPage() {
                   onClick={() => toggleOption(item.key)}
                   className={`rounded-xl border p-3 text-center transition-all ${
                     options[item.key]
-                      ? "border-cyan-500/50 bg-cyan-500/10 text-white"
+                      ? "border-stone-500/50 bg-stone-500/10 text-white"
                       : "border-white/10 bg-[#0a0a14] text-gray-500 hover:border-white/20"
                   }`}
                 >
@@ -382,7 +382,7 @@ export default function PasswordGeneratorPage() {
             {/* Regenerate button */}
             <button
               onClick={generate}
-              className="w-full flex items-center justify-center gap-2 bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-3.5 rounded-xl transition-colors text-lg"
+              className="w-full flex items-center justify-center gap-2 bg-stone-500 hover:bg-stone-400 text-black font-bold py-3.5 rounded-xl transition-colors text-lg"
             >
               <RefreshCw className="w-5 h-5" />
               Generate New Passwords
@@ -392,7 +392,7 @@ export default function PasswordGeneratorPage() {
           {/* Additional passwords */}
           <div className="bg-[#131520] border border-white/10 rounded-2xl p-6 sm:p-8 space-y-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-cyan-400" />
+              <ShieldCheck className="w-5 h-5 text-stone-400" />
               5 Generated Passwords
             </h2>
             <div className="space-y-3">
@@ -413,13 +413,13 @@ export default function PasswordGeneratorPage() {
                     title="Copy"
                   >
                     {copiedIdx === i ? (
-                      <Check className="w-4 h-4 text-emerald-400" />
+                      <Check className="w-4 h-4 text-stone-400" />
                     ) : (
                       <Copy className="w-4 h-4" />
                     )}
                   </button>
                   {copiedIdx === i && (
-                    <span className="text-xs text-emerald-400 font-medium shrink-0">Copied!</span>
+                    <span className="text-xs text-stone-400 font-medium shrink-0">Copied!</span>
                   )}
                 </div>
               ))}
@@ -429,28 +429,28 @@ export default function PasswordGeneratorPage() {
           {/* Password strength tips */}
           <div className="bg-[#131520] border border-white/10 rounded-2xl p-6 sm:p-8 space-y-5">
             <h2 className="text-xl font-bold flex items-center gap-2">
-              <Zap className="w-5 h-5 text-yellow-400" />
+              <Zap className="w-5 h-5 text-stone-400" />
               Password Strength Tips
             </h2>
             <div className="grid sm:grid-cols-2 gap-4">
               {[
                 {
-                  icon: <ShieldCheck className="w-5 h-5 text-emerald-400" />,
+                  icon: <ShieldCheck className="w-5 h-5 text-stone-400" />,
                   title: "Use 16+ characters",
                   text: "Every extra character exponentially increases the time needed to crack your password. 16 is the modern minimum for sensitive accounts.",
                 },
                 {
-                  icon: <RefreshCw className="w-5 h-5 text-cyan-400" />,
+                  icon: <RefreshCw className="w-5 h-5 text-stone-400" />,
                   title: "Unique per account",
                   text: "Never reuse passwords. If one service is breached, attackers try those credentials everywhere else automatically.",
                 },
                 {
-                  icon: <Lock className="w-5 h-5 text-purple-400" />,
+                  icon: <Lock className="w-5 h-5 text-stone-400" />,
                   title: "Use a password manager",
                   text: "You cannot remember 50+ unique passwords. Use a password manager like 1Password, Bitwarden, or Apple Keychain.",
                 },
                 {
-                  icon: <AlertTriangle className="w-5 h-5 text-yellow-400" />,
+                  icon: <AlertTriangle className="w-5 h-5 text-stone-400" />,
                   title: "Enable 2FA everywhere",
                   text: "A strong password plus two-factor authentication makes your accounts virtually impenetrable to remote attacks.",
                 },
@@ -500,8 +500,8 @@ export default function PasswordGeneratorPage() {
           </div>
 
           {/* VPN CTA */}
-          <div className="bg-gradient-to-br from-cyan-500/10 to-purple-500/10 border border-cyan-500/20 rounded-2xl p-6 sm:p-8 text-center space-y-4">
-            <ShieldCheck className="w-12 h-12 text-cyan-400 mx-auto" />
+          <div className="bg-gradient-to-br from-stone-500/10 to-stone-500/10 border border-stone-500/20 rounded-2xl p-6 sm:p-8 text-center space-y-4">
+            <ShieldCheck className="w-12 h-12 text-stone-400 mx-auto" />
             <h2 className="text-2xl font-bold">Protect Your Passwords with a VPN</h2>
             <p className="text-gray-400 max-w-xl mx-auto">
               A strong password is step one. Encrypting your internet connection is step two.
@@ -509,7 +509,7 @@ export default function PasswordGeneratorPage() {
             </p>
             <Link
               href="/products/vpn"
-              className="inline-flex items-center gap-2 bg-cyan-500 hover:bg-cyan-400 text-black font-bold px-6 py-3 rounded-xl transition-colors"
+              className="inline-flex items-center gap-2 bg-stone-500 hover:bg-stone-400 text-black font-bold px-6 py-3 rounded-xl transition-colors"
             >
               <Shield className="w-5 h-5" />
               Explore Zoobicon VPN

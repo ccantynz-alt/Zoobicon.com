@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { sql } from "@/lib/db";
+import { sql, withUserContext } from "@/lib/db";
 
 function slugify(name: string): string {
   return name
@@ -17,11 +17,14 @@ export async function GET(req: NextRequest) {
       return Response.json({ error: "email query parameter is required" }, { status: 400 });
     }
 
-    const rows = await sql`
-      SELECT id, name, slug, email, plan, status, settings, created_at, updated_at
-      FROM sites WHERE email = ${email} AND status != 'deleted'
-      ORDER BY updated_at DESC
-    `;
+    // RLS: withUserContext ensures Postgres enforces tenant isolation
+    const rows = await withUserContext(email, (db) =>
+      db`
+        SELECT id, name, slug, email, plan, status, settings, created_at, updated_at
+        FROM sites WHERE email = ${email} AND status != 'deleted'
+        ORDER BY updated_at DESC
+      `
+    );
 
     const sites = rows.map((s: Record<string, unknown>) => ({
       ...s,

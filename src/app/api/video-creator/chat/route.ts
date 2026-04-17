@@ -105,7 +105,7 @@ RULES:
         controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "done" })}\n\n`));
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Chat failed";
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "error", message: msg })}\n\n`));
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "error", fatal: true, message: msg })}\n\n`));
       }
       controller.close();
     },

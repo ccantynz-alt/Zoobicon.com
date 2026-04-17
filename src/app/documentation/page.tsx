@@ -96,10 +96,10 @@ function renderContent(content: string) {
       if (lang) return <div key={i} className="text-[10px] text-white/30 mt-3 mb-0.5 font-mono">{lang}</div>;
       return null;
     }
-    if (line.startsWith('> **')) return <div key={i} className="flex items-start gap-2 p-3 my-2 bg-amber-500/10 border border-amber-500/20 rounded-lg text-sm text-amber-200"><AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-amber-400" /><span>{line.replace('> ', '')}</span></div>;
-    if (line.startsWith('> ')) return <div key={i} className="flex items-start gap-2 p-3 my-2 bg-blue-500/10 border border-blue-500/20 rounded-lg text-sm text-blue-200"><Info className="w-4 h-4 mt-0.5 flex-shrink-0 text-blue-400" /><span>{line.replace('> ', '')}</span></div>;
+    if (line.startsWith('> **')) return <div key={i} className="flex items-start gap-2 p-3 my-2 bg-stone-500/10 border border-stone-500/20 rounded-lg text-sm text-stone-200"><AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-stone-400" /><span>{line.replace('> ', '')}</span></div>;
+    if (line.startsWith('> ')) return <div key={i} className="flex items-start gap-2 p-3 my-2 bg-stone-500/10 border border-stone-500/20 rounded-lg text-sm text-stone-200"><Info className="w-4 h-4 mt-0.5 flex-shrink-0 text-stone-400" /><span>{line.replace('> ', '')}</span></div>;
     if (line.startsWith('| ')) return <p key={i} className="text-sm text-white/60 font-mono">{line}</p>;
-    if (line.startsWith('- ')) return <p key={i} className="text-sm text-white/60 ml-4 my-0.5 flex items-start gap-2"><span className="text-violet-400 mt-1">*</span>{line.replace('- ', '')}</p>;
+    if (line.startsWith('- ')) return <p key={i} className="text-sm text-white/60 ml-4 my-0.5 flex items-start gap-2"><span className="text-stone-400 mt-1">*</span>{line.replace('- ', '')}</p>;
     if (line.match(/^\d+\. /)) return <p key={i} className="text-sm text-white/60 ml-4 my-0.5">{line}</p>;
     if (line.trim() === '') return <br key={i} />;
     return <p key={i} className="text-sm text-white/60 leading-relaxed">{line}</p>;
@@ -147,11 +147,11 @@ export default function DocumentationPage() {
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
               <ArrowLeft className="w-4 h-4" />
-              <span className="font-bold text-lg bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Zoobicon</span>
+              <span className="font-bold text-lg bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</span>
             </Link>
             <ChevronRight className="w-4 h-4 text-white/30" />
             <div className="flex items-center gap-2">
-              <FileText className="w-5 h-5 text-violet-400" />
+              <FileText className="w-5 h-5 text-stone-400" />
               <span className="font-semibold">Documentation</span>
             </div>
           </div>
@@ -160,7 +160,7 @@ export default function DocumentationPage() {
               {versions.map(v => <option key={v} value={v}>{v}</option>)}
             </select>
             <Link href="/builder" className="px-4 py-2 text-sm text-white/70 hover:text-white transition-colors">Builder</Link>
-            <Link href="/dashboard" className="px-4 py-2 text-sm bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors">Dashboard</Link>
+            <Link href="/dashboard" className="px-4 py-2 text-sm bg-stone-600 hover:bg-stone-500 rounded-lg transition-colors">Dashboard</Link>
           </div>
         </div>
       </header>
@@ -169,7 +169,7 @@ export default function DocumentationPage() {
         {/* Search */}
         <div className="relative max-w-2xl mx-auto mb-8">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
-          <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search documentation..." className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 text-base text-white placeholder-white/30 focus:outline-none focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/10 transition-all" />
+          <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search documentation..." className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 text-base text-white placeholder-white/30 focus:outline-none focus:border-stone-500/50 focus:ring-2 focus:ring-stone-500/10 transition-all" />
           {searchQuery && filteredArticles.length > 0 && (
             <div className="absolute top-full mt-2 w-full bg-[#12121e] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-10">
               {filteredArticles.map(article => (
@@ -188,7 +188,7 @@ export default function DocumentationPage() {
         {/* Tabs */}
         <div className="flex gap-1 mb-8 bg-white/5 rounded-xl p-1 w-fit">
           {tabs.map(tab => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === tab.id ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/25' : 'text-white/60 hover:text-white hover:bg-white/5'}`}>
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === tab.id ? 'bg-stone-600 text-white shadow-lg shadow-stone-600/25' : 'text-white/60 hover:text-white hover:bg-white/5'}`}>
               {tab.icon}{tab.label}
             </button>
           ))}
@@ -208,7 +208,7 @@ export default function DocumentationPage() {
                   {expandedSections.has(section.id) && (
                     <div className="ml-5 border-l border-white/10 pl-3 space-y-0.5 mb-2">
                       {section.children.map(article => (
-                        <button key={article.id} onClick={() => setSelectedArticle(article)} className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-all ${selectedArticle.id === article.id ? 'bg-violet-600/20 text-violet-300' : 'text-white/50 hover:text-white hover:bg-white/5'}`}>
+                        <button key={article.id} onClick={() => setSelectedArticle(article)} className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-all ${selectedArticle.id === article.id ? 'bg-stone-600/20 text-stone-300' : 'text-white/50 hover:text-white hover:bg-white/5'}`}>
                           {article.title}
                         </button>
                       ))}
@@ -257,7 +257,7 @@ export default function DocumentationPage() {
                 <h3 className="font-semibold">Editing: {selectedArticle.title}</h3>
                 <div className="flex gap-2">
                   <button onClick={() => {}} className="px-3 py-1.5 bg-white/10 hover:bg-white/15 rounded-lg text-xs transition-colors">Preview</button>
-                  <button onClick={() => {}} className="px-3 py-1.5 bg-violet-600 hover:bg-violet-500 rounded-lg text-xs transition-colors">Save</button>
+                  <button onClick={() => {}} className="px-3 py-1.5 bg-stone-600 hover:bg-stone-500 rounded-lg text-xs transition-colors">Save</button>
                 </div>
               </div>
               <div className="flex gap-2 mb-3">
@@ -265,7 +265,7 @@ export default function DocumentationPage() {
                   <button onClick={() => {}} key={btn} className="px-2.5 py-1 bg-white/5 hover:bg-white/10 rounded text-xs text-white/50 transition-colors">{btn}</button>
                 ))}
               </div>
-              <textarea defaultValue={selectedArticle.content} rows={20} className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-mono focus:outline-none focus:border-violet-500/50 resize-none leading-relaxed" />
+              <textarea defaultValue={selectedArticle.content} rows={20} className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-mono focus:outline-none focus:border-stone-500/50 resize-none leading-relaxed" />
             </div>
           </div>
         )}
@@ -273,17 +273,17 @@ export default function DocumentationPage() {
         {activeTab === 'versions' && (
           <div className="max-w-3xl mx-auto space-y-4">
             {versions.map((version, i) => (
-              <div key={version} className={`bg-white/5 rounded-2xl border p-6 transition-all ${version === selectedVersion ? 'border-violet-500/50' : 'border-white/10'}`}>
+              <div key={version} className={`bg-white/5 rounded-2xl border p-6 transition-all ${version === selectedVersion ? 'border-stone-500/50' : 'border-white/10'}`}>
                 <div className="flex items-center gap-3">
-                  <GitBranch className="w-5 h-5 text-violet-400" />
+                  <GitBranch className="w-5 h-5 text-stone-400" />
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold">{version}</h3>
-                      {i === 0 && <span className="text-xs px-2 py-0.5 bg-green-500/20 text-green-400 rounded-full">Latest</span>}
+                      {i === 0 && <span className="text-xs px-2 py-0.5 bg-stone-500/20 text-stone-400 rounded-full">Latest</span>}
                     </div>
                     <p className="text-xs text-white/40 mt-0.5">Released {new Date(2026, 2, 22 - i * 14).toISOString().split('T')[0]}</p>
                   </div>
-                  <button onClick={() => setSelectedVersion(version)} className={`px-3 py-1.5 rounded-lg text-xs transition-colors ${version === selectedVersion ? 'bg-violet-600 text-white' : 'bg-white/5 text-white/50 hover:bg-white/10'}`}>
+                  <button onClick={() => setSelectedVersion(version)} className={`px-3 py-1.5 rounded-lg text-xs transition-colors ${version === selectedVersion ? 'bg-stone-600 text-white' : 'bg-white/5 text-white/50 hover:bg-white/10'}`}>
                     {version === selectedVersion ? 'Current' : 'Switch'}
                   </button>
                 </div>
@@ -296,7 +296,7 @@ export default function DocumentationPage() {
           <div className="max-w-3xl mx-auto">
             <div className="bg-white/5 rounded-2xl border border-white/10 p-8">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-stone-600 to-stone-600 flex items-center justify-center">
                   <Sparkles className="w-5 h-5" />
                 </div>
                 <div>
@@ -307,18 +307,18 @@ export default function DocumentationPage() {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm text-white/70 mb-1.5">Document Title</label>
-                  <input type="text" placeholder="e.g., Webhook Integration Guide" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-violet-500/50" />
+                  <input type="text" placeholder="e.g., Webhook Integration Guide" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-stone-500/50" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm text-white/70 mb-1.5">Section</label>
-                    <select className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-violet-500/50">
+                    <select className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-stone-500/50">
                       {DOC_TREE.map(s => <option key={s.id}>{s.title}</option>)}
                     </select>
                   </div>
                   <div>
                     <label className="block text-sm text-white/70 mb-1.5">Type</label>
-                    <select className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-violet-500/50">
+                    <select className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-stone-500/50">
                       <option>Guide</option>
                       <option>API Reference</option>
                       <option>Tutorial</option>
@@ -328,17 +328,17 @@ export default function DocumentationPage() {
                 </div>
                 <div>
                   <label className="block text-sm text-white/70 mb-1.5">Description</label>
-                  <textarea value={docPrompt} onChange={e => setDocPrompt(e.target.value)} rows={4} placeholder="Describe what this documentation should cover..." className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-violet-500/50 resize-none" />
+                  <textarea value={docPrompt} onChange={e => setDocPrompt(e.target.value)} rows={4} placeholder="Describe what this documentation should cover..." className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-stone-500/50 resize-none" />
                 </div>
                 <div>
                   <label className="block text-sm text-white/70 mb-2">Include</label>
                   <div className="flex flex-wrap gap-2">
                     {['Code Examples', 'API Tables', 'Callout Boxes', 'Step-by-Step', 'Diagrams', 'FAQ'].map(item => (
-                      <button onClick={() => {}} key={item} className="px-3 py-1.5 bg-white/5 hover:bg-violet-600/20 border border-white/10 hover:border-violet-500/50 rounded-lg text-xs text-white/60 hover:text-violet-300 transition-all">{item}</button>
+                      <button onClick={() => {}} key={item} className="px-3 py-1.5 bg-white/5 hover:bg-stone-600/20 border border-white/10 hover:border-stone-500/50 rounded-lg text-xs text-white/60 hover:text-stone-300 transition-all">{item}</button>
                     ))}
                   </div>
                 </div>
-                <button onClick={handleGenerate} disabled={generating} className="w-full py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-violet-600/25 disabled:opacity-50">
+                <button onClick={handleGenerate} disabled={generating} className="w-full py-3 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-stone-600/25 disabled:opacity-50">
                   {generating ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Generating...</> : <><Sparkles className="w-4 h-4" /> Generate Documentation</>}
                 </button>
               </div>
@@ -350,7 +350,7 @@ export default function DocumentationPage() {
       <footer className="border-t border-white/10 mt-20 py-12">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <p className="text-white/40 text-sm">
-            Replaces GitBook ($8/mo), ReadMe ($99/mo), and Notion wikis &mdash; <span className="text-violet-400">included free with Zoobicon Pro</span>
+            Replaces GitBook ($8/mo), ReadMe ($99/mo), and Notion wikis &mdash; <span className="text-stone-400">included free with Zoobicon Pro</span>
           </p>
           <div className="flex items-center justify-center gap-6 mt-4">
             <Link href="/pricing" className="text-sm text-white/50 hover:text-white transition-colors">Pricing</Link>

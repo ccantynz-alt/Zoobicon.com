@@ -180,7 +180,17 @@ async function callOpenSRS(
         "Content-Length": String(Buffer.byteLength(xml)),
       },
       body: xml,
+      signal: AbortSignal.timeout(10000),
     });
+
+    if (!response.ok) {
+      const body = await response.text().catch(() => "");
+      console.error(`[OpenSRS] HTTP ${response.status}: ${response.statusText}`, body.slice(0, 500));
+      return {
+        success: false,
+        error: `OpenSRS HTTP ${response.status}: ${response.statusText}`,
+      };
+    }
 
     const text = await response.text();
 
@@ -284,14 +294,23 @@ export async function registerDomain(
   registration: DomainRegistration
 ): Promise<{ success: boolean; orderId?: string; error?: string }> {
   if (!hasOpenSRSConfig()) {
-    // Dev fallback
-    console.log("[Domain Reseller] OpenSRS not configured. Registration logged:");
-    console.log(`  Domain: ${registration.domain}`);
-    console.log(`  Period: ${registration.period} year(s)`);
-    return {
-      success: true,
-      orderId: `dev-order-${Date.now()}`,
-    };
+    // HARD FAIL — previous dev fallback silently returned {success: true} with
+    // a fake orderId, which meant a paid Stripe checkout could mark a domain
+    // "active" in the DB without ever registering it at the registry. That is
+    // a revenue-blocking Law 8 violation. The only safe behaviour when the
+    // registry credentials are missing is to refuse and let the caller (the
+    // Stripe webhook / verify-purchase) mark the row `registration_failed`
+    // so we can retry once Craig sets the env vars.
+    const missing: string[] = [];
+    if (!process.env.OPENSRS_API_KEY) missing.push("OPENSRS_API_KEY");
+    if (!process.env.OPENSRS_RESELLER_USER) missing.push("OPENSRS_RESELLER_USER");
+    const envNote =
+      process.env.OPENSRS_ENV && process.env.OPENSRS_ENV !== "live"
+        ? ` OPENSRS_ENV is "${process.env.OPENSRS_ENV}" — must be "live" to register real domains.`
+        : "";
+    const message = `OpenSRS/Tucows registry not configured — cannot register ${registration.domain}. Missing env: ${missing.join(", ") || "(none)"}.${envNote} Set these in Vercel → Project → Environment Variables and redeploy.`;
+    console.error("[Domain Reseller]", message);
+    return { success: false, error: message };
   }
 
   const contact = registration.registrant;
@@ -336,7 +355,12 @@ export async function registerDomain(
   });
 
   if (result.success) {
-    return { success: true, orderId: `opensrs-${Date.now()}` };
+    // Parse the real OpenSRS order ID from the XML response if present.
+    const raw: string = (result.data as { raw?: string } | undefined)?.raw || "";
+    const orderIdMatch = raw.match(/<item key="id">(\d+)<\/item>/) ||
+                         raw.match(/<item key="order_id">(\d+)<\/item>/);
+    const orderId = orderIdMatch?.[1] || `opensrs-${Date.now()}`;
+    return { success: true, orderId };
   }
 
   return { success: false, error: result.error };

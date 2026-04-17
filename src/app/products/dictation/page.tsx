@@ -2,16 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import BackgroundEffects from "@/components/BackgroundEffects";
-import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
-  Zap,
   ArrowRight,
   Check,
   Minus,
   ChevronDown,
-  ChevronRight,
   Mic,
   Languages,
   Users,
@@ -24,15 +19,8 @@ import {
   Video,
   Scale,
   Pen,
-  LayoutDashboard,
-  LogOut,
+  BadgeCheck,
 } from "lucide-react";
-
-const fadeInUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } },
-};
-const staggerContainer = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
 
 const STATS = [
   { value: "50+", label: "Languages supported" },
@@ -60,7 +48,6 @@ const USE_CASES = [
 ];
 
 const COMPETITORS = [
-  { name: "Feature", zoobicon: "Zoobicon", otter: "Otter.ai", rev: "Rev", descript: "Descript", whisper: "Whisper" },
   { name: "Real-Time Transcription", zoobicon: true, otter: true, rev: false, descript: false, whisper: false },
   { name: "Languages", zoobicon: "50+", otter: "English only", rev: "12", descript: "23", whisper: "50+" },
   { name: "Speaker Diarization", zoobicon: true, otter: true, rev: true, descript: true, whisper: false },
@@ -87,6 +74,19 @@ const FAQS = [
   { q: "Is my audio data private?", a: "We don't store your audio files after transcription is complete. The transcript belongs to you. Audio is processed via Deepgram's secure API (SOC 2 Type II certified) and is not used to train AI models. Your data stays yours." },
   { q: "What languages are supported?", a: "50+ languages including English, Spanish, French, German, Portuguese, Italian, Dutch, Japanese, Korean, Mandarin Chinese, Hindi, Arabic, Turkish, Polish, Russian, and many more. Language detection is automatic — just start speaking." },
 ];
+
+const CARD_BG = "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(10,10,15,0.7) 100%)";
+const PRIMARY_CTA = {
+  background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+  color: "#0a0a0f",
+  boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
+} as const;
+const SERIF: React.CSSProperties = {
+  fontFamily: "Fraunces, ui-serif, Georgia, serif",
+  fontStyle: "italic",
+  fontWeight: 400,
+  color: "#E8D4B0",
+};
 
 export default function DictationProductPage() {
   const [user, setUser] = useState<{ email?: string } | null>(null);
@@ -124,159 +124,284 @@ export default function DictationProductPage() {
     mainEntity: FAQS.map(f => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
   };
 
-  const Cell = ({ val }: { val: unknown }) => {
-    if (val === true) return <Check className="w-4 h-4 text-emerald-400 mx-auto" />;
-    if (val === false) return <Minus className="w-4 h-4 text-white/20 mx-auto" />;
-    return <span className="text-sm text-white/70">{String(val)}</span>;
+  const Cell = ({ val, highlight = false }: { val: unknown; highlight?: boolean }) => {
+    if (val === true) return <Check className="w-4 h-4 mx-auto" style={{ color: highlight ? "#E8D4B0" : undefined }} />;
+    if (val === false) return <Minus className="w-4 h-4 mx-auto text-white/25" />;
+    return <span className="text-[13px]" style={{ color: highlight ? "#E8D4B0" : "rgba(255,255,255,0.65)" }}>{String(val)}</span>;
   };
 
   return (
-    <div className="relative min-h-screen">
+    <div className="min-h-screen bg-[#050508] text-white fs-grain pt-[72px]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
-      <BackgroundEffects preset="technical" />
-
-      {/* Nav */}
-      <nav className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center"><Zap className="w-4 h-4 text-white" /></div>
-            <span className="text-lg font-bold tracking-tight">Zoobicon</span>
-          </Link>
-          <div className="flex items-center gap-3">
-            {user ? (
-              <>
-                <Link href="/dashboard" className="text-sm text-white/65 hover:text-white transition-colors px-3 py-2 flex items-center gap-1.5"><LayoutDashboard className="w-3.5 h-3.5" /> Dashboard</Link>
-                <button onClick={() => { try { localStorage.removeItem("zoobicon_user"); } catch {} setUser(null); }} className="text-sm text-white/65 hover:text-white transition-colors px-3 py-2 flex items-center gap-1.5"><LogOut className="w-3.5 h-3.5" /> Sign out</button>
-              </>
-            ) : (
-              <>
-                <Link href="/auth/login" className="text-sm text-white/65 hover:text-white transition-colors px-3 py-2">Sign in</Link>
-                <Link href={user ? "/dictation" : "/auth/signup"} className="btn-gradient px-4 py-2 rounded-xl text-sm font-semibold text-white">{user ? "Open App" : "Get Started"}</Link>
-              </>
-            )}
-          </div>
-        </div>
-      </nav>
 
       {/* Hero */}
-      <section className="relative pt-24 pb-20 overflow-hidden">
-        <HeroEffects variant="purple" cursorGlow particles particleCount={25} aurora />
-        <CursorGlowTracker />
-        <motion.div className="relative z-10 max-w-5xl mx-auto px-6 text-center" variants={staggerContainer} initial="hidden" animate="visible">
-          <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 mb-8">
-            <Mic className="w-3.5 h-3.5 text-purple-400" /><span className="text-xs font-medium text-purple-300">AI-Powered Transcription</span>
-          </motion.div>
-          <motion.h1 variants={fadeInUp} className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6">
-            Speak.{" "}<span className="bg-gradient-to-r from-purple-400 via-pink-400 to-rose-400 bg-clip-text text-transparent">It types.</span>
-          </motion.h1>
-          <motion.p variants={fadeInUp} className="text-lg sm:text-xl text-white/50 max-w-2xl mx-auto mb-10">
-            AI dictation and transcription in 50+ languages. 95%+ accuracy. Real-time or batch. Speaker labels, summaries, and smart punctuation — all automatic.
-          </motion.p>
-          <motion.div variants={fadeInUp} className="flex flex-wrap justify-center gap-4">
-            <Link href={user ? "/dictation" : "/auth/signup"} className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-purple-500 to-pink-600 font-semibold hover:from-purple-400 hover:to-pink-500 transition-all flex items-center gap-2">{user ? "Open Dictation" : "Start Dictating"} <ArrowRight className="w-4 h-4" /></Link>
-            <Link href="#pricing" className="px-8 py-3.5 rounded-xl bg-white/[0.05] border border-white/[0.1] font-semibold hover:bg-white/[0.08] transition-all">View Plans</Link>
-          </motion.div>
-        </motion.div>
+      <section className="relative pt-20 pb-24 md:pt-28 md:pb-32 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+          <div className="absolute left-1/2 top-0 h-[720px] w-[1200px] -translate-x-1/2 rounded-full blur-[160px]"
+            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.09), transparent 70%)" }} />
+          <div className="absolute right-[-10%] top-[30%] h-[420px] w-[520px] rounded-full blur-[140px]"
+            style={{ background: "radial-gradient(closest-side, rgba(224,139,176,0.07), transparent 70%)" }} />
+        </div>
+
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-8">
+            <BadgeCheck className="w-3 h-3" />
+            Deepgram Nova-2 · 50+ languages · 95%+ accuracy
+          </div>
+
+          <h1 className="fs-display-xl mb-6">
+            Speak.{" "}
+            <span style={SERIF}>It types.</span>
+          </h1>
+
+          <p className="max-w-3xl mx-auto text-[17px] md:text-[19px] leading-relaxed text-white/60 mb-10">
+            AI dictation and transcription in 50+ languages. 95%+ accuracy. Real-time or batch.
+            Speaker labels, summaries, and smart punctuation — all automatic.
+          </p>
+
+          <div className="flex flex-wrap justify-center gap-2 mb-10 max-w-3xl mx-auto">
+            {["Real-time", "Speaker labels", "Auto punctuation", "AI summaries", "50+ languages", "Custom vocabulary"].map((pill) => (
+              <span
+                key={pill}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1 text-[11px] text-white/60"
+              >
+                <Check className="w-3 h-3" style={{ color: "#E8D4B0" }} />
+                {pill}
+              </span>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href={user ? "/dictation" : "/auth/signup"}
+              className="group inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
+              style={PRIMARY_CTA}
+            >
+              {user ? "Open Dictation" : "Start Dictating"}
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+            <Link
+              href="#pricing"
+              className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-7 py-3.5 text-[14px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+            >
+              View plans
+            </Link>
+          </div>
+        </div>
       </section>
 
       {/* Stats */}
-      <section className="border-y border-white/[0.06] py-8">
-        <div className="max-w-5xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6">
-          {STATS.map(s => (
-            <div key={s.label} className="text-center">
-              <div className="text-2xl font-bold text-purple-400">{s.value}</div>
-              <div className="text-xs text-white/40 mt-1">{s.label}</div>
-            </div>
-          ))}
+      <section className="relative py-16 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {STATS.map((stat) => (
+              <div key={stat.label} className="text-center">
+                <div className="text-4xl md:text-5xl font-semibold tracking-[-0.02em] mb-2" style={{ color: "#E8D4B0" }}>
+                  {stat.value}
+                </div>
+                <div className="text-[13px] text-white/55">{stat.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Features */}
-      <section className="py-20">
-        <div className="max-w-5xl mx-auto px-6">
-          <motion.div className="text-center mb-16" variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
-            <motion.h2 variants={fadeInUp} className="text-3xl sm:text-4xl font-bold mb-4">Transcription that actually works</motion.h2>
-            <motion.p variants={fadeInUp} className="text-white/40 max-w-lg mx-auto">Powered by Deepgram Nova-2 — the most accurate speech-to-text AI available.</motion.p>
-          </motion.div>
-          <motion.div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5" variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
-            {FEATURES.map(f => (
-              <motion.div key={f.title} variants={fadeInUp} className="rounded-2xl bg-white/[0.03] border border-white/[0.08] p-6 hover:border-purple-500/20 transition-all">
-                <f.icon className="w-6 h-6 text-purple-400 mb-4" />
-                <h3 className="font-semibold mb-2">{f.title}</h3>
-                <p className="text-sm text-white/40 leading-relaxed">{f.desc}</p>
-              </motion.div>
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              Capabilities
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              Transcription that{" "}
+              <span style={SERIF}>actually works.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              Powered by Deepgram Nova-2 — the most accurate speech-to-text AI available.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {FEATURES.map((f) => (
+              <div
+                key={f.title}
+                className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
+                style={{ background: CARD_BG }}
+              >
+                <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }} />
+                <div className="relative">
+                  <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05]">
+                    <f.icon className="h-5 w-5 text-[#E8D4B0]" />
+                  </div>
+                  <h3 className="text-[17px] font-semibold tracking-[-0.01em] mb-2">{f.title}</h3>
+                  <p className="text-[13px] text-white/55 leading-relaxed">{f.desc}</p>
+                </div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Use Cases */}
-      <section className="py-20 border-t border-white/[0.06]">
-        <div className="max-w-5xl mx-auto px-6">
-          <motion.h2 variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-3xl font-bold text-center mb-12">Built for every use case</motion.h2>
-          <motion.div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5" variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
-            {USE_CASES.map(u => (
-              <motion.div key={u.title} variants={fadeInUp} className="rounded-2xl bg-white/[0.03] border border-white/[0.08] p-5">
-                <u.icon className="w-5 h-5 text-purple-400 mb-3" />
-                <h3 className="font-semibold text-sm mb-1">{u.title}</h3>
-                <p className="text-xs text-white/40 leading-relaxed">{u.desc}</p>
-              </motion.div>
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              Use cases
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              Built for{" "}
+              <span style={SERIF}>every voice.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              From boardrooms to classrooms. Anywhere words matter, dictation delivers.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {USE_CASES.map((u) => (
+              <div
+                key={u.title}
+                className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
+                style={{ background: CARD_BG }}
+              >
+                <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }} />
+                <div className="relative flex items-start gap-4">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05] flex-shrink-0">
+                    <u.icon className="h-5 w-5 text-[#E8D4B0]" />
+                  </div>
+                  <div>
+                    <h3 className="text-[17px] font-semibold tracking-[-0.01em] mb-1.5">{u.title}</h3>
+                    <p className="text-[13px] text-white/55 leading-relaxed">{u.desc}</p>
+                  </div>
+                </div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* Competitor Comparison */}
-      <section className="py-20 border-t border-white/[0.06]">
-        <div className="max-w-5xl mx-auto px-6">
-          <motion.h2 variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-3xl font-bold text-center mb-12">How Zoobicon Dictation compares</motion.h2>
-          <div className="overflow-x-auto rounded-2xl border border-white/[0.08]">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-white/[0.08]">
-                  {["Feature", "Zoobicon", "Otter.ai", "Rev", "Descript", "Whisper"].map((h, i) => (
-                    <th key={h} className={`px-4 py-3 text-left text-xs uppercase tracking-wider ${i === 1 ? "text-purple-400 bg-purple-500/5" : "text-white/40"}`}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/[0.04]">
-                {COMPETITORS.slice(1).map(row => (
-                  <tr key={row.name} className="hover:bg-white/[0.02]">
-                    <td className="px-4 py-3 text-white/60 text-sm">{row.name}</td>
-                    <td className="px-4 py-3 bg-purple-500/5"><Cell val={row.zoobicon} /></td>
-                    <td className="px-4 py-3"><Cell val={row.otter} /></td>
-                    <td className="px-4 py-3"><Cell val={row.rev} /></td>
-                    <td className="px-4 py-3"><Cell val={row.descript} /></td>
-                    <td className="px-4 py-3"><Cell val={row.whisper} /></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      {/* Competitor comparison */}
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06] overflow-hidden">
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          <div className="absolute left-1/2 top-1/2 h-[520px] w-[900px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[140px]"
+            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }} />
+        </div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              Industry comparison
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              See how we{" "}
+              <span style={SERIF}>stack up.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              The only transcription platform bundled with website hosting, eSIM, VPN, and a full software suite.
+            </p>
           </div>
-          <p className="text-[10px] text-white/20 mt-3 text-center">Comparison based on publicly available information as of March 2026. Features and pricing may change. All trademarks belong to their respective owners. See our <a href="/disclaimers" className="underline hover:text-white/30">disclaimers</a>.</p>
+
+          <div className="overflow-x-auto rounded-[28px] border border-white/[0.08]" style={{ background: CARD_BG }}>
+            <div className="min-w-[820px]">
+              <div className="grid grid-cols-6 px-6 py-4 border-b border-white/[0.08] text-[11px] uppercase tracking-[0.15em] font-semibold text-white/55">
+                <div>Feature</div>
+                <div className="text-center" style={{ color: "#E8D4B0" }}>Zoobicon</div>
+                <div className="text-center">Otter.ai</div>
+                <div className="text-center">Rev</div>
+                <div className="text-center">Descript</div>
+                <div className="text-center">Whisper</div>
+              </div>
+              {COMPETITORS.map((row, i) => (
+                <div
+                  key={row.name}
+                  className={`grid grid-cols-6 px-6 py-4 text-[13px] ${
+                    i !== COMPETITORS.length - 1 ? "border-b border-white/[0.04]" : ""
+                  }`}
+                >
+                  <div className="text-white/75 font-medium">{row.name}</div>
+                  <div className="text-center"><Cell val={row.zoobicon} highlight /></div>
+                  <div className="text-center"><Cell val={row.otter} /></div>
+                  <div className="text-center"><Cell val={row.rev} /></div>
+                  <div className="text-center"><Cell val={row.descript} /></div>
+                  <div className="text-center"><Cell val={row.whisper} /></div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <p className="text-[11px] text-white/30 mt-4 text-center">
+            Comparison based on publicly available information as of March 2026. Features and pricing
+            may change. All trademarks belong to their respective owners. See our{" "}
+            <Link href="/disclaimers" className="underline hover:text-white/55">disclaimers</Link>.
+          </p>
         </div>
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-20 border-t border-white/[0.06]">
-        <div className="max-w-5xl mx-auto px-6">
-          <motion.h2 variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-3xl font-bold text-center mb-12">Simple, transparent pricing</motion.h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {PLANS.map(p => (
-              <div key={p.name} className={`rounded-2xl p-6 border ${p.featured ? "bg-purple-500/5 border-purple-500/20 ring-1 ring-purple-500/10" : "bg-white/[0.02] border-white/[0.08]"}`}>
-                {p.featured && <div className="text-[10px] text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full inline-block mb-3 font-semibold uppercase tracking-wider">Most Popular</div>}
-                <h3 className="text-lg font-bold mb-1">{p.name}</h3>
-                <p className="text-xs text-white/40 mb-4">{p.desc}</p>
-                <div className="flex items-baseline gap-1 mb-1"><span className="text-3xl font-bold">{p.price}</span><span className="text-sm text-white/30">{p.period}</span></div>
-                <p className="text-xs text-white/30 mb-4">{p.minutes}</p>
-                <ul className="space-y-2 mb-6">
-                  {p.features.map(f => (
-                    <li key={f} className="flex items-center gap-2 text-xs text-white/50"><Check className="w-3.5 h-3.5 text-purple-400 shrink-0" />{f}</li>
+      <section id="pricing" className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              Pricing
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              Simple, transparent{" "}
+              <span style={SERIF}>pricing.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              Pay only for what you speak. No surprises, no hidden minutes.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto">
+            {PLANS.map((p) => (
+              <div
+                key={p.name}
+                className={`relative rounded-[24px] p-7 transition-all duration-500 hover:-translate-y-1 ${
+                  p.featured ? "border-2 border-[#E8D4B0]/35" : "border border-white/[0.08] hover:border-[#E8D4B0]/25"
+                }`}
+                style={{
+                  background: p.featured
+                    ? "linear-gradient(135deg, rgba(232,212,176,0.08) 0%, rgba(17,17,24,0.85) 100%)"
+                    : CARD_BG,
+                }}
+              >
+                {p.featured && (
+                  <div
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-wide"
+                    style={{ background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)", color: "#0a0a0f" }}
+                  >
+                    Most popular
+                  </div>
+                )}
+                <h3 className="text-[17px] font-semibold tracking-[-0.01em] mb-2">{p.name}</h3>
+                <div className="flex items-baseline gap-1 mb-1">
+                  <span className="text-4xl font-semibold tracking-[-0.02em]" style={{ color: "#E8D4B0" }}>{p.price}</span>
+                  <span className="text-[13px] text-white/50">{p.period}</span>
+                </div>
+                <p className="text-[12px] text-white/45 mb-3">{p.minutes}</p>
+                <p className="text-[13px] text-white/55 mb-6">{p.desc}</p>
+                <ul className="space-y-2.5 mb-7">
+                  {p.features.map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-[13px] text-white/65">
+                      <Check className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#E8D4B0" }} />
+                      {f}
+                    </li>
                   ))}
                 </ul>
-                <Link href={user ? "/dictation" : "/auth/signup"} className={`block text-center py-2.5 rounded-xl text-sm font-semibold transition-all ${p.featured ? "bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-400 hover:to-pink-500" : "bg-white/[0.05] border border-white/[0.1] hover:bg-white/[0.08]"}`}>{user ? "Open App" : "Start Free Trial"}</Link>
+                <Link
+                  href={user ? "/dictation" : "/auth/signup"}
+                  className={`block text-center rounded-full py-3 text-[13px] font-semibold transition-all ${
+                    p.featured ? "" : "border border-white/[0.12] bg-white/[0.03] text-white/80 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+                  }`}
+                  style={p.featured ? PRIMARY_CTA : undefined}
+                >
+                  {user ? "Open App" : "Start Free Trial"}
+                </Link>
               </div>
             ))}
           </div>
@@ -284,17 +409,38 @@ export default function DictationProductPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 border-t border-white/[0.06]">
-        <div className="max-w-3xl mx-auto px-6">
-          <motion.h2 variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-3xl font-bold text-center mb-12">Frequently asked questions</motion.h2>
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              Questions
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              Frequently{" "}
+              <span style={SERIF}>asked.</span>
+            </h2>
+          </div>
+
           <div className="space-y-3">
             {FAQS.map((f, i) => (
-              <div key={i} className="rounded-xl border border-white/[0.08] overflow-hidden">
-                <button onClick={() => setOpenFaq(openFaq === i ? null : i)} className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-white/[0.02] transition-colors">
-                  <span className="text-sm font-medium pr-4">{f.q}</span>
-                  <ChevronDown className={`w-4 h-4 text-white/30 shrink-0 transition-transform ${openFaq === i ? "rotate-180" : ""}`} />
+              <div
+                key={i}
+                className="overflow-hidden rounded-[20px] border border-white/[0.08]"
+                style={{ background: CARD_BG }}
+              >
+                <button
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  className="w-full flex items-center justify-between px-6 py-5 text-left transition-colors hover:bg-white/[0.02]"
+                >
+                  <span className="text-[15px] font-medium pr-4 text-white/85">{f.q}</span>
+                  <ChevronDown
+                    className={`w-4 h-4 flex-shrink-0 transition-transform duration-300 ${openFaq === i ? "rotate-180" : ""}`}
+                    style={{ color: "#E8D4B0" }}
+                  />
                 </button>
-                {openFaq === i && <div className="px-5 pb-4 text-sm text-white/50 leading-relaxed">{f.a}</div>}
+                {openFaq === i && (
+                  <div className="px-6 pb-5 text-[14px] text-white/60 leading-relaxed">{f.a}</div>
+                )}
               </div>
             ))}
           </div>
@@ -302,26 +448,37 @@ export default function DictationProductPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-24 border-t border-white/[0.06]">
-        <div className="max-w-3xl mx-auto px-6 text-center">
-          <Mic className="w-12 h-12 text-purple-400 mx-auto mb-6" />
-          <h2 className="text-3xl font-bold mb-4">Your voice. Your words. Instantly.</h2>
-          <p className="text-white/40 mb-8 max-w-lg mx-auto">Stop typing. Start talking. 50+ languages, 95%+ accuracy, real-time transcription.</p>
-          <Link href={user ? "/dictation" : "/auth/signup"} className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-purple-500 to-pink-600 font-semibold hover:from-purple-400 hover:to-pink-500 transition-all">{user ? "Open Dictation" : "Start Dictating"} <ArrowRight className="w-4 h-4" /></Link>
+      <section className="relative py-24 md:py-32 border-t border-white/[0.06] overflow-hidden">
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          <div className="absolute left-1/2 top-1/2 h-[560px] w-[1000px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[140px]"
+            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.11), transparent 70%)" }} />
         </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="border-t border-white/[0.06] py-10">
-        <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="text-xs text-white/30">&copy; 2026 Zoobicon. All rights reserved.</div>
-          <div className="text-xs text-white/20">zoobicon.com &middot; zoobicon.ai &middot; zoobicon.io &middot; zoobicon.sh</div>
-          <div className="flex gap-4">
-            <Link href="/privacy" className="text-xs text-white/30 hover:text-white/50 transition-colors">Privacy</Link>
-            <Link href="/terms" className="text-xs text-white/30 hover:text-white/50 transition-colors">Terms</Link>
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center">
+          <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05]">
+            <Mic className="h-6 w-6 text-[#E8D4B0]" />
+          </div>
+          <h2 className="fs-display-lg mb-5">
+            Your voice. Your words.{" "}
+            <span style={SERIF}>Instantly.</span>
+          </h2>
+          <p className="text-[17px] text-white/60 mb-10 max-w-xl mx-auto">
+            Stop typing. Start talking. 50+ languages, 95%+ accuracy, real-time transcription.
+          </p>
+          <Link
+            href={user ? "/dictation" : "/auth/signup"}
+            className="group inline-flex items-center gap-2 rounded-full px-8 py-4 text-[15px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
+            style={PRIMARY_CTA}
+          >
+            {user ? "Open Dictation" : "Start Dictating"}
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+          <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-[12px] text-white/55">
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} /> 14-day free trial</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} /> No credit card</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} /> Cancel anytime</span>
           </div>
         </div>
-      </footer>
+      </section>
     </div>
   );
 }

@@ -58,7 +58,7 @@ registerComponent({
   tags: ["dark", "tech", "saas", "cyber", "software", "startup", "developer", "hacker"],
   code: `export default function Navbar() {
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const links = ["Features", "Solutions", "Pricing", "Docs"];
+  const links = ["Features", "Pricing", "FAQ", "Contact"];
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-950/80 backdrop-blur-xl border-b border-gray-800/50">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -107,7 +107,7 @@ registerComponent({
   code: `export default function Navbar() {
   const [scrolled, setScrolled] = React.useState(false);
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const links = ["Work", "About", "Contact"];
+  const links = ["Features", "About", "Contact"];
 
   React.useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -167,8 +167,8 @@ registerComponent({
   code: `export default function Navbar() {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
-  const leftLinks = ["Collections", "About"];
-  const rightLinks = ["Journal", "Contact"];
+  const leftLinks = ["Features", "About"];
+  const rightLinks = ["Pricing", "Contact"];
 
   React.useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -262,9 +262,9 @@ registerComponent({
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className={\`transition-transform \${megaOpen ? "rotate-180" : ""}\`}><path d="M6 9l6 6 6-6"/></svg>
             </button>
           </div>
-          <a href="#solutions" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Solutions</a>
+          <a href="#features" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Features</a>
           <a href="#pricing" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
-          <a href="#docs" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Docs</a>
+          <a href="#faq" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">FAQ</a>
         </div>
         <div className="hidden md:flex items-center gap-3">
           <a href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Sign in</a>
@@ -301,7 +301,7 @@ registerComponent({
             <a key={p.name} href={\`#\${p.name.toLowerCase()}\`} className="block text-sm font-medium text-gray-700 py-2">{p.name} &mdash; {p.desc}</a>
           ))}
           <a href="#pricing" className="block text-sm font-medium text-gray-700 py-2">Pricing</a>
-          <a href="#docs" className="block text-sm font-medium text-gray-700 py-2">Docs</a>
+          <a href="#faq" className="block text-sm font-medium text-gray-700 py-2">FAQ</a>
           <button className="w-full px-5 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg mt-2">Get Started</button>
         </div>
       )}
@@ -321,7 +321,7 @@ registerComponent({
   code: `export default function Navbar() {
   const [scrolled, setScrolled] = React.useState(false);
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const links = ["Features", "How It Works", "Pricing", "FAQ"];
+  const links = ["Features", "About", "Pricing", "FAQ"];
 
   React.useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40);
@@ -376,7 +376,7 @@ registerComponent({
   tags: ["colored", "bold", "vibrant", "education", "nonprofit", "community", "event", "conference", "health", "wellness"],
   code: `export default function Navbar() {
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const links = ["Programs", "About Us", "Impact", "Get Involved"];
+  const links = ["Features", "About", "Pricing", "Contact"];
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-indigo-600">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -424,7 +424,7 @@ registerComponent({
   tags: ["glass", "frosted", "premium", "luxury", "fintech", "crypto", "web3", "futuristic", "dark", "modern"],
   code: `export default function Navbar() {
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const links = ["Markets", "Trading", "Earn", "Learn"];
+  const links = ["Features", "Pricing", "About", "FAQ"];
   return (
     <nav className="fixed top-4 left-4 right-4 z-50">
       <div className="max-w-7xl mx-auto bg-white/5 backdrop-blur-2xl rounded-2xl border border-white/10 shadow-2xl shadow-black/20">

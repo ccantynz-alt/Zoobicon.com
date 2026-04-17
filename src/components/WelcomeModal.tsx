@@ -21,27 +21,27 @@ const steps = [
     title: "Describe",
     description:
       "Tell the AI what you want. Be specific about your business, style, and features.",
-    color: "text-blue-400",
-    bg: "bg-blue-500/10",
-    border: "border-blue-500/20",
+    color: "text-stone-400",
+    bg: "bg-stone-500/10",
+    border: "border-stone-500/20",
   },
   {
     icon: Cpu,
     title: "Build",
     description:
       "Our 7-agent pipeline creates your site in ~60 seconds. Watch it happen live.",
-    color: "text-purple-400",
-    bg: "bg-purple-500/10",
-    border: "border-purple-500/20",
+    color: "text-stone-400",
+    bg: "bg-stone-500/10",
+    border: "border-stone-500/20",
   },
   {
     icon: Rocket,
     title: "Ship",
     description:
       "Edit with AI chat, then deploy to a live URL with one click.",
-    color: "text-emerald-400",
-    bg: "bg-emerald-500/10",
-    border: "border-emerald-500/20",
+    color: "text-stone-400",
+    bg: "bg-stone-500/10",
+    border: "border-stone-500/20",
   },
 ];
 
@@ -168,7 +168,7 @@ export default function WelcomeModal({ onClose, onBrowseTemplates }: WelcomeModa
             </button>
             <button
               onClick={handleStartBuilding}
-              className="flex-1 px-4 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-sm font-medium text-white transition-colors"
+              className="flex-1 px-4 py-2.5 rounded-lg bg-stone-600 hover:bg-stone-500 text-sm font-medium text-white transition-colors"
             >
               Start Building
             </button>
@@ -180,7 +180,7 @@ export default function WelcomeModal({ onClose, onBrowseTemplates }: WelcomeModa
               type="checkbox"
               checked={dontShowAgain}
               onChange={(e) => setDontShowAgain(e.target.checked)}
-              className="w-3.5 h-3.5 rounded border-white/20 bg-white/5 text-blue-500 focus:ring-blue-500/30 focus:ring-offset-0"
+              className="w-3.5 h-3.5 rounded border-white/20 bg-white/5 text-stone-500 focus:ring-stone-500/30 focus:ring-offset-0"
             />
             <span className="text-xs text-white/50">
               Don&apos;t show this again
