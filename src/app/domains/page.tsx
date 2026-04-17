@@ -265,14 +265,12 @@ export default function DomainsPage() {
     // scroll to results
     setTimeout(() => genResultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
 
-    // Use a small TLD set for the generator to keep us under RDAP rate limits.
-    // If the user has manually ticked TLDs beyond the defaults, honour them;
-    // otherwise use the smaller GENERATOR_DEFAULT_TLDS list.
-    const userSelection = Array.from(selectedTlds);
-    const tlds = userSelection.length > 0 && userSelection.length <= GENERATOR_DEFAULT_TLDS.length + 1
-      ? userSelection
-      : GENERATOR_DEFAULT_TLDS.filter((t) => selectedTlds.has(t) || selectedTlds.size === 0);
-    let finalTlds = tlds.length > 0 ? tlds : GENERATOR_DEFAULT_TLDS;
+    // Honour the user's TLD selection exactly. Whatever they ticked is
+    // what we check — no silent narrowing, no silent widening. The AI's
+    // industry recommendations show up as guidance in the UI but never
+    // override what the user chose.
+    let finalTlds = Array.from(selectedTlds);
+    if (finalTlds.length === 0) finalTlds = GENERATOR_DEFAULT_TLDS;
 
     // Step 1 — get names from Claude
     let names: Array<{ name: string; tagline: string }> = [];
@@ -299,17 +297,6 @@ export default function DomainsPage() {
         else setGenIndustry(null);
         if (Array.isArray(data?.meta?.recommendedTlds)) setGenRecommendedTlds(data.meta.recommendedTlds);
         else setGenRecommendedTlds([]);
-
-        // If the AI detected a specific industry with a "critical" TLD (e.g.
-        // .ai for AI apps), fold the top 2 recommended TLDs into the check
-        // set so we surface them even when the user stuck to defaults.
-        const recTldsRaw = Array.isArray(data?.meta?.recommendedTlds) ? data.meta.recommendedTlds : [];
-        const topRecTlds = recTldsRaw.slice(0, 2).map((r: { tld: string }) => r.tld).filter(Boolean);
-        if (topRecTlds.length) {
-          const merged = Array.from(new Set([...finalTlds, ...topRecTlds]));
-          // Cap at 5 TLDs per name to stay inside RDAP rate limits.
-          finalTlds = merged.slice(0, 5);
-        }
       }
     } catch {
       setGeneratorError("Couldn't reach the name generator. Check your connection and try again.");
@@ -697,7 +684,7 @@ export default function DomainsPage() {
         </div>
 
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
-          {/* Coinage Engine announcement — flagship feature surface */}
+          {/* Advanced AI Search announcement — flagship feature surface */}
           <Link
             href="/domains/ai-search"
             className="group inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/30 bg-gradient-to-r from-[#E8D4B0]/[0.06] via-[#E08BB0]/[0.05] to-[#E8D4B0]/[0.06] px-4 py-1.5 text-[11px] font-medium text-white/90 mb-5 hover:border-[#E8D4B0]/60 hover:text-white transition-all"
@@ -705,7 +692,7 @@ export default function DomainsPage() {
             <span className="inline-flex h-1.5 w-1.5 rounded-full bg-[#E8D4B0] shadow-[0_0_12px_2px_rgba(232,212,176,0.6)]" />
             <span className="font-semibold tracking-widest uppercase text-[#E8D4B0]">New</span>
             <span className="text-white/60">·</span>
-            <span>AI Coinage Engine — six-phase live pipeline</span>
+            <span>Advanced AI Search — trademark &amp; language checks built in</span>
             <ArrowRight className="w-3 h-3 text-[#E8D4B0] transition group-hover:translate-x-0.5" />
           </Link>
 
@@ -776,10 +763,10 @@ export default function DomainsPage() {
             <Link
               href="/domains/ai-search"
               className="group flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] font-semibold border border-[#E8D4B0]/35 bg-gradient-to-r from-[#E8D4B0]/[0.06] via-[#E08BB0]/[0.05] to-[#E8D4B0]/[0.06] text-[#E8D4B0] backdrop-blur hover:border-[#E8D4B0]/70 hover:text-white transition-all"
-              title="The flagship engine — 6-phase coinage pipeline with trademark, 18-language, and live registry screening"
+              title="The flagship engine — invents original brand names, screens trademarks, checks 18 languages for bad meanings, and verifies live availability"
             >
               <Sparkles className="w-4 h-4" />
-              Coinage Engine
+              Advanced AI Search
               <span className="inline-flex items-center rounded-full bg-[#E8D4B0]/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-[#E8D4B0]">New</span>
             </Link>
           </div>
@@ -824,6 +811,31 @@ export default function DomainsPage() {
                   >
                     {searching ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
                     Search
+                  </button>
+                </div>
+
+                {/* Extension quick-picks */}
+                <div className="flex flex-wrap gap-2 mb-3">
+                  <button
+                    type="button"
+                    onClick={() => { setSelectedTlds(new Set(allTlds)); setAutoExpandedTlds(true); }}
+                    className="px-3 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-widest border border-[#E8D4B0]/30 bg-[#E8D4B0]/[0.04] text-[#E8D4B0] hover:border-[#E8D4B0]/60 hover:bg-[#E8D4B0]/[0.08] transition"
+                  >
+                    All {allTlds.length} extensions
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setSelectedTlds(new Set(["com"])); setAutoExpandedTlds(true); }}
+                    className="px-3 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-widest border border-white/[0.10] bg-white/[0.03] text-white/70 hover:border-white/25 hover:text-white transition"
+                  >
+                    .com only
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setSelectedTlds(new Set(DEFAULT_TLDS)); setAutoExpandedTlds(true); }}
+                    className="px-3 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-widest border border-white/[0.10] bg-white/[0.03] text-white/70 hover:border-white/25 hover:text-white transition"
+                  >
+                    Popular {DEFAULT_TLDS.length}
                   </button>
                 </div>
 
@@ -926,7 +938,32 @@ export default function DomainsPage() {
 
                 {/* Extension pills (shared) */}
                 <div className="mb-6">
-                  <label className="block text-[11px] uppercase tracking-[0.2em] font-semibold text-[#E8D4B0]/75 mb-3">Check availability on</label>
+                  <div className="flex items-center justify-between flex-wrap gap-3 mb-3">
+                    <label className="block text-[11px] uppercase tracking-[0.2em] font-semibold text-[#E8D4B0]/75">Check availability on</label>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => { setSelectedTlds(new Set(allTlds)); setAutoExpandedTlds(true); }}
+                        className="px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-widest border border-[#E8D4B0]/30 bg-[#E8D4B0]/[0.04] text-[#E8D4B0] hover:border-[#E8D4B0]/60 hover:bg-[#E8D4B0]/[0.08] transition"
+                      >
+                        All {allTlds.length}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setSelectedTlds(new Set(["com"])); setAutoExpandedTlds(true); }}
+                        className="px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-widest border border-white/[0.10] bg-white/[0.03] text-white/70 hover:border-white/25 hover:text-white transition"
+                      >
+                        .com only
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setSelectedTlds(new Set(DEFAULT_TLDS)); setAutoExpandedTlds(true); }}
+                        className="px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-widest border border-white/[0.10] bg-white/[0.03] text-white/70 hover:border-white/25 hover:text-white transition"
+                      >
+                        Popular {DEFAULT_TLDS.length}
+                      </button>
+                    </div>
+                  </div>
                   <div className="flex flex-wrap gap-2">
                     {allTlds.map(tld => (
                       <button
@@ -1286,20 +1323,30 @@ export default function DomainsPage() {
                     {genRecommendedTlds.length > 0 && (
                       <div className="mt-3 space-y-1.5">
                         <div className="text-[11px] uppercase tracking-[0.15em] font-semibold text-white/40">
-                          Recommended TLDs for your space
+                          Suggested TLDs — tap to add to your search
                         </div>
                         <div className="flex flex-wrap gap-2">
-                          {genRecommendedTlds.slice(0, 4).map((r) => (
-                            <div
-                              key={r.tld}
-                              className="group px-3 py-1.5 rounded-full border border-[#E8D4B0]/25 bg-[#E8D4B0]/[0.05] text-[12px] text-white/80 flex items-center gap-2"
-                              title={r.reason}
-                            >
-                              <span className="text-[#E8D4B0] font-semibold">.{r.tld}</span>
-                              <span className="text-white/45 hidden sm:inline">— {r.reason}</span>
-                              <span className="text-white/45 inline sm:hidden text-[11px]">— {r.reason.slice(0, 30)}…</span>
-                            </div>
-                          ))}
+                          {genRecommendedTlds.slice(0, 4).map((r) => {
+                            const active = selectedTlds.has(r.tld);
+                            return (
+                              <button
+                                key={r.tld}
+                                type="button"
+                                onClick={() => toggleTld(r.tld)}
+                                title={`${r.reason} — click to ${active ? "remove" : "add"}`}
+                                className={`group px-3 py-1.5 rounded-full text-[12px] flex items-center gap-2 transition-all ${
+                                  active
+                                    ? "border border-[#E8D4B0]/60 bg-[#E8D4B0]/[0.12] text-white"
+                                    : "border border-[#E8D4B0]/25 bg-[#E8D4B0]/[0.04] text-white/80 hover:border-[#E8D4B0]/50 hover:bg-[#E8D4B0]/[0.08]"
+                                }`}
+                              >
+                                <span className="text-[#E8D4B0] font-semibold">.{r.tld}</span>
+                                <span className="text-white/45 hidden sm:inline">— {r.reason}</span>
+                                <span className="text-white/45 inline sm:hidden text-[11px]">— {r.reason.slice(0, 30)}…</span>
+                                {active && <Check className="w-3 h-3 text-[#E8D4B0]" />}
+                              </button>
+                            );
+                          })}
                         </div>
                       </div>
                     )}
