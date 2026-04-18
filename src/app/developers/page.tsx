@@ -394,12 +394,67 @@ export default function DevelopersPage() {
         </div>
       </section>
 
-      {/* Plans + auth header */}
-      <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
-              Pricing
+      {/* Pricing */}
+      <section className="py-20 border-t border-white/[0.08]">
+        <div className="max-w-5xl mx-auto px-6 lg:px-8">
+          <div>
+            <div className="text-center mb-12">
+              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
+                API <span className="gradient-text">Pricing</span>
+              </h2>
+              <p className="text-lg text-white/60">Start free. Pay only for what you use.</p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="gradient-border p-6 rounded-xl">
+                <div className="text-sm font-semibold text-white/65 mb-2">Free</div>
+                <div className="text-3xl font-black mb-1">$0</div>
+                <div className="text-xs text-white/60 mb-4">10 requests/min</div>
+                <ul className="space-y-2 mb-6 text-sm text-white/60">
+                  <li>Standard tier generation</li>
+                  <li>Deploy to zoobicon.sh</li>
+                  <li>Community support</li>
+                  <li>1 API key</li>
+                </ul>
+                <Link href="/auth/signup" className="block text-center py-2.5 rounded-xl border border-white/[0.12] text-sm font-semibold text-white/60 hover:border-white/20 transition-all">
+                  Get Started
+                </Link>
+              </div>
+
+              <div className="relative p-6 rounded-xl border border-accent-cyan/30 bg-accent-cyan/[0.02] shadow-glow-cyan">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-accent-cyan to-emerald-500 text-xs font-bold text-white">
+                  Popular
+                </div>
+                <div className="text-sm font-semibold text-accent-cyan mb-2">Pro</div>
+                <div className="text-3xl font-black mb-1">$79<span className="text-lg font-normal text-white/60">/mo</span></div>
+                <div className="text-xs text-white/60 mb-4">60 requests/min</div>
+                <ul className="space-y-2 mb-6 text-sm text-white/65">
+                  <li>Premium tier generation</li>
+                  <li>43 specialized generators</li>
+                  <li>White-label branding</li>
+                  <li>Webhook callbacks</li>
+                  <li>Priority support</li>
+                </ul>
+                <Link href="/auth/signup" className="block text-center w-full py-2.5 rounded-xl bg-gradient-to-r from-accent-cyan to-emerald-500 text-sm font-bold text-white">
+                  Start Pro
+                </Link>
+              </div>
+
+              <div className="gradient-border p-6 rounded-xl">
+                <div className="text-sm font-semibold text-white/65 mb-2">Enterprise</div>
+                <div className="text-3xl font-black mb-1">Custom</div>
+                <div className="text-xs text-white/60 mb-4">600 requests/min</div>
+                <ul className="space-y-2 mb-6 text-sm text-white/60">
+                  <li>Dedicated rate limits</li>
+                  <li>Custom model routing</li>
+                  <li>SLA guarantee</li>
+                  <li>Agency bulk generation</li>
+                  <li>24/7 support</li>
+                </ul>
+                <a href="mailto:sales@zoobicon.com?subject=Enterprise API Inquiry" className="block w-full py-2.5 rounded-xl border border-white/[0.12] text-sm font-semibold text-white/60 hover:border-white/20 transition-all text-center">
+                  Contact Sales
+                </a>
+              </div>
             </div>
             <h2 className="fs-display-lg mb-4">
               API pricing,{" "}
