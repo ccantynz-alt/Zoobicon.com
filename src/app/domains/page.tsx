@@ -32,11 +32,28 @@ interface DomainResult {
   checking: boolean;
 }
 
+interface NameVariant {
+  name: string;
+  reason: string;
+  domains: DomainResult[];
+  checking: boolean;
+}
+
 interface GeneratedName {
   name: string;
   tagline: string;
   domains: DomainResult[];
   checkingDomains: boolean;
+  /** Optional 0-100 brandability score from the AI. Only shown when present. */
+  score?: number;
+  /** 2-4 short tags ("short", "memorable", "latin root"). Only shown when present. */
+  factors?: string[];
+  /** Variants auto-suggested when every TLD comes back taken. */
+  variants?: NameVariant[];
+  /** Loading state while we fetch + availability-check the variants. */
+  variantsLoading?: boolean;
+  /** Error string if variant generation failed — surface it, don't swallow. */
+  variantsError?: string | null;
 }
 
 // NOTE: must match TLD_PRICING in /api/domains/search/route.ts — source of truth is backend.
@@ -96,13 +113,12 @@ export default function DomainsPage() {
   const [userEmail, setUserEmail] = useState("");
   const [generating, setGenerating] = useState(false);
   const [pendingGenerate, setPendingGenerate] = useState(false);
-  const [generating, setGenerating] = useState(false);
-  const [generatedNames, setGeneratedNames] = useState<Array<{ name: string; tagline: string; domains: Array<{ domain: string; tld: string; available: boolean | null; price: number; checking: boolean }> }>>([]);
   const [autoExpandedTlds, setAutoExpandedTlds] = useState(false);
   const [autoGenerating, setAutoGenerating] = useState(false);
   const [genDescription, setGenDescription] = useState("");
   const [genStyle, setGenStyle] = useState<string>("modern");
   const [generatedNames, setGeneratedNames] = useState<GeneratedName[]>([]);
+  const [autoToppedUp, setAutoToppedUp] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
   const [contactInfo, setContactInfo] = useState({
@@ -248,21 +264,23 @@ export default function DomainsPage() {
     setGeneratedNames([]);
     setResults([]);
     setGeneratorError(null);
+    setAutoToppedUp(false); // new generation = new top-up budget
 
     // scroll to results
     setTimeout(() => genResultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
 
-    // Use a small TLD set for the generator to keep us under RDAP rate limits.
-    // If the user has manually ticked TLDs beyond the defaults, honour them;
-    // otherwise use the smaller GENERATOR_DEFAULT_TLDS list.
-    const userSelection = Array.from(selectedTlds);
-    const tlds = userSelection.length > 0 && userSelection.length <= GENERATOR_DEFAULT_TLDS.length + 1
-      ? userSelection
-      : GENERATOR_DEFAULT_TLDS.filter((t) => selectedTlds.has(t) || selectedTlds.size === 0);
-    const finalTlds = tlds.length > 0 ? tlds : GENERATOR_DEFAULT_TLDS;
+    // Honour the user's TLD selection exactly. Whatever they ticked is what we
+    // check — no silent narrowing, no silent widening. The backend
+    // `/api/domains/search` already caps concurrency at 6 and enforces a 9s
+    // total budget, returning `null` for any TLD still in flight. That's the
+    // right place to defend against rate limits — not here, where silently
+    // dropping .sh and .co makes every generated name look "all taken".
+    let finalTlds = Array.from(selectedTlds);
+    if (finalTlds.length === 0) finalTlds = GENERATOR_DEFAULT_TLDS;
 
-    // Step 1 — get names from Claude
-    let names: Array<{ name: string; tagline: string }> = [];
+    // Step 1 — get names from Claude. The API returns score/factors too; we
+    // carry those through so each card can show its brandability badge.
+    let names: Array<{ name: string; tagline: string; score?: number; factors?: string[] }> = [];
     let apiError: string | null = null;
     try {
       const res = await fetch("/api/tools/business-names", {
@@ -293,12 +311,14 @@ export default function DomainsPage() {
       return;
     }
 
-    // Sanitize names → dns-safe strings
+    // Sanitize names → dns-safe strings, preserving optional AI score/factors.
     const cleaned = names
       .map((n) => ({
         name: n.name,
         tagline: n.tagline || "",
         slug: n.name.toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 63),
+        score: typeof n.score === "number" ? n.score : undefined,
+        factors: Array.isArray(n.factors) ? n.factors : undefined,
       }))
       .filter((n) => n.slug.length >= 2);
 
@@ -307,6 +327,9 @@ export default function DomainsPage() {
       cleaned.map((n) => ({
         name: n.name,
         tagline: n.tagline,
+        checkingDomains: true,
+        score: n.score,
+        factors: n.factors,
         domains: finalTlds.map((tld) => ({
           domain: `${n.slug}.${tld}`,
           tld,
@@ -372,6 +395,183 @@ export default function DomainsPage() {
 
     setGenerating(false);
   }, [genDescription, genStyle, selectedTlds, generating, genExclusions, genRefinement]);
+
+  /**
+   * When a generated name comes back fully taken, rescue the user: ask
+   * Claude for 6 brandable variants (get${name}, ${name}labs, semantic
+   * siblings) and availability-check them inline. This is the "don't show
+   * an empty result" safety net — it keeps the flow alive on every search.
+   */
+  const fetchVariants = useCallback(async (baseName: string) => {
+    const gnSnapshot = generatedNames.find((gn) => gn.name === baseName);
+    if (!gnSnapshot) return;
+    if (gnSnapshot.variantsLoading || (gnSnapshot.variants && gnSnapshot.variants.length > 0)) return;
+
+    // Use the TLDs attached to the original name so variants get the same
+    // TLD treatment the user chose for the primary search.
+    const variantTlds = gnSnapshot.domains.map((d) => d.tld);
+    if (variantTlds.length === 0) return;
+
+    setGeneratedNames((prev) =>
+      prev.map((gn) =>
+        gn.name !== baseName ? gn : { ...gn, variantsLoading: true, variantsError: null },
+      ),
+    );
+
+    let rawVariants: Array<{ name: string; reason: string }> = [];
+    try {
+      const r = await fetch("/api/domains/variants", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          baseName,
+          description: genDescription.trim().slice(0, 400),
+          count: 6,
+        }),
+      });
+      const data = await r.json().catch(() => null);
+      if (!r.ok) {
+        const msg =
+          data && typeof data.error === "string"
+            ? data.error
+            : `Variant generator returned ${r.status}.`;
+        setGeneratedNames((prev) =>
+          prev.map((gn) =>
+            gn.name !== baseName ? gn : { ...gn, variantsLoading: false, variantsError: msg },
+          ),
+        );
+        return;
+      }
+      rawVariants = Array.isArray(data?.variants) ? data.variants : [];
+    } catch {
+      setGeneratedNames((prev) =>
+        prev.map((gn) =>
+          gn.name !== baseName
+            ? gn
+            : { ...gn, variantsLoading: false, variantsError: "Couldn't reach the variant generator." },
+        ),
+      );
+      return;
+    }
+
+    if (rawVariants.length === 0) {
+      setGeneratedNames((prev) =>
+        prev.map((gn) =>
+          gn.name !== baseName
+            ? gn
+            : { ...gn, variantsLoading: false, variantsError: "No variants returned." },
+        ),
+      );
+      return;
+    }
+
+    // Seed variants in "checking" state so the UI shows instant progress.
+    const seeded: NameVariant[] = rawVariants.map((v) => ({
+      name: v.name,
+      reason: v.reason,
+      checking: true,
+      domains: variantTlds.map((tld) => ({
+        domain: `${v.name.toLowerCase().replace(/[^a-z0-9-]/g, "")}.${tld}`,
+        tld,
+        available: null,
+        price: TLD_PRICES[tld] || 9.99,
+        checking: true,
+      })),
+    }));
+
+    setGeneratedNames((prev) =>
+      prev.map((gn) =>
+        gn.name !== baseName ? gn : { ...gn, variants: seeded, variantsLoading: false },
+      ),
+    );
+
+    // Check each variant's availability with the same concurrency budget.
+    const checkVariant = async (variant: NameVariant) => {
+      const slug = variant.name.toLowerCase().replace(/[^a-z0-9-]/g, "");
+      try {
+        const r = await fetch(
+          `/api/domains/search?q=${encodeURIComponent(slug)}&tlds=${encodeURIComponent(variantTlds.join(","))}`,
+        );
+        if (!r.ok) throw new Error("search failed");
+        const data = await r.json();
+        const apiResults: Array<{ domain: string; available: boolean | null; price: number }> =
+          data.results || [];
+        setGeneratedNames((prev) =>
+          prev.map((gn) => {
+            if (gn.name !== baseName || !gn.variants) return gn;
+            return {
+              ...gn,
+              variants: gn.variants.map((v) =>
+                v.name !== variant.name
+                  ? v
+                  : {
+                      ...v,
+                      checking: false,
+                      domains: variantTlds.map((tld) => {
+                        const match = apiResults.find((x) => x.domain === `${slug}.${tld}`);
+                        return {
+                          domain: `${slug}.${tld}`,
+                          tld,
+                          available: match ? match.available : null,
+                          price: match?.price ?? TLD_PRICES[tld] ?? 9.99,
+                          checking: false,
+                        };
+                      }),
+                    },
+              ),
+            };
+          }),
+        );
+      } catch {
+        setGeneratedNames((prev) =>
+          prev.map((gn) => {
+            if (gn.name !== baseName || !gn.variants) return gn;
+            return {
+              ...gn,
+              variants: gn.variants.map((v) =>
+                v.name !== variant.name
+                  ? v
+                  : {
+                      ...v,
+                      checking: false,
+                      domains: v.domains.map((d) => ({ ...d, checking: false, available: null })),
+                    },
+              ),
+            };
+          }),
+        );
+      }
+    };
+
+    const queue = [...seeded];
+    await Promise.all(
+      Array.from({ length: Math.min(GEN_CLIENT_CONCURRENCY, queue.length) }, async () => {
+        while (queue.length) {
+          const next = queue.shift();
+          if (!next) return;
+          await checkVariant(next);
+        }
+      }),
+    );
+  }, [generatedNames, genDescription]);
+
+  /**
+   * Auto-rescue: whenever a name finishes checking with zero available TLDs
+   * and no variants yet, fetch variants automatically. This guarantees every
+   * result page has something actionable — no "all taken" dead ends.
+   */
+  useEffect(() => {
+    if (generating) return;
+    for (const gn of generatedNames) {
+      const stillChecking = gn.domains.some((d) => d.checking);
+      if (stillChecking) continue;
+      const hasAvailable = gn.domains.some((d) => d.available === true);
+      const allTaken = gn.domains.every((d) => d.available === false);
+      if (!hasAvailable && allTaken && !gn.variants && !gn.variantsLoading && !gn.variantsError) {
+        void fetchVariants(gn.name);
+      }
+    }
+  }, [generatedNames, generating, fetchVariants]);
 
   const handleSearch = async () => {
     const cleanName = name.trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
@@ -1184,7 +1384,20 @@ export default function DomainsPage() {
             })()}
 
             <div className="space-y-4">
-              {generatedNames.map((gn) => {
+              {[...generatedNames]
+                .sort((a, b) => {
+                  // Available names first, then still-checking, then all-taken last.
+                  // The point of the tool is to surface what's available — don't
+                  // make the user scroll past dead cards to find it.
+                  const score = (gn: typeof a) => {
+                    if (gn.domains.some((d) => d.available === true)) return 0;
+                    if (gn.domains.some((d) => d.checking)) return 1;
+                    if (gn.domains.some((d) => d.available === null)) return 2;
+                    return 3;
+                  };
+                  return score(a) - score(b);
+                })
+                .map((gn) => {
                 const availableDomains = gn.domains.filter((d) => d.available === true);
                 const hasAvailable = availableDomains.length > 0;
                 const stillChecking = gn.domains.some((d) => d.checking);
@@ -1205,26 +1418,56 @@ export default function DomainsPage() {
                     }}
                   >
                     {/* Name header */}
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <h3 className="text-[18px] font-semibold text-white tracking-[-0.01em]">{gn.name}</h3>
+                    <div className="flex items-start justify-between mb-4 gap-3">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="text-[18px] font-semibold text-white tracking-[-0.01em]">{gn.name}</h3>
+                          {typeof gn.score === "number" && (
+                            <span
+                              title="AI brandability score"
+                              className={`text-[10px] px-2 py-0.5 rounded-full font-bold tabular-nums tracking-[0.05em] shrink-0 ${
+                                gn.score >= 90
+                                  ? "border border-[#E8D4B0]/35 bg-[#E8D4B0]/[0.1] text-[#E8D4B0]"
+                                  : gn.score >= 75
+                                    ? "border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05] text-[#E8D4B0]/90"
+                                    : "border border-white/10 bg-white/[0.03] text-white/60"
+                              }`}
+                            >
+                              {gn.score}
+                            </span>
+                          )}
+                        </div>
                         <p className="text-[13px] text-white/45 mt-0.5">{gn.tagline}</p>
+                        {gn.factors && gn.factors.length > 0 && (
+                          <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+                            {gn.factors.map((f) => (
+                              <span
+                                key={f}
+                                className="text-[10px] px-2 py-0.5 rounded-full bg-white/[0.03] border border-white/[0.06] text-white/55 uppercase tracking-[0.08em]"
+                              >
+                                {f}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                      {hasAvailable && (
-                        <span className="text-[11px] px-2.5 py-1 rounded-full border border-[#E8D4B0]/25 bg-[#E8D4B0]/[0.06] text-[#E8D4B0] font-semibold shrink-0 uppercase tracking-[0.1em]">
-                          {availableDomains.length} available
-                        </span>
-                      )}
-                      {stillChecking && (
-                        <span className="text-[11px] px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.06] text-white/50 font-semibold shrink-0 flex items-center gap-1">
-                          <Loader2 className="w-3 h-3 animate-spin" /> Checking
-                        </span>
-                      )}
-                      {allTaken && (
-                        <span className="text-[11px] px-2.5 py-1 rounded-full bg-white/[0.03] border border-white/10 text-white/45 font-semibold shrink-0 uppercase tracking-[0.1em]">
-                          All TLDs taken
-                        </span>
-                      )}
+                      <div className="flex flex-col items-end gap-1.5 shrink-0">
+                        {hasAvailable && (
+                          <span className="text-[11px] px-2.5 py-1 rounded-full border border-[#E8D4B0]/25 bg-[#E8D4B0]/[0.06] text-[#E8D4B0] font-semibold uppercase tracking-[0.1em]">
+                            {availableDomains.length} available
+                          </span>
+                        )}
+                        {stillChecking && (
+                          <span className="text-[11px] px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.06] text-white/50 font-semibold flex items-center gap-1">
+                            <Loader2 className="w-3 h-3 animate-spin" /> Checking
+                          </span>
+                        )}
+                        {allTaken && (
+                          <span className="text-[11px] px-2.5 py-1 rounded-full bg-white/[0.03] border border-white/10 text-white/45 font-semibold uppercase tracking-[0.1em]">
+                            All TLDs taken
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     {/* Domain results — show available + checking always.
@@ -1306,6 +1549,125 @@ export default function DomainsPage() {
                       >
                         <Plus className="w-4 h-4" /> Add all {availableDomains.length} to cart
                       </button>
+                    )}
+
+                    {/* AI-suggested variants when the primary name is fully taken.
+                        The useEffect above auto-kicks this whenever a name lands
+                        on all-taken. User never stares at a dead card. */}
+                    {allTaken && (gn.variantsLoading || gn.variants || gn.variantsError) && (
+                      <div className="mt-4 pt-4 border-t border-white/[0.06]">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Wand2 className="w-3.5 h-3.5 text-[#E8D4B0]" />
+                          <span className="text-[11px] uppercase tracking-[0.15em] text-[#E8D4B0]/85 font-semibold">
+                            Similar available alternatives
+                          </span>
+                          {gn.variantsLoading && (
+                            <Loader2 className="w-3 h-3 text-white/40 animate-spin" />
+                          )}
+                        </div>
+
+                        {gn.variantsError && (
+                          <div className="text-[12px] text-red-300/80 bg-red-500/[0.05] border border-red-500/15 rounded-lg px-3 py-2 mb-3">
+                            {gn.variantsError}{" "}
+                            <button
+                              onClick={() => fetchVariants(gn.name)}
+                              className="underline text-red-200 hover:text-red-100"
+                            >
+                              Retry
+                            </button>
+                          </div>
+                        )}
+
+                        {gn.variants && gn.variants.length > 0 && (
+                          <div className="space-y-2">
+                            {gn.variants.map((v) => {
+                              const vAvailable = v.domains.filter((d) => d.available === true);
+                              const vHasAvailable = vAvailable.length > 0;
+                              const vStillChecking = v.domains.some((d) => d.checking);
+                              const vAllTaken =
+                                !vStillChecking && !vHasAvailable && v.domains.every((d) => d.available === false);
+                              return (
+                                <div
+                                  key={v.name}
+                                  className={`rounded-xl p-3 border transition-all ${
+                                    vHasAvailable
+                                      ? "border-[#E8D4B0]/15 bg-[#E8D4B0]/[0.03]"
+                                      : "border-white/[0.06] bg-white/[0.015]"
+                                  } ${vAllTaken ? "opacity-55" : ""}`}
+                                >
+                                  <div className="flex items-start justify-between gap-3 mb-2">
+                                    <div className="min-w-0">
+                                      <div className="flex items-center gap-2 flex-wrap">
+                                        <span className="text-[14px] font-semibold text-white">{v.name}</span>
+                                        <span className="text-[10px] uppercase tracking-[0.08em] text-white/40">
+                                          {v.reason}
+                                        </span>
+                                      </div>
+                                    </div>
+                                    {vStillChecking && (
+                                      <Loader2 className="w-3.5 h-3.5 text-white/40 animate-spin shrink-0" />
+                                    )}
+                                  </div>
+                                  <div className="space-y-1.5">
+                                    {v.domains
+                                      .filter((d) => d.checking || d.available === true || vAllTaken)
+                                      .map((d) => (
+                                        <div
+                                          key={d.domain}
+                                          className="flex items-center justify-between text-[12px] gap-2"
+                                        >
+                                          <div className="flex items-center gap-2 min-w-0">
+                                            {d.checking ? (
+                                              <Loader2 className="w-3 h-3 text-white/40 animate-spin shrink-0" />
+                                            ) : d.available === true ? (
+                                              <Check className="w-3 h-3 text-[#E8D4B0] shrink-0" />
+                                            ) : (
+                                              <X className="w-3 h-3 text-white/30 shrink-0" />
+                                            )}
+                                            <span
+                                              className={`truncate ${
+                                                d.checking || d.available === false ? "text-white/40" : "text-white/85"
+                                              }`}
+                                            >
+                                              {d.domain}
+                                            </span>
+                                          </div>
+                                          {d.available === true && (
+                                            <div className="flex items-center gap-2 shrink-0">
+                                              <span className="text-[12px] font-semibold text-white">
+                                                ${d.price}
+                                                <span className="text-[10px] text-white/40 font-normal">/yr</span>
+                                              </span>
+                                              {cart.some((c) => c.domain === d.domain) ? (
+                                                <button
+                                                  onClick={() => removeFromCart(d.domain)}
+                                                  className="px-2.5 py-1 rounded-full border border-[#E8D4B0]/25 bg-[#E8D4B0]/[0.06] text-[#E8D4B0] text-[11px] font-semibold flex items-center gap-1"
+                                                >
+                                                  <Check className="w-3 h-3" /> In cart
+                                                </button>
+                                              ) : (
+                                                <button
+                                                  onClick={() => addToCart(d)}
+                                                  className="px-2.5 py-1 rounded-full text-[11px] font-semibold flex items-center gap-1 transition-all hover:-translate-y-0.5"
+                                                  style={{
+                                                    background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+                                                    color: "#0a0a0f",
+                                                  }}
+                                                >
+                                                  <ShoppingCart className="w-3 h-3" /> Add
+                                                </button>
+                                              )}
+                                            </div>
+                                          )}
+                                        </div>
+                                      ))}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
                     )}
                   </div>
                 );
