@@ -516,20 +516,43 @@ ${themeBlock}${exclusionBlock}${refinementBlock}
 
 CORE RULES:
 - 1-2 words, 3-15 characters total, letters and digits only (no spaces, hyphens, or punctuation — must be a valid domain label).
-- Mix patterns for variety: invented words, Latin/Greek roots, mythological figures, compound words, metaphors, abstract concepts, single evocative nouns.
 - Each name MUST be unique within your response.
 - Each name gets a short tagline (5-12 words) that captures the brand vibe AND nods to the theme/meaning.
-- AVAILABILITY BIAS: Common dictionary words (Solar, Apex, Phoenix, Atlas, Nova, Lumen, Vertex, Pulse, Forge, Spark, Edge, Flux, Sage, Echo, Lyra) are almost certainly taken on .com — avoid the obvious ones. Lean toward invented coinages, less-common Latin/Greek/Norse words, or compounds (e.g. "Vexion", "Quorum", "Lumeris", "Octavus", "Sophora", "Calidus") that have a real chance of being free.
 - NEVER suggest generic names ("TechSolutions", "BestService", "ProBuilder", "AIvoice", "SmartApp").
 - NEVER reuse a forbidden name or its near-phonetic siblings.
 
-BRANDABILITY SCORING — every name gets an honest 0-100 score:
-- 90-100: World-class. Short (≤7 chars), instantly memorable, easy to spell by ear, pronounceable in every major market, no existing brand collision. Think "Stripe", "Figma", "Vercel".
-- 75-89: Strong. Brandable, memorable, pronounceable; may be slightly longer or slightly abstract.
-- 60-74: Solid. Clear concept, reasonable length, works but not exceptional.
-- Below 60: Don't submit it. If you can't score ≥60, pick a different name.
-- Also give 2-4 short tags ("factors") explaining the score — single words or 1-3 word phrases: "short", "memorable", "latin root", "hard to spell", "unique coinage", "mythic", "strong consonants".
-- Be honest — do NOT score everything 95. Spread the scores. A long invented compound might be 72; a crisp 5-letter coinage might be 94.
+.COM AVAILABILITY IS THE GOAL — .com is saturated. 30 years of squatting.
+Every common word, every one-syllable Latin root, every mythological name is
+already registered. To give the user REAL .com hits, you MUST lean hard into
+patterns that are statistically likely to be free:
+
+DISTRIBUTE your ${nameCount} names across ALL of these patterns (roughly
+even split — do NOT dump 20 single-word Latin names and call it done):
+
+  1. INVENTED COINAGES (~25%) — fabricated words built from Latin/Greek
+     morphemes. 6-10 letters. Examples: Vexion, Lumeris, Calidus, Octavus,
+     Sophora, Veridia, Noctura, Saelum, Orbix, Celestar, Veridax, Sonare.
+     These are UNREGISTERED 90% of the time.
+  2. TWO-ROOT COMPOUNDS (~25%) — stitch two uncommon Latin/Greek/Norse roots.
+     Examples: AurumVox, FerroMind, NoxCaesar, VelumOra, CelerMens, NovaRune,
+     SolVerba, DuxSonus, ImperoVox. Compounds almost never taken on .com.
+  3. RARE MYTHOLOGICAL DEEP CUTS (~20%) — not Apollo/Atlas/Phoenix (all taken).
+     Dig for obscure figures: Vesta, Vulcanus, Mercurius, Quirinus, Fornax,
+     Volturnus, Portunus, Robigus, Vertumnus, Edusa, Potina, Aius Locutius,
+     Saturnalia, Caerimonia. The less famous, the more likely free.
+  4. LATIN/GREEK ABSTRACT NOUNS (~15%) — uncommon abstract virtues or concepts:
+     Libertas, Magnanimitas, Concordia, Prudentia, Sapientia, Virtus, Pietas,
+     Dignitas, Gravitas, Auctoritas, Clementia, Fides. Full Latin abstract
+     nouns fare much better than single short words.
+  5. LETTER-MUTATED CLASSICS (~15%) — take a classic and mutate one letter
+     to dodge the squatter: Julius → Julix, Caesar → Caesor, Apex → Apox,
+     Nova → Novix, Lumen → Lumex, Atlas → Atlax. Looks classical, very
+     likely free.
+
+BANNED on .com (DO NOT suggest these — 99% taken): Solar, Apex, Phoenix,
+Atlas, Nova, Lumen, Vertex, Pulse, Forge, Spark, Edge, Flux, Sage, Echo,
+Lyra, Lux, Vox, Apex, Helios, Kairos, Orion, Nexus, Zenith, Apollo, Vega,
+Titan, Iris, Aura, Sol, Luna.
 
 CRITICAL OUTPUT FORMAT:
 Output ONLY a valid JSON array. No markdown code fences. No preamble. No explanation text. No trailing commentary.

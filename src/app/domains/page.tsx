@@ -69,8 +69,10 @@ const DEFAULT_TLDS = ["com", "ai", "io", "sh", "co"];
 const GENERATOR_DEFAULT_TLDS = ["com", "ai", "io"];
 // Max concurrent /api/domains/search calls the client will make at once.
 const GEN_CLIENT_CONCURRENCY = 4;
-// Haiku is asked for this many names — smaller = faster + less RDAP pressure.
-const GEN_NAME_COUNT = 12;
+// The AI is asked for this many names. 24 gives enough headroom that a
+// handful will land on a free .com even when most are taken — .com is
+// saturated, so 12 names meant ~zero available results for common themes.
+const GEN_NAME_COUNT = 24;
 
 /* ── Popular TLD showcase cards ── */
 const FEATURED_TLDS = [
@@ -134,6 +136,9 @@ export default function DomainsPage() {
   });
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [generatorError, setGeneratorError] = useState<string | null>(null);
+  const [genExclusions, setGenExclusions] = useState<string[]>([]);
+  const [genRefinement, setGenRefinement] = useState<string>("");
+  const [genThemes, setGenThemes] = useState<string[]>([]);
   const resultsRef = useRef<HTMLDivElement>(null);
   const genResultsRef = useRef<HTMLDivElement>(null);
 
@@ -938,6 +943,27 @@ export default function DomainsPage() {
             </Link>
           </div>
 
+          {/* Plain-English explainer for whichever tab is active. Stops people
+              from staring at three buttons wondering which one to press. */}
+          <p className="text-[12.5px] text-white/45 mb-6 max-w-2xl mx-auto leading-relaxed">
+            {mode === "search" && (
+              <>
+                <span className="text-white/70 font-semibold">Search exact name:</span>{" "}
+                you type the name, we check registry availability across the extensions you select. Fastest path if you already know what you want.
+              </>
+            )}
+            {mode === "generate" && (
+              <>
+                <span className="text-white/70 font-semibold">AI name generator:</span>{" "}
+                describe your business, the AI invents {GEN_NAME_COUNT} brandable names, then checks each one against your selected extensions in real time. Best when you need ideas.
+              </>
+            )}
+          </p>
+          <p className="text-[12px] text-[#E8D4B0]/55 mb-10 max-w-2xl mx-auto leading-relaxed">
+            <Sparkles className="inline w-3 h-3 -mt-0.5 mr-1" />
+            <span className="text-[#E8D4B0]/75 font-semibold">Advanced AI Search</span> (the third button) runs a deeper 6-phase pipeline — trademark screening, 18-language meaning check, and availability — for a pre-vetted shortlist. Slower but pro-grade.
+          </p>
+
           {/* ── SEARCH MODE ── */}
           {mode === "search" && (
             <div
@@ -1413,7 +1439,7 @@ export default function DomainsPage() {
       {generatedNames.length > 0 && (
         <section className="pb-20 px-4 sm:px-6">
           <div className="max-w-4xl mx-auto">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-3">
               <h2 className="text-[22px] font-semibold tracking-[-0.02em] text-white flex items-center gap-2">
                 <Wand2 className="w-5 h-5 text-[#E8D4B0]" />
                 {(() => {
@@ -1435,6 +1461,149 @@ export default function DomainsPage() {
                 <RefreshCw className={`w-3.5 h-3.5 ${generating ? "animate-spin" : ""}`} /> Regenerate
               </button>
             </div>
+
+            {/* Per-TLD availability breakdown. Craig's exact feedback: "should
+                be millions of .com names available" — if all 24 .com slots come
+                back taken, show that explicitly so he can SEE it's the AI's
+                suggestions that are saturated, not a bug in the search. */}
+            {(() => {
+              const stillChecking = generatedNames.some(gn => gn.domains.some(d => d.checking));
+              if (stillChecking || generatedNames.length === 0) return null;
+              const tldsInPlay = Array.from(
+                new Set(generatedNames.flatMap(gn => gn.domains.map(d => d.tld))),
+              );
+              if (tldsInPlay.length === 0) return null;
+              const breakdown = tldsInPlay.map(tld => {
+                let available = 0;
+                let taken = 0;
+                let unknown = 0;
+                for (const gn of generatedNames) {
+                  for (const d of gn.domains) {
+                    if (d.tld !== tld) continue;
+                    if (d.available === true) available++;
+                    else if (d.available === false) taken++;
+                    else unknown++;
+                  }
+                }
+                return { tld, available, taken, unknown };
+              });
+              return (
+                <div className="mb-6 flex flex-wrap gap-2">
+                  {breakdown.map(b => (
+                    <div
+                      key={b.tld}
+                      className={`text-[11px] px-3 py-1.5 rounded-full border font-mono tracking-tight flex items-center gap-2 ${
+                        b.available > 0
+                          ? "border-[#E8D4B0]/30 bg-[#E8D4B0]/[0.06] text-[#E8D4B0]"
+                          : "border-white/[0.08] bg-white/[0.02] text-white/45"
+                      }`}
+                      title={`.${b.tld}: ${b.available} available · ${b.taken} taken${b.unknown > 0 ? ` · ${b.unknown} unknown` : ""}`}
+                    >
+                      <span className="font-semibold">.{b.tld}</span>
+                      <span>{b.available}/{generatedNames.length} available</span>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
+
+            {/* Industry + recommended TLD intelligence panel.
+                This is the "AI actually thinks" layer — tells the user what
+                category their prompt landed in and which TLDs matter for it. */}
+            {(genIndustry || genRecommendedTlds.length > 0) && (
+              <div
+                className="rounded-[20px] border border-[#E8D4B0]/15 p-5 mb-5 backdrop-blur-xl"
+                style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.03) 0%, rgba(17,17,24,0.65) 100%)" }}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-[#E8D4B0]/[0.08] flex items-center justify-center shrink-0">
+                    <Sparkles className="w-4.5 h-4.5 text-[#E8D4B0]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[11px] uppercase tracking-[0.15em] font-semibold text-white/50">
+                        AI categorised this as
+                      </span>
+                      {genIndustry && (
+                        <span className="text-[13px] font-semibold text-white">{genIndustry}</span>
+                      )}
+                    </div>
+                    {genRecommendedTlds.length > 0 && (
+                      <div className="mt-3 space-y-1.5">
+                        <div className="text-[11px] uppercase tracking-[0.15em] font-semibold text-white/40">
+                          Suggested TLDs — tap to add to your search
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {genRecommendedTlds.slice(0, 4).map((r) => {
+                            const active = selectedTlds.has(r.tld);
+                            return (
+                              <button
+                                key={r.tld}
+                                type="button"
+                                onClick={() => toggleTld(r.tld)}
+                                title={`${r.reason} — click to ${active ? "remove" : "add"}`}
+                                className={`group px-3 py-1.5 rounded-full text-[12px] flex items-center gap-2 transition-all ${
+                                  active
+                                    ? "border border-[#E8D4B0]/60 bg-[#E8D4B0]/[0.12] text-white"
+                                    : "border border-[#E8D4B0]/25 bg-[#E8D4B0]/[0.04] text-white/80 hover:border-[#E8D4B0]/50 hover:bg-[#E8D4B0]/[0.08]"
+                                }`}
+                              >
+                                <span className="text-[#E8D4B0] font-semibold">.{r.tld}</span>
+                                <span className="text-white/45 hidden sm:inline">— {r.reason}</span>
+                                <span className="text-white/45 inline sm:hidden text-[11px]">— {r.reason.slice(0, 30)}…</span>
+                                {active && <Check className="w-3 h-3 text-[#E8D4B0]" />}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Detected themes + active exclusions chips */}
+            {(genThemes.length > 0 || genExclusions.length > 0 || genRefinement) && (
+              <div className="flex flex-wrap items-center gap-2 mb-5 text-[11px]">
+                {genThemes.length > 0 && (
+                  <>
+                    <span className="text-white/40 uppercase tracking-[0.15em] font-semibold">AI detected</span>
+                    {genThemes.map((t) => (
+                      <span key={t} className="px-2.5 py-1 rounded-full border border-[#E8D4B0]/30 bg-[#E8D4B0]/[0.08] text-[#E8D4B0]">
+                        {t}
+                      </span>
+                    ))}
+                  </>
+                )}
+                {genRefinement && (
+                  <>
+                    <span className="text-white/40 uppercase tracking-[0.15em] font-semibold ml-2">refinement</span>
+                    <span className="px-2.5 py-1 rounded-full border border-white/15 bg-white/[0.04] text-white/70 flex items-center gap-1.5">
+                      {genRefinement}
+                      <button
+                        onClick={() => { setGenRefinement(""); handleGenerate({ refinement: "" }); }}
+                        className="text-white/40 hover:text-white"
+                        aria-label="Clear refinement"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  </>
+                )}
+                {genExclusions.length > 0 && (
+                  <>
+                    <span className="text-white/40 uppercase tracking-[0.15em] font-semibold ml-2">excluding {genExclusions.length}</span>
+                    <button
+                      onClick={() => { setGenExclusions([]); handleGenerate(); }}
+                      className="text-white/50 hover:text-white underline-offset-2 hover:underline"
+                    >
+                      reset exclusions
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
 
             {/* Rate-limited / network failure banner */}
             {(() => {
