@@ -29,7 +29,14 @@ const PRIMARY_MODEL = "claude-haiku-4-5-20251001";
 const FALLBACK_MODEL = "claude-sonnet-4-5";
 const ANTHROPIC_TIMEOUT_MS = 25_000;
 
-type GeneratedName = { name: string; tagline: string };
+type GeneratedName = {
+  name: string;
+  tagline: string;
+  /** 0–100 brandability score. Optional — if the model omits or returns garbage, sanitizeNames strips it. */
+  score?: number;
+  /** 2–4 short tags explaining why the name scores well ("short", "memorable", "latin root"). */
+  factors?: string[];
+};
 
 interface RequestBody {
   description?: string;
@@ -552,7 +559,7 @@ Output ONLY a valid JSON array. No markdown code fences. No preamble. No explana
 Start your response with [ and end with ]. Nothing else.
 
 Example of the EXACT shape required:
-[{"name":"Octavus","tagline":"The eighth voice — clarity from the imperial chorus"},{"name":"Vocem","tagline":"Latin for 'voice' — speak with authority"}]
+[{"name":"Octavus","tagline":"The eighth voice — clarity from the imperial chorus","score":88,"factors":["latin root","memorable","mythic"]},{"name":"Vocem","tagline":"Latin for 'voice' — speak with authority","score":92,"factors":["short","pronounceable","unique coinage"]}]
 
 Now generate ${nameCount} names for "${description}":`;
 }
@@ -690,7 +697,7 @@ function extractJsonArray(text: string): Array<{ name?: unknown; tagline?: unkno
  *  - Cap to nameCount
  */
 function sanitizeNames(
-  raw: Array<{ name?: unknown; tagline?: unknown }>,
+  raw: Array<{ name?: unknown; tagline?: unknown; score?: unknown; factors?: unknown }>,
   nameCount: number,
   exclusions: string[] = [],
 ): GeneratedName[] {
@@ -730,9 +737,32 @@ function sanitizeNames(
 
     const display = nameClean.charAt(0).toUpperCase() + nameClean.slice(1);
 
+    // Score: accept 0-100 integers; if the model gives a float, floor it; if it
+    // gives garbage, omit rather than fabricate. We never show "Score: 0" —
+    // that misleads the user into thinking the model rated the name poorly.
+    let score: number | undefined;
+    if (typeof item.score === "number" && Number.isFinite(item.score)) {
+      const clamped = Math.max(0, Math.min(100, Math.floor(item.score)));
+      if (clamped >= 40) score = clamped; // below 40 is model noise, drop it
+    }
+
+    // Factors: accept an array of 1-4 short strings; drop anything over 40 chars
+    // (if the model paragraph-dumps into a factor, we'd ruin the UI).
+    let factors: string[] | undefined;
+    if (Array.isArray(item.factors)) {
+      const cleaned = item.factors
+        .filter((f): f is string => typeof f === "string")
+        .map((f) => f.trim().toLowerCase())
+        .filter((f) => f.length >= 2 && f.length <= 40)
+        .slice(0, 4);
+      if (cleaned.length > 0) factors = cleaned;
+    }
+
     out.push({
       name: display,
       tagline: rawTagline.trim().slice(0, 200),
+      ...(score !== undefined ? { score } : {}),
+      ...(factors !== undefined ? { factors } : {}),
     });
 
     if (out.length >= nameCount) break;
