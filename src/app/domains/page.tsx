@@ -252,14 +252,14 @@ export default function DomainsPage() {
     // scroll to results
     setTimeout(() => genResultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
 
-    // Use a small TLD set for the generator to keep us under RDAP rate limits.
-    // If the user has manually ticked TLDs beyond the defaults, honour them;
-    // otherwise use the smaller GENERATOR_DEFAULT_TLDS list.
-    const userSelection = Array.from(selectedTlds);
-    const tlds = userSelection.length > 0 && userSelection.length <= GENERATOR_DEFAULT_TLDS.length + 1
-      ? userSelection
-      : GENERATOR_DEFAULT_TLDS.filter((t) => selectedTlds.has(t) || selectedTlds.size === 0);
-    const finalTlds = tlds.length > 0 ? tlds : GENERATOR_DEFAULT_TLDS;
+    // Honour the user's TLD selection exactly. Whatever they ticked is what we
+    // check — no silent narrowing, no silent widening. The backend
+    // `/api/domains/search` already caps concurrency at 6 and enforces a 9s
+    // total budget, returning `null` for any TLD still in flight. That's the
+    // right place to defend against rate limits — not here, where silently
+    // dropping .sh and .co makes every generated name look "all taken".
+    let finalTlds = Array.from(selectedTlds);
+    if (finalTlds.length === 0) finalTlds = GENERATOR_DEFAULT_TLDS;
 
     // Step 1 — get names from Claude
     let names: Array<{ name: string; tagline: string }> = [];
@@ -1184,7 +1184,20 @@ export default function DomainsPage() {
             })()}
 
             <div className="space-y-4">
-              {generatedNames.map((gn) => {
+              {[...generatedNames]
+                .sort((a, b) => {
+                  // Available names first, then still-checking, then all-taken last.
+                  // The point of the tool is to surface what's available — don't
+                  // make the user scroll past dead cards to find it.
+                  const score = (gn: typeof a) => {
+                    if (gn.domains.some((d) => d.available === true)) return 0;
+                    if (gn.domains.some((d) => d.checking)) return 1;
+                    if (gn.domains.some((d) => d.available === null)) return 2;
+                    return 3;
+                  };
+                  return score(a) - score(b);
+                })
+                .map((gn) => {
                 const availableDomains = gn.domains.filter((d) => d.available === true);
                 const hasAvailable = availableDomains.length > 0;
                 const stillChecking = gn.domains.some((d) => d.checking);
