@@ -1047,24 +1047,106 @@ export default function DomainsPage() {
             </div>
           )}
 
-              {/* Generate button */}
-              <button
-                onClick={handleGenerate}
-                disabled={generating || genDescription.trim().length < 3 || selectedTlds.size === 0}
-                className="w-full py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-2xl font-bold text-lg flex items-center justify-center gap-2 disabled:opacity-40 transition-all hover:shadow-lg hover:shadow-purple-500/20"
-              >
-                {generating ? (
-                  <><Loader2 className="w-5 h-5 animate-spin" /> Generating names...</>
-                ) : (
-                  <><Wand2 className="w-5 h-5" /> Generate {GEN_NAME_COUNT} Name Ideas</>
-                )}
-              </button>
-
-              {generatorError && (
-                <div className="mt-4 p-3 rounded-xl border border-red-500/20 bg-red-500/[0.05] text-sm text-red-300">
-                  {generatorError}
+          {mode === "generate" && (
+            <div
+              className="relative rounded-[28px] border border-[#E8D4B0]/15 p-6 md:p-8 text-left max-w-3xl mx-auto backdrop-blur-xl"
+              style={{
+                background: "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(10,10,15,0.7) 100%)",
+                boxShadow: "0 1px 0 rgba(232,212,176,0.08) inset, 0 40px 120px -40px rgba(232,212,176,0.2)",
+              }}
+            >
+              <div
+                className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-[260px] w-[520px] rounded-full blur-[110px]"
+                style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.18), transparent 70%)" }}
+                aria-hidden
+              />
+              <div className="relative">
+                <div className="mb-5">
+                  <label className="block text-[11px] uppercase tracking-[0.2em] font-semibold text-[#E8D4B0]/75 mb-3">Describe your business</label>
+                  <textarea
+                    value={genDescription}
+                    onChange={(e) => setGenDescription(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleGenerate(); } }}
+                    placeholder="e.g. AI-powered accounting software for freelancers, sustainable fashion brand for millennials, premium coffee subscription service..."
+                    rows={3}
+                    className="w-full px-5 py-4 rounded-2xl border border-white/[0.08] bg-white/[0.03] text-white text-base placeholder-white/30 focus:outline-none focus:border-[#E8D4B0]/40 focus:bg-white/[0.05] transition-all resize-none"
+                  />
                 </div>
-              )}
+
+                <div className="mb-5">
+                  <label className="block text-[11px] uppercase tracking-[0.2em] font-semibold text-[#E8D4B0]/75 mb-3">Name style</label>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { id: "modern", label: "Modern & Tech" },
+                      { id: "classic", label: "Classic & Professional" },
+                      { id: "playful", label: "Fun & Playful" },
+                      { id: "minimal", label: "Short & Minimal" },
+                    ].map((s) => (
+                      <button
+                        key={s.id}
+                        onClick={() => setGenStyle(s.id)}
+                        className={`px-4 py-2 rounded-xl text-[13px] font-medium transition-all duration-300 ${
+                          genStyle === s.id
+                            ? "text-[#0a0a0f]"
+                            : "border border-white/[0.08] bg-white/[0.03] text-white/60 hover:border-[#E8D4B0]/30 hover:text-[#E8D4B0]"
+                        }`}
+                        style={genStyle === s.id ? {
+                          background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+                          boxShadow: "0 8px 24px -12px rgba(232,212,176,0.4)",
+                        } : undefined}
+                      >
+                        {s.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mb-6">
+                  <label className="block text-[11px] uppercase tracking-[0.2em] font-semibold text-[#E8D4B0]/75 mb-3">Check availability on</label>
+                  <div className="flex flex-wrap gap-2">
+                    {allTlds.map(tld => (
+                      <button
+                        key={tld}
+                        onClick={() => toggleTld(tld)}
+                        className={`px-4 py-2 rounded-xl text-[13px] font-medium transition-all duration-300 ${
+                          selectedTlds.has(tld)
+                            ? "text-[#0a0a0f]"
+                            : "border border-white/[0.08] bg-white/[0.03] text-white/60 hover:border-[#E8D4B0]/30 hover:text-[#E8D4B0]"
+                        }`}
+                        style={selectedTlds.has(tld) ? {
+                          background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+                          boxShadow: "0 8px 24px -12px rgba(232,212,176,0.4)",
+                        } : undefined}
+                      >
+                        .{tld}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleGenerate}
+                  disabled={generating || genDescription.trim().length < 3 || selectedTlds.size === 0}
+                  className="w-full py-4 rounded-2xl font-semibold text-[14px] flex items-center justify-center gap-2 disabled:opacity-40 transition-all duration-500 hover:-translate-y-0.5"
+                  style={{
+                    background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+                    color: "#0a0a0f",
+                    boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
+                  }}
+                >
+                  {generating ? (
+                    <><Loader2 className="w-5 h-5 animate-spin" /> Generating names...</>
+                  ) : (
+                    <><Wand2 className="w-5 h-5" /> Generate {GEN_NAME_COUNT} name ideas</>
+                  )}
+                </button>
+
+                {generatorError && (
+                  <div className="mt-4 p-3 rounded-xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] text-[13px] text-[#E8D4B0]/85">
+                    {generatorError}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

@@ -388,7 +388,7 @@ export default function AiSearchPage() {
               Watch the engine think.
             </h2>
             <p className="mt-4 mx-auto max-w-xl text-white/60">
-              Six phases. Each phase streams its verdict the moment it's ready — no spinners, no waiting, no mystery.
+              Six phases. Each phase streams its verdict the moment it&apos;s ready — no spinners, no waiting, no mystery.
             </p>
           </div>
 

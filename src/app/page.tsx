@@ -123,8 +123,13 @@ export default function HomePage() {
   return (
     <div className="bg-[#0a0a14] text-white selection:bg-indigo-500/30 selection:text-white">
 
-      {/* ── HERO SLIDESHOW ── */}
-      <HeroShowcase />
+      {/* ── HERO ── built live in the browser via Sandpack.
+          Pre-merge the page opened on a <HeroShowcase> slideshow defined
+          inline in this file; that component got deleted in a later merge
+          but the call didn't, leaving the page referencing an undefined
+          symbol. Swapped in the existing HeroBuilder import so the hero
+          renders the real builder product instead of crashing the page. */}
+      <HeroBuilder />
 
       {/* ── FOUR DOMAINS ── */}
       <section className="py-28 md:py-36 px-4 sm:px-6">
@@ -186,41 +191,36 @@ export default function HomePage() {
               </p>
             </motion.div>
 
-      {/* Clear the fixed 72px nav */}
-      <div className="pt-[72px]">
-        {/* ── THE HERO IS THE PRODUCT ── */}
-        <HeroBuilder />
-
-        {/* ── Trust strip — infinite marquee, Filmora pattern ── */}
-        <section
-          className="relative border-y border-white/[0.05]"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(255,255,255,0.012) 0%, rgba(255,255,255,0.002) 100%)",
-          }}
-        >
-          <div className="relative py-8 overflow-hidden fs-marquee-paused">
-            <div className="fs-marquee">
-              {[...TRUST_ITEMS, ...TRUST_ITEMS].map((item, i) => (
-                <div
-                  key={`${item.label}-${i}`}
-                  className="flex items-center gap-3 px-5 py-2 rounded-full border border-white/[0.06] bg-white/[0.02] backdrop-blur flex-shrink-0"
-                >
-                  <div className="flex items-center gap-1">
-                    {[0, 1, 2, 3, 4].map((j) => (
-                      <Star key={j} className="h-3 w-3 fill-[#E8D4B0] text-[#E8D4B0]" />
-                    ))}
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-1">{d.name}</h3>
-                  <p className={`text-sm font-semibold ${c.text} mb-3`}>{d.role}</p>
-                  <p className="text-[15px] text-slate-400 leading-relaxed mb-5">{d.desc}</p>
-                  <span className={`text-sm font-semibold ${c.text} inline-flex items-center gap-1 group-hover:gap-2 transition-all`}>
-                    {d.cta} <ArrowRight className="w-3 h-3" />
-                  </span>
-                </Link>
-              );
-            })}
-          </div>
+            {/* Right — Domain cards. Pre-merge this was the DOMAINS.map grid,
+                but a bad merge spliced in a broken TRUST_ITEMS marquee whose
+                inner JSX still referenced the old d/c/Link scope — the file
+                wouldn't parse and Vercel stopped deploying. Restored to the
+                DOMAINS grid from 744df83; HeroBuilder + trust strip will be
+                reintroduced in a clean follow-up so they don't take the
+                homepage down again. */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              {DOMAINS.map((d) => {
+                const c = DOMAIN_COLORS[d.color];
+                const Icon = d.icon;
+                return (
+                  <Link
+                    key={d.name}
+                    href={d.href}
+                    className={`group rounded-2xl border border-white/[0.06] bg-white/[0.03] p-7 transition-all duration-200 hover:bg-white/[0.06] ${c.border}`}
+                  >
+                    <div className={`w-11 h-11 rounded-xl ${c.iconBg} flex items-center justify-center mb-5`}>
+                      <Icon className={`w-5 h-5 ${c.text}`} />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-1">{d.name}</h3>
+                    <p className={`text-sm font-semibold ${c.text} mb-3`}>{d.role}</p>
+                    <p className="text-[15px] text-slate-400 leading-relaxed mb-5">{d.desc}</p>
+                    <span className={`text-sm font-semibold ${c.text} inline-flex items-center gap-1 group-hover:gap-2 transition-all`}>
+                      {d.cta} <ArrowRight className="w-3 h-3" />
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>
@@ -239,7 +239,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-12">
-            {STEPS.map((step, i) => (
+            {STEPS.map((step) => (
               <div key={step.num} className="relative">
                 <div className="text-[80px] font-black text-white/[0.04] leading-none absolute -top-4 -left-2 select-none pointer-events-none">
                   {step.num}
@@ -249,7 +249,8 @@ export default function HomePage() {
                     Step {step.num}
                   </div>
                 </div>
-              ))}
+              </div>
+            ))}
             </div>
             {/* Fade edges */}
             <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#050508] to-transparent" />
@@ -747,7 +748,6 @@ export default function HomePage() {
             </motion.div>
           </motion.div>
         </section>
-      </div>
     </div>
   );
 }
