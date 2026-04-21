@@ -22,7 +22,9 @@ import {
   BadgeCheck,
   Sparkles,
   Wand2,
+  SlidersHorizontal,
 } from "lucide-react";
+import EnrichmentPanel from "@/components/domains/EnrichmentPanel";
 
 interface DomainResult {
   domain: string;
@@ -393,6 +395,218 @@ function BundleUpsell({
   );
 }
 
+// ───────────────────────────────────────────────────────────────────────────
+// ScopeToggle — the single unified "which extensions to check" control.
+//
+// Replaces three separate widgets (the .com-only checkbox + quick-pick row +
+// 13 extension pills) with one pill-group that matches the rest of the page
+// chrome. Three modes:
+//   • "com"    — fastest, one RDAP call on .com only
+//   • "all"    — checks every one of the 13 extensions in parallel
+//   • "custom" — opens a popover with checkboxes for an arbitrary subset
+//
+// The component is intentionally dumb — it takes the scope value and a
+// setter. Parent owns selectedTlds / searchScope state and syncs them via a
+// useEffect so every downstream consumer (handleSearch, handleGenerate,
+// handleFragmentSearch, BundleUpsell) keeps working without modification.
+// ───────────────────────────────────────────────────────────────────────────
+function ScopeToggle({
+  scope,
+  onChange,
+  customOpen,
+  setCustomOpen,
+  selectedTlds,
+  toggleTld,
+  allTlds,
+  popularTlds,
+}: {
+  scope: "com" | "all" | "custom";
+  onChange: (s: "com" | "all" | "custom") => void;
+  customOpen: boolean;
+  setCustomOpen: (v: boolean) => void;
+  selectedTlds: Set<string>;
+  toggleTld: (tld: string) => void;
+  allTlds: string[];
+  popularTlds: string[];
+}) {
+  const pill = (active: boolean) =>
+    active
+      ? { className: "text-[#0a1628]", style: { background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)", boxShadow: "0 8px 24px -12px rgba(232,212,176,0.4)" } }
+      : { className: "border border-white/[0.10] bg-white/[0.03] text-white/70 hover:border-[#E8D4B0]/40 hover:text-[#E8D4B0]", style: undefined as React.CSSProperties | undefined };
+
+  const customCount = scope === "custom" ? selectedTlds.size : 0;
+
+  return (
+    <div>
+      <div
+        role="tablist"
+        aria-label="Search scope"
+        className="inline-flex flex-wrap items-center gap-1 p-1 rounded-full border border-white/[0.08] bg-white/[0.02] backdrop-blur"
+      >
+        <button
+          role="tab"
+          aria-selected={scope === "com"}
+          type="button"
+          onClick={() => onChange("com")}
+          className={`px-4 py-2 rounded-full text-[12.5px] font-semibold flex items-center gap-1.5 transition-all duration-300 ${pill(scope === "com").className}`}
+          style={pill(scope === "com").style}
+          title="One fast RDAP check on .com only"
+        >
+          <Zap className="w-3.5 h-3.5" /> Just .com
+        </button>
+        <button
+          role="tab"
+          aria-selected={scope === "all"}
+          type="button"
+          onClick={() => onChange("all")}
+          className={`px-4 py-2 rounded-full text-[12.5px] font-semibold flex items-center gap-1.5 transition-all duration-300 ${pill(scope === "all").className}`}
+          style={pill(scope === "all").style}
+          title={`Check every one of the ${allTlds.length} extensions in parallel`}
+        >
+          <Globe className="w-3.5 h-3.5" /> All {allTlds.length} extensions
+        </button>
+        <button
+          role="tab"
+          aria-selected={scope === "custom"}
+          type="button"
+          onClick={() => onChange("custom")}
+          className={`px-4 py-2 rounded-full text-[12.5px] font-semibold flex items-center gap-1.5 transition-all duration-300 ${pill(scope === "custom").className}`}
+          style={pill(scope === "custom").style}
+          title="Pick any subset of extensions"
+        >
+          <SlidersHorizontal className="w-3.5 h-3.5" />
+          Custom{customCount > 0 && scope === "custom" ? ` · ${customCount}` : ""}
+        </button>
+      </div>
+
+      {/* Helper line — keeps the UI honest about what the toggle just did */}
+      <p className="text-[11.5px] text-white/45 mt-2">
+        {scope === "com" && (
+          <>
+            <span className="text-[#E8D4B0]/85 font-semibold">Fast path.</span>{" "}
+            Checks .com only. If .com is free, the others almost always are too
+            — we&apos;ll offer to expand.
+          </>
+        )}
+        {scope === "all" && (
+          <>
+            <span className="text-[#E8D4B0]/85 font-semibold">Thorough.</span>{" "}
+            Every one of {allTlds.length} extensions checked in parallel against the
+            live registry.
+          </>
+        )}
+        {scope === "custom" && (
+          <>
+            <span className="text-[#E8D4B0]/85 font-semibold">Your pick.</span>{" "}
+            Tap an extension below to toggle it. {selectedTlds.size} selected.
+          </>
+        )}
+      </p>
+
+      {/* Custom popover — checkbox-style pill grid */}
+      {scope === "custom" && customOpen && (
+        <div
+          className="mt-3 rounded-2xl border border-[#E8D4B0]/15 p-4 backdrop-blur-xl"
+          style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.03) 0%, rgba(17,17,24,0.7) 100%)" }}
+        >
+          <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+            <div className="text-[11px] uppercase tracking-[0.15em] font-semibold text-[#E8D4B0]/75">
+              Pick extensions · {selectedTlds.size} selected
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  // Reset to popular subset
+                  allTlds.forEach((t) => {
+                    if (selectedTlds.has(t) && !popularTlds.includes(t)) toggleTld(t);
+                    if (!selectedTlds.has(t) && popularTlds.includes(t)) toggleTld(t);
+                  });
+                }}
+                className="text-[11px] text-[#E8D4B0]/75 hover:text-[#E8D4B0] font-semibold uppercase tracking-widest"
+              >
+                Popular {popularTlds.length}
+              </button>
+              <span className="text-white/15">·</span>
+              <button
+                type="button"
+                onClick={() => {
+                  allTlds.forEach((t) => {
+                    if (!selectedTlds.has(t)) toggleTld(t);
+                  });
+                }}
+                className="text-[11px] text-white/60 hover:text-white font-semibold uppercase tracking-widest"
+              >
+                Select all
+              </button>
+              <span className="text-white/15">·</span>
+              <button
+                type="button"
+                onClick={() => {
+                  allTlds.forEach((t) => {
+                    if (selectedTlds.has(t)) toggleTld(t);
+                  });
+                }}
+                className="text-[11px] text-white/50 hover:text-white/80 font-semibold uppercase tracking-widest"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {allTlds.map((tld) => {
+              const on = selectedTlds.has(tld);
+              return (
+                <button
+                  key={tld}
+                  type="button"
+                  onClick={() => toggleTld(tld)}
+                  aria-pressed={on}
+                  className={`px-3.5 py-1.5 rounded-xl text-[12.5px] font-medium transition-all duration-300 flex items-center gap-1.5 ${
+                    on
+                      ? "text-[#0a1628]"
+                      : "border border-white/[0.08] bg-white/[0.03] text-white/65 hover:border-[#E8D4B0]/30 hover:text-[#E8D4B0]"
+                  }`}
+                  style={
+                    on
+                      ? {
+                          background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+                          boxShadow: "0 6px 18px -10px rgba(232,212,176,0.4)",
+                        }
+                      : undefined
+                  }
+                >
+                  {on ? <Check className="w-3 h-3" /> : <Plus className="w-3 h-3 opacity-60" />}
+                  .{tld}
+                  <span className={`text-[10.5px] ${on ? "opacity-60" : "opacity-45"}`}>${TLD_PRICES[tld]}</span>
+                </button>
+              );
+            })}
+          </div>
+          <button
+            type="button"
+            onClick={() => setCustomOpen(false)}
+            className="mt-3 text-[11px] text-white/40 hover:text-white/70 uppercase tracking-widest font-semibold"
+          >
+            Collapse
+          </button>
+        </div>
+      )}
+
+      {/* Closed-state hint so the user remembers they have a custom set */}
+      {scope === "custom" && !customOpen && (
+        <button
+          type="button"
+          onClick={() => setCustomOpen(true)}
+          className="mt-2 text-[11.5px] text-[#E8D4B0]/75 hover:text-[#E8D4B0] font-semibold inline-flex items-center gap-1"
+        >
+          <SlidersHorizontal className="w-3 h-3" /> Edit extension list
+        </button>
+      )}
+    </div>
+  );
+}
+
 export default function DomainsPage() {
   const [mode, setMode] = useState<"search" | "generate" | "fragment">("search");
   const [name, setName] = useState("");
@@ -431,10 +645,19 @@ export default function DomainsPage() {
   const [genThemes, setGenThemes] = useState<string[]>([]);
   const [genIndustry, setGenIndustry] = useState<string | null>(null);
   const [genRecommendedTlds, setGenRecommendedTlds] = useState<Array<{ tld: string; reason: string }>>([]);
-  // .com-only toggle: default ON. When .com is available the others almost
-  // always are too, so the first click narrows to the fast path. Applies
-  // to both "exact search" and "AI generator" modes.
-  const [comOnly, setComOnly] = useState(true);
+  // ── Unified search scope (the mode toggle) ───────────────────────────
+  // "com"    → fast path, one RDAP check on .com only.
+  // "all"    → check every one of the 13 extensions in parallel.
+  // "custom" → user hand-picks a subset via popover.
+  //
+  // `comOnly` is derived from scope === "com" — preserved as a separate
+  // boolean so the existing endpoint wiring (which takes `mode=com-priority`)
+  // doesn't need to change. Flip scope → comOnly and selectedTlds sync
+  // automatically through the effect below.
+  type SearchScope = "com" | "all" | "custom";
+  const [searchScope, setSearchScope] = useState<SearchScope>("all");
+  const comOnly = searchScope === "com";
+  const [customPopoverOpen, setCustomPopoverOpen] = useState(false);
   // Trademark screening is a post-check we fire once names resolve. Keyed
   // by normalized name → verdict so we can render pills without chasing
   // async state across the tree.
@@ -470,6 +693,16 @@ export default function DomainsPage() {
   }, []);
 
   const allTlds = Object.keys(TLD_PRICES);
+
+  // Sync searchScope → selectedTlds so everything downstream (existing TLD
+  // pill checks, handleSearch, handleGenerate, BundleUpsell) stays correct.
+  // "custom" is user-driven and doesn't touch selectedTlds.
+  useEffect(() => {
+    if (searchScope === "com") setSelectedTlds(new Set(["com"]));
+    else if (searchScope === "all") setSelectedTlds(new Set(allTlds));
+    // "custom" → leave user's set alone
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchScope]);
 
   // Auto-expand: when all selected TLDs are taken, try ALL TLDs automatically
   const handleAutoExpand = useCallback(async (searchName: string) => {
@@ -1428,78 +1661,27 @@ export default function DomainsPage() {
                   </button>
                 </div>
 
-                {/* ── .com-only fast path toggle ──
-                    Default ON. When .com is free, the others almost always are
-                    too — so the first click checks only .com (one RDAP call,
-                    sub-second), and the API tells the UI whether to offer
-                    expansion. Matches how humans actually think about domains. */}
-                <label
-                  className="flex items-start gap-3 mb-4 p-3.5 rounded-2xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.03] cursor-pointer hover:border-[#E8D4B0]/40 transition"
-                  title="When .com is available the others almost always are. Turn off to check every selected extension in parallel."
-                >
-                  <input
-                    type="checkbox"
-                    checked={comOnly}
-                    onChange={(e) => setComOnly(e.target.checked)}
-                    className="mt-0.5 w-4 h-4 accent-[#E8D4B0] cursor-pointer"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-[13px] font-semibold text-white">Check .com first (fast path)</span>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#E8D4B0]/15 text-[#E8D4B0] font-bold uppercase tracking-widest">Smart</span>
-                    </div>
-                    <p className="text-[12px] text-white/50 mt-0.5 leading-relaxed">
-                      If .com is free, other extensions almost always are too. We&apos;ll check .com only — then offer to expand if you want.
-                    </p>
-                  </div>
-                </label>
-
-                {/* Extension quick-picks */}
-                <div className={`flex flex-wrap gap-2 mb-3 transition-opacity ${comOnly ? "opacity-40 pointer-events-none" : ""}`}>
-                  <button
-                    type="button"
-                    onClick={() => { setSelectedTlds(new Set(allTlds)); setAutoExpandedTlds(true); }}
-                    className="px-3 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-widest border border-[#E8D4B0]/30 bg-[#E8D4B0]/[0.04] text-[#E8D4B0] hover:border-[#E8D4B0]/60 hover:bg-[#E8D4B0]/[0.08] transition"
-                  >
-                    All {allTlds.length} extensions
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setSelectedTlds(new Set(["com"])); setAutoExpandedTlds(true); }}
-                    className="px-3 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-widest border border-white/[0.10] bg-white/[0.03] text-white/70 hover:border-white/25 hover:text-white transition"
-                  >
-                    .com only
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setSelectedTlds(new Set(DEFAULT_TLDS)); setAutoExpandedTlds(true); }}
-                    className="px-3 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-widest border border-white/[0.10] bg-white/[0.03] text-white/70 hover:border-white/25 hover:text-white transition"
-                  >
-                    Popular {DEFAULT_TLDS.length}
-                  </button>
-                </div>
-
-                {/* Extension pills */}
-                <div className={`flex flex-wrap gap-2 transition-opacity ${comOnly ? "opacity-40 pointer-events-none" : ""}`}>
-                  {allTlds.map(tld => (
-                    <button
-                      key={tld}
-                      onClick={() => toggleTld(tld)}
-                      className={`px-4 py-2 rounded-xl text-[13px] font-medium transition-all duration-300 ${
-                        selectedTlds.has(tld)
-                          ? "text-[#0a1628]"
-                          : "border border-white/[0.08] bg-white/[0.03] text-white/60 hover:border-[#E8D4B0]/30 hover:text-[#E8D4B0]"
-                      }`}
-                      style={selectedTlds.has(tld) ? {
-                        background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                        boxShadow: "0 8px 24px -12px rgba(232,212,176,0.4)",
-                      } : undefined}
-                    >
-                      .{tld}
-                      <span className="ml-1.5 text-[11px] opacity-70">${TLD_PRICES[tld]}</span>
-                    </button>
-                  ))}
-                </div>
+                {/* ── Unified search-scope toggle ──
+                    One pill group, three choices. Replaces the old combo of a
+                    .com-only checkbox + three quick-pick buttons + 13 extension
+                    pills. Follows Craig's direction: "we want one search engine
+                    to complete everything but we still want [an option] to
+                    search per extension or all domain extensions." */}
+                <ScopeToggle
+                  scope={searchScope}
+                  onChange={(s) => {
+                    setSearchScope(s);
+                    setAutoExpandedTlds(true);
+                    if (s !== "custom") setCustomPopoverOpen(false);
+                    else setCustomPopoverOpen(true);
+                  }}
+                  customOpen={customPopoverOpen}
+                  setCustomOpen={setCustomPopoverOpen}
+                  selectedTlds={selectedTlds}
+                  toggleTld={toggleTld}
+                  allTlds={allTlds}
+                  popularTlds={DEFAULT_TLDS}
+                />
 
                 {/* Recent Searches */}
                 {searchHistory.length > 0 && results.length === 0 && (
@@ -1574,50 +1756,24 @@ export default function DomainsPage() {
                   </div>
                 </div>
 
-                {/* .com-only fast path for the generator — massive RDAP
-                    rate-limit saving when we ask the AI for 24 names. */}
-                <label
-                  className="flex items-start gap-3 mb-4 p-3.5 rounded-2xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.03] cursor-pointer hover:border-[#E8D4B0]/40 transition"
-                  title="Checks .com only for all 24 generated names. Far faster, and if .com is free the rest almost always are too."
-                >
-                  <input
-                    type="checkbox"
-                    checked={comOnly}
-                    onChange={(e) => setComOnly(e.target.checked)}
-                    className="mt-0.5 w-4 h-4 accent-[#E8D4B0] cursor-pointer"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-[13px] font-semibold text-white">Check .com first (fast path)</span>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#E8D4B0]/15 text-[#E8D4B0] font-bold uppercase tracking-widest">Smart</span>
-                    </div>
-                    <p className="text-[12px] text-white/50 mt-0.5 leading-relaxed">
-                      Checks .com only for all {GEN_NAME_COUNT} names. Turn off to check every selected extension in parallel — slower, more RDAP calls.
-                    </p>
-                  </div>
-                </label>
-
+                {/* Unified scope toggle — same control as exact-search mode.
+                    Generator inherits the scope; 24 names × scope = search set. */}
                 <div className="mb-6">
                   <label className="block text-[11px] uppercase tracking-[0.2em] font-semibold text-[#E8D4B0]/75 mb-3">Check availability on</label>
-                  <div className={`flex flex-wrap gap-2 transition-opacity ${comOnly ? "opacity-40 pointer-events-none" : ""}`}>
-                    {allTlds.map(tld => (
-                      <button
-                        key={tld}
-                        onClick={() => toggleTld(tld)}
-                        className={`px-4 py-2 rounded-xl text-[13px] font-medium transition-all duration-300 ${
-                          selectedTlds.has(tld)
-                            ? "text-[#0a1628]"
-                            : "border border-white/[0.08] bg-white/[0.03] text-white/60 hover:border-[#E8D4B0]/30 hover:text-[#E8D4B0]"
-                        }`}
-                        style={selectedTlds.has(tld) ? {
-                          background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                          boxShadow: "0 8px 24px -12px rgba(232,212,176,0.4)",
-                        } : undefined}
-                      >
-                        .{tld}
-                      </button>
-                    ))}
-                  </div>
+                  <ScopeToggle
+                    scope={searchScope}
+                    onChange={(s) => {
+                      setSearchScope(s);
+                      if (s !== "custom") setCustomPopoverOpen(false);
+                      else setCustomPopoverOpen(true);
+                    }}
+                    customOpen={customPopoverOpen}
+                    setCustomOpen={setCustomPopoverOpen}
+                    selectedTlds={selectedTlds}
+                    toggleTld={toggleTld}
+                    allTlds={allTlds}
+                    popularTlds={DEFAULT_TLDS}
+                  />
                 </div>
 
                 <button
@@ -1690,25 +1846,24 @@ export default function DomainsPage() {
                   />
                 </div>
 
-                <label
-                  className="flex items-start gap-3 mb-5 p-3.5 rounded-2xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.03] cursor-pointer hover:border-[#E8D4B0]/40 transition"
-                >
-                  <input
-                    type="checkbox"
-                    checked={comOnly}
-                    onChange={(e) => setComOnly(e.target.checked)}
-                    className="mt-0.5 w-4 h-4 accent-[#E8D4B0] cursor-pointer"
+                {/* Unified scope toggle for fragment results too */}
+                <div className="mb-5">
+                  <label className="block text-[11px] uppercase tracking-[0.2em] font-semibold text-[#E8D4B0]/75 mb-3">Check candidates on</label>
+                  <ScopeToggle
+                    scope={searchScope}
+                    onChange={(s) => {
+                      setSearchScope(s);
+                      if (s !== "custom") setCustomPopoverOpen(false);
+                      else setCustomPopoverOpen(true);
+                    }}
+                    customOpen={customPopoverOpen}
+                    setCustomOpen={setCustomPopoverOpen}
+                    selectedTlds={selectedTlds}
+                    toggleTld={toggleTld}
+                    allTlds={allTlds}
+                    popularTlds={DEFAULT_TLDS}
                   />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-[13px] font-semibold text-white">Check .com first (fast path)</span>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#E8D4B0]/15 text-[#E8D4B0] font-bold uppercase tracking-widest">Smart</span>
-                    </div>
-                    <p className="text-[12px] text-white/50 mt-0.5 leading-relaxed">
-                      If .com is free, the others almost always are too — checking .com first keeps the search under 15 seconds.
-                    </p>
-                  </div>
-                </label>
+                </div>
 
                 <button
                   onClick={handleFragmentSearch}
@@ -1855,33 +2010,40 @@ export default function DomainsPage() {
                       </div>
 
                       {comTld && (
-                        <div className="mt-3 flex items-center justify-between p-3 rounded-xl border border-white/[0.05] bg-white/[0.02]">
-                          <div className="flex items-center gap-2">
+                        <div className="mt-3 rounded-xl border border-white/[0.05] bg-white/[0.02] overflow-hidden">
+                          <div className="flex items-center justify-between p-3 flex-wrap gap-2">
+                            <div className="flex items-center gap-2">
+                              {comTld.available === true ? (
+                                <Check className="w-4 h-4 text-[#E8D4B0]" />
+                              ) : comTld.available === false ? (
+                                <X className="w-4 h-4 text-white/40" />
+                              ) : (
+                                <Loader2 className="w-4 h-4 text-white/40 animate-spin" />
+                              )}
+                              <span className="text-[14px] font-semibold text-white">{comTld.domain}</span>
+                            </div>
                             {comTld.available === true ? (
-                              <Check className="w-4 h-4 text-[#E8D4B0]" />
-                            ) : comTld.available === false ? (
-                              <X className="w-4 h-4 text-white/40" />
+                              <button
+                                onClick={() => addToCart({ domain: comTld.domain, tld: comTld.tld, available: true, price: comTld.price, checking: false })}
+                                className="px-4 py-1.5 rounded-full text-[12px] font-semibold flex items-center gap-1.5 transition-all hover:-translate-y-0.5"
+                                style={{
+                                  background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+                                  color: "#0a1628",
+                                  boxShadow: "0 10px 24px -14px rgba(232,212,176,0.5)",
+                                }}
+                              >
+                                <Plus className="w-3 h-3" /> ${comTld.price.toFixed(2)}
+                              </button>
                             ) : (
-                              <Loader2 className="w-4 h-4 text-white/40 animate-spin" />
+                              <span className="text-[11px] text-white/40 uppercase tracking-widest">
+                                {comTld.available === false ? "Taken" : "Unknown"}
+                              </span>
                             )}
-                            <span className="text-[14px] font-semibold text-white">{comTld.domain}</span>
                           </div>
-                          {comTld.available === true ? (
-                            <button
-                              onClick={() => addToCart({ domain: comTld.domain, tld: comTld.tld, available: true, price: comTld.price, checking: false })}
-                              className="px-4 py-1.5 rounded-full text-[12px] font-semibold flex items-center gap-1.5 transition-all hover:-translate-y-0.5"
-                              style={{
-                                background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                                color: "#0a1628",
-                                boxShadow: "0 10px 24px -14px rgba(232,212,176,0.5)",
-                              }}
-                            >
-                              <Plus className="w-3 h-3" /> ${comTld.price.toFixed(2)}
-                            </button>
-                          ) : (
-                            <span className="text-[11px] text-white/40 uppercase tracking-widest">
-                              {comTld.available === false ? "Taken" : "Unknown"}
-                            </span>
+                          {comTld.available === true && (
+                            <div className="px-3 pb-3">
+                              <EnrichmentPanel domain={comTld.domain} compact />
+                            </div>
                           )}
                         </div>
                       )}
@@ -2027,72 +2189,80 @@ export default function DomainsPage() {
                 </div>
               )}
 
-              {/* Available — cream accent */}
+              {/* Available — cream accent. Enrichment panel hangs off the
+                  bottom of each card (TM, social handles, app stores, history,
+                  valuation). Enrichment fires lazily AFTER availability lands
+                  and degrades to "—" on 404 — never blocks the primary card. */}
               {availableResults.map(r => {
                 const norm = name.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
                 const tm = trademarkVerdicts[norm];
                 return (
                 <div
                   key={r.domain}
-                  className="group flex items-center justify-between p-5 rounded-2xl border border-[#E8D4B0]/15 transition-all duration-500 hover:border-[#E8D4B0]/30 hover:-translate-y-0.5"
+                  className="group rounded-2xl border border-[#E8D4B0]/15 transition-all duration-500 hover:border-[#E8D4B0]/30 hover:-translate-y-0.5 overflow-hidden"
                   style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.04) 0%, rgba(17,17,24,0.6) 100%)" }}
                 >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center"
-                      style={{
-                        background: "linear-gradient(135deg, rgba(232,212,176,0.18) 0%, rgba(224,139,176,0.1) 100%)",
-                        boxShadow: "0 8px 20px -10px rgba(232,212,176,0.4)",
-                      }}
-                    >
-                      <Check className="w-5 h-5 text-[#E8D4B0]" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-[16px] font-semibold text-white">{r.domain}</span>
-                        {tm && tm.verdict !== "unknown" && (
-                          <span
-                            title={tm.reason}
-                            className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest border ${
-                              tm.verdict === "flagged"
-                                ? "border-red-500/40 bg-red-500/10 text-red-300"
-                                : tm.verdict === "caution"
-                                  ? "border-amber-500/40 bg-amber-500/10 text-amber-300"
-                                  : "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
-                            }`}
-                          >
-                            {tm.verdict === "flagged" ? "TM risk" : tm.verdict === "caution" ? "Caution" : "TM clear"}
-                          </span>
-                        )}
-                      </div>
-                      <span className="block text-[11px] uppercase tracking-[0.2em] text-[#E8D4B0]/75">Available</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <span className="text-[20px] font-semibold text-white">${r.price}</span>
-                      <span className="text-[12px] text-white/40">/yr</span>
-                    </div>
-                    {cart.some(c => c.domain === r.domain) ? (
-                      <button
-                        onClick={() => removeFromCart(r.domain)}
-                        className="px-5 py-2.5 rounded-full border border-[#E8D4B0]/25 bg-[#E8D4B0]/[0.06] text-[#E8D4B0] text-[13px] font-semibold flex items-center gap-1.5"
-                      >
-                        <Check className="w-4 h-4" /> Added
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => addToCart(r)}
-                        className="px-5 py-2.5 rounded-full text-[13px] font-semibold flex items-center gap-1.5 transition-all duration-500 hover:-translate-y-0.5"
+                  <div className="flex items-center justify-between p-5 flex-wrap gap-4">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div
+                        className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
                         style={{
-                          background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                          color: "#0a1628",
-                          boxShadow: "0 14px 30px -16px rgba(232,212,176,0.5)",
+                          background: "linear-gradient(135deg, rgba(232,212,176,0.18) 0%, rgba(224,139,176,0.1) 100%)",
+                          boxShadow: "0 8px 20px -10px rgba(232,212,176,0.4)",
                         }}
                       >
-                        <Plus className="w-4 h-4" /> Add to cart
-                      </button>
-                    )}
+                        <Check className="w-5 h-5 text-[#E8D4B0]" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-[16px] font-semibold text-white truncate">{r.domain}</span>
+                          {tm && tm.verdict !== "unknown" && (
+                            <span
+                              title={tm.reason}
+                              className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest border ${
+                                tm.verdict === "flagged"
+                                  ? "border-red-500/40 bg-red-500/10 text-red-300"
+                                  : tm.verdict === "caution"
+                                    ? "border-amber-500/40 bg-amber-500/10 text-amber-300"
+                                    : "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+                              }`}
+                            >
+                              {tm.verdict === "flagged" ? "TM risk" : tm.verdict === "caution" ? "Caution" : "TM clear"}
+                            </span>
+                          )}
+                        </div>
+                        <span className="block text-[11px] uppercase tracking-[0.2em] text-[#E8D4B0]/75">Available</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4 shrink-0">
+                      <div className="text-right">
+                        <span className="text-[20px] font-semibold text-white">${r.price}</span>
+                        <span className="text-[12px] text-white/40">/yr</span>
+                      </div>
+                      {cart.some(c => c.domain === r.domain) ? (
+                        <button
+                          onClick={() => removeFromCart(r.domain)}
+                          className="px-5 py-2.5 rounded-full border border-[#E8D4B0]/25 bg-[#E8D4B0]/[0.06] text-[#E8D4B0] text-[13px] font-semibold flex items-center gap-1.5"
+                        >
+                          <Check className="w-4 h-4" /> Added
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => addToCart(r)}
+                          className="px-5 py-2.5 rounded-full text-[13px] font-semibold flex items-center gap-1.5 transition-all duration-500 hover:-translate-y-0.5"
+                          style={{
+                            background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+                            color: "#0a1628",
+                            boxShadow: "0 14px 30px -16px rgba(232,212,176,0.5)",
+                          }}
+                        >
+                          <Plus className="w-4 h-4" /> Add to cart
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <div className="px-5 pb-4">
+                    <EnrichmentPanel domain={r.domain} />
                   </div>
                 </div>
                 );
@@ -2485,7 +2655,7 @@ export default function DomainsPage() {
                         .map((d) => (
                         <div
                           key={d.domain}
-                          className={`flex items-center justify-between p-3 rounded-xl transition-all ${
+                          className={`rounded-xl transition-all overflow-hidden ${
                             d.checking
                               ? "bg-white/[0.02]"
                               : d.available === true
@@ -2493,48 +2663,55 @@ export default function DomainsPage() {
                                 : "bg-white/[0.02] border border-white/[0.04]"
                           }`}
                         >
-                          <div className="flex items-center gap-2.5">
-                            {d.checking ? (
-                              <Loader2 className="w-4 h-4 text-white/40 animate-spin" />
-                            ) : d.available === true ? (
-                              <Check className="w-4 h-4 text-[#E8D4B0]" />
-                            ) : (
-                              <X className="w-4 h-4 text-white/30" />
-                            )}
-                            <span className={`text-[14px] font-medium ${d.checking || d.available === false ? "text-white/45" : "text-white"}`}>
-                              {d.domain}
-                            </span>
-                            {d.available === false && (
-                              <span className="text-[10px] uppercase tracking-[0.12em] text-white/30 font-semibold">taken</span>
-                            )}
-                          </div>
-                          {d.available && (
-                            <div className="flex items-center gap-3">
-                              <span className="text-[14px] font-semibold text-white">${d.price}<span className="text-[11px] text-white/40 font-normal">/yr</span></span>
-                              {cart.some((c) => c.domain === d.domain) ? (
-                                <button
-                                  onClick={() => removeFromCart(d.domain)}
-                                  className="px-4 py-2 rounded-full border border-[#E8D4B0]/25 bg-[#E8D4B0]/[0.06] text-[#E8D4B0] text-[12px] font-semibold flex items-center gap-1.5"
-                                >
-                                  <Check className="w-3.5 h-3.5" /> In cart
-                                </button>
+                          <div className="flex items-center justify-between p-3 flex-wrap gap-2">
+                            <div className="flex items-center gap-2.5">
+                              {d.checking ? (
+                                <Loader2 className="w-4 h-4 text-white/40 animate-spin" />
+                              ) : d.available === true ? (
+                                <Check className="w-4 h-4 text-[#E8D4B0]" />
                               ) : (
-                                <button
-                                  onClick={() => addToCart(d)}
-                                  className="px-4 py-2 rounded-full text-[12px] font-semibold flex items-center gap-1.5 transition-all duration-500 hover:-translate-y-0.5"
-                                  style={{
-                                    background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                                    color: "#0a1628",
-                                    boxShadow: "0 10px 24px -12px rgba(232,212,176,0.5)",
-                                  }}
-                                >
-                                  <ShoppingCart className="w-3.5 h-3.5" /> Register
-                                </button>
+                                <X className="w-4 h-4 text-white/30" />
+                              )}
+                              <span className={`text-[14px] font-medium ${d.checking || d.available === false ? "text-white/45" : "text-white"}`}>
+                                {d.domain}
+                              </span>
+                              {d.available === false && (
+                                <span className="text-[10px] uppercase tracking-[0.12em] text-white/30 font-semibold">taken</span>
                               )}
                             </div>
-                          )}
-                          {d.checking && (
-                            <span className="text-[11px] text-white/35">Checking...</span>
+                            {d.available && (
+                              <div className="flex items-center gap-3">
+                                <span className="text-[14px] font-semibold text-white">${d.price}<span className="text-[11px] text-white/40 font-normal">/yr</span></span>
+                                {cart.some((c) => c.domain === d.domain) ? (
+                                  <button
+                                    onClick={() => removeFromCart(d.domain)}
+                                    className="px-4 py-2 rounded-full border border-[#E8D4B0]/25 bg-[#E8D4B0]/[0.06] text-[#E8D4B0] text-[12px] font-semibold flex items-center gap-1.5"
+                                  >
+                                    <Check className="w-3.5 h-3.5" /> In cart
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={() => addToCart(d)}
+                                    className="px-4 py-2 rounded-full text-[12px] font-semibold flex items-center gap-1.5 transition-all duration-500 hover:-translate-y-0.5"
+                                    style={{
+                                      background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+                                      color: "#0a1628",
+                                      boxShadow: "0 10px 24px -12px rgba(232,212,176,0.5)",
+                                    }}
+                                  >
+                                    <ShoppingCart className="w-3.5 h-3.5" /> Register
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                            {d.checking && (
+                              <span className="text-[11px] text-white/35">Checking...</span>
+                            )}
+                          </div>
+                          {d.available === true && (
+                            <div className="px-3 pb-3">
+                              <EnrichmentPanel domain={d.domain} compact />
+                            </div>
                           )}
                         </div>
                       ))}
