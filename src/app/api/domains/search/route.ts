@@ -2,9 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { checkWithFallback } from "@/lib/opensrs";
 
 // ---------------------------------------------------------------------------
-// GET /api/domains/search?q=domainname&tlds=com,io,ai
-// Searches domain availability via OpenSRS (Tucows) live API.
-// Falls back to DNS-based check if OpenSRS credentials aren't configured.
+// GET /api/domains/search?q=domainname&tlds=com,io,ai&mode=com-priority
+// Searches domain availability via RDAP (authoritative) with OpenSRS + DNS
+// fallbacks.
+//
+// Modes:
+//   - default  — checks every requested TLD in parallel.
+//   - com-priority — checks .com ONLY (fast path). If .com is available,
+//     UI can offer to expand to other TLDs; when .com is free, the others
+//     are almost always free too, so the first click should be .com only.
 // ---------------------------------------------------------------------------
 
 // TLD pricing (registration price per year)
@@ -25,6 +31,31 @@ const TLD_PRICING: Record<string, number> = {
 
 const DEFAULT_TLDS = Object.keys(TLD_PRICING);
 
+// Lightweight premium signal: dictionary-word bonus. This is not Merriam-
+// Webster — just a ~200-word seed of common high-value English stems that
+// make a domain meaningfully more brandable when matched exactly.
+const DICTIONARY_SEEDS = new Set([
+  "love", "care", "work", "flow", "rise", "edge", "peak", "core", "hub",
+  "labs", "life", "time", "wave", "spark", "light", "dream", "cloud",
+  "pixel", "atlas", "orbit", "nova", "echo", "path", "shift", "forge",
+  "zen", "ember", "sage", "frost", "north", "south", "loop", "prism",
+  "vector", "quantum", "stellar", "cosmic", "signal", "pulse", "lumen",
+  "pace", "kinetic", "vault", "anchor", "helix", "vertex", "crown",
+  "summit", "nimbus", "flux", "mint", "bolt", "zap", "fuse",
+]);
+
+function classifyName(name: string) {
+  const n = name.toLowerCase();
+  const tags: string[] = [];
+  if (n.length <= 3) tags.push("ultra-short");
+  else if (n.length <= 5) tags.push("short");
+  if (DICTIONARY_SEEDS.has(n)) tags.push("dictionary-word");
+  if (/^[aeiou]/.test(n) && /[aeiou]$/.test(n)) tags.push("vowel-bookended");
+  const syllables = n.replace(/[^aeiouy]+/g, " ").trim().split(/\s+/).filter(Boolean).length;
+  if (syllables === 1 && n.length >= 4) tags.push("one-syllable");
+  return { tags, premium: n.length <= 3 || DICTIONARY_SEEDS.has(n) };
+}
+
 // ---------------------------------------------------------------------------
 // Route Handler
 // ---------------------------------------------------------------------------
@@ -33,6 +64,7 @@ export async function GET(req: NextRequest) {
   try {
     const query = req.nextUrl.searchParams.get("q");
     const tldsParam = req.nextUrl.searchParams.get("tlds");
+    const mode = (req.nextUrl.searchParams.get("mode") || "default").toLowerCase();
 
     if (!query || query.trim().length < 2) {
       return NextResponse.json(
@@ -56,16 +88,23 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    // .com-priority mode overrides TLD selection — only .com is checked.
+    // This is the fast path: if .com is available, the others almost
+    // always are too, and the user can expand in a second click.
+    const comPriority = mode === "com-priority" || mode === "com-only";
+
     // Parse requested TLDs or use defaults
-    const tlds = tldsParam
-      ? tldsParam
-          .split(",")
-          .map((t) => t.trim().replace(/^\./, "").toLowerCase())
-          .filter((t) => t)
-      : DEFAULT_TLDS;
+    const tlds = comPriority
+      ? ["com"]
+      : tldsParam
+        ? tldsParam
+            .split(",")
+            .map((t) => t.trim().replace(/^\./, "").toLowerCase())
+            .filter((t) => t)
+        : DEFAULT_TLDS;
 
     const isShort = sanitized.length <= 3;
-    console.log(`[Domain Search] query="${sanitized}" tlds=${tlds.join(",")} source=rdap-authoritative`);
+    console.log(`[Domain Search] query="${sanitized}" mode=${mode} tlds=${tlds.join(",")} source=rdap-authoritative`);
 
     // Check TLDs with bounded concurrency. RDAP rate-limits aggressively and
     // the AI name generator fires one of these per name — if we blasted the
@@ -101,15 +140,22 @@ export async function GET(req: NextRequest) {
     const budget = new Promise<void>((resolve) => setTimeout(resolve, TOTAL_BUDGET_MS));
     await Promise.race([runPool, budget]);
 
+    const { tags, premium: premiumName } = classifyName(sanitized);
     const results = checks.map(({ domain, tld, available }) => {
       const basePrice = TLD_PRICING[tld] ?? 14.99;
       const price = isShort ? Math.round(basePrice * 2 * 100) / 100 : basePrice;
+      // Confidence: resolved = high, timed-out/unknown = low. The UI
+      // uses this to show "unknown" with a retry affordance instead of
+      // silently failing.
+      const confidence: "high" | "low" = available === null ? "low" : "high";
       return {
         domain,
         tld,
         available,
         price,
-        premium: isShort,
+        premium: isShort || premiumName,
+        tags,
+        confidence,
         source: "rdap",
       };
     });
@@ -122,14 +168,24 @@ export async function GET(req: NextRequest) {
       return a.price - b.price;
     });
 
+    const availableCount = results.filter((r) => r.available === true).length;
+    const comResult = results.find((r) => r.tld === "com");
+    const comAvailable = comResult?.available === true;
+
     return NextResponse.json({
       query: sanitized,
       results,
       count: results.length,
-      available: results.filter((r) => r.available === true).length,
+      available: availableCount,
       taken: results.filter((r) => r.available === false).length,
       unknown: results.filter((r) => r.available === null).length,
       source: "rdap-authoritative",
+      mode: comPriority ? "com-priority" : "default",
+      // When .com is free, tell the client it can offer a one-click
+      // expand to the other TLDs (they're almost always free too).
+      hint: comPriority && comAvailable
+        ? { type: "expand-tlds", message: "The .com is free — other TLDs will almost certainly be free too." }
+        : null,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Internal server error";
