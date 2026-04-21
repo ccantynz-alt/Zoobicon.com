@@ -570,6 +570,47 @@ pre code {
 }
 
 /* ============================================
+   SITE BACKDROP — navy gradient + dot-grid pattern
+   Mounted once at root layout so every page inherits
+   the same dark navy chrome. Kept behind content via
+   z-index: -1 so children render above without needing
+   their own stacking context.
+   ============================================ */
+
+.site-backdrop {
+  position: fixed;
+  inset: 0;
+  /* z-index: 0 (not -1) — a negative z-index would paint below the body's
+     solid navy fill and vanish. 0 keeps it behind later DOM siblings
+     (nav, banners, children) which paint on top in natural order. */
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 50% at 12% 18%, rgba(37, 99, 235, 0.14), transparent 70%),
+    radial-gradient(ellipse 55% 45% at 88% 28%, rgba(124, 90, 255, 0.12), transparent 70%),
+    radial-gradient(ellipse 70% 50% at 50% 95%, rgba(34, 211, 238, 0.07), transparent 75%),
+    linear-gradient(180deg, #060e1f 0%, #0a1628 55%, #060e1f 100%);
+}
+
+.site-backdrop::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(180, 195, 229, 0.10) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-position: 0 0;
+  -webkit-mask-image: radial-gradient(ellipse 85% 70% at 50% 35%, black 45%, transparent 100%);
+  mask-image: radial-gradient(ellipse 85% 70% at 50% 35%, black 45%, transparent 100%);
+}
+
+.site-backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 45%, rgba(6, 14, 31, 0.55) 100%);
+}
+
+/* ============================================
    GRAIN — subtle texture overlay for depth
    ============================================ */
 
