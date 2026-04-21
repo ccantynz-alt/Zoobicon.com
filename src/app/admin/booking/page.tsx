@@ -39,25 +39,15 @@ interface Appointment {
 }
 
 export default function AdminBookingPage() {
-  const [isAdmin, setIsAdmin] = useState(false);
+  // AdminShell is the single auth gate — see src/app/admin/AdminShell.tsx.
+  // A duplicated check here used to race against it and flash redirects.
+  const [isAdmin] = useState(true);
   const [services, setServices] = useState<BookingService[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [provider, setProvider] = useState("");
   const [loading, setLoading] = useState(true);
   const [searchFilter, setSearchFilter] = useState("");
   const [expandedService, setExpandedService] = useState<string | null>(null);
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem("zoobicon_user");
-      if (!raw) { window.location.href = "/auth/login"; return; }
-      const user = JSON.parse(raw);
-      if (user.role !== "admin") { window.location.href = "/dashboard"; return; }
-      setIsAdmin(true);
-    } catch {
-      window.location.href = "/auth/login";
-    }
-  }, []);
 
   const fetchData = useCallback(async () => {
     setLoading(true);

@@ -38,7 +38,9 @@ interface PlansResponse {
 }
 
 export default function AdminEsimPage() {
-  const [isAdmin, setIsAdmin] = useState(false);
+  // AdminShell is the single auth gate — see src/app/admin/AdminShell.tsx.
+  // A duplicated check here used to race against it and flash redirects.
+  const [isAdmin] = useState(true);
   const [plans, setPlans] = useState<Plan[]>([]);
   const [provider, setProvider] = useState("");
   const [loading, setLoading] = useState(true);
@@ -49,18 +51,6 @@ export default function AdminEsimPage() {
     result?: Record<string, unknown>;
     error?: string;
   }>({ status: "idle" });
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem("zoobicon_user");
-      if (!raw) { window.location.href = "/auth/login"; return; }
-      const user = JSON.parse(raw);
-      if (user.role !== "admin") { window.location.href = "/dashboard"; return; }
-      setIsAdmin(true);
-    } catch {
-      window.location.href = "/auth/login";
-    }
-  }, []);
 
   const fetchPlans = useCallback(async () => {
     setLoading(true);

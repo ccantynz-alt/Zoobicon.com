@@ -143,13 +143,23 @@ function BundleUpsell({
   const [companions, setCompanions] = useState<BundleCompanion[]>([]);
   const [checking, setChecking] = useState(false);
 
+  // Stable signature of what's already resolved for the bundle TLDs. The
+  // parent rebuilds availableResults (a .filter() call) on every render, so
+  // depending on the array reference would re-fire this effect — and the
+  // /api/domains/search fetch — every keystroke anywhere on the page.
+  const knownSig = BUNDLE_TLDS
+    .map((tld) => {
+      const r = availableResults.find((x) => x.tld === tld);
+      return r ? `${tld}:${r.available}:${r.price}` : `${tld}:-`;
+    })
+    .join("|");
+
   useEffect(() => {
     if (!name || name.length < 2) {
       setCompanions([]);
       return;
     }
 
-    // What's already in the resolved results set — no need to re-check.
     const known = new Map<string, DomainResult>();
     for (const r of availableResults) known.set(r.tld, r);
 
@@ -201,7 +211,10 @@ function BundleUpsell({
       clearTimeout(timer);
       ac.abort();
     };
-  }, [name, availableResults]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- knownSig is a
+    // stable serialisation of availableResults; including the array itself
+    // would refetch on every parent render.
+  }, [name, knownSig]);
 
   if (!name || companions.length === 0) return null;
 
