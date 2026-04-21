@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Get all site assignments for these clients
-    const clientIds = clients.map(c => c.client_id);
+    const clientIds = clients.map((c: Record<string, unknown>) => c.client_id);
     const sites = await sql`
       SELECT
         s.id,
@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
     const agencyBrand = clients[0]?.brand_config || null;
 
     return Response.json({
-      sites: sites.map(s => ({
+      sites: sites.map((s: Record<string, unknown>) => ({
         id: s.id,
         name: s.name,
         slug: s.slug,

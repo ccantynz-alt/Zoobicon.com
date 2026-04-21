@@ -33,7 +33,7 @@ interface MCPToolInfo {
 
 interface MCPResultData {
   success: boolean;
-  data: unknown;
+  data: string | Record<string, unknown> | null;
   contentType: string;
   summary: string;
 }

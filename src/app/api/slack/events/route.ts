@@ -54,7 +54,7 @@ export async function POST(request: Request) {
 
   // Slack URL verification challenge
   if (body.type === "url_verification") {
-    return new Response(body.challenge, {
+    return new Response(body.challenge as string, {
       status: 200,
       headers: { "Content-Type": "text/plain" },
     });
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
 
   // Handle event callbacks
   if (body.type === "event_callback") {
-    const event = body.event;
+    const event = body.event as Record<string, unknown> | undefined;
 
     // Ignore bot messages to prevent loops
     if (event?.bot_id || event?.subtype === "bot_message") {
@@ -71,21 +71,21 @@ export async function POST(request: Request) {
 
     switch (event?.type) {
       case "message": {
-        const { channel, user, text, ts } = event;
+        const { channel, user, text, ts } = event as Record<string, string>;
         console.log(`[Slack] message in #${channel} from ${user}: ${text}`);
         await handleChannelMessage({ channel, user, text, ts });
         break;
       }
 
       case "app_mention": {
-        const { channel, user, text, ts } = event;
+        const { channel, user, text, ts } = event as Record<string, string>;
         console.log(`[Slack] app_mention in #${channel} from ${user}: ${text}`);
         await handleAppMention({ channel, user, text, ts });
         break;
       }
 
       case "reaction_added": {
-        const { reaction, user, item } = event;
+        const { reaction, user, item } = event as { reaction: string; user: string; item: { type: string; channel: string; ts: string } };
         console.log(`[Slack] reaction :${reaction}: by ${user} on ${item?.ts}`);
         await handleReactionAdded({ reaction, user, item });
         break;

@@ -80,7 +80,7 @@ class SEOAutoFixAgent extends BaseAgent<SEOCheckInput, SEOCheckOutput> {
         LIMIT ${CONFIG.settings.maxSitesPerRun as number}
       `;
 
-      return sites.map((s) => ({
+      return sites.map((s: any) => ({
         siteId: String(s.id),
         slug: s.slug,
         name: s.name || s.slug,

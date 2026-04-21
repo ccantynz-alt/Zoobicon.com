@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
   // Attempt WebSocket upgrade — works on persistent servers
   // On Vercel serverless, this will fail and the client falls back to polling
   try {
-    // @ts-expect-error — WebSocket upgrade is not in the standard Next.js types
+    // WebSocket upgrade is not in the standard Next.js types
     // but is available on persistent server runtimes
     const { socket, response } = (req as unknown as { socket: WebSocket }).socket
       ? { socket: (req as unknown as { socket: WebSocket }).socket, response: null }
