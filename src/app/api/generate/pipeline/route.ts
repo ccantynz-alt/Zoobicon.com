@@ -15,7 +15,7 @@ import { authenticateRequest, checkUsageQuota, trackUsage } from "@/lib/auth-gua
  * Restructured 7-agent pipeline optimized for QUALITY + SPEED:
  * Phase 1: Strategist (Haiku) — ~4s
  * Phase 2: Brand + Copywriter + Architect in PARALLEL (Haiku) — ~6s
- * Phase 3: Developer (Opus 4.6) — ~70s — the quality differentiator
+ * Phase 3: Developer (Opus 4.7) — ~70s — the quality differentiator
  * Phase 4: SEO + Animation in PARALLEL (Sonnet) — ~15s — high-impact polish
  * Total: ~95s — well within 300s limit
  *

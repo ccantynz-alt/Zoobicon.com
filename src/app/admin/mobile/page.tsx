@@ -38,24 +38,17 @@ interface HealthCheck {
 }
 
 export default function MobileAdminDashboard() {
-  const [isAdmin, setIsAdmin] = useState(false);
+  // Auth is handled once by AdminShell (src/app/admin/AdminShell.tsx) — it
+  // only renders children for authenticated admins. A duplicated check here
+  // used to race against AdminShell and produce visible redirect flashes
+  // ("Checking permissions…" → flash → dashboard → flash back) on slow
+  // networks. Default to trusted-admin; AdminShell is the single gate.
+  const [isAdmin] = useState(true);
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [health, setHealth] = useState<HealthCheck | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem("zoobicon_user");
-      if (!raw) { window.location.href = "/auth/login"; return; }
-      const user = JSON.parse(raw);
-      if (user.role !== "admin") { window.location.href = "/dashboard"; return; }
-      setIsAdmin(true);
-    } catch {
-      window.location.href = "/auth/login";
-    }
-  }, []);
 
   const fetchData = useCallback(async () => {
     try {

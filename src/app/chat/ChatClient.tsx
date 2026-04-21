@@ -37,7 +37,7 @@ interface Conversation {
 type ModelKey = "opus" | "sonnet" | "haiku";
 
 const MODEL_LABEL: Record<ModelKey, { name: string; desc: string; icon: typeof Sparkles }> = {
-  opus: { name: "Opus 4.6", desc: "Deepest reasoning. Slowest + priciest.", icon: Brain },
+  opus: { name: "Opus 4.7", desc: "Deepest reasoning. Slowest + priciest.", icon: Brain },
   sonnet: { name: "Sonnet 4.6", desc: "Best all-round. Default.", icon: Sparkles },
   haiku: { name: "Haiku 4.5", desc: "Fast + cheap. Quick answers.", icon: Zap },
 };

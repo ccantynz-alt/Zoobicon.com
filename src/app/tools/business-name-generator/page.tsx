@@ -230,6 +230,41 @@ export default function BusinessNameGeneratorPage() {
           </p>
         </div>
 
+        {/* Canonical banner — point power users to the unified search */}
+        <div
+          className="mb-8 rounded-2xl border border-[#E8D4B0]/20 p-4 sm:p-5 flex items-start sm:items-center justify-between gap-4 flex-wrap"
+          style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.06) 0%, rgba(17,17,24,0.7) 100%)" }}
+        >
+          <div className="flex items-start gap-3 min-w-0">
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+              style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.14) 0%, rgba(232,212,176,0.06) 100%)" }}
+            >
+              <Sparkles className="w-5 h-5 text-[#E8D4B0]" />
+            </div>
+            <div className="min-w-0">
+              <div className="text-[14px] font-semibold text-white tracking-[-0.01em]">
+                Looking for the full search experience?
+              </div>
+              <p className="text-[12.5px] text-white/55 leading-relaxed mt-0.5">
+                Our unified domain search handles exact names, AI-generated names, fragment ideas,
+                trademark screening, social handle checks and App Store availability — all in one place.
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/domains"
+            className="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full text-[12.5px] font-semibold transition-all hover:-translate-y-0.5"
+            style={{
+              background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+              color: "#0a1628",
+              boxShadow: "0 12px 28px -14px rgba(232,212,176,0.5)",
+            }}
+          >
+            Open unified search <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
         {/* Input Form */}
         <div className="bg-white/[0.03] border border-white/[0.08] rounded-2xl p-6 mb-8">
 

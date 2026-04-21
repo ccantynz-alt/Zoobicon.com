@@ -46,7 +46,7 @@ const API_KEYS_DEMO = [
 ];
 
 const ACTIVITY_TYPES = ["generate", "deploy", "edit"] as const;
-const MODELS = ["claude-opus-4-6", "claude-sonnet-4-20250514", "gpt-4o", "gemini-2.5-pro"];
+const MODELS = ["claude-opus-4-7", "claude-sonnet-4-20250514", "gpt-4o", "gemini-2.5-pro"];
 const STATUSES = ["success", "success", "success", "success", "error"] as const;
 
 function generateActivity(): {

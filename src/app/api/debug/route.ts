@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
 
-const ALLOWED_MODELS = ["claude-sonnet-4-6", "claude-opus-4-6"] as const;
+const ALLOWED_MODELS = ["claude-sonnet-4-6", "claude-opus-4-7"] as const;
 type AllowedModel = (typeof ALLOWED_MODELS)[number];
 
 const SYSTEM_PROMPT = `You are an expert code auditor and auto-debugger. You analyze HTML/CSS/JS code for errors and fix them.
@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
 
     const message = await client.messages.create({
       model,
-      max_tokens: model === "claude-opus-4-6" ? 32000 : 16000,
+      max_tokens: model === "claude-opus-4-7" ? 32000 : 16000,
       system: SYSTEM_PROMPT,
       messages: [
         {

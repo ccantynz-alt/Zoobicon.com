@@ -265,9 +265,9 @@ interface ModelPricing {
 }
 
 const PRICING: Record<string, ModelPricing> = {
-  // Claude Opus 4.6
-  "claude-opus-4-6": { input: 15, output: 75, cached: 1.5 },
-  "claude-opus-4-6-20250101": { input: 15, output: 75, cached: 1.5 },
+  // Claude Opus 4.7
+  "claude-opus-4-7": { input: 15, output: 75, cached: 1.5 },
+  "claude-opus-4-7-20250101": { input: 15, output: 75, cached: 1.5 },
   // Claude Sonnet 4.6
   "claude-sonnet-4-6": { input: 3, output: 15, cached: 0.3 },
   "claude-sonnet-4-6-20250101": { input: 3, output: 15, cached: 0.3 },
@@ -279,7 +279,7 @@ const PRICING: Record<string, ModelPricing> = {
 function pricingFor(model: string): ModelPricing {
   if (PRICING[model]) return PRICING[model];
   const lower = model.toLowerCase();
-  if (lower.includes("opus")) return PRICING["claude-opus-4-6"];
+  if (lower.includes("opus")) return PRICING["claude-opus-4-7"];
   if (lower.includes("haiku")) return PRICING["claude-haiku-4-5"];
   return PRICING["claude-sonnet-4-6"];
 }

@@ -99,7 +99,7 @@ export default function WebsiteBuilderPage() {
         "name": "What AI models power Zoobicon's website builder?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Zoobicon uses Claude Opus 4.6 for the core Developer agent (HTML generation), Claude Haiku for fast planning agents (strategy, brand design, copywriting, architecture), and Claude Sonnet for enhancement agents (SEO, animations). Users can also select GPT-4o or Gemini 2.5 Pro as alternatives."
+          "text": "Zoobicon uses Claude Opus 4.7 for the core Developer agent (HTML generation), Claude Haiku for fast planning agents (strategy, brand design, copywriting, architecture), and Claude Sonnet for enhancement agents (SEO, animations). Users can also select GPT-4o or Gemini 2.5 Pro as alternatives."
         }
       },
       {
@@ -144,7 +144,7 @@ export default function WebsiteBuilderPage() {
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-8">
             <BadgeCheck className="w-3 h-3" />
-            7 AI agents · Opus 4.6 · Production-ready output
+            7 AI agents · Opus 4.7 · Production-ready output
           </div>
 
           <h1 className="fs-display-xl mb-6">
